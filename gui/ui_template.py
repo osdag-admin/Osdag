@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from .ui_design_preferences import Ui_Dialog
@@ -34,7 +34,7 @@ import cairosvg
 import configparser
 
 class Ui_ModuleWindow(QMainWindow):
-    def setupUi(self, MainWindow, main):
+    def setupUi(self, MainWindow,main):
         # print(self,MainWindow,main)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)

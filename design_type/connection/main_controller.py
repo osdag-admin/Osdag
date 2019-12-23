@@ -1,6 +1,6 @@
 import sys
 # from PyQt5 import Qt
-# from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication
 from gui.ui_OsdagMainPage import Ui_MainWindow
 from gui.ui_tutorial import Ui_Tutorial
@@ -43,7 +43,9 @@ from gui.ui_OsdagMainPage import Ui_MainWindow
 from gui.ui_template import Ui_ModuleWindow
 class MainController(QMainWindow):
     closed = pyqtSignal()
-    def __init__(self, main, folder):
+    hide = pyqtSignal()
+    def __init__(self, Ui_ModuleWindow,main, folder):
+        super(MainController,self).__init__()
         QMainWindow.__init__(self)
         print (1)
         self.ui = Ui_ModuleWindow()
@@ -72,10 +74,26 @@ class MainController(QMainWindow):
         #
         # # window = MainController(Ui_ModuleWindow, FinPlateConnection, folder_path)
         # # MainController.hide(self)
-        # self.ui.show()
+        self.ui.show()
         # window.closed.connect(Ui_ModuleWindow.show)
 
 
+def closeEvent(self, event):
+        '''
+        Closing finPlate window.
+        '''
+
+        # uiInput = self.getuser_inputs()
+        uiInput = self.designParameters()
+        self.save_inputs(uiInput)
+        reply = QMessageBox.question(self, 'Message',
+                                     "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            self.closed.emit()
+            event.accept()
+        else:
+            event.ignore()
 
 def set_osdaglogger(self):
     global logger
@@ -108,23 +126,23 @@ def module_setup(self):
     global logger
     logger = logging.getLogger("osdag.model")
 
-def launchwindow(osdagMainWindow, main, folder):
-        set_osdaglogger(osdagMainWindow)
-        rawLogger = logging.getLogger("raw")
-        rawLogger.setLevel(logging.INFO)
-        fh = logging.FileHandler("design_type/connection/fin.log", mode="w")
-        formatter = logging.Formatter('''%(message)s''')
-        fh.setFormatter(formatter)
-        rawLogger.addHandler(fh)
-        rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>''')
-        module_setup(osdagMainWindow)
-        # print(osdagMainWindow,main, folder)
-        window = MainController(main, folder)
-        # print(window)
-        osdagMainWindow.hide()
-        window.show()
-        # print(osdagMainWindow)
-        window.closed.connect(osdagMainWindow.show)
+def launchwindow(osdagMainWindow,Ui_ModuleWindow,main,folder):
+    set_osdaglogger(osdagMainWindow)
+    rawLogger = logging.getLogger("raw")
+    rawLogger.setLevel(logging.INFO)
+    fh = logging.FileHandler("design_type/connection/fin.log", mode="w")
+    formatter = logging.Formatter('''%(message)s''')
+    fh.setFormatter(formatter)
+    rawLogger.addHandler(fh)
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>''')
+    module_setup(osdagMainWindow)
+    # print(osdagMainWindow,main, folder)
+    window = MainController(Ui_ModuleWindow,main,folder)
+    # print(window)
+    osdagMainWindow.hide()
+    window.showEvent()
+    # print(osdagMainWindow)
+    window.closed.connect(osdagMainWindow.show)
 
 
 if __name__ == '__main__':
@@ -136,7 +154,7 @@ if __name__ == '__main__':
     if not os.path.exists(image_folder_path):
         os.mkdir(image_folder_path, 0o755)
     print(Ui_ModuleWindow,FinPlateConnection,folder_path)
-    window = MainController(FinPlateConnection,folder_path)
+    window = MainController(Ui_ModuleWindow,FinPlateConnection,folder_path)
     print(window)
     window.show()
     try:

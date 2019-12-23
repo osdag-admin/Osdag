@@ -7,7 +7,7 @@ Created on 31-Mar-2016
 
 import sys
 # from PyQt5 import Qt
-# from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication
 from gui.ui_OsdagMainPage import Ui_MainWindow
 from gui.ui_tutorial import Ui_Tutorial
@@ -157,6 +157,7 @@ class OsdagMainWindow(QMainWindow):
         folder = QFileDialog.getExistingDirectory(self, "Select Workspace Folder (Don't use spaces in the folder name)", desktop_path)
         return folder
 
+    # @pyqtSlot
     def show_shear_connection(self):
         folder = self.select_workspace_folder()
         folder = str(folder)
@@ -183,7 +184,7 @@ class OsdagMainWindow(QMainWindow):
         if self.ui.rdbtn_finplate.isChecked():
             # window = Ui_ModuleWindow(FinPlateConnection,folder)
             # window.show()
-            launchwindow(self,FinPlateConnection,folder)
+            launchwindow(self,Ui_ModuleWindow,FinPlateConnection,folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")

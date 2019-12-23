@@ -36,6 +36,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.ui = Ui_Popup()
         self.ui.setupUi(self.window)
         self.ui.addAvailableItems(op)
+        self.ui.pushButton_5.clicked.connect(self.window.close)
         self.window.show()
 
 

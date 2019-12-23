@@ -374,7 +374,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         option_list = main.input_values(self)
 
-        list_selection = Ui_Popup()
+        #list_selection = Ui_Popup()
         _translate = QtCore.QCoreApplication.translate
         i = 0
         for option in option_list:
@@ -382,7 +382,7 @@ class Ui_ModuleWindow(QMainWindow):
             type = option[2]
             # value = option[4]
             # print(option)
-            if type != TYPE_TITLE:
+            if type not in [TYPE_TITLE, TYPE_IMAGE]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 40 + i, 120, 25))
                 font = QtGui.QFont()
@@ -415,6 +415,15 @@ class Ui_ModuleWindow(QMainWindow):
                 r.setFont(font)
                 r.setObjectName(option[0])
 
+            if type == TYPE_IMAGE:
+                im = QtWidgets.QLabel(self.dockWidgetContents)
+                im.setGeometry(QtCore.QRect(190, 40 + i, 70, 57))
+                im.setObjectName(option[0])
+                im.setScaledContents(True)
+                pixmap = QPixmap("./ResourceFiles/images/fin_cf_bw.png")
+                im.setPixmap(pixmap)
+                i = i + 30
+
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents)
                 q.setGeometry(QtCore.QRect(3, 40 + i, 201, 25))
@@ -439,7 +448,6 @@ class Ui_ModuleWindow(QMainWindow):
                 key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
             else:
                 pass
-
 
         def popup(key, for_custom_list):
             for c_tup in for_custom_list:
@@ -469,6 +477,7 @@ class Ui_ModuleWindow(QMainWindow):
                 if typ == TYPE_LABEL:
                     k2_key = k2_key + "_label"
                 k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
+                print(k2)
                 val = f(k1.currentText())
                 k2.clear()
                 if typ == TYPE_COMBOBOX:
@@ -476,6 +485,9 @@ class Ui_ModuleWindow(QMainWindow):
                         k2.addItem(values)
                 elif typ == TYPE_LABEL:
                     k2.setText(val)
+                elif typ == TYPE_IMAGE:
+                    pixmap1 = QPixmap(val)
+                    k2.setPixmap(pixmap1)
                 else:
                     pass
 
@@ -763,42 +775,42 @@ class Ui_ModuleWindow(QMainWindow):
         self.retranslateUi(MainWindow)
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        def reset_fn():
-            for widget in self.dockWidgetContents.children():
-                for op in option_list:
-                    if widget.objectName() == op[0]:
-                        if op[2] == TYPE_COMBOBOX:
-                            widget.setCurrentIndex(0)
-                        elif op[2] == TYPE_TEXTBOX:
-                            widget.setText('')
-                        else:
-                            pass
+
+        self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list))
+        self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, main))
+
+    def reset_fn(self, op_list):
+        for widget in self.dockWidgetContents.children():
+            for op in op_list:
+                if widget.objectName() == op[0]:
+                    if op[2] == TYPE_COMBOBOX:
+                        widget.setCurrentIndex(0)
+                    elif op[2] == TYPE_TEXTBOX:
+                        widget.setText('')
                     else:
                         pass
+                else:
+                    pass
 
-        self.btn_Reset.clicked.connect(reset_fn)
-
-        def design_fn():
-            design_dictionary = {}
-            for widget in self.dockWidgetContents.children():
-                for op in option_list:
-                    if widget.objectName() == op[0]:
-                        if op[2] == TYPE_COMBOBOX:
-                            des_key = widget.objectName()
-                            des_val = widget.currentText()
-                            d1 = {des_key: des_val}
-                        elif op[2] == TYPE_TEXTBOX:
-                            des_key = widget.objectName()
-                            des_val = widget.text()
-                            d1 = {des_key: des_val}
-                        else:
-                            pass
-                        design_dictionary.update(d1)
+    def design_fn(self, op_list, main):
+        design_dictionary = {}
+        for widget in self.dockWidgetContents.children():
+            for op in op_list:
+                if widget.objectName() == op[0]:
+                    if op[2] == TYPE_COMBOBOX:
+                        des_key = widget.objectName()
+                        des_val = widget.currentText()
+                        d1 = {des_key: des_val}
+                    elif op[2] == TYPE_TEXTBOX:
+                        des_key = widget.objectName()
+                        des_val = widget.text()
+                        d1 = {des_key: des_val}
                     else:
                         pass
-            print(design_dictionary)
-
-        self.btn_Design.clicked.connect(design_fn)
+                    design_dictionary.update(d1)
+                else:
+                    pass
+        main.to_get_d(design_dictionary)
         
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -940,7 +952,9 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             event.ignore()
 
+
 class DesignPreferences(QDialog):
+
     def __init__(self, parent=None):
 
         QDialog.__init__(self, parent)

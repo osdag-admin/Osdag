@@ -116,6 +116,9 @@ class FinPlateConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN)
         options_list.append(t2)
 
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
+        options_list.append(t15)
+
         t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC)
         options_list.append(t3)
 
@@ -177,59 +180,75 @@ class FinPlateConnection(ShearConnection):
         list1.append(t3)
         return list1
 
+    def fn_conn_suptngsec_lbl(v):
+
+        if v in VALUES_CONN_1:
+            return KEY_DISP_COLSEC
+        elif v in VALUES_CONN_2:
+            return KEY_DISP_PRIBM
+        else:
+            return ''
+
+    def fn_conn_suptdsec_lbl(v):
+
+        if v in VALUES_CONN_1:
+            return KEY_DISP_BEAMSEC
+        elif v in VALUES_CONN_2:
+            return KEY_DISP_SECBM
+        else:
+            return ''
+
+    def fn_conn_suptngsec(v):
+
+        if v in VALUES_CONN_1:
+            return VALUES_COLSEC
+        elif v in VALUES_CONN_2:
+            return VALUES_PRIBM
+        else:
+            return []
+
+    def fn_conn_suptdsec(v):
+
+        if v in VALUES_CONN_1:
+            return VALUES_BEAMSEC
+        elif v in VALUES_CONN_2:
+            return VALUES_SECBM
+        else:
+            return []
+
+    def fn_conn_image(v):
+        if v == VALUES_CONN[0]:
+            return './ResourceFiles/images/fin_cf_bw.png'
+        elif v == VALUES_CONN[1]:
+            return './ResourceFiles/images/fin_cw_bw.png'
+        elif v in VALUES_CONN_2:
+            return './ResourceFiles/images/fin_beam_beam.png'
+        else:
+            return''
+
     def input_value_changed():
-
-        def fn_conn_suptngsec_lbl(v):
-
-            if v in VALUES_CONN_1:
-                return KEY_DISP_COLSEC
-            elif v in VALUES_CONN_2:
-                return KEY_DISP_PRIBM
-            else:
-                return ''
-
-        def fn_conn_suptdsec_lbl(v):
-
-            if v in VALUES_CONN_1:
-                return KEY_DISP_BEAMSEC
-            elif v in VALUES_CONN_2:
-                return KEY_DISP_SECBM
-            else:
-                return ''
-
-        def fn_conn_suptngsec(v):
-
-            if v in VALUES_CONN_1:
-                return VALUES_COLSEC
-            elif v in VALUES_CONN_2:
-                return VALUES_PRIBM
-            else:
-                return []
-
-        def fn_conn_suptdsec(v):
-
-            if v in VALUES_CONN_1:
-                return VALUES_BEAMSEC
-            elif v in VALUES_CONN_2:
-                return VALUES_SECBM
-            else:
-                return []
 
         lst = []
 
-        t1 = (KEY_CONN, KEY_SUPTNGSEC , TYPE_LABEL, fn_conn_suptngsec_lbl)
+        t1 = (KEY_CONN, KEY_SUPTNGSEC , TYPE_LABEL, FinPlateConnection.fn_conn_suptngsec_lbl)
         lst.append(t1)
 
-        t2 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_COMBOBOX, fn_conn_suptngsec)
+        t2 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_COMBOBOX, FinPlateConnection.fn_conn_suptngsec)
         lst.append(t2)
 
-        t3 = (KEY_CONN, KEY_SUPTDSEC , TYPE_LABEL, fn_conn_suptdsec_lbl)
+        t3 = (KEY_CONN, KEY_SUPTDSEC , TYPE_LABEL, FinPlateConnection.fn_conn_suptdsec_lbl)
         lst.append(t3)
 
-        t4 = (KEY_CONN, KEY_SUPTDSEC, TYPE_COMBOBOX, fn_conn_suptdsec)
+        t4 = (KEY_CONN, KEY_SUPTDSEC, TYPE_COMBOBOX, FinPlateConnection.fn_conn_suptdsec)
         lst.append(t4)
 
+        t5 = (KEY_CONN, KEY_IMAGE, TYPE_IMAGE, FinPlateConnection.fn_conn_image)
+        lst.append(t5)
+
         return lst
+
+    def to_get_d(my_d):
+        print(my_d)
 
     def get_weld(self):
         return self.weld

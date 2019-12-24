@@ -172,6 +172,7 @@ class FinPlateConnection(ShearConnection):
         c = connectdb1()
         return c
 
+
     def customized_input():
 
         list1 = []

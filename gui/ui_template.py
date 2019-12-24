@@ -382,7 +382,7 @@ class Ui_ModuleWindow(QMainWindow):
             lable = option[1]
             type = option[2]
             # value = option[4]
-            if type not in [TYPE_TITLE, TYPE_IMAGE]:
+            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 40 + i, 120, 25))
                 font = QtGui.QFont()
@@ -392,6 +392,9 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setFont(font)
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+
+            if type == TYPE_MODULE:
+                i = i - 30
 
             if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)
@@ -414,6 +417,10 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+
+            if type == TYPE_MODULE:
+                _translate = QtCore.QCoreApplication.translate
+                MainWindow.setWindowTitle(_translate("MainWindow", option[1]))
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
@@ -466,7 +473,7 @@ class Ui_ModuleWindow(QMainWindow):
                 if selected == "Customized":
                     data[c_tup[0] + "_customized"] = self.open_popup(options, existing_options)
                 else:
-                    print(f())
+                    data[c_tup[0] + "_customized"] = f()
 
         updated_list = main.input_value_changed()
 
@@ -816,7 +823,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))
+        #MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))
         self.btnInput.setToolTip(_translate("MainWindow", "Left Dock"))
         self.btnInput.setText(_translate("MainWindow", "input"))
         self.btnOutput.setToolTip(_translate("MainWindow", "Right Dock"))

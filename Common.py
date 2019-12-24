@@ -64,6 +64,11 @@ def tuple_to_str(tl):
         arr.append(val)
     return arr
 
+
+KEY_MODULE = 'Module'
+KEY_DISP_FINPLATE = 'Fin Plate'
+TYPE_MODULE = 'Window Title'
+
 DISP_TITLE_CM = 'Connecting members'
 
 KEY_CONN = 'Connectivity'

@@ -110,6 +110,9 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platethk = ''
 
+        t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, None)
+        options_list.append(t16)
+
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 

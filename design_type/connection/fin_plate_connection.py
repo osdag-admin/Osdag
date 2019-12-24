@@ -140,19 +140,19 @@ class FinPlateConnection(ShearConnection):
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
         options_list.append(t9)
 
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX, existingvalue_key_d, VALUES_D)
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D)
         options_list.append(t10)
 
         t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
         options_list.append(t11)
 
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, VALUES_GRD)
+        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
         options_list.append(t12)
 
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None)
         options_list.append(t13)
 
-        t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX, existingvalue_key_platethk, VALUES_PLATETHK)
+        t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_platethk, VALUES_PLATETHK)
         options_list.append(t14)
 
         return options_list
@@ -236,7 +236,7 @@ class FinPlateConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_COMBOBOX, FinPlateConnection.fn_conn_suptngsec)
         lst.append(t2)
 
-        t3 = (KEY_CONN, KEY_SUPTDSEC , TYPE_LABEL, FinPlateConnection.fn_conn_suptdsec_lbl)
+        t3 = (KEY_CONN, KEY_SUPTDSEC, TYPE_LABEL, FinPlateConnection.fn_conn_suptdsec_lbl)
         lst.append(t3)
 
         t4 = (KEY_CONN, KEY_SUPTDSEC, TYPE_COMBOBOX, FinPlateConnection.fn_conn_suptdsec)

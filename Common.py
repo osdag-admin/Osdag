@@ -2,7 +2,8 @@ TYPE_COMBOBOX = 'ComboBox'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
-TYPE_IMAGE= 'Image'
+TYPE_IMAGE = 'Image'
+TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
 
 import sqlite3
 from utils.common.component import Component

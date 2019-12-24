@@ -21,7 +21,7 @@ def connectdb1():
 
 
 def connectdb(table_name):
-   
+
     conn = sqlite3.connect(Component().path_to_database)
     lst = []
     if table_name == "Angles":

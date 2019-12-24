@@ -32,7 +32,6 @@ from .ui_design_preferences import Ui_Dialog
 
 class Ui_ModuleWindow(QMainWindow):
     closed = pyqtSignal()
-
     def open_popup(self, op,  KEYEXISTING_CUSTOMIZED):
         self.window = QtWidgets.QDialog()
         self.ui = Ui_Popup()
@@ -42,6 +41,8 @@ class Ui_ModuleWindow(QMainWindow):
         self.window.exec()
         return self.ui.get_right_elements()
 
+    # def close(self):
+    #     self.window.close()
     def setupUi(self, MainWindow, main):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -463,6 +464,8 @@ class Ui_ModuleWindow(QMainWindow):
                 f = c_tup[1]
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
+                print(existing_options)
+
                 if selected == "Customized":
                     data[c_tup[0] + "_customized"] = self.open_popup(options, existing_options)
                 else:

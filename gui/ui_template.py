@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
@@ -31,6 +31,7 @@ from .ui_design_preferences import Ui_Dialog
 
 
 class Ui_ModuleWindow(QMainWindow):
+
     closed = pyqtSignal()
     def open_popup(self, op,  KEYEXISTING_CUSTOMIZED):
         self.window = QtWidgets.QDialog()
@@ -378,6 +379,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         option_list = main.input_values(self)
         _translate = QtCore.QCoreApplication.translate
+
         i = 0
         for option in option_list:
             lable = option[1]
@@ -385,7 +387,7 @@ class Ui_ModuleWindow(QMainWindow):
             # value = option[4]
             if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
-                l.setGeometry(QtCore.QRect(6, 40 + i, 120, 25))
+                l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -399,7 +401,8 @@ class Ui_ModuleWindow(QMainWindow):
 
             if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)
-                combo.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                combo.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                # combo.setMaxVisibleItems(5)
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -408,10 +411,11 @@ class Ui_ModuleWindow(QMainWindow):
                 combo.setObjectName(option[0])
                 for item in option[4]:
                     combo.addItem(item)
+                # combo.setMaxVisibleItems(int(5))
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
-                r.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                r.setGeometry(QtCore.QRect(150,10 + i, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -425,7 +429,7 @@ class Ui_ModuleWindow(QMainWindow):
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
-                im.setGeometry(QtCore.QRect(190, 40 + i, 70, 57))
+                im.setGeometry(QtCore.QRect(190, 10 + i, 70, 57))
                 im.setObjectName(option[0])
                 im.setScaledContents(True)
                 pixmap = QPixmap("./ResourceFiles/images/fin_cf_bw.png")
@@ -434,7 +438,7 @@ class Ui_ModuleWindow(QMainWindow):
 
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents)
-                q.setGeometry(QtCore.QRect(3, 40 + i, 201, 25))
+                q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
                 font = QtGui.QFont()
                 q.setFont(font)
                 q.setObjectName("_title")
@@ -443,7 +447,8 @@ class Ui_ModuleWindow(QMainWindow):
 
             i = i + 30
 
-        new_list = main.customized_input()
+
+        new_list = main.customized_input(main)
 
         data = {}
 
@@ -478,7 +483,7 @@ class Ui_ModuleWindow(QMainWindow):
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
-        updated_list = main.input_value_changed()
+        updated_list = main.input_value_changed(main)
 
         for t in updated_list:
             key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
@@ -807,6 +812,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     def design_fn(self, op_list, main, data_list):
         design_dictionary = {}
+
         for op in op_list:
             widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
             if op[2] == TYPE_COMBOBOX:
@@ -935,6 +941,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionfinPlate_quit.setShortcut(_translate("MainWindow", "Shift+Q"))
         self.actio_load_input.setText(_translate("MainWindow", "Load input"))
         self.actio_load_input.setShortcut(_translate("MainWindow", "Ctrl+L"))
+        print("Done")
 
     def dockbtn_clicked(self, widget):
 

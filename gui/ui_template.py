@@ -386,7 +386,7 @@ class Ui_ModuleWindow(QMainWindow):
             # print(option)
             if type not in [TYPE_TITLE, TYPE_IMAGE]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
-                l.setGeometry(QtCore.QRect(6, 40 + i, 120, 25))
+                l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -397,7 +397,8 @@ class Ui_ModuleWindow(QMainWindow):
 
             if type == TYPE_COMBOBOX:
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)
-                combo.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                combo.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                # combo.setMaxVisibleItems(5)
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -406,10 +407,11 @@ class Ui_ModuleWindow(QMainWindow):
                 combo.setObjectName(option[0])
                 for item in option[4]:
                     combo.addItem(item)
+                # combo.setMaxVisibleItems(int(5))
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
-                r.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                r.setGeometry(QtCore.QRect(150,10 + i, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -419,7 +421,7 @@ class Ui_ModuleWindow(QMainWindow):
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
-                im.setGeometry(QtCore.QRect(190, 40 + i, 70, 57))
+                im.setGeometry(QtCore.QRect(190, 10 + i, 70, 57))
                 im.setObjectName(option[0])
                 im.setScaledContents(True)
                 pixmap = QPixmap("./ResourceFiles/images/fin_cf_bw.png")
@@ -428,7 +430,7 @@ class Ui_ModuleWindow(QMainWindow):
 
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents)
-                q.setGeometry(QtCore.QRect(3, 40 + i, 201, 25))
+                q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
                 font = QtGui.QFont()
                 q.setFont(font)
                 q.setObjectName("_title")
@@ -437,19 +439,23 @@ class Ui_ModuleWindow(QMainWindow):
 
             i = i + 30
 
-        new_list = main.customized_input()
-        for t in new_list:
-            if t[0] == KEY_PLATETHK:
-                key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
-            elif t[0] == KEY_GRD:
-                key_customized_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                key_customized_2.activated.connect(lambda: popup(key_customized_2, new_list))
-            elif t[0] == KEY_D:
-                key_customized_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
-            else:
-                pass
+
+        new_list = main.customized_input(main)
+        if KEY_PLATETHK == None:
+            pass
+        else:
+            for t in new_list:
+                if t[0] == KEY_PLATETHK:
+                    key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                    key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
+                elif t[0] == KEY_GRD:
+                    key_customized_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                    key_customized_2.activated.connect(lambda: popup(key_customized_2, new_list))
+                elif t[0] == KEY_D:
+                    key_customized_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                    key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
+                else:
+                    pass
 
         def popup(key, for_custom_list):
             for c_tup in for_custom_list:
@@ -464,7 +470,7 @@ class Ui_ModuleWindow(QMainWindow):
                 else:
                     print(f())
 
-        updated_list = main.input_value_changed()
+        updated_list = main.input_value_changed(main)
 
         for t in updated_list:
             key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
@@ -809,9 +815,12 @@ class Ui_ModuleWindow(QMainWindow):
                         d1 = {des_key: des_val}
                     else:
                         pass
+
                     design_dictionary.update(d1)
+                    print(design_dictionary)
                 else:
                     pass
+
         main.to_get_d(design_dictionary)
         
     def retranslateUi(self, MainWindow):

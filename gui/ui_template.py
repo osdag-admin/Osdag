@@ -31,14 +31,31 @@ from .ui_design_preferences import Ui_Dialog
 
 class Ui_ModuleWindow(QMainWindow):
     closed = pyqtSignal()
-    def open_popup(self, op):
+    # ui1 = Ui_Popup()
+    # KEYEXISTING_CUSTOMIZED = ui1.get_right_elements()
+    def open_popup(self, op,  KEYEXISTING_CUSTOMIZED):
         self.window = QtWidgets.QDialog()
         self.ui = Ui_Popup()
         self.ui.setupUi(self.window)
-        self.ui.addAvailableItems(op)
-        self.window.show()
+        # KEY_EXISTINGVAL = ['Q','W','E','R','T','Y']
+        #print(KEY_EXISTINGVAL)
 
+        # def temp(self):
+        #
+        #     self.KEY_EXISTINGVAL = self.get_right_elements()
+        #
+        #     print(self.KEY_EXISTINGVAL)
+        # self.ui.pushButton_5.clicked.connect(self.temp)
+        #self.ui.addAvailableItems(op)
+        #KEY_EXISTINGVAL = self.ui.get_updated_list()
+        self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
 
+        self.ui.pushButton_5.clicked.connect(self.window.close)
+        self.window.exec()
+        return self.ui.get_right_elements()
+
+    # def close(self):
+    #     self.window.close()
     def setupUi(self, MainWindow, main):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -427,19 +444,24 @@ class Ui_ModuleWindow(QMainWindow):
             i = i + 30
 
         new_list = main.customized_input()
+
+        data = {}
+
         for t in new_list:
             if t[0] == KEY_PLATETHK:
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
+                data[t[0] + "_customized"] = t[1]()
             elif t[0] == KEY_GRD:
                 key_customized_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_2.activated.connect(lambda: popup(key_customized_2, new_list))
+                data[t[0] + "_customized"] = t[1]()
             elif t[0] == KEY_D:
                 key_customized_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
+                data[t[0] + "_customized"] = t[1]()
             else:
                 pass
-
 
         def popup(key, for_custom_list):
             for c_tup in for_custom_list:
@@ -449,8 +471,10 @@ class Ui_ModuleWindow(QMainWindow):
                 print(c_tup)
                 f = c_tup[1]
                 options = f()
+                existing_options = data[c_tup[0] + "_customized"]
+                print(existing_options)
                 if selected == "Customized":
-                    self.open_popup(options)
+                    data[c_tup[0] + "_customized"] = self.open_popup(options, existing_options)
                 else:
                     print(f())
 

@@ -322,7 +322,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     # folder_path = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'
     # # folder_path = r'C:\Users\Win10\Desktop'
-    # # folder_path = r'C:\Users\pc\Desktop'
+    #folder_path = r'C:\Users\pc\Desktop'
     # window = MainController(Ui_ModuleWindow, FinPlateConnection, folder_path)
     window = OsdagMainWindow()
     window.show()

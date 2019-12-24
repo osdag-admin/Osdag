@@ -29,17 +29,21 @@ from Common import *
 from .customized_popup import Ui_Popup
 from .ui_design_preferences import Ui_Dialog
 
+
 class Ui_ModuleWindow(QMainWindow):
 
     closed = pyqtSignal()
-    def open_popup(self, op):
+    def open_popup(self, op,  KEYEXISTING_CUSTOMIZED):
         self.window = QtWidgets.QDialog()
         self.ui = Ui_Popup()
         self.ui.setupUi(self.window)
-        self.ui.addAvailableItems(op)
-        self.window.show()
+        self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
+        self.ui.pushButton_5.clicked.connect(self.window.close)
+        self.window.exec()
+        return self.ui.get_right_elements()
 
-
+    # def close(self):
+    #     self.window.close()
     def setupUi(self, MainWindow, main):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -374,8 +378,6 @@ class Ui_ModuleWindow(QMainWindow):
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Link, brush)
 
         option_list = main.input_values(self)
-
-        #list_selection = Ui_Popup()
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
@@ -383,7 +385,6 @@ class Ui_ModuleWindow(QMainWindow):
             lable = option[1]
             type = option[2]
             # value = option[4]
-            # print(option)
             if type not in [TYPE_TITLE, TYPE_IMAGE]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
@@ -395,7 +396,7 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
 
-            if type == TYPE_COMBOBOX:
+            if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)
                 combo.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
                 # combo.setMaxVisibleItems(5)
@@ -441,34 +442,39 @@ class Ui_ModuleWindow(QMainWindow):
 
 
         new_list = main.customized_input(main)
-        if KEY_PLATETHK == None:
-            pass
-        else:
-            for t in new_list:
-                if t[0] == KEY_PLATETHK:
-                    key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                    key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
-                elif t[0] == KEY_GRD:
-                    key_customized_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                    key_customized_2.activated.connect(lambda: popup(key_customized_2, new_list))
-                elif t[0] == KEY_D:
-                    key_customized_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                    key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
-                else:
-                    pass
+
+        data = {}
+
+        for t in new_list:
+            if t[0] == KEY_PLATETHK:
+                key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
+                data[t[0] + "_customized"] = t[1]()
+            elif t[0] == KEY_GRD:
+                key_customized_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_customized_2.activated.connect(lambda: popup(key_customized_2, new_list))
+                data[t[0] + "_customized"] = t[1]()
+            elif t[0] == KEY_D:
+                key_customized_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
+                data[t[0] + "_customized"] = t[1]()
+            else:
+                pass
 
         def popup(key, for_custom_list):
             for c_tup in for_custom_list:
                 if c_tup[0] != key.objectName():
                     continue
                 selected = key.currentText()
-                print(c_tup)
                 f = c_tup[1]
                 options = f()
+                existing_options = data[c_tup[0] + "_customized"]
+                print(existing_options)
+
                 if selected == "Customized":
-                    self.open_popup(options)
+                    data[c_tup[0] + "_customized"] = self.open_popup(options, existing_options)
                 else:
-                    print(f())
+                    data[c_tup[0] + "_customized"] = f()
 
         updated_list = main.input_value_changed(main)
 
@@ -485,7 +491,6 @@ class Ui_ModuleWindow(QMainWindow):
                 if typ == TYPE_LABEL:
                     k2_key = k2_key + "_label"
                 k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
-                print(k2)
                 val = f(k1.currentText())
                 k2.clear()
                 if typ == TYPE_COMBOBOX:
@@ -785,44 +790,39 @@ class Ui_ModuleWindow(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list))
-        self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, main))
+        self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, main, data))
 
     def reset_fn(self, op_list):
-        for widget in self.dockWidgetContents.children():
-            for op in op_list:
-                if widget.objectName() == op[0]:
-                    if op[2] == TYPE_COMBOBOX:
-                        widget.setCurrentIndex(0)
-                    elif op[2] == TYPE_TEXTBOX:
-                        widget.setText('')
-                    else:
-                        pass
-                else:
-                    pass
+        for op in op_list:
+            widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
+            if op[2] == TYPE_COMBOBOX or op[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                widget.setCurrentIndex(0)
+            elif op[2] == TYPE_TEXTBOX:
+                widget.setText('')
+            else:
+                pass
+        self.window.close()
 
-    def design_fn(self, op_list, main):
+    def design_fn(self, op_list, main, data_list):
         design_dictionary = {}
-        for widget in self.dockWidgetContents.children():
-            for op in op_list:
-                if widget.objectName() == op[0]:
-                    if op[2] == TYPE_COMBOBOX:
-                        des_key = widget.objectName()
-                        des_val = widget.currentText()
-                        d1 = {des_key: des_val}
-                    elif op[2] == TYPE_TEXTBOX:
-                        des_key = widget.objectName()
-                        des_val = widget.text()
-                        d1 = {des_key: des_val}
-                    else:
-                        pass
 
-                    design_dictionary.update(d1)
-                    print(design_dictionary)
-                else:
-                    pass
-
+        for op in op_list:
+            widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
+            if op[2] == TYPE_COMBOBOX:
+                des_val = widget.currentText()
+                d1 = {op[0]: des_val}
+            elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                des_val = data_list[op[0]+"_customized"]
+                d1 = {op[0]: des_val}
+            elif op[2] == TYPE_TEXTBOX:
+                des_val = widget.text()
+                d1 = {op[0]: des_val}
+            else:
+                d1 = {}
+            design_dictionary.update(d1)
         main.to_get_d(design_dictionary)
-        
+
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))

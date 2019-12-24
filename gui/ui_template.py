@@ -476,7 +476,7 @@ class Ui_ModuleWindow(QMainWindow):
                 if selected == "Customized":
                     data[c_tup[0] + "_customized"] = self.open_popup(options, existing_options)
                 else:
-                    print(f())
+                    data[c_tup[0] + "_customized"] = f()
 
         updated_list = main.input_value_changed()
 

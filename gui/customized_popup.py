@@ -37,17 +37,16 @@ class Ui_Popup(object):
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.listWidget = QtWidgets.QListWidget(MainWindow)
+
         self.listWidget.setGeometry(QtCore.QRect(20, 80, 211, 271))
         self.listWidget.setObjectName("listWidget")
         self.listWidget.setSortingEnabled(True)
         self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-
         self.listWidget_2 = QtWidgets.QListWidget(MainWindow)
         self.listWidget_2.setGeometry(QtCore.QRect(370, 80, 211, 271))
         self.listWidget_2.setObjectName("listWidget_2")
         self.listWidget_2.setSortingEnabled(True)
         self.listWidget_2.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-
         self.pushButton = QtWidgets.QPushButton(MainWindow)
         self.pushButton.setGeometry(QtCore.QRect(265, 130, 75, 23))
         self.pushButton.setObjectName("pushButton")
@@ -132,6 +131,9 @@ class Ui_Popup(object):
     def on_mButtonToAvailable_clicked(self):
         while self.listWidget_2.count() > 0:
             self.listWidget.addItem(self.listWidget_2.takeItem(0))
+        for item in self.listWidget.selectedItems():
+            self.listWidget.takeItem(self.listWidget.row(item))
+
 
     def on_mButtonToSelected_clicked(self):
         while self.listWidget.count() > 0:
@@ -153,7 +155,6 @@ class Ui_Popup(object):
     #         self.listWidget_2.addItems(KEY_EXISTINGVAL_CUSTOMIZED)
     #     else:
     #         self.listWidget_2.addItems(items1)
-
 
     # def get_left_elements(self):
     #     r = []

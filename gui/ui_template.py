@@ -394,9 +394,6 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
 
-            if type == TYPE_MODULE:
-                i = i - 30
-
             if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)
                 combo.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
@@ -422,6 +419,7 @@ class Ui_ModuleWindow(QMainWindow):
             if type == TYPE_MODULE:
                 _translate = QtCore.QCoreApplication.translate
                 MainWindow.setWindowTitle(_translate("MainWindow", option[1]))
+                i = i - 30
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
@@ -471,8 +469,6 @@ class Ui_ModuleWindow(QMainWindow):
                 f = c_tup[1]
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
-                print(existing_options)
-
                 if selected == "Customized":
                     data[c_tup[0] + "_customized"] = self.open_popup(options, existing_options)
                 else:
@@ -738,6 +734,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(self)
+        self.designPrefDialog.rejected.connect(self.design_preferences)
 
 
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
@@ -793,6 +790,11 @@ class Ui_ModuleWindow(QMainWindow):
 
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list))
         self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, main, data))
+        self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
+
+    def reset_popup(self, new_list, data):
+        for custom_combo in new_list:
+            data[custom_combo[0] + "_customized"] = custom_combo[1]()
 
     def reset_fn(self, op_list):
         for op in op_list:
@@ -812,6 +814,9 @@ class Ui_ModuleWindow(QMainWindow):
             if op[2] == TYPE_COMBOBOX:
                 des_val = widget.currentText()
                 d1 = {op[0]: des_val}
+            elif op[2] == TYPE_MODULE:
+                des_val = op[1]
+                d1 = {op[0]: des_val}
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 des_val = data_list[op[0]+"_customized"]
                 d1 = {op[0]: des_val}
@@ -821,8 +826,10 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 d1 = {}
             design_dictionary.update(d1)
-        main.to_get_d(design_dictionary)
+        design_dictionary.update(self.designPrefDialog.save_designPref_para())
 
+
+        main.to_get_d(design_dictionary)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -949,7 +956,7 @@ class Ui_ModuleWindow(QMainWindow):
             widget.hide()
 
     def design_preferences(self):
-        self.designPrefDialog.show()
+        self.designPrefDialog.exec()
 
     def closeEvent(self, event):
         '''
@@ -985,9 +992,41 @@ class DesignPreferences(QDialog):
         self.ui.txt_detailingGap.setValidator(dbl_validator)
         self.ui.txt_detailingGap.setMaxLength(5)
         # self.ui.btn_defaults.clicked.connect(self.set_default_para)
-        self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
-        # self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
+        #self.ui.btn_save.clicked.connect(Ui_ModuleWindow.design_preferences(Ui_ModuleWindow()))
+        #self.ui.combo_boltHoleType.currentIndexChanged.connect(my_fn)
+
+    def save_designPref_para(self):
+        """This routine is responsible for saving all design preferences selected by the user
+        """
+        key_boltHoleType = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, "combo_boltHoleType")
+        combo_boltHoleType = key_boltHoleType.currentText()
+        key_boltFu = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, "txt_boltFu")
+        line_boltFu = key_boltFu.text()
+        key_slipfactor = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, "combo_slipfactor")
+        combo_slipfactor = key_slipfactor.currentText()
+        key_weldType = self.ui.tab_Weld.findChild(QtWidgets.QWidget, "combo_weldType")
+        combo_weldType = key_weldType.currentText()
+        key_weldFu = self.ui.tab_Weld.findChild(QtWidgets.QWidget, "txt_weldFu")
+        line_weldFu = key_weldFu.text()
+        key_detailingEdgeType = self.ui.tab_Detailing.findChild(QtWidgets.QWidget, "combo_detailingEdgeType")
+        combo_detailingEdgeType = key_detailingEdgeType.currentText()
+        key_detailingGap = self.ui.tab_Detailing.findChild(QtWidgets.QWidget, "txt_detailingGap")
+        line_detailingGap = key_detailingGap.text()
+        key_detailing_memebers = self.ui.tab_Detailing.findChild(QtWidgets.QWidget, "combo_detailing_memebers")
+        combo_detailing_memebers = key_detailing_memebers.currentText()
+        key_design_method = self.ui.tab_Design.findChild(QtWidgets.QWidget, "combo_design_method")
+        combo_design_method = key_design_method.currentText()
+        d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+              KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
+              KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
+              KEY_DP_WELD_TYPE: combo_weldType,
+              KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+              KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+              KEY_DP_GAP: line_detailingGap,
+              KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers, KEY_DP_DESIGN_METHOD: combo_design_method}
+        print(d1)
+        return d1
 
     def highlight_slipfactor_description(self):
         """Highlight the description of currosponding slipfactor on selection of inputs
@@ -1015,11 +1054,6 @@ class DesignPreferences(QDialog):
             # Move to the next match
             pos = index + regex.matchedLength()
             index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
-
-    def save_designPref_para(self):
-        """This routine is responsible for saving all design preferences selected by the user
-        """
-        return None
 
     def close_designPref(self):
         self.close()

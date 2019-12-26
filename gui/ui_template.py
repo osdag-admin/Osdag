@@ -802,6 +802,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         self.btn_Reset.clicked.connect(reset_fn)
 
+
         def design_fn():
             design_dictionary = {}
             for widget in self.dockWidgetContents.children():
@@ -823,6 +824,11 @@ class Ui_ModuleWindow(QMainWindow):
             print(design_dictionary)
 
         self.btn_Design.clicked.connect(design_fn)
+        self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
+
+    def reset_popup(self, new_list, data):
+        for custom_combo in new_list:
+            data[custom_combo[0] + "_customized"] = custom_combo[1]()
         
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

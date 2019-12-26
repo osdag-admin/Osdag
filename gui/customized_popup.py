@@ -82,7 +82,7 @@ class Ui_Popup(object):
         # print(test_list)
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        Form.setWindowTitle(_translate("MainWindow", "Customized"))
         self.label.setText(_translate("MainWindow", "Available:"))
         self.label_2.setText(_translate("MainWindow", "Selected:"))
         self.pushButton.setText(_translate("MainWindow", ">>"))

@@ -291,6 +291,14 @@ class Ui_Dialog(object):
         self.combo_design_method.addItem("")
         self.tabWidget.addTab(self.tab_Design, "")
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
+        # self.my_list = []
+        #
+        # def fn():
+        #     txt = self.combo_boltHoleType.currentText()
+        #     print(txt)
+        #     self.my_list.append(txt)
+        # self.btn_save.clicked.connect(fn)
+
 
         self.retranslateUi(Dialog)
         self.tabWidget.setCurrentIndex(0)

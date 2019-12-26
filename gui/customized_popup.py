@@ -143,7 +143,7 @@ class Ui_Popup(object):
     def addAvailableItems(self,items,KEY_EXISTINGVAL_CUSTOMIZED):
         self.listWidget_2.clear()
         #self.listWidget_2.addItems(items)
-        if items not in KEY_EXISTINGVAL_CUSTOMIZED :
+        if items not in KEY_EXISTINGVAL_CUSTOMIZED:
             self.listWidget_2.addItems(KEY_EXISTINGVAL_CUSTOMIZED)
             a = list(set(items) - set(KEY_EXISTINGVAL_CUSTOMIZED))
             self.listWidget.addItems(a)

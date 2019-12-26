@@ -124,7 +124,7 @@ KEY_GRD = 'Bolt.Grade'
 KEY_DISP_GRD = 'Grade *'
 
 VALUES_GRD = ['All', 'Customized']
-VALUES_GRD_CUSTOMIZED = ['3.6','4.6','4.8','5.6','5.8','6.8','8.8','9.8','10.9','12.9']
+VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
 
 DISP_TITLE_PLATE = 'Plate'
 
@@ -132,6 +132,17 @@ KEY_PLATETHK = 'Plate.Thickness'
 KEY_DISP_PLATETHK = 'Thickness(mm)*'
 VALUES_PLATETHK = ['All', 'Customized']
 VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20']
+
+KEY_DP_BOLT_HOLE_TYPE = 'DesignPreferences.Bolt.Bolt_Hole_Type'
+KEY_DP_BOLT_MATERIAL_G_O = 'DesignPreferences.Bolt.Material_Grade_OverWrite'
+KEY_DP_BOLT_SLIP_FACTOR = 'DesignPreferences.Bolt.Slip_Factor'
+KEY_DP_WELD_TYPE = 'DesignPreferences.Weld.Type'
+KEY_DP_WELD_MATERIAL_G_O = 'DesignPreferences.Weld.Material_Grade_OverWrite'
+KEY_DP_DETAILING_EDGE_TYPE = 'DesignPreferences.Detailing.Edge_type'
+KEY_DP_GAP = 'DesignPreferences.Detailing.Gap'
+KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'DesignPreferences.Detailing.Corrosive_Influences'
+KEY_DP_DESIGN_METHOD = 'DesignPreferences.Design.Design_Method'
+
 
 DISP_TITLE_CLEAT = 'Cleat Angle'
 DISP_TITLE_ANGLE = 'Angle Section'

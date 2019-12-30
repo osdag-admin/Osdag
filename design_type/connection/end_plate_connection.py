@@ -44,8 +44,8 @@ class EndPlateConnectionInput(ShearConnection):
         else:
             existingvalue_key_mtrl = ''
 
-        if KEY_VERSH in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_VERSH]
+        if KEY_SHEAR in existingvalues:
+            existingvalue_key_versh = existingvalues[KEY_SHEAR]
         else:
             existingvalue_key_versh = ''
 
@@ -95,7 +95,7 @@ class EndPlateConnectionInput(ShearConnection):
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
         options_list.append(t6)
 
-        t7 = (KEY_VERSH, KEY_DISP_VERSH, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
         options_list.append(t7)
 
         t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)

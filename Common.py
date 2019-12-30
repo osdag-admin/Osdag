@@ -6,11 +6,11 @@ TYPE_IMAGE = 'Image'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
 
 import sqlite3
-from utils.common.component import Component
+from utils.common.component import *
 
 def connectdb1():
     lst = []
-    conn = sqlite3.connect(Component().path_to_database)
+    conn = sqlite3.connect(path_to_database)
     cursor = conn.execute("SELECT Bolt_diameter FROM Bolt")
     rows = cursor.fetchall()
     for row in rows:
@@ -22,7 +22,7 @@ def connectdb1():
 
 def connectdb(table_name):
 
-    conn = sqlite3.connect(Component().path_to_database)
+    conn = sqlite3.connect(path_to_database)
     lst = []
     if table_name == "Angles":
         cursor = conn.execute("SELECT Designation FROM Angles")
@@ -102,8 +102,8 @@ VALUES_MATERIAL = connectdb("Material")
 
 DISP_TITLE_FSL = 'Factored shear load'
 
-KEY_VERSH = 'Load.Vertical_Shear'
-KEY_DISP_VERSH = 'Vert. Shear(kN)*'
+KEY_SHEAR = 'Load.Shear'
+KEY_DISP_SHEAR = 'Shear(kN)*'
 
 KEY_AXIAL = 'Load.Axial'
 KEY_DISP_AXIAL = 'Axial (kN) *'

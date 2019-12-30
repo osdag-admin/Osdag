@@ -1,19 +1,42 @@
-from utils.common.material import Material
 from utils.common.is800_2007 import IS800_2007
 import sqlite3
 import math
+path_to_database = "ResourceFiles/Database/Intg_osdag.sqlite"
+class Material(object):
 
+    def __init__(self, material_grade):
 
-class Component(object):
+        self.fy_20 = 0.0
+        self.fy_20_40 = 0.0
+        self.fy_40 = 0.0
+        self.fu = 0.0
+        self.connect_to_database_to_get_fy_fu(grade=material_grade)
 
-    def __init__(self, material=Material()):
-        self.material = material
-        self.path_to_database = "ResourceFiles/Database/Intg_osdag.sqlite"
+    def __repr__(self):
+        repr = "Material:\n"
+        repr += "fy_20: {}\n".format(self.fy_20)
+        repr += "fy_20_40: {}\n".format(self.fy_20_40)
+        repr += "fy_40: {}\n".format(self.fy_40)
+        repr += "fu: {}".format(self.fu)
+        return repr
 
-class Bolt(Component):
+    def connect_to_database_to_get_fy_fu(self, grade):
+        conn = sqlite3.connect(path_to_database)
+        db_query = "SELECT * FROM Material WHERE Grade = ?"
+        cur = conn.cursor()
+        cur.execute(db_query,(grade,))
+        row = cur.fetchone()
+        self.fy_20 = row[1]
+        self.fy_20_40 = row[2]
+        self.fy_40 = row[3]
+        self.fu = row[4]
 
-    def __init__(self, grade=0.0, diameter=0.0, bolt_type="", length=0.0, material=Material()):
-        super(Bolt, self).__init__(material)
+        conn.close()
+
+class Bolt(Material):
+
+    def __init__(self, grade=0.0, diameter=0.0, bolt_type="", length=0.0, material_grade=""):
+        super(Bolt, self).__init__(material_grade)
         self.grade = grade
         self.diameter = diameter
         self.bolt_type = bolt_type
@@ -39,11 +62,11 @@ class Bolt(Component):
         pass
 
 
-class Nut(Component):
+class Nut(Material):
 
-    def __init__(self, diameter=0.0, material=Material()):
+    def __init__(self, diameter=0.0, material_grade=""):
         self.diameter = diameter
-        super(Nut, self).__init__(material)
+        super(Nut, self).__init__(material_grade)
 
     def __repr__(self):
         repr = "Nut\n"
@@ -51,9 +74,10 @@ class Nut(Component):
         return repr
 
 
-class Section(Component):
+class Section(Material):
 
-    def __init__(self, designation, material=Material()):
+    def __init__(self, designation, material_grade=""):
+        super(Section, self).__init__(material_grade)
         self.designation = designation
         self.mass = 0.0
         self.area = 0.0
@@ -73,7 +97,8 @@ class Section(Component):
         self.plast_sec_mod_z = 0.0
         self.plast_sec_mod_y = 0.0
         self.source = 0.0
-        super(Section, self).__init__(material)
+        self.fy = 0.0
+        self.fu = 0.0
 
     def __repr__(self):
         repr = "Section\n"
@@ -81,7 +106,7 @@ class Section(Component):
         return repr
 
     def connect_to_database_update_other_attributes(self, table, designation):
-        conn = sqlite3.connect(self.path_to_database)
+        conn = sqlite3.connect(path_to_database)
         db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
@@ -103,6 +128,8 @@ class Section(Component):
         self.elast_sec_mod_y = row[15]
         self.plast_sec_mod_z = row[16]
         self.plast_sec_mod_y = row[17]
+        self.fy = min(self.fy_20, self.fy_20_40, self.fy_40)
+        self.fu = 0.0
         self.source = row[19]
 
         conn.close()
@@ -110,24 +137,25 @@ class Section(Component):
 
 class Beam(Section):
 
-    def __init__(self, designation, material=Material()):
-        super(Beam, self).__init__(designation, material)
+    def __init__(self, designation, material_grade):
+        super(Beam, self).__init__(designation, material_grade)
+        print(designation)
         self.connect_to_database_update_other_attributes("Beams", designation)
 
 
 class Column(Section):
 
-    def __init__(self, designation, material=Material()):
-        super(Column, self).__init__(designation, material)
+    def __init__(self, designation, material_grade):
+        super(Column, self).__init__(designation, material_grade)
         self.connect_to_database_update_other_attributes("Columns", designation)
 
 
-class Weld(Component):
+class Weld(Material):
 
-    def __init__(self, size=0.0, length=0.0, material=Material()):
+    def __init__(self, size=0.0, length=0.0, material_grade=""):
         self.size = size
         self.length = length
-        super(Weld, self).__init__(material)
+        super(Weld, self).__init__(material_grade)
 
     def __repr__(self):
         repr = "Weld\n"
@@ -136,13 +164,13 @@ class Weld(Component):
         return repr
 
 
-class Plate(Component):
+class Plate(Material):
 
-    def __init__(self, thickness=0.0, height=0.0, width=0.0, material=Material()):
+    def __init__(self, thickness=0.0, height=0.0, width=0.0, material_grade=""):
+        super(Plate, self).__init__(material_grade)
         self.thickness = thickness
         self.height = height
         self.width = width
-        super(Plate, self).__init__(material)
 
     def __repr__(self):
         repr = "Plate\n"
@@ -150,9 +178,10 @@ class Plate(Component):
         return repr
 
 
-class Angle(Component):
+class Angle(Material):
 
-    def __init__(self, designation, material=Material()):
+    def __init__(self, designation, material_grade):
+        super(Angle, self).__init__(material_grade)
         self.designation = designation
 
         self.leg_a_length = 0.0
@@ -162,7 +191,6 @@ class Angle(Component):
         self.connect_to_database_update_other_attributes(designation)
 
         self.length = 0.0
-        super(Angle, self).__init__(material)
 
     def __repr__(self):
         repr = "Angle\n"
@@ -170,7 +198,7 @@ class Angle(Component):
         return repr
 
     def connect_to_database_update_other_attributes(self, designation):
-        conn = sqlite3.connect(self.path_to_database)
+        conn = sqlite3.connect(path_to_database)
         db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))

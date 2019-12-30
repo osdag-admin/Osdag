@@ -841,7 +841,7 @@ class Ui_ModuleWindow(QMainWindow):
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
 
 
-        main.to_get_d(design_dictionary)
+        main.to_get_d(main,design_dictionary)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -973,19 +973,17 @@ class Ui_ModuleWindow(QMainWindow):
 
     def column_design_prefer(self):
         # designation = str(self.ui.combo_columnSec.currentText())
-        #TODO:ADD FUNCTION TO GET designation, FY,FU
+        #TODO:ADD FUNCTION TO GET designation, material_grade
         designation = "HB 150"
-        ultimateStrength_Column = "410"
-        yieldStrength_Column = "250"
-        self.designPrefDialog.column_preferences(designation, ultimateStrength_Column, yieldStrength_Column)
+        material_grade = "E 250 (Fe 410 W)A"
+        self.designPrefDialog.column_preferences(designation, material_grade)
 
     def beam_design_prefer(self):
         # designation = str(self.ui.combo_beamSec.currentText())
-        #TODO:ADD FUNCTION TO GET designation, FY,FU
+        #TODO:ADD FUNCTION TO GET designation, material_grade
         designation = "JB 150"
-        ultimateStrength_Column = "410"
-        yieldStrength_Column = "250"
-        self.designPrefDialog.beam_preferences(designation, ultimateStrength_Column, yieldStrength_Column)
+        material_grade = "E 250 (Fe 410 W)A"
+        self.designPrefDialog.beam_preferences(designation, material_grade)
 
     def closeEvent(self, event):
         '''
@@ -1122,13 +1120,13 @@ class DesignPreferences(QDialog):
     #     self.source = row[19]
     #
     #     conn.close()
-    def column_preferences(self, designation, ultimateStrength_Column, yieldStrength_Column):
-        col_attributes = Section(designation)
+    def column_preferences(self, designation,material_grade):
+        col_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(col_attributes,"Columns", designation)
         self.ui.lineEdit_Designation_Column.setText(designation)
         self.ui.lineEdit_Source_Column.setText(col_attributes.source)
-        self.ui.lineEdit_UltimateStrength_Column.setText(str(ultimateStrength_Column))
-        self.ui.lineEdit_YieldStrength_Column.setText(str(yieldStrength_Column))
+        self.ui.lineEdit_UltimateStrength_Column.setText(str(col_attributes.fu))
+        self.ui.lineEdit_YieldStrength_Column.setText(str(col_attributes.fy))
         self.ui.lineEdit_Depth_Column.setText(str(col_attributes.depth))
         self.ui.lineEdit_FlangeWidth_Column.setText(str(col_attributes.flange_width))
         self.ui.lineEdit_FlangeThickness_Column.setText(str(col_attributes.flange_thickness))
@@ -1164,13 +1162,13 @@ class DesignPreferences(QDialog):
             self.ui.lineEdit_FlangeThickness_Column.textChanged.connect(self.new_sectionalprop_Column)
             self.ui.lineEdit_WeBThickness_Column.textChanged.connect(self.new_sectionalprop_Column)
 
-    def beam_preferences(self, designation, ultimateStrength_Beam, yieldStrength_Beam):
-        beam_attributes = Section(designation)
+    def beam_preferences(self, designation,material_grade):
+        beam_attributes = Section(designation,material_grade)
         Section.connect_to_database_update_other_attributes(beam_attributes, "Beams", designation)
         self.ui.lineEdit_Designation_Beam.setText(designation)
         self.ui.lineEdit_Source_Beam.setText(str(beam_attributes.source))
-        self.ui.lineEdit_UltimateStrength_Beam.setText(ultimateStrength_Beam)
-        self.ui.lineEdit_YieldStrength_Beam.setText(yieldStrength_Beam)
+        self.ui.lineEdit_UltimateStrength_Beam.setText(str(beam_attributes.fu))
+        self.ui.lineEdit_YieldStrength_Beam.setText(str(beam_attributes.fy))
         self.ui.lineEdit_Depth_Beam.setText(str(beam_attributes.depth))
         self.ui.lineEdit_FlangeWidth_Beam.setText(str(beam_attributes.flange_width))
         self.ui.lineEdit_FlangeThickness_Beam.setText(str(beam_attributes.flange_thickness))

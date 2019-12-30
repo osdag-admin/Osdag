@@ -32,7 +32,8 @@ bolt_type = "friction_grip"
 bolt_grade = 8.8
 plate_thickness = 10.0
 weld_size = 6
-material = Material(fy=fy, fu=fu)
+material_grade = "E 250 (Fe 410 W)B"
+material = Material(material_grade)
 
 logger = None
 

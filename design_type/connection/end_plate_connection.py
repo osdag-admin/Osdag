@@ -1,4 +1,3 @@
-from utils.common.material import Material
 from design_type.connection.shear_connection import ShearConnection
 from utils.common.component import *
 from utils.common.component import Bolt, Plate, Weld

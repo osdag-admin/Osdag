@@ -129,7 +129,7 @@ class Section(Material):
         self.plast_sec_mod_z = row[16]
         self.plast_sec_mod_y = row[17]
         self.fy = min(self.fy_20, self.fy_20_40, self.fy_40)
-        self.fu = 0.0
+        self.fu = self.fu
         self.source = row[19]
 
         conn.close()
@@ -139,7 +139,6 @@ class Beam(Section):
 
     def __init__(self, designation, material_grade):
         super(Beam, self).__init__(designation, material_grade)
-        print(designation)
         self.connect_to_database_update_other_attributes("Beams", designation)
 
 

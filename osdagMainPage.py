@@ -14,6 +14,9 @@ from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.fin_plate_connection import FinPlateConnection
+from design_type.connection.cleat_angle_connection import CleatAngleConnectionInput
+from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
+from design_type.connection.end_plate_connection import EndPlateConnectionInput
 from gui.ui_template import Ui_ModuleWindow
 
 # from design_type.connection.main_controller import MainController
@@ -152,6 +155,7 @@ class OsdagMainWindow(QMainWindow):
         folder = QFileDialog.getExistingDirectory(self, "Select Workspace Folder (Don't use spaces in the folder name)", desktop_path)
         return folder
 
+
     # ********************************* Help Action *********************************************************************************************
 
 
@@ -222,8 +226,37 @@ class OsdagMainWindow(QMainWindow):
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
             # self.window.show()
             # self.window.closed.connect(self.show)
+        elif self.ui.rdbtn_cleat.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2,CleatAngleConnectionInput)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+            # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
+            # self.window.show()
+            # self.window.closed.connect(self.show)
+        elif self.ui.rdbtn_seat.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2,SeatedAngleConnectionInput)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+            # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
+            # self.window.show()
+            # self.window.closed.connect(self.show)
+        elif self.ui.rdbtn_endplate.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, EndPlateConnectionInput)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+            # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
+            # self.window.show()
+            # self.window.closed.connect(self.show)
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")
+
+
 
 class MainController(QMainWindow):
     closed = pyqtSignal()
@@ -235,6 +268,7 @@ class MainController(QMainWindow):
         self.folder = folder
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
+
 
     def dockbtn_clicked(self, widget):
 
@@ -292,6 +326,8 @@ if __name__ == '__main__':
     # window = MainController(Ui_ModuleWindow, FinPlateConnection, folder_path)
     window = OsdagMainWindow()
     window.show()
+    # app.exec_()
+    # sys.exit(app.exec_())
     try:
         sys.exit(app.exec_())
     except BaseException as e:

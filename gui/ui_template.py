@@ -788,6 +788,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        self.action_save_input.triggered.connect(lambda: self.design_fn(option_list, main, data))
+        self.action_save_input.triggered.connect(lambda: self.saveDesign_inputs(option_list, data))
+        self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list))
         self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, main, data))
         self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
@@ -805,7 +808,6 @@ class Ui_ModuleWindow(QMainWindow):
                 widget.setText('')
             else:
                 pass
-        self.window.close()
 
     def design_fn(self, op_list, main, data_list):
         design_dictionary = {}
@@ -827,9 +829,81 @@ class Ui_ModuleWindow(QMainWindow):
                 d1 = {}
             design_dictionary.update(d1)
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
-
-
         main.to_get_d(design_dictionary)
+        self.design_inputs = design_dictionary
+
+    def saveDesign_inputs(self, op_list, data_list):
+        path = r'C:\Users\Win10\Desktop'
+        fileName, _ = QFileDialog.getSaveFileName(self,
+                                                  "Save Design", os.path.join(str(path), "untitled.osi"),
+                                                  "Input Files(*.osi)")
+        # design_dictionary = {}
+        # for op in op_list:
+        #     widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
+        #     if op[2] == TYPE_COMBOBOX:
+        #         des_val = widget.currentText()
+        #         d1 = {op[0]: des_val}
+        #     elif op[2] == TYPE_MODULE:
+        #         des_val = op[1]
+        #         d1 = {op[0]: des_val}
+        #     elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
+        #         des_val = data_list[op[0]+"_customized"]
+        #         d1 = {op[0]: des_val}
+        #     elif op[2] == TYPE_TEXTBOX:
+        #         des_val = widget.text()
+        #         d1 = {op[0]: des_val}
+        #     else:
+        #         d1 = {}
+        #     design_dictionary.update(d1)
+        # design_dictionary.update(self.designPrefDialog.save_designPref_para())
+        if not fileName:
+            return
+        try:
+            with open(fileName, 'w') as input_file:
+                json.dump(self.design_inputs, input_file)
+        except Exception as e:
+            QMessageBox.warning(self, "Application",
+                                "Cannot write file %s:\n%s" % (fileName, str(e)))
+            return
+
+    def loadDesign_inputs(self, op_list, data, new):
+        path = r'C:\Users\Win10\Desktop'
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(path), "InputFiles(*.osi)")
+        if not fileName:
+            return
+        try:
+            in_file = str(fileName)
+            with open(in_file, 'r') as fileObject:
+                uiObj = json.load(fileObject)
+            self.setDictToUserInputs(uiObj, op_list, data, new)
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+
+    def setDictToUserInputs(self, uiObj, op_list, data, new):
+        for op in op_list:
+            key_str = op[0]
+            key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
+            if op[2] == TYPE_COMBOBOX:
+                index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
+                if index >= 0:
+                    key.setCurrentIndex(index)
+            elif op[2] == TYPE_TEXTBOX:
+                key.setText(uiObj[key_str])
+            elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                for n in new:
+                    if n[0] == key_str:
+                        if uiObj[key_str] != n[1]():
+                            data[key_str + "_customized"] = uiObj[key_str]
+                            key.setCurrentIndex(1)
+                        else:
+                            pass
+            else:
+                pass
+
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -995,6 +1069,47 @@ class DesignPreferences(QDialog):
         self.ui.btn_close.clicked.connect(self.close_designPref)
         #self.ui.btn_save.clicked.connect(Ui_ModuleWindow.design_preferences(Ui_ModuleWindow()))
         #self.ui.combo_boltHoleType.currentIndexChanged.connect(my_fn)
+        #self.ui.btn_save.clicked.connect(self.save_fn)
+        self.ui.btn_defaults.clicked.connect(self.default_fn)
+
+    def default_fn(self):
+        for children in self.ui.tab_Bolt.children():
+            if children.objectName() == 'combo_boltHoleType':
+                children.setCurrentIndex(0)
+            elif children.objectName() == 'txt_boltFu':
+                children.setText('800')
+            elif children.objectName() == 'combo_slipfactor':
+                children.setCurrentIndex(8)
+            else:
+                pass
+        for children in self.ui.tab_Weld.children():
+            if children.objectName() == 'combo_weldType':
+                children.setCurrentIndex(0)
+            elif children.objectName() == 'txt_weldFu':
+                children.setText('410')
+            else:
+                pass
+        for children in self.ui.tab_Detailing.children():
+            if children.objectName() == 'combo_detailingEdgeType':
+                children.setCurrentIndex(0)
+            elif children.objectName() == 'txt_detailingGap':
+                children.setText('10')
+            elif children.objectName() == 'combo_detailing_memebers':
+                children.setCurrentIndex(0)
+            else:
+                pass
+        for children in self.ui.tab_Design.children():
+            if children.objectName() == 'combo_design_method':
+                children.setCurrentIndex(0)
+            else:
+                pass
+
+    # def save_fn(self):
+    #     for children in self.ui.tab_Bolt.children():
+    #         if isinstance(children, QtWidgets.QComboBox):
+    #             children.setCurrentIndex(children.currentIndex())
+    #             print('check')
+
 
     def save_designPref_para(self):
         """This routine is responsible for saving all design preferences selected by the user
@@ -1025,7 +1140,6 @@ class DesignPreferences(QDialog):
               KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
               KEY_DP_GAP: line_detailingGap,
               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers, KEY_DP_DESIGN_METHOD: combo_design_method}
-        print(d1)
         return d1
 
     def highlight_slipfactor_description(self):

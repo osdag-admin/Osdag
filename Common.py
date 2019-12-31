@@ -50,7 +50,7 @@ def connectdb(table_name):
     return final_lst
 
 def connect_for_red(table_name):
-    conn = sqlite3.connect(Component().path_to_database)
+    conn = sqlite3.connect(path_to_database)
     lst = []
     if table_name == "Angles":
         cursor = conn.execute("SELECT Designation FROM Angles WHERE Source = 'IS808_Old'")

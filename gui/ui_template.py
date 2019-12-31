@@ -485,7 +485,7 @@ class Ui_ModuleWindow(QMainWindow):
                     indx = option[4].index(str(value))
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
-        new_list = main.customized_input()
+        new_list = main.customized_input(main)
         data = {}
 
         for t in new_list:

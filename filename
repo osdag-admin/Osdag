@@ -29,23 +29,47 @@ plate: !!python/object:utils.common.component.Plate
   thickness: 10.0
   width: 0.0
 supported_member: !!python/object:utils.common.component.Beam
+  area: 58.6
   depth: 300.0
   designation: MB 300
+  elast_sec_mod_y: 598.0
+  elast_sec_mod_z: 2.82
+  flange_slope: 116.5
   flange_thickness: 13.1
   flange_width: 140.0
+  mass: 46.0
   material: *id002
+  mom_inertia_y: 8970.0
+  mom_inertia_z: 7.0
   path_to_database: ResourceFiles/Database/Intg_osdag.sqlite
-  root_radius: 14.0
-  toe_radius: 7.0
+  plast_sec_mod_y: 679.6
+  plast_sec_mod_z: 67.0
+  rad_of_gy_y: 12.4
+  rad_of_gy_z: 466.0
+  root_radius: 98
+  source: IS808_Rev
+  toe_radius: 14.0
   web_thickness: 7.7
 supporting_member: !!python/object:utils.common.component.Column
+  area: 98.7
   depth: 400.0
   designation: HB 400
+  elast_sec_mod_y: 218.0
+  elast_sec_mod_z: 1400.0
+  flange_slope: 94
   flange_thickness: 12.7
   flange_width: 250.0
+  mass: 77.4
   material: *id002
+  mom_inertia_y: 2730.0
+  mom_inertia_z: 28100.0
   path_to_database: ResourceFiles/Database/Intg_osdag.sqlite
+  plast_sec_mod_y: null
+  plast_sec_mod_z: null
+  rad_of_gy_y: 5.26
+  rad_of_gy_z: 16.9
   root_radius: 14.0
+  source: IS808_Old
   toe_radius: 7.0
   web_thickness: 9.1
 weld: !!python/object:utils.common.component.Weld

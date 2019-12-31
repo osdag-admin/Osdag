@@ -561,8 +561,8 @@ class Ui_ModuleWindow(QMainWindow):
         font.setBold(True)
         font.setWeight(75)
         self.outputDock.setFont(font)
-        self.outputDock.setFloating(False)
-        self.outputDock.setFeatures(QtWidgets.QDockWidget.AllDockWidgetFeatures)
+        # self.outputDock.setFloating(False)
+        # self.outputDock.setFeatures(QtWidgets.QDockWidget.AllDockWidgetFeatures)
         self.outputDock.setObjectName("outputDock")
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
         self.dockWidgetContents_2 = QtWidgets.QWidget()
@@ -570,7 +570,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_2)
         self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 100, 200, 30))
         font = QtGui.QFont()
-
         font.setPointSize(12)
         font.setBold(True)
         font.setWeight(75)

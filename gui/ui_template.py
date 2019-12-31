@@ -6,7 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 from PyQt5.QtWidgets import QMessageBox, qApp
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
+from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette, QStandardItem
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
@@ -18,6 +18,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from PyQt5.QtGui import QStandardItem
 import os
 import json
 import logging
@@ -35,6 +36,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.window = QtWidgets.QDialog()
         self.ui = Ui_Popup()
         self.ui.setupUi(self.window)
+        self.a = self.ui.get_right_elements()
         self.ui.addAvailableItems(op)
         self.ui.pushButton_5.clicked.connect(self.window.close)
         self.window.show()
@@ -402,8 +404,21 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setBold(False)
                 font.setWeight(50)
                 combo.setFont(font)
+                combo.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+                combo.setMaxVisibleItems(5)
+                # combo.setForegroundRole(QtGui.QColor('red'))
                 combo.setObjectName(option[0])
                 for item in option[4]:
+                    # item = PyQt5.QtGui.QStandardItem(str(account))
+                    # item.setBackground
+                    # item.setColor('red')
+                    # combo.setColor(QDialog.Foreground, Qt.red)
+                    # item = QPalette()
+                    # item.setColor('red')
+                    # item.setItemData(item, QBrush(QColor("red")), Qt.TextColorRole)
+                    # combo.setItemData(item, QBrush(QColor("red")), Qt.TextColorRole)
+                    # combo.setBackground(QBrush(QColor("red")))
                     combo.addItem(item)
 
             if type == TYPE_TEXTBOX:
@@ -426,6 +441,29 @@ class Ui_ModuleWindow(QMainWindow):
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
 
             i = i + 30
+
+        for option in option_list:
+            key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+
+            #v = ''
+            if option[0] == KEY_SUPTNGSEC:
+                v = "Columns"
+                red_list = connect_for_red(v)
+                #print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+            elif option[0] == KEY_SUPTDSEC:
+
+                v = "Beams"
+                red_list = connect_for_red(v)
+                #print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
         new_list = main.customized_input()
         for t in new_list:
@@ -475,6 +513,33 @@ class Ui_ModuleWindow(QMainWindow):
                 if typ == TYPE_COMBOBOX:
                     for values in val:
                         k2.addItem(values)
+                    if k2.objectName() == KEY_SUPTNGSEC:
+                        if k1.currentText() in VALUES_CONN_1:
+                            v = "Columns"
+                            red_list = connect_for_red(v)
+                            #print(red_list)
+
+                            for value in red_list:
+                                indx = val.index(str(value))
+                                k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+                        else:
+                            v = "Beams"
+                            red_list = connect_for_red(v)
+                            #print(red_list)
+
+                            for value in red_list:
+                                indx = val.index(str(value))
+                                k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+                    elif k2.objectName() == KEY_SUPTDSEC:
+                        v = "Beams"
+                        red_list = connect_for_red(v)
+                        #print(red_list)
+
+                        for value in red_list:
+                            indx = val.index(str(value))
+                            k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+
                 elif typ == TYPE_LABEL:
                     k2.setText(val)
                 else:
@@ -800,6 +865,37 @@ class Ui_ModuleWindow(QMainWindow):
             print(design_dictionary)
 
         self.btn_Design.clicked.connect(design_fn)
+        #self.red_func(option_list)
+
+    def red_func(self, option_list):
+        for option in option_list:
+            key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+
+            #v = ''
+            if option[0] == KEY_SUPTNGSEC:
+                v = "Columns"
+                red_list = connect_for_red(v)
+                print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+            elif option[0] == KEY_SUPTDSEC:
+
+                v = "Beams"
+
+                red_list = connect_for_red(v)
+
+                print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+
+
         
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

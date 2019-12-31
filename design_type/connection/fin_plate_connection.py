@@ -251,7 +251,7 @@ class FinPlateConnection(ShearConnection):
         self.bolt.bolt_capacity = self.bolt.grade * 100
 
 
-    # fin_plate_input = FinPlateConnectionInput(connectivity, supporting_member_section, supported_member_section, material)
+# fin_plate_input = FinPlateConnectionInput(connectivity, supporting_member_section, supported_member_section, material)
 
 # fin_plate_input = FinPlateConnection(FinPlateConnection.connectivity, supporting_member_section, supported_member_section, fu, fy,
 #                                      shear_force, axial_force, bolt_diameter, bolt_type, bolt_grade,

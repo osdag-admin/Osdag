@@ -388,7 +388,7 @@ class FinPlateConnection(ShearConnection):
         # print("resultobj", self.result)
         # self.column_data = self.fetchColumnPara()
         # self.beam_data = self.fetchBeamPara()
-        save_html(self.result, self.alist, fileName, report_summary,folder)
+        save_html(self.result, self.alist, fileName, report_summary, folder)
 
 
 

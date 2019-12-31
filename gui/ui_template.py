@@ -37,25 +37,11 @@ class Ui_ModuleWindow(QMainWindow):
         self.window = QtWidgets.QDialog()
         self.ui = Ui_Popup()
         self.ui.setupUi(self.window)
-        # KEY_EXISTINGVAL = ['Q','W','E','R','T','Y']
-        #print(KEY_EXISTINGVAL)
-
-        # def temp(self):
-        #
-        #     self.KEY_EXISTINGVAL = self.get_right_elements()
-        #
-        #     print(self.KEY_EXISTINGVAL)
-        # self.ui.pushButton_5.clicked.connect(self.temp)
-        #self.ui.addAvailableItems(op)
-        #KEY_EXISTINGVAL = self.ui.get_updated_list()
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
-
-        self.ui.pushButton_5.clicked.connect(self.window.close)
         self.window.exec()
+        print(self.ui.get_right_elements())
         return self.ui.get_right_elements()
 
-    # def close(self):
-    #     self.window.close()
     def setupUi(self, MainWindow, main):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -522,7 +508,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setFont(font)
         self.btn_Design.setAutoDefault(True)
         self.btn_Design.setObjectName("btn_Design")
-
+        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main))
         self.inputDock.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.inputDock)
 
@@ -829,7 +815,62 @@ class Ui_ModuleWindow(QMainWindow):
     def reset_popup(self, new_list, data):
         for custom_combo in new_list:
             data[custom_combo[0] + "_customized"] = custom_combo[1]()
-        
+
+    def validateInputsOnDesignBtn(self, main):
+
+        option_list = main.input_values(self)
+        missing_fields_list = []
+
+        for option in option_list:
+            if option[0] == KEY_CONN:
+                continue
+            s = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+
+            if option[2] == TYPE_COMBOBOX:
+                if option[0] in ["Bolt.Diameter","Bolt.Grade","Plate.Thickness"]:
+                    continue
+                if s.currentIndex() == 0:
+                    missing_fields_list.append(option[1])
+
+
+            elif option[2] == TYPE_TEXTBOX:
+                if s.text() == '':
+                    missing_fields_list.append(option[1])
+            else:
+                pass
+
+        if len(missing_fields_list) > 0:
+            QMessageBox.information(self, "Information",self.generate_missing_fields_error_string(missing_fields_list))
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+
+        Returns:
+            error string that has to be displayed
+
+        """
+
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+
+
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))

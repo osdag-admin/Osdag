@@ -8,6 +8,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox, qApp
+
 import sqlite3
 from PyQt5.QtCore import pyqtSlot
 #from PyQt5.QtCore import pyqtSlot
@@ -66,22 +68,14 @@ class Ui_Popup(object):
         font.setPointSize(14)
         self.pushButton_5.setFont(font)
         self.pushButton_5.setObjectName("pushButton_5")
-        #self.pushButton_5.clicked.connect(self.close_on_submit)
+        self.connections(MainWindow)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.update_buttons_status()
-        self.connections()
-        # self.KEY_EXISTINGVAL = self.get_right_elements()
-        # print(self.KEY_EXISTINGVAL)
-        #test_list = self.get_right_elements()
 
-        # for i in range(0, len(test_list)):
-        #     test_list[i] = int(test_list[i])
-        # test_list.sort()
-        # print(test_list)
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        Form.setWindowTitle(_translate("MainWindow", "Customized"))
         self.label.setText(_translate("MainWindow", "Available:"))
         self.label_2.setText(_translate("MainWindow", "Selected:"))
         self.pushButton.setText(_translate("MainWindow", ">>"))
@@ -90,7 +84,7 @@ class Ui_Popup(object):
         self.pushButton_4.setText(_translate("MainWindow", "<<"))
         self.pushButton_5.setText(_translate("MainWindow", "Submit"))
 
-    def connections(self):
+    def connections(self,MainWindow):
         self.listWidget.itemSelectionChanged.connect(self.update_buttons_status)
         self.listWidget_2.itemSelectionChanged.connect(self.update_buttons_status)
         self.pushButton_2.clicked.connect(self.on_mBtnMoveToAvailable_clicked)
@@ -98,7 +92,16 @@ class Ui_Popup(object):
         self.pushButton_4.clicked.connect(self.on_mButtonToAvailable_clicked)
         self.pushButton.clicked.connect(self.on_mButtonToSelected_clicked)
         self.pushButton_5.clicked.connect(self.get_right_elements)
-        #self.pushButton_5.clicked.connect(self.get_updated_list)
+        self.pushButton_5.clicked.connect(lambda: self.is_empty(MainWindow))
+    def is_empty(self,MainWindow):
+        if len(self.get_right_elements()) == 0:
+            self.error_message = QtWidgets.QMessageBox()
+            self.error_message.setWindowTitle('Information')
+            self.error_message.setIcon(QtWidgets.QMessageBox.Critical)
+            self.error_message.setText('Please Select some values.')
+            self.error_message.exec()
+        else:
+            MainWindow.close()
 
 
     def update_buttons_status(self):
@@ -182,6 +185,4 @@ if __name__ == "__main__":
     ui = Ui_Popup()
     ui.setupUi(MainWindow)
     print(MainWindow.exec())
-    print(ui.get_right_elements())
-    print(1)
     sys.exit(app.exec_())

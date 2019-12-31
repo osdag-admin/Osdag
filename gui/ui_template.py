@@ -28,6 +28,7 @@ import sqlite3
 from Common import *
 from .customized_popup import Ui_Popup
 from .ui_design_preferences import Ui_Dialog
+from gui.ui_design_summary import Ui_DesignReport
 
 
 class Ui_ModuleWindow(QMainWindow):
@@ -376,6 +377,18 @@ class Ui_ModuleWindow(QMainWindow):
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Link, brush)
+        # self.dockWidgetContents_2 = QtWidgets.QWidget()
+        # self.dockWidgetContents_2.setObjectName("dockWidgetContents_2")
+        self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents)
+        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 650, 200, 30))
+        self.btn_CreateDesign.setAutoDefault(True)
+        self.btn_CreateDesign.setObjectName("btn_CreateDesign")
+        self.btn_CreateDesign.raise_()
+
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        font.setBold(False)
+        font.setWeight(50)
 
         option_list = main.input_values(self)
         _translate = QtCore.QCoreApplication.translate
@@ -544,7 +557,13 @@ class Ui_ModuleWindow(QMainWindow):
         self.outputDock.setFont(font)
         self.outputDock.setObjectName("outputDock")
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
-
+        self.dockWidgetContents_2 = QtWidgets.QWidget()
+        self.dockWidgetContents_2.setObjectName("dockWidgetContents_2")
+        self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents)
+        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 650, 200, 30))
+        self.btn_CreateDesign.setAutoDefault(True)
+        self.btn_CreateDesign.setObjectName("btn_CreateDesign")
+        self.btn_CreateDesign.raise_()
         self.actionInput = QtWidgets.QAction(MainWindow)
         icon7 = QtGui.QIcon()
         icon7.addPixmap(QtGui.QPixmap(":/images/input.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -737,6 +756,20 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(self)
 
+        # self.btn_CreateDesign = QtWidgets.QAction(MainWindow)
+        # font = QtGui.QFont()
+        # font.setFamily("DejaVu Serif")
+        # self.btn_CreateDesign.setFont(font)
+        # self.btn_CreateDesign.setObjectName("Dialog")
+        # self.btn_CreateDesign.triggered.connect(self.create_design_report)
+        # self.create_report = Ui_DesignReport()
+
+        # self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents)
+        # self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 650, 200, 30))
+        # self.btn_CreateDesign.setAutoDefault(True)
+        # self.btn_CreateDesign.setObjectName("btn_CreateDesign")
+        # self.btn_CreateDesign.raise_()
+
 
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
         self.actionfinPlate_quit.setObjectName("actionfinPlate_quit")
@@ -859,7 +892,8 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setShortcut(_translate("MainWindow", "Alt+D"))
 
         self.outputDock.setWindowTitle(_translate("MainWindow", "Output dock"))
-
+        self.btn_CreateDesign.setToolTip(_translate("MainWindow", "Design report"))
+        self.btn_CreateDesign.setText(_translate("MainWindow", "Design report"))
         self.actionInput.setText(_translate("MainWindow", "Input"))
         self.actionInput.setToolTip(_translate("MainWindow", "Input browser"))
         self.actionInputwindow.setText(_translate("MainWindow", "inputwindow"))
@@ -950,6 +984,9 @@ class Ui_ModuleWindow(QMainWindow):
 
     def design_preferences(self):
         self.designPrefDialog.show()
+
+    def create_design_report(self):
+        self.create_report.show()
 
     def closeEvent(self, event):
         '''

@@ -6,12 +6,14 @@ Created on April, 2019
 
 
 
-from __builtin__ import str
+from builtins import str
 import time
 import math
+import configparser
+import pdfkit
 import os
 import pickle
-from Connections.connection_calculations import ConnectionCalculations
+# from Connections.connection_calculations import ConnectionCalculations
 
 ######################################################################
 # Start of Report
@@ -2321,6 +2323,33 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     myfile.write(t('/body'))
     myfile.write(t('/html'))
     myfile.close()
+
+def save_design(self, report_summary,folder):
+
+    filename = os.path.join(str(folder), "images_html", "Html_Report.html")
+    file_name = str(filename)
+    self.call_designreport(file_name, report_summary)
+
+    config = configparser.ConfigParser()
+    config.readfp(open(r'Osdag.config'))
+    wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+
+    config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+
+    options = {
+        'margin-bottom': '10mm',
+        'footer-right': '[page]'
+    }
+    file_type = "PDF(*.pdf)"
+    fname, _ = QFileDialog.getSaveFileName(self, "Save File As", folder + "/", file_type)
+    fname = str(fname)
+    flag = True
+    if fname == '':
+        flag = False
+        return flag
+    else:
+        pdfkit.from_file(filename, fname, configuration=config, options=options)
+        QMessageBox.about(self, 'Information', "Report Saved")
 
 
 def space(n):

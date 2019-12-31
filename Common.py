@@ -49,6 +49,31 @@ def connectdb(table_name):
     final_lst = tuple_to_str(lst)
     return final_lst
 
+def connect_for_red(table_name):
+    conn = sqlite3.connect(path_to_database)
+    lst = []
+    if table_name == "Angles":
+        cursor = conn.execute("SELECT Designation FROM Angles WHERE Source = 'IS808_Old'")
+
+    elif table_name == "Channels":
+        cursor = conn.execute("SELECT Designation FROM Channels WHERE Source = 'IS808_Old'")
+
+    elif table_name == "Beams":
+        cursor = conn.execute("SELECT Designation FROM Beams WHERE Source = 'IS808_Old'")
+
+    elif table_name == "Columns":
+        cursor = conn.execute("SELECT Designation FROM Columns WHERE Source = 'IS808_Old'")
+
+    else:
+        return []
+    rows = cursor.fetchall()
+
+    for row in rows:
+        lst.append(row)
+
+    final_lst = tuple_to_str_red(lst)
+    return final_lst
+
 
 def tuple_to_str_popup(tl):
     arr = []
@@ -65,9 +90,18 @@ def tuple_to_str(tl):
     return arr
 
 
+def tuple_to_str_red(tl):
+    arr = []
+    for v in tl:
+        val = ''.join(v)
+        arr.append(val)
+    return arr
+
+
 KEY_MODULE = 'Module'
 KEY_DISP_FINPLATE = 'Fin Plate'
 TYPE_MODULE = 'Window Title'
+
 
 DISP_TITLE_CM = 'Connecting members'
 
@@ -273,7 +307,3 @@ KEY_DISP_LEN_INLINE = 'Total Length in line with tension'
 
 KEY_LEN_OPPLINE = 'Total length opp line with tension'
 KEY_DISP_LEN_OPPLINE = 'Total Length opp line with tension'
-
-
-
-          

@@ -18,6 +18,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from PyQt5.QtGui import QStandardItem
 import os
 import json
 import logging
@@ -44,10 +45,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
         self.ui.pushButton_5.clicked.connect(self.window.close)
         self.window.exec()
+        print(self.ui.get_right_elements())
         return self.ui.get_right_elements()
 
-    # def close(self):
-    #     self.window.close()
     def setupUi(self, MainWindow, main):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -409,8 +409,21 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setBold(False)
                 font.setWeight(50)
                 combo.setFont(font)
+                combo.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+                combo.setMaxVisibleItems(5)
+                # combo.setForegroundRole(QtGui.QColor('red'))
                 combo.setObjectName(option[0])
                 for item in option[4]:
+                    # item = PyQt5.QtGui.QStandardItem(str(account))
+                    # item.setBackground
+                    # item.setColor('red')
+                    # combo.setColor(QDialog.Foreground, Qt.red)
+                    # item = QPalette()
+                    # item.setColor('red')
+                    # item.setItemData(item, QBrush(QColor("red")), Qt.TextColorRole)
+                    # combo.setItemData(item, QBrush(QColor("red")), Qt.TextColorRole)
+                    # combo.setBackground(QBrush(QColor("red")))
                     combo.addItem(item)
                 # combo.setMaxVisibleItems(int(5))
 
@@ -449,9 +462,30 @@ class Ui_ModuleWindow(QMainWindow):
 
             i = i + 30
 
+        for option in option_list:
+            key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+
+            #v = ''
+            if option[0] == KEY_SUPTNGSEC:
+                v = "Columns"
+                red_list = connect_for_red(v)
+                #print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+            elif option[0] == KEY_SUPTDSEC:
+
+                v = "Beams"
+                red_list = connect_for_red(v)
+                #print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
         new_list = main.customized_input(main)
-
         data = {}
 
         for t in new_list:
@@ -503,6 +537,33 @@ class Ui_ModuleWindow(QMainWindow):
                 if typ == TYPE_COMBOBOX:
                     for values in val:
                         k2.addItem(values)
+                    if k2.objectName() == KEY_SUPTNGSEC:
+                        if k1.currentText() in VALUES_CONN_1:
+                            v = "Columns"
+                            red_list = connect_for_red(v)
+                            #print(red_list)
+
+                            for value in red_list:
+                                indx = val.index(str(value))
+                                k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+                        else:
+                            v = "Beams"
+                            red_list = connect_for_red(v)
+                            #print(red_list)
+
+                            for value in red_list:
+                                indx = val.index(str(value))
+                                k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+                    elif k2.objectName() == KEY_SUPTDSEC:
+                        v = "Beams"
+                        red_list = connect_for_red(v)
+                        #print(red_list)
+
+                        for value in red_list:
+                            indx = val.index(str(value))
+                            k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+
                 elif typ == TYPE_LABEL:
                     k2.setText(val)
                 elif typ == TYPE_IMAGE:
@@ -530,7 +591,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setFont(font)
         self.btn_Design.setAutoDefault(True)
         self.btn_Design.setObjectName("btn_Design")
-
+        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main))
         self.inputDock.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.inputDock)
 
@@ -798,7 +859,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.retranslateUi(MainWindow)
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
         self.action_save_input.triggered.connect(lambda: self.design_fn(option_list, main, data))
         self.action_save_input.triggered.connect(lambda: self.saveDesign_inputs(option_list, data))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
@@ -915,6 +975,92 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 pass
 
+        self.btn_Design.clicked.connect(design_fn)
+        #self.red_func(option_list)
+
+    def red_func(self, option_list):
+        for option in option_list:
+            key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+
+            #v = ''
+            if option[0] == KEY_SUPTNGSEC:
+                v = "Columns"
+                red_list = connect_for_red(v)
+                print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+            elif option[0] == KEY_SUPTDSEC:
+
+                v = "Beams"
+
+                red_list = connect_for_red(v)
+
+                print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+    def validateInputsOnDesignBtn(self, main):
+
+        option_list = main.input_values(self)
+        missing_fields_list = []
+
+        for option in option_list:
+            if option[0] == KEY_CONN:
+                continue
+            s = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+
+            if option[2] == TYPE_COMBOBOX:
+                if option[0] in ["Bolt.Diameter","Bolt.Grade","Plate.Thickness"]:
+                    continue
+                if s.currentIndex() == 0:
+                    missing_fields_list.append(option[1])
+
+
+            elif option[2] == TYPE_TEXTBOX:
+                if s.text() == '':
+                    missing_fields_list.append(option[1])
+            else:
+                pass
+
+        if len(missing_fields_list) > 0:
+            QMessageBox.information(self, "Information",self.generate_missing_fields_error_string(missing_fields_list))
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+
+        Returns:
+            error string that has to be displayed
+
+        """
+
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+
+
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
+      
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         #MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))

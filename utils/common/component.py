@@ -1,5 +1,6 @@
 from utils.common.is800_2007 import IS800_2007
-from utils.common.material import Material
+from utils.common.material import *
+from Common import *
 import sqlite3
 import math
 
@@ -23,7 +24,7 @@ class Bolt(Material):
         repr += "Diameter: {}\n".format(self.diameter)
         repr += "Type: {}\n".format(self.bolt_type)
         repr += "Grade: {}\n".format(self.grade)
-        repr += "Length: {}".format(self.length)
+        repr += "Length: {}\n".format(self.length)
         return repr
 
     def calculate_bolt_shear_capacity(self, bolt_diameter):
@@ -40,7 +41,7 @@ class Nut(Material):
 
     def __repr__(self):
         repr = "Nut\n"
-        repr += "Diameter: {}".format(self.diameter)
+        repr += "Diameter: {}\n".format(self.diameter)
         return repr
 
 
@@ -71,7 +72,7 @@ class Section(Material):
         self.fu = 0.0
 
     def connect_to_database_update_other_attributes(self, table, designation):
-        conn = sqlite3.connect(self.path_to_database)
+        conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
@@ -101,7 +102,7 @@ class Section(Material):
 
     def __repr__(self):
         repr = "Section\n"
-        repr += "Designation: {}".format(self.designation)
+        repr += "Designation: {}\n".format(self.designation)
         return repr
 
 class Beam(Section):
@@ -128,7 +129,7 @@ class Weld(Material):
     def __repr__(self):
         repr = "Weld\n"
         repr += "Size: {}\n".format(self.size)
-        repr += "Length: {}".format(self.length)
+        repr += "Length: {}\n".format(self.length)
         return repr
 
 
@@ -142,7 +143,7 @@ class Plate(Material):
 
     def __repr__(self):
         repr = "Plate\n"
-        repr += "Thickness: {}".format(self.thickness)
+        repr += "Thickness: {}\n".format(self.thickness)
         return repr
 
 
@@ -162,11 +163,11 @@ class Angle(Material):
 
     def __repr__(self):
         repr = "Angle\n"
-        repr += "Designation: {}".format(self.designation)
+        repr += "Designation: {}\n".format(self.designation)
         return repr
 
     def connect_to_database_update_other_attributes(self, designation):
-        conn = sqlite3.connect(path_to_database)
+        conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))

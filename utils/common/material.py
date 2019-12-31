@@ -1,13 +1,9 @@
 import sqlite3
+from Common import *
 
-class Database(object):
-    def __init__(self):
-        self.path_to_database = "ResourceFiles/Database/Intg_osdag.sqlite"
-
-class Material(Database):
+class Material(object):
 
     def __init__(self, material_grade):
-        super(Material, self).__init__()
         self.fy_20 = 0.0
         self.fy_20_40 = 0.0
         self.fy_40 = 0.0
@@ -19,11 +15,11 @@ class Material(Database):
         repr += "fy_20: {}\n".format(self.fy_20)
         repr += "fy_20_40: {}\n".format(self.fy_20_40)
         repr += "fy_40: {}\n".format(self.fy_40)
-        repr += "fu: {}".format(self.fu)
+        repr += "fu: {}\n".format(self.fu)
         return repr
 
     def connect_to_database_to_get_fy_fu(self, grade):
-        conn = sqlite3.connect(self.path_to_database)
+        conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT * FROM Material WHERE Grade = ?"
         cur = conn.cursor()
         cur.execute(db_query,(grade,))

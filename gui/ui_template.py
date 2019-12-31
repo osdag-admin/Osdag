@@ -841,7 +841,7 @@ class Ui_ModuleWindow(QMainWindow):
                 d1 = {}
             design_dictionary.update(d1)
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
-        main.to_get_d(main,design_dictionary)
+        main.set_input_values(main, design_dictionary)
         self.design_inputs = design_dictionary
 
     def saveDesign_inputs(self, op_list, data_list):

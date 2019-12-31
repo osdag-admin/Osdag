@@ -2,6 +2,7 @@ from utils.common.is800_2007 import IS800_2007
 import sqlite3
 import math
 path_to_database = "ResourceFiles/Database/Intg_osdag.sqlite"
+
 class Material(object):
 
     def __init__(self, material_grade):
@@ -32,6 +33,7 @@ class Material(object):
         self.fu = row[4]
 
         conn.close()
+
 
 class Bolt(Material):
 
@@ -100,11 +102,6 @@ class Section(Material):
         self.fy = 0.0
         self.fu = 0.0
 
-    def __repr__(self):
-        repr = "Section\n"
-        repr += "Designation: {}".format(self.designation)
-        return repr
-
     def connect_to_database_update_other_attributes(self, table, designation):
         conn = sqlite3.connect(path_to_database)
         db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
@@ -134,6 +131,10 @@ class Section(Material):
 
         conn.close()
 
+    def __repr__(self):
+        repr = "Section\n"
+        repr += "Designation: {}".format(self.designation)
+        return repr
 
 class Beam(Section):
 

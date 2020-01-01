@@ -181,6 +181,135 @@ class FinPlateConnection(ShearConnection):
 
         return options_list
 
+
+    @staticmethod
+    def pltthk_customized():
+        a = VALUES_PLATETHK_CUSTOMIZED
+        return a
+
+    @staticmethod
+    def grdval_customized():
+        b = VALUES_GRD_CUSTOMIZED
+        return b
+
+    @staticmethod
+    def diam_bolt_customized():
+        c = connectdb1()
+        return c
+
+    def customized_input(self):
+
+        list1 = []
+        t1 = (KEY_GRD, self.grdval_customized)
+        list1.append(t1)
+        t2 = (KEY_PLATETHK, self.pltthk_customized)
+        list1.append(t2)
+        t3 = (KEY_D, self.diam_bolt_customized)
+        list1.append(t3)
+        return list1
+
+    def fn_conn_suptngsec_lbl(self):
+
+        if self in VALUES_CONN_1:
+            return KEY_DISP_COLSEC
+        elif self in VALUES_CONN_2:
+            return KEY_DISP_PRIBM
+        else:
+            return ''
+
+    def fn_conn_suptdsec_lbl(self):
+
+        if self in VALUES_CONN_1:
+            return KEY_DISP_BEAMSEC
+        elif self in VALUES_CONN_2:
+            return KEY_DISP_SECBM
+        else:
+            return ''
+
+    def fn_conn_suptngsec(self):
+
+        if self in VALUES_CONN_1:
+            return VALUES_COLSEC
+        elif self in VALUES_CONN_2:
+            return VALUES_PRIBM
+        else:
+            return []
+
+    def fn_conn_suptdsec(self):
+
+        if self in VALUES_CONN_1:
+            return VALUES_BEAMSEC
+        elif self in VALUES_CONN_2:
+            return VALUES_SECBM
+        else:
+            return []
+
+    def fn_conn_image(self):
+        if self == VALUES_CONN[0]:
+            return './ResourceFiles/images/fin_cf_bw.png'
+        elif self == VALUES_CONN[1]:
+            return './ResourceFiles/images/fin_cw_bw.png'
+        elif self in VALUES_CONN_2:
+            return './ResourceFiles/images/fin_beam_beam.png'
+        else:
+            return''
+
+    def input_value_changed(self):
+
+        lst = []
+
+        t1 = (KEY_CONN, KEY_SUPTNGSEC , TYPE_LABEL,self.fn_conn_suptngsec_lbl)
+        lst.append(t1)
+
+        t2 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_COMBOBOX, self.fn_conn_suptngsec)
+        lst.append(t2)
+
+        t3 = (KEY_CONN, KEY_SUPTDSEC , TYPE_LABEL, self.fn_conn_suptdsec_lbl)
+        lst.append(t3)
+
+        t4 = (KEY_CONN, KEY_SUPTDSEC, TYPE_COMBOBOX, self.fn_conn_suptdsec)
+        lst.append(t4)
+
+        t5 = (KEY_CONN, KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        lst.append(t5)
+
+        return lst
+
+    def to_get_d(self, my_d):
+        # self.set_connectivity(self, my_d[KEY_CONN])
+        # self.set_supporting_section(self,my_d[KEY_SUPTNGSEC])
+        # self.set_supported_section(self,my_d[KEY_SUPTDSEC])
+        # self.set_material(self,my_d[KEY_MATERIAL])
+        # self.set_shear(self, my_d[KEY_SHEAR])
+        # self.set_axial(self,my_d[KEY_AXIAL])
+        # self.set_bolt_dia(self,my_d[KEY_D])
+        # self.set_bolt_type(self,my_d[KEY_TYP])
+        # self.set_bolt_grade(self,my_d[KEY_GRD])
+        # self.set_plate_thk(self,my_d[KEY_PLATETHK])
+        # self.weld = Weld(weld_size)
+        # self.weld_size_list = []
+        print(my_d)
+        self.connectivity = my_d[KEY_CONN]
+
+        if self.connectivity in VALUES_CONN_1:
+            self.supporting_section = Column(designation=my_d[KEY_SUPTNGSEC], material_grade=my_d[KEY_MATERIAL])
+        else:
+            self.supporting_section = Beam(designation=my_d[KEY_SUPTNGSEC], material_grade=my_d[KEY_MATERIAL])
+
+
+        self.supported_section = Beam(designation=my_d[KEY_SUPTDSEC], material_grade=my_d[KEY_MATERIAL])
+        self.bolt = Bolt(grade=my_d[KEY_GRD], diameter=my_d[KEY_D], bolt_type=my_d[KEY_TYP],
+                         material_grade=material_grade)
+        self.load = Load(shear_force=my_d[KEY_SHEAR], axial_force=my_d[KEY_AXIAL])
+        self.plate = Plate(thickness=my_d[KEY_PLATETHK], material_grade=my_d[KEY_MATERIAL])
+
+        print(self.connectivity)
+        print(self.supporting_section)
+        print(self.supported_section)
+        print(self.bolt)
+        print(self.load)
+        print(self.plate)
+        
     def warn_text(self,key, my_d):
         old_col_section = get_oldcolumncombolist()
         old_beam_section = get_oldbeamcombolist()
@@ -201,6 +330,7 @@ class FinPlateConnection(ShearConnection):
             key.setText(data)
         else:
             key.setText("")
+
 
     # def set_axial(self, axial):
     #     self.axial = axial

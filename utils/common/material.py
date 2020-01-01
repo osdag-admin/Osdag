@@ -28,5 +28,7 @@ class Material(object):
         self.fy_20_40 = row[2]
         self.fy_40 = row[3]
         self.fu = row[4]
+        print(self.fu)
+
 
         conn.close()

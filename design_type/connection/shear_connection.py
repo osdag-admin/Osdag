@@ -114,4 +114,4 @@ class ShearConnection(Connection):
                          material_grade=design_dictionary[KEY_MATERIAL])
         self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None))
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None), material_grade=design_dictionary[KEY_MATERIAL])
-        print(self.bolt, self.connectivity, self.load, self.supported_section, self.supporting_section)
+        print(self.supported_section, self.supporting_section)

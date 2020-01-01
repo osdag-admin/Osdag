@@ -32,6 +32,7 @@ from Common import *
 from utils.common.component import Section,I_sectional_Properties
 from utils.common.component import *
 from .customized_popup import Ui_Popup
+from .ui_summary_popup import Ui_Dialog1
 from .ui_design_preferences import Ui_Dialog
 
 
@@ -47,7 +48,11 @@ class Ui_ModuleWindow(QMainWindow):
         self.window.exec()
         print(self.ui.get_right_elements())
         return self.ui.get_right_elements()
-
+    def open_summary_popup(self):
+        self.new_window = QtWidgets.QDialog()
+        self.new_ui = Ui_Dialog1()
+        self.new_ui.setupUi(self.new_window)
+        self.new_window.exec()
     def setupUi(self, MainWindow, main):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -380,6 +385,30 @@ class Ui_ModuleWindow(QMainWindow):
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Link, brush)
+        self.outputDock = QtWidgets.QDockWidget(MainWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.outputDock.sizePolicy().hasHeightForWidth())
+        self.outputDock.setSizePolicy(sizePolicy)
+        self.outputDock.setMinimumSize(QtCore.QSize(320, 710))
+        self.outputDock.setMaximumSize(QtCore.QSize(310, 710))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(11)
+        font.setBold(True)
+        font.setWeight(75)
+        self.outputDock.setFont(font)
+        self.outputDock.setObjectName("outputDock")
+        self.dockWidgetContents_2 = QtWidgets.QWidget()
+        self.dockWidgetContents_2.setObjectName("dockWidgetContents_2")
+        self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_2)
+        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 600, 200, 30))
+        self.btn_CreateDesign.setAutoDefault(True)
+        self.btn_CreateDesign.setObjectName("btn_CreateDesign")
+        self.btn_CreateDesign.clicked.connect(self.open_summary_popup)
+        self.outputDock.setWidget(self.dockWidgetContents_2)
+        MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
 
         option_list = main.input_values(self)
         _translate = QtCore.QCoreApplication.translate
@@ -1103,6 +1132,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setShortcut(_translate("MainWindow", "Alt+D"))
 
         self.outputDock.setWindowTitle(_translate("MainWindow", "Output dock"))
+        self.btn_CreateDesign.setText(_translate("MainWindow", "Create design report"))
 
         self.actionInput.setText(_translate("MainWindow", "Input"))
         self.actionInput.setToolTip(_translate("MainWindow", "Input browser"))

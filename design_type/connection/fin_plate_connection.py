@@ -275,6 +275,7 @@ class FinPlateConnection(ShearConnection):
         else:
             self.supporting_section = Beam(designation=my_d[KEY_SUPTNGSEC], material_grade=my_d[KEY_MATERIAL])
 
+
         self.supported_section = Beam(designation=my_d[KEY_SUPTDSEC], material_grade=my_d[KEY_MATERIAL])
         self.bolt = Bolt(grade=my_d[KEY_GRD], diameter=my_d[KEY_D], bolt_type=my_d[KEY_TYP],
                          material_grade=material_grade)

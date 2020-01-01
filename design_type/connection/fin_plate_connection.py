@@ -123,10 +123,10 @@ class FinPlateConnection(ShearConnection):
         t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
         options_list.append(t15)
 
-        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC)
+        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"))
         options_list.append(t3)
 
-        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC)
+        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, connectdb("Beams"))
         options_list.append(t4)
 
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
@@ -208,18 +208,18 @@ class FinPlateConnection(ShearConnection):
     def fn_conn_suptngsec(self):
 
         if self in VALUES_CONN_1:
-            return VALUES_COLSEC
+            return connectdb("Columns")
         elif self in VALUES_CONN_2:
-            return VALUES_PRIBM
+            return connectdb("Beams")
         else:
             return []
 
     def fn_conn_suptdsec(self):
 
         if self in VALUES_CONN_1:
-            return VALUES_BEAMSEC
+            return connectdb("Beams")
         elif self in VALUES_CONN_2:
-            return VALUES_SECBM
+            return connectdb("Beams")
         else:
             return []
 

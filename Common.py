@@ -105,7 +105,7 @@ def get_oldcolumncombolist():
     '''(None) -> (List)
     This function returns the list of Indian Standard Column Designation.
     '''
-    conn = sqlite3.connect(path_to_database)
+    conn = sqlite3.connect(PATH_TO_DATABASE)
     old_columnList = []
     # columnQuery = QSqlQuery("SELECT Designation FROM Columns where Source = 'IS808_Old' order by id ASC")
     columnQuery = conn.execute("SELECT Designation FROM Columns WHERE Source = 'IS808_Old'")
@@ -126,7 +126,7 @@ def get_oldcolumncombolist():
 
     #return old_columnList
 def get_oldbeamcombolist():
-    conn = sqlite3.connect(path_to_database)
+    conn = sqlite3.connect(PATH_TO_DATABASE)
     old_columnList = []
     # columnQuery = QSqlQuery("SELECT Designation FROM Beams where Source = 'IS808_Old' order by id ASC")
     columnQuery = conn.execute("SELECT Designation FROM Beams WHERE Source = 'IS808_Old'")

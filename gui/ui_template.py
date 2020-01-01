@@ -43,7 +43,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.ui = Ui_Popup()
         self.ui.setupUi(self.window)
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
-        self.ui.pushButton_5.clicked.connect(self.window.close)
+        #self.ui.pushButton_5.clicked.connect(self.window.close)
         self.window.exec()
         print(self.ui.get_right_elements())
         return self.ui.get_right_elements()
@@ -193,6 +193,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
+        self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -902,6 +903,8 @@ class Ui_ModuleWindow(QMainWindow):
             design_dictionary.update(d1)
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
         main.to_get_d(main,design_dictionary)
+        key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
+        main.warn_text(main, key, design_dictionary)
         self.design_inputs = design_dictionary
 
     def saveDesign_inputs(self, op_list, data_list):

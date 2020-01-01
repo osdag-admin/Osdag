@@ -40,9 +40,35 @@ logger = None
 def module_setup():
     global logger
     logger = logging.getLogger("osdag.finPlateCalc")
-
-
 module_setup()
+
+# def set_osdaglogger():
+#     global logger
+#     if logger is None:
+#
+#         logger = logging.getLogger("osdag")
+#     else:
+#         for handler in logger.handlers[:]:
+#             logger.removeHandler(handler)
+#
+#     logger.setLevel(logging.DEBUG)
+#
+#     # create the logging file handler
+#     fh = logging.FileHandler("Connections/Shear/Finplate/fin.log", mode="a")
+#
+#     # ,datefmt='%a, %d %b %Y %H:%M:%S'
+#     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+#
+#     formatter = logging.Formatter('''
+#     <div  class="LOG %(levelname)s">
+#         <span class="DATE">%(asctime)s</span>
+#         <span class="LEVEL">%(levelname)s</span>
+#         <span class="MSG">%(message)s</span>
+#     </div>''')
+#     formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+#     fh.setFormatter(formatter)
+#     logger.addHandler(fh)
+
 
 
 class FinPlateConnection(ShearConnection):
@@ -254,7 +280,10 @@ class FinPlateConnection(ShearConnection):
 
         return lst
 
+
+
     def to_get_d(self, my_d):
+        #set_osdaglogger()
         # self.set_connectivity(self, my_d[KEY_CONN])
         # self.set_supporting_section(self,my_d[KEY_SUPTNGSEC])
         # self.set_supported_section(self,my_d[KEY_SUPTDSEC])
@@ -269,6 +298,7 @@ class FinPlateConnection(ShearConnection):
         # self.weld_size_list = []
         print(my_d)
         self.connectivity = my_d[KEY_CONN]
+        global logger
 
         if self.connectivity in VALUES_CONN_1:
             self.supporting_section = Column(designation=my_d[KEY_SUPTNGSEC], material_grade=my_d[KEY_MATERIAL])
@@ -287,6 +317,29 @@ class FinPlateConnection(ShearConnection):
         print(self.bolt)
         print(self.load)
         print(self.plate)
+        warn = my_d
+        # self.warn_text(self,warn)
+
+    def warn_text(self,key, my_d):
+        old_col_section = get_oldcolumncombolist()
+        old_beam_section = get_oldbeamcombolist()
+
+        if my_d[KEY_SUPTNGSEC] in old_col_section or my_d[KEY_SUPTDSEC] in old_beam_section:
+            del_data = open('logging_text.log', 'w')
+            del_data.truncate()
+            del_data.close()
+            logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
+            logging.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+            with open('logging_text.log') as file:
+                data = file.read()
+                file.close()
+            # file = open('logging_text.log', 'r')
+            # # This will print every line one by one in the file
+            # for each in file:
+            #     print(each)
+            key.setText(data)
+        else:
+            key.setText("")
 
     # def set_axial(self, axial):
     #     self.axial = axial

@@ -40,21 +40,41 @@ logger = None
 def module_setup():
     global logger
     logger = logging.getLogger("osdag.finPlateCalc")
-
-
 module_setup()
+
+# def set_osdaglogger():
+#     global logger
+#     if logger is None:
+#
+#         logger = logging.getLogger("osdag")
+#     else:
+#         for handler in logger.handlers[:]:
+#             logger.removeHandler(handler)
+#
+#     logger.setLevel(logging.DEBUG)
+#
+#     # create the logging file handler
+#     fh = logging.FileHandler("Connections/Shear/Finplate/fin.log", mode="a")
+#
+#     # ,datefmt='%a, %d %b %Y %H:%M:%S'
+#     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+#
+#     formatter = logging.Formatter('''
+#     <div  class="LOG %(levelname)s">
+#         <span class="DATE">%(asctime)s</span>
+#         <span class="LEVEL">%(levelname)s</span>
+#         <span class="MSG">%(message)s</span>
+#     </div>''')
+#     formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+#     fh.setFormatter(formatter)
+#     logger.addHandler(fh)
+
 
 
 class FinPlateConnection(ShearConnection):
 
-    # def __init__(self, connectivity, supporting_member_section, supported_member_section, fu, fy, shear_load,axial_load,
-    #              bolt_diameter, bolt_type, bolt_grade, weld_size, plate_thickness, plate_height=0.0, plate_width=0.0):
-    #     super(FinPlateConnection, self).__init__(connectivity, supporting_member_section, supported_member_section,
-    #                                                   fu, fy, shear_load, axial_load, bolt_diameter, bolt_type, bolt_grade)
-    #
-    #     self.weld = Weld(weld_size)
-    #     self.weld_size_list = []
-    #     self.plate = Plate(thickness=plate_thickness, height=plate_height, width=plate_width, material_grade=material_grade)
+    def __init__(self):
+        super(FinPlateConnection, self).__init__()
 
 
     def input_values(self, existingvalues={}):
@@ -160,6 +180,7 @@ class FinPlateConnection(ShearConnection):
         options_list.append(t14)
 
         return options_list
+
 
     @staticmethod
     def pltthk_customized():
@@ -288,6 +309,28 @@ class FinPlateConnection(ShearConnection):
         print(self.bolt)
         print(self.load)
         print(self.plate)
+        
+    def warn_text(self,key, my_d):
+        old_col_section = get_oldcolumncombolist()
+        old_beam_section = get_oldbeamcombolist()
+
+        if my_d[KEY_SUPTNGSEC] in old_col_section or my_d[KEY_SUPTDSEC] in old_beam_section:
+            del_data = open('logging_text.log', 'w')
+            del_data.truncate()
+            del_data.close()
+            logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
+            logging.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+            with open('logging_text.log') as file:
+                data = file.read()
+                file.close()
+            # file = open('logging_text.log', 'r')
+            # # This will print every line one by one in the file
+            # for each in file:
+            #     print(each)
+            key.setText(data)
+        else:
+            key.setText("")
+
 
     # def set_axial(self, axial):
     #     self.axial = axial
@@ -314,13 +357,17 @@ class FinPlateConnection(ShearConnection):
     # fin_plate_input = FinPlateConnectionInput(connectivity, supporting_member_section, supported_member_section, material)
 
 # fin_plate_input = FinPlateConnection(FinPlateConnection.connectivity, supporting_member_section, supported_member_section, fu, fy,
+
+# fin_plate_input = FinPlateConnection(FinPlateConnection.connectivity, supporting_member_section,
+#                                       supported_member_section, fu, fy,
+
 #                                      shear_force, axial_force, bolt_diameter, bolt_type, bolt_grade,
 #                                      weld_size, plate_thickness)
 # bolt = Bolt(grade=bolt_grade, diameter=bolt_diameter, bolt_type=bolt_type, material_grade=material_grade)
 # load = Load(shear_force=shear_force)
 # plate = Plate(thickness=plate_thickness, material_grade=material_grade)
 # weld = Weld(size=weld_size, material_grade=material_grade)
-# FinPlateConnection.to_get_d(my_d)
+# FinPlateConnection.to_get_d(design_dictionary)
 # fin_plate_input.bolt = bolt
 # fin_plate_input.load = load
 # fin_plate_input.plate = plate

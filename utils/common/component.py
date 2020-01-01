@@ -1,37 +1,8 @@
 from utils.common.is800_2007 import IS800_2007
+from utils.common.material import *
+from Common import *
 import sqlite3
 import math
-path_to_database = "ResourceFiles/Database/Intg_osdag.sqlite"
-class Material(object):
-
-    def __init__(self, material_grade):
-
-        self.fy_20 = 0.0
-        self.fy_20_40 = 0.0
-        self.fy_40 = 0.0
-        self.fu = 0.0
-        self.connect_to_database_to_get_fy_fu(grade=material_grade)
-
-    def __repr__(self):
-        repr = "Material:\n"
-        repr += "fy_20: {}\n".format(self.fy_20)
-        repr += "fy_20_40: {}\n".format(self.fy_20_40)
-        repr += "fy_40: {}\n".format(self.fy_40)
-        repr += "fu: {}".format(self.fu)
-        return repr
-
-    def connect_to_database_to_get_fy_fu(self, grade):
-        conn = sqlite3.connect(path_to_database)
-        db_query = "SELECT * FROM Material WHERE Grade = ?"
-        cur = conn.cursor()
-        cur.execute(db_query,(grade,))
-        row = cur.fetchone()
-        self.fy_20 = row[1]
-        self.fy_20_40 = row[2]
-        self.fy_40 = row[3]
-        self.fu = row[4]
-
-        conn.close()
 
 class Bolt(Material):
 
@@ -53,7 +24,7 @@ class Bolt(Material):
         repr += "Diameter: {}\n".format(self.diameter)
         repr += "Type: {}\n".format(self.bolt_type)
         repr += "Grade: {}\n".format(self.grade)
-        repr += "Length: {}".format(self.length)
+        repr += "Length: {}\n".format(self.length)
         return repr
 
     def calculate_bolt_shear_capacity(self, bolt_diameter):
@@ -70,7 +41,7 @@ class Nut(Material):
 
     def __repr__(self):
         repr = "Nut\n"
-        repr += "Diameter: {}".format(self.diameter)
+        repr += "Diameter: {}\n".format(self.diameter)
         return repr
 
 
@@ -97,16 +68,9 @@ class Section(Material):
         self.plast_sec_mod_z = 0.0
         self.plast_sec_mod_y = 0.0
         self.source = 0.0
-        self.fy = 0.0
-        self.fu = 0.0
-
-    def __repr__(self):
-        repr = "Section\n"
-        repr += "Designation: {}".format(self.designation)
-        return repr
 
     def connect_to_database_update_other_attributes(self, table, designation):
-        conn = sqlite3.connect(path_to_database)
+        conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
@@ -129,11 +93,16 @@ class Section(Material):
         self.plast_sec_mod_z = row[16]
         self.plast_sec_mod_y = row[17]
         self.fy = min(self.fy_20, self.fy_20_40, self.fy_40)
-        self.fu = self.fu
         self.source = row[19]
 
         conn.close()
 
+    def __repr__(self):
+        repr = "Section\n"
+        repr += "Designation: {}\n".format(self.designation)
+        repr += "fy: {}\n".format(self.fy)
+        repr += "fu: {}\n".format(self.fu)
+        return repr
 
 class Beam(Section):
 
@@ -159,7 +128,7 @@ class Weld(Material):
     def __repr__(self):
         repr = "Weld\n"
         repr += "Size: {}\n".format(self.size)
-        repr += "Length: {}".format(self.length)
+        repr += "Length: {}\n".format(self.length)
         return repr
 
 
@@ -173,7 +142,7 @@ class Plate(Material):
 
     def __repr__(self):
         repr = "Plate\n"
-        repr += "Thickness: {}".format(self.thickness)
+        repr += "Thickness: {}\n".format(self.thickness)
         return repr
 
 
@@ -193,11 +162,11 @@ class Angle(Material):
 
     def __repr__(self):
         repr = "Angle\n"
-        repr += "Designation: {}".format(self.designation)
+        repr += "Designation: {}\n".format(self.designation)
         return repr
 
     def connect_to_database_update_other_attributes(self, designation):
-        conn = sqlite3.connect(path_to_database)
+        conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))

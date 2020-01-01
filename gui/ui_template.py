@@ -198,6 +198,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
+        self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -930,7 +931,11 @@ class Ui_ModuleWindow(QMainWindow):
                 d1 = {}
             design_dictionary.update(d1)
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
-        main.to_get_d(main,design_dictionary)
+
+        key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
+        main.warn_text(main, key, design_dictionary)
+        print(design_dictionary)
+        main.set_input_values(main, design_dictionary)
         self.design_inputs = design_dictionary
 
     def saveDesign_inputs(self, op_list, data_list):
@@ -1605,7 +1610,7 @@ class DesignPreferences(QDialog):
             Zpy_c = float(self.ui.lineEdit_ElasticModPY_Column.text())
             Source_c = self.ui.lineEdit_Source_Column.text()
 
-            conn = sqlite3.connect(path_to_database)
+            conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
             c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (Designation_c,))
@@ -1662,7 +1667,7 @@ class DesignPreferences(QDialog):
             Zpy_b = float(self.ui.lineEdit_ElasticModPY_Beam.text())
             Source_b = self.ui.lineEdit_Source_Beam.text()
 
-            conn = sqlite3.connect(path_to_database)
+            conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
             c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_b,))

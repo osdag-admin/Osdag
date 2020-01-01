@@ -592,7 +592,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setFont(font)
         self.btn_Design.setAutoDefault(True)
         self.btn_Design.setObjectName("btn_Design")
-        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main))
+        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main,data))
         self.inputDock.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.inputDock)
 
@@ -864,7 +864,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.action_save_input.triggered.connect(lambda: self.saveDesign_inputs(option_list, data))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list))
-        self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, main, data))
+
         self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
 
     def reset_popup(self, new_list, data):
@@ -902,9 +902,11 @@ class Ui_ModuleWindow(QMainWindow):
                 d1 = {}
             design_dictionary.update(d1)
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
-        main.to_get_d(main,design_dictionary)
+
         key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
         main.warn_text(main, key, design_dictionary)
+        print(design_dictionary)
+        main.set_input_values(main, design_dictionary)
         self.design_inputs = design_dictionary
 
     def saveDesign_inputs(self, op_list, data_list):
@@ -978,7 +980,7 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 pass
 
-        self.btn_Design.clicked.connect(design_fn)
+        # self.btn_Design.clicked.connect(design_fn)
         #self.red_func(option_list)
 
     def red_func(self, option_list):
@@ -1008,7 +1010,7 @@ class Ui_ModuleWindow(QMainWindow):
 
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
-    def validateInputsOnDesignBtn(self, main):
+    def validateInputsOnDesignBtn(self, main,data):
 
         option_list = main.input_values(self)
         missing_fields_list = []
@@ -1033,6 +1035,12 @@ class Ui_ModuleWindow(QMainWindow):
 
         if len(missing_fields_list) > 0:
             QMessageBox.information(self, "Information",self.generate_missing_fields_error_string(missing_fields_list))
+        else:
+            self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, main, data))
+
+
+
+
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
 
@@ -1572,7 +1580,7 @@ class DesignPreferences(QDialog):
             Zpy_c = float(self.ui.lineEdit_ElasticModPY_Column.text())
             Source_c = self.ui.lineEdit_Source_Column.text()
 
-            conn = sqlite3.connect(path_to_database)
+            conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
             c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (Designation_c,))
@@ -1629,7 +1637,7 @@ class DesignPreferences(QDialog):
             Zpy_b = float(self.ui.lineEdit_ElasticModPY_Beam.text())
             Source_b = self.ui.lineEdit_Source_Beam.text()
 
-            conn = sqlite3.connect(path_to_database)
+            conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
             c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_b,))

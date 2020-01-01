@@ -4,14 +4,16 @@ TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
+PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 
 import sqlite3
 from utils.common.component import *
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 
+
 def connectdb1():
     lst = []
-    conn = sqlite3.connect(path_to_database)
+    conn = sqlite3.connect(PATH_TO_DATABASE)
     cursor = conn.execute("SELECT Bolt_diameter FROM Bolt")
     rows = cursor.fetchall()
     for row in rows:
@@ -23,7 +25,7 @@ def connectdb1():
 
 def connectdb(table_name):
 
-    conn = sqlite3.connect(path_to_database)
+    conn = sqlite3.connect(PATH_TO_DATABASE)
     lst = []
     if table_name == "Angles":
         cursor = conn.execute("SELECT Designation FROM Angles")
@@ -51,7 +53,7 @@ def connectdb(table_name):
     return final_lst
 
 def connect_for_red(table_name):
-    conn = sqlite3.connect(path_to_database)
+    conn = sqlite3.connect(PATH_TO_DATABASE)
     lst = []
     if table_name == "Angles":
         cursor = conn.execute("SELECT Designation FROM Angles WHERE Source = 'IS808_Old'")

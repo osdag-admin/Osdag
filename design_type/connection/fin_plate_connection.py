@@ -40,9 +40,35 @@ logger = None
 def module_setup():
     global logger
     logger = logging.getLogger("osdag.finPlateCalc")
-
-
 module_setup()
+
+# def set_osdaglogger():
+#     global logger
+#     if logger is None:
+#
+#         logger = logging.getLogger("osdag")
+#     else:
+#         for handler in logger.handlers[:]:
+#             logger.removeHandler(handler)
+#
+#     logger.setLevel(logging.DEBUG)
+#
+#     # create the logging file handler
+#     fh = logging.FileHandler("Connections/Shear/Finplate/fin.log", mode="a")
+#
+#     # ,datefmt='%a, %d %b %Y %H:%M:%S'
+#     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+#
+#     formatter = logging.Formatter('''
+#     <div  class="LOG %(levelname)s">
+#         <span class="DATE">%(asctime)s</span>
+#         <span class="LEVEL">%(levelname)s</span>
+#         <span class="MSG">%(message)s</span>
+#     </div>''')
+#     formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+#     fh.setFormatter(formatter)
+#     logger.addHandler(fh)
+
 
 
 class FinPlateConnection(ShearConnection):
@@ -155,8 +181,56 @@ class FinPlateConnection(ShearConnection):
 
         return options_list
 
+    def warn_text(self,key, my_d):
+        old_col_section = get_oldcolumncombolist()
+        old_beam_section = get_oldbeamcombolist()
+
+        if my_d[KEY_SUPTNGSEC] in old_col_section or my_d[KEY_SUPTDSEC] in old_beam_section:
+            del_data = open('logging_text.log', 'w')
+            del_data.truncate()
+            del_data.close()
+            logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
+            logging.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+            with open('logging_text.log') as file:
+                data = file.read()
+                file.close()
+            # file = open('logging_text.log', 'r')
+            # # This will print every line one by one in the file
+            # for each in file:
+            #     print(each)
+            key.setText(data)
+        else:
+            key.setText("")
+
+    # def set_axial(self, axial):
+    #     self.axial = axial
+    #
+    # def set_plate_thk(self, plate_thk):
+    #     self.plate_thk = plate_thk
+    #
+    # def set_supporting_section(self, supporting_section):
+    #     self.supporting_section = supporting_section
+    #
+    # def set_supported_section(self, supported_section):
+    #     self.supported_section = supported_section
+    #
+    # def set_material(self, material=Material(material_grade)):
+    #     self.material = Material(material)
+    #     print(self.material)
+    #
+    # def set_weld_by_size(self, weld_size, length=0, material=Material(material_grade)):
+    #     self.weld = Weld(weld_size,length,material)
+    #
+    # def get_shear_capacity(self):
+    #     shear_capacity = self.shear
+
+    # fin_plate_input = FinPlateConnectionInput(connectivity, supporting_member_section, supported_member_section, material)
+
+# fin_plate_input = FinPlateConnection(FinPlateConnection.connectivity, supporting_member_section, supported_member_section, fu, fy,
+
 # fin_plate_input = FinPlateConnection(FinPlateConnection.connectivity, supporting_member_section,
 #                                       supported_member_section, fu, fy,
+
 #                                      shear_force, axial_force, bolt_diameter, bolt_type, bolt_grade,
 #                                      weld_size, plate_thickness)
 # bolt = Bolt(grade=bolt_grade, diameter=bolt_diameter, bolt_type=bolt_type, material_grade=material_grade)

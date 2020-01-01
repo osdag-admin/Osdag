@@ -7,6 +7,9 @@ TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 
 import sqlite3
+from utils.common.component import *
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+
 
 def connectdb1():
     lst = []
@@ -96,6 +99,49 @@ def tuple_to_str_red(tl):
         val = ''.join(v)
         arr.append(val)
     return arr
+
+
+def get_oldcolumncombolist():
+    '''(None) -> (List)
+    This function returns the list of Indian Standard Column Designation.
+    '''
+    conn = sqlite3.connect(path_to_database)
+    old_columnList = []
+    # columnQuery = QSqlQuery("SELECT Designation FROM Columns where Source = 'IS808_Old' order by id ASC")
+    columnQuery = conn.execute("SELECT Designation FROM Columns WHERE Source = 'IS808_Old'")
+    rows = columnQuery.fetchall()
+    # a = columnQuery.size()
+    # print(a)
+
+    #comboList.append("Select section")
+    # while(columnQuery.next()):
+    #     old_columnList.append(columnQuery.value(0))
+    for row in rows:
+        old_columnList.append(row)
+
+    final_lst = tuple_to_str_red(old_columnList)
+    return final_lst
+
+
+
+    #return old_columnList
+def get_oldbeamcombolist():
+    conn = sqlite3.connect(path_to_database)
+    old_columnList = []
+    # columnQuery = QSqlQuery("SELECT Designation FROM Beams where Source = 'IS808_Old' order by id ASC")
+    columnQuery = conn.execute("SELECT Designation FROM Beams WHERE Source = 'IS808_Old'")
+    rows = columnQuery.fetchall()
+    # a = columnQuery.size()
+    # print(a)
+
+    # comboList.append("Select section")
+    # while(columnQuery.next()):
+    #     old_columnList.append(columnQuery.value(0))
+    for row in rows:
+        old_columnList.append(row)
+
+    final_lst = tuple_to_str_red(old_columnList)
+    return final_lst
 
 
 KEY_MODULE = 'Module'

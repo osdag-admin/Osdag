@@ -4,13 +4,16 @@ TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
+PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 
 import sqlite3
 from utils.common.component import *
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+
 
 def connectdb1():
     lst = []
-    conn = sqlite3.connect(path_to_database)
+    conn = sqlite3.connect(PATH_TO_DATABASE)
     cursor = conn.execute("SELECT Bolt_diameter FROM Bolt")
     rows = cursor.fetchall()
     for row in rows:
@@ -22,7 +25,7 @@ def connectdb1():
 
 def connectdb(table_name):
 
-    conn = sqlite3.connect(path_to_database)
+    conn = sqlite3.connect(PATH_TO_DATABASE)
     lst = []
     if table_name == "Angles":
         cursor = conn.execute("SELECT Designation FROM Angles")
@@ -49,6 +52,31 @@ def connectdb(table_name):
     final_lst = tuple_to_str(lst)
     return final_lst
 
+def connect_for_red(table_name):
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+    lst = []
+    if table_name == "Angles":
+        cursor = conn.execute("SELECT Designation FROM Angles WHERE Source = 'IS808_Old'")
+
+    elif table_name == "Channels":
+        cursor = conn.execute("SELECT Designation FROM Channels WHERE Source = 'IS808_Old'")
+
+    elif table_name == "Beams":
+        cursor = conn.execute("SELECT Designation FROM Beams WHERE Source = 'IS808_Old'")
+
+    elif table_name == "Columns":
+        cursor = conn.execute("SELECT Designation FROM Columns WHERE Source = 'IS808_Old'")
+
+    else:
+        return []
+    rows = cursor.fetchall()
+
+    for row in rows:
+        lst.append(row)
+
+    final_lst = tuple_to_str_red(lst)
+    return final_lst
+
 
 def tuple_to_str_popup(tl):
     arr = []
@@ -65,9 +93,61 @@ def tuple_to_str(tl):
     return arr
 
 
+def tuple_to_str_red(tl):
+    arr = []
+    for v in tl:
+        val = ''.join(v)
+        arr.append(val)
+    return arr
+
+
+def get_oldcolumncombolist():
+    '''(None) -> (List)
+    This function returns the list of Indian Standard Column Designation.
+    '''
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+    old_columnList = []
+    # columnQuery = QSqlQuery("SELECT Designation FROM Columns where Source = 'IS808_Old' order by id ASC")
+    columnQuery = conn.execute("SELECT Designation FROM Columns WHERE Source = 'IS808_Old'")
+    rows = columnQuery.fetchall()
+    # a = columnQuery.size()
+    # print(a)
+
+    #comboList.append("Select section")
+    # while(columnQuery.next()):
+    #     old_columnList.append(columnQuery.value(0))
+    for row in rows:
+        old_columnList.append(row)
+
+    final_lst = tuple_to_str_red(old_columnList)
+    return final_lst
+
+
+
+    #return old_columnList
+def get_oldbeamcombolist():
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+    old_columnList = []
+    # columnQuery = QSqlQuery("SELECT Designation FROM Beams where Source = 'IS808_Old' order by id ASC")
+    columnQuery = conn.execute("SELECT Designation FROM Beams WHERE Source = 'IS808_Old'")
+    rows = columnQuery.fetchall()
+    # a = columnQuery.size()
+    # print(a)
+
+    # comboList.append("Select section")
+    # while(columnQuery.next()):
+    #     old_columnList.append(columnQuery.value(0))
+    for row in rows:
+        old_columnList.append(row)
+
+    final_lst = tuple_to_str_red(old_columnList)
+    return final_lst
+
+
 KEY_MODULE = 'Module'
 KEY_DISP_FINPLATE = 'Fin Plate'
 TYPE_MODULE = 'Window Title'
+
 
 DISP_TITLE_CM = 'Connecting members'
 
@@ -273,7 +353,3 @@ KEY_DISP_LEN_INLINE = 'Total Length in line with tension'
 
 KEY_LEN_OPPLINE = 'Total length opp line with tension'
 KEY_DISP_LEN_OPPLINE = 'Total Length opp line with tension'
-
-
-
-          

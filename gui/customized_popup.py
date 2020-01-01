@@ -8,6 +8,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox, qApp
+
 import sqlite3
 from PyQt5.QtCore import pyqtSlot
 #from PyQt5.QtCore import pyqtSlot
@@ -50,15 +52,19 @@ class Ui_Popup(object):
         self.pushButton = QtWidgets.QPushButton(MainWindow)
         self.pushButton.setGeometry(QtCore.QRect(265, 130, 75, 23))
         self.pushButton.setObjectName("pushButton")
+        self.pushButton.setAutoDefault(False)
         self.pushButton_2 = QtWidgets.QPushButton(MainWindow)
         self.pushButton_2.setGeometry(QtCore.QRect(265, 180, 75, 23))
         self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_2.setAutoDefault(False)
         self.pushButton_3 = QtWidgets.QPushButton(MainWindow)
         self.pushButton_3.setGeometry(QtCore.QRect(265, 230, 75, 23))
         self.pushButton_3.setObjectName("pushButton_3")
+        self.pushButton_3.setAutoDefault(False)
         self.pushButton_4 = QtWidgets.QPushButton(MainWindow)
         self.pushButton_4.setGeometry(QtCore.QRect(265, 280, 75, 23))
         self.pushButton_4.setObjectName("pushButton_4")
+        self.pushButton_4.setAutoDefault(False)
         self.pushButton_5 = QtWidgets.QPushButton(MainWindow)
         self.pushButton_5.setGeometry(QtCore.QRect(225, 400, 140, 40))
         font = QtGui.QFont()
@@ -66,22 +72,16 @@ class Ui_Popup(object):
         font.setPointSize(14)
         self.pushButton_5.setFont(font)
         self.pushButton_5.setObjectName("pushButton_5")
-        #self.pushButton_5.clicked.connect(self.close_on_submit)
+        self.pushButton_5.setDefault(True)
+        self.pushButton_5.setFocus()
+        self.connections(MainWindow)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.update_buttons_status()
-        self.connections()
-        # self.KEY_EXISTINGVAL = self.get_right_elements()
-        # print(self.KEY_EXISTINGVAL)
-        #test_list = self.get_right_elements()
 
-        # for i in range(0, len(test_list)):
-        #     test_list[i] = int(test_list[i])
-        # test_list.sort()
-        # print(test_list)
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        Form.setWindowTitle(_translate("MainWindow", "Customized"))
         self.label.setText(_translate("MainWindow", "Available:"))
         self.label_2.setText(_translate("MainWindow", "Selected:"))
         self.pushButton.setText(_translate("MainWindow", ">>"))
@@ -90,7 +90,7 @@ class Ui_Popup(object):
         self.pushButton_4.setText(_translate("MainWindow", "<<"))
         self.pushButton_5.setText(_translate("MainWindow", "Submit"))
 
-    def connections(self):
+    def connections(self,MainWindow):
         self.listWidget.itemSelectionChanged.connect(self.update_buttons_status)
         self.listWidget_2.itemSelectionChanged.connect(self.update_buttons_status)
         self.pushButton_2.clicked.connect(self.on_mBtnMoveToAvailable_clicked)
@@ -98,7 +98,16 @@ class Ui_Popup(object):
         self.pushButton_4.clicked.connect(self.on_mButtonToAvailable_clicked)
         self.pushButton.clicked.connect(self.on_mButtonToSelected_clicked)
         self.pushButton_5.clicked.connect(self.get_right_elements)
-        #self.pushButton_5.clicked.connect(self.get_updated_list)
+        self.pushButton_5.clicked.connect(lambda: self.is_empty(MainWindow))
+    def is_empty(self,MainWindow):
+        if len(self.get_right_elements()) == 0:
+            self.error_message = QtWidgets.QMessageBox()
+            self.error_message.setWindowTitle('Information')
+            self.error_message.setIcon(QtWidgets.QMessageBox.Critical)
+            self.error_message.setText('Please Select some values.')
+            self.error_message.exec()
+        else:
+            MainWindow.close()
 
 
     def update_buttons_status(self):
@@ -182,6 +191,4 @@ if __name__ == "__main__":
     ui = Ui_Popup()
     ui.setupUi(MainWindow)
     print(MainWindow.exec())
-    print(ui.get_right_elements())
-    print(1)
     sys.exit(app.exec_())

@@ -192,7 +192,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
-        self.textEdit.setStyleSheet("QTextEdit {color:red}")
+        #self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -522,6 +522,9 @@ class Ui_ModuleWindow(QMainWindow):
         for t in updated_list:
             key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
             key_changed.currentIndexChanged.connect(lambda: change(key_changed, updated_list))
+            # if t[1] == KEY_IMAGE:
+        key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
+        key_changed.currentIndexChanged.connect(lambda: self.validate_beam_beam(key_changed))
 
         def change(k1, new):
 
@@ -1050,6 +1053,42 @@ class Ui_ModuleWindow(QMainWindow):
         information += "."
 
         return information
+
+    def validate_beam_beam(self, key):
+        if key.currentIndex() == 2:
+            self.val()
+
+    def val(self):
+        key2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
+        key3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+        key2.currentIndexChanged.connect(lambda: self.for_key2(key2, key3))
+        key3.currentIndexChanged.connect(lambda: self.for_key2(key2, key3))
+
+    def for_key2(self, key2, key3):
+        if key2.currentIndex() != 0 and key3.currentIndex() != 0:
+            primary = key2.currentText()
+            secondary = key3.currentText()
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation =( ? ) ", (primary,))
+            lst = []
+            rows = cursor.fetchall()
+            for row in rows:
+                lst.append(row)
+            p_val = lst[0][0]
+            cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+            lst1 = []
+            rows1 = cursor2.fetchall()
+            for row1 in rows1:
+                lst1.append(row1)
+            s_val = lst1[0][0]
+            if p_val < s_val:
+                self.btn_Design.setDisabled(True)
+                QMessageBox.about(self, 'Information',
+                                    "Secondary beam depth is higher than clear depth of primary beam web "
+                                    "(No provision in Osdag till now)")
+
+            else:
+                self.btn_Design.setDisabled(False)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

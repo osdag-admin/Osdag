@@ -201,6 +201,19 @@ class FinPlateConnection(ShearConnection):
             key.setText(data)
         else:
             key.setText("")
+
+    def set_input_values(self, design_dictionary):
+        super(FinPlateConnection,self).set_input_values(self, design_dictionary)
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+                           material_grade=design_dictionary[KEY_MATERIAL])
+        self.bolt = Bolt(grade=design_dictionary[KEY_GRD][0], diameter=design_dictionary[KEY_D][0],
+                         bolt_type=design_dictionary[KEY_TYP],
+                         bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
+                         connecting_plates_tk=[self.plate.thickness[0], self.supported_section.web_thickness],
+                         material_grade=design_dictionary[KEY_MATERIAL],
+                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                         mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
+                         corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
 #
 # with open("filename", 'w') as out_file:
 #     yaml.dump(fin_plate_input, out_file)

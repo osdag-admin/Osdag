@@ -1,35 +1,90 @@
 from utils.common.is800_2007 import IS800_2007
 from utils.common.material import *
+from utils.common.other_standards import *
 from Common import *
 import sqlite3
 import math
+import numpy as np
 
 class Bolt(Material):
 
-    def __init__(self, grade=0.0, diameter=0.0, bolt_type="", length=0.0, material_grade=""):
+    def __init__(self, grade=0.0, diameter=0.0, bolt_type="", material_grade="", bolt_hole_type="",
+                 edge_type="",connecting_plates_tk=[], mu_f=0.0, corrosive_influences=True):
         super(Bolt, self).__init__(material_grade)
-        self.grade = grade
-        self.diameter = diameter
+        self.bolt_grade = float(grade)
+        self.bolt_diameter = float(diameter)
         self.bolt_type = bolt_type
-        self.length = length
-        self.shear_capacity = 0.0
-        self.bearing_capacity = 0.0
+        self.bolt_hole_type = bolt_hole_type
+        self.edge_type = edge_type
+        self.mu_f = float(mu_f)
+        self.connecting_plates_tk = list(np.float_(connecting_plates_tk))
+        self.bolt_shear_capacity = 0.0
+        self.bolt_bearing_capacity = 0.0
         self.bolt_capacity = 0.0
         self.no_of_bolts = 0
         self.bolt_group_capacity = 0.0
+        self.bolt_fu = 0.0
+        self.bolt_fy = 0.0
+        if corrosive_influences == "Yes":
+            self.corrosive_influences = True
+        else:
+            self.corrosive_influences = False
+        [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter)
+        self.min_pitch = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter)
+        self.min_gauge = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter)
+        self.min_edge_dist = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter, self.bolt_hole_type, self.edge_type)
+        self.min_end_dist = self.min_edge_dist
+        self.max_spacing = IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk)
+        self.max_edge_dist = IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy, self.corrosive_influences)
+        self.max_end_dist = self.max_edge_dist
+        self.dia_hole = IS800_2007.cl_10_2_1_bolt_hole_size(self.bolt_diameter, self.bolt_hole_type)
 
 
     def __repr__(self):
         repr = "Bolt\n"
-        repr += "Diameter: {}\n".format(self.diameter)
+        repr += "Diameter: {}\n".format(self.bolt_diameter)
         repr += "Type: {}\n".format(self.bolt_type)
-        repr += "Grade: {}\n".format(self.grade)
-        repr += "Length: {}\n".format(self.length)
+        repr += "Grade: {}\n".format(self.bolt_grade)
+        repr += "Bolt Shear Capacity: {}\n".format(self.bolt_shear_capacity)
+        repr += "Bolt Bearing Capacity: {}\n".format(self.bolt_bearing_capacity)
+        repr += "Bolt Capacity: {}\n".format(self.bolt_capacity)
         return repr
 
-    def calculate_bolt_shear_capacity(self, bolt_diameter):
-        # self.shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity()
-        # TODO : Bolt shear capacity functions
+    def calculate_bolt_shear_capacity(self, n_planes):
+        """
+
+        :param bolt_type: bearing or friction grip bolt
+        :param bolt_grade: grade of bolt
+        :param member_fu: ultimate strength of member
+        :param plate_fu: ultimate strength of plate (This is taken same as member strength)
+        :param bolt_hole_type: standard or over-sized
+        :param bolt_dia: diameter of bolt
+        :param n_planes: number of shear planes
+        :param edge_type: shear or hand flame cut
+        :param connecting_plates_tk: thickness of connecting plates
+        :param mu_f: slip factor for friction grip bolts
+        :param member_fy: yield strength of member
+        :param plate_fy: yield strength of plate
+        :param corrosive_influences: yes or no
+        :return: capacity of bolt (shear and bearing), ultimate strength of bolt and yield strength of bolt
+        """
+
+        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade)
+        if self.bolt_type == "Bearing Bolt":
+            self.bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
+                f_u=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
+            self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
+                f_u=self.fu, f_ub=self.bolt_fu, t=min(self.connecting_plates_tk), d=self.bolt_diameter,
+                e=self.min_edge_dist, p=self.min_pitch, bolt_hole_type=self.bolt_hole_type)
+            self.bolt_capacity = [self.bolt_shear_capacity, self.bolt_bearing_capacity]
+
+        elif self.bolt_type == "Friction Grip Bolt":
+            self.bolt_shear_capacity = IS800_2007.cl_10_4_3_bolt_slip_resistance(
+                f_ub=self.bolt_fu, A_nb=self.bolt_net_area, n_e=n_planes, mu_f=self.mu_f, bolt_hole_type=self.bolt_hole_type)
+            self.bolt_bearing_capacity = 'N/A'
+            self.bolt_capacity = [self.bolt_shear_capacity, self.bolt_bearing_capacity]
+
+        return self.bolt_capacity, self.bolt_fu, self.bolt_fy
         pass
 
 
@@ -92,7 +147,6 @@ class Section(Material):
         self.elast_sec_mod_y = row[15]
         self.plast_sec_mod_z = row[16]
         self.plast_sec_mod_y = row[17]
-        self.fy = min(self.fy_20, self.fy_20_40, self.fy_40)
         self.source = row[19]
 
         conn.close()

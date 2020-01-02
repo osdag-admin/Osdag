@@ -110,8 +110,13 @@ class ShearConnection(Connection):
             self.supporting_section = Beam(designation=design_dictionary[KEY_SUPTNGSEC], material_grade=design_dictionary[KEY_MATERIAL])
 
         self.supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC], material_grade=design_dictionary[KEY_MATERIAL])
-        self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D], bolt_type=design_dictionary[KEY_TYP],
-                         material_grade=design_dictionary[KEY_MATERIAL])
+
         self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None))
-        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None), material_grade=design_dictionary[KEY_MATERIAL])
-        print(self.supported_section, self.supporting_section)
+
+
+    def get_bolt_capacity(self):
+        self.bolt.calculate_bolt_shear_capacity(n_planes=1)
+        print(self.bolt)
+
+
+

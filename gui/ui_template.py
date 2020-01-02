@@ -45,7 +45,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
         #self.ui.pushButton_5.clicked.connect(self.window.close)
         self.window.exec()
-        print(self.ui.get_right_elements())
         return self.ui.get_right_elements()
 
     def setupUi(self, MainWindow, main):
@@ -592,7 +591,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setFont(font)
         self.btn_Design.setAutoDefault(True)
         self.btn_Design.setObjectName("btn_Design")
-        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main,data))
         self.inputDock.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.inputDock)
 
@@ -861,13 +859,10 @@ class Ui_ModuleWindow(QMainWindow):
         self.retranslateUi(MainWindow)
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-        self.action_save_input.triggered.connect(lambda: self.design_fn(option_list, data))
-        # self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, data))
-        self.action_save_input.triggered.connect(self.saveDesign_inputs)
+        self.action_save_input.triggered.connect(lambda: self.validateInputsOnDesignBtn(main, data,"Save"))
+        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main, data,"Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list))
-        # self.btn_Design.clicked.connect(lambda: self.pass_d(main, self.design_inputs))
         self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
 
     def reset_popup(self, new_list, data):
@@ -886,7 +881,6 @@ class Ui_ModuleWindow(QMainWindow):
 
     def design_fn(self, op_list, data_list):
         design_dictionary = {}
-
         for op in op_list:
             widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
             if op[2] == TYPE_COMBOBOX:
@@ -908,7 +902,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.design_inputs = design_dictionary
 
     def pass_d(self, main, design_dictionary):
-        main.set_input_values(self, design_dictionary)
         key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
         main.warn_text(main, key, design_dictionary)
         main.set_input_values(main, design_dictionary)
@@ -993,7 +986,7 @@ class Ui_ModuleWindow(QMainWindow):
 
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
-    def validateInputsOnDesignBtn(self, main,data):
+    def validateInputsOnDesignBtn(self, main,data,trigger_type):
 
         option_list = main.input_values(self)
         missing_fields_list = []
@@ -1018,9 +1011,14 @@ class Ui_ModuleWindow(QMainWindow):
 
         if len(missing_fields_list) > 0:
             QMessageBox.information(self, "Information",self.generate_missing_fields_error_string(missing_fields_list))
+        elif trigger_type == "Save":
+            self.design_fn(option_list, data)
+            self.saveDesign_inputs()
         else:
-            self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, data))
-            self.btn_Design.clicked.connect(lambda: self.pass_d(main, self.design_inputs))
+            self.design_fn(option_list, data)
+            self.pass_d(main, self.design_inputs)
+            main.set_input_values(main, self.design_inputs)
+            main.get_bolt_capacity(main)
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """

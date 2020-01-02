@@ -9,5 +9,5 @@ class Load(object):
         repr = "Load\n"
         repr += "Axial Force: {}\n".format(self.axial_force)
         repr += "Shear Force: {}\n".format(self.shear_force)
-        repr += "Moment: {}".format(self.moment)
+        repr += "Moment: {}\n".format(self.moment)
         return repr

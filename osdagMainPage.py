@@ -14,12 +14,12 @@ from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
 # from design_type.connection.fin_plate_connection import design_report_show
-from design_type.connection.fin_plate_connection import DesignReportDialog
+# from design_type.connection.fin_plate_connection import DesignReportDialog
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnectionInput
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
 from design_type.connection.end_plate_connection import EndPlateConnectionInput
-from design_type.connection.fin_plate_connection import design_report
+# from design_type.connection.fin_plate_connection import design_report
 from gui.ui_template import Ui_ModuleWindow
 
 # from design_type.connection.main_controller import MainController
@@ -272,8 +272,8 @@ class MainController(QMainWindow):
         self.folder = folder
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
-        self.ui.btn_CreateDesign.clicked.connect(design_report(Ui_DesignReport))
-        self.design_report = DesignReportDialog(self)
+        # self.ui.btn_CreateDesign.clicked.connect(design_report(Ui_DesignReport))
+        # self.design_report = DesignReportDialog(self)
         # self.ui.actionCreate_design_report.triggered.connect(DesignReportDialog.exec)
 
 

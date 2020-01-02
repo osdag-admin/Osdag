@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
 from PyQt5 import QtCore, QtGui, QtWidgets
+from design_report import reportGenerator
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp
@@ -17,19 +18,29 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
+from PyQt5.QtGui import QStandardItem
 import os
 import json
 import logging
 from drawing_2D.Svg_Window import SvgWindow
 import sys
 import sqlite3
+import shutil
+import openpyxl
+import pdfkit
+import configparser
+import pickle
+import cairosvg
 
 from Common import *
+from utils.common.component import Section,I_sectional_Properties
+from utils.common.component import *
 from .customized_popup import Ui_Popup
+from .ui_summary_popup import Ui_Dialog1
 from .ui_design_preferences import Ui_Dialog
-from gui.ui_design_summary import Ui_DesignReport
-
+from gui.ui_summary_popup import Ui_Dialog1
+from design_report.reportGenerator import save_html
 
 class Ui_ModuleWindow(QMainWindow):
 
@@ -39,12 +50,181 @@ class Ui_ModuleWindow(QMainWindow):
         self.ui = Ui_Popup()
         self.ui.setupUi(self.window)
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
-        self.ui.pushButton_5.clicked.connect(self.window.close)
+        #self.ui.pushButton_5.clicked.connect(self.window.close)
         self.window.exec()
+        print(self.ui.get_right_elements())
         return self.ui.get_right_elements()
+    @pyqtSlot()
+    def open_summary_popup(self):
+        self.new_window = QtWidgets.QDialog()
+        self.new_ui = Ui_Dialog1()
+        self.new_ui.setupUi(self.new_window)
+        self.new_window.exec()
+        self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_ui.lbl_browse))
+        self.new_ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
+        self.new_ui.btn_useProfile.clicked.connect(self.useUserProfile)
+        # self.new_ui.buttonBox.clicked.connect(self.save_inputSummary)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        buttons.accepted.connect(self.save_inputSummary)
+        # self.new_ui.buttonBox.accepted.connect(self.save_inputSummary)
 
-    # def close(self):
-    #     self.window.close()
+    def save_inputSummary(self):
+        input_summary = self.getPopUpInputs()
+        self.save_design(input_summary)
+
+    def call_designreport(self, fileName, report_summary, folder):
+        self.alist = {'Designation': 'MB 500', 'Mass': 86.9, 'Area': 111.0, 'D': 500.0, 'B': 180.0, 'tw': 10.2,
+                      'T': 17.2, 'FlangeSlope': 98, 'R1': 17.0, 'R2': 8.5, 'Iz': 45228.0, 'Iy': 1320.0, 'rz': 20.2,
+                      'ry': 3.5, 'Zz': 1809.1, 'Zy': 147.0, 'Zpz': 2074.8, 'Zpy': 266.7, 'Source': 'IS808_Rev',
+                      'Bolt': {'Diameter (mm)': '24', 'Grade': '8.8', 'Type': 'Friction Grip Bolt'},
+                      'Weld': {'Size (mm)': '12'},
+                      'Member': {'BeamSection': 'MB 500', 'ColumSection': 'UC 305 x 305 x 97',
+                                 'Connectivity': 'Column flange-Beam web', 'fu (MPa)': '410', 'fy (MPa)': '250'},
+                      'Plate': {'Thickness (mm)': '12', 'Height (mm)': '', 'Width (mm)': ''},
+                      'Load': {'ShearForce (kN)': '140'}, 'Connection': 'Finplate',
+                      'bolt': {'bolt_hole_type': 'Standard', 'bolt_hole_clrnce': 2, 'bolt_fu': 800.0,
+                               'slip_factor': 0.3},
+                      'weld': {'typeof_weld': 'Shop weld', 'safety_factor': 1.25, 'fu_overwrite': '410'},
+                      'detailing': {'typeof_edge': 'a - Sheared or hand flame cut', 'min_edgend_dist': 1.7, 'gap': 10.0,
+                                    'is_env_corrosive': 'No'}, 'design': {'design_method': 'Limit State Design'}}
+        self.result = {
+            'Bolt': {'status': True, 'shearcapacity': 47.443, 'bearingcapacity': 'N/A', 'boltcapacity': 47.443,
+                     'numofbolts': 3, 'boltgrpcapacity': 142.33, 'numofrow': 3, 'numofcol': 1, 'pitch': 96.0,
+                     'edge': 54.0, 'enddist': 54.0, 'gauge': 0.0, 'bolt_fu': 800.0, 'bolt_dia': 24, 'k_b': 0.519,
+                     'beam_w_t': 10.2, 'web_plate_t': 12.0, 'beam_fu': 410.0, 'shearforce': 140.0, 'dia_hole': 26},
+            'Weld': {'thickness': 10, 'thicknessprovided': 12.0, 'resultantshear': 434.557, 'weldstrength': 1590.715,
+                     'weld_fu': 410.0, 'effectiveWeldlength': 276.0},
+            'Plate': {'minHeight': 300.0, 'minWidth': 118.0, 'plateedge': 64.0, 'externalmoment': 8.96,
+                      'momentcapacity': 49.091, 'height': 300.0, 'width': 118.0, 'blockshear': 439.837,
+                      'web_plate_fy': 250.0, 'platethk': 12.0, 'beamdepth': 500.0, 'beamrootradius': 17.0,
+                      'colrootradius': 15.2, 'beamflangethk': 17.2, 'colflangethk': 15.4}}
+        # print("resultobj", self.result)
+        # self.column_data = self.fetchColumnPara()
+        # self.beam_data = self.fetchBeamPara()
+        save_html(self.result, self.alist, fileName, report_summary, folder)
+
+    def save_design(self, popup_summary):
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.call_3DModel("white_bg")
+        #     data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+        #     self.display.ExportToImage(data)
+        #     self.display.FitAll()
+        # else:
+        #     pass
+
+
+        folder = self.select_workspace_folder()
+        self.folder = str(folder)
+        fileName = os.path.join(self.folder, "images_html", "Html_Report.html")
+        fileName = str(fileName)
+        # self.commLogicObj.call_designReport(fileName, popup_summary)
+        self.call_designreport(fileName, popup_summary,self.folder)
+
+        config = configparser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+        # Creates pdf
+
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
+
+        options = {
+            'margin-bottom': '10mm',
+            'footer-right': '[page]'
+        }
+        file_type = "PDF (*.pdf)"
+        fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
+        fname = str(fname)
+        flag = True
+        if fname == '':
+            flag = False
+            return flag
+        else:
+            pdfkit.from_file(fileName, fname, configuration=config, options=options)
+            QMessageBox.about(self, 'Information', "Report Saved")
+
+    def select_workspace_folder(self):
+        # This function prompts the user to select the workspace folder and returns the name of the workspace folder
+        config = configparser.ConfigParser()
+        config.read_file(open(r'Osdag.config'))
+        desktop_path = config.get("desktop_path", "path1")
+        folder = QFileDialog.getExistingDirectory(self,
+                                                  "Select Workspace Folder (Don't use spaces in the folder name)",
+                                                  desktop_path)
+        return folder
+
+    def getLogoFilePath(self, lblwidget):
+
+        self.new_ui.lbl_browse.clear()
+        filename, _ = QFileDialog.getOpenFileName(
+            self, 'Open File', " ../../",
+            'Images (*.png *.svg *.jpg)',
+            None, QFileDialog.DontUseNativeDialog)
+        flag = True
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            base = os.path.basename(str(filename))
+            lblwidget.setText(base)
+            base_type = base[-4:]
+            self.desired_location(filename, base_type)
+
+        return str(filename)
+
+    def desired_location(self, filename, base_type):
+        if base_type == ".svg":
+            cairosvg.svg2png(file_obj=filename,
+                             write_to=os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
+        else:
+            shutil.copyfile(filename, os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
+
+    def saveUserProfile(self):
+
+        flag = True
+        inputData = self.getPopUpInputs()
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+                                                  os.path.join(str(self.folder), "Profile"), '*.txt')
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            infile = open(filename, 'w')
+            pickle.dump(inputData, infile)
+            infile.close()
+
+    def getPopUpInputs(self):
+        input_summary = {}
+        input_summary["ProfileSummary"] = {}
+        input_summary["ProfileSummary"]["CompanyName"] = str(self.new_ui.lineEdit_companyName.text())
+        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.new_ui.lbl_browse.text())
+        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.new_ui.lineEdit_groupName.text())
+        input_summary["ProfileSummary"]["Designer"] = str(self.new_ui.lineEdit_designer.text())
+
+        input_summary["ProjectTitle"] = str(self.new_ui.lineEdit_projectTitle.text())
+        input_summary["Subtitle"] = str(self.new_ui.lineEdit_subtitle.text())
+        input_summary["JobNumber"] = str(self.new_ui.lineEdit_jobNumber.text())
+        input_summary["AdditionalComments"] = str(self.new_ui.txt_additionalComments.toPlainText())
+        input_summary["Client"] = str(self.new_ui.lineEdit_client.text())
+
+        return input_summary
+
+    def useUserProfile(self):
+
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+                                                  os.path.join(str(self.folder), "Profile"),
+                                                  '*.txt')
+        if os.path.isfile(filename):
+            outfile = open(filename, 'r')
+            reportsummary = pickle.load(outfile)
+            self.new_ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
+            self.new_ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
+            self.new_ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
+            self.new_ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
+
+        else:
+            pass
+
     def setupUi(self, MainWindow, main):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -190,6 +370,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
+        self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -377,6 +558,30 @@ class Ui_ModuleWindow(QMainWindow):
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Link, brush)
+        self.outputDock = QtWidgets.QDockWidget(MainWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.outputDock.sizePolicy().hasHeightForWidth())
+        self.outputDock.setSizePolicy(sizePolicy)
+        self.outputDock.setMinimumSize(QtCore.QSize(320, 710))
+        self.outputDock.setMaximumSize(QtCore.QSize(310, 710))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(11)
+        font.setBold(True)
+        font.setWeight(75)
+        self.outputDock.setFont(font)
+        self.outputDock.setObjectName("outputDock")
+        self.dockWidgetContents_2 = QtWidgets.QWidget()
+        self.dockWidgetContents_2.setObjectName("dockWidgetContents_2")
+        self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_2)
+        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 600, 200, 30))
+        self.btn_CreateDesign.setAutoDefault(True)
+        self.btn_CreateDesign.setObjectName("btn_CreateDesign")
+        self.btn_CreateDesign.clicked.connect(self.open_summary_popup)
+        self.outputDock.setWidget(self.dockWidgetContents_2)
+        MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
 
         font = QtGui.QFont()
         font.setPointSize(11)
@@ -391,7 +596,7 @@ class Ui_ModuleWindow(QMainWindow):
             lable = option[1]
             type = option[2]
             # value = option[4]
-            if type not in [TYPE_TITLE, TYPE_IMAGE]:
+            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
                 font = QtGui.QFont()
@@ -411,8 +616,21 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setBold(False)
                 font.setWeight(50)
                 combo.setFont(font)
+                combo.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+                combo.setMaxVisibleItems(5)
+                # combo.setForegroundRole(QtGui.QColor('red'))
                 combo.setObjectName(option[0])
                 for item in option[4]:
+                    # item = PyQt5.QtGui.QStandardItem(str(account))
+                    # item.setBackground
+                    # item.setColor('red')
+                    # combo.setColor(QDialog.Foreground, Qt.red)
+                    # item = QPalette()
+                    # item.setColor('red')
+                    # item.setItemData(item, QBrush(QColor("red")), Qt.TextColorRole)
+                    # combo.setItemData(item, QBrush(QColor("red")), Qt.TextColorRole)
+                    # combo.setBackground(QBrush(QColor("red")))
                     combo.addItem(item)
                 # combo.setMaxVisibleItems(int(5))
 
@@ -425,6 +643,11 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+
+            if type == TYPE_MODULE:
+                _translate = QtCore.QCoreApplication.translate
+                MainWindow.setWindowTitle(_translate("MainWindow", option[1]))
+                i = i - 30
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
@@ -446,9 +669,30 @@ class Ui_ModuleWindow(QMainWindow):
 
             i = i + 30
 
+        for option in option_list:
+            key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+
+            #v = ''
+            if option[0] == KEY_SUPTNGSEC:
+                v = "Columns"
+                red_list = connect_for_red(v)
+                #print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+            elif option[0] == KEY_SUPTDSEC:
+
+                v = "Beams"
+                red_list = connect_for_red(v)
+                #print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
         new_list = main.customized_input(main)
-
         data = {}
 
         for t in new_list:
@@ -475,8 +719,6 @@ class Ui_ModuleWindow(QMainWindow):
                 f = c_tup[1]
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
-                print(existing_options)
-
                 if selected == "Customized":
                     data[c_tup[0] + "_customized"] = self.open_popup(options, existing_options)
                 else:
@@ -502,6 +744,33 @@ class Ui_ModuleWindow(QMainWindow):
                 if typ == TYPE_COMBOBOX:
                     for values in val:
                         k2.addItem(values)
+                    if k2.objectName() == KEY_SUPTNGSEC:
+                        if k1.currentText() in VALUES_CONN_1:
+                            v = "Columns"
+                            red_list = connect_for_red(v)
+                            #print(red_list)
+
+                            for value in red_list:
+                                indx = val.index(str(value))
+                                k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+                        else:
+                            v = "Beams"
+                            red_list = connect_for_red(v)
+                            #print(red_list)
+
+                            for value in red_list:
+                                indx = val.index(str(value))
+                                k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+                    elif k2.objectName() == KEY_SUPTDSEC:
+                        v = "Beams"
+                        red_list = connect_for_red(v)
+                        #print(red_list)
+
+                        for value in red_list:
+                            indx = val.index(str(value))
+                            k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+
                 elif typ == TYPE_LABEL:
                     k2.setText(val)
                 elif typ == TYPE_IMAGE:
@@ -529,55 +798,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setFont(font)
         self.btn_Design.setAutoDefault(True)
         self.btn_Design.setObjectName("btn_Design")
-
+        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main,data))
         self.inputDock.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.inputDock)
-
-        self.outputDock = QtWidgets.QDockWidget(MainWindow)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.outputDock.sizePolicy().hasHeightForWidth())
-        self.outputDock.setSizePolicy(sizePolicy)
-        self.outputDock.setMinimumSize(QtCore.QSize(320, 710))
-        self.outputDock.setMaximumSize(QtCore.QSize(310, 710))
-
-        # font = QtGui.QFont()
-        # font.setFamily("Arial")
-        # font.setPointSize(11)
-        # font.setBold(True)
-        # font.setItalic(False)
-        # font.setWeight(75)
-        # self.inputDock.setFont(font)
-        # self.inputDock.setFloating(False)
-        # self.inputDock.setFeatures(QtWidgets.QDockWidget.AllDockWidgetFeatures)
-        # self.inputDock.setObjectName("inputDock")
-
-
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.outputDock.setFont(font)
-        # self.outputDock.setFloating(False)
-        # self.outputDock.setFeatures(QtWidgets.QDockWidget.AllDockWidgetFeatures)
-        self.outputDock.setObjectName("outputDock")
-        MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
-        self.dockWidgetContents_2 = QtWidgets.QWidget()
-        self.dockWidgetContents_2.setObjectName("dockWidgetContents_2")
-        self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_2)
-        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 100, 200, 30))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btn_CreateDesign.setFont(font)
-        self.btn_CreateDesign.setAutoDefault(True)
-        self.btn_CreateDesign.setObjectName("btn_CreateDesign")
-        self.btn_CreateDesign.raise_()
-
         self.actionInput = QtWidgets.QAction(MainWindow)
         icon7 = QtGui.QIcon()
         icon7.addPixmap(QtGui.QPixmap(":/images/input.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -768,7 +991,10 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.setFont(font)
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
+        self.actionDesign_Preferences.triggered.connect(self.column_design_prefer)
+        self.actionDesign_Preferences.triggered.connect(self.beam_design_prefer)
         self.designPrefDialog = DesignPreferences(self)
+        self.designPrefDialog.rejected.connect(self.design_preferences)
 
         # self.btn_CreateDesign = QtWidgets.QAction(MainWindow)
         # font = QtGui.QFont()
@@ -835,9 +1061,16 @@ class Ui_ModuleWindow(QMainWindow):
         self.retranslateUi(MainWindow)
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
+        self.action_save_input.triggered.connect(lambda: self.design_fn(option_list, main, data))
+        self.action_save_input.triggered.connect(lambda: self.saveDesign_inputs(option_list, data))
+        self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list))
-        self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, main, data))
+
+        self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
+
+    def reset_popup(self, new_list, data):
+        for custom_combo in new_list:
+            data[custom_combo[0] + "_customized"] = custom_combo[1]()
 
     def reset_fn(self, op_list):
         for op in op_list:
@@ -848,7 +1081,6 @@ class Ui_ModuleWindow(QMainWindow):
                 widget.setText('')
             else:
                 pass
-        self.window.close()
 
     def design_fn(self, op_list, main, data_list):
         design_dictionary = {}
@@ -857,6 +1089,9 @@ class Ui_ModuleWindow(QMainWindow):
             widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
             if op[2] == TYPE_COMBOBOX:
                 des_val = widget.currentText()
+                d1 = {op[0]: des_val}
+            elif op[2] == TYPE_MODULE:
+                des_val = op[1]
                 d1 = {op[0]: des_val}
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 des_val = data_list[op[0]+"_customized"]
@@ -867,12 +1102,180 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 d1 = {}
             design_dictionary.update(d1)
-        main.to_get_d(design_dictionary)
+        design_dictionary.update(self.designPrefDialog.save_designPref_para())
+
+        key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
+        main.warn_text(main, key, design_dictionary)
+        print(design_dictionary)
+        main.set_input_values(main, design_dictionary)
+        self.design_inputs = design_dictionary
+
+    def saveDesign_inputs(self, op_list, data_list):
+        path = r'C:\Users\Win10\Desktop'
+        fileName, _ = QFileDialog.getSaveFileName(self,
+                                                  "Save Design", os.path.join(str(path), "untitled.osi"),
+                                                  "Input Files(*.osi)")
+        # design_dictionary = {}
+        # for op in op_list:
+        #     widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
+        #     if op[2] == TYPE_COMBOBOX:
+        #         des_val = widget.currentText()
+        #         d1 = {op[0]: des_val}
+        #     elif op[2] == TYPE_MODULE:
+        #         des_val = op[1]
+        #         d1 = {op[0]: des_val}
+        #     elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
+        #         des_val = data_list[op[0]+"_customized"]
+        #         d1 = {op[0]: des_val}
+        #     elif op[2] == TYPE_TEXTBOX:
+        #         des_val = widget.text()
+        #         d1 = {op[0]: des_val}
+        #     else:
+        #         d1 = {}
+        #     design_dictionary.update(d1)
+        # design_dictionary.update(self.designPrefDialog.save_designPref_para())
+        if not fileName:
+            return
+        try:
+            with open(fileName, 'w') as input_file:
+                json.dump(self.design_inputs, input_file)
+        except Exception as e:
+            QMessageBox.warning(self, "Application",
+                                "Cannot write file %s:\n%s" % (fileName, str(e)))
+            return
+
+    def loadDesign_inputs(self, op_list, data, new):
+        path = r'C:\Users\Win10\Desktop'
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(path), "InputFiles(*.osi)")
+        if not fileName:
+            return
+        try:
+            in_file = str(fileName)
+            with open(in_file, 'r') as fileObject:
+                uiObj = json.load(fileObject)
+            self.setDictToUserInputs(uiObj, op_list, data, new)
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+
+    def setDictToUserInputs(self, uiObj, op_list, data, new):
+        for op in op_list:
+            key_str = op[0]
+            key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
+            if op[2] == TYPE_COMBOBOX:
+                index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
+                if index >= 0:
+                    key.setCurrentIndex(index)
+            elif op[2] == TYPE_TEXTBOX:
+                key.setText(uiObj[key_str])
+            elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                for n in new:
+                    if n[0] == key_str:
+                        if uiObj[key_str] != n[1]():
+                            data[key_str + "_customized"] = uiObj[key_str]
+                            key.setCurrentIndex(1)
+                        else:
+                            pass
+            else:
+                pass
+
+        # self.btn_Design.clicked.connect(design_fn)
+        #self.red_func(option_list)
+
+    def red_func(self, option_list):
+        for option in option_list:
+            key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+
+            #v = ''
+            if option[0] == KEY_SUPTNGSEC:
+                v = "Columns"
+                red_list = connect_for_red(v)
+                print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+            elif option[0] == KEY_SUPTDSEC:
+
+                v = "Beams"
+
+                red_list = connect_for_red(v)
+
+                print(red_list)
+
+                for value in red_list:
+                    indx = option[4].index(str(value))
+
+                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+    def validateInputsOnDesignBtn(self, main,data):
+
+        option_list = main.input_values(self)
+        missing_fields_list = []
+
+        for option in option_list:
+            if option[0] == KEY_CONN:
+                continue
+            s = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+
+            if option[2] == TYPE_COMBOBOX:
+                if option[0] in ["Bolt.Diameter","Bolt.Grade","Plate.Thickness"]:
+                    continue
+                if s.currentIndex() == 0:
+                    missing_fields_list.append(option[1])
 
 
+            elif option[2] == TYPE_TEXTBOX:
+                if s.text() == '':
+                    missing_fields_list.append(option[1])
+            else:
+                pass
+
+        if len(missing_fields_list) > 0:
+            QMessageBox.information(self, "Information",self.generate_missing_fields_error_string(missing_fields_list))
+        else:
+            self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, main, data))
+
+
+
+
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+
+        Returns:
+            error string that has to be displayed
+
+        """
+
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+
+
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
+      
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))
+        #MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))
         self.btnInput.setToolTip(_translate("MainWindow", "Left Dock"))
         self.btnInput.setText(_translate("MainWindow", "input"))
         self.btnOutput.setToolTip(_translate("MainWindow", "Right Dock"))
@@ -906,9 +1309,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setShortcut(_translate("MainWindow", "Alt+D"))
 
         self.outputDock.setWindowTitle(_translate("MainWindow", "Output dock"))
-        self.btn_CreateDesign.setToolTip(_translate("MainWindow", "Design report"))
-        self.btn_CreateDesign.setText(_translate("MainWindow", "Design report"))
-        self.btn_CreateDesign.setShortcut(_translate("MainWindow", "Alt+Z"))
+
+        self.btn_CreateDesign.setText(_translate("MainWindow", "Create design report"))
+
         self.actionInput.setText(_translate("MainWindow", "Input"))
         self.actionInput.setToolTip(_translate("MainWindow", "Input browser"))
         self.actionInputwindow.setText(_translate("MainWindow", "inputwindow"))
@@ -998,7 +1401,21 @@ class Ui_ModuleWindow(QMainWindow):
             widget.hide()
 
     def design_preferences(self):
-        self.designPrefDialog.show()
+        self.designPrefDialog.exec()
+
+    def column_design_prefer(self):
+        # designation = str(self.ui.combo_columnSec.currentText())
+        #TODO:ADD FUNCTION TO GET designation, material_grade
+        designation = "HB 150"
+        material_grade = "E 250 (Fe 410 W)A"
+        self.designPrefDialog.column_preferences(designation, material_grade)
+
+    def beam_design_prefer(self):
+        # designation = str(self.ui.combo_beamSec.currentText())
+        #TODO:ADD FUNCTION TO GET designation, material_grade
+        designation = "JB 150"
+        material_grade = "E 250 (Fe 410 W)A"
+        self.designPrefDialog.beam_preferences(designation, material_grade)
 
     def create_design_report(self):
         self.create_report.show()
@@ -1029,17 +1446,101 @@ class DesignPreferences(QDialog):
         self.saved = None
         self.ui.combo_design_method.model().item(1).setEnabled(False)
         self.ui.combo_design_method.model().item(2).setEnabled(False)
+        # self.save_default_para()
         dbl_validator = QDoubleValidator()
         self.ui.txt_boltFu.setValidator(dbl_validator)
         self.ui.txt_boltFu.setMaxLength(7)
         self.ui.txt_weldFu.setValidator(dbl_validator)
         self.ui.txt_weldFu.setMaxLength(7)
-        self.ui.txt_detailingGap.setValidator(dbl_validator)
-        self.ui.txt_detailingGap.setMaxLength(5)
-        # self.ui.btn_defaults.clicked.connect(self.set_default_para)
-        self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        # self.ui.btn_defaults.clicked.connect(self.save_default_para)
+        # self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        self.ui.btn_save.hide()
         self.ui.btn_close.clicked.connect(self.close_designPref)
         # self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
+        self.ui.pushButton_Import_Column.setDisabled(True)
+        self.ui.pushButton_Import_Beam.setDisabled(True)
+        self.ui.pushButton_Add_Column.clicked.connect(self.add_ColumnPref)
+        self.ui.pushButton_Add_Beam.clicked.connect(self.add_BeamPref)
+        self.ui.pushButton_Clear_Column.clicked.connect(self.clear_ColumnPref)
+        self.ui.pushButton_Clear_Beam.clicked.connect(self.clear_BeamPref)
+        self.ui.pushButton_Download_Column.clicked.connect(self.download_Database_Column)
+        self.ui.pushButton_Download_Beam.clicked.connect(self.download_Database_Beam)
+
+        self.ui.pushButton_Import_Column.clicked.connect(self.import_ColumnPref)
+        self.ui.pushButton_Import_Beam.clicked.connect(self.import_BeamPref)
+        #self.ui.btn_save.clicked.connect(Ui_ModuleWindow.design_preferences(Ui_ModuleWindow()))
+        #self.ui.combo_boltHoleType.currentIndexChanged.connect(my_fn)
+        #self.ui.btn_save.clicked.connect(self.save_fn)
+        self.ui.btn_defaults.clicked.connect(self.default_fn)
+
+    def default_fn(self):
+        for children in self.ui.tab_Bolt.children():
+            if children.objectName() == 'combo_boltHoleType':
+                children.setCurrentIndex(0)
+            elif children.objectName() == 'txt_boltFu':
+                children.setText('800')
+            elif children.objectName() == 'combo_slipfactor':
+                children.setCurrentIndex(8)
+            else:
+                pass
+        for children in self.ui.tab_Weld.children():
+            if children.objectName() == 'combo_weldType':
+                children.setCurrentIndex(0)
+            elif children.objectName() == 'txt_weldFu':
+                children.setText('410')
+            else:
+                pass
+        for children in self.ui.tab_Detailing.children():
+            if children.objectName() == 'combo_detailingEdgeType':
+                children.setCurrentIndex(0)
+            elif children.objectName() == 'txt_detailingGap':
+                children.setText('10')
+            elif children.objectName() == 'combo_detailing_memebers':
+                children.setCurrentIndex(0)
+            else:
+                pass
+        for children in self.ui.tab_Design.children():
+            if children.objectName() == 'combo_design_method':
+                children.setCurrentIndex(0)
+            else:
+                pass
+
+    # def save_fn(self):
+    #     for children in self.ui.tab_Bolt.children():
+    #         if isinstance(children, QtWidgets.QComboBox):
+    #             children.setCurrentIndex(children.currentIndex())
+    #             print('check')
+
+    def save_designPref_para(self):
+        """This routine is responsible for saving all design preferences selected by the user
+        """
+        key_boltHoleType = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, "combo_boltHoleType")
+        combo_boltHoleType = key_boltHoleType.currentText()
+        key_boltFu = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, "txt_boltFu")
+        line_boltFu = key_boltFu.text()
+        key_slipfactor = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, "combo_slipfactor")
+        combo_slipfactor = key_slipfactor.currentText()
+        key_weldType = self.ui.tab_Weld.findChild(QtWidgets.QWidget, "combo_weldType")
+        combo_weldType = key_weldType.currentText()
+        key_weldFu = self.ui.tab_Weld.findChild(QtWidgets.QWidget, "txt_weldFu")
+        line_weldFu = key_weldFu.text()
+        key_detailingEdgeType = self.ui.tab_Detailing.findChild(QtWidgets.QWidget, "combo_detailingEdgeType")
+        combo_detailingEdgeType = key_detailingEdgeType.currentText()
+        key_detailingGap = self.ui.tab_Detailing.findChild(QtWidgets.QWidget, "txt_detailingGap")
+        line_detailingGap = key_detailingGap.text()
+        key_detailing_memebers = self.ui.tab_Detailing.findChild(QtWidgets.QWidget, "combo_detailing_memebers")
+        combo_detailing_memebers = key_detailing_memebers.currentText()
+        key_design_method = self.ui.tab_Design.findChild(QtWidgets.QWidget, "combo_design_method")
+        combo_design_method = key_design_method.currentText()
+        d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+              KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
+              KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
+              KEY_DP_WELD_TYPE: combo_weldType,
+              KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+              KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+              KEY_DP_GAP: line_detailingGap,
+              KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers, KEY_DP_DESIGN_METHOD: combo_design_method}
+        return d1
 
     def highlight_slipfactor_description(self):
         """Highlight the description of currosponding slipfactor on selection of inputs
@@ -1068,13 +1569,458 @@ class DesignPreferences(QDialog):
             pos = index + regex.matchedLength()
             index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
 
-    def save_designPref_para(self):
-        """This routine is responsible for saving all design preferences selected by the user
-        """
-        return None
+    # def connect_to_database_update_other_attributes(self, table, designation):
+    #     self.path_to_database = "ResourceFiles/Database/Intg_osdag.sqlite"
+    #     conn = sqlite3.connect(self.path_to_database)
+    #     db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
+    #     cur = conn.cursor()
+    #     cur.execute(db_query, (designation,))
+    #     row = cur.fetchone()
+    #     self.mass = row[2]
+    #     self.area = row[3]
+    #     self.depth = row[4]
+    #     self.flange_width = row[5]
+    #     self.web_thickness = row[6]
+    #     self.flange_thickness = row[7]
+    #     self.flange_slope = row[8]
+    #     self.root_radius = row[9]
+    #     self.toe_radius = row[10]
+    #     self.mom_inertia_z = row[11]
+    #     self.mom_inertia_y = row[12]
+    #     self.rad_of_gy_z = row[13]
+    #     self.rad_of_gy_y = row[14]
+    #     self.elast_sec_mod_z = row[15]
+    #     self.elast_sec_mod_y = row[16]
+    #     self.plast_sec_mod_z = row[17]
+    #     self.plast_sec_mod_y = row[18]
+    #     self.source = row[19]
+    #
+    #     conn.close()
+    def column_preferences(self, designation,material_grade):
+        col_attributes = Section(designation, material_grade)
+        Section.connect_to_database_update_other_attributes(col_attributes,"Columns", designation)
+        self.ui.lineEdit_Designation_Column.setText(designation)
+        self.ui.lineEdit_Source_Column.setText(col_attributes.source)
+        self.ui.lineEdit_UltimateStrength_Column.setText(str(col_attributes.fu))
+        self.ui.lineEdit_YieldStrength_Column.setText(str(col_attributes.fy))
+        self.ui.lineEdit_Depth_Column.setText(str(col_attributes.depth))
+        self.ui.lineEdit_FlangeWidth_Column.setText(str(col_attributes.flange_width))
+        self.ui.lineEdit_FlangeThickness_Column.setText(str(col_attributes.flange_thickness))
+        self.ui.lineEdit_WeBThickness_Column.setText(str(col_attributes.web_thickness))
+        self.ui.lineEdit_FlangeSlope_Column.setText(str(col_attributes.flange_slope))
+        self.ui.lineEdit_RootRadius_Column.setText(str(col_attributes.root_radius))
+        self.ui.lineEdit_ToeRadius_Column.setText(str(col_attributes.toe_radius))
+        self.ui.lineEdit_ModElasticity_Column.setText("200")
+        self.ui.lineEdit_ModElasticity_Column.setDisabled(True)
+        self.ui.lineEdit_ModulusOfRigidity_Column.setText("76.9")
+        self.ui.lineEdit_ModulusOfRigidity_Column.setDisabled(True)
+        self.ui.lineEdit_PoissionsRatio_Column.setText("0.3")
+        self.ui.lineEdit_PoissionsRatio_Column.setDisabled(True)
+        self.ui.lineEdit_ThermalExpansion_Column.setText("12")
+        self.ui.lineEdit_ThermalExpansion_Column.setDisabled(True)
+        self.ui.lineEdit_Mass_Column.setText(str(col_attributes.mass))
+        self.ui.lineEdit_SectionalArea_Column.setText(str(col_attributes.area))
+        self.ui.lineEdit_MomentOfAreaZ_Column.setText(str(col_attributes.mom_inertia_z))
+        self.ui.lineEdit_MomentOfAreaY_Column.setText(str(col_attributes.mom_inertia_y))
+        self.ui.lineEdit_RogZ_Column.setText(str(col_attributes.rad_of_gy_z))
+        self.ui.lineEdit_RogY_Column.setText(str(col_attributes.rad_of_gy_y))
+        self.ui.lineEdit_ElasticModZ_Column.setText(str(col_attributes.elast_sec_mod_z))
+        self.ui.lineEdit_ElasticModY_Column.setText(str(col_attributes.elast_sec_mod_y))
+        self.ui.lineEdit_ElasticModPZ_Column.setText(str(col_attributes.plast_sec_mod_z))
+        self.ui.lineEdit_ElasticModPY_Column.setText(str(col_attributes.plast_sec_mod_y))
+        self.ui.pushButton_Add_Column.setEnabled(True)
+
+        if (
+                self.ui.lineEdit_Depth_Column.text() != "" and self.ui.lineEdit_FlangeWidth_Column.text() != "" and self.ui.lineEdit_FlangeThickness_Column.text() != ""
+                and self.ui.lineEdit_WeBThickness_Column.text() != ""):
+            self.ui.lineEdit_Depth_Column.textChanged.connect(self.new_sectionalprop_Column)
+            self.ui.lineEdit_FlangeWidth_Column.textChanged.connect(self.new_sectionalprop_Column)
+            self.ui.lineEdit_FlangeThickness_Column.textChanged.connect(self.new_sectionalprop_Column)
+            self.ui.lineEdit_WeBThickness_Column.textChanged.connect(self.new_sectionalprop_Column)
+
+    def beam_preferences(self, designation,material_grade):
+        beam_attributes = Section(designation,material_grade)
+        Section.connect_to_database_update_other_attributes(beam_attributes, "Beams", designation)
+        self.ui.lineEdit_Designation_Beam.setText(designation)
+        self.ui.lineEdit_Source_Beam.setText(str(beam_attributes.source))
+        self.ui.lineEdit_UltimateStrength_Beam.setText(str(beam_attributes.fu))
+        self.ui.lineEdit_YieldStrength_Beam.setText(str(beam_attributes.fy))
+        self.ui.lineEdit_Depth_Beam.setText(str(beam_attributes.depth))
+        self.ui.lineEdit_FlangeWidth_Beam.setText(str(beam_attributes.flange_width))
+        self.ui.lineEdit_FlangeThickness_Beam.setText(str(beam_attributes.flange_thickness))
+        self.ui.lineEdit_WeBThickness_Beam.setText(str(beam_attributes.web_thickness))
+        self.ui.lineEdit_FlangeSlope_Beam.setText(str(beam_attributes.flange_slope))
+        self.ui.lineEdit_RootRadius_Beam.setText(str(beam_attributes.root_radius))
+        self.ui.lineEdit_ToeRadius_Beam.setText(str(beam_attributes.toe_radius))
+        self.ui.lineEdit_ModElasticity_Beam.setText("200")
+        self.ui.lineEdit_ModElasticity_Beam.setDisabled(True)
+        self.ui.lineEdit_ModulusOfRigidity_Beam.setText("76.9")
+        self.ui.lineEdit_ModulusOfRigidity_Beam.setDisabled(True)
+        self.ui.lineEdit_PoissonsRatio_Beam.setText("0.3")
+        self.ui.lineEdit_PoissonsRatio_Beam.setDisabled(True)
+        self.ui.lineEdit_ThermalExpansion_Beam.setText("12")
+        self.ui.lineEdit_ThermalExpansion_Beam.setDisabled(True)
+        self.ui.lineEdit_Mass_Beam.setText(str(beam_attributes.mass))
+        self.ui.lineEdit_SectionalArea_Beam.setText(str(beam_attributes.area))
+        self.ui.lineEdit_MomentOfAreaZ_Beam.setText(str(beam_attributes.mom_inertia_z))
+        self.ui.lineEdit_MomentOfAreaY_Beam.setText(str(beam_attributes.mom_inertia_y))
+        self.ui.lineEdit_RogZ_Beam.setText(str(beam_attributes.rad_of_gy_z))
+        self.ui.lineEdit_RogY_Beam.setText(str(beam_attributes.rad_of_gy_y))
+        self.ui.lineEdit_ElasticModZ_Beam.setText(str(beam_attributes.elast_sec_mod_z))
+        self.ui.lineEdit_ElasticModY_Beam.setText(str(beam_attributes.elast_sec_mod_y))
+        self.ui.lineEdit_ElasticModPZ_Beam.setText(str(beam_attributes.plast_sec_mod_z))
+        self.ui.lineEdit_ElasticModPY_Beam.setText(str(beam_attributes.plast_sec_mod_y))
+        self.ui.pushButton_Add_Beam.setEnabled(True)
+
+        if (
+                self.ui.lineEdit_Depth_Beam.text() != "" and self.ui.lineEdit_FlangeWidth_Beam.text() != "" and self.ui.lineEdit_FlangeThickness_Beam.text() != ""
+                and self.ui.lineEdit_WeBThickness_Beam.text() != ""):
+            self.ui.lineEdit_Depth_Beam.textChanged.connect(self.new_sectionalprop_Beam)
+            self.ui.lineEdit_FlangeWidth_Beam.textChanged.connect(self.new_sectionalprop_Beam)
+            self.ui.lineEdit_FlangeThickness_Beam.textChanged.connect(self.new_sectionalprop_Beam)
+            self.ui.lineEdit_WeBThickness_Beam.textChanged.connect(self.new_sectionalprop_Beam)
+
+    def new_sectionalprop_Column(self):
+        if self.ui.lineEdit_Depth_Column.text() == "":
+            return
+        else:
+            D = float(self.ui.lineEdit_Depth_Column.text())
+
+        if self.ui.lineEdit_FlangeWidth_Column.text() == "":
+            return
+        else:
+            B = float(self.ui.lineEdit_FlangeWidth_Column.text())
+
+        if self.ui.lineEdit_FlangeThickness_Column.text() == "":
+            return
+        else:
+            t_w = float(self.ui.lineEdit_FlangeThickness_Column.text())
+
+        if self.ui.lineEdit_WeBThickness_Column.text() == "":
+            return
+        else:
+            t_f = float(self.ui.lineEdit_WeBThickness_Column.text())
+
+        self.sectionalprop = I_sectional_Properties()
+        self.ui.lineEdit_Mass_Column.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
+        self.ui.lineEdit_SectionalArea_Column.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
+        self.ui.lineEdit_MomentOfAreaZ_Column.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
+        self.ui.lineEdit_MomentOfAreaY_Column.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
+        self.ui.lineEdit_RogZ_Column.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
+        self.ui.lineEdit_RogY_Column.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
+        self.ui.lineEdit_ElasticModZ_Column.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
+        self.ui.lineEdit_ElasticModY_Column.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
+        self.ui.lineEdit_ElasticModPZ_Column.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
+        self.ui.lineEdit_ElasticModPY_Column.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
+
+        self.ui.pushButton_Add_Column.setEnabled(True)
+
+    def new_sectionalprop_Beam(self):
+        if self.ui.lineEdit_Depth_Beam.text() == "":
+            return
+        else:
+            D = float(self.ui.lineEdit_Depth_Beam.text())
+
+        if self.ui.lineEdit_FlangeWidth_Beam.text() == "":
+            return
+        else:
+            B = float(self.ui.lineEdit_FlangeWidth_Beam.text())
+
+        if self.ui.lineEdit_FlangeThickness_Beam.text() == "":
+            return
+        else:
+            t_w = float(self.ui.lineEdit_FlangeThickness_Beam.text())
+
+        if self.ui.lineEdit_WeBThickness_Beam.text() == "":
+            return
+        else:
+            t_f = float(self.ui.lineEdit_WeBThickness_Beam.text())
+
+        self.sectionalprop = I_sectional_Properties()
+        self.ui.lineEdit_Mass_Beam.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
+        self.ui.lineEdit_SectionalArea_Beam.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
+        self.ui.lineEdit_MomentOfAreaZ_Beam.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
+        self.ui.lineEdit_MomentOfAreaY_Beam.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
+        self.ui.lineEdit_RogZ_Beam.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
+        self.ui.lineEdit_RogY_Beam.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
+        self.ui.lineEdit_ElasticModZ_Beam.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
+        self.ui.lineEdit_ElasticModY_Beam.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
+        self.ui.lineEdit_ElasticModPZ_Beam.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
+        self.ui.lineEdit_ElasticModPY_Beam.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
+        self.ui.pushButton_Add_Beam.setEnabled(True)
+
+    def add_ColumnPref(self):
+
+        if (
+                self.ui.lineEdit_Designation_Column.text() == "" or self.ui.lineEdit_Mass_Column.text() == "" or self.ui.lineEdit_SectionalArea_Column.text() == "" or self.ui.lineEdit_Depth_Column.text() == ""
+                or self.ui.lineEdit_FlangeWidth_Column.text() == "" or self.ui.lineEdit_WeBThickness_Column.text() == "" or self.ui.lineEdit_FlangeThickness_Column.text() == "" or self.ui.lineEdit_FlangeSlope_Column.text() == ""
+                or self.ui.lineEdit_RootRadius_Column.text() == "" or self.ui.lineEdit_ToeRadius_Column.text() == "" or self.ui.lineEdit_MomentOfAreaZ_Column.text() == "" or self.ui.lineEdit_MomentOfAreaY_Column.text() == ""
+                or self.ui.lineEdit_RogZ_Column.text() == "" or self.ui.lineEdit_RogY_Column.text() == "" or self.ui.lineEdit_ElasticModZ_Column.text() == "" or self.ui.lineEdit_ElasticModY_Column.text() == ""
+                or self.ui.lineEdit_Source_Column.text() == ""):
+            QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+            self.ui.pushButton_Add_Column.setDisabled(True)
+
+
+        else:
+            self.ui.pushButton_Add_Column.setEnabled(True)
+            Designation_c = self.ui.lineEdit_Designation_Column.text()
+            Mass_c = float(self.ui.lineEdit_Mass_Column.text())
+            Area_c = float(self.ui.lineEdit_SectionalArea_Column.text())
+            D_c = float(self.ui.lineEdit_Depth_Column.text())
+            B_c = float(self.ui.lineEdit_FlangeWidth_Column.text())
+            tw_c = float(self.ui.lineEdit_WeBThickness_Column.text())
+            T_c = float(self.ui.lineEdit_FlangeThickness_Column.text())
+            FlangeSlope_c = int(self.ui.lineEdit_FlangeSlope_Column.text())
+            R1_c = float(self.ui.lineEdit_RootRadius_Column.text())
+            R2_c = float(self.ui.lineEdit_ToeRadius_Column.text())
+            Iz_c = float(self.ui.lineEdit_MomentOfAreaZ_Column.text())
+            Iy_c = float(self.ui.lineEdit_MomentOfAreaY_Column.text())
+            rz_c = float(self.ui.lineEdit_RogZ_Column.text())
+            ry_c = float(self.ui.lineEdit_RogY_Column.text())
+            Zz_c = float(self.ui.lineEdit_ElasticModZ_Column.text())
+            Zy_c = float(self.ui.lineEdit_ElasticModY_Column.text())
+            if (self.ui.lineEdit_ElasticModPZ_Column.text() == "" or self.ui.lineEdit_ElasticModPY_Column.text() == ""):
+                self.ui.lineEdit_ElasticModPZ_Column.setText("0")
+                self.ui.lineEdit_ElasticModPY_Column.setText("0")
+            Zpz_c = float(self.ui.lineEdit_ElasticModPZ_Column.text())
+            Zpy_c = float(self.ui.lineEdit_ElasticModPY_Column.text())
+            Source_c = self.ui.lineEdit_Source_Column.text()
+
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+
+            c = conn.cursor()
+            c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (Designation_c,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
+    				                                               Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (Designation_c, Mass_c, Area_c,
+                           D_c, B_c, tw_c, T_c,
+                           R1_c, R2_c, Iz_c, Iy_c, rz_c,
+                           ry_c, Zz_c, Zy_c,
+                           Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
+                conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                self.clear_ColumnPref()
+
+    def add_BeamPref(self):
+
+        if (
+                self.ui.lineEdit_Designation_Beam.text() == "" or self.ui.lineEdit_Mass_Beam.text() == "" or self.ui.lineEdit_SectionalArea_Beam.text() == "" or self.ui.lineEdit_Depth_Beam.text() == ""
+                or self.ui.lineEdit_FlangeWidth_Beam.text() == "" or self.ui.lineEdit_WeBThickness_Beam.text() == "" or self.ui.lineEdit_FlangeThickness_Beam.text() == "" or self.ui.lineEdit_FlangeSlope_Beam.text() == ""
+                or self.ui.lineEdit_RootRadius_Beam.text() == "" or self.ui.lineEdit_ToeRadius_Beam.text() == "" or self.ui.lineEdit_MomentOfAreaZ_Beam.text() == "" or self.ui.lineEdit_MomentOfAreaY_Beam.text() == ""
+                or self.ui.lineEdit_RogZ_Beam.text() == "" or self.ui.lineEdit_RogY_Beam.text() == "" or self.ui.lineEdit_ElasticModZ_Beam.text() == "" or self.ui.lineEdit_ElasticModY_Beam.text() == ""
+                or self.ui.lineEdit_Source_Beam.text() == ""):
+            QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+            self.ui.pushButton_Add_Beam.setDisabled(True)
+
+        else:
+            self.ui.pushButton_Add_Beam.setEnabled(True)
+            Designation_b = self.ui.lineEdit_Designation_Beam.text()
+            Mass_b = float(self.ui.lineEdit_Mass_Beam.text())
+            Area_b = float(self.ui.lineEdit_SectionalArea_Beam.text())
+            D_b = float(self.ui.lineEdit_Depth_Beam.text())
+            B_b = float(self.ui.lineEdit_FlangeWidth_Beam.text())
+            tw_b = float(self.ui.lineEdit_WeBThickness_Beam.text())
+            T_b = float(self.ui.lineEdit_FlangeThickness_Beam.text())
+            FlangeSlope_b = int(self.ui.lineEdit_FlangeSlope_Beam.text())
+            R1_b = float(self.ui.lineEdit_RootRadius_Beam.text())
+            R2_b = float(self.ui.lineEdit_ToeRadius_Beam.text())
+            Iz_b = float(self.ui.lineEdit_MomentOfAreaZ_Beam.text())
+            Iy_b = float(self.ui.lineEdit_MomentOfAreaY_Beam.text())
+            rz_b = float(self.ui.lineEdit_RogZ_Beam.text())
+            ry_b = float(self.ui.lineEdit_RogY_Beam.text())
+            Zz_b = float(self.ui.lineEdit_ElasticModZ_Beam.text())
+            Zy_b = float(self.ui.lineEdit_ElasticModY_Beam.text())
+            if (self.ui.lineEdit_ElasticModPZ_Beam.text() == "" or self.ui.lineEdit_ElasticModPY_Beam.text() == ""):
+                self.ui.lineEdit_ElasticModPZ_Beam.setText("0")
+                self.ui.lineEdit_ElasticModPY_Beam.setText("0")
+            Zpz_b = float(self.ui.lineEdit_ElasticModPZ_Beam.text())
+            Zpy_b = float(self.ui.lineEdit_ElasticModPY_Beam.text())
+            Source_b = self.ui.lineEdit_Source_Beam.text()
+
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+
+            c = conn.cursor()
+            c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_b,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+    				                                                Zz,zy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (Designation_b, Mass_b, Area_b,
+                           D_b, B_b, tw_b, T_b, FlangeSlope_b,
+                           R1_b, R2_b, Iz_b, Iy_b, rz_b,
+                           ry_b, Zz_b, Zy_b,
+                           Zpz_b, Zpy_b, Source_b))
+                conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                self.clear_BeamPref()
+
+    def clear_ColumnPref(self):
+        self.ui.lineEdit_Designation_Column.clear()
+        self.ui.lineEdit_Source_Column.clear()
+        self.ui.lineEdit_UltimateStrength_Column.clear()
+        self.ui.lineEdit_YieldStrength_Column.clear()
+        self.ui.lineEdit_Depth_Column.clear()
+        self.ui.lineEdit_FlangeWidth_Column.clear()
+        self.ui.lineEdit_FlangeThickness_Column.clear()
+        self.ui.lineEdit_WeBThickness_Column.clear()
+        self.ui.lineEdit_FlangeSlope_Column.clear()
+        self.ui.lineEdit_RootRadius_Column.clear()
+        self.ui.lineEdit_ToeRadius_Column.clear()
+        self.ui.lineEdit_Mass_Column.clear()
+        self.ui.lineEdit_SectionalArea_Column.clear()
+        self.ui.lineEdit_MomentOfAreaZ_Column.clear()
+        self.ui.lineEdit_MomentOfAreaY_Column.clear()
+        self.ui.lineEdit_RogZ_Column.clear()
+        self.ui.lineEdit_RogY_Column.clear()
+        self.ui.lineEdit_ElasticModZ_Column.clear()
+        self.ui.lineEdit_ElasticModY_Column.clear()
+        self.ui.lineEdit_ElasticModPZ_Column.clear()
+        self.ui.lineEdit_ElasticModPY_Column.clear()
+        self.ui.pushButton_Add_Column.setDisabled(True)
+
+    def clear_BeamPref(self):
+        self.ui.lineEdit_Designation_Beam.clear()
+        self.ui.lineEdit_Source_Beam.clear()
+        self.ui.lineEdit_UltimateStrength_Beam.clear()
+        self.ui.lineEdit_YieldStrength_Beam.clear()
+        self.ui.lineEdit_Depth_Beam.clear()
+        self.ui.lineEdit_FlangeWidth_Beam.clear()
+        self.ui.lineEdit_FlangeThickness_Beam.clear()
+        self.ui.lineEdit_WeBThickness_Beam.clear()
+        self.ui.lineEdit_FlangeSlope_Beam.clear()
+        self.ui.lineEdit_RootRadius_Beam.clear()
+        self.ui.lineEdit_ToeRadius_Beam.clear()
+        self.ui.lineEdit_Mass_Beam.clear()
+        self.ui.lineEdit_SectionalArea_Beam.clear()
+        self.ui.lineEdit_MomentOfAreaZ_Beam.clear()
+        self.ui.lineEdit_MomentOfAreaY_Beam.clear()
+        self.ui.lineEdit_RogZ_Beam.clear()
+        self.ui.lineEdit_RogY_Beam.clear()
+        self.ui.lineEdit_ElasticModZ_Beam.clear()
+        self.ui.lineEdit_ElasticModY_Beam.clear()
+        self.ui.lineEdit_ElasticModPZ_Beam.clear()
+        self.ui.lineEdit_ElasticModPY_Beam.clear()
+        self.ui.pushButton_Add_Beam.setDisabled(True)
+
+    def download_Database_Column(self):
+        file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))
+        shutil.copyfile(file_path, os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+        QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded in your selected workspace')
+        self.ui.pushButton_Import_Column.setEnabled(True)
+
+    def download_Database_Beam(self):
+        file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))
+        shutil.copyfile(file_path, os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+        QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded in your selected workspace')
+        self.ui.pushButton_Import_Beam.setEnabled(True)
+
+    def import_ColumnPref(self):
+        wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+        sheet = wb['First Sheet']
+        conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
+
+        for rowNum in range(2, sheet.max_row + 1):
+            designation = sheet.cell(row=rowNum, column=2).value
+            mass = sheet.cell(row=rowNum, column=3).value
+            area = sheet.cell(row=rowNum, column=4).value
+            d = sheet.cell(row=rowNum, column=5).value
+            b = sheet.cell(row=rowNum, column=6).value
+            tw = sheet.cell(row=rowNum, column=7).value
+            t = sheet.cell(row=rowNum, column=8).value
+            flangeSlope = sheet.cell(row=rowNum, column=9).value
+            r1 = sheet.cell(row=rowNum, column=10).value
+            r2 = sheet.cell(row=rowNum, column=11).value
+            iz = sheet.cell(row=rowNum, column=12).value
+            iy = sheet.cell(row=rowNum, column=13).value
+            rz = sheet.cell(row=rowNum, column=14).value
+            ry = sheet.cell(row=rowNum, column=15).value
+            zz = sheet.cell(row=rowNum, column=16).value
+            zy = sheet.cell(row=rowNum, column=17).value
+            zpz = sheet.cell(row=rowNum, column=18).value
+            zpy = sheet.cell(row=rowNum, column=19).value
+            source = sheet.cell(row=rowNum, column=20).value
+            c = conn.cursor()
+            c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (designation,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
+    				                           Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (designation, mass, area,
+                           d, b, tw, t,
+                           r1, r2, iz, iy, rz, ry,
+                           zz, zy
+                           ,
+                           zpz, zpy, flangeSlope, source))
+                conn.commit()
+                c.close()
+
+        conn.close()
+        QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
+        self.ui.pushButton_Import_Column.setDisabled(True)
+
+    def import_BeamPref(self):
+        wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+        sheet = wb['First Sheet']
+        conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
+
+        for rowNum in range(2, sheet.max_row + 1):
+            designation = sheet.cell(row=rowNum, column=2).value
+            mass = sheet.cell(row=rowNum, column=3).value
+            area = sheet.cell(row=rowNum, column=4).value
+            d = sheet.cell(row=rowNum, column=5).value
+            b = sheet.cell(row=rowNum, column=6).value
+            tw = sheet.cell(row=rowNum, column=7).value
+            t = sheet.cell(row=rowNum, column=8).value
+            flangeSlope = sheet.cell(row=rowNum, column=9).value
+            r1 = sheet.cell(row=rowNum, column=10).value
+            r2 = sheet.cell(row=rowNum, column=11).value
+            iz = sheet.cell(row=rowNum, column=12).value
+            iy = sheet.cell(row=rowNum, column=13).value
+            rz = sheet.cell(row=rowNum, column=14).value
+            ry = sheet.cell(row=rowNum, column=15).value
+            zz = sheet.cell(row=rowNum, column=16).value
+            zy = sheet.cell(row=rowNum, column=17).value
+            zpz = sheet.cell(row=rowNum, column=18).value
+            zpy = sheet.cell(row=rowNum, column=19).value
+            source = sheet.cell(row=rowNum, column=20).value
+
+            c = conn.cursor()
+            c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (designation,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+            				                           Zz,zy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (designation, mass, area,
+                           d, b, tw, t,
+                           flangeSlope, r1
+                           ,
+                           r2, iz, iy, rz, ry,
+                           zz, zy
+                           ,
+                           zpz, zpy, source))
+                conn.commit()
+                c.close()
+
+        conn.close()
+        QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
+        self.ui.pushButton_Import_Beam.setDisabled(True)
 
     def close_designPref(self):
         self.close()
+
+    def closeEvent(self, QCloseEvent):
+        self.save_designPref_para()
+        QCloseEvent.accept()
 
 from . import icons_rc
 if __name__ == '__main__':

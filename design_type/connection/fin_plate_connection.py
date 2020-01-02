@@ -1,8 +1,9 @@
-from utils.common.material import Material
 from design_type.connection.shear_connection import ShearConnection
+
 from utils.common.component import Bolt, Plate, Weld
-from gui.ui_design_summary import Ui_DesignReport
+# from gui.ui_summary_popup import Ui_Dialog
 from gui.ui_template import Ui_ModuleWindow
+from utils.common.component import *
 from Common import *
 from utils.common.load import Load
 import yaml
@@ -39,7 +40,8 @@ bolt_type = "friction_grip"
 bolt_grade = 8.8
 plate_thickness = 10.0
 weld_size = 6
-material = Material(fy=fy, fu=fu)
+material_grade = "E 250 (Fe 410 W)B"
+material = Material(material_grade)
 
 logger = None
 
@@ -47,133 +49,93 @@ logger = None
 def module_setup():
     global logger
     logger = logging.getLogger("osdag.finPlateCalc")
-
-
 module_setup()
-class DesignReportDialog(QDialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
-        self.ui = Ui_DesignReport()
-        self.ui.setupUi(self)
-        # self.Dialog = QDialog()
-        # self.ui = Ui_DesignReport()
-        # self.ui.setupUi(self.Dialog)
-        # self.Dialog.show()
-        self.maincontroller = parent
-        self.setWindowTitle("Design Profile")
-        self.ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.ui.lbl_browse))
-        self.ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
-        self.ui.btn_useProfile.clicked.connect(self.useUserProfile)
-        self.accepted.connect(self.save_inputSummary)
 
-
-    def save_inputSummary(self):
-        report_summary = self.get_report_summary()
-        self.maincontroller.save_design(report_summary)
-
-    def getLogoFilePath(self, lblwidget):
-        self.ui.lbl_browse.clear()
-        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', "../../ ", 'Images (*.png *.svg *.jpg)', None,
-                                                  QFileDialog.DontUseNativeDialog)
-        flag = True
-        if filename == '':
-            flag = False
-            return flag
-        else:
-            base = os.path.basename(str(filename))
-            lblwidget.setText(base)
-            base_type = base[-4:]
-            self.desired_location(filename, base_type)
-
-        return str(filename)
-
-    def desired_location(self, filename, base_type):
-        if base_type == ".svg":
-            cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html",
-                                                                      "cmpylogoExtendEndplate.svg"))
-        else:
-            shutil.copyfile(filename,
-                            os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
-
-    def saveUserProfile(self):
-        inputData = self.get_report_summary()
-        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
-                                                  os.path.join(str(self.maincontroller.folder), "Profile"), '*.txt')
-        if filename == '':
-            flag = False
-            return flag
-        else:
-            infile = open(filename, 'w')
-            pickle.dump(inputData, infile)
-            infile.close()
-
-    def get_report_summary(self):
-        report_summary = {"ProfileSummary": {}}
-        report_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
-        report_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
-        report_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
-        report_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
-
-        report_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
-        report_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
-        report_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
-        report_summary["Client"] = str(self.ui.lineEdit_client.text())
-        report_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-
-        return report_summary
-
-
-    def useUserProfile(self):
-        filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
-                                                  os.path.join(str(self.maincontroller.folder), "Profile"),
-                                                  "All Files (*)")
-        if os.path.isfile(filename):
-            outfile = open(filename, 'r')
-            reportsummary = pickle.load(outfile)
-            self.ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
-            self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
-            self.ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
-            self.ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
-        else:
-            pass
-
-    # def get_report_summary(self):
-    #     report_summary = {"ProfileSummary": {}}
-    #     report_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
-    #     report_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
-    #     report_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
-    #     report_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
-    #
-    #     report_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
-    #     report_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
-    #     report_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
-    #     report_summary["Client"] = str(self.ui.lineEdit_client.text())
-    #     report_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-    #
-    #     return report_summary
+# def set_osdaglogger():
+#     global logger
+#     if logger is None:
 #
-# # class design_report_show():
-#     @staticmethod
-#     def design_report_show():
-#         design_report_dialog = DesignReportDialog(QDialog)
-#         design_report_dialog.exec_()
+#         logger = logging.getLogger("osdag")
+#     else:
+#         for handler in logger.handlers[:]:
+#             logger.removeHandler(handler)
+#
+#     logger.setLevel(logging.DEBUG)
+#
+#     # create the logging file handler
+#     fh = logging.FileHandler("Connections/Shear/Finplate/fin.log", mode="a")
+#
+#     # ,datefmt='%a, %d %b %Y %H:%M:%S'
+#     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+#
+#     formatter = logging.Formatter('''
+#     <div  class="LOG %(levelname)s">
+#         <span class="DATE">%(asctime)s</span>
+#         <span class="LEVEL">%(levelname)s</span>
+#         <span class="MSG">%(message)s</span>
+#     </div>''')
+#     formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+#     fh.setFormatter(formatter)
+#     logger.addHandler(fh)
+
+
+def desired_location(self, filename, base_type):
+    if base_type == ".svg":
+        cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html",
+                                                                  "cmpylogoExtendEndplate.svg"))
+    else:
+        shutil.copyfile(filename,
+                        os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
+
+def saveUserProfile(self):
+    inputData = self.get_report_summary()
+    filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+                                              os.path.join(str(self.maincontroller.folder), "Profile"), '*.txt')
+    if filename == '':
+        flag = False
+        return flag
+    else:
+        infile = open(filename, 'w')
+        pickle.dump(inputData, infile)
+        infile.close()
+
+
+def getPopUpInputs(self):
+    input_summary = {}
+    input_summary["ProfileSummary"] = {}
+    input_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
+    input_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
+    input_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
+    input_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
+
+    input_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
+    input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
+    input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
+    input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
+    input_summary["Client"] = str(self.ui.lineEdit_client.text())
+
+
+def useUserProfile(self):
+    filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+                                              os.path.join(str(self.maincontroller.folder), "Profile"),
+                                              "All Files (*)")
+    if os.path.isfile(filename):
+        outfile = open(filename, 'r')
+        reportsummary = pickle.load(outfile)
+        self.ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
+        self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
+        self.ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
+        self.ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
+    else:
+        pass
+
 
 class FinPlateConnection(ShearConnection):
 
-    def __init__(self, connectivity, supporting_member_section, supported_member_section, fu, fy, shear_load,axial_load,
-                 bolt_diameter, bolt_type, bolt_grade, weld_size, plate_thickness, plate_height=0.0, plate_width=0.0,):
-        super(FinPlateConnection, self).__init__(connectivity, supporting_member_section, supported_member_section,
-                                                      fu, fy, shear_load, axial_load, bolt_diameter, bolt_type, bolt_grade)
 
-        self.weld = Weld(weld_size)
-        self.weld_size_list = []
-        self.plate = Plate(thickness=plate_thickness, height=plate_height, width=plate_width, material=self.material)
-        # self.folder = folder
-        # self.ui = Ui_ModuleWindow()
-        # self.ui.setupUi(self)
-        # self.ui.btn_CreateDesign.clicked.connect(self.design_report) # self.ui = Ui_ModuleWindow()
-        # self.ui.setupUi(self)
-        # self.ui.btn_CreateDesign.clicked.connect(self.design_report)
+    def __init__(self):
+        super(FinPlateConnection, self).__init__()
+
 
     def input_values(self, existingvalues={}):
 
@@ -199,8 +161,8 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_mtrl = ''
 
-        if KEY_VERSH in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_VERSH]
+        if KEY_SHEAR in existingvalues:
+            existingvalue_key_versh = existingvalues[KEY_SHEAR]
         else:
             existingvalue_key_versh = ''
 
@@ -229,6 +191,9 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platethk = ''
 
+        t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, None)
+        options_list.append(t16)
+
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
@@ -250,7 +215,7 @@ class FinPlateConnection(ShearConnection):
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
         options_list.append(t6)
 
-        t7 = (KEY_VERSH, KEY_DISP_VERSH, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
         options_list.append(t7)
 
         t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
@@ -276,6 +241,7 @@ class FinPlateConnection(ShearConnection):
 
         return options_list
 
+
     @staticmethod
     def pltthk_customized():
         a = VALUES_PLATETHK_CUSTOMIZED
@@ -290,7 +256,6 @@ class FinPlateConnection(ShearConnection):
     def diam_bolt_customized():
         c = connectdb1()
         return c
-
 
     def customized_input(self):
 
@@ -370,8 +335,40 @@ class FinPlateConnection(ShearConnection):
 
         return lst
 
-    def to_get_d(my_d):
+    def to_get_d(self, my_d):
+        # self.set_connectivity(self, my_d[KEY_CONN])
+        # self.set_supporting_section(self,my_d[KEY_SUPTNGSEC])
+        # self.set_supported_section(self,my_d[KEY_SUPTDSEC])
+        # self.set_material(self,my_d[KEY_MATERIAL])
+        # self.set_shear(self, my_d[KEY_SHEAR])
+        # self.set_axial(self,my_d[KEY_AXIAL])
+        # self.set_bolt_dia(self,my_d[KEY_D])
+        # self.set_bolt_type(self,my_d[KEY_TYP])
+        # self.set_bolt_grade(self,my_d[KEY_GRD])
+        # self.set_plate_thk(self,my_d[KEY_PLATETHK])
+        # self.weld = Weld(weld_size)
+        # self.weld_size_list = []
         print(my_d)
+        self.connectivity = my_d[KEY_CONN]
+
+        if self.connectivity in VALUES_CONN_1:
+            self.supporting_section = Column(designation=my_d[KEY_SUPTNGSEC], material_grade=my_d[KEY_MATERIAL])
+        else:
+            self.supporting_section = Beam(designation=my_d[KEY_SUPTNGSEC], material_grade=my_d[KEY_MATERIAL])
+
+
+        self.supported_section = Beam(designation=my_d[KEY_SUPTDSEC], material_grade=my_d[KEY_MATERIAL])
+        self.bolt = Bolt(grade=my_d[KEY_GRD], diameter=my_d[KEY_D], bolt_type=my_d[KEY_TYP],
+                         material_grade=material_grade)
+        self.load = Load(shear_force=my_d[KEY_SHEAR], axial_force=my_d[KEY_AXIAL])
+        self.plate = Plate(thickness=my_d[KEY_PLATETHK], material_grade=my_d[KEY_MATERIAL])
+
+        print(self.connectivity)
+        print(self.supporting_section)
+        print(self.supported_section)
+        print(self.bolt)
+        print(self.load)
+        print(self.plate)
 
     def get_weld(self):
         return self.weld
@@ -379,7 +376,7 @@ class FinPlateConnection(ShearConnection):
     def set_weld(self, weld):
         self.weld = weld
 
-    def set_weld_by_size(self, weld_size, length=0, material=Material()):
+    def set_weld_by_size(self, weld_size, length=0, material=Material(material_grade)):
         self.weld = Weld(weld_size,length,material)
 
     def call_designreport(self, fileName, report_summary,folder):
@@ -419,27 +416,100 @@ class FinPlateConnection(ShearConnection):
             pdfkit.from_file(filename, fname, configuration=config, options=options)
             QMessageBox.about(self, 'Information', "Report Saved")
 
-def design_report(Ui_DesignReport):
-    design_report_dialog = DesignReportDialog(Ui_DesignReport)
-    design_report_dialog.show()
 
 # fin_plate_input = FinPlateConnectionInput(connectivity, supporting_member_section, supported_member_section, material)
 
 
-fin_plate_input = FinPlateConnection(connectivity, supporting_member_section, supported_member_section, fu, fy,
-                                     shear_force, axial_force, bolt_diameter, bolt_type, bolt_grade,
-                                     weld_size, plate_thickness,Ui_ModuleWindow)
-bolt = Bolt(grade=bolt_grade, diameter=bolt_diameter, bolt_type=bolt_type, material=material)
-load = Load(shear_force=shear_force)
-plate = Plate(thickness=plate_thickness, material=material)
-weld = Weld(size=weld_size, material=material)
-
-fin_plate_input.bolt = bolt
-fin_plate_input.load = load
-fin_plate_input.plate = plate
-fin_plate_input.weld = weld
+# fin_plate_input = FinPlateConnection(connectivity, supporting_member_section, supported_member_section, fu, fy,
+#                                      shear_force, axial_force, bolt_diameter, bolt_type, bolt_grade,
+#                                      weld_size, plate_thickness,Ui_ModuleWindow)
+# bolt = Bolt(grade=bolt_grade, diameter=bolt_diameter, bolt_type=bolt_type, material=material)
+# load = Load(shear_force=shear_force)
+# plate = Plate(thickness=plate_thickness, material=material)
+# weld = Weld(size=weld_size, material=material)
+#
+# fin_plate_input.bolt = bolt
+# fin_plate_input.load = load
+# fin_plate_input.plate = plate
+# fin_plate_input.weld = weld
 
 # print(fin_plate_input.bolt)
 
-with open("filename", 'w') as out_file:
-    yaml.dump(fin_plate_input, out_file)
+# with open("filename", 'w') as out_file:
+#     yaml.dump(fin_plate_input, out_file)
+
+        
+    def warn_text(self,key, my_d):
+        old_col_section = get_oldcolumncombolist()
+        old_beam_section = get_oldbeamcombolist()
+
+        if my_d[KEY_SUPTNGSEC] in old_col_section or my_d[KEY_SUPTDSEC] in old_beam_section:
+            del_data = open('logging_text.log', 'w')
+            del_data.truncate()
+            del_data.close()
+            logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
+            logging.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+            with open('logging_text.log') as file:
+                data = file.read()
+                file.close()
+            # file = open('logging_text.log', 'r')
+            # # This will print every line one by one in the file
+            # for each in file:
+            #     print(each)
+            key.setText(data)
+        else:
+            key.setText("")
+
+
+    # def set_axial(self, axial):
+    #     self.axial = axial
+    #
+    # def set_plate_thk(self, plate_thk):
+    #     self.plate_thk = plate_thk
+    #
+    # def set_supporting_section(self, supporting_section):
+    #     self.supporting_section = supporting_section
+    #
+    # def set_supported_section(self, supported_section):
+    #     self.supported_section = supported_section
+    #
+    # def set_material(self, material=Material(material_grade)):
+    #     self.material = Material(material)
+    #     print(self.material)
+    #
+    # def set_weld_by_size(self, weld_size, length=0, material=Material(material_grade)):
+    #     self.weld = Weld(weld_size,length,material)
+    #
+    # def get_shear_capacity(self):
+    #     shear_capacity = self.shear
+
+    # fin_plate_input = FinPlateConnectionInput(connectivity, supporting_member_section, supported_member_section, material)
+
+# fin_plate_input = FinPlateConnection(FinPlateConnection.connectivity, supporting_member_section, supported_member_section, fu, fy,
+
+# fin_plate_input = FinPlateConnection(FinPlateConnection.connectivity, supporting_member_section,
+#                                       supported_member_section, fu, fy,
+
+#                                      shear_force, axial_force, bolt_diameter, bolt_type, bolt_grade,
+#                                      weld_size, plate_thickness)
+# bolt = Bolt(grade=bolt_grade, diameter=bolt_diameter, bolt_type=bolt_type, material_grade=material_grade)
+# load = Load(shear_force=shear_force)
+# plate = Plate(thickness=plate_thickness, material_grade=material_grade)
+# weld = Weld(size=weld_size, material_grade=material_grade)
+# FinPlateConnection.to_get_d(design_dictionary)
+# fin_plate_input.bolt = bolt
+# fin_plate_input.load = load
+# fin_plate_input.plate = plate
+# fin_plate_input.weld = weld
+#
+# print(FinPlateConnection.to_get_d().bolt)
+#
+# with open("filename", 'w') as out_file:
+#     yaml.dump(fin_plate_input, out_file)
+#
+#
+# # print(fin_plate_input.bolt)
+#
+# with open("filename", 'w') as out_file:
+#     yaml.dump(fin_plate_input, out_file)
+

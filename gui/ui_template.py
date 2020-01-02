@@ -20,7 +20,7 @@ from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtGui import QStandardItem
 import os
-import json
+import yaml
 import logging
 from drawing_2D.Svg_Window import SvgWindow
 import sys
@@ -859,7 +859,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.menubar.addAction(self.menuGraphics.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi()
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.action_save_input.triggered.connect(lambda: self.validateInputsOnDesignBtn(main, data,"Save"))
@@ -907,7 +907,7 @@ class Ui_ModuleWindow(QMainWindow):
     def pass_d(self, main, design_dictionary):
         key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
         main.warn_text(main, key, design_dictionary)
-        main.set_input_values(main, design_dictionary)
+        # main.set_input_values(main, design_dictionary)
 
     def saveDesign_inputs(self):
         fileName, _ = QFileDialog.getSaveFileName(self,
@@ -917,7 +917,7 @@ class Ui_ModuleWindow(QMainWindow):
             return
         try:
             with open(fileName, 'w') as input_file:
-                json.dump(self.design_inputs, input_file)
+                yaml.dump(self.design_inputs, input_file)
         except Exception as e:
             QMessageBox.warning(self, "Application",
                                 "Cannot write file %s:\n%s" % (fileName, str(e)))
@@ -1021,7 +1021,7 @@ class Ui_ModuleWindow(QMainWindow):
             self.design_fn(option_list, data)
             self.pass_d(main, self.design_inputs)
             main.set_input_values(main, self.design_inputs)
-            main.get_bolt_capacity(main)
+            main.get_bolt_details(main)
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
@@ -1033,7 +1033,6 @@ class Ui_ModuleWindow(QMainWindow):
             error string that has to be displayed
 
         """
-
         # The base string which should be displayed
         information = "Please input the following required field"
         if len(missing_fields_list) > 1:
@@ -1044,8 +1043,6 @@ class Ui_ModuleWindow(QMainWindow):
         # Loops through the list of the missing fields and adds each field to the above sentence with a comma
 
         for item in missing_fields_list:
-
-
             information = information + item + ", "
 
         # Removes the last comma
@@ -1090,9 +1087,8 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 self.btn_Design.setDisabled(False)
 
-    def retranslateUi(self, MainWindow):
+    def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        #MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))
         self.btnInput.setToolTip(_translate("MainWindow", "Left Dock"))
         self.btnInput.setText(_translate("MainWindow", "input"))
         self.btnOutput.setToolTip(_translate("MainWindow", "Right Dock"))

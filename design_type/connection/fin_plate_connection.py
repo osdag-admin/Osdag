@@ -205,15 +205,35 @@ class FinPlateConnection(ShearConnection):
     def set_input_values(self, design_dictionary):
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-                           material_grade=design_dictionary[KEY_MATERIAL])
-        self.bolt = Bolt(grade=design_dictionary[KEY_GRD][0], diameter=design_dictionary[KEY_D][0],
-                         bolt_type=design_dictionary[KEY_TYP],
-                         bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
-                         connecting_plates_tk=[self.plate.thickness[0], self.supported_section.web_thickness],
-                         material_grade=design_dictionary[KEY_MATERIAL],
-                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
-                         mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
-                         corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_GAP])
+
+
+    def get_bolt_details(self):
+        self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter[0],
+                                                connecting_plates_tk=[self.plate.thickness[0],
+                                                                      self.supported_section.web_thickness],bolt_hole_type=self.bolt.bolt_hole_type)
+        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter[0],
+                                          bolt_grade_provided=self.bolt.bolt_grade[0],
+                                          connecting_plates_tk=[self.plate.thickness[0],
+                                                                self.supported_section.web_thickness],
+                                          n_planes=1)
+
+        min_plate_length = self.supported_section.min_plate_length()
+        max_plate_length = self.supported_section.max_plate_length()
+
+        self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter[0], web_plate_l_min=min_plate_length,
+                                         web_plate_l_max=max_plate_length, bolt_capacity=self.bolt.bolt_capacity,
+                                         connecting_plates_tk=[self.plate.thickness[0],
+                                                               self.supported_section.web_thickness],
+                                         bolt_hole_type=self.bolt.bolt_hole_type,
+                                         bolt_line_limit=2, shear_load=self.load.shear_force*1000, gap=self.plate.gap,
+                                         shear_ecc=True)
+
+        print(self.bolt)
+        print(self.plate)
+
+
+
 #
 # with open("filename", 'w') as out_file:
 #     yaml.dump(fin_plate_input, out_file)

@@ -192,7 +192,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
-        #self.textEdit.setStyleSheet("QTextEdit {color:red}")
+        # self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -1081,7 +1081,7 @@ class Ui_ModuleWindow(QMainWindow):
             for row1 in rows1:
                 lst1.append(row1)
             s_val = lst1[0][0]
-            if p_val < s_val:
+            if p_val <= s_val:
                 self.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information',
                                     "Secondary beam depth is higher than clear depth of primary beam web "

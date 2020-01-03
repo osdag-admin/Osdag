@@ -1202,15 +1202,13 @@ class Ui_ModuleWindow(QMainWindow):
         designation_col = key_2.currentText()
         designation_bm = key_3.currentText()
         material_grade = key_4.currentText()
-        if key_2.currentIndex() != 0 and key_3.currentIndex() != 0 and key_4.currentIndex() != 0:
-            if conn in VALUES_CONN_1:
-                self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
-            elif conn in VALUES_CONN_2:
-                self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
-            self.designPrefDialog.beam_preferences(designation_bm, table_2, material_grade)
-        def fn():
-            pass
-        key_1.currentIndexChanged.connect(fn)
+        # if key_2.currentIndex() != 0 and key_3.currentIndex() != 0 and key_4.currentIndex() != 0:
+        #     if conn in VALUES_CONN_1:
+        #         self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
+        #     elif conn in VALUES_CONN_2:
+        #         self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
+        #     self.designPrefDialog.beam_preferences(designation_bm, table_2, material_grade)
+
 
 
     # def beam_design_prefer(self):
@@ -1238,7 +1236,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 class DesignPreferences(QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(self, main, parent=None):
 
         QDialog.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -1250,26 +1248,26 @@ class DesignPreferences(QDialog):
         self.ui.combo_design_method.model().item(2).setEnabled(False)
         # self.save_default_para()
         dbl_validator = QDoubleValidator()
-        self.ui.txt_boltFu.setValidator(dbl_validator)
-        self.ui.txt_boltFu.setMaxLength(7)
-        self.ui.txt_weldFu.setValidator(dbl_validator)
-        self.ui.txt_weldFu.setMaxLength(7)
+        # self.ui.txt_boltFu.setValidator(dbl_validator)
+        # self.ui.txt_boltFu.setMaxLength(7)
+        # self.ui.txt_weldFu.setValidator(dbl_validator)
+        # self.ui.txt_weldFu.setMaxLength(7)
         # self.ui.btn_defaults.clicked.connect(self.save_default_para)
         # self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_save.hide()
         self.ui.btn_close.clicked.connect(self.close_designPref)
         # self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
-        self.ui.pushButton_Import_Column.setDisabled(True)
-        self.ui.pushButton_Import_Beam.setDisabled(True)
+        # self.ui.pushButton_Import_Column.setDisabled(True)
+        #self.ui.pushButton_Import_Beam.setDisabled(True)
         # self.ui.pushButton_Add_Column.clicked.connect(self.add_ColumnPref)
         # self.ui.pushButton_Add_Beam.clicked.connect(self.add_BeamPref)
-        self.ui.pushButton_Clear_Column.clicked.connect(self.clear_ColumnPref)
-        self.ui.pushButton_Clear_Beam.clicked.connect(self.clear_BeamPref)
-        self.ui.pushButton_Download_Column.clicked.connect(self.download_Database_Column)
-        self.ui.pushButton_Download_Beam.clicked.connect(self.download_Database_Beam)
+        # self.ui.pushButton_Clear_Column.clicked.connect(self.clear_ColumnPref)
+        #self.ui.pushButton_Clear_Beam.clicked.connect(self.clear_BeamPref)
+        # self.ui.pushButton_Download_Column.clicked.connect(self.download_Database_Column)
+        #self.ui.pushButton_Download_Beam.clicked.connect(self.download_Database_Beam)
 
-        self.ui.pushButton_Import_Column.clicked.connect(self.import_ColumnPref)
-        self.ui.pushButton_Import_Beam.clicked.connect(self.import_BeamPref)
+        # self.ui.pushButton_Import_Column.clicked.connect(self.import_ColumnPref)
+        #self.ui.pushButton_Import_Beam.clicked.connect(self.import_BeamPref)
         #self.ui.btn_save.clicked.connect(Ui_ModuleWindow.design_preferences(Ui_ModuleWindow()))
         #self.ui.combo_boltHoleType.currentIndexChanged.connect(my_fn)
         #self.ui.btn_save.clicked.connect(self.save_fn)

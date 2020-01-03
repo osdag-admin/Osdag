@@ -436,6 +436,8 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+                # onlyInt = QIntValidator()
+                # r.setValidator(onlyInt)
 
             if type == TYPE_MODULE:
                 _translate = QtCore.QCoreApplication.translate
@@ -451,6 +453,11 @@ class Ui_ModuleWindow(QMainWindow):
                 im.setPixmap(pixmap)
                 i = i + 30
 
+            if option[0] in [KEY_AXIAL,KEY_SHEAR]:
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+                onlyInt = QIntValidator()
+                key.setValidator(onlyInt)
+
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents)
                 q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
@@ -461,6 +468,9 @@ class Ui_ModuleWindow(QMainWindow):
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
 
             i = i + 30
+        # for option in option_list:
+        #     sh = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+
 
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])

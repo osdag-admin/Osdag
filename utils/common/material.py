@@ -27,5 +27,6 @@ class Material(object):
         self.fy_20 = row[1]
         self.fy_20_40 = row[2]
         self.fy_40 = row[3]
+        self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
         self.fu = row[4]
         conn.close()

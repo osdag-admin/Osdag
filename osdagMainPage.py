@@ -19,7 +19,10 @@ from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnectionInput
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
 from design_type.connection.end_plate_connection import EndPlateConnectionInput
-# from design_type.connection.fin_plate_connection import design_report
+
+from design_type.connection.beam_cover_plate import BeamCoverPlate
+from design_type.connection.beam_end_plate import BeamEndPlate
+
 from gui.ui_template import Ui_ModuleWindow
 
 # from design_type.connection.main_controller import MainController
@@ -95,11 +98,12 @@ class OsdagMainWindow(QMainWindow):
         self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
        # self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
         self.ui.btn_start.clicked.connect(self.show_shear_connection)
-        self.ui.btn_start_2.clicked.connect(self.unavailable)
+        self.ui.btn_start_2.clicked.connect(self.show_moment_connection)
         self.ui.btn_start_3.clicked.connect(self.unavailable)
+        self.ui.cc_Start.clicked.connect(self.unavailable)
+
         self.ui.Tension_Start.clicked.connect(self.unavailable)
         self.ui.Compression_Start.clicked.connect(self.unavailable)
-        self.ui.cc_Start.clicked.connect(self.unavailable)
 
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
         self.ui.btn_compression.clicked.connect(self.unavailable)
@@ -260,6 +264,48 @@ class OsdagMainWindow(QMainWindow):
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
+    def show_moment_connection(self):
+        folder = self.select_workspace_folder()
+        folder = str(folder)
+        if not os.path.exists(folder):
+            if folder == '':
+                pass
+            else:
+                os.mkdir(folder, 0o755)
+
+        root_path = folder
+        images_html_folder = ['images_html']
+        flag = True
+        for create_folder in images_html_folder:
+            if root_path == '':
+                flag = False
+                return flag
+            else:
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder))
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder))
+
+        if self.ui.rdbtn_coverplate_7.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, BeamCoverPlate)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+            # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
+            # self.window.show()
+            # self.window.closed.connect(self.show)
+        elif self.ui.rdbtn_endplate_ext_7.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2,BeamEndPlate)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+            # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
+            # self.window.show()
+            # self.window.closed.connect(self.show)
+
 
 
 class MainController(QMainWindow):
@@ -327,11 +373,11 @@ def the_exception_hook(exctype, value, traceback):
 sys.excepthook = the_exception_hook
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # folder_path = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'
+    folder_path = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'
     # # folder_path = r'C:\Users\Win10\Desktop'
     #folder_path = r'C:\Users\pc\Desktop'
-    # window = MainController(Ui_ModuleWindow, FinPlateConnection, folder_path)
-    window = OsdagMainWindow()
+    window = MainController(Ui_ModuleWindow, FinPlateConnection, folder_path)
+    # window = OsdagMainWindow()
     window.show()
     # app.exec_()
     # sys.exit(app.exec_())

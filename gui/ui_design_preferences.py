@@ -1274,6 +1274,7 @@ class Ui_Dialog(object):
         self.label_39.setText(_translate("DesignPreferences", "Type of edges"))
         self.combo_detailingEdgeType.setItemText(0, _translate("DesignPreferences", "a - Sheared or hand flame cut"))
         self.combo_detailingEdgeType.setItemText(1, _translate("DesignPreferences", "b - Rolled, machine-flame cut, sawn and planed"))
+        self.txt_detailingGap.setText(_translate("DesignPreferences", "10"))
         self.label_40.setText(_translate("DesignPreferences", "Are the members exposed to\n"
 "corrosive influences?"))
         self.combo_detailing_memebers.setItemText(0, _translate("DesignPreferences", "No"))

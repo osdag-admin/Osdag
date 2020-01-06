@@ -148,6 +148,8 @@ KEY_MODULE = 'Module'
 KEY_DISP_FINPLATE = 'Fin Plate'
 TYPE_MODULE = 'Window Title'
 
+KEY_DISP_COVERPLATE = 'Cover Plate Connection'
+
 
 DISP_TITLE_CM = 'Connecting members'
 
@@ -217,13 +219,15 @@ VALUES_FLANGEPLATE_PREFERENCES = ['Cover plate location', 'Outside','Outside + I
 
 KEY_FLANGEPLATE_THICKNESS = 'Plate.Flange_Splice.Thickness'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
-VALUES_FLANGEPLATE_THICKNESS = []
+VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
+
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_WEBPLATE_THICKNESS = 'Plate.Web_Splice.Thickness'
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
-VALUES_WEBPLATE_THICKNESS = []
+VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
+VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
 
 DISP_TITLE_PLATE = 'Plate'

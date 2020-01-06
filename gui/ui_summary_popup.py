@@ -5,8 +5,20 @@
 # Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
-
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
+from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5 import QtCore, QtGui, QtWidgets
+import pdfkit
+import configparser
+import os
+import pickle
+import cairosvg
+# from gui.ui_summary_popup import Ui_Dialog1
+from design_report.reportGenerator import save_html
+
+
+
+# from design_type.connection.fin_plate_connection import sa
 
 class Ui_Dialog1(object):
     def setupUi(self, Dialog):
@@ -132,7 +144,9 @@ class Ui_Dialog1(object):
         self.gridLayout.addWidget(self.buttonBox, 10, 1, 1, 1)
 
         self.retranslateUi(Dialog)
+
         self.buttonBox.accepted.connect(Dialog.accept)
+        self.buttonBox.accepted.connect(self.save_inputSummary)
         self.buttonBox.rejected.connect(Dialog.reject)
         self.btn_browse.clicked.connect(self.lbl_browse.clear)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -147,6 +161,103 @@ class Ui_Dialog1(object):
         Dialog.setTabOrder(self.lineEdit_jobNumber, self.lineEdit_client)
         Dialog.setTabOrder(self.lineEdit_client, self.txt_additionalComments)
         Dialog.setTabOrder(self.txt_additionalComments, self.buttonBox)
+
+    def save_inputSummary(self):
+        input_summary = self.getPopUpInputs()
+        self.save_design(input_summary)
+
+    def call_designreport(self, fileName, report_summary, folder):
+        self.alist = {'Connection': 'Finplate','Designation': 'MB 500', 'Mass': 86.9, 'Area': 111.0, 'D': 500.0, 'B': 180.0, 'tw': 10.2,
+                      'T': 17.2, 'FlangeSlope': 98, 'R1': 17.0, 'R2': 8.5, 'Iz': 45228.0, 'Iy': 1320.0, 'rz': 20.2,
+                      'ry': 3.5, 'Zz': 1809.1, 'Zy': 147.0, 'Zpz': 2074.8, 'Zpy': 266.7, 'Source': 'IS808_Rev',
+                      'Bolt': {'Diameter (mm)': '24', 'Grade': '8.8', 'Type': 'Friction Grip Bolt'},
+                      'Weld': {'Size (mm)': '12'},
+                      'Member': {'BeamSection': 'MB 500', 'ColumSection': 'UC 305 x 305 x 97',
+                                 'Connectivity': 'Column flange-Beam web', 'fu (MPa)': '410', 'fy (MPa)': '250'},
+                      'Plate': {'Thickness (mm)': '12', 'Height (mm)': '', 'Width (mm)': ''},
+                      'Load': {'ShearForce (kN)': '140'},
+                      'bolt': {'bolt_hole_type': 'Standard', 'bolt_hole_clrnce': 2, 'bolt_fu': 800.0,
+                               'slip_factor': 0.3},
+                      'weld': {'typeof_weld': 'Shop weld', 'safety_factor': 1.25, 'fu_overwrite': '410'},
+                      'detailing': {'typeof_edge': 'a - Sheared or hand flame cut', 'min_edgend_dist': 1.7, 'gap': 10.0,
+                                    'is_env_corrosive': 'No'}, 'design': {'design_method': 'Limit State Design'}}
+        self.result = {
+            'Bolt': {'status': True, 'shearcapacity': 47.443, 'bearingcapacity': 'N/A', 'boltcapacity': 47.443,
+                     'numofbolts': 3, 'boltgrpcapacity': 142.33, 'numofrow': 3, 'numofcol': 1, 'pitch': 96.0,
+                     'edge': 54.0, 'enddist': 54.0, 'gauge': 0.0, 'bolt_fu': 800.0, 'bolt_dia': 24, 'k_b': 0.519,
+                     'beam_w_t': 10.2, 'web_plate_t': 12.0, 'beam_fu': 410.0, 'shearforce': 140.0, 'dia_hole': 26},
+            'Weld': {'thickness': 10, 'thicknessprovided': 12.0, 'resultantshear': 434.557, 'weldstrength': 1590.715,
+                     'weld_fu': 410.0, 'effectiveWeldlength': 276.0},
+            'Plate': {'minHeight': 300.0, 'minWidth': 118.0, 'plateedge': 64.0, 'externalmoment': 8.96,
+                      'momentcapacity': 49.091, 'height': 300.0, 'width': 118.0, 'blockshear': 439.837,
+                      'web_plate_fy': 250.0, 'platethk': 12.0, 'beamdepth': 500.0, 'beamrootradius': 17.0,
+                      'colrootradius': 15.2, 'beamflangethk': 17.2, 'colflangethk': 15.4}}
+        # print("resultobj", self.result)
+        # self.column_data = self.fetchColumnPara()
+        # self.beam_data = self.fetchBeamPara()
+        save_html(self.result, self.alist, report_summary,fileName, folder)
+
+    def save_design(self, popup_summary):
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.call_3DModel("white_bg")
+        #     data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+        #     self.display.ExportToImage(data)
+        #     self.display.FitAll()
+        # else:
+        #     pass
+
+        folder = self.select_workspace_folder()
+        filename = os.path.join(str(folder), "images_html", "Html_Report.html")
+        file_name = str(filename)
+        self.call_designreport(file_name, popup_summary,folder)
+
+        # Creates PDF
+        config = configparser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+
+        options = {
+            'margin-bottom': '10mm',
+            'footer-right': '[page]'
+        }
+        file_type = "PDF(*.pdf)"
+        fname, _ = QFileDialog.getSaveFileName(None, "Save File As", folder + "/", file_type)
+        fname = str(fname)
+        flag = True
+        if fname == '':
+            flag = False
+            return flag
+        else:
+            pdfkit.from_file(filename, fname, configuration=config, options=options)
+            QMessageBox.about(None, 'Information', "Report Saved")
+
+    def select_workspace_folder(self):
+        # This function prompts the user to select the workspace folder and returns the name of the workspace folder
+        config = configparser.ConfigParser()
+        config.read_file(open(r'Osdag.config'))
+        desktop_path = config.get("desktop_path", "path1")
+        folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
+                                                  desktop_path)
+        return folder
+
+    def getPopUpInputs(self):
+        input_summary = {}
+        input_summary["ProfileSummary"] = {}
+        input_summary["ProfileSummary"]["CompanyName"] = str(self.lineEdit_companyName.text())
+        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.lbl_browse.text())
+        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.lineEdit_groupName.text())
+        input_summary["ProfileSummary"]["Designer"] = str(self.lineEdit_designer.text())
+
+        input_summary["ProjectTitle"] = str(self.lineEdit_projectTitle.text())
+        input_summary["Subtitle"] = str(self.lineEdit_subtitle.text())
+        input_summary["JobNumber"] = str(self.lineEdit_jobNumber.text())
+        input_summary["AdditionalComments"] = str(self.txt_additionalComments.toPlainText())
+        input_summary["Client"] = str(self.lineEdit_client.text())
+
+        return input_summary
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate

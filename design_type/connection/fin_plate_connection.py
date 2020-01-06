@@ -203,10 +203,10 @@ class FinPlateConnection(ShearConnection):
         t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
         options_list.append(t15)
 
-        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC)
+        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"))
         options_list.append(t3)
 
-        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC)
+        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, connectdb("Beams"))
         options_list.append(t4)
 
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
@@ -460,55 +460,6 @@ class FinPlateConnection(ShearConnection):
         else:
             key.setText("")
 
-
-    # def set_axial(self, axial):
-    #     self.axial = axial
-    #
-    # def set_plate_thk(self, plate_thk):
-    #     self.plate_thk = plate_thk
-    #
-    # def set_supporting_section(self, supporting_section):
-    #     self.supporting_section = supporting_section
-    #
-    # def set_supported_section(self, supported_section):
-    #     self.supported_section = supported_section
-    #
-    # def set_material(self, material=Material(material_grade)):
-    #     self.material = Material(material)
-    #     print(self.material)
-    #
-    # def set_weld_by_size(self, weld_size, length=0, material=Material(material_grade)):
-    #     self.weld = Weld(weld_size,length,material)
-    #
-    # def get_shear_capacity(self):
-    #     shear_capacity = self.shear
-
-    # fin_plate_input = FinPlateConnectionInput(connectivity, supporting_member_section, supported_member_section, material)
-
-# fin_plate_input = FinPlateConnection(FinPlateConnection.connectivity, supporting_member_section, supported_member_section, fu, fy,
-
-# fin_plate_input = FinPlateConnection(FinPlateConnection.connectivity, supporting_member_section,
-#                                       supported_member_section, fu, fy,
-
-#                                      shear_force, axial_force, bolt_diameter, bolt_type, bolt_grade,
-#                                      weld_size, plate_thickness)
-# bolt = Bolt(grade=bolt_grade, diameter=bolt_diameter, bolt_type=bolt_type, material_grade=material_grade)
-# load = Load(shear_force=shear_force)
-# plate = Plate(thickness=plate_thickness, material_grade=material_grade)
-# weld = Weld(size=weld_size, material_grade=material_grade)
-# FinPlateConnection.to_get_d(design_dictionary)
-# fin_plate_input.bolt = bolt
-# fin_plate_input.load = load
-# fin_plate_input.plate = plate
-# fin_plate_input.weld = weld
-#
-# print(FinPlateConnection.to_get_d().bolt)
-#
-# with open("filename", 'w') as out_file:
-#     yaml.dump(fin_plate_input, out_file)
-#
-#
-# # print(fin_plate_input.bolt)
 #
 # with open("filename", 'w') as out_file:
 #     yaml.dump(fin_plate_input, out_file)

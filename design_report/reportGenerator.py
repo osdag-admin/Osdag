@@ -62,17 +62,17 @@ def save_html(outObj, uiObj,reportsummary, filename, folder):
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # Fin Plate Main Data
-#     beam_tw = str(float(dictBeamData["tw"]))
-#     beam_f_t = str(float(dictBeamData["T"]))
-#     beam_d = str(float(dictBeamData["D"]))
-#     beam_R1 = str(float(dictBeamData["R1"]))
-#     beam_b = str(float(dictBeamData["B"]))
-#
-#     column_w_t = str(float(dictColData["tw"]))
-#     column_f_t = str(float(dictColData["T"]))
-#     column_R1 = str(float(dictColData["R1"]))
-#     column_d = str(float(dictColData["D"]))
-#     column_b = str(float(dictColData["B"]))
+    beam_tw = str(10)
+    beam_f_t = str(10)
+    beam_d = str(400)
+    beam_R1 =str(10)
+    beam_b = str(200)
+
+    column_w_t = str(10)
+    column_f_t = str(10)
+    column_R1 = str(10)
+    column_d = str(400)
+    column_b = str(200)
 
     connectivity = str(uiObj['Member']['Connectivity'])
     shear_load = str(uiObj['Load']['ShearForce (kN)'])
@@ -104,12 +104,12 @@ def save_html(outObj, uiObj,reportsummary, filename, folder):
     design_method = str(uiObj["design"]["design_method"])
 
     ## To call k_h value from Friction Grip Bolt calculations
-    bolt_param_k_h = ConnectionCalculations.calculate_k_h(bolt_hole_type=bolt_hole_type)
-    k_h = str(float(bolt_param_k_h))
+    # bolt_param_k_h = ConnectionCalculations.calculate_k_h(bolt_hole_type=bolt_hole_type)
+    k_h = 1
 
     ## To call F_0 value from Friction Grip Bolt calculations
-    bolt_param_F_0 = ConnectionCalculations.proof_load_F_0(bolt_diameter=boltDia, bolt_fu=bolt_grade_fu)
-    F_0 = str(float(bolt_param_F_0))
+    # bolt_param_F_0 = ConnectionCalculations.proof_load_F_0(bolt_diameter=boltDia, bolt_fu=bolt_grade_fu)
+    # F_0 = str(float(bolt_param_F_0))
 
     beamdepth = str(int(round(outObj['Plate']['beamdepth'], 1)))
     beamflangethk = str(int(round(outObj['Plate']['beamflangethk'], 1)))
@@ -134,7 +134,7 @@ def save_html(outObj, uiObj,reportsummary, filename, folder):
     weld_strength = str(round(float(outObj['Weld']['weldstrength'] / 1000), 3))
     moment_demand = str(outObj['Plate']['externalmoment'])
     # gap = '20'
-    beam_tw = str(float(dictBeamData["tw"]))
+    # beam_tw = str(float(dictBeamData["tw"]))
 
     bolt_fu = str(outObj['Bolt']['bolt_fu'])
     bolt_dia = str(outObj['Bolt']['bolt_dia'])
@@ -215,6 +215,9 @@ def save_html(outObj, uiObj,reportsummary, filename, folder):
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # Design Conclusion
 #     rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    title = ["Connection","Connection Category", "Loading(Factored Load)", "Components"]
+    sub_title = {"Connection":{0:"Connection Title",1:"Connection Type"},"Connection Category":{0:"Connectivity",1:"Beam Connection",2:"Column Connection"}, "Loading(Factored Load)", "Components"}
+
     rstr += t('table border-collapse= "collapse" border="1px solid black" width= 100% ')
 
     row = [0, 'Design Conclusion', "IS800:2007/Limit state design"]
@@ -222,17 +225,19 @@ def save_html(outObj, uiObj,reportsummary, filename, folder):
     rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
+    # Connection = str(uiObj["Connection])
+
     if status == 'True':
-        row = [1, "Fin Plate", "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [1, str(uiObj["Connection"]), "<p align=left style=color:green><b>Pass</b></p>"]
     else:
-        row = [1, "Fin Plate", "<p align=left style=color:red><b>Fail</b></p>"]
+        row = [1, str(uiObj["Connection"]), "<p align=left style=color:red><b>Fail</b></p>"]
     rstr += t('tr')
     rstr += t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail1"') + row[2] + t('/td')
     # rstr += t('td class="header1 safe"') + row[3] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Fin Plate", " "]
+    row = [0, str(uiObj["Connection"]), " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -242,7 +247,7 @@ def save_html(outObj, uiObj,reportsummary, filename, folder):
     rstr += t('td colspan="2" class="detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Connection ", " "]
+    row = [0, title[0], " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -744,12 +749,12 @@ def save_html(outObj, uiObj,reportsummary, filename, folder):
     const = str(round(math.pi / 4 * 0.78, 4))
     # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
     n_e = str(1)
-    if bearingcapacity == "N/A" :
-        row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsf</sub> = ((" + slip_factor + "*" + n_e + "*" + k_h + "*" + F_0 +
-               ")/(1.25)) = " + shearCapacity + "<br> [cl. 10.4.3]", ""]
-    else:
-        row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
-           ")/(&#8730;3*1.25*1000) = " + shearCapacity + "<br> [cl. 10.3.3]", ""]
+    # if bearingcapacity == "N/A" :
+    #     row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsf</sub> = ((" + slip_factor + "*" + n_e + "*" + k_h + "*" + F_0 +
+    #            ")/(1.25)) = " + shearCapacity + "<br> [cl. 10.4.3]", ""]
+    # else:
+    #     row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
+    #        ")/(&#8730;3*1.25*1000) = " + shearCapacity + "<br> [cl. 10.3.3]", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1032,12 +1037,12 @@ def save_html(outObj, uiObj,reportsummary, filename, folder):
     # *************************************************************************************************************************
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # Header of the pdf fetched from dialogbox
-    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
-    rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
-    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
-    rstr += t('/tr')
+    # rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    # rstr += t('tr')
+    # row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    # rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    # rstr += t('/tr')
 
     rstr += t('tr')
     row = [0, 'Company Name']
@@ -1096,108 +1101,108 @@ def save_html(outObj, uiObj,reportsummary, filename, folder):
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Digram
-
-    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-
-    row = [0, "Views", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-    png = folder + "/images_html/3D_Model.png"
-    datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
-
-    side = folder + "/images_html/finSide.png"
-    dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
-
-    top = folder + "/images_html/finTop.png"
-    datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
-
-    front = folder + "/images_html/finFront.png"
-    datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
-
-    if status == 'True':
-        row = [0, datapng, datatop]
-        rstr += t('tr')
-        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
-        rstr += t('/tr')
-
-        row = [0, dataside, datafront]
-        rstr += t('tr')
-        rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
-        rstr += t('/tr')
-
-    else:
-        pass
-
-    rstr += t('/table')
-    rstr += t('h1 style="page-break-before:always"')  # page break
-    rstr += t('/h1')
-
-# *************************************************************************************************************************
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Header of the pdf fetched from dialogbox
-    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
-    rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
-    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Company Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-#     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
-    row = [0, companyname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-
-    row = [0, 'Project Title']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, projecttitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Group/Team Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, groupteamname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Subtitle']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, subtitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Designer']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, designer]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Job Number']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, jobnumber]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Date']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, time.strftime("%d /%m /%Y")]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, "Client"]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, client]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-    rstr += t('/table')
-
-    rstr += t('hr')
-#     rstr += t('p> &nbsp</p')
+# # Digram
+#
+#     rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+#
+#     # row = [0, "Views", " "]
+#     # rstr += t('tr')
+#     # rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
+#     # rstr += t('/tr')
+#     # png = folder + "/images_html/3D_Model.png"
+#     # datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+#     #
+#     # side = folder + "/images_html/finSide.png"
+#     # dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+#     #
+#     # top = folder + "/images_html/finTop.png"
+#     # datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+#     #
+#     # front = folder + "/images_html/finFront.png"
+#     # datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+#
+#     # if status == 'True':
+#     #     row = [0, datapng, datatop]
+#     #     rstr += t('tr')
+#     #     rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+#     #     rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
+#     #     rstr += t('/tr')
+#     #
+#     #     row = [0, dataside, datafront]
+#     #     rstr += t('tr')
+#     #     rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+#     #     rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
+#     #     rstr += t('/tr')
+#     #
+#     # else:
+#     #     pass
+#
+#     rstr += t('/table')
+#     rstr += t('h1 style="page-break-before:always"')  # page break
+#     rstr += t('/h1')
+#
+# # *************************************************************************************************************************
+# # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+# # Header of the pdf fetched from dialogbox
+# #     rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+# #     rstr += t('tr')
+# #     row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+# #     rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+# #     rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+# #     rstr += t('/tr')
+#
+#     rstr += t('tr')
+#     row = [0, 'Company Name']
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+# #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
+#     row = [0, companyname]
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#
+#     row = [0, 'Project Title']
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     row = [0, projecttitle]
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     rstr += t('/tr')
+#
+#     rstr += t('tr')
+#     row = [0, 'Group/Team Name']
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     row = [0, groupteamname]
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     row = [0, 'Subtitle']
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     row = [0, subtitle]
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     rstr += t('/tr')
+#
+#     rstr += t('tr')
+#     row = [0, 'Designer']
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     row = [0, designer]
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     row = [0, 'Job Number']
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     row = [0, jobnumber]
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     rstr += t('/tr')
+#
+#     rstr += t('tr')
+#     row = [0, 'Date']
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     row = [0, time.strftime("%d /%m /%Y")]
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     row = [0, "Client"]
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     row = [0, client]
+#     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+#     rstr += t('/tr')
+#     rstr += t('/table')
+#
 #     rstr += t('hr')
+# #     rstr += t('p> &nbsp</p')
+# #     rstr += t('hr')
+# #     rstr += t('/hr')
 #     rstr += t('/hr')
-    rstr += t('/hr')
 
 # *************************************************************************************************************************
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -1222,32 +1227,32 @@ def save_html(outObj, uiObj,reportsummary, filename, folder):
     myfile.write(t('/html'))
     myfile.close()
 
-def save_design(self, report_summary,folder):
-
-    filename = os.path.join(str(folder), "images_html", "Html_Report.html")
-    file_name = str(filename)
-    self.call_designreport(file_name, report_summary)
-
-    config = configparser.ConfigParser()
-    config.readfp(open(r'Osdag.config'))
-    wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
-
-    config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
-
-    options = {
-        'margin-bottom': '10mm',
-        'footer-right': '[page]'
-    }
-    file_type = "PDF(*.pdf)"
-    fname, _ = QFileDialog.getSaveFileName(self, "Save File As", folder + "/", file_type)
-    fname = str(fname)
-    flag = True
-    if fname == '':
-        flag = False
-        return flag
-    else:
-        pdfkit.from_file(filename, fname, configuration=config, options=options)
-        QMessageBox.about(self, 'Information', "Report Saved")
+# def save_design(self, report_summary,folder):
+#
+#     filename = os.path.join(str(folder), "images_html", "Html_Report.html")
+#     file_name = str(filename)
+#     self.call_designreport(file_name, report_summary)
+#
+#     config = configparser.ConfigParser()
+#     config.readfp(open(r'Osdag.config'))
+#     wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+#
+#     config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+#
+#     options = {
+#         'margin-bottom': '10mm',
+#         'footer-right': '[page]'
+#     }
+#     file_type = "PDF(*.pdf)"
+#     fname, _ = QFileDialog.getSaveFileName(self, "Save File As", folder + "/", file_type)
+#     fname = str(fname)
+#     flag = True
+#     if fname == '':
+#         flag = False
+#         return flag
+#     else:
+#         pdfkit.from_file(filename, fname, configuration=config, options=options)
+#         QMessageBox.about(self, 'Information', "Report Saved")
 
 def space(n):
     rstr = "&nbsp;" * 4 * n

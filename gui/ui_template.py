@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFi
 from PyQt5.QtGui import QStandardItem
 import os
 import yaml
+import json
 import logging
 from drawing_2D.Svg_Window import SvgWindow
 import sys
@@ -940,7 +941,7 @@ class Ui_ModuleWindow(QMainWindow):
         try:
             in_file = str(fileName)
             with open(in_file, 'r') as fileObject:
-                uiObj = json.load(fileObject)
+                uiObj = yaml.load(fileObject)
             self.setDictToUserInputs(uiObj, op_list, data, new)
 
         except IOError:

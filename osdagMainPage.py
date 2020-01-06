@@ -95,7 +95,7 @@ class OsdagMainWindow(QMainWindow):
        # self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
         self.ui.btn_start.clicked.connect(self.show_shear_connection)
         self.ui.btn_start_2.clicked.connect(self.show_moment_connection)
-        self.ui.btn_start_3.clicked.connect(self.show_moment_connection_bc)
+        self.ui.btn_start_3.clicked.connect(self.unavailable)
         self.ui.cc_Start.clicked.connect(self.unavailable)
 
         self.ui.Tension_Start.clicked.connect(self.unavailable)
@@ -302,47 +302,6 @@ class OsdagMainWindow(QMainWindow):
             # self.window.show()
             # self.window.closed.connect(self.show)
 
-    def show_moment_connection_bc(self):
-        folder = self.select_workspace_folder()
-        folder = str(folder)
-        if not os.path.exists(folder):
-            if folder == '':
-                pass
-            else:
-                os.mkdir(folder, 0o755)
-
-        root_path = folder
-        images_html_folder = ['images_html']
-        flag = True
-        for create_folder in images_html_folder:
-            if root_path == '':
-                flag = False
-                return flag
-            else:
-                try:
-                    os.mkdir(os.path.join(root_path, create_folder))
-                except OSError:
-                    shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder))
-
-        if self.ui.rdbtn_bolted.isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, TensionMemberBolted)
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-            # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
-            # self.window.show()
-            # self.window.closed.connect(self.show)
-        elif self.ui.rdbtn_welded.isChecked():
-            self.hide()
-            self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2,TensionMemberWelded)
-            self.ui2.show()
-            self.ui2.closed.connect(self.show)
-            # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
-            # self.window.show()
-            # self.window.closed.connect(self.show)
 
 
 class MainController(QMainWindow):
@@ -407,11 +366,11 @@ def the_exception_hook(exctype, value, traceback):
 sys.excepthook = the_exception_hook
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # folder_path = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'
+    folder_path = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'
     # # folder_path = r'C:\Users\Win10\Desktop'
     #folder_path = r'C:\Users\pc\Desktop'
-    # window = MainController(Ui_ModuleWindow, FinPlateConnection, folder_path)
-    window = OsdagMainWindow()
+    window = MainController(Ui_ModuleWindow, FinPlateConnection, folder_path)
+    # window = OsdagMainWindow()
     window.show()
     # app.exec_()
     # sys.exit(app.exec_())

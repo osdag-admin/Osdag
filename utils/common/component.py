@@ -50,9 +50,16 @@ class Bolt(Material):
         self.min_edge_dist = 0.0
         self.min_end_dist = 0.0
         self.max_spacing = 0.0
-        self.max_edge_dist = 0.0
+        self.max_edge_dist= 0.0
         self.max_end_dist = 0.0
         self.dia_hole = 0.0
+        self.min_pitch_round = round_up(self.min_pitch, 2)
+        self.min_gauge_round = round_up(self.min_gauge, 2)
+        self.min_edge_dist_round = round_up(self.min_edge_dist, 5)
+        self.min_end_dist_round = round_up(self.min_end_dist, 5)
+        self.max_spacing_round = round_down(self.max_spacing, 5)
+        self.max_edge_dist_round = round_down(self.max_edge_dist, 5)
+        self.max_end_dist_round = round_down(self.max_end_dist, 5)
 
     def __repr__(self):
         repr = "Bolt\n"
@@ -63,8 +70,8 @@ class Bolt(Material):
         repr += "Grade Provided: {}\n".format(self.bolt_grade_provided)
 
         repr += "Diameter of Hole: {}\n".format(self.dia_hole)
-        repr += "Minimum Pitch: {}\n".format(self.min_pitch)
-        repr += "Minimum Gauge: {}\n".format(self.min_gauge)
+        repr += "Minimum Pitch: {}\n".format(self.min_pitch_round)
+        repr += "Minimum Gauge: {}\n".format(self.min_gauge_round)
         repr += "Minimum Edge Distance: {}\n".format(self.min_edge_dist)
         repr += "Minimum End Distance: {}\n".format(self.min_end_dist)
         repr += "Maximum Edge Distance: {}\n".format(self.max_edge_dist)
@@ -107,7 +114,7 @@ class Bolt(Material):
                 f_u=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
             self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                 f_u=self.fu, f_ub=self.bolt_fu, t=min(self.connecting_plates_tk), d=self.bolt_diameter_provided,
-                e=self.min_edge_dist, p=self.min_pitch, bolt_hole_type=self.bolt_hole_type)
+                e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
 
         elif self.bolt_type == "Friction Grip Bolt":
@@ -126,12 +133,19 @@ class Bolt(Material):
         self.min_pitch = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)
         self.min_gauge = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)
         self.min_edge_dist = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
-                                                                      self.edge_type)
+                                                                            self.edge_type)
         self.min_end_dist = self.min_edge_dist
         self.max_spacing = IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk)
         self.max_edge_dist = IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
-                                                                  self.corrosive_influences)
+                                                                        self.corrosive_influences)
         self.max_end_dist = self.max_edge_dist
+        self.min_pitch_round = round_up(self.min_pitch, 2)
+        self.min_gauge_round = round_up(self.min_gauge, 2)
+        self.min_edge_dist_round = round_up(self.min_edge_dist, 5)
+        self.min_end_dist_round = round_up(self.min_end_dist, 5)
+        self.max_spacing_round = round_down(self.max_spacing, 5)
+        self.max_edge_dist_round = round_down(self.max_edge_dist, 5)
+        self.max_end_dist_round = round_down(self.max_end_dist, 5)
         self.dia_hole = IS800_2007.cl_10_2_1_bolt_hole_size(self.bolt_diameter_provided, self.bolt_hole_type)
 
 
@@ -244,7 +258,7 @@ class Plate(Bolt):
 
     def __init__(self, thickness=0.0, length=0.0, width=0.0, gap=0.0, material_grade=""):
         super(Plate, self).__init__(material_grade=material_grade)
-        self.thickness = thickness
+        self.thickness = list(np.float_(thickness))
         self.length = length
         self.width = width
         self.gap = float(gap)
@@ -254,22 +268,26 @@ class Plate(Bolt):
         self.edge_dist_provided = 0.0
         self.end_dist_provided = 0.0
 
+        self.block_shear_capacity = 0.0
+        self.shear_yielding_capacity = 0.0
+        self.shear_rupture_capacity = 0.0
+
     def get_web_plate_l_req(self, bolts_one_line, pitch, end_dist):
         web_plate_l_req = float((bolts_one_line - 1) * pitch + 2 * end_dist)
         return web_plate_l_req
 
     def get_spacing_adjusted(self, gauge_pitch, edge_end):
-        while gauge_pitch > self.max_spacing:
+        while gauge_pitch > self.max_spacing_round:
             edge_end += 5
             gauge_pitch -= 5
         return gauge_pitch, edge_end
 
-    def get_web_plate_l_bolts_one_line(self, web_plate_l_max, web_plate_l_min, bolts_required,bolt_dia,connecting_plates_tk,bolt_hole_type):
+    def get_web_plate_l_bolts_one_line(self, web_plate_l_max, web_plate_l_min, bolts_required,bolt_dia, connecting_plates_tk, bolt_hole_type):
         super(Plate, self).calculate_bolt_spacing_limits(bolt_dia,connecting_plates_tk,bolt_hole_type)
-        max_bolts_one_line = int(((web_plate_l_max - (2 * self.min_end_dist)) / self.min_pitch) + 1)
+        max_bolts_one_line = int(((web_plate_l_max - (2 * self.min_end_dist_round)) / self.min_pitch_round) + 1)
         bolt_line = int(math.ceil((float(bolts_required) / float(max_bolts_one_line))))
         bolts_one_line = max(int(math.ceil(float(bolts_required) / float(bolt_line))), 2)
-        web_plate_l = max(web_plate_l_min, self.get_web_plate_l_req (bolts_one_line, self.min_pitch, self.min_end_dist))
+        web_plate_l = max(web_plate_l_min, self.get_web_plate_l_req (bolts_one_line, self.min_pitch_round, self.min_end_dist_round))
 
         return bolt_line, bolts_one_line, web_plate_l
 
@@ -277,21 +295,24 @@ class Plate(Bolt):
         """
 
         :param web_plate_l: length of plate
-        :param min_end_dist: minimum end distance
+        :param min_end_dist_round: minimum end distance
         :param bolts_one_line: bolts in one line
-        :param max_spacing: maximum pitch
-        :param max_end_dist: maximum end distance
+        :param max_spacing_round: maximum pitch
+        :param max_end_dist_round: maximum end distance
         :return: pitch, end distance, length of plate (false if applicable)
         """
-        pitch = round_up((web_plate_l - (2 * self.min_end_dist)) / (bolts_one_line - 1), multiplier=1)
-        end_dist = (web_plate_l - pitch * (bolts_one_line - 1)) / 2
-        if pitch > self.max_spacing:
-            pitch, end_dist = self.get_spacing_adjusted(pitch, end_dist)
-            if end_dist >= self.max_end_dist:
+        pitch = round_up((web_plate_l - (2 * self.min_end_dist_round)) / (bolts_one_line - 1), multiplier=1)
+        web_plate_l = pitch*(bolts_one_line - 1) + self.min_end_dist_round*2
+        if pitch > self.max_spacing_round:
+            pitch, end_dist = self.get_spacing_adjusted(pitch, self.min_end_dist_round)
+            if end_dist >= self.max_end_dist_round:
+                # TODO: add one more bolt to satisfy spacing criteria
                 web_plate_l = False
+        else:
+            end_dist = self.min_end_dist_round
         return pitch, end_dist, web_plate_l
 
-    def get_vres(self, bolts_one_line, pitch, gauge, bolt_line, shear_load, ecc):
+    def get_vres(self, bolts_one_line, pitch, gauge, bolt_line, shear_load, axial_load, ecc):
         """
 
         :param bolts_one_line: number of bolts in one line
@@ -316,7 +337,8 @@ class Plate(Bolt):
         moment_demand = round(shear_load * ecc, 3)
         tmh = moment_demand * ymax / sigma_r_sq
         tmv = moment_demand * xmax / sigma_r_sq
-        vres = math.sqrt((vbv + tmv) ** 2 + tmh ** 2)
+        abh = axial_load / (bolts_one_line * bolt_line)
+        vres = math.sqrt((vbv + tmv) ** 2 + (tmh+abh) ** 2)
         return vres
 
     def get_bolt_red(self, bolts_one_line, pitch, bolt_capacity, bolt_dia):
@@ -336,8 +358,10 @@ class Plate(Bolt):
             bolt_capacity_red = bolt_capacity
         return bolt_capacity_red
 
-    def get_web_plate_details(self, bolt_dia, web_plate_l_min, web_plate_l_max, bolt_capacity, bolt_line_limit, shear_load, gap,
-                              shear_ecc,connecting_plates_tk,bolt_hole_type):
+    def get_web_plate_details(self, bolt_dia, web_plate_l_min, web_plate_l_max, bolt_capacity, bolt_line_limit=2,
+                              shear_load=0.0, axial_load=0.0, gap=0.0,
+                              shear_ecc=False,connecting_plates_tk=None,bolt_hole_type=""):
+
         """
 
         :param bolt_dia: diameter of bolt
@@ -352,19 +376,20 @@ class Plate(Bolt):
         :param web_plate_l_max: maximum plate length
         :param bolt_capacity: capacity of bolt
         :param bolt_line_limit: maximum number of bolt lines allowed
-        :param shear_load: load along the length
+        :param shear_load: load along the length (bolt_line)
+        :param axial_load: load along the width
         :param gap: gap between members which adds up to eccentricity
         :param shear_ecc: if eccentricity effect needs to be considered this value should be passed as "True"
         :return: web_plate_l, bolt_line, bolts_one_line, bolts_required, bolt_capacity_red, vres, moment_demand, \
-               pitch, gauge, edge_dist, end_dist, a.min_edge_dist, a.min_pitch, a.max_spacing, a.max_edge_dist
+               pitch, gauge, edge_dist, end_dist, a.min_edge_dist_round, a.min_pitch_round, a.max_spacing_round, a.max_edge_dist_round
         """
 
         # initialising values to start the loop
         bolts_required = max(int(math.ceil(shear_load / bolt_capacity)), 3)
         # calculation of  bolts in one line and check for given web plate height = 0 or user input value
-        [bolt_line, bolts_one_line, web_plate_l] = self.get_web_plate_l_bolts_one_line(web_plate_l_max, web_plate_l_min,
-                                                                                    bolts_required,bolt_dia,connecting_plates_tk,bolt_hole_type)
-        bolts_required = bolt_line * bolts_one_line
+        [bolt_line, bolts_one_line, web_plate_l] = \
+            self.get_web_plate_l_bolts_one_line(web_plate_l_max, web_plate_l_min, bolts_required, bolt_dia,
+                                                connecting_plates_tk, bolt_hole_type)
         vres = bolt_capacity + 1
         bolt_capacity_red = bolt_capacity
         moment_demand = 0
@@ -373,19 +398,19 @@ class Plate(Bolt):
             # for calculated length and bolts in one line, pitch,end dist and updated value of plate is calculated
             [pitch, end_dist, web_plate_l] = self.get_pitch_end_dist(web_plate_l, bolts_one_line)
             # Horizontal Shear due to eccentricity of load
-            gauge = self.min_gauge
-            edge_dist = self.min_edge_dist
+            gauge = self.min_gauge_round
+            edge_dist = self.min_edge_dist_round
             # If length is not false and check for shear eccentricity is true resultant force in bolt is calculated
             if shear_ecc is True:
-                ecc = (gauge * max((bolt_line-1.5),0)) + edge_dist + gap
+                ecc = (gauge * max((bolt_line-1.5), 0)) + edge_dist + gap
                 moment_demand = shear_load * ecc
                 while True:
                     vres = self.get_vres(bolts_one_line, pitch,
-                                      gauge, bolt_line, shear_load, ecc)
+                                      gauge, bolt_line, shear_load, axial_load, ecc)
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                        pitch, bolt_capacity,
                                                        bolt_dia)
-                    # if input is 0, length of plate is increased for calculated bolts in one line.
+                    # Length of plate is increased for calculated bolts in one line.
                     # This increases spacing which decreases resultant force
                     if vres > bolt_capacity_red:
                         if web_plate_l + 10 <= web_plate_l_max:
@@ -416,6 +441,65 @@ class Plate(Bolt):
         self.edge_dist_provided = edge_dist
         self.end_dist_provided = end_dist
 
+    # Function for block shear capacity calculation
+    def blockshear(self, numrow, numcol, pitch, gauge, thk, end_dist, edge_dist, dia_hole, fy, fu):
+        '''
+
+        Args:
+            numrow (str) Number of row(s) of bolts
+            dia_hole (int) diameter of hole (Ref. Table 5.6 Subramanian's book, page: 340)
+            fy (float) Yeild stress of material
+            fu (float) Ultimate stress of material
+            edge_dist (float) edge distance based on diameter of hole
+            end_dist (float) end distance based on diameter of hole
+            pitch (float) pitch distance based on diameter of bolt
+            thk (float) thickness of plate or beam web
+
+        Returns:
+            Capacity of fin plate under block shear
+
+        '''
+
+        Avg = thk * ((numrow - 1) * pitch + end_dist)
+        Avn = thk * ((numrow - 1) * pitch + end_dist - (numrow - 0.5) * dia_hole)
+        Atg = thk * (gauge * (numcol - 1) + edge_dist)
+        Atn = thk * (gauge * (numcol - 1) + edge_dist - (numcol - 0.5) * dia_hole)
+        Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
+        Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
+        Tdb = min(Tdb1, Tdb2)
+        Tdb = round(Tdb / 1000, 3)
+        self.block_shear_capacity = Tdb
+
+    # Check for shear yielding ###
+    def shear_yielding_b(self, length, thickness, fy):
+        '''
+        Args:
+            A_v (float) Area under shear
+            beam_fy (float) Yeild stress of beam material
+        Returns:
+            Capacity of beam web in shear yeiding
+        '''
+        A_v = length * thickness
+        V_p = (0.6 * A_v * fy) / (math.sqrt(3) * 1.10 * 1000)  # kN
+        self.shear_yielding_capacity = V_p
+
+    # Check for shear rupture ###
+    # TODO: This formula based on AISC guidelines, check if this should be included
+    def shear_rupture_b(self, length, thickness, bolts_one_line, dia_hole, fu):
+        '''
+        Args:
+            A_vn (float) Net area under shear
+            beam_fu (float) Ultimate stress of beam material
+        Returns:
+            Capacity of beam web in shear rupture
+        '''
+        A_vn = (length - bolts_one_line * dia_hole) * thickness
+        R_n = (0.75 * fu * A_vn) / 1000  # kN
+        self.shear_rupture_capacity = R_n
+
+    def get_moment_cacacity(self, fy, plate_tk, plate_len):
+        self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6 * 10 ** -6
+
     def __repr__(self):
         repr = "Plate\n"
         repr += "Thickness: {}\n".format(self.thickness)
@@ -428,9 +512,15 @@ class Plate(Bolt):
         repr += "Bolt Force: {}\n".format(self.bolt_force)
         repr += "Moment Demand: {}\n".format(self.moment_demand)
         repr += "Pitch Provided: {}\n".format(self.pitch_provided)
+
         repr += "Gauge Provided: {}\n".format(self.gauge_provided)
         repr += "Edge Distance Provided: {}\n".format(self.edge_dist_provided)
         repr += "End Distance Provided: {}\n".format(self.end_dist_provided)
+
+        repr += "Block Shear Capacity: {}\n".format(self.block_shear_capacity)
+        repr += "Shear Yielding Capacity: {}\n".format(self.shear_yielding_capacity)
+        repr += "Shear Rupture Capacity: {}\n".format(self.shear_rupture_capacity)
+        repr += "Moment Capacity: {}\n".format(self.moment_capacity)
         return repr
 
 

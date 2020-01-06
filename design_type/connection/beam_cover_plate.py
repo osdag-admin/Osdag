@@ -72,7 +72,7 @@ class BeamCoverPlate(MomentConnection):
         else:
             existingvalue_key_platethk = ''
 
-        t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_COVERPLATE, TYPE_MODULE, None, None)
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
@@ -87,7 +87,7 @@ class BeamCoverPlate(MomentConnection):
         # t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"))
         # options_list.append(t3)
 
-        t4 = (KEY_SECTYPE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_suptdsec, connectdb("Beams"))
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_suptdsec, connectdb("Beams"))
         options_list.append(t4)
 
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)

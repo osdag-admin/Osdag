@@ -486,7 +486,7 @@ class Ui_ModuleWindow(QMainWindow):
                     indx = option[4].index(str(value))
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
-            elif option[0] == KEY_SUPTDSEC:
+            elif option[0] in [KEY_SUPTDSEC, KEY_SECSIZE]:
 
                 v = "Beams"
                 red_list = connect_for_red(v)
@@ -495,12 +495,19 @@ class Ui_ModuleWindow(QMainWindow):
                 for value in red_list:
                     indx = option[4].index(str(value))
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-
+            # elif option[0] == KEY_SECSIZE:
+            #     v = "Beams"
+            #     red_list = connect_for_red(v)
+            #     # print(red_list)
+            #
+            #     for value in red_list:
+            #         indx = option[4].index(str(value))
+            #         key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
         new_list = main.customized_input(main)
         data = {}
-
+        # CUSTOMIZED_LIST = [KEY_PLATETHK,KEY_GRD,KEY_D,KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS]
         for t in new_list:
-            if t[0] == KEY_PLATETHK:
+            if t[0] in [KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS,KEY_PLATETHK]:
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -1011,7 +1018,7 @@ class Ui_ModuleWindow(QMainWindow):
             s = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
             if option[2] == TYPE_COMBOBOX:
-                if option[0] in ["Bolt.Diameter","Bolt.Grade","Plate.Thickness"]:
+                if option[0] in [KEY_D ,KEY_GRD, KEY_PLATETHK, KEY_FLANGEPLATE_PREFERENCES]:
                     continue
                 if s.currentIndex() == 0:
                     missing_fields_list.append(option[1])

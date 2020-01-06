@@ -180,7 +180,10 @@ KEY_MATERIAL = 'Member.Material'
 KEY_DISP_MATERIAL = 'Material *'
 VALUES_MATERIAL = connectdb("Material")
 
-DISP_TITLE_FSL = 'Factored shear load'
+DISP_TITLE_FSL = 'Factored load'
+
+KEY_MOMENT = 'Load.Moment'
+KEY_DISP_MOMENT = 'Moment(kNm)*'
 
 KEY_SHEAR = 'Load.Shear'
 KEY_DISP_SHEAR = 'Shear(kN)*'
@@ -205,6 +208,23 @@ KEY_DISP_GRD = 'Grade *'
 
 VALUES_GRD = ['All', 'Customized']
 VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+
+DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate'
+
+KEY_FLANGEPLATE_PREFERENCES = 'Plate.Flange_Splice.Preferences'
+KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
+VALUES_FLANGEPLATE_PREFERENCES = ['Cover plate location', 'Outside','Outside + Inside']
+
+KEY_FLANGEPLATE_THICKNESS = 'Plate.Flange_Splice.Thickness'
+KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
+VALUES_FLANGEPLATE_THICKNESS = []
+
+DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
+
+KEY_WEBPLATE_THICKNESS = 'Plate.Web_Splice.Thickness'
+KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
+VALUES_WEBPLATE_THICKNESS = []
+
 
 DISP_TITLE_PLATE = 'Plate'
 

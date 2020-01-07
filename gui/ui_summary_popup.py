@@ -167,20 +167,38 @@ class Ui_Dialog1(object):
         self.save_design(input_summary)
 
     def call_designreport(self, fileName, report_summary, folder):
-        self.alist = {'Connection': 'Finplate','Designation': 'MB 500', 'Mass': 86.9, 'Area': 111.0, 'D': 500.0, 'B': 180.0, 'tw': 10.2,
-                      'T': 17.2, 'FlangeSlope': 98, 'R1': 17.0, 'R2': 8.5, 'Iz': 45228.0, 'Iy': 1320.0, 'rz': 20.2,
-                      'ry': 3.5, 'Zz': 1809.1, 'Zy': 147.0, 'Zpz': 2074.8, 'Zpy': 266.7, 'Source': 'IS808_Rev',
-                      'Bolt': {'Diameter (mm)': '24', 'Grade': '8.8', 'Type': 'Friction Grip Bolt'},
-                      'Weld': {'Size (mm)': '12'},
-                      'Member': {'BeamSection': 'MB 500', 'ColumSection': 'UC 305 x 305 x 97',
-                                 'Connectivity': 'Column flange-Beam web', 'fu (MPa)': '410', 'fy (MPa)': '250'},
-                      'Plate': {'Thickness (mm)': '12', 'Height (mm)': '', 'Width (mm)': ''},
-                      'Load': {'ShearForce (kN)': '140'},
-                      'bolt': {'bolt_hole_type': 'Standard', 'bolt_hole_clrnce': 2, 'bolt_fu': 800.0,
-                               'slip_factor': 0.3},
-                      'weld': {'typeof_weld': 'Shop weld', 'safety_factor': 1.25, 'fu_overwrite': '410'},
-                      'detailing': {'typeof_edge': 'a - Sheared or hand flame cut', 'min_edgend_dist': 1.7, 'gap': 10.0,
-                                    'is_env_corrosive': 'No'}, 'design': {'design_method': 'Limit State Design'}}
+        self.alist = {'Connection':{"Connection Title" : 'Finplate', 'Connection Type': 'Shear Connection'},"Connnection Category":{"Connectivity": 'Column flange-Beam web', "Beam Connection":"Bolted", "Column Connection": "Welded"},"Loading":{'ShearForce(kN) - Vs': '140'},"Components":{"Column Section": 'UC 305 x 305 x 97',"Column Material":"E250(Fe410W)A", "Column(N/mm2)-Fuc":410, "Column(N/mm2)-Fyc":250, "Beam Section": "MB 500", "Beam Material":"E250(Fe410W)A", "Beam(N/mm2)-Fub":410, "Beam(N/mm2)-Fyb":250,
+                      'Mass': 86.9, 'Area-A': 111.0, 'D': 500.0, 'B': 180.0, 'tw': 10.2,'T': 17.2, 'FlangeSlope': 98, 'R1': 17.0, 'R2': 8.5, 'Iz': 45228.0, 'Iy': 1320.0, 'rz': 20.2, 'ry': 3.5, 'Zz': 1809.1, 'Zy': 147.0, 'Zpz': 2074.8, 'Zpy': 266.7,"Plate Section" : '300 x 100 x 12',  'Thickness(mm)-tp': 12.0, 'Depth(mm)-dp': 300.0, 'Width(mm)-wp': 118.0, "Weld": "", "Weld Type":"Double Fillet", "Size(mm)-ws": 12, 'Type_of_weld': 'Shop weld', 'Safety_Factor- ': 1.25, 'Weld(kN) - Fuw ': '410',"Bolts":"",'Diameter (mm)': 24 , 'Grade': 8.8 ,
+                    'Bolt Type': 'Friction Grip Bolt','Bolt Hole Type': 'Standard', 'Bolt Hole Clearance - bc': 2,'Slip Factor - sf': 0.3,'Bolt Numbers - nb': 3, "Bolts per Row - rb": 1, "Bolts per Column - cb": 1, "Gauge (mm) - g": 0, "Pitch(mm) - p": 100,  'End Distance(mm) - en': 54.0, 'Edge Distance(mm) - eg': 54.0}}
+
+        #               'Bolt': {'Diameter (mm)': '24', 'Grade': '8.8', 'Type': 'Friction Grip Bolt'},
+        #               'Weld': {'Size (mm)': '12'},
+        #               'Member': {'BeamSection': 'MB 500', 'ColumSection': 'UC 305 x 305 x 97',
+        #                          'Connectivity': 'Column flange-Beam web', 'fu (MPa)': '410', 'fy (MPa)': '250'},
+        #               'Plate': {'Thickness (mm)': '12', 'Height (mm)': '', 'Width (mm)': ''},
+        #               'Load': {'ShearForce (kN)': '140'},
+        #               'bolt': {'bolt_hole_type': 'Standard', 'bolt_hole_clrnce': 2, 'bolt_fu': 800.0,
+        #                        'slip_factor': 0.3},
+        #               'weld': {'typeof_weld': 'Shop weld', 'safety_factor': 1.25, 'fu_overwrite': '410'},
+        #               'detailing': {'typeof_edge': 'a - Sheared or hand flame cut', 'min_edgend_dist': 1.7, 'gap': 10.0,
+        #                             'is_env_corrosive': 'No'}, 'design': {'design_method': 'Limit State Design'}}
+
+        # self.alist = {'Connection': 'Finplate', 'Connection Type': 'Shear Connection', "Beam Connection": "Bolted",
+        #               "Column Connection": "Welded", "Loading": {'ShearForce (kN)': '140'}, 'Designation': 'MB 500',
+        #               'Mass': 86.9, 'Area': 111.0, 'D': 500.0, 'B': 180.0, 'tw': 10.2,
+        #               'T': 17.2, 'FlangeSlope': 98, 'R1': 17.0, 'R2': 8.5, 'Iz': 45228.0, 'Iy': 1320.0, 'rz': 20.2,
+        #               'ry': 3.5, 'Zz': 1809.1, 'Zy': 147.0, 'Zpz': 2074.8, 'Zpy': 266.7, 'Source': 'IS808_Rev',
+        #               'Bolt': {'Diameter (mm)': '24', 'Grade': '8.8', 'Type': 'Friction Grip Bolt'},
+        #               'Weld': {'Size (mm)': '12'},
+        #               'Member': {'BeamSection': 'MB 500', 'ColumSection': 'UC 305 x 305 x 97',
+        #                          'Connectivity': 'Column flange-Beam web', 'fu (MPa)': '410', 'fy (MPa)': '250'},
+        #               'Plate': {'Thickness (mm)': '12', 'Height (mm)': '', 'Width (mm)': ''},
+        #               'Load': {'ShearForce (kN)': '140'},
+        #               'bolt': {'bolt_hole_type': 'Standard', 'bolt_hole_clrnce': 2, 'bolt_fu': 800.0,
+        #                        'slip_factor': 0.3},
+        #               'weld': {'typeof_weld': 'Shop weld', 'safety_factor': 1.25, 'fu_overwrite': '410'},
+        #               'detailing': {'typeof_edge': 'a - Sheared or hand flame cut', 'min_edgend_dist': 1.7, 'gap': 10.0,
+        #                             'is_env_corrosive': 'No'}, 'design': {'design_method': 'Limit State Design'}}
         self.result = {
             'Bolt': {'status': True, 'shearcapacity': 47.443, 'bearingcapacity': 'N/A', 'boltcapacity': 47.443,
                      'numofbolts': 3, 'boltgrpcapacity': 142.33, 'numofrow': 3, 'numofcol': 1, 'pitch': 96.0,

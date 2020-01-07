@@ -55,18 +55,16 @@ class ShearConnection(Connection):
     def fn_conn_suptngsec(self):
 
         if self in VALUES_CONN_1:
-            return VALUES_COLSEC
+            return connectdb("Columns")
         elif self in VALUES_CONN_2:
-            return VALUES_PRIBM
+            return connectdb("Beams")
         else:
             return []
 
     def fn_conn_suptdsec(self):
 
-        if self in VALUES_CONN_1:
-            return VALUES_BEAMSEC
-        elif self in VALUES_CONN_2:
-            return VALUES_SECBM
+        if self in VALUES_CONN:
+            return connectdb("Beams")
         else:
             return []
 
@@ -360,6 +358,15 @@ class ShearConnection(Connection):
         detailing.append(t3)
 
         return detailing
+
+    def design_values(self):
+        design = []
+
+        t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX, ['Limit State Design',
+                                                    'Limit State (Capacity based) Design', 'Working Stress Design'])
+        design.append(t1)
+
+        return design
 
     def set_input_values(self, design_dictionary):
         self.connectivity = design_dictionary[KEY_CONN]

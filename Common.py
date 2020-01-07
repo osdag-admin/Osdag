@@ -235,6 +235,7 @@ KEY_DISP_DP_DETAILING_GAP = 'Gap between beam and <br>support (mm)'
 KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'DesignPreferences.Detailing.Corrosive_Influences'
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the members exposed to <br>corrosive influences'
 KEY_DP_DESIGN_METHOD = 'DesignPreferences.Design.Design_Method'
+KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
 
 KEY_SUPTNGSEC_DESIGNATION = 'Supporting_Section.Designation'
 KEY_DISP_SUPTNGSEC_DESIGNATION = 'Designation'

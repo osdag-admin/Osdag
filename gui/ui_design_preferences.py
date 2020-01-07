@@ -6,10 +6,33 @@
 #
 # WARNING! All changes made in this file will be lost!
 from Common import *
+from utils.common.component import Section,I_sectional_Properties
+from utils.common.component import *
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.shear_connection import ShearConnection
 
+from PyQt5.QtWidgets import QMessageBox, qApp
+from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
+from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtCore import QRegExp
+from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
+from PyQt5.QtGui import QTextCharFormat
+from PyQt5.QtGui import QTextCursor
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from PyQt5.QtGui import QStandardItem
+import os
+import json
+import logging
+from drawing_2D.Svg_Window import SvgWindow
+import sys
+import sqlite3
+import shutil
+import openpyxl
 
 
 class Ui_Dialog(object):
@@ -59,7 +82,7 @@ class Ui_Dialog(object):
             lable = element[1]
             type = element[2]
             # value = option[4]
-            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_BREAK, TYPE_ENTER]:
+            if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
                 l = QtWidgets.QLabel(self.tab_Column)
                 if lable in [KEY_DISP_SUPTNGSEC_THERMAL_EXP]:
                     l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 28))
@@ -76,7 +99,7 @@ class Ui_Dialog(object):
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                 l.setAlignment(QtCore.Qt.AlignCenter)
 
-            if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
+            if type == TYPE_COMBOBOX:
                 combo = QtWidgets.QComboBox(self.tab_Column)
                 combo.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
                 font = QtGui.QFont()
@@ -109,6 +132,8 @@ class Ui_Dialog(object):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(element[0])
+                if element[0] in [KEY_SUPTNGSEC_DEPTH, KEY_SUPTNGSEC_FLANGE_W, KEY_SUPTNGSEC_FLANGE_T, KEY_SUPTNGSEC_WEB_T]:
+                    r.setValidator(QDoubleValidator())
 
             if type == TYPE_BREAK:
                 j = j + 310
@@ -128,6 +153,36 @@ class Ui_Dialog(object):
         pushButton_Add_Column.setFont(font)
         pushButton_Add_Column.setText("Add")
 
+        pushButton_Clear_Column = QtWidgets.QPushButton(self.tab_Column)
+        pushButton_Clear_Column.setObjectName("pushButton_Clear_Column")
+        pushButton_Clear_Column.setGeometry(QtCore.QRect(180, 500, 160, 27))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        pushButton_Clear_Column.setFont(font)
+        pushButton_Clear_Column.setText("Clear")
+
+        pushButton_Import_Column = QtWidgets.QPushButton(self.tab_Column)
+        pushButton_Import_Column.setObjectName("pushButton_Import_Column")
+        pushButton_Import_Column.setGeometry(QtCore.QRect(770, 500, 160, 27))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        pushButton_Import_Column.setFont(font)
+        pushButton_Import_Column.setText("Import xlsx file")
+
+        pushButton_Download_Column = QtWidgets.QPushButton(self.tab_Column)
+        pushButton_Download_Column.setObjectName("pushButton_Download_Column")
+        pushButton_Download_Column.setGeometry(QtCore.QRect(600, 500, 160, 27))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        pushButton_Download_Column.setFont(font)
+        pushButton_Download_Column.setText("Download xlsx file")
+
         self.tabWidget.addTab(self.tab_Column, "")
         self.tab_Beam = QtWidgets.QWidget()
         self.tab_Beam.setObjectName("tab_Beam")
@@ -140,7 +195,7 @@ class Ui_Dialog(object):
             lable = element[1]
             type = element[2]
             # value = option[4]
-            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_BREAK, TYPE_ENTER]:
+            if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
                 l = QtWidgets.QLabel(self.tab_Beam)
                 if lable in [KEY_DISP_SUPTNGSEC_THERMAL_EXP]:
                     l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 28))
@@ -157,7 +212,7 @@ class Ui_Dialog(object):
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                 l.setAlignment(QtCore.Qt.AlignCenter)
 
-            if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
+            if type == TYPE_COMBOBOX:
                 combo = QtWidgets.QComboBox(self.tab_Beam)
                 combo.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
                 font = QtGui.QFont()
@@ -190,6 +245,9 @@ class Ui_Dialog(object):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(element[0])
+                if element[0] in [KEY_SUPTDSEC_DEPTH, KEY_SUPTDSEC_FLANGE_W, KEY_SUPTDSEC_FLANGE_T,
+                               KEY_SUPTDSEC_WEB_T]:
+                    r.setValidator(QDoubleValidator())
 
             if type == TYPE_BREAK:
                 j = j + 310
@@ -208,6 +266,36 @@ class Ui_Dialog(object):
         font.setWeight(50)
         pushButton_Add_Beam.setFont(font)
         pushButton_Add_Beam.setText("Add")
+
+        pushButton_Clear_Beam = QtWidgets.QPushButton(self.tab_Beam)
+        pushButton_Clear_Beam.setObjectName("pushButton_Clear_Beam")
+        pushButton_Clear_Beam.setGeometry(QtCore.QRect(180, 500, 160, 27))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        pushButton_Clear_Beam.setFont(font)
+        pushButton_Clear_Beam.setText("Clear")
+
+        pushButton_Import_Beam = QtWidgets.QPushButton(self.tab_Beam)
+        pushButton_Import_Beam.setObjectName("pushButton_Import_Beam")
+        pushButton_Import_Beam.setGeometry(QtCore.QRect(770, 500, 160, 27))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        pushButton_Import_Beam.setFont(font)
+        pushButton_Import_Beam.setText("Import xlsx file")
+
+        pushButton_Download_Beam = QtWidgets.QPushButton(self.tab_Beam)
+        pushButton_Download_Beam.setObjectName("pushButton_Download_Beam")
+        pushButton_Download_Beam.setGeometry(QtCore.QRect(600, 500, 160, 27))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setWeight(50)
+        pushButton_Download_Beam.setFont(font)
+        pushButton_Download_Beam.setText("Download xlsx file")
 
         self.tabWidget.addTab(self.tab_Beam, "")
         self.tab_Bolt = QtWidgets.QWidget()
@@ -343,7 +431,7 @@ class Ui_Dialog(object):
             lable = element[1]
             type = element[2]
             # value = option[4]
-            if type not in [TYPE_TITLE, TYPE_ENTER]:
+            if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
                 l = QtWidgets.QLabel(self.tab_Bolt)
                 l.setGeometry(QtCore.QRect(6, 10 + i, 185, 22))
                 font = QtGui.QFont()
@@ -389,8 +477,12 @@ class Ui_Dialog(object):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(element[0])
-                if element[3] != None:
+                if element[3]:
                     r.setText(element[3])
+                dbl_validator = QDoubleValidator()
+                if element[0] == KEY_DP_BOLT_MATERIAL_G_O:
+                    r.setValidator(dbl_validator)
+                    r.setMaxLength(7)
 
             if type == TYPE_ENTER:
                 i = i + 100
@@ -436,7 +528,7 @@ class Ui_Dialog(object):
             lable = element[1]
             type = element[2]
             # value = option[4]
-            if type not in [TYPE_TITLE, TYPE_ENTER]:
+            if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
                 l = QtWidgets.QLabel(self.tab_Weld)
                 l.setGeometry(QtCore.QRect(6, 10 + i, 185, 22))
                 font = QtGui.QFont()
@@ -470,8 +562,12 @@ class Ui_Dialog(object):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(element[0])
-                if element[3] != None:
+                if element[3]:
                     r.setText(element[3])
+                dbl_validator = QDoubleValidator()
+                if element[0] == KEY_DP_WELD_MATERIAL_G_O:
+                    r.setValidator(dbl_validator)
+                    r.setMaxLength(7)
 
             i = i + 40
         self.tabWidget.addTab(self.tab_Weld, "")
@@ -492,7 +588,7 @@ class Ui_Dialog(object):
         font.setWeight(75)
         label_3.setFont(font)
         label_3.setObjectName("label_3")
-        label_3.setGeometry(QtCore.QRect(400, 10, 130, 22))
+        label_3.setGeometry(QtCore.QRect(470, 10, 130, 22))
         label_3.setText("Description")
         textBrowser = QtWidgets.QTextBrowser(self.tab_Detailing)
         textBrowser.setMinimumSize(QtCore.QSize(210, 320))
@@ -517,7 +613,7 @@ class Ui_Dialog(object):
             lable = element[1]
             type = element[2]
             # value = option[4]
-            if type not in [TYPE_TITLE, TYPE_ENTER]:
+            if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
                 l = QtWidgets.QLabel(self.tab_Detailing)
                 l.setGeometry(QtCore.QRect(6, 10 + i, 174, 30))
                 font = QtGui.QFont()
@@ -530,7 +626,7 @@ class Ui_Dialog(object):
 
             if type == TYPE_COMBOBOX:
                 combo = QtWidgets.QComboBox(self.tab_Detailing)
-                combo.setGeometry(QtCore.QRect(180, 10 + i, 270, 30))
+                combo.setGeometry(QtCore.QRect(180, 10 + i, 270, 22))
                 font = QtGui.QFont()
                 font.setPointSize(9)
                 font.setBold(False)
@@ -554,14 +650,14 @@ class Ui_Dialog(object):
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.tab_Detailing)
-                r.setGeometry(QtCore.QRect(180, 10 + i, 270, 30))
+                r.setGeometry(QtCore.QRect(180, 10 + i, 270, 22))
                 font = QtGui.QFont()
                 font.setPointSize(9)
                 font.setBold(False)
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(element[0])
-                if element[3] != None:
+                if element[3]:
                     r.setText(element[3])
 
             i = i + 40
@@ -629,15 +725,51 @@ class Ui_Dialog(object):
         self.tabWidget.addTab(self.tab_Detailing, "")
         self.tab_Design = QtWidgets.QWidget()
         self.tab_Design.setObjectName("tab_Design")
-        self.label_19 = QtWidgets.QLabel(self.tab_Design)
-        self.label_19.setGeometry(QtCore.QRect(21, 31, 101, 16))
-        self.label_19.setObjectName("label_19")
-        self.combo_design_method = QtWidgets.QComboBox(self.tab_Design)
-        self.combo_design_method.setGeometry(QtCore.QRect(160, 31, 227, 22))
-        self.combo_design_method.setObjectName("combo_design_method")
-        self.combo_design_method.addItem("")
-        self.combo_design_method.addItem("")
-        self.combo_design_method.addItem("")
+
+        design_list = ShearConnection.design_values(self)
+        _translate = QtCore.QCoreApplication.translate
+        i = 40
+        for element in design_list:
+            lable = element[1]
+            type = element[2]
+            # value = option[4]
+            if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
+                l = QtWidgets.QLabel(self.tab_Design)
+                l.setGeometry(QtCore.QRect(6, 10 + i, 174, 30))
+                font = QtGui.QFont()
+                font.setPointSize(9)
+                font.setWeight(50)
+                l.setFont(font)
+                l.setObjectName(element[0] + "_label")
+                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+                l.setAlignment(QtCore.Qt.AlignCenter)
+
+            if type == TYPE_COMBOBOX:
+                combo = QtWidgets.QComboBox(self.tab_Design)
+                combo.setGeometry(QtCore.QRect(180, 10 + i, 270, 22))
+                font = QtGui.QFont()
+                font.setPointSize(9)
+                font.setBold(False)
+                font.setWeight(50)
+                combo.setFont(font)
+                combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+                combo.setMaxVisibleItems(5)
+                combo.setObjectName(element[0])
+                for item in element[3]:
+                    combo.addItem(item)
+                if element[0] == KEY_DP_DESIGN_METHOD:
+                    combo.model().item(1).setEnabled(False)
+                    combo.model().item(2).setEnabled(False)
+
+        # self.label_19 = QtWidgets.QLabel(self.tab_Design)
+        # self.label_19.setGeometry(QtCore.QRect(21, 31, 101, 16))
+        # self.label_19.setObjectName("label_19")
+        # self.combo_design_method = QtWidgets.QComboBox(self.tab_Design)
+        # self.combo_design_method.setGeometry(QtCore.QRect(160, 31, 227, 22))
+        # self.combo_design_method.setObjectName("combo_design_method")
+        # self.combo_design_method.addItem("")
+        # self.combo_design_method.addItem("")
+        # self.combo_design_method.addItem("")
         self.tabWidget.addTab(self.tab_Design, "")
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
 
@@ -715,6 +847,200 @@ class Ui_Dialog(object):
         DesignPreferences.setTabOrder(self.btn_defaults, self.btn_close)
         DesignPreferences.setTabOrder(self.btn_close, self.tab_Beam)
 
+        pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+        pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+
+        pushButton_Add_Column.clicked.connect(self.add_tab_column)
+        pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+
+    def clear_tab(self, tab_name):
+        if tab_name == "Column":
+            tab = self.tab_Column
+        elif tab_name == "Beam":
+            tab = self.tab_Beam
+        for c in tab.children():
+            if isinstance(c, QtWidgets.QComboBox):
+                c.setCurrentIndex(0)
+            elif isinstance(c, QtWidgets.QLineEdit):
+                c.clear()
+
+    def add_tab_column(self):
+
+        name = self.tabWidget.tabText(self.tabWidget.indexOf(self.tab_Column))
+        if name == KEY_DISP_COLSEC:
+            table = "Columns"
+        elif name == KEY_DISP_PRIBM:
+            table = "Beams"
+        else:
+            pass
+
+        for ch in self.tab_Column.children():
+            if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                add_col = self.tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Add_Column')
+                add_col.setDisabled(True)
+                break
+            elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
+                if ch.objectName() == KEY_SUPTNGSEC_DESIGNATION:
+                    Designation_c = ch.text()
+                elif ch.objectName() == KEY_SUPTNGSEC_SOURCE:
+                    Source_c = ch.text()
+                elif ch.objectName() == KEY_SUPTNGSEC_DEPTH:
+                    D_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_W:
+                    B_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_T:
+                    T_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_WEB_T:
+                    tw_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_S:
+                    FlangeSlope_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_ROOT_R:
+                    R1_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_TOE_R:
+                    R2_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_MASS:
+                    Mass_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_SEC_AREA:
+                    Area_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_MOA_LZ:
+                    Iz_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_MOA_LY:
+                    Iy_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_ROG_RZ:
+                    rz_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_ROG_RY:
+                    ry_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_EM_ZZ:
+                    Zz_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_EM_ZY:
+                    Zy_c = float(ch.text())
+                elif ch.objectName() == KEY_SUPTNGSEC_PM_ZPZ:
+                    if ch.text() == "":
+                        ch.setText("0")
+                    Zpz_c = ch.text()
+                elif ch.objectName() == KEY_SUPTNGSEC_PM_ZPY:
+                    if ch.text() == "":
+                        ch.setText("0")
+                    Zpy_c = ch.text()
+                else:
+                    pass
+
+        if ch == self.tab_Column.children()[len(self.tab_Column.children())-1]:
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            c = conn.cursor()
+            if table == "Beams":
+                c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_c,))
+                data = c.fetchone()[0]
+            else:
+                c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (Designation_c,))
+                data = c.fetchone()[0]
+            if data == 0:
+                if table == "Beams":
+                    c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
+                        Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (Designation_c, Mass_c, Area_c,
+                               D_c, B_c, tw_c, T_c,
+                               R1_c, R2_c, Iz_c, Iy_c, rz_c,
+                               ry_c, Zz_c, Zy_c,
+                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
+                    conn.commit()
+                else:
+                    c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
+                        Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (Designation_c, Mass_c, Area_c,
+                               D_c, B_c, tw_c, T_c,
+                               R1_c, R2_c, Iz_c, Iy_c, rz_c,
+                               ry_c, Zz_c, Zy_c,
+                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
+                    conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
+
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                self.clear_tab("Column")
+
+    def add_tab_beam(self):
+
+        for ch in self.tab_Beam.children():
+
+            if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                add_bm = self.tab_Beam.findChild(QtWidgets.QWidget, 'pushButton_Add_Beam')
+                add_bm.setDisabled(True)
+                break
+
+            elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
+
+                if ch.objectName() == KEY_SUPTDSEC_DESIGNATION:
+                    Designation_b = ch.text()
+                elif ch.objectName() == KEY_SUPTDSEC_SOURCE:
+                    Source_b = ch.text()
+                elif ch.objectName() == KEY_SUPTDSEC_DEPTH:
+                    D_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_FLANGE_W:
+                    B_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_FLANGE_T:
+                    T_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_WEB_T:
+                    tw_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_FLANGE_S:
+                    FlangeSlope_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_ROOT_R:
+                    R1_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_TOE_R:
+                    R2_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_MASS:
+                    Mass_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_SEC_AREA:
+                    Area_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_MOA_LZ:
+                    Iz_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_MOA_LY:
+                    Iy_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_ROG_RZ:
+                    rz_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_ROG_RY:
+                    ry_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_EM_ZZ:
+                    Zz_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_EM_ZY:
+                    Zy_b = float(ch.text())
+                elif ch.objectName() == KEY_SUPTDSEC_PM_ZPZ:
+                    if ch.text() == "":
+                        ch.setText("0")
+                    Zpz_b = ch.text()
+                elif ch.objectName() == KEY_SUPTDSEC_PM_ZPY:
+                    if ch.text() == "":
+                        ch.setText("0")
+                    Zpy_b = ch.text()
+                else:
+                    pass
+
+        if ch == self.tab_Beam.children()[len(self.tab_Beam.children())-1]:
+
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+
+            c = conn.cursor()
+            c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_b,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,Zz,zy,Zpz,Zpy,
+                    FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (Designation_b, Mass_b, Area_b,
+                           D_b, B_b, tw_b, T_b, FlangeSlope_b,
+                           R1_b, R2_b, Iz_b, Iy_b, rz_b,
+                           ry_b, Zz_b, Zy_b,
+                           Zpz_b, Zpy_b, Source_b))
+                conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                self.clear_tab("Beam")
 
     def retranslateUi(self, DesignPreferences):
         _translate = QtCore.QCoreApplication.translate
@@ -722,246 +1048,852 @@ class Ui_Dialog(object):
         self.btn_defaults.setText(_translate("DesignPreferences", "Defaults"))
         self.btn_save.setText(_translate("DesignPreferences", "Save"))
         self.btn_close.setText(_translate("DesignPreferences", "Save"))
-        # self.label_49.setText(_translate("DesignPreferences", "Web thickness, t (mm)*"))
-        # self.label_50.setText(_translate("DesignPreferences", "Root radius, R1 (mm)*"))
-        # self.label_36.setText(_translate("DesignPreferences", "Toe radius, R2 (mm)*"))
-        # self.label_45.setText(_translate("DesignPreferences", "Dimensions"))
-        # self.label_28.setText(_translate("DesignPreferences", "Flange width, B (mm)*"))
-        # self.label_48.setText(_translate("DesignPreferences", "Flange thickness, T (mm)*"))
-        # self.label_47.setText(_translate("DesignPreferences", "<html><head/><body><p>Flange Slope, <span style=\" font-family:\'Symbol\'; font-size:large;\">a </span>(deg.)*</p></body></html>"))
-        # self.label_54.setText(_translate("DesignPreferences", "Depth, D (mm)*"))
-        # self.label_85.setText(_translate("DesignPreferences", "Poissons ratio, v"))
-        # self.comboBox_Column.setItemText(0, _translate("DesignPreferences", "Rolled"))
-        # self.comboBox_Column.setItemText(1, _translate("DesignPreferences", "Welded"))
-        # self.label_43.setText(_translate("DesignPreferences", "<html><head/><body><p>Plastic modulus, Z<span style=\" vertical-align:sub;\">pz</span> (cm<span style=\" vertical-align:super;\">3</span> )</p></body></html>"))
-        # self.label_46.setText(_translate("DesignPreferences", "Ultimate strength, fu (MPa)"))
-        # self.label_31.setText(_translate("DesignPreferences", "Modulus of elasticity, E (GPa)"))
-        # self.label_32.setText(_translate("DesignPreferences", "Mechanical Properties"))
-        # self.label_30.setText(_translate("DesignPreferences", "<html><head/><body><p><span style=\" font-size:10pt;\">Designation</span></p></body></html>"))
-        # self.label_35.setText(_translate("DesignPreferences", "<html><head/><body><p><span style=\" font-size:10pt;\">Source</span></p></body></html>"))
-        # self.label_41.setText(_translate("DesignPreferences", "<html><head/><body><p><span style=\" font-size:10pt;\">Type</span></p></body></html>"))
-        # self.label_34.setText(_translate("DesignPreferences", "<html><head/><body><p>2nd Moment of area, I<span style=\" vertical-align:sub;\">z</span>(cm<span style=\" vertical-align:super;\">4</span>)</p></body></html>"))
-        # self.label_53.setText(_translate("DesignPreferences", "Mass, M (kg/m)"))
-        # self.label_42.setText(_translate("DesignPreferences", "<html><head/><body><p>Elastic modulus, Z<span style=\" vertical-align:sub;\">z</span> (cm<span style=\" vertical-align:super;\">3</span>)</p></body></html>"))
-        # self.label_52.setText(_translate("DesignPreferences", "Sectional Properties"))
-        # self.label_51.setText(_translate("DesignPreferences", "<html><head/><body><p>Radius of gyration, r<span style=\" vertical-align:sub;\">z</span> (cm)</p></body></html>"))
-        # self.label_33.setText(_translate("DesignPreferences", "<html><head/><body><p>Radius of gyration, r<span style=\" vertical-align:sub;\">y</span> (cm)</p></body></html>"))
-        # self.label_44.setText(_translate("DesignPreferences", "<html><head/><body><p>Elastic modulus, Z<span style=\" vertical-align:sub;\">y</span> (cm<span style=\" vertical-align:super;\">3</span>)</p></body></html>"))
-        # self.label_29.setText(_translate("DesignPreferences", "<html><head/><body><p>2nd Moment of area,I<span style=\" vertical-align:sub;\">y</span> (cm<span style=\" vertical-align:super;\">4</span>)</p></body></html>"))
-        # self.label_57.setText(_translate("DesignPreferences", "<html><head/><body><p>Sectional area, a (mm<span style=\" vertical-align:super;\">2</span>)</p></body></html>"))
-        # self.label_56.setText(_translate("DesignPreferences", "<html><head/><body><p>Plastic modulus, Z<span style=\" vertical-align:sub;\">py</span> (cm<span style=\" vertical-align:super;\">3</span> )</p></body></html>"))
-        # self.label_86.setText(_translate("DesignPreferences", "<html><head/><body><p>Thermal expansion </p><p>coeff.<span style=\" font-family:\'Symbol\'; font-size:large;\">a </span>(x10<span style=\" vertical-align:super;\">-6</span>/<span style=\" vertical-align:super;\">0</span>C)</p></body></html>"))
-        # self.label_55.setText(_translate("DesignPreferences", "Yield Strength , fy (MPa)"))
-        # self.label_37.setText(_translate("DesignPreferences", "Modulus of rigidity, G (GPa)"))
-        # self.pushButton_Clear_Column.setText(_translate("DesignPreferences", "Clear"))
-        # self.pushButton_Add_Column.setText(_translate("DesignPreferences", "Add"))
-        # self.pushButton_Download_Column.setText(_translate("DesignPreferences", "Download xlsx format"))
-        # self.pushButton_Import_Column.setText(_translate("DesignPreferences", "Import xlsx file"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Column), _translate("DesignPreferences", "Column"))
-        # self.pushButton_Download_Beam.setText(_translate("DesignPreferences", "Download xlsx format"))
-        # self.pushButton_Import_Beam.setText(_translate("DesignPreferences", "Import xlsx file"))
-        # self.label_74.setText(_translate("DesignPreferences", "<html><head/><body><p><span style=\" font-size:10pt;\">Source</span></p></body></html>"))
-        # self.pushButton_Clear_Beam.setText(_translate("DesignPreferences", "Clear"))
-        # self.pushButton_Add_Beam.setText(_translate("DesignPreferences", "Add"))
-        # self.label_75.setText(_translate("DesignPreferences", "Sectional Properties"))
-        # self.label_77.setText(_translate("DesignPreferences", "Dimensions"))
-        # self.label_58.setText(_translate("DesignPreferences", "Modulus of elasticity, E (GPa)"))
-        # self.comboBox_Beam.setItemText(0, _translate("DesignPreferences", "Rolled"))
-        # self.comboBox_Beam.setItemText(1, _translate("DesignPreferences", "Welded"))
-        # self.label_66.setText(_translate("DesignPreferences", "Modulus of rigidity, G (GPa)"))
-        # self.label_79.setText(_translate("DesignPreferences", "Ultimate strength, fu (MPa)"))
-        # self.label_81.setText(_translate("DesignPreferences", "Mechanical Properties"))
-        # self.label_88.setText(_translate("DesignPreferences", "Poissons ratio, v"))
-        # self.label_89.setText(_translate("DesignPreferences", "<html><head/><body><p>Thermal expansion </p><p>coeff.<span style=\" font-family:\'Symbol\'; font-size:large;\">a </span>(x10<span style=\" vertical-align:super;\">-6</span>/<span style=\" vertical-align:super;\">0</span>C)</p></body></html>"))
-        # self.label_80.setText(_translate("DesignPreferences", "Depth, D (mm)*"))
-        # self.label_64.setText(_translate("DesignPreferences", "<html><head/><body><p><span style=\" font-size:10pt;\">Designation</span></p></body></html>"))
-        # self.label_63.setText(_translate("DesignPreferences", "<html><head/><body><p><span style=\" font-size:10pt;\">Type</span></p></body></html>"))
-        # self.label_150.setText(_translate("DesignPreferences", "<html><head/><body><p>Radius of gyration, r<span style=\" vertical-align:sub;\">z</span> (cm)</p></body></html>"))
-        # self.label_145.setText(_translate("DesignPreferences", "<html><head/><body><p>Elastic modulus, Z<span style=\" vertical-align:sub;\">y</span> (cm<span style=\" vertical-align:super;\">3</span>)</p></body></html>"))
-        # self.label_78.setText(_translate("DesignPreferences", "Toe radius, R2 (mm)*"))
-        # self.label_147.setText(_translate("DesignPreferences", "<html><head/><body><p>Sectional area, a (mm<span style=\" vertical-align:super;\">2</span>)</p></body></html>"))
-        # self.label_152.setText(_translate("DesignPreferences", "<html><head/><body><p>Plastic modulus, Z<span style=\" vertical-align:sub;\">pz</span> (cm<span style=\" vertical-align:super;\">3</span> )</p></body></html>"))
-        # self.label_153.setText(_translate("DesignPreferences", "<html><head/><body><p>Radius of gyration, r<span style=\" vertical-align:sub;\">y</span> (cm)</p></body></html>"))
-        # self.label_82.setText(_translate("DesignPreferences", "Yield Strength , fy (MPa)"))
-        # self.label_72.setText(_translate("DesignPreferences", "<html><head/><body><p>Flange Slope, <span style=\" font-family:\'Symbol\'; font-size:large;\">a </span>(deg.)*</p></body></html>"))
-        # self.label_73.setText(_translate("DesignPreferences", "Root radius, R1 (mm)*"))
-        # self.label_151.setText(_translate("DesignPreferences", "<html><head/><body><p>Elastic modulus, Z<span style=\" vertical-align:sub;\">z</span> (cm<span style=\" vertical-align:super;\">3</span>)</p></body></html>"))
-        # self.label_61.setText(_translate("DesignPreferences", "Flange thickness, T (mm)*"))
-        # self.label_62.setText(_translate("DesignPreferences", "Mass, M (kg/m)"))
-        # self.label_146.setText(_translate("DesignPreferences", "<html><head/><body><p>2nd Moment of area, I<span style=\" vertical-align:sub;\">z</span>(cm<span style=\" vertical-align:super;\">4</span>)</p></body></html>"))
-        # self.label_59.setText(_translate("DesignPreferences", "Flange width, B (mm)*"))
-        # self.label_149.setText(_translate("DesignPreferences", "<html><head/><body><p>2nd Moment of area,I<span style=\" vertical-align:sub;\">y</span> (cm<span style=\" vertical-align:super;\">4</span>)</p></body></html>"))
-        # self.label_69.setText(_translate("DesignPreferences", "Web thickness, t (mm)*"))
-        # self.label_148.setText(_translate("DesignPreferences", "<html><head/><body><p>Plastic modulus, Z<span style=\" vertical-align:sub;\">py</span> (cm<span style=\" vertical-align:super;\">3</span> )</p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Beam), _translate("DesignPreferences", "Beam"))
-#         self.label_note.setText(_translate("DesignPreferences", "NOTE : If slip is permitted under the design load, design the bolt as a bearing\n"
-# "bolt and select corresponding bolt grade."))
-#         self.label.setText(_translate("DesignPreferences", "Bolt type"))
-#         self.label_4.setText(_translate("DesignPreferences", "Material grade overwrite (MPa)"))
-#         self.label_2.setText(_translate("DesignPreferences", "Bolt hole type"))
-#         self.combo_boltHoleType.setItemText(0, _translate("DesignPreferences", "Standard"))
-#         self.combo_boltHoleType.setItemText(1, _translate("DesignPreferences", "Over-sized"))
-#         self.label_8.setText(_translate("DesignPreferences", "Fu"))
-#         self.txt_boltFu.setText(_translate("DesignPreferences", "800"))
-#         self.combo_boltType.setItemText(0, _translate("DesignPreferences", "Pretensioned"))
-#         self.combo_boltType.setItemText(1, _translate("DesignPreferences", "Non-pretensioned"))
-#         self.label_7.setText(_translate("DesignPreferences", "HSFG bolt design parameters:"))
-#         self.label_15.setText(_translate("DesignPreferences", "Slip factor (µ_f)"))
-#         self.combo_slipfactor.setItemText(0, _translate("DesignPreferences", "0.2"))
-#         self.combo_slipfactor.setItemText(1, _translate("DesignPreferences", "0.5"))
-#         self.combo_slipfactor.setItemText(2, _translate("DesignPreferences", "0.1"))
-#         self.combo_slipfactor.setItemText(3, _translate("DesignPreferences", "0.25"))
-#         self.combo_slipfactor.setItemText(4, _translate("DesignPreferences", "0.3"))
-#         self.combo_slipfactor.setItemText(5, _translate("DesignPreferences", "0.33"))
-#         self.combo_slipfactor.setItemText(6, _translate("DesignPreferences", "0.48"))
-#         self.combo_slipfactor.setItemText(7, _translate("DesignPreferences", "0.52"))
-#         self.combo_slipfactor.setItemText(8, _translate("DesignPreferences", "0.55"))
-#         self.label_5.setText(_translate("DesignPreferences", "Inputs"))
-#         self.label_3.setText(_translate("DesignPreferences", "Description"))
-#         self.textBrowser.setHtml(_translate("DesignPreferences", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-# "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-# "p, li { white-space: pre-wrap; }\n"
-# "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-# "<table border=\"0\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;\" cellspacing=\"2\" cellpadding=\"0\">\n"
-# "<tr>\n"
-# "<td colspan=\"3\">\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">IS 800 Table 20 Typical Average Values for Coefficient of Friction (</span><span style=\" font-family:\'Calibri,sans-serif\'; font-size:9pt;\">µ</span><span style=\" font-family:\'Calibri,sans-serif\'; font-size:9pt; vertical-align:sub;\">f</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">)</span></p></td></tr></table>\n"
-# "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p>\n"
-# "<table border=\"0\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;\" cellspacing=\"2\" cellpadding=\"0\">\n"
-# "<tr>\n"
-# "<td width=\"26\"></td>\n"
-# "<td width=\"383\">\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Treatment of Surfaces</span></p></td>\n"
-# "<td width=\"78\">\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  µ_f</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">i)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces not treated</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.2</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">ii)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with short or grit with any loose rust removed, no pitting</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.5</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">iii)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with short or grit and hot-dip galvanized</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.1</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">iv)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with short or grit and spray - metallized with zinc (thickness 50-70 µm)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.25</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">v)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with shot or grit and painted with ethylzinc silicate coat (thickness 30-60 µm)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.3</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">vi)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Sand blasted surface, after light rusting</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.52</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">vii)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with shot or grit and painted with ethylzinc silicate coat (thickness 60-80 µm)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.3</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">viii)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with shot or grit and painted with alcalizinc silicate coat (thickness 60-80 µm)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.3</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">ix)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with shot or grit and spray metallized with aluminium (thickness &gt;50 µm)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.5</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">x)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Clean mill scale</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.33</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">xi)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Sand blasted surface</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.48</span></p></td></tr>\n"
-# "<tr>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">xii)</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Red lead painted surface</span></p></td>\n"
-# "<td>\n"
-# "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.1</span></p>\n"
-# "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></td></tr></table></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Bolt), _translate("DesignPreferences", "Bolt"))
-#         self.label_16.setText(_translate("DesignPreferences", "Inputs"))
-#         self.label_17.setText(_translate("DesignPreferences", "Description"))
-#         self.textBrowser_weldDescription.setHtml(_translate("DesignPreferences", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-# "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-# "p, li { white-space: pre-wrap; }\n"
-# "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-# "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Shop weld takes a material safety factor of 1.25</span></p>\n"
-# "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Field weld takes a material safety factor of 1.5</span></p>\n"
-# "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">(IS 800 - cl. 5. 4. 1 or Table 5)</span></p></body></html>"))
-#         self.label_6.setText(_translate("DesignPreferences", "Material grade overwrite (MPa)"))
-#         self.combo_weldType.setItemText(0, _translate("DesignPreferences", "Shop weld"))
-#         self.combo_weldType.setItemText(1, _translate("DesignPreferences", "Field weld"))
-#         self.label_22.setText(_translate("DesignPreferences", "Type of weld"))
-#         self.txt_weldFu.setText(_translate("DesignPreferences", "410"))
-#         self.label_10.setText(_translate("DesignPreferences", "Fu"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Weld), _translate("DesignPreferences", "Weld"))
-#         self.label_38.setText(_translate("DesignPreferences", "Inputs"))
-#         self.label_39.setText(_translate("DesignPreferences", "Type of edges"))
-#         self.combo_detailingEdgeType.setItemText(0, _translate("DesignPreferences", "a - Sheared or hand flame cut"))
-#         self.combo_detailingEdgeType.setItemText(1, _translate("DesignPreferences", "b - Rolled, machine-flame cut, sawn and planed"))
-#         self.label_40.setText(_translate("DesignPreferences", "Are the members exposed to\n"
-# "corrosive influences?"))
-#         self.combo_detailing_memebers.setItemText(0, _translate("DesignPreferences", "No"))
-#         self.combo_detailing_memebers.setItemText(1, _translate("DesignPreferences", "Yes"))
-#         self.label_12.setText(_translate("Dialog", "Gap between beam & support (mm)"))
-#         self.label_18.setText(_translate("DesignPreferences", "Description"))
-#         self.textBrowser_detailingDescription.setHtml(_translate("DesignPreferences", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-# "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-# "p, li { white-space: pre-wrap; }\n"
-# "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-# "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[a- sheared or hand flame cut edges] </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">and </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[b - Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
-# "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
-# "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">This gap should include the tolerance value of 5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5 mm{tolerance})</span></p>\n"
-# "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
-# "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
-# "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Detailing), _translate("DesignPreferences", "Detailing"))
-        self.label_19.setText(_translate("DesignPreferences", "Design Method"))
-        self.combo_design_method.setItemText(0, _translate("DesignPreferences", "Limit State Design"))
-        self.combo_design_method.setItemText(1, _translate("DesignPreferences", "Limit State (Capacity based) Design"))
-        self.combo_design_method.setItemText(2, _translate("DesignPreferences", "Working Stress Design"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Design), _translate("DesignPreferences", "Design"))
+
+
+class DesignPreferences(QDialog):
+
+    def __init__(self, main, parent=None):
+
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Dialog()
+        self.ui.setupUi(self)
+        self.main_controller = parent
+        #self.uiobj = self.main_controller.uiObj
+        self.saved = None
+        self.sectionalprop = I_sectional_Properties()
+        # self.ui.combo_design_method.model().item(1).setEnabled(False)
+        # self.ui.combo_design_method.model().item(2).setEnabled(False)
+        # self.save_default_para()
+        # self.ui.txt_boltFu.setValidator(dbl_validator)
+        # self.ui.txt_boltFu.setMaxLength(7)
+        # self.ui.txt_weldFu.setValidator(dbl_validator)
+        # self.ui.txt_weldFu.setMaxLength(7)
+        # self.ui.btn_defaults.clicked.connect(self.save_default_para)
+        # self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        self.ui.btn_save.hide()
+        self.ui.btn_close.clicked.connect(self.close_designPref)
+        # self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
+        # self.ui.pushButton_Import_Column.setDisabled(True)
+        #self.ui.pushButton_Import_Beam.setDisabled(True)
+        # self.ui.pushButton_Add_Column.clicked.connect(self.add_ColumnPref)
+        # self.ui.pushButton_Add_Beam.clicked.connect(self.add_BeamPref)
+        # self.ui.pushButton_Clear_Column.clicked.connect(self.clear_ColumnPref)
+        #self.ui.pushButton_Clear_Beam.clicked.connect(self.clear_BeamPref)
+        # pushButton_Download_Column = self.ui.tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Download_Column')
+        # pushButton_Download_Column.clicked.connect(self.download_Database_Column)
+        # pushButton_Download_Beam = self.ui.tab_Beam.findChild(QtWidgets.QWidget, 'pushButton_Download_Beam')
+        # pushButton_Download_Beam.clicked.connect(self.download_Database_Beam)
+        #
+        # pushButton_Import_Column = self.ui.tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Import_Column')
+        # pushButton_Import_Column.clicked.connect(self.import_ColumnPref)
+        # pushButton_Import_Beam = self.ui.tab_Beam.findChild(QtWidgets.QWidget, 'pushButton_Import_Beam')
+        # pushButton_Import_Beam.clicked.connect(self.import_BeamPref)
+        #self.ui.btn_save.clicked.connect(Ui_ModuleWindow.design_preferences(Ui_ModuleWindow()))
+        #self.ui.combo_boltHoleType.currentIndexChanged.connect(my_fn)
+        #self.ui.btn_save.clicked.connect(self.save_fn)
+        self.ui.btn_defaults.clicked.connect(self.default_fn)
+
+    def default_fn(self):
+        for children in self.ui.tab_Bolt.children():
+            if children.objectName() == KEY_DP_BOLT_TYPE:
+                children.setCurrentIndex(0)
+            elif children.objectName() == KEY_DP_BOLT_HOLE_TYPE:
+                children.setCurrentIndex(0)
+            elif children.objectName() == KEY_DP_BOLT_MATERIAL_G_O:
+                children.setText('410')
+            elif children.objectName() == KEY_DP_BOLT_SLIP_FACTOR:
+                children.setCurrentIndex(4)
+            else:
+                pass
+        for children in self.ui.tab_Weld.children():
+            if children.objectName() == KEY_DP_WELD_TYPE:
+                children.setCurrentIndex(0)
+            elif children.objectName() == KEY_DP_WELD_MATERIAL_G_O:
+                children.setText('410')
+            else:
+                pass
+        for children in self.ui.tab_Detailing.children():
+            if children.objectName() == KEY_DP_DETAILING_EDGE_TYPE:
+                children.setCurrentIndex(0)
+            elif children.objectName() == KEY_DP_DETAILING_GAP:
+                children.setText('10')
+            elif children.objectName() == KEY_DP_DETAILING_CORROSIVE_INFLUENCES:
+                children.setCurrentIndex(0)
+            else:
+                pass
+        for children in self.ui.tab_Design.children():
+            if children.objectName() == KEY_DP_DESIGN_METHOD:
+                children.setCurrentIndex(0)
+            else:
+                pass
+
+    # def save_fn(self):
+    #     for children in self.ui.tab_Bolt.children():
+    #         if isinstance(children, QtWidgets.QComboBox):
+    #             children.setCurrentIndex(children.currentIndex())
+    #             print('check')
+
+    def save_designPref_para(self):
+        """This routine is responsible for saving all design preferences selected by the user
+        """
+        key_boltHoleType = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_HOLE_TYPE)
+        combo_boltHoleType = key_boltHoleType.currentText()
+        key_boltFu = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O)
+        line_boltFu = key_boltFu.text()
+        key_slipfactor = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_SLIP_FACTOR)
+        combo_slipfactor = key_slipfactor.currentText()
+        key_weldType = self.ui.tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_TYPE)
+        combo_weldType = key_weldType.currentText()
+        key_weldFu = self.ui.tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O)
+        line_weldFu = key_weldFu.text()
+        key_detailingEdgeType = self.ui.tab_Detailing.findChild(QtWidgets.QWidget, KEY_DP_DETAILING_EDGE_TYPE)
+        combo_detailingEdgeType = key_detailingEdgeType.currentText()
+        key_detailingGap = self.ui.tab_Detailing.findChild(QtWidgets.QWidget, KEY_DP_DETAILING_GAP)
+        line_detailingGap = key_detailingGap.text()
+        key_detailing_memebers = self.ui.tab_Detailing.findChild(QtWidgets.QWidget, KEY_DP_DETAILING_CORROSIVE_INFLUENCES)
+        combo_detailing_memebers = key_detailing_memebers.currentText()
+        key_design_method = self.ui.tab_Design.findChild(QtWidgets.QWidget, KEY_DP_DESIGN_METHOD)
+        combo_design_method = key_design_method.currentText()
+        d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+              KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
+              KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
+              KEY_DP_WELD_TYPE: combo_weldType,
+              KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+              KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+              KEY_DP_DETAILING_GAP: line_detailingGap,
+              KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers, KEY_DP_DESIGN_METHOD: combo_design_method}
+        return d1
+
+    def highlight_slipfactor_description(self):
+        """Highlight the description of currosponding slipfactor on selection of inputs
+        Note : This routine is not in use in current version
+        :return:
+        """
+        slip_factor = str(self.ui.combo_slipfactor.currentText())
+        self.textCursor = QTextCursor(self.ui.textBrowser.document())
+        cursor = self.textCursor
+        # Setup the desired format for matches
+        format = QTextCharFormat()
+        format.setBackground(QBrush(QColor("red")))
+        # Setup the regex engine
+        pattern = str(slip_factor)
+        regex = QRegExp(pattern)
+        # Process the displayed document
+        pos = 0
+        index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
+        while (index != -1):
+            # Select the matched text and apply the desired format
+            cursor.setPosition(index)
+            cursor.movePosition(QTextCursor.EndOfLine, 1)
+            # cursor.movePosition(QTextCursor.EndOfWord, 1)
+            cursor.mergeCharFormat(format)
+            # Move to the next match
+            pos = index + regex.matchedLength()
+            index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
+
+    # def connect_to_database_update_other_attributes(self, table, designation):
+    #     self.path_to_database = "ResourceFiles/Database/Intg_osdag.sqlite"
+    #     conn = sqlite3.connect(self.path_to_database)
+    #     db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
+    #     cur = conn.cursor()
+    #     cur.execute(db_query, (designation,))
+    #     row = cur.fetchone()
+    #     self.mass = row[2]
+    #     self.area = row[3]
+    #     self.depth = row[4]
+    #     self.flange_width = row[5]
+    #     self.web_thickness = row[6]
+    #     self.flange_thickness = row[7]
+    #     self.flange_slope = row[8]
+    #     self.root_radius = row[9]
+    #     self.toe_radius = row[10]
+    #     self.mom_inertia_z = row[11]
+    #     self.mom_inertia_y = row[12]
+    #     self.rad_of_gy_z = row[13]
+    #     self.rad_of_gy_y = row[14]
+    #     self.elast_sec_mod_z = row[15]
+    #     self.elast_sec_mod_y = row[16]
+    #     self.plast_sec_mod_z = row[17]
+    #     self.plast_sec_mod_y = row[18]
+    #     self.source = row[19]
+    #
+    #     conn.close()
+    def column_preferences(self, designation, table, material_grade):
+        col_list = []
+        col_attributes = Section(designation, material_grade)
+        Section.connect_to_database_update_other_attributes(col_attributes, table, designation)
+        if table == "Beams":
+            self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab_Column), KEY_DISP_PRIBM)
+            self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab_Beam), KEY_DISP_SECBM)
+        else:
+            self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab_Column), KEY_DISP_COLSEC)
+            self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab_Beam), KEY_DISP_BEAMSEC)
+        for ch in self.ui.tab_Column.children():
+            if ch.objectName() == KEY_SUPTNGSEC_DESIGNATION:
+                ch.setText(designation)
+            elif ch.objectName() == KEY_SUPTNGSEC_SOURCE:
+                ch.setText(col_attributes.source)
+            elif ch.objectName() == KEY_SUPTNGSEC_FU:
+                ch.setText(str(col_attributes.fu))
+            elif ch.objectName() == KEY_SUPTNGSEC_FY:
+                ch.setText(str(col_attributes.fy))
+            elif ch.objectName() == KEY_SUPTNGSEC_DEPTH:
+                ch.setText(str(col_attributes.depth))
+                col_list.append(ch)
+            elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_W:
+                ch.setText(str(col_attributes.flange_width))
+                col_list.append(ch)
+            elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_T:
+                ch.setText(str(col_attributes.flange_thickness))
+                col_list.append(ch)
+            elif ch.objectName() == KEY_SUPTNGSEC_WEB_T:
+                ch.setText(str(col_attributes.web_thickness))
+                col_list.append(ch)
+            elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_S:
+                ch.setText(str(col_attributes.flange_slope))
+            elif ch.objectName() == KEY_SUPTNGSEC_ROOT_R:
+                ch.setText(str(col_attributes.root_radius))
+            elif ch.objectName() == KEY_SUPTNGSEC_TOE_R:
+                ch.setText(str(col_attributes.toe_radius))
+            elif ch.objectName() == KEY_SUPTNGSEC_MOD_OF_ELAST:
+                ch.setText("200")
+                ch.setDisabled(True)
+            elif ch.objectName() == KEY_SUPTNGSEC_MOD_OF_RIGID:
+                ch.setText("76.9")
+                ch.setDisabled(True)
+            elif ch.objectName() == KEY_SUPTNGSEC_POISSON_RATIO:
+                ch.setText("0.3")
+                ch.setDisabled(True)
+            elif ch.objectName() == KEY_SUPTNGSEC_THERMAL_EXP:
+                ch.setText("12")
+                ch.setDisabled(True)
+            elif ch.objectName() == KEY_SUPTNGSEC_MASS:
+                ch.setText(str(col_attributes.mass))
+            elif ch.objectName() == KEY_SUPTNGSEC_SEC_AREA:
+                ch.setText(str(col_attributes.area))
+            elif ch.objectName() == KEY_SUPTNGSEC_MOA_LZ:
+                ch.setText(str(col_attributes.mom_inertia_z))
+            elif ch.objectName() == KEY_SUPTNGSEC_MOA_LY:
+                ch.setText(str(col_attributes.mom_inertia_y))
+            elif ch.objectName() == KEY_SUPTNGSEC_ROG_RZ:
+                ch.setText(str(col_attributes.rad_of_gy_z))
+            elif ch.objectName() == KEY_SUPTNGSEC_ROG_RY:
+                ch.setText(str(col_attributes.rad_of_gy_y))
+            elif ch.objectName() == KEY_SUPTNGSEC_EM_ZZ:
+                ch.setText(str(col_attributes.elast_sec_mod_z))
+            elif ch.objectName() == KEY_SUPTNGSEC_EM_ZY:
+                ch.setText(str(col_attributes.elast_sec_mod_y))
+            elif ch.objectName() == KEY_SUPTNGSEC_PM_ZPZ:
+                ch.setText(str(col_attributes.plast_sec_mod_z))
+            elif ch.objectName() == KEY_SUPTNGSEC_PM_ZPY:
+                ch.setText(str(col_attributes.plast_sec_mod_y))
+            elif ch.objectName() == 'pushButton_Add_Column':
+                ch.setEnabled(True)
+            else:
+                pass
+
+        for e in col_list:
+            if e.text() != "":
+                e.textChanged.connect(lambda: self.new_sectionalprop_Column(col_list))
+
+        # self.ui.lineEdit_Designation_Column.setText(designation)
+        # self.ui.lineEdit_Source_Column.setText(col_attributes.source)
+        # self.ui.lineEdit_UltimateStrength_Column.setText(str(col_attributes.fu))
+        # self.ui.lineEdit_YieldStrength_Column.setText(str(col_attributes.fy))
+        # self.ui.lineEdit_Depth_Column.setText(str(col_attributes.depth))
+        # self.ui.lineEdit_FlangeWidth_Column.setText(str(col_attributes.flange_width))
+        # self.ui.lineEdit_FlangeThickness_Column.setText(str(col_attributes.flange_thickness))
+        # self.ui.lineEdit_WeBThickness_Column.setText(str(col_attributes.web_thickness))
+        # self.ui.lineEdit_FlangeSlope_Column.setText(str(col_attributes.flange_slope))
+        # self.ui.lineEdit_RootRadius_Column.setText(str(col_attributes.root_radius))
+        # self.ui.lineEdit_ToeRadius_Column.setText(str(col_attributes.toe_radius))
+        # self.ui.lineEdit_ModElasticity_Column.setText("200")
+        # self.ui.lineEdit_ModElasticity_Column.setDisabled(True)
+        # self.ui.lineEdit_ModulusOfRigidity_Column.setText("76.9")
+        # self.ui.lineEdit_ModulusOfRigidity_Column.setDisabled(True)
+        # self.ui.lineEdit_PoissionsRatio_Column.setText("0.3")
+        # self.ui.lineEdit_PoissionsRatio_Column.setDisabled(True)
+        # self.ui.lineEdit_ThermalExpansion_Column.setText("12")
+        # self.ui.lineEdit_ThermalExpansion_Column.setDisabled(True)
+        # self.ui.lineEdit_Mass_Column.setText(str(col_attributes.mass))
+        # self.ui.lineEdit_SectionalArea_Column.setText(str(col_attributes.area))
+        # self.ui.lineEdit_MomentOfAreaZ_Column.setText(str(col_attributes.mom_inertia_z))
+        # self.ui.lineEdit_MomentOfAreaY_Column.setText(str(col_attributes.mom_inertia_y))
+        # self.ui.lineEdit_RogZ_Column.setText(str(col_attributes.rad_of_gy_z))
+        # self.ui.lineEdit_RogY_Column.setText(str(col_attributes.rad_of_gy_y))
+        # self.ui.lineEdit_ElasticModZ_Column.setText(str(col_attributes.elast_sec_mod_z))
+        # self.ui.lineEdit_ElasticModY_Column.setText(str(col_attributes.elast_sec_mod_y))
+        # self.ui.lineEdit_ElasticModPZ_Column.setText(str(col_attributes.plast_sec_mod_z))
+        # self.ui.lineEdit_ElasticModPY_Column.setText(str(col_attributes.plast_sec_mod_y))
+        # self.ui.pushButton_Add_Column.setEnabled(True)
+        # self.ui.pushButton_Add_Column.clicked.connect(lambda: self.add_ColumnPref(table))
+        #
+        # if (
+        #         self.ui.lineEdit_Depth_Column.text() != "" and self.ui.lineEdit_FlangeWidth_Column.text() != "" and self.ui.lineEdit_FlangeThickness_Column.text() != ""
+        #         and self.ui.lineEdit_WeBThickness_Column.text() != ""):
+        #     self.ui.lineEdit_Depth_Column.textChanged.connect(self.new_sectionalprop_Column)
+        #     self.ui.lineEdit_FlangeWidth_Column.textChanged.connect(self.new_sectionalprop_Column)
+        #     self.ui.lineEdit_FlangeThickness_Column.textChanged.connect(self.new_sectionalprop_Column)
+        #     self.ui.lineEdit_WeBThickness_Column.textChanged.connect(self.new_sectionalprop_Column)
+
+    def beam_preferences(self, designation, material_grade):
+        beam_attributes = Section(designation, material_grade)
+        Section.connect_to_database_update_other_attributes(beam_attributes, "Beams", designation)
+        beam_list = []
+        for ch in self.ui.tab_Beam.children():
+            if ch.objectName() == KEY_SUPTDSEC_DESIGNATION:
+                ch.setText(designation)
+            elif ch.objectName() == KEY_SUPTDSEC_SOURCE:
+                ch.setText(beam_attributes.source)
+            elif ch.objectName() == KEY_SUPTDSEC_FU:
+                ch.setText(str(beam_attributes.fu))
+            elif ch.objectName() == KEY_SUPTDSEC_FY:
+                ch.setText(str(beam_attributes.fy))
+            elif ch.objectName() == KEY_SUPTDSEC_DEPTH:
+                ch.setText(str(beam_attributes.depth))
+                beam_list.append(ch)
+            elif ch.objectName() == KEY_SUPTDSEC_FLANGE_W:
+                ch.setText(str(beam_attributes.flange_width))
+                beam_list.append(ch)
+            elif ch.objectName() == KEY_SUPTDSEC_FLANGE_T:
+                ch.setText(str(beam_attributes.flange_thickness))
+                beam_list.append(ch)
+            elif ch.objectName() == KEY_SUPTDSEC_WEB_T:
+                ch.setText(str(beam_attributes.web_thickness))
+                beam_list.append(ch)
+            elif ch.objectName() == KEY_SUPTDSEC_FLANGE_S:
+                ch.setText(str(beam_attributes.flange_slope))
+            elif ch.objectName() == KEY_SUPTDSEC_ROOT_R:
+                ch.setText(str(beam_attributes.root_radius))
+            elif ch.objectName() == KEY_SUPTDSEC_TOE_R:
+                ch.setText(str(beam_attributes.toe_radius))
+            elif ch.objectName() == KEY_SUPTDSEC_MOD_OF_ELAST:
+                ch.setText("200")
+                ch.setDisabled(True)
+            elif ch.objectName() == KEY_SUPTDSEC_MOD_OF_RIGID:
+                ch.setText("76.9")
+                ch.setDisabled(True)
+            elif ch.objectName() == KEY_SUPTDSEC_POISSON_RATIO:
+                ch.setText("0.3")
+                ch.setDisabled(True)
+            elif ch.objectName() == KEY_SUPTDSEC_THERMAL_EXP:
+                ch.setText("12")
+                ch.setDisabled(True)
+            elif ch.objectName() == KEY_SUPTDSEC_MASS:
+                ch.setText(str(beam_attributes.mass))
+            elif ch.objectName() == KEY_SUPTDSEC_SEC_AREA:
+                ch.setText(str(beam_attributes.area))
+            elif ch.objectName() == KEY_SUPTDSEC_MOA_LZ:
+                ch.setText(str(beam_attributes.mom_inertia_z))
+            elif ch.objectName() == KEY_SUPTDSEC_MOA_LY:
+                ch.setText(str(beam_attributes.mom_inertia_y))
+            elif ch.objectName() == KEY_SUPTDSEC_ROG_RZ:
+                ch.setText(str(beam_attributes.rad_of_gy_z))
+            elif ch.objectName() == KEY_SUPTDSEC_ROG_RY:
+                ch.setText(str(beam_attributes.rad_of_gy_y))
+            elif ch.objectName() == KEY_SUPTDSEC_EM_ZZ:
+                ch.setText(str(beam_attributes.elast_sec_mod_z))
+            elif ch.objectName() == KEY_SUPTDSEC_EM_ZY:
+                ch.setText(str(beam_attributes.elast_sec_mod_y))
+            elif ch.objectName() == KEY_SUPTDSEC_PM_ZPZ:
+                ch.setText(str(beam_attributes.plast_sec_mod_z))
+            elif ch.objectName() == KEY_SUPTDSEC_PM_ZPY:
+                ch.setText(str(beam_attributes.plast_sec_mod_y))
+            elif ch.objectName() == 'pushButton_Add_Beam':
+                ch.setEnabled(True)
+            else:
+                pass
+
+        for e in beam_list:
+            if e.text() != "":
+                e.textChanged.connect(lambda: self.new_sectionalprop_Beam(beam_list))
+        # self.ui.lineEdit_Designation_Beam.setText(designation)
+        # self.ui.lineEdit_Source_Beam.setText(str(beam_attributes.source))
+        # self.ui.lineEdit_UltimateStrength_Beam.setText(str(beam_attributes.fu))
+        # self.ui.lineEdit_YieldStrength_Beam.setText(str(beam_attributes.fy))
+        # self.ui.lineEdit_Depth_Beam.setText(str(beam_attributes.depth))
+        # self.ui.lineEdit_FlangeWidth_Beam.setText(str(beam_attributes.flange_width))
+        # self.ui.lineEdit_FlangeThickness_Beam.setText(str(beam_attributes.flange_thickness))
+        # self.ui.lineEdit_WeBThickness_Beam.setText(str(beam_attributes.web_thickness))
+        # self.ui.lineEdit_FlangeSlope_Beam.setText(str(beam_attributes.flange_slope))
+        # self.ui.lineEdit_RootRadius_Beam.setText(str(beam_attributes.root_radius))
+        # self.ui.lineEdit_ToeRadius_Beam.setText(str(beam_attributes.toe_radius))
+        # self.ui.lineEdit_ModElasticity_Beam.setText("200")
+        # self.ui.lineEdit_ModElasticity_Beam.setDisabled(True)
+        # self.ui.lineEdit_ModulusOfRigidity_Beam.setText("76.9")
+        # self.ui.lineEdit_ModulusOfRigidity_Beam.setDisabled(True)
+        # self.ui.lineEdit_PoissonsRatio_Beam.setText("0.3")
+        # self.ui.lineEdit_PoissonsRatio_Beam.setDisabled(True)
+        # self.ui.lineEdit_ThermalExpansion_Beam.setText("12")
+        # self.ui.lineEdit_ThermalExpansion_Beam.setDisabled(True)
+        # self.ui.lineEdit_Mass_Beam.setText(str(beam_attributes.mass))
+        # self.ui.lineEdit_SectionalArea_Beam.setText(str(beam_attributes.area))
+        # self.ui.lineEdit_MomentOfAreaZ_Beam.setText(str(beam_attributes.mom_inertia_z))
+        # self.ui.lineEdit_MomentOfAreaY_Beam.setText(str(beam_attributes.mom_inertia_y))
+        # self.ui.lineEdit_RogZ_Beam.setText(str(beam_attributes.rad_of_gy_z))
+        # self.ui.lineEdit_RogY_Beam.setText(str(beam_attributes.rad_of_gy_y))
+        # self.ui.lineEdit_ElasticModZ_Beam.setText(str(beam_attributes.elast_sec_mod_z))
+        # self.ui.lineEdit_ElasticModY_Beam.setText(str(beam_attributes.elast_sec_mod_y))
+        # self.ui.lineEdit_ElasticModPZ_Beam.setText(str(beam_attributes.plast_sec_mod_z))
+        # self.ui.lineEdit_ElasticModPY_Beam.setText(str(beam_attributes.plast_sec_mod_y))
+        # self.ui.pushButton_Add_Beam.setEnabled(True)
+        # self.ui.pushButton_Add_Beam.clicked.connect(self.add_BeamPref)
+        #
+        #
+        # if (
+        #         self.ui.lineEdit_Depth_Beam.text() != "" and self.ui.lineEdit_FlangeWidth_Beam.text() != "" and self.ui.lineEdit_FlangeThickness_Beam.text() != ""
+        #         and self.ui.lineEdit_WeBThickness_Beam.text() != ""):
+        #     self.ui.lineEdit_Depth_Beam.textChanged.connect(self.new_sectionalprop_Beam)
+        #     self.ui.lineEdit_FlangeWidth_Beam.textChanged.connect(self.new_sectionalprop_Beam)
+        #     self.ui.lineEdit_FlangeThickness_Beam.textChanged.connect(self.new_sectionalprop_Beam)
+        #     self.ui.lineEdit_WeBThickness_Beam.textChanged.connect(self.new_sectionalprop_Beam)
+
+    def new_sectionalprop_Column(self, col_list):
+
+        for e in col_list:
+            if e.text() != "":
+                if e.objectName() == KEY_SUPTNGSEC_DEPTH:
+                    D = float(e.text())
+                elif e.objectName() == KEY_SUPTNGSEC_FLANGE_W:
+                    B = float(e.text())
+                elif e.objectName() == KEY_SUPTNGSEC_FLANGE_T:
+                    t_w = float(e.text())
+                elif e.objectName() == KEY_SUPTNGSEC_WEB_T:
+                    t_f = float(e.text())
+                else:
+                    pass
+            else:
+                return
+        if col_list:
+            for c in self.ui.tab_Column.children():
+                if c.objectName() == KEY_SUPTNGSEC_MASS:
+                    c.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTNGSEC_SEC_AREA:
+                    c.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTNGSEC_MOA_LZ:
+                    c.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTNGSEC_MOA_LY:
+                    c.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTNGSEC_ROG_RZ:
+                    c.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTNGSEC_ROG_RY:
+                    c.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTNGSEC_EM_ZZ:
+                    c.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTNGSEC_EM_ZY:
+                    c.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTNGSEC_PM_ZPZ:
+                    c.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTNGSEC_PM_ZPY:
+                    c.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
+                elif c.objectName() == 'pushButton_Add_Column':
+                    c.setEnabled(True)
+                else:
+                    pass
+
+
+
+        # if self.ui.lineEdit_Depth_Column.text() == "":
+        #     return
+        # else:
+        #     D = float(self.ui.lineEdit_Depth_Column.text())
+        #
+        # if self.ui.lineEdit_FlangeWidth_Column.text() == "":
+        #     return
+        # else:
+        #     B = float(self.ui.lineEdit_FlangeWidth_Column.text())
+        #
+        # if self.ui.lineEdit_FlangeThickness_Column.text() == "":
+        #     return
+        # else:
+        #     t_w = float(self.ui.lineEdit_FlangeThickness_Column.text())
+        #
+        # if self.ui.lineEdit_WeBThickness_Column.text() == "":
+        #     return
+        # else:
+        #     t_f = float(self.ui.lineEdit_WeBThickness_Column.text())
+        #
+        # self.sectionalprop = I_sectional_Properties()
+        # self.ui.lineEdit_Mass_Column.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
+        # self.ui.lineEdit_SectionalArea_Column.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
+        # self.ui.lineEdit_MomentOfAreaZ_Column.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
+        # self.ui.lineEdit_MomentOfAreaY_Column.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
+        # self.ui.lineEdit_RogZ_Column.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
+        # self.ui.lineEdit_RogY_Column.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
+        # self.ui.lineEdit_ElasticModZ_Column.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
+        # self.ui.lineEdit_ElasticModY_Column.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
+        # self.ui.lineEdit_ElasticModPZ_Column.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
+        # self.ui.lineEdit_ElasticModPY_Column.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
+        #
+        # self.ui.pushButton_Add_Column.setEnabled(True)
+
+    def new_sectionalprop_Beam(self, beam_list):
+
+        for e in beam_list:
+            if e.text() != "":
+                if e.objectName() == KEY_SUPTDSEC_DEPTH:
+                    D = float(e.text())
+                elif e.objectName() == KEY_SUPTDSEC_FLANGE_W:
+                    B = float(e.text())
+                elif e.objectName() == KEY_SUPTDSEC_FLANGE_T:
+                    t_w = float(e.text())
+                elif e.objectName() == KEY_SUPTDSEC_WEB_T:
+                    t_f = float(e.text())
+                else:
+                    pass
+            else:
+                return
+        if beam_list:
+            for c in self.ui.tab_Beam.children():
+                if c.objectName() == KEY_SUPTDSEC_MASS:
+                    c.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTDSEC_SEC_AREA:
+                    c.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTDSEC_MOA_LZ:
+                    c.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTDSEC_MOA_LY:
+                    c.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTDSEC_ROG_RZ:
+                    c.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTDSEC_ROG_RY:
+                    c.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTDSEC_EM_ZZ:
+                    c.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTDSEC_EM_ZY:
+                    c.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTDSEC_PM_ZPZ:
+                    c.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
+                elif c.objectName() == KEY_SUPTDSEC_PM_ZPY:
+                    c.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
+                elif c.objectName() == 'pushButton_Add_Beam':
+                    c.setEnabled(True)
+                else:
+                    pass
+        # if self.ui.lineEdit_Depth_Beam.text() == "":
+        #     return
+        # else:
+        #     D = float(self.ui.lineEdit_Depth_Beam.text())
+        #
+        # if self.ui.lineEdit_FlangeWidth_Beam.text() == "":
+        #     return
+        # else:
+        #     B = float(self.ui.lineEdit_FlangeWidth_Beam.text())
+        #
+        # if self.ui.lineEdit_FlangeThickness_Beam.text() == "":
+        #     return
+        # else:
+        #     t_w = float(self.ui.lineEdit_FlangeThickness_Beam.text())
+        #
+        # if self.ui.lineEdit_WeBThickness_Beam.text() == "":
+        #     return
+        # else:
+        #     t_f = float(self.ui.lineEdit_WeBThickness_Beam.text())
+        #
+        # self.sectionalprop = I_sectional_Properties()
+        # self.ui.lineEdit_Mass_Beam.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
+        # self.ui.lineEdit_SectionalArea_Beam.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
+        # self.ui.lineEdit_MomentOfAreaZ_Beam.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
+        # self.ui.lineEdit_MomentOfAreaY_Beam.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
+        # self.ui.lineEdit_RogZ_Beam.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
+        # self.ui.lineEdit_RogY_Beam.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
+        # self.ui.lineEdit_ElasticModZ_Beam.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
+        # self.ui.lineEdit_ElasticModY_Beam.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
+        # self.ui.lineEdit_ElasticModPZ_Beam.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
+        # self.ui.lineEdit_ElasticModPY_Beam.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
+        # self.ui.pushButton_Add_Beam.setEnabled(True)
+
+    def add_ColumnPref(self, table):
+
+        if (
+                self.ui.lineEdit_Designation_Column.text() == "" or self.ui.lineEdit_Mass_Column.text() == "" or self.ui.lineEdit_SectionalArea_Column.text() == "" or self.ui.lineEdit_Depth_Column.text() == ""
+                or self.ui.lineEdit_FlangeWidth_Column.text() == "" or self.ui.lineEdit_WeBThickness_Column.text() == "" or self.ui.lineEdit_FlangeThickness_Column.text() == "" or self.ui.lineEdit_FlangeSlope_Column.text() == ""
+                or self.ui.lineEdit_RootRadius_Column.text() == "" or self.ui.lineEdit_ToeRadius_Column.text() == "" or self.ui.lineEdit_MomentOfAreaZ_Column.text() == "" or self.ui.lineEdit_MomentOfAreaY_Column.text() == ""
+                or self.ui.lineEdit_RogZ_Column.text() == "" or self.ui.lineEdit_RogY_Column.text() == "" or self.ui.lineEdit_ElasticModZ_Column.text() == "" or self.ui.lineEdit_ElasticModY_Column.text() == ""
+                or self.ui.lineEdit_Source_Column.text() == ""):
+            QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+            self.ui.pushButton_Add_Column.setDisabled(True)
+
+
+        else:
+            self.ui.pushButton_Add_Column.setEnabled(True)
+            Designation_c = self.ui.lineEdit_Designation_Column.text()
+            Mass_c = float(self.ui.lineEdit_Mass_Column.text())
+            Area_c = float(self.ui.lineEdit_SectionalArea_Column.text())
+            D_c = float(self.ui.lineEdit_Depth_Column.text())
+            B_c = float(self.ui.lineEdit_FlangeWidth_Column.text())
+            tw_c = float(self.ui.lineEdit_WeBThickness_Column.text())
+            T_c = float(self.ui.lineEdit_FlangeThickness_Column.text())
+            FlangeSlope_c = float(self.ui.lineEdit_FlangeSlope_Column.text())
+            R1_c = float(self.ui.lineEdit_RootRadius_Column.text())
+            R2_c = float(self.ui.lineEdit_ToeRadius_Column.text())
+            Iz_c = float(self.ui.lineEdit_MomentOfAreaZ_Column.text())
+            Iy_c = float(self.ui.lineEdit_MomentOfAreaY_Column.text())
+            rz_c = float(self.ui.lineEdit_RogZ_Column.text())
+            ry_c = float(self.ui.lineEdit_RogY_Column.text())
+            Zz_c = float(self.ui.lineEdit_ElasticModZ_Column.text())
+            Zy_c = float(self.ui.lineEdit_ElasticModY_Column.text())
+            if (self.ui.lineEdit_ElasticModPZ_Column.text() == "" or self.ui.lineEdit_ElasticModPY_Column.text() == ""):
+                self.ui.lineEdit_ElasticModPZ_Column.setText("0")
+                self.ui.lineEdit_ElasticModPY_Column.setText("0")
+            Zpz_c = self.ui.lineEdit_ElasticModPZ_Column.text()
+            Zpy_c = self.ui.lineEdit_ElasticModPY_Column.text()
+            Source_c = self.ui.lineEdit_Source_Column.text()
+
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+
+            c = conn.cursor()
+            if table == "Beams":
+                c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_c,))
+                data = c.fetchone()[0]
+            else:
+                c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (Designation_c,))
+                data = c.fetchone()[0]
+            if data == 0:
+                if table == "Beams":
+                    c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
+                                                                                                               Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (Designation_c, Mass_c, Area_c,
+                               D_c, B_c, tw_c, T_c,
+                               R1_c, R2_c, Iz_c, Iy_c, rz_c,
+                               ry_c, Zz_c, Zy_c,
+                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
+                    conn.commit()
+                else:
+                    c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
+                                                                                           Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (Designation_c, Mass_c, Area_c,
+                               D_c, B_c, tw_c, T_c,
+                               R1_c, R2_c, Iz_c, Iy_c, rz_c,
+                               ry_c, Zz_c, Zy_c,
+                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
+                    conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                self.clear_ColumnPref()
+
+    def add_BeamPref(self):
+
+        if (
+                self.ui.lineEdit_Designation_Beam.text() == "" or self.ui.lineEdit_Mass_Beam.text() == "" or self.ui.lineEdit_SectionalArea_Beam.text() == "" or self.ui.lineEdit_Depth_Beam.text() == ""
+                or self.ui.lineEdit_FlangeWidth_Beam.text() == "" or self.ui.lineEdit_WeBThickness_Beam.text() == "" or self.ui.lineEdit_FlangeThickness_Beam.text() == "" or self.ui.lineEdit_FlangeSlope_Beam.text() == ""
+                or self.ui.lineEdit_RootRadius_Beam.text() == "" or self.ui.lineEdit_ToeRadius_Beam.text() == "" or self.ui.lineEdit_MomentOfAreaZ_Beam.text() == "" or self.ui.lineEdit_MomentOfAreaY_Beam.text() == ""
+                or self.ui.lineEdit_RogZ_Beam.text() == "" or self.ui.lineEdit_RogY_Beam.text() == "" or self.ui.lineEdit_ElasticModZ_Beam.text() == "" or self.ui.lineEdit_ElasticModY_Beam.text() == ""
+                or self.ui.lineEdit_Source_Beam.text() == ""):
+            QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+            self.ui.pushButton_Add_Beam.setDisabled(True)
+
+        else:
+            self.ui.pushButton_Add_Beam.setEnabled(True)
+            Designation_b = self.ui.lineEdit_Designation_Beam.text()
+            Mass_b = float(self.ui.lineEdit_Mass_Beam.text())
+            Area_b = float(self.ui.lineEdit_SectionalArea_Beam.text())
+            D_b = float(self.ui.lineEdit_Depth_Beam.text())
+            B_b = float(self.ui.lineEdit_FlangeWidth_Beam.text())
+            tw_b = float(self.ui.lineEdit_WeBThickness_Beam.text())
+            T_b = float(self.ui.lineEdit_FlangeThickness_Beam.text())
+            FlangeSlope_b = float(self.ui.lineEdit_FlangeSlope_Beam.text())
+            R1_b = float(self.ui.lineEdit_RootRadius_Beam.text())
+            R2_b = float(self.ui.lineEdit_ToeRadius_Beam.text())
+            Iz_b = float(self.ui.lineEdit_MomentOfAreaZ_Beam.text())
+            Iy_b = float(self.ui.lineEdit_MomentOfAreaY_Beam.text())
+            rz_b = float(self.ui.lineEdit_RogZ_Beam.text())
+            ry_b = float(self.ui.lineEdit_RogY_Beam.text())
+            Zz_b = float(self.ui.lineEdit_ElasticModZ_Beam.text())
+            Zy_b = float(self.ui.lineEdit_ElasticModY_Beam.text())
+            if (self.ui.lineEdit_ElasticModPZ_Beam.text() == "" or self.ui.lineEdit_ElasticModPY_Beam.text() == ""):
+                self.ui.lineEdit_ElasticModPZ_Beam.setText("0")
+                self.ui.lineEdit_ElasticModPY_Beam.setText("0")
+            Zpz_b = self.ui.lineEdit_ElasticModPZ_Beam.text()
+            Zpy_b = self.ui.lineEdit_ElasticModPY_Beam.text()
+            Source_b = self.ui.lineEdit_Source_Beam.text()
+
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+
+            c = conn.cursor()
+            c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_b,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,Zz,zy,Zpz,Zpy,
+    				                                                FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (Designation_b, Mass_b, Area_b,
+                           D_b, B_b, tw_b, T_b, FlangeSlope_b,
+                           R1_b, R2_b, Iz_b, Iy_b, rz_b,
+                           ry_b, Zz_b, Zy_b,
+                           Zpz_b, Zpy_b, Source_b))
+                conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+                self.clear_BeamPref()
+
+    def clear_ColumnPref(self):
+        self.ui.lineEdit_Designation_Column.clear()
+        self.ui.lineEdit_Source_Column.clear()
+        self.ui.lineEdit_UltimateStrength_Column.clear()
+        self.ui.lineEdit_YieldStrength_Column.clear()
+        self.ui.lineEdit_Depth_Column.clear()
+        self.ui.lineEdit_FlangeWidth_Column.clear()
+        self.ui.lineEdit_FlangeThickness_Column.clear()
+        self.ui.lineEdit_WeBThickness_Column.clear()
+        self.ui.lineEdit_FlangeSlope_Column.clear()
+        self.ui.lineEdit_RootRadius_Column.clear()
+        self.ui.lineEdit_ToeRadius_Column.clear()
+        self.ui.lineEdit_Mass_Column.clear()
+        self.ui.lineEdit_SectionalArea_Column.clear()
+        self.ui.lineEdit_MomentOfAreaZ_Column.clear()
+        self.ui.lineEdit_MomentOfAreaY_Column.clear()
+        self.ui.lineEdit_RogZ_Column.clear()
+        self.ui.lineEdit_RogY_Column.clear()
+        self.ui.lineEdit_ElasticModZ_Column.clear()
+        self.ui.lineEdit_ElasticModY_Column.clear()
+        self.ui.lineEdit_ElasticModPZ_Column.clear()
+        self.ui.lineEdit_ElasticModPY_Column.clear()
+        self.ui.pushButton_Add_Column.setDisabled(True)
+
+    def clear_BeamPref(self):
+        self.ui.lineEdit_Designation_Beam.clear()
+        self.ui.lineEdit_Source_Beam.clear()
+        self.ui.lineEdit_UltimateStrength_Beam.clear()
+        self.ui.lineEdit_YieldStrength_Beam.clear()
+        self.ui.lineEdit_Depth_Beam.clear()
+        self.ui.lineEdit_FlangeWidth_Beam.clear()
+        self.ui.lineEdit_FlangeThickness_Beam.clear()
+        self.ui.lineEdit_WeBThickness_Beam.clear()
+        self.ui.lineEdit_FlangeSlope_Beam.clear()
+        self.ui.lineEdit_RootRadius_Beam.clear()
+        self.ui.lineEdit_ToeRadius_Beam.clear()
+        self.ui.lineEdit_Mass_Beam.clear()
+        self.ui.lineEdit_SectionalArea_Beam.clear()
+        self.ui.lineEdit_MomentOfAreaZ_Beam.clear()
+        self.ui.lineEdit_MomentOfAreaY_Beam.clear()
+        self.ui.lineEdit_RogZ_Beam.clear()
+        self.ui.lineEdit_RogY_Beam.clear()
+        self.ui.lineEdit_ElasticModZ_Beam.clear()
+        self.ui.lineEdit_ElasticModY_Beam.clear()
+        self.ui.lineEdit_ElasticModPZ_Beam.clear()
+        self.ui.lineEdit_ElasticModPY_Beam.clear()
+        self.ui.pushButton_Add_Beam.setDisabled(True)
+
+    def download_Database_Column(self):
+        file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))
+        shutil.copyfile(file_path, os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+        QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded in your selected workspace')
+        #self.ui.pushButton_Import_Column.setEnabled(True)
+
+    def download_Database_Beam(self):
+        file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))
+        shutil.copyfile(file_path, os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+        QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded in your selected workspace')
+        #self.ui.pushButton_Import_Beam.setEnabled(True)
+
+    def import_ColumnPref(self):
+        wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+        sheet = wb['First Sheet']
+        conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
+
+        for rowNum in range(2, sheet.max_row + 1):
+            designation = sheet.cell(row=rowNum, column=2).value
+            mass = sheet.cell(row=rowNum, column=3).value
+            area = sheet.cell(row=rowNum, column=4).value
+            d = sheet.cell(row=rowNum, column=5).value
+            b = sheet.cell(row=rowNum, column=6).value
+            tw = sheet.cell(row=rowNum, column=7).value
+            t = sheet.cell(row=rowNum, column=8).value
+            flangeSlope = sheet.cell(row=rowNum, column=9).value
+            r1 = sheet.cell(row=rowNum, column=10).value
+            r2 = sheet.cell(row=rowNum, column=11).value
+            iz = sheet.cell(row=rowNum, column=12).value
+            iy = sheet.cell(row=rowNum, column=13).value
+            rz = sheet.cell(row=rowNum, column=14).value
+            ry = sheet.cell(row=rowNum, column=15).value
+            zz = sheet.cell(row=rowNum, column=16).value
+            zy = sheet.cell(row=rowNum, column=17).value
+            zpz = sheet.cell(row=rowNum, column=18).value
+            zpy = sheet.cell(row=rowNum, column=19).value
+            source = sheet.cell(row=rowNum, column=20).value
+            c = conn.cursor()
+            c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (designation,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
+    				                           Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (designation, mass, area,
+                           d, b, tw, t,
+                           r1, r2, iz, iy, rz, ry,
+                           zz, zy
+                           ,
+                           zpz, zpy, flangeSlope, source))
+                conn.commit()
+                c.close()
+
+        conn.close()
+        QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
+        self.ui.pushButton_Import_Column.setDisabled(True)
+
+    def import_BeamPref(self):
+        wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+        sheet = wb['First Sheet']
+        conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
+
+        for rowNum in range(2, sheet.max_row + 1):
+            designation = sheet.cell(row=rowNum, column=2).value
+            mass = sheet.cell(row=rowNum, column=3).value
+            area = sheet.cell(row=rowNum, column=4).value
+            d = sheet.cell(row=rowNum, column=5).value
+            b = sheet.cell(row=rowNum, column=6).value
+            tw = sheet.cell(row=rowNum, column=7).value
+            t = sheet.cell(row=rowNum, column=8).value
+            flangeSlope = sheet.cell(row=rowNum, column=9).value
+            r1 = sheet.cell(row=rowNum, column=10).value
+            r2 = sheet.cell(row=rowNum, column=11).value
+            iz = sheet.cell(row=rowNum, column=12).value
+            iy = sheet.cell(row=rowNum, column=13).value
+            rz = sheet.cell(row=rowNum, column=14).value
+            ry = sheet.cell(row=rowNum, column=15).value
+            zz = sheet.cell(row=rowNum, column=16).value
+            zy = sheet.cell(row=rowNum, column=17).value
+            zpz = sheet.cell(row=rowNum, column=18).value
+            zpy = sheet.cell(row=rowNum, column=19).value
+            source = sheet.cell(row=rowNum, column=20).value
+
+            c = conn.cursor()
+            c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (designation,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+            				                           Zz,zy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (designation, mass, area,
+                           d, b, tw, t,
+                           flangeSlope, r1
+                           ,
+                           r2, iz, iy, rz, ry,
+                           zz, zy
+                           ,
+                           zpz, zpy, source))
+                conn.commit()
+                c.close()
+
+        conn.close()
+        QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
+        self.ui.pushButton_Import_Beam.setDisabled(True)
+
+    def close_designPref(self):
+        self.close()
+
+    # def closeEvent(self, QCloseEvent):
+    #     self.save_designPref_para()
+    #     QCloseEvent.accept()
 
 
 if __name__ == "__main__":
@@ -970,6 +1902,6 @@ if __name__ == "__main__":
     DesignPreferences = QtWidgets.QDialog()
     ui = Ui_Dialog()
     ui.setupUi(DesignPreferences)
-    DesignPreferences.show()
+    DesignPreferences.exec()
     sys.exit(app.exec_())
 

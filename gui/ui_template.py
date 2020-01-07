@@ -20,6 +20,7 @@ from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtGui import QStandardItem
 import os
+import yaml
 import json
 import logging
 from drawing_2D.Svg_Window import SvgWindow
@@ -47,7 +48,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
         #self.ui.pushButton_5.clicked.connect(self.window.close)
         self.window.exec()
-        print(self.ui.get_right_elements())
         return self.ui.get_right_elements()
 
     def setupUi(self, MainWindow, main):
@@ -195,7 +195,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
-        self.textEdit.setStyleSheet("QTextEdit {color:red}")
+        # self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -439,6 +439,8 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+                # onlyInt = QIntValidator()
+                # r.setValidator(onlyInt)
 
             if type == TYPE_MODULE:
                 _translate = QtCore.QCoreApplication.translate
@@ -454,6 +456,11 @@ class Ui_ModuleWindow(QMainWindow):
                 im.setPixmap(pixmap)
                 i = i + 30
 
+            if option[0] in [KEY_AXIAL,KEY_SHEAR]:
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+                onlyInt = QIntValidator()
+                key.setValidator(onlyInt)
+
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents)
                 q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
@@ -464,35 +471,60 @@ class Ui_ModuleWindow(QMainWindow):
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
 
             i = i + 30
-
+        # for option in option_list:
+        #     sh = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
-            #v = ''
-            if option[0] == KEY_SUPTNGSEC:
-                v = "Columns"
-                red_list = connect_for_red(v)
-                #print(red_list)
+            # v = ''
+            # if option[0] == KEY_SUPTNGSEC:
+            #     v = "Columns"
+            #     red_list = connect_for_red(v)
+            #     # print(red_list)
+            #
+            #     for value in red_list:
+            #         indx = option[4].index(str(value))
+            #         key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
-                for value in red_list:
+            if option[0] in [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]:
+                red_list = []
+                red_list_columns = connect_for_red("Columns")
+                red_list_beams = connect_for_red("Beams")
+                red_list.extend(red_list_beams)
+                red_list.extend(red_list_columns)
+                print(red_list)
+                print(option[4])
+                red_list_set = set(red_list)
+                current_list_set = set(option[4])
+                current_red_list = list(current_list_set.intersection(red_list_set))
+                print(current_red_list)
+                for value in current_red_list:
                     indx = option[4].index(str(value))
+                    # key.addItem(option[4])
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
-            elif option[0] == KEY_SUPTDSEC:
-
-                v = "Beams"
-                red_list = connect_for_red(v)
-                #print(red_list)
-
-                for value in red_list:
-                    indx = option[4].index(str(value))
-                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-
+            # elif option[0] in [KEY_SUPTDSEC, KEY_SECSIZE]:
+            #
+            #     v = "Beams"
+            #     red_list = connect_for_red(v)
+            #     # print(red_list)
+            #
+            #     for value in red_list:
+            #         indx = option[4].index(str(value))
+            #         key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            # elif option[0] == KEY_SECSIZE:
+            #     v = "Beams"
+            #     red_list = connect_for_red(v)
+            #     # print(red_list)
+            #
+            #     for value in red_list:
+            #         indx = option[4].index(str(value))
+            #         key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
         new_list = main.customized_input(main)
         data = {}
-
+        # CUSTOMIZED_LIST = [KEY_PLATETHK,KEY_GRD,KEY_D,KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS]
         for t in new_list:
-            if t[0] == KEY_PLATETHK:
+            if t[0] in [KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS,KEY_PLATETHK,KEY_ENDPLATE_THICKNESS]:
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -521,10 +553,16 @@ class Ui_ModuleWindow(QMainWindow):
                     data[c_tup[0] + "_customized"] = f()
 
         updated_list = main.input_value_changed(main)
-
-        for t in updated_list:
-            key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-            key_changed.currentIndexChanged.connect(lambda: change(key_changed, updated_list))
+        if updated_list is None:
+            pass
+        else:
+            for t in updated_list:
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_changed.currentIndexChanged.connect(lambda: change(key_changed, updated_list))
+                # if t[1] == KEY_IMAGE:
+            key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
+            key_changed.currentIndexChanged.connect(lambda: self.validate_beam_beam(key_changed))
 
         def change(k1, new):
 
@@ -594,7 +632,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setFont(font)
         self.btn_Design.setAutoDefault(True)
         self.btn_Design.setObjectName("btn_Design")
-        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main,data))
         self.inputDock.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.inputDock)
 
@@ -860,16 +897,13 @@ class Ui_ModuleWindow(QMainWindow):
         self.menubar.addAction(self.menuGraphics.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi()
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-        self.action_save_input.triggered.connect(lambda: self.design_fn(option_list, data))
-        # self.btn_Design.clicked.connect(lambda: self.design_fn(option_list, data))
-        self.action_save_input.triggered.connect(self.saveDesign_inputs)
+        self.action_save_input.triggered.connect(lambda: self.validateInputsOnDesignBtn(main, data,"Save"))
+        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main, data,"Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list))
-        # self.btn_Design.clicked.connect(lambda: self.pass_d(main, self.design_inputs))
         self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
 
     def reset_popup(self, new_list, data):
@@ -888,7 +922,6 @@ class Ui_ModuleWindow(QMainWindow):
 
     def design_fn(self, op_list, data_list):
         design_dictionary = {}
-
         for op in op_list:
             widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
             if op[2] == TYPE_COMBOBOX:
@@ -910,10 +943,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.design_inputs = design_dictionary
 
     def pass_d(self, main, design_dictionary):
-        main.set_input_values(self, design_dictionary)
         key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
         main.warn_text(main, key, design_dictionary)
-        main.set_input_values(main, design_dictionary)
+        # main.set_input_values(main, design_dictionary)
 
     def saveDesign_inputs(self):
         fileName, _ = QFileDialog.getSaveFileName(self,
@@ -923,7 +955,7 @@ class Ui_ModuleWindow(QMainWindow):
             return
         try:
             with open(fileName, 'w') as input_file:
-                json.dump(self.design_inputs, input_file)
+                yaml.dump(self.design_inputs, input_file)
         except Exception as e:
             QMessageBox.warning(self, "Application",
                                 "Cannot write file %s:\n%s" % (fileName, str(e)))
@@ -936,7 +968,7 @@ class Ui_ModuleWindow(QMainWindow):
         try:
             in_file = str(fileName)
             with open(in_file, 'r') as fileObject:
-                uiObj = json.load(fileObject)
+                uiObj = yaml.load(fileObject)
             self.setDictToUserInputs(uiObj, op_list, data, new)
 
         except IOError:
@@ -995,7 +1027,7 @@ class Ui_ModuleWindow(QMainWindow):
 
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
-    def validateInputsOnDesignBtn(self, main, data):
+    def validateInputsOnDesignBtn(self, main,data,trigger_type):
 
         option_list = main.input_values(self)
         missing_fields_list = []
@@ -1006,7 +1038,7 @@ class Ui_ModuleWindow(QMainWindow):
             s = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
             if option[2] == TYPE_COMBOBOX:
-                if option[0] in ["Bolt.Diameter","Bolt.Grade","Plate.Thickness"]:
+                if option[0] in [KEY_D ,KEY_GRD, KEY_PLATETHK]:
                     continue
                 if s.currentIndex() == 0:
                     missing_fields_list.append(option[1])
@@ -1020,9 +1052,14 @@ class Ui_ModuleWindow(QMainWindow):
 
         if len(missing_fields_list) > 0:
             QMessageBox.information(self, "Information",self.generate_missing_fields_error_string(missing_fields_list))
+        elif trigger_type == "Save":
+            self.design_fn(option_list, data)
+            self.saveDesign_inputs()
         else:
             self.design_fn(option_list, data)
             self.pass_d(main, self.design_inputs)
+            main.set_input_values(main, self.design_inputs)
+            main.get_bolt_details(main)
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
@@ -1034,7 +1071,6 @@ class Ui_ModuleWindow(QMainWindow):
             error string that has to be displayed
 
         """
-
         # The base string which should be displayed
         information = "Please input the following required field"
         if len(missing_fields_list) > 1:
@@ -1045,8 +1081,6 @@ class Ui_ModuleWindow(QMainWindow):
         # Loops through the list of the missing fields and adds each field to the above sentence with a comma
 
         for item in missing_fields_list:
-
-
             information = information + item + ", "
 
         # Removes the last comma
@@ -1055,9 +1089,44 @@ class Ui_ModuleWindow(QMainWindow):
 
         return information
 
-    def retranslateUi(self, MainWindow):
+    def validate_beam_beam(self, key):
+        if key.currentIndex() == 2:
+            self.val()
+
+    def val(self):
+        key2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
+        key3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+        key2.currentIndexChanged.connect(lambda: self.for_key2(key2, key3))
+        key3.currentIndexChanged.connect(lambda: self.for_key2(key2, key3))
+
+    def for_key2(self, key2, key3):
+        if key2.currentIndex() != 0 and key3.currentIndex() != 0:
+            primary = key2.currentText()
+            secondary = key3.currentText()
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation =( ? ) ", (primary,))
+            lst = []
+            rows = cursor.fetchall()
+            for row in rows:
+                lst.append(row)
+            p_val = lst[0][0]
+            cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+            lst1 = []
+            rows1 = cursor2.fetchall()
+            for row1 in rows1:
+                lst1.append(row1)
+            s_val = lst1[0][0]
+            if p_val <= s_val:
+                self.btn_Design.setDisabled(True)
+                QMessageBox.about(self, 'Information',
+                                    "Secondary beam depth is higher than clear depth of primary beam web "
+                                    "(No provision in Osdag till now)")
+
+            else:
+                self.btn_Design.setDisabled(False)
+
+    def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        #MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))
         self.btnInput.setToolTip(_translate("MainWindow", "Left Dock"))
         self.btnInput.setText(_translate("MainWindow", "input"))
         self.btnOutput.setToolTip(_translate("MainWindow", "Right Dock"))

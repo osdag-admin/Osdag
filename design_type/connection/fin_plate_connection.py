@@ -1,5 +1,6 @@
 from design_type.connection.shear_connection import ShearConnection
 from utils.common.component import *
+from utils.common.material import *
 from Common import *
 from utils.common.load import Load
 import yaml
@@ -40,6 +41,8 @@ logger = None
 def module_setup():
     global logger
     logger = logging.getLogger("osdag.finPlateCalc")
+
+
 module_setup()
 
 # def set_osdaglogger():
@@ -201,6 +204,74 @@ class FinPlateConnection(ShearConnection):
             key.setText(data)
         else:
             key.setText("")
+
+    def set_input_values(self, design_dictionary):
+        super(FinPlateConnection,self).set_input_values(self, design_dictionary)
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_GAP])
+
+
+    def get_bolt_details(self):
+        self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter[0],
+                                                connecting_plates_tk=[self.plate.thickness[0],
+                                                                      self.supported_section.web_thickness],bolt_hole_type=self.bolt.bolt_hole_type)
+        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter[0],
+                                          bolt_grade_provided=self.bolt.bolt_grade[0],
+                                          connecting_plates_tk=[self.plate.thickness[0],
+                                                                self.supported_section.web_thickness],
+                                          n_planes=1)
+
+        min_plate_length = self.supported_section.min_plate_length()
+        max_plate_length = self.supported_section.max_plate_length()
+
+        self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter[0], web_plate_l_min=min_plate_length,
+                                         web_plate_l_max=max_plate_length, bolt_capacity=self.bolt.bolt_capacity,
+                                         connecting_plates_tk=[self.plate.thickness[0],
+                                                               self.supported_section.web_thickness],
+                                         bolt_hole_type=self.bolt.bolt_hole_type,
+                                         bolt_line_limit=2, shear_load=self.load.shear_force*1000, gap=self.plate.gap,
+                                         shear_ecc=True)
+
+        block_shear_capacity = 0
+        moment_capacity = 0
+        edge_dist_rem = self.plate.edge_dist_provided+self.plate.gap
+
+        self.plate.blockshear(numrow=self.plate.bolts_one_line, numcol=self.plate.bolt_line, pitch=self.plate.pitch_provided,
+                              gauge=self.plate.gauge_provided, thk=self.plate.thickness[0], end_dist=self.plate.end_dist_provided,
+                              edge_dist=edge_dist_rem, dia_hole=self.bolt.dia_hole,
+                              fy=self.supported_section.fy, fu=self.supported_section.fu)
+
+        self.plate.shear_yielding_b(self.plate.length, self.plate.thickness[0], self.plate.fy)
+
+        self.plate.shear_rupture_b(self.plate.length, self.plate.thickness[0], self.plate.bolts_one_line,
+                                       self.bolt.dia_hole, self.plate.fu)
+
+        plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,
+                                   self.plate.shear_yielding_capacity)
+
+        # if self.load.shear_force > plate_shear_capacity:
+        #     design_status = False
+        #     logger.error(":shear capacity of the plate is less than the applied shear force, %2.2f kN [cl. 6.4.1]"
+        #                  % self.load.shear_force)
+        #     logger.warning(":Shear capacity of plate is %2.2f kN" % plate_shear_capacity)
+        #     logger.info(": Increase the plate thickness")
+
+        self.plate.get_moment_cacacity(self.plate.fy,self.plate.thickness[0],self.plate.length)
+
+        # if self.plate.moment_capacity < self.plate.moment_demand:
+        #     design_status = False
+        #     logger.error(": Plate moment capacity is less than the moment demand [cl. 8.2.1.2]")
+        #     logger.warning(": Re-design with increased plate dimensions")
+
+        print(self.connectivity)
+        print(self.supporting_section)
+        print(self.supported_section)
+        print(self.load)
+        print(self.bolt)
+        print(self.plate)
+
+
+
 #
 # with open("filename", 'w') as out_file:
 #     yaml.dump(fin_plate_input, out_file)

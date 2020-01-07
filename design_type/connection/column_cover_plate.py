@@ -7,15 +7,20 @@ import os
 import shutil
 import logging
 
-class BeamEndPlate(MomentConnection):
+class ColumnCoverPlate(MomentConnection):
 
     def __init__(self):
-        super(BeamEndPlate, self).__init__()
+        super(ColumnCoverPlate, self).__init__()
 
 
     def input_values(self, existingvalues={}):
 
         options_list = []
+
+        if KEY_CONN in existingvalues:
+            existingvalue_key_conn = existingvalues[KEY_CONN]
+        else:
+            existingvalue_key_conn = ''
 
         if KEY_SECSIZE in existingvalues:
             existingvalue_key_secsize = existingvalues[KEY_SECSIZE]
@@ -57,18 +62,28 @@ class BeamEndPlate(MomentConnection):
         else:
             existingvalue_key_grd = ''
 
-        if KEY_ENDPLATE_THICKNESS in existingvalues:
-            existingvalue_key_endplatethk = existingvalues[KEY_ENDPLATE_THICKNESS]
+        if KEY_FLANGEPLATE_PREFERENCES in existingvalues:
+            existingvalue_key_fplate_pref = existingvalues[KEY_PLATETHK]
         else:
-            existingvalue_key_endplatethk = ''
+            existingvalue_key_fplate_pref = ''
 
-        t16 = (KEY_MODULE, KEY_DISP_BEAMENDPLATE, TYPE_MODULE, None, None)
+        if KEY_FLANGEPLATE_THICKNESS in existingvalues:
+            existingvalue_key_fplate_thk = existingvalues[KEY_PLATETHK]
+        else:
+            existingvalue_key_fplate_thk = ''
+
+        if KEY_WEBPLATE_THICKNESS in existingvalues:
+            existingvalue_key_wplate_thk = existingvalues[KEY_PLATETHK]
+        else:
+            existingvalue_key_wplate_thk = ''
+
+        t16 = (KEY_MODULE, KEY_DISP_COLUMNCOVERPLATE, TYPE_MODULE, None, None)
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Beams"))
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Columns"))
         options_list.append(t4)
 
         t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
@@ -101,10 +116,26 @@ class BeamEndPlate(MomentConnection):
         t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
         options_list.append(t12)
 
-        t21 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, None)
+        t18 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, None)
+        options_list.append(t18)
+
+        t19 = (KEY_FLANGEPLATE_PREFERENCES, KEY_DISP_FLANGESPLATE_PREFERENCES, TYPE_COMBOBOX, existingvalue_key_fplate_pref, VALUES_FLANGEPLATE_PREFERENCES)
+        options_list.append(t19)
+
+        t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_fplate_thk, VALUES_FLANGEPLATE_THICKNESS)
+        options_list.append(t20)
+
+        t21 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None, None)
         options_list.append(t21)
 
-        t22 = (KEY_ENDPLATE_THICKNESS, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_endplatethk, VALUES_ENDPLATE_THICKNESS)
+        t22 = (KEY_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_wplate_thk, VALUES_WEBPLATE_THICKNESS)
         options_list.append(t22)
+
+
+        # t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None)
+        # options_list.append(t13)
+        #
+        # t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_platethk, VALUES_PLATETHK)
+        # options_list.append(t14)
 
         return options_list

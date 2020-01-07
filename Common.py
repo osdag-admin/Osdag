@@ -148,8 +148,10 @@ KEY_MODULE = 'Module'
 KEY_DISP_FINPLATE = 'Fin Plate'
 TYPE_MODULE = 'Window Title'
 
-KEY_DISP_COVERPLATE = 'Cover Plate Connection'
-
+KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
+KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
+KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
+KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
 
 DISP_TITLE_CM = 'Connecting members'
 
@@ -229,6 +231,11 @@ KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
+DISP_TITLE_ENDPLATE = 'end plate'
+
+KEY_ENDPLATE_THICKNESS = 'Plate.end_plate.Thickness'
+KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
+VALUES_ENDPLATE_THICKNESS = ['All', 'Customized']
 
 DISP_TITLE_PLATE = 'Plate'
 

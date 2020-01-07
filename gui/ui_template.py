@@ -471,30 +471,45 @@ class Ui_ModuleWindow(QMainWindow):
             i = i + 30
         # for option in option_list:
         #     sh = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
-
-
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
-            #v = ''
-            if option[0] == KEY_SUPTNGSEC:
-                v = "Columns"
-                red_list = connect_for_red(v)
-                #print(red_list)
+            # v = ''
+            # if option[0] == KEY_SUPTNGSEC:
+            #     v = "Columns"
+            #     red_list = connect_for_red(v)
+            #     # print(red_list)
+            #
+            #     for value in red_list:
+            #         indx = option[4].index(str(value))
+            #         key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
-                for value in red_list:
+            if option[0] in [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]:
+                red_list = []
+                red_list_columns = connect_for_red("Columns")
+                red_list_beams = connect_for_red("Beams")
+                red_list.extend(red_list_beams)
+                red_list.extend(red_list_columns)
+                print(red_list)
+                print(option[4])
+                red_list_set = set(red_list)
+                current_list_set = set(option[4])
+                current_red_list = list(current_list_set.intersection(red_list_set))
+                print(current_red_list)
+                for value in current_red_list:
                     indx = option[4].index(str(value))
+                    # key.addItem(option[4])
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
-            elif option[0] in [KEY_SUPTDSEC, KEY_SECSIZE]:
-
-                v = "Beams"
-                red_list = connect_for_red(v)
-                #print(red_list)
-
-                for value in red_list:
-                    indx = option[4].index(str(value))
-                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            # elif option[0] in [KEY_SUPTDSEC, KEY_SECSIZE]:
+            #
+            #     v = "Beams"
+            #     red_list = connect_for_red(v)
+            #     # print(red_list)
+            #
+            #     for value in red_list:
+            #         indx = option[4].index(str(value))
+            #         key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
             # elif option[0] == KEY_SECSIZE:
             #     v = "Beams"
             #     red_list = connect_for_red(v)
@@ -507,7 +522,7 @@ class Ui_ModuleWindow(QMainWindow):
         data = {}
         # CUSTOMIZED_LIST = [KEY_PLATETHK,KEY_GRD,KEY_D,KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS]
         for t in new_list:
-            if t[0] in [KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS,KEY_PLATETHK]:
+            if t[0] in [KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS,KEY_PLATETHK,KEY_ENDPLATE_THICKNESS]:
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -536,13 +551,16 @@ class Ui_ModuleWindow(QMainWindow):
                     data[c_tup[0] + "_customized"] = f()
 
         updated_list = main.input_value_changed(main)
-
-        for t in updated_list:
-            key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-            key_changed.currentIndexChanged.connect(lambda: change(key_changed, updated_list))
-            # if t[1] == KEY_IMAGE:
-        key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
-        key_changed.currentIndexChanged.connect(lambda: self.validate_beam_beam(key_changed))
+        if updated_list is None:
+            pass
+        else:
+            for t in updated_list:
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_changed.currentIndexChanged.connect(lambda: change(key_changed, updated_list))
+                # if t[1] == KEY_IMAGE:
+            key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
+            key_changed.currentIndexChanged.connect(lambda: self.validate_beam_beam(key_changed))
 
         def change(k1, new):
 

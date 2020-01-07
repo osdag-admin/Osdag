@@ -7,10 +7,10 @@ import os
 import shutil
 import logging
 
-class BeamEndPlate(MomentConnection):
+class ColumnEndPlate(MomentConnection):
 
     def __init__(self):
-        super(BeamEndPlate, self).__init__()
+        super(ColumnEndPlate, self).__init__()
 
 
     def input_values(self, existingvalues={}):
@@ -62,13 +62,13 @@ class BeamEndPlate(MomentConnection):
         else:
             existingvalue_key_endplatethk = ''
 
-        t16 = (KEY_MODULE, KEY_DISP_BEAMENDPLATE, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_COLUMNENDPLATE, TYPE_MODULE, None, None)
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Beams"))
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Columns"))
         options_list.append(t4)
 
         t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)

@@ -139,3 +139,53 @@ class ColumnCoverPlate(MomentConnection):
         # options_list.append(t14)
 
         return options_list
+
+    def set_input_values(self, design_dictionary):
+        super(ColumnCoverPlate, self).set_input_values(self, design_dictionary)
+
+        self.preference = design_dictionary[KEY_FLANGEPLATE_PREFERENCES]
+
+        self.section = Column(designation=design_dictionary[KEY_SECSIZE], material_grade=design_dictionary[KEY_MATERIAL])
+
+        self.flange_plate = Plate(thickness=design_dictionary.get(KEY_FLANGEPLATE_THICKNESS, None),
+                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        self.web_plate = Plate(thickness=design_dictionary.get(KEY_WEBPLATE_THICKNESS, None),
+                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+
+    def get_bolt_details(self):
+        self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter[0],
+                                                connecting_plates_tk=[self.flange_plate.thickness[0],
+                                                                      self.section.flange_thickness],bolt_hole_type=self.bolt.bolt_hole_type)
+
+        if self.preference == "Outside":
+            self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter[0],
+                                          bolt_grade_provided=self.bolt.bolt_grade[0],
+                                          connecting_plates_tk=[self.flange_plate.thickness[0],
+                                                                self.section.flange_thickness],
+                                          n_planes=1)
+        else:
+            self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter[0],
+                                          bolt_grade_provided=self.bolt.bolt_grade[0],
+                                          connecting_plates_tk=[self.flange_plate.thickness[0],
+                                                                self.section.flange_thickness],
+                                          n_planes=2)
+
+        min_plate_length = self.section.flange_width
+        max_plate_length = self.section.flange_width
+
+        self.flange_plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter[0], web_plate_l_min=min_plate_length,
+                                         web_plate_l_max=max_plate_length, bolt_capacity=self.bolt.bolt_capacity,
+                                         connecting_plates_tk=[self.flange_plate.thickness[0],
+                                                               self.section.flange_thickness],
+                                         bolt_hole_type=self.bolt.bolt_hole_type,
+                                         bolt_line_limit=10, axial_load=self.load.axial_force,
+                                                gap=self.flange_plate.gap,
+                                         shear_ecc=False)
+        self.flange_plate.get_moment_cacacity(self.flange_plate.fy,self.flange_plate.thickness[0],self.flange_plate.length)
+
+
+        print(self.section)
+        print(self.load)
+        print(self.bolt)
+        print(self.flange_plate)
+

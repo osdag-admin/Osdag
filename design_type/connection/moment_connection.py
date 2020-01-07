@@ -51,7 +51,15 @@ class MomentConnection(Connection):
 
         return list1
     def set_input_values(self, design_dictionary):
-        print(design_dictionary)
+
+        self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
+                            bolt_type=design_dictionary[KEY_TYP],material_grade=design_dictionary[KEY_MATERIAL],
+                            bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
+                            edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                            mu_f=design_dictionary[KEY_DP_BOLT_SLIP_FACTOR],
+                            corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None),
+                         moment=design_dictionary[KEY_MOMENT])
 
     def get_bolt_details(self):
         pass

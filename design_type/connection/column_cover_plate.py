@@ -147,45 +147,91 @@ class ColumnCoverPlate(MomentConnection):
 
         self.section = Column(designation=design_dictionary[KEY_SECSIZE], material_grade=design_dictionary[KEY_MATERIAL])
 
+        self.web_bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
+                         bolt_type=design_dictionary[KEY_TYP], material_grade=design_dictionary[KEY_MATERIAL],
+                         bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
+                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                         mu_f=design_dictionary[KEY_DP_BOLT_SLIP_FACTOR],
+                         corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+
+        self.flange_bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
+                             bolt_type=design_dictionary[KEY_TYP], material_grade=design_dictionary[KEY_MATERIAL],
+                             bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
+                             edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                             mu_f=design_dictionary[KEY_DP_BOLT_SLIP_FACTOR],
+                             corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+
         self.flange_plate = Plate(thickness=design_dictionary.get(KEY_FLANGEPLATE_THICKNESS, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.web_plate = Plate(thickness=design_dictionary.get(KEY_WEBPLATE_THICKNESS, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
     def get_bolt_details(self):
-        self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter[0],
+        self.flange_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.flange_bolt.bolt_diameter[0],
                                                 connecting_plates_tk=[self.flange_plate.thickness[0],
-                                                                      self.section.flange_thickness],bolt_hole_type=self.bolt.bolt_hole_type)
+                                                                      self.section.flange_thickness],bolt_hole_type=self.flange_bolt.bolt_hole_type)
+        self.flange_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.flange_bolt.bolt_diameter[0],
+                                                connecting_plates_tk=[self.web_plate.thickness[0],
+                                                                      self.section.web_thickness],
+                                                bolt_hole_type=self.flange_bolt.bolt_hole_type)
 
         if self.preference == "Outside":
-            self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter[0],
-                                          bolt_grade_provided=self.bolt.bolt_grade[0],
+            self.flange_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.flange_bolt.bolt_diameter[0],
+                                          bolt_grade_provided=self.flange_bolt.bolt_grade[0],
                                           connecting_plates_tk=[self.flange_plate.thickness[0],
                                                                 self.section.flange_thickness],
                                           n_planes=1)
         else:
-            self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter[0],
-                                          bolt_grade_provided=self.bolt.bolt_grade[0],
+            self.flange_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.flange_bolt.bolt_diameter[0],
+                                          bolt_grade_provided=self.flange_bolt.bolt_grade[0],
                                           connecting_plates_tk=[self.flange_plate.thickness[0],
                                                                 self.section.flange_thickness],
                                           n_planes=2)
 
+
         min_plate_length = self.section.flange_width
         max_plate_length = self.section.flange_width
+        axial_force_f = self.load.axial_force * self.section.flange_width * self.section.flange_thickness/self.section.area
+        flange_force=(((self.load.moment * 1000000) / (self.section.depth - self.section.flange_thickness)) + (axial_force_f * 1000)) / 1000
 
-        self.flange_plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter[0], web_plate_l_min=min_plate_length,
-                                         web_plate_l_max=max_plate_length, bolt_capacity=self.bolt.bolt_capacity,
+
+        self.flange_plate.get_web_plate_details(bolt_dia=self.flange_bolt.bolt_diameter[0], web_plate_l_min=min_plate_length,
+                                         web_plate_l_max=max_plate_length, bolt_capacity=self.flange_bolt.bolt_capacity,
                                          connecting_plates_tk=[self.flange_plate.thickness[0],
                                                                self.section.flange_thickness],
-                                         bolt_hole_type=self.bolt.bolt_hole_type,
-                                         bolt_line_limit=10, axial_load=self.load.axial_force,
-                                                gap=self.flange_plate.gap,
+                                         bolt_hole_type=self.flange_bolt.bolt_hole_type,
+                                         bolt_line_limit=10, axial_load=flange_force,
                                          shear_ecc=False)
-        self.flange_plate.get_moment_cacacity(self.flange_plate.fy,self.flange_plate.thickness[0],self.flange_plate.length)
+
+        self.flange_plate.get_moment_cacacity(self.flange_plate.fy, self.flange_plate.thickness[0],
+                                              self.flange_plate.length)
+
+        ########################
+        # Design of web splice plate
+
+        min_web_plate_length = self.section.min_plate_length()
+        max_web_plate_length = self.section.max_plate_length()
+        axial_force_w = int(((self.section.depth - 2 * ( self.section.flange_thickness)) * self.section.web_thickness * self.load.axial_force * 10) / self.section.area) / 1000
+        self.web_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.web_bolt.bolt_diameter[0],
+                                          bolt_grade_provided=self.web_bolt.bolt_grade[0],
+                                          connecting_plates_tk=[self.web_plate.thickness[0],
+                                                                self.section.web_thickness],
+                                          n_planes=2)
+
+        self.web_plate.get_web_plate_details(bolt_dia=self.web_bolt.bolt_diameter[0], web_plate_l_min=min_web_plate_length,
+                                             web_plate_l_max=max_web_plate_length,
+                                             bolt_capacity=self.web_bolt.bolt_capacity,
+                                             connecting_plates_tk=[2*self.web_plate.thickness[0],
+                                                                   self.section.web_thickness],
+                                             bolt_hole_type=self.web_bolt.bolt_hole_type,
+                                             bolt_line_limit=10, shear_load= self.load.shear_force,axial_load=axial_force_w,
+                                             gap=self.web_plate.gap, shear_ecc=True)
 
 
         print(self.section)
         print(self.load)
-        print(self.bolt)
+        print(self.flange_bolt)
         print(self.flange_plate)
+        print(self.web_bolt)
+        print(self.web_plate)
 

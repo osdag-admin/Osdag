@@ -239,6 +239,14 @@ class Column(Section):
         super(Column, self).__init__(designation, material_grade)
         self.connect_to_database_update_other_attributes("Columns", designation)
 
+    def min_plate_length(self):
+        return 0.6 * self.depth
+
+    def max_plate_length(self):
+
+        clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
+        return clear_depth
+
 
 class Weld(Material):
 

@@ -1036,7 +1036,7 @@ class Ui_ModuleWindow(QMainWindow):
             s = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
             if option[2] == TYPE_COMBOBOX:
-                if option[0] in [KEY_D ,KEY_GRD, KEY_PLATETHK, KEY_FLANGEPLATE_PREFERENCES]:
+                if option[0] in [KEY_D ,KEY_GRD, KEY_PLATETHK]:
                     continue
                 if s.currentIndex() == 0:
                     missing_fields_list.append(option[1])

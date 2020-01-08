@@ -205,7 +205,24 @@ class ColumnCoverPlate(MomentConnection):
 
         self.flange_plate.get_moment_cacacity(self.flange_plate.fy, self.flange_plate.thickness[0],
                                               self.flange_plate.length)
+        block_shear_capacity = 0
+        moment_capacity = 0
+        edge_dist_rem = self.flange_plate.edge_dist_provided + self.flange_plate.gap
 
+        self.flange_plate.blockshear(numrow=self.flange_plate.bolts_one_line, numcol=self.flange_plate.bolt_line,
+                              pitch=self.flange_plate.pitch_provided,
+                              gauge=self.flange_plate.gauge_provided, thk=self.flange_plate.thickness[0],
+                              end_dist=self.flange_plate.end_dist_provided,
+                              edge_dist=edge_dist_rem, dia_hole=self.flange_bolt.dia_hole,
+                              fy=self.flange_plate.fy, fu=self.flange_plate.fu)
+
+        self.flange_plate.shear_yielding_b(self.flange_plate.length, self.flange_plate.thickness[0], self.flange_plate.fy)
+
+        self.flange_plate.shear_rupture_b(self.flange_plate.length, self.flange_plate.thickness[0], self.flange_plate.bolts_one_line,
+                                   self.flange_bolt.dia_hole, self.flange_plate.fu)
+
+        plate_shear_capacity = min(self.flange_plate.block_shear_capacity, self.flange_plate.shear_rupture_capacity,
+                                   self.flange_plate.shear_yielding_capacity)
         ########################
         # Design of web splice plate
 
@@ -226,6 +243,26 @@ class ColumnCoverPlate(MomentConnection):
                                              bolt_hole_type=self.web_bolt.bolt_hole_type,
                                              bolt_line_limit=10, shear_load= self.load.shear_force,axial_load=axial_force_w,
                                              gap=self.web_plate.gap, shear_ecc=True)
+
+        block_shear_capacity = 0
+        moment_capacity = 0
+        edge_dist_rem = self.web_plate.edge_dist_provided + self.web_plate.gap
+
+        self.web_plate.blockshear(numrow=self.web_plate.bolts_one_line, numcol=self.web_plate.bolt_line,
+                              pitch=self.web_plate.pitch_provided,
+                              gauge=self.web_plate.gauge_provided, thk=self.web_plate.thickness[0],
+                              end_dist=self.web_plate.end_dist_provided,
+                              edge_dist=edge_dist_rem, dia_hole=self.web_bolt.dia_hole,
+                              fy=self.web_plate.fy, fu=self.web_plate.fu)
+
+        self.web_plate.shear_yielding_b(self.web_plate.length, self.web_plate.thickness[0], self.web_plate.fy)
+
+        self.web_plate.shear_rupture_b(self.web_plate.length, self.web_plate.thickness[0], self.web_plate.bolts_one_line,
+                                   self.web_bolt.dia_hole, self.web_plate.fu)
+
+        plate_shear_capacity = min(self.flange_plate.block_shear_capacity, self.flange_plate.shear_rupture_capacity,
+                                   self.flange_plate.shear_yielding_capacity)
+
 
         self.web_plate.get_moment_cacacity(self.web_plate.fy, self.web_plate.thickness[0],
                                               self.web_plate.length)

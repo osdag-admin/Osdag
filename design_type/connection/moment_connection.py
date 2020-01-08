@@ -51,7 +51,9 @@ class MomentConnection(Connection):
 
         return list1
     def set_input_values(self, design_dictionary):
-        print(design_dictionary)
+
+        self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None),
+                         moment=design_dictionary[KEY_MOMENT])
 
     def get_bolt_details(self):
         pass

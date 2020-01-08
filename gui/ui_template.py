@@ -446,6 +446,7 @@ class Ui_ModuleWindow(QMainWindow):
                 _translate = QtCore.QCoreApplication.translate
                 MainWindow.setWindowTitle(_translate("MainWindow", option[1]))
                 i = i - 30
+                module = lable
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
@@ -469,7 +470,6 @@ class Ui_ModuleWindow(QMainWindow):
                 q.setObjectName("_title")
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
-
             i = i + 30
         # for option in option_list:
         #     sh = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
@@ -842,7 +842,7 @@ class Ui_ModuleWindow(QMainWindow):
         font.setFamily("DejaVu Serif")
         self.actionDesign_Preferences.setFont(font)
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
-        self.actionDesign_Preferences.triggered.connect(self.combined_design_prefer)
+        self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(module))
         # self.actionDesign_Preferences.triggered.connect(self.column_design_prefer)
         # self.actionDesign_Preferences.triggered.connect(self.beam_design_prefer)
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
@@ -1051,7 +1051,7 @@ class Ui_ModuleWindow(QMainWindow):
                 pass
 
         if len(missing_fields_list) > 0:
-            QMessageBox.information(self, "Information",self.generate_missing_fields_error_string(missing_fields_list))
+            QMessageBox.information(self, "Information", self.generate_missing_fields_error_string(missing_fields_list))
         elif trigger_type == "Save":
             self.design_fn(option_list, data)
             self.saveDesign_inputs()
@@ -1060,6 +1060,7 @@ class Ui_ModuleWindow(QMainWindow):
             self.pass_d(main, self.design_inputs)
             main.set_input_values(main, self.design_inputs)
             main.get_bolt_details(main)
+
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
@@ -1261,25 +1262,53 @@ class Ui_ModuleWindow(QMainWindow):
     #     material_grade = key_2.currentText()
     #     self.designPrefDialog.column_preferences(designation, material_grade)
 
-    def combined_design_prefer(self):
+    def combined_design_prefer(self, module):
         key_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
         key_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
         key_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
         key_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
+        key_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
         table_1 = "Columns"
         table_2 = "Beams"
-
-        conn = key_1.currentText()
-        designation_col = key_2.currentText()
-        designation_bm = key_3.currentText()
+        if module == KEY_DISP_BEAMCOVERPLATE:
+            t = table_2
+        elif module == KEY_DISP_COLUMNCOVERPLATE:
+            t = table_1
         material_grade = key_4.currentText()
-        if key_2.currentIndex() != 0 and key_3.currentIndex() != 0 and key_4.currentIndex() != 0:
+        if module in [KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COLUMNCOVERPLATE]:
+            designation_col = key_5.currentText()
+            self.designPrefDialog.ui.tabWidget.removeTab(
+                self.designPrefDialog.ui.tabWidget.indexOf(self.designPrefDialog.ui.tab_Beam))
+            self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tab_Column), KEY_DISP_SECSIZE)
+            if key_5.currentIndex() != 0:
+                self.designPrefDialog.column_preferences(designation_col, t, material_grade)
+        else:
+            conn = key_1.currentText()
+            designation_col = key_2.currentText()
+            designation_bm = key_3.currentText()
+            # if key_2.currentIndex() != 0 and key_3.currentIndex() != 0:
+            #     if conn in VALUES_CONN_1:
+            #         self.designPrefDialog.column_preferences(designation_col, table_1, material_grade, module)
+            #     elif conn in VALUES_CONN_2:
+            #         self.designPrefDialog.column_preferences(designation_col, table_2, material_grade, module)
+            #     self.designPrefDialog.beam_preferences(designation_bm, material_grade)
             if conn in VALUES_CONN_1:
-                self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
+                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
+                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
+                if key_2.currentIndex() != 0 and key_3.currentIndex() != 0:
+                    self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
+                    self.designPrefDialog.beam_preferences(designation_bm, material_grade)
             elif conn in VALUES_CONN_2:
-                self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
-            self.designPrefDialog.beam_preferences(designation_bm, material_grade)
-
+                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Column), KEY_DISP_PRIBM)
+                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECBM)
+                if key_2.currentIndex() != 0 and key_3.currentIndex() != 0:
+                    self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
+                    self.designPrefDialog.beam_preferences(designation_bm, material_grade)
 
 
     # def beam_design_prefer(self):

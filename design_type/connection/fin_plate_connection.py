@@ -208,7 +208,7 @@ class FinPlateConnection(ShearConnection):
     def set_input_values(self, design_dictionary):
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_GAP])
+                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
 
     def get_bolt_details(self):

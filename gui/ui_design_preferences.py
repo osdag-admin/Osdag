@@ -317,6 +317,15 @@ class Ui_Dialog(object):
         label_3.setObjectName("label_3")
         label_3.setGeometry(QtCore.QRect(400, 10, 130, 22))
         label_3.setText("Description")
+        label_4 = QtWidgets.QLabel(self.tab_Bolt)
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setWeight(75)
+        label_4.setFont(font)
+        label_4.setObjectName("label_4")
+        label_4.setGeometry(QtCore.QRect(10, 400, 400, 50))
+        label_4.setText("NOTE : If slip is permitted under the design load, design the bolt as"
+                        "<br>a bearing bolt and select corresponding bolt grade.")
         textBrowser = QtWidgets.QTextBrowser(self.tab_Bolt)
         textBrowser.setMinimumSize(QtCore.QSize(210, 320))
         textBrowser.setObjectName("textBrowser")
@@ -1228,12 +1237,7 @@ class DesignPreferences(QDialog):
         col_list = []
         col_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(col_attributes, table, designation)
-        if table == "Beams":
-            self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab_Column), KEY_DISP_PRIBM)
-            self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab_Beam), KEY_DISP_SECBM)
-        else:
-            self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab_Column), KEY_DISP_COLSEC)
-            self.ui.tabWidget.setTabText(self.ui.tabWidget.indexOf(self.ui.tab_Beam), KEY_DISP_BEAMSEC)
+
         for ch in self.ui.tab_Column.children():
             if ch.objectName() == KEY_SUPTNGSEC_DESIGNATION:
                 ch.setText(designation)

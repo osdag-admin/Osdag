@@ -239,6 +239,14 @@ class Column(Section):
         super(Column, self).__init__(designation, material_grade)
         self.connect_to_database_update_other_attributes("Columns", designation)
 
+    def min_plate_length(self):
+        return 0.6 * self.depth
+
+    def max_plate_length(self):
+
+        clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
+        return clear_depth
+
 
 class Weld(Material):
 
@@ -422,7 +430,7 @@ class Plate(Bolt):
                             # calculation of  bolts in one line and check for given web plate height = 0
                             # or user input value
                             [bolt_line, bolts_one_line, web_plate_l] = self.get_web_plate_l_bolts_one_line\
-                                (web_plate_l_max, web_plate_l_min, bolts_required,bolt_dia,connecting_plates_tk)
+                                (web_plate_l_max, web_plate_l_min, bolts_required,bolt_dia,connecting_plates_tk,bolt_hole_type)
                             break
                     else:
                         break

@@ -221,11 +221,11 @@ class FinPlateConnection(ShearConnection):
                                                                 self.supported_section.web_thickness],
                                           n_planes=1)
 
-        min_plate_length = self.supported_section.min_plate_length()
-        max_plate_length = self.supported_section.max_plate_length()
+        min_plate_height = self.supported_section.min_plate_height()
+        max_plate_height = self.supported_section.max_plate_height()
 
-        self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter[0], web_plate_l_min=min_plate_length,
-                                         web_plate_l_max=max_plate_length, bolt_capacity=self.bolt.bolt_capacity,
+        self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter[0], web_plate_h_min=min_plate_height,
+                                         web_plate_h_max=max_plate_height, bolt_capacity=self.bolt.bolt_capacity,
                                          connecting_plates_tk=[self.plate.thickness[0],
                                                                self.supported_section.web_thickness],
                                          bolt_hole_type=self.bolt.bolt_hole_type,
@@ -241,10 +241,10 @@ class FinPlateConnection(ShearConnection):
                               edge_dist=edge_dist_rem, dia_hole=self.bolt.dia_hole,
                               fy=self.supported_section.fy, fu=self.supported_section.fu)
 
-        self.plate.shear_yielding_b(self.plate.length, self.plate.thickness[0], self.plate.fy)
+        self.plate.shear_yielding_b(self.plate.height, self.plate.thickness[0], self.plate.fy)
 
-        self.plate.shear_rupture_b(self.plate.length, self.plate.thickness[0], self.plate.bolts_one_line,
-                                       self.bolt.dia_hole, self.plate.fu)
+        self.plate.shear_rupture_b(self.plate.height, self.plate.thickness[0], self.plate.bolts_one_line,
+                                   self.bolt.dia_hole, self.plate.fu)
 
         plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,
                                    self.plate.shear_yielding_capacity)
@@ -256,7 +256,7 @@ class FinPlateConnection(ShearConnection):
         #     logger.warning(":Shear capacity of plate is %2.2f kN" % plate_shear_capacity)
         #     logger.info(": Increase the plate thickness")
 
-        self.plate.get_moment_cacacity(self.plate.fy,self.plate.thickness[0],self.plate.length)
+        self.plate.get_moment_cacacity(self.plate.fy, self.plate.thickness[0], self.plate.height)
 
         # if self.plate.moment_capacity < self.plate.moment_demand:
         #     design_status = False

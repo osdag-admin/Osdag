@@ -227,7 +227,8 @@ class ColumnCoverPlate(MomentConnection):
                                              bolt_line_limit=10, shear_load= self.load.shear_force,axial_load=axial_force_w,
                                              gap=self.web_plate.gap, shear_ecc=True)
 
-
+        self.web_plate.get_moment_cacacity(self.web_plate.fy, self.web_plate.thickness[0],
+                                              self.web_plate.length)
         print(self.section)
         print(self.load)
         print(self.flange_bolt)

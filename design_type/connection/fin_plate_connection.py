@@ -79,7 +79,6 @@ class FinPlateConnection(ShearConnection):
     def __init__(self):
         super(FinPlateConnection, self).__init__()
 
-
     def input_values(self, existingvalues={}):
 
         options_list = []
@@ -184,6 +183,62 @@ class FinPlateConnection(ShearConnection):
 
         return options_list
 
+    def output_values(self, flag):
+
+        if flag == 'True':
+
+            out_list = []
+
+            t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+            out_list.append(t1)
+
+            t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided)
+            out_list.append(t2)
+
+            t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided)
+            out_list.append(t3)
+
+            t4 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
+            out_list.append(t4)
+
+            t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, self.plate.thickness)
+            out_list.append(t5)
+
+            t6 = (KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height)
+            out_list.append(t6)
+
+            t7 = (KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length)
+            out_list.append(t7)
+
+            return out_list
+
+        if flag == 'False':
+
+            out_list = []
+
+            t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+            out_list.append(t1)
+
+            t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX, '')
+            out_list.append(t2)
+
+            t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX, '')
+            out_list.append(t3)
+
+            t4 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
+            out_list.append(t4)
+
+            t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, '')
+            out_list.append(t5)
+
+            t6 = (KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, '')
+            out_list.append(t6)
+
+            t7 = (KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, '')
+            out_list.append(t7)
+
+            return out_list
+
     def warn_text(self,key, my_d):
         old_col_section = get_oldcolumncombolist()
         old_beam_section = get_oldbeamcombolist()
@@ -210,8 +265,8 @@ class FinPlateConnection(ShearConnection):
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
-
     def get_bolt_details(self):
+        print(self)
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter[0],
                                                 connecting_plates_tk=[self.plate.thickness[0],
                                                                       self.supported_section.web_thickness],bolt_hole_type=self.bolt.bolt_hole_type)
@@ -269,7 +324,6 @@ class FinPlateConnection(ShearConnection):
         print(self.load)
         print(self.bolt)
         print(self.plate)
-
 
 
 #

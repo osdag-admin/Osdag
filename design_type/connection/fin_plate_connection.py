@@ -244,7 +244,7 @@ class FinPlateConnection(ShearConnection):
         self.plate.shear_yielding_b(self.plate.height, self.plate.thickness[0], self.plate.fy)
 
         self.plate.shear_rupture_b(self.plate.height, self.plate.thickness[0], self.plate.bolts_one_line,
-                                   self.bolt.dia_hole, self.plate.fu)
+                                       self.bolt.dia_hole, self.plate.fu)
 
         plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,
                                    self.plate.shear_yielding_capacity)
@@ -267,8 +267,25 @@ class FinPlateConnection(ShearConnection):
         print(self.supporting_section)
         print(self.supported_section)
         print(self.load)
-        print(self.bolt)
-        print(self.plate)
+#        print(Plate.design_status)
+        if self.plate.design_status == False:
+            # del_data = open('logging_text.log', 'w')
+            # del_data.truncate()
+            # del_data.close()
+            logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
+            logging.warning(" : The connection cannot be designed with given loads")
+            with open('logging_text.log') as file:
+                data = file.read()
+                print(data)
+                file.close()
+            # file = open('logging_text.log', 'r')
+            # # This will print every line one by one in the file
+            # for each in file:
+            #     print(each)
+            #key.setText(data)    
+        else:        
+            print(self.bolt)
+            print(self.plate)
 
 
 

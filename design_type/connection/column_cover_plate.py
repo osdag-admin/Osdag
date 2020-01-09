@@ -1,5 +1,6 @@
 from design_type.connection.moment_connection import MomentConnection
 from utils.common.component import *
+from utils.common.is800_2007 import *
 from Common import *
 from utils.common.load import Load
 import yaml
@@ -202,75 +203,306 @@ class ColumnCoverPlate(MomentConnection):
 
         self.flange_plate.get_moment_cacacity(self.flange_plate.fy, self.flange_plate.thickness[0],
                                               self.flange_plate.length)
-        block_shear_capacity = 0
+        flange_block_shear_capactity = 0
+        flange_plate_block_shear_capactity=0
         moment_capacity = 0
-        edge_dist_rem = self.flange_plate.edge_dist_provided + self.flange_plate.gap
-
-        self.flange_plate.blockshear(numrow=self.flange_plate.bolts_one_line, numcol=self.flange_plate.bolt_line,
-                              pitch=self.flange_plate.pitch_provided,
-                              gauge=self.flange_plate.gauge_provided, thk=self.flange_plate.thickness[0],
-                              end_dist=self.flange_plate.end_dist_provided,
-                              edge_dist=edge_dist_rem, dia_hole=self.flange_bolt.dia_hole,
-                              fy=self.flange_plate.fy, fu=self.flange_plate.fu)
-
-        self.flange_plate.shear_yielding_b(self.flange_plate.length, self.flange_plate.thickness[0], self.flange_plate.fy)
-
-        self.flange_plate.shear_rupture_b(self.flange_plate.length, self.flange_plate.thickness[0], self.flange_plate.bolts_one_line,
-                                   self.flange_bolt.dia_hole, self.flange_plate.fu)
-
-        plate_shear_capacity = min(self.flange_plate.block_shear_capacity, self.flange_plate.shear_rupture_capacity,
-                                   self.flange_plate.shear_yielding_capacity)
+        # edge_dist_rem = self.flange_plate.edge_dist_provided + self.flange_plate.gap
+        # #
+        # self.flange_plate.blockshear(numrow=self.flange_plate.bolts_one_line, numcol=self.flange_plate.bolt_line,
+        #                       pitch=self.flange_plate.pitch_provided,
+        #                       gauge=self.flange_plate.gauge_provided, thk=self.flange_plate.thickness[0],
+        #                       end_dist=self.flange_plate.end_dist_provided,
+        #                       edge_dist=edge_dist_rem, dia_hole=self.flange_bolt.dia_hole,
+        #                       fy=self.flange_plate.fy, fu=self.flange_plate.fu)
+        #
+        # self.flange_plate.shear_yielding_b(self.flange_plate.length, self.flange_plate.thickness[0], self.flange_plate.fy)
+        #
+        # self.flange_plate.shear_rupture_b(self.flange_plate.length, self.flange_plate.thickness[0], self.flange_plate.bolts_one_line,
+        #                            self.flange_bolt.dia_hole, self.flange_plate.fu)
+        #
+        # plate_shear_capacity = min(self.flange_plate.block_shear_capacity, self.flange_plate.shear_rupture_capacity,
+        #                            self.flange_plate.shear_yielding_capacity)
         ########################
-        # Design of web splice plate
-        self.web_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.web_bolt.bolt_diameter[0],
-                                                       connecting_plates_tk=[self.web_plate.thickness[0],
-                                                                             self.section.web_thickness],
-                                                       bolt_hole_type=self.web_bolt.bolt_hole_type)
-        min_web_plate_height = self.section.min_plate_height()
-        max_web_plate_height = self.section.max_plate_height()
-        axial_force_w = int(((self.section.depth - 2 * ( self.section.flange_thickness)) * self.section.web_thickness * self.load.axial_force * 10) / self.section.area) / 1000
-        self.web_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.web_bolt.bolt_diameter[0],
-                                          bolt_grade_provided=self.web_bolt.bolt_grade[0],
-                                          connecting_plates_tk=[self.web_plate.thickness[0],
-                                                                self.section.web_thickness],
-                                          n_planes=2)
+        # # Design of web splice plate
+        # self.web_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.web_bolt.bolt_diameter[0],
+        #                                                connecting_plates_tk=[self.web_plate.thickness[0],
+        #                                                                      self.section.web_thickness],
+        #                                                bolt_hole_type=self.web_bolt.bolt_hole_type)
+        # min_web_plate_height = self.section.min_plate_height()
+        # max_web_plate_height = self.section.max_plate_height()
+        # axial_force_w = int(((self.section.depth - 2 * ( self.section.flange_thickness)) * self.section.web_thickness * self.load.axial_force * 10) / self.section.area) / 1000
+        # self.web_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.web_bolt.bolt_diameter[0],
+        #                                   bolt_grade_provided=self.web_bolt.bolt_grade[0],
+        #                                   connecting_plates_tk=[self.web_plate.thickness[0],
+        #                                                         self.section.web_thickness],
+        #                                   n_planes=2)
+        #
+        # self.web_plate.get_web_plate_details(bolt_dia=self.web_bolt.bolt_diameter[0], web_plate_h_min=min_web_plate_height,
+        #                                      web_plate_h_max=max_web_plate_height,
+        #                                      bolt_capacity=self.web_bolt.bolt_capacity,
+        #                                      connecting_plates_tk=[2*self.web_plate.thickness[0],
+        #                                                            self.section.web_thickness],
+        #                                      bolt_hole_type=self.web_bolt.bolt_hole_type,
+        #                                      bolt_line_limit=10, shear_load= self.load.shear_force,axial_load=axial_force_w,
+        #                                      gap=self.web_plate.gap, shear_ecc=True)
 
-        self.web_plate.get_web_plate_details(bolt_dia=self.web_bolt.bolt_diameter[0], web_plate_h_min=min_web_plate_height,
-                                             web_plate_h_max=max_web_plate_height,
-                                             bolt_capacity=self.web_bolt.bolt_capacity,
-                                             connecting_plates_tk=[2*self.web_plate.thickness[0],
-                                                                   self.section.web_thickness],
-                                             bolt_hole_type=self.web_bolt.bolt_hole_type,
-                                             bolt_line_limit=10, shear_load= self.load.shear_force,axial_load=axial_force_w,
-                                             gap=self.web_plate.gap, shear_ecc=True)
-
-        block_shear_capacity = 0
+        # block_shear_capacity = 0
         moment_capacity = 0
-        edge_dist_rem = self.web_plate.edge_dist_provided + self.web_plate.gap
-
-        self.web_plate.blockshear(numrow=self.web_plate.bolts_one_line, numcol=self.web_plate.bolt_line,
-                              pitch=self.web_plate.pitch_provided,
-                              gauge=self.web_plate.gauge_provided, thk=self.web_plate.thickness[0],
-                              end_dist=self.web_plate.end_dist_provided,
-                              edge_dist=edge_dist_rem, dia_hole=self.web_bolt.dia_hole,
-                              fy=self.web_plate.fy, fu=self.web_plate.fu)
-
-        self.web_plate.shear_yielding_b(self.web_plate.length, self.web_plate.thickness[0], self.web_plate.fy)
-
-        self.web_plate.shear_rupture_b(self.web_plate.length, self.web_plate.thickness[0], self.web_plate.bolts_one_line,
-                                   self.web_bolt.dia_hole, self.web_plate.fu)
-
-        plate_shear_capacity = min(self.flange_plate.block_shear_capacity, self.flange_plate.shear_rupture_capacity,
-                                   self.flange_plate.shear_yielding_capacity)
+        # edge_dist_rem = self.web_plate.edge_dist_provided + self.web_plate.gap
+        #
+        # self.web_plate.blockshear(numrow=self.web_plate.bolts_one_line, numcol=self.web_plate.bolt_line,
+        #                       pitch=self.web_plate.pitch_provided,
+        #                       gauge=self.web_plate.gauge_provided, thk=self.web_plate.thickness[0],
+        #                       end_dist=self.web_plate.end_dist_provided,
+        #                       edge_dist=edge_dist_rem, dia_hole=self.web_bolt.dia_hole,
+        #                       fy=self.web_plate.fy, fu=self.web_plate.fu)
+        #
+        # self.web_plate.shear_yielding_b(self.web_plate.length, self.web_plate.thickness[0], self.web_plate.fy)
+        #
+        # self.web_plate.shear_rupture_b(self.web_plate.length, self.web_plate.thickness[0], self.web_plate.bolts_one_line,
+        #                            self.web_bolt.dia_hole, self.web_plate.fu)
+        #
+        # plate_shear_capacity = min(self.flange_plate.block_shear_capacity, self.flange_plate.shear_rupture_capacity,
+        #                            self.flange_plate.shear_yielding_capacity)
 
 
         self.web_plate.get_moment_cacacity(self.web_plate.fy, self.web_plate.thickness[0],
                                               self.web_plate.length)
+
+        ################################ CAPACITY CHECK #####################################################################################
+        # cl 6.2 Design Strength Due to Yielding of Gross Section
+
+    def tension_member_design_due_to_yielding_of_gross_section(self,  A_v, fy):
+        '''
+             Args:
+                 A_v (float) Area under shear
+                 column_fy (float) Yeild stress of column material
+             Returns:
+                 Capacity of column web in shear yeiding
+             '''
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        #A_v = height * thickness
+        tdg = A_v * fy / (gamma_m0 *1000)
+        self.yielding_shear_cap = tdg
+
+    def tension_member_design_due_to_rupture_of_critical_section(self, A_vn, fu):
+        '''
+               Args:
+                   A_vn (float) Net area under shear
+                   column_fu (float) Ultimate stress of beam material
+               Returns:
+                   Capacity of beam web in shear rupture
+               '''
+
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        #A_vn = (height- bolts_one_line * dia_hole) * thickness
+        T_dn = 0.9 * A_vn * fu / (gamma_m1*1000)
+        self.rupture_shear_cap = T_dn
+
+#capacity Check for flange = min(block, yielding, rupture)
+        A_vn_flange = (self.section.flange_width - self.flange_plate.bolts_one_line * self.flange_plate.dia_hole) * \
+                      self.section.flange_thickness[0]
+        A_v_flange = self.section.flange_thickness[0] * self.flange_plate.height
+
+        yielding_cap_flange = self.tension_member_design_due_to_yielding_of_gross_section(A_v=A_v_flange,
+                                                                                                fy=self.flange_plate.fy)
+
+        rupture_cap_flange = self.tension_member_design_due_to_rupture_of_critical_section(A_vn=A_vn_flange,
+                                                                                                 fu=self.flange_plate.fu)
+        #  Block shear strength for flange
+        Avg = 2 * (self.flange_plate.end_dist_provided + (
+                self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided) \
+              * self.section.flange_thickness[0]
+        Avn = 2 * (self.flange_plate.end_dist_provided + (
+                self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided - (
+                           self.flange_plate.bolt_line - 0.5) * self.flange_plate.dia_hole) * \
+              self.section.flange_thickness[0]
+        Atg = (self.section.flange_width - (
+                self.flange_plate.bolts_one_line - 1) * self.flange_plate.gauge_provided) \
+              * self.section.flange_thickness[0]
+        Atn = (self.section.flange_width - (
+                (self.flange_plate.bolts_one_line - 1) * self.flange_plate.gauge_provided)
+               - (self.flange_plate.bolts_one_line - 1) * self.flange_plate.dia_hole) * \
+              self.section.flange_thickness[0]
+
+        self.flange_block_shear_capactity = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=Avg, A_vn=Avn, A_tg=Atg,
+                                                                                A_tn=Atn,
+                                                                                f_u=self.flange_plate.fu,
+                                                                                f_y=self.flange_plate.fy)
+        if self.flange_block_shear_capactity < self.load.axial_force:  # increase thickness todo
+            design_status = False
+        else:
+            pass
+
+        axial_force_f = self.load.axial_force * self.section.flange_width * self.section.flange_thickness/self.section.area
+        flange_force=(((self.load.moment * 1000000) / (self.section.depth - self.section.flange_thickness)) + (axial_force_f * 1000)) / 1000
+
+        self.Tension_capacity_flange = min (yielding_cap_flange,rupture_cap_flange,self.flange_block_shear_capactity)
+
+        if self.Tension_capacity_flange < flange_force:
+            design_status= False
+        else:
+            pass
+
+#capacity Check for flange_outsite_plate =min(block, yielding, rupture)
+
+        ####Capacity of flange cover plate for bolted Outside #
+        if self.preference == "Outside":
+            A_vn_flange = (self.section.flange_width - self.flange_plate.bolts_one_line * self.flange_plate.dia_hole) * self.flange_plate.thickness[0]
+            A_v_flange = self.flange_plate.thickness[0] * self.flange_plate.height
+            yielding_cap_flange_plate = self.tension_member_design_due_to_yielding_of_gross_section(A_v = A_v_flange,
+                                                                                           fy=self.flange_plate.fy)
+
+            rupture_cap_flange_plate = self.tension_member_design_due_to_rupture_of_critical_section(A_vn=A_vn_flange,
+                                                                                             fu=self.flange_plate.fu)
+            # #  Block shear strength for flange
+            # Avg = 2 * (self.flange_plate.end_dist_provided + (
+            #             self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided) \
+            #       * self.section.flange_thickness[0]
+            # Avn = 2 * (self.flange_plate.end_dist_provided + (
+            #             self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided - (
+            #                    self.flange_plate.bolt_line - 0.5) * self.flange_plate.dia_hole) * \
+            #       self.section.flange_thickness[0]
+            # Atg = (self.section.flange_width - (
+            #             self.flange_plate.bolts_one_line - 1) * self.flange_plate.gauge_provided) \
+            #       * self.section.flange_thickness[0]
+            # Atn = (self.section.flange_width - (
+            #             (self.flange_plate.bolts_one_line - 1) * self.flange_plate.gauge_provided)
+            #        - (self.flange_plate.bolts_one_line - 1) * self.flange_plate.dia_hole) * \
+            #       self.section.flange_thickness[0]
+            #
+            # flange_block_shear_capactity = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=Avg, A_vn=Avn, A_tg=Atg,
+            #                                                                         A_tn=Atn,
+            #                                                                         f_u=self.flange_plate.fu,
+            #                                                                         f_y=self.flange_plate.fy)
+            # if flange_block_shear_capactity < self.load.axial_force:  # increase thickness todo
+            #     design_status = False
+            # else:
+            #     pass
+
+
+
+            #  Block shear strength for outside flange plate
+
+            Avg = 2 * (self.flange_plate.end_dist_provided + (
+                        self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided) * self.flange_plate.thickness[0]
+            Avn = 2 * (self.flange_plate.end_dist_provided + (
+                        self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided - (
+                               self.flange_plate.bolt_line - 0.5) * self.flange_plate.dia_hole) * self.flange_plate.thickness[0]
+            Atg = ((self.flange_plate.bolts_one_line - 1) * self.flange_plate.gauge_provided) * self.flange_plate.thickness[0]
+            Atn = (((self.flange_plate.bolts_one_line - 1) * self.flange_plate.gauge_provided) - (
+                           self.flange_plate.bolts_one_line - 1) * self.flange_plate.dia_hole) * self.flange_plate.thickness[0]
+            self.flange_plate_block_shear_capactity = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=Avg, A_vn=Avn, A_tg=Atg,
+                                                                                          A_tn=Atn,
+                                                                                          f_u=self.flange_plate.fu,
+                                                                                          f_y=self.flange_plate.fy)
+
+            if self.flange_plate_block_shear_capactity < self.load.axial_force:#increase thickness todo
+                design_status = False
+            else:
+                pass
+            self.Tension_capacity_flange_plate = min(yielding_cap_flange_plate, rupture_cap_flange_plate, self.flange_plate_block_shear_capactity)
+            if self.Tension_capacity_flange_plate < flange_force:
+                design_status = False
+            else:
+                pass
+
+        else:
+# capacity Check for flange_outsite_plate =min(block, yielding, rupture)
+
+            #  yielding,rupture  for  inside flange plate
+            flange_plate_height_inside = (self.section.flange_width - self.section.web_thickness - self.section.root_radius) / 2 - \
+                                         self.flange_plate.bolts_one_line * self.flange_plate.dia_hole
+            flange_plate_height_outside = self.flange_plate.thickness[0] * self.flange_plate.height
+            A_vn_flange = ((self.flange_plate.height - self.section.web_thickness - 2 * self.section.root_radius) / 2 *
+                           self.flange_plate.thickness) / 2
+            A_v_flange = (flange_plate_height_outside * self.flange_plate.thickness) + \
+                         2 * (flange_plate_height_inside * self.flange_plate.thickness)
+
+            yielding_cap_flange_plate = self.tension_member_design_due_to_yielding_of_gross_section(A_v=A_v_flange,
+                                                                                                    fy=self.flange_plate.fy)
+            flange_plate_height_inside = (self.section.flange_width - self.section.web_thickness - self.section.root_radius) / 2 - \
+                                         self.flange_plate.bolts_one_line * self.flange_plate.dia_hole
+
+            rupture_cap_flange_plate = self.tension_member_design_due_to_rupture_of_critical_section(A_vn=A_vn_flange,
+                                                                                                     fu=self.flange_plate.fu)
+
+            #  Block shear strength for outside + inside flange plate
+
+            #OUTSIDE
+
+            Avg = 2 * (self.flange_plate.end_dist_provided + (
+                    self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided) * self.flange_plate.thickness[
+                      0]
+            Avn = 2 * (self.flange_plate.end_dist_provided + (
+                    self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided - (
+                               self.flange_plate.bolt_line - 0.5) * self.flange_plate.dia_hole) * \
+                  self.flange_plate.thickness[0]
+            Atg = ((self.flange_plate.bolts_one_line - 1) * self.flange_plate.gauge_provided) * \
+                  self.flange_plate.thickness[0]
+            Atn = (((self.flange_plate.bolts_one_line - 1) * self.flange_plate.gauge_provided) - (
+                    self.flange_plate.bolts_one_line - 1) * self.flange_plate.dia_hole) * self.flange_plate.thickness[0]
+
+            self.flange_plate_block_shear_capactity_outside = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=Avg, A_vn=Avn, A_tg=Atg,
+                                                                                          A_tn=Atn,
+                                                                                          f_u=self.flange_plate.fu,
+                                                                                          f_y=self.flange_plate.fy)
+
+            #  Block shear strength for inside flange plate under shear
+            Avg = 2 * (self.flange_plate.end_dist_provided + (
+                        self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided) \
+                  * self.flange_plate.thickness[0]
+            Avn = 2 * (self.flange_plate.end_dist_provided + (
+                        self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided - (
+                               self.flange_plate.bolt_line - 0.5) * self.flange_plate.dia_hole) * \
+                  self.flange_plate.thickness[0]
+            Atg = (self.section.flange_width - (self.flange_plate.bolt_line - 1) * self.flange_plate.gauge_provided) * \
+                  self.flange_plate.thickness[0]
+            Atn = (self.section.flange_width - (
+                        (self.flange_plate.bolt_line - 1) * self.flange_plate.gauge_provided) - (
+                           self.flange_plate.bolt_line - 1) * self.flange_plate.dia_hole) * self.flange_plate.thickness[0]
+
+            self.flange_plate_block_shear_capactity_inside = IS800_2007.cl_6_4_1_block_shear_strength(A_vg=Avg, A_vn=Avn, A_tg=Atg,
+                                                                                           A_tn=Atn,
+                                                                                           f_u=self.flange_plate.fu,
+                                                                                           f_y=self.flange_plate.fy)
+            self.flange_plate_block_shear_capactity = self.flange_plate_block_shear_capactity_outside + self.flange_plate_block_shear_capactity_inside
+
+            if self.flange_plate_block_shear_capactity < self.load.axial_force:#increase thickness todo
+                design_status = False
+            else:
+                pass
+            self.Tension_capacity_flange_plate = min(yielding_cap_flange_plate, rupture_cap_flange_plate, self.flange_plate_block_shear_capactity)
+            if self.Tension_capacity_flange_plate < flange_force:
+                design_status = False
+            else:
+                pass
+
+
+            # #  yielding,rupture  for  inside flange plate
+            # flange_plate_height_inside = (self.section.flange_width - self.section.web_thickness - self.section.root_radius) / 2 - \
+            #                              self.flange_plate.bolts_one_line * self.flange_plate.dia_hole
+            # flange_plate_height_outside= self.flange_plate.thickness[0] * self.flange_plate.height
+            # A_vn_flange= ((self.flange_plate.height - self.section.web_thickness - 2*self.section.root_radius)/2 *
+            #               self.flange_plate.thickness)/2
+            # A_v_flange = (flange_plate_height_outside * self.flange_plate.thickness) + \
+            #              2*(flange_plate_height_inside * self.flange_plate.thickness)
+            #
+            # yielding_cap_flange_plate = self.tension_member_design_due_to_yielding_of_gross_section(A_v=A_v_flange,fy=self.flange_plate.fy)
+            # flange_plate_height_inside = (self.section.flange_width - self.section.web_thickness - self.section.root_radius)/2 - \
+            #                              self.flange_plate.bolts_one_line * self.flange_plate.dia_hole
+            #
+            # rupture_cap_flange_plate = self.tension_member_design_due_to_rupture_of_critical_section(A_vn=A_vn_flange,
+            #                                                                                  fu=self.flange_plate.fu)
+
+
         print(self.section)
         print(self.load)
         print(self.flange_bolt)
         print(self.flange_plate)
         print(self.web_bolt)
         print(self.web_plate)
+        print(self.Tension_capacity_flange_plate)
+        print(self.Tension_capacity_flange)
 
 

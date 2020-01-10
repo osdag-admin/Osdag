@@ -185,59 +185,31 @@ class FinPlateConnection(ShearConnection):
 
     def output_values(self, flag):
 
-        if flag == 'True':
+        out_list = []
 
-            out_list = []
+        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+        out_list.append(t1)
 
-            t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
-            out_list.append(t1)
+        t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX,  self.bolt.bolt_diameter_provided if flag == 'True' else '')
+        out_list.append(t2)
 
-            t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided)
-            out_list.append(t2)
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag == 'True' else '')
+        out_list.append(t3)
 
-            t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided)
-            out_list.append(t3)
+        t4 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
+        out_list.append(t4)
 
-            t4 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
-            out_list.append(t4)
+        t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, self.plate.thickness if flag == 'True' else '')
+        out_list.append(t5)
 
-            t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, self.plate.thickness)
-            out_list.append(t5)
+        t6 = (KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag == 'True' else '')
+        out_list.append(t6)
 
-            t6 = (KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height)
-            out_list.append(t6)
+        t7 = (KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag == 'True' else '')
+        out_list.append(t7)
 
-            t7 = (KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length)
-            out_list.append(t7)
+        return out_list
 
-            return out_list
-
-        if flag == 'False':
-
-            out_list = []
-
-            t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
-            out_list.append(t1)
-
-            t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX, '')
-            out_list.append(t2)
-
-            t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX, '')
-            out_list.append(t3)
-
-            t4 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
-            out_list.append(t4)
-
-            t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, '')
-            out_list.append(t5)
-
-            t6 = (KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, '')
-            out_list.append(t6)
-
-            t7 = (KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, '')
-            out_list.append(t7)
-
-            return out_list
 
     def warn_text(self,key, my_d):
         old_col_section = get_oldcolumncombolist()

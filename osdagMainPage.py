@@ -22,7 +22,8 @@ from design_type.connection.end_plate_connection import EndPlateConnectionInput
 
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
-
+from design_type.connection.column_cover_plate import ColumnCoverPlate
+from design_type.connection.column_end_plate import ColumnEndPlate
 from gui.ui_template import Ui_ModuleWindow
 
 # from design_type.connection.main_controller import MainController
@@ -97,10 +98,10 @@ class OsdagMainWindow(QMainWindow):
         self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
         self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
        # self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
-        self.ui.btn_start.clicked.connect(self.show_shear_connection)
-        self.ui.btn_start_2.clicked.connect(self.show_moment_connection)
-        self.ui.btn_start_3.clicked.connect(self.unavailable)
-        self.ui.cc_Start.clicked.connect(self.unavailable)
+        self.ui.btn_shearconnection_start.clicked.connect(self.show_shear_connection)
+        self.ui.btn_momentconnection_bb_start.clicked.connect(self.show_moment_connection)
+        self.ui.btn_momentconnection_bc_start.clicked.connect(self.unavailable)
+        self.ui.btn_momentconnection_cc_start.clicked.connect(self.show_moment_connection_cc)
 
         self.ui.Tension_Start.clicked.connect(self.unavailable)
         self.ui.Compression_Start.clicked.connect(self.unavailable)
@@ -287,7 +288,7 @@ class OsdagMainWindow(QMainWindow):
                     shutil.rmtree(os.path.join(folder, create_folder))
                     os.mkdir(os.path.join(root_path, create_folder))
 
-        if self.ui.rdbtn_coverplate_7.isChecked():
+        if self.ui.rdbtn_bb_coverplate_bolted.isChecked() or self.ui.rdbtn_bb_coverplate_welded.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, BeamCoverPlate)
@@ -296,7 +297,7 @@ class OsdagMainWindow(QMainWindow):
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
             # self.window.show()
             # self.window.closed.connect(self.show)
-        elif self.ui.rdbtn_endplate_ext_7.isChecked():
+        elif self.ui.rdbtn_bb_endplate.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2,BeamEndPlate)
@@ -305,6 +306,43 @@ class OsdagMainWindow(QMainWindow):
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
             # self.window.show()
             # self.window.closed.connect(self.show)
+
+    def show_moment_connection_cc(self):
+        folder = self.select_workspace_folder()
+        folder = str(folder)
+        if not os.path.exists(folder):
+            if folder == '':
+                pass
+            else:
+                os.mkdir(folder, 0o755)
+
+        root_path = folder
+        images_html_folder = ['images_html']
+        flag = True
+        for create_folder in images_html_folder:
+            if root_path == '':
+                flag = False
+                return flag
+            else:
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder))
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder))
+
+        if self.ui.rdbtn_cc_coverplate_bolted.isChecked() or self.ui.rdbtn_cc_coverplate_welded.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, ColumnCoverPlate)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
+        elif self.ui.rdbtn_cc_endplate.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, ColumnEndPlate)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
 
 
 

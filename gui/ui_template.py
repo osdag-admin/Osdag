@@ -520,12 +520,18 @@ class Ui_ModuleWindow(QMainWindow):
             #         key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
         new_list = main.customized_input(main)
         data = {}
+
         # CUSTOMIZED_LIST = [KEY_PLATETHK,KEY_GRD,KEY_D,KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS]
         for t in new_list:
-            if t[0] in [KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS,KEY_PLATETHK,KEY_ENDPLATE_THICKNESS]:
+
+            if t[0] in [KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS,KEY_PLATETHK, KEY_ENDPLATE_THICKNESS]:
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
+            # elif t[0] == KEY_ENDPLATE_THICKNESS:
+            #     key_customized_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+            #     key_customized_5.activated.connect(lambda: popup(key_customized_5, new_list))
+            #     data[t[0] + "_customized"] = t[1]()
             elif t[0] == KEY_GRD:
                 key_customized_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_2.activated.connect(lambda: popup(key_customized_2, new_list))

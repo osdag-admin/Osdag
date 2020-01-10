@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1116</width>
+    <width>1462</width>
     <height>857</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <string>Osdag</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
+   <iconset>
     <normaloff>:/newPrefix/images/Osdag.png</normaloff>:/newPrefix/images/Osdag.png</iconset>
   </property>
   <property name="styleSheet">
@@ -782,15 +782,6 @@ color:#ffffff;
            </color>
           </brush>
          </colorrole>
-         <colorrole role="PlaceholderText">
-          <brush brushstyle="NoBrush">
-           <color alpha="128">
-            <red>255</red>
-            <green>255</green>
-            <blue>255</blue>
-           </color>
-          </brush>
-         </colorrole>
         </active>
         <inactive>
          <colorrole role="WindowText">
@@ -865,15 +856,6 @@ color:#ffffff;
            </color>
           </brush>
          </colorrole>
-         <colorrole role="PlaceholderText">
-          <brush brushstyle="NoBrush">
-           <color alpha="128">
-            <red>255</red>
-            <green>255</green>
-            <blue>255</blue>
-           </color>
-          </brush>
-         </colorrole>
         </inactive>
         <disabled>
          <colorrole role="WindowText">
@@ -942,15 +924,6 @@ color:#ffffff;
          <colorrole role="HighlightedText">
           <brush brushstyle="SolidPattern">
            <color alpha="255">
-            <red>255</red>
-            <green>255</green>
-            <blue>255</blue>
-           </color>
-          </brush>
-         </colorrole>
-         <colorrole role="PlaceholderText">
-          <brush brushstyle="NoBrush">
-           <color alpha="128">
             <red>255</red>
             <green>255</green>
             <blue>255</blue>
@@ -1049,7 +1022,7 @@ color:#ffffff;
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="Osdagpage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -1077,7 +1050,7 @@ color:#ffffff;
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="ResourceFiles/osdagMainPageIcons.qrc">:/newPrefix/images/Osdag_header.png</pixmap>
+           <pixmap>:/newPrefix/images/Osdag_header.png</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -1169,7 +1142,7 @@ color:#ffffff;
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="ResourceFiles/osdagMainPageIcons.qrc">:/newPrefix/images/Fossee_logo.png</pixmap>
+           <pixmap>:/newPrefix/images/Fossee_logo.png</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -1194,7 +1167,7 @@ color:#ffffff;
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="ResourceFiles/osdagMainPageIcons.qrc">:/newPrefix/images/logoiitb.png</pixmap>
+           <pixmap>:/newPrefix/images/logoiitb.png</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -1391,7 +1364,7 @@ border-bottom-right-radius: 0px ;
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>ResourceFiles/images/finplate.png</normaloff>ResourceFiles/images/finplate.png</iconset>
+                  <normaloff>../ResourceFiles/images/finplate.png</normaloff>../ResourceFiles/images/finplate.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -1490,7 +1463,7 @@ border-bottom-right-radius: 0px ;
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>ResourceFiles/images/cleatAngle.png</normaloff>ResourceFiles/images/cleatAngle.png</iconset>
+                  <normaloff>../ResourceFiles/images/cleatAngle.png</normaloff>../ResourceFiles/images/cleatAngle.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -1591,7 +1564,7 @@ border-bottom-right-radius: 0px ;
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>ResourceFiles/images/endplate.png</normaloff>ResourceFiles/images/endplate.png</iconset>
+                  <normaloff>../ResourceFiles/images/endplate.png</normaloff>../ResourceFiles/images/endplate.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -1660,8 +1633,8 @@ border-bottom-right-radius: 0px ;
                  <string/>
                 </property>
                 <property name="icon">
-                 <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
-                  <normaloff>:/newPrefix/images/seatedAngle1.png</normaloff>:/newPrefix/images/seatedAngle1.png</iconset>
+                 <iconset>
+                  <normaloff>../ResourceFiles/images/seatedAngle1.png</normaloff>../ResourceFiles/images/seatedAngle1.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -1729,7 +1702,7 @@ border-bottom-right-radius: 0px ;
              </spacer>
             </item>
             <item row="4" column="4">
-             <widget class="QPushButton" name="btn_start">
+             <widget class="QPushButton" name="btn_shearconnection_start">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -1905,12 +1878,12 @@ border-bottom-right-radius: 0px ;
                      </font>
                     </property>
                     <property name="text">
-                     <string>Cover Plate Connection</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cover Plate Bolted&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QRadioButton" name="rdbtn_coverplate_7">
+                   <widget class="QRadioButton" name="rdbtn_bb_coverplate_bolted">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                       <horstretch>0</horstretch>
@@ -1930,8 +1903,8 @@ border-bottom-right-radius: 0px ;
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
-                      <normaloff>:/newPrefix/images/coverplate.png</normaloff>:/newPrefix/images/coverplate.png</iconset>
+                     <iconset>
+                      <normaloff>../ResourceFiles/images/coverplate.png</normaloff>../ResourceFiles/images/coverplate.png</iconset>
                     </property>
                     <property name="iconSize">
                      <size>
@@ -1968,12 +1941,12 @@ border-bottom-right-radius: 0px ;
                      </font>
                     </property>
                     <property name="text">
-                     <string>End Plate Connection</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cover Plate Welded&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QRadioButton" name="rdbtn_endplate_ext_7">
+                   <widget class="QRadioButton" name="rdbtn_bb_coverplate_welded">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                       <horstretch>0</horstretch>
@@ -1993,8 +1966,8 @@ border-bottom-right-radius: 0px ;
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
-                      <normaloff>:/newPrefix/images/extended.png</normaloff>:/newPrefix/images/extended.png</iconset>
+                     <iconset>
+                      <normaloff>../ResourceFiles/images/coverplate.png</normaloff>../ResourceFiles/images/coverplate.png</iconset>
                     </property>
                     <property name="iconSize">
                      <size>
@@ -2007,7 +1980,7 @@ border-bottom-right-radius: 0px ;
                  </layout>
                 </item>
                 <item row="2" column="2">
-                 <widget class="QPushButton" name="btn_start_2">
+                 <widget class="QPushButton" name="btn_momentconnection_bb_start">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                     <horstretch>0</horstretch>
@@ -2148,6 +2121,69 @@ color:#ffffff;
                   </property>
                  </spacer>
                 </item>
+                <item row="1" column="1">
+                 <layout class="QVBoxLayout" name="verticalLayout_54">
+                  <property name="leftMargin">
+                   <number>10</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>6</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>10</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>6</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_68">
+                    <property name="font">
+                     <font>
+                      <family>Arial</family>
+                      <pointsize>12</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;End Plate Connection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="rdbtn_bb_endplate">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Arial</family>
+                      <pointsize>12</pointsize>
+                     </font>
+                    </property>
+                    <property name="layoutDirection">
+                     <enum>Qt::LeftToRight</enum>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>../ResourceFiles/images/endplate.png</normaloff>../ResourceFiles/images/endplate.png</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>300</width>
+                      <height>300</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
                </layout>
               </widget>
               <widget class="QWidget" name="tab_beamtocolumn">
@@ -2206,7 +2242,7 @@ color:#ffffff;
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>ResourceFiles/images/beam_column_endplate.png</normaloff>ResourceFiles/images/beam_column_endplate.png</iconset>
+                      <normaloff>../ResourceFiles/images/beam_column_endplate.png</normaloff>../ResourceFiles/images/beam_column_endplate.png</iconset>
                     </property>
                     <property name="iconSize">
                      <size>
@@ -2258,7 +2294,7 @@ color:#ffffff;
                  </spacer>
                 </item>
                 <item row="3" column="1">
-                 <widget class="QPushButton" name="btn_start_3">
+                 <widget class="QPushButton" name="btn_momentconnection_bc_start">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                     <horstretch>0</horstretch>
@@ -2340,131 +2376,258 @@ color:#ffffff;
                <attribute name="title">
                 <string>Column To Column</string>
                </attribute>
-               <widget class="QWidget" name="gridLayoutWidget">
+               <widget class="QWidget" name="layoutWidget">
                 <property name="geometry">
                  <rect>
-                  <x>29</x>
-                  <y>20</y>
-                  <width>760</width>
-                  <height>353</height>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>100</width>
+                  <height>30</height>
                  </rect>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_6">
-                 <item row="2" column="6">
-                  <widget class="QLabel" name="label_13">
-                   <property name="font">
-                    <font>
-                     <family>Arial</family>
-                     <pointsize>12</pointsize>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="1">
-                  <spacer name="verticalSpacer_12">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="2" column="0">
-                  <spacer name="horizontalSpacer_27">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="6" column="1">
-                  <spacer name="verticalSpacer_7">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="2" column="2">
-                  <layout class="QHBoxLayout" name="horizontalLayout_6"/>
-                 </item>
-                 <item row="5" column="1">
-                  <widget class="QRadioButton" name="rdbtn_coverplate">
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="icon">
-                    <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
-                     <normaloff>:/newPrefix/images/coverplate.png</normaloff>:/newPrefix/images/coverplate.png</iconset>
-                   </property>
-                   <property name="iconSize">
-                    <size>
-                     <width>275</width>
-                     <height>230</height>
-                    </size>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QLabel" name="label_8">
-                   <property name="text">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Cover Plate Connection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="textFormat">
-                    <enum>Qt::AutoText</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="4">
-                  <widget class="QLabel" name="rdbtn_endplate_2">
-                   <property name="text">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;End Plate Connection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="4">
-                  <widget class="QRadioButton" name="rdb_endplate">
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="icon">
-                    <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
-                     <normaloff>:/newPrefix/images/endplate.png</normaloff>:/newPrefix/images/endplate.png</iconset>
-                   </property>
-                   <property name="iconSize">
-                    <size>
-                     <width>283</width>
-                     <height>273</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="2">
-                  <widget class="QPushButton" name="cc_Start">
-                   <property name="styleSheet">
-                    <string notr="true">QPushButton::hover
+                <layout class="QHBoxLayout" name="horizontalLayout_6"/>
+               </widget>
+               <widget class="QLabel" name="label_13">
+                <property name="geometry">
+                 <rect>
+                  <x>780</x>
+                  <y>21</y>
+                  <width>16</width>
+                  <height>20</height>
+                 </rect>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>12</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_70">
+                <property name="geometry">
+                 <rect>
+                  <x>610</x>
+                  <y>10</y>
+                  <width>327</width>
+                  <height>20</height>
+                 </rect>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>12</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cover Plate Welded&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rdbtn_cc_coverplate_welded">
+                <property name="geometry">
+                 <rect>
+                  <x>620</x>
+                  <y>40</y>
+                  <width>327</width>
+                  <height>211</height>
+                 </rect>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../ResourceFiles/images/coverplate.png</normaloff>../ResourceFiles/images/coverplate.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>300</width>
+                  <height>300</height>
+                 </size>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_69">
+                <property name="geometry">
+                 <rect>
+                  <x>50</x>
+                  <y>10</y>
+                  <width>327</width>
+                  <height>20</height>
+                 </rect>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>12</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cover Plate Bolted&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rdbtn_cc_coverplate_bolted">
+                <property name="geometry">
+                 <rect>
+                  <x>60</x>
+                  <y>40</y>
+                  <width>361</width>
+                  <height>211</height>
+                 </rect>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../ResourceFiles/images/coverplate.png</normaloff>../ResourceFiles/images/coverplate.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>300</width>
+                  <height>300</height>
+                 </size>
+                </property>
+               </widget>
+               <widget class="QLabel" name="label_71">
+                <property name="geometry">
+                 <rect>
+                  <x>60</x>
+                  <y>260</y>
+                  <width>327</width>
+                  <height>20</height>
+                 </rect>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>12</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;End Plate Connection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rdbtn_cc_endplate">
+                <property name="geometry">
+                 <rect>
+                  <x>60</x>
+                  <y>280</y>
+                  <width>327</width>
+                  <height>231</height>
+                 </rect>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../ResourceFiles/images/endplate.png</normaloff>../ResourceFiles/images/endplate.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>300</width>
+                  <height>300</height>
+                 </size>
+                </property>
+               </widget>
+               <widget class="QPushButton" name="btn_momentconnection_cc_start">
+                <property name="geometry">
+                 <rect>
+                  <x>430</x>
+                  <y>510</y>
+                  <width>190</width>
+                  <height>30</height>
+                 </rect>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>190</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>190</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>11</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::TabFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Enter</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton::hover
 {
    background-color: #d97f7f;
    color:#000000 ;
@@ -2475,26 +2638,22 @@ QPushButton
 background-color: #925a5b;
 color:#ffffff;
 }</string>
-                   </property>
-                   <property name="text">
-                    <string>Start</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="5">
-                  <spacer name="horizontalSpacer_28">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
+                </property>
+                <property name="text">
+                 <string>Start</string>
+                </property>
+                <property name="shortcut">
+                 <string>Return</string>
+                </property>
+                <property name="checkable">
+                 <bool>false</bool>
+                </property>
+                <property name="autoExclusive">
+                 <bool>false</bool>
+                </property>
+                <property name="autoDefault">
+                 <bool>true</bool>
+                </property>
                </widget>
               </widget>
               <widget class="QWidget" name="tab_PEB">
@@ -2806,7 +2965,7 @@ color:#ffffff;
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
+            <iconset>
              <normaloff>:/newPrefix/images/beam_column_endplate.png</normaloff>:/newPrefix/images/beam_column_endplate.png</iconset>
            </property>
            <property name="iconSize">
@@ -2835,7 +2994,7 @@ color:#ffffff;
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
+            <iconset>
              <normaloff>:/newPrefix/images/finplate.png</normaloff>
              <disabledoff>:/newPrefix/images/finplate.png</disabledoff>:/newPrefix/images/finplate.png</iconset>
            </property>
@@ -2890,8 +3049,8 @@ color:#ffffff;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1116</width>
-     <height>26</height>
+     <width>1462</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>

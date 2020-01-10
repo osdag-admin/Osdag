@@ -35,6 +35,7 @@ from utils.common.component import *
 from .customized_popup import Ui_Popup
 from .ui_design_preferences import Ui_Dialog
 from .ui_design_preferences import DesignPreferences
+from design_type.connection.shear_connection import ShearConnection
 
 
 
@@ -651,6 +652,48 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(75)
         self.outputDock.setFont(font)
         self.outputDock.setObjectName("outputDock")
+        self.dockWidgetContents_out = QtWidgets.QWidget()
+        self.dockWidgetContents_out.setObjectName("dockWidgetContents_out")
+        out_list = main.output_values(main, DESIGN_FLAG)
+        _translate = QtCore.QCoreApplication.translate
+
+        i = 0
+        for option in out_list:
+            lable = option[1]
+            type = option[2]
+            # value = option[4]
+            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
+                l = QtWidgets.QLabel(self.dockWidgetContents_out)
+                l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                l.setFont(font)
+                l.setObjectName(option[0] + "_label")
+                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+
+            if type == TYPE_TEXTBOX:
+                r = QtWidgets.QLineEdit(self.dockWidgetContents_out)
+                r.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                r.setFont(font)
+                r.setObjectName(option[0])
+
+            if type == TYPE_TITLE:
+                q = QtWidgets.QLabel(self.dockWidgetContents_out)
+                q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
+                font = QtGui.QFont()
+                q.setFont(font)
+                q.setObjectName("_title")
+                q.setText(_translate("MainWindow",
+                                     "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
+            i = i + 30
+
+        self.outputDock.setWidget(self.dockWidgetContents_out)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
 
         self.actionInput = QtWidgets.QAction(MainWindow)
@@ -1060,6 +1103,19 @@ class Ui_ModuleWindow(QMainWindow):
             self.pass_d(main, self.design_inputs)
             main.set_input_values(main, self.design_inputs)
             main.get_bolt_details(main)
+            DESIGN_FLAG = 'True'
+            out_list = main.output_values(main, DESIGN_FLAG)
+            for option in out_list:
+                if option[2] == TYPE_TEXTBOX:
+                    txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+                    print(txt)
+                    print(option[3])
+                    txt.setText(str(option[3]))
+
+
+
+            # key = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, KEY_OUT_PLATE_HEIGHT)
+            # key.setText(str(l[0].length))
 
 
     def generate_missing_fields_error_string(self, missing_fields_list):

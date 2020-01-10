@@ -234,11 +234,12 @@ KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
-DISP_TITLE_ENDPLATE = 'end plate'
+DISP_TITLE_ENDPLATE = 'End plate'
 
 KEY_ENDPLATE_THICKNESS = 'Plate.end_plate.Thickness'
 KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_ENDPLATE_THICKNESS = ['All', 'Customized']
+VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20']
 
 DISP_TITLE_PLATE = 'Plate'
 

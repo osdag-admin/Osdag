@@ -1,9 +1,13 @@
 from design_type.connection.shear_connection import ShearConnection
+
+from utils.common.component import Bolt, Plate, Weld
+# from gui.ui_summary_popup import Ui_Dialog
 from utils.common.component import *
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
 import yaml
+from design_report.reportGenerator import save_html
 import os
 import shutil
 import logging
@@ -14,8 +18,12 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
 import pickle
+import pdfkit
+import configparser
+import cairosvg
+
 
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
@@ -73,8 +81,59 @@ module_setup()
 #     logger.addHandler(fh)
 
 
+def desired_location(self, filename, base_type):
+    if base_type == ".svg":
+        cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html",
+                                                                  "cmpylogoExtendEndplate.svg"))
+    else:
+        shutil.copyfile(filename,
+                        os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
+
+def saveUserProfile(self):
+    inputData = self.get_report_summary()
+    filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+                                              os.path.join(str(self.maincontroller.folder), "Profile"), '*.txt')
+    if filename == '':
+        flag = False
+        return flag
+    else:
+        infile = open(filename, 'w')
+        pickle.dump(inputData, infile)
+        infile.close()
+
+
+def getPopUpInputs(self):
+    input_summary = {}
+    input_summary["ProfileSummary"] = {}
+    input_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
+    input_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
+    input_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
+    input_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
+
+    input_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
+    input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
+    input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
+    input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
+    input_summary["Client"] = str(self.ui.lineEdit_client.text())
+
+
+def useUserProfile(self):
+    filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+                                              os.path.join(str(self.maincontroller.folder), "Profile"),
+                                              "All Files (*)")
+    if os.path.isfile(filename):
+        outfile = open(filename, 'r')
+        reportsummary = pickle.load(outfile)
+        self.ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
+        self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
+        self.ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
+        self.ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
+    else:
+        pass
+
 
 class FinPlateConnection(ShearConnection):
+
 
     def __init__(self):
         super(FinPlateConnection, self).__init__()
@@ -210,7 +269,6 @@ class FinPlateConnection(ShearConnection):
 
         return out_list
 
-
     def warn_text(self,key, my_d):
         old_col_section = get_oldcolumncombolist()
         old_beam_section = get_oldbeamcombolist()
@@ -294,6 +352,7 @@ class FinPlateConnection(ShearConnection):
         print(self.supporting_section)
         print(self.supported_section)
         print(self.load)
+
 #        print(Plate.design_status)
         if self.plate.design_status == False:
             # del_data = open('logging_text.log', 'w')
@@ -315,6 +374,8 @@ class FinPlateConnection(ShearConnection):
             print(self.plate)
 
 
+
 #
 # with open("filename", 'w') as out_file:
 #     yaml.dump(fin_plate_input, out_file)
+

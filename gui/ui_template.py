@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
 from PyQt5 import QtCore, QtGui, QtWidgets
+from design_report import reportGenerator
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp
@@ -17,7 +18,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
 from PyQt5.QtGui import QStandardItem
 import os
 import yaml
@@ -28,15 +29,22 @@ import sys
 import sqlite3
 import shutil
 import openpyxl
+import pdfkit
+import configparser
+import pickle
+import cairosvg
 
 from Common import *
 from utils.common.component import Section,I_sectional_Properties
 from utils.common.component import *
 from .customized_popup import Ui_Popup
+# from .ui_summary_popup import Ui_Dialog1
 from .ui_design_preferences import Ui_Dialog
+
+from gui.ui_summary_popup import Ui_Dialog1
+from design_report.reportGenerator import save_html
 from .ui_design_preferences import DesignPreferences
 from design_type.connection.shear_connection import ShearConnection
-
 
 
 class Ui_ModuleWindow(QMainWindow):
@@ -50,6 +58,176 @@ class Ui_ModuleWindow(QMainWindow):
         #self.ui.pushButton_5.clicked.connect(self.window.close)
         self.window.exec()
         return self.ui.get_right_elements()
+    @pyqtSlot()
+    def open_summary_popup(self):
+        self.new_window = QtWidgets.QDialog()
+        self.new_ui = Ui_Dialog1()
+        self.new_ui.setupUi(self.new_window)
+        self.new_window.exec()
+        self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_ui.lbl_browse))
+        self.new_ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
+        self.new_ui.btn_useProfile.clicked.connect(self.useUserProfile)
+        # self.new_ui.buttonBox.clicked.connect(self.save_inputSummary)
+        # buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, self)
+        # buttons.accepted.connect(self.save_inputSummary)
+        # # self.new_ui.buttonBox.accepted.connect(self.save_inputSummary)
+
+    # def save_inputSummary(self):
+    #     input_summary = self.getPopUpInputs()
+    #     self.save_design(input_summary)
+    #
+    # def call_designreport(self, fileName, report_summary, folder):
+    #     self.alist = {'Designation': 'MB 500', 'Mass': 86.9, 'Area': 111.0, 'D': 500.0, 'B': 180.0, 'tw': 10.2,
+    #                   'T': 17.2, 'FlangeSlope': 98, 'R1': 17.0, 'R2': 8.5, 'Iz': 45228.0, 'Iy': 1320.0, 'rz': 20.2,
+    #                   'ry': 3.5, 'Zz': 1809.1, 'Zy': 147.0, 'Zpz': 2074.8, 'Zpy': 266.7, 'Source': 'IS808_Rev',
+    #                   'Bolt': {'Diameter (mm)': '24', 'Grade': '8.8', 'Type': 'Friction Grip Bolt'},
+    #                   'Weld': {'Size (mm)': '12'},
+    #                   'Member': {'BeamSection': 'MB 500', 'ColumSection': 'UC 305 x 305 x 97',
+    #                              'Connectivity': 'Column flange-Beam web', 'fu (MPa)': '410', 'fy (MPa)': '250'},
+    #                   'Plate': {'Thickness (mm)': '12', 'Height (mm)': '', 'Width (mm)': ''},
+    #                   'Load': {'ShearForce (kN)': '140'}, 'Connection': 'Finplate',
+    #                   'bolt': {'bolt_hole_type': 'Standard', 'bolt_hole_clrnce': 2, 'bolt_fu': 800.0,
+    #                            'slip_factor': 0.3},
+    #                   'weld': {'typeof_weld': 'Shop weld', 'safety_factor': 1.25, 'fu_overwrite': '410'},
+    #                   'detailing': {'typeof_edge': 'a - Sheared or hand flame cut', 'min_edgend_dist': 1.7, 'gap': 10.0,
+    #                                 'is_env_corrosive': 'No'}, 'design': {'design_method': 'Limit State Design'}}
+    #     self.result = {
+    #         'Bolt': {'status': True, 'shearcapacity': 47.443, 'bearingcapacity': 'N/A', 'boltcapacity': 47.443,
+    #                  'numofbolts': 3, 'boltgrpcapacity': 142.33, 'numofrow': 3, 'numofcol': 1, 'pitch': 96.0,
+    #                  'edge': 54.0, 'enddist': 54.0, 'gauge': 0.0, 'bolt_fu': 800.0, 'bolt_dia': 24, 'k_b': 0.519,
+    #                  'beam_w_t': 10.2, 'web_plate_t': 12.0, 'beam_fu': 410.0, 'shearforce': 140.0, 'dia_hole': 26},
+    #         'Weld': {'thickness': 10, 'thicknessprovided': 12.0, 'resultantshear': 434.557, 'weldstrength': 1590.715,
+    #                  'weld_fu': 410.0, 'effectiveWeldlength': 276.0},
+    #         'Plate': {'minHeight': 300.0, 'minWidth': 118.0, 'plateedge': 64.0, 'externalmoment': 8.96,
+    #                   'momentcapacity': 49.091, 'height': 300.0, 'width': 118.0, 'blockshear': 439.837,
+    #                   'web_plate_fy': 250.0, 'platethk': 12.0, 'beamdepth': 500.0, 'beamrootradius': 17.0,
+    #                   'colrootradius': 15.2, 'beamflangethk': 17.2, 'colflangethk': 15.4}}
+    #     # print("resultobj", self.result)
+    #     # self.column_data = self.fetchColumnPara()
+    #     # self.beam_data = self.fetchBeamPara()
+    #     save_html(self.result, self.alist, fileName, report_summary, folder)
+    #
+    # def save_design(self, popup_summary):
+    #     # status = self.resultObj['Bolt']['status']
+    #     # if status is True:
+    #     #     self.call_3DModel("white_bg")
+    #     #     data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+    #     #     self.display.ExportToImage(data)
+    #     #     self.display.FitAll()
+    #     # else:
+    #     #     pass
+    #
+    #
+    #     folder = self.select_workspace_folder()
+    #     self.folder = str(folder)
+    #     fileName = os.path.join(self.folder, "images_html", "Html_Report.html")
+    #     fileName = str(fileName)
+    #     # self.commLogicObj.call_designReport(fileName, popup_summary)
+    #     self.call_designreport(fileName, popup_summary,self.folder)
+    #
+    #     config = configparser.ConfigParser()
+    #     config.readfp(open(r'Osdag.config'))
+    #     wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+    #     # Creates pdf
+    #
+    #     config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
+    #
+    #     options = {
+    #         'margin-bottom': '10mm',
+    #         'footer-right': '[page]'
+    #     }
+    #     file_type = "PDF (*.pdf)"
+    #     fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
+    #     fname = str(fname)
+    #     flag = True
+    #     if fname == '':
+    #         flag = False
+    #         return flag
+    #     else:
+    #         pdfkit.from_file(fileName, fname, configuration=config, options=options)
+    #         QMessageBox.about(self, 'Information', "Report Saved")
+    #
+    # def select_workspace_folder(self):
+    #     # This function prompts the user to select the workspace folder and returns the name of the workspace folder
+    #     config = configparser.ConfigParser()
+    #     config.read_file(open(r'Osdag.config'))
+    #     desktop_path = config.get("desktop_path", "path1")
+    #     folder = QFileDialog.getExistingDirectory(self,
+    #                                               "Select Workspace Folder (Don't use spaces in the folder name)",
+    #                                               desktop_path)
+    #     return folder
+
+    def getLogoFilePath(self, lblwidget):
+
+        self.new_ui.lbl_browse.clear()
+        filename, _ = QFileDialog.getOpenFileName(
+            self, 'Open File', " ../../",
+            'Images (*.png *.svg *.jpg)',
+            None, QFileDialog.DontUseNativeDialog)
+        flag = True
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            base = os.path.basename(str(filename))
+            lblwidget.setText(base)
+            base_type = base[-4:]
+            self.desired_location(filename, base_type)
+
+        return str(filename)
+
+    def desired_location(self, filename, base_type):
+        if base_type == ".svg":
+            cairosvg.svg2png(file_obj=filename,
+                             write_to=os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
+        else:
+            shutil.copyfile(filename, os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
+
+    def saveUserProfile(self):
+
+        flag = True
+        inputData = self.getPopUpInputs()
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+                                                  os.path.join(str(self.folder), "Profile"), '*.txt')
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            infile = open(filename, 'w')
+            pickle.dump(inputData, infile)
+            infile.close()
+
+    def getPopUpInputs(self):
+        input_summary = {}
+        input_summary["ProfileSummary"] = {}
+        input_summary["ProfileSummary"]["CompanyName"] = str(self.new_ui.lineEdit_companyName.text())
+        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.new_ui.lbl_browse.text())
+        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.new_ui.lineEdit_groupName.text())
+        input_summary["ProfileSummary"]["Designer"] = str(self.new_ui.lineEdit_designer.text())
+
+        input_summary["ProjectTitle"] = str(self.new_ui.lineEdit_projectTitle.text())
+        input_summary["Subtitle"] = str(self.new_ui.lineEdit_subtitle.text())
+        input_summary["JobNumber"] = str(self.new_ui.lineEdit_jobNumber.text())
+        input_summary["AdditionalComments"] = str(self.new_ui.txt_additionalComments.toPlainText())
+        input_summary["Client"] = str(self.new_ui.lineEdit_client.text())
+
+        return input_summary
+
+    def useUserProfile(self):
+
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+                                                  os.path.join(str(self.folder), "Profile"),
+                                                  '*.txt')
+        if os.path.isfile(filename):
+            outfile = open(filename, 'r')
+            reportsummary = pickle.load(outfile)
+            self.new_ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
+            self.new_ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
+            self.new_ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
+            self.new_ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
+
+        else:
+            pass
 
     def setupUi(self, MainWindow, main):
         MainWindow.setObjectName("MainWindow")
@@ -384,6 +562,26 @@ class Ui_ModuleWindow(QMainWindow):
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Link, brush)
+        self.outputDock = QtWidgets.QDockWidget(MainWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.outputDock.sizePolicy().hasHeightForWidth())
+        self.outputDock.setSizePolicy(sizePolicy)
+        self.outputDock.setMinimumSize(QtCore.QSize(320, 710))
+        self.outputDock.setMaximumSize(QtCore.QSize(310, 710))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(11)
+        font.setBold(True)
+        font.setWeight(75)
+        self.outputDock.setFont(font)
+        self.outputDock.setObjectName("outputDock")
+
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        font.setBold(False)
+        font.setWeight(50)
 
         option_list = main.input_values(self)
         _translate = QtCore.QCoreApplication.translate
@@ -476,16 +674,6 @@ class Ui_ModuleWindow(QMainWindow):
         #     sh = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
-
-            # v = ''
-            # if option[0] == KEY_SUPTNGSEC:
-            #     v = "Columns"
-            #     red_list = connect_for_red(v)
-            #     # print(red_list)
-            #
-            #     for value in red_list:
-            #         indx = option[4].index(str(value))
-            #         key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
             if option[0] in [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]:
                 red_list = []
@@ -642,6 +830,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.inputDock.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.inputDock)
 
+
         self.outputDock = QtWidgets.QDockWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
 
@@ -701,6 +890,11 @@ class Ui_ModuleWindow(QMainWindow):
 
         self.outputDock.setWidget(self.dockWidgetContents_out)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
+        self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_out)
+        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 600, 200, 30))
+        self.btn_CreateDesign.setAutoDefault(True)
+        self.btn_CreateDesign.setObjectName("btn_CreateDesign")
+        self.btn_CreateDesign.clicked.connect(self.open_summary_popup)
 
         self.actionInput = QtWidgets.QAction(MainWindow)
         icon7 = QtGui.QIcon()
@@ -897,7 +1091,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(self)
         self.designPrefDialog.rejected.connect(self.design_preferences)
-
 
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
         self.actionfinPlate_quit.setObjectName("actionfinPlate_quit")
@@ -1229,7 +1422,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setShortcut(_translate("MainWindow", "Alt+D"))
 
         self.outputDock.setWindowTitle(_translate("MainWindow", "Output dock"))
-
+        self.btn_CreateDesign.setText(_translate("MainWindow", "Create design report"))
         self.actionInput.setText(_translate("MainWindow", "Input"))
         self.actionInput.setToolTip(_translate("MainWindow", "Input browser"))
         self.actionInputwindow.setText(_translate("MainWindow", "inputwindow"))
@@ -1387,6 +1580,9 @@ class Ui_ModuleWindow(QMainWindow):
     #     key_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
     #     material_grade = key_2.currentText()
     #     self.designPrefDialog.beam_preferences(designation, material_grade)
+
+    def create_design_report(self):
+        self.create_report.show()
 
     def closeEvent(self, event):
         '''

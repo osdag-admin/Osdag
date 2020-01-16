@@ -1145,19 +1145,25 @@ class Ui_ModuleWindow(QMainWindow):
         self.action_save_input.triggered.connect(lambda: self.validateInputsOnDesignBtn(main, data,"Save"))
         self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main, data,"Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
-        self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list))
+        self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
 
     def reset_popup(self, new_list, data):
         for custom_combo in new_list:
             data[custom_combo[0] + "_customized"] = custom_combo[1]()
 
-    def reset_fn(self, op_list):
+    def reset_fn(self, op_list, out_list):
         for op in op_list:
             widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
             if op[2] == TYPE_COMBOBOX or op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 widget.setCurrentIndex(0)
             elif op[2] == TYPE_TEXTBOX:
+                widget.setText('')
+            else:
+                pass
+        for out in out_list:
+            widget = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, out[0])
+            if out[2] == TYPE_TEXTBOX:
                 widget.setText('')
             else:
                 pass

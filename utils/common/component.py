@@ -185,6 +185,14 @@ class Section(Material):
         self.plast_sec_mod_y = 0.0
         self.source = 0.0
 
+        self.tension_yielding_capacity = 0.0
+        self.tension_rupture_capacity = 0.0
+        self.shear_yielding_capacity = 0.0
+        self.shear_rupture_capacity = 0.0
+
+        self.block_shear_capacity_axial = 0.0
+        self.block_shear_capacity_shear = 0.0
+
     def connect_to_database_update_other_attributes(self, table, designation):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
@@ -271,6 +279,7 @@ class Plate(Bolt):
         self.length = length
         self.gap = float(gap)
         self.moment_demand = 0.0
+        self.thickness_provided = 0.0
         self.pitch_provided = 0.0
         self.gauge_provided = 0.0
         self.edge_dist_provided = 0.0
@@ -510,7 +519,7 @@ class Plate(Bolt):
 
     def __repr__(self):
         repr = "Plate\n"
-        repr += "Thickness: {}\n".format(self.thickness)
+        repr += "Thickness Provided: {}\n".format(self.thickness_provided)
         repr += "Height: {}\n".format(self.height)
         repr += "Length: {}\n".format(self.length)
         repr += "Bolt Lines: {}\n".format(self.bolt_line)

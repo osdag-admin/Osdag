@@ -448,14 +448,14 @@ class ColumnCoverPlate(MomentConnection):
             #### Block shear capacity of web plate ###
                 while self.web_plate.max_spacing_round >= self.web_plate.pitch_provided:
                     #print(self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
-                    Avg = (self.web_plate.edge_dist_provided + (
+                    Atg = (self.web_plate.edge_dist_provided + (
                                 self.web_plate.bolts_one_line - 1) * self.web_plate.gauge_provided) * self.web_plate.thickness_provided
-                    Avn = (self.web_plate.edge_dist_provided + (
+                    Atn = (self.web_plate.edge_dist_provided + (
                                 self.web_plate.bolts_one_line - 1) * self.web_plate.gauge_provided - (
                                    self.web_plate.bolts_one_line - 0.5) * self.web_plate.dia_hole) * self.web_plate.thickness_provided
-                    Atg = ((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided + self.web_plate.end_dist_provided) * \
+                    Avg= ((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided + self.web_plate.end_dist_provided) * \
                           self.web_plate.thickness_provided
-                    Atn = ((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided + (
+                    Avn = ((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided + (
                                 self.web_plate.bolt_line - 1) * self.web_plate.dia_hole + self.web_plate.end_dist_provided) * \
                           self.web_plate.thickness_provided
                     # print(self.web_plate.bolt_line, self.web_plate.pitch_provided, self.web_plate.bolt_line,
@@ -475,7 +475,7 @@ class ColumnCoverPlate(MomentConnection):
                         design_status = True
                         break
             else:
-                pass
+                break
 
     #     self.section.shear_yielding_capacity =self.tension_member_design_due_to_yielding_of_gross_section(
     #         A_v=A_v_web,

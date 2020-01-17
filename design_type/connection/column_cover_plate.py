@@ -257,13 +257,13 @@ class ColumnCoverPlate(MomentConnection):
                     (self.flange_plate.bolts_one_line - 1) * self.flange_plate.gauge_provided)
                    - (self.flange_plate.bolts_one_line - 1) * self.flange_plate.dia_hole) * \
                   self.section.flange_thickness
-            print(Avg, Avn, Atg, Atn)
-            print(8, self.flange_plate.bolt_line, pitch, end_dist)
+            # print(Avg, Avn, Atg, Atn)
+            # print(8, self.flange_plate.bolt_line, pitch, end_dist)
 
             self.section.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg, A_tn=Atn,
                                                                                   f_u=self.flange_plate.fu,
                                                                                   f_y=self.flange_plate.fy)
-            print(9,  self.flange_plate.block_shear_capacity, self.load.axial_force, self.flange_plate.pitch_provided)
+            # print(9,  self.flange_plate.block_shear_capacity, self.load.axial_force, self.flange_plate.pitch_provided)
 
             if self.flange_plate.block_shear_capacity < self.load.axial_force:
                 if self.flange_plate.max_spacing_round >= pitch + 5 and self.flange_plate.max_end_dist >= end_dist + 5:  # increase thickness todo
@@ -281,7 +281,7 @@ class ColumnCoverPlate(MomentConnection):
             else:
                 design_status_block_shear = True
                 break
-        print("A", design_status_block_shear)
+        # print("A", design_status_block_shear)
         # if design_status_block_shear is True:
         #     break
 
@@ -366,10 +366,10 @@ class ColumnCoverPlate(MomentConnection):
                     else:
                         design_status_block_shear = True
                         break
-                print(design_status_block_shear)
+                # print(design_status_block_shear)
                 if design_status_block_shear is True:
                     break
-            print(design_status_block_shear)
+            # print(design_status_block_shear)
             # self.flange_plate.end_dist_provided = end_dist
             # self.flange_plate.gauge_provided = gauge
             # self.flange_plate.pitch_provided = pitch
@@ -481,10 +481,10 @@ class ColumnCoverPlate(MomentConnection):
                     else:
                         design_status_block_shear = True
                         break
-                print(design_status_block_shear)
+                # print(design_status_block_shear)
                 if design_status_block_shear is True:
                     break
-            print(design_status_block_shear)
+            # print(design_status_block_shear)
             # self.flange_plate.end_dist_provided = end_dist
             # self.flange_plate.gauge_provided = gauge
             # self.flange_plate.pitch_provided = pitch
@@ -526,7 +526,7 @@ class ColumnCoverPlate(MomentConnection):
 
         ################################ CAPACITY CHECK FOR WEB #####################################################################################
 
-        ###### # capacity Check for web in axial = min(block, yielding, rupture)  Todo
+        ###### # capacity Check for web in axial = min(block, yielding, rupture)
 
         A_vn_web = (self.section.depth - 2 * self.section.flange_thickness - self.web_bolt.bolts_one_line * self.web_plate.dia_hole) * self.section.web_thickness
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
@@ -538,32 +538,101 @@ class ColumnCoverPlate(MomentConnection):
         available_web_thickness = list([x for x in self.web_plate.thickness if (self.section.web_thickness <= x)])
         #print(111,self.web_plate.pitch_provided)
         #print(available_web_thickness,self.web_plate.thickness)
+        design_status_block_shear = False
+        edge_dist = self.web_plate.edge_dist_provided
+        end_dist = self.web_plate.end_dist_provided
+        gauge = self.web_plate.gauge_provided
+        pitch = self.web_plate.pitch_provided
+        print(1)
+
+   #### Block shear capacity of web in axial ###
+
+        while design_status_block_shear == False:
+            #print(design_status_block_shear)
+            #print(0, self.web_plate.max_end_dist, self.web_plate.end_dist_provided, self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
+            Atg = (self.web_plate.edge_dist_provided + (
+                        self.web_plate.bolts_one_line - 1) * gauge) * self.web_plate.thickness_provided
+            Atn = (self.web_plate.edge_dist_provided + (
+                        self.web_plate.bolts_one_line - 1) * gauge - (
+                           self.web_plate.bolts_one_line - 0.5) * self.web_plate.dia_hole) * self.web_plate.thickness_provided
+            Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
+                  self.web_plate.thickness_provided
+            Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
+                        self.web_plate.bolt_line - 1) * self.web_plate.dia_hole + end_dist) * \
+                  self.web_plate.thickness_provided
+            print(17,self.web_plate.bolt_line, self.web_plate.pitch_provided, self.web_plate.bolt_line,
+                 self.web_plate.dia_hole, self.web_plate.end_dist_provided, self.web_plate.thickness_provided)
+            print(18, self.web_plate.bolt_line, pitch, end_dist, self.web_plate.thickness_provided)
+
+            self.web_plate.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
+                                                                                    A_tn=Atn,
+                                                                                    f_u=self.web_plate.fu,
+                                                                                    f_y=self.web_plate.fy)
+            print(19, self.web_plate.thickness_provided, self.web_plate.block_shear_capacity, self.load.axial_force, self.web_plate.pitch_provided)
+            if self.web_plate.block_shear_capacity < self.load.axial_force:
+                if self.web_plate.max_spacing_round >= pitch+5 and self.web_plate.max_end_dist >= end_dist+5:  # increase thickness todo
+                    if self.web_plate.bolt_line == 1:
+                        end_dist += 5
+                    else:
+                        pitch += 5
+
+                else:
+                    design_status_block_shear = False
+                    break
+
+                #print(Avg, Avn, Atg, Atn)
+                # logger.error(": flange_plate_t is less than min_thk_flange_plate:")
+                # logger.warning(": Minimum flange_plate_t required is %2.2f mm" % (min_thk_flange_plate))
+            else:
+                design_status_block_shear = True
+                break
+        print(design_status_block_shear)
+        # if design_status_block_shear is True:
+        #     break
+                    # design_status = True
+        # print(design_status_block_shear)
+        # self.web_plate.end_dist_provided = end_dist
+        # self.web_plate.gauge_provided = gauge
+        # self.web_plate.pitch_provided = pitch
+
+        ###### # capacity Check for web plate in axial = min(block, yielding, rupture)
+        A_vn_web = ( self.web_plate.height - (self.web_bolt.bolts_one_line * self.web_plate.dia_hole)) * self.section.web_thickness
+        A_v_web = self.web_plate.height * self.section.web_thickness
+        self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
+            A_v=A_v_web, fy=self.web_plate.fy)
+        self.section.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
+            A_vn=A_vn_web, fu=self.web_plate.fu)
+
+        available_web_thickness = list([x for x in self.web_plate.thickness if (self.section.web_thickness <= x)])
+        # print(111,self.web_plate.pitch_provided)
+        # print(available_web_thickness,self.web_plate.thickness)
         for self.web_plate.thickness_provided in available_web_thickness:
             design_status_block_shear = False
             edge_dist = self.web_plate.edge_dist_provided
             end_dist = self.web_plate.end_dist_provided
             gauge = self.web_plate.gauge_provided
             pitch = self.web_plate.pitch_provided
-            #print(1)
+            # print(1)
 
-            #### Block shear capacity of web plate ###
+            #### Block shear capacity of web plate in axial ###
 
             while design_status_block_shear == False:
-                #print(design_status_block_shear)
-                #print(0, self.web_plate.max_end_dist, self.web_plate.end_dist_provided, self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
-                Avg = 2*(self.web_plate.edge_dist_provided + (
-                            self.web_plate.bolts_one_line - 1) * gauge) * self.web_plate.thickness_provided
-                Avn = 2*(self.web_plate.edge_dist_provided + (
-                            self.web_plate.bolts_one_line - 1) * gauge - (
-                               self.web_plate.bolts_one_line - 0.5) * self.web_plate.dia_hole) * self.web_plate.thickness_provided
-                Atg = ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
+                # print(design_status_block_shear)
+                # print(0, self.web_plate.max_end_dist, self.web_plate.end_dist_provided, self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
+                Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
                       self.web_plate.thickness_provided
-                Atn = ((self.web_plate.bolt_line - 1) * pitch + (
-                            self.web_plate.bolt_line - 1) * self.web_plate.dia_hole + end_dist) * \
+                Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
+                        self.web_plate.bolt_line - 1) * self.web_plate.dia_hole + end_dist) * \
                       self.web_plate.thickness_provided
+                Atg = (self.web_plate.edge_dist_provided + (
+                        self.web_plate.bolts_one_line - 1) * gauge) * self.web_plate.thickness_provided
+                Atn = (self.web_plate.edge_dist_provided + (
+                        self.web_plate.bolts_one_line - 1) * gauge - (
+                                   self.web_plate.bolts_one_line - 0.5) * self.web_plate.dia_hole) * self.web_plate.thickness_provided
+
                 # print(self.web_plate.bolt_line, self.web_plate.pitch_provided, self.web_plate.bolt_line,
-                     # self.web_plate.dia_hole, self.web_plate.end_dist_provided, self.web_plate.thickness_provided)
-                #print(1, self.web_plate.bolt_line, pitch, end_dist, self.web_plate.thickness_provided)
+                # self.web_plate.dia_hole, self.web_plate.end_dist_provided, self.web_plate.thickness_provided)
+                # print(1, self.web_plate.bolt_line, pitch, end_dist, self.web_plate.thickness_provided)
 
                 self.web_plate.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
                                                                                         A_tn=Atn,
@@ -571,7 +640,60 @@ class ColumnCoverPlate(MomentConnection):
                                                                                         f_y=self.web_plate.fy)
                 # print(2, self.web_plate.thickness_provided, self.web_plate.block_shear_capacity, self.load.axial_force, self.web_plate.pitch_provided)
                 if self.web_plate.block_shear_capacity < self.load.axial_force:
-                    if self.web_plate.max_spacing_round >= pitch+5 and self.web_plate.max_end_dist >= end_dist+5:  # increase thickness todo
+                    if self.web_plate.max_spacing_round >= pitch + 5 and self.web_plate.max_end_dist >= end_dist + 5:  # increase thickness todo
+                        if self.web_plate.bolt_line == 1:
+                            end_dist += 5
+                        else:
+                            pitch += 5
+
+                    else:
+                        break
+
+                    # print(Avg, Avn, Atg, Atn)
+                    # logger.error(": flange_plate_t is less than min_thk_flange_plate:")
+                    # logger.warning(": Minimum flange_plate_t required is %2.2f mm" % (min_thk_flange_plate))
+                else:
+                    design_status_block_shear = True
+                    break
+            # print(design_status_block_shear)
+            # if design_status_block_shear is True:
+            #     break
+
+
+    ###### # capacity Check for web plate  in shear = min(block, yielding, rupture)
+
+        A_vn_web = (self.web_plate.height - (self.web_bolt.bolts_one_line * self.web_plate.dia_hole)) * self.web_plate.thickness[0]
+        A_v_web = self.web_plate.height * self.web_plate.thickness[0]
+        self.web_plate.shear_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
+            A_v=A_v_web, fy=A_vn_web)
+        self.web_plate.shear_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
+            A_vn=A_vn_web, fu=self.web_plate.fu)
+
+        available_web_thickness = list([x for x in self.web_plate.thickness if (self.section.web_thickness <= x)])
+        # print(111,self.web_plate.pitch_provided)
+        # print(available_web_thickness,self.web_plate.thickness)
+        for self.web_plate.thickness_provided in available_web_thickness:  #
+            design_status_block_shear = False
+            edge_dist = self.web_plate.edge_dist_provided
+            end_dist = self.web_plate.end_dist_provided
+            gauge = self.web_plate.gauge_provided
+            pitch = self.web_plate.pitch_provided
+            # print(1)
+
+            #### Block shear capacity of web plate ###
+
+            while design_status_block_shear == False:
+                Avg = ((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
+                Avn = ((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided + ( self.web_plate.bolt_line - 1) * self.web_plate.dia_hole + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
+                Atg = (self.web_plate.edge_dist_provided + (self.web_bolt.bolts_one_line - 1) * self.web_plate.gauge_provided) * self.web_plate.thickness_provided
+                Atn = (self.web_plate.edge_dist_provided  + (self.web_bolt.bolts_one_line - 1) * self.web_plate.gauge_provided - (
+                        self.web_bolt.bolts_one_line - 0.5) *  self.web_plate.dia_hole) * self.web_plate.thickness_provided
+                self.web_plate.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg, A_tn=Atn,
+                                                                         f_u=self.web_plate.fu, f_y=self.web_plate.fy)
+
+                # print(2, self.web_plate.thickness_provided, self.web_plate.block_shear_capacity, self.load.axial_force, self.web_plate.pitch_provided)
+                if self.web_plate.block_shear_capacity < self.load.axial_force:
+                    if self.web_plate.max_spacing_round >= pitch + 5 and self.web_plate.max_end_dist >= end_dist + 5:  # increase thickness todo
                         if self.web_plate.bolt_line == 1:
                             end_dist += 5
                         else:
@@ -581,86 +703,15 @@ class ColumnCoverPlate(MomentConnection):
                         design_status_block_shear = False
                         break
 
-                    #print(Avg, Avn, Atg, Atn)
+                    # print(Avg, Avn, Atg, Atn)
                     # logger.error(": flange_plate_t is less than min_thk_flange_plate:")
                     # logger.warning(": Minimum flange_plate_t required is %2.2f mm" % (min_thk_flange_plate))
                 else:
                     design_status_block_shear = True
                     break
-            # print(design_status_block_shear)
+                # print(design_status_block_shear)
             if design_status_block_shear is True:
                 break
-                    # design_status = True
-        # print(design_status_block_shear)
-        # self.web_plate.end_dist_provided = end_dist
-        # self.web_plate.gauge_provided = gauge
-        # self.web_plate.pitch_provided = pitch
-
-
-    #     self.section.shear_yielding_capacity =self.tension_member_design_due_to_yielding_of_gross_section(
-    #         A_v=A_v_web,
-    #         fy=self.web_plate.fy)
-    #
-    #     self.section.shear_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
-    #         A_vn=A_vn_web,
-    #         fu=self.web_plate.fu)
-    #     #  Block shear strength for web
-    #     Avg = 2 * (self.web_plate.end_dist_provided + (self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) * self.section.web_thickness
-    #     Avn = 2 * (self.web_plate.end_dist_provided  + (self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided - (
-    #                 self.web_plate.bolts_one_line - 0.5) * self.web_plate.dia_hole) * self.section.web_thickness
-    #     Atg = (self.section.depth - self.section.flange_thickness - ((self.web_plate.bolts_one_line - 1) * self.web_plate.gauge_provided)) * self.section.web_thickness
-    #     Atn = ((self.section.depth - self.section.flange_thickness - ((self.web_plate.bolts_one_line - 1) * self.web_plate.gauge_provided)) - (
-    #             self.web_plate.bolts_one_line  - 0.5) * self.web_plate.dia_hole) * self.section.web_thickness
-    #
-    #     self.section.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg, A_tn=Atn,
-    #                                                                           f_u=self.web_plate.fu,
-    #                                                                           f_y=self.web_plate.fy)
-    #
-    #
-    #     if self.section.block_shear_capacity < self.load.axial_force:  # increase pitch
-    #         design_status = False
-    #     else:
-    #         pass
-    #         # Tension_capacity_web_plate = min( self.section.shear_yielding_capacity , self.section.shear_rupture_capacity  ,
-    #         #                                     self.section.block_shear_capacity )
-    #         # if Tension_capacity_web_plate  < web_force:
-    #         #     design_status = False
-    #         # else:
-    #         #     pass
-    # ###### # capacity Check for web plate  in shear = min(block, yielding, rupture)
-    #     i = 0
-    #     design_status = "True"
-    #     while design_status == "True":
-    #         self.web_plate.thickness_provided = self.web_plate.thickness[i]
-    #
-    #         A_vn_web = (self.section.depth - self.section.flange_thickness - self.web_bolt.bolts_one_line * self.web_plate.dia_hole) * self.section.web_thickness
-    #         A_v_web = self.web_plate.thickness[i] * self.web_plate.height
-    #         self.web_plate.shear_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(A_v=A_v_web,fy= A_vn_web)
-    #         self.web_plate.shear_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(A_vn=A_vn_web,fu=self.web_plate.fu)
-    #
-    #         Avg = (self.web_plate.edge_dist_provided + (self.web_bolt.bolts_one_line - 1) * self.web_plate.gauge_provided) * self.web_plate.thickness[i]
-    #         Avn = (self.web_plate.edge_dist_provided  + (self.web_bolt.bolts_one_line - 1) * self.web_plate.gauge_provided - (
-    #                 self.web_bolt.bolts_one_line - 0.5) *  self.web_plate.dia_hole) * self.web_plate.thickness[i]
-    #         Atg = ((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided + self.web_plate.end_dist_provided) * self.web_plate.thickness[i]
-    #         Atn = ((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided + (self.web_plate.bolt_line - 1) * self.web_plate.dia_hole + self.web_plate.end_dist_provided) * self.web_plate.thickness[0]
-    #         self.web_plate.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg, A_tn=Atn,
-    #                                                                  f_u=self.web_plate.fu, f_y=self.web_plate.fy)
-    #
-    #
-    #         if self.web_plate.block_shear_capacity < self.load.axial_force:  # increase thickness
-    #             i+=1
-    #             if i ==len(self.web_plate.thickness):
-    #                 self.web_plate.pitch_provided += 5
-    #                 if self.web_plate.max_spacing_round >= self.web_plate.pitch_provided:
-    #                     design_status = False # logger warning
-    #                 else:
-    #                     pass
-    #                 # logger.error(": flange_plate_t is less than min_thk_flange_plate:")
-    #                 # logger.warning(": Minimum flange_plate_t required is %2.2f mm" % (min_thk_flange_plate))
-    #             else:
-    #                 pass
-    #         else:
-    #             break
     #         # Tension_capacity_web_plate = min( self.section.shear_yielding_capacity , self.section.shear_rupture_capacity  ,
     #         #                                     self.section.block_shear_capacity )
     #     # if Tension_capacity_web_plate  < web_force:

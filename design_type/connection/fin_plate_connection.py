@@ -23,6 +23,9 @@ import pickle
 import pdfkit
 import configparser
 import cairosvg
+from io import StringIO
+
+
 
 
 #from ...gui.newnew import Ui_Form
@@ -43,42 +46,39 @@ weld_size = 6
 material_grade = "E 250 (Fe 410 W)B"
 material = Material(material_grade)
 
-logger = None
-
-
-def module_setup():
+def set_osdaglogger(key):
     global logger
-    logger = logging.getLogger("osdag.finPlateCalc")
+    logger = logging.getLogger('osdag')
+    logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt= '%H:%M:%S')
 
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
-module_setup()
+    handler = logging.FileHandler('C:/Users/pc/Desktop/osdag3/Osdag3-master/logging_text.log')
+    handler.setLevel(logging.WARNING)
+    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    handler = OurLog(key)
+    handler.setLevel(logging.WARNING)
+    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
-# def set_osdaglogger():
-#     global logger
-#     if logger is None:
-#
-#         logger = logging.getLogger("osdag")
-#     else:
-#         for handler in logger.handlers[:]:
-#             logger.removeHandler(handler)
-#
-#     logger.setLevel(logging.DEBUG)
-#
-#     # create the logging file handler
-#     fh = logging.FileHandler("Connections/Shear/Finplate/fin.log", mode="a")
-#
-#     # ,datefmt='%a, %d %b %Y %H:%M:%S'
-#     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#
-#     formatter = logging.Formatter('''
-#     <div  class="LOG %(levelname)s">
-#         <span class="DATE">%(asctime)s</span>
-#         <span class="LEVEL">%(levelname)s</span>
-#         <span class="MSG">%(message)s</span>
-#     </div>''')
-#     formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
-#     fh.setFormatter(formatter)
-#     logger.addHandler(fh)
+class OurLog(logging.Handler):
+
+    def __init__(self,key):
+        logging.Handler.__init__(self)
+        self.key = key
+        # self.key.setText("INDIA")
+
+    def handle(self, record):
+        msg = self.format(record)
+        self.key.append(msg)
+
 
 
 def desired_location(self, filename, base_type):
@@ -270,23 +270,15 @@ class FinPlateConnection(ShearConnection):
         return out_list
 
     def warn_text(self,key, my_d):
+        global logger
         old_col_section = get_oldcolumncombolist()
         old_beam_section = get_oldbeamcombolist()
 
         if my_d[KEY_SUPTNGSEC] in old_col_section or my_d[KEY_SUPTDSEC] in old_beam_section:
-            del_data = open('logging_text.log', 'w')
-            del_data.truncate()
-            del_data.close()
-            logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
-            logging.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
-            with open('logging_text.log') as file:
-                data = file.read()
-                file.close()
-            # file = open('logging_text.log', 'r')
-            # # This will print every line one by one in the file
-            # for each in file:
-            #     print(each)
-            key.setText(data)
+            logger.warning(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+            logger.debug(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
         else:
             key.setText("")
 
@@ -358,17 +350,17 @@ class FinPlateConnection(ShearConnection):
             # del_data = open('logging_text.log', 'w')
             # del_data.truncate()
             # del_data.close()
-            logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
-            logging.warning(" : The connection cannot be designed with given loads")
-            with open('logging_text.log') as file:
-                data = file.read()
-                print(data)
-                file.close()
+            # logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
+            logger.warning(" : The connection cannot be designed with given loads")
+            # with open('logging_text.log') as file:
+            #     data = file.read()
+            #     print(data)
+            #     file.close()
             # file = open('logging_text.log', 'r')
             # # This will print every line one by one in the file
             # for each in file:
             #     print(each)
-            #key.setText(data)    
+            #key.setText(data)
         else:        
             print(self.bolt)
             print(self.plate)

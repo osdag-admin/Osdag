@@ -25,7 +25,6 @@ def connectdb1():
     return l2
 
 
-
 def connectdb(table_name):
 
     conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -55,6 +54,7 @@ def connectdb(table_name):
     final_lst = tuple_to_str(lst)
     return final_lst
 
+
 def connect_for_red(table_name):
     conn = sqlite3.connect(PATH_TO_DATABASE)
     lst = []
@@ -79,6 +79,15 @@ def connect_for_red(table_name):
 
     final_lst = tuple_to_str_red(lst)
     return final_lst
+
+
+def red_list_function():
+    red_list = []
+    red_list_columns = connect_for_red("Columns")
+    red_list_beams = connect_for_red("Beams")
+    red_list.extend(red_list_beams)
+    red_list.extend(red_list_columns)
+    return red_list
 
 
 def tuple_to_str_popup(tl):

@@ -45,7 +45,7 @@ from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 from .ui_design_preferences import DesignPreferences
 from design_type.connection.shear_connection import ShearConnection
-
+from design_type.connection.fin_plate_connection import set_osdaglogger
 
 class Ui_ModuleWindow(QMainWindow):
 
@@ -285,6 +285,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
+
+
+        set_osdaglogger(self.textEdit)
         # self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -1048,11 +1051,14 @@ class Ui_ModuleWindow(QMainWindow):
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
         self.design_inputs = design_dictionary
 
+    def pass_d(self, main, design_dictionary):
+        key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
+        main.warn_text(main, key, design_dictionary)
+        # main.set_input_values(main, design_dictionary)
 # Function for saving inputs in a file
     '''
     @author: Umair 
     '''
-
     def saveDesign_inputs(self):
         fileName, _ = QFileDialog.getSaveFileName(self,
                                                   "Save Design", os.path.join(' ', "untitled.osi"),
@@ -1431,6 +1437,8 @@ class Ui_ModuleWindow(QMainWindow):
 
 from . import icons_rc
 if __name__ == '__main__':
+    # set_osdaglogger()
+
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()

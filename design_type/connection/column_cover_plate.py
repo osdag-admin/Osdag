@@ -8,14 +8,46 @@ import os
 import shutil
 import logging
 
-flag = 1
-logger = None
+# flag = 1
+# logger = None
+
+# def set_osdaglogger(key):
+#     global logger
+#     logger = logging.getLogger('osdag')
+#     logger.setLevel(logging.DEBUG)
+#     handler = logging.StreamHandler()
+#     handler.setLevel(logging.DEBUG)
+#     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt= '%H:%M:%S')
+#
+#     handler.setFormatter(formatter)
+#     logger.addHandler(handler)
+#
+#     handler.setLevel(logging.WARNING)
+#     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+#     handler.setFormatter(formatter)
+#     logger.addHandler(handler)
+#     handler = OurLog(key)
+#     handler.setLevel(logging.WARNING)
+#     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+#     handler.setFormatter(formatter)
+#     logger.addHandler(handler)
+#
+# class OurLog(logging.Handler):
+#
+#     def __init__(self,key):
+#         logging.Handler.__init__(self)
+#         self.key = key
+#         # self.key.setText("INDIA")
+#
+#     def handle(self, record):
+#         msg = self.format(record)
+#         self.key.append(msg)
 
 
-def module_setup():
-    global logger
-    logger = logging.getLogger("osdag.column_cover_plate")
-    module_setup()
+# def module_setup():
+#     global logger
+#     logger = logging.getLogger("osdag.column_cover_plate")
+#     module_setup()
 
 class ColumnCoverPlate(MomentConnection):
 
@@ -149,6 +181,51 @@ class ColumnCoverPlate(MomentConnection):
         # options_list.append(t14)
 
         return options_list
+
+    def output_values(self, flag):
+
+        out_list = []
+
+        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+        out_list.append(t1)
+
+        t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX,
+              self.bolt.bolt_diameter_provided if flag == 'True' else '')
+        out_list.append(t2)
+
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX,
+              self.bolt.bolt_grade_provided if flag == 'True' else '')
+        out_list.append(t3)
+
+        # t4 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
+        # out_list.append(t4)
+
+        # t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, self.plate.thickness if flag == 'True' else '')
+        # out_list.append(t5)
+
+        # t4 = (
+        # KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag == 'True' else '')
+        # out_list.append(t4)
+        #
+        # t5 = (
+        # KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag == 'True' else '')
+        # out_list.append(t5)
+        #
+        # t6 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None)
+        # out_list.append(t6)
+        #
+        # t7 = KEY_DISP_WEBPLATE_THICKNESS ,VALUES_WEBPLATE_THICKNESS,VALUES_PLATETHICKNESS_CUSTOMIZED, self.web_plate.thickness_provided if flag == 'True' else '')
+        # out_list.append(t7)
+        #
+        # t8 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
+        # out_list.append(t8)
+        #
+        # t9 = ( KEY_DISP_FLANGESPLATE_THICKNESS, VALUES_FLANGEPLATE_THICKNESS, VALUES_FLANGEPLATE_THICKNESS, self.flange_plate.thickness_provided if flag == 'True' else '')
+        # out_list.append(t9)
+        # return out_list
+
+
+
 
     def set_input_values(self, design_dictionary):
         super(ColumnCoverPlate, self).set_input_values(self, design_dictionary)
@@ -299,6 +376,8 @@ class ColumnCoverPlate(MomentConnection):
 
         if self.Tension_capacity_flange < flange_force:
             design_status = False
+            # logger.warning(": Tension capacity flange is less than required flange force kN")
+            # logger.info(": Increase the size of column section")
 
         else:
             pass

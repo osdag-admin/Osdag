@@ -200,9 +200,11 @@ class ColumnCoverPlate(MomentConnection):
 
         min_plate_height = self.section.flange_width
         max_plate_height = self.section.flange_width
-        axial_force_f = self.load.axial_force * self.section.flange_width * self.section.flange_thickness/self.section.area
-        flange_force=(((self.load.moment * 1000000) / (self.section.depth - self.section.flange_thickness)) + (axial_force_f * 1000)) / 1000
-
+        axial_force_f = self.load.axial_force * 1000 * self.section.flange_width * self.section.flange_thickness / (
+                    self.section.area * 100)
+        flange_force = (((self.load.moment * 1000000) / (self.section.depth - self.section.flange_thickness)) + (
+            axial_force_f))
+        flange_force = flange_force / 1000
 
         self.flange_plate.get_web_plate_details(bolt_dia=self.flange_bolt.bolt_diameter[0], web_plate_h_min=min_plate_height,
                                          web_plate_h_max=max_plate_height, bolt_capacity=self.flange_bolt.bolt_capacity,
@@ -280,23 +282,27 @@ class ColumnCoverPlate(MomentConnection):
             # logger.warning(": Minimum flange_plate_t required is %2.2f mm" % (min_thk_flange_plate))
             else:
                 design_status_block_shear = True
+                print("A", design_status_block_shear)
                 break
         # print("A", design_status_block_shear)
         # if design_status_block_shear is True:
         #     break
 
-        axial_force_f = self.load.axial_force * self.section.flange_width * self.section.flange_thickness / self.section.area
-        flange_force = (((self.load.moment * 1000000) / (self.section.depth - self.section.flange_thickness)) + (
-                axial_force_f * 1000)) / 1000
+        axial_force_f = self.load.axial_force *1000* self.section.flange_width * self.section.flange_thickness / (self.section.area * 100)
+        flange_force = (((self.load.moment * 1000000 ) / (self.section.depth - self.section.flange_thickness)) + (
+                axial_force_f))
+        flange_force = flange_force/1000
+        print(0,flange_force )
 
         self.Tension_capacity_flange = min(self.section.shear_yielding_capacity , self.section.shear_rupture_capacity,
         self.section.block_shear_capacity)
 
-        # if self.Tension_capacity_flange < flange_force:
-        #     design_status = False
-        # else:
-        #     pass
+        if self.Tension_capacity_flange < flange_force:
+            design_status = False
 
+        else:
+            pass
+        print(0, design_status)
         # capacity Check for flange_outsite_plate =min(block, yielding, rupture)
 
         ####Capacity of flange cover plate for bolted Outside #
@@ -378,10 +384,11 @@ class ColumnCoverPlate(MomentConnection):
                                                 self.flange_plate.block_shear_capacity )
             # print(100,Tension_capacity_flange_plate)
             # print(50,flange_force)
-            # if Tension_capacity_flange_plate < flange_force:
-            #     design_status = False
-            # else:
-            #     pass
+            if Tension_capacity_flange_plate < flange_force:
+                design_status = False
+            else:
+                pass
+            print(200, design_status)
 
         else:
             # capacity Check for flange_outsite_plate =min(block, yielding, rupture)
@@ -490,10 +497,11 @@ class ColumnCoverPlate(MomentConnection):
             # self.flange_plate.pitch_provided = pitch
             Tension_capacity_flange_plate = min(self.flange_plate.shear_yielding_capacity, self.flange_plate.shear_rupture_capacity,
                                                 self.flange_plate.block_shear_capacity)
-            # if Tension_capacity_flange_plate < flange_force:
-            #     design_status = False
-            # else:
-            #     pass
+            if Tension_capacity_flange_plate < flange_force:
+                design_status = False
+            else:
+                pass
+            print(300, design_status)
      ##########################################################################
         # Design of web splice plate
         self.web_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.web_bolt.bolt_diameter[0],
@@ -535,7 +543,7 @@ class ColumnCoverPlate(MomentConnection):
         self.section.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
             A_vn=A_vn_web, fu=self.web_plate.fu)
 
-        available_web_thickness = list([x for x in self.web_plate.thickness if (self.section.web_thickness <= x)])
+        # available_web_thickness = list([x for x in self.web_plate.thickness if (self.section.web_thickness <= x)])
         #print(111,self.web_plate.pitch_provided)
         #print(available_web_thickness,self.web_plate.thickness)
         design_status_block_shear = False
@@ -543,7 +551,7 @@ class ColumnCoverPlate(MomentConnection):
         end_dist = self.web_plate.end_dist_provided
         gauge = self.web_plate.gauge_provided
         pitch = self.web_plate.pitch_provided
-        print(1)
+        # print(1)
 
    #### Block shear capacity of web in axial ###
 
@@ -551,24 +559,24 @@ class ColumnCoverPlate(MomentConnection):
             #print(design_status_block_shear)
             #print(0, self.web_plate.max_end_dist, self.web_plate.end_dist_provided, self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
             Atg = (self.web_plate.edge_dist_provided + (
-                        self.web_plate.bolts_one_line - 1) * gauge) * self.web_plate.thickness_provided
+                        self.web_plate.bolts_one_line - 1) * gauge) * self.section.web_thickness
             Atn = (self.web_plate.edge_dist_provided + (
                         self.web_plate.bolts_one_line - 1) * gauge - (
-                           self.web_plate.bolts_one_line - 0.5) * self.web_plate.dia_hole) * self.web_plate.thickness_provided
+                           self.web_plate.bolts_one_line - 0.5) * self.web_plate.dia_hole) * self.section.web_thickness
             Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
-                  self.web_plate.thickness_provided
+                  self.section.web_thickness
             Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
                         self.web_plate.bolt_line - 1) * self.web_plate.dia_hole + end_dist) * \
-                  self.web_plate.thickness_provided
-            print(17,self.web_plate.bolt_line, self.web_plate.pitch_provided, self.web_plate.bolt_line,
-                 self.web_plate.dia_hole, self.web_plate.end_dist_provided, self.web_plate.thickness_provided)
-            print(18, self.web_plate.bolt_line, pitch, end_dist, self.web_plate.thickness_provided)
+                  self.section.web_thickness
+            # print(17,self.web_plate.bolt_line, self.web_plate.pitch_provided, self.web_plate.bolt_line,
+            #      self.web_plate.dia_hole, self.web_plate.end_dist_provided, self.web_plate.thickness_provided)
+            # print(18, self.web_plate.bolt_line, pitch, end_dist, self.section.web_thickness)
 
             self.web_plate.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
                                                                                     A_tn=Atn,
                                                                                     f_u=self.web_plate.fu,
                                                                                     f_y=self.web_plate.fy)
-            print(19, self.web_plate.thickness_provided, self.web_plate.block_shear_capacity, self.load.axial_force, self.web_plate.pitch_provided)
+            # print(19, self.web_plate.thickness_provided, self.web_plate.block_shear_capacity, self.load.axial_force, self.web_plate.pitch_provided)
             if self.web_plate.block_shear_capacity < self.load.axial_force:
                 if self.web_plate.max_spacing_round >= pitch+5 and self.web_plate.max_end_dist >= end_dist+5:  # increase thickness todo
                     if self.web_plate.bolt_line == 1:
@@ -586,7 +594,17 @@ class ColumnCoverPlate(MomentConnection):
             else:
                 design_status_block_shear = True
                 break
-        print(design_status_block_shear)
+        Tension_capacity_web_plate = min(self.section.shear_yielding_capacity, self.section.shear_rupture_capacity,
+                                         self.section.block_shear_capacity)
+        self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,column_t_w=self.section.web_thickness,
+                                       factored_axial_force = self.load.axial_force, column_area=self.section.area)
+        if Tension_capacity_web_plate < self.webforce:
+            design_status = False
+
+        else:
+            pass
+        print(400, design_status)
+        # print(design_status_block_shear)
         # if design_status_block_shear is True:
         #     break
                     # design_status = True
@@ -655,6 +673,17 @@ class ColumnCoverPlate(MomentConnection):
                 else:
                     design_status_block_shear = True
                     break
+            Tension_capacity_web_plate = min(self.section.shear_yielding_capacity, self.section.shear_rupture_capacity,
+                                             self.section.block_shear_capacity)
+            self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,
+                                           column_t_w=self.section.web_thickness,
+                                           factored_axial_force=self.load.axial_force, column_area=self.section.area)
+            if Tension_capacity_web_plate < self.webforce:
+                design_status = False
+
+            else:
+                pass
+            print(500, design_status)
             # print(design_status_block_shear)
             # if design_status_block_shear is True:
             #     break
@@ -712,12 +741,17 @@ class ColumnCoverPlate(MomentConnection):
                 # print(design_status_block_shear)
             if design_status_block_shear is True:
                 break
-    #         # Tension_capacity_web_plate = min( self.section.shear_yielding_capacity , self.section.shear_rupture_capacity  ,
-    #         #                                     self.section.block_shear_capacity )
-    #     # if Tension_capacity_web_plate  < web_force:
-    #     #     design_status = False
-    #     # else:
-    #     #     pass
+            Tension_capacity_web_plate = min( self.section.shear_yielding_capacity , self.section.shear_rupture_capacity  ,
+                                                self.section.block_shear_capacity )
+        self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,
+                                       column_t_w=self.section.web_thickness,
+                                       factored_axial_force=self.load.axial_force, column_area=self.section.area)
+        if Tension_capacity_web_plate  < self.webforce:
+            design_status = False
+
+        else:
+            pass
+        print(600, design_status)
 
 
         print(self.section)
@@ -823,6 +857,39 @@ class ColumnCoverPlate(MomentConnection):
         #A_vn = (height- bolts_one_line * dia_hole) * thickness
         T_dn = 0.9 * A_vn * fu / (gamma_m1*1000)
         return T_dn
+
+    def web_force(column_d, column_f_t, column_t_w, factored_axial_force, column_area):
+        """
+        Args:
+           column_d: Overall depth of the column section in mm (float)
+           column_f_t: Thickness of flange in mm (float)
+           column_t_w: Thickness of flange in mm (float)
+           axial_force: Factored axial force in kN (float)
+
+        Returns:
+            Force in flange in kN (float)
+        """
+        axial_force_w = int(
+            ((column_d - 2 * (column_f_t)) * column_t_w * factored_axial_force * 10) / column_area) / 1000  # KN
+        return round(axial_force_w)
+
+    # def flange_force(column_d, column_f_t, column_b, column_area, factored_axial_force, moment_load):
+    #     """
+    #     Args:
+    #        Column_d: Overall depth of the column section in mm (float)
+    #        Column_b: width of the column section in mm (float)
+    #        Column_f_t: Thickness of flange in mm (float)
+    #        axial_force: Factored axial force in kN (float)
+    #        moment_load: Factored bending moment in kN-m (float)
+    #     Returns:
+    #         Force in flange in kN (float)
+    #     """
+    #
+    #     area_f = column_b * column_f_t
+    #     axial_force_f = ((area_f * factored_axial_force * 1000 / (100 * column_area))) / 1000  # KN
+    #     f_f = (((moment_load * 1000000) / (column_d - column_f_t)) + (axial_force_f * 1000)) / 1000  # KN
+    #     # print(f_f)
+    #     return (f_f)
 
 
 

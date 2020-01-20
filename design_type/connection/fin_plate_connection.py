@@ -266,16 +266,10 @@ class FinPlateConnection(ShearConnection):
         self.get_bolt_details(self)
 
     def warn_text(self):
-        # old_col_section = get_oldcolumncombolist()
-        # old_beam_section = get_oldbeamcombolist()
         red_list = red_list_function()
-
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
             logger.warning(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
-            logger.debug(
-                " : You are using a section (in red color) that is not available in latest version of IS 808")
-
 
     def get_bolt_details(self):
         print(self)

@@ -12,7 +12,18 @@ DESIGN_FLAG = 'False'
 import sqlite3
 from utils.common.component import *
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+import logging
 
+class OurLog(logging.Handler):
+
+    def __init__(self, key):
+        logging.Handler.__init__(self)
+        self.key = key
+        # self.key.setText("INDIA")
+
+    def handle(self, record):
+        msg = self.format(record)
+        self.key.append(msg)
 
 def connectdb1():
     lst = []

@@ -45,7 +45,7 @@ from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 from .ui_design_preferences import DesignPreferences
 from design_type.connection.shear_connection import ShearConnection
-from design_type.connection.fin_plate_connection import set_osdaglogger
+
 
 class Ui_ModuleWindow(QMainWindow):
 
@@ -287,7 +287,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setObjectName("textEdit")
 
 
-        set_osdaglogger(self.textEdit)
+        main.set_osdaglogger(self.textEdit)
         # self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -1151,9 +1151,7 @@ class Ui_ModuleWindow(QMainWindow):
             self.saveDesign_inputs()
         else:
             self.design_fn(option_list, data)
-            self.warning_function(main, self.design_inputs)
             main.set_input_values(main, self.design_inputs)
-            main.get_bolt_details(main)
             DESIGN_FLAG = 'True'
             out_list = main.output_values(main, DESIGN_FLAG)
             for option in out_list:
@@ -1165,9 +1163,9 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for warning about structure
 
-    def warning_function(self, main, design_dictionary):
-        key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
-        main.warn_text(main, key, design_dictionary)
+    # def warning_function(self, main, design_dictionary):
+    #     key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
+    #     main.warn_text(main, key, design_dictionary)
 
 # Function for error if any field is missing
 

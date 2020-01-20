@@ -24,6 +24,7 @@ import pdfkit
 import configparser
 import cairosvg
 from io import StringIO
+import logging
 
 
 
@@ -45,39 +46,6 @@ plate_thickness = 10.0
 weld_size = 6
 material_grade = "E 250 (Fe 410 W)B"
 material = Material(material_grade)
-
-def set_osdaglogger(key):
-    global logger
-    logger = logging.getLogger('osdag')
-    logger.setLevel(logging.DEBUG)
-    handler = logging.StreamHandler()
-    handler.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt= '%H:%M:%S')
-
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
-    handler.setLevel(logging.WARNING)
-    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    handler = OurLog(key)
-    handler.setLevel(logging.WARNING)
-    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
-class OurLog(logging.Handler):
-
-    def __init__(self,key):
-        logging.Handler.__init__(self)
-        self.key = key
-        # self.key.setText("INDIA")
-
-    def handle(self, record):
-        msg = self.format(record)
-        self.key.append(msg)
-
 
 
 def desired_location(self, filename, base_type):
@@ -136,6 +104,27 @@ class FinPlateConnection(ShearConnection):
 
     def __init__(self):
         super(FinPlateConnection, self).__init__()
+
+    def set_osdaglogger(key):
+        global logger
+        logger = logging.getLogger('osdag')
+        logger.setLevel(logging.DEBUG)
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+        handler.setLevel(logging.WARNING)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        handler = OurLog(key)
+        handler.setLevel(logging.WARNING)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
     def input_values(self, existingvalues={}):
 
@@ -268,23 +257,25 @@ class FinPlateConnection(ShearConnection):
 
         return out_list
 
-    def warn_text(self,key, my_d):
-        global logger
-        old_col_section = get_oldcolumncombolist()
-        old_beam_section = get_oldbeamcombolist()
-
-        if my_d[KEY_SUPTNGSEC] in old_col_section or my_d[KEY_SUPTDSEC] in old_beam_section:
-            logger.warning(
-                " : You are using a section (in red color) that is not available in latest version of IS 808")
-            logger.debug(
-                " : You are using a section (in red color) that is not available in latest version of IS 808")
-        else:
-            key.setText("")
-
     def set_input_values(self, design_dictionary):
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+
+        self.warn_text(self)
+        self.get_bolt_details(self)
+
+    def warn_text(self):
+        # old_col_section = get_oldcolumncombolist()
+        # old_beam_section = get_oldbeamcombolist()
+        red_list = red_list_function()
+
+        if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
+            logger.warning(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+            logger.debug(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+
 
     def get_bolt_details(self):
         print(self)

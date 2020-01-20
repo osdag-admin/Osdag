@@ -1,9 +1,13 @@
 from design_type.connection.shear_connection import ShearConnection
+
+from utils.common.component import Bolt, Plate, Weld
+# from gui.ui_summary_popup import Ui_Dialog
 from utils.common.component import *
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
 import yaml
+from design_report.reportGenerator import save_html
 import os
 import shutil
 import logging
@@ -14,8 +18,15 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
 import pickle
+import pdfkit
+import configparser
+import cairosvg
+from io import StringIO
+
+
+
 
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
@@ -35,50 +46,97 @@ weld_size = 6
 material_grade = "E 250 (Fe 410 W)B"
 material = Material(material_grade)
 
-logger = None
-
-
-def module_setup():
+def set_osdaglogger(key):
     global logger
-    logger = logging.getLogger("osdag.finPlateCalc")
+    logger = logging.getLogger('osdag')
+    logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt= '%H:%M:%S')
+
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    handler = logging.FileHandler('C:/Users/pc/Desktop/osdag3/Osdag3-master/logging_text.log')
+    handler.setLevel(logging.WARNING)
+    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    handler = OurLog(key)
+    handler.setLevel(logging.WARNING)
+    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+class OurLog(logging.Handler):
+
+    def __init__(self,key):
+        logging.Handler.__init__(self)
+        self.key = key
+        # self.key.setText("INDIA")
+
+    def handle(self, record):
+        msg = self.format(record)
+        self.key.append(msg)
 
 
-module_setup()
 
-# def set_osdaglogger():
-#     global logger
-#     if logger is None:
-#
-#         logger = logging.getLogger("osdag")
-#     else:
-#         for handler in logger.handlers[:]:
-#             logger.removeHandler(handler)
-#
-#     logger.setLevel(logging.DEBUG)
-#
-#     # create the logging file handler
-#     fh = logging.FileHandler("Connections/Shear/Finplate/fin.log", mode="a")
-#
-#     # ,datefmt='%a, %d %b %Y %H:%M:%S'
-#     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#
-#     formatter = logging.Formatter('''
-#     <div  class="LOG %(levelname)s">
-#         <span class="DATE">%(asctime)s</span>
-#         <span class="LEVEL">%(levelname)s</span>
-#         <span class="MSG">%(message)s</span>
-#     </div>''')
-#     formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
-#     fh.setFormatter(formatter)
-#     logger.addHandler(fh)
+def desired_location(self, filename, base_type):
+    if base_type == ".svg":
+        cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html",
+                                                                  "cmpylogoExtendEndplate.svg"))
+    else:
+        shutil.copyfile(filename,
+                        os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
 
+def saveUserProfile(self):
+    inputData = self.get_report_summary()
+    filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+                                              os.path.join(str(self.maincontroller.folder), "Profile"), '*.txt')
+    if filename == '':
+        flag = False
+        return flag
+    else:
+        infile = open(filename, 'w')
+        pickle.dump(inputData, infile)
+        infile.close()
+
+
+def getPopUpInputs(self):
+    input_summary = {}
+    input_summary["ProfileSummary"] = {}
+    input_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
+    input_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
+    input_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
+    input_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
+
+    input_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
+    input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
+    input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
+    input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
+    input_summary["Client"] = str(self.ui.lineEdit_client.text())
+
+
+def useUserProfile(self):
+    filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+                                              os.path.join(str(self.maincontroller.folder), "Profile"),
+                                              "All Files (*)")
+    if os.path.isfile(filename):
+        outfile = open(filename, 'r')
+        reportsummary = pickle.load(outfile)
+        self.ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
+        self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
+        self.ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
+        self.ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
+    else:
+        pass
 
 
 class FinPlateConnection(ShearConnection):
 
+
     def __init__(self):
         super(FinPlateConnection, self).__init__()
-
 
     def input_values(self, existingvalues={}):
 
@@ -184,24 +242,43 @@ class FinPlateConnection(ShearConnection):
 
         return options_list
 
+    def output_values(self, flag):
+
+        out_list = []
+
+        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+        out_list.append(t1)
+
+        t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX,  self.bolt.bolt_diameter_provided if flag == 'True' else '')
+        out_list.append(t2)
+
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag == 'True' else '')
+        out_list.append(t3)
+
+        t4 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
+        out_list.append(t4)
+
+        t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, self.plate.thickness if flag == 'True' else '')
+        out_list.append(t5)
+
+        t6 = (KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag == 'True' else '')
+        out_list.append(t6)
+
+        t7 = (KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag == 'True' else '')
+        out_list.append(t7)
+
+        return out_list
+
     def warn_text(self,key, my_d):
+        global logger
         old_col_section = get_oldcolumncombolist()
         old_beam_section = get_oldbeamcombolist()
 
         if my_d[KEY_SUPTNGSEC] in old_col_section or my_d[KEY_SUPTDSEC] in old_beam_section:
-            del_data = open('logging_text.log', 'w')
-            del_data.truncate()
-            del_data.close()
-            logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
-            logging.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
-            with open('logging_text.log') as file:
-                data = file.read()
-                file.close()
-            # file = open('logging_text.log', 'r')
-            # # This will print every line one by one in the file
-            # for each in file:
-            #     print(each)
-            key.setText(data)
+            logger.warning(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+            logger.debug(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
         else:
             key.setText("")
 
@@ -210,8 +287,8 @@ class FinPlateConnection(ShearConnection):
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
-
     def get_bolt_details(self):
+        print(self)
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter[0],
                                                 connecting_plates_tk=[self.plate.thickness[0],
                                                                       self.supported_section.web_thickness],bolt_hole_type=self.bolt.bolt_hole_type)
@@ -244,7 +321,7 @@ class FinPlateConnection(ShearConnection):
         self.plate.shear_yielding_b(self.plate.height, self.plate.thickness[0], self.plate.fy)
 
         self.plate.shear_rupture_b(self.plate.height, self.plate.thickness[0], self.plate.bolts_one_line,
-                                   self.bolt.dia_hole, self.plate.fu)
+                                       self.bolt.dia_hole, self.plate.fu)
 
         plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,
                                    self.plate.shear_yielding_capacity)
@@ -267,11 +344,30 @@ class FinPlateConnection(ShearConnection):
         print(self.supporting_section)
         print(self.supported_section)
         print(self.load)
-        print(self.bolt)
-        print(self.plate)
+
+#        print(Plate.design_status)
+        if self.plate.design_status == False:
+            # del_data = open('logging_text.log', 'w')
+            # del_data.truncate()
+            # del_data.close()
+            # logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
+            logger.warning(" : The connection cannot be designed with given loads")
+            # with open('logging_text.log') as file:
+            #     data = file.read()
+            #     print(data)
+            #     file.close()
+            # file = open('logging_text.log', 'r')
+            # # This will print every line one by one in the file
+            # for each in file:
+            #     print(each)
+            #key.setText(data)
+        else:        
+            print(self.bolt)
+            print(self.plate)
 
 
 
 #
 # with open("filename", 'w') as out_file:
 #     yaml.dump(fin_plate_input, out_file)
+

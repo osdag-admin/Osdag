@@ -74,6 +74,10 @@ class Ui_Dialog(object):
         self.tab_Column = QtWidgets.QWidget()
         self.tab_Column.setObjectName("tab_Column")
 
+        '''
+        @author: Umair 
+        '''
+
         supporting_section_list = ShearConnection.supporting_section_values(self)
         _translate = QtCore.QCoreApplication.translate
         i = 0
@@ -536,7 +540,6 @@ class Ui_Dialog(object):
         for element in weld_list:
             lable = element[1]
             type = element[2]
-            # value = option[4]
             if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
                 l = QtWidgets.QLabel(self.tab_Weld)
                 l.setGeometry(QtCore.QRect(6, 10 + i, 185, 22))
@@ -548,7 +551,7 @@ class Ui_Dialog(object):
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                 l.setAlignment(QtCore.Qt.AlignCenter)
 
-            if type == TYPE_COMBOBOX :
+            if type == TYPE_COMBOBOX:
                 combo = QtWidgets.QComboBox(self.tab_Weld)
                 combo.setGeometry(QtCore.QRect(230, 10 + i, 130, 22))
                 font = QtGui.QFont()
@@ -671,66 +674,6 @@ class Ui_Dialog(object):
 
             i = i + 40
 
-
-        # self.gridLayout_18 = QtWidgets.QGridLayout(self.tab_Detailing)
-        # self.gridLayout_18.setObjectName("gridLayout_18")
-        # self.gridLayout_17 = QtWidgets.QGridLayout()
-        # self.gridLayout_17.setObjectName("gridLayout_17")
-        # self.gridLayout_6 = QtWidgets.QGridLayout()
-        # self.gridLayout_6.setObjectName("gridLayout_6")
-        # self.label_38 = QtWidgets.QLabel(self.tab_Detailing)
-        # self.label_38.setObjectName("label_38")
-        # self.gridLayout_6.addWidget(self.label_38, 0, 0, 1, 1)
-        # self.line_11 = QtWidgets.QFrame(self.tab_Detailing)
-        # self.line_11.setFrameShape(QtWidgets.QFrame.HLine)
-        # self.line_11.setFrameShadow(QtWidgets.QFrame.Sunken)
-        # self.line_11.setObjectName("line_11")
-        # self.gridLayout_6.addWidget(self.line_11, 1, 0, 1, 1)
-        # self.gridLayout_17.addLayout(self.gridLayout_6, 0, 0, 1, 1)
-        # self.gridLayout_4 = QtWidgets.QGridLayout()
-        # self.gridLayout_4.setObjectName("gridLayout_4")
-        # self.label_39 = QtWidgets.QLabel(self.tab_Detailing)
-        # self.label_39.setObjectName("label_39")
-        # self.gridLayout_4.addWidget(self.label_39, 0, 0, 1, 1)
-        # self.combo_detailingEdgeType = QtWidgets.QComboBox(self.tab_Detailing)
-        # self.combo_detailingEdgeType.setObjectName("combo_detailingEdgeType")
-        # self.combo_detailingEdgeType.addItem("")
-        # self.combo_detailingEdgeType.addItem("")
-        # self.gridLayout_4.addWidget(self.combo_detailingEdgeType, 0, 1, 1, 1)
-        # self.label_12 = QtWidgets.QLabel(self.tab_Detailing)
-        # self.label_12.setObjectName("label_30")
-        # self.gridLayout_4.addWidget(self.label_12, 1, 0, 1, 1)
-        # self.txt_detailingGap = QtWidgets.QLineEdit(self.tab_Detailing)
-        # self.txt_detailingGap.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        # self.txt_detailingGap.setObjectName("txt_detailingGap")
-        # self.gridLayout_4.addWidget(self.txt_detailingGap, 1, 1, 1, 1)
-        # self.label_40 = QtWidgets.QLabel(self.tab_Detailing)
-        # self.label_40.setObjectName("label_40")
-        # self.gridLayout_4.addWidget(self.label_40, 2, 0, 1, 1)
-        # self.combo_detailing_memebers = QtWidgets.QComboBox(self.tab_Detailing)
-        # self.combo_detailing_memebers.setObjectName("combo_detailing_memebers")
-        # self.combo_detailing_memebers.addItem("")
-        # self.combo_detailing_memebers.addItem("")
-        # self.gridLayout_4.addWidget(self.combo_detailing_memebers, 2, 1, 1, 1)
-        # self.gridLayout_17.addLayout(self.gridLayout_4, 1, 0, 1, 1)
-        # self.gridLayout_18.addLayout(self.gridLayout_17, 0, 0, 1, 1)
-        # self.gridLayout_10 = QtWidgets.QGridLayout()
-        # self.gridLayout_10.setObjectName("gridLayout_10")
-        # self.line_6 = QtWidgets.QFrame(self.tab_Detailing)
-        # self.line_6.setFrameShape(QtWidgets.QFrame.HLine)
-        # self.line_6.setFrameShadow(QtWidgets.QFrame.Sunken)
-        # self.line_6.setObjectName("line_6")
-        # self.gridLayout_10.addWidget(self.line_6, 1, 0, 1, 1)
-        # self.label_18 = QtWidgets.QLabel(self.tab_Detailing)
-        # self.label_18.setObjectName("label_18")
-        # self.gridLayout_10.addWidget(self.label_18, 0, 0, 1, 1)
-        # self.textBrowser_detailingDescription = QtWidgets.QTextBrowser(self.tab_Detailing)
-        # self.textBrowser_detailingDescription.setMinimumSize(QtCore.QSize(210, 0))
-        # self.textBrowser_detailingDescription.setObjectName("textBrowser_detailingDescription")
-        # self.gridLayout_10.addWidget(self.textBrowser_detailingDescription, 2, 0, 1, 1)
-        # self.gridLayout_18.addLayout(self.gridLayout_10, 0, 1, 2, 1)
-        # spacerItem7 = QtWidgets.QSpacerItem(20, 255, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        # self.gridLayout_18.addItem(spacerItem7, 1, 0, 1, 1)
         self.tabWidget.addTab(self.tab_Detailing, "")
         self.tab_Design = QtWidgets.QWidget()
         self.tab_Design.setObjectName("tab_Design")
@@ -770,91 +713,12 @@ class Ui_Dialog(object):
                     combo.model().item(1).setEnabled(False)
                     combo.model().item(2).setEnabled(False)
 
-        # self.label_19 = QtWidgets.QLabel(self.tab_Design)
-        # self.label_19.setGeometry(QtCore.QRect(21, 31, 101, 16))
-        # self.label_19.setObjectName("label_19")
-        # self.combo_design_method = QtWidgets.QComboBox(self.tab_Design)
-        # self.combo_design_method.setGeometry(QtCore.QRect(160, 31, 227, 22))
-        # self.combo_design_method.setObjectName("combo_design_method")
-        # self.combo_design_method.addItem("")
-        # self.combo_design_method.addItem("")
-        # self.combo_design_method.addItem("")
         self.tabWidget.addTab(self.tab_Design, "")
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(DesignPreferences)
         self.tabWidget.setCurrentIndex(2)
-        #self.combo_slipfactor.setCurrentIndex(8)
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
-        DesignPreferences.setTabOrder(self.btn_close, self.tab_Column)
-        # DesignPreferences.setTabOrder(self.tab_Column, self.lineEdit_Designation_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_Designation_Column, self.lineEdit_UltimateStrength_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_UltimateStrength_Column, self.lineEdit_YieldStrength_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_YieldStrength_Column, self.lineEdit_Depth_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_Depth_Column, self.lineEdit_FlangeWidth_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_FlangeWidth_Column, self.lineEdit_FlangeThickness_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_FlangeThickness_Column, self.lineEdit_WeBThickness_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_WeBThickness_Column, self.lineEdit_FlangeSlope_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_FlangeSlope_Column, self.lineEdit_RootRadius_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_RootRadius_Column, self.lineEdit_ToeRadius_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_ToeRadius_Column, self.comboBox_Column)
-        # DesignPreferences.setTabOrder(self.comboBox_Column, self.lineEdit_ModElasticity_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_ModElasticity_Column, self.lineEdit_ModulusOfRigidity_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_ModulusOfRigidity_Column, self.lineEdit_Mass_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_Mass_Column, self.lineEdit_SectionalArea_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_SectionalArea_Column, self.lineEdit_MomentOfAreaZ_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_MomentOfAreaZ_Column, self.lineEdit_MomentOfAreaY_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_MomentOfAreaY_Column, self.lineEdit_RogZ_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_RogZ_Column, self.lineEdit_RogY_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_RogY_Column, self.lineEdit_ElasticModZ_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_ElasticModZ_Column, self.lineEdit_ElasticModY_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_ElasticModY_Column, self.lineEdit_ElasticModPZ_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_ElasticModPZ_Column, self.lineEdit_ElasticModPY_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_ElasticModPY_Column, self.lineEdit_Source_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_Source_Column, self.lineEdit_PoissionsRatio_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_PoissionsRatio_Column, self.lineEdit_ThermalExpansion_Column)
-        # DesignPreferences.setTabOrder(self.lineEdit_ThermalExpansion_Column, self.pushButton_Clear_Column)
-        # DesignPreferences.setTabOrder(self.pushButton_Clear_Column, self.pushButton_Add_Column)
-        # DesignPreferences.setTabOrder(self.pushButton_Add_Column, self.pushButton_Download_Column)
-        # DesignPreferences.setTabOrder(self.pushButton_Download_Column, self.btn_save)
-        # DesignPreferences.setTabOrder(self.btn_save, self.btn_defaults)
-        # DesignPreferences.setTabOrder(self.btn_defaults, self.btn_close)
-        DesignPreferences.setTabOrder(self.btn_close, self.tab_Column)
-
-        DesignPreferences.setTabOrder(self.btn_close, self.tab_Beam)
-        # DesignPreferences.setTabOrder(self.tab_Beam, self.lineEdit_Designation_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_Designation_Beam, self.lineEdit_UltimateStrength_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_UltimateStrength_Beam, self.lineEdit_YieldStrength_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_YieldStrength_Beam, self.lineEdit_Depth_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_Depth_Beam, self.lineEdit_FlangeWidth_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_FlangeWidth_Beam, self.lineEdit_FlangeThickness_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_FlangeThickness_Beam, self.lineEdit_WeBThickness_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_WeBThickness_Beam, self.lineEdit_FlangeSlope_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_FlangeSlope_Beam, self.lineEdit_RootRadius_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_RootRadius_Beam, self.lineEdit_ToeRadius_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_ToeRadius_Beam, self.comboBox_Beam)
-        # DesignPreferences.setTabOrder(self.comboBox_Beam, self.lineEdit_ModElasticity_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_ModElasticity_Beam, self.lineEdit_ModulusOfRigidity_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_ModulusOfRigidity_Beam, self.lineEdit_Mass_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_Mass_Beam, self.lineEdit_SectionalArea_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_SectionalArea_Beam, self.lineEdit_MomentOfAreaZ_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_MomentOfAreaZ_Beam, self.lineEdit_MomentOfAreaY_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_MomentOfAreaY_Beam, self.lineEdit_RogZ_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_RogZ_Beam, self.lineEdit_RogY_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_RogY_Beam, self.lineEdit_ElasticModZ_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_ElasticModZ_Beam, self.lineEdit_ElasticModY_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_ElasticModY_Beam, self.lineEdit_ElasticModPZ_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_ElasticModPZ_Beam, self.lineEdit_ElasticModPY_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_ElasticModPY_Beam, self.lineEdit_Source_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_Source_Beam, self.lineEdit_PoissonsRatio_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_PoissonsRatio_Beam, self.lineEdit_ThermalExpansion_Beam)
-        # DesignPreferences.setTabOrder(self.lineEdit_ThermalExpansion_Beam, self.pushButton_Clear_Beam)
-        # DesignPreferences.setTabOrder(self.pushButton_Clear_Beam, self.pushButton_Add_Beam)
-        # DesignPreferences.setTabOrder(self.pushButton_Add_Beam, self.pushButton_Download_Beam)
-        # DesignPreferences.setTabOrder(self.pushButton_Download_Beam, self.btn_save)
-        DesignPreferences.setTabOrder(self.btn_save, self.btn_defaults)
-        DesignPreferences.setTabOrder(self.btn_defaults, self.btn_close)
-        DesignPreferences.setTabOrder(self.btn_close, self.tab_Beam)
 
         pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
         pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
@@ -863,6 +727,9 @@ class Ui_Dialog(object):
         pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
 
     def clear_tab(self, tab_name):
+        '''
+        @author: Umair
+        '''
         if tab_name == "Column":
             tab = self.tab_Column
         elif tab_name == "Beam":
@@ -874,7 +741,9 @@ class Ui_Dialog(object):
                 c.clear()
 
     def add_tab_column(self):
-
+        '''
+        @author: Umair
+        '''
         name = self.tabWidget.tabText(self.tabWidget.indexOf(self.tab_Column))
         if name == KEY_DISP_COLSEC:
             table = "Columns"
@@ -972,6 +841,9 @@ class Ui_Dialog(object):
                 self.clear_tab("Column")
 
     def add_tab_beam(self):
+        '''
+        @author: Umair
+        '''
 
         for ch in self.tab_Beam.children():
 
@@ -1076,39 +948,14 @@ class DesignPreferences(QDialog):
         #self.uiobj = self.main_controller.uiObj
         self.saved = None
         self.sectionalprop = I_sectional_Properties()
-        # self.ui.combo_design_method.model().item(1).setEnabled(False)
-        # self.ui.combo_design_method.model().item(2).setEnabled(False)
-        # self.save_default_para()
-        # self.ui.txt_boltFu.setValidator(dbl_validator)
-        # self.ui.txt_boltFu.setMaxLength(7)
-        # self.ui.txt_weldFu.setValidator(dbl_validator)
-        # self.ui.txt_weldFu.setMaxLength(7)
-        # self.ui.btn_defaults.clicked.connect(self.save_default_para)
-        # self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_save.hide()
         self.ui.btn_close.clicked.connect(self.close_designPref)
-        # self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
-        # self.ui.pushButton_Import_Column.setDisabled(True)
-        #self.ui.pushButton_Import_Beam.setDisabled(True)
-        # self.ui.pushButton_Add_Column.clicked.connect(self.add_ColumnPref)
-        # self.ui.pushButton_Add_Beam.clicked.connect(self.add_BeamPref)
-        # self.ui.pushButton_Clear_Column.clicked.connect(self.clear_ColumnPref)
-        #self.ui.pushButton_Clear_Beam.clicked.connect(self.clear_BeamPref)
-        # pushButton_Download_Column = self.ui.tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Download_Column')
-        # pushButton_Download_Column.clicked.connect(self.download_Database_Column)
-        # pushButton_Download_Beam = self.ui.tab_Beam.findChild(QtWidgets.QWidget, 'pushButton_Download_Beam')
-        # pushButton_Download_Beam.clicked.connect(self.download_Database_Beam)
-        #
-        # pushButton_Import_Column = self.ui.tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Import_Column')
-        # pushButton_Import_Column.clicked.connect(self.import_ColumnPref)
-        # pushButton_Import_Beam = self.ui.tab_Beam.findChild(QtWidgets.QWidget, 'pushButton_Import_Beam')
-        # pushButton_Import_Beam.clicked.connect(self.import_BeamPref)
-        #self.ui.btn_save.clicked.connect(Ui_ModuleWindow.design_preferences(Ui_ModuleWindow()))
-        #self.ui.combo_boltHoleType.currentIndexChanged.connect(my_fn)
-        #self.ui.btn_save.clicked.connect(self.save_fn)
         self.ui.btn_defaults.clicked.connect(self.default_fn)
 
     def default_fn(self):
+        '''
+        @author: Umair
+        '''
         for children in self.ui.tab_Bolt.children():
             if children.objectName() == KEY_DP_BOLT_TYPE:
                 children.setCurrentIndex(0)
@@ -1142,11 +989,6 @@ class DesignPreferences(QDialog):
             else:
                 pass
 
-    # def save_fn(self):
-    #     for children in self.ui.tab_Bolt.children():
-    #         if isinstance(children, QtWidgets.QComboBox):
-    #             children.setCurrentIndex(children.currentIndex())
-    #             print('check')
 
     def save_designPref_para(self):
         """This routine is responsible for saving all design preferences selected by the user
@@ -1234,6 +1076,9 @@ class DesignPreferences(QDialog):
     #
     #     conn.close()
     def column_preferences(self, designation, table, material_grade):
+        '''
+        @author: Umair
+        '''
         col_list = []
         col_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(col_attributes, table, designation)
@@ -1306,47 +1151,10 @@ class DesignPreferences(QDialog):
             if e.text() != "":
                 e.textChanged.connect(lambda: self.new_sectionalprop_Column(col_list))
 
-        # self.ui.lineEdit_Designation_Column.setText(designation)
-        # self.ui.lineEdit_Source_Column.setText(col_attributes.source)
-        # self.ui.lineEdit_UltimateStrength_Column.setText(str(col_attributes.fu))
-        # self.ui.lineEdit_YieldStrength_Column.setText(str(col_attributes.fy))
-        # self.ui.lineEdit_Depth_Column.setText(str(col_attributes.depth))
-        # self.ui.lineEdit_FlangeWidth_Column.setText(str(col_attributes.flange_width))
-        # self.ui.lineEdit_FlangeThickness_Column.setText(str(col_attributes.flange_thickness))
-        # self.ui.lineEdit_WeBThickness_Column.setText(str(col_attributes.web_thickness))
-        # self.ui.lineEdit_FlangeSlope_Column.setText(str(col_attributes.flange_slope))
-        # self.ui.lineEdit_RootRadius_Column.setText(str(col_attributes.root_radius))
-        # self.ui.lineEdit_ToeRadius_Column.setText(str(col_attributes.toe_radius))
-        # self.ui.lineEdit_ModElasticity_Column.setText("200")
-        # self.ui.lineEdit_ModElasticity_Column.setDisabled(True)
-        # self.ui.lineEdit_ModulusOfRigidity_Column.setText("76.9")
-        # self.ui.lineEdit_ModulusOfRigidity_Column.setDisabled(True)
-        # self.ui.lineEdit_PoissionsRatio_Column.setText("0.3")
-        # self.ui.lineEdit_PoissionsRatio_Column.setDisabled(True)
-        # self.ui.lineEdit_ThermalExpansion_Column.setText("12")
-        # self.ui.lineEdit_ThermalExpansion_Column.setDisabled(True)
-        # self.ui.lineEdit_Mass_Column.setText(str(col_attributes.mass))
-        # self.ui.lineEdit_SectionalArea_Column.setText(str(col_attributes.area))
-        # self.ui.lineEdit_MomentOfAreaZ_Column.setText(str(col_attributes.mom_inertia_z))
-        # self.ui.lineEdit_MomentOfAreaY_Column.setText(str(col_attributes.mom_inertia_y))
-        # self.ui.lineEdit_RogZ_Column.setText(str(col_attributes.rad_of_gy_z))
-        # self.ui.lineEdit_RogY_Column.setText(str(col_attributes.rad_of_gy_y))
-        # self.ui.lineEdit_ElasticModZ_Column.setText(str(col_attributes.elast_sec_mod_z))
-        # self.ui.lineEdit_ElasticModY_Column.setText(str(col_attributes.elast_sec_mod_y))
-        # self.ui.lineEdit_ElasticModPZ_Column.setText(str(col_attributes.plast_sec_mod_z))
-        # self.ui.lineEdit_ElasticModPY_Column.setText(str(col_attributes.plast_sec_mod_y))
-        # self.ui.pushButton_Add_Column.setEnabled(True)
-        # self.ui.pushButton_Add_Column.clicked.connect(lambda: self.add_ColumnPref(table))
-        #
-        # if (
-        #         self.ui.lineEdit_Depth_Column.text() != "" and self.ui.lineEdit_FlangeWidth_Column.text() != "" and self.ui.lineEdit_FlangeThickness_Column.text() != ""
-        #         and self.ui.lineEdit_WeBThickness_Column.text() != ""):
-        #     self.ui.lineEdit_Depth_Column.textChanged.connect(self.new_sectionalprop_Column)
-        #     self.ui.lineEdit_FlangeWidth_Column.textChanged.connect(self.new_sectionalprop_Column)
-        #     self.ui.lineEdit_FlangeThickness_Column.textChanged.connect(self.new_sectionalprop_Column)
-        #     self.ui.lineEdit_WeBThickness_Column.textChanged.connect(self.new_sectionalprop_Column)
-
     def beam_preferences(self, designation, material_grade):
+        '''
+        @author: Umair
+        '''
         beam_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(beam_attributes, "Beams", designation)
         beam_list = []
@@ -1417,48 +1225,11 @@ class DesignPreferences(QDialog):
         for e in beam_list:
             if e.text() != "":
                 e.textChanged.connect(lambda: self.new_sectionalprop_Beam(beam_list))
-        # self.ui.lineEdit_Designation_Beam.setText(designation)
-        # self.ui.lineEdit_Source_Beam.setText(str(beam_attributes.source))
-        # self.ui.lineEdit_UltimateStrength_Beam.setText(str(beam_attributes.fu))
-        # self.ui.lineEdit_YieldStrength_Beam.setText(str(beam_attributes.fy))
-        # self.ui.lineEdit_Depth_Beam.setText(str(beam_attributes.depth))
-        # self.ui.lineEdit_FlangeWidth_Beam.setText(str(beam_attributes.flange_width))
-        # self.ui.lineEdit_FlangeThickness_Beam.setText(str(beam_attributes.flange_thickness))
-        # self.ui.lineEdit_WeBThickness_Beam.setText(str(beam_attributes.web_thickness))
-        # self.ui.lineEdit_FlangeSlope_Beam.setText(str(beam_attributes.flange_slope))
-        # self.ui.lineEdit_RootRadius_Beam.setText(str(beam_attributes.root_radius))
-        # self.ui.lineEdit_ToeRadius_Beam.setText(str(beam_attributes.toe_radius))
-        # self.ui.lineEdit_ModElasticity_Beam.setText("200")
-        # self.ui.lineEdit_ModElasticity_Beam.setDisabled(True)
-        # self.ui.lineEdit_ModulusOfRigidity_Beam.setText("76.9")
-        # self.ui.lineEdit_ModulusOfRigidity_Beam.setDisabled(True)
-        # self.ui.lineEdit_PoissonsRatio_Beam.setText("0.3")
-        # self.ui.lineEdit_PoissonsRatio_Beam.setDisabled(True)
-        # self.ui.lineEdit_ThermalExpansion_Beam.setText("12")
-        # self.ui.lineEdit_ThermalExpansion_Beam.setDisabled(True)
-        # self.ui.lineEdit_Mass_Beam.setText(str(beam_attributes.mass))
-        # self.ui.lineEdit_SectionalArea_Beam.setText(str(beam_attributes.area))
-        # self.ui.lineEdit_MomentOfAreaZ_Beam.setText(str(beam_attributes.mom_inertia_z))
-        # self.ui.lineEdit_MomentOfAreaY_Beam.setText(str(beam_attributes.mom_inertia_y))
-        # self.ui.lineEdit_RogZ_Beam.setText(str(beam_attributes.rad_of_gy_z))
-        # self.ui.lineEdit_RogY_Beam.setText(str(beam_attributes.rad_of_gy_y))
-        # self.ui.lineEdit_ElasticModZ_Beam.setText(str(beam_attributes.elast_sec_mod_z))
-        # self.ui.lineEdit_ElasticModY_Beam.setText(str(beam_attributes.elast_sec_mod_y))
-        # self.ui.lineEdit_ElasticModPZ_Beam.setText(str(beam_attributes.plast_sec_mod_z))
-        # self.ui.lineEdit_ElasticModPY_Beam.setText(str(beam_attributes.plast_sec_mod_y))
-        # self.ui.pushButton_Add_Beam.setEnabled(True)
-        # self.ui.pushButton_Add_Beam.clicked.connect(self.add_BeamPref)
-        #
-        #
-        # if (
-        #         self.ui.lineEdit_Depth_Beam.text() != "" and self.ui.lineEdit_FlangeWidth_Beam.text() != "" and self.ui.lineEdit_FlangeThickness_Beam.text() != ""
-        #         and self.ui.lineEdit_WeBThickness_Beam.text() != ""):
-        #     self.ui.lineEdit_Depth_Beam.textChanged.connect(self.new_sectionalprop_Beam)
-        #     self.ui.lineEdit_FlangeWidth_Beam.textChanged.connect(self.new_sectionalprop_Beam)
-        #     self.ui.lineEdit_FlangeThickness_Beam.textChanged.connect(self.new_sectionalprop_Beam)
-        #     self.ui.lineEdit_WeBThickness_Beam.textChanged.connect(self.new_sectionalprop_Beam)
 
     def new_sectionalprop_Column(self, col_list):
+        '''
+        @author: Umair
+        '''
 
         for e in col_list:
             if e.text() != "":
@@ -1501,43 +1272,10 @@ class DesignPreferences(QDialog):
                 else:
                     pass
 
-
-
-        # if self.ui.lineEdit_Depth_Column.text() == "":
-        #     return
-        # else:
-        #     D = float(self.ui.lineEdit_Depth_Column.text())
-        #
-        # if self.ui.lineEdit_FlangeWidth_Column.text() == "":
-        #     return
-        # else:
-        #     B = float(self.ui.lineEdit_FlangeWidth_Column.text())
-        #
-        # if self.ui.lineEdit_FlangeThickness_Column.text() == "":
-        #     return
-        # else:
-        #     t_w = float(self.ui.lineEdit_FlangeThickness_Column.text())
-        #
-        # if self.ui.lineEdit_WeBThickness_Column.text() == "":
-        #     return
-        # else:
-        #     t_f = float(self.ui.lineEdit_WeBThickness_Column.text())
-        #
-        # self.sectionalprop = I_sectional_Properties()
-        # self.ui.lineEdit_Mass_Column.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
-        # self.ui.lineEdit_SectionalArea_Column.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
-        # self.ui.lineEdit_MomentOfAreaZ_Column.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
-        # self.ui.lineEdit_MomentOfAreaY_Column.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
-        # self.ui.lineEdit_RogZ_Column.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
-        # self.ui.lineEdit_RogY_Column.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
-        # self.ui.lineEdit_ElasticModZ_Column.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
-        # self.ui.lineEdit_ElasticModY_Column.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
-        # self.ui.lineEdit_ElasticModPZ_Column.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
-        # self.ui.lineEdit_ElasticModPY_Column.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
-        #
-        # self.ui.pushButton_Add_Column.setEnabled(True)
-
     def new_sectionalprop_Beam(self, beam_list):
+        '''
+        @author: Umair
+        '''
 
         for e in beam_list:
             if e.text() != "":
@@ -1579,215 +1317,6 @@ class DesignPreferences(QDialog):
                     c.setEnabled(True)
                 else:
                     pass
-        # if self.ui.lineEdit_Depth_Beam.text() == "":
-        #     return
-        # else:
-        #     D = float(self.ui.lineEdit_Depth_Beam.text())
-        #
-        # if self.ui.lineEdit_FlangeWidth_Beam.text() == "":
-        #     return
-        # else:
-        #     B = float(self.ui.lineEdit_FlangeWidth_Beam.text())
-        #
-        # if self.ui.lineEdit_FlangeThickness_Beam.text() == "":
-        #     return
-        # else:
-        #     t_w = float(self.ui.lineEdit_FlangeThickness_Beam.text())
-        #
-        # if self.ui.lineEdit_WeBThickness_Beam.text() == "":
-        #     return
-        # else:
-        #     t_f = float(self.ui.lineEdit_WeBThickness_Beam.text())
-        #
-        # self.sectionalprop = I_sectional_Properties()
-        # self.ui.lineEdit_Mass_Beam.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
-        # self.ui.lineEdit_SectionalArea_Beam.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
-        # self.ui.lineEdit_MomentOfAreaZ_Beam.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
-        # self.ui.lineEdit_MomentOfAreaY_Beam.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
-        # self.ui.lineEdit_RogZ_Beam.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
-        # self.ui.lineEdit_RogY_Beam.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
-        # self.ui.lineEdit_ElasticModZ_Beam.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
-        # self.ui.lineEdit_ElasticModY_Beam.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
-        # self.ui.lineEdit_ElasticModPZ_Beam.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
-        # self.ui.lineEdit_ElasticModPY_Beam.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
-        # self.ui.pushButton_Add_Beam.setEnabled(True)
-
-    def add_ColumnPref(self, table):
-
-        if (
-                self.ui.lineEdit_Designation_Column.text() == "" or self.ui.lineEdit_Mass_Column.text() == "" or self.ui.lineEdit_SectionalArea_Column.text() == "" or self.ui.lineEdit_Depth_Column.text() == ""
-                or self.ui.lineEdit_FlangeWidth_Column.text() == "" or self.ui.lineEdit_WeBThickness_Column.text() == "" or self.ui.lineEdit_FlangeThickness_Column.text() == "" or self.ui.lineEdit_FlangeSlope_Column.text() == ""
-                or self.ui.lineEdit_RootRadius_Column.text() == "" or self.ui.lineEdit_ToeRadius_Column.text() == "" or self.ui.lineEdit_MomentOfAreaZ_Column.text() == "" or self.ui.lineEdit_MomentOfAreaY_Column.text() == ""
-                or self.ui.lineEdit_RogZ_Column.text() == "" or self.ui.lineEdit_RogY_Column.text() == "" or self.ui.lineEdit_ElasticModZ_Column.text() == "" or self.ui.lineEdit_ElasticModY_Column.text() == ""
-                or self.ui.lineEdit_Source_Column.text() == ""):
-            QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
-            self.ui.pushButton_Add_Column.setDisabled(True)
-
-
-        else:
-            self.ui.pushButton_Add_Column.setEnabled(True)
-            Designation_c = self.ui.lineEdit_Designation_Column.text()
-            Mass_c = float(self.ui.lineEdit_Mass_Column.text())
-            Area_c = float(self.ui.lineEdit_SectionalArea_Column.text())
-            D_c = float(self.ui.lineEdit_Depth_Column.text())
-            B_c = float(self.ui.lineEdit_FlangeWidth_Column.text())
-            tw_c = float(self.ui.lineEdit_WeBThickness_Column.text())
-            T_c = float(self.ui.lineEdit_FlangeThickness_Column.text())
-            FlangeSlope_c = float(self.ui.lineEdit_FlangeSlope_Column.text())
-            R1_c = float(self.ui.lineEdit_RootRadius_Column.text())
-            R2_c = float(self.ui.lineEdit_ToeRadius_Column.text())
-            Iz_c = float(self.ui.lineEdit_MomentOfAreaZ_Column.text())
-            Iy_c = float(self.ui.lineEdit_MomentOfAreaY_Column.text())
-            rz_c = float(self.ui.lineEdit_RogZ_Column.text())
-            ry_c = float(self.ui.lineEdit_RogY_Column.text())
-            Zz_c = float(self.ui.lineEdit_ElasticModZ_Column.text())
-            Zy_c = float(self.ui.lineEdit_ElasticModY_Column.text())
-            if (self.ui.lineEdit_ElasticModPZ_Column.text() == "" or self.ui.lineEdit_ElasticModPY_Column.text() == ""):
-                self.ui.lineEdit_ElasticModPZ_Column.setText("0")
-                self.ui.lineEdit_ElasticModPY_Column.setText("0")
-            Zpz_c = self.ui.lineEdit_ElasticModPZ_Column.text()
-            Zpy_c = self.ui.lineEdit_ElasticModPY_Column.text()
-            Source_c = self.ui.lineEdit_Source_Column.text()
-
-            conn = sqlite3.connect(PATH_TO_DATABASE)
-
-            c = conn.cursor()
-            if table == "Beams":
-                c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_c,))
-                data = c.fetchone()[0]
-            else:
-                c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (Designation_c,))
-                data = c.fetchone()[0]
-            if data == 0:
-                if table == "Beams":
-                    c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
-                                                                                                               Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                              (Designation_c, Mass_c, Area_c,
-                               D_c, B_c, tw_c, T_c,
-                               R1_c, R2_c, Iz_c, Iy_c, rz_c,
-                               ry_c, Zz_c, Zy_c,
-                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
-                    conn.commit()
-                else:
-                    c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
-                                                                                           Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                              (Designation_c, Mass_c, Area_c,
-                               D_c, B_c, tw_c, T_c,
-                               R1_c, R2_c, Iz_c, Iy_c, rz_c,
-                               ry_c, Zz_c, Zy_c,
-                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
-                    conn.commit()
-                c.close()
-                conn.close()
-                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
-            else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
-                self.clear_ColumnPref()
-
-    def add_BeamPref(self):
-
-        if (
-                self.ui.lineEdit_Designation_Beam.text() == "" or self.ui.lineEdit_Mass_Beam.text() == "" or self.ui.lineEdit_SectionalArea_Beam.text() == "" or self.ui.lineEdit_Depth_Beam.text() == ""
-                or self.ui.lineEdit_FlangeWidth_Beam.text() == "" or self.ui.lineEdit_WeBThickness_Beam.text() == "" or self.ui.lineEdit_FlangeThickness_Beam.text() == "" or self.ui.lineEdit_FlangeSlope_Beam.text() == ""
-                or self.ui.lineEdit_RootRadius_Beam.text() == "" or self.ui.lineEdit_ToeRadius_Beam.text() == "" or self.ui.lineEdit_MomentOfAreaZ_Beam.text() == "" or self.ui.lineEdit_MomentOfAreaY_Beam.text() == ""
-                or self.ui.lineEdit_RogZ_Beam.text() == "" or self.ui.lineEdit_RogY_Beam.text() == "" or self.ui.lineEdit_ElasticModZ_Beam.text() == "" or self.ui.lineEdit_ElasticModY_Beam.text() == ""
-                or self.ui.lineEdit_Source_Beam.text() == ""):
-            QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
-            self.ui.pushButton_Add_Beam.setDisabled(True)
-
-        else:
-            self.ui.pushButton_Add_Beam.setEnabled(True)
-            Designation_b = self.ui.lineEdit_Designation_Beam.text()
-            Mass_b = float(self.ui.lineEdit_Mass_Beam.text())
-            Area_b = float(self.ui.lineEdit_SectionalArea_Beam.text())
-            D_b = float(self.ui.lineEdit_Depth_Beam.text())
-            B_b = float(self.ui.lineEdit_FlangeWidth_Beam.text())
-            tw_b = float(self.ui.lineEdit_WeBThickness_Beam.text())
-            T_b = float(self.ui.lineEdit_FlangeThickness_Beam.text())
-            FlangeSlope_b = float(self.ui.lineEdit_FlangeSlope_Beam.text())
-            R1_b = float(self.ui.lineEdit_RootRadius_Beam.text())
-            R2_b = float(self.ui.lineEdit_ToeRadius_Beam.text())
-            Iz_b = float(self.ui.lineEdit_MomentOfAreaZ_Beam.text())
-            Iy_b = float(self.ui.lineEdit_MomentOfAreaY_Beam.text())
-            rz_b = float(self.ui.lineEdit_RogZ_Beam.text())
-            ry_b = float(self.ui.lineEdit_RogY_Beam.text())
-            Zz_b = float(self.ui.lineEdit_ElasticModZ_Beam.text())
-            Zy_b = float(self.ui.lineEdit_ElasticModY_Beam.text())
-            if (self.ui.lineEdit_ElasticModPZ_Beam.text() == "" or self.ui.lineEdit_ElasticModPY_Beam.text() == ""):
-                self.ui.lineEdit_ElasticModPZ_Beam.setText("0")
-                self.ui.lineEdit_ElasticModPY_Beam.setText("0")
-            Zpz_b = self.ui.lineEdit_ElasticModPZ_Beam.text()
-            Zpy_b = self.ui.lineEdit_ElasticModPY_Beam.text()
-            Source_b = self.ui.lineEdit_Source_Beam.text()
-
-            conn = sqlite3.connect(PATH_TO_DATABASE)
-
-            c = conn.cursor()
-            c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_b,))
-            data = c.fetchone()[0]
-            if data == 0:
-                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,Zz,zy,Zpz,Zpy,
-    				                                                FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                          (Designation_b, Mass_b, Area_b,
-                           D_b, B_b, tw_b, T_b, FlangeSlope_b,
-                           R1_b, R2_b, Iz_b, Iy_b, rz_b,
-                           ry_b, Zz_b, Zy_b,
-                           Zpz_b, Zpy_b, Source_b))
-                conn.commit()
-                c.close()
-                conn.close()
-                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
-            else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
-                self.clear_BeamPref()
-
-    def clear_ColumnPref(self):
-        self.ui.lineEdit_Designation_Column.clear()
-        self.ui.lineEdit_Source_Column.clear()
-        self.ui.lineEdit_UltimateStrength_Column.clear()
-        self.ui.lineEdit_YieldStrength_Column.clear()
-        self.ui.lineEdit_Depth_Column.clear()
-        self.ui.lineEdit_FlangeWidth_Column.clear()
-        self.ui.lineEdit_FlangeThickness_Column.clear()
-        self.ui.lineEdit_WeBThickness_Column.clear()
-        self.ui.lineEdit_FlangeSlope_Column.clear()
-        self.ui.lineEdit_RootRadius_Column.clear()
-        self.ui.lineEdit_ToeRadius_Column.clear()
-        self.ui.lineEdit_Mass_Column.clear()
-        self.ui.lineEdit_SectionalArea_Column.clear()
-        self.ui.lineEdit_MomentOfAreaZ_Column.clear()
-        self.ui.lineEdit_MomentOfAreaY_Column.clear()
-        self.ui.lineEdit_RogZ_Column.clear()
-        self.ui.lineEdit_RogY_Column.clear()
-        self.ui.lineEdit_ElasticModZ_Column.clear()
-        self.ui.lineEdit_ElasticModY_Column.clear()
-        self.ui.lineEdit_ElasticModPZ_Column.clear()
-        self.ui.lineEdit_ElasticModPY_Column.clear()
-        self.ui.pushButton_Add_Column.setDisabled(True)
-
-    def clear_BeamPref(self):
-        self.ui.lineEdit_Designation_Beam.clear()
-        self.ui.lineEdit_Source_Beam.clear()
-        self.ui.lineEdit_UltimateStrength_Beam.clear()
-        self.ui.lineEdit_YieldStrength_Beam.clear()
-        self.ui.lineEdit_Depth_Beam.clear()
-        self.ui.lineEdit_FlangeWidth_Beam.clear()
-        self.ui.lineEdit_FlangeThickness_Beam.clear()
-        self.ui.lineEdit_WeBThickness_Beam.clear()
-        self.ui.lineEdit_FlangeSlope_Beam.clear()
-        self.ui.lineEdit_RootRadius_Beam.clear()
-        self.ui.lineEdit_ToeRadius_Beam.clear()
-        self.ui.lineEdit_Mass_Beam.clear()
-        self.ui.lineEdit_SectionalArea_Beam.clear()
-        self.ui.lineEdit_MomentOfAreaZ_Beam.clear()
-        self.ui.lineEdit_MomentOfAreaY_Beam.clear()
-        self.ui.lineEdit_RogZ_Beam.clear()
-        self.ui.lineEdit_RogY_Beam.clear()
-        self.ui.lineEdit_ElasticModZ_Beam.clear()
-        self.ui.lineEdit_ElasticModY_Beam.clear()
-        self.ui.lineEdit_ElasticModPZ_Beam.clear()
-        self.ui.lineEdit_ElasticModPY_Beam.clear()
-        self.ui.pushButton_Add_Beam.setDisabled(True)
 
     def download_Database_Column(self):
         file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))

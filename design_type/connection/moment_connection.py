@@ -36,7 +36,10 @@ class MomentConnection(Connection):
     def plate_thick_customized():
         f = VALUES_PLATETHICKNESS_CUSTOMIZED
         return f
-
+    @staticmethod
+    def endplate_thick_customized():
+        d = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED
+        return d
     def customized_input(self):
 
         list1 = []
@@ -48,6 +51,7 @@ class MomentConnection(Connection):
         list1.append(t4)
         t5 = (KEY_FLANGEPLATE_THICKNESS, self.plate_thick_customized)
         list1.append(t5)
+
 
         return list1
     def set_input_values(self, design_dictionary):

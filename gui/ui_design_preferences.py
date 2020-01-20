@@ -9,7 +9,7 @@ from Common import *
 from utils.common.component import Section,I_sectional_Properties
 from utils.common.component import *
 from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.connection.shear_connection import ShearConnection
+from design_type.connection.connection import Connection
 
 from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
@@ -78,7 +78,7 @@ class Ui_Dialog(object):
         @author: Umair 
         '''
 
-        supporting_section_list = ShearConnection.supporting_section_values(self)
+        supporting_section_list = Connection.supporting_section_values(self)
         _translate = QtCore.QCoreApplication.translate
         i = 0
         j = 6
@@ -191,7 +191,7 @@ class Ui_Dialog(object):
         self.tab_Beam = QtWidgets.QWidget()
         self.tab_Beam.setObjectName("tab_Beam")
 
-        supported_section_list = ShearConnection.supported_section_values(self)
+        supported_section_list = Connection.supported_section_values(self)
         _translate = QtCore.QCoreApplication.translate
         i = 0
         j = 6
@@ -437,7 +437,7 @@ class Ui_Dialog(object):
                                             "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.1</span></p>\n"
                                             "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></td></tr></table></body></html>"))
 
-        bolt_list = ShearConnection.bolt_values(self)
+        bolt_list = Connection.bolt_values(self)
         _translate = QtCore.QCoreApplication.translate
         i = 40
         for element in bolt_list:
@@ -534,7 +534,7 @@ class Ui_Dialog(object):
                                        "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Shop weld takes a material safety factor of 1.25</span></p>\n"
                                        "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Field weld takes a material safety factor of 1.5</span></p>\n"
                                        "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">(IS 800 - cl. 5. 4. 1 or Table 5)</span></p></body></html>"))
-        weld_list = ShearConnection.weld_values(self)
+        weld_list = Connection.weld_values(self)
         _translate = QtCore.QCoreApplication.translate
         i = 40
         for element in weld_list:
@@ -618,7 +618,7 @@ class Ui_Dialog(object):
                                        "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
                                        "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>"))
 
-        detailing_list = ShearConnection.detailing_values(self)
+        detailing_list = Connection.detailing_values(self)
         _translate = QtCore.QCoreApplication.translate
         i = 40
         for element in detailing_list:
@@ -678,7 +678,7 @@ class Ui_Dialog(object):
         self.tab_Design = QtWidgets.QWidget()
         self.tab_Design.setObjectName("tab_Design")
 
-        design_list = ShearConnection.design_values(self)
+        design_list = Connection.design_values(self)
         _translate = QtCore.QCoreApplication.translate
         i = 40
         for element in design_list:

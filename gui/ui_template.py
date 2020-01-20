@@ -669,8 +669,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.inputDock.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.inputDock)
 
-        key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
-        key_changed.currentIndexChanged.connect(lambda: self.validate_beam_beam(key_changed))
+        # if module not in [KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COLUMNCOVERPLATE]:
+        #     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
+        #     key_changed.currentIndexChanged.connect(lambda: self.validate_beam_beam(key_changed))
 
 # OUTPUT DOCK
 #############

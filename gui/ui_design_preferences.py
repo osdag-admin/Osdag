@@ -803,6 +803,10 @@ class Ui_Dialog(object):
                     Zpy_c = ch.text()
                 else:
                     pass
+            elif isinstance(ch, QtWidgets.QComboBox):
+                if ch.objectName() == KEY_SUPTNGSEC_TYPE:
+                    Type = ch.currentText()
+
 
         if ch == self.tab_Column.children()[len(self.tab_Column.children())-1]:
             conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -816,21 +820,21 @@ class Ui_Dialog(object):
             if data == 0:
                 if table == "Beams":
                     c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
-                        Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                        Zz,zy,Zpz,Zpy,FlangeSlope,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                               (Designation_c, Mass_c, Area_c,
                                D_c, B_c, tw_c, T_c,
                                R1_c, R2_c, Iz_c, Iy_c, rz_c,
                                ry_c, Zz_c, Zy_c,
-                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
+                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c, Type))
                     conn.commit()
                 else:
                     c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
-                        Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                        Zz,zy,Zpz,Zpy,FlangeSlope,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                               (Designation_c, Mass_c, Area_c,
                                D_c, B_c, tw_c, T_c,
                                R1_c, R2_c, Iz_c, Iy_c, rz_c,
                                ry_c, Zz_c, Zy_c,
-                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
+                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c, Type))
                     conn.commit()
                 c.close()
                 conn.close()
@@ -899,6 +903,9 @@ class Ui_Dialog(object):
                     Zpy_b = ch.text()
                 else:
                     pass
+            elif isinstance(ch, QtWidgets.QComboBox):
+                if ch.objectName() == KEY_SUPTDSEC_TYPE:
+                    Type = ch.currentText()
 
         if ch == self.tab_Beam.children()[len(self.tab_Beam.children())-1]:
 
@@ -909,12 +916,12 @@ class Ui_Dialog(object):
             data = c.fetchone()[0]
             if data == 0:
                 c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,Zz,zy,Zpz,Zpy,
-                    FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                    FlangeSlope,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                           (Designation_b, Mass_b, Area_b,
                            D_b, B_b, tw_b, T_b, FlangeSlope_b,
                            R1_b, R2_b, Iz_b, Iy_b, rz_b,
                            ry_b, Zz_b, Zy_b,
-                           Zpz_b, Zpy_b, Source_b))
+                           Zpz_b, Zpy_b, Source_b, Type))
                 conn.commit()
                 c.close()
                 conn.close()

@@ -1120,6 +1120,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         option_list = main.input_values(self)
         missing_fields_list = []
+        signal = True
 
         for option in option_list:
             if option[0] == KEY_CONN:
@@ -1146,7 +1147,7 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             self.design_fn(option_list, data)
             self.warning_function(main, self.design_inputs)
-            main.set_input_values(main, self.design_inputs)
+            main.set_input_values(main, self.design_inputs, signal)
             main.get_bolt_details(main)
             DESIGN_FLAG = 'True'
             out_list = main.output_values(main, DESIGN_FLAG)

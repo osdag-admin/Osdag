@@ -24,7 +24,6 @@ import pdfkit
 import configparser
 import cairosvg
 
-
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
 
@@ -290,10 +289,14 @@ class FinPlateConnection(ShearConnection):
         else:
             key.setText("")
 
-    def set_input_values(self, design_dictionary):
-        super(FinPlateConnection,self).set_input_values(self, design_dictionary)
+    def set_input_values(self, design_dictionary, signal):
+        if signal:
+            super(FinPlateConnection, self).set_input_values(self, design_dictionary)
+        else:
+            super(FinPlateConnection, self).set_input_values(design_dictionary)
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        print("yes")
 
     def get_bolt_details(self):
         print(self)
@@ -374,8 +377,20 @@ class FinPlateConnection(ShearConnection):
             print(self.plate)
 
 
-
 #
 # with open("filename", 'w') as out_file:
 #     yaml.dump(fin_plate_input, out_file)
+
+
+# For Command Line
+
+
+from ast import literal_eval
+
+path = input("Enter the file location: ")
+with open(path, 'r') as f:
+    data = f.read()
+    d = literal_eval(data)
+    FinPlateConnection.set_input_values(FinPlateConnection(), d, False)
+
 

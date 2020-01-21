@@ -278,11 +278,11 @@ class IS800_2007(object):
 
     # cl. 10.3.3 Shear Capacity of Bearing Bolt
     @staticmethod
-    def cl_10_3_3_bolt_shear_capacity(f_u, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter='field'):
+    def cl_10_3_3_bolt_shear_capacity(f_ub, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter='field'):
         """Calculate design shear strength of bearing bolt
 
         Args:
-            f_u - Ultimate tensile strength of the bolt in MPa (float)
+            f_ub - Ultimate tensile strength of the bolt in MPa (float)
             A_nb - Net shear area of the bolt at threads in sq. mm  (float)
             A_sb - Nominal plain shank area of the bolt in sq. mm  (float)
             n_n - Number of shear planes with threads intercepting the shear plane (int)
@@ -297,7 +297,7 @@ class IS800_2007(object):
             IS 800:2007,  cl 10.3.3
 
         """
-        V_nsb = f_u / math.sqrt(3) * (n_n * A_nb + n_s * A_sb)
+        V_nsb = f_ub / math.sqrt(3) * (n_n * A_nb + n_s * A_sb)
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         V_dsb = V_nsb/gamma_mb
         return V_dsb

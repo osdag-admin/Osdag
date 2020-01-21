@@ -561,7 +561,7 @@ class Ui_ModuleWindow(QMainWindow):
                 red_list_set = set(red_list_function())
                 current_list_set = set(option[4])
                 current_red_list = list(current_list_set.intersection(red_list_set))
-                print(current_red_list)
+
                 for value in current_red_list:
                     indx = option[4].index(str(value))
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
@@ -1159,8 +1159,6 @@ class Ui_ModuleWindow(QMainWindow):
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
-                    print(txt)
-                    print(option[3])
                     txt.setText(str(option[3]))
 
 # Function for warning about structure

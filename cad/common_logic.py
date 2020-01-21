@@ -11,6 +11,7 @@ import math
 from cad.items.notch import Notch
 from cad.items.bolt import Bolt
 from cad.items.nut import Nut
+from cad.items.plate import Plate
 from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
 from cad.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
@@ -279,11 +280,13 @@ class CommonDesignLogic(object):
         notch_height = self.get_notch_ht(A.supporting_section.flange_width, A.supporting_section.flange_thickness, A.supported_section.flange_thickness, A.supported_section.root_radius)
         notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
 
-        # if self.connection == "cleatAngle":
-        #     angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
-        # else:
-        #     plate = Plate(L=fillet_length, W=plate_width, T=plate_thick)
-        #     Fweld1 = FilletWeld(L=fillet_length, b=fillet_thickness, h=fillet_thickness)
+        if self.connection == "cleatAngle":
+            pass
+            # angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
+        else:
+            plate = Plate(L=A.plate.length, W=A.plate.height, T=A.plate.thickness_provided)
+
+        Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
         # --Notch dimensions
         if self.connection == "Finplate":
@@ -317,9 +320,9 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
         if self.connection == "Finplate":  # finBeamWebBeamWeb/endBeamWebBeamWeb
-            nut_space = A.supported_section.web_thickness + A.plate.thickness + nut_T
+            nut_space = A.supported_section.web_thickness + A.plate.thickness_provided + nut_T
             nutBoltArray = finNutBoltArray(A.bolt, nut, bolt, nut_space)
-            beamwebconn = FinBeamWebBeamWeb(A.supporting_section, A.supported_section, notchObj, A.plate, A.weld, nutBoltArray, gap)
+            beamwebconn = FinBeamWebBeamWeb(supporting, supported, notchObj, plate, Fweld1, nutBoltArray, gap)
             # column, beam, notch, plate, Fweld, nut_bolt_array
         # elif self.connection == "Endplate":
         #     nut_space = sBeam_tw + plate_thick + nut_T
@@ -400,25 +403,27 @@ class CommonDesignLogic(object):
         nut_Ht = bolt_dia
         gap = A.plate.gap
 
-        # if self.connection == "cleatAngle":
-        #     angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
-        # elif self.connection == 'SeatedAngle':
-        #     seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
-        #                       R2=seatangle_r2)
-        #     topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1=topangle_r1,
-        #                          R2=topangle_r2)
-        # else:
-        #     plate = Plate(L=fillet_length, W=plate_width, T=int(plate_thick))
+        if self.connection == "cleatAngle":
+            pass
+            # angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
+        elif self.connection == 'SeatedAngle':
+            pass
+            # seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
+            #                   R2=seatangle_r2)
+            # topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1=topangle_r1,
+            #                      R2=topangle_r2)
+        else:
+            plate = Plate(L=A.plate.length, W=A.plate.height, T=A.plate.thickness_provided)
 
-        # Fweld1 = FilletWeld(L=fillet_length, b=int(fillet_thickness), h=int(fillet_thickness))
+        Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
         if self.connection == "Finplate":  # finColWebBeamWeb
-            nut_space = A.supported_section.web_thickness + int(A.plate.th) + nut_T
-            nutBoltArray = finNutBoltArray(A,bolt, nut, bolt, nut_space)
-            colwebconn = FinColWebBeamWeb(A.supporting_section, A.supported_section, A.weld, A.plate, nutBoltArray)
+            nut_space = A.supported_section.web_thickness + int(A.plate.thickness_provided) + nut_T
+            nutBoltArray = finNutBoltArray(A.bolt, nut, bolt, nut_space)
+            colwebconn = FinColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
 
         # elif self.connection == "Endplate":
         #     nut_space = column_tw + int(plate_thick) + nut_T
@@ -547,21 +552,23 @@ class CommonDesignLogic(object):
         nut_Ht = bolt_dia
         gap = A.plate.gap
         #
-        # if self.connection == "cleatAngle":
-        #     angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
-        #     #bolt_len_required = float(bolt_T + 2 * (cleat_thick) + beam_tw + nut_T)
-        # elif self.connection == 'SeatedAngle':
-        #     seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
-        #                       R2=seatangle_r2)
-        #     #bolt_len_required = float(bolt_T + (seat_thick) + beam_tw + nut_T)
-        #     topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1=topangle_r1,
-        #                          R2=topangle_r2)
-        # else:
-        #     # plate = Plate(L= 300,W =100, T = 10)
-        #     plate = Plate(L=fillet_length, W=plate_width, T=int(plate_thick))
-        #
-        #     # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
-        #     Fweld1 = FilletWeld(L=fillet_length, b=int(fillet_thickness), h=int(fillet_thickness))
+        if self.connection == "cleatAngle":
+            pass
+            # angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
+            #bolt_len_required = float(bolt_T + 2 * (cleat_thick) + beam_tw + nut_T)
+        elif self.connection == 'SeatedAngle':
+            pass
+            # seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
+                              # R2=seatangle_r2)
+            #bolt_len_required = float(bolt_T + (seat_thick) + beam_tw + nut_T)
+            # topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1=topangle_r1,
+            #                      R2=topangle_r2)
+        else:
+            # plate = Plate(L= 300,W =100, T = 10)
+            plate = Plate(L=A.plate.length, W=A.plate.height, T=A.plate.thickness_provided)
+
+            # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
+        Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
@@ -570,12 +577,12 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
         if self.connection == "Finplate":
-            nut_space = A.supported_section.web_thickness+ int(A.plate.thickness) + nut_T
+            nut_space = A.supported_section.web_thickness+ int(A.plate.thickness_provided) + nut_T
             # nutBoltArray = finNutBoltArray(A, nut, bolt, nut_space)  # finColFlangeBeamWeb
             # colflangeconn = finColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray, gap)
 
-            nutBoltArray = finNutBoltArray(A, bolt, nut, bolt, nut_space)
-            colflangeconn = FinColFlangeBeamWeb(A.supporting_section, A.supported_section, A.weld, A.plate, nutBoltArray)
+            nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
+            colflangeconn = FinColFlangeBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
         else:
             pass
         # elif self.connection == "Endplate":
@@ -614,16 +621,16 @@ class CommonDesignLogic(object):
 
         if bgcolor =="gradient_bg":
 
-            self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+            self.display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
         else:
-            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+            self.display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
 
         if self.loc == "Column flange-Beam web" and self.connection == "Finplate":
-            self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+            self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
         elif self.loc == "Column flange-Beam flange" and self.connection == "SeatedAngle":
-            self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+            self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
         elif self.loc == "Column web-Beam flange" and self.connection == "SeatedAngle":
-            self.display.View.SetProj(OCC.V3d.V3d_XposYnegZpos)
+            self.display.View.SetProj(OCC.Core.V3d.V3d_XposYnegZpos)
 
         if self.component == "Column":
             osdag_display_shape(self.display, self.connectivityObj.get_columnModel(), update=True)

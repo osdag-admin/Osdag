@@ -44,14 +44,15 @@ pDir      |      |       | End distance  |
 
     '''
 
-    def __init__(self, boltPlaceObj, nut, bolt, nut_space):
+    def __init__(self, boltPlaceObj, plateObj, nut, bolt, nut_space):
+        # finNutBoltArray(A.bolt, nut, bolt, nut_space)
 
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
         self.boltDir = None
 
-        self.initBoltPlaceParams(boltPlaceObj)
+        self.initBoltPlaceParams(plateObj)
 
         self.bolt = bolt
         self.nut = nut
@@ -78,15 +79,15 @@ pDir      |      |       | End distance  |
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
 
-    def initBoltPlaceParams(self, boltPlaceObj):
+    def initBoltPlaceParams(self, plateObj):
 
-        self.pitch = boltPlaceObj['Bolt']['pitch']
-        self.gauge = boltPlaceObj['Bolt']['gauge']
-        self.edge = boltPlaceObj['Bolt']['edge']
-        self.plateedge = boltPlaceObj['Plate']['plateedge']
-        self.end = boltPlaceObj['Bolt']['enddist']
-        self.row = boltPlaceObj['Bolt']['numofrow']
-        self.col = boltPlaceObj['Bolt']['numofcol']
+        self.pitch = plateObj.pitch_provided
+        self.gauge = plateObj.gauge_provided
+        self.edge = plateObj.edge_dist_provided
+        self.plateedge = plateObj.end_dist_provided + plateObj.gap
+        self.end = plateObj.end_dist_provided
+        self.row = plateObj.bolts_one_line
+        self.col = plateObj.bolt_line
 
     def calculatePositions(self):
         '''

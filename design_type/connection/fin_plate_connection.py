@@ -367,7 +367,7 @@ class FinPlateConnection(ShearConnection):
                 break
             bolts_required_previous = self.plate.bolts_required
             bolt_diameter_previous = self.bolt.bolt_diameter_provided
-            count +=1
+            count += 1
 
         bolts_required_previous = self.plate.bolts_required
 
@@ -406,14 +406,66 @@ class FinPlateConnection(ShearConnection):
         self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
                                          web_plate_h_min=min_plate_height, web_plate_h_max=max_plate_height,
                                          bolt_capacity=self.bolt.bolt_capacity,
-                                         min_end_dist=self.bolt.min_end_dist_round,
-                                         min_pitch=self.bolt.min_pitch_round, max_spacing=self.bolt.max_spacing_round,
-                                         max_end_dist=self.bolt.max_end_dist_round, shear_load=self.load.shear_force*1000,
+                                         min_edge_dist=self.bolt.min_edge_dist_round,
+                                         min_gauge=self.bolt.min_gauge_round, max_spacing=self.bolt.max_spacing_round,
+                                         max_edge_dist=self.bolt.max_edge_dist_round, shear_load=self.load.shear_force*1000,
                                          axial_load=self.load.axial_force*1000, gap=self.plate.gap,
                                          shear_ecc=True)
 
         edge_dist_rem = self.plate.edge_dist_provided+self.plate.gap
 
+        #################################
+        # Block Shear Check for supporting section
+        #################################
+
+        # while design_status_block_shear == False:
+        #     # print(design_status_block_shear)
+        #     # print(0, self.web_plate.max_end_dist, self.web_plate.end_dist_provided, self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
+        #     Avg_s = (self.plate.end_dist_provided + (self.plate.bolts_one_line - 1) * self.plate.pitch_provided)\
+        #             * self.supporting_section.web_thickness
+        #     Avn_s = ((self.plate.end_dist_provided + (self.plate.bolts_one_line - 1) * self.plate.pitch_provided)
+        #              - (self.plate.bolts_one_line - 0.5) * self.bolt.dia_hole) * self.supporting_section.web_thickness
+        #
+        #     Atg_s = ((self.plate.bolt_line - 1) * self.plate.gauge_provided + edge_dist_rem)\
+        #             * self.supporting_section.thickness_provided
+        #     Atn_s = ((self.plate.bolt_line - 1) * self.plate.gauge_provided -
+        #              (self.plate.bolt_line - 0.5) * self.bolt.dia_hole + edge_dist_rem) * \
+        #             self.supporting_section.web_thickness
+        #
+        #     Avg_a = 2 * (self.web_plate.edge_dist_provided + (
+        #             self.web_plate.bolts_one_line - 1) * gauge) * self.web_plate.thickness_provided
+        #     Avn_a = 2 * (self.web_plate.edge_dist_provided + (
+        #             self.web_plate.bolts_one_line - 1) * gauge - (
+        #                        self.web_plate.bolts_one_line - 0.5) * self.web_plate.dia_hole) * self.web_plate.thickness_provided
+        #     Atg_a = ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
+        #           self.web_plate.thickness_provided
+        #     Atn_a = ((self.web_plate.bolt_line - 1) * pitch + (
+        #             self.web_plate.bolt_line - 1) * self.web_plate.dia_hole + end_dist) * \
+        #           self.web_plate.thickness_provided
+        #
+        #
+        #     self.web_plate.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
+        #                                                                             A_tn=Atn,
+        #                                                                             f_u=self.supporting_section.fu,
+        #                                                                             f_y=self.supporting_section.fy)
+        #     # print(2, self.web_plate.thickness_provided, self.web_plate.block_shear_capacity, self.load.axial_force, self.web_plate.pitch_provided)
+        #     if self.web_plate.block_shear_capacity < self.load.axial_force:
+        #         if self.web_plate.max_spacing_round >= pitch + 5 and self.web_plate.max_end_dist >= end_dist + 5:  # increase thickness todo
+        #             if self.web_plate.bolt_line == 1:
+        #                 end_dist += 5
+        #             else:
+        #                 pitch += 5
+        #
+        #         else:
+        #             design_status_block_shear = False
+        #             break
+        #
+        #         # print(Avg, Avn, Atg, Atn)
+        #         # logger.error(": flange_plate_t is less than min_thk_flange_plate:")
+        #         # logger.warning(": Minimum flange_plate_t required is %2.2f mm" % (min_thk_flange_plate))
+        #     else:
+        #         design_status_block_shear = True
+        #         break
         self.plate.blockshear(numrow=self.plate.bolts_one_line, numcol=self.plate.bolt_line, pitch=self.plate.pitch_provided,
                               gauge=self.plate.gauge_provided, thk=self.plate.thickness[0], end_dist=self.plate.end_dist_provided,
                               edge_dist=edge_dist_rem, dia_hole=self.bolt.dia_hole,
@@ -448,3 +500,31 @@ class FinPlateConnection(ShearConnection):
         print(self.bolt)
         print(self.plate)
 
+    def block_shear_strength_section(self, A_vg, A_vn, A_tg, A_tn, f_u, f_y):
+        """Calculate the block shear strength of bolted connections as per cl. 6.4.1
+
+        Args:
+            A_vg: Minimum gross area in shear along bolt line parallel to external force [in sq. mm] (float)
+            A_vn: Minimum net area in shear along bolt line parallel to external force [in sq. mm] (float)
+            A_tg: Minimum gross area in tension from the bolt hole to the toe of the angle,
+                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+            A_tn: Minimum net area in tension from the bolt hole to the toe of the angle,
+                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+            f_u: Ultimate stress of the plate material in MPa (float)
+            f_y: Yield stress of the plate material in MPa (float)
+
+        Return:
+            block shear strength of bolted connection in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007, cl. 6.4.1
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
+        T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
+        Tdb = min(T_db1, T_db2)
+        Tdb = round(Tdb / 1000, 3)
+        return Tdb

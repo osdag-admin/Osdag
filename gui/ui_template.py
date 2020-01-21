@@ -1126,6 +1126,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         option_list = main.input_values(self)
         missing_fields_list = []
+        signal = True
 
         for option in option_list:
             if option[0] == KEY_CONN:

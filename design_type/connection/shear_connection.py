@@ -153,3 +153,4 @@ class ShearConnection(Connection):
         self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None))
 
 
+

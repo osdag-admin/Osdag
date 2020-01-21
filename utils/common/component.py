@@ -53,8 +53,8 @@ class Bolt(Material):
         self.max_edge_dist= 0.0
         self.max_end_dist = 0.0
         self.dia_hole = 0.0
-        self.min_pitch_round = round_up(self.min_pitch, 2)
-        self.min_gauge_round = round_up(self.min_gauge, 2)
+        self.min_pitch_round = round_up(self.min_pitch, 5)
+        self.min_gauge_round = round_up(self.min_gauge, 5)
         self.min_edge_dist_round = round_up(self.min_edge_dist, 5)
         self.min_end_dist_round = round_up(self.min_end_dist, 5)
         self.max_spacing_round = round_down(self.max_spacing, 5)
@@ -368,7 +368,7 @@ class Plate(Material):
         :param max_end_dist_round: maximum end distance
         :return: pitch, end distance, height of plate (false if applicable)
         """
-        gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=1)
+        gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
         web_plate_h = gauge*(bolts_one_line - 1) + edge_dist*2
         if gauge > max_spacing:
             gauge, edge_dist = self.get_spacing_adjusted(gauge, edge_dist, max_spacing)
@@ -454,7 +454,10 @@ class Plate(Material):
             self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
                                                 min_edge_dist, min_gauge)
         [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,min_edge_dist,max_spacing, max_edge_dist)
-        pitch = min_gauge
+        if bolt_line == 1:
+            pitch = 0.0
+        else:
+            pitch = min_gauge
         end_dist = min_edge_dist
         moment_demand = 0.0
         vres = res_force / (bolt_line*bolts_one_line)

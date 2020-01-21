@@ -1,5 +1,6 @@
 from design_type.connection.shear_connection import ShearConnection
-
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from utils.common.component import *
@@ -237,33 +238,128 @@ class FinPlateConnection(ShearConnection):
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
         out_list.append(t1)
 
-        t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX,  self.bolt.bolt_diameter_provided if flag == 'True' else '')
+        t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX,  self.bolt.bolt_diameter_provided if flag == 'True' and self.design_flag else '')
         out_list.append(t2)
 
-        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag == 'True' else '')
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag == 'True' and self.design_flag else '')
         out_list.append(t3)
 
         t4 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
         out_list.append(t4)
 
-        t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, self.plate.thickness if flag == 'True' else '')
+        t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, self.plate.thickness if flag == 'True' and self.design_flag else '')
         out_list.append(t5)
 
-        t6 = (KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag == 'True' else '')
+        t6 = (KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag == 'True' and self.design_flag else '')
         out_list.append(t6)
 
-        t7 = (KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag == 'True' else '')
+        t7 = (KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag == 'True' and self.design_flag else '')
         out_list.append(t7)
 
         return out_list
 
-    def set_input_values(self, design_dictionary):
-        super(FinPlateConnection,self).set_input_values(self, design_dictionary)
-        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+    def set_input_values(self, design_dictionary, window):
 
-        self.warn_text(self)
-        self.get_bolt_details(self)
+        self.design_flag = self.func_for_validation(self, window, design_dictionary)
+        if self.design_flag:
+            super(FinPlateConnection, self).set_input_values(self, design_dictionary)
+            self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+                               material_grade=design_dictionary[KEY_MATERIAL],
+                               gap=design_dictionary[KEY_DP_DETAILING_GAP])
+
+            self.warn_text(self)
+            self.get_bolt_details(self)
+
+    def func_for_validation(self, window, design_dictionary):
+        flag = False
+        flag1 = True
+        option_list = self.input_values(self)
+        missing_fields_list = []
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                val = option[4]
+                if design_dictionary[option[0]] == val[0]:
+                    missing_fields_list.append(option[1])
+
+        if design_dictionary[KEY_CONN] == 'Beam-Beam':
+            primary = design_dictionary[KEY_SUPTNGSEC]
+            secondary = design_dictionary[KEY_SUPTDSEC]
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
+            lst = []
+            rows = cursor.fetchall()
+            for row in rows:
+                lst.append(row)
+            p_val = lst[0][0]
+            cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+            lst1 = []
+            rows1 = cursor2.fetchall()
+            for row1 in rows1:
+                lst1.append(row1)
+            s_val = lst1[0][0]
+            if p_val <= s_val:
+                QMessageBox.about(window, 'Information',
+                                  "Secondary beam depth is higher than clear depth of primary beam web "
+                                  "(No provision in Osdag till now)")
+                flag1 = False
+
+        if len(missing_fields_list) > 0:
+            QMessageBox.information(window, "Information",
+                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+            flag = False
+        else:
+            flag = True
+        if flag and flag1:
+            return True
+        else:
+            return False
+
+        # for option in option_list:
+        #     if option[0] == KEY_CONN:
+        #         continue
+        #     s = p.findChild(QtWidgets.QWidget, option[0])
+        #
+        #     if option[2] == TYPE_COMBOBOX:
+        #         if option[0] in [KEY_D, KEY_GRD, KEY_PLATETHK]:
+        #             continue
+        #         if s.currentIndex() == 0:
+        #             missing_fields_list.append(option[1])
+        #
+        #
+        #     elif option[2] == TYPE_TEXTBOX:
+        #         if s.text() == '':
+        #             missing_fields_list.append(option[1])
+        #     else:
+        #         pass
+
+
+
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
 
     def warn_text(self):
         # old_col_section = get_oldcolumncombolist()

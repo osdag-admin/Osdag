@@ -27,7 +27,6 @@ from io import StringIO
 
 
 
-
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
 
@@ -306,10 +305,14 @@ class FinPlateConnection(ShearConnection):
             logger.warning(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
-    def set_input_values(self, design_dictionary):
-        super(FinPlateConnection,self).set_input_values(self, design_dictionary)
+    def set_input_values(self, design_dictionary, signal):
+        if signal:
+            super(FinPlateConnection, self).set_input_values(self, design_dictionary)
+        else:
+            super(FinPlateConnection, self).set_input_values(design_dictionary)
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
     def member_capacity(self):
@@ -330,12 +333,15 @@ class FinPlateConnection(ShearConnection):
 
         if self.supported_section.shear_yielding_capacity > self.load.shear_force and \
                 self.supported_section.tension_yielding_capacity > self.load.axial_force:
+            print("preliminary member check is satisfactory. Doing bolt checks")
             self.get_bolt_details(self)
         else:
             logger.error(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
                            "than applied loads, Please select larger sections or decrease loads"
                             .format(self.supported_section.shear_yielding_capacity,
                                     self.supported_section.tension_yielding_capacity))
+            print("failed in preliminary member checks. Select larger sections or decrease loads")
+
 
     def get_bolt_details(self):
 
@@ -498,6 +504,9 @@ class FinPlateConnection(ShearConnection):
         print(self.bolt)
         print(self.plate)
 
+        # with open("filename", 'w') as out_file:
+        #     yaml.dump(fin_plate_input, out_file)
+
     def block_shear_strength_section(self, A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         """Calculate the block shear strength of bolted connections as per cl. 6.4.1
 
@@ -526,3 +535,14 @@ class FinPlateConnection(ShearConnection):
         Tdb = min(T_db1, T_db2)
         Tdb = round(Tdb / 1000, 3)
         return Tdb
+
+# For Command Line
+
+
+from ast import literal_eval
+
+path = input("Enter the file location: ")
+with open(path, 'r') as f:
+    data = f.read()
+    d = literal_eval(data)
+    FinPlateConnection.set_input_values(FinPlateConnection(), d, False)

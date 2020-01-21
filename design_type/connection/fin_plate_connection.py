@@ -238,41 +238,41 @@ class FinPlateConnection(ShearConnection):
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
         out_list.append(t1)
 
-        t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX,  self.bolt.bolt_diameter_provided if flag == 'True' and self.design_flag else '')
+        t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX,  self.bolt.bolt_diameter_provided if flag else '')
         out_list.append(t2)
 
-        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag == 'True' and self.design_flag else '')
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '')
         out_list.append(t3)
 
         t4 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
         out_list.append(t4)
 
-        t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, self.plate.thickness if flag == 'True' and self.design_flag else '')
+        t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, self.plate.thickness if flag else '')
         out_list.append(t5)
 
-        t6 = (KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag == 'True' and self.design_flag else '')
+        t6 = (KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
         out_list.append(t6)
 
-        t7 = (KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag == 'True' and self.design_flag else '')
+        t7 = (KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
         out_list.append(t7)
 
         return out_list
 
     def set_input_values(self, design_dictionary, window):
 
-        self.design_flag = self.func_for_validation(self, window, design_dictionary)
-        if self.design_flag:
-            super(FinPlateConnection, self).set_input_values(self, design_dictionary)
-            self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-                               material_grade=design_dictionary[KEY_MATERIAL],
-                               gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        # self.design_flag = self.func_for_validation(self, window, design_dictionary)
+        # if self.design_flag:
+        super(FinPlateConnection, self).set_input_values(self, design_dictionary)
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+                           material_grade=design_dictionary[KEY_MATERIAL],
+                           gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
-            self.warn_text(self)
-            self.get_bolt_details(self)
+        self.warn_text(self)
+        self.get_bolt_details(self)
 
     def func_for_validation(self, window, design_dictionary):
         flag = False
-        flag1 = True
+        flag1 = False
         option_list = self.input_values(self)
         missing_fields_list = []
         for option in option_list:
@@ -304,18 +304,21 @@ class FinPlateConnection(ShearConnection):
                 QMessageBox.about(window, 'Information',
                                   "Secondary beam depth is higher than clear depth of primary beam web "
                                   "(No provision in Osdag till now)")
-                flag1 = False
+            else:
+                flag1 = True
 
         if len(missing_fields_list) > 0:
             QMessageBox.information(window, "Information",
                                     self.generate_missing_fields_error_string(self, missing_fields_list))
-            flag = False
+            # flag = False
         else:
             flag = True
         if flag and flag1:
+            self.set_input_values(self, design_dictionary, window)
             return True
         else:
             return False
+
 
         # for option in option_list:
         #     if option[0] == KEY_CONN:
@@ -334,8 +337,6 @@ class FinPlateConnection(ShearConnection):
         #             missing_fields_list.append(option[1])
         #     else:
         #         pass
-
-
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """

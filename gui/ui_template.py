@@ -697,7 +697,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         self.dockWidgetContents_out = QtWidgets.QWidget()
         self.dockWidgetContents_out.setObjectName("dockWidgetContents_out")
-        out_list = main.output_values(main, DESIGN_FLAG)
+        out_list = main.output_values(main, False)
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
@@ -988,8 +988,8 @@ class Ui_ModuleWindow(QMainWindow):
         self.retranslateUi()
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        self.action_save_input.triggered.connect(lambda: self.validateInputsOnDesignBtn(main, data, "Save"))
-        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main, data, "Design"))
+        self.action_save_input.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Save"))
+        self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
 
@@ -1122,7 +1122,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for Input Validation
 
-    def validateInputsOnDesignBtn(self, main, data, trigger_type):
+    def common_function_for_save_and_design(self, main, data, trigger_type):
 
         option_list = main.input_values(self)
         # missing_fields_list = []
@@ -1151,9 +1151,11 @@ class Ui_ModuleWindow(QMainWindow):
             self.saveDesign_inputs()
         else:
             self.design_fn(option_list, data)
-            main.set_input_values(main, self.design_inputs, self)
-            DESIGN_FLAG = 'True'
-            out_list = main.output_values(main, DESIGN_FLAG)
+            valid = main.func_for_validation(main, self, self.design_inputs)
+            # main.set_input_values(main, self.design_inputs, self)
+            # DESIGN_FLAG = 'True'
+
+            out_list = main.output_values(main, valid)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])

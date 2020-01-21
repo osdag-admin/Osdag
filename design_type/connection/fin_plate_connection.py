@@ -3,6 +3,7 @@ from design_type.connection.shear_connection import ShearConnection
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from utils.common.component import *
+# from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
@@ -28,20 +29,20 @@ import cairosvg
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
 
-connectivity = "column_flange_beam_web"
-supporting_member_section = "HB 400"
-supported_member_section = "MB 300"
-fy = 250.0
-fu = 410.0
-shear_force = 100.0
-axial_force=100.0
-bolt_diameter = 24.0
-bolt_type = "friction_grip"
-bolt_grade = 8.8
-plate_thickness = 10.0
-weld_size = 6
-material_grade = "E 250 (Fe 410 W)B"
-material = Material(material_grade)
+# connectivity = "column_flange_beam_web"
+# supporting_member_section = "HB 400"
+# supported_member_section = "MB 300"
+# fy = 250.0
+# fu = 410.0
+# shear_force = 100.0
+# axial_force=100.0
+# bolt_diameter = 24.0
+# bolt_type = "friction_grip"
+# bolt_grade = 8.8
+# plate_thickness = 10.0
+# weld_size = 6
+# material_grade = "E 250 (Fe 410 W)B"
+# material = Material(material_grade)
 
 logger = None
 
@@ -294,6 +295,7 @@ class FinPlateConnection(ShearConnection):
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
 
     def get_bolt_details(self):
         print(self)
@@ -372,8 +374,19 @@ class FinPlateConnection(ShearConnection):
         else:        
             print(self.bolt)
             print(self.plate)
-
-
+    #
+    # def call_3DModel(self, bgcolor):
+    #     '''
+    #
+    #     This routine responsible for displaying 3D Cad model
+    #     :param flag: boolean
+    #     :return:
+    #     '''
+    #     if self.ui.btn3D.isChecked:
+    #         self.ui.chkBxCol.setChecked(Qt.Unchecked)
+    #         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #         self.ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #     self.commLogicObj.display_3DModel("Model",bgcolor)
 
 #
 # with open("filename", 'w') as out_file:

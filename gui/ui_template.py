@@ -794,6 +794,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionPaste.setFont(font)
         self.actionPaste.setObjectName("actionPaste")
         self.actionInput_Browser = QtWidgets.QAction(MainWindow)
+        self.actionInput_Browser = QtWidgets.QAction(MainWindow)
         self.actionInput_Browser.setObjectName("actionInput_Browser")
         self.actionOutput_Browser = QtWidgets.QAction(MainWindow)
         self.actionOutput_Browser.setObjectName("actionOutput_Browser")

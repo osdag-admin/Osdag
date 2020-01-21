@@ -8,52 +8,34 @@ import os
 import shutil
 import logging
 
-# flag = 1
-# logger = None
-
-# def set_osdaglogger(key):
-#     global logger
-#     logger = logging.getLogger('osdag')
-#     logger.setLevel(logging.DEBUG)
-#     handler = logging.StreamHandler()
-#     handler.setLevel(logging.DEBUG)
-#     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt= '%H:%M:%S')
-#
-#     handler.setFormatter(formatter)
-#     logger.addHandler(handler)
-#
-#     handler.setLevel(logging.WARNING)
-#     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-#     handler.setFormatter(formatter)
-#     logger.addHandler(handler)
-#     handler = OurLog(key)
-#     handler.setLevel(logging.WARNING)
-#     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-#     handler.setFormatter(formatter)
-#     logger.addHandler(handler)
-#
-# class OurLog(logging.Handler):
-#
-#     def __init__(self,key):
-#         logging.Handler.__init__(self)
-#         self.key = key
-#         # self.key.setText("INDIA")
-#
-#     def handle(self, record):
-#         msg = self.format(record)
-#         self.key.append(msg)
 
 
-# def module_setup():
-#     global logger
-#     logger = logging.getLogger("osdag.column_cover_plate")
-#     module_setup()
 
 class ColumnCoverPlate(MomentConnection):
 
     def __init__(self):
         super(ColumnCoverPlate, self).__init__()
 
+    def set_osdaglogger(key):
+        global logger
+        logger = logging.getLogger('osdag')
+        logger.setLevel(logging.DEBUG)
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+        handler.setLevel(logging.WARNING)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        handler = OurLog(key)
+        handler.setLevel(logging.WARNING)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
     def input_values(self, existingvalues={}):
 
@@ -190,39 +172,46 @@ class ColumnCoverPlate(MomentConnection):
         out_list.append(t1)
 
         t2 = (KEY_OUT_D_PROVIDED, KEY_DISP_OUT_D_PROVIDED, TYPE_TEXTBOX,
-              self.bolt.bolt_diameter_provided if flag == 'True' else '')
+              self.web_bolt.bolt_diameter_provided if flag == 'True' else '')
         out_list.append(t2)
 
         t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_OUT_GRD_PROVIDED, TYPE_TEXTBOX,
-              self.bolt.bolt_grade_provided if flag == 'True' else '')
+              self.web_bolt.bolt_grade_provided if flag == 'True' else '')
         out_list.append(t3)
 
-        # t4 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
-        # out_list.append(t4)
+        t4 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None)
+        out_list.append(t4)
 
-        # t5 = (KEY_OUT_PLATETHK, KEY_DISP_OUT_PLATETHK, TYPE_TEXTBOX, self.plate.thickness if flag == 'True' else '')
-        # out_list.append(t5)
 
-        # t4 = (
-        # KEY_OUT_PLATE_HEIGHT, KEY_DISP_OUT_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag == 'True' else '')
-        # out_list.append(t4)
-        #
-        # t5 = (
-        # KEY_OUT_PLATE_LENGTH, KEY_DISP_OUT_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag == 'True' else '')
-        # out_list.append(t5)
-        #
-        # t6 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None)
-        # out_list.append(t6)
-        #
-        # t7 = KEY_DISP_WEBPLATE_THICKNESS ,VALUES_WEBPLATE_THICKNESS,VALUES_PLATETHICKNESS_CUSTOMIZED, self.web_plate.thickness_provided if flag == 'True' else '')
-        # out_list.append(t7)
-        #
-        # t8 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
-        # out_list.append(t8)
-        #
-        # t9 = ( KEY_DISP_FLANGESPLATE_THICKNESS, VALUES_FLANGEPLATE_THICKNESS, VALUES_FLANGEPLATE_THICKNESS, self.flange_plate.thickness_provided if flag == 'True' else '')
-        # out_list.append(t9)
-        # return out_list
+        t5 = (KEY_WEB_PLATE_HEIGHT, KEY_DISP_WEB_PLATE_HEIGHT, TYPE_TEXTBOX,
+            self.web_plate.height if flag == 'True' else '')
+        out_list.append(t5)
+
+        t6 = (KEY_WEB_PLATE_LENGTH, KEY_DISP_WEB_PLATE_LENGTH, TYPE_TEXTBOX,
+              self.web_plate.length if flag == 'True' else '')
+        out_list.append(t6)
+
+        t7 = (KEY_WEBPLATE_THICKNESS,KEY_DISP_WEBPLATE_THICKNESS, VALUES_WEBPLATE_THICKNESS,VALUES_PLATETHICKNESS_CUSTOMIZED,
+              self.flange_plate.thickness if flag == 'True' else '')
+        out_list.append(t7)
+
+
+        t8 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
+        out_list.append(t8)
+
+        t9 = (KEY_FLANGE_PLATE_HEIGHT, KEY_DISP_FLANGE_PLATE_HEIGHT, TYPE_TEXTBOX, self.flange_plate.height if flag == 'True' else '')
+        out_list.append(t9)
+
+        t10 = (KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
+            self.flange_plate.height if flag == 'True' else '')
+        out_list.append(t10)
+
+        t11 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, VALUES_FLANGEPLATE_THICKNESS,
+              self.flange_plate.thickness if flag == 'True' else '')
+        out_list.append(t11)
+
+
+        return out_list
 
 
 
@@ -252,6 +241,8 @@ class ColumnCoverPlate(MomentConnection):
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.web_plate = Plate(thickness=design_dictionary.get(KEY_WEBPLATE_THICKNESS, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+
+        self.get_bolt_details(self)
 
     def get_bolt_details(self):
         global design_status
@@ -299,7 +290,7 @@ class ColumnCoverPlate(MomentConnection):
 
         ###### # capacity Check for flange = min(block, yielding, rupture)
 
-            #### Block shear capacity of  plate ###
+            #### Block shear capacity of  flange ###
 
         A_vn_flange = (self.section.flange_width - self.flange_plate.bolts_one_line * self.flange_plate.dia_hole) * \
                       self.section.flange_thickness
@@ -354,14 +345,10 @@ class ColumnCoverPlate(MomentConnection):
                 else:
                     break
 
-            # print(Avg, Avn, Atg, Atn)
-            # logger.error(": flange_plate_t is less than min_thk_flange_plate:")
-            # logger.warning(": Minimum flange_plate_t required is %2.2f mm" % (min_thk_flange_plate))
             else:
                 design_status_block_shear = True
-                print("A", design_status_block_shear)
                 break
-        # print("A", design_status_block_shear)
+
         # if design_status_block_shear is True:
         #     break
 
@@ -369,19 +356,19 @@ class ColumnCoverPlate(MomentConnection):
         flange_force = (((self.load.moment * 1000000 ) / (self.section.depth - self.section.flange_thickness)) + (
                 axial_force_f))
         flange_force = flange_force/1000
-        print(0,flange_force )
+
 
         self.Tension_capacity_flange = min(self.section.shear_yielding_capacity , self.section.shear_rupture_capacity,
         self.section.block_shear_capacity)
 
         if self.Tension_capacity_flange < flange_force:
             design_status = False
-            # logger.warning(": Tension capacity flange is less than required flange force kN")
-            # logger.info(": Increase the size of column section")
+            logger.warning(": Tension capacity flange is less than required flange force kN")
+            logger.info(": Increase the size of column section")
 
         else:
             pass
-        print(0, design_status)
+
         # capacity Check for flange_outsite_plate =min(block, yielding, rupture)
 
         ####Capacity of flange cover plate for bolted Outside #
@@ -446,29 +433,23 @@ class ColumnCoverPlate(MomentConnection):
                             break
 
                         # print(Avg, Avn, Atg, Atn)
-                        # logger.error(": flange_plate_t is less than min_thk_flange_plate:")
-                        # logger.warning(": Minimum flange_plate_t required is %2.2f mm" % (min_thk_flange_plate))
                     else:
                         design_status_block_shear = True
                         break
                 # print(design_status_block_shear)
                 if design_status_block_shear is True:
                     break
-            # print(design_status_block_shear)
-            # self.flange_plate.end_dist_provided = end_dist
-            # self.flange_plate.gauge_provided = gauge
-            # self.flange_plate.pitch_provided = pitch
 
             Tension_capacity_flange_plate = min(self.flange_plate.shear_yielding_capacity , self.flange_plate.shear_rupture_capacity,
                                                 self.flange_plate.block_shear_capacity )
-            # print(100,Tension_capacity_flange_plate)
-            # print(50,flange_force)
-            if Tension_capacity_flange_plate < flange_force:
+
+            if self.Tension_capacity_flange < flange_force:
                 design_status = False
+                logger.warning(": Tension capacity flange is less than required flange force kN")
+                logger.info(": Increase the size of column section")
+
             else:
                 pass
-            print(200, design_status)
-
         else:
             # capacity Check for flange_outsite_plate =min(block, yielding, rupture)
 
@@ -576,11 +557,14 @@ class ColumnCoverPlate(MomentConnection):
             # self.flange_plate.pitch_provided = pitch
             Tension_capacity_flange_plate = min(self.flange_plate.shear_yielding_capacity, self.flange_plate.shear_rupture_capacity,
                                                 self.flange_plate.block_shear_capacity)
-            if Tension_capacity_flange_plate < flange_force:
+            if self.Tension_capacity_flange < flange_force:
                 design_status = False
+                logger.warning(": Tension capacity flange is less than required flange force kN")
+                logger.info(": Increase the size of column section")
+
             else:
                 pass
-            print(300, design_status)
+            # print(300, design_status)
      ##########################################################################
         # Design of web splice plate
         self.web_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.web_bolt.bolt_diameter[0],
@@ -679,18 +663,11 @@ class ColumnCoverPlate(MomentConnection):
                                        factored_axial_force = self.load.axial_force, column_area=self.section.area)
         if Tension_capacity_web_plate < self.webforce:
             design_status = False
+            logger.warning(": Tension capacity web_plate is less than required web force kN ")
+            logger.error(": Increase the size of column section") # todo
 
         else:
             pass
-        print(400, design_status)
-        # print(design_status_block_shear)
-        # if design_status_block_shear is True:
-        #     break
-                    # design_status = True
-        # print(design_status_block_shear)
-        # self.web_plate.end_dist_provided = end_dist
-        # self.web_plate.gauge_provided = gauge
-        # self.web_plate.pitch_provided = pitch
 
         ###### # capacity Check for web plate in axial = min(block, yielding, rupture)
         A_vn_web = ( self.web_plate.height - (self.web_bolt.bolts_one_line * self.web_plate.dia_hole)) * self.section.web_thickness
@@ -746,9 +723,6 @@ class ColumnCoverPlate(MomentConnection):
                     else:
                         break
 
-                    # print(Avg, Avn, Atg, Atn)
-                    # logger.error(": flange_plate_t is less than min_thk_flange_plate:")
-                    # logger.warning(": Minimum flange_plate_t required is %2.2f mm" % (min_thk_flange_plate))
                 else:
                     design_status_block_shear = True
                     break
@@ -759,14 +733,11 @@ class ColumnCoverPlate(MomentConnection):
                                            factored_axial_force=self.load.axial_force, column_area=self.section.area)
             if Tension_capacity_web_plate < self.webforce:
                 design_status = False
+                logger.warning(": Tension capacity web_plate is less than required web force kN ")
+                logger.error(": Increase the size of column section")  # todo
 
             else:
                 pass
-            print(500, design_status)
-            # print(design_status_block_shear)
-            # if design_status_block_shear is True:
-            #     break
-
 
     ###### # capacity Check for web plate  in shear = min(block, yielding, rupture)
 
@@ -825,12 +796,14 @@ class ColumnCoverPlate(MomentConnection):
         self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,
                                        column_t_w=self.section.web_thickness,
                                        factored_axial_force=self.load.axial_force, column_area=self.section.area)
-        if Tension_capacity_web_plate  < self.webforce:
+        if Tension_capacity_web_plate < self.webforce:
             design_status = False
+            logger.warning(": Tension capacity web_plate is less than required web force kN ")
+            logger.error(": Increase the size of column section")  # todo
 
         else:
             pass
-        print(600, design_status)
+        # print(600, design_status)
 
 
         print(self.section)
@@ -842,6 +815,15 @@ class ColumnCoverPlate(MomentConnection):
         print(self.web_plate.thickness_provided)
         print(self.flange_plate.thickness_provided)
         print(design_status)
+
+        if design_status == True:
+
+            logger.error(": Overall bolted cover plate splice connection design is safe \n")
+            logger.debug(" :=========End Of design===========")
+        else:
+            logger.error(": Design is not safe \n ")
+            logger.debug(" :=========End Of design===========")
+
 
 
         ################################ CAPACITY CHECK #####################################################################################

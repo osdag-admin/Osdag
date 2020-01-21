@@ -246,6 +246,11 @@ KEY_FLANGEPLATE_THICKNESS = 'Plate.Flange_Splice.Thickness'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
+KEY_FLANGE_PLATE_HEIGHT = 'Plate.Flange_Splice.Height'
+KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
+KEY_FLANGE_PLATE_LENGTH ='Plate.Flange_Splice.Length'
+KEY_DISP_FLANGE_PLATE_LENGTH ='Length'
+
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
@@ -253,6 +258,11 @@ KEY_WEBPLATE_THICKNESS = 'Plate.Web_Splice.Thickness'
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+
+KEY_WEB_PLATE_HEIGHT = 'Plate.Web_Splice.Height'
+KEY_DISP_WEB_PLATE_HEIGHT = 'Height(mm)'
+KEY_WEB_PLATE_LENGTH ='Plate.Flange_Splice.Length'
+KEY_DISP_WEB_PLATE_LENGTH ='Length'
 
 DISP_TITLE_ENDPLATE = 'End plate'
 

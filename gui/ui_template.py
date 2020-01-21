@@ -285,6 +285,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
+
+
+        main.set_osdaglogger(self.textEdit)
         # self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -558,7 +561,7 @@ class Ui_ModuleWindow(QMainWindow):
                 red_list_set = set(red_list_function())
                 current_list_set = set(option[4])
                 current_red_list = list(current_list_set.intersection(red_list_set))
-                print(current_red_list)
+
                 for value in current_red_list:
                     indx = option[4].index(str(value))
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
@@ -1049,11 +1052,14 @@ class Ui_ModuleWindow(QMainWindow):
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
         self.design_inputs = design_dictionary
 
+    def pass_d(self, main, design_dictionary):
+        key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
+        main.warn_text(main, key, design_dictionary)
+        # main.set_input_values(main, design_dictionary)
 # Function for saving inputs in a file
     '''
     @author: Umair 
     '''
-
     def saveDesign_inputs(self):
         fileName, _ = QFileDialog.getSaveFileName(self,
                                                   "Save Design", os.path.join(' ', "untitled.osi"),
@@ -1146,23 +1152,19 @@ class Ui_ModuleWindow(QMainWindow):
             self.saveDesign_inputs()
         else:
             self.design_fn(option_list, data)
-            self.warning_function(main, self.design_inputs)
-            main.set_input_values(main, self.design_inputs, signal)
-            main.get_bolt_details(main)
+            main.set_input_values(main, self.design_inputs)
             DESIGN_FLAG = 'True'
             out_list = main.output_values(main, DESIGN_FLAG)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
-                    print(txt)
-                    print(option[3])
                     txt.setText(str(option[3]))
 
 # Function for warning about structure
 
-    def warning_function(self, main, design_dictionary):
-        key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
-        main.warn_text(main, key, design_dictionary)
+    # def warning_function(self, main, design_dictionary):
+    #     key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
+    #     main.warn_text(main, key, design_dictionary)
 
 # Function for error if any field is missing
 
@@ -1433,6 +1435,8 @@ class Ui_ModuleWindow(QMainWindow):
 
 from . import icons_rc
 if __name__ == '__main__':
+    # set_osdaglogger()
+
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()

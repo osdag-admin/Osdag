@@ -171,11 +171,11 @@ class ColumnCoverPlate(MomentConnection):
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
         out_list.append(t1)
 
-        t2 = (KEY_D, KEY_DISP_D , VALUES_D,  TYPE_TEXTBOX,
+        t2 = (KEY_D, KEY_OUT_DISP_D_PROVIDED,  TYPE_TEXTBOX,
               self.web_bolt.bolt_diameter_provided if flag == 'True' else '')
         out_list.append(t2)
 
-        t3 = (KEY_GRD , KEY_DISP_GRD, VALUES_GRD,VALUES_GRD_CUSTOMIZED, TYPE_TEXTBOX,
+        t3 = (KEY_GRD , KEY_DISP_GRD,  TYPE_TEXTBOX,
               self.web_bolt.bolt_grade_provided if flag == 'True' else '')
         out_list.append(t3)
 
@@ -191,24 +191,77 @@ class ColumnCoverPlate(MomentConnection):
               self.web_plate.length if flag == 'True' else '')
         out_list.append(t6)
 
-        t7 = (KEY_WEBPLATE_THICKNESS,KEY_DISP_WEBPLATE_THICKNESS, VALUES_WEBPLATE_THICKNESS,VALUES_PLATETHICKNESS_CUSTOMIZED,
-              self.flange_plate.thickness if flag == 'True' else '')
+        t7 = (KEY_WEBPLATE_THICKNESS,KEY_DISP_WEBPLATE_THICKNESS, TYPE_TEXTBOX,
+              self.web_plate.thickness_provided if flag == 'True' else '')
         out_list.append(t7)
 
-
-        t8 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
+        t8= (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX,
+               self.web_plate.pitch_provided if flag == 'True' else '')
         out_list.append(t8)
 
-        t9 = (KEY_FLANGE_PLATE_HEIGHT, KEY_DISP_FLANGE_PLATE_HEIGHT, TYPE_TEXTBOX, self.flange_plate.height if flag == 'True' else '')
+        t9=(KEY_WEB_GAUGE, KEY_DISP_WEB_PLATE_GAUGE, TYPE_TEXTBOX,
+               self.web_plate.gauge_provided if flag == 'True' else '')
         out_list.append(t9)
 
-        t10 = (KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-            self.flange_plate.height if flag == 'True' else '')
+        t10=(KEY_ENDDIST_W ,KEY_DISP_END_DIST_W, TYPE_TEXTBOX,
+               self.web_plate.end_dist_provided if flag == 'True' else '')
         out_list.append(t10)
 
-        t11 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, VALUES_FLANGEPLATE_THICKNESS,
-              self.flange_plate.thickness if flag == 'True' else '')
+        t11 = (KEY_EDGEDIST_W , KEY_DISP_EDGEDIST, TYPE_TEXTBOX,self.web_plate.edge_dist_provided if flag == 'True' else '')
         out_list.append(t11)
+
+        t12 = (KEY_BLOCKSHEARCAP_W, KEY_DISP_BLOCKSHEARCAP_W, TYPE_TEXTBOX,
+               self.web_plate.block_shear_capacity if flag == 'True' else '')
+        out_list.append(t12)
+
+        t13 = (KEY_SHEARYIELDINGCAP_W, KEY_DISP_SHEARYIELDINGCAP_W, TYPE_TEXTBOX,
+               self.web_plate.shear_yielding_capacity if flag == 'True' else '')
+        out_list.append(t13)
+
+        t14 = (KEY_SHEARRUPTURECAP_W, KEY_DISP_SHEARRUPTURECAP_W, TYPE_TEXTBOX,
+               self.web_plate.shear_rupture_capacity if flag == 'True' else '')
+        out_list.append(t14)
+
+        t15 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
+        out_list.append(t15)
+
+        t16 = (KEY_FLANGE_PLATE_HEIGHT, KEY_DISP_FLANGE_PLATE_HEIGHT, TYPE_TEXTBOX, self.flange_plate.height if flag == 'True' else '')
+        out_list.append(t16)
+
+        t17 = (KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
+            self.flange_plate.length if flag == 'True' else '')
+        out_list.append(t17)
+
+        t18 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
+              self.flange_plate.thickness_provided if flag == 'True' else '')
+        out_list.append(t17)
+
+        t19 = (KEY_FLANGE_PITCH,KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,self.flange_plate.pitch_provided if flag == 'True' else '')
+        out_list.append(t19)
+
+        t20 = (KEY_FLANGE_PLATE_GAUGE,KEY_DISP_FLANGE_PLATE_GAUGE , TYPE_TEXTBOX,
+               self.flange_plate.gauge_provided if flag == 'True' else '')
+        out_list.append(t20)
+
+        t21 = (KEY_ENDDIST_F,KEY_DISP_END_DIST_F ,TYPE_TEXTBOX,
+               self.flange_plate.end_dist_provided if flag == 'True' else '')
+        out_list.append(t21)
+
+        t22 = (KEY_EDGEDIST_F,KEY_DISP_EDGEDIST_F,TYPE_TEXTBOX,
+               self.flange_plate.edge_dist_provided if flag == 'True' else '')
+        out_list.append(t22)
+
+        t23 = (KEY_BLOCKSHEARCAP_F, KEY_DISP_BLOCKSHEARCAP_F, TYPE_TEXTBOX,
+               self.flange_plate.block_shear_capacity if flag == 'True' else '')
+        out_list.append(t23)
+
+        t24 = (KEY_SHEARYIELDINGCAP_F, KEY_DISP_SHEARYIELDINGCAP_F, TYPE_TEXTBOX,
+               self.flange_plate.shear_yielding_capacity if flag == 'True' else '')
+        out_list.append(t24)
+
+        t25 = (KEY_SHEARRUPTURECAP_F, KEY_DISP_SHEARRUPTURECAP_F, TYPE_TEXTBOX,
+               self.flange_plate.shear_rupture_capacity if flag == 'True' else '')
+        out_list.append(t25)
 
 
         return out_list
@@ -276,17 +329,17 @@ class ColumnCoverPlate(MomentConnection):
 
         self.flange_plate.get_web_plate_details(bolt_dia=self.flange_bolt.bolt_diameter[0], web_plate_h_min=min_plate_height,
                                          web_plate_h_max=max_plate_height, bolt_capacity=self.flange_bolt.bolt_capacity,
-                                         min_end_dist=self.flange_bolt.min_end_dist_round, min_pitch=self.flange_bolt.min_pitch_round,
-                                                max_spacing=self.flange_bolt.max_spacing_round, max_end_dist=self.flange_bolt.max_end_dist_round,
+                                         min_edge_dist=self.flange_bolt.max_end_dist_round, min_gauge = self.flange_bolt.min_gauge_round,
+                                                max_spacing = self.flange_bolt.max_spacing, max_edge_dist = self.flange_bolt.max_edge_dist,
                                                 axial_load=flange_force,
                                          shear_ecc=False)
 
-        end_dist_temp = self.flange_plate.end_dist_provided
-        gauge_temp = self.flange_plate.gauge_provided
-        self.flange_plate.end_dist_provided = self.flange_plate.edge_dist_provided
-        self.flange_plate.gauge_provided = self.flange_plate.pitch_provided
-        self.flange_plate.edge_dist_provided = end_dist_temp
-        self.flange_plate.pitch_provided = gauge_temp
+        # end_dist_temp = self.flange_plate.end_dist_provided
+        # gauge_temp = self.flange_plate.gauge_provided
+        # self.flange_plate.end_dist_provided = self.flange_plate.edge_dist_provided
+        # self.flange_plate.gauge_provided = self.flange_plate.pitch_provided
+        # self.flange_plate.edge_dist_provided = end_dist_temp
+        # self.flange_plate.pitch_provided = gauge_temp
 
         block_shear_capactity = 0
         moment_capacity = 0
@@ -580,6 +633,7 @@ class ColumnCoverPlate(MomentConnection):
         min_web_plate_height = self.section.min_plate_height()
         max_web_plate_height = self.section.max_plate_height()
         axial_force_w = int(((self.section.depth - 2 * ( self.section.flange_thickness)) * self.section.web_thickness * self.load.axial_force * 10) / self.section.area) / 1000
+
         self.web_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.web_bolt.bolt_diameter[0],
                                           bolt_grade_provided=self.web_bolt.bolt_grade[0],
                                           connecting_plates_tk=[self.web_plate.thickness[0],
@@ -588,10 +642,12 @@ class ColumnCoverPlate(MomentConnection):
 
         self.web_plate.get_web_plate_details(bolt_dia=self.web_bolt.bolt_diameter[0], web_plate_h_min=min_web_plate_height,
                                              web_plate_h_max=max_web_plate_height,
-                                             bolt_capacity=self.web_bolt.bolt_capacity,min_end_dist = self.flange_bolt.min_end_dist_round,
-                                             min_pitch = self.flange_bolt.min_pitch_round, max_spacing = self.flange_bolt.max_spacing_round, max_end_dist=self.flange_bolt.max_end_dist_round
+                                             bolt_capacity=self.web_bolt.bolt_capacity,min_edge_dist=self.web_bolt.max_end_dist_round, min_gauge = self.web_bolt.min_gauge_round,max_spacing = self.web_bolt.max_spacing_round,
+                                             max_edge_dist = self.web_bolt.max_edge_dist
                                              , shear_load= self.load.shear_force,axial_load=axial_force_w,
                                              gap=self.web_plate.gap, shear_ecc=True)
+
+
 
         block_shear_capacity = 0
         moment_capacity = 0

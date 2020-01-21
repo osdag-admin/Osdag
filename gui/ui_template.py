@@ -571,7 +571,7 @@ class Ui_ModuleWindow(QMainWindow):
                 red_list_set = set(red_list_function())
                 current_list_set = set(option[4])
                 current_red_list = list(current_list_set.intersection(red_list_set))
-                print(current_red_list)
+
                 for value in current_red_list:
                     indx = option[4].index(str(value))
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
@@ -1272,17 +1272,17 @@ class Ui_ModuleWindow(QMainWindow):
 #                     indx = option[4].index(str(value))
 #
 #                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+#
+#     def select_workspace_folder(self):
+#         # This function prompts the user to select the workspace folder and returns the name of the workspace folder
+#         config = configparser.ConfigParser()
+#         config.read_file(open(r'Osdag.config'))
+#         desktop_path = config.get("desktop_path", "path1")
+#         folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
+#                                                   desktop_path)
+#         return folder
 
-    def select_workspace_folder(self):
-        # This function prompts the user to select the workspace folder and returns the name of the workspace folder
-        config = configparser.ConfigParser()
-        config.read_file(open(r'Osdag.config'))
-        desktop_path = config.get("desktop_path", "path1")
-        folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
-                                                  desktop_path)
-        return folder
-
-    def validateInputsOnDesignBtn(self, main,data,trigger_type):
+    def validateInputsOnDesignBtn(self,main,data,trigger_type):
 
 
         option_list = main.input_values(self)
@@ -1314,8 +1314,13 @@ class Ui_ModuleWindow(QMainWindow):
             self.design_fn(option_list, data)
             main.set_input_values(main, self.design_inputs)
             DESIGN_FLAG = 'True'
+            out_list = main.output_values(main, DESIGN_FLAG)
+            for option in out_list:
+                if option[2] == TYPE_TEXTBOX:
+                    txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+                    txt.setText(str(option[3]))
             self.commLogicObj = CommonDesignLogic(self.display,self.folder,
-                                                  "Finplate")
+                                                  main.module)
             # self.resultObj = self.commLogicObj.resultObj
             # alist = self.resultObj.values()
             # self.display_output(self.resultObj)
@@ -1323,7 +1328,7 @@ class Ui_ModuleWindow(QMainWindow):
             # isempty = [True if val != '' else False for ele in alist for val in ele.values()]
 
             # if isempty[0] is True:
-            status = True
+            status = main.design_status
             self.commLogicObj.call_3DModel(status)
             if status is True:
                 # self.callFin2D_Drawing("All")
@@ -1340,13 +1345,7 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_beam.setEnabled(False)
                 self.actionShow_column.setEnabled(False)
                 self.actionShow_finplate.setEnabled(False)
-            out_list = main.output_values(main, DESIGN_FLAG)
-            for option in out_list:
-                if option[2] == TYPE_TEXTBOX:
-                    txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
-                    print(txt)
-                    print(option[3])
-                    txt.setText(str(option[3]))
+
 
 # Function for warning about structure
 

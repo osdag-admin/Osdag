@@ -94,16 +94,16 @@ pDir      |      |       | End distance  |
         Calculates the exact position for nuts and bolts.
         '''
         self.positions = []
-        for rw in range(self.row):
-            for col in range(self.col):
+        for rw in range(self.col):
+            for col in range(self.row):
                 pos = self.origin
                 # pos = pos + self.end * self.gaugeDir
                 # #pos = pos + self.edge * self.gaugeDir
                 pos = pos + self.plateedge * self.gaugeDir
-                pos = pos + col * self.gauge * self.gaugeDir
-                # pos = pos + self.edge * self.pitchDir
+                pos = pos + col * self.gauge * self.pitchDir
+                # pos = pos + self.edge * self.pitchDirself.gauge self.pitchDir
                 pos = pos + self.end * self.pitchDir
-                pos = pos + rw * self.pitch * self.pitchDir
+                pos = pos + rw * self.pitch * self.gaugeDir
 
                 self.positions.append(pos)
 

@@ -115,7 +115,7 @@ class CommonDesignLogic(object):
 
     # ============================= FinCalculation ===========================================
     # def call_calculation(self):  # Done
-    #     if self.connection == "Finplate":
+    #     if self.connection == "Fin Plate":
     #         outputs = finConn(self.uiObj)
     #     # elif self.connection == "Endplate":
     #     #     outputs = end_connection(self.uiObj)
@@ -227,7 +227,7 @@ class CommonDesignLogic(object):
         # pBeam_R1 = float(self.dictcoldata["R1"])
         # pBeam_R2 = float(self.dictcoldata["R2"])
         # pBeam_length = 800.0  # This parameter as per view of 3D cad model
-        if self.connection == "Finplate":
+        if self.connection == "Fin Plate":
             A = FinPlateConnection()
         else:
             pass
@@ -269,7 +269,7 @@ class CommonDesignLogic(object):
         #     fillet_thickness = float(self.uiObj["Weld"]['Size (mm)'])
         #     plate_width = float(self.resultObj['Plate']['width'])
 
-        bolt_dia = A.bolt.bolt_diameter_provided
+        bolt_dia = int(A.bolt.bolt_diameter_provided)
         bolt_r = bolt_dia / 2.0
         bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2.0
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
@@ -284,12 +284,12 @@ class CommonDesignLogic(object):
             pass
             # angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
         else:
-            plate = Plate(L=A.plate.length, W=A.plate.height, T=A.plate.thickness_provided)
+            plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
 
         Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
         # --Notch dimensions
-        if self.connection == "Finplate":
+        if self.connection == "Fin Plate":
             notchObj = Notch(R1=notch_R1,
                              height=notch_height,
                              #width= (pBeam_B/2.0 - (pBeam_tw/2.0 ))+ gap,
@@ -319,7 +319,7 @@ class CommonDesignLogic(object):
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        if self.connection == "Finplate":  # finBeamWebBeamWeb/endBeamWebBeamWeb
+        if self.connection == "Fin Plate":  # finBeamWebBeamWeb/endBeamWebBeamWeb
             nut_space = A.supported_section.web_thickness + A.plate.thickness_provided + nut_T
             nutBoltArray = finNutBoltArray(A.bolt, nut, bolt, nut_space)
             beamwebconn = FinBeamWebBeamWeb(supporting, supported, notchObj, plate, Fweld1, nutBoltArray, gap)
@@ -345,7 +345,7 @@ class CommonDesignLogic(object):
 
         '''
 
-        if self.connection == "Finplate":
+        if self.connection == "Fin Plate":
             A = FinPlateConnection()
         else:
             pass
@@ -394,7 +394,7 @@ class CommonDesignLogic(object):
         #     plate_width = self.resultObj['Plate']['width']
         #     plate_thick = str(self.uiObj['Plate']['Thickness (mm)'])
 
-        bolt_dia = A.bolt.bolt_diameter_provided
+        bolt_dia = int(A.bolt.bolt_diameter_provided)
         bolt_r = bolt_dia / 2.0
         bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2.0
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
@@ -413,14 +413,14 @@ class CommonDesignLogic(object):
             # topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1=topangle_r1,
             #                      R2=topangle_r2)
         else:
-            plate = Plate(L=A.plate.length, W=A.plate.height, T=A.plate.thickness_provided)
+            plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
 
         Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        if self.connection == "Finplate":  # finColWebBeamWeb
+        if self.connection == "Fin Plate":  # finColWebBeamWeb
             nut_space = A.supported_section.web_thickness + int(A.plate.thickness_provided) + nut_T
             nutBoltArray = finNutBoltArray(A.bolt, nut, bolt, nut_space)
             colwebconn = FinColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
@@ -468,7 +468,7 @@ class CommonDesignLogic(object):
         # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
         # beam = ISection(B=beam_B, T=beam_T, D=beam_D, t=beam_tw,
         #                 R1=beam_R1, R2=beam_R2, alpha=beam_alpha, length=beam_length, notchObj=None)
-        if self.connection == "Finplate":
+        if self.connection == "Fin Plate":
             A = FinPlateConnection()
         else:
             pass
@@ -543,7 +543,7 @@ class CommonDesignLogic(object):
         # nut_Ht = 12.2  #
         # gap = float(str(self.uiObj['detailing']['gap']))
 
-        bolt_dia = A.bolt.bolt_diameter_provided
+        bolt_dia = int(A.bolt.bolt_diameter_provided)
         bolt_r = bolt_dia / 2.0
         bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2.0
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
@@ -565,7 +565,7 @@ class CommonDesignLogic(object):
             #                      R2=topangle_r2)
         else:
             # plate = Plate(L= 300,W =100, T = 10)
-            plate = Plate(L=A.plate.length, W=A.plate.height, T=A.plate.thickness_provided)
+            plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
 
             # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
         Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
@@ -576,7 +576,7 @@ class CommonDesignLogic(object):
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        if self.connection == "Finplate":
+        if self.connection == "Fin Plate":
             nut_space = A.supported_section.web_thickness+ int(A.plate.thickness_provided) + nut_T
             # nutBoltArray = finNutBoltArray(A, nut, bolt, nut_space)  # finColFlangeBeamWeb
             # colflangeconn = finColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray, gap)
@@ -625,7 +625,7 @@ class CommonDesignLogic(object):
         else:
             self.display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
 
-        if self.loc == "Column flange-Beam web" and self.connection == "Finplate":
+        if self.loc == "Column flange-Beam web" and self.connection == "Fin Plate":
             self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
         elif self.loc == "Column flange-Beam flange" and self.connection == "SeatedAngle":
             self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
@@ -667,7 +667,7 @@ class CommonDesignLogic(object):
             osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
             osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                                 update=True)
-            if self.connection == "Finplate" or self.connection == "Endplate":
+            if self.connection == "Fin Plate" or self.connection == "Endplate":
                 osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
                 osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
                 osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1,
@@ -735,7 +735,7 @@ class CommonDesignLogic(object):
     #
     # def callDesired_View(self, fileName, view, folder):
     #
-    #     if self.connection == "Finplate":
+    #     if self.connection == "Fin Plate":
     #         finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
     #         finCommonObj.saveToSvg(str(fileName), view)
     #     elif self.connection == "Endplate":
@@ -752,8 +752,8 @@ class CommonDesignLogic(object):
     #
     # def call_saveMessages(self):  # Done
     #
-    #     if self.connection == "Finplate":
-    #         fileName = os.path.join("Connections", "Shear", "Finplate", "fin.log")
+    #     if self.connection == "Fin Plate":
+    #         fileName = os.path.join("Connections", "Shear", "Fin Plate", "fin.log")
     #
     #     elif self.connection == "Endplate":
     #         fileName = os.path.join("Connections", "Shear", "Endplate", "end.log")
@@ -770,7 +770,7 @@ class CommonDesignLogic(object):
     #
     #     fileName = str(htmlfilename)
     #
-    #     if self.connection == "Finplate":
+    #     if self.connection == "Fin Plate":
     #         fin_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
     #                       htmlfilename, self.folder)
     #     elif self.connection == "Endplate":

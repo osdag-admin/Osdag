@@ -47,55 +47,6 @@ from io import StringIO
 # material_grade = "E 250 (Fe 410 W)B"
 # material = Material(material_grade)
 
-def desired_location(self, filename, base_type):
-    if base_type == ".svg":
-        cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html",
-                                                                  "cmpylogoExtendEndplate.svg"))
-    else:
-        shutil.copyfile(filename,
-                        os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
-
-def saveUserProfile(self):
-    inputData = self.get_report_summary()
-    filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
-                                              os.path.join(str(self.maincontroller.folder), "Profile"), '*.txt')
-    if filename == '':
-        flag = False
-        return flag
-    else:
-        infile = open(filename, 'w')
-        pickle.dump(inputData, infile)
-        infile.close()
-
-
-def getPopUpInputs(self):
-    input_summary = {}
-    input_summary["ProfileSummary"] = {}
-    input_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
-    input_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
-    input_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
-    input_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
-
-    input_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
-    input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
-    input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
-    input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-    input_summary["Client"] = str(self.ui.lineEdit_client.text())
-
-
-def useUserProfile(self):
-    filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
-                                              os.path.join(str(self.maincontroller.folder), "Profile"),
-                                              "All Files (*)")
-    if os.path.isfile(filename):
-        outfile = open(filename, 'r')
-        reportsummary = pickle.load(outfile)
-        self.ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
-        self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
-        self.ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
-        self.ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
-    else:
-        pass
 
 
 class FinPlateConnection(ShearConnection):
@@ -103,6 +54,7 @@ class FinPlateConnection(ShearConnection):
 
     def __init__(self):
         super(FinPlateConnection, self).__init__()
+
 
     def set_osdaglogger(key):
         global logger
@@ -309,6 +261,7 @@ class FinPlateConnection(ShearConnection):
 
     def set_input_values(self, design_dictionary):
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
+        self.module = design_dictionary[KEY_MODULE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
@@ -334,7 +287,10 @@ class FinPlateConnection(ShearConnection):
         if self.supported_section.shear_yielding_capacity > self.load.shear_force and \
                 self.supported_section.tension_yielding_capacity > self.load.axial_force:
             self.get_bolt_details(self)
+            self.design_status = True
+
         else:
+            self.design_status = False
             logger.error(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
                            "than applied loads, Please select larger sections or decrease loads"
                             .format(self.supported_section.shear_yielding_capacity,
@@ -370,7 +326,7 @@ class FinPlateConnection(ShearConnection):
                 break
             bolts_required_previous = self.plate.bolts_required
             bolt_diameter_previous = self.bolt.bolt_diameter_provided
-            count +=1
+            count += 1
 
         bolts_required_previous = self.plate.bolts_required
 
@@ -409,13 +365,63 @@ class FinPlateConnection(ShearConnection):
         self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
                                          web_plate_h_min=min_plate_height, web_plate_h_max=max_plate_height,
                                          bolt_capacity=self.bolt.bolt_capacity,
-                                         min_end_dist=self.bolt.min_end_dist_round,
-                                         min_pitch=self.bolt.min_pitch_round, max_spacing=self.bolt.max_spacing_round,
-                                         max_end_dist=self.bolt.max_end_dist_round, shear_load=self.load.shear_force*1000,
+                                         min_edge_dist=self.bolt.min_edge_dist_round,
+                                         min_gauge=self.bolt.min_gauge_round, max_spacing=self.bolt.max_spacing_round,
+                                         max_edge_dist=self.bolt.max_edge_dist_round, shear_load=self.load.shear_force*1000,
                                          axial_load=self.load.axial_force*1000, gap=self.plate.gap,
                                          shear_ecc=True)
 
         edge_dist_rem = self.plate.edge_dist_provided+self.plate.gap
+
+        #################################
+        # Block Shear Check for supporting section
+        #################################
+        # design_status_block_shear = False
+        # while design_status_block_shear is False:
+        #     # print(design_status_block_shear)
+        #     # print(0, self.web_plate.max_end_dist, self.web_plate.end_dist_provided, self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
+        #     Avg_a = 2 * (self.plate.end_dist_provided + self.plate.gap + (self.plate.bolt_line - 1) * self.plate.pitch_provided)\
+        #             * self.supporting_section.web_thickness
+        #     Avn_a = 2 * (self.plate.end_dist_provided + (self.plate.bolt_line - 1) * self.plate.pitch_provided
+        #              - (self.plate.bolt_line - 0.5) * self.bolt.dia_hole) * self.supporting_section.web_thickness
+        #
+        #     Atg_a = ((self.plate.bolts_one_line - 1) * self.plate.pitch_provided)\
+        #             * self.supporting_section.thickness_provided
+        #     Atn_a = ((self.plate.bolts_one_line - 1) * self.plate.pitch_provided -
+        #              (self.plate.bolt_line - 1) * self.bolt.dia_hole) * \
+        #             self.supporting_section.web_thickness
+        #
+        #     Avg_s = (self.plate.edge_dist_provided + (self.plate.bolts_one_line - 1) * self.plate.gauge_provided)\
+        #             * self.supporting_section.web_thickness
+        #     Avn_s = ((self.plate.edge_dist_provided + (self.plate.bolts_one_line - 1) * self.plate.gauge_provided)
+        #              - (self.plate.bolts_one_line - 0.5) * self.bolt.dia_hole) * self.supporting_section.web_thickness
+        #
+        #     Atg_s = ((self.plate.bolt_line - 1) * self.plate.pitch_provided + self.plate.end_dist_provided + self.plate.gap)\
+        #             * self.supporting_section.thickness_provided
+        #     Atn_s = ((self.plate.bolt_line - 1) * self.plate.pitch_provided -
+        #              (self.plate.bolt_line - 0.5) * self.bolt.dia_hole + self.plate.end_dist_provided + self.plate.gap) * \
+        #             self.supporting_section.web_thickness
+        #
+        #     self.supporting_section.block_shear_capacity_axial = self.block_shear_strength_section(A_vg=Avg_a, A_vn=Avn_a, A_tg=Atg_a,
+        #                                                                             A_tn=Atn_a,
+        #                                                                             f_u=self.supporting_section.fu,
+        #                                                                             f_y=self.supporting_section.fy)
+        #
+        #     self.supporting_section.block_shear_capacity_shear = self.block_shear_strength_section(A_vg=Avg_s, A_vn=Avn_s, A_tg=Atg_s,
+        #                                                                             A_tn=Atn_s,
+        #                                                                             f_u=self.supporting_section.fu,
+        #                                                                             f_y=self.supporting_section.fy)
+        #
+        #     if self.supporting_section.block_shear_capacity < self.load.axial_force:
+        #         if self.bolt.max_spacing_round >= self.plate.pitch_provided + 5 and self.bolt.max_end_dist >= self.plate.end_dist_provided + 5:  # increase thickness todo
+        #             if self.plate.bolt_line == 1:
+        #                 self.plate.end_dist_provided += 5
+        #             else:
+        #                 self.plate.pitch_provided += 5
+        #         else:
+        #             design_status_block_shear = False
+        #     else:
+        #         design_status_block_shear = True
 
         self.plate.blockshear(numrow=self.plate.bolts_one_line, numcol=self.plate.bolt_line, pitch=self.plate.pitch_provided,
                               gauge=self.plate.gauge_provided, thk=self.plate.thickness[0], end_dist=self.plate.end_dist_provided,
@@ -451,4 +457,33 @@ class FinPlateConnection(ShearConnection):
         print(self.bolt)
         print(self.plate)
 
+
+    def block_shear_strength_section(self, A_vg, A_vn, A_tg, A_tn, f_u, f_y):
+        """Calculate the block shear strength of bolted connections as per cl. 6.4.1
+
+        Args:
+            A_vg: Minimum gross area in shear along bolt line parallel to external force [in sq. mm] (float)
+            A_vn: Minimum net area in shear along bolt line parallel to external force [in sq. mm] (float)
+            A_tg: Minimum gross area in tension from the bolt hole to the toe of the angle,
+                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+            A_tn: Minimum net area in tension from the bolt hole to the toe of the angle,
+                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+            f_u: Ultimate stress of the plate material in MPa (float)
+            f_y: Yield stress of the plate material in MPa (float)
+
+        Return:
+            block shear strength of bolted connection in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007, cl. 6.4.1
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
+        T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
+        Tdb = min(T_db1, T_db2)
+        Tdb = round(Tdb / 1000, 3)
+        return Tdb
 

@@ -1183,7 +1183,7 @@ class Ui_ModuleWindow(QMainWindow):
         r = colorTup[0]
         g = colorTup[1]
         b = colorTup[2]
-        self.display.set_bg_gradient_color(r, g, b, [255, 255, 255])
+        self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
     def init_display(self, backend_str=None, size=(1024, 768)):
 
@@ -1201,14 +1201,14 @@ class Ui_ModuleWindow(QMainWindow):
         self.modelTab = qtViewer3d(self)
 
         self.setWindowTitle("Osdag Fin Plate")
-        # self.mytabWidget.resize(size[1], size[2])
-        # self.mytabWidget.addTab(self.modelTab, "")
+        self.mytabWidget.resize(size[0], size[1])
+        self.mytabWidget.addTab(self.modelTab, "")
 
         self.modelTab.InitDriver()
         display = self.modelTab._display
 
         # background gradient
-        display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
+        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
         # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
         display.display_triedron()
         display.View.SetProj(1, 1, 1)
@@ -1274,7 +1274,7 @@ class Ui_ModuleWindow(QMainWindow):
 
                 QMessageBox.about(self, 'Information', "File saved")
         else:
-            self.ui.actionSave_3D_model.setEnabled(False)
+            self.actionSave_3D_model.setEnabled(False)
             QMessageBox.about(self,'Information', 'Design Unsafe: 3D Model cannot be saved')
 
     def reset_popup(self, new_list, data):

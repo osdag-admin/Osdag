@@ -11,10 +11,10 @@ def color_the_edges(shp, display, color, width):
     ctx = display.Context
     while Ex.More():
         aEdge = topods.Edge(Ex.Current())
-        ais_shape = AIS_Shape(aEdge).GetHandle()
-        ctx.SetColor(ais_shape, color, False)
-        ctx.SetWidth(ais_shape, width, False)
-        ctx.Display(ais_shape, False)
+        # ais_shape = AIS_Shape(aEdge).GetHandle()
+        # ctx.SetColor(ais_shape, color, False)
+        # ctx.SetWidth(ais_shape, width, False)
+        # ctx.Display(ais_shape, False)
         Ex.Next()
 
 

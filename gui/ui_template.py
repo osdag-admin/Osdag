@@ -751,7 +751,7 @@ class Ui_ModuleWindow(QMainWindow):
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
 
         self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_out)
-        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 600, 200, 30))
+        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 650, 200, 30))
         self.btn_CreateDesign.setAutoDefault(True)
         self.btn_CreateDesign.setObjectName("btn_CreateDesign")
         self.btn_CreateDesign.clicked.connect(self.open_summary_popup)
@@ -1012,6 +1012,10 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionShow_all.triggered.connect(lambda: self.call_3DModel("gradient_bg"))
         self.actionChange_background.triggered.connect(self.showColorDialog)
         self.actionSave_3D_model.triggered.connect(self.save3DcadImages)
+        self.btn3D.clicked.connect(lambda: self.call_3DModel("gradient_bg"))
+        self.chkBxBeam.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
+        self.chkBxCol.clicked.connect(lambda: self.call_3DColumn("gradient_bg"))
+        self.chkBxFinplate.clicked.connect(lambda: self.call_3DFinplate("gradient_bg"))
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())

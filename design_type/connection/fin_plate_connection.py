@@ -45,57 +45,6 @@ weld_size = 6
 material_grade = "E 250 (Fe 410 W)B"
 material = Material(material_grade)
 
-def desired_location(self, filename, base_type):
-    if base_type == ".svg":
-        cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html",
-                                                                  "cmpylogoExtendEndplate.svg"))
-    else:
-        shutil.copyfile(filename,
-                        os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
-
-def saveUserProfile(self):
-    inputData = self.get_report_summary()
-    filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
-                                              os.path.join(str(self.maincontroller.folder), "Profile"), '*.txt')
-    if filename == '':
-        flag = False
-        return flag
-    else:
-        infile = open(filename, 'w')
-        pickle.dump(inputData, infile)
-        infile.close()
-
-
-def getPopUpInputs(self):
-    input_summary = {}
-    input_summary["ProfileSummary"] = {}
-    input_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
-    input_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
-    input_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
-    input_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
-
-    input_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
-    input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
-    input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
-    input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-    input_summary["Client"] = str(self.ui.lineEdit_client.text())
-
-
-def useUserProfile(self):
-    filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
-                                              os.path.join(str(self.maincontroller.folder), "Profile"),
-                                              "All Files (*)")
-    if os.path.isfile(filename):
-        outfile = open(filename, 'r')
-        reportsummary = pickle.load(outfile)
-        self.ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
-        self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
-        self.ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
-        self.ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
-    else:
-        pass
-
-
 class FinPlateConnection(ShearConnection):
 
 
@@ -103,6 +52,12 @@ class FinPlateConnection(ShearConnection):
         super(FinPlateConnection, self).__init__()
 
     def set_osdaglogger(key):
+
+        """
+        Function to set Logger for FinPlate Module
+        """
+
+        # @author Arsil Zunzunia
         global logger
         logger = logging.getLogger('osdag')
 
@@ -125,8 +80,13 @@ class FinPlateConnection(ShearConnection):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-
     def input_values(self, existingvalues={}):
+
+        '''
+        Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
+        '''
+
+        # @author: Amir, Umair
 
         options_list = []
 
@@ -180,6 +140,7 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platethk = ''
 
+        
         t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, None)
         options_list.append(t16)
 
@@ -231,6 +192,11 @@ class FinPlateConnection(ShearConnection):
         return options_list
 
     def output_values(self, flag):
+        '''
+        Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
+        '''
+
+        # @author: Umair
 
         out_list = []
 
@@ -299,7 +265,15 @@ class FinPlateConnection(ShearConnection):
 
         return out_list
 
+    
     def warn_text(self):
+      
+        """
+        Function to give logger warning when any old value is selected from Column and Beams table.
+        """
+
+        # @author Arsil Zunzunia
+        
         red_list = red_list_function()
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
             logger.warning(

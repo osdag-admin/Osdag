@@ -50,7 +50,15 @@ from design_type.connection.shear_connection import ShearConnection
 class Ui_ModuleWindow(QMainWindow):
 
     closed = pyqtSignal()
-    def open_popup(self, op,  KEYEXISTING_CUSTOMIZED):
+    def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
+        """
+        Function to connect the customized_popup with the ui_template file
+        on clicking the customized option
+        """
+
+        # @author : Amir
+
+
         self.window = QtWidgets.QDialog()
         self.ui = Ui_Popup()
         self.ui.setupUi(self.window)
@@ -59,6 +67,15 @@ class Ui_ModuleWindow(QMainWindow):
         return self.ui.get_right_elements()
     @pyqtSlot()
     def open_summary_popup(self):
+
+        """
+        Function to connect the summary_popup with the ui_template file on clicking
+         the 'create design report' button
+        """
+
+        # @author: Amir
+
+
         self.new_window = QtWidgets.QDialog()
         self.new_ui = Ui_Dialog1()
         self.new_ui.setupUi(self.new_window)
@@ -444,6 +461,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # INPUT DOCK
 #############
+        # @author : Umair
 
         self.inputDock = QtWidgets.QDockWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -568,7 +586,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     # Customized option in Combobox
     ###############################
-
+    # @author: Amir
         new_list = main.customized_input(main)
         data = {}
 
@@ -590,6 +608,13 @@ class Ui_ModuleWindow(QMainWindow):
                 pass
 
         def popup(key, for_custom_list):
+
+            """
+            Function for retaining the values in the popup once it is closed.
+             """
+
+            # @author: Amir
+
             for c_tup in for_custom_list:
                 if c_tup[0] != key.objectName():
                     continue
@@ -598,7 +623,7 @@ class Ui_ModuleWindow(QMainWindow):
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
                 if selected == "Customized":
-                    data[c_tup[0] + "_customized"] = self.open_popup(options, existing_options)
+                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
@@ -615,9 +640,9 @@ class Ui_ModuleWindow(QMainWindow):
 
         def change(k1, new):
 
-            '''
+            """
             @author: Umair
-            '''
+            """
 
             for tup in new:
                 (object_name, k2_key, typ, f) = tup
@@ -675,9 +700,11 @@ class Ui_ModuleWindow(QMainWindow):
 
 # OUTPUT DOCK
 #############
-        '''
+        """
+        
         @author: Umair 
-        '''
+        
+        """
 
         self.outputDock = QtWidgets.QDockWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -996,7 +1023,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for Reset Button
     '''
-    @author: Umair 
+    @author: Umair, Amir 
     '''
 
     def reset_fn(self, op_list, out_list, new_list, data):
@@ -1054,6 +1081,13 @@ class Ui_ModuleWindow(QMainWindow):
         self.design_inputs = design_dictionary
 
     def pass_d(self, main, design_dictionary):
+        """
+        It sets key variable textEdit and passes it to warn text function present in fin_plate_connection.py for logger
+         """
+
+        # @author Arsil Zunzunia
+
+
         key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
         main.warn_text(main, key, design_dictionary)
         # main.set_input_values(main, design_dictionary)
@@ -1125,6 +1159,8 @@ class Ui_ModuleWindow(QMainWindow):
 
     def validateInputsOnDesignBtn(self, main, data, trigger_type):
 
+        # @author: Amir
+
         option_list = main.input_values(self)
         missing_fields_list = []
         signal = True
@@ -1170,6 +1206,8 @@ class Ui_ModuleWindow(QMainWindow):
 # Function for error if any field is missing
 
     def generate_missing_fields_error_string(self, missing_fields_list):
+
+
         """
 
         Args:
@@ -1180,6 +1218,9 @@ class Ui_ModuleWindow(QMainWindow):
 
         """
         # The base string which should be displayed
+
+        # @author: Amir
+
         information = "Please input the following required field"
         if len(missing_fields_list) > 1:
             # Adds 's' to the above sentence if there are multiple missing input fields
@@ -1200,6 +1241,9 @@ class Ui_ModuleWindow(QMainWindow):
 # Function for validation in beam-beam structure
 
     def validate_beam_beam(self, key):
+
+        # @author: Arsil
+
         if key.currentIndex() == 2:
             key2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
             key3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
@@ -1209,6 +1253,9 @@ class Ui_ModuleWindow(QMainWindow):
 # Function for primary and secondary beam size comparison
 
     def primary_secondary_beam_comparison(self, key, key2, key3):
+
+        # @author: Arsil
+
         if key.currentIndex() == 2:
             if key2.currentIndex() != 0 and key3.currentIndex() != 0:
                 primary = key2.currentText()

@@ -8,6 +8,7 @@ class Material(object):
         self.fy_20_40 = 0.0
         self.fy_40 = 0.0
         self.fu = 0.0
+        self.fy = 0.0
         self.connect_to_database_to_get_fy_fu(grade=material_grade)
 
     def __repr__(self):

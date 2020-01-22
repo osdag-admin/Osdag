@@ -45,7 +45,7 @@ from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 from .ui_design_preferences import DesignPreferences
 from design_type.connection.shear_connection import ShearConnection
-from design_type.connection.fin_plate_connection import set_osdaglogger
+
 
 class Ui_ModuleWindow(QMainWindow):
 
@@ -304,7 +304,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setObjectName("textEdit")
 
 
-        set_osdaglogger(self.textEdit)
+        main.set_osdaglogger(self.textEdit)
         # self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -579,7 +579,7 @@ class Ui_ModuleWindow(QMainWindow):
                 red_list_set = set(red_list_function())
                 current_list_set = set(option[4])
                 current_red_list = list(current_list_set.intersection(red_list_set))
-                print(current_red_list)
+
                 for value in current_red_list:
                     indx = option[4].index(str(value))
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
@@ -694,8 +694,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.inputDock.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.inputDock)
 
-        key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
-        key_changed.currentIndexChanged.connect(lambda: self.validate_beam_beam(key_changed))
+        # if module not in [KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COLUMNCOVERPLATE]:
+        #     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
+        #     key_changed.currentIndexChanged.connect(lambda: self.validate_beam_beam(key_changed))
 
 # OUTPUT DOCK
 #############
@@ -819,6 +820,7 @@ class Ui_ModuleWindow(QMainWindow):
         font.setFamily("DejaVu Sans")
         self.actionPaste.setFont(font)
         self.actionPaste.setObjectName("actionPaste")
+        self.actionInput_Browser = QtWidgets.QAction(MainWindow)
         self.actionInput_Browser = QtWidgets.QAction(MainWindow)
         self.actionInput_Browser.setObjectName("actionInput_Browser")
         self.actionOutput_Browser = QtWidgets.QAction(MainWindow)
@@ -1161,6 +1163,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         option_list = main.input_values(self)
         missing_fields_list = []
+        signal = True
 
         for option in option_list:
             if option[0] == KEY_CONN:
@@ -1186,23 +1189,19 @@ class Ui_ModuleWindow(QMainWindow):
             self.saveDesign_inputs()
         else:
             self.design_fn(option_list, data)
-            self.warning_function(main, self.design_inputs)
             main.set_input_values(main, self.design_inputs)
-            main.get_bolt_details(main)
             DESIGN_FLAG = 'True'
             out_list = main.output_values(main, DESIGN_FLAG)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
-                    print(txt)
-                    print(option[3])
                     txt.setText(str(option[3]))
 
 # Function for warning about structure
 
-    def warning_function(self, main, design_dictionary):
-        key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
-        main.warn_text(main, key, design_dictionary)
+    # def warning_function(self, main, design_dictionary):
+    #     key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
+    #     main.warn_text(main, key, design_dictionary)
 
 # Function for error if any field is missing
 

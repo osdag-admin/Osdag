@@ -47,6 +47,13 @@ material_grade = "E 250 (Fe 410 W)B"
 material = Material(material_grade)
 
 def set_osdaglogger(key):
+
+    """
+    Function to set Logger for FinPlate Module
+    """
+
+    # @author Arsil Zunzunia
+
     global logger
     logger = logging.getLogger('osdag')
     logger.setLevel(logging.DEBUG)
@@ -69,6 +76,9 @@ def set_osdaglogger(key):
     logger.addHandler(handler)
 
 class OurLog(logging.Handler):
+
+    # @author Arsil Zunzunia
+
 
     def __init__(self,key):
         logging.Handler.__init__(self)
@@ -137,8 +147,12 @@ class FinPlateConnection(ShearConnection):
 
     def __init__(self):
         super(FinPlateConnection, self).__init__()
-
+    '''
+    Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
+    '''
     def input_values(self, existingvalues={}):
+
+        # @author: Amir, Umair
 
         options_list = []
 
@@ -242,7 +256,12 @@ class FinPlateConnection(ShearConnection):
 
         return options_list
 
+    '''
+       Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
+    '''
     def output_values(self, flag):
+
+        # @author: Umair
 
         out_list = []
 
@@ -270,6 +289,13 @@ class FinPlateConnection(ShearConnection):
         return out_list
 
     def warn_text(self,key, my_d):
+
+        """
+        Function to give logger warning when any old value is selected from Column and Beams table.
+        """
+
+        # @author Arsil Zunzunia
+
         global logger
         old_col_section = get_oldcolumncombolist()
         old_beam_section = get_oldbeamcombolist()

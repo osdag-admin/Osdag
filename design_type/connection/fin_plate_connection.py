@@ -3,6 +3,7 @@ from design_type.connection.shear_connection import ShearConnection
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from utils.common.component import *
+# from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
@@ -30,26 +31,28 @@ from io import StringIO
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
 
-connectivity = "column_flange_beam_web"
-supporting_member_section = "HB 400"
-supported_member_section = "MB 300"
-fy = 250.0
-fu = 410.0
-shear_force = 100.0
-axial_force=100.0
-bolt_diameter = 24.0
-bolt_type = "friction_grip"
-bolt_grade = 8.8
-plate_thickness = 10.0
-weld_size = 6
-material_grade = "E 250 (Fe 410 W)B"
-material = Material(material_grade)
+# connectivity = "column_flange_beam_web"
+# supporting_member_section = "HB 400"
+# supported_member_section = "MB 300"
+# fy = 250.0
+# fu = 410.0
+# shear_force = 100.0
+# axial_force=100.0
+# bolt_diameter = 24.0
+# bolt_type = "friction_grip"
+# bolt_grade = 8.8
+# plate_thickness = 10.0
+# weld_size = 6
+# material_grade = "E 250 (Fe 410 W)B"
+# material = Material(material_grade)
+
 
 
 class FinPlateConnection(ShearConnection):
 
     def __init__(self):
         super(FinPlateConnection, self).__init__()
+
 
     def set_osdaglogger(key):
         global logger
@@ -255,12 +258,12 @@ class FinPlateConnection(ShearConnection):
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def set_input_values(self, design_dictionary):
-        # if signal:
-        super(FinPlateConnection, self).set_input_values(self, design_dictionary)
-        # else:
-        #     super(FinPlateConnection, self).set_input_values(design_dictionary)
+
+        super(FinPlateConnection,self).set_input_values(self, design_dictionary)
+        self.module = design_dictionary[KEY_MODULE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
@@ -284,7 +287,10 @@ class FinPlateConnection(ShearConnection):
                 self.supported_section.tension_yielding_capacity > self.load.axial_force:
             print("preliminary member check is satisfactory. Doing bolt checks")
             self.get_bolt_details(self)
+            self.design_status = True
+
         else:
+            self.design_status = False
             logger.error(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
                            "than applied loads, Please select larger sections or decrease loads"
                             .format(self.supported_section.shear_yielding_capacity,
@@ -455,8 +461,11 @@ class FinPlateConnection(ShearConnection):
         print(self.bolt)
         print(self.plate)
 
+
+
         # with open("filename", 'w') as out_file:
         #     yaml.dump(fin_plate_input, out_file)
+
 
     def block_shear_strength_section(self, A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         """Calculate the block shear strength of bolted connections as per cl. 6.4.1
@@ -486,6 +495,7 @@ class FinPlateConnection(ShearConnection):
         Tdb = min(T_db1, T_db2)
         Tdb = round(Tdb / 1000, 3)
         return Tdb
+
 
 # For Command Line
 

@@ -62,6 +62,7 @@ class MomentConnection(Connection):
     def get_bolt_details(self):
         pass
 
+
     def warn_text(self,key, my_d):
         old_col_section = get_oldcolumncombolist()
         old_beam_section = get_oldbeamcombolist()
@@ -85,4 +86,19 @@ class MomentConnection(Connection):
 
 
     def input_value_changed(self):
+        pass
+
+    def web_force(column_d, column_f_t, column_t_w, factored_axial_force, column_area):
+        pass
+
+    def block_shear_strength_plate(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
+        pass
+
+    def block_shear_strength_section(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
+        pass
+
+    def tension_member_design_due_to_yielding_of_gross_section(A_v, fy):
+        pass
+
+    def tension_member_design_due_to_rupture_of_critical_section(A_vn, fu):
         pass

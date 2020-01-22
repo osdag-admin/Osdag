@@ -806,6 +806,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionPaste.setFont(font)
         self.actionPaste.setObjectName("actionPaste")
         self.actionInput_Browser = QtWidgets.QAction(MainWindow)
+        self.actionInput_Browser = QtWidgets.QAction(MainWindow)
         self.actionInput_Browser.setObjectName("actionInput_Browser")
         self.actionOutput_Browser = QtWidgets.QAction(MainWindow)
         self.actionOutput_Browser.setObjectName("actionOutput_Browser")
@@ -1291,6 +1292,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         option_list = main.input_values(self)
         missing_fields_list = []
+        signal = True
 
         for option in option_list:
             if option[0] == KEY_CONN:

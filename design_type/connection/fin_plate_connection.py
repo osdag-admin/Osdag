@@ -28,7 +28,6 @@ from io import StringIO
 
 
 
-
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
 
@@ -260,12 +259,13 @@ class FinPlateConnection(ShearConnection):
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def set_input_values(self, design_dictionary):
+
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
-
+        print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
     def member_capacity(self):
@@ -286,6 +286,7 @@ class FinPlateConnection(ShearConnection):
 
         if self.supported_section.shear_yielding_capacity > self.load.shear_force and \
                 self.supported_section.tension_yielding_capacity > self.load.axial_force:
+            print("preliminary member check is satisfactory. Doing bolt checks")
             self.get_bolt_details(self)
             self.design_status = True
 
@@ -295,6 +296,8 @@ class FinPlateConnection(ShearConnection):
                            "than applied loads, Please select larger sections or decrease loads"
                             .format(self.supported_section.shear_yielding_capacity,
                                     self.supported_section.tension_yielding_capacity))
+            print("failed in preliminary member checks. Select larger sections or decrease loads")
+
 
     def get_bolt_details(self):
 
@@ -378,50 +381,50 @@ class FinPlateConnection(ShearConnection):
         #################################
         # design_status_block_shear = False
         # while design_status_block_shear is False:
-        #     # print(design_status_block_shear)
-        #     # print(0, self.web_plate.max_end_dist, self.web_plate.end_dist_provided, self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
-        #     Avg_a = 2 * (self.plate.end_dist_provided + self.plate.gap + (self.plate.bolt_line - 1) * self.plate.pitch_provided)\
-        #             * self.supporting_section.web_thickness
-        #     Avn_a = 2 * (self.plate.end_dist_provided + (self.plate.bolt_line - 1) * self.plate.pitch_provided
-        #              - (self.plate.bolt_line - 0.5) * self.bolt.dia_hole) * self.supporting_section.web_thickness
-        #
-        #     Atg_a = ((self.plate.bolts_one_line - 1) * self.plate.pitch_provided)\
-        #             * self.supporting_section.thickness_provided
-        #     Atn_a = ((self.plate.bolts_one_line - 1) * self.plate.pitch_provided -
-        #              (self.plate.bolt_line - 1) * self.bolt.dia_hole) * \
-        #             self.supporting_section.web_thickness
-        #
-        #     Avg_s = (self.plate.edge_dist_provided + (self.plate.bolts_one_line - 1) * self.plate.gauge_provided)\
-        #             * self.supporting_section.web_thickness
-        #     Avn_s = ((self.plate.edge_dist_provided + (self.plate.bolts_one_line - 1) * self.plate.gauge_provided)
-        #              - (self.plate.bolts_one_line - 0.5) * self.bolt.dia_hole) * self.supporting_section.web_thickness
-        #
-        #     Atg_s = ((self.plate.bolt_line - 1) * self.plate.pitch_provided + self.plate.end_dist_provided + self.plate.gap)\
-        #             * self.supporting_section.thickness_provided
-        #     Atn_s = ((self.plate.bolt_line - 1) * self.plate.pitch_provided -
-        #              (self.plate.bolt_line - 0.5) * self.bolt.dia_hole + self.plate.end_dist_provided + self.plate.gap) * \
-        #             self.supporting_section.web_thickness
-        #
-        #     self.supporting_section.block_shear_capacity_axial = self.block_shear_strength_section(A_vg=Avg_a, A_vn=Avn_a, A_tg=Atg_a,
-        #                                                                             A_tn=Atn_a,
-        #                                                                             f_u=self.supporting_section.fu,
-        #                                                                             f_y=self.supporting_section.fy)
-        #
-        #     self.supporting_section.block_shear_capacity_shear = self.block_shear_strength_section(A_vg=Avg_s, A_vn=Avn_s, A_tg=Atg_s,
-        #                                                                             A_tn=Atn_s,
-        #                                                                             f_u=self.supporting_section.fu,
-        #                                                                             f_y=self.supporting_section.fy)
-        #
-        #     if self.supporting_section.block_shear_capacity < self.load.axial_force:
-        #         if self.bolt.max_spacing_round >= self.plate.pitch_provided + 5 and self.bolt.max_end_dist >= self.plate.end_dist_provided + 5:  # increase thickness todo
-        #             if self.plate.bolt_line == 1:
-        #                 self.plate.end_dist_provided += 5
-        #             else:
-        #                 self.plate.pitch_provided += 5
-        #         else:
-        #             design_status_block_shear = False
-        #     else:
-        #         design_status_block_shear = True
+            # print(design_status_block_shear)
+            # print(0, self.web_plate.max_end_dist, self.web_plate.end_dist_provided, self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
+            # Avg_a = 2 * (self.plate.end_dist_provided + self.plate.gap + (self.plate.bolt_line - 1) * self.plate.pitch_provided)\
+            #         * self.supporting_section.web_thickness
+            # Avn_a = 2 * (self.plate.end_dist_provided + (self.plate.bolt_line - 1) * self.plate.pitch_provided
+            #          - (self.plate.bolt_line - 0.5) * self.bolt.dia_hole) * self.supporting_section.web_thickness
+            #
+            # Atg_a = ((self.plate.bolts_one_line - 1) * self.plate.pitch_provided)\
+            #         * self.supporting_section.web_thickness
+            # Atn_a = ((self.plate.bolts_one_line - 1) * self.plate.pitch_provided -
+            #          (self.plate.bolt_line - 1) * self.bolt.dia_hole) * \
+            #         self.supporting_section.web_thickness
+            #
+            # Avg_s = (self.plate.edge_dist_provided + (self.plate.bolts_one_line - 1) * self.plate.gauge_provided)\
+            #         * self.supporting_section.web_thickness
+            # Avn_s = ((self.plate.edge_dist_provided + (self.plate.bolts_one_line - 1) * self.plate.gauge_provided)
+            #          - (self.plate.bolts_one_line - 0.5) * self.bolt.dia_hole) * self.supporting_section.web_thickness
+            #
+            # Atg_s = ((self.plate.bolt_line - 1) * self.plate.pitch_provided + self.plate.end_dist_provided + self.plate.gap)\
+            #         * self.supporting_section.web_thickness
+            # Atn_s = ((self.plate.bolt_line - 1) * self.plate.pitch_provided -
+            #          (self.plate.bolt_line - 0.5) * self.bolt.dia_hole + self.plate.end_dist_provided + self.plate.gap) * \
+            #         self.supporting_section.web_thickness
+            #
+            # self.supporting_section.block_shear_capacity_axial = self.block_shear_strength_section(A_vg=Avg_a, A_vn=Avn_a, A_tg=Atg_a,
+            #                                                                         A_tn=Atn_a,
+            #                                                                         f_u=self.supporting_section.fu,
+            #                                                                         f_y=self.supporting_section.fy)
+            #
+            # self.supporting_section.block_shear_capacity_shear = self.block_shear_strength_section(A_vg=Avg_s, A_vn=Avn_s, A_tg=Atg_s,
+            #                                                                         A_tn=Atn_s,
+            #                                                                         f_u=self.supporting_section.fu,
+            #                                                                         f_y=self.supporting_section.fy)
+            #
+            # if self.supporting_section.block_shear_capacity_axial < self.load.axial_force:
+            #     if self.bolt.max_spacing_round >= self.plate.pitch_provided + 5 and self.bolt.max_end_dist >= self.plate.end_dist_provided + 5:  # increase thickness todo
+            #         if self.plate.bolt_line == 1:
+            #             self.plate.end_dist_provided += 5
+            #         else:
+            #             self.plate.pitch_provided += 5
+            #     else:
+            #         design_status_block_shear = False
+            # else:
+            #     design_status_block_shear = True
 
         self.plate.blockshear(numrow=self.plate.bolts_one_line, numcol=self.plate.bolt_line, pitch=self.plate.pitch_provided,
                               gauge=self.plate.gauge_provided, thk=self.plate.thickness[0], end_dist=self.plate.end_dist_provided,
@@ -458,6 +461,11 @@ class FinPlateConnection(ShearConnection):
         print(self.plate)
 
 
+
+        # with open("filename", 'w') as out_file:
+        #     yaml.dump(fin_plate_input, out_file)
+
+
     def block_shear_strength_section(self, A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         """Calculate the block shear strength of bolted connections as per cl. 6.4.1
 
@@ -487,3 +495,14 @@ class FinPlateConnection(ShearConnection):
         Tdb = round(Tdb / 1000, 3)
         return Tdb
 
+
+# For Command Line
+
+
+# from ast import literal_eval
+#
+# path = input("Enter the file location: ")
+# with open(path, 'r') as f:
+#     data = f.read()
+#     d = literal_eval(data)
+#     FinPlateConnection.set_input_values(FinPlateConnection(), d, False)

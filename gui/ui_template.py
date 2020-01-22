@@ -709,7 +709,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         self.dockWidgetContents_out = QtWidgets.QWidget()
         self.dockWidgetContents_out.setObjectName("dockWidgetContents_out")
-        out_list = main.output_values(main, DESIGN_FLAG)
+        out_list = main.output_values(main, False)
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
@@ -1001,8 +1001,8 @@ class Ui_ModuleWindow(QMainWindow):
         self.retranslateUi()
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        self.action_save_input.triggered.connect(lambda: self.validateInputsOnDesignBtn(main, data, "Save"))
-        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main, data, "Design"))
+        self.action_save_input.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Save"))
+        self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
@@ -1286,45 +1286,24 @@ class Ui_ModuleWindow(QMainWindow):
 #         folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
 #                                                   desktop_path)
 #         return folder
-
-    def validateInputsOnDesignBtn(self,main,data,trigger_type):
-
+    def common_function_for_save_and_design(self, main, data, trigger_type):
 
         option_list = main.input_values(self)
-        missing_fields_list = []
-        signal = True
-
-        for option in option_list:
-            if option[0] == KEY_CONN:
-                continue
-            s = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
-
-            if option[2] == TYPE_COMBOBOX:
-                if option[0] in [KEY_D, KEY_GRD, KEY_PLATETHK]:
-                    continue
-                if s.currentIndex() == 0:
-                    missing_fields_list.append(option[1])
-
-            elif option[2] == TYPE_TEXTBOX:
-                if s.text() == '':
-                    missing_fields_list.append(option[1])
-            else:
-                pass
-
-        if len(missing_fields_list) > 0:
-            QMessageBox.information(self, "Information", self.generate_missing_fields_error_string(missing_fields_list))
-        elif trigger_type == "Save":
+        if trigger_type == "Save":
             self.design_fn(option_list, data)
             self.saveDesign_inputs()
         else:
             self.design_fn(option_list, data)
-            main.set_input_values(main, self.design_inputs)
-            DESIGN_FLAG = 'True'
-            out_list = main.output_values(main, DESIGN_FLAG)
+            valid = main.func_for_validation(main, self, self.design_inputs)
+            # main.set_input_values(main, self.design_inputs, self)
+            # DESIGN_FLAG = 'True'
+
+            out_list = main.output_values(main, valid)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
+
             self.commLogicObj = CommonDesignLogic(self.display,self.folder,
                                                   main.module)
             # self.resultObj = self.commLogicObj.resultObj
@@ -1400,36 +1379,36 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for primary and secondary beam size comparison
 
-    def primary_secondary_beam_comparison(self, key, key2, key3):
-        if key.currentIndex() == 2:
-            if key2.currentIndex() != 0 and key3.currentIndex() != 0:
-                primary = key2.currentText()
-                secondary = key3.currentText()
-                conn = sqlite3.connect(PATH_TO_DATABASE)
-                cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
-                lst = []
-                rows = cursor.fetchall()
-                for row in rows:
-                    lst.append(row)
-                p_val = lst[0][0]
-                cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
-                lst1 = []
-                rows1 = cursor2.fetchall()
-                for row1 in rows1:
-                    lst1.append(row1)
-                s_val = lst1[0][0]
-                if p_val <= s_val:
-                    self.btn_Design.setDisabled(True)
-                    QMessageBox.about(self, 'Information',
-                                        "Secondary beam depth is higher than clear depth of primary beam web "
-                                        "(No provision in Osdag till now)")
-
-                else:
-                    self.btn_Design.setDisabled(False)
-
-        else:
-            key2.currentIndexChanged.disconnect()
-            key3.currentIndexChanged.disconnect()
+    # def primary_secondary_beam_comparison(self, key, key2, key3):
+    #     if key.currentIndex() == 2:
+    #         if key2.currentIndex() != 0 and key3.currentIndex() != 0:
+    #             primary = key2.currentText()
+    #             secondary = key3.currentText()
+    #             conn = sqlite3.connect(PATH_TO_DATABASE)
+    #             cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
+    #             lst = []
+    #             rows = cursor.fetchall()
+    #             for row in rows:
+    #                 lst.append(row)
+    #             p_val = lst[0][0]
+    #             cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+    #             lst1 = []
+    #             rows1 = cursor2.fetchall()
+    #             for row1 in rows1:
+    #                 lst1.append(row1)
+    #             s_val = lst1[0][0]
+    #             if p_val <= s_val:
+    #                 self.btn_Design.setDisabled(True)
+    #                 QMessageBox.about(self, 'Information',
+    #                                     "Secondary beam depth is higher than clear depth of primary beam web "
+    #                                     "(No provision in Osdag till now)")
+    #
+    #             else:
+    #                 self.btn_Design.setDisabled(False)
+    #
+    #     else:
+    #         key2.currentIndexChanged.disconnect()
+    #         key3.currentIndexChanged.disconnect()
 
     def call_3DModel(self, bgcolor):
         '''

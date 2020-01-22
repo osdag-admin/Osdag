@@ -166,99 +166,105 @@ class BeamCoverPlate(MomentConnection):
         t4 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None)
         out_list.append(t4)
 
-        t5 = (
-            KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX,
-            self.web_plate.height if flag == 'True' else '')
+        t5 = (KEY_WEB_PLATE_HEIGHT, KEY_DISP_WEB_PLATE_HEIGHT, TYPE_TEXTBOX,
+              self.web_plate.height if flag == 'True' else '')
         out_list.append(t5)
 
-        t6 = (
-            KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX,
-            self.web_plate.length if flag == 'True' else '')
+        t6 = (KEY_WEB_PLATE_LENGTH, KEY_DISP_WEB_PLATE_LENGTH, TYPE_TEXTBOX,
+              self.web_plate.length if flag == 'True' else '')
         out_list.append(t6)
 
         t7 = (KEY_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_TEXTBOX,
               self.web_plate.thickness_provided if flag == 'True' else '')
         out_list.append(t7)
 
-        t8 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag == 'True' else '')
+        t8 = (
+        KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag == 'True' else '')
         out_list.append(t8)
 
         t9 = (
-            KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX,
+            KEY_ENDDIST_W, KEY_DISP_END_DIST_W, TYPE_TEXTBOX,
             self.web_plate.end_dist_provided if flag == 'True' else '')
         out_list.append(t9)
 
-        t10 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.web_plate.gauge_provided if flag == 'True' else '')
+        t10 = (
+        KEY_WEB_GAUGE, KEY_DISP_WEB_PLATE_GAUGE, TYPE_TEXTBOX, self.web_plate.gauge_provided if flag == 'True' else '')
         out_list.append(t10)
 
-        t11 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX,
+        t11 = (KEY_EDGEDIST_W, KEY_DISP_EDGEDIST_W, TYPE_TEXTBOX,
                self.web_plate.edge_dist_provided if flag == 'True' else '')
         out_list.append(t11)
 
-        # t12 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX,
-        #        round(self.web_plate.shear_yielding_capacity, 2) if flag == 'True' else '')
-        # out_list.append(t12)
-        #
-        # t13 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX,
-        #        round(self.web_plate.block_shear_capacity, 2) if flag == 'True' else '')
-        # out_list.append(t13)
-        #
-        # t14 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
-        #        round(self.web_plate.moment_demand / 1000000, 2) if flag == 'True' else '')
-        # out_list.append(t14)
-        #
-        # t15 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
-        #        round(self.web_plate.moment_capacity, 2) if flag == 'True' else '')
-        # out_list.append(t15)
+        t12 = (KEY_SHEARYIELDINGCAP_W, KEY_DISP_SHEARYIELDINGCAP_W, TYPE_TEXTBOX,
+               round(self.web_plate.shear_yielding_capacity, 2) if flag == 'True' else '')
+        out_list.append(t12)
 
-        t16 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
+        t13 = (KEY_BLOCKSHEARCAP_W, KEY_DISP_BLOCKSHEARCAP_W, TYPE_TEXTBOX,
+               round(self.web_plate.block_shear_capacity, 2) if flag == 'True' else '')
+        out_list.append(t13)
+
+        t14 = (KEY_SHEARRUPTURECAP_W, KEY_DISP_SHEARRUPTURECAP_W, TYPE_TEXTBOX,
+               round(self.web_plate.shear_rupture_capacity, 2) if flag == 'True' else '')
+        out_list.append(t14)
+
+        t15 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
+               round(self.web_plate.moment_demand / 1000000, 2) if flag == 'True' else '')
+        out_list.append(t15)
+
+        t16 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
+               round(self.web_plate.moment_capacity, 2) if flag == 'True' else '')
         out_list.append(t16)
 
-        t17 = (
-            KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX,
-            self.flange_plate.height if flag == 'True' else '')
+        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
         out_list.append(t17)
 
-        t18 = (
-            KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX,
-            self.flange_plate.length if flag == 'True' else '')
+        t18 = (KEY_FLANGE_PLATE_HEIGHT, KEY_DISP_FLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
+               self.flange_plate.height if flag == 'True' else '')
         out_list.append(t18)
 
-        t19 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_plate.thickness_provided if flag == 'True' else '')
+        t19 = (
+            KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
+            self.flange_plate.length if flag == 'True' else '')
         out_list.append(t19)
 
-        t20 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag == 'True' else '')
+        t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
+               self.flange_plate.thickness_provided if flag == 'True' else '')
         out_list.append(t20)
 
-        t21 = (
-            KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX,
-            self.flange_plate.end_dist_provided if flag == 'True' else '')
+        t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
+               self.flange_plate.pitch_provided if flag == 'True' else '')
         out_list.append(t21)
 
-        t22 = (
-        KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.flange_plate.gauge_provided if flag == 'True' else '')
+        t22 = (KEY_ENDDIST_F, KEY_DISP_END_DIST_F, TYPE_TEXTBOX,
+               self.flange_plate.end_dist_provided if flag == 'True' else '')
         out_list.append(t22)
 
-        t23 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX,
-               self.flange_plate.edge_dist_provided if flag == 'True' else '')
+        t23 = (KEY_FLANGE_PLATE_GAUGE, KEY_DISP_FLANGE_PLATE_GAUGE, TYPE_TEXTBOX,
+               self.flange_plate.gauge_provided if flag == 'True' else '')
         out_list.append(t23)
 
-        # t24 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX,
+        t24 = (KEY_EDGEDIST_F, KEY_DISP_EDGEDIST_F, TYPE_TEXTBOX,
+               self.flange_plate.edge_dist_provided if flag == 'True' else '')
+        out_list.append(t24)
+
+        # t25 = (KEY_SHEARYIELDINGCAP_F, KEY_DISP_SHEARYIELDINGCAP_F, TYPE_TEXTBOX,
         #        round(self.flange_plate.shear_yielding_capacity, 2) if flag == 'True' else '')
-        # out_list.append(t24)
-        #
-        # t25 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX,
-        #        round(self.flange_plate.block_shear_capacity, 2) if flag == 'True' else '')
         # out_list.append(t25)
         #
-        # t26 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
-        #        round(self.flange_plate.moment_demand / 1000000, 2) if flag == 'True' else '')
+        # t26 = (KEY_BLOCKSHEARCAP_F, KEY_DISP_BLOCKSHEARCAP_F, TYPE_TEXTBOX,
+        #        round(self.flange_plate.block_shear_capacity, 2) if flag == 'True' else '')
         # out_list.append(t26)
+        # t27 = ( KEY_SHEARRUPTURECAP_F,KEY_DISP_SHEARRUPTURECAP_F,TYPE_TEXTBOX,
+        # #        round(self.flange_plate.shear_rupture_capacity, 2) if flag == 'True' else '')
+        # # out_list.append(t27)
+        # #
+        # t28 = (KEY_FLANGE_PLATE_MOM_DEMAND, KEY_FLANGE_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
+        #        round(self.flange_plate.moment_demand / 1000000, 2) if flag == 'True' else '')
+        # out_list.append(t28)
         #
-        # t27 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
+        # t29 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
         #        round(self.flange_plate.moment_capacity, 2) if flag == 'True' else '')
-        # out_list.append( t27)
+        # out_list.append( t29)
 
         return out_list
 
@@ -418,8 +424,7 @@ class BeamCoverPlate(MomentConnection):
 
         if self.Tension_capacity_flange < flange_force:
             design_status = False
-            logger.warning(": Tension capacity flange is less than required flange force kN")
-            logger.info(": Increase the size of Beam section")
+            logger.warning(": Tension capacity flange is less than required flange force kN Select larger beam section")
 
         else:
             pass
@@ -731,8 +736,7 @@ class BeamCoverPlate(MomentConnection):
                                        factored_axial_force=self.load.axial_force, column_area=self.section.area)
         if Tension_capacity_web_plate < self.webforce:
             design_status = False
-            logger.warning(": Tension capacity web_plate is less than required web force kN ")
-            logger.error(": Increase the size of Beam section")  # todo
+            logger.warning(": Tension capacity web_plate is less than required web force kN Select larger beam section")  # todo
 
         else:
             pass
@@ -802,8 +806,7 @@ class BeamCoverPlate(MomentConnection):
                                            factored_axial_force=self.load.axial_force, column_area=self.section.area)
             if Tension_capacity_web_plate < self.webforce:
                 design_status = False
-                logger.warning(": Tension capacity web_plate is less than required web force kN ")
-                logger.error(": Increase the size of Beam section")  # todo
+                logger.warning(": Tension capacity web_plate is less than required web force kN Select larger beam section")  # todo
 
             else:
                 pass
@@ -874,8 +877,7 @@ class BeamCoverPlate(MomentConnection):
                                        factored_axial_force=self.load.axial_force, column_area=self.section.area)
         if Tension_capacity_web_plate < self.webforce:
             design_status = False
-            logger.warning(": Tension capacity web_plate is less than required web force kN ")
-            logger.error(": Increase the size of Beam section")  # todo
+            logger.warning(": Tension capacity web_plate is less than required web force kN Select larger beam section") # todo
 
         else:
             pass

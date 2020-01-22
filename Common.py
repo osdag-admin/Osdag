@@ -247,6 +247,29 @@ KEY_FLANGEPLATE_THICKNESS = 'Plate.Flange_Splice.Thickness'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
+KEY_FLANGE_PLATE_HEIGHT = 'Plate.Flange_Splice.Height'
+KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
+KEY_FLANGE_PLATE_LENGTH ='Plate.Flange_Splice.Length'
+KEY_DISP_FLANGE_PLATE_LENGTH ='Length'
+
+KEY_FLANGE_PITCH = 'Flange_plate.Pitch'
+KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
+KEY_FLANGE_PLATE_GAUGE = "Flange_plate.Gauge"
+KEY_DISP_FLANGE_PLATE_GAUGE ="Gauge"
+KEY_ENDDIST_F= 'Flange_plate.EndDist'
+KEY_DISP_END_DIST_F = 'End Distance'
+KEY_EDGEDIST_F= 'Flange_plate.EdgeDist'
+KEY_DISP_EDGEDIST_F= 'Edge Distance'
+
+KEY_BLOCKSHEARCAP_F='Flange.plate.block_shear_capacity'
+KEY_DISP_BLOCKSHEARCAP_F='Block Shear Capacity'
+KEY_SHEARYIELDINGCAP_F= 'Flange.plate.shear_yielding_capacity'
+KEY_DISP_SHEARYIELDINGCAP_F= 'Shear Yielding Capacity'
+KEY_SHEARRUPTURECAP_F= 'Flange.plate.shear_rupture_capacity'
+KEY_DISP_SHEARRUPTURECAP_F= 'Shear Rupture Capacity'
+KEY_FLANGE_PLATE_MOM_DEMAND = 'Flange_plate.MomCapacity'
+KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Moment Capacity'
+
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
@@ -254,6 +277,29 @@ KEY_WEBPLATE_THICKNESS = 'Plate.Web_Splice.Thickness'
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+
+KEY_WEB_PLATE_HEIGHT = 'Plate.Web_Splice.Height'
+KEY_DISP_WEB_PLATE_HEIGHT = 'Height(mm)'
+KEY_WEB_PLATE_LENGTH ='Plate.Web_Splice.Length'
+KEY_DISP_WEB_PLATE_LENGTH ='Length'
+
+KEY_WEB_PITCH = "Web_plate.Pitch"
+KEY_DISP_WEB_PLATE_PITCH ="Pitch"
+KEY_WEB_GAUGE = "Web_plate.Gauge"
+KEY_DISP_WEB_PLATE_GAUGE ="Gauge"
+KEY_ENDDIST_W= 'Web_plate.EndDist'
+KEY_DISP_END_DIST_W = 'End Distance'
+KEY_EDGEDIST_W = 'Web_plate.EdgeDist'
+KEY_DISP_EDGEDIST_W = 'Edge Distance'
+KEY_BLOCKSHEARCAP_W='web.plate.block_shear_capacity'
+KEY_DISP_BLOCKSHEARCAP_W='Block Shear Capacity'
+KEY_SHEARYIELDINGCAP_W= 'web.plate.shear_yielding_capacity'
+KEY_DISP_SHEARYIELDINGCAP_W= 'Shear Yielding Capacity'
+KEY_SHEARRUPTURECAP_W= 'web.plate.shear_rupture_capacity'
+KEY_DISP_SHEARRUPTURECAP_W= 'Shear Rupture Capacity'
+KEY_WEB_PLATE_MOM_DEMAND = 'Web_plate.MomCapacity'
+KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Capacity'
+
 
 DISP_TITLE_ENDPLATE = 'End plate'
 

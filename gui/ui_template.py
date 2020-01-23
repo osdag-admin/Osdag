@@ -50,8 +50,8 @@ from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.Interface import Interface_Static_SetCVal
 from OCC.Core.IFSelect import IFSelect_RetDone
 from OCC.Core.StlAPI import StlAPI_Writer
-from OCC import BRepTools
-from OCC import IGESControl
+from OCC.Core import BRepTools
+from OCC.Core import IGESControl
 
 
 
@@ -65,17 +65,15 @@ class Ui_ModuleWindow(QMainWindow):
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
         self.window.exec()
         return self.ui.get_right_elements()
-    @pyqtSlot()
-    def open_summary_popup(self):
+
+    def open_summary_popup(self, main):
         self.new_window = QtWidgets.QDialog()
         self.new_ui = Ui_Dialog1()
-        self.new_ui.setupUi(self.new_window)
+        self.new_ui.setupUi(self.new_window, main)
         self.new_window.exec()
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
         self.new_ui.btn_useProfile.clicked.connect(self.useUserProfile)
-
-
 
     def getLogoFilePath(self, lblwidget):
 
@@ -754,7 +752,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 650, 200, 30))
         self.btn_CreateDesign.setAutoDefault(True)
         self.btn_CreateDesign.setObjectName("btn_CreateDesign")
-        self.btn_CreateDesign.clicked.connect(self.open_summary_popup)
+        # self.btn_CreateDesign.clicked.connect(self.createDesignReport(main))
 
         self.actionInput = QtWidgets.QAction(MainWindow)
         icon7 = QtGui.QIcon()
@@ -1017,6 +1015,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.chkBxBeam.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
         self.chkBxCol.clicked.connect(lambda: self.call_3DColumn("gradient_bg"))
         self.chkBxFinplate.clicked.connect(lambda: self.call_3DFinplate("gradient_bg"))
+        self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -1027,7 +1026,6 @@ class Ui_ModuleWindow(QMainWindow):
         # self.resultObj = None
         # self.uiObj = None
 
-
     def showColorDialog(self):
 
         col = QColorDialog.getColor()
@@ -1035,7 +1033,7 @@ class Ui_ModuleWindow(QMainWindow):
         r = colorTup[0]
         g = colorTup[1]
         b = colorTup[2]
-        self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
+        self.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
 
     def init_display(self, backend_str=None, size=(1024, 768)):
 

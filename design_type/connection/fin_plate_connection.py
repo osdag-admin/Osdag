@@ -27,11 +27,8 @@ import configparser
 import cairosvg
 from io import StringIO
 
-
-
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
-
 
 # connectivity = "column_flange_beam_web"
 # supporting_member_section = "HB 400"
@@ -48,11 +45,11 @@ from io import StringIO
 # material_grade = "E 250 (Fe 410 W)B"
 # material = Material(material_grade)
 
+
 class FinPlateConnection(ShearConnection):
 
     def __init__(self):
         super(FinPlateConnection, self).__init__()
-
 
     def set_osdaglogger(key):
 
@@ -194,20 +191,20 @@ class FinPlateConnection(ShearConnection):
 
         return options_list
 
-    def spacing(self):
+    def spacing(self, status):
 
         spacing = []
 
-        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided)
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
         spacing.append(t9)
 
-        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided)
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if status else '')
         spacing.append(t10)
 
-        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided)
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
         spacing.append(t11)
 
-        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided)
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
         spacing.append(t12)
 
         return spacing

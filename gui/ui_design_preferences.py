@@ -807,7 +807,6 @@ class Ui_Dialog(object):
                 if ch.objectName() == KEY_SUPTNGSEC_TYPE:
                     Type = ch.currentText()
 
-
         if ch == self.tab_Column.children()[len(self.tab_Column.children())-1]:
             conn = sqlite3.connect(PATH_TO_DATABASE)
             c = conn.cursor()
@@ -842,7 +841,6 @@ class Ui_Dialog(object):
 
             else:
                 QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
-                self.clear_tab("Column")
 
     def add_tab_beam(self):
         '''
@@ -928,7 +926,6 @@ class Ui_Dialog(object):
                 QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
             else:
                 QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
-                self.clear_tab("Beam")
 
     def retranslateUi(self, DesignPreferences):
         _translate = QtCore.QCoreApplication.translate
@@ -1086,6 +1083,11 @@ class DesignPreferences(QDialog):
         '''
         @author: Umair
         '''
+
+        if designation == 'Select Section':
+            self.ui.clear_tab("Column")
+            return
+
         col_list = []
         col_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(col_attributes, table, designation)
@@ -1162,6 +1164,9 @@ class DesignPreferences(QDialog):
         '''
         @author: Umair
         '''
+        if designation == 'Select Section':
+            self.ui.clear_tab("Beam")
+            return
         beam_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(beam_attributes, "Beams", designation)
         beam_list = []

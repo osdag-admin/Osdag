@@ -1,9 +1,15 @@
+
+# @author: Amir, Umair, Arsil
+
+
 TYPE_COMBOBOX = 'ComboBox'
+
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
+TYPE_OUT_BUTTON = 'Output_dock_Button'
 TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
@@ -27,6 +33,11 @@ class OurLog(logging.Handler):
         self.key.append(msg)
 
 def connectdb1():
+    """
+    Function to fetch diameter values from Bolt Table
+     """
+    # @author: Amir
+
     lst = []
     conn = sqlite3.connect(PATH_TO_DATABASE)
     cursor = conn.execute("SELECT Bolt_diameter FROM Bolt")
@@ -39,6 +50,11 @@ def connectdb1():
 
 def connectdb(table_name):
 
+    """
+        Function to fetch designation values from respective Tables.
+         """
+
+    # @author: Amir
     conn = sqlite3.connect(PATH_TO_DATABASE)
     lst = []
     if table_name == "Angles":
@@ -68,6 +84,12 @@ def connectdb(table_name):
 
 
 def connect_for_red(table_name):
+
+    """
+        Function to fetch designation values from various Tables where source is IS808_Old
+    """
+
+    # @author: Arsil
     conn = sqlite3.connect(PATH_TO_DATABASE)
     lst = []
     if table_name == "Angles":
@@ -94,6 +116,13 @@ def connect_for_red(table_name):
 
 
 def red_list_function():
+
+    """
+        Function to form a list for old values from Columns and Beams table.
+     """
+
+    # @author: Arsil
+
     red_list = []
     red_list_columns = connect_for_red("Columns")
     red_list_beams = connect_for_red("Beams")
@@ -103,6 +132,9 @@ def red_list_function():
 
 
 def tuple_to_str_popup(tl):
+
+    # @author: Amir
+
     arr = []
     for v in tl:
         val = ''.join(v)
@@ -129,6 +161,9 @@ def get_oldcolumncombolist():
     '''(None) -> (List)
     This function returns the list of Indian Standard Column Designation.
     '''
+
+    # @author: Arsil
+
     conn = sqlite3.connect(PATH_TO_DATABASE)
     old_columnList = []
     # columnQuery = QSqlQuery("SELECT Designation FROM Columns where Source = 'IS808_Old' order by id ASC")
@@ -150,6 +185,12 @@ def get_oldcolumncombolist():
 
     #return old_columnList
 def get_oldbeamcombolist():
+    '''(None) -> (List)
+       This function returns the list of Indian Standard Beams Designation.
+       '''
+
+    # @author: Arsil
+
     conn = sqlite3.connect(PATH_TO_DATABASE)
     old_columnList = []
     # columnQuery = QSqlQuery("SELECT Designation FROM Beams where Source = 'IS808_Old' order by id ASC")
@@ -470,6 +511,8 @@ KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
 KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line'
+KEY_OUT_SPACING = 'spacing'
+KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
 KEY_OUT_DISP_PITCH = 'Pitch'
 KEY_OUT_END_DIST = 'Bolt.EndDist'

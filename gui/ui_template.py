@@ -4,7 +4,7 @@
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
-# WARNING! All changes made in this file will be lost!
+# WARNING! All changes made in this file will be lost!\
 from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
@@ -45,12 +45,28 @@ from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 from .ui_design_preferences import DesignPreferences
 from design_type.connection.shear_connection import ShearConnection
+from cad.common_logic import CommonDesignLogic
+from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
+from OCC.Core.Interface import Interface_Static_SetCVal
+from OCC.Core.IFSelect import IFSelect_RetDone
+from OCC.Core.StlAPI import StlAPI_Writer
+from OCC.Core import BRepTools
+from OCC.Core import IGESControl
+
 
 
 class Ui_ModuleWindow(QMainWindow):
 
     closed = pyqtSignal()
-    def open_popup(self, op,  KEYEXISTING_CUSTOMIZED):
+    def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
+        """
+        Function to connect the customized_popup with the ui_template file
+        on clicking the customized option
+        """
+
+        # @author : Amir
+
+
         self.window = QtWidgets.QDialog()
         self.ui = Ui_Popup()
         self.ui.setupUi(self.window)
@@ -59,6 +75,15 @@ class Ui_ModuleWindow(QMainWindow):
         return self.ui.get_right_elements()
     @pyqtSlot()
     def open_summary_popup(self):
+
+        """
+        Function to connect the summary_popup with the ui_template file on clicking
+         the 'create design report' button
+        """
+
+        # @author: Amir
+
+
         self.new_window = QtWidgets.QDialog()
         self.new_ui = Ui_Dialog1()
         self.new_ui.setupUi(self.new_window)
@@ -66,6 +91,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
         self.new_ui.btn_useProfile.clicked.connect(self.useUserProfile)
+
 
 
     def getLogoFilePath(self, lblwidget):
@@ -140,7 +166,8 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             pass
 
-    def setupUi(self, MainWindow, main):
+    def setupUi(self, MainWindow, main,folder):
+        self.folder = folder
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
         icon = QtGui.QIcon()
@@ -444,6 +471,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # INPUT DOCK
 #############
+        # @author : Umair
 
         self.inputDock = QtWidgets.QDockWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -568,7 +596,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     # Customized option in Combobox
     ###############################
-
+    # @author: Amir
         new_list = main.customized_input(main)
         data = {}
 
@@ -589,7 +617,16 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 pass
 
+
+
         def popup(key, for_custom_list):
+
+            """
+            Function for retaining the values in the popup once it is closed.
+             """
+
+            # @author: Amir
+
             for c_tup in for_custom_list:
                 if c_tup[0] != key.objectName():
                     continue
@@ -598,7 +635,7 @@ class Ui_ModuleWindow(QMainWindow):
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
                 if selected == "Customized":
-                    data[c_tup[0] + "_customized"] = self.open_popup(options, existing_options)
+                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
@@ -615,9 +652,9 @@ class Ui_ModuleWindow(QMainWindow):
 
         def change(k1, new):
 
-            '''
+            """
             @author: Umair
-            '''
+            """
 
             for tup in new:
                 (object_name, k2_key, typ, f) = tup
@@ -675,9 +712,11 @@ class Ui_ModuleWindow(QMainWindow):
 
 # OUTPUT DOCK
 #############
-        '''
+        """
+        
         @author: Umair 
-        '''
+        
+        """
 
         self.outputDock = QtWidgets.QDockWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -697,7 +736,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         self.dockWidgetContents_out = QtWidgets.QWidget()
         self.dockWidgetContents_out.setObjectName("dockWidgetContents_out")
-        out_list = main.output_values(main, DESIGN_FLAG)
+        out_list = main.output_values(main, False)
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
@@ -725,6 +764,20 @@ class Ui_ModuleWindow(QMainWindow):
                 r.setFont(font)
                 r.setObjectName(option[0])
 
+            if type == TYPE_OUT_BUTTON:
+                v = option[3]
+                b = QtWidgets.QPushButton(self.dockWidgetContents_out)
+                b.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                b.setFont(font)
+                b.setObjectName(option[0])
+                b.setText(v[0])
+                b.setDisabled(True)
+                b.clicked.connect(lambda: self.output_button_dialog(main, v))
+
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
                 q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
@@ -739,7 +792,7 @@ class Ui_ModuleWindow(QMainWindow):
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
 
         self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_out)
-        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 600, 200, 30))
+        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 650, 200, 30))
         self.btn_CreateDesign.setAutoDefault(True)
         self.btn_CreateDesign.setObjectName("btn_CreateDesign")
         self.btn_CreateDesign.clicked.connect(self.open_summary_popup)
@@ -989,14 +1042,140 @@ class Ui_ModuleWindow(QMainWindow):
         self.retranslateUi()
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        self.action_save_input.triggered.connect(lambda: self.validateInputsOnDesignBtn(main, data, "Save"))
-        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main, data, "Design"))
+        self.action_save_input.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Save"))
+        self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
+        self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
+        self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
+        self.actionShow_beam.triggered.connect(lambda: self.call_3DBeam("gradient_bg"))
+        self.actionShow_column.triggered.connect(lambda: self.call_3DColumn("gradient_bg"))
+        self.actionShow_finplate.triggered.connect(lambda: self.call_3DFinplate("gradient_bg"))
+        self.actionShow_all.triggered.connect(lambda: self.call_3DModel("gradient_bg"))
+        self.actionChange_background.triggered.connect(self.showColorDialog)
+        self.actionSave_3D_model.triggered.connect(self.save3DcadImages)
+        self.btn3D.clicked.connect(lambda: self.call_3DModel("gradient_bg"))
+        self.chkBxBeam.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
+        self.chkBxCol.clicked.connect(lambda: self.call_3DColumn("gradient_bg"))
+        self.chkBxFinplate.clicked.connect(lambda: self.call_3DFinplate("gradient_bg"))
+
+        from osdagMainSettings import backend_name
+        self.display, _ = self.init_display(backend_str=backend_name())
+
+        self.connectivity = None
+        self.fuse_model = None
+        # self.disableViewButtons()
+        # self.resultObj = None
+        # self.uiObj = None
+
+
+    def showColorDialog(self):
+
+        col = QColorDialog.getColor()
+        colorTup = col.getRgb()
+        r = colorTup[0]
+        g = colorTup[1]
+        b = colorTup[2]
+        self.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
+
+    def init_display(self, backend_str=None, size=(1024, 768)):
+
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
+        global display, start_display, app, _, USED_BACKEND
+        if 'qt' in used_backend:
+            from OCC.Display.qtDisplay import qtViewer3d
+            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+
+        # from OCC.Display.pyqt4Display import qtViewer3d
+        from OCC.Display.qtDisplay import qtViewer3d
+        self.modelTab = qtViewer3d(self)
+
+        self.setWindowTitle("Osdag Fin Plate")
+        self.mytabWidget.resize(size[0], size[1])
+        self.mytabWidget.addTab(self.modelTab, "")
+
+        self.modelTab.InitDriver()
+        display = self.modelTab._display
+
+        # background gradient
+        display.set_bg_gradient_color([23, 1, 32],[23, 1, 32])
+        # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
+        display.display_triedron()
+        display.View.SetProj(1, 1, 1)
+
+        def centerOnScreen(self):
+            '''Centers the window on the screen.'''
+            resolution = QtGui.QDesktopWidget().screenGeometry()
+            self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+                      (resolution.height() / 2) - (self.frameSize().height() / 2))
+
+        def start_display():
+            self.modelTab.raise_()
+
+        return display, start_display
+
+    def save3DcadImages(self):
+        status = True
+        if status is True:
+            if self.fuse_model is None:
+                self.fuse_model = CommonDesignLogic.create2Dcad
+            shape = self.fuse_model
+
+            files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
+
+            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+                                                      files_types)
+            fName = str(fileName)
+
+            flag = True
+            if fName == '':
+                flag = False
+                return flag
+            else:
+                file_extension = fName.split(".")[-1]
+
+                if file_extension == 'igs':
+                    IGESControl.IGESControl_Controller().Init()
+                    iges_writer = IGESControl.IGESControl_Writer()
+                    iges_writer.AddShape(shape)
+                    iges_writer.Write(fName)
+
+                elif file_extension == 'brep':
+
+                    BRepTools.breptools.Write(shape, fName)
+
+                elif file_extension == 'stp':
+                    # initialize the STEP exporter
+                    step_writer = STEPControl_Writer()
+                    Interface_Static_SetCVal("write.step.schema", "AP203")
+
+                    # transfer shapes and write file
+                    step_writer.Transfer(shape, STEPControl_AsIs)
+                    status = step_writer.Write(fName)
+
+                    assert (status == IFSelect_RetDone)
+
+                else:
+                    stl_writer = StlAPI_Writer()
+                    stl_writer.SetASCIIMode(True)
+                    stl_writer.Write(shape, fName)
+
+                self.fuse_model = None
+
+                QMessageBox.about(self, 'Information', "File saved")
+        else:
+            self.actionSave_3D_model.setEnabled(False)
+            QMessageBox.about(self,'Information', 'Design Unsafe: 3D Model cannot be saved')
+
+
+
 
 # Function for Reset Button
     '''
-    @author: Umair 
+    @author: Umair, Amir 
     '''
 
     def reset_fn(self, op_list, out_list, new_list, data):
@@ -1054,6 +1233,13 @@ class Ui_ModuleWindow(QMainWindow):
         self.design_inputs = design_dictionary
 
     def pass_d(self, main, design_dictionary):
+        """
+        It sets key variable textEdit and passes it to warn text function present in fin_plate_connection.py for logger
+         """
+
+        # @author Arsil Zunzunia
+
+
         key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
         main.warn_text(main, key, design_dictionary)
         # main.set_input_values(main, design_dictionary)
@@ -1122,44 +1308,114 @@ class Ui_ModuleWindow(QMainWindow):
                 pass
 
 # Function for Input Validation
+#
+#                 for value in red_list:
+#                     indx = option[4].index(str(value))
+#                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+#
+#             elif option[0] == KEY_SUPTDSEC:
+#
+#                 v = "Beams"
+#
+#                 red_list = connect_for_red(v)
+#
+#                 print(red_list)
+#
+#                 for value in red_list:
+#                     indx = option[4].index(str(value))
+#
+#                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+#
+#     def select_workspace_folder(self):
+#         # This function prompts the user to select the workspace folder and returns the name of the workspace folder
+#         config = configparser.ConfigParser()
+#         config.read_file(open(r'Osdag.config'))
+#         desktop_path = config.get("desktop_path", "path1")
+#         folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
+#                                                   desktop_path)
+#         return folder
+    def common_function_for_save_and_design(self, main, data, trigger_type):
 
-    def validateInputsOnDesignBtn(self, main, data, trigger_type):
+        # @author: Amir
 
         option_list = main.input_values(self)
-        missing_fields_list = []
-        signal = True
-
-        for option in option_list:
-            if option[0] == KEY_CONN:
-                continue
-            s = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
-
-            if option[2] == TYPE_COMBOBOX:
-                if option[0] in [KEY_D, KEY_GRD, KEY_PLATETHK]:
-                    continue
-                if s.currentIndex() == 0:
-                    missing_fields_list.append(option[1])
-
-            elif option[2] == TYPE_TEXTBOX:
-                if s.text() == '':
-                    missing_fields_list.append(option[1])
-            else:
-                pass
-
-        if len(missing_fields_list) > 0:
-            QMessageBox.information(self, "Information", self.generate_missing_fields_error_string(missing_fields_list))
-        elif trigger_type == "Save":
+        if trigger_type == "Save":
             self.design_fn(option_list, data)
             self.saveDesign_inputs()
         else:
             self.design_fn(option_list, data)
-            main.set_input_values(main, self.design_inputs)
-            DESIGN_FLAG = 'True'
-            out_list = main.output_values(main, DESIGN_FLAG)
+
+            main.func_for_validation(main, self, self.design_inputs)
+            status = main.design_status
+            # main.set_input_values(main, self.design_inputs, self)
+            # DESIGN_FLAG = 'True'
+
+            out_list = main.output_values(main, status)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
+                elif option[2] == TYPE_OUT_BUTTON:
+                    self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
+
+            if status is True:
+                self.commLogicObj = CommonDesignLogic(self.display,self.folder,
+                                                      main.module)
+                status = main.design_status
+                self.commLogicObj.call_3DModel(status)
+                # self.callFin2D_Drawing("All")
+                self.actionShow_all.setEnabled(True)
+                self.actionShow_beam.setEnabled(True)
+                self.actionShow_column.setEnabled(True)
+                self.actionShow_finplate.setEnabled(True)
+            else:
+                self.btn3D.setEnabled(False)
+                self.chkBxBeam.setEnabled(False)
+                self.chkBxCol.setEnabled(False)
+                self.chkBxFinplate.setEnabled(False)
+                self.actionShow_all.setEnabled(False)
+                self.actionShow_beam.setEnabled(False)
+                self.actionShow_column.setEnabled(False)
+                self.actionShow_finplate.setEnabled(False)
+
+    def output_button_dialog(self, main, list):
+        dialog = QtWidgets.QDialog()
+        dialog.resize(350, 170)
+        dialog.setFixedSize(dialog.size())
+        dialog.setObjectName("Dialog")
+        dialog.setWindowTitle(list[0])
+
+        i = 0
+        for option in list[1](main):
+            lable = option[1]
+            type = option[2]
+            _translate = QtCore.QCoreApplication.translate
+            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
+                l = QtWidgets.QLabel(dialog)
+                l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
+                font = QtGui.QFont()
+                font.setPointSize(9)
+                font.setBold(False)
+                font.setWeight(50)
+                l.setFont(font)
+                l.setObjectName(option[0] + "_label")
+                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+
+            if type == TYPE_TEXTBOX:
+                r = QtWidgets.QLineEdit(dialog)
+                r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                r.setFont(font)
+                r.setObjectName(option[0])
+                r.setText(str(option[3]))
+
+            i = i + 30
+
+        dialog.exec()
+
 
 # Function for warning about structure
 
@@ -1170,6 +1426,8 @@ class Ui_ModuleWindow(QMainWindow):
 # Function for error if any field is missing
 
     def generate_missing_fields_error_string(self, missing_fields_list):
+
+
         """
 
         Args:
@@ -1180,6 +1438,9 @@ class Ui_ModuleWindow(QMainWindow):
 
         """
         # The base string which should be displayed
+
+        # @author: Amir
+
         information = "Please input the following required field"
         if len(missing_fields_list) > 1:
             # Adds 's' to the above sentence if there are multiple missing input fields
@@ -1200,44 +1461,74 @@ class Ui_ModuleWindow(QMainWindow):
 # Function for validation in beam-beam structure
 
     def validate_beam_beam(self, key):
+
+        # @author: Arsil
+
         if key.currentIndex() == 2:
             key2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
             key3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
             key2.currentIndexChanged.connect(lambda: self.primary_secondary_beam_comparison(key, key2, key3))
             key3.currentIndexChanged.connect(lambda: self.primary_secondary_beam_comparison(key, key2, key3))
 
-# Function for primary and secondary beam size comparison
 
-    def primary_secondary_beam_comparison(self, key, key2, key3):
-        if key.currentIndex() == 2:
-            if key2.currentIndex() != 0 and key3.currentIndex() != 0:
-                primary = key2.currentText()
-                secondary = key3.currentText()
-                conn = sqlite3.connect(PATH_TO_DATABASE)
-                cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
-                lst = []
-                rows = cursor.fetchall()
-                for row in rows:
-                    lst.append(row)
-                p_val = lst[0][0]
-                cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
-                lst1 = []
-                rows1 = cursor2.fetchall()
-                for row1 in rows1:
-                    lst1.append(row1)
-                s_val = lst1[0][0]
-                if p_val <= s_val:
-                    self.btn_Design.setDisabled(True)
-                    QMessageBox.about(self, 'Information',
-                                        "Secondary beam depth is higher than clear depth of primary beam web "
-                                        "(No provision in Osdag till now)")
+    def call_3DModel(self, bgcolor):
+        '''
+        This routine responsible for displaying 3D Cad model
+        :param flag: boolean
+        :return:
+        '''
+        if self.btn3D.isChecked:
+            self.chkBxCol.setChecked(Qt.Unchecked)
+            self.chkBxBeam.setChecked(Qt.Unchecked)
+            self.chkBxFinplate.setChecked(Qt.Unchecked)
+        self.commLogicObj.display_3DModel("Model",bgcolor)
 
-                else:
-                    self.btn_Design.setDisabled(False)
+    def call_3DBeam(self, bgcolor):
+        '''
+        Creating and displaying 3D Beam
+        '''
+        self.chkBxBeam.setChecked(Qt.Checked)
+        if self.chkBxBeam.isChecked():
+            self.chkBxCol.setChecked(Qt.Unchecked)
+            self.chkBxFinplate.setChecked(Qt.Unchecked)
+            self.btn3D.setChecked(Qt.Unchecked)
+            self.mytabWidget.setCurrentIndex(0)
 
-        else:
-            key2.currentIndexChanged.disconnect()
-            key3.currentIndexChanged.disconnect()
+        self.commLogicObj.display_3DModel("Beam", bgcolor)
+
+    def call_3DColumn(self, bgcolor):
+        '''
+        '''
+        self.chkBxCol.setChecked(Qt.Checked)
+        if self.chkBxCol.isChecked():
+            self.chkBxBeam.setChecked(Qt.Unchecked)
+            self.chkBxFinplate.setChecked(Qt.Unchecked)
+            self.btn3D.setChecked(Qt.Unchecked)
+            self.mytabWidget.setCurrentIndex(0)
+        self.commLogicObj.display_3DModel("Column", bgcolor)
+
+    def call_3DFinplate(self, bgcolor):
+        '''
+        Displaying FinPlate in 3D
+        '''
+        self.chkBxFinplate.setChecked(Qt.Checked)
+        if self.chkBxFinplate.isChecked():
+            self.chkBxBeam.setChecked(Qt.Unchecked)
+            self.chkBxCol.setChecked(Qt.Unchecked)
+            self.mytabWidget.setCurrentIndex(0)
+            self.btn3D.setChecked(Qt.Unchecked)
+
+        self.commLogicObj.display_3DModel("Plate", bgcolor)
+
+    def unchecked_allChkBox(self):
+        '''
+        This routine is responsible for unchecking all checkboxes in GUI
+        '''
+
+        self.btn3D.setChecked(Qt.Unchecked)
+        self.chkBxBeam.setChecked(Qt.Unchecked)
+        self.chkBxCol.setChecked(Qt.Unchecked)
+        self.chkBxFinplate.setChecked(Qt.Unchecked)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate

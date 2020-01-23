@@ -99,7 +99,12 @@ class Ui_Popup(object):
         self.pushButton.clicked.connect(self.on_mButtonToSelected_clicked)
         self.pushButton_5.clicked.connect(self.get_right_elements)
         self.pushButton_5.clicked.connect(lambda: self.is_empty(MainWindow))
+
     def is_empty(self,MainWindow):
+
+        # Function to check whether values are selected or not.
+        # @author: Amir
+
         if len(self.get_right_elements()) == 0:
             self.error_message = QtWidgets.QMessageBox()
             self.error_message.setWindowTitle('Information')
@@ -114,16 +119,11 @@ class Ui_Popup(object):
         self.pushButton_2.setDisabled(not bool(self.listWidget.selectedItems()))
         self.pushButton_3.setDisabled(not bool(self.listWidget_2.selectedItems()))
 
-    # def on_mBtnMoveToAvailable_clicked(self):
-    #     self.listWidget_2.addItem(self.listWidget.takeItem(self.listWidget.currentRow()))
-    #     # x = []
-    #     # for i in range(len(items)):
-    #     #     self.listWidget_2.addItem(self.listWidget.selectedItems()[i].text())
-    #
-    # def on_mBtnMoveToSelected_clicked(self):
-    #     self.listWidget.addItem(self.listWidget_2.takeItem(self.listWidget_2.currentRow()))
-
     def on_mBtnMoveToAvailable_clicked(self):
+        """
+        Functions to move Values from Availabe listWidget to Selected ListWidget and vice versa on clicking the respective buttons
+        """
+        # @author : Arsil
         items = self.listWidget.selectedItems()
         for i in range(len(items)):
             self.listWidget_2.addItem(self.listWidget.selectedItems()[i].text())
@@ -150,6 +150,10 @@ class Ui_Popup(object):
 
 
     def addAvailableItems(self,items,KEY_EXISTINGVAL_CUSTOMIZED):
+        # Function to addItems from one listWidget to another
+
+        # @author : Amir
+
         self.listWidget_2.clear()
         #self.listWidget_2.addItems(items)
         if items not in KEY_EXISTINGVAL_CUSTOMIZED:
@@ -176,6 +180,13 @@ class Ui_Popup(object):
     #     return r
 
     def get_right_elements(self):
+
+        # Function to get the selected (i.e. thr right elements) elements
+
+        # @author: Amir
+
+
+
         r = []
         for i in range(self.listWidget_2.count()):
             it = self.listWidget_2.item(i)

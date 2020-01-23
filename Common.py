@@ -1,9 +1,15 @@
+
+# @author: Amir, Umair, Arsil
+
+
 TYPE_COMBOBOX = 'ComboBox'
+
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
+TYPE_OUT_BUTTON = 'Output_dock_Button'
 TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
@@ -27,6 +33,11 @@ class OurLog(logging.Handler):
         self.key.append(msg)
 
 def connectdb1():
+    """
+    Function to fetch diameter values from Bolt Table
+     """
+    # @author: Amir
+
     lst = []
     conn = sqlite3.connect(PATH_TO_DATABASE)
     cursor = conn.execute("SELECT Bolt_diameter FROM Bolt")
@@ -39,6 +50,11 @@ def connectdb1():
 
 def connectdb(table_name):
 
+    """
+        Function to fetch designation values from respective Tables.
+         """
+
+    # @author: Amir
     conn = sqlite3.connect(PATH_TO_DATABASE)
     lst = []
     if table_name == "Angles":
@@ -68,6 +84,12 @@ def connectdb(table_name):
 
 
 def connect_for_red(table_name):
+
+    """
+        Function to fetch designation values from various Tables where source is IS808_Old
+    """
+
+    # @author: Arsil
     conn = sqlite3.connect(PATH_TO_DATABASE)
     lst = []
     if table_name == "Angles":
@@ -94,6 +116,13 @@ def connect_for_red(table_name):
 
 
 def red_list_function():
+
+    """
+        Function to form a list for old values from Columns and Beams table.
+     """
+
+    # @author: Arsil
+
     red_list = []
     red_list_columns = connect_for_red("Columns")
     red_list_beams = connect_for_red("Beams")
@@ -103,6 +132,9 @@ def red_list_function():
 
 
 def tuple_to_str_popup(tl):
+
+    # @author: Amir
+
     arr = []
     for v in tl:
         val = ''.join(v)
@@ -129,6 +161,9 @@ def get_oldcolumncombolist():
     '''(None) -> (List)
     This function returns the list of Indian Standard Column Designation.
     '''
+
+    # @author: Arsil
+
     conn = sqlite3.connect(PATH_TO_DATABASE)
     old_columnList = []
     # columnQuery = QSqlQuery("SELECT Designation FROM Columns where Source = 'IS808_Old' order by id ASC")
@@ -150,6 +185,12 @@ def get_oldcolumncombolist():
 
     #return old_columnList
 def get_oldbeamcombolist():
+    '''(None) -> (List)
+       This function returns the list of Indian Standard Beams Designation.
+       '''
+
+    # @author: Arsil
+
     conn = sqlite3.connect(PATH_TO_DATABASE)
     old_columnList = []
     # columnQuery = QSqlQuery("SELECT Designation FROM Beams where Source = 'IS808_Old' order by id ASC")
@@ -247,6 +288,29 @@ KEY_FLANGEPLATE_THICKNESS = 'Plate.Flange_Splice.Thickness'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
+KEY_FLANGE_PLATE_HEIGHT = 'Plate.Flange_Splice.Height'
+KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
+KEY_FLANGE_PLATE_LENGTH ='Plate.Flange_Splice.Length'
+KEY_DISP_FLANGE_PLATE_LENGTH ='Length'
+
+KEY_FLANGE_PITCH = 'Flange_plate.Pitch'
+KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
+KEY_FLANGE_PLATE_GAUGE = "Flange_plate.Gauge"
+KEY_DISP_FLANGE_PLATE_GAUGE ="Gauge"
+KEY_ENDDIST_F= 'Flange_plate.EndDist'
+KEY_DISP_END_DIST_F = 'End Distance'
+KEY_EDGEDIST_F= 'Flange_plate.EdgeDist'
+KEY_DISP_EDGEDIST_F= 'Edge Distance'
+
+KEY_BLOCKSHEARCAP_F='Flange.plate.block_shear_capacity'
+KEY_DISP_BLOCKSHEARCAP_F='Block Shear Capacity'
+KEY_SHEARYIELDINGCAP_F= 'Flange.plate.shear_yielding_capacity'
+KEY_DISP_SHEARYIELDINGCAP_F= 'Shear Yielding Capacity'
+KEY_SHEARRUPTURECAP_F= 'Flange.plate.shear_rupture_capacity'
+KEY_DISP_SHEARRUPTURECAP_F= 'Shear Rupture Capacity'
+KEY_FLANGE_PLATE_MOM_DEMAND = 'Flange_plate.MomCapacity'
+KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Moment Capacity'
+
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
@@ -254,6 +318,29 @@ KEY_WEBPLATE_THICKNESS = 'Plate.Web_Splice.Thickness'
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+
+KEY_WEB_PLATE_HEIGHT = 'Plate.Web_Splice.Height'
+KEY_DISP_WEB_PLATE_HEIGHT = 'Height(mm)'
+KEY_WEB_PLATE_LENGTH ='Plate.Web_Splice.Length'
+KEY_DISP_WEB_PLATE_LENGTH ='Length'
+
+KEY_WEB_PITCH = "Web_plate.Pitch"
+KEY_DISP_WEB_PLATE_PITCH ="Pitch"
+KEY_WEB_GAUGE = "Web_plate.Gauge"
+KEY_DISP_WEB_PLATE_GAUGE ="Gauge"
+KEY_ENDDIST_W= 'Web_plate.EndDist'
+KEY_DISP_END_DIST_W = 'End Distance'
+KEY_EDGEDIST_W = 'Web_plate.EdgeDist'
+KEY_DISP_EDGEDIST_W = 'Edge Distance'
+KEY_BLOCKSHEARCAP_W='web.plate.block_shear_capacity'
+KEY_DISP_BLOCKSHEARCAP_W='Block Shear Capacity'
+KEY_SHEARYIELDINGCAP_W= 'web.plate.shear_yielding_capacity'
+KEY_DISP_SHEARYIELDINGCAP_W= 'Shear Yielding Capacity'
+KEY_SHEARRUPTURECAP_W= 'web.plate.shear_rupture_capacity'
+KEY_DISP_SHEARRUPTURECAP_W= 'Shear Rupture Capacity'
+KEY_WEB_PLATE_MOM_DEMAND = 'Web_plate.MomCapacity'
+KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Capacity'
+
 
 DISP_TITLE_ENDPLATE = 'End plate'
 
@@ -424,6 +511,8 @@ KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
 KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line'
+KEY_OUT_SPACING = 'spacing'
+KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
 KEY_OUT_DISP_PITCH = 'Pitch'
 KEY_OUT_END_DIST = 'Bolt.EndDist'

@@ -58,13 +58,22 @@ from OCC.Core import IGESControl
 class Ui_ModuleWindow(QMainWindow):
 
     closed = pyqtSignal()
-    def open_popup(self, op,  KEYEXISTING_CUSTOMIZED):
+    def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
+        """
+        Function to connect the customized_popup with the ui_template file
+        on clicking the customized option
+        """
+
+        # @author : Amir
+
+
         self.window = QtWidgets.QDialog()
         self.ui = Ui_Popup()
         self.ui.setupUi(self.window)
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
         self.window.exec()
         return self.ui.get_right_elements()
+
 
     def open_summary_popup(self, main):
         self.new_window = QtWidgets.QDialog()
@@ -452,6 +461,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # INPUT DOCK
 #############
+        # @author : Umair
 
         self.inputDock = QtWidgets.QDockWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -576,7 +586,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     # Customized option in Combobox
     ###############################
-
+    # @author: Amir
         new_list = main.customized_input(main)
         data = {}
 
@@ -600,6 +610,13 @@ class Ui_ModuleWindow(QMainWindow):
 
 
         def popup(key, for_custom_list):
+
+            """
+            Function for retaining the values in the popup once it is closed.
+             """
+
+            # @author: Amir
+
             for c_tup in for_custom_list:
                 if c_tup[0] != key.objectName():
                     continue
@@ -608,7 +625,7 @@ class Ui_ModuleWindow(QMainWindow):
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
                 if selected == "Customized":
-                    data[c_tup[0] + "_customized"] = self.open_popup(options, existing_options)
+                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
@@ -625,9 +642,9 @@ class Ui_ModuleWindow(QMainWindow):
 
         def change(k1, new):
 
-            '''
+            """
             @author: Umair
-            '''
+            """
 
             for tup in new:
                 (object_name, k2_key, typ, f) = tup
@@ -685,9 +702,11 @@ class Ui_ModuleWindow(QMainWindow):
 
 # OUTPUT DOCK
 #############
-        '''
+        """
+        
         @author: Umair 
-        '''
+        
+        """
 
         self.outputDock = QtWidgets.QDockWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -707,7 +726,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         self.dockWidgetContents_out = QtWidgets.QWidget()
         self.dockWidgetContents_out.setObjectName("dockWidgetContents_out")
-        out_list = main.output_values(main, DESIGN_FLAG)
+        out_list = main.output_values(main, False)
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
@@ -734,6 +753,20 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+
+            if type == TYPE_OUT_BUTTON:
+                v = option[3]
+                b = QtWidgets.QPushButton(self.dockWidgetContents_out)
+                b.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                b.setFont(font)
+                b.setObjectName(option[0])
+                b.setText(v[0])
+                b.setDisabled(True)
+                b.clicked.connect(lambda: self.output_button_dialog(main, v))
 
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
@@ -999,8 +1032,8 @@ class Ui_ModuleWindow(QMainWindow):
         self.retranslateUi()
         self.mytabWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        self.action_save_input.triggered.connect(lambda: self.validateInputsOnDesignBtn(main, data, "Save"))
-        self.btn_Design.clicked.connect(lambda: self.validateInputsOnDesignBtn(main, data, "Design"))
+        self.action_save_input.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Save"))
+        self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
@@ -1132,7 +1165,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for Reset Button
     '''
-    @author: Umair 
+    @author: Umair, Amir 
     '''
 
     def reset_fn(self, op_list, out_list, new_list, data):
@@ -1190,6 +1223,13 @@ class Ui_ModuleWindow(QMainWindow):
         self.design_inputs = design_dictionary
 
     def pass_d(self, main, design_dictionary):
+        """
+        It sets key variable textEdit and passes it to warn text function present in fin_plate_connection.py for logger
+         """
+
+        # @author Arsil Zunzunia
+
+
         key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
         main.warn_text(main, key, design_dictionary)
         # main.set_input_values(main, design_dictionary)
@@ -1284,57 +1324,35 @@ class Ui_ModuleWindow(QMainWindow):
 #         folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
 #                                                   desktop_path)
 #         return folder
+    def common_function_for_save_and_design(self, main, data, trigger_type):
 
-    def validateInputsOnDesignBtn(self,main,data,trigger_type):
-
+        # @author: Amir
 
         option_list = main.input_values(self)
-        missing_fields_list = []
-        signal = True
-
-        for option in option_list:
-            if option[0] == KEY_CONN:
-                continue
-            s = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
-
-            if option[2] == TYPE_COMBOBOX:
-                if option[0] in [KEY_D, KEY_GRD, KEY_PLATETHK]:
-                    continue
-                if s.currentIndex() == 0:
-                    missing_fields_list.append(option[1])
-
-            elif option[2] == TYPE_TEXTBOX:
-                if s.text() == '':
-                    missing_fields_list.append(option[1])
-            else:
-                pass
-
-        if len(missing_fields_list) > 0:
-            QMessageBox.information(self, "Information", self.generate_missing_fields_error_string(missing_fields_list))
-        elif trigger_type == "Save":
+        if trigger_type == "Save":
             self.design_fn(option_list, data)
             self.saveDesign_inputs()
         else:
             self.design_fn(option_list, data)
-            main.set_input_values(main, self.design_inputs)
-            DESIGN_FLAG = 'True'
-            out_list = main.output_values(main, DESIGN_FLAG)
+
+            main.func_for_validation(main, self, self.design_inputs)
+            status = main.design_status
+            # main.set_input_values(main, self.design_inputs, self)
+            # DESIGN_FLAG = 'True'
+
+            out_list = main.output_values(main, status)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
-            self.commLogicObj = CommonDesignLogic(self.display,self.folder,
-                                                  main.module)
-            # self.resultObj = self.commLogicObj.resultObj
-            # alist = self.resultObj.values()
-            # self.display_output(self.resultObj)
-            # self.displaylog_totextedit(self.commLogicObj)
-            # isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+                elif option[2] == TYPE_OUT_BUTTON:
+                    self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-            # if isempty[0] is True:
-            status = main.design_status
-            self.commLogicObj.call_3DModel(status)
             if status is True:
+                self.commLogicObj = CommonDesignLogic(self.display,self.folder,
+                                                      main.module)
+                status = main.design_status
+                self.commLogicObj.call_3DModel(status)
                 # self.callFin2D_Drawing("All")
                 self.actionShow_all.setEnabled(True)
                 self.actionShow_beam.setEnabled(True)
@@ -1350,6 +1368,44 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_column.setEnabled(False)
                 self.actionShow_finplate.setEnabled(False)
 
+    def output_button_dialog(self, main, list):
+        dialog = QtWidgets.QDialog()
+        dialog.resize(350, 170)
+        dialog.setFixedSize(dialog.size())
+        dialog.setObjectName("Dialog")
+        dialog.setWindowTitle(list[0])
+
+        i = 0
+        for option in list[1](main):
+            lable = option[1]
+            type = option[2]
+            _translate = QtCore.QCoreApplication.translate
+            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
+                l = QtWidgets.QLabel(dialog)
+                l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
+                font = QtGui.QFont()
+                font.setPointSize(9)
+                font.setBold(False)
+                font.setWeight(50)
+                l.setFont(font)
+                l.setObjectName(option[0] + "_label")
+                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+
+            if type == TYPE_TEXTBOX:
+                r = QtWidgets.QLineEdit(dialog)
+                r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                r.setFont(font)
+                r.setObjectName(option[0])
+                r.setText(str(option[3]))
+
+            i = i + 30
+
+        dialog.exec()
+
 
 # Function for warning about structure
 
@@ -1360,6 +1416,8 @@ class Ui_ModuleWindow(QMainWindow):
 # Function for error if any field is missing
 
     def generate_missing_fields_error_string(self, missing_fields_list):
+
+
         """
 
         Args:
@@ -1370,6 +1428,9 @@ class Ui_ModuleWindow(QMainWindow):
 
         """
         # The base string which should be displayed
+
+        # @author: Amir
+
         information = "Please input the following required field"
         if len(missing_fields_list) > 1:
             # Adds 's' to the above sentence if there are multiple missing input fields
@@ -1390,48 +1451,18 @@ class Ui_ModuleWindow(QMainWindow):
 # Function for validation in beam-beam structure
 
     def validate_beam_beam(self, key):
+
+        # @author: Arsil
+
         if key.currentIndex() == 2:
             key2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
             key3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
             key2.currentIndexChanged.connect(lambda: self.primary_secondary_beam_comparison(key, key2, key3))
             key3.currentIndexChanged.connect(lambda: self.primary_secondary_beam_comparison(key, key2, key3))
 
-# Function for primary and secondary beam size comparison
-
-    def primary_secondary_beam_comparison(self, key, key2, key3):
-        if key.currentIndex() == 2:
-            if key2.currentIndex() != 0 and key3.currentIndex() != 0:
-                primary = key2.currentText()
-                secondary = key3.currentText()
-                conn = sqlite3.connect(PATH_TO_DATABASE)
-                cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
-                lst = []
-                rows = cursor.fetchall()
-                for row in rows:
-                    lst.append(row)
-                p_val = lst[0][0]
-                cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
-                lst1 = []
-                rows1 = cursor2.fetchall()
-                for row1 in rows1:
-                    lst1.append(row1)
-                s_val = lst1[0][0]
-                if p_val <= s_val:
-                    self.btn_Design.setDisabled(True)
-                    QMessageBox.about(self, 'Information',
-                                        "Secondary beam depth is higher than clear depth of primary beam web "
-                                        "(No provision in Osdag till now)")
-
-                else:
-                    self.btn_Design.setDisabled(False)
-
-        else:
-            key2.currentIndexChanged.disconnect()
-            key3.currentIndexChanged.disconnect()
 
     def call_3DModel(self, bgcolor):
         '''
-
         This routine responsible for displaying 3D Cad model
         :param flag: boolean
         :return:

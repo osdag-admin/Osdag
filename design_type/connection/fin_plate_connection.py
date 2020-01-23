@@ -1,5 +1,6 @@
 from design_type.connection.shear_connection import ShearConnection
-
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from utils.common.component import *
@@ -31,6 +32,7 @@ from io import StringIO
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
 
+
 # connectivity = "column_flange_beam_web"
 # supporting_member_section = "HB 400"
 # supported_member_section = "MB 300"
@@ -46,16 +48,19 @@ from io import StringIO
 # material_grade = "E 250 (Fe 410 W)B"
 # material = Material(material_grade)
 
-
-
 class FinPlateConnection(ShearConnection):
-
 
     def __init__(self):
         super(FinPlateConnection, self).__init__()
 
 
     def set_osdaglogger(key):
+
+        """
+        Function to set Logger for FinPlate Module
+        """
+
+        # @author Arsil Zunzunia
         global logger
         logger = logging.getLogger('osdag')
 
@@ -78,8 +83,13 @@ class FinPlateConnection(ShearConnection):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-
     def input_values(self, existingvalues={}):
+
+        '''
+        Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
+        '''
+
+        # @author: Amir, Umair
 
         options_list = []
 
@@ -133,6 +143,7 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platethk = ''
 
+        
         t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, None)
         options_list.append(t16)
 
@@ -183,76 +194,204 @@ class FinPlateConnection(ShearConnection):
 
         return options_list
 
+    def spacing(self):
+
+        spacing = []
+
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided)
+        spacing.append(t9)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided)
+        spacing.append(t10)
+
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided)
+        spacing.append(t11)
+
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided)
+        spacing.append(t12)
+
+        return spacing
+
     def output_values(self, flag):
+        '''
+        Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
+        '''
+
+        # @author: Umair
 
         out_list = []
 
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
         out_list.append(t1)
 
-        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,  self.bolt.bolt_diameter_provided if flag == 'True' else '')
+        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '')
         out_list.append(t2)
 
-        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag == 'True' else '')
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '')
+
         out_list.append(t3)
 
-        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag == 'True' else '')
+        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag else '')
         out_list.append(t4)
 
-        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, round(self.bolt.bolt_bearing_capacity/1000,2) if flag == 'True' else '')
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, round(self.bolt.bolt_bearing_capacity/1000,2) if flag else '')
         out_list.append(t5)
 
-        t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag == 'True' else '')
+        t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '')
         out_list.append(t6)
 
-        t21 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_FORCE, TYPE_TEXTBOX, round(self.plate.bolt_force / 1000, 2) if flag == 'True' else '')
+        t21 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_FORCE, TYPE_TEXTBOX, round(self.plate.bolt_force / 1000, 2) if flag else '')
         out_list.append(t21)
 
-        t7 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if flag == 'True' else '')
+        t7 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if flag else '')
         out_list.append(t7)
 
-        t8 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if flag == 'True' else '')
+        t8 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if flag else '')
         out_list.append(t8)
 
-        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if flag == 'True' else '')
-        out_list.append(t9)
+        t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
+        out_list.append(t21)
 
-        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if flag == 'True' else '')
-        out_list.append(t10)
-
-        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if flag == 'True' else '')
-        out_list.append(t11)
-
-        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if flag == 'True' else '')
-        out_list.append(t12)
+        # t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if flag else '')
+        # out_list.append(t9)
+        #
+        # t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if flag else '')
+        # out_list.append(t10)
+        #
+        # t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if flag else '')
+        # out_list.append(t11)
+        #
+        # t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if flag else '')
+        # out_list.append(t12)
 
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
         out_list.append(t13)
 
-        t14 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness_provided if flag == 'True' else '')
+        t14 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '')
         out_list.append(t14)
 
-        t15 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag == 'True' else '')
+        t15 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
         out_list.append(t15)
 
-        t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag == 'True' else '')
+        t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
         out_list.append(t16)
 
-        t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity,2) if flag == 'True' else '')
+        t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity,2) if flag else '')
         out_list.append(t17)
 
-        t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity,2) if flag == 'True' else '')
+        t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity,2) if flag else '')
         out_list.append(t18)
 
-        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if flag == 'True' else '')
+        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if flag else '')
         out_list.append(t19)
 
-        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.plate.moment_capacity,2) if flag == 'True' else '')
+        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.plate.moment_capacity,2) if flag else '')
         out_list.append(t20)
 
         return out_list
 
+    def func_for_validation(self, window, design_dictionary):
+        flag = False
+        flag1 = False
+        option_list = self.input_values(self)
+        missing_fields_list = []
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                val = option[4]
+                if design_dictionary[option[0]] == val[0]:
+                    missing_fields_list.append(option[1])
+
+        if design_dictionary[KEY_CONN] == 'Beam-Beam':
+            primary = design_dictionary[KEY_SUPTNGSEC]
+            secondary = design_dictionary[KEY_SUPTDSEC]
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
+            lst = []
+            rows = cursor.fetchall()
+            for row in rows:
+                lst.append(row)
+            p_val = lst[0][0]
+            cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+            lst1 = []
+            rows1 = cursor2.fetchall()
+            for row1 in rows1:
+                lst1.append(row1)
+            s_val = lst1[0][0]
+            if p_val <= s_val:
+                QMessageBox.about(window, 'Information',
+                                  "Secondary beam depth is higher than clear depth of primary beam web "
+                                  "(No provision in Osdag till now)")
+            else:
+                flag1 = True
+        else:
+            flag1 = True
+
+        if len(missing_fields_list) > 0:
+            QMessageBox.information(window, "Information",
+                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+            # flag = False
+        else:
+            flag = True
+
+        if flag and flag1:
+            self.set_input_values(self, design_dictionary)
+        else:
+            pass
+
+        # for option in option_list:
+        #     if option[0] == KEY_CONN:
+        #         continue
+        #     s = p.findChild(QtWidgets.QWidget, option[0])
+        #
+        #     if option[2] == TYPE_COMBOBOX:
+        #         if option[0] in [KEY_D, KEY_GRD, KEY_PLATETHK]:
+        #             continue
+        #         if s.currentIndex() == 0:
+        #             missing_fields_list.append(option[1])
+        #
+        #
+        #     elif option[2] == TYPE_TEXTBOX:
+        #         if s.text() == '':
+        #             missing_fields_list.append(option[1])
+        #     else:
+        #         pass
+
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
+
+    
     def warn_text(self):
+      
+        """
+        Function to give logger warning when any old value is selected from Column and Beams table.
+        """
+
+        # @author Arsil Zunzunia
+        
         red_list = red_list_function()
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
             logger.warning(
@@ -299,10 +438,12 @@ class FinPlateConnection(ShearConnection):
             print("failed in preliminary member checks. Select larger sections or decrease loads")
 
 
+
     def get_bolt_details(self):
 
         min_plate_height = self.supported_section.min_plate_height()
         max_plate_height = self.supported_section.max_plate_height()
+        print(min_plate_height, max_plate_height)
         self.plate.thickness_provided = round_up(self.supported_section.web_thickness, 2)
         bolts_required_previous = 2
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]

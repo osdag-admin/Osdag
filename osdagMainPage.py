@@ -24,6 +24,7 @@ from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
+# from cad.cad_common import call_3DBeam
 from gui.ui_template import Ui_ModuleWindow
 
 # from design_type.connection.main_controller import MainController
@@ -229,9 +230,10 @@ class OsdagMainWindow(QMainWindow):
         if self.ui.rdbtn_finplate.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, FinPlateConnection)
+            self.ui2.setupUi(self.ui2, FinPlateConnection,folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
+
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
             # self.window.show()
             # self.window.closed.connect(self.show)
@@ -352,10 +354,11 @@ class MainController(QMainWindow):
         super(MainController,self).__init__()
         QMainWindow.__init__(self)
         self.ui = Ui_ModuleWindow()
-        self.ui.setupUi(self, main)
+        self.ui.setupUi(self, main,folder)
         self.folder = folder
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
+
         # self.ui.btn_CreateDesign.clicked.connect(design_report(Ui_DesignReport))
         # self.design_report = DesignReportDialog(self)
         # self.ui.actionCreate_design_report.triggered.connect(DesignReportDialog.exec)

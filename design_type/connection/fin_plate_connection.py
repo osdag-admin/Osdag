@@ -1,8 +1,10 @@
 from design_type.connection.shear_connection import ShearConnection
-
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from utils.common.component import *
+# from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
@@ -30,26 +32,27 @@ from io import StringIO
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
 
-connectivity = "column_flange_beam_web"
-supporting_member_section = "HB 400"
-supported_member_section = "MB 300"
-fy = 250.0
-fu = 410.0
-shear_force = 100.0
-axial_force=100.0
-bolt_diameter = 24.0
-bolt_type = "friction_grip"
-bolt_grade = 8.8
-plate_thickness = 10.0
-weld_size = 6
-material_grade = "E 250 (Fe 410 W)B"
-material = Material(material_grade)
+
+# connectivity = "column_flange_beam_web"
+# supporting_member_section = "HB 400"
+# supported_member_section = "MB 300"
+# fy = 250.0
+# fu = 410.0
+# shear_force = 100.0
+# axial_force=100.0
+# bolt_diameter = 24.0
+# bolt_type = "friction_grip"
+# bolt_grade = 8.8
+# plate_thickness = 10.0
+# weld_size = 6
+# material_grade = "E 250 (Fe 410 W)B"
+# material = Material(material_grade)
 
 class FinPlateConnection(ShearConnection):
 
-
     def __init__(self):
         super(FinPlateConnection, self).__init__()
+
 
     def set_osdaglogger(key):
 
@@ -207,6 +210,7 @@ class FinPlateConnection(ShearConnection):
         out_list.append(t2)
 
         t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag == 'True' else '')
+
         out_list.append(t3)
 
         t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag == 'True' else '')
@@ -264,6 +268,99 @@ class FinPlateConnection(ShearConnection):
         out_list.append(t20)
 
         return out_list
+   
+
+    def func_for_validation(self, window, design_dictionary):
+        flag = False
+        flag1 = False
+        option_list = self.input_values(self)
+        missing_fields_list = []
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                val = option[4]
+                if design_dictionary[option[0]] == val[0]:
+                    missing_fields_list.append(option[1])
+
+        if design_dictionary[KEY_CONN] == 'Beam-Beam':
+            primary = design_dictionary[KEY_SUPTNGSEC]
+            secondary = design_dictionary[KEY_SUPTDSEC]
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
+            lst = []
+            rows = cursor.fetchall()
+            for row in rows:
+                lst.append(row)
+            p_val = lst[0][0]
+            cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+            lst1 = []
+            rows1 = cursor2.fetchall()
+            for row1 in rows1:
+                lst1.append(row1)
+            s_val = lst1[0][0]
+            if p_val <= s_val:
+                QMessageBox.about(window, 'Information',
+                                  "Secondary beam depth is higher than clear depth of primary beam web "
+                                  "(No provision in Osdag till now)")
+            else:
+                flag1 = True
+
+        if len(missing_fields_list) > 0:
+            QMessageBox.information(window, "Information",
+                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+            # flag = False
+        else:
+            flag = True
+        if flag and flag1:
+            self.set_input_values(self, design_dictionary, window)
+            return True
+        else:
+            return False
+
+
+        # for option in option_list:
+        #     if option[0] == KEY_CONN:
+        #         continue
+        #     s = p.findChild(QtWidgets.QWidget, option[0])
+        #
+        #     if option[2] == TYPE_COMBOBOX:
+        #         if option[0] in [KEY_D, KEY_GRD, KEY_PLATETHK]:
+        #             continue
+        #         if s.currentIndex() == 0:
+        #             missing_fields_list.append(option[1])
+        #
+        #
+        #     elif option[2] == TYPE_TEXTBOX:
+        #         if s.text() == '':
+        #             missing_fields_list.append(option[1])
+        #     else:
+        #         pass
+
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
 
     
     def warn_text(self):
@@ -280,12 +377,12 @@ class FinPlateConnection(ShearConnection):
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def set_input_values(self, design_dictionary):
-        # if signal:
-        super(FinPlateConnection, self).set_input_values(self, design_dictionary)
-        # else:
-        #     super(FinPlateConnection, self).set_input_values(design_dictionary)
+
+        super(FinPlateConnection,self).set_input_values(self, design_dictionary)
+        self.module = design_dictionary[KEY_MODULE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
@@ -309,7 +406,10 @@ class FinPlateConnection(ShearConnection):
                 self.supported_section.tension_yielding_capacity > self.load.axial_force:
             print("preliminary member check is satisfactory. Doing bolt checks")
             self.get_bolt_details(self)
+            self.design_status = True
+
         else:
+            self.design_status = False
             logger.error(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
                            "than applied loads, Please select larger sections or decrease loads"
                             .format(self.supported_section.shear_yielding_capacity,
@@ -317,10 +417,12 @@ class FinPlateConnection(ShearConnection):
             print("failed in preliminary member checks. Select larger sections or decrease loads")
 
 
+
     def get_bolt_details(self):
 
         min_plate_height = self.supported_section.min_plate_height()
         max_plate_height = self.supported_section.max_plate_height()
+        print(min_plate_height, max_plate_height)
         self.plate.thickness_provided = round_up(self.supported_section.web_thickness, 2)
         bolts_required_previous = 2
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
@@ -478,8 +580,11 @@ class FinPlateConnection(ShearConnection):
         print(self.bolt)
         print(self.plate)
 
+
+
         # with open("filename", 'w') as out_file:
         #     yaml.dump(fin_plate_input, out_file)
+
 
     def block_shear_strength_section(self, A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         """Calculate the block shear strength of bolted connections as per cl. 6.4.1
@@ -509,6 +614,7 @@ class FinPlateConnection(ShearConnection):
         Tdb = min(T_db1, T_db2)
         Tdb = round(Tdb / 1000, 3)
         return Tdb
+
 
 # For Command Line
 

@@ -467,25 +467,39 @@ class Plate(Material):
             # If check for shear eccentricity is true, resultant force in bolt is calculated
             ecc = (pitch * max((bolt_line-1.5), 0)) + end_dist + gap
             moment_demand = shear_load * ecc
+            print(2, bolts_one_line, pitch,
+                                 gauge, bolt_line, shear_load, axial_load, ecc)
             vres = self.get_vres(bolts_one_line, pitch,
                                  gauge, bolt_line, shear_load, axial_load, ecc)
             bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                   gauge, bolt_capacity,
                                                   bolt_dia)
-            print(1, vres, bolt_capacity_red)
+            print(3, vres, bolt_capacity_red)
             while vres > bolt_capacity_red:
                 # Length of plate is increased for calculated bolts in one line.
                 # This increases spacing which decreases resultant force
+                print(4, web_plate_h, web_plate_h_max)
                 if web_plate_h + 10 <= web_plate_h_max:
                     web_plate_h += 10
                 # If height cannot be increased number of bolts is increased by 1 and loop is repeated
                 else:
                     bolts_required += 1
+                    print(5, web_plate_h_max, web_plate_h_min, bolts_required,
+                                                            min_edge_dist, min_gauge)
                     [bolt_line, bolts_one_line, web_plate_h] = \
                         self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
                                                             min_edge_dist, min_gauge)
-                    print(bolts_required, bolt_line, bolts_one_line, web_plate_h)
+                print(6, bolts_required, bolt_line, bolts_one_line, web_plate_h)
                 [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,min_edge_dist, max_spacing, max_edge_dist)
+                while web_plate_h is False:
+                    bolts_required += 1
+                    [bolt_line, bolts_one_line, web_plate_h] = \
+                        self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
+                                                            min_edge_dist, min_gauge)
+                    [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,
+                                                                               min_edge_dist, max_spacing,
+                                                                               max_edge_dist)
+
                 vres = self.get_vres(bolts_one_line, pitch,
                                      gauge, bolt_line, shear_load, axial_load, ecc)
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,

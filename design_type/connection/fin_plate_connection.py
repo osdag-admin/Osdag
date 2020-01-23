@@ -338,24 +338,6 @@ class FinPlateConnection(ShearConnection):
         else:
             pass
 
-        # for option in option_list:
-        #     if option[0] == KEY_CONN:
-        #         continue
-        #     s = p.findChild(QtWidgets.QWidget, option[0])
-        #
-        #     if option[2] == TYPE_COMBOBOX:
-        #         if option[0] in [KEY_D, KEY_GRD, KEY_PLATETHK]:
-        #             continue
-        #         if s.currentIndex() == 0:
-        #             missing_fields_list.append(option[1])
-        #
-        #
-        #     elif option[2] == TYPE_TEXTBOX:
-        #         if s.text() == '':
-        #             missing_fields_list.append(option[1])
-        #     else:
-        #         pass
-
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
         Args:
@@ -441,7 +423,7 @@ class FinPlateConnection(ShearConnection):
         min_plate_height = self.supported_section.min_plate_height()
         max_plate_height = self.supported_section.max_plate_height()
         print(min_plate_height, max_plate_height)
-        self.plate.thickness_provided = round_up(self.supported_section.web_thickness, 2)
+        self.plate.thickness_provided = max(min(self.plate.thickness), math.ceil(self.supported_section.web_thickness))
         bolts_required_previous = 2
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         bolt_grade_previous = self.bolt.bolt_grade[-1]
@@ -460,6 +442,7 @@ class FinPlateConnection(ShearConnection):
                                               n_planes=1)
 
             self.plate.bolts_required = max(int(math.ceil(res_force / self.bolt.bolt_capacity)), 2)
+            print(1, res_force, self.bolt.bolt_capacity)
 
             if self.plate.bolts_required > bolts_required_previous and count >= 1:
                 self.bolt.bolt_diameter_provided = bolt_diameter_previous

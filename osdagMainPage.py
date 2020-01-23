@@ -354,7 +354,7 @@ class MainController(QMainWindow):
         super(MainController,self).__init__()
         QMainWindow.__init__(self)
         self.ui = Ui_ModuleWindow()
-        self.ui.setupUi(self, main,folder)
+        self.ui.setupUi(self, main, folder)
         self.folder = folder
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))

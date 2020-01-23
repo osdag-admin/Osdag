@@ -119,22 +119,11 @@ class Ui_Popup(object):
         self.pushButton_2.setDisabled(not bool(self.listWidget.selectedItems()))
         self.pushButton_3.setDisabled(not bool(self.listWidget_2.selectedItems()))
 
-    # def on_mBtnMoveToAvailable_clicked(self):
-    #     self.listWidget_2.addItem(self.listWidget.takeItem(self.listWidget.currentRow()))
-    #     # x = []
-    #     # for i in range(len(items)):
-    #     #     self.listWidget_2.addItem(self.listWidget.selectedItems()[i].text())
-    #
-    # def on_mBtnMoveToSelected_clicked(self):
-    #     self.listWidget.addItem(self.listWidget_2.takeItem(self.listWidget_2.currentRow()))
-
-   '''
-   Functions to move Values from Availabe listWidget to Selected ListWidget and vice versa on clicking the respective buttons
-   
-   '''
-   # @author : Arsil
-
     def on_mBtnMoveToAvailable_clicked(self):
+        """
+        Functions to move Values from Availabe listWidget to Selected ListWidget and vice versa on clicking the respective buttons
+        """
+        # @author : Arsil
         items = self.listWidget.selectedItems()
         for i in range(len(items)):
             self.listWidget_2.addItem(self.listWidget.selectedItems()[i].text())

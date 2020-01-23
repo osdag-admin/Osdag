@@ -1330,35 +1330,36 @@ class Ui_ModuleWindow(QMainWindow):
             self.saveDesign_inputs()
         else:
             self.design_fn(option_list, data)
-            valid = main.func_for_validation(main, self, self.design_inputs)
+            main.func_for_validation(main, self, self.design_inputs)
+            status = main.design_status
             # main.set_input_values(main, self.design_inputs, self)
             # DESIGN_FLAG = 'True'
 
-            out_list = main.output_values(main, valid)
+            out_list = main.output_values(main, status)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
-            if valid is True:
+
+            if status is True:
                 self.commLogicObj = CommonDesignLogic(self.display,self.folder,
                                                       main.module)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)
-                if status is True:
-                    # self.callFin2D_Drawing("All")
-                    self.actionShow_all.setEnabled(True)
-                    self.actionShow_beam.setEnabled(True)
-                    self.actionShow_column.setEnabled(True)
-                    self.actionShow_finplate.setEnabled(True)
-                else:
-                    self.btn3D.setEnabled(False)
-                    self.chkBxBeam.setEnabled(False)
-                    self.chkBxCol.setEnabled(False)
-                    self.chkBxFinplate.setEnabled(False)
-                    self.actionShow_all.setEnabled(False)
-                    self.actionShow_beam.setEnabled(False)
-                    self.actionShow_column.setEnabled(False)
-                    self.actionShow_finplate.setEnabled(False)
+                # self.callFin2D_Drawing("All")
+                self.actionShow_all.setEnabled(True)
+                self.actionShow_beam.setEnabled(True)
+                self.actionShow_column.setEnabled(True)
+                self.actionShow_finplate.setEnabled(True)
+            else:
+                self.btn3D.setEnabled(False)
+                self.chkBxBeam.setEnabled(False)
+                self.chkBxCol.setEnabled(False)
+                self.chkBxFinplate.setEnabled(False)
+                self.actionShow_all.setEnabled(False)
+                self.actionShow_beam.setEnabled(False)
+                self.actionShow_column.setEnabled(False)
+                self.actionShow_finplate.setEnabled(False)
 
 
 # Function for warning about structure

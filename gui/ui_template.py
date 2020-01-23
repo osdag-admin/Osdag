@@ -50,8 +50,8 @@ from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.Interface import Interface_Static_SetCVal
 from OCC.Core.IFSelect import IFSelect_RetDone
 from OCC.Core.StlAPI import StlAPI_Writer
-from OCC import BRepTools
-from OCC import IGESControl
+from OCC.Core import BRepTools
+from OCC.Core import IGESControl
 
 
 
@@ -1062,7 +1062,7 @@ class Ui_ModuleWindow(QMainWindow):
         r = colorTup[0]
         g = colorTup[1]
         b = colorTup[2]
-        self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
+        self.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
 
     def init_display(self, backend_str=None, size=(1024, 768)):
 

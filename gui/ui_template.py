@@ -990,6 +990,12 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(module))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(self)
+        add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Column")
+        add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Beam")
+        column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
+        beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
+        add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
+        add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
         self.designPrefDialog.rejected.connect(self.design_preferences)
 
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
@@ -1386,7 +1392,7 @@ class Ui_ModuleWindow(QMainWindow):
         dialog.setWindowTitle(list[0])
 
         i = 0
-        for option in list[1](main):
+        for option in list[1](main, main.design_status):
             lable = option[1]
             type = option[2]
             _translate = QtCore.QCoreApplication.translate
@@ -1415,6 +1421,85 @@ class Ui_ModuleWindow(QMainWindow):
             i = i + 30
 
         dialog.exec()
+
+    def refresh_sections(self, prev, section):
+
+        connectivity = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
+        supporting_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
+        supported_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+        Columns = connectdb("Columns")
+        Beams = connectdb("Beams")
+        red_list_set = set(red_list_function())
+
+        # if section == "Supporting":
+        #     prev_column = prev
+        # elif section == "Supported":
+        #     prev_beam = prev
+
+        #if connectivity.currentText() in VALUES_CONN_1:
+        if section == "Supporting":
+            supporting_section.clear()
+            if connectivity.currentText() in VALUES_CONN_1:
+                for item in Columns:
+                    supporting_section.addItem(item)
+                current_list_set = set(Columns)
+                current_red_list = list(current_list_set.intersection(red_list_set))
+                for value in current_red_list:
+                    indx = Columns.index(str(value))
+                    supporting_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+            elif connectivity.currentText() in VALUES_CONN_2:
+                for item in Beams:
+                    supporting_section.addItem(item)
+                current_list_set = set(Beams)
+                current_red_list = list(current_list_set.intersection(red_list_set))
+                for value in current_red_list:
+                    indx = Beams.index(str(value))
+                    supporting_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
+            text_index = supporting_section.findText(text, QtCore.Qt.MatchFixedString)
+            if text_index:
+                supporting_section.setCurrentIndex(text_index)
+            else:
+                supporting_section.setCurrentIndex(prev)
+
+        if section == "Supported":
+            supported_section.clear()
+            #if connectivity.currentText() in VALUES_CONN_1:
+
+            for item in Beams:
+                supported_section.addItem(item)
+            current_list_set = set(Beams)
+            current_red_list = list(current_list_set.intersection(red_list_set))
+            for value in current_red_list:
+                indx = Beams.index(str(value))
+                supported_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
+            text_index = supported_section.findText(text, QtCore.Qt.MatchFixedString)
+            if text_index:
+                supported_section.setCurrentIndex(text_index)
+            else:
+                supported_section.setCurrentIndex(prev)
+
+
+            #elif connectivity.currentText() in VALUES_CONN_2:
+                #for item in Beams:
+                 #   supported_section.addItem(item)
+
+        # else:
+        #     for item in Beams:
+        #         if section == "Supporting":
+        #             supporting_section.addItem(item)
+        #         if section == "Supported":
+        #             supported_section.addItem(item)
+
+        # red_list_set = set(red_list_function())
+        # current_list_set = set(Columns)
+        # current_red_list = list(current_list_set.intersection(red_list_set))
+        #
+        # for value in current_red_list:
+        #     indx = option[4].index(str(value))
+        #     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
 
 # Function for warning about structure
@@ -1672,6 +1757,7 @@ class Ui_ModuleWindow(QMainWindow):
         key_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
         key_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
         key_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
+
         table_1 = "Columns"
         table_2 = "Beams"
         if module == KEY_DISP_BEAMCOVERPLATE:
@@ -1696,17 +1782,15 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
                 self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
-                if key_2.currentIndex() != 0 and key_3.currentIndex() != 0:
-                    self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
-                    self.designPrefDialog.beam_preferences(designation_bm, material_grade)
+                self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
+                self.designPrefDialog.beam_preferences(designation_bm, material_grade)
             elif conn in VALUES_CONN_2:
                 self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Column), KEY_DISP_PRIBM)
                 self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECBM)
-                if key_2.currentIndex() != 0 and key_3.currentIndex() != 0:
-                    self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
-                    self.designPrefDialog.beam_preferences(designation_bm, material_grade)
+                self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
+                self.designPrefDialog.beam_preferences(designation_bm, material_grade)
 
     def create_design_report(self):
         self.create_report.show()

@@ -32,6 +32,7 @@ from io import StringIO
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
 
+
 # connectivity = "column_flange_beam_web"
 # supporting_member_section = "HB 400"
 # supported_member_section = "MB 300"
@@ -47,8 +48,6 @@ from io import StringIO
 # material_grade = "E 250 (Fe 410 W)B"
 # material = Material(material_grade)
 
-
-
 class FinPlateConnection(ShearConnection):
 
     def __init__(self):
@@ -56,6 +55,12 @@ class FinPlateConnection(ShearConnection):
 
 
     def set_osdaglogger(key):
+
+        """
+        Function to set Logger for FinPlate Module
+        """
+
+        # @author Arsil Zunzunia
         global logger
         logger = logging.getLogger('osdag')
 
@@ -78,8 +83,13 @@ class FinPlateConnection(ShearConnection):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-
     def input_values(self, existingvalues={}):
+
+        '''
+        Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
+        '''
+
+        # @author: Amir, Umair
 
         options_list = []
 
@@ -133,6 +143,7 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platethk = ''
 
+        
         t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, None)
         options_list.append(t16)
 
@@ -184,6 +195,11 @@ class FinPlateConnection(ShearConnection):
         return options_list
 
     def output_values(self, flag):
+        '''
+        Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
+        '''
+
+        # @author: Umair
 
         out_list = []
 
@@ -346,7 +362,15 @@ class FinPlateConnection(ShearConnection):
 
         return information
 
+    
     def warn_text(self):
+      
+        """
+        Function to give logger warning when any old value is selected from Column and Beams table.
+        """
+
+        # @author Arsil Zunzunia
+        
         red_list = red_list_function()
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
             logger.warning(

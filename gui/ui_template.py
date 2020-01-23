@@ -764,6 +764,20 @@ class Ui_ModuleWindow(QMainWindow):
                 r.setFont(font)
                 r.setObjectName(option[0])
 
+            if type == TYPE_OUT_BUTTON:
+                v = option[3]
+                b = QtWidgets.QPushButton(self.dockWidgetContents_out)
+                b.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                b.setFont(font)
+                b.setObjectName(option[0])
+                b.setText(v[0])
+                b.setDisabled(True)
+                b.clicked.connect(lambda: self.output_button_dialog(main, v))
+
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
                 q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
@@ -1330,6 +1344,7 @@ class Ui_ModuleWindow(QMainWindow):
             self.saveDesign_inputs()
         else:
             self.design_fn(option_list, data)
+
             main.func_for_validation(main, self, self.design_inputs)
             status = main.design_status
             # main.set_input_values(main, self.design_inputs, self)
@@ -1340,6 +1355,8 @@ class Ui_ModuleWindow(QMainWindow):
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
+                elif option[2] == TYPE_OUT_BUTTON:
+                    self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
             if status is True:
                 self.commLogicObj = CommonDesignLogic(self.display,self.folder,
@@ -1360,6 +1377,44 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_beam.setEnabled(False)
                 self.actionShow_column.setEnabled(False)
                 self.actionShow_finplate.setEnabled(False)
+
+    def output_button_dialog(self, main, list):
+        dialog = QtWidgets.QDialog()
+        dialog.resize(350, 170)
+        dialog.setFixedSize(dialog.size())
+        dialog.setObjectName("Dialog")
+        dialog.setWindowTitle(list[0])
+
+        i = 0
+        for option in list[1](main):
+            lable = option[1]
+            type = option[2]
+            _translate = QtCore.QCoreApplication.translate
+            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
+                l = QtWidgets.QLabel(dialog)
+                l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
+                font = QtGui.QFont()
+                font.setPointSize(9)
+                font.setBold(False)
+                font.setWeight(50)
+                l.setFont(font)
+                l.setObjectName(option[0] + "_label")
+                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+
+            if type == TYPE_TEXTBOX:
+                r = QtWidgets.QLineEdit(dialog)
+                r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                r.setFont(font)
+                r.setObjectName(option[0])
+                r.setText(str(option[3]))
+
+            i = i + 30
+
+        dialog.exec()
 
 
 # Function for warning about structure

@@ -132,7 +132,7 @@ def save_html(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsumm
     rstr += t('tr')
     rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    png = folder + "/3D_Model.png"
+    png = folder + "/images_html/3D_Model.png"
     datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
 
     side = folder + "/finSide.png"

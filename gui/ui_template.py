@@ -1050,6 +1050,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionShow_all.triggered.connect(lambda: self.call_3DModel("gradient_bg"))
         self.actionChange_background.triggered.connect(self.showColorDialog)
         self.actionSave_3D_model.triggered.connect(self.save3DcadImages)
+        self.actionSave_current_image.triggered.connect(lambda:self.save_cadImages(main))
         self.btn3D.clicked.connect(lambda: self.call_3DModel("gradient_bg"))
         self.chkBxBeam.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
         self.chkBxCol.clicked.connect(lambda: self.call_3DColumn("gradient_bg"))
@@ -1112,6 +1113,29 @@ class Ui_ModuleWindow(QMainWindow):
             self.modelTab.raise_()
 
         return display, start_display
+
+    def save_cadImages(self,main):
+        """Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)
+
+        Returns:
+
+        """
+
+        if main.design_status is True:
+
+            files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+                                                      files_types)
+            fName = str(fileName)
+            file_extension = fName.split(".")[-1]
+
+            if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
+                self.display.ExportToImage(fName)
+                QMessageBox.about(self, 'Information', "File saved")
+        else:
+            self.actionSave_current_image.setEnabled(False)
+            QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
+
 
     def save3DcadImages(self):
         status = True

@@ -1431,12 +1431,6 @@ class Ui_ModuleWindow(QMainWindow):
         Beams = connectdb("Beams")
         red_list_set = set(red_list_function())
 
-        # if section == "Supporting":
-        #     prev_column = prev
-        # elif section == "Supported":
-        #     prev_beam = prev
-
-        #if connectivity.currentText() in VALUES_CONN_1:
         if section == "Supporting":
             supporting_section.clear()
             if connectivity.currentText() in VALUES_CONN_1:
@@ -1465,7 +1459,6 @@ class Ui_ModuleWindow(QMainWindow):
 
         if section == "Supported":
             supported_section.clear()
-            #if connectivity.currentText() in VALUES_CONN_1:
 
             for item in Beams:
                 supported_section.addItem(item)
@@ -1480,26 +1473,6 @@ class Ui_ModuleWindow(QMainWindow):
                 supported_section.setCurrentIndex(text_index)
             else:
                 supported_section.setCurrentIndex(prev)
-
-
-            #elif connectivity.currentText() in VALUES_CONN_2:
-                #for item in Beams:
-                 #   supported_section.addItem(item)
-
-        # else:
-        #     for item in Beams:
-        #         if section == "Supporting":
-        #             supporting_section.addItem(item)
-        #         if section == "Supported":
-        #             supported_section.addItem(item)
-
-        # red_list_set = set(red_list_function())
-        # current_list_set = set(Columns)
-        # current_red_list = list(current_list_set.intersection(red_list_set))
-        #
-        # for value in current_red_list:
-        #     indx = option[4].index(str(value))
-        #     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
 
 # Function for warning about structure
@@ -1768,8 +1741,10 @@ class Ui_ModuleWindow(QMainWindow):
         if module in [KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COLUMNCOVERPLATE]:
             designation_col = key_5.currentText()
             self.designPrefDialog.ui.tabWidget.removeTab(
-                self.designPrefDialog.ui.tabWidget.indexOf(self.designPrefDialog.ui.tab_Beam))
-            self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Beam))
+            self.designPrefDialog.ui.tabWidget.setTabText(
+                self.designPrefDialog.ui.tabWidget.indexOf(
                 self.designPrefDialog.ui.tab_Column), KEY_DISP_SECSIZE)
             if key_5.currentIndex() != 0:
                 self.designPrefDialog.column_preferences(designation_col, t, material_grade)
@@ -1778,16 +1753,20 @@ class Ui_ModuleWindow(QMainWindow):
             designation_col = key_2.currentText()
             designation_bm = key_3.currentText()
             if conn in VALUES_CONN_1:
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
                 self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)
             elif conn in VALUES_CONN_2:
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Column), KEY_DISP_PRIBM)
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECBM)
                 self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)

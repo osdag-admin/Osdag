@@ -53,7 +53,6 @@ class FinPlateConnection(ShearConnection):
     def __init__(self):
         super(FinPlateConnection, self).__init__()
 
-
     def set_osdaglogger(key):
 
         """

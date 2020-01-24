@@ -285,7 +285,7 @@ KEY_FLANGEPLATE_PREFERENCES = 'Plate.Flange_Splice.Preferences'
 KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
 VALUES_FLANGEPLATE_PREFERENCES = ['Cover plate location', 'Outside','Outside + Inside']
 
-KEY_FLANGEPLATE_THICKNESS = 'Plate.Flange_Splice.Thickness'
+KEY_FLANGEPLATE_THICKNESS = 'Flange_Plate.thickness_provided'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
@@ -321,7 +321,7 @@ KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
-KEY_WEBPLATE_THICKNESS = 'Web_Plate.Web_Splice.Thickness'
+KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']

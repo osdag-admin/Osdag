@@ -281,17 +281,17 @@ VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8',
 
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate'
 
-KEY_FLANGEPLATE_PREFERENCES = 'Plate.Flange_Splice.Preferences'
+KEY_FLANGEPLATE_PREFERENCES = 'Flange_Plate.Preferences'
 KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
 VALUES_FLANGEPLATE_PREFERENCES = ['Cover plate location', 'Outside','Outside + Inside']
 
-KEY_FLANGEPLATE_THICKNESS = 'Flange_Plate.thickness_provided'
+KEY_FLANGEPLATE_THICKNESS = 'flange_plate.thickness_provided'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
-KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Flange_Splice.Height'
+KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
 KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
-KEY_FLANGE_PLATE_LENGTH ='Flange_Plate.Flange_Splice.Length'
+KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length'
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
@@ -326,9 +326,9 @@ KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
-KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Web_Splice.Height'
+KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height(mm)'
-KEY_WEB_PLATE_LENGTH ='Web_Plate.Web_Splice.Length'
+KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
 KEY_DISP_WEB_PLATE_LENGTH ='Length'
 
 KEY_WEB_SPACING ="Web_plate.spacing"

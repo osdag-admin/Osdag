@@ -19,6 +19,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
+from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PyQt5.QtGui import QStandardItem
 import os
 import yaml
@@ -33,6 +34,7 @@ import pdfkit
 import configparser
 import pickle
 import cairosvg
+
 
 from Common import *
 from utils.common.component import Section,I_sectional_Properties
@@ -50,8 +52,8 @@ from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.Interface import Interface_Static_SetCVal
 from OCC.Core.IFSelect import IFSelect_RetDone
 from OCC.Core.StlAPI import StlAPI_Writer
-from OCC import BRepTools
-from OCC import IGESControl
+from OCC.Core import BRepTools
+from OCC.Core import IGESControl
 
 
 
@@ -73,26 +75,16 @@ class Ui_ModuleWindow(QMainWindow):
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
         self.window.exec()
         return self.ui.get_right_elements()
-    @pyqtSlot()
-    def open_summary_popup(self):
-
-        """
-        Function to connect the summary_popup with the ui_template file on clicking
-         the 'create design report' button
-        """
-
-        # @author: Amir
 
 
+    def open_summary_popup(self, main):
         self.new_window = QtWidgets.QDialog()
         self.new_ui = Ui_Dialog1()
-        self.new_ui.setupUi(self.new_window)
+        self.new_ui.setupUi(self.new_window, main)
         self.new_window.exec()
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
         self.new_ui.btn_useProfile.clicked.connect(self.useUserProfile)
-
-
 
     def getLogoFilePath(self, lblwidget):
 
@@ -795,7 +787,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 650, 200, 30))
         self.btn_CreateDesign.setAutoDefault(True)
         self.btn_CreateDesign.setObjectName("btn_CreateDesign")
-        self.btn_CreateDesign.clicked.connect(self.open_summary_popup)
+        # self.btn_CreateDesign.clicked.connect(self.createDesignReport(main))
 
         self.actionInput = QtWidgets.QAction(MainWindow)
         icon7 = QtGui.QIcon()
@@ -1060,10 +1052,12 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionShow_all.triggered.connect(lambda: self.call_3DModel("gradient_bg"))
         self.actionChange_background.triggered.connect(self.showColorDialog)
         self.actionSave_3D_model.triggered.connect(self.save3DcadImages)
+        self.actionSave_current_image.triggered.connect(lambda:self.save_cadImages(main))
         self.btn3D.clicked.connect(lambda: self.call_3DModel("gradient_bg"))
         self.chkBxBeam.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
         self.chkBxCol.clicked.connect(lambda: self.call_3DColumn("gradient_bg"))
         self.chkBxFinplate.clicked.connect(lambda: self.call_3DFinplate("gradient_bg"))
+        self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -1074,7 +1068,6 @@ class Ui_ModuleWindow(QMainWindow):
         # self.resultObj = None
         # self.uiObj = None
 
-
     def showColorDialog(self):
 
         col = QColorDialog.getColor()
@@ -1082,7 +1075,7 @@ class Ui_ModuleWindow(QMainWindow):
         r = colorTup[0]
         g = colorTup[1]
         b = colorTup[2]
-        self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
+        self.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
 
     def init_display(self, backend_str=None, size=(1024, 768)):
 
@@ -1122,6 +1115,29 @@ class Ui_ModuleWindow(QMainWindow):
             self.modelTab.raise_()
 
         return display, start_display
+
+    def save_cadImages(self,main):
+        """Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)
+
+        Returns:
+
+        """
+
+        if main.design_status is True:
+
+            files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+                                                      files_types)
+            fName = str(fileName)
+            file_extension = fName.split(".")[-1]
+
+            if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
+                self.display.ExportToImage(fName)
+                QMessageBox.about(self, 'Information', "File saved")
+        else:
+            self.actionSave_current_image.setEnabled(False)
+            QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
+
 
     def save3DcadImages(self):
         status = True
@@ -1353,6 +1369,7 @@ class Ui_ModuleWindow(QMainWindow):
 
             main.func_for_validation(main, self, self.design_inputs)
             status = main.design_status
+
             # main.set_input_values(main, self.design_inputs, self)
             # DESIGN_FLAG = 'True'
 
@@ -1364,25 +1381,25 @@ class Ui_ModuleWindow(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-            if status is True:
-                self.commLogicObj = CommonDesignLogic(self.display,self.folder,
-                                                      main.module)
-                status = main.design_status
-                self.commLogicObj.call_3DModel(status)
-                # self.callFin2D_Drawing("All")
-                self.actionShow_all.setEnabled(True)
-                self.actionShow_beam.setEnabled(True)
-                self.actionShow_column.setEnabled(True)
-                self.actionShow_finplate.setEnabled(True)
-            else:
-                self.btn3D.setEnabled(False)
-                self.chkBxBeam.setEnabled(False)
-                self.chkBxCol.setEnabled(False)
-                self.chkBxFinplate.setEnabled(False)
-                self.actionShow_all.setEnabled(False)
-                self.actionShow_beam.setEnabled(False)
-                self.actionShow_column.setEnabled(False)
-                self.actionShow_finplate.setEnabled(False)
+            # if status is True:
+            #     self.commLogicObj = CommonDesignLogic(self.display,self.folder,
+            #                                           main.module)
+            #     status = main.design_status
+            #     self.commLogicObj.call_3DModel(status)
+            #     # self.callFin2D_Drawing("All")
+            #     self.actionShow_all.setEnabled(True)
+            #     self.actionShow_beam.setEnabled(True)
+            #     self.actionShow_column.setEnabled(True)
+            #     self.actionShow_finplate.setEnabled(True)
+            # else:
+            #     self.btn3D.setEnabled(False)
+            #     self.chkBxBeam.setEnabled(False)
+            #     self.chkBxCol.setEnabled(False)
+            #     self.chkBxFinplate.setEnabled(False)
+            #     self.actionShow_all.setEnabled(False)
+            #     self.actionShow_beam.setEnabled(False)
+            #     self.actionShow_column.setEnabled(False)
+            #     self.actionShow_finplate.setEnabled(False)
 
     def output_button_dialog(self, main, list):
         dialog = QtWidgets.QDialog()

@@ -7,6 +7,8 @@ import yaml
 import os
 import shutil
 import logging
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
+
 
 
 
@@ -15,6 +17,7 @@ class ColumnCoverPlate(MomentConnection):
 
     def __init__(self):
         super(ColumnCoverPlate, self).__init__()
+        self.design_status = False
 
     def set_osdaglogger(key):
         global logger
@@ -164,6 +167,96 @@ class ColumnCoverPlate(MomentConnection):
 
         return options_list
 
+    # def flangespacing(self):
+    #
+    #     flangespacing = []
+    #
+    #     t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
+    #            self.flange_plate.pitch_provided )
+    #     flangespacing.append(t21)
+    #
+    #     t22 = (KEY_ENDDIST_FLANGE, KEY_DISP_END_DIST_FLANGE, TYPE_TEXTBOX,
+    #            self.flange_plate.end_dist_provided )
+    #     flangespacing.append(t22)
+    #
+    #     t23 = (KEY_FLANGE_PLATE_GAUGE, KEY_DISP_FLANGE_PLATE_GAUGE, TYPE_TEXTBOX,
+    #            self.flange_plate.gauge_provided )
+    #     flangespacing.append(t23)
+    #
+    #     t24 = (KEY_EDGEDIST_FLANGE, KEY_DISP_EDGEDIST_FLANGE, TYPE_TEXTBOX,
+    #            self.flange_plate.edge_dist_provided )
+    #     flangespacing.append(t24)
+    #     return flangespacing
+    #
+    def webspacing(self):
+
+        webspacing = []
+
+        t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided )
+        webspacing.append(t8)
+
+        t9 = (KEY_ENDDIST_W, KEY_DISP_END_DIST_W, TYPE_TEXTBOX,
+            self.web_plate.end_dist_provided)
+        webspacing.append(t9)
+
+        t10 = ( KEY_WEB_GAUGE, KEY_DISP_WEB_PLATE_GAUGE, TYPE_TEXTBOX, self.web_plate.gauge_provided )
+        webspacing.append(t10)
+
+        t11 = (KEY_EDGEDIST_W, KEY_DISP_EDGEDIST_W, TYPE_TEXTBOX,
+               self.web_plate.edge_dist_provided )
+        webspacing.append(t11)
+        return webspacing
+    #
+    def flangecapacity(self):
+
+        flangecapacity = []
+
+        t25 = (KEY_SHEARYIELDINGCAP_FLANGE, KEY_DISP_SHEARYIELDINGCAP_FLANGE, TYPE_TEXTBOX,
+               round(self.flange_plate.shear_yielding_capacity, 2))
+        flangecapacity.append(t25)
+
+        t26 = (KEY_BLOCKSHEARCAP_FLANGE, KEY_DISP_BLOCKSHEARCAP_FLANGE, TYPE_TEXTBOX,
+               round(self.flange_plate.block_shear_capacity, 2))
+        flangecapacity.append(t26)
+
+        t27 = ( KEY_SHEARRUPTURECAP_FLANGE,KEY_DISP_SHEARRUPTURECAP_FLANGE,TYPE_TEXTBOX,
+               round(self.flange_plate.shear_rupture_capacity, 2))
+        flangecapacity.append(t27)
+
+        t28 = (KEY_FLANGE_PLATE_MOM_DEMAND, KEY_FLANGE_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
+               round(self.flange_plate.moment_demand / 1000000, 2))
+        flangecapacity.append(t28)
+
+        t29 = (KEY_FLANGE_PLATE_MOM_CAPACITY, KEY_FLANGE_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
+               round(self.flange_plate.moment_capacity, 2))
+        flangecapacity.append( t29)
+
+        return flangecapacity
+
+    def webcapacity(self):
+
+        webcapacity = []
+        t12 = (KEY_SHEARYIELDINGCAP_WEB, KEY_DISP_SHEARYIELDINGCAP_WEB, TYPE_TEXTBOX,
+               round(self.web_plate.shear_yielding_capacity, 2) )
+        webcapacity.append(t12)
+
+        t13 = (KEY_BLOCKSHEARCAP_WEB, KEY_DISP_BLOCKSHEARCAP_WEB, TYPE_TEXTBOX,
+               round(self.web_plate.block_shear_capacity, 2) )
+        webcapacity.append(t13)
+
+        t14 = (KEY_SHEARRUPTURECAP_WEB, KEY_DISP_SHEARRUPTURECAP_WEB, TYPE_TEXTBOX,
+               round(self.web_plate.shear_rupture_capacity, 2) )
+        webcapacity.append(t14)
+
+        t15 = (KEY_WEB_PLATE_MOM_DEMAND, KEY_WEB_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
+               round(self.web_plate.moment_demand / 1000000, 2))
+        webcapacity.append(t15)
+
+        t16 = (KEY_WEB_PLATE_MOM_CAPACITY, KEY_WEB_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
+               round(self.web_plate.moment_capacity, 2))
+        webcapacity.append(t16)
+        return webcapacity
+
     def output_values(self, flag):
 
         out_list = []
@@ -172,119 +265,142 @@ class ColumnCoverPlate(MomentConnection):
         out_list.append(t1)
 
         t2 = (KEY_D, KEY_OUT_DISP_D_PROVIDED,  TYPE_TEXTBOX,
-              self.web_bolt.bolt_diameter_provided if flag == 'True' else '')
+              self.web_bolt.bolt_diameter_provided if flag else '')
         out_list.append(t2)
 
         t3 = (KEY_GRD , KEY_DISP_GRD,  TYPE_TEXTBOX,
-              self.web_bolt.bolt_grade_provided if flag == 'True' else '')
+              self.web_bolt.bolt_grade_provided if flag else '')
         out_list.append(t3)
 
         t4 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None)
         out_list.append(t4)
 
         t5 = (KEY_WEB_PLATE_HEIGHT, KEY_DISP_WEB_PLATE_HEIGHT, TYPE_TEXTBOX,
-            self.web_plate.height if flag == 'True' else '')
+            self.web_plate.height if flag else '')
         out_list.append(t5)
 
         t6 = (KEY_WEB_PLATE_LENGTH, KEY_DISP_WEB_PLATE_LENGTH, TYPE_TEXTBOX,
-            self.web_plate.length if flag == 'True' else '')
+            self.web_plate.length if flag else '')
         out_list.append(t6)
 
         t7 = (KEY_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_TEXTBOX,
-              self.web_plate.thickness_provided if flag == 'True' else '')
+              self.web_plate.thickness_provided if flag else '')
         out_list.append(t7)
 
-        t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag == 'True' else '')
-        out_list.append(t8)
+        t21 = (KEY_WEB_SPACING, KEY_DISP_WEB_SPACING, TYPE_OUT_BUTTON, ['Web Spacing Details', self.webspacing])
+        out_list.append(t21)
 
-        t9 = (
-            KEY_ENDDIST_W, KEY_DISP_END_DIST_W, TYPE_TEXTBOX,
-            self.web_plate.end_dist_provided if flag == 'True' else '')
-        out_list.append(t9)
+        t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON, ['Web Capacity', self.webcapacity])
+        out_list.append(t21)
 
-        t10 = (KEY_WEB_GAUGE, KEY_DISP_WEB_PLATE_GAUGE, TYPE_TEXTBOX, self.web_plate.gauge_provided if flag == 'True' else '')
-        out_list.append(t10)
 
-        t11 = (KEY_EDGEDIST_W, KEY_DISP_EDGEDIST_W, TYPE_TEXTBOX,
-               self.web_plate.edge_dist_provided if flag == 'True' else '')
-        out_list.append(t11)
 
-        t12 = (KEY_SHEARYIELDINGCAP_W, KEY_DISP_SHEARYIELDINGCAP_W, TYPE_TEXTBOX,
-               round(self.web_plate.shear_yielding_capacity, 2) if flag == 'True' else '')
-        out_list.append(t12)
 
-        t13 = (KEY_BLOCKSHEARCAP_W, KEY_DISP_BLOCKSHEARCAP_W, TYPE_TEXTBOX,
-               round(self.web_plate.block_shear_capacity, 2) if flag == 'True' else '')
-        out_list.append(t13)
-
-        t14 = (KEY_SHEARRUPTURECAP_W,KEY_DISP_SHEARRUPTURECAP_W, TYPE_TEXTBOX,  round(self.web_plate.shear_rupture_capacity, 2) if flag == 'True' else '')
-        out_list.append(t14)
-
-        t15 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
-               round(self.web_plate.moment_demand / 1000000, 2) if flag == 'True' else '')
-        out_list.append(t15)
-
-        t16 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
-               round(self.web_plate.moment_capacity, 2) if flag == 'True' else '')
-        out_list.append(t16)
 
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
         out_list.append(t17)
 
         t18 = (KEY_FLANGE_PLATE_HEIGHT , KEY_DISP_FLANGE_PLATE_HEIGHT , TYPE_TEXTBOX,
-            self.flange_plate.height if flag == 'True' else '')
+            self.flange_plate.height if flag else '')
         out_list.append(t18)
 
         t19 = (
             KEY_FLANGE_PLATE_LENGTH , KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-            self.flange_plate.length if flag == 'True' else '')
+            self.flange_plate.length if flag else '')
         out_list.append(t19)
 
         t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-              self.flange_plate.thickness_provided if flag == 'True' else '')
+              self.flange_plate.thickness_provided if flag else '')
         out_list.append(t20)
-
-        t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH , TYPE_TEXTBOX, self.flange_plate.pitch_provided if flag == 'True' else '')
+        t21 = (KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing])
         out_list.append(t21)
 
-        t22 = (KEY_ENDDIST_F, KEY_DISP_END_DIST_F, TYPE_TEXTBOX,
-            self.flange_plate.end_dist_provided if flag == 'True' else '')
-        out_list.append(t22)
-
-        t23 = (KEY_FLANGE_PLATE_GAUGE , KEY_DISP_FLANGE_PLATE_GAUGE , TYPE_TEXTBOX, self.flange_plate.gauge_provided if flag == 'True' else '')
-        out_list.append(t23)
-
-        t24 = (KEY_EDGEDIST_F, KEY_DISP_EDGEDIST_F, TYPE_TEXTBOX,
-               self.flange_plate.edge_dist_provided if flag == 'True' else '')
-        out_list.append(t24)
-
-        # t25 = (KEY_SHEARYIELDINGCAP_F, KEY_DISP_SHEARYIELDINGCAP_F, TYPE_TEXTBOX,
-        #        round(self.flange_plate.shear_yielding_capacity, 2) if flag == 'True' else '')
-        # out_list.append(t25)
-        #
-        # t26 = (KEY_BLOCKSHEARCAP_F, KEY_DISP_BLOCKSHEARCAP_F, TYPE_TEXTBOX,
-        #        round(self.flange_plate.block_shear_capacity, 2) if flag == 'True' else '')
-        # out_list.append(t26)
-        # t27 = ( KEY_SHEARRUPTURECAP_F,KEY_DISP_SHEARRUPTURECAP_F,TYPE_TEXTBOX,
-        # #        round(self.flange_plate.shear_rupture_capacity, 2) if flag == 'True' else '')
-        # # out_list.append(t27)
-        # #
-        # t28 = (KEY_FLANGE_PLATE_MOM_DEMAND, KEY_FLANGE_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
-        #        round(self.flange_plate.moment_demand / 1000000, 2) if flag == 'True' else '')
-        # out_list.append(t28)
-        #
-        # t29 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
-        #        round(self.flange_plate.moment_capacity, 2) if flag == 'True' else '')
-        # out_list.append( t29)
+        t21 = (
+        KEY_FLANGE_CAPACITY , KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity])
+        out_list.append(t21)
 
         return out_list
 
+
+    def func_for_validation(self, window, design_dictionary):
+        self.design_status = False
+        flag = False
+
+        option_list = self.input_values(self)
+        missing_fields_list = []
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                val = option[4]
+                if design_dictionary[option[0]] == val[0]:
+                    missing_fields_list.append(option[1])
+
+
+
+        if len(missing_fields_list) > 0:
+            QMessageBox.information(window, "Information",
+                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+            # flag = False
+        else:
+            flag = True
+
+        if flag:
+            self.set_input_values(self, design_dictionary)
+        else:
+            pass
+
+        # for option in option_list:
+        #     if option[0] == KEY_CONN:
+        #         continue
+        #     s = p.findChild(QtWidgets.QWidget, option[0])
+        #
+        #     if option[2] == TYPE_COMBOBOX:
+        #         if option[0] in [KEY_D, KEY_GRD, KEY_PLATETHK]:
+        #             continue
+        #         if s.currentIndex() == 0:
+        #             missing_fields_list.append(option[1])
+        #
+        #
+        #     elif option[2] == TYPE_TEXTBOX:
+        #         if s.text() == '':
+        #             missing_fields_list.append(option[1])
+        #     else:
+        #         pass
+
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
 
 
 
     def set_input_values(self, design_dictionary):
         super(ColumnCoverPlate, self).set_input_values(self, design_dictionary)
-
+        #
+        # global design_status
+        self.design_status = True
+        #
         self.preference = design_dictionary[KEY_FLANGEPLATE_PREFERENCES]
 
         self.section = Column(designation=design_dictionary[KEY_SECSIZE], material_grade=design_dictionary[KEY_MATERIAL])
@@ -311,8 +427,8 @@ class ColumnCoverPlate(MomentConnection):
         self.get_bolt_details(self)
 
     def get_bolt_details(self):
-        global design_status
-        design_status = True
+        # global design_status
+
         self.flange_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.flange_bolt.bolt_diameter[0],
                                                 connecting_plates_tk=[self.flange_plate.thickness[0],
                                                                       self.section.flange_thickness])
@@ -435,7 +551,7 @@ class ColumnCoverPlate(MomentConnection):
         self.section.block_shear_capacity)
 
         if self.Tension_capacity_flange < flange_force:
-            design_status = False
+            self.design_status = False
             logger.warning(": Tension capacity flange is less than required flange force kN")
             logger.info(": Increase the size of column section")
 
@@ -517,7 +633,7 @@ class ColumnCoverPlate(MomentConnection):
                                                 self.flange_plate.block_shear_capacity )
 
             if self.Tension_capacity_flange < flange_force:
-                design_status = False
+                self.design_status = False
                 logger.warning(": Tension capacity flange is less than required flange force kN")
                 logger.info(": Increase the size of column section")
 
@@ -631,7 +747,7 @@ class ColumnCoverPlate(MomentConnection):
             Tension_capacity_flange_plate = min(self.flange_plate.shear_yielding_capacity, self.flange_plate.shear_rupture_capacity,
                                                 self.flange_plate.block_shear_capacity)
             if self.Tension_capacity_flange < flange_force:
-                design_status = False
+                self.design_status = False
                 logger.warning(": Tension capacity flange is less than required flange force kN")
                 logger.info(": Increase the size of column section")
 
@@ -694,16 +810,16 @@ class ColumnCoverPlate(MomentConnection):
         while design_status_block_shear == False:
             #print(design_status_block_shear)
             #print(0, self.web_plate.max_end_dist, self.web_plate.end_dist_provided, self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
-            Atg = (self.web_plate.edge_dist_provided + (
-                        self.web_plate.bolts_one_line - 1) * gauge) * self.section.web_thickness
-            Atn = (self.web_plate.edge_dist_provided + (
-                        self.web_plate.bolts_one_line - 1) * gauge - (
-                           self.web_plate.bolts_one_line - 0.5) * self.web_bolt.dia_hole) * self.section.web_thickness
             Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
                   self.section.web_thickness
             Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
-                        self.web_plate.bolt_line - 1) * self.web_bolt.dia_hole + end_dist) * \
+                    self.web_plate.bolt_line - 1) * self.web_bolt.dia_hole + end_dist) * \
                   self.section.web_thickness
+
+            Atg = ((self.web_plate.bolts_one_line - 1) * gauge) * self.section.web_thickness
+            Atn = ((self.web_plate.bolts_one_line - 1) * gauge - (
+                           self.web_plate.bolts_one_line - 0.5) * self.web_bolt.dia_hole) * self.section.web_thickness
+
             # print(17,self.web_plate.bolt_line, self.web_plate.pitch_provided, self.web_plate.bolt_line,
             #      self.web_bolt.dia_hole, self.web_plate.end_dist_provided, self.web_plate.thickness_provided)
             # print(18, self.web_plate.bolt_line, pitch, end_dist, self.section.web_thickness)
@@ -735,7 +851,7 @@ class ColumnCoverPlate(MomentConnection):
         self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,column_t_w=self.section.web_thickness,
                                        factored_axial_force = self.load.axial_force, column_area=self.section.area)
         if Tension_capacity_web_plate < self.webforce:
-            design_status = False
+            self.design_status = False
             logger.warning(": Tension capacity web_plate is less than required web force kN ")
             logger.error(": Increase the size of column section") # todo
 
@@ -805,7 +921,7 @@ class ColumnCoverPlate(MomentConnection):
                                            column_t_w=self.section.web_thickness,
                                            factored_axial_force=self.load.axial_force, column_area=self.section.area)
             if Tension_capacity_web_plate < self.webforce:
-                design_status = False
+                self.design_status = False
                 logger.warning(": Tension capacity web_plate is less than required web force kN ")
                 logger.error(": Increase the size of column section")  # todo
 
@@ -870,7 +986,7 @@ class ColumnCoverPlate(MomentConnection):
                                        column_t_w=self.section.web_thickness,
                                        factored_axial_force=self.load.axial_force, column_area=self.section.area)
         if Tension_capacity_web_plate < self.webforce:
-            design_status = False
+            self.design_status = False
             logger.warning(": Tension capacity web_plate is less than required web force kN ")
             logger.error(": Increase the size of column section")  # todo
 
@@ -887,9 +1003,9 @@ class ColumnCoverPlate(MomentConnection):
         print(self.web_plate)
         print(self.web_plate.thickness_provided)
         print(self.flange_plate.thickness_provided)
-        print(design_status)
+        print( self.design_status)
 
-        if design_status == True:
+        if  self.design_status == True:
 
             logger.error(": Overall bolted cover plate splice connection design is safe \n")
             logger.debug(" :=========End Of design===========")

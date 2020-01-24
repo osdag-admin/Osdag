@@ -335,7 +335,7 @@ class OsdagMainWindow(QMainWindow):
         if self.ui.rdbtn_cc_coverplate_bolted.isChecked() or self.ui.rdbtn_cc_coverplate_welded.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, ColumnCoverPlate)
+            self.ui2.setupUi(self.ui2, ColumnCoverPlate,folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
@@ -354,7 +354,7 @@ class MainController(QMainWindow):
         super(MainController,self).__init__()
         QMainWindow.__init__(self)
         self.ui = Ui_ModuleWindow()
-        self.ui.setupUi(self, main,folder)
+        self.ui.setupUi(self, main, folder)
         self.folder = folder
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))

@@ -649,6 +649,8 @@ class FinPlateConnection(ShearConnection):
                                                   desktop_path)
         return folder
 
+
+
     def block_shear_strength_section(self, A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         """Calculate the block shear strength of bolted connections as per cl. 6.4.1
 

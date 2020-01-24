@@ -732,6 +732,7 @@ class Ui_ModuleWindow(QMainWindow):
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
+        button_list = []
         for option in out_list:
             lable = option[1]
             type = option[2]
@@ -768,7 +769,8 @@ class Ui_ModuleWindow(QMainWindow):
                 b.setObjectName(option[0])
                 b.setText(v[0])
                 b.setDisabled(True)
-                b.clicked.connect(lambda: self.output_button_dialog(main, v))
+                button_list.append(option)
+                #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
@@ -779,6 +781,55 @@ class Ui_ModuleWindow(QMainWindow):
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
             i = i + 30
+        d = {
+            'Button_1': QtWidgets.QPushButton(),
+            'Button_2': QtWidgets.QPushButton(),
+            'Button_3': QtWidgets.QPushButton(),
+            'Button_4': QtWidgets.QPushButton(),
+            'Button_5': QtWidgets.QPushButton(),
+            'Button_6': QtWidgets.QPushButton()
+        }
+
+        print(button_list)
+        for option in button_list:
+            for i in d.keys():
+                if self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]) not in d.values():
+                    d[i] = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+        d['Button_1'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_1']))
+        d['Button_2'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_2']))
+        d['Button_3'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_3']))
+        d['Button_4'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_4']))
+        d['Button_5'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_5']))
+        d['Button_6'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_6']))
+        print(d['Button_1'])
+        print(d['Button_2'])
+        print(d['Button_3'])
+        print(d['Button_4'])
+        print(d['Button_5'])
+        print(d['Button_6'])
+        print(self.dockWidgetContents_out.findChild(QtWidgets.QPushButton, KEY_WEB_SPACING))
+
+
+
+
+
+            # if option[0] == KEY_WEB_SPACING:
+            #     d['button_1'] =
+            #     button_web_spacing = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+            #     print(button_web_spacing)
+            #     button_web_spacing.clicked.connect(lambda: self.output_button_dialog(main, button_list, KEY_WEB_SPACING))
+            # elif option[0] == KEY_WEB_CAPACITY:
+            #     button_web_capacity = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+            #     print(button_web_capacity)
+            #     button_web_capacity.clicked.connect(lambda: self.output_button_dialog(main, button_list, KEY_WEB_CAPACITY))
+
+        # for i in range(len(button_connect)):
+        #     button_connect[i].clicked.connect(lambda: self.output_button_dialog(main, button_list,
+        #                                                                         button_connect[i].objectName()))
+
+        # for button in self.dockWidgetContents_out.children():
+        #     if button.objectName() == KEY
+
 
         self.outputDock.setWidget(self.dockWidgetContents_out)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
@@ -984,10 +1035,14 @@ class Ui_ModuleWindow(QMainWindow):
         self.designPrefDialog = DesignPreferences(self)
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Column")
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Beam")
-        column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
-        beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
-        add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
-        add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE]:
+            column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
+            beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
+            add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
+            add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
+        else:
+            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Supporting"))
         self.designPrefDialog.rejected.connect(self.design_preferences)
 
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
@@ -1401,43 +1456,49 @@ class Ui_ModuleWindow(QMainWindow):
             #     self.actionShow_column.setEnabled(False)
             #     self.actionShow_finplate.setEnabled(False)
 
-    def output_button_dialog(self, main, list):
+    def output_button_dialog(self, main, button_list, button):
+        #print(fn)
         dialog = QtWidgets.QDialog()
         dialog.resize(350, 170)
         dialog.setFixedSize(dialog.size())
         dialog.setObjectName("Dialog")
-        dialog.setWindowTitle(list[0])
+        for op in button_list:
+            if op[0] == button.objectName():
+                tup = op[3]
+                title = tup[0]
+                fn = tup[1]
+                dialog.setWindowTitle(title)
+                i = 0
+                for option in fn(main, main.design_status):
+                    lable = option[1]
+                    type = option[2]
+                    _translate = QtCore.QCoreApplication.translate
+                    if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
+                        l = QtWidgets.QLabel(dialog)
+                        l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
+                        font = QtGui.QFont()
+                        font.setPointSize(9)
+                        font.setBold(False)
+                        font.setWeight(50)
+                        l.setFont(font)
+                        l.setObjectName(option[0] + "_label")
+                        l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
 
-        i = 0
-        for option in list[1](main, main.design_status):
-            lable = option[1]
-            type = option[2]
-            _translate = QtCore.QCoreApplication.translate
-            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
-                l = QtWidgets.QLabel(dialog)
-                l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(False)
-                font.setWeight(50)
-                l.setFont(font)
-                l.setObjectName(option[0] + "_label")
-                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+                    if type == TYPE_TEXTBOX:
+                        r = QtWidgets.QLineEdit(dialog)
+                        r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
+                        font = QtGui.QFont()
+                        font.setPointSize(11)
+                        font.setBold(False)
+                        font.setWeight(50)
+                        r.setFont(font)
+                        r.setObjectName(option[0])
+                        r.setText(str(option[3]))
 
-            if type == TYPE_TEXTBOX:
-                r = QtWidgets.QLineEdit(dialog)
-                r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
-                font = QtGui.QFont()
-                font.setPointSize(11)
-                font.setBold(False)
-                font.setWeight(50)
-                r.setFont(font)
-                r.setObjectName(option[0])
-                r.setText(str(option[3]))
+                    i = i + 30
 
-            i = i + 30
+                dialog.exec()
 
-        dialog.exec()
 
     def refresh_sections(self, prev, section):
 

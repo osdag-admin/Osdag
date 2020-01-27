@@ -589,6 +589,7 @@ class FinPlateConnection(ShearConnection):
 
     def save_design(self,ui,popup_summary):
 
+
         self.report_input =  {'Connection':{"Connection Title" : 'Finplate', 'Connection Type': 'Shear Connection'},"Connection Category":{"Connectivity": 'Column flange-Beam web', "Beam Connection":"Bolted", "Column Connection": "Welded"},"Loading":{'ShearForce(kN) - Vs': 140},"Components":{"Column Section": 'UC 305 x 305 x 97',"Column Material":"E250(Fe410W)A", "Column(N/mm2)-Fuc":410, "Column(N/mm2)-Fyc":250,"Column Details": "","Beam Section": "MB 500", "Beam Material":"E250(Fe410W)A", "Beam(N/mm2)-Fub":410, "Beam(N/mm2)-Fyb":250, "Beam Details": "","Plate Section" : '300 x 100 x 12',  'Thickness(mm)-tp': 12.0, 'Depth(mm)-dp': 300.0, 'Width(mm)-wp': 118.0, 'externalmoment(kN) - md': 8.96, "Weld": "", "Weld Type":"Double Fillet", "Size(mm)-ws": 12, 'Type_of_weld': 'Shop weld', 'Safety_Factor- ': 1.25, 'Weld(kN) - Fuw ': 410, 'WeldStrength - wst': 1590.715 , "EffectiveWeldLength(mm) - efl": 276.0 ,"Bolts":"",'Diameter (mm) - d': 24 , 'Grade': 8.8 ,
                     'Bolt Type': 'Friction Grip Bolt','Bolt Hole Type': 'Standard', 'Bolt Hole Clearance - bc': 2,'Slip Factor - sf': 0.3, 'k_b': 0.519,"Number of effective interface - ne":1, "Factor for clearance- Kh":1,"Minimum Bolt Tension - F0": 50, "Bolt Fu - Fubo": 800, "Bolt Fy - Fybo": 400, "Bolt Numbers - nb": 3, "Bolts per Row - rb": 1, "Bolts per Column - cb": 1, "Gauge (mm) - g": 0, "Pitch(mm) - p": 100, 'colflangethk(mm) - cft ': 15.4, 'colrootradius(mm) - crr': 15.2,'End Distance(mm) - en': 54.0, 'Edge Distance(mm) - eg': 54.0, 'Type of Edge': 'a - Sheared or hand flame cut', 'Min_Edge/end_dist': 1.7, 'gap': 10.0,'is_env_corrosive': 'No'}}
 
@@ -656,6 +657,88 @@ class FinPlateConnection(ShearConnection):
         return folder
 
 
+    def call_3DModel(self,ui,bgcolor):
+        '''
+        This routine responsible for displaying 3D Cad model
+        :param flag: boolean
+        :return:
+        '''
+        if ui.btn3D.isChecked:
+            ui.chkBxCol.setChecked(Qt.Unchecked)
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxFinplate.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Model",bgcolor)
+
+    def call_3DBeam(self,ui,bgcolor):
+        '''
+        Creating and displaying 3D Beam
+        '''
+        ui.chkBxBeam.setChecked(Qt.Checked)
+        if ui.chkBxBeam.isChecked():
+            ui.chkBxCol.setChecked(Qt.Unchecked)
+            ui.chkBxFinplate.setChecked(Qt.Unchecked)
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+
+        ui.commLogicObj.display_3DModel("Beam", bgcolor)
+
+    def call_3DColumn(self, ui, bgcolor):
+        '''
+        '''
+        ui.chkBxCol.setChecked(Qt.Checked)
+        if ui.chkBxCol.isChecked():
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxFinplate.setChecked(Qt.Unchecked)
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+        ui.commLogicObj.display_3DModel("Column", bgcolor)
+
+    def call_3DFinplate(self,ui,bgcolor):
+        '''
+        Displaying FinPlate in 3D
+        '''
+        ui.chkBxFinplate.setChecked(Qt.Checked)
+        if ui.chkBxFinplate.isChecked():
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxCol.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+            ui.btn3D.setChecked(Qt.Unchecked)
+
+        ui.commLogicObj.display_3DModel("Plate", bgcolor)
+
+    def unchecked_allChkBox(self,ui):
+        '''
+        This routine is responsible for unchecking all checkboxes in GUI
+        '''
+
+        ui.btn3D.setChecked(Qt.Unchecked)
+        ui.chkBxBeam.setChecked(Qt.Unchecked)
+        ui.chkBxCol.setChecked(Qt.Unchecked)
+        ui.chkBxFinplate.setChecked(Qt.Unchecked)
+
+    def showColorDialog(self,ui):
+
+        col = QColorDialog.getColor()
+        colorTup = col.getRgb()
+        r = colorTup[0]
+        g = colorTup[1]
+        b = colorTup[2]
+        ui.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
+
+    def generate_3D_Cad_image(self,ui,folder):
+
+        # folder = self.select_workspace_folder(self)
+
+        # status = self.resultObj['Bolt']['status']
+        if self.design_status is True:
+            self.call_3DModel(self, ui,"gradient_bg")
+            data = os.path.join(str(folder), "images_html", "3D_Model.png")
+            ui.display.ExportToImage(data)
+            ui.display.FitAll()
+        else:
+            pass
+
+        return data
 
     def block_shear_strength_section(self, A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         """Calculate the block shear strength of bolted connections as per cl. 6.4.1

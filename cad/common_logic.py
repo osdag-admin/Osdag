@@ -616,7 +616,13 @@ class CommonDesignLogic(object):
         self.display.FitAll()
 
         self.display.DisableAntiAliasing()
-        self.loc = FinPlateConnection().connectivity
+
+        if self.connection == "Fin Plate":
+            A = FinPlateConnection()
+        else:
+            pass
+
+        self.loc = A.connectivity
 
 
         if bgcolor =="gradient_bg":
@@ -689,7 +695,12 @@ class CommonDesignLogic(object):
 
     def call_3DModel(self, flag):  # Done
 
-        self.loc = FinPlateConnection().connectivity
+        if self.connection == "Fin Plate":
+            A = FinPlateConnection()
+        else:
+            pass
+
+        self.loc = A.connectivity
 
         if flag is True:
 

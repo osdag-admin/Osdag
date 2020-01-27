@@ -781,36 +781,39 @@ class Ui_ModuleWindow(QMainWindow):
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
             i = i + 30
-        d = {
-            'Button_1': QtWidgets.QPushButton(),
-            'Button_2': QtWidgets.QPushButton(),
-            'Button_3': QtWidgets.QPushButton(),
-            'Button_4': QtWidgets.QPushButton(),
-            'Button_5': QtWidgets.QPushButton(),
-            'Button_6': QtWidgets.QPushButton()
-        }
 
-        print(button_list)
-        for option in button_list:
-            for i in d.keys():
-                if self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]) not in d.values():
-                    d[i] = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
-        d['Button_1'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_1']))
-        d['Button_2'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_2']))
-        d['Button_3'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_3']))
-        d['Button_4'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_4']))
-        d['Button_5'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_5']))
-        d['Button_6'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_6']))
-        print(d['Button_1'])
-        print(d['Button_2'])
-        print(d['Button_3'])
-        print(d['Button_4'])
-        print(d['Button_5'])
-        print(d['Button_6'])
-        print(self.dockWidgetContents_out.findChild(QtWidgets.QPushButton, KEY_WEB_SPACING))
+        # common_button = QtWidgets.QPushButton()
+        # d = {
+        #     'Button_1': common_button,
+        #     'Button_2': common_button,
+        #     'Button_3': common_button,
+        #     'Button_4': common_button,
+        #     'Button_5': common_button,
+        #     'Button_6': common_button
+        # }
+        #
+        # print(button_list)
 
+        # Case_1
 
+        # for option in button_list:
+        #     for i in d.keys():
+        #         button = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+        #         if button not in d.values() and d[i] not in self.dockWidgetContents_out.children():
+        #             d[i] = button
+        # d['Button_1'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_1']))
+        # d['Button_2'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_2']))
+        # d['Button_3'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_3']))
+        # d['Button_4'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_4']))
+        # d['Button_5'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_5']))
+        # d['Button_6'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_6']))
 
+        # Case_2
+
+        if button_list:
+            for button_key in button_list:
+                button = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, button_key[0])
+                self.output_button_connect(main, button_list, button)
 
 
             # if option[0] == KEY_WEB_SPACING:
@@ -1456,6 +1459,9 @@ class Ui_ModuleWindow(QMainWindow):
             #     self.actionShow_column.setEnabled(False)
             #     self.actionShow_finplate.setEnabled(False)
 
+    def output_button_connect(self, main, button_list, b):
+        b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
+
     def output_button_dialog(self, main, button_list, button):
         #print(fn)
         dialog = QtWidgets.QDialog()
@@ -1499,12 +1505,12 @@ class Ui_ModuleWindow(QMainWindow):
 
                 dialog.exec()
 
-
     def refresh_sections(self, prev, section):
 
         connectivity = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
         supporting_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
         supported_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+
         Columns = connectdb("Columns")
         Beams = connectdb("Beams")
         red_list_set = set(red_list_function())

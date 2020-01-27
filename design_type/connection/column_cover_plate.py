@@ -167,26 +167,26 @@ class ColumnCoverPlate(MomentConnection):
 
         return options_list
 
-    # def flangespacing(self):
-    #
-    #     flangespacing = []
-    #
-    #     t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
-    #            self.flange_plate.pitch_provided )
-    #     flangespacing.append(t21)
-    #
-    #     t22 = (KEY_ENDDIST_FLANGE, KEY_DISP_END_DIST_FLANGE, TYPE_TEXTBOX,
-    #            self.flange_plate.end_dist_provided )
-    #     flangespacing.append(t22)
-    #
-    #     t23 = (KEY_FLANGE_PLATE_GAUGE, KEY_DISP_FLANGE_PLATE_GAUGE, TYPE_TEXTBOX,
-    #            self.flange_plate.gauge_provided )
-    #     flangespacing.append(t23)
-    #
-    #     t24 = (KEY_EDGEDIST_FLANGE, KEY_DISP_EDGEDIST_FLANGE, TYPE_TEXTBOX,
-    #            self.flange_plate.edge_dist_provided )
-    #     flangespacing.append(t24)
-    #     return flangespacing
+    def flangespacing(self):
+
+        flangespacing = []
+
+        t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
+               self.flange_plate.pitch_provided )
+        flangespacing.append(t21)
+
+        t22 = (KEY_ENDDIST_FLANGE, KEY_DISP_END_DIST_FLANGE, TYPE_TEXTBOX,
+               self.flange_plate.end_dist_provided )
+        flangespacing.append(t22)
+
+        t23 = (KEY_FLANGE_PLATE_GAUGE, KEY_DISP_FLANGE_PLATE_GAUGE, TYPE_TEXTBOX,
+               self.flange_plate.gauge_provided )
+        flangespacing.append(t23)
+
+        t24 = (KEY_EDGEDIST_FLANGE, KEY_DISP_EDGEDIST_FLANGE, TYPE_TEXTBOX,
+               self.flange_plate.edge_dist_provided )
+        flangespacing.append(t24)
+        return flangespacing
     #
     def webspacing(self, flag):
 

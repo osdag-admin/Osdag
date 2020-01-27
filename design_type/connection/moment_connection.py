@@ -63,26 +63,27 @@ class MomentConnection(Connection):
         pass
 
 
-    def warn_text(self,key, my_d):
-        old_col_section = get_oldcolumncombolist()
-        old_beam_section = get_oldbeamcombolist()
-
-        if my_d[KEY_SECSIZE] in old_beam_section or old_col_section:
-            del_data = open('logging_text.log', 'w')
-            del_data.truncate()
-            del_data.close()
-            logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
-            logging.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
-            with open('logging_text.log') as file:
-                data = file.read()
-                file.close()
-            # file = open('logging_text.log', 'r')
-            # # This will print every line one by one in the file
-            # for each in file:
-            #     print(each)
-            key.setText(data)
-        else:
-            key.setText("")
+    def warn_text(self):
+        pass
+        # old_col_section = get_oldcolumncombolist()
+        # old_beam_section = get_oldbeamcombolist()
+        #
+        # if my_d[KEY_SECSIZE] in old_beam_section or old_col_section:
+        #     del_data = open('logging_text.log', 'w')
+        #     del_data.truncate()
+        #     del_data.close()
+        #     logging.basicConfig(format='%(asctime)s %(message)s', filename='logging_text.log',level=logging.DEBUG)
+        #     logging.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+        #     with open('logging_text.log') as file:
+        #         data = file.read()
+        #         file.close()
+        #     # file = open('logging_text.log', 'r')
+        #     # # This will print every line one by one in the file
+        #     # for each in file:
+        #     #     print(each)
+        #     key.setText(data)
+        # else:
+        #     key.setText("")
 
 
     def input_value_changed(self):

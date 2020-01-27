@@ -216,6 +216,7 @@ class Connection(Main):
         return supported_section
 
     def bolt_values(self):
+
         bolt = []
 
         t1 = (KEY_DP_BOLT_TYPE, KEY_DISP_TYP, TYPE_COMBOBOX, ['Pretensioned', 'Non-pretensioned'])
@@ -240,6 +241,7 @@ class Connection(Main):
         return bolt
 
     def weld_values(self):
+
         weld = []
 
         t1 = (KEY_DP_WELD_TYPE, KEY_DISP_DP_WELD_TYPE, TYPE_COMBOBOX, ['Shop Weld', 'Field weld'])
@@ -267,6 +269,7 @@ class Connection(Main):
         return detailing
 
     def design_values(self):
+
         design = []
 
         t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX, ['Limit State Design',

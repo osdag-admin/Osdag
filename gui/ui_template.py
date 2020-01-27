@@ -1324,16 +1324,16 @@ class Ui_ModuleWindow(QMainWindow):
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
         self.design_inputs = design_dictionary
 
-    def pass_d(self, main, design_dictionary):
-        """
-        It sets key variable textEdit and passes it to warn text function present in fin_plate_connection.py for logger
-         """
-
-        # @author Arsil Zunzunia
-
-        key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
-
-        main.warn_text(main)
+    # def pass_d(self, main, design_dictionary):
+    #     """
+    #     It sets key variable textEdit and passes it to warn text function present in fin_plate_connection.py for logger
+    #      """
+    #
+    #     # @author Arsil Zunzunia
+    #
+    #     key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
+    #
+    #     main.warn_text(main)
         # main.set_input_values(main, design_dictionary)
 # Function for saving inputs in a file
     '''
@@ -1451,27 +1451,27 @@ class Ui_ModuleWindow(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-        self.pass_d(main, self.design_inputs)
+        # self.pass_d(main, self.design_inputs)
 
-            # if status is True:
-            #     self.commLogicObj = CommonDesignLogic(self.display,self.folder,
-            #                                           main.module)
-            #     status = main.design_status
-            #     self.commLogicObj.call_3DModel(status)
-            #     # self.callFin2D_Drawing("All")
-            #     self.actionShow_all.setEnabled(True)
-            #     self.actionShow_beam.setEnabled(True)
-            #     self.actionShow_column.setEnabled(True)
-            #     self.actionShow_finplate.setEnabled(True)
-            # else:
-            #     self.btn3D.setEnabled(False)
-            #     self.chkBxBeam.setEnabled(False)
-            #     self.chkBxCol.setEnabled(False)
-            #     self.chkBxFinplate.setEnabled(False)
-            #     self.actionShow_all.setEnabled(False)
-            #     self.actionShow_beam.setEnabled(False)
-            #     self.actionShow_column.setEnabled(False)
-            #     self.actionShow_finplate.setEnabled(False)
+            if status is True:
+                self.commLogicObj = CommonDesignLogic(self.display,self.folder,
+                                                      main.module)
+                status = main.design_status
+                self.commLogicObj.call_3DModel(status)
+                # self.callFin2D_Drawing("All")
+                self.actionShow_all.setEnabled(True)
+                self.actionShow_beam.setEnabled(True)
+                self.actionShow_column.setEnabled(True)
+                self.actionShow_finplate.setEnabled(True)
+            else:
+                self.btn3D.setEnabled(False)
+                self.chkBxBeam.setEnabled(False)
+                self.chkBxCol.setEnabled(False)
+                self.chkBxFinplate.setEnabled(False)
+                self.actionShow_all.setEnabled(False)
+                self.actionShow_beam.setEnabled(False)
+                self.actionShow_column.setEnabled(False)
+                self.actionShow_finplate.setEnabled(False)
 
         image = main.generate_3D_Cad_image(main,self,self.folder)
 

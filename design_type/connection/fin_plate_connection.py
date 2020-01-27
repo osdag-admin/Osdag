@@ -53,6 +53,7 @@ class FinPlateConnection(ShearConnection):
         self.min_plate_height = 0.0
         self.max_plate_height = 0.0
         self.res_force = 0.0
+        self.design_status = False
 
     def set_osdaglogger(key):
 
@@ -295,6 +296,7 @@ class FinPlateConnection(ShearConnection):
         return out_list
 
     def func_for_validation(self, window, design_dictionary):
+        self.design_status = False
         flag = False
         flag1 = False
         option_list = self.input_values(self)
@@ -369,7 +371,6 @@ class FinPlateConnection(ShearConnection):
 
         return information
 
-    
     def warn_text(self):
       
         """

@@ -997,6 +997,9 @@ class DesignPreferences(QDialog):
     def save_designPref_para(self):
         """This routine is responsible for saving all design preferences selected by the user
         """
+        '''
+        @author: Umair
+        '''
         key_boltHoleType = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_HOLE_TYPE)
         combo_boltHoleType = key_boltHoleType.currentText()
         key_boltFu = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O)

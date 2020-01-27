@@ -188,72 +188,72 @@ class ColumnCoverPlate(MomentConnection):
         flangespacing.append(t24)
         return flangespacing
     #
-    def webspacing(self):
+    def webspacing(self, flag):
 
         webspacing = []
 
-        t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided )
+        t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag else '')
         webspacing.append(t8)
 
         t9 = (KEY_ENDDIST_W, KEY_DISP_END_DIST_W, TYPE_TEXTBOX,
-            self.web_plate.end_dist_provided)
+            self.web_plate.end_dist_provided if flag else '')
         webspacing.append(t9)
 
-        t10 = ( KEY_WEB_GAUGE, KEY_DISP_WEB_PLATE_GAUGE, TYPE_TEXTBOX, self.web_plate.gauge_provided )
+        t10 = ( KEY_WEB_GAUGE, KEY_DISP_WEB_PLATE_GAUGE, TYPE_TEXTBOX, self.web_plate.gauge_provided if flag else '')
         webspacing.append(t10)
 
         t11 = (KEY_EDGEDIST_W, KEY_DISP_EDGEDIST_W, TYPE_TEXTBOX,
-               self.web_plate.edge_dist_provided )
+               self.web_plate.edge_dist_provided if flag else '')
         webspacing.append(t11)
         return webspacing
     #
-    def flangecapacity(self):
+    def flangecapacity(self, flag):
 
         flangecapacity = []
 
         t25 = (KEY_SHEARYIELDINGCAP_FLANGE, KEY_DISP_SHEARYIELDINGCAP_FLANGE, TYPE_TEXTBOX,
-               round(self.flange_plate.shear_yielding_capacity, 2))
+               round(self.flange_plate.shear_yielding_capacity, 2) if flag else '')
         flangecapacity.append(t25)
 
         t26 = (KEY_BLOCKSHEARCAP_FLANGE, KEY_DISP_BLOCKSHEARCAP_FLANGE, TYPE_TEXTBOX,
-               round(self.flange_plate.block_shear_capacity, 2))
+               round(self.flange_plate.block_shear_capacity, 2) if flag else '')
         flangecapacity.append(t26)
 
         t27 = ( KEY_SHEARRUPTURECAP_FLANGE,KEY_DISP_SHEARRUPTURECAP_FLANGE,TYPE_TEXTBOX,
-               round(self.flange_plate.shear_rupture_capacity, 2))
+               round(self.flange_plate.shear_rupture_capacity, 2) if flag else '')
         flangecapacity.append(t27)
 
         t28 = (KEY_FLANGE_PLATE_MOM_DEMAND, KEY_FLANGE_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
-               round(self.flange_plate.moment_demand / 1000000, 2))
+               round(self.flange_plate.moment_demand / 1000000, 2) if flag else '')
         flangecapacity.append(t28)
 
         t29 = (KEY_FLANGE_PLATE_MOM_CAPACITY, KEY_FLANGE_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
-               round(self.flange_plate.moment_capacity, 2))
+               round(self.flange_plate.moment_capacity, 2) if flag else '')
         flangecapacity.append( t29)
 
         return flangecapacity
 
-    def webcapacity(self):
+    def webcapacity(self, flag):
 
         webcapacity = []
         t12 = (KEY_SHEARYIELDINGCAP_WEB, KEY_DISP_SHEARYIELDINGCAP_WEB, TYPE_TEXTBOX,
-               round(self.web_plate.shear_yielding_capacity, 2) )
+               round(self.web_plate.shear_yielding_capacity, 2) if flag else '')
         webcapacity.append(t12)
 
         t13 = (KEY_BLOCKSHEARCAP_WEB, KEY_DISP_BLOCKSHEARCAP_WEB, TYPE_TEXTBOX,
-               round(self.web_plate.block_shear_capacity, 2) )
+               round(self.web_plate.block_shear_capacity, 2) if flag else '')
         webcapacity.append(t13)
 
         t14 = (KEY_SHEARRUPTURECAP_WEB, KEY_DISP_SHEARRUPTURECAP_WEB, TYPE_TEXTBOX,
-               round(self.web_plate.shear_rupture_capacity, 2) )
+               round(self.web_plate.shear_rupture_capacity, 2) if flag else '')
         webcapacity.append(t14)
 
         t15 = (KEY_WEB_PLATE_MOM_DEMAND, KEY_WEB_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
-               round(self.web_plate.moment_demand / 1000000, 2))
+               round(self.web_plate.moment_demand / 1000000, 2) if flag else '')
         webcapacity.append(t15)
 
         t16 = (KEY_WEB_PLATE_MOM_CAPACITY, KEY_WEB_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
-               round(self.web_plate.moment_capacity, 2))
+               round(self.web_plate.moment_capacity, 2) if flag else '')
         webcapacity.append(t16)
         return webcapacity
 
@@ -293,10 +293,6 @@ class ColumnCoverPlate(MomentConnection):
         t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON, ['Web Capacity', self.webcapacity])
         out_list.append(t21)
 
-
-
-
-
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
         out_list.append(t17)
 
@@ -312,12 +308,12 @@ class ColumnCoverPlate(MomentConnection):
         t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
               self.flange_plate.thickness_provided if flag else '')
         out_list.append(t20)
-        t21 = (KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing])
-        out_list.append(t21)
-
-        t21 = (
-        KEY_FLANGE_CAPACITY , KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity])
-        out_list.append(t21)
+        # t21 = (KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing])
+        # out_list.append(t21)
+        #
+        # t21 = (
+        # KEY_FLANGE_CAPACITY , KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity])
+        # out_list.append(t21)
 
         return out_list
 

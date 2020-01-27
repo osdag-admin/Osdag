@@ -767,11 +767,13 @@ class ColumnCoverPlate(MomentConnection):
 
         self.web_plate.get_web_plate_details(bolt_dia=self.web_bolt.bolt_diameter[0], web_plate_h_min=min_web_plate_height,
                                              web_plate_h_max=max_web_plate_height,
-                                             bolt_capacity=self.web_bolt.bolt_capacity,min_edge_dist=self.web_bolt.max_end_dist_round, min_gauge = self.web_bolt.min_gauge_round,max_spacing = self.web_bolt.max_spacing_round,
-                                             max_edge_dist = self.web_bolt.max_edge_dist
-                                             , shear_load= self.load.shear_force,axial_load=axial_force_w,
+                                             bolt_capacity=self.web_bolt.bolt_capacity,min_edge_dist=self.web_bolt.min_edge_dist_round, min_gauge = self.web_bolt.min_gauge_round,max_spacing = self.web_bolt.max_spacing_round,
+                                             max_edge_dist = self.web_bolt.max_edge_dist_round
+                                             , shear_load= self.load.shear_force*1000,axial_load=axial_force_w*1000,
                                              gap=self.web_plate.gap, shear_ecc=True)
 
+        if self.web_plate.design_status is False:
+            logger.error(" : Select bolt of lower diameter")
 
 
         block_shear_capacity = 0
@@ -1118,6 +1120,9 @@ class ColumnCoverPlate(MomentConnection):
         axial_force_w = int(
             ((column_d - 2 * (column_f_t)) * column_t_w * factored_axial_force * 10) / column_area) / 1000  # KN
         return round(axial_force_w)
+
+    def generate_3D_Cad_image(self, ui, folder):
+        pass
 
     # def flange_force(column_d, column_f_t, column_b, column_area, factored_axial_force, moment_load):
     #     """

@@ -745,9 +745,9 @@ class Ui_Dialog(object):
         @author: Umair
         '''
         name = self.tabWidget.tabText(self.tabWidget.indexOf(self.tab_Column))
-        if name == KEY_DISP_COLSEC:
+        if name in [KEY_DISP_COLSEC, KEY_DISP_SECSIZE]:
             table = "Columns"
-        elif name in [KEY_DISP_PRIBM, KEY_DISP_SECSIZE]:
+        elif name == KEY_DISP_PRIBM:
             table = "Beams"
         else:
             pass

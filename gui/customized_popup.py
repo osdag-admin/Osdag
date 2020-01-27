@@ -187,6 +187,7 @@ class Ui_Popup(object):
 
 
 
+
         r = []
         for i in range(self.listWidget_2.count()):
             it = self.listWidget_2.item(i)

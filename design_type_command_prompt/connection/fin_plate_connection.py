@@ -53,9 +53,8 @@ class FinPlateConnection(ShearConnection):
         self.min_plate_height = 0.0
         self.max_plate_height = 0.0
         self.res_force = 0.0
-        self.design_status = False
 
-    def set_osdaglogger(key):
+    def set_osdaglogger():
 
         """
         Function to set Logger for FinPlate Module
@@ -82,11 +81,7 @@ class FinPlateConnection(ShearConnection):
         # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         # handler.setFormatter(formatter)
         # logger.addHandler(handler)
-        handler = OurLog(key)
-        # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+
 
     def input_values(self, existingvalues={}):
 
@@ -296,7 +291,6 @@ class FinPlateConnection(ShearConnection):
         return out_list
 
     def func_for_validation(self, window, design_dictionary):
-        self.design_status = False
         flag = False
         flag1 = False
         option_list = self.input_values(self)
@@ -309,10 +303,6 @@ class FinPlateConnection(ShearConnection):
                 val = option[4]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                if design_dictionary[option[0]] == []:
-                    missing_fields_list.append(option[1])
-
 
         if design_dictionary[KEY_CONN] == 'Beam-Beam':
             primary = design_dictionary[KEY_SUPTNGSEC]
@@ -375,6 +365,7 @@ class FinPlateConnection(ShearConnection):
 
         return information
 
+    
     def warn_text(self):
       
         """

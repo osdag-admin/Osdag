@@ -629,7 +629,13 @@ class Ui_ModuleWindow(QMainWindow):
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
                 if selected == "Customized":
-                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
+
+                   data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
+                   if data[c_tup[0] + "_customized"] == []:
+
+
+                       data[c_tup[0] + "_customized"] = f()
+                       key.setCurrentIndex(0)
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
@@ -1045,9 +1051,12 @@ class Ui_ModuleWindow(QMainWindow):
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
             add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
-        else:
+        elif module == KEY_DISP_COLUMNCOVERPLATE:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Supporting"))
+            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
+        elif module == KEY_DISP_BEAMCOVERPLATE:
+            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+            add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
         self.designPrefDialog.rejected.connect(self.design_preferences)
 
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
@@ -1104,8 +1113,8 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
-        self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
-        self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
+        # self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
+        # self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
         self.btn_Design.clicked.connect(self.osdag_header)
         self.actionShow_beam.triggered.connect(lambda: main.call_3DBeam(self,"gradient_bg"))
         self.actionShow_column.triggered.connect(lambda: main.call_3DColumn(self,"gradient_bg"))
@@ -1383,19 +1392,22 @@ class Ui_ModuleWindow(QMainWindow):
             key_str = op[0]
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
             if op[2] == TYPE_COMBOBOX:
-                index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
-                if index >= 0:
-                    key.setCurrentIndex(index)
+                if key_str in uiObj.keys():
+                    index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
+                    if index >= 0:
+                        key.setCurrentIndex(index)
             elif op[2] == TYPE_TEXTBOX:
                 key.setText(uiObj[key_str])
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                for n in new:
-                    if n[0] == key_str:
-                        if uiObj[key_str] != n[1]():
-                            data[key_str + "_customized"] = uiObj[key_str]
-                            key.setCurrentIndex(1)
-                        else:
-                            pass
+                if key_str in uiObj.keys():
+
+                    for n in new:
+                        if n[0] == key_str:
+                            if uiObj[key_str] != n[1]():
+                                data[key_str + "_customized"] = uiObj[key_str]
+                                key.setCurrentIndex(1)
+                            else:
+                                pass
             else:
                 pass
 
@@ -1451,8 +1463,6 @@ class Ui_ModuleWindow(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-        # self.pass_d(main, self.design_inputs)
-
             if status is True:
                 self.commLogicObj = CommonDesignLogic(self.display,self.folder,
                                                       main.module)
@@ -1472,7 +1482,6 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_beam.setEnabled(False)
                 self.actionShow_column.setEnabled(False)
                 self.actionShow_finplate.setEnabled(False)
-
         image = main.generate_3D_Cad_image(main,self,self.folder)
 
     def osdag_header(self):
@@ -1529,6 +1538,7 @@ class Ui_ModuleWindow(QMainWindow):
         connectivity = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
         supporting_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
         supported_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+        section_size = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
 
         Columns = connectdb("Columns")
         Beams = connectdb("Beams")
@@ -1576,6 +1586,40 @@ class Ui_ModuleWindow(QMainWindow):
                 supported_section.setCurrentIndex(text_index)
             else:
                 supported_section.setCurrentIndex(prev)
+
+        if section == "Section_col":
+            section_size.clear()
+            for item in Columns:
+                section_size.addItem(item)
+            current_list_set = set(Columns)
+            current_red_list = list(current_list_set.intersection(red_list_set))
+            for value in current_red_list:
+                indx = Columns.index(str(value))
+                section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
+            text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
+            if text_index:
+                section_size.setCurrentIndex(text_index)
+            else:
+                section_size.setCurrentIndex(prev)
+
+        if section == "Section_bm":
+            section_size.clear()
+            for item in Beams:
+                section_size.addItem(item)
+            current_list_set = set(Beams)
+            current_red_list = list(current_list_set.intersection(red_list_set))
+            for value in current_red_list:
+                indx = Beams.index(str(value))
+                section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
+            text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
+            if text_index:
+                section_size.setCurrentIndex(text_index)
+            else:
+                section_size.setCurrentIndex(prev)
+
+
 
 
 # Function for warning about structure
@@ -1779,12 +1823,8 @@ class Ui_ModuleWindow(QMainWindow):
 
         table_1 = "Columns"
         table_2 = "Beams"
-        if module == KEY_DISP_BEAMCOVERPLATE:
-            t = table_2
-        elif module == KEY_DISP_COLUMNCOVERPLATE:
-            t = table_1
         material_grade = key_4.currentText()
-        if module in [KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COLUMNCOVERPLATE]:
+        if module == KEY_DISP_COLUMNCOVERPLATE:
             designation_col = key_5.currentText()
             self.designPrefDialog.ui.tabWidget.removeTab(
                 self.designPrefDialog.ui.tabWidget.indexOf(
@@ -1793,7 +1833,17 @@ class Ui_ModuleWindow(QMainWindow):
                 self.designPrefDialog.ui.tabWidget.indexOf(
                 self.designPrefDialog.ui.tab_Column), KEY_DISP_SECSIZE)
             if key_5.currentIndex() != 0:
-                self.designPrefDialog.column_preferences(designation_col, t, material_grade)
+                self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
+        elif module == KEY_DISP_BEAMCOVERPLATE:
+            designation_col = key_5.currentText()
+            self.designPrefDialog.ui.tabWidget.removeTab(
+                self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Column))
+            self.designPrefDialog.ui.tabWidget.setTabText(
+                self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECSIZE)
+            if key_5.currentIndex() != 0:
+                self.designPrefDialog.beam_preferences(designation_col, table_2, material_grade)
         else:
             conn = key_1.currentText()
             designation_col = key_2.currentText()

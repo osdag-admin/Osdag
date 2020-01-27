@@ -295,6 +295,7 @@ class FinPlateConnection(ShearConnection):
         return out_list
 
     def func_for_validation(self, window, design_dictionary):
+        self.design_status = False
         flag = False
         flag1 = False
         option_list = self.input_values(self)
@@ -307,6 +308,10 @@ class FinPlateConnection(ShearConnection):
                 val = option[4]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                if design_dictionary[option[0]] == []:
+                    missing_fields_list.append(option[1])
+
 
         if design_dictionary[KEY_CONN] == 'Beam-Beam':
             primary = design_dictionary[KEY_SUPTNGSEC]

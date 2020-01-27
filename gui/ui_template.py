@@ -734,6 +734,7 @@ class Ui_ModuleWindow(QMainWindow):
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
+        button_list = []
         for option in out_list:
             lable = option[1]
             type = option[2]
@@ -770,7 +771,8 @@ class Ui_ModuleWindow(QMainWindow):
                 b.setObjectName(option[0])
                 b.setText(v[0])
                 b.setDisabled(True)
-                b.clicked.connect(lambda: self.output_button_dialog(main, v))
+                button_list.append(option)
+                #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
@@ -781,6 +783,58 @@ class Ui_ModuleWindow(QMainWindow):
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
             i = i + 30
+
+        # common_button = QtWidgets.QPushButton()
+        # d = {
+        #     'Button_1': common_button,
+        #     'Button_2': common_button,
+        #     'Button_3': common_button,
+        #     'Button_4': common_button,
+        #     'Button_5': common_button,
+        #     'Button_6': common_button
+        # }
+        #
+        # print(button_list)
+
+        # Case_1
+
+        # for option in button_list:
+        #     for i in d.keys():
+        #         button = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+        #         if button not in d.values() and d[i] not in self.dockWidgetContents_out.children():
+        #             d[i] = button
+        # d['Button_1'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_1']))
+        # d['Button_2'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_2']))
+        # d['Button_3'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_3']))
+        # d['Button_4'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_4']))
+        # d['Button_5'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_5']))
+        # d['Button_6'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_6']))
+
+        # Case_2
+
+        if button_list:
+            for button_key in button_list:
+                button = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, button_key[0])
+                self.output_button_connect(main, button_list, button)
+
+
+            # if option[0] == KEY_WEB_SPACING:
+            #     d['button_1'] =
+            #     button_web_spacing = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+            #     print(button_web_spacing)
+            #     button_web_spacing.clicked.connect(lambda: self.output_button_dialog(main, button_list, KEY_WEB_SPACING))
+            # elif option[0] == KEY_WEB_CAPACITY:
+            #     button_web_capacity = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+            #     print(button_web_capacity)
+            #     button_web_capacity.clicked.connect(lambda: self.output_button_dialog(main, button_list, KEY_WEB_CAPACITY))
+
+        # for i in range(len(button_connect)):
+        #     button_connect[i].clicked.connect(lambda: self.output_button_dialog(main, button_list,
+        #                                                                         button_connect[i].objectName()))
+
+        # for button in self.dockWidgetContents_out.children():
+        #     if button.objectName() == KEY
+
 
         self.outputDock.setWidget(self.dockWidgetContents_out)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
@@ -986,10 +1040,14 @@ class Ui_ModuleWindow(QMainWindow):
         self.designPrefDialog = DesignPreferences(self)
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Column")
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Beam")
-        column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
-        beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
-        add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
-        add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE]:
+            column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
+            beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
+            add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
+            add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
+        else:
+            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Supporting"))
         self.designPrefDialog.rejected.connect(self.design_preferences)
 
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
@@ -1419,60 +1477,61 @@ class Ui_ModuleWindow(QMainWindow):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
         shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
+    def output_button_connect(self, main, button_list, b):
+        b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
 
-    def output_button_dialog(self, main, list):
+    def output_button_dialog(self, main, button_list, button):
         dialog = QtWidgets.QDialog()
         dialog.resize(350, 170)
         dialog.setFixedSize(dialog.size())
         dialog.setObjectName("Dialog")
-        dialog.setWindowTitle(list[0])
+        for op in button_list:
+            if op[0] == button.objectName():
+                tup = op[3]
+                title = tup[0]
+                fn = tup[1]
+                dialog.setWindowTitle(title)
+                i = 0
+                for option in fn(main, main.design_status):
+                    lable = option[1]
+                    type = option[2]
+                    _translate = QtCore.QCoreApplication.translate
+                    if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
+                        l = QtWidgets.QLabel(dialog)
+                        l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
+                        font = QtGui.QFont()
+                        font.setPointSize(9)
+                        font.setBold(False)
+                        font.setWeight(50)
+                        l.setFont(font)
+                        l.setObjectName(option[0] + "_label")
+                        l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
 
-        i = 0
-        for option in list[1](main, main.design_status):
-            lable = option[1]
-            type = option[2]
-            _translate = QtCore.QCoreApplication.translate
-            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
-                l = QtWidgets.QLabel(dialog)
-                l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(False)
-                font.setWeight(50)
-                l.setFont(font)
-                l.setObjectName(option[0] + "_label")
-                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+                    if type == TYPE_TEXTBOX:
+                        r = QtWidgets.QLineEdit(dialog)
+                        r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
+                        font = QtGui.QFont()
+                        font.setPointSize(11)
+                        font.setBold(False)
+                        font.setWeight(50)
+                        r.setFont(font)
+                        r.setObjectName(option[0])
+                        r.setText(str(option[3]))
 
-            if type == TYPE_TEXTBOX:
-                r = QtWidgets.QLineEdit(dialog)
-                r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
-                font = QtGui.QFont()
-                font.setPointSize(11)
-                font.setBold(False)
-                font.setWeight(50)
-                r.setFont(font)
-                r.setObjectName(option[0])
-                r.setText(str(option[3]))
+                    i = i + 30
 
-            i = i + 30
-
-        dialog.exec()
+                dialog.exec()
 
     def refresh_sections(self, prev, section):
 
         connectivity = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
         supporting_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
         supported_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+
         Columns = connectdb("Columns")
         Beams = connectdb("Beams")
         red_list_set = set(red_list_function())
 
-        # if section == "Supporting":
-        #     prev_column = prev
-        # elif section == "Supported":
-        #     prev_beam = prev
-
-        #if connectivity.currentText() in VALUES_CONN_1:
         if section == "Supporting":
             supporting_section.clear()
             if connectivity.currentText() in VALUES_CONN_1:
@@ -1501,7 +1560,6 @@ class Ui_ModuleWindow(QMainWindow):
 
         if section == "Supported":
             supported_section.clear()
-            #if connectivity.currentText() in VALUES_CONN_1:
 
             for item in Beams:
                 supported_section.addItem(item)
@@ -1516,26 +1574,6 @@ class Ui_ModuleWindow(QMainWindow):
                 supported_section.setCurrentIndex(text_index)
             else:
                 supported_section.setCurrentIndex(prev)
-
-
-            #elif connectivity.currentText() in VALUES_CONN_2:
-                #for item in Beams:
-                 #   supported_section.addItem(item)
-
-        # else:
-        #     for item in Beams:
-        #         if section == "Supporting":
-        #             supporting_section.addItem(item)
-        #         if section == "Supported":
-        #             supported_section.addItem(item)
-
-        # red_list_set = set(red_list_function())
-        # current_list_set = set(Columns)
-        # current_red_list = list(current_list_set.intersection(red_list_set))
-        #
-        # for value in current_red_list:
-        #     indx = option[4].index(str(value))
-        #     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
 
 # Function for warning about structure
@@ -1747,8 +1785,10 @@ class Ui_ModuleWindow(QMainWindow):
         if module in [KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COLUMNCOVERPLATE]:
             designation_col = key_5.currentText()
             self.designPrefDialog.ui.tabWidget.removeTab(
-                self.designPrefDialog.ui.tabWidget.indexOf(self.designPrefDialog.ui.tab_Beam))
-            self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Beam))
+            self.designPrefDialog.ui.tabWidget.setTabText(
+                self.designPrefDialog.ui.tabWidget.indexOf(
                 self.designPrefDialog.ui.tab_Column), KEY_DISP_SECSIZE)
             if key_5.currentIndex() != 0:
                 self.designPrefDialog.column_preferences(designation_col, t, material_grade)
@@ -1757,16 +1797,20 @@ class Ui_ModuleWindow(QMainWindow):
             designation_col = key_2.currentText()
             designation_bm = key_3.currentText()
             if conn in VALUES_CONN_1:
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
                 self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)
             elif conn in VALUES_CONN_2:
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Column), KEY_DISP_PRIBM)
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECBM)
                 self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)

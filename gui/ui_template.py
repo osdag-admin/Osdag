@@ -629,7 +629,13 @@ class Ui_ModuleWindow(QMainWindow):
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
                 if selected == "Customized":
-                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
+
+                   data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
+                   if data[c_tup[0] + "_customized"] == []:
+
+
+                       data[c_tup[0] + "_customized"] = f()
+                       key.setCurrentIndex(0)
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
@@ -1457,7 +1463,7 @@ class Ui_ModuleWindow(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-        self.pass_d(main, self.design_inputs)
+        # self.pass_d(main, self.design_inputs)
 
             # if status is True:
             #     self.commLogicObj = CommonDesignLogic(self.display,self.folder,
@@ -1479,7 +1485,7 @@ class Ui_ModuleWindow(QMainWindow):
             #     self.actionShow_column.setEnabled(False)
             #     self.actionShow_finplate.setEnabled(False)
 
-        image = main.generate_3D_Cad_image(main,self,self.folder)
+        # image = main.generate_3D_Cad_image(main,self,self.folder)
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))

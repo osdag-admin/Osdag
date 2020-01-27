@@ -1331,9 +1331,9 @@ class Ui_ModuleWindow(QMainWindow):
 
         # @author Arsil Zunzunia
 
-
         key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
-        main.warn_text(main, key, design_dictionary)
+
+        main.warn_text(main)
         # main.set_input_values(main, design_dictionary)
 # Function for saving inputs in a file
     '''
@@ -1450,6 +1450,8 @@ class Ui_ModuleWindow(QMainWindow):
                     txt.setText(str(option[3]))
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
+
+        self.pass_d(main, self.design_inputs)
 
             # if status is True:
             #     self.commLogicObj = CommonDesignLogic(self.display,self.folder,

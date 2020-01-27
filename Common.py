@@ -26,11 +26,18 @@ class OurLog(logging.Handler):
     def __init__(self, key):
         logging.Handler.__init__(self)
         self.key = key
-        # self.key.setText("INDIA")
+        # self.key.setText("<h1>Welcome to Osdag</h1>")
 
     def handle(self, record):
         msg = self.format(record)
+        if record.levelname == 'WARNING':
+            msg = "<span style='color: yellow;'>"+ msg +"</span>"
+        elif record.levelname == 'ERROR':
+            msg = "<span style='color: red;'>"+ msg +"</span>"
+        elif record.levelname == 'INFO':
+            msg = "<span style='color: green;'>" + msg + "</span>"
         self.key.append(msg)
+        # self.key.append(record.levelname)
 
 def connectdb1():
     """

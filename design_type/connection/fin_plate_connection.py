@@ -66,19 +66,23 @@ class FinPlateConnection(ShearConnection):
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
-        handler.setLevel(logging.DEBUG)
+        # handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
 
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
-        handler.setLevel(logging.WARNING)
+        # handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+        # handler.setLevel(logging.INFO)
+        # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        # handler.setFormatter(formatter)
+        # logger.addHandler(handler)
         handler = OurLog(key)
-        handler.setLevel(logging.WARNING)
+        # handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
@@ -373,10 +377,12 @@ class FinPlateConnection(ShearConnection):
         """
 
         # @author Arsil Zunzunia
-        
+        global logger
         red_list = red_list_function()
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
             logger.warning(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+            logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def set_input_values(self, design_dictionary):

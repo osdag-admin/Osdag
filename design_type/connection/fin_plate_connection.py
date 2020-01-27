@@ -460,7 +460,7 @@ class FinPlateConnection(ShearConnection):
 
         if bolts_one_line == 1:
             self.design_status = False
-            logger.error(" : You are using a section (in red color) that is not available in latest version of IS 808")
+            logger.error(" : Select bolt of lower diameter")
         else:
             self.get_bolt_grade(self)
 

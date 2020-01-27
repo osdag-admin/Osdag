@@ -19,6 +19,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
+from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PyQt5.QtGui import QStandardItem
 import os
 import yaml
@@ -33,6 +34,7 @@ import pdfkit
 import configparser
 import pickle
 import cairosvg
+
 
 from Common import *
 from utils.common.component import Section,I_sectional_Properties
@@ -87,10 +89,12 @@ class Ui_ModuleWindow(QMainWindow):
     def getLogoFilePath(self, lblwidget):
 
         self.new_ui.lbl_browse.clear()
-        filename, _ = QFileDialog.getOpenFileName(
-            self, 'Open File', " ../../",
-            'Images (*.png *.svg *.jpg)',
-            None, QFileDialog.DontUseNativeDialog)
+        filename, _ = QFileDialog.getOpenFileName(self, "Open Image", os.path.join(str(' '), ''), "InputFiles(*.png *.svg *.jpg)")
+
+        # filename, _ = QFileDialog.getOpenFileName(
+        #     self, 'Open File', " ../../",
+        #     'Images (*.png *.svg *.jpg)',
+        #     None, QFileDialog.DontUseNativeDialog)
         flag = True
         if filename == '':
             flag = False
@@ -1044,17 +1048,19 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
         self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
-        self.actionShow_beam.triggered.connect(lambda: self.call_3DBeam("gradient_bg"))
-        self.actionShow_column.triggered.connect(lambda: self.call_3DColumn("gradient_bg"))
-        self.actionShow_finplate.triggered.connect(lambda: self.call_3DFinplate("gradient_bg"))
-        self.actionShow_all.triggered.connect(lambda: self.call_3DModel("gradient_bg"))
-        self.actionChange_background.triggered.connect(self.showColorDialog)
+        self.btn_Design.clicked.connect(self.osdag_header)
+        self.actionShow_beam.triggered.connect(lambda: main.call_3DBeam(self,"gradient_bg"))
+        self.actionShow_column.triggered.connect(lambda: main.call_3DColumn(self,"gradient_bg"))
+        self.actionShow_finplate.triggered.connect(lambda: main.call_3DFinplate(self,"gradient_bg"))
+        self.actionShow_all.triggered.connect(lambda: main.call_3DModel(self,"gradient_bg"))
+        self.actionChange_background.triggered.connect(lambda: main.showColorDialog(self))
         self.actionSave_3D_model.triggered.connect(self.save3DcadImages)
-        self.btn3D.clicked.connect(lambda: self.call_3DModel("gradient_bg"))
-        self.chkBxBeam.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
-        self.chkBxCol.clicked.connect(lambda: self.call_3DColumn("gradient_bg"))
-        self.chkBxFinplate.clicked.connect(lambda: self.call_3DFinplate("gradient_bg"))
+        self.btn3D.clicked.connect(lambda: main.call_3DModel(self,"gradient_bg"))
+        self.chkBxBeam.clicked.connect(lambda: main.call_3DBeam(self,"gradient_bg"))
+        self.chkBxCol.clicked.connect(lambda: main.call_3DColumn(self,"gradient_bg"))
+        self.chkBxFinplate.clicked.connect(lambda: main.call_3DFinplate(self,"gradient_bg"))
         self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
+        self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -1113,6 +1119,29 @@ class Ui_ModuleWindow(QMainWindow):
 
         return display, start_display
 
+    # def save_cadImages(self,main):
+    #     """Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)
+    #
+    #     Returns:
+    #
+    #     """
+    #
+    #     if main.design_status is True:
+    #
+    #         files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+    #         fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+    #                                                   files_types)
+    #         fName = str(fileName)
+    #         file_extension = fName.split(".")[-1]
+    #
+    #         if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
+    #             self.display.ExportToImage(fName)
+    #             QMessageBox.about(self, 'Information', "File saved")
+    #     else:
+    #         self.actionSave_current_image.setEnabled(False)
+    #         QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
+
+
     def save3DcadImages(self):
         status = True
         if status is True:
@@ -1166,10 +1195,19 @@ class Ui_ModuleWindow(QMainWindow):
             self.actionSave_3D_model.setEnabled(False)
             QMessageBox.about(self,'Information', 'Design Unsafe: 3D Model cannot be saved')
 
-
-
-
-# Function for Reset Button
+    # def generate_3D_Cad_image(self,main):
+    #
+    #     # status = self.resultObj['Bolt']['status']
+    #     if main.design_status is True:
+    #         main.call_3DModel(main, self,"gradient_bg")
+    #         data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+    #         self.display.ExportToImage(data)
+    #         self.display.FitAll()
+    #     else:
+    #         pass
+    #
+    #     return data
+    # Function for Reset Button
     '''
     @author: Umair, Amir 
     '''
@@ -1343,6 +1381,7 @@ class Ui_ModuleWindow(QMainWindow):
 
             main.func_for_validation(main, self, self.design_inputs)
             status = main.design_status
+
             # main.set_input_values(main, self.design_inputs, self)
             # DESIGN_FLAG = 'True'
 
@@ -1354,25 +1393,32 @@ class Ui_ModuleWindow(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-            if status is True:
-                self.commLogicObj = CommonDesignLogic(self.display,self.folder,
-                                                      main.module)
-                status = main.design_status
-                self.commLogicObj.call_3DModel(status)
-                # self.callFin2D_Drawing("All")
-                self.actionShow_all.setEnabled(True)
-                self.actionShow_beam.setEnabled(True)
-                self.actionShow_column.setEnabled(True)
-                self.actionShow_finplate.setEnabled(True)
-            else:
-                self.btn3D.setEnabled(False)
-                self.chkBxBeam.setEnabled(False)
-                self.chkBxCol.setEnabled(False)
-                self.chkBxFinplate.setEnabled(False)
-                self.actionShow_all.setEnabled(False)
-                self.actionShow_beam.setEnabled(False)
-                self.actionShow_column.setEnabled(False)
-                self.actionShow_finplate.setEnabled(False)
+            # if status is True:
+            #     self.commLogicObj = CommonDesignLogic(self.display,self.folder,
+            #                                           main.module)
+            #     status = main.design_status
+            #     self.commLogicObj.call_3DModel(status)
+            #     # self.callFin2D_Drawing("All")
+            #     self.actionShow_all.setEnabled(True)
+            #     self.actionShow_beam.setEnabled(True)
+            #     self.actionShow_column.setEnabled(True)
+            #     self.actionShow_finplate.setEnabled(True)
+            # else:
+            #     self.btn3D.setEnabled(False)
+            #     self.chkBxBeam.setEnabled(False)
+            #     self.chkBxCol.setEnabled(False)
+            #     self.chkBxFinplate.setEnabled(False)
+            #     self.actionShow_all.setEnabled(False)
+            #     self.actionShow_beam.setEnabled(False)
+            #     self.actionShow_column.setEnabled(False)
+            #     self.actionShow_finplate.setEnabled(False)
+
+        image = main.generate_3D_Cad_image(main,self,self.folder)
+
+    def osdag_header(self):
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
+
 
     def output_button_dialog(self, main, list):
         dialog = QtWidgets.QDialog()
@@ -1546,64 +1592,7 @@ class Ui_ModuleWindow(QMainWindow):
             key3.currentIndexChanged.connect(lambda: self.primary_secondary_beam_comparison(key, key2, key3))
 
 
-    def call_3DModel(self, bgcolor):
-        '''
-        This routine responsible for displaying 3D Cad model
-        :param flag: boolean
-        :return:
-        '''
-        if self.btn3D.isChecked:
-            self.chkBxCol.setChecked(Qt.Unchecked)
-            self.chkBxBeam.setChecked(Qt.Unchecked)
-            self.chkBxFinplate.setChecked(Qt.Unchecked)
-        self.commLogicObj.display_3DModel("Model",bgcolor)
 
-    def call_3DBeam(self, bgcolor):
-        '''
-        Creating and displaying 3D Beam
-        '''
-        self.chkBxBeam.setChecked(Qt.Checked)
-        if self.chkBxBeam.isChecked():
-            self.chkBxCol.setChecked(Qt.Unchecked)
-            self.chkBxFinplate.setChecked(Qt.Unchecked)
-            self.btn3D.setChecked(Qt.Unchecked)
-            self.mytabWidget.setCurrentIndex(0)
-
-        self.commLogicObj.display_3DModel("Beam", bgcolor)
-
-    def call_3DColumn(self, bgcolor):
-        '''
-        '''
-        self.chkBxCol.setChecked(Qt.Checked)
-        if self.chkBxCol.isChecked():
-            self.chkBxBeam.setChecked(Qt.Unchecked)
-            self.chkBxFinplate.setChecked(Qt.Unchecked)
-            self.btn3D.setChecked(Qt.Unchecked)
-            self.mytabWidget.setCurrentIndex(0)
-        self.commLogicObj.display_3DModel("Column", bgcolor)
-
-    def call_3DFinplate(self, bgcolor):
-        '''
-        Displaying FinPlate in 3D
-        '''
-        self.chkBxFinplate.setChecked(Qt.Checked)
-        if self.chkBxFinplate.isChecked():
-            self.chkBxBeam.setChecked(Qt.Unchecked)
-            self.chkBxCol.setChecked(Qt.Unchecked)
-            self.mytabWidget.setCurrentIndex(0)
-            self.btn3D.setChecked(Qt.Unchecked)
-
-        self.commLogicObj.display_3DModel("Plate", bgcolor)
-
-    def unchecked_allChkBox(self):
-        '''
-        This routine is responsible for unchecking all checkboxes in GUI
-        '''
-
-        self.btn3D.setChecked(Qt.Unchecked)
-        self.chkBxBeam.setChecked(Qt.Unchecked)
-        self.chkBxCol.setChecked(Qt.Unchecked)
-        self.chkBxFinplate.setChecked(Qt.Unchecked)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate

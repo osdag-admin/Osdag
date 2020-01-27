@@ -293,7 +293,7 @@ class OsdagMainWindow(QMainWindow):
         if self.ui.rdbtn_bb_coverplate_bolted.isChecked() or self.ui.rdbtn_bb_coverplate_welded.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, BeamCoverPlate)
+            self.ui2.setupUi(self.ui2, BeamCoverPlate,folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
@@ -335,7 +335,7 @@ class OsdagMainWindow(QMainWindow):
         if self.ui.rdbtn_cc_coverplate_bolted.isChecked() or self.ui.rdbtn_cc_coverplate_welded.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, ColumnCoverPlate)
+            self.ui2.setupUi(self.ui2, ColumnCoverPlate,folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

@@ -81,15 +81,18 @@ class Ui_ModuleWindow(QMainWindow):
         self.new_window = QtWidgets.QDialog()
         self.new_ui = Ui_Dialog1()
         self.new_ui.setupUi(self.new_window, main)
+        self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
+        self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
+        self.new_ui.btn_useProfile.clicked.connect(lambda: self.useUserProfile(self.new_window))
         self.new_window.exec()
-        self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_ui.lbl_browse))
-        self.new_ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
-        self.new_ui.btn_useProfile.clicked.connect(self.useUserProfile)
+        # self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_ui.lbl_browse))
+        # self.new_ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
+        # self.new_ui.btn_useProfile.clicked.connect(self.useUserProfile)
 
-    def getLogoFilePath(self, lblwidget):
+    def getLogoFilePath(self, window, lblwidget):
 
         self.new_ui.lbl_browse.clear()
-        filename, _ = QFileDialog.getOpenFileName(self, "Open Image", os.path.join(str(' '), ''), "InputFiles(*.png *.svg *.jpg)")
+        filename, _ = QFileDialog.getOpenFileName(window, "Open Image", os.path.join(str(' '), ''), "InputFiles(*.png *.svg *.jpg)")
 
         # filename, _ = QFileDialog.getOpenFileName(
         #     self, 'Open File', " ../../",
@@ -114,18 +117,18 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             shutil.copyfile(filename, os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
 
-    def saveUserProfile(self):
+    def saveUserProfile(self, window):
 
         flag = True
         inputData = self.getPopUpInputs()
-        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+        filename, _ = QFileDialog.getSaveFileName(window, 'Save Files',
                                                   os.path.join(str(self.folder), "Profile"), '*.txt')
         if filename == '':
             flag = False
             return flag
         else:
             infile = open(filename, 'w')
-            pickle.dump(inputData, infile)
+            yaml.dump(inputData, infile)
             infile.close()
 
     def getPopUpInputs(self):
@@ -144,14 +147,14 @@ class Ui_ModuleWindow(QMainWindow):
 
         return input_summary
 
-    def useUserProfile(self):
+    def useUserProfile(self, window):
 
-        filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+        filename, _ = QFileDialog.getOpenFileName(window, 'Open Files',
                                                   os.path.join(str(self.folder), "Profile"),
                                                   '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
-            reportsummary = pickle.load(outfile)
+            reportsummary = yaml.load(outfile)
             self.new_ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
             self.new_ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
             self.new_ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])

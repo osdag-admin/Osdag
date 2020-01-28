@@ -146,7 +146,7 @@ class Ui_Dialog1(object):
         self.retranslateUi(Dialog)
 
         self.buttonBox.accepted.connect(Dialog.accept)
-        self.buttonBox.accepted.connect(lambda:self.save_inputSummary(main))
+        self.buttonBox.accepted.connect(lambda: self.save_inputSummary(main))
         self.buttonBox.rejected.connect(Dialog.reject)
         self.btn_browse.clicked.connect(self.lbl_browse.clear)
         QtCore.QMetaObject.connectSlotsByName(Dialog)

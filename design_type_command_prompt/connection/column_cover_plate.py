@@ -35,7 +35,6 @@ class ColumnCoverPlate(MomentConnection):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-
     def input_values(self, existingvalues={}):
 
         options_list = []

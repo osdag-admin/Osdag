@@ -9,7 +9,7 @@ from utils.common.material import *
 from Common import *
 from utils.common.load import Load
 import yaml
-from design_report.reportGenerator import save_html
+from design_report_command_prompt.reportGenerator import save_html
 import os
 import shutil
 import logging
@@ -600,7 +600,7 @@ class FinPlateConnection(ShearConnection):
         print(self.bolt)
         print(self.plate)
 
-    def save_design(self,ui,popup_summary):
+    def save_design(self, f):
 
 
         self.report_input =  {'Connection':{"Connection Title" : 'Finplate', 'Connection Type': 'Shear Connection'},"Connection Category":{"Connectivity": 'Column flange-Beam web', "Beam Connection":"Bolted", "Column Connection": "Welded"},"Loading":{'ShearForce(kN) - Vs': 140},"Components":{"Column Section": 'UC 305 x 305 x 97',"Column Material":"E250(Fe410W)A", "Column(N/mm2)-Fuc":410, "Column(N/mm2)-Fyc":250,"Column Details": "","Beam Section": "MB 500", "Beam Material":"E250(Fe410W)A", "Beam(N/mm2)-Fub":410, "Beam(N/mm2)-Fyb":250, "Beam Details": "","Plate Section" : '300 x 100 x 12',  'Thickness(mm)-tp': 12.0, 'Depth(mm)-dp': 300.0, 'Width(mm)-wp': 118.0, 'externalmoment(kN) - md': 8.96, "Weld": "", "Weld Type":"Double Fillet", "Size(mm)-ws": 12, 'Type_of_weld': 'Shop weld', 'Safety_Factor- ': 1.25, 'Weld(kN) - Fuw ': 410, 'WeldStrength - wst': 1590.715 , "EffectiveWeldLength(mm) - efl": 276.0 ,"Bolts":"",'Diameter (mm) - d': 24 , 'Grade': 8.8 ,
@@ -631,9 +631,10 @@ class FinPlateConnection(ShearConnection):
 
 
         folder = self.select_workspace_folder(self)
+        print(folder)
         filename = os.path.join(str(folder), "images_html", "Html_Report.html")
         file_name = str(filename)
-        ui.call_designreport(self,file_name, popup_summary, folder)
+        self.call_designreport(self, self, file_name, folder)
 
         # Creates PDF
         config = configparser.ConfigParser()
@@ -647,27 +648,52 @@ class FinPlateConnection(ShearConnection):
             'footer-right': '[page]'
         }
         file_type = "PDF(*.pdf)"
-        fname, _ = QFileDialog.getSaveFileName(None, "Save File As", folder + "/", file_type)
-        fname = str(fname)
+        # fname, _ = QFileDialog.getSaveFileName(None, "Save File As", folder + "/", file_type)
+        fname = os.path.join(str(folder), str(os.path.splitext(f)[0])+"_Report.pdf")
         flag = True
         if fname == '':
             flag = False
             return flag
         else:
             pdfkit.from_file(filename, fname, configuration=config, options=options)
-            QMessageBox.about(None, 'Information', "Report Saved")
+            # QMessageBox.about(None, 'Information', "Report Saved")
+            print("Report Saved!!")
 
         # with open("filename", 'w') as out_file:
         #     yaml.dump(fin_plate_input, out_file)
+
+    def call_designreport(self, main,fileName, folder):
+        report_summary = {}
+        report_summary["ProfileSummary"] = {}
+        report_summary["ProfileSummary"]["CompanyName"] = ''
+        report_summary["ProfileSummary"]["CompanyLogo"] = ''
+        report_summary["ProfileSummary"]["Group/TeamName"] = ''
+        report_summary["ProfileSummary"]["Designer"] = ''
+
+        report_summary["ProjectTitle"] = ''
+        report_summary["Subtitle"] = ''
+        report_summary["JobNumber"] = ''
+        report_summary["AdditionalComments"] = ''
+        report_summary["Client"] = ''
+        self.alist = main.report_input
+        self.column_details = main.report_supporting
+        self.beam_details = main.report_supported
+        self.result = main.report_result
+        self.Design_Check = main.report_check
+        save_html(self.result, self.alist, self.Design_Check, self.column_details,self.beam_details, report_summary,fileName, folder)
 
     def select_workspace_folder(self):
         # This function prompts the user to select the workspace folder and returns the name of the workspace folder
         config = configparser.ConfigParser()
         config.read_file(open(r'Osdag.config'))
         desktop_path = config.get("desktop_path", "path1")
-        folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
-                                                  desktop_path)
-        return folder
+        # folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
+        #                                           desktop_path)
+        folder = r'C:\Users\Win10\Desktop'
+        for r, d, f in os.walk(folder):
+            for directory in d:
+                if 'OsdagWorkspace' in directory:
+                    return os.path.join(r'C:\Users\Win10\Desktop', directory)
 
 
     def call_3DModel(self,ui,bgcolor):

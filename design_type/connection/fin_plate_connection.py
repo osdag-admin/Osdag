@@ -776,10 +776,11 @@ class FinPlateConnection(ShearConnection):
             data = os.path.join(str(folder), "images_html", "3D_Model.png")
             ui.display.ExportToImage(data)
             ui.display.FitAll()
+            return data
+
         else:
             pass
 
-        return data
 
     def block_shear_strength_section(self, A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         """Calculate the block shear strength of bolted connections as per cl. 6.4.1

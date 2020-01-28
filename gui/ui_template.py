@@ -54,7 +54,15 @@ from OCC.Core.IFSelect import IFSelect_RetDone
 from OCC.Core.StlAPI import StlAPI_Writer
 from OCC.Core import BRepTools
 from OCC.Core import IGESControl
+from design_type.connection.fin_plate_connection import FinPlateConnection
+from design_type.connection.column_cover_plate import ColumnCoverPlate
+from design_type.connection.cleat_angle_connection import CleatAngleConnectionInput
+from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
+from design_type.connection.end_plate_connection import EndPlateConnectionInput
 
+from design_type.connection.beam_cover_plate import BeamCoverPlate
+from design_type.connection.beam_end_plate import BeamEndPlate
+from design_type.connection.column_end_plate import ColumnEndPlate
 
 
 class Ui_ModuleWindow(QMainWindow):
@@ -75,7 +83,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.ui.addAvailableItems(op, KEYEXISTING_CUSTOMIZED)
         self.window.exec()
         return self.ui.get_right_elements()
-
 
     def open_summary_popup(self, main):
         self.new_window = QtWidgets.QDialog()
@@ -629,11 +636,8 @@ class Ui_ModuleWindow(QMainWindow):
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
                 if selected == "Customized":
-
                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                    if data[c_tup[0] + "_customized"] == []:
-
-
                        data[c_tup[0] + "_customized"] = f()
                        key.setCurrentIndex(0)
                 else:
@@ -1111,7 +1115,9 @@ class Ui_ModuleWindow(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.action_save_input.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Save"))
         self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
-        self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
+        self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list, main))
+        # self.action_load_input.triggered.connect(lambda: main.loadDesign_inputs(main, self, option_list, data, new_list))
+
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
         # self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
         # self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
@@ -1361,13 +1367,23 @@ class Ui_ModuleWindow(QMainWindow):
             QMessageBox.warning(self, "Application",
                                 "Cannot write file %s:\n%s" % (fileName, str(e)))
             return
-
+    def return_class(self,name):
+        if name == KEY_DISP_FINPLATE:
+            return FinPlateConnection
+        elif name == KEY_DISP_COLUMNCOVERPLATE:
+            return ColumnCoverPlate
+        elif name == KEY_DISP_BEAMCOVERPLATE:
+            return BeamCoverPlate
+        elif name == KEY_DISP_BEAMENDPLATE:
+            return BeamEndPlate
+        elif name == KEY_DISP_COLUMNENDPLATE:
+            return ColumnEndPlate
 # Function for getting inputs from a file
     '''
     @author: Umair 
     '''
 
-    def loadDesign_inputs(self, op_list, data, new):
+    def loadDesign_inputs(self, op_list, data, new, main):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(' '), ''), "InputFiles(*.osi)")
         if not fileName:
             return
@@ -1375,8 +1391,16 @@ class Ui_ModuleWindow(QMainWindow):
             in_file = str(fileName)
             with open(in_file, 'r') as fileObject:
                 uiObj = yaml.load(fileObject)
-            self.setDictToUserInputs(uiObj, op_list, data, new)
+            module = uiObj[KEY_MODULE]
 
+            # module_class = self.return_class(module)
+            if main.module(main) == module:
+                self.setDictToUserInputs(uiObj, op_list, data, new)
+            else:
+                QMessageBox.information(self, "Information",
+                                        "Please load the appropriate Input")
+
+                return
         except IOError:
             QMessageBox.information(self, "Unable to open file",
                                     "There was an error opening \"%s\"" % fileName)

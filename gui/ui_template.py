@@ -1463,7 +1463,7 @@ class Ui_ModuleWindow(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-            if status is True:
+            if status is True and main.module == "Fin Plate":
                 self.commLogicObj = CommonDesignLogic(self.display,self.folder,
                                                       main.module)
                 status = main.design_status

@@ -87,6 +87,9 @@ class FinPlateConnection(ShearConnection):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
+    def module(self):
+        return KEY_DISP_FINPLATE
+
     def input_values(self, existingvalues={}):
 
         '''
@@ -94,6 +97,7 @@ class FinPlateConnection(ShearConnection):
         '''
 
         # @author: Amir, Umair
+        self.module = KEY_DISP_FINPLATE
 
         options_list = []
 
@@ -294,6 +298,55 @@ class FinPlateConnection(ShearConnection):
 
         return out_list
 
+    # def loadDesign_inputs(self, window, op_list, data, new):
+    #     fileName, _ = QFileDialog.getOpenFileName(window, "Open Design", os.path.join(str(' '), ''), "InputFiles(*.osi)")
+    #     if not fileName:
+    #         return
+    #     try:
+    #         in_file = str(fileName)
+    #         with open(in_file, 'r') as fileObject:
+    #             uiObj = yaml.load(fileObject)
+    #         module = uiObj[KEY_MODULE]
+    #
+    #         if module == KEY_DISP_FINPLATE:
+    #             self.setDictToUserInputs(window, uiObj, op_list, data, new)
+    #         else:
+    #             QMessageBox.information(window, "Information",
+    #                                 "Please load the appropriate Input")
+    #
+    #             return
+    #     except IOError:
+    #         QMessageBox.information(window, "Unable to open file",
+    #                                 "There was an error opening \"%s\"" % fileName)
+    #         return
+    #
+    #     # Function for loading inputs from a file to Ui
+    #
+    # '''
+    # @author: Umair
+    # '''
+    #
+    # def setDictToUserInputs(self, uiObj, op_list, data, new):
+    #     for op in op_list:
+    #         key_str = op[0]
+    #         key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
+    #         if op[2] == TYPE_COMBOBOX:
+    #             index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
+    #             if index >= 0:
+    #                 key.setCurrentIndex(index)
+    #         elif op[2] == TYPE_TEXTBOX:
+    #             key.setText(uiObj[key_str])
+    #         elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
+    #             for n in new:
+    #                 if n[0] == key_str:
+    #                     if uiObj[key_str] != n[1]():
+    #                         data[key_str + "_customized"] = uiObj[key_str]
+    #                         key.setCurrentIndex(1)
+    #                     else:
+    #                         pass
+    #         else:
+    #             pass
+
     def func_for_validation(self, window, design_dictionary):
         self.design_status = False
         flag = False
@@ -311,7 +364,8 @@ class FinPlateConnection(ShearConnection):
             elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 if design_dictionary[option[0]] == []:
                     missing_fields_list.append(option[1])
-
+            # elif option[2] == TYPE_MODULE:
+            #     if design_dictionary[option[0]] == "Fin Plate":
 
         if design_dictionary[KEY_CONN] == 'Beam-Beam':
             primary = design_dictionary[KEY_SUPTNGSEC]

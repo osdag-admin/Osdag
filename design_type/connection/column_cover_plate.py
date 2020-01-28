@@ -397,6 +397,7 @@ class ColumnCoverPlate(MomentConnection):
         # global design_status
         self.design_status = True
         #
+        self.module = design_dictionary[KEY_MODULE]
         self.preference = design_dictionary[KEY_FLANGEPLATE_PREFERENCES]
 
         self.section = Column(designation=design_dictionary[KEY_SECSIZE], material_grade=design_dictionary[KEY_MATERIAL])

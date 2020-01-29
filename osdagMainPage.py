@@ -98,6 +98,10 @@ class OsdagMainWindow(QMainWindow):
         list_of_items = {'Osdagpage': 0, 'connectionpage': 1, 'Tension': 2,'Compression': 3, 'beamtocolumnpage': 4,'flexuralpage': 5}
         self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
         self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
+        self.ui.btn_compression.clicked.connect(
+            lambda: self.change_desgin_page(list_of_items['Compression'], list_of_items['Osdagpage']))
+        self.ui.btn_tension.clicked.connect(
+            lambda: self.change_desgin_page(list_of_items['Tension'], list_of_items['Osdagpage']))
        # self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
         self.ui.btn_shearconnection_start.clicked.connect(self.show_shear_connection)
         self.ui.btn_momentconnection_bb_start.clicked.connect(self.show_moment_connection)
@@ -105,16 +109,16 @@ class OsdagMainWindow(QMainWindow):
         self.ui.btn_momentconnection_cc_start.clicked.connect(self.show_moment_connection_cc)
 
         self.ui.Tension_Start.clicked.connect(self.unavailable)
-        self.ui.Compression_Start.clicked.connect(self.unavailable)
+        self.ui.Compression_Start.clicked.connect(self.show_compression_module)
 
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
-        self.ui.btn_compression.clicked.connect(self.unavailable)
+        # self.ui.btn_compression.clicked.connect(self.unavailable)
         self.ui.btn_flexural.clicked.connect(self.unavailable)
         self.ui.btn_truss.clicked.connect(self.unavailable)
         self.ui.btn_2dframe.clicked.connect(self.unavailable)
         self.ui.btn_3dframe.clicked.connect(self.unavailable)
         self.ui.btn_groupdesign.clicked.connect(self.unavailable)
-        self.ui.btn_tension.clicked.connect(self.unavailable)
+        # self.ui.btn_tension.clicked.connect(self.unavailable)
         self.ui.btn_plate.clicked.connect(self.unavailable)
         self.ui.comboBox_help.setCurrentIndex(0)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
@@ -346,7 +350,41 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
+    def show_compression_module(self):
+        folder = self.select_workspace_folder()
+        folder = str(folder)
+        if not os.path.exists(folder):
+            if folder == '':
+                pass
+            else:
+                os.mkdir(folder, 0o755)
 
+        root_path = folder
+        images_html_folder = ['images_html']
+        flag = True
+        for create_folder in images_html_folder:
+            if root_path == '':
+                flag = False
+                return flag
+            else:
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder))
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder))
+        if self.ui.rdbtn_compression_bolted.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, ColumnCoverPlate, folder)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
+        elif self.ui.rdbtn_compression_welded.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, ColumnEndPlate)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
 
 class MainController(QMainWindow):
     closed = pyqtSignal()

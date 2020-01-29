@@ -90,6 +90,7 @@ class Ui_Dialog(object):
                 l = QtWidgets.QLabel(self.tab_Column)
                 if lable in [KEY_DISP_SUPTNGSEC_THERMAL_EXP]:
                     l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 28))
+                    i = i + 10
                 else:
                     l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
                 font = QtGui.QFont()
@@ -138,6 +139,15 @@ class Ui_Dialog(object):
                 r.setObjectName(element[0])
                 if element[0] in [KEY_SUPTNGSEC_DEPTH, KEY_SUPTNGSEC_FLANGE_W, KEY_SUPTNGSEC_FLANGE_T, KEY_SUPTNGSEC_WEB_T]:
                     r.setValidator(QDoubleValidator())
+
+            if type == TYPE_IMAGE:
+                im = QtWidgets.QLabel(self.tab_Column)
+                im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
+                im.setObjectName(element[0])
+                im.setScaledContents(True)
+                image = QPixmap("./ResourceFiles/images/Columns_Beams.png")
+                im.setPixmap(image)
+                i = i + 300
 
             if type == TYPE_BREAK:
                 j = j + 310
@@ -201,8 +211,9 @@ class Ui_Dialog(object):
             # value = option[4]
             if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
                 l = QtWidgets.QLabel(self.tab_Beam)
-                if lable in [KEY_DISP_SUPTNGSEC_THERMAL_EXP]:
+                if lable in [KEY_DISP_SUPTDSEC_THERMAL_EXP]:
                     l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 28))
+                    i = i + 10
                 else:
                     l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
                 font = QtGui.QFont()
@@ -252,6 +263,15 @@ class Ui_Dialog(object):
                 if element[0] in [KEY_SUPTDSEC_DEPTH, KEY_SUPTDSEC_FLANGE_W, KEY_SUPTDSEC_FLANGE_T,
                                KEY_SUPTDSEC_WEB_T]:
                     r.setValidator(QDoubleValidator())
+
+            if type == TYPE_IMAGE:
+                im = QtWidgets.QLabel(self.tab_Beam)
+                im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
+                im.setObjectName(element[0])
+                im.setScaledContents(True)
+                image = QPixmap("./ResourceFiles/images/Columns_Beams.png")
+                im.setPixmap(image)
+                i = i + 300
 
             if type == TYPE_BREAK:
                 j = j + 310

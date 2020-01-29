@@ -152,7 +152,6 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platethk = ''
 
-        
         t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, None)
         options_list.append(t16)
 
@@ -162,7 +161,7 @@ class FinPlateConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN)
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/fin_cf_bw.png")
         options_list.append(t15)
 
         t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"))

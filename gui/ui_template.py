@@ -13,7 +13,7 @@ from design_report import reportGenerator
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QBrush, QImage
 from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
@@ -317,7 +317,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
 
-
         main.set_osdaglogger(self.textEdit)
         # self.textEdit.setStyleSheet("QTextEdit {color:red}")
         self.verticalLayout_2.addWidget(self.splitter)
@@ -520,7 +519,7 @@ class Ui_ModuleWindow(QMainWindow):
         for option in option_list:
             lable = option[1]
             type = option[2]
-            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
+            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
                 font = QtGui.QFont()
@@ -567,8 +566,17 @@ class Ui_ModuleWindow(QMainWindow):
                 im.setGeometry(QtCore.QRect(190, 10 + i, 70, 57))
                 im.setObjectName(option[0])
                 im.setScaledContents(True)
-                pixmap = QPixmap("./ResourceFiles/images/fin_cf_bw.png")
+                pixmap = QPixmap(option[4])
                 im.setPixmap(pixmap)
+                i = i + 30
+
+            if type == TYPE_IMAGE_COMPRESSION:
+                imc = QtWidgets.QLabel(self.dockWidgetContents)
+                imc.setGeometry(QtCore.QRect(130, 10 + i, 160, 150))
+                imc.setObjectName(option[0])
+                imc.setScaledContents(True)
+                pixmapc = QPixmap(option[4])
+                imc.setPixmap(pixmapc)
                 i = i + 30
 
             if option[0] in [KEY_AXIAL, KEY_SHEAR]:
@@ -621,8 +629,6 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 pass
 
-
-
         def popup(key, for_custom_list):
 
             """
@@ -655,41 +661,7 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             for t in updated_list:
                 key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                key_changed.currentIndexChanged.connect(lambda: change(key_changed, updated_list))
-
-        def change(k1, new):
-
-            """
-            @author: Umair
-            """
-
-            for tup in new:
-                (object_name, k2_key, typ, f) = tup
-                if object_name != k1.objectName():
-                    continue
-                if typ == TYPE_LABEL:
-                    k2_key = k2_key + "_label"
-                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
-                val = f(k1.currentText())
-                k2.clear()
-                if typ == TYPE_COMBOBOX:
-                    for values in val:
-                        k2.addItem(values)
-                        k2.setCurrentIndex(0)
-                    if k2_key in [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]:
-                        red_list_set = set(red_list_function())
-                        current_list_set = set(val)
-                        current_red_list = list(current_list_set.intersection(red_list_set))
-                        for value in current_red_list:
-                            indx = val.index(str(value))
-                            k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-                elif typ == TYPE_LABEL:
-                    k2.setText(val)
-                elif typ == TYPE_IMAGE:
-                    pixmap1 = QPixmap(val)
-                    k2.setPixmap(pixmap1)
-                else:
-                    pass
+                self.on_change_connect(key_changed, updated_list)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
         self.btn_Reset.setGeometry(QtCore.QRect(30, 600, 100, 30))
@@ -1053,7 +1025,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.designPrefDialog = DesignPreferences(self)
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Column")
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Beam")
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE]:
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
@@ -1283,6 +1255,49 @@ class Ui_ModuleWindow(QMainWindow):
     #         pass
     #
     #     return data
+
+    def on_change_connect(self, key_changed, updated_list):
+        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list))
+
+    def change(self, k1, new):
+
+        """
+        @author: Umair
+        """
+        for tup in new:
+            (object_name, k2_key, typ, f) = tup
+            if object_name != k1.objectName():
+                continue
+            if typ == TYPE_LABEL:
+                k2_key = k2_key + "_label"
+            if object_name != KEY_END2:
+                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
+                val = f(k1.currentText())
+                k2.clear()
+            elif object_name == KEY_END2:
+                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
+                key_end1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_END1)
+                val = f(k1.currentText(), key_end1.currentText())
+                k2.clear()
+            if typ == TYPE_COMBOBOX:
+                for values in val:
+                    k2.addItem(values)
+                    k2.setCurrentIndex(0)
+                if k2_key in [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]:
+                    red_list_set = set(red_list_function())
+                    current_list_set = set(val)
+                    current_red_list = list(current_list_set.intersection(red_list_set))
+                    for value in current_red_list:
+                        indx = val.index(str(value))
+                        k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            elif typ == TYPE_LABEL:
+                k2.setText(val)
+            elif typ == TYPE_IMAGE:
+                pixmap1 = QPixmap(val)
+                k2.setPixmap(pixmap1)
+            else:
+                pass
+
     # Function for Reset Button
     '''
     @author: Umair, Amir 
@@ -1509,7 +1524,7 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_beam.setEnabled(False)
                 self.actionShow_column.setEnabled(False)
                 self.actionShow_finplate.setEnabled(False)
-        image = main.generate_3D_Cad_image(main,self,self.folder)
+        # image = main.generate_3D_Cad_image(main,self,self.folder)
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
@@ -1871,7 +1886,7 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECSIZE)
             if key_5.currentIndex() != 0:
                 self.designPrefDialog.beam_preferences(designation_col, table_2, material_grade)
-        else:
+        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION]:
             conn = key_1.currentText()
             designation_col = key_2.currentText()
             designation_bm = key_3.currentText()

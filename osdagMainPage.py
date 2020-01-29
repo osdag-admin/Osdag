@@ -24,6 +24,7 @@ from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
+from design_type.compression_member.compression import Compression
 # from cad.cad_common import call_3DBeam
 from gui.ui_template import Ui_ModuleWindow
 
@@ -108,7 +109,7 @@ class OsdagMainWindow(QMainWindow):
         self.ui.Compression_Start.clicked.connect(self.unavailable)
 
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
-        self.ui.btn_compression.clicked.connect(self.unavailable)
+        self.ui.btn_compression.clicked.connect(self.show_compression_module)
         self.ui.btn_flexural.clicked.connect(self.unavailable)
         self.ui.btn_truss.clicked.connect(self.unavailable)
         self.ui.btn_2dframe.clicked.connect(self.unavailable)
@@ -266,6 +267,35 @@ class OsdagMainWindow(QMainWindow):
             # self.window.closed.connect(self.show)
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")
+
+    def show_compression_module(self):
+        folder = self.select_workspace_folder()
+        folder = str(folder)
+        if not os.path.exists(folder):
+            if folder == '':
+                pass
+            else:
+                os.mkdir(folder, 0o755)
+
+        root_path = folder
+        images_html_folder = ['images_html']
+        flag = True
+        for create_folder in images_html_folder:
+            if root_path == '':
+                flag = False
+                return flag
+            else:
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder))
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder))
+        self.hide()
+        self.ui3 = Ui_ModuleWindow()
+        self.ui3.setupUi(self.ui3, Compression, folder)
+        self.ui3.show()
+        self.ui3.closed.connect(self.show)
+
 
     def show_moment_connection(self):
         folder = self.select_workspace_folder()

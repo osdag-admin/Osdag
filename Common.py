@@ -21,6 +21,8 @@ from utils.common.component import *
 from utils.common.component import *
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 import logging
+# from design_type.connection.fin_plate_connection import FinPlateConnection
+# from design_type.connection.column_cover_plate import ColumnCoverPlate
 
 class OurLog(logging.Handler):
 
@@ -215,7 +217,6 @@ def get_oldbeamcombolist():
 
     final_lst = tuple_to_str_red(old_columnList)
     return final_lst
-
 
 KEY_MODULE = 'Module'
 KEY_DISP_FINPLATE = 'Fin Plate'

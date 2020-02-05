@@ -19,7 +19,7 @@ class ColumnCoverPlate(MomentConnection):
         super(ColumnCoverPlate, self).__init__()
         self.design_status = False
 
-    def set_osdaglogger(key):
+    def set_osdaglogger():
         global logger
         logger = logging.getLogger('osdag')
         logger.setLevel(logging.DEBUG)
@@ -30,11 +30,6 @@ class ColumnCoverPlate(MomentConnection):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-        handler.setLevel(logging.WARNING)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        handler = OurLog(key)
         handler.setLevel(logging.WARNING)
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
@@ -397,7 +392,6 @@ class ColumnCoverPlate(MomentConnection):
         # global design_status
         self.design_status = True
         #
-        self.module = design_dictionary[KEY_MODULE]
         self.preference = design_dictionary[KEY_FLANGEPLATE_PREFERENCES]
 
         self.section = Column(designation=design_dictionary[KEY_SECSIZE], material_grade=design_dictionary[KEY_MATERIAL])

@@ -26,13 +26,14 @@ DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
 DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
 DesignPreferences.Weld.Type: Shop Weld
-Load.Axial: '200'
-Load.Moment: '20'
-Load.Shear: '20'
-Member.Material: E 250 (Fe 410 W)A
-Module: Beam Coverplate Connection
-Plate.Flange_Splice.Preferences: Outside + Inside
-Plate.Flange_Splice.Thickness: &id001
+Flange_Plate.Preferences: Outside + Inside
+Load.Axial: '50'
+Load.Moment: '50'
+Load.Shear: '50'
+Member.Material: E 250 (Fe 410 W)B
+Module: Column Coverplate Connection
+Section Size: HB 200
+Web_Plate.thickness_provided: &id001
 - '6'
 - '8'
 - '10'
@@ -46,5 +47,4 @@ Plate.Flange_Splice.Thickness: &id001
 - '26'
 - '28'
 - '30'
-Plate.Web_Splice.Thickness: *id001
-Section Size: MB 500
+flange_plate.thickness_provided: *id001

@@ -17,6 +17,7 @@ Bolt.Grade:
 - '10.9'
 - '12.9'
 Bolt.Type: Bearing Bolt
+Connectivity: Column flange-Beam web
 DesignPreferences.Bolt.Bolt_Hole_Type: Standard
 DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
 DesignPreferences.Bolt.Slip_Factor: '0.3'
@@ -26,13 +27,16 @@ DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
 DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
 DesignPreferences.Weld.Type: Shop Weld
-Load.Axial: '200'
-Load.Moment: '20'
+Load.Axial: '30'
 Load.Shear: '20'
 Member.Material: E 250 (Fe 410 W)B
-Module: Column Coverplate Connection
-Plate.Flange_Splice.Preferences: Outside + Inside
-Plate.Flange_Splice.Thickness: &id001
+Member.Supported_Section: JB 200
+Member.Supporting_Section: HB 150
+Module: Fin Plate
+Plate.Thickness:
+- '3'
+- '4'
+- '5'
 - '6'
 - '8'
 - '10'
@@ -41,10 +45,3 @@ Plate.Flange_Splice.Thickness: &id001
 - '16'
 - '18'
 - '20'
-- '22'
-- '24'
-- '26'
-- '28'
-- '30'
-Plate.Web_Splice.Thickness: *id001
-Section Size: HB 450*

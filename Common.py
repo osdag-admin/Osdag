@@ -8,6 +8,7 @@ TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
+TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
 TYPE_OUT_BUTTON = 'Output_dock_Button'
 TYPE_BREAK = 'Break'
@@ -20,17 +21,26 @@ from utils.common.component import *
 from utils.common.component import *
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 import logging
+# from design_type.connection.fin_plate_connection import FinPlateConnection
+# from design_type.connection.column_cover_plate import ColumnCoverPlate
 
 class OurLog(logging.Handler):
 
     def __init__(self, key):
         logging.Handler.__init__(self)
         self.key = key
-        # self.key.setText("INDIA")
+        # self.key.setText("<h1>Welcome to Osdag</h1>")
 
     def handle(self, record):
         msg = self.format(record)
+        if record.levelname == 'WARNING':
+            msg = "<span style='color: yellow;'>"+ msg +"</span>"
+        elif record.levelname == 'ERROR':
+            msg = "<span style='color: red;'>"+ msg +"</span>"
+        elif record.levelname == 'INFO':
+            msg = "<span style='color: green;'>" + msg + "</span>"
         self.key.append(msg)
+        # self.key.append(record.levelname)
 
 def connectdb1():
     """
@@ -208,10 +218,10 @@ def get_oldbeamcombolist():
     final_lst = tuple_to_str_red(old_columnList)
     return final_lst
 
-
 KEY_MODULE = 'Module'
 KEY_DISP_FINPLATE = 'Fin Plate'
 TYPE_MODULE = 'Window Title'
+KEY_DISP_COMPRESSION = 'Compression Member'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
@@ -225,6 +235,7 @@ KEY_DISP_CONN = 'Connectivity *'
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
+
 
 KEY_IMAGE = 'Image'
 
@@ -280,67 +291,79 @@ VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8',
 
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate'
 
-KEY_FLANGEPLATE_PREFERENCES = 'Plate.Flange_Splice.Preferences'
+KEY_FLANGEPLATE_PREFERENCES = 'Flange_Plate.Preferences'
 KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
 VALUES_FLANGEPLATE_PREFERENCES = ['Cover plate location', 'Outside','Outside + Inside']
 
-KEY_FLANGEPLATE_THICKNESS = 'Plate.Flange_Splice.Thickness'
+KEY_FLANGEPLATE_THICKNESS = 'flange_plate.thickness_provided'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
-KEY_FLANGE_PLATE_HEIGHT = 'Plate.Flange_Splice.Height'
+KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
 KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
-KEY_FLANGE_PLATE_LENGTH ='Plate.Flange_Splice.Length'
+KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length'
 
-KEY_FLANGE_PITCH = 'Flange_plate.Pitch'
+KEY_FLANGE_SPACING ="Flange_plate.spacing"
+KEY_DISP_FLANGE_SPACING = 'Spacing'
+KEY_FLANGE_PITCH = 'Flange_plate.pitch_provided'
 KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
-KEY_FLANGE_PLATE_GAUGE = "Flange_plate.Gauge"
+KEY_FLANGE_PLATE_GAUGE = "Flange_plate.gauge_provided "
 KEY_DISP_FLANGE_PLATE_GAUGE ="Gauge"
-KEY_ENDDIST_F= 'Flange_plate.EndDist'
-KEY_DISP_END_DIST_F = 'End Distance'
-KEY_EDGEDIST_F= 'Flange_plate.EdgeDist'
-KEY_DISP_EDGEDIST_F= 'Edge Distance'
+KEY_ENDDIST_FLANGE= 'Flange_plate.end_dist_provided '
+KEY_DISP_END_DIST_FLANGE = 'End Distance'
+KEY_EDGEDIST_FLANGE= 'Flange_plate.edge_dist_provided'
+KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 
-KEY_BLOCKSHEARCAP_F='Flange.plate.block_shear_capacity'
-KEY_DISP_BLOCKSHEARCAP_F='Block Shear Capacity'
-KEY_SHEARYIELDINGCAP_F= 'Flange.plate.shear_yielding_capacity'
-KEY_DISP_SHEARYIELDINGCAP_F= 'Shear Yielding Capacity'
-KEY_SHEARRUPTURECAP_F= 'Flange.plate.shear_rupture_capacity'
-KEY_DISP_SHEARRUPTURECAP_F= 'Shear Rupture Capacity'
-KEY_FLANGE_PLATE_MOM_DEMAND = 'Flange_plate.MomCapacity'
-KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Moment Capacity'
+KEY_FLANGE_CAPACITY ="Flange_plate.capacity"
+KEY_DISP_FLANGE_CAPACITY= 'capacity'
+KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
+KEY_DISP_BLOCKSHEARCAP_FLANGE='Block Shear Capacity'
+KEY_SHEARYIELDINGCAP_FLANGE= 'Flange_plate.shear_yielding_capacity'
+KEY_DISP_SHEARYIELDINGCAP_FLANGE= 'Shear Yielding Capacity'
+KEY_SHEARRUPTURECAP_FLANGE= 'Flange_plate.shear_rupture_capacity'
+KEY_DISP_SHEARRUPTURECAP_FLANGE= 'Shear Rupture Capacity'
+KEY_FLANGE_PLATE_MOM_DEMAND = 'Flange_Plate.MomDemand'
+KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
+KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
+KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
-KEY_WEBPLATE_THICKNESS = 'Plate.Web_Splice.Thickness'
+KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
-KEY_WEB_PLATE_HEIGHT = 'Plate.Web_Splice.Height'
+KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height(mm)'
-KEY_WEB_PLATE_LENGTH ='Plate.Web_Splice.Length'
+KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
 KEY_DISP_WEB_PLATE_LENGTH ='Length'
 
-KEY_WEB_PITCH = "Web_plate.Pitch"
+KEY_WEB_SPACING ="Web_plate.spacing"
+KEY_DISP_WEB_SPACING = 'Spacing'
+KEY_WEB_PITCH = "Web_plate.pitch_provided"
 KEY_DISP_WEB_PLATE_PITCH ="Pitch"
-KEY_WEB_GAUGE = "Web_plate.Gauge"
+KEY_WEB_GAUGE = "Web_plate.gauge_provided "
 KEY_DISP_WEB_PLATE_GAUGE ="Gauge"
-KEY_ENDDIST_W= 'Web_plate.EndDist'
+KEY_ENDDIST_W= 'Web_plate.end_dist_provided '
 KEY_DISP_END_DIST_W = 'End Distance'
-KEY_EDGEDIST_W = 'Web_plate.EdgeDist'
+KEY_EDGEDIST_W = 'Web_plate.edge_dist_provided'
 KEY_DISP_EDGEDIST_W = 'Edge Distance'
-KEY_BLOCKSHEARCAP_W='web.plate.block_shear_capacity'
-KEY_DISP_BLOCKSHEARCAP_W='Block Shear Capacity'
-KEY_SHEARYIELDINGCAP_W= 'web.plate.shear_yielding_capacity'
-KEY_DISP_SHEARYIELDINGCAP_W= 'Shear Yielding Capacity'
-KEY_SHEARRUPTURECAP_W= 'web.plate.shear_rupture_capacity'
-KEY_DISP_SHEARRUPTURECAP_W= 'Shear Rupture Capacity'
-KEY_WEB_PLATE_MOM_DEMAND = 'Web_plate.MomCapacity'
-KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Capacity'
 
+KEY_WEB_CAPACITY ="Web_plate.capacity"
+KEY_DISP_WEB_CAPACITY= 'capacity'
+KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'
+KEY_DISP_SHEARYIELDINGCAP_WEB= 'Shear Yielding Capacity'
+KEY_BLOCKSHEARCAP_WEB='web_plate.block_shear_capacity'
+KEY_DISP_BLOCKSHEARCAP_WEB='Block Shear Capacity'
+KEY_SHEARRUPTURECAP_WEB= 'web_plate.shear_rupture_capacity'
+KEY_DISP_SHEARRUPTURECAP_WEB= 'Shear Rupture Capacity'
+KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
+KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
+KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
+KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
 DISP_TITLE_ENDPLATE = 'End plate'
 
@@ -539,8 +562,27 @@ KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
 
+KEY_SEC_PROFILE = 'Member.Profile'
+KEY_DISP_SEC_PROFILE = 'Section Profile'
+VALUES_SEC_PROFILE = ['Beams', 'Columns', 'Angles', 'Channels', 'Back to Back Angles', 'Back to Back Channels', 'Star Angles']
+
+KEY_LENZZ = 'Member.Length_zz'
+KEY_DISP_LENZZ = 'Length (z-z)'
 
 
+KEY_LENYY = 'Member.Length_yy'
+KEY_DISP_LENYY = 'Length (y-y)'
+
+DISP_TITLE_SC = 'Supporting Condition'
+
+KEY_END1 = 'End_1'
+KEY_DISP_END1 = 'End 1'
+VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
+
+
+KEY_END2 = 'End_2'
+KEY_DISP_END2 = 'End 2'
+VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
 
 
 
@@ -638,29 +680,13 @@ KEY_EDGEDIST = 'Edge Distance'
 KEY_DISP_EDGEDIST = 'Edge Distance'
 
 
-DISP_TITLE_SC = 'Support Condition'
 
 
-KEY_END1_TRANSLATION = 'End 1'
-KEY_END1_ROTATION = 'End 1'
-KEY_DISP_END1 = 'End 1'
-VALUES_END1_TRANSLATION = ['Translation','Free','Restrained']
-VALUES_END1_ROTATION = ['Rotation','Free','Restrained']
 
 
-KEY_END2_TRANSLATION = 'End 2'
-KEY_END2_ROTATION = 'End 2'
-KEY_DISP_END2 = 'End 2'
-VALUES_END2_TRANSLATION = ['Translation','Free','Restrained']
-VALUES_END2_ROTATION = ['Rotation','Free','Restrained']
 
 
-KEY_LENZZ = 'Member.Length_zz'
-KEY_DISP_LENZZ = 'Length (z-z)'
 
-
-KEY_LENYY = 'Length'
-KEY_DISP_LENYY = 'Length (y-y)'
 
 
 KEY_CONNLOC = 'Conn Location'

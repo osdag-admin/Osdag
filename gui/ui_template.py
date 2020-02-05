@@ -13,12 +13,13 @@ from design_report import reportGenerator
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QBrush, QImage
 from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
+from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PyQt5.QtGui import QStandardItem
 import os
 import yaml
@@ -33,6 +34,7 @@ import pdfkit
 import configparser
 import pickle
 import cairosvg
+
 
 from Common import *
 from utils.common.component import Section,I_sectional_Properties
@@ -53,6 +55,16 @@ from OCC.Core.StlAPI import StlAPI_Writer
 from OCC.Core import BRepTools
 from OCC.Core import IGESControl
 from cad.cad3dconnection import cadconnection
+from design_type.connection.fin_plate_connection import FinPlateConnection
+from design_type.connection.column_cover_plate import ColumnCoverPlate
+from design_type.connection.cleat_angle_connection import CleatAngleConnectionInput
+from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
+from design_type.connection.end_plate_connection import EndPlateConnectionInput
+
+from design_type.connection.beam_cover_plate import BeamCoverPlate
+from design_type.connection.beam_end_plate import BeamEndPlate
+from design_type.connection.column_end_plate import ColumnEndPlate
+
 
 
 class Ui_ModuleWindow(QMainWindow):
@@ -74,20 +86,22 @@ class Ui_ModuleWindow(QMainWindow):
         self.window.exec()
         return self.ui.get_right_elements()
 
-
     def open_summary_popup(self, main):
         self.new_window = QtWidgets.QDialog()
         self.new_ui = Ui_Dialog1()
         self.new_ui.setupUi(self.new_window, main)
+        self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
+        self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
+        self.new_ui.btn_useProfile.clicked.connect(lambda: self.useUserProfile(self.new_window))
         self.new_window.exec()
-        self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_ui.lbl_browse))
-        self.new_ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
-        self.new_ui.btn_useProfile.clicked.connect(self.useUserProfile)
+        # self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_ui.lbl_browse))
+        # self.new_ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
+        # self.new_ui.btn_useProfile.clicked.connect(self.useUserProfile)
 
-    def getLogoFilePath(self, lblwidget):
+    def getLogoFilePath(self, window, lblwidget):
 
         self.new_ui.lbl_browse.clear()
-        filename, _ = QFileDialog.getOpenFileName(self, "Open Image", os.path.join(str(' '), ''), "InputFiles(*.png *.svg *.jpg)")
+        filename, _ = QFileDialog.getOpenFileName(window, "Open Image", os.path.join(str(' '), ''), "InputFiles(*.png *.svg *.jpg)")
 
         # filename, _ = QFileDialog.getOpenFileName(
         #     self, 'Open File', " ../../",
@@ -112,18 +126,18 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             shutil.copyfile(filename, os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
 
-    def saveUserProfile(self):
+    def saveUserProfile(self, window):
 
         flag = True
         inputData = self.getPopUpInputs()
-        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+        filename, _ = QFileDialog.getSaveFileName(window, 'Save Files',
                                                   os.path.join(str(self.folder), "Profile"), '*.txt')
         if filename == '':
             flag = False
             return flag
         else:
             infile = open(filename, 'w')
-            pickle.dump(inputData, infile)
+            yaml.dump(inputData, infile)
             infile.close()
 
     def getPopUpInputs(self):
@@ -142,14 +156,14 @@ class Ui_ModuleWindow(QMainWindow):
 
         return input_summary
 
-    def useUserProfile(self):
+    def useUserProfile(self, window):
 
-        filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+        filename, _ = QFileDialog.getOpenFileName(window, 'Open Files',
                                                   os.path.join(str(self.folder), "Profile"),
                                                   '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
-            reportsummary = pickle.load(outfile)
+            reportsummary = yaml.load(outfile)
             self.new_ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
             self.new_ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
             self.new_ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
@@ -304,7 +318,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
-
 
         main.set_osdaglogger(self.textEdit)
         # self.textEdit.setStyleSheet("QTextEdit {color:red}")
@@ -508,7 +521,7 @@ class Ui_ModuleWindow(QMainWindow):
         for option in option_list:
             lable = option[1]
             type = option[2]
-            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
+            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
                 font = QtGui.QFont()
@@ -555,8 +568,17 @@ class Ui_ModuleWindow(QMainWindow):
                 im.setGeometry(QtCore.QRect(190, 10 + i, 70, 57))
                 im.setObjectName(option[0])
                 im.setScaledContents(True)
-                pixmap = QPixmap("./ResourceFiles/images/fin_cf_bw.png")
+                pixmap = QPixmap(option[4])
                 im.setPixmap(pixmap)
+                i = i + 30
+
+            if type == TYPE_IMAGE_COMPRESSION:
+                imc = QtWidgets.QLabel(self.dockWidgetContents)
+                imc.setGeometry(QtCore.QRect(130, 10 + i, 160, 150))
+                imc.setObjectName(option[0])
+                imc.setScaledContents(True)
+                pixmapc = QPixmap(option[4])
+                imc.setPixmap(pixmapc)
                 i = i + 30
 
             if option[0] in [KEY_AXIAL, KEY_SHEAR]:
@@ -609,8 +631,6 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 pass
 
-
-
         def popup(key, for_custom_list):
 
             """
@@ -627,7 +647,10 @@ class Ui_ModuleWindow(QMainWindow):
                 options = f()
                 existing_options = data[c_tup[0] + "_customized"]
                 if selected == "Customized":
-                    data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
+                   data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
+                   if data[c_tup[0] + "_customized"] == []:
+                       data[c_tup[0] + "_customized"] = f()
+                       key.setCurrentIndex(0)
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
@@ -640,41 +663,7 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             for t in updated_list:
                 key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                key_changed.currentIndexChanged.connect(lambda: change(key_changed, updated_list))
-
-        def change(k1, new):
-
-            """
-            @author: Umair
-            """
-
-            for tup in new:
-                (object_name, k2_key, typ, f) = tup
-                if object_name != k1.objectName():
-                    continue
-                if typ == TYPE_LABEL:
-                    k2_key = k2_key + "_label"
-                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
-                val = f(k1.currentText())
-                k2.clear()
-                if typ == TYPE_COMBOBOX:
-                    for values in val:
-                        k2.addItem(values)
-                        k2.setCurrentIndex(0)
-                    if k2_key in [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]:
-                        red_list_set = set(red_list_function())
-                        current_list_set = set(val)
-                        current_red_list = list(current_list_set.intersection(red_list_set))
-                        for value in current_red_list:
-                            indx = val.index(str(value))
-                            k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-                elif typ == TYPE_LABEL:
-                    k2.setText(val)
-                elif typ == TYPE_IMAGE:
-                    pixmap1 = QPixmap(val)
-                    k2.setPixmap(pixmap1)
-                else:
-                    pass
+                self.on_change_connect(key_changed, updated_list)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
         self.btn_Reset.setGeometry(QtCore.QRect(30, 600, 100, 30))
@@ -732,6 +721,7 @@ class Ui_ModuleWindow(QMainWindow):
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
+        button_list = []
         for option in out_list:
             lable = option[1]
             type = option[2]
@@ -768,7 +758,8 @@ class Ui_ModuleWindow(QMainWindow):
                 b.setObjectName(option[0])
                 b.setText(v[0])
                 b.setDisabled(True)
-                b.clicked.connect(lambda: self.output_button_dialog(main, v))
+                button_list.append(option)
+                #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
@@ -779,6 +770,58 @@ class Ui_ModuleWindow(QMainWindow):
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
             i = i + 30
+
+        # common_button = QtWidgets.QPushButton()
+        # d = {
+        #     'Button_1': common_button,
+        #     'Button_2': common_button,
+        #     'Button_3': common_button,
+        #     'Button_4': common_button,
+        #     'Button_5': common_button,
+        #     'Button_6': common_button
+        # }
+        #
+        # print(button_list)
+
+        # Case_1
+
+        # for option in button_list:
+        #     for i in d.keys():
+        #         button = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+        #         if button not in d.values() and d[i] not in self.dockWidgetContents_out.children():
+        #             d[i] = button
+        # d['Button_1'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_1']))
+        # d['Button_2'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_2']))
+        # d['Button_3'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_3']))
+        # d['Button_4'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_4']))
+        # d['Button_5'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_5']))
+        # d['Button_6'].clicked.connect(lambda: self.output_button_dialog(main, button_list, d['Button_6']))
+
+        # Case_2
+
+        if button_list:
+            for button_key in button_list:
+                button = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, button_key[0])
+                self.output_button_connect(main, button_list, button)
+
+
+            # if option[0] == KEY_WEB_SPACING:
+            #     d['button_1'] =
+            #     button_web_spacing = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+            #     print(button_web_spacing)
+            #     button_web_spacing.clicked.connect(lambda: self.output_button_dialog(main, button_list, KEY_WEB_SPACING))
+            # elif option[0] == KEY_WEB_CAPACITY:
+            #     button_web_capacity = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+            #     print(button_web_capacity)
+            #     button_web_capacity.clicked.connect(lambda: self.output_button_dialog(main, button_list, KEY_WEB_CAPACITY))
+
+        # for i in range(len(button_connect)):
+        #     button_connect[i].clicked.connect(lambda: self.output_button_dialog(main, button_list,
+        #                                                                         button_connect[i].objectName()))
+
+        # for button in self.dockWidgetContents_out.children():
+        #     if button.objectName() == KEY
+
 
         self.outputDock.setWidget(self.dockWidgetContents_out)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
@@ -984,10 +1027,17 @@ class Ui_ModuleWindow(QMainWindow):
         self.designPrefDialog = DesignPreferences(self)
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Column")
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Beam")
-        column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
-        beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
-        add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
-        add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION]:
+            column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
+            beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
+            add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
+            add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
+        elif module == KEY_DISP_COLUMNCOVERPLATE:
+            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
+        elif module == KEY_DISP_BEAMCOVERPLATE:
+            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+            add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
         self.designPrefDialog.rejected.connect(self.design_preferences)
 
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
@@ -1042,10 +1092,12 @@ class Ui_ModuleWindow(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.action_save_input.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Save"))
         self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
-        self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list))
+        self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list, main))
+        # self.action_load_input.triggered.connect(lambda: main.loadDesign_inputs(main, self, option_list, data, new_list))
+
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
-        self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
-        self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
+        # self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
+        # self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
         self.btn_Design.clicked.connect(self.osdag_header)
         self.actionShow_beam.triggered.connect(lambda: main.call_3DBeam(self,"gradient_bg"))
         self.actionShow_column.triggered.connect(lambda: main.call_3DColumn(self,"gradient_bg"))
@@ -1205,6 +1257,49 @@ class Ui_ModuleWindow(QMainWindow):
     #         pass
     #
     #     return data
+
+    def on_change_connect(self, key_changed, updated_list):
+        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list))
+
+    def change(self, k1, new):
+
+        """
+        @author: Umair
+        """
+        for tup in new:
+            (object_name, k2_key, typ, f) = tup
+            if object_name != k1.objectName():
+                continue
+            if typ == TYPE_LABEL:
+                k2_key = k2_key + "_label"
+            if object_name != KEY_END2:
+                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
+                val = f(k1.currentText())
+                k2.clear()
+            elif object_name == KEY_END2:
+                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
+                key_end1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_END1)
+                val = f(k1.currentText(), key_end1.currentText())
+                k2.clear()
+            if typ == TYPE_COMBOBOX:
+                for values in val:
+                    k2.addItem(values)
+                    k2.setCurrentIndex(0)
+                if k2_key in [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]:
+                    red_list_set = set(red_list_function())
+                    current_list_set = set(val)
+                    current_red_list = list(current_list_set.intersection(red_list_set))
+                    for value in current_red_list:
+                        indx = val.index(str(value))
+                        k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            elif typ == TYPE_LABEL:
+                k2.setText(val)
+            elif typ == TYPE_IMAGE:
+                pixmap1 = QPixmap(val)
+                k2.setPixmap(pixmap1)
+            else:
+                pass
+
     # Function for Reset Button
     '''
     @author: Umair, Amir 
@@ -1264,16 +1359,16 @@ class Ui_ModuleWindow(QMainWindow):
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
         self.design_inputs = design_dictionary
 
-    def pass_d(self, main, design_dictionary):
-        """
-        It sets key variable textEdit and passes it to warn text function present in fin_plate_connection.py for logger
-         """
-
-        # @author Arsil Zunzunia
-
-
-        key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
-        main.warn_text(main, key, design_dictionary)
+    # def pass_d(self, main, design_dictionary):
+    #     """
+    #     It sets key variable textEdit and passes it to warn text function present in fin_plate_connection.py for logger
+    #      """
+    #
+    #     # @author Arsil Zunzunia
+    #
+    #     key = self.centralwidget.findChild(QtWidgets.QWidget, "textEdit")
+    #
+    #     main.warn_text(main)
         # main.set_input_values(main, design_dictionary)
 # Function for saving inputs in a file
     '''
@@ -1292,13 +1387,23 @@ class Ui_ModuleWindow(QMainWindow):
             QMessageBox.warning(self, "Application",
                                 "Cannot write file %s:\n%s" % (fileName, str(e)))
             return
-
+    def return_class(self,name):
+        if name == KEY_DISP_FINPLATE:
+            return FinPlateConnection
+        elif name == KEY_DISP_COLUMNCOVERPLATE:
+            return ColumnCoverPlate
+        elif name == KEY_DISP_BEAMCOVERPLATE:
+            return BeamCoverPlate
+        elif name == KEY_DISP_BEAMENDPLATE:
+            return BeamEndPlate
+        elif name == KEY_DISP_COLUMNENDPLATE:
+            return ColumnEndPlate
 # Function for getting inputs from a file
     '''
     @author: Umair 
     '''
 
-    def loadDesign_inputs(self, op_list, data, new):
+    def loadDesign_inputs(self, op_list, data, new, main):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(' '), ''), "InputFiles(*.osi)")
         if not fileName:
             return
@@ -1306,8 +1411,16 @@ class Ui_ModuleWindow(QMainWindow):
             in_file = str(fileName)
             with open(in_file, 'r') as fileObject:
                 uiObj = yaml.load(fileObject)
-            self.setDictToUserInputs(uiObj, op_list, data, new)
+            module = uiObj[KEY_MODULE]
 
+            # module_class = self.return_class(module)
+            if main.module(main) == module:
+                self.setDictToUserInputs(uiObj, op_list, data, new)
+            else:
+                QMessageBox.information(self, "Information",
+                                        "Please load the appropriate Input")
+
+                return
         except IOError:
             QMessageBox.information(self, "Unable to open file",
                                     "There was an error opening \"%s\"" % fileName)
@@ -1323,19 +1436,22 @@ class Ui_ModuleWindow(QMainWindow):
             key_str = op[0]
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
             if op[2] == TYPE_COMBOBOX:
-                index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
-                if index >= 0:
-                    key.setCurrentIndex(index)
+                if key_str in uiObj.keys():
+                    index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
+                    if index >= 0:
+                        key.setCurrentIndex(index)
             elif op[2] == TYPE_TEXTBOX:
                 key.setText(uiObj[key_str])
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                for n in new:
-                    if n[0] == key_str:
-                        if uiObj[key_str] != n[1]():
-                            data[key_str + "_customized"] = uiObj[key_str]
-                            key.setCurrentIndex(1)
-                        else:
-                            pass
+                if key_str in uiObj.keys():
+
+                    for n in new:
+                        if n[0] == key_str:
+                            if uiObj[key_str] != n[1]():
+                                data[key_str + "_customized"] = uiObj[key_str]
+                                key.setCurrentIndex(1)
+                            else:
+                                pass
             else:
                 pass
 
@@ -1379,6 +1495,7 @@ class Ui_ModuleWindow(QMainWindow):
 
             main.func_for_validation(main, self, self.design_inputs)
             status = main.design_status
+
             # main.set_input_values(main, self.design_inputs, self)
             # DESIGN_FLAG = 'True'
 
@@ -1391,8 +1508,10 @@ class Ui_ModuleWindow(QMainWindow):
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
             if status is True:
-                self.commLogicObj = cadconnection.commonfile(cadconnection,main.mainmodule,self.display,self.folder,
-                                                      main.module)
+                self.commLogicObj = cadconnection.commonfile(cadconnection,main.mainmodule,self.display,self.folder,main.module)
+
+            if status is True and main.module == "Fin Plate":
+                self.commLogicObj = CommonDesignLogic(self.display,self.folder,main.module)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)
                 # self.callFin2D_Drawing("All")
@@ -1409,67 +1528,68 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_beam.setEnabled(False)
                 self.actionShow_column.setEnabled(False)
                 self.actionShow_finplate.setEnabled(False)
-
-        image = main.generate_3D_Cad_image(main,self,self.folder)
+        # image = main.generate_3D_Cad_image(main,self,self.folder)
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
         shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
+    def output_button_connect(self, main, button_list, b):
+        b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
 
-    def output_button_dialog(self, main, list):
+    def output_button_dialog(self, main, button_list, button):
         dialog = QtWidgets.QDialog()
         dialog.resize(350, 170)
         dialog.setFixedSize(dialog.size())
         dialog.setObjectName("Dialog")
-        dialog.setWindowTitle(list[0])
+        for op in button_list:
+            if op[0] == button.objectName():
+                tup = op[3]
+                title = tup[0]
+                fn = tup[1]
+                dialog.setWindowTitle(title)
+                i = 0
+                for option in fn(main, main.design_status):
+                    lable = option[1]
+                    type = option[2]
+                    _translate = QtCore.QCoreApplication.translate
+                    if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
+                        l = QtWidgets.QLabel(dialog)
+                        l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
+                        font = QtGui.QFont()
+                        font.setPointSize(9)
+                        font.setBold(False)
+                        font.setWeight(50)
+                        l.setFont(font)
+                        l.setObjectName(option[0] + "_label")
+                        l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
 
-        i = 0
-        for option in list[1](main, main.design_status):
-            lable = option[1]
-            type = option[2]
-            _translate = QtCore.QCoreApplication.translate
-            if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
-                l = QtWidgets.QLabel(dialog)
-                l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(False)
-                font.setWeight(50)
-                l.setFont(font)
-                l.setObjectName(option[0] + "_label")
-                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+                    if type == TYPE_TEXTBOX:
+                        r = QtWidgets.QLineEdit(dialog)
+                        r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
+                        font = QtGui.QFont()
+                        font.setPointSize(11)
+                        font.setBold(False)
+                        font.setWeight(50)
+                        r.setFont(font)
+                        r.setObjectName(option[0])
+                        r.setText(str(option[3]))
 
-            if type == TYPE_TEXTBOX:
-                r = QtWidgets.QLineEdit(dialog)
-                r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
-                font = QtGui.QFont()
-                font.setPointSize(11)
-                font.setBold(False)
-                font.setWeight(50)
-                r.setFont(font)
-                r.setObjectName(option[0])
-                r.setText(str(option[3]))
+                    i = i + 30
 
-            i = i + 30
-
-        dialog.exec()
+                dialog.exec()
 
     def refresh_sections(self, prev, section):
 
         connectivity = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
         supporting_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
         supported_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+        section_size = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
+
         Columns = connectdb("Columns")
         Beams = connectdb("Beams")
         red_list_set = set(red_list_function())
 
-        # if section == "Supporting":
-        #     prev_column = prev
-        # elif section == "Supported":
-        #     prev_beam = prev
-
-        #if connectivity.currentText() in VALUES_CONN_1:
         if section == "Supporting":
             supporting_section.clear()
             if connectivity.currentText() in VALUES_CONN_1:
@@ -1498,7 +1618,6 @@ class Ui_ModuleWindow(QMainWindow):
 
         if section == "Supported":
             supported_section.clear()
-            #if connectivity.currentText() in VALUES_CONN_1:
 
             for item in Beams:
                 supported_section.addItem(item)
@@ -1514,25 +1633,39 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 supported_section.setCurrentIndex(prev)
 
+        if section == "Section_col":
+            section_size.clear()
+            for item in Columns:
+                section_size.addItem(item)
+            current_list_set = set(Columns)
+            current_red_list = list(current_list_set.intersection(red_list_set))
+            for value in current_red_list:
+                indx = Columns.index(str(value))
+                section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
+            text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
+            if text_index:
+                section_size.setCurrentIndex(text_index)
+            else:
+                section_size.setCurrentIndex(prev)
 
-            #elif connectivity.currentText() in VALUES_CONN_2:
-                #for item in Beams:
-                 #   supported_section.addItem(item)
+        if section == "Section_bm":
+            section_size.clear()
+            for item in Beams:
+                section_size.addItem(item)
+            current_list_set = set(Beams)
+            current_red_list = list(current_list_set.intersection(red_list_set))
+            for value in current_red_list:
+                indx = Beams.index(str(value))
+                section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
+            text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
+            if text_index:
+                section_size.setCurrentIndex(text_index)
+            else:
+                section_size.setCurrentIndex(prev)
 
-        # else:
-        #     for item in Beams:
-        #         if section == "Supporting":
-        #             supporting_section.addItem(item)
-        #         if section == "Supported":
-        #             supported_section.addItem(item)
 
-        # red_list_set = set(red_list_function())
-        # current_list_set = set(Columns)
-        # current_red_list = list(current_list_set.intersection(red_list_set))
-        #
-        # for value in current_red_list:
-        #     indx = option[4].index(str(value))
-        #     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
 
 # Function for warning about structure
@@ -1736,34 +1869,46 @@ class Ui_ModuleWindow(QMainWindow):
 
         table_1 = "Columns"
         table_2 = "Beams"
-        if module == KEY_DISP_BEAMCOVERPLATE:
-            t = table_2
-        elif module == KEY_DISP_COLUMNCOVERPLATE:
-            t = table_1
         material_grade = key_4.currentText()
-        if module in [KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COLUMNCOVERPLATE]:
+        if module == KEY_DISP_COLUMNCOVERPLATE:
             designation_col = key_5.currentText()
             self.designPrefDialog.ui.tabWidget.removeTab(
-                self.designPrefDialog.ui.tabWidget.indexOf(self.designPrefDialog.ui.tab_Beam))
-            self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Beam))
+            self.designPrefDialog.ui.tabWidget.setTabText(
+                self.designPrefDialog.ui.tabWidget.indexOf(
                 self.designPrefDialog.ui.tab_Column), KEY_DISP_SECSIZE)
             if key_5.currentIndex() != 0:
-                self.designPrefDialog.column_preferences(designation_col, t, material_grade)
-        else:
+                self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
+        elif module == KEY_DISP_BEAMCOVERPLATE:
+            designation_col = key_5.currentText()
+            self.designPrefDialog.ui.tabWidget.removeTab(
+                self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Column))
+            self.designPrefDialog.ui.tabWidget.setTabText(
+                self.designPrefDialog.ui.tabWidget.indexOf(
+                    self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECSIZE)
+            if key_5.currentIndex() != 0:
+                self.designPrefDialog.beam_preferences(designation_col, table_2, material_grade)
+        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION]:
             conn = key_1.currentText()
             designation_col = key_2.currentText()
             designation_bm = key_3.currentText()
             if conn in VALUES_CONN_1:
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
                 self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)
             elif conn in VALUES_CONN_2:
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Column), KEY_DISP_PRIBM)
-                self.designPrefDialog.ui.tabWidget.setTabText(self.designPrefDialog.ui.tabWidget.indexOf(
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECBM)
                 self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)

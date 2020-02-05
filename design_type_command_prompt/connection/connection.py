@@ -108,9 +108,6 @@ class Connection(Main):
         t32 = (KEY_SUPTNGSEC_THERMAL_EXP, KEY_DISP_SUPTNGSEC_THERMAL_EXP, TYPE_TEXTBOX, None)
         supporting_section.append(t32)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
-        supporting_section.append(t33)
-
         return supporting_section
 
     def supported_section_values(self):
@@ -215,9 +212,6 @@ class Connection(Main):
 
         t32 = (KEY_SUPTDSEC_THERMAL_EXP, KEY_DISP_SUPTDSEC_THERMAL_EXP, TYPE_TEXTBOX, None)
         supported_section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
-        supported_section.append(t33)
 
         return supported_section
 

@@ -52,7 +52,7 @@ from OCC.Core.IFSelect import IFSelect_RetDone
 from OCC.Core.StlAPI import StlAPI_Writer
 from OCC.Core import BRepTools
 from OCC.Core import IGESControl
-
+from cad.cad3dconnection import cadconnection
 
 
 class Ui_ModuleWindow(QMainWindow):
@@ -1391,7 +1391,7 @@ class Ui_ModuleWindow(QMainWindow):
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
             if status is True:
-                self.commLogicObj = CommonDesignLogic(self.display,self.folder,
+                self.commLogicObj = cadconnection.commonfile(cadconnection,main.mainmodule,self.display,self.folder,
                                                       main.module)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)

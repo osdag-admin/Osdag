@@ -1361,7 +1361,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     # def pass_d(self, main, design_dictionary):
     #     """
-    #     It sets key variable textEdit and passes it to warn text function present in fin_plate_connection.py for logger
+    #     It sets key variable textEdit and passes it to warn text function present in tension_design.py for logger
     #      """
     #
     #     # @author Arsil Zunzunia

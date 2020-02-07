@@ -8,6 +8,7 @@ TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
+TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
 TYPE_OUT_BUTTON = 'Output_dock_Button'
 TYPE_BREAK = 'Break'
@@ -20,6 +21,8 @@ from utils.common.component import *
 from utils.common.component import *
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 import logging
+# from design_type.connection.fin_plate_connection import FinPlateConnection
+# from design_type.connection.column_cover_plate import ColumnCoverPlate
 
 class OurLog(logging.Handler):
 
@@ -215,10 +218,10 @@ def get_oldbeamcombolist():
     final_lst = tuple_to_str_red(old_columnList)
     return final_lst
 
-
 KEY_MODULE = 'Module'
 KEY_DISP_FINPLATE = 'Fin Plate'
 TYPE_MODULE = 'Window Title'
+KEY_DISP_COMPRESSION = 'Compression Member'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
@@ -563,8 +566,27 @@ KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
 
+KEY_SEC_PROFILE = 'Member.Profile'
+KEY_DISP_SEC_PROFILE = 'Section Profile'
+VALUES_SEC_PROFILE = ['Beams', 'Columns', 'Angles', 'Channels', 'Back to Back Angles', 'Back to Back Channels', 'Star Angles']
+
+KEY_LENZZ = 'Member.Length_zz'
+KEY_DISP_LENZZ = 'Length (z-z)'
 
 
+KEY_LENYY = 'Member.Length_yy'
+KEY_DISP_LENYY = 'Length (y-y)'
+
+DISP_TITLE_SC = 'Supporting Condition'
+
+KEY_END1 = 'End_1'
+KEY_DISP_END1 = 'End 1'
+VALUES_END1 = ['Fixed', 'Free', 'Hinged', 'Roller']
+
+
+KEY_END2 = 'End_2'
+KEY_DISP_END2 = 'End 2'
+VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
 
 
 
@@ -662,29 +684,13 @@ KEY_EDGEDIST = 'Edge Distance'
 KEY_DISP_EDGEDIST = 'Edge Distance'
 
 
-DISP_TITLE_SC = 'Support Condition'
 
 
-KEY_END1_TRANSLATION = 'End 1'
-KEY_END1_ROTATION = 'End 1'
-KEY_DISP_END1 = 'End 1'
-VALUES_END1_TRANSLATION = ['Translation','Free','Restrained']
-VALUES_END1_ROTATION = ['Rotation','Free','Restrained']
 
 
-KEY_END2_TRANSLATION = 'End 2'
-KEY_END2_ROTATION = 'End 2'
-KEY_DISP_END2 = 'End 2'
-VALUES_END2_TRANSLATION = ['Translation','Free','Restrained']
-VALUES_END2_ROTATION = ['Rotation','Free','Restrained']
 
 
-KEY_LENZZ = 'Member.Length_zz'
-KEY_DISP_LENZZ = 'Length (z-z)'
 
-
-KEY_LENYY = 'Length'
-KEY_DISP_LENYY = 'Length (y-y)'
 
 
 KEY_CONNLOC = 'Conn Location'

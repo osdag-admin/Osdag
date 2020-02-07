@@ -67,7 +67,7 @@ def save_html(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsumm
     # rstr += t('td colspan="2" class="header0"') + t('/td')
     rstr += t('/tr')
     mainfolder = "/home/darshan/Desktop/Osdag3_new/Osdag3/ResourceFiles/images"
-
+    mainfolder = r'C:\Users\Win10\Desktop\Osdag3-master\ResourceFiles\images'
     for i in uiObj:
         row1 = [0,i, " "]
         rstr += t('tr')
@@ -83,7 +83,7 @@ def save_html(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsumm
                 rstr += t('td colspan="3" class="detail1"') + space(row2[0]) + row2[1] + t('/td')
                 rstr += t('td colspan="2" class="detail1"') + row2[2] + t('/td')
                 rstr += t('/tr')
-                png = mainfolder + "/size.png"
+                png = mainfolder + "/Columns_Beams.png"
                 datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
                 row = [0, datapng, ""]
                 rstr += t('tr')
@@ -101,7 +101,7 @@ def save_html(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsumm
                 rstr += t('td colspan="3" class="detail1"') + space(row2[0]) + row2[1] + t('/td')
                 rstr += t('td colspan="2" class="detail1" ') + row2[2] + t('/td')
                 rstr += t('/tr')
-                png = mainfolder + "/size.png"
+                png = mainfolder + "/Columns_Beams.png"
                 datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
                 row = [0, datapng, ""]
                 rstr += t('tr')

@@ -24,6 +24,7 @@ from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
+from design_type.compression_member.compression import Compression
 # from cad.cad_common import call_3DBeam
 from gui.ui_template import Ui_ModuleWindow
 
@@ -98,6 +99,10 @@ class OsdagMainWindow(QMainWindow):
         list_of_items = {'Osdagpage': 0, 'connectionpage': 1, 'Tension': 2,'Compression': 3, 'beamtocolumnpage': 4,'flexuralpage': 5}
         self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
         self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
+        self.ui.btn_compression.clicked.connect(
+            lambda: self.change_desgin_page(list_of_items['Compression'], list_of_items['Osdagpage']))
+        self.ui.btn_tension.clicked.connect(
+            lambda: self.change_desgin_page(list_of_items['Tension'], list_of_items['Osdagpage']))
        # self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
         self.ui.btn_shearconnection_start.clicked.connect(self.show_shear_connection)
         self.ui.btn_momentconnection_bb_start.clicked.connect(self.show_moment_connection)
@@ -105,16 +110,16 @@ class OsdagMainWindow(QMainWindow):
         self.ui.btn_momentconnection_cc_start.clicked.connect(self.show_moment_connection_cc)
 
         self.ui.Tension_Start.clicked.connect(self.unavailable)
-        self.ui.Compression_Start.clicked.connect(self.unavailable)
+        self.ui.Compression_Start.clicked.connect(self.show_compression_module)
 
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
-        self.ui.btn_compression.clicked.connect(self.unavailable)
+        # self.ui.btn_compression.clicked.connect(self.unavailable)
         self.ui.btn_flexural.clicked.connect(self.unavailable)
         self.ui.btn_truss.clicked.connect(self.unavailable)
         self.ui.btn_2dframe.clicked.connect(self.unavailable)
         self.ui.btn_3dframe.clicked.connect(self.unavailable)
         self.ui.btn_groupdesign.clicked.connect(self.unavailable)
-        self.ui.btn_tension.clicked.connect(self.unavailable)
+        # self.ui.btn_tension.clicked.connect(self.unavailable)
         self.ui.btn_plate.clicked.connect(self.unavailable)
         self.ui.comboBox_help.setCurrentIndex(0)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
@@ -266,6 +271,35 @@ class OsdagMainWindow(QMainWindow):
             # self.window.closed.connect(self.show)
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")
+    #
+    # def show_compression_module(self):
+    #     folder = self.select_workspace_folder()
+    #     folder = str(folder)
+    #     if not os.path.exists(folder):
+    #         if folder == '':
+    #             pass
+    #         else:
+    #             os.mkdir(folder, 0o755)
+    #
+    #     root_path = folder
+    #     images_html_folder = ['images_html']
+    #     flag = True
+    #     for create_folder in images_html_folder:
+    #         if root_path == '':
+    #             flag = False
+    #             return flag
+    #         else:
+    #             try:
+    #                 os.mkdir(os.path.join(root_path, create_folder))
+    #             except OSError:
+    #                 shutil.rmtree(os.path.join(folder, create_folder))
+    #                 os.mkdir(os.path.join(root_path, create_folder))
+    #     self.hide()
+    #     self.ui3 = Ui_ModuleWindow()
+    #     self.ui3.setupUi(self.ui3, Compression, folder)
+    #     self.ui3.show()
+    #     self.ui3.closed.connect(self.show)
+
 
     def show_moment_connection(self):
         folder = self.select_workspace_folder()
@@ -346,7 +380,41 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
+    def show_compression_module(self):
+        folder = self.select_workspace_folder()
+        folder = str(folder)
+        if not os.path.exists(folder):
+            if folder == '':
+                pass
+            else:
+                os.mkdir(folder, 0o755)
 
+        root_path = folder
+        images_html_folder = ['images_html']
+        flag = True
+        for create_folder in images_html_folder:
+            if root_path == '':
+                flag = False
+                return flag
+            else:
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder))
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder))
+        if self.ui.rdbtn_compression_bolted.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, Compression, folder)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
+        elif self.ui.rdbtn_compression_welded.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, Compression)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
 
 class MainController(QMainWindow):
     closed = pyqtSignal()

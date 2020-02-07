@@ -402,6 +402,7 @@ class ColumnCoverPlate(MomentConnection):
         # global design_status
         self.design_status = True
         #
+        self.module = design_dictionary[KEY_MODULE]
         self.preference = design_dictionary[KEY_FLANGEPLATE_PREFERENCES]
 
         self.section = Column(designation=design_dictionary[KEY_SECSIZE], material_grade=design_dictionary[KEY_MATERIAL])
@@ -489,7 +490,8 @@ class ColumnCoverPlate(MomentConnection):
                          .format(self.section.tension_yielding_capacity))
             # print("BBB failed in web member checks. Select larger sections or decrease loads")
 
-
+    def module(self):
+        return KEY_DISP_COLUMNCOVERPLATE
 
     def select_bolt_dia(self):
         min_plate_height = self.section.flange_width

@@ -331,6 +331,7 @@ class Plate(Material):
         self.shear_yielding_capacity = 0.0
         self.shear_rupture_capacity = 0.0
         self.tension_yielding_capacity = 0.0
+        self.tension_rupture_capacity = 0.0
         self.moment_capacity = 0.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)

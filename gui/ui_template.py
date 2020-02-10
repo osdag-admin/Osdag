@@ -54,6 +54,7 @@ from OCC.Core.IFSelect import IFSelect_RetDone
 from OCC.Core.StlAPI import StlAPI_Writer
 from OCC.Core import BRepTools
 from OCC.Core import IGESControl
+from cad.cad3dconnection import cadconnection
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.cleat_angle_connection import CleatAngleConnectionInput
@@ -63,6 +64,7 @@ from design_type.connection.end_plate_connection import EndPlateConnectionInput
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
+
 
 
 class Ui_ModuleWindow(QMainWindow):
@@ -1359,7 +1361,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     # def pass_d(self, main, design_dictionary):
     #     """
-    #     It sets key variable textEdit and passes it to warn text function present in fin_plate_connection.py for logger
+    #     It sets key variable textEdit and passes it to warn text function present in tension_design.py for logger
     #      """
     #
     #     # @author Arsil Zunzunia
@@ -1505,9 +1507,11 @@ class Ui_ModuleWindow(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
+            if status is True:
+                self.commLogicObj = cadconnection.commonfile(cadconnection,main.mainmodule,self.display,self.folder,main.module)
+
             if status is True and main.module == "Fin Plate":
-                self.commLogicObj = CommonDesignLogic(self.display,self.folder,
-                                                      main.module)
+                self.commLogicObj = CommonDesignLogic(self.display,self.folder,main.module)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)
                 # self.callFin2D_Drawing("All")

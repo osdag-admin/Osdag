@@ -65,6 +65,7 @@ from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 
+from cad.cad3dconnection import cadconnection
 
 
 class Ui_ModuleWindow(QMainWindow):
@@ -1508,7 +1509,10 @@ class Ui_ModuleWindow(QMainWindow):
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
             if status is True and main.module == "Fin Plate":
-                self.commLogicObj = CommonDesignLogic(self.display,self.folder,main.module)
+                self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
+                                                             main.module)
+            if status is True and main.module == "Fin Plate":
+                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)
                 # self.callFin2D_Drawing("All")
@@ -1888,7 +1892,7 @@ class Ui_ModuleWindow(QMainWindow):
                 self.designPrefDialog.ui.tabWidget.indexOf(
                     self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECSIZE)
             if key_5.currentIndex() != 0:
-                self.designPrefDialog.beam_preferences(designation_col, table_2, material_grade)
+                self.designPrefDialog.beam_preferences(designation_col, material_grade)
         elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION]:
             conn = key_1.currentText()
             designation_col = key_2.currentText()

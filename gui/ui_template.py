@@ -1512,9 +1512,6 @@ class Ui_ModuleWindow(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-            if status is True:
-                self.commLogicObj = cadconnection.commonfile(cadconnection,main.mainmodule,self.display,self.folder,main.module)
-
             if status is True and main.module == "Fin Plate":
                 self.commLogicObj = CommonDesignLogic(self.display,self.folder,main.module)
                 status = main.design_status
@@ -1533,6 +1530,8 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_beam.setEnabled(False)
                 self.actionShow_column.setEnabled(False)
                 self.actionShow_finplate.setEnabled(False)
+
+
         # image = main.generate_3D_Cad_image(main,self,self.folder)
 
     def osdag_header(self):

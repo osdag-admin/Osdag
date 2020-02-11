@@ -428,6 +428,11 @@ class ColumnCoverPlate(MomentConnection):
         # print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
+        self.load.axial_force = self.load.axial_force * 1000
+        self.load.shear_force = self.load.shear_force* 1000
+        self.load.moment= self.load.moment * 1000000
+
+
     def member_capacity(self):
     #     # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
     #     if self.connectivity in VALUES_CONN_1:
@@ -1146,7 +1151,6 @@ class ColumnCoverPlate(MomentConnection):
         else:
             logger.error(": Design is not safe \n ")
             logger.debug(" :=========End Of design===========")
-
 
 
         ################################ CAPACITY CHECK #####################################################################################

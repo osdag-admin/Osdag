@@ -416,6 +416,11 @@ class BeamCoverPlate(MomentConnection):
                                material_grade=design_dictionary[KEY_MATERIAL],
                                gap=design_dictionary[KEY_DP_DETAILING_GAP])
         # print("input values are set. Doing preliminary member checks")
+
+        self.load.axial_force = self.load.axial_force * 1000
+        self.load.shear_force = self.load.shear_force * 1000
+        self.load.moment = self.load.moment * 1000000
+
         self.member_capacity(self)
 
     def member_capacity(self):

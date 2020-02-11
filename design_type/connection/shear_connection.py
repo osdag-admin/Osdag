@@ -133,6 +133,7 @@ class ShearConnection(Connection):
         return lst
 
     def set_input_values(self, design_dictionary):
+        self.mainmodule = "Shear Connection"
         self.connectivity = design_dictionary[KEY_CONN]
 
         if self.connectivity in VALUES_CONN_1:

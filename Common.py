@@ -227,6 +227,7 @@ KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
+KEY_DISP_TENSION = 'Tension Members Design'
 
 DISP_TITLE_CM = 'Connecting members'
 
@@ -236,8 +237,26 @@ VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
 
+KEY_SECTION = 'Section Type'
+KEY_DISP_SECTION = 'Section Type *'
+VALUES_SECTION = ['Select Section','Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
+
+KEY_SIZE = 'Section Size'
+KEY_DISP_SIZE = 'Section Size *'
+if VALUES_SECTION == "Angles" or VALUES_SECTION =="Back to Back Angles" or VALUES_SECTION =="Star Angles":
+    VALUES_SIZE = connectdb("Angles")
+else:
+    VALUES_SIZE = connectdb("Channels")
+
+
+KEY_LOCATION = 'Conn_Location'
+KEY_DISP_LOCATION = 'Conn_Location *'
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
 
 KEY_IMAGE = 'Image'
+
+KEY_LENGTH = 'Length(mm)'
+KEY_DISP_LENGTH = 'Length(mm) *'
 
 KEY_SUPTNGSEC = 'Member.Supporting_Section'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'

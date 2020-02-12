@@ -240,7 +240,7 @@ class Tension(Main):
 
         out_list = []
 
-        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+        t1 = (None, DISP_TITLE_TENSION, TYPE_TITLE, None)
         out_list.append(t1)
 
         t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '')

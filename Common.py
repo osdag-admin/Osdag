@@ -244,10 +244,11 @@ VALUES_SECTION = ['Select Section','Angles', 'Back to Back Angles', 'Star Angles
 KEY_SIZE = 'Section Size'
 KEY_DISP_SIZE = 'Section Size *'
 if VALUES_SECTION == "Angles" or VALUES_SECTION =="Back to Back Angles" or VALUES_SECTION =="Star Angles":
-    VALUES_SIZE = connectdb("Angles")
+    VALUES_SIZE = ['All', 'Customized']
+    VALUES_SIZE_CUSTOMIZED = connectdb("Angles")
 else:
-    VALUES_SIZE = connectdb("Channels")
-
+    VALUES_SIZE = ['All', 'Customized']
+    VALUES_SIZE_CUSTOMIZED = connectdb("Channels")
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
@@ -291,6 +292,7 @@ KEY_AXIAL = 'Load.Axial'
 KEY_DISP_AXIAL = 'Axial (kN) *'
 
 DISP_TITLE_BOLT = 'Bolt'
+DISP_TITLE_TENSION = 'Tension Capacity'
 
 KEY_D = 'Bolt.Diameter'
 KEY_DISP_D = 'Diameter(mm)*'
@@ -540,6 +542,8 @@ KEY_SUPTDSEC_POISSON_RATIO = 'Supported_Section.Poisson_Ratio'
 KEY_DISP_SUPTDSEC_POISSON_RATIO = 'Poissons ratio, v'
 KEY_SUPTDSEC_THERMAL_EXP = 'Supported_Section.Thermal_Expansion'
 KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
+
+KEY_OUT_YIELDING = "Bolt."
 
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'

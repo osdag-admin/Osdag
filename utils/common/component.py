@@ -162,7 +162,7 @@ class Section(Material):
     def __init__(self, designation, material_grade=""):
         super(Section, self).__init__(material_grade)
         self.designation = designation
-        self.build = "Rolled"
+        self.type = "Rolled"
         self.mass = 0.0
         self.area = 0.0
         self.depth = 0.0
@@ -305,7 +305,7 @@ class Weld(Material):
 
 class Plate(Material):
 
-    def __init__(self, thickness=0.0, height=0.0, length=0.0, gap=0.0, material_grade=""):
+    def __init__(self, thickness=[], height=0.0, length=0.0, gap=0.0, material_grade=""):
         super(Plate, self).__init__(material_grade=material_grade)
         self.design_status = True
         self.thickness = list(np.float_(thickness))

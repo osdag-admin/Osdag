@@ -16,7 +16,7 @@ from gui.ui_ask_question import Ui_AskQuestion
 # from design_type.connection.fin_plate_connection import design_report_show
 # from design_type.connection.fin_plate_connection import DesignReportDialog
 from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.connection.cleat_angle_connection import CleatAngleConnectionInput
+from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
 from design_type.connection.end_plate_connection import EndPlateConnectionInput
 
@@ -245,7 +245,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_cleat.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2,CleatAngleConnectionInput)
+            self.ui2.setupUi(self.ui2, CleatAngleConnection, folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)

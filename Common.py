@@ -42,6 +42,30 @@ class OurLog(logging.Handler):
         self.key.append(msg)
         # self.key.append(record.levelname)
 
+def generate_missing_fields_error_string(missing_fields_list):
+    """
+    Args:
+        missing_fields_list: list of fields that are not selected or entered
+    Returns:
+        error string that has to be displayed
+    """
+    # The base string which should be displayed
+    information = "Please input the following required field"
+    if len(missing_fields_list) > 1:
+        # Adds 's' to the above sentence if there are multiple missing input fields
+        information += "s"
+    information += ": "
+    # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+    for item in missing_fields_list:
+        information = information + item + ", "
+
+    # Removes the last comma
+    information = information[:-2]
+    information += "."
+
+    return information
+
 def connectdb1():
     """
     Function to fetch diameter values from Bolt Table
@@ -58,7 +82,7 @@ def connectdb1():
     return l2
 
 
-def connectdb(table_name):
+def connectdb(table_name,call_type="dropdown"):
 
     """
         Function to fetch designation values from respective Tables.
@@ -89,7 +113,7 @@ def connectdb(table_name):
     for row in rows:
         lst.append(row)
    
-    final_lst = tuple_to_str(lst)
+    final_lst = tuple_to_str(lst,call_type)
     return final_lst
 
 
@@ -151,8 +175,11 @@ def tuple_to_str_popup(tl):
         arr.append(val)
     return arr
 
-def tuple_to_str(tl):
-    arr = ['Select Section']
+def tuple_to_str(tl, call_type):
+    if call_type is "dropdown":
+        arr = ['Select Section']
+    else:
+        arr = []
     for v in tl:
         val = ''.join(v)
         arr.append(val)
@@ -220,6 +247,7 @@ def get_oldbeamcombolist():
 
 KEY_MODULE = 'Module'
 KEY_DISP_FINPLATE = 'Fin Plate'
+KEY_DISP_CLEATANGLE = 'Cleat Angle'
 TYPE_MODULE = 'Window Title'
 KEY_DISP_COMPRESSION = 'Compression Member'
 
@@ -611,7 +639,8 @@ KEY_DISP_TOPANGLE='Top Angle *'
 #     '20 20 X 3', '20 20 X 4', '25 25 x 3', '25 25 x 4', '25 25 x 5',
 #     '30 30 x 3', '30 30 x 4', '30 30 x 5', '35 35 x 3', '35 35 x 4',
 #     '35 35 x 5', '35 35 x 6', '40 40 x 3', '40 40 x 4', '40 40 x 5', '40 40 x 6', '45 45 x 3', '45 45 x 4', '45 45 x 5', '45 45 x 6', '50 50 x 3', '50 50 x 4', '50 50 x 5', '50 50 x 6', '50 50 x 7', '50 50 x 8', '55 55 x 4', '55 55 x 5', '55 55 x 6', '55 55 x 8', '55 55 x 10', '60 60 x 4', '60 60 x 5', '60 60 x 6', '60 60 x 8', '60 60 x 10', '65 65 x 4', '65 65 x 5', '65 65 x 6', '65 65 x 8', '65 65 x 10', '70 70 x 5', '70 70 x 6', '70 70 x 7', '70 70 x 8', '70 70 x 10', '75 75 x 5', '75 75 x 6', '75 75 x 8', '75 75 x 10', '80 80 x 6', '80 80 x 8', '80 80 x 10', '80 80 x 12', '90 90 x 6', '90 90 x 8', '90 90 x 10', '90 90 x 12', '100 100 x 6', '100 100 x 7', '100 100 x 8', '100 100 x 10', '100 100x 12', '100 100 x 15', '110 110 X 8', '110 110 X 10', '110 110 X 12', '110 110 X 16', '120 120 X 8', '120 120 X 10', '120 120 X 12', '120 120 X 15', '130 130 X 8', '130 130 X 9', '130 130 X 10', '130 130 X 12', '130 130 X 16', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '180 180 X 15', '180 180 X 18', '180 180 X 20', '200 200 X 12', '200 200 X 16', '200 200 X 20', '200 200 X 24', '200 200 X 25', '30 20 X 3', '30 20 X 4', '30 20 X 5', '40 20 X 3', '40 20 X 4', '40 20 X 5', '40 25 X 3', '40 25 X 4', '40 25 X 5', '40 25 X 6', '45 30 X 3', '45 30 X 4', '45 30 X 5', '45 30 X 6', '50 30 X 3', '50 30 X 4', '50 30 X 5', '50 30 X 6', '60 30 X 5', '60 30 X 6', '60 40 X 5', '60 40 X 6', '60 40 X 7', '60 40 X 8', '65 45 X 5', '65 45 X 6', '65 45 X 8', '65 50 X 5', '65 50 X 6', '65 50 X 7', '65 50 X 8', '70 45 X 5', '70 45 X 6', '70 45 X 8', '70 45 X 10', '70 50 X 5', '70 50 X 6', '70 50 X 7', '70 50 X 8', '75 50X 5', '75 50X 6', '75 50X 7', '75 50X 8', '75 50X 10', '80 40 X 5', '80 40 X 6', '80 40 X 7', '80 40 X 8', '80 50 X 5', '80 50 X  6', '80 50 X  8', '80 50 X 10', '80 60 X 6', '80 60 X 7', '80 60 X 8', '90 60 X 6', '90 60 X  8', '90 60 X 10', '90 60 X 12', '90 65 X 6', '90 65 X 7', '90 65 X 8', '90 65 X 10', '100 50 X 6', '100 50 X 7', '100 50 X 8', '100 50 X 10', '100 65 X 6', '100 65 X  7', '100 65 X  8', '100 65 X 10', '100 75 X 6', '100 75 X  8', '100 75 X 10', '100 75 X 12', '120 80 X 8', '120 80 X 10', '120 80 X 12', '125 75 X 6', '125 75 X  8', '125 75 X 10', '125 75 X 12', '125 95 X 6', '125 95 X  8', '125 95 X 10', '125 95 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '150 75 X 8', '150 75 X  9', '150 75 X 10', '150 75 X 12', '150 75 X 15', '150 90 X 10', '150 90 X X 12', '150 90 X X 15', '150 90 X 10', '150 90 X 12', '150 90 X 15', '150 115 X 8', '150 115 X 10', '150 115 X 12', '150 115 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20']
-VALUES_ANGLESEC= connectdb("Angles")
+VALUES_ANGLESEC= ['All', 'Customized']
+VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
 
 

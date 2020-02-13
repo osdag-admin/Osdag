@@ -514,6 +514,10 @@ class Ui_ModuleWindow(QMainWindow):
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Link, brush)
+        self.btn3D.setEnabled(False)
+        self.chkBxBeam.setEnabled(False)
+        self.chkBxCol.setEnabled(False)
+        self.chkBxFinplate.setEnabled(False)
 
         option_list = main.input_values(self)
         _translate = QtCore.QCoreApplication.translate
@@ -1111,10 +1115,10 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionShow_all.triggered.connect(lambda: main.call_3DModel(self,"gradient_bg"))
         self.actionChange_background.triggered.connect(lambda: main.showColorDialog(self))
         self.actionSave_3D_model.triggered.connect(self.save3DcadImages)
-        self.btn3D.clicked.connect(lambda: main.call_3DModel(self,"gradient_bg"))
-        self.chkBxBeam.clicked.connect(lambda: main.call_3DBeam(self,"gradient_bg"))
-        self.chkBxCol.clicked.connect(lambda: main.call_3DColumn(self,"gradient_bg"))
-        self.chkBxFinplate.clicked.connect(lambda: main.call_3DFinplate(self,"gradient_bg"))
+        self.btn3D.clicked.connect(lambda: main.call_3DModel(main,self,"gradient_bg"))
+        self.chkBxBeam.clicked.connect(lambda: main.call_3DBeam(main, self,"gradient_bg"))
+        self.chkBxCol.clicked.connect(lambda: main.call_3DColumn(main,self,"gradient_bg"))
+        self.chkBxFinplate.clicked.connect(lambda: main.call_3DFinplate(main, self,"gradient_bg"))
         self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
 
@@ -1337,6 +1341,17 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 pass
 
+        self.display.EraseAll()
+
+        self.btn3D.setEnabled(False)
+        self.chkBxBeam.setEnabled(False)
+        self.chkBxCol.setEnabled(False)
+        self.chkBxFinplate.setEnabled(False)
+        self.btn3D.setChecked(Qt.Unchecked)
+        self.chkBxBeam.setChecked(Qt.Unchecked)
+        self.chkBxCol.setChecked(Qt.Unchecked)
+        self.chkBxFinplate.setChecked(Qt.Unchecked)
+
 # Function for Design Button
     '''
     @author: Umair 
@@ -1520,6 +1535,10 @@ class Ui_ModuleWindow(QMainWindow):
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)
                 # self.callFin2D_Drawing("All")
+                self.btn3D.setEnabled(True)
+                self.chkBxBeam.setEnabled(True)
+                self.chkBxCol.setEnabled(True)
+                self.chkBxFinplate.setEnabled(True)
                 self.actionShow_all.setEnabled(True)
                 self.actionShow_beam.setEnabled(True)
                 self.actionShow_column.setEnabled(True)

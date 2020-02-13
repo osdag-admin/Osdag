@@ -284,7 +284,8 @@ class CommonDesignLogic(object):
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
         nut_Ht = bolt_dia
         gap = A.plate.gap
-        notch_height = self.get_notch_ht(A.supporting_section.flange_width, A.supporting_section.flange_thickness, A.supported_section.flange_thickness, A.supported_section.root_radius)
+        # notch_height = self.get_notch_ht(A.supporting_section.flange_width, A.supporting_section.flange_thickness, A.supported_section.flange_thickness, A.supported_section.root_radius)
+        notch_height = 2 * A.supporting_section.flange_thickness
         notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
 
         if self.connection == "cleatAngle":
@@ -328,7 +329,7 @@ class CommonDesignLogic(object):
 
         if self.connection == "Fin Plate":  # finBeamWebBeamWeb/endBeamWebBeamWeb
             nut_space = A.supported_section.web_thickness + A.plate.thickness_provided + nut_T
-            nutBoltArray = finNutBoltArray(A.bolt, nut, bolt, nut_space)
+            nutBoltArray = finNutBoltArray(A.bolt,  A.plate, nut, bolt, nut_space)
             beamwebconn = FinBeamWebBeamWeb(supporting, supported, notchObj, plate, Fweld1, nutBoltArray, gap)
             # column, beam, notch, plate, Fweld, nut_bolt_array
         # elif self.connection == "Endplate":
@@ -429,8 +430,10 @@ class CommonDesignLogic(object):
 
         if self.connection == "Fin Plate":  # finColWebBeamWeb
             nut_space = A.supported_section.web_thickness + int(A.plate.thickness_provided) + nut_T
-            nutBoltArray = finNutBoltArray(A.bolt, nut, bolt, nut_space)
+            nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colwebconn = FinColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
+
+
 
         # elif self.connection == "Endplate":
         #     nut_space = column_tw + int(plate_thick) + nut_T

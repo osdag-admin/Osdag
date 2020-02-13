@@ -40,6 +40,7 @@ class Bolt(Material):
         self.bolt_fu = 0.0
         self.bolt_fy = 0.0
 
+
         if corrosive_influences == "Yes":
             self.corrosive_influences = True
         else:

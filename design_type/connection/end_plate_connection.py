@@ -19,7 +19,55 @@ class EndPlateConnectionInput(ShearConnection):
         self.weld = Weld(weld_size)
         self.weld_size_list = []
 
+    def set_osdaglogger(key):
+
+        """
+        Function to set Logger for FinPlate Module
+        """
+
+        # @author Arsil Zunzunia
+        global logger
+        logger = logging.getLogger('osdag')
+
+        logger.setLevel(logging.DEBUG)
+        handler = logging.StreamHandler()
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        handler = logging.FileHandler('logging_text.log')
+
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        # handler.setLevel(logging.INFO)
+        # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        # handler.setFormatter(formatter)
+        # logger.addHandler(handler)
+        handler = OurLog(key)
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+    def module(self):
+        return KEY_DISP_ENDPLATE
+
+
+
+
+
+
     def input_values(self, existingvalues={}):
+
+        '''
+        Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
+        '''
+
+        # @author: Amir, Umair
+        self.module = KEY_DISP_ENDPLATE
 
         options_list = []
 
@@ -72,6 +120,10 @@ class EndPlateConnectionInput(ShearConnection):
             existingvalue_key_platethk = existingvalues[KEY_PLATETHK]
         else:
             existingvalue_key_platethk = ''
+
+        t16 = (KEY_MODULE, KEY_DISP_ENDPLATE, TYPE_MODULE, None, None)
+        options_list.append(t16)
+
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)

@@ -245,7 +245,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_cleat.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2,CleatAngleConnectionInput)
+            self.ui2.setupUi(self.ui2,CleatAngleConnectionInput,folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
@@ -263,7 +263,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_endplate.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, EndPlateConnectionInput)
+            self.ui2.setupUi(self.ui2, EndPlateConnectionInput,folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)

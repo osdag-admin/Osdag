@@ -1391,6 +1391,8 @@ class Ui_ModuleWindow(QMainWindow):
     def return_class(self,name):
         if name == KEY_DISP_FINPLATE:
             return FinPlateConnection
+        elif name == KEY_DISP_ENDPLATE:
+            return EndPlateConnectionInput
         elif name == KEY_DISP_COLUMNCOVERPLATE:
             return ColumnCoverPlate
         elif name == KEY_DISP_BEAMCOVERPLATE:

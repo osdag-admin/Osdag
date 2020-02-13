@@ -220,6 +220,7 @@ def get_oldbeamcombolist():
 
 KEY_MODULE = 'Module'
 KEY_DISP_FINPLATE = 'Fin Plate'
+KEY_DISP_ENDPLATE = 'End Plate'
 TYPE_MODULE = 'Window Title'
 KEY_DISP_COMPRESSION = 'Compression Member'
 

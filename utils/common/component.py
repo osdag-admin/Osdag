@@ -40,6 +40,7 @@ class Bolt(Material):
         self.bolt_fu = 0.0
         self.bolt_fy = 0.0
 
+
         if corrosive_influences == "Yes":
             self.corrosive_influences = True
         else:
@@ -251,6 +252,16 @@ class Section(Material):
         self.tension_yielding_capacity = tdg
         return tdg
 
+    def tension_rupture(self, A_n, F_u):
+        "preliminary design strength,T_pdn,as governed by rupture at net section"
+        "A_n = net area of the total cross-section"
+        "F_u = Ultimate Strength of material"
+
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_pdn = 0.9 * A_n * F_u / gamma_m1
+
+        return T_pdn
+
     def __repr__(self):
         repr = "Section\n"
         repr += "Designation: {}\n".format(self.designation)
@@ -355,6 +366,7 @@ class Plate(Material):
         print('maxh',web_plate_h_max)
         print(web_plate_h_max,edge_dist,gauge)
         max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
+        print("max_bolts_one_line", max_bolts_one_line)
         self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
         self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
         self.height = max(web_plate_h_min, self.get_web_plate_h_req (self.bolts_one_line, gauge, edge_dist))

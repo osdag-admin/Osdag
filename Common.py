@@ -255,6 +255,7 @@ KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
+KEY_DISP_TENSION = 'Tension Members Design'
 
 DISP_TITLE_CM = 'Connecting members'
 
@@ -264,8 +265,27 @@ VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
 
+KEY_SECTION = 'Section Type'
+KEY_DISP_SECTION = 'Section Type *'
+VALUES_SECTION = ['Select Section','Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
+
+KEY_SIZE = 'Section Size'
+KEY_DISP_SIZE = 'Section Size *'
+if VALUES_SECTION == "Angles" or VALUES_SECTION =="Back to Back Angles" or VALUES_SECTION =="Star Angles":
+    VALUES_SIZE = ['All', 'Customized']
+    VALUES_SIZE_CUSTOMIZED = connectdb("Angles")
+else:
+    VALUES_SIZE = ['All', 'Customized']
+    VALUES_SIZE_CUSTOMIZED = connectdb("Channels")
+
+KEY_LOCATION = 'Conn_Location'
+KEY_DISP_LOCATION = 'Conn_Location *'
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
 
 KEY_IMAGE = 'Image'
+
+KEY_LENGTH = 'Length(mm)'
+KEY_DISP_LENGTH = 'Length(mm) *'
 
 KEY_SUPTNGSEC = 'Member.Supporting_Section'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
@@ -300,6 +320,7 @@ KEY_AXIAL = 'Load.Axial'
 KEY_DISP_AXIAL = 'Axial (kN) *'
 
 DISP_TITLE_BOLT = 'Bolt'
+DISP_TITLE_TENSION = 'Tension Capacity'
 
 KEY_D = 'Bolt.Diameter'
 KEY_DISP_D = 'Diameter(mm)*'
@@ -549,6 +570,8 @@ KEY_SUPTDSEC_POISSON_RATIO = 'Supported_Section.Poisson_Ratio'
 KEY_DISP_SUPTDSEC_POISSON_RATIO = 'Poissons ratio, v'
 KEY_SUPTDSEC_THERMAL_EXP = 'Supported_Section.Thermal_Expansion'
 KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
+
+KEY_OUT_YIELDING = "Bolt."
 
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'

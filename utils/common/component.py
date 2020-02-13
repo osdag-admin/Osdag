@@ -40,6 +40,7 @@ class Bolt(Material):
         self.bolt_fu = 0.0
         self.bolt_fy = 0.0
 
+
         if corrosive_influences == "Yes":
             self.corrosive_influences = True
         else:
@@ -250,6 +251,16 @@ class Section(Material):
         tdg = (A_v * fy) / (gamma_m0 * 1000)
         self.tension_yielding_capacity = tdg
         return tdg
+
+    def tension_rupture(self, A_n, F_u):
+        "preliminary design strength,T_pdn,as governed by rupture at net section"
+        "A_n = net area of the total cross-section"
+        "F_u = Ultimate Strength of material"
+
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_pdn = 0.9 * A_n * F_u / gamma_m1
+
+        return T_pdn
 
     def __repr__(self):
         repr = "Section\n"

@@ -24,6 +24,7 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFi
 import pickle
 import pdfkit
 import configparser
+from main import Main
 import cairosvg
 from io import StringIO
 
@@ -46,7 +47,7 @@ from io import StringIO
 # material = Material(material_grade)
 
 
-class FinPlateConnection(ShearConnection):
+class Tension(Main):
 
     def __init__(self):
         # super(FinPlateConnection, self).__init__()
@@ -98,34 +99,44 @@ class FinPlateConnection(ShearConnection):
         '''
 
         # @author: Amir, Umair
-        self.module = KEY_DISP_FINPLATE
+        self.module = KEY_DISP_TENSION
 
         options_list = []
 
-        if KEY_CONN in existingvalues:
-            existingvalue_key_conn = existingvalues[KEY_CONN]
+        if KEY_SECTION in existingvalues:
+            existingvalue_key_section = existingvalues[KEY_SECTION]
         else:
-            existingvalue_key_conn = ''
+            existingvalue_key_section = ''
 
-        if KEY_SUPTNGSEC in existingvalues:
-           existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
-        else:
-            existingvalue_key_suptngsec = ''
+        # if KEY_SUPTNGSEC in existingvalues:
+        #    existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
+        # else:
+        #     existingvalue_key_suptngsec = ''
+        #
+        # if KEY_SUPTDSEC in existingvalues:
+        #     existingvalue_key_suptdsec = existingvalues[KEY_SUPTDSEC]
+        # else:
+        #     existingvalue_key_suptdsec = ''
 
-        if KEY_SUPTDSEC in existingvalues:
-            existingvalue_key_suptdsec = existingvalues[KEY_SUPTDSEC]
+        if KEY_LOCATION in existingvalues:
+            existingvalue_key_location = existingvalues[KEY_LOCATION]
         else:
-            existingvalue_key_suptdsec = ''
+            existingvalue_key_location = ''
+
+        if KEY_SIZE in existingvalues:
+            existingvalue_key_size = existingvalues[KEY_SIZE]
+        else:
+            existingvalue_key_size = ''
 
         if KEY_MATERIAL in existingvalues:
             existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
         else:
             existingvalue_key_mtrl = ''
 
-        if KEY_SHEAR in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_SHEAR]
-        else:
-            existingvalue_key_versh = ''
+        # if KEY_SHEAR in existingvalues:
+        #     existingvalue_key_versh = existingvalues[KEY_SHEAR]
+        # else:
+        #     existingvalue_key_versh = ''
 
         if KEY_AXIAL in existingvalues:
             existingvalue_key_axial = existingvalues[KEY_AXIAL]
@@ -152,22 +163,22 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platethk = ''
 
-        t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_TENSION, TYPE_MODULE, None, None)
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
-        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN)
+        t2 = (KEY_SECTION, KEY_DISP_SECTION, TYPE_COMBOBOX, existingvalue_key_section, VALUES_SECTION)
         options_list.append(t2)
 
         t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/fin_cf_bw.png")
         options_list.append(t15)
 
-        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"))
+        t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, existingvalue_key_location, VALUES_LOCATION)
         options_list.append(t3)
 
-        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, connectdb("Beams"))
+        t4 = (KEY_SIZE, KEY_DISP_SIZE, TYPE_COMBOBOX, existingvalue_key_size, VALUES_SIZE)
         options_list.append(t4)
 
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
@@ -176,14 +187,14 @@ class FinPlateConnection(ShearConnection):
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
         options_list.append(t6)
 
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        # t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        # options_list.append(t7)
+
+        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
+        t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
         options_list.append(t8)
-
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
-        options_list.append(t9)
 
         t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D)
         options_list.append(t10)
@@ -229,7 +240,7 @@ class FinPlateConnection(ShearConnection):
 
         out_list = []
 
-        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+        t1 = (None, DISP_TITLE_TENSION, TYPE_TITLE, None)
         out_list.append(t1)
 
         t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '')
@@ -445,7 +456,7 @@ class FinPlateConnection(ShearConnection):
 
     def set_input_values(self, design_dictionary):
 
-        super(FinPlateConnection,self).set_input_values(self, design_dictionary)
+        super(Tension,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])

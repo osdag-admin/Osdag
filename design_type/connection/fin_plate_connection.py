@@ -241,8 +241,14 @@ class FinPlateConnection(ShearConnection):
 
         t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag else '')
         out_list.append(t4)
+        bolt_bearing_capacity_disp = ''
+        if flag is True:
+            if self.bolt.bolt_bearing_capacity is not 'N/A':
+                bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+            else:
+                bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
-        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, round(self.bolt.bolt_bearing_capacity/1000,2) if flag else '')
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '')
         out_list.append(t5)
 
         t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '')
@@ -298,55 +304,6 @@ class FinPlateConnection(ShearConnection):
 
         return out_list
 
-    # def loadDesign_inputs(self, window, op_list, data, new):
-    #     fileName, _ = QFileDialog.getOpenFileName(window, "Open Design", os.path.join(str(' '), ''), "InputFiles(*.osi)")
-    #     if not fileName:
-    #         return
-    #     try:
-    #         in_file = str(fileName)
-    #         with open(in_file, 'r') as fileObject:
-    #             uiObj = yaml.load(fileObject)
-    #         module = uiObj[KEY_MODULE]
-    #
-    #         if module == KEY_DISP_FINPLATE:
-    #             self.setDictToUserInputs(window, uiObj, op_list, data, new)
-    #         else:
-    #             QMessageBox.information(window, "Information",
-    #                                 "Please load the appropriate Input")
-    #
-    #             return
-    #     except IOError:
-    #         QMessageBox.information(window, "Unable to open file",
-    #                                 "There was an error opening \"%s\"" % fileName)
-    #         return
-    #
-    #     # Function for loading inputs from a file to Ui
-    #
-    # '''
-    # @author: Umair
-    # '''
-    #
-    # def setDictToUserInputs(self, uiObj, op_list, data, new):
-    #     for op in op_list:
-    #         key_str = op[0]
-    #         key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
-    #         if op[2] == TYPE_COMBOBOX:
-    #             index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
-    #             if index >= 0:
-    #                 key.setCurrentIndex(index)
-    #         elif op[2] == TYPE_TEXTBOX:
-    #             key.setText(uiObj[key_str])
-    #         elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
-    #             for n in new:
-    #                 if n[0] == key_str:
-    #                     if uiObj[key_str] != n[1]():
-    #                         data[key_str + "_customized"] = uiObj[key_str]
-    #                         key.setCurrentIndex(1)
-    #                     else:
-    #                         pass
-    #         else:
-    #             pass
-
     def func_for_validation(self, window, design_dictionary):
         self.design_status = False
         flag = False
@@ -394,7 +351,7 @@ class FinPlateConnection(ShearConnection):
 
         if len(missing_fields_list) > 0:
             QMessageBox.information(window, "Information",
-                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+                                    generate_missing_fields_error_string(missing_fields_list))
             # flag = False
         else:
             flag = True
@@ -403,30 +360,6 @@ class FinPlateConnection(ShearConnection):
             self.set_input_values(self, design_dictionary)
         else:
             pass
-
-    def generate_missing_fields_error_string(self, missing_fields_list):
-        """
-        Args:
-            missing_fields_list: list of fields that are not selected or entered
-        Returns:
-            error string that has to be displayed
-        """
-        # The base string which should be displayed
-        information = "Please input the following required field"
-        if len(missing_fields_list) > 1:
-            # Adds 's' to the above sentence if there are multiple missing input fields
-            information += "s"
-        information += ": "
-        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
-
-        for item in missing_fields_list:
-            information = information + item + ", "
-
-        # Removes the last comma
-        information = information[:-2]
-        information += "."
-
-        return information
 
     def warn_text(self):
       
@@ -447,6 +380,7 @@ class FinPlateConnection(ShearConnection):
 
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
+
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
@@ -454,9 +388,9 @@ class FinPlateConnection(ShearConnection):
         self.member_capacity(self)
 
     def member_capacity(self):
-        # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
+        # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)
         if self.connectivity in VALUES_CONN_1:
-            if self.supported_section.build == "Rolled":
+            if self.supported_section.type == "Rolled":
                 length = self.supported_section.depth
             else:
                 length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)

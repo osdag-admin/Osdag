@@ -20,8 +20,9 @@ class cadconnection(object):
 
         if self.mainmodule == "Shear Connection":
             self.commLogicObj = CommonDesignLogic(self.display, self.folder,
-                                                  self.module)
-        else:
-            pass
+                                                  self.module,self.mainmodule)
+        elif self.mainmodule == "Moment Connection":
+            self.commLogicObj = CommonDesignLogic(self.display, self.folder,
+                                                  self.module,self.mainmodule)
 
         return self.commLogicObj

@@ -366,6 +366,7 @@ class Plate(Material):
         print('maxh',web_plate_h_max)
         print(web_plate_h_max,edge_dist,gauge)
         max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
+        print("max_bolts_one_line", max_bolts_one_line)
         self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
         self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
         self.height = max(web_plate_h_min, self.get_web_plate_h_req (self.bolts_one_line, gauge, edge_dist))
@@ -481,7 +482,8 @@ class Plate(Material):
             end_dist = min_edge_dist
             moment_demand = 0.0
             vres = res_force / (bolt_line*bolts_one_line)
-            bolt_capacity_red = self.get_bolt_red(bolts_one_line, gauge, bolt_capacity, bolt_dia)
+
+
             if shear_ecc is True:
                 # If check for shear eccentricity is true, resultant force in bolt is calculated
                 ecc = (pitch * max((bolt_line-1.5), 0)) + end_dist + gap
@@ -527,7 +529,18 @@ class Plate(Material):
                                                           gauge, bolt_capacity,
                                                           bolt_dia)
                     print("bow", vres, bolt_capacity_red)
+            while web_plate_h is False:
+                bolts_required += 1
+                [bolt_line, bolts_one_line, web_plate_h] = \
+                    self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
+                                                        min_edge_dist, min_gauge)
+                [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,
+                                                                           min_edge_dist, max_spacing,
+                                                                           max_edge_dist)
 
+            bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+                                                  gauge, bolt_capacity,
+                                                  bolt_dia)
             self.length = gap + end_dist * 2 + pitch * (bolt_line - 1)
             self.height = web_plate_h
             self.bolt_line = bolt_line

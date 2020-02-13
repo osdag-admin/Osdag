@@ -428,7 +428,7 @@ class BeamCoverPlate(MomentConnection):
     def member_capacity(self):
         #     # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
         #     if self.connectivity in VALUES_CONN_1:
-        if self.section.build == "Rolled":
+        if self.section.type == "Rolled":
             length = self.section.depth
         else:
             length = self.section.depth - (

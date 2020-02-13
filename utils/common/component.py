@@ -355,6 +355,7 @@ class Plate(Material):
         print('maxh',web_plate_h_max)
         print(web_plate_h_max,edge_dist,gauge)
         max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
+        print("max_bolts_one_line", max_bolts_one_line)
         self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
         self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
         self.height = max(web_plate_h_min, self.get_web_plate_h_req (self.bolts_one_line, gauge, edge_dist))

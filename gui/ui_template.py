@@ -1508,11 +1508,11 @@ class Ui_ModuleWindow(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
-            if status is True and main.module == "Fin Plate":
-                self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
-                                                             main.module)
-            if status is True and main.module == "Fin Plate":
-                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module)
+            # if status is True and main.module == "Fin Plate":
+            #     self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
+            #                                                  main.module)
+            if status is True:
+                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)
                 # self.callFin2D_Drawing("All")

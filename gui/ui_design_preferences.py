@@ -36,7 +36,7 @@ import openpyxl
 
 
 class Ui_Dialog(object):
-    def setupUi(self, DesignPreferences):
+    def setupUi(self, DesignPreferences, main):
         DesignPreferences.setObjectName("DesignPreferences")
         DesignPreferences.resize(969, 624)
         self.gridLayout_5 = QtWidgets.QGridLayout(DesignPreferences)
@@ -78,7 +78,7 @@ class Ui_Dialog(object):
         @author: Umair 
         '''
 
-        supporting_section_list = Connection.supporting_section_values(self)
+        supporting_section_list = main.supporting_section_values(self)
         _translate = QtCore.QCoreApplication.translate
         i = 0
         j = 6
@@ -201,7 +201,7 @@ class Ui_Dialog(object):
         self.tab_Beam = QtWidgets.QWidget()
         self.tab_Beam.setObjectName("tab_Beam")
 
-        supported_section_list = Connection.supported_section_values(self)
+        supported_section_list = main.supported_section_values(self)
         _translate = QtCore.QCoreApplication.translate
         i = 0
         j = 6
@@ -967,7 +967,7 @@ class DesignPreferences(QDialog):
 
         QDialog.__init__(self, parent)
         self.ui = Ui_Dialog()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self, main)
         self.main_controller = parent
         #self.uiobj = self.main_controller.uiObj
         self.saved = None

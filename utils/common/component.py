@@ -164,6 +164,8 @@ class Section(Material):
         super(Section, self).__init__(material_grade)
         self.designation = designation
         self.type = "Rolled"
+        self.type2 ="generally"
+
         self.mass = 0.0
         self.area = 0.0
         self.depth = 0.0

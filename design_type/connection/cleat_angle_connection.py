@@ -429,18 +429,22 @@ class CleatAngleConnection(ShearConnection):
                 break
             bolts_required_previous = self.bolts_required_sptd
             bolt_grade_previous = self.bolt.bolt_grade_provided
-        self.get_sptd_leg(self)
+        self.get_cleat_angle(self)
 
-    def get_sptd_leg(self):
+    def get_cleat_angle(self):
         print(self.bolt.bolt_diameter_provided, self.bolts_required_sptd, self.bolt_line_sptd, self.bolts_one_line_sptd)
-        self.get_sptd_leg_pitch(self)
+        sptd_leg = self.get_sptd_leg_pitch(self, self.bolt_line_sptd, self.bolt.bolt_diameter_provided)
+        sptng_leg = sptd_leg
 
-    def get_sptd_leg_pitch(self):
+
+
+    def get_sptd_leg_pitch(self, bolt_line, bolt_dia):
         conn = sqlite3.connect(PATH_TO_DATABASE)
-        db_query = "SELECT Nominal_Leg, Max_Bolt_Dia, S1, S2, S3 FROM Angle_Pitch WHERE Bolt_lines = ?"
+        db_query = "SELECT Nominal_Leg, S1, S2, S3 FROM Angle_Pitch " \
+                   "WHERE Bolt_lines >= ? AND Max_Bolt_Dia >= ?"
         cur = conn.cursor()
-        print(self.bolt_line_sptd)
-        cur.execute(db_query, (self.bolt_line_sptd,))
+
+        cur.execute(db_query, (bolt_line, bolt_dia))
         rows = cur.fetchall()
 
         # rows = cursor.fetchall()
@@ -451,7 +455,8 @@ class CleatAngleConnection(ShearConnection):
             # self.S1 = rows[4]
             # self.S2 = rows[5]
             # self.S3 = rows[6]
-            angle_pitch_details = [rows[0], rows[1], rows[2], rows[3], rows[4]]
+            # angle_pitch_details = [rows[0], rows[1], rows[2], rows[3]]
             angle_pitch_details.append(row)
 
         print(angle_pitch_details)
+        return angle_pitch_details[0][0]

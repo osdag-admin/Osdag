@@ -507,7 +507,10 @@ class FinPlateConnection(ShearConnection):
                                          min_gauge=self.bolt.min_gauge_round, max_spacing=self.bolt.max_spacing_round,
                                          max_edge_dist=self.bolt.max_edge_dist_round, shear_load=self.load.shear_force*1000,
                                          axial_load=self.load.axial_force*1000, gap=self.plate.gap,
-                                         shear_ecc=True)
+                                         shear_ecc=True, bolt_line_limit=2)
+        if self.plate.design_status is False:
+            logger.error(self.plate.reason)
+
 
     def section_block_shear_capacity(self):
         #################################

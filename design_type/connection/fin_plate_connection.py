@@ -694,6 +694,8 @@ class FinPlateConnection(ShearConnection):
         :param flag: boolean
         :return:
         '''
+        # if self.design_status is True:
+
         if ui.btn3D.isChecked:
             ui.chkBxCol.setChecked(Qt.Unchecked)
             ui.chkBxBeam.setChecked(Qt.Unchecked)

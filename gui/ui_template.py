@@ -1456,7 +1456,8 @@ class Ui_ModuleWindow(QMainWindow):
             module = uiObj[KEY_MODULE]
 
             # module_class = self.return_class(module)
-            if main.module(main) == module:
+            selected_module = main.module_name(main)
+            if selected_module == module:
                 self.setDictToUserInputs(uiObj, op_list, data, new)
             else:
                 QMessageBox.information(self, "Information",

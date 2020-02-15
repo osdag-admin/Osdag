@@ -88,7 +88,7 @@ class FinPlateConnection(ShearConnection):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-    def module(self):
+    def module_name(self):
         return KEY_DISP_FINPLATE
 
     def input_values(self, existingvalues={}):

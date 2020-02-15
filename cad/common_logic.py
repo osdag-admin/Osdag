@@ -19,8 +19,16 @@ from cad.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBea
 from cad.colWebBeamWebConnectivity import ColWebBeamWeb as FinColWebBeamWeb
 from cad.nutBoltPlacement import NutBoltArray as finNutBoltArray
 from design_type.connection.fin_plate_connection import FinPlateConnection
+from design_type.connection.cleat_angle_connection import CleatAngleConnection
+from design_type.connection.beam_cover_plate import BeamCoverPlate
 from utilities import osdag_display_shape
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+import copy
+from cad.BBCad.nutBoltPlacement_AF import NutBoltArray_AF
+from cad.BBCad.nutBoltPlacement_BF import NutBoltArray_BF
+from cad.BBCad.nutBoltPlacement_Web import NutBoltArray_Web
+from  cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
+from Common import *
 
 from cad.nutBoltPlacement import NutBoltArray
 from design_type.connection import cleat_angle_connection
@@ -95,7 +103,7 @@ class CommonDesignLogic(object):
     # def __init__(self, uiObj, dictbeamdata, dictcoldata, dictangledata,
     #              dicttopangledata, loc, component, bolt_R, bolt_T,
     #              bolt_Ht, nut_T, display, folder, connection):
-    def __init__(self, display, folder, connection):
+    def __init__(self, display, folder, connection, mainmodule):
 
         # self.bolt = Bolt
         # self.beam = Beam
@@ -107,6 +115,7 @@ class CommonDesignLogic(object):
         # self.weld = Weld
 
         self.display = display
+        self.mainmodule = mainmodule
         self.connection = connection
         # self.resultObj = self.call_calculation()
 
@@ -277,7 +286,8 @@ class CommonDesignLogic(object):
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
         nut_Ht = bolt_dia
         gap = A.plate.gap
-        notch_height = self.get_notch_ht(A.supporting_section.flange_width, A.supporting_section.flange_thickness, A.supported_section.flange_thickness, A.supported_section.root_radius)
+        # notch_height = self.get_notch_ht(A.supporting_section.flange_width, A.supporting_section.flange_thickness, A.supported_section.flange_thickness, A.supported_section.root_radius)
+        notch_height = 2 * A.supporting_section.flange_thickness
         notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
 
         if self.connection == "cleatAngle":
@@ -321,7 +331,7 @@ class CommonDesignLogic(object):
 
         if self.connection == "Fin Plate":  # finBeamWebBeamWeb/endBeamWebBeamWeb
             nut_space = A.supported_section.web_thickness + A.plate.thickness_provided + nut_T
-            nutBoltArray = finNutBoltArray(A.bolt, nut, bolt, nut_space)
+            nutBoltArray = finNutBoltArray(A.bolt,  A.plate, nut, bolt, nut_space)
             beamwebconn = FinBeamWebBeamWeb(supporting, supported, notchObj, plate, Fweld1, nutBoltArray, gap)
             # column, beam, notch, plate, Fweld, nut_bolt_array
         # elif self.connection == "Endplate":
@@ -347,6 +357,8 @@ class CommonDesignLogic(object):
 
         if self.connection == "Fin Plate":
             A = FinPlateConnection()
+        elif self.connection == KEY_DISP_CLEATANGLE:
+            A = CleatAngleConnection()
         else:
             pass
 
@@ -422,8 +434,10 @@ class CommonDesignLogic(object):
 
         if self.connection == "Fin Plate":  # finColWebBeamWeb
             nut_space = A.supported_section.web_thickness + int(A.plate.thickness_provided) + nut_T
-            nutBoltArray = finNutBoltArray(A.bolt, nut, bolt, nut_space)
+            nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colwebconn = FinColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
+
+
 
         # elif self.connection == "Endplate":
         #     nut_space = column_tw + int(plate_thick) + nut_T
@@ -470,6 +484,9 @@ class CommonDesignLogic(object):
         #                 R1=beam_R1, R2=beam_R2, alpha=beam_alpha, length=beam_length, notchObj=None)
         if self.connection == "Fin Plate":
             A = FinPlateConnection()
+            gap = A.plate.gap
+        elif self.connection == KEY_DISP_CLEATANGLE:
+            A = CleatAngleConnection()
         else:
             pass
 
@@ -550,9 +567,9 @@ class CommonDesignLogic(object):
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
         nut_Ht = bolt_dia
-        gap = A.plate.gap
+        # gap = A.plate.gap
         #
-        if self.connection == "cleatAngle":
+        if self.connection == KEY_DISP_CLEATANGLE:
             pass
             # angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
             #bolt_len_required = float(bolt_T + 2 * (cleat_thick) + beam_tw + nut_T)
@@ -568,7 +585,7 @@ class CommonDesignLogic(object):
             plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
 
             # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
-        Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
+            Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
@@ -590,11 +607,11 @@ class CommonDesignLogic(object):
         #     nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, nut_space)
         #     colflangeconn = endColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
         #
-        # elif self.connection == "cleatAngle":
-        #     nut_space = beam_tw + 2 * cleat_thick + nut_T
-        #     cnut_space = column_T + cleat_thick + nut_T
-        #     nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
-        #     colflangeconn = cleatColFlangeBeamWeb(column, beam, angle, nut_bolt_array,gap)
+        # elif self.connection == KEY_DISP_CLEATANGLE:
+            # nut_space =  A.supported_section.web_thickness + 2 *  + nut_T
+            # cnut_space = column_T + cleat_thick + nut_T
+            # nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
+            # colflangeconn = cleatColFlangeBeamWeb(column, beam, angle, nut_bolt_array,gap)
         # else:
         #     snut_space = column_T + seat_thick + nut_T
         #     sbnut_space = beam_T + seat_thick + nut_T
@@ -607,6 +624,86 @@ class CommonDesignLogic(object):
         colflangeconn.create_3dmodel()
         return colflangeconn
 
+    def createBBCoverPlateBoltedCAD(self):
+        '''
+        :return: The calculated values/parameters to create 3D CAD model of individual components.
+        '''
+        B= BeamCoverPlate()
+        # beam_data = self.fetchBeamPara()  # Fetches the beam dimensions
+
+        beam_tw = float(B.section.web_thickness)
+        beam_T = float(B.section.flange_thickness)
+        beam_d = float(B.section.depth)
+        beam_B = float(B.section.flange_width)
+        beam_R1 = float(B.section.root_radius)
+        beam_R2 = float(B.section.toe_radius)
+        beam_alpha = float(B.section.flange_slope)
+        beam_length = 800.0
+
+        beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
+                             R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
+                             length=beam_length, notchObj=None)  # Call to ISection in Component repository
+        beam_Right = copy.copy(beam_Left)  # Since both the beams are same
+        # outputobj = self.outputs  # Output dictionary from calculation file
+        # alist = self.designParameters()  # An object to save all input values entered by user
+
+        plateAbvFlange = Plate(L=B.flange_plate.length,
+                               W=B.flange_plate.height,
+                               T=float(B.flange_plate.thickness_provided))  # Call to Plate in Component repository
+        plateBelwFlange = copy.copy(plateAbvFlange)  # Since both the flange plates are identical
+
+        innerplateAbvFlangeFront = Plate(L=B.flange_plate.length,
+                                         W=B.flange_plate.height,
+                                         T=float(B.flange_plate.thickness_provided))
+        innerplateAbvFlangeBack = copy.copy(innerplateAbvFlangeFront)
+        innerplateBelwFlangeFront = copy.copy(innerplateAbvFlangeBack)
+        innerplateBelwFlangeBack = copy.copy(innerplateBelwFlangeFront)
+
+        WebPlateLeft = Plate(L=B.web_plate.length,
+                             W=B.web_plate.height,
+                             T=float(B.web_plate.thickness_provided))  # Call to Plate in Component repository
+        WebPlateRight = copy.copy(WebPlateLeft)  # Since both the Web plates are identical
+
+        bolt_d = float(B.flange_bolt.bolt_diameter_provided)  # Bolt diameter (shank part), entered by user
+        bolt_r = bolt_d / 2  # Bolt radius (Shank part)
+        bolt_T = self.boltHeadThick_Calculation(bolt_d)  # Bolt head thickness
+        bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
+        bolt_Ht = self.boltLength_Calculation(bolt_d)  # Bolt head height
+
+        bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component directory
+        nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
+        nut_Ht = nut_T
+        nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)  # Call to create Nut from Component directory
+
+        numOfBoltsF = 2 * int(B.flange_plate.bolts_required)  # Number of flange bolts for both beams
+        nutSpaceF = float(B.flange_plate.thickness_provided) + beam_T  # Space between bolt head and nut for flange bolts
+
+        numOfBoltsW = 2 * int(B.web_plate.bolts_required)  # Number of web bolts for both beams
+        nutSpaceW = 2 * float(
+            B.web_plate.thickness_provided) + beam_tw  # Space between bolt head and nut for web bolts
+
+        # Bolt placement for Above Flange bolts, call to nutBoltPlacement_AF.py
+        bolting_AF = NutBoltArray_AF(BeamCoverPlate(), nut, bolt, numOfBoltsF, nutSpaceF)
+
+        # Bolt placement for Below Flange bolts, call to nutBoltPlacement_BF.py
+        bolting_BF = NutBoltArray_BF(BeamCoverPlate(), nut, bolt, numOfBoltsF, nutSpaceF)
+
+        # Bolt placement for Web Plate bolts, call to nutBoltPlacement_Web.py
+        bolting_Web = NutBoltArray_Web(BeamCoverPlate(), nut, bolt, numOfBoltsW, nutSpaceW)
+
+        # bbCoverPlateBolted is an object which is passed BBCoverPlateBoltedCAD.py file, which initialized the parameters of each CAD component
+        bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left, beam_Right, plateAbvFlange, plateBelwFlange,
+                                                   innerplateAbvFlangeFront,
+                                                   innerplateAbvFlangeBack, innerplateBelwFlangeFront,
+                                                   innerplateBelwFlangeBack,
+                                                   WebPlateLeft, WebPlateRight, bolting_AF, bolting_BF, bolting_Web,
+                                                   BeamCoverPlate())
+
+        # bbCoverPlateBolted.create_3DModel() will create the CAD model of each component, debugging this line will give moe clarity
+        bbCoverPlateBolted.create_3DModel()
+
+        return bbCoverPlateBolted
+
     def display_3DModel(self, component,bgcolor):
 
         self.component = component
@@ -617,105 +714,208 @@ class CommonDesignLogic(object):
 
         self.display.DisableAntiAliasing()
 
-        if self.connection == "Fin Plate":
-            A = FinPlateConnection()
-        else:
-            pass
-
-        self.loc = A.connectivity
-
-
-        if bgcolor =="gradient_bg":
+        if bgcolor == "gradient_bg":
 
             self.display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
         else:
             self.display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
 
-        if self.loc == "Column flange-Beam web" and self.connection == "Fin Plate":
-            self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
-        elif self.loc == "Column flange-Beam flange" and self.connection == "SeatedAngle":
-            self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
-        elif self.loc == "Column web-Beam flange" and self.connection == "SeatedAngle":
-            self.display.View.SetProj(OCC.Core.V3d.V3d_XposYnegZpos)
+        if self.mainmodule  == "Shear Connection":
 
-        if self.component == "Column":
-            osdag_display_shape(self.display, self.connectivityObj.get_columnModel(), update=True)
-        elif self.component == "Beam":
-            osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
-                                update=True)
-        elif component == "cleatAngle":
+            if self.connection == "Fin Plate":
+                A = FinPlateConnection()
+            else:
+                pass
 
-            osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
-            osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=Quantity_NOC_BLUE1,
-                                update=True)
-            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
-            for nutbolt in nutboltlist:
-                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+            self.loc = A.connectivity
 
-        elif component == "SeatAngle":
-            osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=Quantity_NOC_BLUE1,
-                                update=True)
-            osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
-            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
-            for nutbolt in nutboltlist:
-                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
-        elif self.component == "Plate":
-            osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
-            osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-            osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1, update=True)
-            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
-            for nutbolt in nutboltlist:
-                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+            if self.loc == "Column flange-Beam web" and self.connection == "Fin Plate":
+                self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
+            elif self.loc == "Column flange-Beam flange" and self.connection == "SeatedAngle":
+                self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
+            elif self.loc == "Column web-Beam flange" and self.connection == "SeatedAngle":
+                self.display.View.SetProj(OCC.Core.V3d.V3d_XposYnegZpos)
 
-        elif self.component == "Model":
-
-            osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
-            osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
-                                update=True)
-            if self.connection == "Fin Plate" or self.connection == "Endplate":
-                osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
-                osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-                osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1,
+            if self.component == "Column":
+                osdag_display_shape(self.display, self.connectivityObj.get_columnModel(), update=True)
+            elif self.component == "Beam":
+                osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
                                     update=True)
+            elif component == "cleatAngle":
 
-            elif self.connection == "cleatAngle":
-                osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1,
-                                    update=True)
+                osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
                 osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=Quantity_NOC_BLUE1,
                                     update=True)
-            else:
+                nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
+                for nutbolt in nutboltlist:
+                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+
+            elif component == "SeatAngle":
                 osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=Quantity_NOC_BLUE1,
                                     update=True)
-                osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1,
+                osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
+                nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
+                for nutbolt in nutboltlist:
+                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+
+            elif self.component == "Plate":
+                osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
+                osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
+                osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1, update=True)
+                nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
+                for nutbolt in nutboltlist:
+                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+
+            elif self.component == "Model":
+
+                osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                                     update=True)
-            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
-            for nutbolt in nutboltlist:
-                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                if self.connection == "Fin Plate" or self.connection == "Endplate":
+                    osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
+                    osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
+                    osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1,
+                                        update=True)
+
+                elif self.connection == "cleatAngle":
+                    osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1,
+                                        update=True)
+                    osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=Quantity_NOC_BLUE1,
+                                        update=True)
+                else:
+                    osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=Quantity_NOC_BLUE1,
+                                        update=True)
+                    osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1,
+                                        update=True)
+                nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
+                for nutbolt in nutboltlist:
+                    osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+
+        if self.mainmodule == "Moment Connection":
+            # if self.connection == "Beam Coverplate Connection":
+            #     A = BeamCoverPlate()
+            # else:
+            #     pass
+            #
+            # self.loc = A.connectivity
+            self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()  # CPBoltedObj is an object which gets all the calculated values of CAD models
+
+            if component == "Beam":
+                # Displays both beams
+                osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
+                osdag_display_shape(self.display, self.CPBoltedObj.get_beamRModel(), update=True)
+
+            elif component == "Connector":
+                # Displays the Flange Plates
+                osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
+                osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True,
+                                    color='Blue')
+                if self.ui.combo_flange_preference.currentText() != 'Outside':
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,
+                                        color='Blue')
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,
+                                        color='Blue')
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,
+                                        color='Blue')
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,
+                                        color='Blue')
+
+                # Displays the Web Plates
+                osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
+                osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
+
+                # Displays the bolts which are above the Flange Plate, debugging will give more clarity
+                nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
+                for nutboltAF in nutboltlistAF:
+                    osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
+
+                # Displays the bolts which are below the Flange Plate, debugging will give more clarity
+                nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
+                for nutboltBF in nutboltlistBF:
+                    osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
+
+                # Displays the bolts which are on the right side of web plate, debugging will give more clarity
+                nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
+                for nutboltW in nutboltlistW:
+                    osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
+
+
+            elif component == "Model":
+                # Displays both beams
+                osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
+                osdag_display_shape(self.display, self.CPBoltedObj.get_beamRModel(), update=True)
+
+                # Displays the Flange Plates
+                osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
+                osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True,
+                                    color='Blue')
+                if self.ui.combo_flange_preference.currentText() != 'Outside':
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,
+                                        color='Blue')
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,
+                                        color='Blue')
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,
+                                        color='Blue')
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,
+                                        color='Blue')
+
+                # Displays the Web Plates
+                osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
+                osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
+
+                # Displays the bolts which are above the Flange Plate, debugging will give more clarity
+                nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
+                for nutboltAF in nutboltlistAF:
+                    osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
+
+                # Displays the bolts which are below the Flange Plate, debugging will give more clarity
+                nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
+                for nutboltBF in nutboltlistBF:
+                    osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
+
+                # Displays the bolts which are on the right side of web plate, debugging will give more clarity
+                nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
+                for nutboltW in nutboltlistW:
+                    osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
 
     def call_3DModel(self, flag):  # Done
 
-        if self.connection == "Fin Plate":
-            A = FinPlateConnection()
-        else:
+        if self.mainmodule == "Shear Connection":
+
+            if self.connection == "Fin Plate":
+                A = FinPlateConnection()
+            elif self.connection == KEY_DISP_CLEATANGLE:
+                A = CleatAngleConnection()
             pass
 
-        self.loc = A.connectivity
+            self.loc = A.connectivity
 
-        if flag is True:
+            if flag is True:
 
-            if self.loc == "Column web-Beam web" or self.loc == "Column web-Beam flange":
-                self.connectivityObj = self.create3DColWebBeamWeb()
+                if self.loc == "Column web-Beam web" or self.loc == "Column web-Beam flange":
+                    self.connectivityObj = self.create3DColWebBeamWeb()
 
-            elif self.loc == "Column flange-Beam web" or self.loc == "Column flange-Beam flange":
-                self.connectivityObj = self.create3DColFlangeBeamWeb()
+                elif self.loc == "Column flange-Beam web" or self.loc == "Column flange-Beam flange":
+                    self.connectivityObj = self.create3DColFlangeBeamWeb()
 
+                else:
+                    self.connectivityObj = self.create3DBeamWebBeamWeb()
+
+                self.display_3DModel("Model","gradient_bg")
             else:
-                self.connectivityObj = self.create3DBeamWebBeamWeb()
+                self.display.EraseAll()
 
-            self.display_3DModel("Model","gradient_bg")
-        else:
-            self.display.EraseAll()
+        elif self.mainmodule == "Moment Connection":
+
+            if flag is True:
+
+                self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()
+
+                self.display_3DModel("Model", "gradient_bg")
+            else:
+                self.display.EraseAll()
+
 
     # def call_saveOutputs(self):  # Done
     #     return self.call_calculation(self.uiObj)
@@ -837,3 +1037,5 @@ class CommonDesignLogic(object):
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
 
         return final_model
+
+

@@ -24,6 +24,7 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFi
 import pickle
 import pdfkit
 import configparser
+from main import Main
 import cairosvg
 from io import StringIO
 
@@ -46,13 +47,13 @@ from io import StringIO
 # material = Material(material_grade)
 
 
-class FinPlateConnection(ShearConnection):
+class Tension(Main):
 
     def __init__(self):
-        super(FinPlateConnection, self).__init__()
-        self.min_plate_height = 0.0
-        self.max_plate_height = 0.0
-        self.res_force = 0.0
+        # super(FinPlateConnection, self).__init__()
+        # self.min_plate_height = 0.0
+        # self.max_plate_height = 0.0
+        # self.res_force = 0.0
         self.design_status = False
 
     def set_osdaglogger(key):
@@ -88,7 +89,7 @@ class FinPlateConnection(ShearConnection):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-    def module_name(self):
+    def module(self):
         return KEY_DISP_FINPLATE
 
     def input_values(self, existingvalues={}):
@@ -98,34 +99,44 @@ class FinPlateConnection(ShearConnection):
         '''
 
         # @author: Amir, Umair
-        self.module = KEY_DISP_FINPLATE
+        self.module = KEY_DISP_TENSION
 
         options_list = []
 
-        if KEY_CONN in existingvalues:
-            existingvalue_key_conn = existingvalues[KEY_CONN]
+        if KEY_SECTION in existingvalues:
+            existingvalue_key_section = existingvalues[KEY_SECTION]
         else:
-            existingvalue_key_conn = ''
+            existingvalue_key_section = ''
 
-        if KEY_SUPTNGSEC in existingvalues:
-           existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
-        else:
-            existingvalue_key_suptngsec = ''
+        # if KEY_SUPTNGSEC in existingvalues:
+        #    existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
+        # else:
+        #     existingvalue_key_suptngsec = ''
+        #
+        # if KEY_SUPTDSEC in existingvalues:
+        #     existingvalue_key_suptdsec = existingvalues[KEY_SUPTDSEC]
+        # else:
+        #     existingvalue_key_suptdsec = ''
 
-        if KEY_SUPTDSEC in existingvalues:
-            existingvalue_key_suptdsec = existingvalues[KEY_SUPTDSEC]
+        if KEY_LOCATION in existingvalues:
+            existingvalue_key_location = existingvalues[KEY_LOCATION]
         else:
-            existingvalue_key_suptdsec = ''
+            existingvalue_key_location = ''
+
+        if KEY_SIZE in existingvalues:
+            existingvalue_key_size = existingvalues[KEY_SIZE]
+        else:
+            existingvalue_key_size = ''
 
         if KEY_MATERIAL in existingvalues:
             existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
         else:
             existingvalue_key_mtrl = ''
 
-        if KEY_SHEAR in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_SHEAR]
-        else:
-            existingvalue_key_versh = ''
+        # if KEY_SHEAR in existingvalues:
+        #     existingvalue_key_versh = existingvalues[KEY_SHEAR]
+        # else:
+        #     existingvalue_key_versh = ''
 
         if KEY_AXIAL in existingvalues:
             existingvalue_key_axial = existingvalues[KEY_AXIAL]
@@ -152,22 +163,22 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platethk = ''
 
-        t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_TENSION, TYPE_MODULE, None, None)
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
-        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN)
+        t2 = (KEY_SECTION, KEY_DISP_SECTION, TYPE_COMBOBOX, existingvalue_key_section, VALUES_SECTION)
         options_list.append(t2)
 
         t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/fin_cf_bw.png")
         options_list.append(t15)
 
-        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"))
+        t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, existingvalue_key_location, VALUES_LOCATION)
         options_list.append(t3)
 
-        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, connectdb("Beams"))
+        t4 = (KEY_SIZE, KEY_DISP_SIZE, TYPE_COMBOBOX, existingvalue_key_size, VALUES_SIZE)
         options_list.append(t4)
 
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
@@ -176,14 +187,14 @@ class FinPlateConnection(ShearConnection):
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
         options_list.append(t6)
 
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        # t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        # options_list.append(t7)
+
+        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
+        t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
         options_list.append(t8)
-
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
-        options_list.append(t9)
 
         t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D)
         options_list.append(t10)
@@ -229,7 +240,7 @@ class FinPlateConnection(ShearConnection):
 
         out_list = []
 
-        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+        t1 = (None, DISP_TITLE_TENSION, TYPE_TITLE, None)
         out_list.append(t1)
 
         t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '')
@@ -241,14 +252,8 @@ class FinPlateConnection(ShearConnection):
 
         t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag else '')
         out_list.append(t4)
-        bolt_bearing_capacity_disp = ''
-        if flag is True:
-            if self.bolt.bolt_bearing_capacity is not 'N/A':
-                bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-            else:
-                bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
-        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '')
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, round(self.bolt.bolt_bearing_capacity/1000,2) if flag else '')
         out_list.append(t5)
 
         t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '')
@@ -304,6 +309,55 @@ class FinPlateConnection(ShearConnection):
 
         return out_list
 
+    # def loadDesign_inputs(self, window, op_list, data, new):
+    #     fileName, _ = QFileDialog.getOpenFileName(window, "Open Design", os.path.join(str(' '), ''), "InputFiles(*.osi)")
+    #     if not fileName:
+    #         return
+    #     try:
+    #         in_file = str(fileName)
+    #         with open(in_file, 'r') as fileObject:
+    #             uiObj = yaml.load(fileObject)
+    #         module = uiObj[KEY_MODULE]
+    #
+    #         if module == KEY_DISP_FINPLATE:
+    #             self.setDictToUserInputs(window, uiObj, op_list, data, new)
+    #         else:
+    #             QMessageBox.information(window, "Information",
+    #                                 "Please load the appropriate Input")
+    #
+    #             return
+    #     except IOError:
+    #         QMessageBox.information(window, "Unable to open file",
+    #                                 "There was an error opening \"%s\"" % fileName)
+    #         return
+    #
+    #     # Function for loading inputs from a file to Ui
+    #
+    # '''
+    # @author: Umair
+    # '''
+    #
+    # def setDictToUserInputs(self, uiObj, op_list, data, new):
+    #     for op in op_list:
+    #         key_str = op[0]
+    #         key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
+    #         if op[2] == TYPE_COMBOBOX:
+    #             index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
+    #             if index >= 0:
+    #                 key.setCurrentIndex(index)
+    #         elif op[2] == TYPE_TEXTBOX:
+    #             key.setText(uiObj[key_str])
+    #         elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
+    #             for n in new:
+    #                 if n[0] == key_str:
+    #                     if uiObj[key_str] != n[1]():
+    #                         data[key_str + "_customized"] = uiObj[key_str]
+    #                         key.setCurrentIndex(1)
+    #                     else:
+    #                         pass
+    #         else:
+    #             pass
+
     def func_for_validation(self, window, design_dictionary):
         self.design_status = False
         flag = False
@@ -351,7 +405,7 @@ class FinPlateConnection(ShearConnection):
 
         if len(missing_fields_list) > 0:
             QMessageBox.information(window, "Information",
-                                    generate_missing_fields_error_string(missing_fields_list))
+                                    self.generate_missing_fields_error_string(self, missing_fields_list))
             # flag = False
         else:
             flag = True
@@ -360,6 +414,30 @@ class FinPlateConnection(ShearConnection):
             self.set_input_values(self, design_dictionary)
         else:
             pass
+
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
 
     def warn_text(self):
       
@@ -378,9 +456,8 @@ class FinPlateConnection(ShearConnection):
 
     def set_input_values(self, design_dictionary):
 
-        super(FinPlateConnection,self).set_input_values(self, design_dictionary)
+        super(Tension,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
-
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
@@ -388,9 +465,9 @@ class FinPlateConnection(ShearConnection):
         self.member_capacity(self)
 
     def member_capacity(self):
-        # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)
+        # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
         if self.connectivity in VALUES_CONN_1:
-            if self.supported_section.type == "Rolled":
+            if self.supported_section.build == "Rolled":
                 length = self.supported_section.depth
             else:
                 length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)
@@ -507,10 +584,7 @@ class FinPlateConnection(ShearConnection):
                                          min_gauge=self.bolt.min_gauge_round, max_spacing=self.bolt.max_spacing_round,
                                          max_edge_dist=self.bolt.max_edge_dist_round, shear_load=self.load.shear_force*1000,
                                          axial_load=self.load.axial_force*1000, gap=self.plate.gap,
-                                         shear_ecc=True, bolt_line_limit=2)
-        if self.plate.design_status is False:
-            logger.error(self.plate.reason)
-
+                                         shear_ecc=True)
 
     def section_block_shear_capacity(self):
         #################################
@@ -694,8 +768,6 @@ class FinPlateConnection(ShearConnection):
         :param flag: boolean
         :return:
         '''
-        # if self.design_status is True:
-
         if ui.btn3D.isChecked:
             ui.chkBxCol.setChecked(Qt.Unchecked)
             ui.chkBxBeam.setChecked(Qt.Unchecked)

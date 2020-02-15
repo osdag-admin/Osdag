@@ -16,7 +16,7 @@ from gui.ui_ask_question import Ui_AskQuestion
 # from design_type.connection.fin_plate_connection import design_report_show
 # from design_type.connection.fin_plate_connection import DesignReportDialog
 from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.connection.cleat_angle_connection import CleatAngleConnectionInput
+from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
 from design_type.connection.end_plate_connection import EndPlateConnectionInput
 
@@ -25,6 +25,7 @@ from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
+from design_type.tension_member.tension import Tension
 # from cad.cad_common import call_3DBeam
 from gui.ui_template import Ui_ModuleWindow
 
@@ -109,7 +110,7 @@ class OsdagMainWindow(QMainWindow):
         self.ui.btn_momentconnection_bc_start.clicked.connect(self.unavailable)
         self.ui.btn_momentconnection_cc_start.clicked.connect(self.show_moment_connection_cc)
 
-        self.ui.Tension_Start.clicked.connect(self.unavailable)
+        self.ui.Tension_Start.clicked.connect(self.show_tension_module)
         self.ui.Compression_Start.clicked.connect(self.show_compression_module)
 
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
@@ -245,7 +246,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_cleat.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2,CleatAngleConnectionInput)
+            self.ui2.setupUi(self.ui2, CleatAngleConnection, folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
@@ -413,6 +414,43 @@ class OsdagMainWindow(QMainWindow):
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, Compression)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
+    def show_tension_module(self):
+        folder = self.select_workspace_folder()
+        folder = str(folder)
+        if not os.path.exists(folder):
+            if folder == '':
+                pass
+            else:
+                os.mkdir(folder, 0o755)
+
+        root_path = folder
+        images_html_folder = ['images_html']
+        flag = True
+        for create_folder in images_html_folder:
+            if root_path == '':
+                flag = False
+                return flag
+            else:
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder))
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder))
+
+        if self.ui.rdbtn_tension_bolted.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2,Tension, folder)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+
+        elif self.ui.rdbtn_tension_welded.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, Tension, folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

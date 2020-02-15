@@ -668,8 +668,10 @@ class Ui_ModuleWindow(QMainWindow):
                             data[c_tup[0] + "_customized"] = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText())
                             key.setCurrentIndex(0)
                     else:
-                        data[c_tup[0] + "_customized"] = f(self.dockWidgetContents.findChild(QtWidgets.QWidget,
-                            KEY_SEC_PROFILE).currentText()).remove('Select Section')
+                        input = f(self.dockWidgetContents.findChild(QtWidgets.QWidget,
+                            KEY_SEC_PROFILE).currentText())
+                        input.remove('Select Section')
+                        data[c_tup[0] + "_customized"] = input
                 else:
                     options = f()
                     existing_options = data[c_tup[0] + "_customized"]

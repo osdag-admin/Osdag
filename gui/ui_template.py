@@ -1174,7 +1174,7 @@ class Ui_ModuleWindow(QMainWindow):
         # from OCC.Display.pyqt4Display import qtViewer3d
         from OCC.Display.qtDisplay import qtViewer3d
         self.modelTab = qtViewer3d(self)
-        self.setWindowTitle("Osdag Fin Plate")
+        # self.setWindowTitle("Osdag Fin Plate")
         self.mytabWidget.resize(size[0], size[1])
         self.mytabWidget.addTab(self.modelTab, "")
 

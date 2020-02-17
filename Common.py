@@ -438,6 +438,8 @@ KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_ENDPLATE_THICKNESS = ['All', 'Customized']
 VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20']
 
+ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
+
 DISP_TITLE_PLATE = 'Plate'
 
 KEY_PLATETHK = 'Plate.Thickness'
@@ -455,6 +457,9 @@ KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 KEY_DP_BOLT_SLIP_FACTOR = 'DesignPreferences.Bolt.Slip_Factor'
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 KEY_DP_WELD_TYPE = 'DesignPreferences.Weld.Type'
+KEY_DP_WELD_TYPE_SHOP = 'Shop Weld'
+KEY_DP_WELD_TYPE_FIELD = 'Field weld'
+KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_SHOP, KEY_DP_WELD_TYPE_FIELD]
 KEY_DISP_DP_WELD_TYPE = 'Type of weld'
 KEY_DP_WELD_MATERIAL_G_O = 'DesignPreferences.Weld.Material_Grade_OverWrite'
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
@@ -584,7 +589,6 @@ KEY_DISP_SUPTDSEC_POISSON_RATIO = 'Poissons ratio, v'
 KEY_SUPTDSEC_THERMAL_EXP = 'Supported_Section.Thermal_Expansion'
 KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
 
-KEY_OUT_YIELDING = "Bolt."
 
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
@@ -628,6 +632,17 @@ KEY_OUT_PLATE_MOM_DEMAND = 'Plate.MomDemand'
 KEY_OUT_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
+
+KEY_OUT_PLATE_CAPACITIES = 'capacities'
+KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
+
+DISP_TITLE_WELD = 'Weld'
+KEY_OUT_WELD_SIZE = 'Weld.Size'
+KEY_OUT_DISP_WELD_SIZE = 'Size(mm)'
+KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
+KEY_OUT_WELD_STRESS = 'Weld.Stress'
+KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"

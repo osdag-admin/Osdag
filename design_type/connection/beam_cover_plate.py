@@ -495,7 +495,7 @@ class BeamCoverPlate(MomentConnection):
                        )
             # print("BBB failed in web member checks. Select larger sections or decrease loads")
 
-    def module(self):
+    def module_name(self):
         return KEY_DISP_COLUMNCOVERPLATE
 
     def select_bolt_dia(self):

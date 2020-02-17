@@ -420,7 +420,7 @@ class CleatAngleConnection(ShearConnection):
             self.set_input_values(self, design_dictionary)
         else:
             pass
-    def module(self):
+    def module_name(self):
         return KEY_DISP_CLEATANGLE
 
     def set_input_values(self, design_dictionary):

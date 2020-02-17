@@ -302,16 +302,38 @@ class Column(Section):
 
 class Weld(Material):
 
-    def __init__(self, size=0.0, length=0.0, material_grade=""):
-        self.size = size
-        self.length = length
+    def __init__(self, material_grade="", fabrication=KEY_DP_WELD_TYPE_SHOP):
+        self.size = 0.0
+        self.length = 0.0
+        self.strength = 0.0
+        self.stress = 0.0
+        self.fabrication = fabrication
         super(Weld, self).__init__(material_grade)
 
     def __repr__(self):
         repr = "Weld\n"
         repr += "Size: {}\n".format(self.size)
         repr += "Length: {}\n".format(self.length)
+        repr += "Stress: {}\n".format(self.stress)
+        repr += "Strength: {}\n".format(self.strength)
         return repr
+
+    def get_weld_strength(self,connecting_fu, weld_fabrication, t_weld, weld_angle):
+        f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
+        throat_tk = \
+            IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness\
+                (t_weld, weld_angle)
+        weld_strength = f_wd * throat_tk
+        return weld_strength
+
+    def get_weld_stress(self,weld_shear, weld_axial, weld_twist, Ip_weld, y_max, x_max, l_weld):
+        T_wh = weld_twist * y_max/Ip_weld
+        T_wv = weld_twist * x_max/Ip_weld
+        V_wv = weld_shear/l_weld
+        A_wh = weld_axial/l_weld
+        print(T_wh, T_wv, V_wv, A_wh)
+        weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
+        return weld_stress
 
 
 class Plate(Material):
@@ -638,7 +660,7 @@ class Plate(Material):
         self.shear_rupture_capacity = R_n
 
     def get_moment_cacacity(self, fy, plate_tk, plate_len):
-        self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6 * 10 ** -6
+        self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6
 
     def __repr__(self):
         repr = "Plate\n"

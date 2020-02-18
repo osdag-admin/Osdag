@@ -251,6 +251,26 @@ class BeamCoverPlate(MomentConnection):
         webcapacity.append(t16)
         return webcapacity
 
+    def boltdetails(self,flag):
+
+        boltdetails = []
+        t16 = (KEY_FLANGE_BOLT_LINE, KEY_FLANGE_DISP_BOLT_LINE, TYPE_TEXTBOX,
+               round(self.flange_plate.bolt_line) if flag else '')
+        boltdetails.append(t16)
+
+        t16 = (KEY_FLANGE_BOLTS_ONE_LINE, KEY_FLANGE_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX,
+               round(self.flange_plate.bolts_one_line) if flag else '')
+        boltdetails.append(t16)
+
+        t16 = (KEY_WEB_BOLT_LINE, KEY_WEB_DISP_BOLT_LINE, TYPE_TEXTBOX,
+               round(self.flange_plate.bolts_one_line) if flag else '')
+        boltdetails.append(t16)
+
+        t16 = (KEY_WEB_BOLTS_ONE_LINE, KEY_WEB_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX,
+               round(self.flange_plate.bolts_one_line) if flag else '')
+        boltdetails.append(t16)
+        return  boltdetails
+
     def output_values(self, flag):
 
         out_list = []
@@ -265,6 +285,13 @@ class BeamCoverPlate(MomentConnection):
         t3 = (KEY_GRD, KEY_DISP_GRD, TYPE_TEXTBOX,
               self.web_bolt.bolt_grade_provided if flag else '')
         out_list.append(t3)
+
+        t4 = (None, DISP_TITLE_BOLTDETAILS, TYPE_TITLE, None)
+        out_list.append(t4)
+
+        t21 = (
+            KEY_BOLT_DETAILS, KEY_DISP_BOLT_DETAILS, TYPE_OUT_BUTTON, ['Bolt details', self.boltdetails])
+        out_list.append(t21)
 
         t4 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None)
         out_list.append(t4)
@@ -309,6 +336,9 @@ class BeamCoverPlate(MomentConnection):
         t21 = (
             KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity])
         out_list.append(t21)
+        # t21 = (
+        #     KEY_BOLT_DETAILS, KEY_DISP_BOLT_DETAILS, TYPE_OUT_BUTTON, ['Bolt details', self.boltdetails])
+        # out_list.append(t21)
 
         return out_list
 
@@ -444,9 +474,10 @@ class BeamCoverPlate(MomentConnection):
         design_shear_capacity = (self.section.depth* self.section.web_thickness * self.section.fy) / (
                 math.sqrt(3) * gamma_m0)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
         if self.load.shear_force * 1000 >= design_shear_capacity:
-            factored_shear_force = design_shear_capacity
+            self.load.shear_force = design_shear_capacity
         else:
             pass
+        # print("factored_shear_force" , factored_shear_force)
         # if self.section.type == "Rolled":
         if self.load.shear_force < (0.6 * design_shear_capacity):
 
@@ -467,6 +498,7 @@ class BeamCoverPlate(MomentConnection):
                                                                                column_area=self.section.area,
                                                                                compression_element="External",
                                                                                section="Rolled")
+            print("limitwidththkratio_flange",self.limitwidththkratio_flange)
         else:
            pass
 
@@ -483,17 +515,18 @@ class BeamCoverPlate(MomentConnection):
                                                                         section="generally")
         else:
             pass
-        self.class_of_section = max(self.limitwidththkratio_flange, self.limitwidththkratio_web)
-        if self.class_of_section == "plastic" and "compact":
+
+        self.class_of_section = int(max(self.limitwidththkratio_flange,self.limitwidththkratio_web))
+        if self.class_of_section == 1 and 2:
             Z_w = self.Z_p
-        elif self.class_of_section == "semi-compact":
+        elif self.class_of_section == 3:
             Z_w = self.Z_e
         else:
             pass
 
-        if self.class_of_section == "plastic" and "compact":
+        if self.class_of_section == 1 and 2:
             beta_b = 1
-        elif self.class_of_section == "semi-compact":
+        elif self.class_of_section == 3:
             beta_b = self.Z_e / self.Z_p
         # else:
         #     # beta_b = 1
@@ -502,12 +535,12 @@ class BeamCoverPlate(MomentConnection):
         design_bending_strength = beta_b * self.Z_p * self.section.fy / (gamma_m0)  # N
 
         print(60, design_bending_strength)
-        if self.load.moment > design_bending_strength:
-            factored_moment = design_bending_strength
+        if self.load.moment  > design_bending_strength/1000000:
+            self.load.moment = design_bending_strength
         else:
             pass
         if self.load.moment == 0:
-            factored_moment = design_bending_strength
+            self.load.moment = design_bending_strength
         else:
             pass
             # else:
@@ -585,7 +618,7 @@ class BeamCoverPlate(MomentConnection):
             axial_force_f))
         print("flange_force",flange_force )
 
-        self.res_force = math.sqrt((self.factored_shear_force)** 2 + ( self.factored_axial_load ) ** 2)
+        self.res_force = math.sqrt((self.load.shear_force *1000 )** 2 + ( self.factored_axial_load ) ** 2)
         self.flange_plate.thickness_provided = max(min(self.flange_plate.thickness),
                                                    math.ceil(self.section.flange_thickness))
         bolts_required_previous = 2
@@ -622,7 +655,8 @@ class BeamCoverPlate(MomentConnection):
                 web_plate_h_max=max_plate_height, web_plate_h_min=min_plate_height,
                 bolts_required=self.flange_plate.bolts_required, edge_dist=self.flange_bolt.min_edge_dist_round,
                 gauge=self.flange_bolt.min_gauge_round)
-            self.flange_plate.bolts_required = bolt_line * bolts_one_line
+            self.flange_plate.bolts_required = int(bolt_line * bolts_one_line)
+            print("flange_plate.bolts_required",self.flange_plate.bolts_required )
 
             if self.flange_plate.bolts_required > bolts_required_previous and count >= 1:
                 self.flange_bolt.bolt_grade_provided = bolt_grade_previous
@@ -742,7 +776,7 @@ class BeamCoverPlate(MomentConnection):
                                                                                   f_y=self.flange_plate.fy)
             # print(9,  self.flange_plate.block_shear_capacity, self.load.axial_force, self.flange_plate.pitch_provided)
 
-            if self.flange_plate.block_shear_capacity <  self.factored_axial_load :
+            if self.section.block_shear_capacity <  self.factored_axial_load :
                 if self.flange_bolt.max_spacing_round >= pitch + 5 and self.flange_bolt.max_end_dist_round >= end_dist + 5:  # increase thickness todo
                     if self.flange_plate.bolt_line == 1:
                         end_dist += 5
@@ -987,9 +1021,7 @@ class BeamCoverPlate(MomentConnection):
                                                                           self.section.web_thickness])
         min_web_plate_height = self.section.min_plate_height()
         max_web_plate_height = self.section.max_plate_height()
-        axial_force_w = int(((self.section.depth - 2 * (
-            self.section.flange_thickness)) * self.section.web_thickness *  self.factored_axial_load ) / self.section.area *100)
-
+        axial_force_w = ((self.section.depth - (2 * self.section.flange_thickness)) * self.section.web_thickness *  self.factored_axial_load ) / (self.section.area *100)
         self.web_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.web_bolt.bolt_diameter[0],
                                               bolt_grade_provided=self.web_bolt.bolt_grade[0],
                                               connecting_plates_tk=[self.web_plate.thickness[0],
@@ -1004,7 +1036,7 @@ class BeamCoverPlate(MomentConnection):
                                              min_gauge=self.web_bolt.min_gauge_round,
                                              max_spacing=self.web_bolt.max_spacing_round,
                                              max_edge_dist=self.web_bolt.max_edge_dist
-                                             , shear_load= self.factored_axial_load , axial_load=axial_force_w,
+                                             , shear_load= self.load.shear_force *1000, axial_load=axial_force_w,
                                              gap=self.web_plate.gap, shear_ecc=True)
 
         block_shear_capacity = 0
@@ -1077,10 +1109,12 @@ class BeamCoverPlate(MomentConnection):
                 break
         Tension_capacity_web_plate = min(self.section.shear_yielding_capacity, self.section.shear_rupture_capacity,
                                          self.section.block_shear_capacity)
-        self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,
-                                       column_t_w=self.section.web_thickness,
-                                       axial_force= self.factored_axial_load  , column_area=self.section.area)
-        if Tension_capacity_web_plate < self.webforce:
+        axial_force_w = ((self.section.depth - (2 * self.section.flange_thickness)) * self.section.web_thickness *  self.factored_axial_load ) / (self.section.area *100)
+
+        # self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,
+        #                                column_t_w=self.section.web_thickness,
+        #                                axial_force= self.factored_axial_load  , column_area=self.section.area)
+        if Tension_capacity_web_plate < axial_force_w:
             self.design_status = False
             logger.warning(": Tension capacity web_plate is less than required web force kN Select larger beam section")  # todo
 
@@ -1147,10 +1181,10 @@ class BeamCoverPlate(MomentConnection):
                     break
             Tension_capacity_web_plate = min( self.section.tension_yielding_capacity , self.section.tension_rupture_capacity,
                                              self.section.block_shear_capacity)
-            self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,
-                                           column_t_w=self.section.web_thickness,
-                                           axial_force= self.factored_axial_load , column_area=self.section.area)
-            if Tension_capacity_web_plate < self.webforce:
+            # self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,
+            #                                column_t_w=self.section.web_thickness,
+            #                                axial_force= self.factored_axial_load , column_area=self.section.area)
+            if Tension_capacity_web_plate < axial_force_w:
                 self.design_status = False
                 logger.warning(": Tension capacity web_plate is less than required web force kN Select larger beam section")  # todo
 
@@ -1218,10 +1252,10 @@ class BeamCoverPlate(MomentConnection):
                 break
             Tension_capacity_web_plate = min(self.section.shear_yielding_capacity, self.section.shear_rupture_capacity,
                                              self.section.block_shear_capacity)
-        self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,
-                                       column_t_w=self.section.web_thickness,
-                                       axial_force= self.factored_axial_load , column_area=self.section.area)
-        if Tension_capacity_web_plate < self.webforce:
+        # self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,
+        #                                column_t_w=self.section.web_thickness,
+        #                                axial_force= self.factored_axial_load , column_area=self.section.area)
+        if Tension_capacity_web_plate < axial_force_w:
             self.design_status = False
             logger.warning(": Tension capacity web_plate is less than required web force kN Select larger beam section") # todo
 
@@ -1229,15 +1263,36 @@ class BeamCoverPlate(MomentConnection):
             pass
         # print(600, design_status)
 
+        print(
+            self.flange_plate.length *2)
+        print(
+            self.web_plate.length *2)
+        print(
+            self.flange_plate.bolts_required * 2)
+        print(
+            self.web_plate.bolts_required * 2)
+
+        self.flange_plate.length = self.flange_plate.length * 2
+        self.web_plate.length = self.web_plate.length * 2
+        self.flange_plate.bolts_required = self.flange_plate.bolts_required * 2
+        self.web_plate.bolts_required = self.web_plate.bolts_required * 2
         print(self.section)
         print(self.load)
-        # print(self.flange_bolt)
-        # print(self.flange_plate)
-        # print(self.web_bolt)
+        print(self.flange_bolt)
+        print(self.flange_plate)
+        print(self.web_bolt)
         print(self.web_plate)
         print(self.web_plate.thickness_provided)
         print(self.flange_plate.thickness_provided)
         #print(design_status)
+        print(
+            self.flange_plate.length )
+        print(
+            self.web_plate.length )
+        print(
+            self.flange_plate.bolts_required )
+        print(
+            self.web_plate.bolts_required )
 
         if self.design_status == True:
 
@@ -1340,27 +1395,27 @@ class BeamCoverPlate(MomentConnection):
         # A_vn = (height- bolts_one_line * dia_hole) * thickness
         T_dn = 0.9 * A_vn * fu / (gamma_m1)
         return T_dn
-
-    def web_force(column_d, column_f_t, column_t_w, axial_force, column_area):
-        """
-        Args:
-           c_d: Overall depth of the column section in mm (float)
-           column_f_t: Thickness of flange in mm (float)
-           column_t_w: Thickness of flange in mm (float)
-           axial_force: Factored axial force in kN (float)
-
-        Returns:
-            Force in flange in kN (float)
-        """
-        axial_force_w = int(
-            ((column_d - 2 * (column_f_t)) * column_t_w * axial_force ) / column_area*100)   # N
-        return round(axial_force_w)
+    #
+    # def web_force(column_d, column_f_t, column_t_w, axial_force, column_area):
+    #     """
+    #     Args:
+    #        c_d: Overall depth of the column section in mm (float)
+    #        column_f_t: Thickness of flange in mm (float)
+    #        column_t_w: Thickness of flange in mm (float)
+    #        axial_force: Factored axial force in kN (float)
+    #
+    #     Returns:
+    #         Force in flange in kN (float)
+    #     """
+    #     axial_force_w = int(
+    #         ((column_d - 2 * (column_f_t)) * column_t_w * axial_force ) / column_area*100)   # N
+    #     return round(axial_force_w)
 
     @staticmethod
     def limiting_width_thk_ratio(column_f_t, column_t_w, column_d, column_b, column_fy, factored_axial_force,
                                  column_area, compression_element, section):
 
-        epsilon = math.sqrt(250 / column_fy)
+        epsilon = int(math.sqrt(250 / column_fy))
         axial_force_w = int(
             ((column_d - 2 * (column_f_t)) * column_t_w * factored_axial_force) /( column_area * 100)) #N
 
@@ -1376,82 +1431,83 @@ class BeamCoverPlate(MomentConnection):
         if compression_element == "External" or compression_element =="Internal":
             if section == "Rolled":
                 if column_b * 0.5 / column_f_t <= 9.4 * epsilon:
-                    class_of_section = "plastic"
+                    class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 10.5 * epsilon:
-                    class_of_section = "compact"
+                    class_of_section1 = "compact"
                 elif column_b * 0.5 / column_f_t <= 15.7 * epsilon:
-                    class_of_section = "semi-compact"
-                else:
-                    pass
+                    class_of_section1 = "semi-compact"
+                # else:
+                #     print('fail')
                 # print("class_of_section", class_of_section )
             elif section == "welded":
                 if column_b * 0.5 / column_f_t <= 8.4 * epsilon:
-                    class_of_section = "plastic"
+                    class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 9.4 * epsilon:
-                    class_of_section = "compact"
+                    class_of_section1 = "compact"
                 elif column_b * 0.5 / column_f_t <= 13.6 * epsilon:
-                    class_of_section = "semi-compact"
-                else:
-                    pass
+                    class_of_section1 = "semi-compact"
+                # else:
+                #     print('fail')
             elif section == "compression due to bending":
                 if column_b * 0.5 / column_f_t <= 29.3 * epsilon:
-                    class_of_section = "plastic"
+                    class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 33.5 * epsilon:
-                    class_of_section = "compact"
+                    class_of_section1 = "compact"
                 elif column_b * 0.5 / column_f_t <= 42 * epsilon:
-                    class_of_section = "semi-compact"
-                else:
-                    pass
-            else:
-                pass
+                    class_of_section1 = "semi-compact"
+                # else:
+                #     print('fail')
+            # else:
+            #     pass
 
         elif compression_element =="Web of an I-H"or compression_element == "box section":
             if section == "generally":
                 if r1 < 0:
-                    if column_d / column_t_w <= (84 * epsilon / (1 + r1)) and column_d / column_t_w <= (42 * epsilon):
-                        class_of_section = "plastic"
+                    if column_d / column_t_w <= (84 * epsilon / (1 + r1)) and column_d / column_t_w >= (42 * epsilon):
+                        class_of_section1 = "plastic"
                     elif column_d / column_t_w <= (105 * epsilon / (1 + r1)):
-                        class_of_section = "compact"
-                    elif column_d / column_t_w <= (126 * epsilon / (1 + r1)) and column_d / column_t_w <= (
+                        class_of_section1 = "compact"
+                    elif column_d / column_t_w <= (126 * epsilon / (1 + r1)) and column_d / column_t_w >= (
                             42 * epsilon):
-                        class_of_section = "semi-compact"
-                    else:
-                        pass
+                        class_of_section1 = "semi-compact"
+                    # else:
+                    #     print('fail')
                     # print("class_of_section3", class_of_section)
                 elif r1 > 0:
-                    if column_d / column_t_w <= (84 * epsilon / (1 + r1)) and column_d / column_t_w <= (42 * epsilon):
-                        class_of_section = "plastic"
-                    elif column_d / column_t_w <= (105 * epsilon / (1 + (r1 * 1.5))) and column_d / column_t_w <= (
+                    if column_d / column_t_w <= (84 * epsilon / (1 + r1)) and column_d / column_t_w >= (42 * epsilon):
+                        class_of_section1 = "plastic"
+                    elif column_d / column_t_w <= (105 * epsilon / (1 + (r1 * 1.5))) and column_d / column_t_w >= (
                             42 * epsilon):
-                        class_of_section = "compact"
-                    elif column_d / column_t_w <= (126 * epsilon / (1 + r1)) and column_d / column_t_w <= (
+                        class_of_section1 = "compact"
+                    elif column_d / column_t_w <= (126 * epsilon / (1 + r1)) and column_d / column_t_w >= (
                             42 * epsilon):
-                        class_of_section = "semi-compact"
-                    else:
-                        pass
-                    print("class_of_section4", class_of_section)
+                        class_of_section1 = "semi-compact"
+                    # else:
+                    #     print('fail')
+                    # print("class_of_section4", class_of_section)
             elif section == "Axial compression":
                 if column_d / column_t_w <= (42 * epsilon):
-                    class_of_section = "semi-compact"
+                    class_of_section1 = "semi-compact"
                 else:
-                    class_of_section = "N/A"
-            else:
-                pass
-        else:
-            pass
-        print("class_of_section1", class_of_section )
-        if class_of_section == "plastic":
-            class_of_section = 1
-        elif class_of_section == "compact":
-            class_of_section = 2
-        elif class_of_section == "semi-compact":
-            class_of_section = 3
-        else:
-            pass
-        print( "class_of_section2",class_of_section)
+                    class_of_section1 = "N/A"
+        #     else:
+        #         print('fail')
+        # else:
+        #     pass
+        print("class_of_section", class_of_section1 )
+        if class_of_section1 == "plastic":
+            class_of_section1 = 1
+        elif class_of_section1 == "compact":
+            class_of_section1 = 2
+        elif class_of_section1 == "semi-compact":
+            class_of_section1 = 3
+        # else:
+        #     print('fail')
+        print( "class_of_section2",class_of_section1)
 
-        return class_of_section
+        return class_of_section1
 
+        print("class_of_section1", class_of_section1)
     # def flange_force(column_d, column_f_t, column_b, column_area, factored_axial_force, moment_load):
     #     """
     #     Args:

@@ -381,6 +381,13 @@ KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
 KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
+DISP_TITLE_BOLTDETAILS ='Bolt Details'
+KEY_BOLT_DETAILS ="Bolt.Details"
+KEY_DISP_BOLT_DETAILS = "Bolt Details"
+KEY_FLANGE_BOLT_LINE = 'Flange_plate.Bolt_Line'
+KEY_FLANGE_DISP_BOLT_LINE = 'Bolt Lines in flange'
+KEY_FLANGE_BOLTS_ONE_LINE = 'Flange_plate.Bolt_OneLine'
+KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in Line in flange'
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
@@ -417,6 +424,10 @@ KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
 KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
 KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
+KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
+KEY_WEB_DISP_BOLT_LINE = 'Bolt Lines in web'
+KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
+KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in Line in web'
 
 DISP_TITLE_ENDPLATE = 'End plate'
 

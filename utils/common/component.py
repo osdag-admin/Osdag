@@ -14,8 +14,10 @@ class Bolt(Material):
         super(Bolt, self).__init__(material_grade)
         if grade is not None:
             self.bolt_grade = list(np.float_(grade))
+            self.bolt_grade.sort(key=float)
         if diameter is not None:
             self.bolt_diameter = list(np.float_(diameter))
+            self.bolt_diameter.sort(key=float)
         self.bolt_type = bolt_type
         self.bolt_hole_type = bolt_hole_type
         self.edge_type = edge_type
@@ -343,6 +345,7 @@ class Plate(Material):
         self.design_status = True
         self.reason = ""
         self.thickness = list(np.float_(thickness))
+        self.thickness.sort(key=float)
         self.thickness_provided = 0.0
         self.height = height
         self.length = length
@@ -495,7 +498,7 @@ class Plate(Material):
         if bolts_one_line == 1:
             self.design_status = False
             self.reason = "Can't fit two bolts in one line. Select lower diameter"
-        if bolt_line > bolt_line_limit:
+        elif bolt_line > bolt_line_limit:
             self.design_status = False
             self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
         else:
@@ -522,7 +525,7 @@ class Plate(Material):
                                                       gauge, bolt_capacity,
                                                       bolt_dia)
                 print(3, vres, bolt_capacity_red)
-                while bolt_line < bolt_line_limit and vres > bolt_capacity_red:
+                while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
                     # Length of plate is increased for calculated bolts in one line.
                     # This increases spacing which decreases resultant force
                     print(4, web_plate_h, web_plate_h_max)
@@ -549,6 +552,11 @@ class Plate(Material):
                                                                                    min_edge_dist, max_spacing,
                                                                                    max_edge_dist)
 
+                    if bolt_line == 1:
+                        pitch = 0.0
+                    else:
+                        pitch = min_gauge
+                    ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
                     vres = self.get_vres(bolts_one_line, pitch,
                                          gauge, bolt_line, shear_load, axial_load, ecc)
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
@@ -571,6 +579,10 @@ class Plate(Material):
             if vres > bolt_capacity_red:
                 self.design_status = False
                 self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+            else:
+                self.design_status = True
+
+
 
             self.length = gap + end_dist * 2 + pitch * (bolt_line - 1)
             self.height = web_plate_h

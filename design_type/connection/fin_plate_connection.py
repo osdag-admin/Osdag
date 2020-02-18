@@ -1,4 +1,5 @@
 from design_type.connection.shear_connection import ShearConnection
+import time
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
@@ -413,6 +414,8 @@ class FinPlateConnection(ShearConnection):
     def set_input_values(self, design_dictionary):
 
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
+
+        self.start_time = time.time()
         self.module = design_dictionary[KEY_MODULE]
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
@@ -420,6 +423,9 @@ class FinPlateConnection(ShearConnection):
         self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],fabrication = design_dictionary[KEY_DP_WELD_TYPE])
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
+
+
+
 
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)
@@ -459,7 +465,7 @@ class FinPlateConnection(ShearConnection):
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
         count = 0
-        bolts_one_line = 1
+        bolt_force_previous = 0.0
         for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                     connecting_plates_tk=[self.plate.thickness_provided,
@@ -471,31 +477,48 @@ class FinPlateConnection(ShearConnection):
                                                                     self.supported_section.web_thickness],
                                               n_planes=1)
 
-            self.plate.bolts_required = max(int(math.ceil(self.res_force / self.bolt.bolt_capacity)), 2)
-            [bolt_line, bolts_one_line, web_plate_h] = \
-                self.plate.get_web_plate_l_bolts_one_line(self.max_plate_height, self.min_plate_height, self.plate.bolts_required,
-                                                    self.bolt.min_edge_dist_round, self.bolt.min_gauge_round)
-            self.plate.bolts_required = bolt_line * bolts_one_line
-            print(1, self.res_force, self.bolt.bolt_capacity, self.bolt.bolt_diameter_provided, self.plate.bolts_required, bolts_one_line)
-            if bolts_one_line > 1:
+            self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                             web_plate_h_min=self.min_plate_height,
+                                             web_plate_h_max=self.max_plate_height,
+                                             bolt_capacity=self.bolt.bolt_capacity,
+                                             min_edge_dist=self.bolt.min_edge_dist_round,
+                                             min_gauge=self.bolt.min_gauge_round,
+                                             max_spacing=self.bolt.max_spacing_round,
+                                             max_edge_dist=self.bolt.max_edge_dist_round,
+                                             shear_load=self.load.shear_force * 1000,
+                                             axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
+                                             shear_ecc=True, bolt_line_limit=2)
+
+            # self.plate.bolts_required = max(int(math.ceil(self.res_force / self.bolt.bolt_capacity)), 2)
+            # [bolt_line, bolts_one_line, web_plate_h] = \
+            #     self.plate.get_web_plate_l_bolts_one_line(self.max_plate_height, self.min_plate_height, self.plate.bolts_required,
+            #                                         self.bolt.min_edge_dist_round, self.bolt.min_gauge_round)
+            # self.plate.bolts_required = bolt_line * bolts_one_line
+            print(1, self.plate.bolt_force, self.bolt.bolt_capacity, self.bolt.bolt_diameter_provided, self.plate.bolts_required, self.plate.bolts_one_line)
+            if self.plate.design_status is True:
                 if self.plate.bolts_required > bolts_required_previous and count >= 1:
                     self.bolt.bolt_diameter_provided = bolt_diameter_previous
                     self.plate.bolts_required = bolts_required_previous
+                    self.plate.bolt_force = bolt_force_previous
                     break
                 bolts_required_previous = self.plate.bolts_required
                 bolt_diameter_previous = self.bolt.bolt_diameter_provided
+                bolt_force_previous = self.plate.bolt_force
                 count += 1
+            else:
+                pass
+        bolt_capacity_req = self.bolt.bolt_capacity
 
-        if bolts_one_line == 1:
+        if self.plate.design_status is False:
             self.design_status = False
-            logger.error(" : Select bolt of lower diameter")
+            logger.error(self.plate.reason)
         else:
             self.design_status = True
-            self.get_bolt_grade(self)
+            self.get_bolt_grade(self,bolt_capacity_req)
 
-    def get_bolt_grade(self):
+    def get_bolt_grade(self,bolt_capacity_req):
+        print(self.design_status, "Getting bolt grade")
         bolt_grade_previous = self.bolt.bolt_grade[-1]
-        bolts_required_previous = self.plate.bolts_required
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
             count = 1
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
@@ -508,15 +531,9 @@ class FinPlateConnection(ShearConnection):
                                                                     self.supported_section.web_thickness],
                                               n_planes=1)
 
-            self.plate.bolts_required = max(int(math.ceil(self.res_force / self.bolt.bolt_capacity)), 2)
-            [bolt_line, bolts_one_line, web_plate_h] = \
-                self.plate.get_web_plate_l_bolts_one_line(self.max_plate_height, self.min_plate_height, self.plate.bolts_required,
-                                                    self.bolt.min_edge_dist_round, self.bolt.min_gauge_round)
-            self.plate.bolts_required = bolt_line * bolts_one_line
-            print(2, self.res_force, self.bolt.bolt_capacity, self.bolt.bolt_grade_provided, self.plate.bolts_required, bolts_one_line)
-            if self.plate.bolts_required > bolts_required_previous and count >= 1:
+            print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.plate.bolt_force)
+            if self.bolt.bolt_capacity < self.plate.bolt_force and count >= 1:
                 self.bolt.bolt_grade_provided = bolt_grade_previous
-                self.plate.bolts_required = bolts_required_previous
                 break
             bolts_required_previous = self.plate.bolts_required
             bolt_grade_previous = self.bolt.bolt_grade_provided
@@ -524,6 +541,7 @@ class FinPlateConnection(ShearConnection):
         self.get_fin_plate_details(self)
 
     def get_fin_plate_details(self):
+        print(self.design_status,"getting fin plate details")
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                 connecting_plates_tk=[self.plate.thickness_provided,
                                                                       self.supported_section.web_thickness])
@@ -669,6 +687,7 @@ class FinPlateConnection(ShearConnection):
             logger.error(": Weld thickness is not sufficient [cl. 10.5.7, IS 800:2007]")
             logger.warning(": Minimum weld thickness required is %2.2f mm " % t_weld_req)
             logger.info(": Should increase length of weld/fin plate")
+        print("--- %s seconds ---" % (time.time() - self.start_time))
 
     def save_design(self,ui,popup_summary):
 

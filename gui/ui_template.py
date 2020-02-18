@@ -668,10 +668,15 @@ class Ui_ModuleWindow(QMainWindow):
                             data[c_tup[0] + "_customized"] = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText())
                             key.setCurrentIndex(0)
                     else:
+<<<<<<< HEAD
+                        data[c_tup[0] + "_customized"] = f(self.dockWidgetContents.findChild(QtWidgets.QWidget,
+                            KEY_SEC_PROFILE).currentText()).remove('Select Section')
+=======
                         input = f(self.dockWidgetContents.findChild(QtWidgets.QWidget,
                             KEY_SEC_PROFILE).currentText())
                         input.remove('Select Section')
                         data[c_tup[0] + "_customized"] = input
+>>>>>>> 6cf73de1eccd9984a7eabbebc260495068a10335
                 else:
                     options = f()
                     existing_options = data[c_tup[0] + "_customized"]
@@ -1174,7 +1179,11 @@ class Ui_ModuleWindow(QMainWindow):
         # from OCC.Display.pyqt4Display import qtViewer3d
         from OCC.Display.qtDisplay import qtViewer3d
         self.modelTab = qtViewer3d(self)
+<<<<<<< HEAD
+        self.setWindowTitle("Osdag Fin Plate")
+=======
         # self.setWindowTitle("Osdag Fin Plate")
+>>>>>>> 6cf73de1eccd9984a7eabbebc260495068a10335
         self.mytabWidget.resize(size[0], size[1])
         self.mytabWidget.addTab(self.modelTab, "")
 
@@ -1458,8 +1467,12 @@ class Ui_ModuleWindow(QMainWindow):
             module = uiObj[KEY_MODULE]
 
             # module_class = self.return_class(module)
+<<<<<<< HEAD
+            if main.module(main) == module:
+=======
             selected_module = main.module_name(main)
             if selected_module == module:
+>>>>>>> 6cf73de1eccd9984a7eabbebc260495068a10335
                 self.setDictToUserInputs(uiObj, op_list, data, new)
             else:
                 QMessageBox.information(self, "Information",
@@ -1556,7 +1569,11 @@ class Ui_ModuleWindow(QMainWindow):
             # if status is True and main.module == "Fin Plate":
             #     self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
             #                                                  main.module)
+<<<<<<< HEAD
+            if status is True:
+=======
             if status is True and main.module == "Fin Plate":
+>>>>>>> 6cf73de1eccd9984a7eabbebc260495068a10335
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)
@@ -1970,6 +1987,11 @@ class Ui_ModuleWindow(QMainWindow):
             #     print(designation_col[0])
             # self.designPrefDialog.column_preferences(designation_col[0], table_c, material_grade)
 
+<<<<<<< HEAD
+        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION]:
+                self.designPrefDialog.beam_preferences(designation_col, table_2, material_grade)
+=======
+>>>>>>> 6cf73de1eccd9984a7eabbebc260495068a10335
         elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
             conn = key_1.currentText()
             designation_col = key_2.currentText()

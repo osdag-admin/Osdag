@@ -250,6 +250,7 @@ class Connection(Main):
 
         weld = []
 
+
         t1 = (KEY_DP_WELD_TYPE, KEY_DISP_DP_WELD_TYPE, TYPE_COMBOBOX, KEY_DP_WELD_TYPE_VALUES)
         weld.append(t1)
 

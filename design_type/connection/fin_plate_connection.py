@@ -1,4 +1,5 @@
 from design_type.connection.shear_connection import ShearConnection
+
 import time
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -88,6 +89,7 @@ class FinPlateConnection(ShearConnection):
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+
 
     def module_name(self):
         return KEY_DISP_FINPLATE
@@ -310,6 +312,7 @@ class FinPlateConnection(ShearConnection):
         t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
         out_list.append(t16)
 
+
         # t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity,2) if flag else '')
         # out_list.append(t17)
         #
@@ -416,16 +419,15 @@ class FinPlateConnection(ShearConnection):
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
 
         self.start_time = time.time()
+
         self.module = design_dictionary[KEY_MODULE]
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+
         self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],fabrication = design_dictionary[KEY_DP_WELD_TYPE])
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
-
-
-
 
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)
@@ -465,7 +467,9 @@ class FinPlateConnection(ShearConnection):
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
         count = 0
+
         bolt_force_previous = 0.0
+
         for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                     connecting_plates_tk=[self.plate.thickness_provided,
@@ -519,6 +523,7 @@ class FinPlateConnection(ShearConnection):
     def get_bolt_grade(self,bolt_capacity_req):
         print(self.design_status, "Getting bolt grade")
         bolt_grade_previous = self.bolt.bolt_grade[-1]
+
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
             count = 1
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
@@ -531,6 +536,7 @@ class FinPlateConnection(ShearConnection):
                                                                     self.supported_section.web_thickness],
                                               n_planes=1)
 
+
             print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.plate.bolt_force)
             if self.bolt.bolt_capacity < self.plate.bolt_force and count >= 1:
                 self.bolt.bolt_grade_provided = bolt_grade_previous
@@ -541,7 +547,9 @@ class FinPlateConnection(ShearConnection):
         self.get_fin_plate_details(self)
 
     def get_fin_plate_details(self):
+
         print(self.design_status,"getting fin plate details")
+
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                 connecting_plates_tk=[self.plate.thickness_provided,
                                                                       self.supported_section.web_thickness])
@@ -562,6 +570,7 @@ class FinPlateConnection(ShearConnection):
                                          shear_ecc=True, bolt_line_limit=2)
         if self.plate.design_status is False:
             logger.error(self.plate.reason)
+
         else:
             self.plate_shear_checks(self)
             self.design_weld(self)
@@ -572,6 +581,7 @@ class FinPlateConnection(ShearConnection):
         # Block Shear Check for supporting section
         #################################
         edge_dist_rem = self.plate.edge_dist_provided + self.plate.gap
+
         # design_status_block_shear = False
         # while design_status_block_shear is False:
         #     print(design_status_block_shear)
@@ -636,6 +646,7 @@ class FinPlateConnection(ShearConnection):
 
         plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,
                                    self.plate.shear_yielding_capacity)
+
 
         if self.load.shear_force > plate_shear_capacity:
             # self.design_status = False

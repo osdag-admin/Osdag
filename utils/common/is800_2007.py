@@ -564,7 +564,6 @@ class IS800_2007(object):
 
     # cl. 10.5.7.1.1 Design stresses in fillet welds
     @staticmethod
-
     def cl_10_5_7_1_1_fillet_weld_design_stress(ultimate_stresses, fabrication=KEY_DP_WELD_TYPE_SHOP):
 
         """Calculate the design strength of fillet weld

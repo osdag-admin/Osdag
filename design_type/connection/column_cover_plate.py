@@ -1544,26 +1544,24 @@ class ColumnCoverPlate(MomentConnection):
         elif compression_element == "Web of an I-H" or compression_element == "box section":
             if section == "generally":
                 if r1 < 0:
-                    if column_d / column_t_w <= (84 * epsilon / (1 + r1)) and column_d / column_t_w >= (
-                            42 * epsilon):
+                    if column_d / column_t_w <= max((84 * epsilon / (1 + r1)), (42 * epsilon)):
                         class_of_section1 = "plastic"
-                    elif column_d / column_t_w <= (105 * epsilon / (1 + r1)):
+                    elif column_d / column_t_w <= (max(105 * epsilon / (1 + r1)), (42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= (126 * epsilon / (1 + r1)) and column_d / column_t_w >= (
-                            42 * epsilon):
+                    elif column_d / column_t_w <= max((126 * epsilon / (1 + r1)), column_d / column_t_w >= (
+                            42 * epsilon)):
                         class_of_section1 = "semi-compact"
                     # else:
                     #     print('fail')
                     # print("class_of_section3", class_of_section)
                 elif r1 > 0:
-                    if column_d / column_t_w <= (84 * epsilon / (1 + r1)) and column_d / column_t_w >= (
-                            42 * epsilon):
+                    if column_d / column_t_w <= max((84 * epsilon / (1 + r1)), (42 * epsilon)):
                         class_of_section1 = "plastic"
-                    elif column_d / column_t_w <= (105 * epsilon / (1 + (r1 * 1.5))) and column_d / column_t_w >= (
-                            42 * epsilon):
+                    elif column_d / column_t_w <= max((105 * epsilon / (1 + (r1 * 1.5))), (
+                            42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= (126 * epsilon / (1 + r1)) and column_d / column_t_w >= (
-                            42 * epsilon):
+                    elif column_d / column_t_w <= max((126 * epsilon / (1 + r1)), (
+                            42 * epsilon)):
                         class_of_section1 = "semi-compact"
                     # else:
                     #     print('fail')

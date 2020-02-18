@@ -548,6 +548,7 @@ class CommonDesignLogic(object):
         #     # ---------------- fillet_thickness = self.resultObj['Weld']['thickness']
         #     plate_width = self.resultObj['Plate']['width']
         #     plate_thick = str(self.uiObj['Plate']['Thickness (mm)'])
+        #
 
         # bolt_dia = str(self.uiObj["Bolt"]["Diameter (mm)"])
         # bolt_r = (float(bolt_dia) / 2)

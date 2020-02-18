@@ -287,6 +287,10 @@ class ColumnCoverPlate(MomentConnection):
                round(self.flange_plate.bolts_one_line) if flag else '')
         boltdetails.append(t16)
 
+        t16 = (KEY_FLANGE_BOLTS_REQ, KEY_FLANGE_DISP_BOLTS_REQ, TYPE_TEXTBOX,
+               round(self.flange_plate.bolts_required) if flag else '')
+        boltdetails.append(t16)
+
         t16 = (KEY_WEB_BOLT_LINE, KEY_WEB_DISP_BOLT_LINE, TYPE_TEXTBOX,
                round(self.flange_plate.bolts_one_line) if flag else '')
         boltdetails.append(t16)
@@ -294,6 +298,11 @@ class ColumnCoverPlate(MomentConnection):
         t16 = (KEY_WEB_BOLTS_ONE_LINE, KEY_WEB_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX,
                round(self.flange_plate.bolts_one_line) if flag else '')
         boltdetails.append(t16)
+
+        t16 = (KEY_WEB_BOLTS_REQ, KEY_WEB_DISP_BOLTS_REQ, TYPE_TEXTBOX,
+               round(self.web_plate.bolts_required) if flag else '')
+        boltdetails.append(t16)
+
         return boltdetails
 
 

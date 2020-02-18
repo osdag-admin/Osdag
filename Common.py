@@ -406,6 +406,8 @@ KEY_FLANGE_BOLT_LINE = 'Flange_plate.Bolt_Line'
 KEY_FLANGE_DISP_BOLT_LINE = 'Bolt Lines in flange'
 KEY_FLANGE_BOLTS_ONE_LINE = 'Flange_plate.Bolt_OneLine'
 KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in flange'
+KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
+KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
@@ -446,6 +448,8 @@ KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
 KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
 KEY_WEB_DISP_BOLT_LINE = 'Bolt Lines in web'
+KEY_WEB_BOLTS_REQ = "Web_plate.Bolt_required"
+KEY_WEB_DISP_BOLTS_REQ = "Web Bolt Required"
 KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
 KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in web'
 

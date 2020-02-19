@@ -287,7 +287,8 @@ class CommonDesignLogic(object):
         nut_Ht = bolt_dia
         gap = A.plate.gap
         # notch_height = self.get_notch_ht(A.supporting_section.flange_width, A.supporting_section.flange_thickness, A.supported_section.flange_thickness, A.supported_section.root_radius)
-        notch_height = 2 * A.supporting_section.flange_thickness
+        # notch_height = 2 * A.supporting_section.flange_thickness
+        notch_height = A.supported_section.notch_ht
         notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
 
         if self.connection == "cleatAngle":

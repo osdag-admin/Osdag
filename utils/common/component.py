@@ -168,6 +168,7 @@ class Section(Material):
         self.designation = designation
         self.type = "Rolled"
         self.type2 = "generally"
+        self.notch_ht = 0.0
 
         self.mass = 0.0
         self.area = 0.0
@@ -285,9 +286,11 @@ class Beam(Section):
     def min_plate_height(self):
         return 0.6 * self.depth
 
-    def max_plate_height(self):
-
-        clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
+    def max_plate_height(self, connectivity, notch_height = 0.0):
+        if connectivity in VALUES_CONN_1:
+            clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
+        else:
+            clear_depth = self.depth - notch_height
         return clear_depth
 
 class Column(Section):
@@ -308,6 +311,7 @@ class Column(Section):
 class Weld(Material):
 
     def __init__(self, material_grade="", fabrication=KEY_DP_WELD_TYPE_SHOP):
+        self.design_status = True
         self.size = 0.0
         self.length = 0.0
         self.strength = 0.0
@@ -336,7 +340,6 @@ class Weld(Material):
         T_wv = weld_twist * x_max/Ip_weld
         V_wv = weld_shear/l_weld
         A_wh = weld_axial/l_weld
-        print(T_wh, T_wv, V_wv, A_wh)
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
         return weld_stress
 
@@ -528,7 +531,7 @@ class Plate(Material):
                                                       bolt_dia)
                 print(3, vres, bolt_capacity_red)
 
-                while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
+                while bolt_line <= bolt_line_limit and vres > bolt_capacity_red and web_plate_h <= web_plate_h_max:
                     # Length of plate is increased for calculated bolts in one line.
                     # This increases spacing which decreases resultant force
                     print(4, web_plate_h, web_plate_h_max)

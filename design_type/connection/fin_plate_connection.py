@@ -649,7 +649,7 @@ class FinPlateConnection(ShearConnection):
                 logger.error(": For given members and %2.2f mm thick plate, weld sizes should be of range "
                          "%2.2f mm and  %2.2f mm " %self.plate.thickness_provided % weld_size_min
                              % weld_size_max)
-                logger.info(": Please select appropriate weld sizes for selected plate thickness values ")
+                logger.info(": Cannot design weld with available welds ")
 
         self.plate_shear_checks(self)
 

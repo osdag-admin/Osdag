@@ -59,7 +59,7 @@ from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
-from design_type.connection.end_plate_connection import EndPlateConnectionInput
+from design_type.connection.end_plate_connection import EndPlateConnection
 
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
@@ -1418,7 +1418,7 @@ class Ui_ModuleWindow(QMainWindow):
         if name == KEY_DISP_FINPLATE:
             return FinPlateConnection
         elif name == KEY_DISP_ENDPLATE:
-            return EndPlateConnectionInput
+            return EndPlateConnection
         elif name == KEY_DISP_COLUMNCOVERPLATE:
             return ColumnCoverPlate
         elif name == KEY_DISP_BEAMCOVERPLATE:
@@ -1540,7 +1540,7 @@ class Ui_ModuleWindow(QMainWindow):
             # if status is True and main.module == "Fin Plate":
             #     self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
             #                                                  main.module)
-            if status is True:
+            if status is True and main.module == "Fin Plate":
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)
@@ -1950,8 +1950,7 @@ class Ui_ModuleWindow(QMainWindow):
             #     print(designation_col[0])
             # self.designPrefDialog.column_preferences(designation_col[0], table_c, material_grade)
 
-        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION]:
-                self.designPrefDialog.beam_preferences(designation_col, table_2, material_grade)
+
         elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
             conn = key_1.currentText()
             designation_col = key_2.currentText()

@@ -247,11 +247,11 @@ def get_oldbeamcombolist():
 
 KEY_MODULE = 'Module'
 KEY_DISP_FINPLATE = 'Fin Plate'
-<<<<<<< HEAD
+
 KEY_DISP_ENDPLATE = 'End Plate'
-=======
+
 KEY_DISP_CLEATANGLE = 'Cleat Angle'
->>>>>>> 20afb411cc52b60160134997d111cc494e741dfa
+
 TYPE_MODULE = 'Window Title'
 KEY_DISP_COMPRESSION = 'Compression Member'
 
@@ -427,14 +427,14 @@ DISP_TITLE_ENDPLATE = 'End plate'
 KEY_ENDPLATE_THICKNESS = 'Plate.end_plate.Thickness'
 KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_ENDPLATE_THICKNESS = ['All', 'Customized']
-VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20']
+VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
 DISP_TITLE_PLATE = 'Plate'
 
 KEY_PLATETHK = 'Plate.Thickness'
 KEY_DISP_PLATETHK = 'Thickness(mm)*'
 VALUES_PLATETHK = ['All', 'Customized']
-VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20']
+VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
 KEY_DP_BOLT_TYPE = 'DesignPreferences.Bolt.Type'
 KEY_DISP_DP_BOLT_TYPE = 'Bolt type'

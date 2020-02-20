@@ -123,7 +123,7 @@ class Bolt(Material):
         elif self.bolt_type == "Friction Grip Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_4_3_bolt_slip_resistance(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, n_e=n_planes, mu_f=self.mu_f, bolt_hole_type=self.bolt_hole_type)
-            self.bolt_bearing_capacity = 'N/A'
+            self.bolt_bearing_capacity = VALUE_NOT_APPLICABLE
             self.bolt_capacity = self.bolt_shear_capacity
 
     def calculate_bolt_spacing_limits(self, bolt_diameter_provided, connecting_plates_tk):

@@ -17,6 +17,7 @@ TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 DESIGN_FLAG = 'False'
+VALUE_NOT_APPLICABLE = 'N/A'
 
 import sqlite3
 from utils.common.component import *

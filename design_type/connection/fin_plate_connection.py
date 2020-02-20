@@ -266,8 +266,9 @@ class FinPlateConnection(ShearConnection):
 
         bolt_bearing_capacity_disp = ''
         if flag is True:
-            if self.bolt.bolt_bearing_capacity is not 'N/A':
+            if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
                 bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+                pass
             else:
                 bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
@@ -492,12 +493,20 @@ class FinPlateConnection(ShearConnection):
                 self.select_bolt_dia(self)
 
         else:
-            self.design_status = False
-            logger.error(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
+            # self.design_status = False
+            logger.warning(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
                            "than applied loads, Please select larger sections or decrease loads"
                             .format(self.supported_section.shear_yielding_capacity,
                                     self.supported_section.tension_yielding_capacity))
             print("failed in preliminary member checks. Select larger sections or decrease loads")
+            self.thickness_possible = [i for i in self.plate.thickness if i >= self.supported_section.web_thickness]
+
+            if not self.thickness_possible:
+                logger.error(": Plate thickness should be greater than suppported section web thicknesss.")
+            else:
+                print("Selecting bolt diameter")
+                self.select_bolt_dia(self)
+            # self.select_bolt_dia(self)
 
     def select_bolt_dia(self):
         self.min_plate_height = self.supported_section.min_plate_height()
@@ -614,6 +623,7 @@ class FinPlateConnection(ShearConnection):
                                          max_edge_dist=self.bolt.max_edge_dist_round, shear_load=self.load.shear_force*1000,
                                          axial_load=self.load.axial_force*1000, gap=self.plate.gap,
                                          shear_ecc=True, bolt_line_limit=2)
+
         if self.plate.design_status is False:
             self.design_status = False
             logger.error(self.plate.reason)
@@ -745,13 +755,13 @@ class FinPlateConnection(ShearConnection):
     def get_available_welds(self, connecting_members=[]):
 
         weld_size_max = min(connecting_members)
-        weld_size_max = max(list([i for i in ALL_WELD_SIZES if i <= weld_size_max]))
+
         weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(connecting_members[0], connecting_members[1])
 
-        if weld_size_max < weld_size_min:
-            logger.info("Minimum weld size given in Table 21 of IS800:2007 is greater than thickness of thinner connecting plate")
+        if weld_size_max == weld_size_min:
+            logger.info("Minimum weld size given in Table 21 of IS800:2007 is greater than or equal to thickness of thinner connecting plate")
             logger.info("Thicker plate shall be adequately preheated to prevent cracking of the weld")
-            weld_size_min = weld_size_max
+
         available_welds = list([x for x in ALL_WELD_SIZES if (weld_size_min <= x <= weld_size_max)])
         return available_welds,weld_size_min,weld_size_max
 

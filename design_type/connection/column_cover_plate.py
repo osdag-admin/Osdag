@@ -1264,8 +1264,8 @@ class ColumnCoverPlate(MomentConnection):
         A_vn_web = (self.web_plate.height - (self.web_plate.bolts_one_line * self.web_bolt.dia_hole)) * \
                    self.web_plate.thickness[0]
         A_v_web = self.web_plate.height * self.web_plate.thickness[0]
-        self.web_plate.shear_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
-            A_v=A_v_web, fy=A_vn_web)
+        self.web_plate.shear_yielding_capacity = self.shear_yielding(
+            A_v=A_v_web, fy=self.web_plate.fy)
         self.web_plate.shear_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
             A_vn=A_vn_web, fu=self.web_plate.fu)
 
@@ -1485,6 +1485,23 @@ class ColumnCoverPlate(MomentConnection):
         T_dn = 0.9 * A_vn * fu / (gamma_m1)
         return T_dn
 
+    @staticmethod
+    def shear_yielding(A_v, fy):
+        '''
+        Args:
+            length (float) length of member in direction of shear load
+            thickness(float) thickness of member resisting shear
+            beam_fy (float) Yeild stress of section material
+        Returns:
+            Capacity of section in shear yeiding
+        '''
+
+        # A_v = length * thickness
+        gamma_m0 = 1.1
+        # print(length, thickness, fy, gamma_m0)
+        # V_p = (0.6 * A_v * fy) / (math.sqrt(3) * gamma_m0 * 1000)  # kN
+        V_p = (A_v * fy) / (math.sqrt(3) * gamma_m0)  # N
+        return V_p
     #
     # def web_force(column_d, column_f_t, column_t_w, axial_force, column_area):
     #     """

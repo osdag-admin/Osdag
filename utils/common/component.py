@@ -189,8 +189,13 @@ class Section(Material):
         self.source = 0.0
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
-        self.shear_yielding_capacity = 0.0
-        self.shear_rupture_capacity = 0.0
+        # self.shear_yielding_capacity = 0.0
+        # self.shear_rupture_capacity = 0.0
+
+        self.tension_capacity_flange = 0.0
+        self.tension_capacity_web = 0.0
+        self.shear_capacity_flange = 0.0
+        self.shear_capacity_web = 0.0
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
@@ -272,8 +277,13 @@ class Section(Material):
         repr += "Designation: {}\n".format(self.designation)
         repr += "fy: {}\n".format(self.fy)
         repr += "fu: {}\n".format(self.fu)
-        repr += "shear yielding capacity: {}\n".format(self.shear_yielding_capacity)
+        # repr += "shear yielding capacity: {}\n".format(self.shear_yielding_capacity)
         repr += "tension yielding capacity: {}\n".format(self.tension_yielding_capacity)
+
+        repr += "tension_capacity_flange: {}\n".format(self.tension_capacity_flange)
+        repr += "tension_capacity_web: {}\n".format( self.tension_capacity_web)
+        repr += "shear_capacity_flange: {}\n".format( self.shear_capacity_flange)
+        repr += "shear_capacity_web: {}\n".format(self.shear_capacity_web)
         return repr
 
 class Beam(Section):
@@ -367,10 +377,16 @@ class Plate(Material):
         self.end_dist_provided = 0.0
 
         self.block_shear_capacity = 0.0
-        self.shear_yielding_capacity = 0.0
-        self.shear_rupture_capacity = 0.0
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
+
+        self.shear_yielding_capacity = 0.0
+        self.shear_rupture_capacity = 0.0
+
+
+        self.shear_capacity_web_plate=0.0
+        self.tension_capacity_web_plate = 0.0
+        self.tension_capacity_flange_plate = 0.0
         self.moment_capacity = 0.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
@@ -695,6 +711,11 @@ class Plate(Material):
         repr += "Block Shear Capacity: {}\n".format(self.block_shear_capacity)
         repr += "Shear Yielding Capacity: {}\n".format(self.shear_yielding_capacity)
         repr += "Shear Rupture Capacity: {}\n".format(self.shear_rupture_capacity)
+
+        repr += "shear_capacity_web_plate: {}\n".format(self.shear_capacity_web_plate)
+        repr += "tension_capacity_web plate: {}\n".format( self.tension_capacity_web_plate)
+        repr += "tension_capacity_flange_plate: {}\n".format( self.tension_capacity_flange_plate)
+
         repr += "Moment Capacity: {}\n".format(self.moment_capacity)
         return repr
 

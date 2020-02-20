@@ -1,6 +1,8 @@
 
 # @author: Amir, Umair, Arsil
 
+import operator
+
 
 TYPE_COMBOBOX = 'ComboBox'
 
@@ -245,21 +247,35 @@ def get_oldbeamcombolist():
     final_lst = tuple_to_str_red(old_columnList)
     return final_lst
 
+
+########
+# Common Display Strings
+############
+KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity'
+KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
+KEY_DISP_MOM_DEMAND = 'Moment Demand'
+KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
+
+
 KEY_MODULE = 'Module'
+TYPE_MODULE = 'Window Title'
+
 KEY_DISP_FINPLATE = 'Fin Plate'
 
 KEY_DISP_ENDPLATE = 'End Plate'
 
 KEY_DISP_CLEATANGLE = 'Cleat Angle'
 
-TYPE_MODULE = 'Window Title'
-KEY_DISP_COMPRESSION = 'Compression Member'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
+
+
 KEY_DISP_TENSION = 'Tension Members Design'
+KEY_DISP_COMPRESSION = 'Compression Member'
+
 
 DISP_TITLE_CM = 'Connecting members'
 
@@ -386,6 +402,15 @@ KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
 KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
 
+DISP_TITLE_BOLTDETAILS ='Bolt Details'
+KEY_BOLT_DETAILS ="Bolt.Details"
+KEY_DISP_BOLT_DETAILS = "Bolt Details"
+KEY_FLANGE_BOLT_LINE = 'Flange_plate.Bolt_Line'
+KEY_FLANGE_DISP_BOLT_LINE = 'Bolt Lines in flange'
+KEY_FLANGE_BOLTS_ONE_LINE = 'Flange_plate.Bolt_OneLine'
+KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in Line in flange'
+
+
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
@@ -422,12 +447,22 @@ KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
 KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
+KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
+KEY_WEB_DISP_BOLT_LINE = 'Bolt Lines in web'
+KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
+KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in Line in web'
+
+
 DISP_TITLE_ENDPLATE = 'End plate'
 
 KEY_ENDPLATE_THICKNESS = 'Plate.end_plate.Thickness'
 KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_ENDPLATE_THICKNESS = ['All', 'Customized']
 VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+
+
+ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
+
 
 DISP_TITLE_PLATE = 'Plate'
 
@@ -446,6 +481,11 @@ KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 KEY_DP_BOLT_SLIP_FACTOR = 'DesignPreferences.Bolt.Slip_Factor'
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 KEY_DP_WELD_TYPE = 'DesignPreferences.Weld.Type'
+
+KEY_DP_WELD_TYPE_SHOP = 'Shop Weld'
+KEY_DP_WELD_TYPE_FIELD = 'Field weld'
+KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_SHOP, KEY_DP_WELD_TYPE_FIELD]
+
 KEY_DISP_DP_WELD_TYPE = 'Type of weld'
 KEY_DP_WELD_MATERIAL_G_O = 'DesignPreferences.Weld.Material_Grade_OverWrite'
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
@@ -575,7 +615,6 @@ KEY_DISP_SUPTDSEC_POISSON_RATIO = 'Poissons ratio, v'
 KEY_SUPTDSEC_THERMAL_EXP = 'Supported_Section.Thermal_Expansion'
 KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
 
-KEY_OUT_YIELDING = "Bolt."
 
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
@@ -619,6 +658,38 @@ KEY_OUT_PLATE_MOM_DEMAND = 'Plate.MomDemand'
 KEY_OUT_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
+
+
+KEY_OUT_PLATE_CAPACITIES = 'capacities'
+KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
+
+DISP_TITLE_WELD = 'Weld'
+KEY_OUT_WELD_SIZE = 'Weld.Size'
+KEY_OUT_DISP_WELD_SIZE = 'Size(mm)'
+KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
+KEY_OUT_WELD_STRESS = 'Weld.Stress'
+KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
+
+DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
+DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"
+DISP_OUT_TITLE_CLEAT = "Cleat Angle"
+KEY_OUT_CLEATTHK = 'Plate.Thickness'
+KEY_OUT_DISP_CLEATTHK = 'Thickness (mm)'
+KEY_OUT_CLEAT_HEIGHT = 'Plate.Height'
+KEY_OUT_DISP_CLEAT_HEIGHT = 'Height (mm)'
+KEY_OUT_CLEAT_SPTDLEG = 'Cleat.SupportedLength'
+KEY_OUT_DISP_CLEAT_SPTDLEG = 'Length (mm)'
+KEY_OUT_CLEAT_SPTNGLEG = 'Cleat.SupportingLength'
+KEY_OUT_DISP_CLEAT_SPTNGLEG = 'Length (mm)'
+
+KEY_OUT_CLEAT_SHEAR = 'Cleat.Shear'
+
+KEY_OUT_CLEAT_BLK_SHEAR = 'Cleat.BlockShear'
+
+KEY_OUT_CLEAT_MOM_DEMAND = 'Cleat.MomDemand'
+
+KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 
 KEY_SEC_PROFILE = 'Member.Profile'
@@ -667,8 +738,43 @@ KEY_DISP_TOPANGLE='Top Angle *'
 #     '30 30 x 3', '30 30 x 4', '30 30 x 5', '35 35 x 3', '35 35 x 4',
 #     '35 35 x 5', '35 35 x 6', '40 40 x 3', '40 40 x 4', '40 40 x 5', '40 40 x 6', '45 45 x 3', '45 45 x 4', '45 45 x 5', '45 45 x 6', '50 50 x 3', '50 50 x 4', '50 50 x 5', '50 50 x 6', '50 50 x 7', '50 50 x 8', '55 55 x 4', '55 55 x 5', '55 55 x 6', '55 55 x 8', '55 55 x 10', '60 60 x 4', '60 60 x 5', '60 60 x 6', '60 60 x 8', '60 60 x 10', '65 65 x 4', '65 65 x 5', '65 65 x 6', '65 65 x 8', '65 65 x 10', '70 70 x 5', '70 70 x 6', '70 70 x 7', '70 70 x 8', '70 70 x 10', '75 75 x 5', '75 75 x 6', '75 75 x 8', '75 75 x 10', '80 80 x 6', '80 80 x 8', '80 80 x 10', '80 80 x 12', '90 90 x 6', '90 90 x 8', '90 90 x 10', '90 90 x 12', '100 100 x 6', '100 100 x 7', '100 100 x 8', '100 100 x 10', '100 100x 12', '100 100 x 15', '110 110 X 8', '110 110 X 10', '110 110 X 12', '110 110 X 16', '120 120 X 8', '120 120 X 10', '120 120 X 12', '120 120 X 15', '130 130 X 8', '130 130 X 9', '130 130 X 10', '130 130 X 12', '130 130 X 16', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '180 180 X 15', '180 180 X 18', '180 180 X 20', '200 200 X 12', '200 200 X 16', '200 200 X 20', '200 200 X 24', '200 200 X 25', '30 20 X 3', '30 20 X 4', '30 20 X 5', '40 20 X 3', '40 20 X 4', '40 20 X 5', '40 25 X 3', '40 25 X 4', '40 25 X 5', '40 25 X 6', '45 30 X 3', '45 30 X 4', '45 30 X 5', '45 30 X 6', '50 30 X 3', '50 30 X 4', '50 30 X 5', '50 30 X 6', '60 30 X 5', '60 30 X 6', '60 40 X 5', '60 40 X 6', '60 40 X 7', '60 40 X 8', '65 45 X 5', '65 45 X 6', '65 45 X 8', '65 50 X 5', '65 50 X 6', '65 50 X 7', '65 50 X 8', '70 45 X 5', '70 45 X 6', '70 45 X 8', '70 45 X 10', '70 50 X 5', '70 50 X 6', '70 50 X 7', '70 50 X 8', '75 50X 5', '75 50X 6', '75 50X 7', '75 50X 8', '75 50X 10', '80 40 X 5', '80 40 X 6', '80 40 X 7', '80 40 X 8', '80 50 X 5', '80 50 X  6', '80 50 X  8', '80 50 X 10', '80 60 X 6', '80 60 X 7', '80 60 X 8', '90 60 X 6', '90 60 X  8', '90 60 X 10', '90 60 X 12', '90 65 X 6', '90 65 X 7', '90 65 X 8', '90 65 X 10', '100 50 X 6', '100 50 X 7', '100 50 X 8', '100 50 X 10', '100 65 X 6', '100 65 X  7', '100 65 X  8', '100 65 X 10', '100 75 X 6', '100 75 X  8', '100 75 X 10', '100 75 X 12', '120 80 X 8', '120 80 X 10', '120 80 X 12', '125 75 X 6', '125 75 X  8', '125 75 X 10', '125 75 X 12', '125 95 X 6', '125 95 X  8', '125 95 X 10', '125 95 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '150 75 X 8', '150 75 X  9', '150 75 X 10', '150 75 X 12', '150 75 X 15', '150 90 X 10', '150 90 X X 12', '150 90 X X 15', '150 90 X 10', '150 90 X 12', '150 90 X 15', '150 115 X 8', '150 115 X 10', '150 115 X 12', '150 115 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20']
 VALUES_ANGLESEC= ['All', 'Customized']
+
 VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
+
+
+def get_available_cleat_list(input_angle_list, leg_length, relate):
+
+    available_angles = []
+    for designation in input_angle_list:
+        leg_a_length,leg_b_length = get_leg_lengths(designation)
+        if relate(max(leg_a_length,leg_b_length),leg_length):
+            available_angles.append(designation)
+    return available_angles
+
+
+def get_leg_lengths(designation):
+
+    """
+        Function to fetch designation values from respective Tables.
+    """
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+    db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
+    cur = conn.cursor()
+    cur.execute(db_query, (designation,))
+    row = cur.fetchone()
+
+    axb = row[0]
+    axb = axb.lower()
+    leg_a_length = float(axb.split("x")[0])
+    leg_b_length = float(axb.split("x")[1])
+    conn.close()
+    return leg_a_length,leg_b_length
+
+all_angles = connectdb("Angles","popup")
+VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 50.0, operator.ge)
+print(VALUES_CLEAT_CUSTOMIZED)
+
 
 
 

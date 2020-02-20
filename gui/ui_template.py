@@ -1561,7 +1561,8 @@ class Ui_ModuleWindow(QMainWindow):
             #     self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
             #                                                  main.module)
 
-            if status is True and main.module == "Fin Plate":
+            if status is True and main.module == "Fin Plate" :
+            # if status is True and (main.module == "Fin Plate"  or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_COLUMNCOVERPLATE):
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)

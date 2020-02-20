@@ -104,6 +104,7 @@ class BeamCoverPlate(MomentConnection):
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
+
         t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Beams"))
         options_list.append(t4)
 
@@ -461,6 +462,7 @@ class BeamCoverPlate(MomentConnection):
         self.design_status = True
         #
         self.module = design_dictionary[KEY_MODULE]
+        # self.connectivity = design_dictionary[KEY_CONN]
         self.preference = design_dictionary[KEY_FLANGEPLATE_PREFERENCES]
 
         self.section = Beam(designation=design_dictionary[KEY_SECSIZE],
@@ -1326,9 +1328,9 @@ class BeamCoverPlate(MomentConnection):
                 # print(design_status_block_shear)
             if design_status_block_shear is True:
                 break
-            self.anjali = min(self.web_plate.shear_yielding_capacity, self.web_plate.shear_rupture_capacity,
+            self.web_plate.shear_capacity_web_plate  = min(self.web_plate.shear_yielding_capacity, self.web_plate.shear_rupture_capacity,
                                              self.section.block_shear_capacity)
-            print("anjali", self.anjali)
+            # print("anjali", self.anjali)
             # self.web_plate.shear_capacity_web_plate = anjali
         # <<<<<<< HEAD
         # self.webforce = self.web_force(column_d=self.section.depth, column_f_t=self.section.flange_thickness,
@@ -1369,7 +1371,7 @@ class BeamCoverPlate(MomentConnection):
         self.web_plate.length = self.web_plate.length * 2
         self.flange_plate.bolts_required = self.flange_plate.bolts_required * 2
         self.web_plate.bolts_required = self.web_plate.bolts_required * 2
-        print("anjali", self.anjali)
+        # print("anjali", self.anjali)
         print(self.section)
         print(self.load)
         print(self.flange_bolt)

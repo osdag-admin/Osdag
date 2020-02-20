@@ -634,15 +634,11 @@ class Ui_ModuleWindow(QMainWindow):
                 key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
                 data[t[0] + "_customized"] = t[1]()
                 
-            elif t[0] == KEY_SECSIZE and module == KEY_DISP_COMPRESSION:
+            elif t[0] == KEY_SECSIZE and (module == KEY_DISP_COMPRESSION or module == KEY_DISP_TENSION):
                 key_customized_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_4.activated.connect(lambda: popup(key_customized_4, new_list))
                 data[t[0] + "_customized"] = t[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
                                 KEY_SEC_PROFILE).currentText())
-            elif t[0] == KEY_SIZE:
-                key_customized_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                key_customized_4.activated.connect(lambda: popup(key_customized_4, new_list))
-                data[t[0] + "_customized"] = t[1]()
             else:
                 pass
 
@@ -659,7 +655,7 @@ class Ui_ModuleWindow(QMainWindow):
                     continue
                 selected = key.currentText()
                 f = c_tup[1]
-                if c_tup[0] == KEY_SECSIZE and module == KEY_DISP_COMPRESSION:
+                if c_tup[0] == KEY_SECSIZE and (module == KEY_DISP_COMPRESSION or module == KEY_DISP_TENSION):
                     options = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText())
                     existing_options = data[c_tup[0] + "_customized"]
                     if selected == "Customized":
@@ -670,7 +666,7 @@ class Ui_ModuleWindow(QMainWindow):
                     else:
                         input = f(self.dockWidgetContents.findChild(QtWidgets.QWidget,
                             KEY_SEC_PROFILE).currentText())
-                        input.remove('Select Section')
+                        # input.remove('Select Section')
                         data[c_tup[0] + "_customized"] = input
                 else:
                     options = f()
@@ -1556,7 +1552,7 @@ class Ui_ModuleWindow(QMainWindow):
             # if status is True and main.module == "Fin Plate":
             #     self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
             #                                                  main.module)
-            if status is True and main.module == "Fin Plate":
+            if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE):
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)

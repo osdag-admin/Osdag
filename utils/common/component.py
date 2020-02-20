@@ -191,6 +191,7 @@ class Section(Material):
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
+        self.tension_capacity = 0.0
 
 
     def connect_to_database_update_other_attributes(self, table, designation):
@@ -252,7 +253,18 @@ class Section(Material):
         # A_v = height * thickness
         tdg = (A_v * fy) / (gamma_m0 * 1000)
         self.tension_yielding_capacity = tdg
-        return tdg
+
+    def tension_member_yielding(self, A_g, F_y):
+        "design strength of members under axial tension,T_dg,as governed by yielding of gross section"
+        "A_g = gross area of cross-section"
+        "gamma_m0 = partial safety factor for failure in tension by yielding"
+        "F_y = yield stress of the material"
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        T_dg = (A_g*100* F_y / gamma_m0)/1000
+
+        self.tension_yielding_capacity =  T_dg
+
+
 
     def tension_rupture(self, A_n, F_u):
         "preliminary design strength,T_pdn,as governed by rupture at net section"
@@ -262,7 +274,41 @@ class Section(Material):
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         T_pdn = 0.9 * A_n * F_u / gamma_m1
 
-        return T_pdn
+        self.tension_rupture_capacity = T_pdn
+
+    def tension_blockshear(self, numrow, numcol, pitch, gauge, thk, end_dist, edge_dist, dia_hole, fy, fu):
+        '''
+
+        Args:
+            numrow (str) Number of row(s) of bolts
+            dia_hole (int) diameter of hole (Ref. Table 5.6 Subramanian's book, page: 340)
+            fy (float) Yeild stress of material
+            fu (float) Ultimate stress of material
+            edge_dist (float) edge distance based on diameter of hole
+            end_dist (float) end distance based on diameter of hole
+            pitch (float) pitch distance based on diameter of bolt
+            thk (float) thickness of plate or beam web
+
+        Returns:
+            Capacity of fin plate under block shear
+
+        '''
+
+        Avg = thk * ((numrow - 1) * gauge + edge_dist)
+        Avn = thk * ((numrow - 1) * gauge + edge_dist - (numrow - 0.5) * dia_hole)
+        Atg = thk * (pitch * (numcol - 1) + end_dist)
+        Atn = thk * (pitch * (numcol - 1) + end_dist - (numcol - 0.5) * dia_hole)
+        Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
+        Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
+        Tdb = min(Tdb1, Tdb2)
+        Tdb = round(Tdb / 1000, 3)
+        self.block_shear_capacity_axial = Tdb
+
+    def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):
+
+        Tc = min(tension_member_yielding, tension_rupture, tension_blockshear)
+
+        self.tension_capacity = Tc
 
     def __repr__(self):
         repr = "Section\n"
@@ -272,6 +318,8 @@ class Section(Material):
         repr += "shear yielding capacity: {}\n".format(self.shear_yielding_capacity)
         repr += "tension yielding capacity: {}\n".format(self.tension_yielding_capacity)
         return repr
+
+
 
 class Beam(Section):
 
@@ -292,6 +340,20 @@ class Column(Section):
     def __init__(self, designation, material_grade):
         super(Column, self).__init__(designation, material_grade)
         self.connect_to_database_update_other_attributes("Columns", designation)
+
+    def min_plate_height(self):
+        return 0.6 * self.depth
+
+    def max_plate_height(self):
+
+        clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
+        return clear_depth
+
+class Channel(Section):
+
+    def __init__(self, designation, material_grade):
+        super(Channel, self).__init__(designation, material_grade)
+        self.connect_to_database_update_other_attributes("Channels", designation)
 
     def min_plate_height(self):
         return 0.6 * self.depth
@@ -388,9 +450,10 @@ class Plate(Material):
             gauge_pitch -= 5
         return gauge_pitch, edge_end
 
-    def get_web_plate_l_bolts_one_line(self, web_plate_h_max, web_plate_h_min, bolts_required,edge_dist, gauge):
-        print('maxh',web_plate_h_max)
+    def get_web_plate_l_bolts_one_line(self, web_plate_h_max, web_plate_h_min, bolts_required, edge_dist, gauge):
+        # print('maxh',web_plate_h_max)
         print(web_plate_h_max,edge_dist,gauge)
+        print(web_plate_h_max,edge_dist,gauge,"hhhh")
         max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
         print("max_bolts_one_line", max_bolts_one_line)
         self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
@@ -728,9 +791,12 @@ class Angle(Material):
         axb = axb.lower()
         self.leg_a_length = float(axb.split("x")[0])
         self.leg_b_length = float(axb.split("x")[1])
-        self.thickness = row[1]
+        self.mass = row[1]
+        self.area = row[2]
 
         conn.close()
+
+
 
 class I_sectional_Properties(object):
 

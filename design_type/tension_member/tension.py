@@ -50,10 +50,9 @@ from io import StringIO
 class Tension(Main):
 
     def __init__(self):
-        # super(FinPlateConnection, self).__init__()
-        # self.min_plate_height = 0.0
-        # self.max_plate_height = 0.0
-        # self.res_force = 0.0
+        super(Tension, self).__init__()
+
+
         self.design_status = False
 
     def set_osdaglogger(key):
@@ -89,8 +88,33 @@ class Tension(Main):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-    def module(self):
-        return KEY_DISP_FINPLATE
+    def module_name(self):
+        return KEY_DISP_TENSION
+
+    def customized_input(self):
+
+        c_lst = []
+
+        t1 = (KEY_SECSIZE, self.fn_profile_section)
+        c_lst.append(t1)
+        t2 = (KEY_GRD, self.grdval_customized)
+        c_lst.append(t2)
+        t3 = (KEY_D, self.diam_bolt_customized)
+        c_lst.append(t3)
+        t4 = (KEY_PLATETHK, self.plate_thick_customized)
+        c_lst.append(t4)
+
+        return c_lst
+
+    def fn_profile_section(self):
+        if self == 'Beams':
+            return connectdb("Beams", call_type= "popup")
+        elif self == 'Columns':
+            return connectdb("Columns", call_type= "popup")
+        elif self in ['Angles', 'Back to Back Angles', 'Star Angles']:
+            return connectdb("Angles", call_type= "popup")
+        elif self in ['Channels', 'Back to Back Channels']:
+            return connectdb("Channels", call_type= "popup")
 
     def input_values(self, existingvalues={}):
 
@@ -103,10 +127,10 @@ class Tension(Main):
 
         options_list = []
 
-        if KEY_SECTION in existingvalues:
-            existingvalue_key_section = existingvalues[KEY_SECTION]
-        else:
-            existingvalue_key_section = ''
+        # if KEY_SECTION in existingvalues:
+        #     existingvalue_key_section = existingvalues[KEY_SECTION]
+        # else:
+        #     existingvalue_key_section = ''
 
         # if KEY_SUPTNGSEC in existingvalues:
         #    existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
@@ -123,10 +147,15 @@ class Tension(Main):
         else:
             existingvalue_key_location = ''
 
-        if KEY_SIZE in existingvalues:
-            existingvalue_key_size = existingvalues[KEY_SIZE]
+        if KEY_SEC_PROFILE in existingvalues:
+            existingvalue_key_sec_profile = existingvalues[KEY_SEC_PROFILE]
         else:
-            existingvalue_key_size = ''
+            existingvalue_key_sec_profile = ''
+
+        if KEY_SECSIZE in existingvalues:
+            existingvalue_key_sec_size = existingvalues[KEY_SECSIZE]
+        else:
+            existingvalue_key_sec_size = ''
 
         if KEY_MATERIAL in existingvalues:
             existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
@@ -169,7 +198,7 @@ class Tension(Main):
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
-        t2 = (KEY_SECTION, KEY_DISP_SECTION, TYPE_COMBOBOX, existingvalue_key_section, VALUES_SECTION)
+        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, existingvalue_key_sec_profile, VALUES_SEC_PROFILE_2)
         options_list.append(t2)
 
         t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/fin_cf_bw.png")
@@ -178,7 +207,7 @@ class Tension(Main):
         t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, existingvalue_key_location, VALUES_LOCATION)
         options_list.append(t3)
 
-        t4 = (KEY_SIZE, KEY_DISP_SIZE, TYPE_COMBOBOX, existingvalue_key_size, VALUES_SIZE)
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_sec_size, ['All','Customized'])
         options_list.append(t4)
 
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
@@ -240,8 +269,30 @@ class Tension(Main):
 
         out_list = []
 
-        t1 = (None, DISP_TITLE_TENSION, TYPE_TITLE, None)
+        t1 = (None, DISP_TITLE_TENSION_SECTION, TYPE_TITLE, None)
         out_list.append(t1)
+
+        t2 = (KEY_TENSION_YIELDCAPACITY, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX, self.section_size.tension_yielding_capacity if flag else '')
+        out_list.append(t2)
+
+        t3 = (KEY_TENSION_RUPTURECAPACITY, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
+              self.section_size.tension_rupture_capacity if flag else '')
+        out_list.append(t3)
+
+        t4 = (KEY_TENSION_BLOCKSHEARCAPACITY, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
+              self.section_size.block_shear_capacity_axial if flag else '')
+        out_list.append(t4)
+
+        t5 = (KEY_TENSION_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
+              self.section_size.tension_capacity if flag else '')
+        out_list.append(t5)
+
+        t6 = (KEY_EFFICIENCY, KEY_DISP_EFFICIENCY, TYPE_TEXTBOX,
+              self.efficiency if flag else '')
+        out_list.append(t6)
+
+        t7 = (None, DISP_TITLE_BOLT_CAPACITY, TYPE_TITLE, None)
+        out_list.append(t7)
 
         t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '')
         out_list.append(t2)
@@ -295,17 +346,17 @@ class Tension(Main):
         t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
         out_list.append(t16)
 
-        t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity,2) if flag else '')
-        out_list.append(t17)
-
-        t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity,2) if flag else '')
-        out_list.append(t18)
-
-        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if flag else '')
-        out_list.append(t19)
-
-        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.plate.moment_capacity,2) if flag else '')
-        out_list.append(t20)
+        # t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity,2) if flag else '')
+        # out_list.append(t17)
+        #
+        # t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity,2) if flag else '')
+        # out_list.append(t18)
+        #
+        # t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if flag else '')
+        # out_list.append(t19)
+        #
+        # t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.plate.moment_capacity,2) if flag else '')
+        # out_list.append(t20)
 
         return out_list
 
@@ -358,50 +409,77 @@ class Tension(Main):
     #         else:
     #             pass
 
+    # def func_for_validation(self, window, design_dictionary):
+    #     self.design_status = False
+    #     flag = False
+    #     flag1 = False
+    #     option_list = self.input_values(self)
+    #     missing_fields_list = []
+    #     for option in option_list:
+    #         if option[2] == TYPE_TEXTBOX:
+    #             if design_dictionary[option[0]] == '':
+    #                 missing_fields_list.append(option[1])
+    #         elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+    #             val = option[4]
+    #             if design_dictionary[option[0]] == val[0]:
+    #                 missing_fields_list.append(option[1])
+    #         elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
+    #             if design_dictionary[option[0]] == []:
+    #                 missing_fields_list.append(option[1])
+    #         # elif option[2] == TYPE_MODULE:
+    #         #     if design_dictionary[option[0]] == "Fin Plate":
+    #
+    #     # if design_dictionary[KEY_CONN] == 'Beam-Beam':
+    #     #     primary = design_dictionary[KEY_SUPTNGSEC]
+    #     #     secondary = design_dictionary[KEY_SUPTDSEC]
+    #     #     conn = sqlite3.connect(PATH_TO_DATABASE)
+    #     #     cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
+    #     #     lst = []
+    #     #     rows = cursor.fetchall()
+    #     #     for row in rows:
+    #     #         lst.append(row)
+    #     #     p_val = lst[0][0]
+    #     #     cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+    #     #     lst1 = []
+    #     #     rows1 = cursor2.fetchall()
+    #     #     for row1 in rows1:
+    #     #         lst1.append(row1)
+    #     #     s_val = lst1[0][0]
+    #     #     if p_val <= s_val:
+    #     #         QMessageBox.about(window, 'Information',
+    #     #                           "Secondary beam depth is higher than clear depth of primary beam web "
+    #     #                           "(No provision in Osdag till now)")
+    #     #     else:
+    #     #         flag1 = True
+    #     # else:
+    #     #     flag1 = True
+    #
+    #     if len(missing_fields_list) > 0:
+    #         QMessageBox.information(window, "Information",
+    #                                 self.generate_missing_fields_error_string(self, missing_fields_list))
+    #         # flag = False
+    #     else:
+    #         flag = True
+    #
+    #     if flag and flag1:
+    #         self.set_input_values(self, design_dictionary)
+    #     else:
+    #         pass
+
     def func_for_validation(self, window, design_dictionary):
         self.design_status = False
+
         flag = False
-        flag1 = False
         option_list = self.input_values(self)
         missing_fields_list = []
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2]:
                 val = option[4]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                if design_dictionary[option[0]] == []:
-                    missing_fields_list.append(option[1])
-            # elif option[2] == TYPE_MODULE:
-            #     if design_dictionary[option[0]] == "Fin Plate":
-
-        if design_dictionary[KEY_CONN] == 'Beam-Beam':
-            primary = design_dictionary[KEY_SUPTNGSEC]
-            secondary = design_dictionary[KEY_SUPTDSEC]
-            conn = sqlite3.connect(PATH_TO_DATABASE)
-            cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
-            lst = []
-            rows = cursor.fetchall()
-            for row in rows:
-                lst.append(row)
-            p_val = lst[0][0]
-            cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
-            lst1 = []
-            rows1 = cursor2.fetchall()
-            for row1 in rows1:
-                lst1.append(row1)
-            s_val = lst1[0][0]
-            if p_val <= s_val:
-                QMessageBox.about(window, 'Information',
-                                  "Secondary beam depth is higher than clear depth of primary beam web "
-                                  "(No provision in Osdag till now)")
-            else:
-                flag1 = True
-        else:
-            flag1 = True
 
         if len(missing_fields_list) > 0:
             QMessageBox.information(window, "Information",
@@ -410,8 +488,9 @@ class Tension(Main):
         else:
             flag = True
 
-        if flag and flag1:
+        if flag:
             self.set_input_values(self, design_dictionary)
+            print(design_dictionary)
         else:
             pass
 
@@ -458,60 +537,103 @@ class Tension(Main):
 
         super(Tension,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
+        self.sizelist = design_dictionary[KEY_SECSIZE]
+        print(self.sizelist)
+
+        print(self.bolt)
+        self.load = Load(shear_force=None, axial_force=design_dictionary.get(KEY_AXIAL))
+
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
-        self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
+        # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
         print("input values are set. Doing preliminary member checks")
-        self.member_capacity(self)
+        self.initial_member_capacity(self,design_dictionary)
 
-    def member_capacity(self):
+
+    def select_section(self, design_dictionary, selectedsize):
+        if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Back to Back Angles', 'Star Angles']:
+            self.section_size = Angle(designation=selectedsize, material_grade=design_dictionary[KEY_MATERIAL])
+        elif design_dictionary[KEY_SEC_PROFILE] in ['Channels', 'Back to Back Channels']:
+            self.section_size = Channel(designation=selectedsize, material_grade=design_dictionary[KEY_MATERIAL])
+        else:
+            pass
+
+        return self.section_size
+
+
+    def initial_member_capacity(self,design_dictionary):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
-        if self.connectivity in VALUES_CONN_1:
-            if self.supported_section.build == "Rolled":
-                length = self.supported_section.depth
-            else:
-                length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)
-        else:
-            length = self.supported_section.depth - 50.0  # TODO: Subtract notch height for beam-beam connection
+        # if self.connectivity in VALUES_CONN_1:
+        #     if self.supported_section.build == "Rolled":
+        #         length = self.supported_section.depth
+        #     else:
+        #         length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)
+        # else:
+        #     length = self.supported_section.depth - 50.0  # TODO: Subtract notch height for beam-beam connection
+        #
+        # self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
 
-        self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
-        self.supported_section.tension_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
+        for selectedsize in self.sizelist:
+            self.section_size = self.select_section(self,design_dictionary,selectedsize)
+            self.cross_area = self.section_size.area
+            self.section_size.tension_member_yielding(A_g = self.cross_area , F_y =self.section_size.fy)
+            print(self.section_size.tension_yielding_capacity)
 
-        print(self.supported_section.shear_yielding_capacity, self.load.shear_force,
-              self.supported_section.tension_yielding_capacity, self.load.axial_force)
 
-        if self.supported_section.shear_yielding_capacity > self.load.shear_force and \
-                self.supported_section.tension_yielding_capacity > self.load.axial_force:
-            print("preliminary member check is satisfactory. Doing bolt checks")
-            self.select_bolt_dia(self)
+            min_yield = 0
+            if (self.section_size.tension_yielding_capacity > self.load.axial_force):
+                min_yield_current = self.section_size.tension_yielding_capacity
+                if min_yield == 0:
+                    min_yield = min_yield_current
+                elif min_yield_current <= min_yield:
+                    min_yield = min_yield_current
+                    self.section_size = self.select_section(self, design_dictionary, selectedsize)
 
-        else:
-            self.design_status = False
-            logger.error(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
-                           "than applied loads, Please select larger sections or decrease loads"
-                            .format(self.supported_section.shear_yielding_capacity,
-                                    self.supported_section.tension_yielding_capacity))
-            print("failed in preliminary member checks. Select larger sections or decrease loads")
+        print(self.load.axial_force)
+        print(min_yield)
+        print(self.section_size)
+
+        self.select_bolt_dia(self)
+
+
+            # print(self.supported_section.shear_yielding_capacity, self.load.shear_force,
+            #       self.supported_section.tension_yielding_capacity, self.load.axial_force)
+        #
+        # if self.supported_section.shear_yielding_capacity > self.load.shear_force and \
+        #         self.supported_section.tension_yielding_capacity > self.load.axial_force:
+        #     print("preliminary member check is satisfactory. Doing bolt checks")
+        #     self.select_bolt_dia(self)
+        #
+        # else:
+        #     self.design_status = False
+        #     logger.error(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
+        #                    "than applied loads, Please select larger sections or decrease loads"
+        #                     .format(self.supported_section.shear_yielding_capacity,
+        #                             self.supported_section.tension_yielding_capacity))
+        #     print("failed in preliminary member checks. Select larger sections or decrease loads")
 
     def select_bolt_dia(self):
-        self.min_plate_height = self.supported_section.min_plate_height()
-        self.max_plate_height = self.supported_section.max_plate_height()
-        self.res_force = math.sqrt(self.load.shear_force ** 2 + self.load.axial_force ** 2) * 1000
-        self.plate.thickness_provided = max(min(self.plate.thickness), math.ceil(self.supported_section.web_thickness))
+        self.min_plate_height = self.section_size.min_plate_height()
+        self.max_plate_height = self.section_size.max_plate_height()
+        # self.res_force = math.sqrt(self.load.shear_force ** 2 + self.load.axial_force ** 2) * 1000
+        self.res_force = self.load.axial_force
+        self.plate.thickness_provided = max(min(self.plate.thickness), math.ceil(self.section_size.web_thickness))
         bolts_required_previous = 2
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
         count = 0
         bolts_one_line = 1
         for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
+
+
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                     connecting_plates_tk=[self.plate.thickness_provided,
-                                                                          self.supported_section.web_thickness])
+                                                                          self.section_size.web_thickness])
 
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
                                               connecting_plates_tk=[self.plate.thickness_provided,
-                                                                    self.supported_section.web_thickness],
+                                                                    self.section_size.web_thickness],
                                               n_planes=1)
 
             self.plate.bolts_required = max(int(math.ceil(self.res_force / self.bolt.bolt_capacity)), 2)
@@ -536,6 +658,9 @@ class Tension(Main):
             self.design_status = True
             self.get_bolt_grade(self)
 
+        print(self.section_size)
+        print(self.load)
+
     def get_bolt_grade(self):
         bolt_grade_previous = self.bolt.bolt_grade[-1]
         bolts_required_previous = self.plate.bolts_required
@@ -543,12 +668,12 @@ class Tension(Main):
             count = 1
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                     connecting_plates_tk=[self.plate.thickness_provided,
-                                                                          self.supported_section.web_thickness])
+                                                                          self.section_size.web_thickness])
 
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
                                               connecting_plates_tk=[self.plate.thickness_provided,
-                                                                    self.supported_section.web_thickness],
+                                                                    self.section_size.web_thickness],
                                               n_planes=1)
 
             self.plate.bolts_required = max(int(math.ceil(self.res_force / self.bolt.bolt_capacity)), 2)
@@ -569,12 +694,12 @@ class Tension(Main):
     def get_fin_plate_details(self):
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                 connecting_plates_tk=[self.plate.thickness_provided,
-                                                                      self.supported_section.web_thickness])
+                                                                      self.section_size.web_thickness])
 
         self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                           bolt_grade_provided=self.bolt.bolt_grade_provided,
                                           connecting_plates_tk=[self.plate.thickness_provided,
-                                                                self.supported_section.web_thickness],
+                                                                self.section_size.web_thickness],
                                           n_planes=1)
 
         self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -1089,6 +1214,26 @@ class Tension(Main):
         supported_section.append(t33)
 
         return supported_section
+
+    def input_value_changed(self):
+
+        lst = []
+
+        t1 = (KEY_SEC_PROFILE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
+        lst.append(t1)
+
+        # t2 = (KEY_END1, KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
+        # lst.append(t2)
+        #
+        # t3 = (KEY_END1, KEY_IMAGE, TYPE_IMAGE, self.fn_end1_image)
+        # lst.append(t3)
+        #
+        # t4 = (KEY_END2, KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
+        # lst.append(t4)
+
+        return lst
+
+
 
 # For Command Line
 

@@ -391,6 +391,39 @@ class IS800_2007(object):
             V_dpb *= 0.5
         return V_dpb
 
+
+
+
+
+
+    @staticmethod
+    def cl_10_3_5_bolt_tensile_capacity(f_ub, f_yb, A_nb, A_sb, safety_factor_parameter='field'):
+
+        """Calculate design tensile strength of a bolt.
+
+        Args:
+            f_ub    - Ultimate tensile strength of the bolt in MPa (float)
+            f_yb    - Yield strength of the bolt in MPa (float)
+            d       - Diameter of the bolt in mm (float)
+            A_nb    - Net area of the bolt in mm2 (float)
+            safety_factor_parameter - Either 'field' or 'shop' (str)
+
+        return:
+            T_db - Design tensile strength of bearing bolt in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.3.5
+
+        """
+
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
+        T_nb = min((0.90*f_ub*A_nb), (f_yb*A_sb*(gamma_mb/gamma_m0)))
+        T_db = T_nb/gamma_mb
+
+        return T_db
+
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting
     # -------------------------------------------------------------

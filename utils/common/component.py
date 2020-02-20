@@ -126,6 +126,27 @@ class Bolt(Material):
             self.bolt_bearing_capacity = 'N/A'
             self.bolt_capacity = self.bolt_shear_capacity
 
+
+    def calculate_bolt_tension_capacity(self, bolt_diameter_provided, bolt_grade_provided):
+        """
+        :param bolt_grade: grade of bolt
+        :param member_fu: ultimate strength of member
+        :param bolt_dia: diameter of bolt
+
+        :return: capacity of bolt (tension), bolt_grade
+        """
+        self.bolt_diameter_provided = bolt_diameter_provided
+        self.bolt_grade_provided = bolt_grade_provided
+
+
+        [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter_provided)
+        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided)
+
+        self.bolt_tension_capacity = IS800_2007.cl_10_3_5_bolt_tensile_capacity(
+            f_ub=self.bolt_fu, f_yb=self.bolt_fy, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area)
+
+
+
     def calculate_bolt_spacing_limits(self, bolt_diameter_provided, connecting_plates_tk):
         self.connecting_plates_tk = list(np.float_(connecting_plates_tk))
         self.bolt_diameter_provided = bolt_diameter_provided

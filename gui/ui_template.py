@@ -59,7 +59,7 @@ from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
-from design_type.connection.end_plate_connection import EndPlateConnectionInput
+from design_type.connection.end_plate_connection import EndPlateConnection
 
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
@@ -1435,6 +1435,8 @@ class Ui_ModuleWindow(QMainWindow):
     def return_class(self,name):
         if name == KEY_DISP_FINPLATE:
             return FinPlateConnection
+        elif name == KEY_DISP_ENDPLATE:
+            return EndPlateConnection
         elif name == KEY_DISP_COLUMNCOVERPLATE:
             return ColumnCoverPlate
         elif name == KEY_DISP_BEAMCOVERPLATE:

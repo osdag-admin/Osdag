@@ -18,7 +18,7 @@ from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
-from design_type.connection.end_plate_connection import EndPlateConnectionInput
+from design_type.connection.end_plate_connection import EndPlateConnection
 
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
@@ -264,7 +264,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_endplate.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, EndPlateConnectionInput)
+            self.ui2.setupUi(self.ui2, EndPlateConnection,folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)

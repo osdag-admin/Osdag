@@ -420,6 +420,13 @@ KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 
 KEY_FLANGE_CAPACITY ="Flange_plate.capacity"
 KEY_DISP_FLANGE_CAPACITY= 'capacity'
+KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
+KEY_DISP_FLANGE_TEN_CAPACITY ="flange tension capacity"
+
+KEY_TEN_CAP_FLANGE_PLATE ="Flange_plate.tension_capacity"
+KEY_DISP_TEN_CAP_FLANGE_PLATE ="tension_capacity_flange_plate"
+
+
 KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
 KEY_DISP_BLOCKSHEARCAP_FLANGE='Block Shear Capacity'
 KEY_TENSIONYIELDINGCAP_FLANGE = 'Flange_plate.tension_yielding_capacity'
@@ -442,7 +449,9 @@ KEY_DISP_BOLT_DETAILS = "Bolt Details"
 KEY_FLANGE_BOLT_LINE = 'Flange_plate.Bolt_Line'
 KEY_FLANGE_DISP_BOLT_LINE = 'Bolt Lines in flange'
 KEY_FLANGE_BOLTS_ONE_LINE = 'Flange_plate.Bolt_OneLine'
-KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in Line in flange'
+KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in flange'
+KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
+KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
@@ -470,12 +479,24 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance'
 
 KEY_WEB_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_CAPACITY= 'capacity'
+KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
+KEY_DISP_WEB_TEN_CAPACITY ="web tension capacity"
+KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
+KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="shear_capacity_web plate"
+KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
+KEY_DISP_TEN_CAP_WEB_PLATE ="tension_capacity_web_plate"
+
+
 KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'
 KEY_DISP_SHEARYIELDINGCAP_WEB= 'Shear Yielding Capacity'
 KEY_BLOCKSHEARCAP_WEB='web_plate.block_shear_capacity'
 KEY_DISP_BLOCKSHEARCAP_WEB='Block Shear Capacity'
 KEY_SHEARRUPTURECAP_WEB= 'web_plate.shear_rupture_capacity'
 KEY_DISP_SHEARRUPTURECAP_WEB= 'Shear Rupture Capacity'
+KEY_TENSIONYIELDINGCAP_WEB = "web_plate.tension_yielding_capacity"
+KEY_DISP_TENSIONYIELDINGCAP_WEB ='Tension Yielding Capacity'
+KEY_TENSIONRUPTURECAP_WEB ='web_plate.shear_rupture_capacity'
+KEY_DISP_TENSIONRUPTURECAP_WEB ='Tension Rupture Capacity'
 KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
 KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
@@ -483,8 +504,10 @@ KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
 KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
 KEY_WEB_DISP_BOLT_LINE = 'Bolt Lines in web'
+KEY_WEB_BOLTS_REQ = "Web_plate.Bolt_required"
+KEY_WEB_DISP_BOLTS_REQ = "Web Bolt Required"
 KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
-KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in Line in web'
+KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in web'
 
 
 DISP_TITLE_ENDPLATE = 'End plate'

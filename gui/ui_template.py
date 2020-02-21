@@ -5,7 +5,7 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!\
-from PyQt5.QtWidgets import QMessageBox, qApp
+from PyQt5.QtWidgets import QMessageBox, qApp, QScrollArea
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -1596,10 +1596,20 @@ class Ui_ModuleWindow(QMainWindow):
         b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
 
     def output_button_dialog(self, main, button_list, button):
+
         dialog = QtWidgets.QDialog()
         dialog.resize(350, 170)
         dialog.setFixedSize(dialog.size())
         dialog.setObjectName("Dialog")
+
+        layout1 = QtWidgets.QVBoxLayout(dialog)
+        scroll = QScrollArea(dialog)
+        layout1.addWidget(scroll)
+        scroll.setWidgetResizable(True)
+        scrollcontent = QtWidgets.QWidget(scroll)
+        layout2 = QtWidgets.QGridLayout(scrollcontent)
+        scrollcontent.setLayout(layout2)
+
         for op in button_list:
             if op[0] == button.objectName():
                 tup = op[3]
@@ -1607,12 +1617,13 @@ class Ui_ModuleWindow(QMainWindow):
                 fn = tup[1]
                 dialog.setWindowTitle(title)
                 i = 0
+                j = 1
                 for option in fn(main, main.design_status):
                     lable = option[1]
                     type = option[2]
                     _translate = QtCore.QCoreApplication.translate
                     if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
-                        l = QtWidgets.QLabel(dialog)
+                        l = QtWidgets.QLabel()
                         l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
                         font = QtGui.QFont()
                         font.setPointSize(9)
@@ -1621,9 +1632,10 @@ class Ui_ModuleWindow(QMainWindow):
                         l.setFont(font)
                         l.setObjectName(option[0] + "_label")
                         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+                        layout2.addWidget(l, j, 1, 1, 1)
 
                     if type == TYPE_TEXTBOX:
-                        r = QtWidgets.QLineEdit(dialog)
+                        r = QtWidgets.QLineEdit()
                         r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
                         font = QtGui.QFont()
                         font.setPointSize(11)
@@ -1632,9 +1644,10 @@ class Ui_ModuleWindow(QMainWindow):
                         r.setFont(font)
                         r.setObjectName(option[0])
                         r.setText(str(option[3]))
-
+                        layout2.addWidget(r, j, 2, 1, 1)
+                    j = j + 1
                     i = i + 30
-
+                scroll.setWidget(scrollcontent)
                 dialog.exec()
 
     def refresh_sections(self, prev, section):

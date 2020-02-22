@@ -453,6 +453,7 @@ class BeamCoverPlate(MomentConnection):
 
 
     def module_name(self):
+
         return KEY_DISP_BEAMCOVERPLATE
 
     def set_input_values(self, design_dictionary):
@@ -657,10 +658,6 @@ class BeamCoverPlate(MomentConnection):
                          "than applied loads, Please select larger sections or decrease loads"
                        )
             # print("BBB failed in web member checks. Select larger sections or decrease loads")
-
-
-    def module_name(self):
-        return KEY_DISP_COLUMNCOVERPLATE
 
     def select_bolt_dia(self):
         min_plate_height = self.section.flange_width
@@ -1727,5 +1724,15 @@ class BeamCoverPlate(MomentConnection):
             ui.mytabWidget.setCurrentIndex(0)
         # self.display_3DModel("Connector", bgcolor)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
+
+
+    def tab_list(self):
+
+        tabs = []
+
+        t1 = (KEY_DISP_BEAMSEC, self.tab_beam_section)
+        tabs.append(t1)
+
+        return tabs
 
 

@@ -1054,8 +1054,10 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(module))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(main)
-        add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Column")
-        add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Beam")
+
+
+        add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
+        add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
         if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
@@ -1944,22 +1946,10 @@ class Ui_ModuleWindow(QMainWindow):
         material_grade = key_4.currentText()
         if module == KEY_DISP_COLUMNCOVERPLATE:
             designation_col = key_5.currentText()
-            self.designPrefDialog.ui.tabWidget.removeTab(
-                self.designPrefDialog.ui.tabWidget.indexOf(
-                    self.designPrefDialog.ui.tab_Beam))
-            self.designPrefDialog.ui.tabWidget.setTabText(
-                self.designPrefDialog.ui.tabWidget.indexOf(
-                    self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
             if key_5.currentIndex() != 0:
                 self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
         elif module == KEY_DISP_BEAMCOVERPLATE:
             designation_bm = key_5.currentText()
-            self.designPrefDialog.ui.tabWidget.removeTab(
-                self.designPrefDialog.ui.tabWidget.indexOf(
-                    self.designPrefDialog.ui.tab_Column))
-            self.designPrefDialog.ui.tabWidget.setTabText(
-                self.designPrefDialog.ui.tabWidget.indexOf(
-                    self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
             if key_5.currentIndex() != 0:
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)
         elif module == KEY_DISP_COMPRESSION:
@@ -1994,21 +1984,21 @@ class Ui_ModuleWindow(QMainWindow):
             designation_col = key_2.currentText()
             designation_bm = key_3.currentText()
             if conn in VALUES_CONN_1:
-                self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(
-                    self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
-                self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(
-                        self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
+                # self.designPrefDialog.ui.tabWidget.setTabText(
+                #     self.designPrefDialog.ui.tabWidget.indexOf(
+                #     self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
+                # self.designPrefDialog.ui.tabWidget.setTabText(
+                #     self.designPrefDialog.ui.tabWidget.indexOf(
+                #         self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
                 self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)
             elif conn in VALUES_CONN_2:
+                tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+                tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
                 self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(
-                        self.designPrefDialog.ui.tab_Column), KEY_DISP_PRIBM)
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column), KEY_DISP_PRIBM)
                 self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(
-                        self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECBM)
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam), KEY_DISP_SECBM)
                 self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)
 

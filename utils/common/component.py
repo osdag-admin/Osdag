@@ -237,7 +237,7 @@ class Section(Material):
         # V_p = (0.6 * A_v * fy) / (math.sqrt(3) * gamma_m0 * 1000)  # kN
         V_p = (A_v * fy) / (math.sqrt(3) * gamma_m0 * 1000)  # kN
 
-        self.shear_yielding_capacity = V_p
+        self.shear_yielding_capacity = round(V_p,2)
 
     def tension_yielding(self, length, thickness, fy):
         '''
@@ -252,7 +252,7 @@ class Section(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         # A_v = height * thickness
         tdg = (A_v * fy) / (gamma_m0 * 1000)
-        self.tension_yielding_capacity = tdg
+        self.tension_yielding_capacity = round(tdg,2)
 
     def tension_member_yielding(self, A_g, F_y):
         "design strength of members under axial tension,T_dg,as governed by yielding of gross section"
@@ -262,7 +262,7 @@ class Section(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         T_dg = (A_g*100* F_y / gamma_m0)/1000
 
-        self.tension_yielding_capacity =  T_dg
+        self.tension_yielding_capacity = round(T_dg,2)
 
 
 
@@ -274,7 +274,7 @@ class Section(Material):
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         T_pdn = 0.9 * A_n * F_u / gamma_m1
 
-        self.tension_rupture_capacity = T_pdn
+        self.tension_rupture_capacity = round(T_pdn,2)
 
     def tension_blockshear(self, numrow, numcol, pitch, gauge, thk, end_dist, edge_dist, dia_hole, fy, fu):
         '''
@@ -302,7 +302,7 @@ class Section(Material):
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
         Tdb = min(Tdb1, Tdb2)
         Tdb = round(Tdb / 1000, 3)
-        self.block_shear_capacity_axial = Tdb
+        self.block_shear_capacity_axial = round(Tdb,2)
 
     def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):
 
@@ -455,11 +455,17 @@ class Plate(Material):
         print(web_plate_h_max,edge_dist,gauge)
         print(web_plate_h_max,edge_dist,gauge,"hhhh")
         max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
-        print("max_bolts_one_line", max_bolts_one_line)
-        self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
-        self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
-        self.height = max(web_plate_h_min, self.get_web_plate_h_req (self.bolts_one_line, gauge, edge_dist))
-        return self.bolt_line, self.bolts_one_line, self.height
+        if max_bolts_one_line != 0:
+            print("max_bolts_one_line", max_bolts_one_line)
+            self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
+            self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
+            self.height = max(web_plate_h_min, self.get_web_plate_h_req (self.bolts_one_line, gauge, edge_dist))
+            return self.bolt_line, self.bolts_one_line, self.height
+        else:
+            self.bolts_one_line = 0
+            self.bolt_line = 0
+            self.height = 0
+            return self.bolt_line, self.bolts_one_line, self.height
 
     def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist):
         """

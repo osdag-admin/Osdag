@@ -58,7 +58,7 @@ class Tension(Main):
     def set_osdaglogger(key):
 
         """
-        Function to set Logger for FinPlate Module
+        Function to set Logger for Tension Module
         """
 
         # @author Arsil Zunzunia
@@ -187,10 +187,10 @@ class Tension(Main):
         else:
             existingvalue_key_grd = ''
 
-        if KEY_PLATETHK in existingvalues:
-            existingvalue_key_platethk = existingvalues[KEY_PLATETHK]
-        else:
-            existingvalue_key_platethk = ''
+        # if KEY_PLATETHK in existingvalues:
+        #     existingvalue_key_platethk = existingvalues[KEY_PLATETHK]
+        # else:
+        #     existingvalue_key_platethk = ''
 
         t16 = (KEY_MODULE, KEY_DISP_TENSION, TYPE_MODULE, None, None)
         options_list.append(t16)
@@ -234,11 +234,11 @@ class Tension(Main):
         t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
         options_list.append(t12)
 
-        t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None)
-        options_list.append(t13)
+        # t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None)
+        # options_list.append(t13)
 
-        t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_platethk, VALUES_PLATETHK)
-        options_list.append(t14)
+        # t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_platethk, VALUES_PLATETHK)
+        # options_list.append(t14)
 
         return options_list
 
@@ -287,9 +287,9 @@ class Tension(Main):
               self.section_size.tension_capacity if flag else '')
         out_list.append(t5)
 
-        t6 = (KEY_EFFICIENCY, KEY_DISP_EFFICIENCY, TYPE_TEXTBOX,
-              self.efficiency if flag else '')
-        out_list.append(t6)
+        # t6 = (KEY_EFFICIENCY, KEY_DISP_EFFICIENCY, TYPE_TEXTBOX,
+        #       self.efficiency if flag else '')
+        # out_list.append(t6)
 
         t7 = (None, DISP_TITLE_BOLT_CAPACITY, TYPE_TITLE, None)
         out_list.append(t7)
@@ -538,12 +538,13 @@ class Tension(Main):
         super(Tension,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
+        self.plate_thickness = [3,4,6,8,10,12,16,20,24,28,30,32,36,40]
         print(self.sizelist)
 
         print(self.bolt)
         self.load = Load(shear_force=None, axial_force=design_dictionary.get(KEY_AXIAL))
 
-        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+        self.plate = Plate(thickness=self.plate_thickness,
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
         print("input values are set. Doing preliminary member checks")
@@ -572,7 +573,7 @@ class Tension(Main):
         #     length = self.supported_section.depth - 50.0  # TODO: Subtract notch height for beam-beam connection
         #
         # self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
-
+        min_yield = 0
         for selectedsize in self.sizelist:
             self.section_size = self.select_section(self,design_dictionary,selectedsize)
             self.cross_area = self.section_size.area
@@ -580,18 +581,20 @@ class Tension(Main):
             print(self.section_size.tension_yielding_capacity)
 
 
-            min_yield = 0
+
             if (self.section_size.tension_yielding_capacity > self.load.axial_force):
                 min_yield_current = self.section_size.tension_yielding_capacity
                 if min_yield == 0:
                     min_yield = min_yield_current
+                    self.section_size_1 = self.select_section(self, design_dictionary, selectedsize)
+
                 elif min_yield_current <= min_yield:
                     min_yield = min_yield_current
-                    self.section_size = self.select_section(self, design_dictionary, selectedsize)
+                    self.section_size_1 = self.select_section(self, design_dictionary, selectedsize)
 
         print(self.load.axial_force)
         print(min_yield)
-        print(self.section_size)
+        print(self.section_size_1)
 
         self.select_bolt_dia(self)
 
@@ -612,19 +615,23 @@ class Tension(Main):
         #                             self.supported_section.tension_yielding_capacity))
         #     print("failed in preliminary member checks. Select larger sections or decrease loads")
 
+    def closest(self, lst, K):
+
+        return lst[min(range(len(lst)), key=lambda i: abs(lst[i] - K))]
+
     def select_bolt_dia(self):
-        self.min_plate_height = self.section_size.min_plate_height()
-        self.max_plate_height = self.section_size.max_plate_height()
+        self.min_plate_height = self.section_size_1.min_plate_height()
+        self.max_plate_height = self.section_size_1.max_plate_height()
         # self.res_force = math.sqrt(self.load.shear_force ** 2 + self.load.axial_force ** 2) * 1000
         self.res_force = self.load.axial_force
-        self.plate.thickness_provided = max(min(self.plate.thickness), math.ceil(self.section_size.web_thickness))
+        self.plate.thickness_provided = self.closest(self, self.plate_thickness,self.section_size_1.web_thickness)
         bolts_required_previous = 2
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
         count = 0
         bolts_one_line = 1
         for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
-
+            print(self.bolt.bolt_diameter_provided)
 
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                     connecting_plates_tk=[self.plate.thickness_provided,
@@ -641,7 +648,7 @@ class Tension(Main):
                 self.plate.get_web_plate_l_bolts_one_line(self.max_plate_height, self.min_plate_height, self.plate.bolts_required,
                                                     self.bolt.min_edge_dist_round, self.bolt.min_gauge_round)
             self.plate.bolts_required = bolt_line * bolts_one_line
-            print(1, self.res_force, self.bolt.bolt_capacity, self.bolt.bolt_diameter_provided, self.plate.bolts_required, bolts_one_line)
+            # print(1, self.res_force, self.bolt.bolt_capacity, self.bolt.bolt_diameter_provided, self.plate.bolts_required, bolts_one_line)
             if bolts_one_line > 1:
                 if self.plate.bolts_required > bolts_required_previous and count >= 1:
                     self.bolt.bolt_diameter_provided = bolt_diameter_previous
@@ -651,15 +658,15 @@ class Tension(Main):
                 bolt_diameter_previous = self.bolt.bolt_diameter_provided
                 count += 1
 
-        if bolts_one_line == 1:
+        if bolts_one_line == 1 or bolts_one_line == 0:
             self.design_status = False
             logger.error(" : Select bolt of lower diameter")
         else:
             self.design_status = True
             self.get_bolt_grade(self)
 
-        print(self.section_size)
-        print(self.load)
+        # print(self.section_size)
+        # print(self.load)
 
     def get_bolt_grade(self):
         bolt_grade_previous = self.bolt.bolt_grade[-1]
@@ -681,7 +688,7 @@ class Tension(Main):
                 self.plate.get_web_plate_l_bolts_one_line(self.max_plate_height, self.min_plate_height, self.plate.bolts_required,
                                                     self.bolt.min_edge_dist_round, self.bolt.min_gauge_round)
             self.plate.bolts_required = bolt_line * bolts_one_line
-            print(2, self.res_force, self.bolt.bolt_capacity, self.bolt.bolt_grade_provided, self.plate.bolts_required, bolts_one_line)
+            # print(2, self.res_force, self.bolt.bolt_capacity, self.bolt.bolt_grade_provided, self.plate.bolts_required, bolts_one_line)
             if self.plate.bolts_required > bolts_required_previous and count >= 1:
                 self.bolt.bolt_grade_provided = bolt_grade_previous
                 self.plate.bolts_required = bolts_required_previous
@@ -707,7 +714,7 @@ class Tension(Main):
                                          bolt_capacity=self.bolt.bolt_capacity,
                                          min_edge_dist=self.bolt.min_edge_dist_round,
                                          min_gauge=self.bolt.min_gauge_round, max_spacing=self.bolt.max_spacing_round,
-                                         max_edge_dist=self.bolt.max_edge_dist_round, shear_load=self.load.shear_force*1000,
+                                         max_edge_dist=self.bolt.max_edge_dist_round, shear_load= 0.0,
                                          axial_load=self.load.axial_force*1000, gap=self.plate.gap,
                                          shear_ecc=True)
 

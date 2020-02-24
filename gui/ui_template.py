@@ -621,7 +621,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         for t in new_list:
 
-            if t[0] in [KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS, KEY_PLATETHK, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC]:
+            if t[0] in [KEY_WEBPLATE_THICKNESS, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC]:
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()

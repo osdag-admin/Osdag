@@ -137,7 +137,7 @@ class Compression(Main):
 
     def fn_profile_section(self):
         if self == 'Beams':
-            return connectdb("Beams")
+            return connectdb("Beams", call_type="popup")
         elif self == 'Columns':
             return connectdb("Columns")
         elif self in ['Angles', 'Back to Back Angles', 'Star Angles']:

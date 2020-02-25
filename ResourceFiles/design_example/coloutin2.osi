@@ -27,9 +27,9 @@ DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
 DesignPreferences.Weld.Type: Shop Weld
 Flange_Plate.Preferences: Outside + Inside
-Load.Axial: '200'
-Load.Moment: '20'
-Load.Shear: '20'
+Load.Axial: '10'
+Load.Moment: '10'
+Load.Shear: '10'
 Member.Material: E 250 (Fe 410 W)A
 Module: Column Coverplate Connection
 Section Size: HB 450*

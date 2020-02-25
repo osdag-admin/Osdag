@@ -3,6 +3,7 @@ from design_type_command_prompt.connection.fin_plate_connection import FinPlateC
 from design_type_command_prompt.connection.column_cover_plate import ColumnCoverPlate
 from design_type_command_prompt.connection.end_plate_connection import EndPlateConnectionInput
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
+
 import yaml
 from utils.common.component import Bolt, Plate, Weld
 from Common import *

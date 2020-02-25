@@ -1,6 +1,8 @@
 
 # @author: Amir, Umair, Arsil
+
 import operator
+
 
 TYPE_COMBOBOX = 'ComboBox'
 
@@ -15,6 +17,7 @@ TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 DESIGN_FLAG = 'False'
+VALUE_NOT_APPLICABLE = 'N/A'
 
 import sqlite3
 from utils.common.component import *
@@ -259,12 +262,17 @@ KEY_MODULE = 'Module'
 TYPE_MODULE = 'Window Title'
 
 KEY_DISP_FINPLATE = 'Fin Plate'
+
+KEY_DISP_ENDPLATE = 'End Plate'
+
 KEY_DISP_CLEATANGLE = 'Cleat Angle'
+
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
+
 
 KEY_DISP_TENSION = 'Tension Members Design'
 KEY_DISP_COMPRESSION = 'Compression Member'
@@ -372,6 +380,13 @@ KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 
 KEY_FLANGE_CAPACITY ="Flange_plate.capacity"
 KEY_DISP_FLANGE_CAPACITY= 'capacity'
+KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
+KEY_DISP_FLANGE_TEN_CAPACITY ="flange tension capacity"
+
+KEY_TEN_CAP_FLANGE_PLATE ="Flange_plate.tension_capacity"
+KEY_DISP_TEN_CAP_FLANGE_PLATE ="tension_capacity_flange_plate"
+
+
 KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
 KEY_DISP_BLOCKSHEARCAP_FLANGE='Block Shear Capacity'
 KEY_TENSIONYIELDINGCAP_FLANGE = 'Flange_plate.tension_yielding_capacity'
@@ -402,6 +417,17 @@ KEY_DISP_TENSION_CAPACITY = "Tension Capacity"
 KEY_EFFICIENCY = "Member.efficiency"
 KEY_DISP_EFFICIENCY = "Efficiency"
 
+DISP_TITLE_BOLTDETAILS ='Bolt Details'
+KEY_BOLT_DETAILS ="Bolt.Details"
+KEY_DISP_BOLT_DETAILS = "Bolt Details"
+KEY_FLANGE_BOLT_LINE = 'Flange_plate.Bolt_Line'
+KEY_FLANGE_DISP_BOLT_LINE = 'Bolt Lines in flange'
+KEY_FLANGE_BOLTS_ONE_LINE = 'Flange_plate.Bolt_OneLine'
+KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in flange'
+KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
+KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
+
+
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
@@ -427,32 +453,54 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance'
 
 KEY_WEB_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_CAPACITY= 'capacity'
+KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
+KEY_DISP_WEB_TEN_CAPACITY ="web tension capacity"
+KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
+KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="shear_capacity_web plate"
+KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
+KEY_DISP_TEN_CAP_WEB_PLATE ="tension_capacity_web_plate"
+
+
 KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'
 KEY_DISP_SHEARYIELDINGCAP_WEB= 'Shear Yielding Capacity'
 KEY_BLOCKSHEARCAP_WEB='web_plate.block_shear_capacity'
 KEY_DISP_BLOCKSHEARCAP_WEB='Block Shear Capacity'
 KEY_SHEARRUPTURECAP_WEB= 'web_plate.shear_rupture_capacity'
 KEY_DISP_SHEARRUPTURECAP_WEB= 'Shear Rupture Capacity'
+KEY_TENSIONYIELDINGCAP_WEB = "web_plate.tension_yielding_capacity"
+KEY_DISP_TENSIONYIELDINGCAP_WEB ='Tension Yielding Capacity'
+KEY_TENSIONRUPTURECAP_WEB ='web_plate.shear_rupture_capacity'
+KEY_DISP_TENSIONRUPTURECAP_WEB ='Tension Rupture Capacity'
 KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
 KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
 KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
+
+KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
+KEY_WEB_DISP_BOLT_LINE = 'Bolt Lines in web'
+KEY_WEB_BOLTS_REQ = "Web_plate.Bolt_required"
+KEY_WEB_DISP_BOLTS_REQ = "Web Bolt Required"
+KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
+KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in web'
+
 
 DISP_TITLE_ENDPLATE = 'End plate'
 
 KEY_ENDPLATE_THICKNESS = 'Plate.end_plate.Thickness'
 KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_ENDPLATE_THICKNESS = ['All', 'Customized']
-VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20']
+VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+
 
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
+
 
 DISP_TITLE_PLATE = 'Plate'
 
 KEY_PLATETHK = 'Plate.Thickness'
 KEY_DISP_PLATETHK = 'Thickness(mm)*'
 VALUES_PLATETHK = ['All', 'Customized']
-VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20']
+VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
 KEY_DP_BOLT_TYPE = 'DesignPreferences.Bolt.Type'
 KEY_DISP_DP_BOLT_TYPE = 'Bolt type'
@@ -464,9 +512,11 @@ KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 KEY_DP_BOLT_SLIP_FACTOR = 'DesignPreferences.Bolt.Slip_Factor'
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 KEY_DP_WELD_TYPE = 'DesignPreferences.Weld.Type'
+
 KEY_DP_WELD_TYPE_SHOP = 'Shop Weld'
 KEY_DP_WELD_TYPE_FIELD = 'Field weld'
 KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_SHOP, KEY_DP_WELD_TYPE_FIELD]
+
 KEY_DISP_DP_WELD_TYPE = 'Type of weld'
 KEY_DP_WELD_MATERIAL_G_O = 'DesignPreferences.Weld.Material_Grade_OverWrite'
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
@@ -640,6 +690,7 @@ KEY_OUT_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
+
 KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
 
@@ -721,6 +772,10 @@ KEY_DISP_TOPANGLE='Top Angle *'
 #     '35 35 x 5', '35 35 x 6', '40 40 x 3', '40 40 x 4', '40 40 x 5', '40 40 x 6', '45 45 x 3', '45 45 x 4', '45 45 x 5', '45 45 x 6', '50 50 x 3', '50 50 x 4', '50 50 x 5', '50 50 x 6', '50 50 x 7', '50 50 x 8', '55 55 x 4', '55 55 x 5', '55 55 x 6', '55 55 x 8', '55 55 x 10', '60 60 x 4', '60 60 x 5', '60 60 x 6', '60 60 x 8', '60 60 x 10', '65 65 x 4', '65 65 x 5', '65 65 x 6', '65 65 x 8', '65 65 x 10', '70 70 x 5', '70 70 x 6', '70 70 x 7', '70 70 x 8', '70 70 x 10', '75 75 x 5', '75 75 x 6', '75 75 x 8', '75 75 x 10', '80 80 x 6', '80 80 x 8', '80 80 x 10', '80 80 x 12', '90 90 x 6', '90 90 x 8', '90 90 x 10', '90 90 x 12', '100 100 x 6', '100 100 x 7', '100 100 x 8', '100 100 x 10', '100 100x 12', '100 100 x 15', '110 110 X 8', '110 110 X 10', '110 110 X 12', '110 110 X 16', '120 120 X 8', '120 120 X 10', '120 120 X 12', '120 120 X 15', '130 130 X 8', '130 130 X 9', '130 130 X 10', '130 130 X 12', '130 130 X 16', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '180 180 X 15', '180 180 X 18', '180 180 X 20', '200 200 X 12', '200 200 X 16', '200 200 X 20', '200 200 X 24', '200 200 X 25', '30 20 X 3', '30 20 X 4', '30 20 X 5', '40 20 X 3', '40 20 X 4', '40 20 X 5', '40 25 X 3', '40 25 X 4', '40 25 X 5', '40 25 X 6', '45 30 X 3', '45 30 X 4', '45 30 X 5', '45 30 X 6', '50 30 X 3', '50 30 X 4', '50 30 X 5', '50 30 X 6', '60 30 X 5', '60 30 X 6', '60 40 X 5', '60 40 X 6', '60 40 X 7', '60 40 X 8', '65 45 X 5', '65 45 X 6', '65 45 X 8', '65 50 X 5', '65 50 X 6', '65 50 X 7', '65 50 X 8', '70 45 X 5', '70 45 X 6', '70 45 X 8', '70 45 X 10', '70 50 X 5', '70 50 X 6', '70 50 X 7', '70 50 X 8', '75 50X 5', '75 50X 6', '75 50X 7', '75 50X 8', '75 50X 10', '80 40 X 5', '80 40 X 6', '80 40 X 7', '80 40 X 8', '80 50 X 5', '80 50 X  6', '80 50 X  8', '80 50 X 10', '80 60 X 6', '80 60 X 7', '80 60 X 8', '90 60 X 6', '90 60 X  8', '90 60 X 10', '90 60 X 12', '90 65 X 6', '90 65 X 7', '90 65 X 8', '90 65 X 10', '100 50 X 6', '100 50 X 7', '100 50 X 8', '100 50 X 10', '100 65 X 6', '100 65 X  7', '100 65 X  8', '100 65 X 10', '100 75 X 6', '100 75 X  8', '100 75 X 10', '100 75 X 12', '120 80 X 8', '120 80 X 10', '120 80 X 12', '125 75 X 6', '125 75 X  8', '125 75 X 10', '125 75 X 12', '125 95 X 6', '125 95 X  8', '125 95 X 10', '125 95 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '150 75 X 8', '150 75 X  9', '150 75 X 10', '150 75 X 12', '150 75 X 15', '150 90 X 10', '150 90 X X 12', '150 90 X X 15', '150 90 X 10', '150 90 X 12', '150 90 X 15', '150 115 X 8', '150 115 X 10', '150 115 X 12', '150 115 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20']
 VALUES_ANGLESEC= ['All', 'Customized']
 
+VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
+# DISPLAY_TITLE_ANGLESEC='Select Sections'
+
+
 def get_available_cleat_list(input_angle_list, leg_length, relate):
 
     available_angles = []
@@ -752,7 +807,6 @@ def get_leg_lengths(designation):
 all_angles = connectdb("Angles","popup")
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 50.0, operator.ge)
 print(VALUES_CLEAT_CUSTOMIZED)
-
 
 DISP_TITLE_COMPMEM='Compression member'
 

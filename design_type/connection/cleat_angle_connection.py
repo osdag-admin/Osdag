@@ -13,6 +13,7 @@ class CleatAngleConnection(ShearConnection):
 
     def __init__(self):
         super(CleatAngleConnection, self).__init__()
+
         self.sptd_leg_length = 0.0
         self.sptng_leg_length = 0.0
 
@@ -117,6 +118,7 @@ class CleatAngleConnection(ShearConnection):
 
     @staticmethod
     def cleatsec_customized():
+
         a = VALUES_CLEAT_CUSTOMIZED
         return a
 
@@ -227,6 +229,7 @@ class CleatAngleConnection(ShearConnection):
 
         return spacing
 
+
     def output_values(self, flag):
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
@@ -245,6 +248,7 @@ class CleatAngleConnection(ShearConnection):
         t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '')
 
         out_list.append(t3)
+
 
         t4 = (None, DISP_OUT_TITLE_SPTDLEG, TYPE_TITLE, None)
         out_list.append(t4)
@@ -420,6 +424,7 @@ class CleatAngleConnection(ShearConnection):
             self.set_input_values(self, design_dictionary)
         else:
             pass
+
     def module_name(self):
         return KEY_DISP_CLEATANGLE
 
@@ -429,8 +434,10 @@ class CleatAngleConnection(ShearConnection):
         super(CleatAngleConnection,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.cleat_list = design_dictionary[KEY_CLEATSEC]
+
         self.material_grade = design_dictionary[KEY_MATERIAL]
         print(self.cleat_list)
+
         self.sptd_leg = Plate()
 
         print("input values are set. Doing preliminary member checks")
@@ -452,6 +459,7 @@ class CleatAngleConnection(ShearConnection):
 
         if self.supported_section.shear_yielding_capacity > self.load.shear_force:
             print("preliminary member check is satisfactory. Doing bolt checks")
+
             self.get_possible_bolt_dia(self)
 
         else:
@@ -460,6 +468,7 @@ class CleatAngleConnection(ShearConnection):
                          "than applied loads, Please select larger sections or decrease loads"
                             .format(self.supported_section.shear_yielding_capacity))
             print("failed in preliminary member checks. Select larger sections or decrease loads")
+
 
     def get_possible_bolt_dia(self):
         leg_lengths = []
@@ -526,6 +535,7 @@ class CleatAngleConnection(ShearConnection):
                 self.bolts_required_sptd = self.bolt_line_sptd * self.bolts_one_line_sptd
                 print(1, self.bolt.bolt_capacity, self.bolt.bolt_diameter_provided, self.bolts_required_sptd, self.bolts_one_line_sptd,self.bolt_line_sptd)
                 if self.bolts_one_line_sptd > 1:
+
                     if self.bolt_line_sptd <= bolt_line_max and self.bolts_required_sptd > bolts_required_previous and count >= 1:
                         self.bolt.bolt_diameter_provided = bolt_diameter_previous
                         self.bolts_required_sptd = bolts_required_previous
@@ -537,6 +547,7 @@ class CleatAngleConnection(ShearConnection):
                     break
 
         self.sptd_leg.bolt_force = self.load.shear_force*1000/self.bolts_one_line_sptd/self.bolt_line_sptd
+
         if self.bolts_one_line_sptd == 1:
             self.design_status = False
             logger.error(" : Select bolt of lower diameter/beam of higher depth")
@@ -544,6 +555,7 @@ class CleatAngleConnection(ShearConnection):
             self.design_status = False
             logger.error(" : bolt lines cant be more than 3. Select bolt of higher diameter/grade")
         elif self.bolt_line_sptd == 0:
+
             self.design_status = False
             logger.error(" : Empty bolt diameters list")
         elif self.bolt.bolt_capacity <= self.sptd_leg.bolt_force:
@@ -645,8 +657,6 @@ class CleatAngleConnection(ShearConnection):
         designation_angle = self.acceptable_cleat_list[0]
         print(self.sptd_leg_length, self.sptng_leg_length, designation_angle)
 
-
-
     def get_leg_pitch(self, bolt_line, bolt_dia):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT Nominal_Leg, S1, S2, S3 FROM Angle_Pitch " \
@@ -655,7 +665,6 @@ class CleatAngleConnection(ShearConnection):
 
         cur.execute(db_query, (bolt_line, bolt_dia))
         rows = cur.fetchall()
-
         angle_pitch_details = []
         for row in rows:
             angle_pitch_details.append(row)

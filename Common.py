@@ -387,6 +387,9 @@ KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
 KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
 
+KEY_DESIGNATION = "section_size.designation"
+KEY_DISP_DESIGNATION = "Designation"
+
 KEY_TENSION_YIELDCAPACITY = "Member.tension_yielding"
 KEY_DISP_TENSION_YIELDCAPACITY = 'Yield'
 KEY_TENSION_RUPTURECAPACITY = "Member.tension_rupture"

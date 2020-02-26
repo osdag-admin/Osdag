@@ -7,6 +7,7 @@ import math
 import numpy as np
 from utils.common.common_calculation import *
 
+
 class Bolt(Material):
 
     def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="",
@@ -403,21 +404,64 @@ class Plate(Material):
         web_plate_h_req = float((bolts_one_line - 1) * gauge + 2 * edge_dist)
         return web_plate_h_req
 
+
+    def get_flange_plate_h_req(self, bolts_one_line, gauge, edge_dist,web_thickness,root_radius): #todo-anjali
+        flange_plate_h_req = 2*float(((bolts_one_line/2 - 1) * gauge) + (2 * edge_dist) + web_thickness/2 + root_radius)
+        return flange_plate_h_req
+
     def get_spacing_adjusted(self, gauge_pitch, edge_end, max_spacing):
         while gauge_pitch > max_spacing:
             edge_end += 5
             gauge_pitch -= 5
         return gauge_pitch, edge_end
 
-    def get_web_plate_l_bolts_one_line(self, web_plate_h_max, web_plate_h_min, bolts_required,edge_dist, gauge):
+    def get_web_plate_l_bolts_one_line(self, web_plate_h_max, web_plate_h_min,bolts_required,edge_dist, gauge):
         print('maxh',web_plate_h_max)
         print(web_plate_h_max,edge_dist,gauge)
         max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
         print("max_bolts_one_line", max_bolts_one_line)
-        self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
-        self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
-        self.height = max(web_plate_h_min, self.get_web_plate_h_req (self.bolts_one_line, gauge, edge_dist))
-        return self.bolt_line, self.bolts_one_line, self.height
+        if max_bolts_one_line >=2:
+            self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
+            self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
+            self.height = max(web_plate_h_min, self.get_web_plate_h_req (self.bolts_one_line, gauge, edge_dist))
+            return self.bolt_line, self.bolts_one_line, self.height
+        else:
+            self.bolt_line= 0
+            self.bolts_one_line=0
+            self.height=0
+            return self.bolt_line, self.bolts_one_line, self.height
+
+    def get_flange_plate_l_bolts_one_line(self, flange_plate_h_max, flange_plate_h_min, bolts_required, edge_dist, gauge,web_thickness,root_radius):# todo anjalinew
+        print('maxh', flange_plate_h_max)
+        print(flange_plate_h_max, edge_dist, gauge)
+        # max_bolts_one_line = int(((flange_plate_h_max - (2 * edge_dist)) / gauge) + 1)
+        # print("max_bolts_one_line", max_bolts_one_line)
+        possible_bolt = (flange_plate_h_max/2 - web_thickness/2 - 2 *edge_dist)-root_radius
+        if possible_bolt > 0:
+            bolt_one_side = int(possible_bolt/gauge  +1)
+            max_bolts_one_line = 2*bolt_one_side
+
+            if max_bolts_one_line >= 2:
+                bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
+                bolts_one_line = int(math.ceil(float(bolts_required) / float(bolt_line)))
+                height =flange_plate_h_max
+                # (
+                #     self.get_flange_plate_h_req(self.bolts_one_line, gauge, edge_dist, web_thickness, root_radius))
+                return bolt_line, bolts_one_line, height
+            else:
+                bolt_line = 0
+                bolts_one_line = 0
+                height = 0
+                return bolt_line, bolts_one_line, height
+        else:
+            self.design_status = False
+            bolt_line = 0
+            bolts_one_line = 0
+            height = 0
+            return bolt_line, bolts_one_line, height
+
+
+
 
     def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist):
         """
@@ -440,6 +484,36 @@ class Plate(Material):
         else:
             pass
         return gauge, edge_dist, web_plate_h
+
+    def get_gauge_edge_dist_flange(self, flange_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,web_thickness): #todo anjali
+        """
+
+        :param web_plate_l: height of plate
+        :param min_end_dist_round: minimum end distance
+        :param bolts_one_line: bolts in one line
+        :param max_spacing_round: maximum pitch
+        :param max_end_dist_round: maximum end distance
+        :return: pitch, end distance, height of plate (false if applicable)
+        """
+        print("red",flange_plate_h,web_thickness,edge_dist,bolts_one_line)
+        if bolts_one_line > 2:
+            """
+            gauge is the distance between bolts along bolt line on either side of the web thickness
+            """
+            gauge = (int((flange_plate_h/2 - web_thickness/2 - (2 * edge_dist)) / (bolts_one_line/2 - 1))) #
+        else:
+            gauge = 0.0
+        # multiplier=5)
+        # web_plate_h = gauge*(bolts_one_line - 1) + edge_dist*2
+        print("gauge", gauge,edge_dist,max_spacing, max_edge_dist)
+        if gauge > max_spacing:
+            gauge, edge_dist = self.get_spacing_adjusted(gauge, edge_dist, max_spacing)
+            if edge_dist >= max_edge_dist:
+                # TODO: add one more bolt to satisfy spacing criteria
+                flange_plate_h = False
+        else:
+            pass
+        return gauge, edge_dist, flange_plate_h
 
     def get_vres(self, bolts_one_line, pitch, gauge, bolt_line, shear_load, axial_load, ecc):
         """
@@ -490,7 +564,7 @@ class Plate(Material):
         return bolt_capacity_red
 
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge, max_spacing, max_edge_dist,
-                              shear_load=0.0, axial_load=0.0, gap=0.0, shear_ecc=False, bolt_line_limit=math.inf):
+                              shear_load=0.0, axial_load=0.0, web_moment =0.0,  gap=0.0, shear_ecc=False, bolt_line_limit=math.inf):
 
         """
 
@@ -513,10 +587,12 @@ class Plate(Material):
         res_force = math.sqrt(shear_load ** 2 + axial_load ** 2)
         bolts_required = max(int(math.ceil(res_force / bolt_capacity)), 2)
         [bolt_line, bolts_one_line, web_plate_h] = \
-            self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
-                                                min_edge_dist, min_gauge)
+            self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required
+                                                ,min_edge_dist, min_gauge)
         print("boltdetails0", bolt_line, bolts_one_line, web_plate_h)
-        if bolts_one_line == 1:
+
+
+        if bolts_one_line == 1 or bolts_one_line ==0:
             self.design_status = False
             self.reason = "Can't fit two bolts in one line. Select lower diameter"
         elif bolt_line > bolt_line_limit:
@@ -537,7 +613,7 @@ class Plate(Material):
             if shear_ecc is True:
                 # If check for shear eccentricity is true, resultant force in bolt is calculated
                 ecc = (pitch * max((bolt_line-1.5), 0)) + end_dist + gap
-                moment_demand = shear_load * ecc
+                moment_demand = shear_load * ecc + web_moment
                 print(2, bolts_one_line, pitch,
                                      gauge, bolt_line, shear_load, axial_load, ecc, web_plate_h)
                 vres = self.get_vres(bolts_one_line, pitch,
@@ -617,6 +693,141 @@ class Plate(Material):
             self.edge_dist_provided = edge_dist
             self.end_dist_provided = end_dist
 
+    def get_flange_plate_details(self, bolt_dia, flange_plate_h_min, flange_plate_h_max, bolt_capacity, min_edge_dist, min_gauge, max_spacing, max_edge_dist,web_thickness, root_radius,
+                              shear_load=0.0, axial_load=0.0, gap=0.0,  bolt_line_limit=math.inf):
+    #todo anjali
+        """
+
+        :param bolt_dia: diameter of bolt
+        :param end_dist: minimum end distance
+        :param pitch: minimum pitch
+        :param web_plate_h_min: minimum plate height
+        :param web_plate_h_max: maximum plate height
+        :param bolt_capacity: capacity of bolt
+        :param bolt_line_limit: maximum number of bolt lines allowed
+        :param shear_load: load along the height (bolt_line)
+        :param axial_load: load along the length
+        :param gap: gap between members which adds up to eccentricity
+        :param shear_ecc: if eccentricity effect needs to be considered this value should be passed as "True"
+        :return: web_plate_h, bolt_line, bolts_one_line, bolts_required, bolt_capacity_red, vres, moment_demand, \
+               pitch, gauge, edge_dist, end_dist, a.min_edge_dist_round, a.min_pitch_round, a.max_spacing_round, a.max_edge_dist_round
+        """
+
+        # initialising values to start the loop
+        res_force = math.sqrt(shear_load ** 2 + axial_load ** 2)
+        bolts_required = max(int(math.ceil(res_force / bolt_capacity)), 2)
+
+        [bolt_line, bolts_one_line, flange_plate_h] = self.get_flange_plate_l_bolts_one_line(flange_plate_h_max, flange_plate_h_min, bolts_required, min_edge_dist, min_gauge,
+                                           web_thickness, root_radius)
+
+        print("boltdetails0", bolt_line, bolts_one_line, flange_plate_h)
+
+
+        if bolts_one_line == 1 or bolts_one_line ==0:
+            self.design_status = False
+            self.reason = "Can't fit two bolts in one line. Select lower diameter"
+        elif bolt_line > bolt_line_limit:
+            self.design_status = False
+            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+        else:
+            print("boltdetails", bolt_line, bolts_one_line,flange_plate_h)
+            [gauge, edge_dist, flange_plate_h] = self.get_gauge_edge_dist_flange(flange_plate_h, bolts_one_line, min_edge_dist, max_spacing, max_edge_dist, web_thickness)
+
+
+            print("boltdetails", bolt_line, bolts_one_line,flange_plate_h)
+            if bolt_line == 1:
+                pitch = 0.0
+            else:
+                pitch = min_gauge
+            end_dist = min_edge_dist
+            moment_demand = 0.0
+            vres = res_force / (bolt_line*bolts_one_line)
+
+            # if shear_ecc is True:
+            #     # If check for shear eccentricity is true, resultant force in bolt is calculated
+            #     ecc = (pitch * max((bolt_line-1.5), 0)) + end_dist + gap
+            #     moment_demand = shear_load * ecc + web_moment
+            #     print(2, bolts_one_line, pitch,
+            #                          gauge, bolt_line, shear_load, axial_load, ecc, web_plate_h)
+            #     vres = self.get_vres(bolts_one_line, pitch,
+            #                          gauge, bolt_line, shear_load, axial_load, ecc)
+            #     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+            #                                           gauge, bolt_capacity,
+            #                                           bolt_dia)
+            #     print(3, vres, bolt_capacity_red)
+            #
+            #     while bolt_line <= bolt_line_limit and vres > bolt_capacity_red and web_plate_h <= web_plate_h_max:
+            #         # Length of plate is increased for calculated bolts in one line.
+            #         # This increases spacing which decreases resultant force
+            #         print(4, web_plate_h, web_plate_h_max)
+            #         if web_plate_h + 10 <= web_plate_h_max:
+            #             web_plate_h += 10
+            #             print("boltdetails2", bolt_line, bolts_one_line, web_plate_h)
+            #         # If height cannot be increased number of bolts is increased by 1 and loop is repeated
+            #         else:
+            #             bolts_required += 1
+            #             print(5, web_plate_h_max, web_plate_h_min, bolts_required,
+            #                                                     min_edge_dist, min_gauge)
+            #             [bolt_line, bolts_one_line, web_plate_h] = \
+            #                 self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
+            #                                                     min_edge_dist, min_gauge)
+            #
+            #         print(6, bolts_required, bolt_line, bolts_one_line, web_plate_h)
+            #         [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,min_edge_dist, max_spacing, max_edge_dist)
+            #         while web_plate_h is False:
+            #             bolts_required += 1
+            #             [bolt_line, bolts_one_line, web_plate_h] = \
+            #                 self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
+            #                                                     min_edge_dist, min_gauge)
+            #             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,
+            #                                                                        min_edge_dist, max_spacing,
+            #                                                                        max_edge_dist)
+            #
+            #         if bolt_line == 1:
+            #             pitch = 0.0
+            #         else:
+            #             pitch = min_gauge
+            #         ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
+            #         vres = self.get_vres(bolts_one_line, pitch,
+            #                              gauge, bolt_line, shear_load, axial_load, ecc)
+            #         bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+            #                                               gauge, bolt_capacity,
+            #                                               bolt_dia)
+            #         print("bow", vres, bolt_capacity_red)
+
+            while flange_plate_h is False:
+                bolts_required += 1
+                [bolt_line, bolts_one_line, flange_plate_h] = \
+                    self.get_flange_plate_l_bolts_one_line(flange_plate_h_max, flange_plate_h_min, bolts_required,
+                                                           min_edge_dist, min_gauge,
+                                                           web_thickness, root_radius) #
+
+                [gauge, edge_dist, flange_plate_h] = self.get_gauge_edge_dist_flange(flange_plate_h, bolts_one_line,
+                                                                                  min_edge_dist, max_spacing,
+                                                                                  max_edge_dist)
+                print("boltdetailsasaa", bolt_line, bolts_one_line, flange_plate_h)
+
+            bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+                                                  gauge, bolt_capacity,
+                                                  bolt_dia)
+            if vres > bolt_capacity_red:
+                self.design_status = False
+                self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+            else:
+                self.design_status = True
+
+            self.length = gap + end_dist * 2 + pitch * (bolt_line - 1)
+            self.height = flange_plate_h
+            self.bolt_line = bolt_line
+            self.bolts_one_line = bolts_one_line
+            self.bolts_required = bolt_line * bolts_one_line
+            self.bolt_capacity_red = bolt_capacity_red
+            self.bolt_force = vres
+            self.moment_demand = moment_demand
+            self.pitch_provided = pitch
+            self.gauge_provided = gauge
+            self.edge_dist_provided = edge_dist
+            self.end_dist_provided = end_dist
     # Function for block shear capacity calculation
     def blockshear(self, numrow, numcol, pitch, gauge, thk, end_dist, edge_dist, dia_hole, fy, fu):
         '''

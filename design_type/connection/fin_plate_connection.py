@@ -393,7 +393,6 @@ class FinPlateConnection(ShearConnection):
             secondary = design_dictionary[KEY_SUPTDSEC]
             conn = sqlite3.connect(PATH_TO_DATABASE)
             cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
-            cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
             p_beam_details = cursor.fetchone()
             p_val = p_beam_details[0] - 2*p_beam_details[1] - p_beam_details[2] - p_beam_details[3]
             cursor2 = conn.execute("SELECT B FROM BEAMS WHERE Designation = ( ? )", (secondary,))
@@ -788,6 +787,7 @@ class FinPlateConnection(ShearConnection):
                 break
             else:
                 t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
+                print(t_weld_req)
                 self.weld.size = list([x for x in available_welds if (t_weld_req <= x)])[0]
                 if self.weld.size is None:
                     self.plate.height += 10

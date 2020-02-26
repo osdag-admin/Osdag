@@ -139,11 +139,11 @@ class Compression(Main):
         if self == 'Beams':
             return connectdb("Beams", call_type="popup")
         elif self == 'Columns':
-            return connectdb("Columns")
+            return connectdb("Columns", call_type="popup")
         elif self in ['Angles', 'Back to Back Angles', 'Star Angles']:
-            return connectdb("Angles")
+            return connectdb("Angles", call_type="popup")
         elif self in ['Channels', 'Back to Back Channels']:
-            return connectdb("Channels")
+            return connectdb("Channels", call_type="popup")
 
     def fn_end1_end2(self):
 

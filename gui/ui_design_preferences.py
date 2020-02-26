@@ -71,257 +71,415 @@ class Ui_Dialog(object):
         font.setFamily("Arial")
         self.tabWidget.setFont(font)
         self.tabWidget.setObjectName("tabWidget")
-        self.tab_Column = QtWidgets.QWidget()
-        self.tab_Column.setObjectName("tab_Column")
 
-        '''
-        @author: Umair 
-        '''
+###################################################################
+######################################################################
+######################################################################
+####################################################################
 
-        supporting_section_list = main.supporting_section_values(self)
-        _translate = QtCore.QCoreApplication.translate
-        i = 0
-        j = 6
-        for element in supporting_section_list:
-            lable = element[1]
-            type = element[2]
-            # value = option[4]
-            if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
-                l = QtWidgets.QLabel(self.tab_Column)
-                if lable in [KEY_DISP_SUPTNGSEC_THERMAL_EXP]:
-                    l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 28))
-                    i = i + 10
-                else:
-                    l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                if lable in [KEY_DISP_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_SOURCE]:
-                    font.setWeight(75)
-                else:
+
+#START
+
+        tab_index = 0
+        for tab_details in main.tab_list(main):
+            tab_name = tab_details[0]
+            tab_elements = tab_details[1]
+            tab = QtWidgets.QWidget()
+            tab.setObjectName(tab_name)
+            elements = tab_elements()
+            _translate = QtCore.QCoreApplication.translate
+            i = 0
+            j = 6
+            for element in elements:
+                lable = element[1]
+                type = element[2]
+                # value = option[4]
+                if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
+                    l = QtWidgets.QLabel(tab)
+                    if lable in [KEY_DISP_SUPTNGSEC_THERMAL_EXP]:
+                        l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 28))
+                        i = i + 10
+                    else:
+                        l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
+                    font = QtGui.QFont()
+                    font.setPointSize(9)
+                    if lable in [KEY_DISP_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_SOURCE]:
+                        font.setWeight(75)
+                    else:
+                        font.setWeight(50)
+                    l.setFont(font)
+                    l.setObjectName(element[0] + "_label")
+                    l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+                    l.setAlignment(QtCore.Qt.AlignCenter)
+
+                if type == TYPE_COMBOBOX:
+                    combo = QtWidgets.QComboBox(tab)
+                    combo.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
+                    font = QtGui.QFont()
+                    font.setPointSize(9)
+                    font.setBold(False)
                     font.setWeight(50)
-                l.setFont(font)
-                l.setObjectName(element[0] + "_label")
-                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-                l.setAlignment(QtCore.Qt.AlignCenter)
+                    combo.setFont(font)
+                    combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+                    combo.setMaxVisibleItems(5)
+                    combo.setObjectName(element[0])
+                    for item in element[3]:
+                        combo.addItem(item)
 
-            if type == TYPE_COMBOBOX:
-                combo = QtWidgets.QComboBox(self.tab_Column)
-                combo.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(False)
-                font.setWeight(50)
-                combo.setFont(font)
-                combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
-                combo.setMaxVisibleItems(5)
-                combo.setObjectName(element[0])
-                for item in element[3]:
-                    combo.addItem(item)
+                if type == TYPE_TITLE:
+                    q = QtWidgets.QLabel(tab)
+                    q.setGeometry(QtCore.QRect(j, 10 + i, 155, 35))
+                    font = QtGui.QFont()
+                    font.setPointSize(10)
+                    q.setFont(font)
+                    q.setObjectName("_title")
+                    q.setText(_translate("MainWindow",
+                                         "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
 
-            if type == TYPE_TITLE:
-                q = QtWidgets.QLabel(self.tab_Column)
-                q.setGeometry(QtCore.QRect(j, 10 + i, 155, 35))
-                font = QtGui.QFont()
-                font.setPointSize(10)
-                q.setFont(font)
-                q.setObjectName("_title")
-                q.setText(_translate("MainWindow",
-                                     "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
-
-            if type == TYPE_TEXTBOX:
-                r = QtWidgets.QLineEdit(self.tab_Column)
-                r.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(False)
-                font.setWeight(50)
-                r.setFont(font)
-                r.setObjectName(element[0])
-                if element[0] in [KEY_SUPTNGSEC_DEPTH, KEY_SUPTNGSEC_FLANGE_W, KEY_SUPTNGSEC_FLANGE_T, KEY_SUPTNGSEC_WEB_T]:
-                    r.setValidator(QDoubleValidator())
-
-            if type == TYPE_IMAGE:
-                im = QtWidgets.QLabel(self.tab_Column)
-                im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
-                im.setObjectName(element[0])
-                im.setScaledContents(True)
-                image = QPixmap("./ResourceFiles/images/Columns_Beams.png")
-                im.setPixmap(image)
-                i = i + 300
-
-            if type == TYPE_BREAK:
-                j = j + 310
-                i = -30
-
-            if type == TYPE_ENTER:
-                pass
-
-            i = i + 30
-        pushButton_Add_Column = QtWidgets.QPushButton(self.tab_Column)
-        pushButton_Add_Column.setObjectName("pushButton_Add_Column")
-        pushButton_Add_Column.setGeometry(QtCore.QRect(6, 500, 160, 27))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(False)
-        font.setWeight(50)
-        pushButton_Add_Column.setFont(font)
-        pushButton_Add_Column.setText("Add")
-
-        pushButton_Clear_Column = QtWidgets.QPushButton(self.tab_Column)
-        pushButton_Clear_Column.setObjectName("pushButton_Clear_Column")
-        pushButton_Clear_Column.setGeometry(QtCore.QRect(180, 500, 160, 27))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(False)
-        font.setWeight(50)
-        pushButton_Clear_Column.setFont(font)
-        pushButton_Clear_Column.setText("Clear")
-
-        pushButton_Import_Column = QtWidgets.QPushButton(self.tab_Column)
-        pushButton_Import_Column.setObjectName("pushButton_Import_Column")
-        pushButton_Import_Column.setGeometry(QtCore.QRect(770, 500, 160, 27))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(False)
-        font.setWeight(50)
-        pushButton_Import_Column.setFont(font)
-        pushButton_Import_Column.setText("Import xlsx file")
-
-        pushButton_Download_Column = QtWidgets.QPushButton(self.tab_Column)
-        pushButton_Download_Column.setObjectName("pushButton_Download_Column")
-        pushButton_Download_Column.setGeometry(QtCore.QRect(600, 500, 160, 27))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(False)
-        font.setWeight(50)
-        pushButton_Download_Column.setFont(font)
-        pushButton_Download_Column.setText("Download xlsx file")
-
-        self.tabWidget.addTab(self.tab_Column, "")
-        self.tab_Beam = QtWidgets.QWidget()
-        self.tab_Beam.setObjectName("tab_Beam")
-
-        supported_section_list = main.supported_section_values(self)
-        _translate = QtCore.QCoreApplication.translate
-        i = 0
-        j = 6
-        for element in supported_section_list:
-            lable = element[1]
-            type = element[2]
-            # value = option[4]
-            if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
-                l = QtWidgets.QLabel(self.tab_Beam)
-                if lable in [KEY_DISP_SUPTDSEC_THERMAL_EXP]:
-                    l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 28))
-                    i = i + 10
-                else:
-                    l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                if lable in [KEY_DISP_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_SOURCE]:
-                    font.setWeight(75)
-                else:
+                if type == TYPE_TEXTBOX:
+                    r = QtWidgets.QLineEdit(tab)
+                    r.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
+                    font = QtGui.QFont()
+                    font.setPointSize(9)
+                    font.setBold(False)
                     font.setWeight(50)
-                l.setFont(font)
-                l.setObjectName(element[0] + "_label")
-                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-                l.setAlignment(QtCore.Qt.AlignCenter)
+                    r.setFont(font)
+                    r.setObjectName(element[0])
+                    if element[0] in [KEY_SUPTNGSEC_DEPTH, KEY_SUPTNGSEC_FLANGE_W, KEY_SUPTNGSEC_FLANGE_T,
+                                      KEY_SUPTNGSEC_WEB_T, KEY_SUPTDSEC_DEPTH, KEY_SUPTDSEC_FLANGE_W,
+                                      KEY_SUPTDSEC_FLANGE_T, KEY_SUPTDSEC_WEB_T]:
+                        r.setValidator(QDoubleValidator())
 
-            if type == TYPE_COMBOBOX:
-                combo = QtWidgets.QComboBox(self.tab_Beam)
-                combo.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(False)
-                font.setWeight(50)
-                combo.setFont(font)
-                combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
-                combo.setMaxVisibleItems(5)
-                combo.setObjectName(element[0])
-                for item in element[3]:
-                    combo.addItem(item)
+                if type == TYPE_IMAGE:
+                    im = QtWidgets.QLabel(tab)
+                    im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
+                    im.setObjectName(element[0])
+                    im.setScaledContents(True)
+                    image = QPixmap("./ResourceFiles/images/Columns_Beams.png")
+                    im.setPixmap(image)
+                    i = i + 300
 
-            if type == TYPE_TITLE:
-                q = QtWidgets.QLabel(self.tab_Beam)
-                q.setGeometry(QtCore.QRect(j, 10 + i, 155, 35))
-                font = QtGui.QFont()
-                font.setPointSize(10)
-                q.setFont(font)
-                q.setObjectName("_title")
-                q.setText(_translate("MainWindow",
-                                     "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
+                if type == TYPE_BREAK:
+                    j = j + 310
+                    i = -30
 
-            if type == TYPE_TEXTBOX:
-                r = QtWidgets.QLineEdit(self.tab_Beam)
-                r.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(False)
-                font.setWeight(50)
-                r.setFont(font)
-                r.setObjectName(element[0])
-                if element[0] in [KEY_SUPTDSEC_DEPTH, KEY_SUPTDSEC_FLANGE_W, KEY_SUPTDSEC_FLANGE_T,
-                               KEY_SUPTDSEC_WEB_T]:
-                    r.setValidator(QDoubleValidator())
+                if type == TYPE_ENTER:
+                    pass
 
-            if type == TYPE_IMAGE:
-                im = QtWidgets.QLabel(self.tab_Beam)
-                im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
-                im.setObjectName(element[0])
-                im.setScaledContents(True)
-                image = QPixmap("./ResourceFiles/images/Columns_Beams.png")
-                im.setPixmap(image)
-                i = i + 300
+                i = i + 30
+            pushButton_Add = QtWidgets.QPushButton(tab)
+            pushButton_Add.setObjectName(str("pushButton_Add_"+tab_name))
+            pushButton_Add.setGeometry(QtCore.QRect(6, 500, 160, 27))
+            font = QtGui.QFont()
+            font.setPointSize(9)
+            font.setBold(False)
+            font.setWeight(50)
+            pushButton_Add.setFont(font)
+            pushButton_Add.setText("Add")
 
-            if type == TYPE_BREAK:
-                j = j + 310
-                i = -30
+            pushButton_Clear = QtWidgets.QPushButton(tab)
+            pushButton_Clear.setObjectName(str("pushButton_Clear_"+tab_name))
+            pushButton_Clear.setGeometry(QtCore.QRect(180, 500, 160, 27))
+            font = QtGui.QFont()
+            font.setPointSize(9)
+            font.setBold(False)
+            font.setWeight(50)
+            pushButton_Clear.setFont(font)
+            pushButton_Clear.setText("Clear")
 
-            if type == TYPE_ENTER:
-                pass
+            pushButton_Import = QtWidgets.QPushButton(tab)
+            pushButton_Import.setObjectName(str("pushButton_Import_"+tab_name))
+            pushButton_Import.setGeometry(QtCore.QRect(770, 500, 160, 27))
+            font = QtGui.QFont()
+            font.setPointSize(9)
+            font.setBold(False)
+            font.setWeight(50)
+            pushButton_Import.setFont(font)
+            pushButton_Import.setText("Import xlsx file")
 
-            i = i + 30
-        pushButton_Add_Beam = QtWidgets.QPushButton(self.tab_Beam)
-        pushButton_Add_Beam.setObjectName("pushButton_Add_Beam")
-        pushButton_Add_Beam.setGeometry(QtCore.QRect(6, 500, 160, 27))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(False)
-        font.setWeight(50)
-        pushButton_Add_Beam.setFont(font)
-        pushButton_Add_Beam.setText("Add")
+            pushButton_Download = QtWidgets.QPushButton(tab)
+            pushButton_Download.setObjectName(str("pushButton_Download_"+tab_name))
+            pushButton_Download.setGeometry(QtCore.QRect(600, 500, 160, 27))
+            font = QtGui.QFont()
+            font.setPointSize(9)
+            font.setBold(False)
+            font.setWeight(50)
+            pushButton_Download.setFont(font)
+            pushButton_Download.setText("Download xlsx file")
 
-        pushButton_Clear_Beam = QtWidgets.QPushButton(self.tab_Beam)
-        pushButton_Clear_Beam.setObjectName("pushButton_Clear_Beam")
-        pushButton_Clear_Beam.setGeometry(QtCore.QRect(180, 500, 160, 27))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(False)
-        font.setWeight(50)
-        pushButton_Clear_Beam.setFont(font)
-        pushButton_Clear_Beam.setText("Clear")
+            self.tabWidget.addTab(tab, "")
+            self.tabWidget.setTabText(tab_index, tab_name)
+            tab_index += 1
 
-        pushButton_Import_Beam = QtWidgets.QPushButton(self.tab_Beam)
-        pushButton_Import_Beam.setObjectName("pushButton_Import_Beam")
-        pushButton_Import_Beam.setGeometry(QtCore.QRect(770, 500, 160, 27))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(False)
-        font.setWeight(50)
-        pushButton_Import_Beam.setFont(font)
-        pushButton_Import_Beam.setText("Import xlsx file")
 
-        pushButton_Download_Beam = QtWidgets.QPushButton(self.tab_Beam)
-        pushButton_Download_Beam.setObjectName("pushButton_Download_Beam")
-        pushButton_Download_Beam.setGeometry(QtCore.QRect(600, 500, 160, 27))
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(False)
-        font.setWeight(50)
-        pushButton_Download_Beam.setFont(font)
-        pushButton_Download_Beam.setText("Download xlsx file")
 
-        self.tabWidget.addTab(self.tab_Beam, "")
+
+
+#END
+
+####################################################################
+####################################################################
+#####################################################################
+
+
+
+
+
+        #
+        #
+        #
+        # self.tab_Column = QtWidgets.QWidget()
+        # self.tab_Column.setObjectName("tab_Column")
+        #
+        # '''
+        # @author: Umair
+        # '''
+        #
+        # supporting_section_list = main.supporting_section_values(self)
+        # _translate = QtCore.QCoreApplication.translate
+        # i = 0
+        # j = 6
+        # for element in supporting_section_list:
+        #     lable = element[1]
+        #     type = element[2]
+        #     # value = option[4]
+        #     if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
+        #         l = QtWidgets.QLabel(self.tab_Column)
+        #         if lable in [KEY_DISP_SUPTNGSEC_THERMAL_EXP]:
+        #             l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 28))
+        #             i = i + 10
+        #         else:
+        #             l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
+        #         font = QtGui.QFont()
+        #         font.setPointSize(9)
+        #         if lable in [KEY_DISP_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_SOURCE]:
+        #             font.setWeight(75)
+        #         else:
+        #             font.setWeight(50)
+        #         l.setFont(font)
+        #         l.setObjectName(element[0] + "_label")
+        #         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+        #         l.setAlignment(QtCore.Qt.AlignCenter)
+        #
+        #     if type == TYPE_COMBOBOX:
+        #         combo = QtWidgets.QComboBox(self.tab_Column)
+        #         combo.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
+        #         font = QtGui.QFont()
+        #         font.setPointSize(9)
+        #         font.setBold(False)
+        #         font.setWeight(50)
+        #         combo.setFont(font)
+        #         combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+        #         combo.setMaxVisibleItems(5)
+        #         combo.setObjectName(element[0])
+        #         for item in element[3]:
+        #             combo.addItem(item)
+        #
+        #     if type == TYPE_TITLE:
+        #         q = QtWidgets.QLabel(self.tab_Column)
+        #         q.setGeometry(QtCore.QRect(j, 10 + i, 155, 35))
+        #         font = QtGui.QFont()
+        #         font.setPointSize(10)
+        #         q.setFont(font)
+        #         q.setObjectName("_title")
+        #         q.setText(_translate("MainWindow",
+        #                              "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
+        #
+        #     if type == TYPE_TEXTBOX:
+        #         r = QtWidgets.QLineEdit(self.tab_Column)
+        #         r.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
+        #         font = QtGui.QFont()
+        #         font.setPointSize(9)
+        #         font.setBold(False)
+        #         font.setWeight(50)
+        #         r.setFont(font)
+        #         r.setObjectName(element[0])
+        #         if element[0] in [KEY_SUPTNGSEC_DEPTH, KEY_SUPTNGSEC_FLANGE_W, KEY_SUPTNGSEC_FLANGE_T, KEY_SUPTNGSEC_WEB_T]:
+        #             r.setValidator(QDoubleValidator())
+        #
+        #     if type == TYPE_IMAGE:
+        #         im = QtWidgets.QLabel(self.tab_Column)
+        #         im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
+        #         im.setObjectName(element[0])
+        #         im.setScaledContents(True)
+        #         image = QPixmap("./ResourceFiles/images/Columns_Beams.png")
+        #         im.setPixmap(image)
+        #         i = i + 300
+        #
+        #     if type == TYPE_BREAK:
+        #         j = j + 310
+        #         i = -30
+        #
+        #     if type == TYPE_ENTER:
+        #         pass
+        #
+        #     i = i + 30
+        # pushButton_Add_Column = QtWidgets.QPushButton(self.tab_Column)
+        # pushButton_Add_Column.setObjectName("pushButton_Add_Column")
+        # pushButton_Add_Column.setGeometry(QtCore.QRect(6, 500, 160, 27))
+        # font = QtGui.QFont()
+        # font.setPointSize(9)
+        # font.setBold(False)
+        # font.setWeight(50)
+        # pushButton_Add_Column.setFont(font)
+        # pushButton_Add_Column.setText("Add")
+        #
+        # pushButton_Clear_Column = QtWidgets.QPushButton(self.tab_Column)
+        # pushButton_Clear_Column.setObjectName("pushButton_Clear_Column")
+        # pushButton_Clear_Column.setGeometry(QtCore.QRect(180, 500, 160, 27))
+        # font = QtGui.QFont()
+        # font.setPointSize(9)
+        # font.setBold(False)
+        # font.setWeight(50)
+        # pushButton_Clear_Column.setFont(font)
+        # pushButton_Clear_Column.setText("Clear")
+        #
+        # pushButton_Import_Column = QtWidgets.QPushButton(self.tab_Column)
+        # pushButton_Import_Column.setObjectName("pushButton_Import_Column")
+        # pushButton_Import_Column.setGeometry(QtCore.QRect(770, 500, 160, 27))
+        # font = QtGui.QFont()
+        # font.setPointSize(9)
+        # font.setBold(False)
+        # font.setWeight(50)
+        # pushButton_Import_Column.setFont(font)
+        # pushButton_Import_Column.setText("Import xlsx file")
+        #
+        # pushButton_Download_Column = QtWidgets.QPushButton(self.tab_Column)
+        # pushButton_Download_Column.setObjectName("pushButton_Download_Column")
+        # pushButton_Download_Column.setGeometry(QtCore.QRect(600, 500, 160, 27))
+        # font = QtGui.QFont()
+        # font.setPointSize(9)
+        # font.setBold(False)
+        # font.setWeight(50)
+        # pushButton_Download_Column.setFont(font)
+        # pushButton_Download_Column.setText("Download xlsx file")
+        #
+        # self.tabWidget.addTab(self.tab_Column, "")
+        # self.tab_Beam = QtWidgets.QWidget()
+        # self.tab_Beam.setObjectName("tab_Beam")
+        #
+        # supported_section_list = main.supported_section_values(self)
+        # _translate = QtCore.QCoreApplication.translate
+        # i = 0
+        # j = 6
+        # for element in supported_section_list:
+        #     lable = element[1]
+        #     type = element[2]
+        #     # value = option[4]
+        #     if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
+        #         l = QtWidgets.QLabel(self.tab_Beam)
+        #         if lable in [KEY_DISP_SUPTDSEC_THERMAL_EXP]:
+        #             l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 28))
+        #             i = i + 10
+        #         else:
+        #             l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
+        #         font = QtGui.QFont()
+        #         font.setPointSize(9)
+        #         if lable in [KEY_DISP_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_SOURCE]:
+        #             font.setWeight(75)
+        #         else:
+        #             font.setWeight(50)
+        #         l.setFont(font)
+        #         l.setObjectName(element[0] + "_label")
+        #         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+        #         l.setAlignment(QtCore.Qt.AlignCenter)
+        #
+        #     if type == TYPE_COMBOBOX:
+        #         combo = QtWidgets.QComboBox(self.tab_Beam)
+        #         combo.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
+        #         font = QtGui.QFont()
+        #         font.setPointSize(9)
+        #         font.setBold(False)
+        #         font.setWeight(50)
+        #         combo.setFont(font)
+        #         combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+        #         combo.setMaxVisibleItems(5)
+        #         combo.setObjectName(element[0])
+        #         for item in element[3]:
+        #             combo.addItem(item)
+        #
+        #     if type == TYPE_TITLE:
+        #         q = QtWidgets.QLabel(self.tab_Beam)
+        #         q.setGeometry(QtCore.QRect(j, 10 + i, 155, 35))
+        #         font = QtGui.QFont()
+        #         font.setPointSize(10)
+        #         q.setFont(font)
+        #         q.setObjectName("_title")
+        #         q.setText(_translate("MainWindow",
+        #                              "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
+        #
+        #     if type == TYPE_TEXTBOX:
+        #         r = QtWidgets.QLineEdit(self.tab_Beam)
+        #         r.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
+        #         font = QtGui.QFont()
+        #         font.setPointSize(9)
+        #         font.setBold(False)
+        #         font.setWeight(50)
+        #         r.setFont(font)
+        #         r.setObjectName(element[0])
+        #         if element[0] in [KEY_SUPTDSEC_DEPTH, KEY_SUPTDSEC_FLANGE_W, KEY_SUPTDSEC_FLANGE_T,
+        #                        KEY_SUPTDSEC_WEB_T]:
+        #             r.setValidator(QDoubleValidator())
+        #
+        #     if type == TYPE_IMAGE:
+        #         im = QtWidgets.QLabel(self.tab_Beam)
+        #         im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
+        #         im.setObjectName(element[0])
+        #         im.setScaledContents(True)
+        #         image = QPixmap("./ResourceFiles/images/Columns_Beams.png")
+        #         im.setPixmap(image)
+        #         i = i + 300
+        #
+        #     if type == TYPE_BREAK:
+        #         j = j + 310
+        #         i = -30
+        #
+        #     if type == TYPE_ENTER:
+        #         pass
+        #
+        #     i = i + 30
+        # pushButton_Add_Beam = QtWidgets.QPushButton(self.tab_Beam)
+        # pushButton_Add_Beam.setObjectName("pushButton_Add_Beam")
+        # pushButton_Add_Beam.setGeometry(QtCore.QRect(6, 500, 160, 27))
+        # font = QtGui.QFont()
+        # font.setPointSize(9)
+        # font.setBold(False)
+        # font.setWeight(50)
+        # pushButton_Add_Beam.setFont(font)
+        # pushButton_Add_Beam.setText("Add")
+        #
+        # pushButton_Clear_Beam = QtWidgets.QPushButton(self.tab_Beam)
+        # pushButton_Clear_Beam.setObjectName("pushButton_Clear_Beam")
+        # pushButton_Clear_Beam.setGeometry(QtCore.QRect(180, 500, 160, 27))
+        # font = QtGui.QFont()
+        # font.setPointSize(9)
+        # font.setBold(False)
+        # font.setWeight(50)
+        # pushButton_Clear_Beam.setFont(font)
+        # pushButton_Clear_Beam.setText("Clear")
+        #
+        # pushButton_Import_Beam = QtWidgets.QPushButton(self.tab_Beam)
+        # pushButton_Import_Beam.setObjectName("pushButton_Import_Beam")
+        # pushButton_Import_Beam.setGeometry(QtCore.QRect(770, 500, 160, 27))
+        # font = QtGui.QFont()
+        # font.setPointSize(9)
+        # font.setBold(False)
+        # font.setWeight(50)
+        # pushButton_Import_Beam.setFont(font)
+        # pushButton_Import_Beam.setText("Import xlsx file")
+        #
+        # pushButton_Download_Beam = QtWidgets.QPushButton(self.tab_Beam)
+        # pushButton_Download_Beam.setObjectName("pushButton_Download_Beam")
+        # pushButton_Download_Beam.setGeometry(QtCore.QRect(600, 500, 160, 27))
+        # font = QtGui.QFont()
+        # font.setPointSize(9)
+        # font.setBold(False)
+        # font.setWeight(50)
+        # pushButton_Download_Beam.setFont(font)
+        # pushButton_Download_Beam.setText("Download xlsx file")
+        #
+        # self.tabWidget.addTab(self.tab_Beam, "")
+
         self.tab_Bolt = QtWidgets.QWidget()
         self.tab_Bolt.setObjectName("tab_Bolt")
 
@@ -740,20 +898,40 @@ class Ui_Dialog(object):
         self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
 
-        pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
-        pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+        module = main.module_name(main)
 
-        pushButton_Add_Column.clicked.connect(self.add_tab_column)
-        pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION]:
+            pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
+            pushButton_Add_Column.clicked.connect(self.add_tab_column)
+            pushButton_Clear_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+            pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
+            pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+        if module == KEY_DISP_COLUMNCOVERPLATE :
+            print(module)
+            pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
+            pushButton_Add_Column.clicked.connect(self.add_tab_column)
+        if module == KEY_DISP_BEAMCOVERPLATE:
+            pushButton_Clear_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+            pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
+            pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+
 
     def clear_tab(self, tab_name):
         '''
         @author: Umair
         '''
         if tab_name == "Column":
-            tab = self.tab_Column
+            tab_Column = self.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+            tab = tab_Column
         elif tab_name == "Beam":
-            tab = self.tab_Beam
+            tab_Beam = self.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+            tab = tab_Beam
         for c in tab.children():
             if isinstance(c, QtWidgets.QComboBox):
                 c.setCurrentIndex(0)
@@ -764,7 +942,8 @@ class Ui_Dialog(object):
         '''
         @author: Umair
         '''
-        name = self.tabWidget.tabText(self.tabWidget.indexOf(self.tab_Column))
+        tab_Column = self.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+        name = self.tabWidget.tabText(self.tabWidget.indexOf(tab_Column))
         if name in [KEY_DISP_COLSEC, KEY_DISP_SECSIZE]:
             table = "Columns"
         elif name == KEY_DISP_PRIBM:
@@ -772,10 +951,10 @@ class Ui_Dialog(object):
         else:
             pass
 
-        for ch in self.tab_Column.children():
+        for ch in tab_Column.children():
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
                 QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
-                add_col = self.tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Add_Column')
+                add_col = tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Add_'+KEY_DISP_COLSEC)
                 add_col.setDisabled(True)
                 break
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
@@ -827,7 +1006,7 @@ class Ui_Dialog(object):
                 if ch.objectName() == KEY_SUPTNGSEC_TYPE:
                     Type = ch.currentText()
 
-        if ch == self.tab_Column.children()[len(self.tab_Column.children())-1]:
+        if ch == tab_Column.children()[len(tab_Column.children())-1]:
             conn = sqlite3.connect(PATH_TO_DATABASE)
             c = conn.cursor()
             if table == "Beams":
@@ -866,12 +1045,11 @@ class Ui_Dialog(object):
         '''
         @author: Umair
         '''
-
-        for ch in self.tab_Beam.children():
-
+        tab_Beam = self.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+        for ch in tab_Beam.children():
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
                 QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
-                add_bm = self.tab_Beam.findChild(QtWidgets.QWidget, 'pushButton_Add_Beam')
+                add_bm = tab_Beam.findChild(QtWidgets.QWidget, 'pushButton_Add_'+KEY_DISP_BEAMSEC)
                 add_bm.setDisabled(True)
                 break
 
@@ -925,7 +1103,7 @@ class Ui_Dialog(object):
                 if ch.objectName() == KEY_SUPTDSEC_TYPE:
                     Type = ch.currentText()
 
-        if ch == self.tab_Beam.children()[len(self.tab_Beam.children())-1]:
+        if ch == tab_Beam.children()[len(tab_Beam.children())-1]:
 
             conn = sqlite3.connect(PATH_TO_DATABASE)
 
@@ -953,8 +1131,8 @@ class Ui_Dialog(object):
         self.btn_defaults.setText(_translate("DesignPreferences", "Defaults"))
         self.btn_save.setText(_translate("DesignPreferences", "Save"))
         self.btn_close.setText(_translate("DesignPreferences", "Save"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Column), _translate("DesignPreferences", "Column"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Beam), _translate("DesignPreferences", "Beam"))
+        # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Column), _translate("DesignPreferences", "Column"))
+        # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Beam), _translate("DesignPreferences", "Beam"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Bolt), _translate("DesignPreferences", "Bolt"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Weld), _translate("DesignPreferences", "Weld"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Detailing), _translate("DesignPreferences", "Detailing"))
@@ -1114,8 +1292,8 @@ class DesignPreferences(QDialog):
         col_list = []
         col_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(col_attributes, table, designation)
-
-        for ch in self.ui.tab_Column.children():
+        tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+        for ch in tab_Column.children():
             if ch.objectName() == KEY_SUPTNGSEC_DESIGNATION:
                 ch.setText(designation)
             elif ch.objectName() == KEY_SUPTNGSEC_SOURCE:
@@ -1193,7 +1371,8 @@ class DesignPreferences(QDialog):
         beam_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(beam_attributes, "Beams", designation)
         beam_list = []
-        for ch in self.ui.tab_Beam.children():
+        tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+        for ch in tab_Beam.children():
             if ch.objectName() == KEY_SUPTDSEC_DESIGNATION:
                 ch.setText(designation)
             elif ch.objectName() == KEY_SUPTDSEC_SOURCE:
@@ -1281,7 +1460,8 @@ class DesignPreferences(QDialog):
             else:
                 return
         if col_list:
-            for c in self.ui.tab_Column.children():
+            tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+            for c in tab_Column.children():
                 if c.objectName() == KEY_SUPTNGSEC_MASS:
                     c.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
                 elif c.objectName() == KEY_SUPTNGSEC_SEC_AREA:
@@ -1327,7 +1507,8 @@ class DesignPreferences(QDialog):
             else:
                 return
         if beam_list:
-            for c in self.ui.tab_Beam.children():
+            tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+            for c in tab_Beam.children():
                 if c.objectName() == KEY_SUPTDSEC_MASS:
                     c.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
                 elif c.objectName() == KEY_SUPTDSEC_SEC_AREA:

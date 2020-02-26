@@ -1696,11 +1696,16 @@ class ColumnCoverPlate(MomentConnection):
             ui.mytabWidget.setCurrentIndex(0)
         # self.display_3DModel("Connector", bgcolor)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
-
-
         # print(self.web_bolt)
         # print(self.web_plate)
         # print(self.Tension_capacity_flange_plate)
         # print(self.Tension_capacity_flange)
 
+    def tab_list(self):
 
+        tabs = []
+
+        t1 = (KEY_DISP_COLSEC, self.tab_column_section)
+        tabs.append(t1)
+
+        return tabs

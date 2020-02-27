@@ -287,20 +287,20 @@ class FinPlateConnection(ShearConnection):
         t8 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if flag else '')
         out_list.append(t8)
 
-        t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
-        out_list.append(t21)
+        # t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
+        # out_list.append(t21)
 
-        # t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if flag else '')
-        # out_list.append(t9)
-        #
-        # t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if flag else '')
-        # out_list.append(t10)
-        #
-        # t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if flag else '')
-        # out_list.append(t11)
-        #
-        # t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if flag else '')
-        # out_list.append(t12)
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if flag else '')
+        out_list.append(t9)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if flag else '')
+        out_list.append(t10)
+
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if flag else '')
+        out_list.append(t11)
+
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if flag else '')
+        out_list.append(t12)
 
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
         out_list.append(t13)
@@ -315,20 +315,20 @@ class FinPlateConnection(ShearConnection):
         out_list.append(t16)
 
 
-        # t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity,2) if flag else '')
-        # out_list.append(t17)
-        #
-        # t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity,2) if flag else '')
-        # out_list.append(t18)
-        #
-        # t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if flag else '')
-        # out_list.append(t19)
-        #
-        # t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.plate.moment_capacity/1000000,2) if flag else '')
-        # out_list.append(t20)
+        t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity,2) if flag else '')
+        out_list.append(t17)
 
-        t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities])
-        out_list.append(t22)
+        t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity,2) if flag else '')
+        out_list.append(t18)
+
+        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if flag else '')
+        out_list.append(t19)
+
+        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.plate.moment_capacity/1000000,2) if flag else '')
+        out_list.append(t20)
+
+        # t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities])
+        # out_list.append(t22)
 
         t13 = (None, DISP_TITLE_WELD, TYPE_TITLE, None)
         out_list.append(t13)
@@ -392,7 +392,6 @@ class FinPlateConnection(ShearConnection):
             primary = design_dictionary[KEY_SUPTNGSEC]
             secondary = design_dictionary[KEY_SUPTDSEC]
             conn = sqlite3.connect(PATH_TO_DATABASE)
-            cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
             cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
             p_beam_details = cursor.fetchone()
             p_val = p_beam_details[0] - 2*p_beam_details[1] - p_beam_details[2] - p_beam_details[3]
@@ -788,6 +787,7 @@ class FinPlateConnection(ShearConnection):
                 break
             else:
                 t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
+                print(t_weld_req)
                 self.weld.size = list([x for x in available_welds if (t_weld_req <= x)])[0]
                 if self.weld.size is None:
                     self.plate.height += 10

@@ -257,22 +257,21 @@ KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
 
+###################################
+# Key for Storing Module
 
 KEY_MODULE = 'Module'
+
 TYPE_MODULE = 'Window Title'
 
 KEY_DISP_FINPLATE = 'Fin Plate'
-
 KEY_DISP_ENDPLATE = 'End Plate'
-
 KEY_DISP_CLEATANGLE = 'Cleat Angle'
-
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
-
 
 KEY_DISP_TENSION = 'Tension Members Design'
 KEY_DISP_COMPRESSION = 'Compression Member'
@@ -280,11 +279,110 @@ KEY_DISP_COMPRESSION = 'Compression Member'
 
 DISP_TITLE_CM = 'Connecting members'
 
+###################################
+# Key for Storing Connectivity
+
 KEY_CONN = 'Connectivity'
+
 KEY_DISP_CONN = 'Connectivity *'
+
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
+
+KEY_LOCATION = 'Conn_Location'
+KEY_DISP_LOCATION = 'Conn_Location *'
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
+
+KEY_IMAGE = 'Image'
+
+KEY_LENGTH = 'Length(mm)'
+KEY_DISP_LENGTH = 'Length(mm) *'
+
+###################################
+# Key for Storing Supporting_Section sub-key of Member
+
+KEY_SUPTNGSEC = 'Member.Supporting_Section'
+
+KEY_DISP_SUPTNGSEC = 'Supporting Section'
+KEY_DISP_COLSEC = 'Column Section *'
+VALUES_COLSEC = connectdb("Columns")
+
+KEY_DISP_PRIBM = 'Primary beam *'
+VALUES_PRIBM = connectdb("Beams")
+
+###################################
+# Key for Storing Supported_Section sub-key of Member
+
+KEY_SUPTDSEC = 'Member.Supported_Section'
+KEY_DISP_SUPTDSEC = 'Supported Section'
+KEY_DISP_BEAMSEC = 'Beam Section *'
+VALUES_BEAMSEC = connectdb("Beams")
+
+KEY_DISP_SECBM = 'Secondary beam *'
+VALUES_SECBM = connectdb("Beams")
+
+###################################
+# Key for Storing Material sub-key of Member
+KEY_MATERIAL = 'Member.Material'
+KEY_DISP_MATERIAL = 'Material *'
+VALUES_MATERIAL = connectdb("Material")
+
+
+###################################
+# Keys for storing Load
+DISP_TITLE_FSL = 'Factored load'
+
+# Key for Storing Moment sub-key of Load
+KEY_MOMENT = 'Load.Moment'
+KEY_DISP_MOMENT = 'Moment(kNm)*'
+
+###################################
+# Key for Storing Shear sub-key of Load
+KEY_SHEAR = 'Load.Shear'
+KEY_DISP_SHEAR = 'Shear(kN)*'
+
+###################################
+# Key for Storing Axial sub-key of Load
+KEY_AXIAL = 'Load.Axial'
+KEY_DISP_AXIAL = 'Axial (kN) *'
+
+###################################
+# Keys for Storing Bolt
+
+DISP_TITLE_BOLT = 'Bolt'
+DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
+
+DISP_TITLE_SECTION = 'SECTION'
+DISP_TITLE_TENSION_SECTION = 'Section Capacity'
+
+# Key for storing Diameter sub-key of Bolt
+KEY_D = 'Bolt.Diameter'
+KEY_DISP_D = 'Diameter(mm)*'
+VALUES_D = ['All', 'Customized']
+
+# Key for storing Type sub-key of Bolt
+KEY_TYP = 'Bolt.Type'
+KEY_DISP_TYP = 'Type *'
+VALUES_TYP = ['Select Type', 'Friction Grip Bolt', 'Bearing Bolt']
+VALUES_TYP_1 = ['Friction Grip Bolt']
+VALUES_TYP_2 = ['Bearing Bolt']
+
+# Key for storing Grade sub-key of Bolt
+KEY_GRD = 'Bolt.Grade'
+KEY_DISP_GRD = 'Grade *'
+VALUES_GRD = ['All', 'Customized']
+VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+
+#################################
+# Key for storing Plate
+DISP_TITLE_PLATE = 'Plate'
+
+# Key for storing Thickness sub-key of Plate
+KEY_PLATETHK = 'Plate.Thickness'
+KEY_DISP_PLATETHK = 'Thickness(mm)*'
+VALUES_PLATETHK = ['All', 'Customized']
+VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
 
 
@@ -297,60 +395,15 @@ KEY_IMAGE = 'Image'
 KEY_LENGTH = 'Length(mm)'
 KEY_DISP_LENGTH = 'Length(mm) *'
 
-KEY_SUPTNGSEC = 'Member.Supporting_Section'
-KEY_DISP_SUPTNGSEC = 'Supporting Section'
-KEY_DISP_COLSEC = 'Column Section *'
-VALUES_COLSEC = connectdb("Columns")
-
-KEY_DISP_PRIBM = 'Primary beam *'
-VALUES_PRIBM = connectdb("Beams")
 
 
-KEY_SUPTDSEC = 'Member.Supported_Section'
-KEY_DISP_SUPTDSEC = 'Supported Section'
-KEY_DISP_BEAMSEC = 'Beam Section *'
-VALUES_BEAMSEC = connectdb("Beams")
-
-KEY_DISP_SECBM = 'Secondary beam *'
-VALUES_SECBM = connectdb("Beams")
-
-KEY_MATERIAL = 'Member.Material'
-KEY_DISP_MATERIAL = 'Material *'
-VALUES_MATERIAL = connectdb("Material")
-
-DISP_TITLE_FSL = 'Factored load'
-
-KEY_MOMENT = 'Load.Moment'
-KEY_DISP_MOMENT = 'Moment(kNm)*'
-
-KEY_SHEAR = 'Load.Shear'
-KEY_DISP_SHEAR = 'Shear(kN)*'
-
-KEY_AXIAL = 'Load.Axial'
-KEY_DISP_AXIAL = 'Axial (kN) *'
-
-DISP_TITLE_BOLT = 'Bolt'
-DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
-
-DISP_TITLE_SECTION = 'SECTION'
-DISP_TITLE_TENSION_SECTION = 'Section Capacity'
+DISP_TITLE_TENSION = 'Tension Capacity'
 
 
-KEY_D = 'Bolt.Diameter'
-KEY_DISP_D = 'Diameter(mm)*'
-VALUES_D = ['All', 'Customized']
 
-KEY_TYP = 'Bolt.Type'
-KEY_DISP_TYP = 'Type *'
-VALUES_TYP = ['Select Type', 'Friction Grip Bolt', 'Bearing Bolt']
-VALUES_TYP_1 = ['Friction Grip Bolt']
-VALUES_TYP_2 = ['Bearing Bolt']
 
-KEY_GRD = 'Bolt.Grade'
-KEY_DISP_GRD = 'Grade *'
 
-VALUES_GRD = ['All', 'Customized']
-VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+
 
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate'
 
@@ -495,12 +548,7 @@ VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
 
 
-DISP_TITLE_PLATE = 'Plate'
 
-KEY_PLATETHK = 'Plate.Thickness'
-KEY_DISP_PLATETHK = 'Thickness(mm)*'
-VALUES_PLATETHK = ['All', 'Customized']
-VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
 KEY_DP_BOLT_TYPE = 'DesignPreferences.Bolt.Type'
 KEY_DISP_DP_BOLT_TYPE = 'Bolt type'

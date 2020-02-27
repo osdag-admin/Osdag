@@ -3,9 +3,44 @@ from utils.common.material import *
 from utils.common.other_standards import *
 from Common import *
 import sqlite3
+import logging
+
 import math
 import numpy as np
 from utils.common.common_calculation import *
+
+# @staticmethod
+# def set_osdaglogger(key):
+#     """
+#     Function to set Logger for Tension Module
+#     """
+#
+#     # @author Arsil Zunzunia
+#     global logger
+#     logger = logging.getLogger('osdag')
+#
+#     logger.setLevel(logging.DEBUG)
+#     handler = logging.StreamHandler()
+#     # handler.setLevel(logging.DEBUG)
+#     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+#
+#     handler.setFormatter(formatter)
+#     logger.addHandler(handler)
+#     handler = logging.FileHandler('logging_text.log')
+#
+#     # handler.setLevel(logging.DEBUG)
+#     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+#     handler.setFormatter(formatter)
+#     logger.addHandler(handler)
+#     # handler.setLevel(logging.INFO)
+#     # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+#     # handler.setFormatter(formatter)
+#     # logger.addHandler(handler)
+#     handler = OurLog(key)
+#     # handler.setLevel(logging.DEBUG)
+#     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+#     handler.setFormatter(formatter)
+#     logger.addHandler(handler)
 
 class Bolt(Material):
 
@@ -290,11 +325,12 @@ class Section(Material):
         "gamma_m0 = partial safety factor for failure in tension by yielding"
         "F_y = yield stress of the material"
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        T_dg = (A_g*100* F_y / gamma_m0)/1000
+        T_dg = (A_g* F_y / gamma_m0)/1000
+        # logger.warning(
+        #     " : You are using a section (in red color) that is not available in latest version of IS 808")
 
         self.tension_yielding_capacity = round(T_dg,2)
-
-
+        # logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def tension_rupture(self, A_n, F_u):
         "preliminary design strength,T_pdn,as governed by rupture at net section"
@@ -302,7 +338,7 @@ class Section(Material):
         "F_u = Ultimate Strength of material"
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-        T_pdn = 0.9 * A_n * F_u / gamma_m1
+        T_pdn = 0.9 * A_n * F_u / gamma_m1/1000
 
         self.tension_rupture_capacity = round(T_pdn,2)
 
@@ -333,6 +369,44 @@ class Section(Material):
         Tdb = min(Tdb1, Tdb2)
         Tdb = round(Tdb / 1000, 3)
         self.block_shear_capacity_axial = round(Tdb,2)
+
+    def tension_blockshear_area_input(self,A_vg, A_vn, A_tg, A_tn, f_u, f_y):
+        """Calculate the block shear strength of bolted connections as per cl. 6.4.1
+
+        Args:
+            A_vg: Minimum gross area in shear along bolt line parallel to external force [in sq. mm] (float)
+            A_vn: Minimum net area in shear along bolt line parallel to external force [in sq. mm] (float)
+            A_tg: Minimum gross area in tension from the bolt hole to the toe of the angle,
+                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+            A_tn: Minimum net area in tension from the bolt hole to the toe of the angle,
+                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+            f_u: Ultimate stress of the plate material in MPa (float)
+            f_y: Yield stress of the plate material in MPa (float)
+
+        Return:
+            block shear strength of bolted connection in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007, cl. 6.4.1
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
+        T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
+        Tdb = min(T_db1, T_db2)
+        # Tdb = round(Tdb, 3)
+        self.block_shear_capacity_axial = round(Tdb/1000,2)
+
+    # def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):
+    #
+    #     if tension_member_yielding < tension_rupture and tension_member_yielding < tension_blockshear:
+    #         min_capacity = "tension_member_yielding"
+    #     elif tension_rupture < tension_member_yielding and tension_rupture < tension_blockshear:
+    #         min_capacity = "tension_rupture"
+    #     else:
+    #         min_capacity =
 
     def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):
 
@@ -494,11 +568,11 @@ class Plate(Material):
 
     def get_web_plate_l_bolts_one_line(self, web_plate_h_max, web_plate_h_min, bolts_required, edge_dist, gauge):
         # print('maxh',web_plate_h_max)
-        print(web_plate_h_max,edge_dist,gauge)
-        print(web_plate_h_max,edge_dist,gauge,"hhhh")
+        # print(web_plate_h_max,edge_dist,gauge)
+        # print(web_plate_h_max,edge_dist,gauge,"hhhh")
         max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
         if max_bolts_one_line >=2 :
-            print("max_bolts_one_line", max_bolts_one_line)
+            # print("max_bolts_one_line", max_bolts_one_line)
             self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
             self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
             self.height = max(web_plate_h_min, self.get_web_plate_h_req (self.bolts_one_line, gauge, edge_dist))
@@ -521,7 +595,7 @@ class Plate(Material):
         """
         gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
         web_plate_h = gauge*(bolts_one_line - 1) + edge_dist*2
-        print("gauge", gauge,web_plate_h,edge_dist,max_spacing, max_edge_dist)
+        # print("gauge", gauge,web_plate_h,edge_dist,max_spacing, max_edge_dist)
         if gauge > max_spacing:
             gauge, edge_dist = self.get_spacing_adjusted(gauge, edge_dist, max_spacing)
             if edge_dist >= max_edge_dist:
@@ -606,7 +680,7 @@ class Plate(Material):
             self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
                                                 min_edge_dist, min_gauge)
         print("boltdetails0", bolt_line, bolts_one_line, web_plate_h)
-        if bolts_one_line == 1:
+        if bolts_one_line < 2:
             self.design_status = False
             self.reason = "Can't fit two bolts in one line. Select lower diameter"
         elif bolt_line > bolt_line_limit:

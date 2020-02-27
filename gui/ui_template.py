@@ -5,7 +5,7 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!\
-from PyQt5.QtWidgets import QMessageBox, qApp
+from PyQt5.QtWidgets import QMessageBox, qApp, QScrollArea
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -59,7 +59,7 @@ from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
-from design_type.connection.end_plate_connection import EndPlateConnectionInput
+from design_type.connection.end_plate_connection import EndPlateConnection
 
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
@@ -745,10 +745,22 @@ class Ui_ModuleWindow(QMainWindow):
 
         self.dockWidgetContents_out = QtWidgets.QWidget()
         self.dockWidgetContents_out.setObjectName("dockWidgetContents_out")
+
+        out_widget = QtWidgets.QWidget(self.dockWidgetContents_out)
+        out_widget.setGeometry(QtCore.QRect(0, 0, 320, 622))
+        out_layout1 = QtWidgets.QVBoxLayout(out_widget)
+        out_scroll = QScrollArea(out_widget)
+        out_layout1.addWidget(out_scroll)
+        out_scroll.setWidgetResizable(True)
+        out_scrollcontent = QtWidgets.QWidget(out_scroll)
+        out_layout2 = QtWidgets.QGridLayout(out_scrollcontent)
+        out_scrollcontent.setLayout(out_layout2)
+
         out_list = main.output_values(main, False)
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
+        j = 1
         button_list = []
         for option in out_list:
             lable = option[1]
@@ -763,6 +775,7 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setFont(font)
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+                out_layout2.addWidget(l, j, 1, 1, 1)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents_out)
@@ -773,6 +786,7 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+                out_layout2.addWidget(r, j, 2, 1, 1)
 
             if type == TYPE_OUT_BUTTON:
                 v = option[3]
@@ -787,6 +801,7 @@ class Ui_ModuleWindow(QMainWindow):
                 b.setText(v[0])
                 b.setDisabled(True)
                 button_list.append(option)
+                out_layout2.addWidget(b, j, 2, 1, 1)
                 #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if type == TYPE_TITLE:
@@ -797,7 +812,11 @@ class Ui_ModuleWindow(QMainWindow):
                 q.setObjectName("_title")
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
+                out_layout2.addWidget(q, j, 1, 2, 2)
+                j = j + 1
             i = i + 30
+            j = j + 1
+        out_scroll.setWidget(out_scrollcontent)
 
         # common_button = QtWidgets.QPushButton()
         # d = {
@@ -1054,8 +1073,10 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(module))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(main)
-        add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Column")
-        add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_Beam")
+
+
+        add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
+        add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
         if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
@@ -1435,6 +1456,8 @@ class Ui_ModuleWindow(QMainWindow):
     def return_class(self,name):
         if name == KEY_DISP_FINPLATE:
             return FinPlateConnection
+        elif name == KEY_DISP_ENDPLATE:
+            return EndPlateConnection
         elif name == KEY_DISP_COLUMNCOVERPLATE:
             return ColumnCoverPlate
         elif name == KEY_DISP_BEAMCOVERPLATE:
@@ -1594,10 +1617,20 @@ class Ui_ModuleWindow(QMainWindow):
         b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
 
     def output_button_dialog(self, main, button_list, button):
+
         dialog = QtWidgets.QDialog()
         dialog.resize(350, 170)
         dialog.setFixedSize(dialog.size())
         dialog.setObjectName("Dialog")
+
+        layout1 = QtWidgets.QVBoxLayout(dialog)
+        scroll = QScrollArea(dialog)
+        layout1.addWidget(scroll)
+        scroll.setWidgetResizable(True)
+        scrollcontent = QtWidgets.QWidget(scroll)
+        layout2 = QtWidgets.QGridLayout(scrollcontent)
+        scrollcontent.setLayout(layout2)
+
         for op in button_list:
             if op[0] == button.objectName():
                 tup = op[3]
@@ -1605,12 +1638,13 @@ class Ui_ModuleWindow(QMainWindow):
                 fn = tup[1]
                 dialog.setWindowTitle(title)
                 i = 0
+                j = 1
                 for option in fn(main, main.design_status):
                     lable = option[1]
                     type = option[2]
                     _translate = QtCore.QCoreApplication.translate
                     if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
-                        l = QtWidgets.QLabel(dialog)
+                        l = QtWidgets.QLabel()
                         l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
                         font = QtGui.QFont()
                         font.setPointSize(9)
@@ -1619,9 +1653,10 @@ class Ui_ModuleWindow(QMainWindow):
                         l.setFont(font)
                         l.setObjectName(option[0] + "_label")
                         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+                        layout2.addWidget(l, j, 1, 1, 1)
 
                     if type == TYPE_TEXTBOX:
-                        r = QtWidgets.QLineEdit(dialog)
+                        r = QtWidgets.QLineEdit()
                         r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
                         font = QtGui.QFont()
                         font.setPointSize(11)
@@ -1630,9 +1665,10 @@ class Ui_ModuleWindow(QMainWindow):
                         r.setFont(font)
                         r.setObjectName(option[0])
                         r.setText(str(option[3]))
-
+                        layout2.addWidget(r, j, 2, 1, 1)
+                    j = j + 1
                     i = i + 30
-
+                scroll.setWidget(scrollcontent)
                 dialog.exec()
 
     def refresh_sections(self, prev, section):
@@ -1929,22 +1965,10 @@ class Ui_ModuleWindow(QMainWindow):
         material_grade = key_4.currentText()
         if module == KEY_DISP_COLUMNCOVERPLATE:
             designation_col = key_5.currentText()
-            self.designPrefDialog.ui.tabWidget.removeTab(
-                self.designPrefDialog.ui.tabWidget.indexOf(
-                    self.designPrefDialog.ui.tab_Beam))
-            self.designPrefDialog.ui.tabWidget.setTabText(
-                self.designPrefDialog.ui.tabWidget.indexOf(
-                    self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
             if key_5.currentIndex() != 0:
                 self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
         elif module == KEY_DISP_BEAMCOVERPLATE:
             designation_bm = key_5.currentText()
-            self.designPrefDialog.ui.tabWidget.removeTab(
-                self.designPrefDialog.ui.tabWidget.indexOf(
-                    self.designPrefDialog.ui.tab_Column))
-            self.designPrefDialog.ui.tabWidget.setTabText(
-                self.designPrefDialog.ui.tabWidget.indexOf(
-                    self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
             if key_5.currentIndex() != 0:
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)
         elif module == KEY_DISP_COMPRESSION:
@@ -1979,21 +2003,21 @@ class Ui_ModuleWindow(QMainWindow):
             designation_col = key_2.currentText()
             designation_bm = key_3.currentText()
             if conn in VALUES_CONN_1:
-                self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(
-                    self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
-                self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(
-                        self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
+                # self.designPrefDialog.ui.tabWidget.setTabText(
+                #     self.designPrefDialog.ui.tabWidget.indexOf(
+                #     self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
+                # self.designPrefDialog.ui.tabWidget.setTabText(
+                #     self.designPrefDialog.ui.tabWidget.indexOf(
+                #         self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
                 self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)
             elif conn in VALUES_CONN_2:
+                tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+                tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
                 self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(
-                        self.designPrefDialog.ui.tab_Column), KEY_DISP_PRIBM)
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column), KEY_DISP_PRIBM)
                 self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(
-                        self.designPrefDialog.ui.tab_Beam), KEY_DISP_SECBM)
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam), KEY_DISP_SECBM)
                 self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)
 

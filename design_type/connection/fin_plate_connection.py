@@ -266,8 +266,9 @@ class FinPlateConnection(ShearConnection):
 
         bolt_bearing_capacity_disp = ''
         if flag is True:
-            if self.bolt.bolt_bearing_capacity is not 'N/A':
+            if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
                 bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+                pass
             else:
                 bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
@@ -286,20 +287,20 @@ class FinPlateConnection(ShearConnection):
         t8 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if flag else '')
         out_list.append(t8)
 
-        t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
-        out_list.append(t21)
+        # t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
+        # out_list.append(t21)
 
-        # t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if flag else '')
-        # out_list.append(t9)
-        #
-        # t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if flag else '')
-        # out_list.append(t10)
-        #
-        # t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if flag else '')
-        # out_list.append(t11)
-        #
-        # t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if flag else '')
-        # out_list.append(t12)
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if flag else '')
+        out_list.append(t9)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if flag else '')
+        out_list.append(t10)
+
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if flag else '')
+        out_list.append(t11)
+
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if flag else '')
+        out_list.append(t12)
 
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
         out_list.append(t13)
@@ -314,20 +315,20 @@ class FinPlateConnection(ShearConnection):
         out_list.append(t16)
 
 
-        # t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity,2) if flag else '')
-        # out_list.append(t17)
-        #
-        # t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity,2) if flag else '')
-        # out_list.append(t18)
-        #
-        # t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if flag else '')
-        # out_list.append(t19)
-        #
-        # t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.plate.moment_capacity/1000000,2) if flag else '')
-        # out_list.append(t20)
+        t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity,2) if flag else '')
+        out_list.append(t17)
 
-        t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities])
-        out_list.append(t22)
+        t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity,2) if flag else '')
+        out_list.append(t18)
+
+        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if flag else '')
+        out_list.append(t19)
+
+        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.plate.moment_capacity/1000000,2) if flag else '')
+        out_list.append(t20)
+
+        # t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities])
+        # out_list.append(t22)
 
         t13 = (None, DISP_TITLE_WELD, TYPE_TITLE, None)
         out_list.append(t13)
@@ -391,7 +392,6 @@ class FinPlateConnection(ShearConnection):
             primary = design_dictionary[KEY_SUPTNGSEC]
             secondary = design_dictionary[KEY_SUPTDSEC]
             conn = sqlite3.connect(PATH_TO_DATABASE)
-            cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
             cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
             p_beam_details = cursor.fetchone()
             p_val = p_beam_details[0] - 2*p_beam_details[1] - p_beam_details[2] - p_beam_details[3]
@@ -492,12 +492,20 @@ class FinPlateConnection(ShearConnection):
                 self.select_bolt_dia(self)
 
         else:
-            self.design_status = False
-            logger.error(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
+            # self.design_status = False
+            logger.warning(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
                            "than applied loads, Please select larger sections or decrease loads"
                             .format(self.supported_section.shear_yielding_capacity,
                                     self.supported_section.tension_yielding_capacity))
             print("failed in preliminary member checks. Select larger sections or decrease loads")
+            self.thickness_possible = [i for i in self.plate.thickness if i >= self.supported_section.web_thickness]
+
+            if not self.thickness_possible:
+                logger.error(": Plate thickness should be greater than suppported section web thicknesss.")
+            else:
+                print("Selecting bolt diameter")
+                self.select_bolt_dia(self)
+            # self.select_bolt_dia(self)
 
     def select_bolt_dia(self):
         self.min_plate_height = self.supported_section.min_plate_height()
@@ -614,6 +622,7 @@ class FinPlateConnection(ShearConnection):
                                          max_edge_dist=self.bolt.max_edge_dist_round, shear_load=self.load.shear_force*1000,
                                          axial_load=self.load.axial_force*1000, gap=self.plate.gap,
                                          shear_ecc=True, bolt_line_limit=2)
+
         if self.plate.design_status is False:
             self.design_status = False
             logger.error(self.plate.reason)
@@ -639,7 +648,7 @@ class FinPlateConnection(ShearConnection):
                 logger.error(": For given members and %2.2f mm thick plate, weld sizes should be of range "
                          "%2.2f mm and  %2.2f mm " %self.plate.thickness_provided % weld_size_min
                              % weld_size_max)
-                logger.info(": Please select appropriate weld sizes for selected plate thickness values ")
+                logger.info(": Cannot design weld with available welds ")
 
         self.plate_shear_checks(self)
 
@@ -745,13 +754,13 @@ class FinPlateConnection(ShearConnection):
     def get_available_welds(self, connecting_members=[]):
 
         weld_size_max = min(connecting_members)
-        weld_size_max = max(list([i for i in ALL_WELD_SIZES if i <= weld_size_max]))
+
         weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(connecting_members[0], connecting_members[1])
 
-        if weld_size_max < weld_size_min:
-            logger.info("Minimum weld size given in Table 21 of IS800:2007 is greater than thickness of thinner connecting plate")
+        if weld_size_max == weld_size_min:
+            logger.info("Minimum weld size given in Table 21 of IS800:2007 is greater than or equal to thickness of thinner connecting plate")
             logger.info("Thicker plate shall be adequately preheated to prevent cracking of the weld")
-            weld_size_min = weld_size_max
+
         available_welds = list([x for x in ALL_WELD_SIZES if (weld_size_min <= x <= weld_size_max)])
         return available_welds,weld_size_min,weld_size_max
 
@@ -778,6 +787,7 @@ class FinPlateConnection(ShearConnection):
                 break
             else:
                 t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
+                print(t_weld_req)
                 self.weld.size = list([x for x in available_welds if (t_weld_req <= x)])[0]
                 if self.weld.size is None:
                     self.plate.height += 10

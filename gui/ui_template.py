@@ -745,10 +745,22 @@ class Ui_ModuleWindow(QMainWindow):
 
         self.dockWidgetContents_out = QtWidgets.QWidget()
         self.dockWidgetContents_out.setObjectName("dockWidgetContents_out")
+
+        out_widget = QtWidgets.QWidget(self.dockWidgetContents_out)
+        out_widget.setGeometry(QtCore.QRect(0, 0, 320, 622))
+        out_layout1 = QtWidgets.QVBoxLayout(out_widget)
+        out_scroll = QScrollArea(out_widget)
+        out_layout1.addWidget(out_scroll)
+        out_scroll.setWidgetResizable(True)
+        out_scrollcontent = QtWidgets.QWidget(out_scroll)
+        out_layout2 = QtWidgets.QGridLayout(out_scrollcontent)
+        out_scrollcontent.setLayout(out_layout2)
+
         out_list = main.output_values(main, False)
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
+        j = 1
         button_list = []
         for option in out_list:
             lable = option[1]
@@ -763,6 +775,7 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setFont(font)
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+                out_layout2.addWidget(l, j, 1, 1, 1)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents_out)
@@ -773,6 +786,7 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+                out_layout2.addWidget(r, j, 2, 1, 1)
 
             if type == TYPE_OUT_BUTTON:
                 v = option[3]
@@ -787,6 +801,7 @@ class Ui_ModuleWindow(QMainWindow):
                 b.setText(v[0])
                 b.setDisabled(True)
                 button_list.append(option)
+                out_layout2.addWidget(b, j, 2, 1, 1)
                 #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if type == TYPE_TITLE:
@@ -797,7 +812,11 @@ class Ui_ModuleWindow(QMainWindow):
                 q.setObjectName("_title")
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
+                out_layout2.addWidget(q, j, 1, 2, 2)
+                j = j + 1
             i = i + 30
+            j = j + 1
+        out_scroll.setWidget(out_scrollcontent)
 
         # common_button = QtWidgets.QPushButton()
         # d = {

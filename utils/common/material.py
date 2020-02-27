@@ -1,5 +1,7 @@
 import sqlite3
 from Common import *
+import logging
+
 
 class Material(object):
 
@@ -32,3 +34,36 @@ class Material(object):
         self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
         self.fu = row[4]
         conn.close()
+
+    def set_osdaglogger(key):
+
+        """
+        Function to set Logger for Tension Module
+        """
+
+        # @author Arsil Zunzunia
+        global logger
+        logger = logging.getLogger('osdag')
+
+        logger.setLevel(logging.DEBUG)
+        handler = logging.StreamHandler()
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        handler = logging.FileHandler('logging_text.log')
+
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        # handler.setLevel(logging.INFO)
+        # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        # handler.setFormatter(formatter)
+        # logger.addHandler(handler)
+        handler = OurLog(key)
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)

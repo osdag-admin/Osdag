@@ -309,6 +309,7 @@ KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 VALUES_COLSEC = connectdb("Columns")
 
+
 KEY_DISP_PRIBM = 'Primary beam *'
 VALUES_PRIBM = connectdb("Beams")
 

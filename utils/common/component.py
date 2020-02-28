@@ -222,6 +222,9 @@ class Section(Material):
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
+        self.moment_capacity = 0.0
+        self.plastic_moment_capactiy =0.0
+        self.moment_d_def_criteria =0.0
 
 
     def connect_to_database_update_other_attributes(self, table, designation):
@@ -294,6 +297,17 @@ class Section(Material):
         T_pdn = 0.9 * A_n * F_u / gamma_m1
 
         return T_pdn
+
+    def plastic_moment_capacty(self, beta_b, Z_p, fy):
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        self.plastic_moment_capactiy = beta_b * Z_p * fy / (gamma_m0)  # Nm # for section
+
+    def moment_d_deformation_criteria(self, fy, width,thickness):
+        """
+        considering cantilever section
+        """
+        self.moment_d_def_criteria = 1.5 * (fy / 1.1) * (width * thickness ** 2) / 6 # Nm
+        # moment_capacity_sec = self.flange_plate.moment_capacity
 
     def __repr__(self):
         repr = "Section\n"
@@ -925,6 +939,8 @@ class Plate(Material):
 
     def get_moment_cacacity(self, fy, plate_tk, plate_len):
         self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6
+
+
 
     def __repr__(self):
         repr = "Plate\n"

@@ -318,6 +318,8 @@ VALUES_SECBM = connectdb("Beams")
 KEY_MATERIAL = 'Member.Material'
 KEY_DISP_MATERIAL = 'Material *'
 VALUES_MATERIAL = connectdb("Material")
+KEY_SUPTNGSEC_MATERIAL = 'Member.Supporting_Section.Material'
+KEY_SUPTDSEC_MATERIAL = 'Member.Supported_Section.Material'
 
 
 ###################################

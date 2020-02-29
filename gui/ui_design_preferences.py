@@ -909,13 +909,21 @@ class Ui_Dialog(object):
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
-        if module == KEY_DISP_COLUMNCOVERPLATE :
-            print(module)
+        if module == KEY_DISP_COLUMNCOVERPLATE:
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
             pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
         if module == KEY_DISP_BEAMCOVERPLATE:
+            pushButton_Clear_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+            pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
+            pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+        if module == KEY_DISP_COMPRESSION:
+            pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
+            pushButton_Add_Column.clicked.connect(self.add_tab_column)
             pushButton_Clear_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
@@ -1285,14 +1293,15 @@ class DesignPreferences(QDialog):
         @author: Umair
         '''
 
+        tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         if designation == 'Select Section':
             self.ui.clear_tab("Column")
             return
 
+
         col_list = []
         col_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(col_attributes, table, designation)
-        tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         for ch in tab_Column.children():
             if ch.objectName() == KEY_SUPTNGSEC_DESIGNATION:
                 ch.setText(designation)
@@ -1365,13 +1374,14 @@ class DesignPreferences(QDialog):
         '''
         @author: Umair
         '''
+        tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
         if designation == 'Select Section':
             self.ui.clear_tab("Beam")
             return
+
         beam_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(beam_attributes, "Beams", designation)
         beam_list = []
-        tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
         for ch in tab_Beam.children():
             if ch.objectName() == KEY_SUPTDSEC_DESIGNATION:
                 ch.setText(designation)

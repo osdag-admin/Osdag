@@ -16,6 +16,7 @@ class CleatAngleConnection(ShearConnection):
 
         self.sptd_leg_length = 0.0
         self.sptng_leg_length = 0.0
+        self.design_status = False
 
     def input_values(self, existingvalues={}):
 
@@ -321,10 +322,10 @@ class CleatAngleConnection(ShearConnection):
         t15 = (KEY_OUT_CLEAT_HEIGHT, KEY_OUT_DISP_CLEAT_HEIGHT, TYPE_TEXTBOX, self.sptd_leg.height if flag else '')
         out_list.append(t15)
 
-        t16 = (KEY_OUT_CLEAT_SPTDLEG, KEY_OUT_DISP_CLEAT_SPTDLEG, TYPE_TEXTBOX, self.sptd_leg_length if flag else '')
+        t16 = (KEY_OUT_CLEAT_SPTDLEG, KEY_OUT_DISP_CLEAT_SPTDLEG, TYPE_TEXTBOX, self.cleat.leg_a_length if flag else '')
         out_list.append(t16)
 
-        t16 = (KEY_OUT_CLEAT_SPTNGLEG, KEY_OUT_DISP_CLEAT_SPTNGLEG, TYPE_TEXTBOX, self.sptng_leg_length if flag else '')
+        t16 = (KEY_OUT_CLEAT_SPTNGLEG, KEY_OUT_DISP_CLEAT_SPTNGLEG, TYPE_TEXTBOX, self.cleat.leg_b_length if flag else '')
         out_list.append(t16)
 
         t17 = (KEY_OUT_CLEAT_SHEAR, KEY_OUT_DISP_CLEAT_SPTNGLEG, TYPE_TEXTBOX, round(self.sptd_leg.shear_yielding_capacity,2) if flag else '')
@@ -527,6 +528,7 @@ class CleatAngleConnection(ShearConnection):
                                                   bolt_grade_provided=self.bolt.bolt_grade_provided,
                                                   connecting_plates_tk=[self.supported_section.web_thickness],
                                                   n_planes=2)
+
                 self.bolts_required_sptd = max(int(math.ceil(self.load.shear_force*1000 / self.bolt.bolt_capacity)), 2)
                 [self.bolt_line_sptd, self.bolts_one_line_sptd, web_plate_h] = self.sptd_leg.get_web_plate_l_bolts_one_line(
                     web_plate_h_min=self.min_plate_height, web_plate_h_max=self.max_plate_height,
@@ -590,72 +592,92 @@ class CleatAngleConnection(ShearConnection):
                 break
             bolts_required_previous = self.bolts_required_sptd
             bolt_grade_previous = self.bolt.bolt_grade_provided
+
+        print(self.bolt.bolt_diameter_provided, self.bolts_required_sptd, self.bolt_line_sptd, self.bolts_one_line_sptd)
+        self.get_bolts_required_sptng(self)
+
+    def get_bolts_required_sptng(self):
+        self.sptng_bolt = self.bolt
+        self.sptng_leg = self.sptd_leg
+        self.sptng_bolt.calculate_bolt_capacity(self.bolt.bolt_diameter_provided, self.bolt.bolt_grade_provided,
+                                                [self.supporting_section.flange_thickness], 1)
+        self.bolts_required_sptng = max(int(math.ceil(self.load.shear_force * 1000 / self.sptng_bolt.bolt_capacity/2)), 2)
+        [self.bolt_line_sptng, self.bolts_one_line_sptng, web_plate_h] = self.sptng_leg.get_web_plate_l_bolts_one_line(
+            web_plate_h_min=self.min_plate_height, web_plate_h_max=self.max_plate_height,
+            bolts_required=self.bolts_required_sptng, edge_dist=self.sptng_bolt.min_edge_dist_round,
+            gauge=self.sptng_bolt.min_gauge_round)
+
         self.get_acceptable_cleat_list(self)
 
     def get_acceptable_cleat_list(self):
-        print(self.bolt.bolt_diameter_provided, self.bolts_required_sptd, self.bolt_line_sptd, self.bolts_one_line_sptd)
-        sptd_leg_pitch = self.get_sptd_leg_pitch(self, self.bolt_line_sptd, self.bolt.bolt_diameter_provided)
-        self.sptd_leg_lengths = [i[0] for i in sptd_leg_pitch]
-        self.acceptable_cleat_list = []
-        for self.sptd_leg_length in self.sptd_leg_lengths:
-            self.acceptable_cleat_list = get_available_cleat_list(self.cleat_list, self.sptd_leg_length, operator.ge)
-            if self.acceptable_cleat_list:
-                break
 
+        sptd_leg_pitch = self.get_leg_pitch(self, self.bolt_line_sptd, self.bolt.bolt_diameter_provided)
+        sptd_leg_lengths = [i[0] for i in sptd_leg_pitch]
+        min_sptd_leg_length = min(sptd_leg_lengths)
+
+
+        sptng_leg_pitch = self.get_leg_pitch(self, self.bolt_line_sptng, self.bolt.bolt_diameter_provided)
+        sptng_leg_lengths = [i[0] for i in sptng_leg_pitch]
+        min_sptng_leg_length = min(sptng_leg_lengths)
+
+        min_leg_length = min(min_sptd_leg_length, min_sptng_leg_length)
+        max_leg_length = max(min_sptd_leg_length, min_sptng_leg_length)
+        self.acceptable_cleat_list = []
+        self.acceptable_cleat_list = get_available_cleat_list(self.cleat_list, min_leg_length,max_leg_length, operator.ge)
+
+        print(self.acceptable_cleat_list)
         if not self.acceptable_cleat_list:
             self.design_status = False
-            logger.error(" : min required leg length is {}".format(min(self.sptd_leg_lengths)))
+            logger.error(" : min required leg length is {}".format(max_leg_length))
 
         if self.design_status is True:
-            self.select_cleat_angle()
+            self.select_cleat_angle(self)
 
     def select_cleat_angle(self):
-        self.min_plate_height = self.supported_section.min_plate_height()
-        self.max_plate_height = self.supported_section.max_plate_height()
-        for self.cleat_angle_selected in self.acceptable_cleat_list:
-            self.cleat = Angle(designation=self.cleat_angle_selected, material_grade=self.material_grade)
-
-            sptd_angle_pitch_details = self.get_leg_pitch(self, self.bolt_line_sptd,self.bolt.bolt_diameter_provided)
-            pitch_details = []
-            for i in sptd_angle_pitch_details:
-                if self.cleat.leg_a_length == i[0]:
-                    pitch_details_sptd = [i[1], i[2], i[3]]
-                    break
-
-            self.sptd_leg = Plate(thickness=self.cleat.thickness, length=self.cleat.leg_a_length, gap=0.0, material_grade=self.material_grade)
-            self.sptd_leg.get_web_plate_details(self.bolt.bolt_diameter_provided, self.min_plate_height, self.max_plate_height,
-                                                self.bolt.bolt_capacity, pitch_details[0], self.bolt.min_gauge_round,
-                                                self.bolt.max_spacing_round, pitch_details[0],
-                              shear_load=self.load.shear_force*1000, axial_load=0.0, gap=0.0, shear_ecc=True, bolt_line_limit=2)
-
-
-
-            self.sptng_bolt = Bolt()
-            self.sptng_bolt.calculate_bolt_capacity(self.bolt.bolt_diameter_provided,self.bolt.bolt_grade_provided,
-                                                    [self.cleat.thickness,self.supporting_section.flange_thickness], 1)
-
-            sptng_angle_pitch_details = self.get_leg_pitch(self, self.bolt_line_sptng, self.bolt.bolt_diameter_provided)
-            pitch_details = []
-            for i in sptng_angle_pitch_details:
-                if self.cleat.leg_b_length == i[0]:
-                    pitch_details_sptd = [i[1], i[2], i[3]]
-                    break
-
-            self.sptng_leg = Plate(thickness=self.cleat.thickness, length=self.cleat.leg_a_length, gap=0.0,
-                                  material_grade=self.material_grade)
-
-            self.sptng_leg.get_web_plate_details(self.bolt.bolt_diameter_provided, self.min_plate_height,
-                                                self.max_plate_height,
-                                                self.sptng_bolt.bolt_capacity, pitch_details[0], self.bolt.min_gauge_round,
-                                                self.bolt.max_spacing_round, pitch_details[0],
-                                                shear_load=self.load.shear_force * 1000, axial_load=0.0, gap=0.0,
-                                                shear_ecc=True, bolt_line_limit=2)
+        # self.min_plate_height = self.supported_section.min_plate_height()
+        # self.max_plate_height = self.supported_section.max_plate_height()
+        # for self.cleat_angle_selected in self.acceptable_cleat_list:
+        #
+        #     self.cleat = Angle(designation=self.cleat_angle_selected, material_grade=self.material_grade)
+        #
+        #     sptd_angle_pitch_details = self.get_leg_pitch(self, self.bolt_line_sptd,self.bolt.bolt_diameter_provided)
+        #     pitch_details_sptd = []
+        #     for i in sptd_angle_pitch_details:
+        #         if self.cleat.leg_a_length == i[0]:
+        #             pitch_details_sptd = [i[1], i[2], i[3]]
+        #             break
+        #
+        #     self.sptd_leg = Plate(length=self.cleat.leg_a_length, gap=0.0, material_grade=self.material_grade)
+        #     self.sptd_leg.get_web_plate_details(self.bolt.bolt_diameter_provided, self.min_plate_height, self.max_plate_height,
+        #                                         self.bolt.bolt_capacity, pitch_details_sptd[0], self.bolt.min_gauge_round,
+        #                                         self.bolt.max_spacing_round, pitch_details_sptd[0],
+        #                       shear_load=self.load.shear_force*1000, axial_load=0.0, gap=0.0, shear_ecc=True, bolt_line_limit=2)
+        #
+        #     pitch_details_sptng = []
+        #     for i in sptng_angle_pitch_details:
+        #         if self.cleat.leg_b_length == i[0]:
+        #             pitch_details_sptng = [i[1], i[2], i[3]]
+        #             break
+        #
+        #     self.sptng_leg = Plate(length=self.cleat.leg_a_length, gap=0.0,
+        #                            material_grade=self.material_grade)
+        #
+        #     self.sptng_leg.get_web_plate_details(self.bolt.bolt_diameter_provided, self.min_plate_height,
+        #                                          self.max_plate_height,
+        #                                          self.sptng_bolt.bolt_capacity, pitch_details_sptng[0],
+        #                                          self.bolt.min_gauge_round,
+        #                                          self.bolt.max_spacing_round, pitch_details_sptng[0],
+        #                                          shear_load=self.load.shear_force * 1000, axial_load=0.0, gap=0.0,
+        #                                          shear_ecc=True, bolt_line_limit=2)
+        #
+        #     self.sptng_leg_length = min(self.cleat.leg_a_length, self.cleat.leg_b_length)
 
 
-            self.sptng_leg_length = min(self.cleat.leg_a_length,self.cleat.leg_b_length)
 
         designation_angle = self.acceptable_cleat_list[0]
-        print(self.sptd_leg_length, self.sptng_leg_length, designation_angle)
+        self.cleat = Angle(designation=designation_angle, material_grade=self.material_grade)
+        self.for_3D_view(self)
+
 
     def get_leg_pitch(self, bolt_line, bolt_dia):
         conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -670,3 +692,48 @@ class CleatAngleConnection(ShearConnection):
             angle_pitch_details.append(row)
 
         return angle_pitch_details
+
+    def for_3D_view(self):
+        # cleat_length = self.resultObj['cleat']['height']
+        # cleat_thick = float(self.dictangledata["t"])
+        # seat_legsizes = str(self.dictangledata["AXB"])
+        # angle_A = int(seat_legsizes.split('x')[0])
+        # angle_B = int(seat_legsizes.split('x')[1])
+        # angle_r1 = float(str(self.dictangledata["R1"]))
+        # angle_r2 = float(str(self.dictangledata["R2"]))
+        # bolt_dia = str(self.uiObj["Bolt"]["Diameter (mm)"])
+        # bolt_r = (float(bolt_dia) / 2)
+        # bolt_R = self.bolt_R
+        # # bolt_R = bolt_r + 7
+        # nut_R = bolt_R
+        # bolt_T = self.bolt_T
+        # bolt_Ht = self.bolt_Ht
+        # nut_T = self.nut_T
+        # nut_Ht = 12.2  #
+        # gap = float(str(self.uiObj['detailing']['gap']))
+        self.design_status = True
+        self.cleat.gauge_sptd = 60.0
+        self.cleat.pitch_sptd = 0.0
+        self.cleat.edge_sptd = 44.0
+        self.cleat.end_sptd = 44.0
+        self.cleat.bolt_lines_sptd = 1
+        self.cleat.bolt_one_line_sptd = 3
+
+        self.cleat.gauge_sptng = 60.0
+        self.cleat.pitch_sptng = 0.0
+        self.cleat.edge_sptng = 44.0
+        self.cleat.end_sptng = 44.0
+        self.cleat.bolt_lines_sptng = 1
+        self.cleat.bolt_one_line_sptng = 3
+
+        self.cleat.height = 208.0
+        self.cleat.leg_a_length = 100.0
+        self.cleat.leg_b_length = 100.0
+        self.cleat.thickness = 8.0
+        self.cleat.r1 = 8.5
+        self.cleat.r2 = 4.5
+        self.bolt.bolt_diameter_provided = 12.0
+        self.cleat.gap = 10.0
+
+
+

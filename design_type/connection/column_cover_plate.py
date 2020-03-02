@@ -287,6 +287,10 @@ class ColumnCoverPlate(MomentConnection):
                round(self.flange_plate.bolts_one_line) if flag else '')
         boltdetails.append(t16)
 
+        t16 = (KEY_FLANGE_BOLTS_REQ, KEY_FLANGE_DISP_BOLTS_REQ, TYPE_TEXTBOX,
+               round(self.flange_plate.bolts_required) if flag else '')
+        boltdetails.append(t16)
+
         t16 = (KEY_WEB_BOLT_LINE, KEY_WEB_DISP_BOLT_LINE, TYPE_TEXTBOX,
                round(self.flange_plate.bolts_one_line) if flag else '')
         boltdetails.append(t16)
@@ -294,6 +298,11 @@ class ColumnCoverPlate(MomentConnection):
         t16 = (KEY_WEB_BOLTS_ONE_LINE, KEY_WEB_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX,
                round(self.flange_plate.bolts_one_line) if flag else '')
         boltdetails.append(t16)
+
+        t16 = (KEY_WEB_BOLTS_REQ, KEY_WEB_DISP_BOLTS_REQ, TYPE_TEXTBOX,
+               round(self.web_plate.bolts_required) if flag else '')
+        boltdetails.append(t16)
+
         return boltdetails
 
 
@@ -1255,8 +1264,8 @@ class ColumnCoverPlate(MomentConnection):
         A_vn_web = (self.web_plate.height - (self.web_plate.bolts_one_line * self.web_bolt.dia_hole)) * \
                    self.web_plate.thickness[0]
         A_v_web = self.web_plate.height * self.web_plate.thickness[0]
-        self.web_plate.shear_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
-            A_v=A_v_web, fy=A_vn_web)
+        self.web_plate.shear_yielding_capacity = self.shear_yielding(
+            A_v=A_v_web, fy=self.web_plate.fy)
         self.web_plate.shear_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
             A_vn=A_vn_web, fu=self.web_plate.fu)
 
@@ -1476,6 +1485,23 @@ class ColumnCoverPlate(MomentConnection):
         T_dn = 0.9 * A_vn * fu / (gamma_m1)
         return T_dn
 
+    @staticmethod
+    def shear_yielding(A_v, fy):
+        '''
+        Args:
+            length (float) length of member in direction of shear load
+            thickness(float) thickness of member resisting shear
+            beam_fy (float) Yeild stress of section material
+        Returns:
+            Capacity of section in shear yeiding
+        '''
+
+        # A_v = length * thickness
+        gamma_m0 = 1.1
+        # print(length, thickness, fy, gamma_m0)
+        # V_p = (0.6 * A_v * fy) / (math.sqrt(3) * gamma_m0 * 1000)  # kN
+        V_p = (A_v * fy) / (math.sqrt(3) * gamma_m0)  # N
+        return V_p
     #
     # def web_force(column_d, column_f_t, column_t_w, axial_force, column_area):
     #     """
@@ -1544,26 +1570,24 @@ class ColumnCoverPlate(MomentConnection):
         elif compression_element == "Web of an I-H" or compression_element == "box section":
             if section == "generally":
                 if r1 < 0:
-                    if column_d / column_t_w <= (84 * epsilon / (1 + r1)) and column_d / column_t_w >= (
-                            42 * epsilon):
+                    if column_d / column_t_w <= max((84 * epsilon / (1 + r1)), (42 * epsilon)):
                         class_of_section1 = "plastic"
-                    elif column_d / column_t_w <= (105 * epsilon / (1 + r1)):
+                    elif column_d / column_t_w <= (max(105 * epsilon / (1 + r1)), (42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= (126 * epsilon / (1 + r1)) and column_d / column_t_w >= (
-                            42 * epsilon):
+                    elif column_d / column_t_w <= max((126 * epsilon / (1 + r1)), column_d / column_t_w >= (
+                            42 * epsilon)):
                         class_of_section1 = "semi-compact"
                     # else:
                     #     print('fail')
                     # print("class_of_section3", class_of_section)
                 elif r1 > 0:
-                    if column_d / column_t_w <= (84 * epsilon / (1 + r1)) and column_d / column_t_w >= (
-                            42 * epsilon):
+                    if column_d / column_t_w <= max((84 * epsilon / (1 + r1)), (42 * epsilon)):
                         class_of_section1 = "plastic"
-                    elif column_d / column_t_w <= (105 * epsilon / (1 + (r1 * 1.5))) and column_d / column_t_w >= (
-                            42 * epsilon):
+                    elif column_d / column_t_w <= max((105 * epsilon / (1 + (r1 * 1.5))), (
+                            42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= (126 * epsilon / (1 + r1)) and column_d / column_t_w >= (
-                            42 * epsilon):
+                    elif column_d / column_t_w <= max((126 * epsilon / (1 + r1)), (
+                            42 * epsilon)):
                         class_of_section1 = "semi-compact"
                     # else:
                     #     print('fail')
@@ -1672,11 +1696,16 @@ class ColumnCoverPlate(MomentConnection):
             ui.mytabWidget.setCurrentIndex(0)
         # self.display_3DModel("Connector", bgcolor)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
-
-
         # print(self.web_bolt)
         # print(self.web_plate)
         # print(self.Tension_capacity_flange_plate)
         # print(self.Tension_capacity_flange)
 
+    def tab_list(self):
 
+        tabs = []
+
+        t1 = (KEY_DISP_COLSEC, self.tab_column_section)
+        tabs.append(t1)
+
+        return tabs

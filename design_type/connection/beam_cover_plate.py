@@ -519,21 +519,22 @@ class BeamCoverPlate(MomentConnection):
         self.flange_bolt.bolt_grade_provided = 12.9
         self.flange_bolt.bolt_diameter_provided = 20
         self.flange_bolt.dia_hole =22
-        self.flange_bolt.min_edge_dist_round =35
-        self.flange_bolt.min_end_dist_round = 35
-        self.flange_bolt.min_gauge_round = 50
-        self.flange_bolt.min_pitch_round = 50
+        self.flange_bolt.bolt_shear_capacity = 135792.7833134
+        self.flange_bolt.bolt_bearing_capacity = 118287.48484848486
+        self.flange_bolt.bolt_capacity = 118287.48484848486
+        # self.flange_bolt.min_edge_dist_round =35
+        # self.flange_bolt.min_end_dist_round = 35
+        # self.flange_bolt.min_gauge_round = 50
+        # self.flange_bolt.min_pitch_round = 50
 
-        self.flange_bolt.max_edge_dist_round =250
-        self.flange_bolt.max_end_dist_round=250
-        self.flange_bolt.max_spacing_round = 300.0
+        # self.flange_bolt.max_edge_dist_round =250
+        # self.flange_bolt.max_end_dist_round=250
+        # self.flange_bolt.max_spacing_round = 300.0
 
         # self.flange_bolt.bolt_shank_area = 0.0
         # self.flange_bolt.bolt_net_area = 0.0
 
-        self.flange_bolt.bolt_shear_capacity =  135792.7833134
-        self.flange_bolt.bolt_bearing_capacity = 118287.48484848486
-        self.flange_bolt.bolt_capacity =  118287.48484848486
+
 
         # web bolt
         self.web_bolt.bolt_type = "Bearing Bolt"
@@ -545,21 +546,22 @@ class BeamCoverPlate(MomentConnection):
         self.web_bolt.bolt_grade_provided = 12.9
         self.web_bolt.bolt_diameter_provided = 20
         self.web_bolt.dia_hole = 22
-        self.web_bolt.min_edge_dist_round = 33
-        self.web_bolt.min_end_dist_round = 33
-        self.web_bolt.min_gauge_round = 50
-        self.web_bolt.min_pitch_round = 50
+        self.web_bolt.bolt_shear_capacity = 135792.7833134
+        self.web_bolt.bolt_bearing_capacity = 69923.63636363638
+        self.web_bolt.bolt_capacity = 69923.63636363638
+        # self.web_bolt.min_edge_dist_round = 33
+        # self.web_bolt.min_end_dist_round = 33
+        # self.web_bolt.min_gauge_round = 50
+        # self.web_bolt.min_pitch_round = 50
 
-        self.web_bolt.max_edge_dist_round = 150
-        self.web_bolt.max_end_dist_round = 150
-        self.web_bolt.max_spacing_round = 300.0
+        # self.web_bolt.max_edge_dist_round = 150
+        # self.web_bolt.max_end_dist_round = 150
+        # self.web_bolt.max_spacing_round = 300.0
 
         # self.web_bolt.bolt_shank_area = 0.0
         # self.web_bolt.bolt_net_area = 0.0
 
-        self.web_bolt.bolt_shear_capacity = 135792.7833134
-        self.web_bolt.bolt_bearing_capacity =69923.63636363638
-        self.web_bolt.bolt_capacity =69923.63636363638
+
 
         #flange plate
         self.flange_plate.thickness_provided =22

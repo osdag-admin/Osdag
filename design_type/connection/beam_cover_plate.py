@@ -577,15 +577,15 @@ class BeamCoverPlate(MomentConnection):
         self.flange_plate.edge_dist_provided =33
         self.flange_plate.end_dist_provided=33
 
-        self.block_shear_capacity = 707779.918
-        self.shear_yielding_capacity = 0.0
-        self.shear_rupture_capacity =0.0
+        self.flange_plate.block_shear_capacity = 707779.918
+        self.flange_plate.shear_yielding_capacity = 0.0
+        self.flange_plate.shear_rupture_capacity =0.0
 
-        self.shear_capacity_web_plate=0.0
-        self.tension_capacity_web_plate = 0.0
-        self.tension_capacity_flange_plate=707779.918
+        self.flange_plate.shear_capacity_web_plate=0.0
+        self.flange_plate.tension_capacity_web_plate = 0.0
+        self.flange_plate.tension_capacity_flange_plate=707779.918
 
-        self.moment_capacity=0
+        self.flange_plate.moment_capacity=0
 
         # web plate
         self.web_plate.thickness_provided = 12

@@ -827,12 +827,12 @@ VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
 
 
-def get_available_cleat_list(input_angle_list, leg_length, relate):
+def get_available_cleat_list(input_angle_list, max_leg_length, min_leg_length, relate):
 
     available_angles = []
     for designation in input_angle_list:
         leg_a_length,leg_b_length = get_leg_lengths(designation)
-        if relate(max(leg_a_length,leg_b_length),leg_length):
+        if relate(max(leg_a_length,leg_b_length),max_leg_length) and relate(min(leg_a_length,leg_b_length), min_leg_length):
             available_angles.append(designation)
     return available_angles
 
@@ -856,7 +856,7 @@ def get_leg_lengths(designation):
     return leg_a_length,leg_b_length
 
 all_angles = connectdb("Angles","popup")
-VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 50.0, operator.ge)
+VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0, operator.ge)
 print(VALUES_CLEAT_CUSTOMIZED)
 
 DISP_TITLE_COMPMEM='Compression member'

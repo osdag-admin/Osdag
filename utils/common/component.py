@@ -1064,6 +1064,7 @@ class Angle(Material):
         self.leg_a_length = 0.0
         self.leg_b_length = 0.0
         self.thickness = 0.0
+        self.gap = 0.0
 
         self.connect_to_database_update_other_attributes(designation)
 
@@ -1085,8 +1086,7 @@ class Angle(Material):
         axb = axb.lower()
         self.leg_a_length = float(axb.split("x")[0])
         self.leg_b_length = float(axb.split("x")[1])
-        self.mass = row[1]
-        self.area = row[2]
+        self.thickness = row[1]
 
         conn.close()
 

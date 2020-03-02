@@ -468,7 +468,7 @@ class FinPlateConnection(ShearConnection):
             else:
                 length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)
         else:
-            self.supported_section.notch_ht = round_up(self.supporting_section.flange_thickness*2, 5)
+
             length = self.supported_section.depth - self.supported_section.notch_ht
 
 

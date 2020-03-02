@@ -80,14 +80,19 @@ class Bolt(Material):
         repr += "Minimum Pitch: {}\n".format(self.min_pitch_round)
         repr += "Minimum Gauge: {}\n".format(self.min_gauge_round)
         repr += "Minimum Edge Distance: {}\n".format(self.min_edge_dist)
+        repr += "Minimum Edge Distance: {}\n".format(self.min_edge_dist)
+
+
         repr += "Minimum End Distance: {}\n".format(self.min_end_dist)
         repr += "Maximum Edge Distance: {}\n".format(self.max_edge_dist)
         repr += "Maximum End Distance: {}\n".format(self.max_end_dist)
         repr += "Maximum Spacing: {}\n".format(self.max_spacing)
-
         repr += "Bolt Shear Capacity: {}\n".format(self.bolt_shear_capacity)
         repr += "Bolt Bearing Capacity: {}\n".format(self.bolt_bearing_capacity)
         repr += "Bolt Capacity: {}\n".format(self.bolt_capacity)
+
+
+
         return repr
 
     def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, connecting_plates_tk, n_planes):
@@ -392,11 +397,11 @@ class Section(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         self.plastic_moment_capactiy = beta_b * Z_p * fy / (gamma_m0)  # Nm # for section
 
-    def moment_d_deformation_criteria(self, fy, width,thickness):
+    def moment_d_deformation_criteria(self, fy, Z_e):
         """
         considering cantilever section
         """
-        self.moment_d_def_criteria = 1.5 * (fy / 1.1) * (width * thickness ** 2) / 6 # Nm
+        self.moment_d_def_criteria = 1.5 * (fy / 1.1) * (Z_e) # Nm
         # moment_capacity_sec = self.flange_plate.moment_capacity
 
     def __repr__(self):

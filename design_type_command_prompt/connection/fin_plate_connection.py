@@ -387,13 +387,17 @@ class FinPlateConnection(ShearConnection):
         self.module = design_dictionary[KEY_MODULE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+
+
         self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL])
+
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
         if self.connectivity in VALUES_CONN_1:
+
             if self.supported_section.type == "Rolled":
                 length = self.supported_section.depth
             else:

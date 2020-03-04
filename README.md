@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="center"> 
   <img src = "https://user-images.githubusercontent.com/19147922/27816506-9f15355a-60a9-11e7-98cc-585312264801.png"><br>
   Open steel design and graphics <br><br>
@@ -163,3 +164,6 @@ This beta version of Osdag contains only the shear connection modules. Starting 
 (c) Copyright Osdag contributors 2017.<br>
 This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See the <a href="https://github.com/osdag-admin/Osdag/files/1207162/License.txt">License.txt</a> file for details regarding the license.
 The beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
+=======
+# Osdag_refactored
+>>>>>>> restructuring

@@ -561,7 +561,7 @@ class BeamCoverPlate(MomentConnection):
         # self.web_bolt.min_end_dist_round = 33
 
         # self.web_bolt.min_gauge_round = 50
-        #anjali
+        #anjali jatav
         # self.web_bolt.min_pitch_round = 50
 
         # self.web_bolt.max_edge_dist_round = 150

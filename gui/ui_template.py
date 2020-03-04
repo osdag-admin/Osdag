@@ -639,6 +639,9 @@ class Ui_ModuleWindow(QMainWindow):
                 key_customized_4.activated.connect(lambda: popup(key_customized_4, new_list))
                 data[t[0] + "_customized"] = t[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
                                 KEY_SEC_PROFILE).currentText())
+
+
+
             else:
                 pass
 

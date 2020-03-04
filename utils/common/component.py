@@ -257,6 +257,9 @@ class Section(Material):
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
         self.tension_capacity = 0.0
+        self.slenderness = 0.0
+        self.min_radius_gyration = 0.0
+        # self.min_rad_gyration_bbchannel = 0.0
 
 
     def connect_to_database_update_other_attributes(self, table, designation):
@@ -399,20 +402,60 @@ class Section(Material):
         # Tdb = round(Tdb, 3)
         self.block_shear_capacity_axial = round(Tdb/1000,2)
 
-    # def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):
-    #
-    #     if tension_member_yielding < tension_rupture and tension_member_yielding < tension_blockshear:
-    #         min_capacity = "tension_member_yielding"
-    #     elif tension_rupture < tension_member_yielding and tension_rupture < tension_blockshear:
-    #         min_capacity = "tension_rupture"
-    #     else:
-    #         min_capacity =
-
     def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):
 
         Tc = min(tension_member_yielding, tension_rupture, tension_blockshear)
 
         self.tension_capacity = Tc
+
+    def min_rad_gyration_calc(self,key,subkey,mom_inertia_y,mom_inertia_z,rad_y, rad_z,area,Cg_1,Cg_2, thickness=0.0):
+
+        if key == "Channels" and subkey == "Web":
+            min_rad = min(rad_y, rad_z)
+
+        elif key == 'Back to Back Channels'  and subkey == "Web":
+            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+            Izz = 2 * mom_inertia_z
+            I = min(Iyy, Izz)
+            min_rad= math.sqrt(I / (area))
+
+        elif key == 'Back to Back Angles' and subkey == 'Long Leg':
+            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+            Izz = 2 * mom_inertia_z
+            I = min(Iyy, Izz)
+            min_rad= math.sqrt(I / (area))
+
+        elif key == 'Back to Back Angles' and subkey == 'Short Leg':
+            Izz = (mom_inertia_z + (area * (Cg_2 + thickness) * (Cg_2 + thickness))) * 2
+            Iyy = 2 * mom_inertia_y
+            I = min(Iyy, Izz)
+            min_rad= math.sqrt(I / (area))
+
+        elif key == 'Star Angles' and subkey == 'Long Leg':
+            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+            Izz = (mom_inertia_z + (area * Cg_2 * Cg_2)) * 2
+            I = min(Iyy, Izz)
+            min_rad= math.sqrt(I / (area))
+
+        elif key == 'Star Angles' and subkey == 'Short Leg':
+            Izz = (mom_inertia_z + (area * (Cg_2 + thickness) * (Cg_2 + thickness))) * 2
+            Iyy = (mom_inertia_y + (area * Cg_1 * Cg_1)) * 2
+            I = min(Iyy, Izz)
+            min_rad= math.sqrt(I / (area))
+
+        elif key == 'Angles' and (subkey == 'Long Leg' or subkey == 'Short Leg'):
+            min_rad = min(rad_y, rad_z)
+
+        self.min_radius_gyration = min_rad
+
+
+    def design_check_for_slenderness(self, K, L, r):
+        "KL= effective length of member"
+        "r = radius of gyration of member"
+
+        slender = (float(K) * float(L)) / float(r)
+
+        self.slenderness = round(slender,2)
 
     def __repr__(self):
         repr = "Section\n"
@@ -464,7 +507,36 @@ class Channel(Section):
 
     def __init__(self, designation, material_grade):
         super(Channel, self).__init__(designation, material_grade)
-        self.connect_to_database_update_other_attributes("Channels", designation)
+        self.connect_to_database_update_other_attributes(designation)
+        # self.length =0.0
+
+    def connect_to_database_update_other_attributes(self, designation):
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        db_query = "SELECT * FROM Channels WHERE Designation = ?"
+        cur = conn.cursor()
+        cur.execute(db_query, (designation,))
+        row = cur.fetchone()
+        self.mass = row[2]
+        self.area = row[3] *100
+        self.depth = row[4]
+        self.flange_width = row[5]
+        self.web_thickness = row[6]
+        self.flange_thickness = row[7]
+        self.flange_slope = row[8]
+        self.root_radius = row[9]
+        self.toe_radius = row[10]
+        self.Cy = row[11] * 10
+        self.mom_inertia_z = row[12] * 10000
+        self.mom_inertia_y = row[13] * 10000
+        self.rad_of_gy_z = row[14] * 10
+        self.rad_of_gy_y = row[15] * 10
+        self.elast_sec_mod_z = row[16] * 1000
+        self.elast_sec_mod_y = row[17] * 1000
+        # self.plast_sec_mod_z = row[18] * 1000
+        # self.plast_sec_mod_y = row[19] * 1000
+        self.source = row[20]
+
+        conn.close()
 
     def min_plate_height(self):
         return 0.6 * self.depth
@@ -606,7 +678,7 @@ class Plate(Material):
         return gauge, edge_dist, web_plate_h
 
     def get_vres(self, bolts_one_line, pitch, gauge, bolt_line, shear_load, axial_load, ecc):
-        """
+        """1000
 
         :param bolts_one_line: number of bolts in one line
         :param pitch: pitch
@@ -810,6 +882,35 @@ class Plate(Material):
         Tdb = round(Tdb / 1000, 3)
         self.block_shear_capacity = Tdb
 
+    def tension_blockshear_area_input(self,A_vg, A_vn, A_tg, A_tn, f_u, f_y):
+        """Calculate the block shear strength of bolted connections as per cl. 6.4.1
+
+        Args:
+            A_vg: Minimum gross area in shear along bolt line parallel to external force [in sq. mm] (float)
+            A_vn: Minimum net area in shear along bolt line parallel to external force [in sq. mm] (float)
+            A_tg: Minimum gross area in tension from the bolt hole to the toe of the angle,
+                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+            A_tn: Minimum net area in tension from the bolt hole to the toe of the angle,
+                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+            f_u: Ultimate stress of the plate material in MPa (float)
+            f_y: Yield stress of the plate material in MPa (float)
+
+        Return:
+            block shear strength of bolted connection in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007, cl. 6.4.1
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
+        T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
+        Tdb = min(T_db1, T_db2)
+        # Tdb = round(Tdb, 3)
+        self.block_shear_capacity = round(Tdb/1000,2)
+
     # Check for shear yielding ###
     def shear_yielding(self, length, thickness, fy):
         '''
@@ -840,6 +941,17 @@ class Plate(Material):
         tdg = (A_v * fy) / (gamma_m0 * 1000)
         self.tension_yielding_capacity = tdg
         return tdg
+
+    def tension_rupture(self, A_n, F_u):
+        "preliminary design strength,T_pdn,as governed by rupture at net section"
+        "A_n = net area of the total cross-section"
+        "F_u = Ultimate Strength of material"
+
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_pdn = 0.9 * A_n * F_u / gamma_m1 / 1000
+
+        self.tension_rupture_capacity = round(T_pdn, 2)
+
     # Check for shear rupture ###
 
     # TODO: This formula based on AISC guidelines, check if this should be included
@@ -887,42 +999,60 @@ class Plate(Material):
         return repr
 
 
-class Angle(Material):
+class Angle(Section):
 
-    def __init__(self, designation, material_grade):
+    def __init__(self, designation, material_grade ):
         super(Angle, self).__init__(material_grade)
+        # super(Angle, self).__init__(designation, material_grade)
+
         self.designation = designation
 
         self.leg_a_length = 0.0
         self.leg_b_length = 0.0
         self.thickness = 0.0
 
-        self.connect_to_database_update_other_attributes(designation)
+        self.connect_to_database_update_other_attributes_angles(designation)
 
-        self.length = 0.0
+        # self.length = 0.0
 
     def __repr__(self):
         repr = "Angle\n"
         repr += "Designation: {}\n".format(self.designation)
         return repr
 
-    def connect_to_database_update_other_attributes(self, designation):
+    def connect_to_database_update_other_attributes_angles(self, designation):
         conn = sqlite3.connect(PATH_TO_DATABASE)
-        db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
+        # db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
+        db_query =  "SELECT * FROM Angles WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
         row = cur.fetchone()
 
-        axb = row[0]
+        self.mass = row[2]
+        self.area = row[3] * 100
+        axb = row[4]
         axb = axb.lower()
         self.leg_a_length = float(axb.split("x")[0])
         self.leg_b_length = float(axb.split("x")[1])
-        self.mass = row[1]
-        self.area = row[2]
-
+        self.thickness = row[5]
+        self.root_radius = row[6]
+        self.toe_radius = row[7]
+        self.Cz = row[8]
+        self.Cy = row[9]
+        self.mom_inertia_z = row[11] * 10000
+        self.mom_inertia_y = row[12] * 10000
+        self.mom_inertia_u = row[13] * 10000
+        self.mom_inertia_v = row[14] * 10000
+        self.rad_of_gy_z = row[15] * 10
+        self.rad_of_gy_y = row[16] * 10
+        self.rad_of_gy_u = row[17] * 10
+        self.rad_of_gy_v = row[18] * 10
+        self.elast_sec_mod_z = row[19] * 1000
+        self.elast_sec_mod_y = row[20] * 1000
+        self.plast_sec_mod_z = row[21] * 1000
+        self.plast_sec_mod_y = row[22] * 1000
+        self.source = row[23]
         conn.close()
-
-
 
 class I_sectional_Properties(object):
 

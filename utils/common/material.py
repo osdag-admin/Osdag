@@ -1,6 +1,8 @@
 import sqlite3
 from Common import *
 import logging
+from utils.common.is800_2007 import IS800_2007
+
 
 
 class Material(object):
@@ -34,6 +36,58 @@ class Material(object):
         self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
         self.fu = row[4]
         conn.close()
+
+    # def tension_member_yielding(self, A_g, F_y):
+    #     "design strength of members under axial tension,T_dg,as governed by yielding of gross section"
+    #     "A_g = gross area of cross-section"
+    #     "gamma_m0 = partial safety factor for failure in tension by yielding"
+    #     "F_y = yield stress of the material"
+    #     gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+    #     T_dg = (A_g * F_y / gamma_m0) / 1000
+    #     # logger.warning(
+    #     #     " : You are using a section (in red color) that is not available in latest version of IS 808")
+    #
+    #     self.tension_yielding_capacity = round(T_dg, 2)
+    #     # logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+    #
+    # def tension_rupture(self, A_n, F_u):
+    #     "preliminary design strength,T_pdn,as governed by rupture at net section"
+    #     "A_n = net area of the total cross-section"
+    #     "F_u = Ultimate Strength of material"
+    #
+    #     gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+    #     T_pdn = 0.9 * A_n * F_u / gamma_m1 / 1000
+    #
+    #     self.tension_rupture_capacity = round(T_pdn, 2)
+    #
+    # def tension_blockshear_area_input(self,A_vg, A_vn, A_tg, A_tn, f_u, f_y):
+    #     """Calculate the block shear strength of bolted connections as per cl. 6.4.1
+    #
+    #     Args:
+    #         A_vg: Minimum gross area in shear along bolt line parallel to external force [in sq. mm] (float)
+    #         A_vn: Minimum net area in shear along bolt line parallel to external force [in sq. mm] (float)
+    #         A_tg: Minimum gross area in tension from the bolt hole to the toe of the angle,
+    #                        end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+    #         A_tn: Minimum net area in tension from the bolt hole to the toe of the angle,
+    #                        end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+    #         f_u: Ultimate stress of the plate material in MPa (float)
+    #         f_y: Yield stress of the plate material in MPa (float)
+    #
+    #     Return:
+    #         block shear strength of bolted connection in N (float)
+    #
+    #     Note:
+    #         Reference:
+    #         IS 800:2007, cl. 6.4.1
+    #
+    #     """
+    #     gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+    #     gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+    #     T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
+    #     T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
+    #     Tdb = min(T_db1, T_db2)
+    #     # Tdb = round(Tdb, 3)
+    #     self.block_shear_capacity_axial = round(Tdb/1000,2)
 
     def set_osdaglogger(key):
 

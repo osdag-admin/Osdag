@@ -1,8 +1,8 @@
-from OCC.AIS import AIS_Shape
-from OCC.TopAbs import TopAbs_EDGE
-from OCC.TopExp import TopExp_Explorer
-from OCC.TopoDS import topods, TopoDS_Shape
-from OCC.Quantity import Quantity_NOC_BLACK
+from OCC.Core.AIS import AIS_Shape
+from OCC.Core.TopAbs import TopAbs_EDGE
+from OCC.Core.TopExp import TopExp_Explorer
+from OCC.Core.TopoDS import topods, TopoDS_Shape
+from OCC.Core.Quantity import Quantity_NOC_BLACK
 
 
 def color_the_edges(shp, display, color, width):
@@ -11,10 +11,10 @@ def color_the_edges(shp, display, color, width):
     ctx = display.Context
     while Ex.More():
         aEdge = topods.Edge(Ex.Current())
-        ais_shape = AIS_Shape(aEdge).GetHandle()
-        ctx.SetColor(ais_shape, color, False)
-        ctx.SetWidth(ais_shape, width, False)
-        ctx.Display(ais_shape, False)
+        # ais_shape = AIS_Shape(aEdge).GetHandle()
+        # ctx.SetColor(ais_shape, color, False)
+        # ctx.SetWidth(ais_shape, width, False)
+        # ctx.Display(ais_shape, False)
         Ex.Next()
 
 

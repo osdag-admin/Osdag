@@ -1,0 +1,56 @@
+!!python/object:design_type.connection.fin_plate_connection.FinPlateConnection
+bolt: !!python/object:utils.common.component.Bolt
+  bearing_capacity: 0.0
+  bolt_capacity: 0.0
+  bolt_group_capacity: 0.0
+  bolt_type: friction_grip
+  diameter: 24.0
+  grade: 8.8
+  length: 0.0
+  material: &id001 !!python/object:utils.common.material.Material
+    fu: 410.0
+    fy: 250.0
+  no_of_bolts: 0
+  path_to_database: ../../ResourceFiles/Database/Intg_osdag.sqlite
+  shear_capacity: 0.0
+bolt_diameter_list: []
+connectivity: column_flange_beam_web
+load: !!python/object:utils.common.load.Load
+  axial_force: 0.0
+  moment: 0.0
+  shear_force: 100.0
+material: &id002 !!python/object:utils.common.material.Material
+  fu: 410.0
+  fy: 250.0
+plate: !!python/object:utils.common.component.Plate
+  height: 0.0
+  material: *id001
+  path_to_database: ../../ResourceFiles/Database/Intg_osdag.sqlite
+  thickness: 10.0
+  width: 0.0
+supported_member: !!python/object:utils.common.component.Beam
+  depth: 300.0
+  designation: MB 300
+  flange_thickness: 13.1
+  flange_width: 140.0
+  material: *id002
+  path_to_database: ../../ResourceFiles/Database/Intg_osdag.sqlite
+  root_radius: 14.0
+  toe_radius: 7.0
+  web_thickness: 7.7
+supporting_member: !!python/object:utils.common.component.Column
+  depth: 400.0
+  designation: HB 400
+  flange_thickness: 12.7
+  flange_width: 250.0
+  material: *id002
+  path_to_database: ../../ResourceFiles/Database/Intg_osdag.sqlite
+  root_radius: 14.0
+  toe_radius: 7.0
+  web_thickness: 9.1
+weld: !!python/object:utils.common.component.Weld
+  length: 0.0
+  material: *id001
+  path_to_database: ../../ResourceFiles/Database/Intg_osdag.sqlite
+  size: 6
+weld_size_list: []

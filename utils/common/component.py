@@ -200,7 +200,7 @@ class Section(Material):
         self.notch_ht = 0.0
 
         self.mass = 0.0
-        self.area = 0.0
+        self.area  = 0.0
         self.depth = 0.0
         self.flange_width = 0.0
         self.web_thickness = 0.0
@@ -245,7 +245,7 @@ class Section(Material):
         cur.execute(db_query, (designation,))
         row = cur.fetchone()
         self.mass = row[2]
-        self.area = row[3]
+        self.area = row[3] *100
         self.depth = row[4]
         self.flange_width = row[5]
         self.web_thickness = row[6]
@@ -253,14 +253,14 @@ class Section(Material):
         self.flange_slope = row[8]
         self.root_radius = row[9]
         self.toe_radius = row[10]
-        self.mom_inertia_z = row[11]
-        self.mom_inertia_y = row[12]
-        self.rad_of_gy_z = row[13]
-        self.rad_of_gy_y = row[14]
-        self.elast_sec_mod_z = row[15]
-        self.elast_sec_mod_y = row[16]
-        self.plast_sec_mod_z = row[17]
-        self.plast_sec_mod_y = row[18]
+        self.mom_inertia_z = row[11]*10000
+        self.mom_inertia_y = row[12] *10000
+        self.rad_of_gy_z = row[13]* 100
+        self.rad_of_gy_y = row[14] *100
+        self.elast_sec_mod_z = row[15] *1000
+        self.elast_sec_mod_y = row[16] *1000
+        self.plast_sec_mod_z = row[17] *1000
+        self.plast_sec_mod_y = row[18] *1000
         self.source = row[19]
 
         conn.close()
@@ -467,8 +467,9 @@ class Channel(Section):
 
 class Weld(Material):
 
-    def __init__(self, material_grade="", fabrication=KEY_DP_WELD_TYPE_SHOP):
+    def __init__(self, material_grade="", type="fillet", fabrication=KEY_DP_WELD_FAB_SHOP):
         self.design_status = True
+        self.type = type
         self.size = 0.0
         self.length = 0.0
         self.strength = 0.0

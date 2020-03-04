@@ -172,7 +172,7 @@ class Ui_Dialog1(object):
         self.beam_details = main.report_supported
         self.result = main.report_result
         self.Design_Check = main.report_check
-        save_html(self.result, self.alist, self.Design_Check, self.column_details,self.beam_details, report_summary,fileName, folder)
+        save_html(main.report_result, main.report_input, main.report_check, main.report_supporting,main.report_supported, report_summary,fileName, folder)
 
     def getPopUpInputs(self):
         input_summary = {}

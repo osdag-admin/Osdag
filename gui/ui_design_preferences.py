@@ -1178,7 +1178,7 @@ class DesignPreferences(QDialog):
             else:
                 pass
         for children in self.ui.tab_Weld.children():
-            if children.objectName() == KEY_DP_WELD_TYPE:
+            if children.objectName() == KEY_DP_WELD_FAB:
                 children.setCurrentIndex(0)
             elif children.objectName() == KEY_DP_WELD_MATERIAL_G_O:
                 children.setText('410')
@@ -1212,7 +1212,7 @@ class DesignPreferences(QDialog):
         line_boltFu = key_boltFu.text()
         key_slipfactor = self.ui.tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_SLIP_FACTOR)
         combo_slipfactor = key_slipfactor.currentText()
-        key_weldType = self.ui.tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_TYPE)
+        key_weldType = self.ui.tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_FAB)
         combo_weldType = key_weldType.currentText()
         key_weldFu = self.ui.tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O)
         line_weldFu = key_weldFu.text()
@@ -1227,7 +1227,7 @@ class DesignPreferences(QDialog):
         d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
               KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
               KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
-              KEY_DP_WELD_TYPE: combo_weldType,
+              KEY_DP_WELD_FAB: combo_weldType,
               KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
               KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
               KEY_DP_DETAILING_GAP: line_detailingGap,

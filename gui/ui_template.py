@@ -621,7 +621,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         for t in new_list:
 
-            if t[0] in [KEY_WEBPLATE_THICKNESS, KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (module != KEY_DISP_TENSION):
+            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (module != KEY_DISP_TENSION):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -639,6 +639,11 @@ class Ui_ModuleWindow(QMainWindow):
                 key_customized_4.activated.connect(lambda: popup(key_customized_4, new_list))
                 data[t[0] + "_customized"] = t[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
                                 KEY_SEC_PROFILE).currentText())
+
+            elif t[0] in [KEY_WEBPLATE_THICKNESS] and (module != KEY_DISP_TENSION):
+                key_customized_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_customized_5.activated.connect(lambda: popup(key_customized_5, new_list))
+                data[t[0] + "_customized"] = t[1]()
             else:
                 pass
 
@@ -1605,6 +1610,7 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             main.func_for_validation(main, self, self.design_inputs)
             status = main.design_status
+            print(status)
 
             # main.set_input_values(main, self.design_inputs, self)
             # DESIGN_FLAG = 'True'

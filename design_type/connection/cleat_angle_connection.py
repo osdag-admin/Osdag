@@ -2,6 +2,8 @@ from design_type.connection.shear_connection import ShearConnection
 from utils.common.component import *
 from utils.common.component import Bolt, Plate, Weld
 from Common import *
+import sys
+
 from utils.common.load import Load
 import yaml
 import os
@@ -441,8 +443,28 @@ class CleatAngleConnection(ShearConnection):
 
         self.sptd_leg = Plate()
 
-        print("input values are set. Doing preliminary member checks")
-        self.member_capacity(self)
+        logger.info("Input values are set. Checking if angle of required thickness is available")
+
+        self.check_available_cleat_thk(self)
+
+    def check_available_cleat_thk(self):
+        if self.connectivity in VALUES_CONN_1:
+            min_thickness = min(self.supporting_section.flange_thickness, self.supported_section.web_thickness / 2)
+            for designation in self.cleat_list:
+                cleat = Angle(designation=designation,material_grade=self.material_grade)
+                if cleat.thickness <= self.supporting_section.flange_thickness or cleat.thickness*2 <= self.supported_section.web_thickness:
+                    self.cleat_list.pop()
+        else:
+            min_thickness = min(self.supporting_section.web_thickness, self.supported_section.web_thickness / 2)
+            for designation in self.cleat_list:
+                cleat = Angle(designation=designation,material_grade=self.material_grade)
+                if cleat.thickness <= self.supporting_section.web_thickness or cleat.thickness*2 <= self.supported_section.web_thickness:
+                    self.cleat_list.pop()
+        if self.cleat_list:
+            logger.info("Required cleat thickness available. Doing preliminary member checks")
+            self.member_capacity(self)
+        else:
+            logger.error("Cleat Angle should have minimum thickness of %2.2f" % min_thickness)
 
     def member_capacity(self):
         if self.connectivity in VALUES_CONN_1:
@@ -459,8 +481,7 @@ class CleatAngleConnection(ShearConnection):
               self.supported_section.tension_yielding_capacity, self.load.axial_force)
 
         if self.supported_section.shear_yielding_capacity > self.load.shear_force:
-            print("preliminary member check is satisfactory. Doing bolt checks")
-
+            logger.info("preliminary member check is satisfactory. Checking if possible Bolt Diameters are available")
             self.get_possible_bolt_dia(self)
 
         else:
@@ -498,6 +519,7 @@ class CleatAngleConnection(ShearConnection):
         self.bolt.bolt_diameter = list(possible_bolt_dia & user_bolt_dia)
         print (possible_bolt_dia,user_bolt_dia)
         if self.bolt.bolt_diameter:
+            logger.info(": Selecting optimum bolt diameter")
             self.select_bolt_dia(self)
         else:
             self.design_status = False
@@ -623,7 +645,7 @@ class CleatAngleConnection(ShearConnection):
         min_leg_length = min(min_sptd_leg_length, min_sptng_leg_length)
         max_leg_length = max(min_sptd_leg_length, min_sptng_leg_length)
         self.acceptable_cleat_list = []
-        self.acceptable_cleat_list = get_available_cleat_list(self.cleat_list, min_leg_length,max_leg_length, operator.ge)
+        self.acceptable_cleat_list = get_available_cleat_list(self.cleat_list, min_leg_length,max_leg_length)
 
         print(self.acceptable_cleat_list)
         if not self.acceptable_cleat_list:
@@ -653,6 +675,7 @@ class CleatAngleConnection(ShearConnection):
         #                                         self.bolt.max_spacing_round, pitch_details_sptd[0],
         #                       shear_load=self.load.shear_force*1000, axial_load=0.0, gap=0.0, shear_ecc=True, bolt_line_limit=2)
         #
+        #     sptng_angle_pitch_details = self.get_leg_pitch(self, self.bolt_line_sptng, self.bolt.bolt_diameter_provided)
         #     pitch_details_sptng = []
         #     for i in sptng_angle_pitch_details:
         #         if self.cleat.leg_b_length == i[0]:
@@ -734,6 +757,23 @@ class CleatAngleConnection(ShearConnection):
         self.cleat.r2 = 4.5
         self.bolt.bolt_diameter_provided = 12.0
         self.cleat.gap = 10.0
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    folder = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'
+    # # folder_path = r'C:\Users\Win10\Desktop'
+    # folder_path = r'C:\Users\pc\Desktop'
+    # window = MainController(Ui_ModuleWindow, FinPlateConnection, folder_path)
+    from gui.ui_template import Ui_ModuleWindow
+    ui2 = Ui_ModuleWindow()
+    ui2.setupUi(ui2, CleatAngleConnection, folder)
+    ui2.show()
+    # app.exec_()
+    # sys.exit(app.exec_())
+    try:
+        sys.exit(app.exec_())
+    except BaseException as e:
+        print("ERROR", e)
 
 
 

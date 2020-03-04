@@ -261,6 +261,8 @@ KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
 # Key for Storing Module
 
 KEY_MODULE = 'Module'
+KEY_MAIN_MODULE = 'MainModule'
+KEY_MODULE_STATUS = 'Module.Status'
 
 TYPE_MODULE = 'Window Title'
 
@@ -358,7 +360,8 @@ DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
 
 DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
-
+KEY_BOLT_FU = 'Bolt.fu'
+KEY_BOLT_FY = 'Bolt.fy'
 # Key for storing Diameter sub-key of Bolt
 KEY_D = 'Bolt.Diameter'
 KEY_DISP_D = 'Diameter(mm)*'
@@ -383,6 +386,9 @@ DISP_TITLE_PLATE = 'Plate'
 
 # Key for storing Thickness sub-key of Plate
 KEY_PLATETHK = 'Plate.Thickness'
+KEY_PLATE_MATERIAL = 'Plate.Material'
+KEY_PLATE_MIN_HEIGHT = 'Plate.MinHeight'
+KEY_PLATE_MAX_HEIGHT = 'Plate.MaxHeight'
 KEY_DISP_PLATETHK = 'Thickness(mm)*'
 VALUES_PLATETHK = ['All', 'Customized']
 VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
@@ -562,13 +568,14 @@ KEY_DISP_DP_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 KEY_DP_BOLT_SLIP_FACTOR = 'DesignPreferences.Bolt.Slip_Factor'
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
-KEY_DP_WELD_TYPE = 'DesignPreferences.Weld.Type'
+KEY_DP_WELD_FAB = 'DesignPreferences.Weld.Fab'
 
-KEY_DP_WELD_TYPE_SHOP = 'Shop Weld'
-KEY_DP_WELD_TYPE_FIELD = 'Field weld'
-KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_SHOP, KEY_DP_WELD_TYPE_FIELD]
+KEY_DP_WELD_TYPE = 'Weld.Type'
+KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
+KEY_DP_WELD_FAB_FIELD = 'Field weld'
+KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
 
-KEY_DISP_DP_WELD_TYPE = 'Type of weld'
+KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
 KEY_DP_WELD_MATERIAL_G_O = 'DesignPreferences.Weld.Material_Grade_OverWrite'
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DP_DETAILING_EDGE_TYPE = 'DesignPreferences.Detailing.Edge_type'
@@ -697,11 +704,13 @@ KEY_DISP_SUPTDSEC_POISSON_RATIO = 'Poissons ratio, v'
 KEY_SUPTDSEC_THERMAL_EXP = 'Supported_Section.Thermal_Expansion'
 KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
 
-
+KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
+KEY_OUT_KB = 'Bolt.Kb'
+KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
@@ -711,18 +720,33 @@ KEY_OUT_BOLT_FORCE = 'Bolt.Force'
 KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force'
 KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
+KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
+KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
 KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line'
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
+KEY_OUT_MIN_PITCH = 'Bolt.MinPitch'
+
+
+
+
+
+
 KEY_OUT_DISP_PITCH = 'Pitch'
 KEY_OUT_END_DIST = 'Bolt.EndDist'
 KEY_OUT_DISP_END_DIST = 'End Distance'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
+KEY_OUT_MIN_GAUGE = 'Bolt.MinGauge'
+KEY_OUT_MAX_SPACING = 'Bolt.MaxGauge'
 KEY_OUT_DISP_GAUGE = 'Gauge'
+
 KEY_OUT_EDGE_DIST = 'Bolt.EdgeDist'
+KEY_OUT_MIN_EDGE_DIST = 'Bolt.MinEdgeDist'
+KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
+
 KEY_OUT_DISP_EDGE_DIST = 'Edge Distance'
 
 
@@ -752,6 +776,8 @@ KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
 KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
 KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
+KEY_OUT_WELD_LENGTH = 'Weld.Length'
+KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"
@@ -827,12 +853,12 @@ VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
 
 
-def get_available_cleat_list(input_angle_list, max_leg_length, min_leg_length, relate):
+def get_available_cleat_list(input_angle_list, max_leg_length, min_leg_length):
 
     available_angles = []
     for designation in input_angle_list:
         leg_a_length,leg_b_length = get_leg_lengths(designation)
-        if relate(max(leg_a_length,leg_b_length),max_leg_length) and relate(min(leg_a_length,leg_b_length), min_leg_length):
+        if operator.le(max(leg_a_length,leg_b_length),max_leg_length) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length):
             available_angles.append(designation)
     return available_angles
 
@@ -856,7 +882,7 @@ def get_leg_lengths(designation):
     return leg_a_length,leg_b_length
 
 all_angles = connectdb("Angles","popup")
-VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0, operator.ge)
+VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
 print(VALUES_CLEAT_CUSTOMIZED)
 
 DISP_TITLE_COMPMEM='Compression member'

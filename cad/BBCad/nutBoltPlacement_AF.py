@@ -94,7 +94,7 @@ class NutBoltArray_AF():
                 pos_AF = self.boltOrigin_AF
                 if self.row_AF / 2 < rw_AF or self.row_AF / 2 == rw_AF:
                     self.pitch_new_AF = 2 * self.edge_gauge_AF + self.gap
-                    pos_AF = pos_AF + ((rw_AF-1) * self.pitch_AF + self.pitch_new_AF) * self.pitchDirAF
+                    pos_AF = pos_AF + ((rw_AF - 1) * self.pitch_AF + self.pitch_new_AF) * self.pitchDirAF
                     pos_AF = pos_AF + cl_AF * self.gauge_AF * self.gaugeDirAF
                     self.positions_AF.append(pos_AF)
                 else:
@@ -119,9 +119,10 @@ class NutBoltArray_AF():
         print("hhhh",self.bolts_AF)
         for bolt in self.bolts_AF:
             print("bolt", bolt, "fgfg")
-            self.models_AF.append(bolt.create_model())
+            # self.models_AF.append(bolt.create_model())
         for nut in self.nuts_AF:
-            self.models_AF.append(nut.create_model())
+            # self.models_AF.append(nut.create_model())
+            pass
 
         dbg = self.dbgSphere(self.originAF)
         self.models_AF.append(dbg)

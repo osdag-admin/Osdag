@@ -4,9 +4,6 @@ Created on 18-Nov-2016
 @author: deepa
 '''
 
-import os
-
-import math
 # from utils.common.component import Bolt,Beam,Section,Angle,Plate,Nut,Column,Weld
 from cad.items.notch import Notch
 from cad.items.bolt import Bolt
@@ -14,10 +11,18 @@ from cad.items.nut import Nut
 from cad.items.plate import Plate
 from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
-from cad.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
-from cad.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
-from cad.colWebBeamWebConnectivity import ColWebBeamWeb as FinColWebBeamWeb
-from cad.nutBoltPlacement import NutBoltArray as finNutBoltArray
+from cad.items.angle import Angle
+
+from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
+from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
+from cad.ShearConnections.FinPlate.colWebBeamWebConnectivity import ColWebBeamWeb as FinColWebBeamWeb
+from cad.ShearConnections.FinPlate.nutBoltPlacement import NutBoltArray as finNutBoltArray
+
+from cad.ShearConnections.CleatAngle.beamWebBeamWebConnectivity import BeamWebBeamWeb as cleatBeamWebBeamWeb
+from cad.ShearConnections.CleatAngle.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as cleatColFlangeBeamWeb
+from cad.ShearConnections.CleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
+from cad.ShearConnections.CleatAngle.nutBoltPlacement import NutBoltArray as cleatNutBoltArray
+
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
@@ -29,11 +34,6 @@ from cad.BBCad.nutBoltPlacement_BF import NutBoltArray_BF
 from cad.BBCad.nutBoltPlacement_Web import NutBoltArray_Web
 from  cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 from Common import *
-
-from cad.nutBoltPlacement import NutBoltArray
-from design_type.connection import cleat_angle_connection
-from design_type.connection import seated_angle_connection
-from design_type.connection import end_plate_connection
 
 # from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
 # from Connections.Shear.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb as endColWebBeamWeb
@@ -80,8 +80,6 @@ from OCC.Core.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
 # from Connections.Shear.cleatAngle.reportGenerator import save_html as cleat_save_html
 # from Connections.Shear.SeatedAngle.design_report_generator import ReportGenerator
 # ----------------------------------------- from reportGenerator import save_html
-import json
-from cad.items.ModelUtils import *
 
 
 class CommonDesignLogic(object):
@@ -227,56 +225,20 @@ class CommonDesignLogic(object):
         creating 3d cad model with beam web beam web
 
         '''
-        # ##### PRIMARY BEAM PARAMETERS #####
-        # pBeam_D = int(self.dictcoldata["D"])
-        # pBeam_B = int(self.dictcoldata["B"])
-        # pBeam_tw = float(self.dictcoldata["tw"])
-        # pBeam_T = float(self.dictcoldata["T"])
-        # pBeam_alpha = float(self.dictcoldata["FlangeSlope"])
-        # pBeam_R1 = float(self.dictcoldata["R1"])
-        # pBeam_R2 = float(self.dictcoldata["R2"])
-        # pBeam_length = 800.0  # This parameter as per view of 3D cad model
-        if self.connection == "Fin Plate":
+
+        if self.connection == KEY_DISP_FINPLATE:
             A = FinPlateConnection()
+            plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
+            Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
+
+        elif self.connection == KEY_DISP_CLEATANGLE:
+            A = CleatAngleConnection()
+            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_a_length, T=A.cleat.thickness,
+                          R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass
 
 
-        # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
-        supporting = ISection(B=A.supporting_section.flange_width , T=A.supporting_section.flange_thickness, D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
-                          R1=A.supporting_section.root_radius, R2=A.supporting_section.toe_radius, alpha=A.supporting_section.flange_slope,
-                          length=1000, notchObj=None)
-
-        ##### SECONDARY BEAM PARAMETERS ######
-
-        # supported = ISection(B=A.supported_section.flange_width, T=A.supported_section.flange_thickness,
-        #                       D=A.supported_section.depth, t=A.supported_section.web_thickness,
-        #                       R1=A.supported_section.root_radius, R2=A.supported_section.toe_radius,
-        #                       alpha=A.supported_section.flange_slope,
-        #                       length=1000, notchObj=None)
-
-        # sBeam_D = int(self.dictbeamdata["D"])
-        # sBeam_B = int(self.dictbeamdata["B"])
-        # sBeam_tw = float(self.dictbeamdata["tw"])
-        # sBeam_T = float(self.dictbeamdata["T"])
-        # sBeam_alpha = float(self.dictbeamdata["FlangeSlope"])
-        # sBeam_R1 = float(self.dictbeamdata["R1"])
-        # sBeam_R2 = float(self.dictbeamdata["R2"])
-        # #cleardist = float(self.uiObj['detailing']['gap'])
-        #
-        # if self.connection == "cleatAngle":
-        #     cleat_length = self.resultObj['cleat']['height']
-        #     cleat_thick = float(self.dictangledata["t"])
-        #     cleat_legsizes = str(self.dictangledata["AXB"])
-        #     angle_A = int(cleat_legsizes.split('x')[0])
-        #     angle_B = int(cleat_legsizes.split('x')[1])
-        #     angle_r1 = float(str(self.dictangledata["R1"]))
-        #     angle_r2 = float(str(self.dictangledata["R2"]))
-        # else:
-        #     plate_thick = float(self.uiObj['Plate']['Thickness (mm)'])
-        #     fillet_length = float(self.resultObj['Plate']['height'])
-        #     fillet_thickness = float(self.uiObj["Weld"]['Size (mm)'])
-        #     plate_width = float(self.resultObj['Plate']['width'])
 
         bolt_dia = int(A.bolt.bolt_diameter_provided)
         bolt_r = bolt_dia / 2.0
@@ -285,44 +247,51 @@ class CommonDesignLogic(object):
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
         nut_Ht = bolt_dia
-        gap = A.plate.gap
-        # notch_height = self.get_notch_ht(A.supporting_section.flange_width, A.supporting_section.flange_thickness, A.supported_section.flange_thickness, A.supported_section.root_radius)
-        # notch_height = 2 * A.supporting_section.flange_thickness
         notch_height = A.supported_section.notch_ht
         notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
 
-        if self.connection == "cleatAngle":
-            pass
-            # angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
-        else:
-            plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
+        ##### SECONDARY BEAM PARAMETERS ######
 
-        Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
         # --Notch dimensions
-        if self.connection == "Fin Plate":
+        if self.connection == KEY_DISP_FINPLATE:
+            gap = A.plate.gap
             notchObj = Notch(R1=notch_R1,
                              height=notch_height,
-                             #width= (pBeam_B/2.0 - (pBeam_tw/2.0 ))+ gap,
-                             width= (A.supporting_section.flange_width/2.0 - (A.supporting_section.web_thickness/2.0  + gap))+ gap,
+                             # width= (pBeam_B/2.0 - (pBeam_tw/2.0 ))+ gap,
+                             width=(A.supporting_section.flange_width / 2.0 - (
+                                         A.supporting_section.web_thickness / 2.0 + gap)) + gap,
                              length=A.supported_section.flange_width)
 
+        elif self.connection == KEY_DISP_CLEATANGLE:
+            gap = A.cleat.gap
+            notchObj = Notch(R1=notch_R1,
+                             height=notch_height,
+                             width=(A.supporting_section.flange_width / 2.0 - (
+                                     A.supporting_section.web_thickness / 2.0 + gap)) + gap,
+                             length=A.supported_section.flange_width)
+            print(notch_R1,notch_height,(A.supporting_section.flange_width / 2.0 -
+                                         (A.supporting_section.web_thickness / 2.0 + gap)) + gap, A.supported_section.flange_width)
         # elif self.connection == "Endplate":
         #     notchObj = Notch(R1=notch_R1, height=notch_height,
         #                      width=(pBeam_B / 2.0 - (pBeam_tw / 2.0 + plate_thick)) + plate_thick,
         #                      length=sBeam_B)
-        #
-        # elif self.connection == "cleatAngle":
-        #     #((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10)
-        #     notchObj = Notch(R1=notch_R1,
-        #                      height=notch_height,
-        #                      width= (pBeam_B / 2.0 - (pBeam_tw / 2.0 + gap)) + gap,
-        #                      length=sBeam_B)
 
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
-        supported = ISection(B=A.supported_section.flange_width, T=A.supported_section.flange_thickness, D=A.supported_section.depth,
-                        t=A.supported_section.web_thickness, R1=A.supported_section.root_radius, R2=A.supported_section.toe_radius,
-                        alpha=A.supported_section.flange_slope, length=500, notchObj=notchObj)
+
+            # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
+
+        supporting = ISection(B=A.supporting_section.flange_width, T=A.supporting_section.flange_thickness,
+                              D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
+                              R1=A.supporting_section.root_radius, R2=A.supporting_section.toe_radius,
+                              alpha=A.supporting_section.flange_slope,
+                              length=1000, notchObj=None)
+
+        supported = ISection(B=A.supported_section.flange_width, T=A.supported_section.flange_thickness,
+                             D=A.supported_section.depth,
+                             t=A.supported_section.web_thickness, R1=A.supported_section.root_radius,
+                             R2=A.supported_section.toe_radius,
+                             alpha=A.supported_section.flange_slope, length=500, notchObj=notchObj)
 
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
@@ -330,7 +299,7 @@ class CommonDesignLogic(object):
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        if self.connection == "Fin Plate":  # finBeamWebBeamWeb/endBeamWebBeamWeb
+        if self.connection == KEY_DISP_FINPLATE:  # finBeamWebBeamWeb/endBeamWebBeamWeb
             nut_space = A.supported_section.web_thickness + A.plate.thickness_provided + nut_T
             nutBoltArray = finNutBoltArray(A.bolt,  A.plate, nut, bolt, nut_space)
             beamwebconn = FinBeamWebBeamWeb(supporting, supported, notchObj, plate, Fweld1, nutBoltArray, gap)
@@ -340,11 +309,15 @@ class CommonDesignLogic(object):
         #     nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, nut_space)
         #     beamwebconn = endBeamWebBeamWeb(column, beam, notchObj, Fweld1, plate, nutBoltArray)
         #
-        # elif self.connection == "cleatAngle":
-        #     nut_space = sBeam_tw + 2 * cleat_thick + nut_T
-        #     cnut_space = pBeam_tw + cleat_thick + nut_T
-        #     nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
-        #     beamwebconn = cleatBeamWebBeamWeb(column, beam, notchObj, angle, nut_bolt_array,gap)
+        elif self.connection == KEY_DISP_CLEATANGLE:
+            # nut_space = sBeam_tw + 2 * cleat_thick + nut_T
+            # cnut_space = pBeam_tw + cleat_thick + nut_T
+            # nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
+            # beamwebconn = cleatBeamWebBeamWeb(column, beam, notchObj, angle, nut_bolt_array,gap)
+            nut_space = A.supported_section.web_thickness + 2 * A.cleat.thickness + nut_T
+            cnut_space = A.supporting_section.web_thickness + A.cleat.thickness + nut_T
+            nut_bolt_array = cleatNutBoltArray(A.cleat, nut, bolt, nut_space, cnut_space)
+            beamwebconn = cleatBeamWebBeamWeb(supporting, supported, notchObj, angle, nut_bolt_array,gap)
 
         beamwebconn.create_3dmodel()
 
@@ -356,24 +329,17 @@ class CommonDesignLogic(object):
 
         '''
 
-        if self.connection == "Fin Plate":
+        if self.connection == KEY_DISP_FINPLATE:
             A = FinPlateConnection()
         elif self.connection == KEY_DISP_CLEATANGLE:
             A = CleatAngleConnection()
+            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_a_length, T=A.cleat.thickness,
+                          R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass
 
 
-        supporting = ISection(B=A.supporting_section.flange_width, T=A.supporting_section.flange_thickness,
-                              D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
-                              R1=A.supporting_section.root_radius, R2=A.supporting_section.toe_radius,
-                              alpha=A.supporting_section.flange_slope,
-                              length=1000, notchObj=None)
-        supported = ISection(B=A.supported_section.flange_width, T=A.supported_section.flange_thickness,
-                        D=A.supported_section.depth,
-                        t=A.supported_section.web_thickness, R1=A.supported_section.root_radius,
-                        R2=A.supported_section.toe_radius,
-                        alpha=A.supported_section.flange_slope, length=500, notchObj=None)
+
         #### PLATE,BOLT,ANGLE AND NUT PARAMETERS #####
 
         # if self.connection == "cleatAngle":
@@ -414,11 +380,19 @@ class CommonDesignLogic(object):
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
         nut_Ht = bolt_dia
-        gap = A.plate.gap
+        notch_height = A.supported_section.notch_ht
+        notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
 
-        if self.connection == "cleatAngle":
-            pass
-            # angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
+        if self.connection == KEY_DISP_CLEATANGLE:
+            gap = A.cleat.gap
+            notchObj = Notch(R1=notch_R1,
+                             height=notch_height,
+                             width=(A.supporting_section.flange_width / 2.0 - (
+                                     A.supporting_section.web_thickness / 2.0 + gap)) + gap,
+                             length=A.supported_section.flange_width)
+            print(notch_R1, notch_height, (A.supporting_section.flange_width / 2.0 -
+                                           (A.supporting_section.web_thickness / 2.0 + gap)) + gap,
+                  A.supported_section.flange_width)
         elif self.connection == 'SeatedAngle':
             pass
             # seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
@@ -428,7 +402,18 @@ class CommonDesignLogic(object):
         else:
             plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
 
-        Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
+            Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
+
+        supporting = ISection(B=A.supporting_section.flange_width, T=A.supporting_section.flange_thickness,
+                              D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
+                              R1=A.supporting_section.root_radius, R2=A.supporting_section.toe_radius,
+                              alpha=A.supporting_section.flange_slope,
+                              length=1000, notchObj=None)
+        supported = ISection(B=A.supported_section.flange_width, T=A.supported_section.flange_thickness,
+                             D=A.supported_section.depth,
+                             t=A.supported_section.web_thickness, R1=A.supported_section.root_radius,
+                             R2=A.supported_section.toe_radius,
+                             alpha=A.supported_section.flange_slope, length=500, notchObj=None)
 
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
@@ -444,14 +429,18 @@ class CommonDesignLogic(object):
         #     nut_space = column_tw + int(plate_thick) + nut_T
         #     nutBoltArray = endNutBoltArray(A,bolt, nut, bolt, nut_space)
         #     colwebconn = endColWebBeamWeb(A.supporting_section, A.supported_section, A.weld, A.plate, nutBoltArray)
-        #
-        # elif self.connection == "cleatAngle":
-        #     nut_space = beam_tw + 2 * cleat_thick + nut_T
-        #     cnut_space = column_tw + cleat_thick + nut_T
-        #
-        #     nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
-        #
-        #     colwebconn = cleatColWebBeamWeb(column, beam, angle, nut_bolt_array,gap)
+
+
+        elif self.connection == KEY_DISP_CLEATANGLE:
+            # nut_space = beam_tw + 2 * cleat_thick + nut_T
+            # cnut_space = column_tw + cleat_thick + nut_T
+            # nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
+            # colwebconn = cleatColWebBeamWeb(column, beam, angle, nut_bolt_array,gap)
+            nut_space = A.supported_section.web_thickness + 2 * A.cleat.thickness + nut_T
+            cnut_space = A.supporting_section.web_thickness + A.cleat.thickness + nut_T
+            nut_bolt_array = cleatNutBoltArray(A.cleat, nut, bolt, nut_space, cnut_space)
+            colwebconn = cleatColWebBeamWeb(supporting, supported, angle, nut_bolt_array, gap)
+
         else:
             pass
             # snut_space = column_tw + seat_thick  + nut_T
@@ -470,96 +459,17 @@ class CommonDesignLogic(object):
         Creating 3d cad model with column flange beam web connection
 
         '''
-        ##### BEAM PARAMETERS #####
-        # beam_D = int(self.dictbeamdata["D"])
-        # beam_B = int(self.dictbeamdata["B"])
-        # beam_tw = float(self.dictbeamdata["tw"])
-        # beam_T = float(self.dictbeamdata["T"])
-        # beam_alpha = float(self.dictbeamdata["FlangeSlope"])
-        # beam_R1 = float(self.dictbeamdata["R1"])
-        # beam_R2 = float(self.dictbeamdata["R2"])
-        # beam_length = 500.0  # This parameter as per view of 3D cad model
-
-        # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
-        # beam = ISection(B=beam_B, T=beam_T, D=beam_D, t=beam_tw,
-        #                 R1=beam_R1, R2=beam_R2, alpha=beam_alpha, length=beam_length, notchObj=None)
         if self.connection == "Fin Plate":
             A = FinPlateConnection()
             gap = A.plate.gap
         elif self.connection == KEY_DISP_CLEATANGLE:
             A = CleatAngleConnection()
+            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_a_length, T=A.cleat.thickness,
+                          R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass
 
-        supported = ISection(B=A.supported_section.flange_width, T=A.supported_section.flange_thickness,
-                             D=A.supported_section.depth,
-                             t=A.supported_section.web_thickness, R1=A.supported_section.root_radius,
-                             R2=A.supported_section.toe_radius,
-                             alpha=A.supported_section.flange_slope, length=500, notchObj=None)
 
-        ##### COLUMN PARAMETERS ######
-
-        # column_D = int(self.dictcoldata["D"])
-        # column_B = int(self.dictcoldata["B"])
-        # column_tw = float(self.dictcoldata["tw"])
-        # column_T = float(self.dictcoldata["T"])
-        # column_alpha = float(self.dictcoldata["FlangeSlope"])
-        # column_R1 = float(self.dictcoldata["R1"])
-        # column_R2 = float(self.dictcoldata["R2"])
-
-        # column = ISection(B=column_B, T=column_T, D=column_D,
-        #                   t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notchObj=None)
-
-        supporting = ISection(B=A.supporting_section.flange_width, T=A.supporting_section.flange_thickness,
-                              D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
-                              R1=A.supporting_section.root_radius, R2=A.supporting_section.toe_radius,
-                              alpha=A.supporting_section.flange_slope,
-                              length=1000, notchObj=None)
-        #
-        # #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
-        # if self.connection == "cleatAngle":
-        #     cleat_length = self.resultObj['cleat']['height']
-        #     cleat_thick = float(self.dictangledata["t"])
-        #     seat_legsizes = str(self.dictangledata["AXB"])
-        #     angle_A = int(seat_legsizes.split('x')[0])
-        #     angle_B = int(seat_legsizes.split('x')[1])
-        #     angle_r1 = float(str(self.dictangledata["R1"]))
-        #     angle_r2 = float(str(self.dictangledata["R2"]))
-        #
-        # elif self.connection == 'SeatedAngle':
-        #     seat_length = self.resultObj['SeatAngle']['Length (mm)']
-        #     seat_thick = float(self.dictangledata["t"])
-        #     seat_legsizes = str(self.dictangledata["AXB"])
-        #     seatangle_A = int(seat_legsizes.split('x')[0])
-        #     seatangle_B = int(seat_legsizes.split('x')[1])
-        #     seatangle_r1 = float(str(self.dictangledata["R1"]))
-        #     seatangle_r2 = float(str(self.dictangledata["R2"]))
-        #
-        #     topangle_length = self.resultObj['SeatAngle']['Length (mm)']
-        #     topangle_thick = float(self.dicttopangledata["t"])
-        #     top_legsizes = str(self.dicttopangledata["AXB"])
-        #     topangle_A = int(top_legsizes.split('x')[0])
-        #     topangle_B = int(top_legsizes.split('x')[1])
-        #     topangle_r1 = float(str(self.dicttopangledata["R1"]))
-        #     topangle_r2 = float(str(self.dicttopangledata["R2"]))
-        #
-        # else:
-        #     fillet_length = self.resultObj['Plate']['height']
-        #     fillet_thickness = str(self.uiObj['Weld']['Size (mm)'])
-        #     # ---------------- fillet_thickness = self.resultObj['Weld']['thickness']
-        #     plate_width = self.resultObj['Plate']['width']
-        #     plate_thick = str(self.uiObj['Plate']['Thickness (mm)'])
-
-        # bolt_dia = str(self.uiObj["Bolt"]["Diameter (mm)"])
-        # bolt_r = (float(bolt_dia) / 2)
-        # bolt_R = self.bolt_R
-        # # bolt_R = bolt_r + 7
-        # nut_R = bolt_R
-        # bolt_T = self.bolt_T
-        # bolt_Ht = self.bolt_Ht
-        # nut_T = self.nut_T
-        # nut_Ht = 12.2  #
-        # gap = float(str(self.uiObj['detailing']['gap']))
 
         bolt_dia = int(A.bolt.bolt_diameter_provided)
         bolt_r = bolt_dia / 2.0
@@ -569,11 +479,19 @@ class CommonDesignLogic(object):
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
         nut_Ht = bolt_dia
         # gap = A.plate.gap
-        #
+        notch_height = A.supported_section.notch_ht
+        notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
+
         if self.connection == KEY_DISP_CLEATANGLE:
-            pass
-            # angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
-            #bolt_len_required = float(bolt_T + 2 * (cleat_thick) + beam_tw + nut_T)
+            gap = A.cleat.gap
+            notchObj = Notch(R1=notch_R1,
+                             height=notch_height,
+                             width=(A.supporting_section.flange_width / 2.0 - (
+                                     A.supporting_section.web_thickness / 2.0 + gap)) + gap,
+                             length=A.supported_section.flange_width)
+            print(notch_R1, notch_height, (A.supporting_section.flange_width / 2.0 -
+                                           (A.supporting_section.web_thickness / 2.0 + gap)) + gap,
+                  A.supported_section.flange_width)
         elif self.connection == 'SeatedAngle':
             pass
             # seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
@@ -588,31 +506,51 @@ class CommonDesignLogic(object):
             # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
             Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
+        supported = ISection(B=A.supported_section.flange_width, T=A.supported_section.flange_thickness,
+                             D=A.supported_section.depth,
+                             t=A.supported_section.web_thickness, R1=A.supported_section.root_radius,
+                             R2=A.supported_section.toe_radius,
+                             alpha=A.supported_section.flange_slope, length=500, notchObj=None)
+
+        supporting = ISection(B=A.supporting_section.flange_width, T=A.supporting_section.flange_thickness,
+                              D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
+                              R1=A.supporting_section.root_radius, R2=A.supporting_section.toe_radius,
+                              alpha=A.supporting_section.flange_slope,
+                              length=1000, notchObj=None)
+
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
 
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        if self.connection == "Fin Plate":
+        if self.connection == KEY_DISP_FINPLATE:
             nut_space = A.supported_section.web_thickness+ int(A.plate.thickness_provided) + nut_T
             # nutBoltArray = finNutBoltArray(A, nut, bolt, nut_space)  # finColFlangeBeamWeb
             # colflangeconn = finColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray, gap)
 
             nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colflangeconn = FinColFlangeBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
-        else:
-            pass
-        # elif self.connection == "Endplate":
-        #     nut_space = column_T + int(plate_thick) + nut_T
-        #     nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, nut_space)
-        #     colflangeconn = endColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
-        #
-        # elif self.connection == KEY_DISP_CLEATANGLE:
+
+        elif self.connection == KEY_DISP_CLEATANGLE:
+
             # nut_space =  A.supported_section.web_thickness + 2 *  + nut_T
             # cnut_space = column_T + cleat_thick + nut_T
             # nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
             # colflangeconn = cleatColFlangeBeamWeb(column, beam, angle, nut_bolt_array,gap)
+            nut_space = A.supported_section.web_thickness + 2 * A.cleat.thickness + nut_T
+            cnut_space = A.supporting_section.web_thickness + A.cleat.thickness + nut_T
+            nut_bolt_array = cleatNutBoltArray(A.cleat, nut, bolt, nut_space, cnut_space)
+            colflangeconn = cleatColFlangeBeamWeb(supporting, supported, angle, nut_bolt_array, gap)
+
+        else:
+            pass
+            # elif self.connection == "Endplate":
+            #     nut_space = column_T + int(plate_thick) + nut_T
+            #     nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, nut_space)
+            #     colflangeconn = endColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
+            #
+
         # else:
         #     snut_space = column_T + seat_thick + nut_T
         #     sbnut_space = beam_T + seat_thick + nut_T
@@ -648,13 +586,13 @@ class CommonDesignLogic(object):
         # outputobj = self.outputs  # Output dictionary from calculation file
         # alist = self.designParameters()  # An object to save all input values entered by user
 
-        plateAbvFlange = Plate(L=B.flange_plate.length,
-                               W=B.flange_plate.height,
+        plateAbvFlange = Plate(L=B.flange_plate.height,
+                               W=B.flange_plate.length,
                                T=float(B.flange_plate.thickness_provided))  # Call to Plate in Component repository
         plateBelwFlange = copy.copy(plateAbvFlange)  # Since both the flange plates are identical
 
-        innerplateAbvFlangeFront = Plate(L=B.flange_plate.length,
-                                         W=B.flange_plate.height,
+        innerplateAbvFlangeFront = Plate(L=B.flange_plate.height,
+                                         W=B.flange_plate.length,
                                          T=float(B.flange_plate.thickness_provided))
         innerplateAbvFlangeBack = copy.copy(innerplateAbvFlangeFront)
         innerplateBelwFlangeFront = copy.copy(innerplateAbvFlangeBack)
@@ -679,9 +617,10 @@ class CommonDesignLogic(object):
         numOfBoltsF = 2 * int(B.flange_plate.bolts_required)  # Number of flange bolts for both beams
         nutSpaceF = float(B.flange_plate.thickness_provided) + beam_T  # Space between bolt head and nut for flange bolts
 
+        #TODO : update nutSpace from Osdag test
+
         numOfBoltsW = 2 * int(B.web_plate.bolts_required)  # Number of web bolts for both beams
-        nutSpaceW = 2 * float(
-            B.web_plate.thickness_provided) + beam_tw  # Space between bolt head and nut for web bolts
+        nutSpaceW = 2 * float(B.web_plate.thickness_provided) + beam_tw  # Space between bolt head and nut for web bolts
 
         # Bolt placement for Above Flange bolts, call to nutBoltPlacement_AF.py
         bolting_AF = NutBoltArray_AF(BeamCoverPlate(), nut, bolt, numOfBoltsF, nutSpaceF)
@@ -723,8 +662,10 @@ class CommonDesignLogic(object):
 
         if self.mainmodule  == "Shear Connection":
 
-            if self.connection == "Fin Plate":
+            if self.connection == KEY_DISP_FINPLATE:
                 A = FinPlateConnection()
+            elif self.connection == KEY_DISP_CLEATANGLE:
+                A = CleatAngleConnection()
             else:
                 pass
 
@@ -773,13 +714,13 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
                 osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                                     update=True)
-                if self.connection == "Fin Plate" or self.connection == "Endplate":
+                if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_ENDPLATE:
                     osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
                     osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
                     osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1,
                                         update=True)
 
-                elif self.connection == "cleatAngle":
+                elif self.connection == KEY_DISP_CLEATANGLE:
                     osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1,
                                         update=True)
                     osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=Quantity_NOC_BLUE1,
@@ -795,90 +736,34 @@ class CommonDesignLogic(object):
 
         if self.mainmodule == "Moment Connection":
             # if self.connection == "Beam Coverplate Connection":
-            #     A = BeamCoverPlate()
+            B = BeamCoverPlate()
             # else:
             #     pass
             #
             # self.loc = A.connectivity
             self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()  # CPBoltedObj is an object which gets all the calculated values of CAD models
-
-            if component == "Beam":
+            if self.component == "Beam":
                 # Displays both beams
-                osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
-                osdag_display_shape(self.display, self.CPBoltedObj.get_beamRModel(), update=True)
+                osdag_display_shape(self.display, self.CPBoltedObj.get_beamsModel(), update=True)
 
-            elif component == "Connector":
-                # Displays the Flange Plates
-                osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
-                osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True,
-                                    color='Blue')
-                if self.ui.combo_flange_preference.currentText() != 'Outside':
-                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,
-                                        color='Blue')
+            elif self.component == "Connector":
+                osdag_display_shape(self.display, self.CPBoltedObj.get_flangewebplatesModel(), update=True, color='Blue')
+                if self.B.preference != 'Outside':
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innetplatesModels(), update=True,color='Blue')
 
-                # Displays the Web Plates
-                osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
-                osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
+                osdag_display_shape(self.display, self.CPBoltedObj.get_nut_bolt_arrayModels(), update=True, color=Quantity_NOC_SADDLEBROWN)
 
-                # Displays the bolts which are above the Flange Plate, debugging will give more clarity
-                nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
-                for nutboltAF in nutboltlistAF:
-                    osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
+            elif self.component == "Model":
+                osdag_display_shape(self.display, self.CPBoltedObj.get_beamsModel(), update=True)
+                osdag_display_shape(self.display, self.CPBoltedObj.get_flangewebplatesModel(), update=True, color='Blue')
 
-                # Displays the bolts which are below the Flange Plate, debugging will give more clarity
-                nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
-                for nutboltBF in nutboltlistBF:
-                    osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
+                #Todo: remove velove commented lines
 
-                # Displays the bolts which are on the right side of web plate, debugging will give more clarity
-                nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
-                for nutboltW in nutboltlistW:
-                    osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
+                # if self.B.preference != 'Outside':
+                #     osdag_display_shape(self.display, self.CPBoltedObj.get_innetplatesModels(), update=True,color='Blue')
 
+                osdag_display_shape(self.display, self.CPBoltedObj.get_nut_bolt_arrayModels(), update=True, color=Quantity_NOC_SADDLEBROWN)
 
-            elif component == "Model":
-                # Displays both beams
-                osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
-                osdag_display_shape(self.display, self.CPBoltedObj.get_beamRModel(), update=True)
-
-                # Displays the Flange Plates
-                osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
-                osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True,
-                                    color='Blue')
-                if self.ui.combo_flange_preference.currentText() != 'Outside':
-                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,
-                                        color='Blue')
-
-                # Displays the Web Plates
-                osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
-                osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
-
-                # Displays the bolts which are above the Flange Plate, debugging will give more clarity
-                nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
-                for nutboltAF in nutboltlistAF:
-                    osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
-
-                # Displays the bolts which are below the Flange Plate, debugging will give more clarity
-                nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
-                for nutboltBF in nutboltlistBF:
-                    osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
-
-                # Displays the bolts which are on the right side of web plate, debugging will give more clarity
-                nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
-                for nutboltW in nutboltlistW:
-                    osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
 
     def call_3DModel(self, flag):  # Done
 

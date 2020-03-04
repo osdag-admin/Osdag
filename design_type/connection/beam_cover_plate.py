@@ -522,113 +522,107 @@ class BeamCoverPlate(MomentConnection):
         # self.load.moment = self.load.moment * 1000000
 
         self.member_capacity(self)
-    #     self.hard_values(self)
-    # def hard_values(self):
-    #     #flange bolt
-    #     self.flange_bolt.bolt_type = "Bearing Bolt"
-    #     # self.flange_bolt.bolt_hole_type = bolt_hole_type
-    #     # self.flange_bolt.edge_type = edge_type
-    #     # self.flange_bolt.mu_f = float(mu_f)
-    #     self.flange_bolt.connecting_plates_tk = None
-    #
-    #     self.flange_bolt.bolt_grade_provided = 12.9
-    #     self.flange_bolt.bolt_diameter_provided = 20
-    #     self.flange_bolt.dia_hole =22
-    #     self.flange_bolt.bolt_shear_capacity = 135792.7833134
-    #     self.flange_bolt.bolt_bearing_capacity = 118287.48484848486
-    #     self.flange_bolt.bolt_capacity = 118287.48484848486
-    #     # self.flange_bolt.min_edge_dist_round =35
-    #     # self.flange_bolt.min_end_dist_round = 35
-    #     # self.flange_bolt.min_gauge_round = 50
-    #     # self.flange_bolt.min_pitch_round = 50
-    #
-    #     # self.flange_bolt.max_edge_dist_round =250
-    #     # self.flange_bolt.max_end_dist_round=250
-    #     # self.flange_bolt.max_spacing_round = 300.0
-    #
-    #     # self.flange_bolt.bolt_shank_area = 0.0
-    #     # self.flange_bolt.bolt_net_area = 0.0
-    #
-    #
-    #
-    #     # web bolt
-    #     self.web_bolt.bolt_type = "Bearing Bolt"
-    #     # self.web_bolt.bolt_hole_type = bolt_hole_type
-    #     # self.web_bolt.edge_type = edge_type
-    #     # self.web_bolt.mu_f = float(mu_f)
-    #     self.web_bolt.connecting_plates_tk = None
-    #
-    #     self.web_bolt.bolt_grade_provided = 12.9
-    #     self.web_bolt.bolt_diameter_provided = 20
-    #     self.web_bolt.dia_hole = 22
-    #     self.web_bolt.bolt_shear_capacity = 135792.7833134
-    #     self.web_bolt.bolt_bearing_capacity = 69923.63636363638
-    #     self.web_bolt.bolt_capacity = 69923.63636363638
-    #     # self.web_bolt.min_edge_dist_round = 33
-    #     # self.web_bolt.min_end_dist_round = 33
-    #     # self.web_bolt.min_gauge_round = 50
-    #     # self.web_bolt.min_pitch_round = 50
-    #
-    #     # self.web_bolt.max_edge_dist_round = 150
-    #     # self.web_bolt.max_end_dist_round = 150
-    #     # self.web_bolt.max_spacing_round = 300.0
-    #
-    #     # self.web_bolt.bolt_shank_area = 0.0
-    #     # self.web_bolt.bolt_net_area = 0.0
-    #
-    #
-    #
-    #     #flange plate
-    #     self.flange_plate.thickness_provided =22
-    #     self.flange_plate.height = 210
-    #     self.flange_plate.length= 132
-    #     self.flange_plate.bolt_line = 1
-    #     self.flange_plate.bolts_one_line =2
-    #     self.flange_plate.bolts_required= 4
-    #     self.flange_plate.bolt_capacity_red = 118287.48484848486
-    #     self.flange_plate.bolt_force = 54031.416273417875
-    #     self.flange_plate.moment_demand= 0
-    #     self.flange_plate.pitch_provided = 0
-    #
-    #     self.flange_plate.gauge_provided =0.0
-    #     self.flange_plate.edge_dist_provided =33
-    #     self.flange_plate.end_dist_provided=33
-    #
-    #     self.flange_plate.block_shear_capacity = 707779.918
-    #     self.flange_plate.shear_yielding_capacity = 0.0
-    #     self.flange_plate.shear_rupture_capacity =0.0
-    #
-    #     self.flange_plate.shear_capacity_web_plate=0.0
-    #     self.flange_plate.tension_capacity_web_plate = 0.0
-    #     self.flange_plate.tension_capacity_flange_plate=707779.918
-    #
-    #     self.flange_plate.moment_capacity=0
-    #
-    #     # web plate
-    #     self.web_plate.thickness_provided = 12
-    #     self.web_plate.height = 366.0
-    #     self.web_plate.length = 152
-    #     self.web_plate.bolt_line = 1
-    #     self.web_plate.bolts_one_line = 3
-    #     self.web_plate.bolts_required = 4
-    #     self.web_plate.bolt_capacity_red = 69923.63636363638
-    #     self.web_plate.bolt_force = 54031.416273417875
-    #     self.web_plate.moment_demand = 2150000.0
-    #     self.web_plate.pitch_provided = 0
-    #
-    #     self.web_plate.gauge_provided = 0.0
-    #     self.web_plate.edge_dist_provided = 33
-    #     self.web_plate.end_dist_provided = 33
-    #
-    #     self.web_plate.block_shear_capacity = 707779.918
-    #     self.web_plate.shear_yielding_capacity = 0.0
-    #     self.web_plate.shear_rupture_capacity = 0.0
-    #
-    #     self.web_plate.shear_capacity_web_plate = 0.0
-    #     self.web_plate.tension_capacity_web_plate = 0.0
-    #     self.web_plate.tension_capacity_flange_plate = 0.0
-    #
-    #     self.web_plate.moment_capacity = 0
+        # self.hard_values(self)
+    def hard_values(self):
+        #flange bolt
+        self.load.moment = 20 #kN
+        self.factored_axial_load= 300 #KN
+        self.load.shear_force =50 # kN
+        self.flange_bolt.bolt_type = "Bearing Bolt"
+        # self.flange_bolt.bolt_hole_type = bolt_hole_type
+        # self.flange_bolt.edge_type = edge_type
+        # self.flange_bolt.mu_f = float(mu_f)
+        self.flange_bolt.connecting_plates_tk = None
+
+        self.flange_bolt.bolt_grade_provided = 5.8
+        self.flange_bolt.bolt_diameter_provided = 20
+        self.flange_bolt.dia_hole =22
+        self.flange_bolt.bolt_shear_capacity = 56580.32638058333
+        self.flange_bolt.bolt_bearing_capacity = 118287.48484848486
+        self.flange_bolt.bolt_capacity = 56580.32638058333
+
+
+
+
+        # web bolt
+        self.web_bolt.bolt_type = "Bearing Bolt"
+        # self.web_bolt.bolt_hole_type = bolt_hole_type
+        # self.web_bolt.edge_type = edge_type
+        # self.web_bolt.mu_f = float(mu_f)
+        self.web_bolt.connecting_plates_tk = None
+
+        self.web_bolt.bolt_grade_provided = 5.8
+        self.web_bolt.bolt_diameter_provided = 20
+        self.web_bolt.dia_hole = 22
+        self.web_bolt.bolt_shear_capacity = 56580.32638058333
+        self.web_bolt.bolt_bearing_capacity = 69923.63636363638
+        self.web_bolt.bolt_capacity = 69923.63636363638
+        # self.web_bolt.min_edge_dist_round = 33
+        # self.web_bolt.min_end_dist_round = 33
+        # self.web_bolt.min_gauge_round = 50
+        # self.web_bolt.min_pitch_round = 50
+
+        # self.web_bolt.max_edge_dist_round = 150
+        # self.web_bolt.max_end_dist_round = 150
+        # self.web_bolt.max_spacing_round = 300.0
+
+        # self.web_bolt.bolt_shank_area = 0.0
+        # self.web_bolt.bolt_net_area = 0.0
+
+
+
+        #flange plate
+        self.flange_plate.thickness_provided =22
+        self.flange_plate.height = 210
+        self.flange_plate.length= 232
+        self.flange_plate.bolt_line = 2
+        self.flange_plate.bolts_one_line =2
+        self.flange_plate.bolts_required= 8
+        self.flange_plate.bolt_capacity_red = 56580.32638058333
+        self.flange_plate.bolt_force = 29359.584393928224
+        # self.flange_plate.moment_demand= 0
+        self.flange_plate.pitch_provided = 50
+
+        self.flange_plate.gauge_provided =0.0
+        self.flange_plate.edge_dist_provided =33
+        self.flange_plate.end_dist_provided=33
+
+        self.flange_plate.block_shear_capacity = 917754.359
+        # self.flange_plate.shear_yielding_capacity = 0.0
+        # self.flange_plate.shear_rupture_capacity =0.0
+        #
+        # self.flange_plate.shear_capacity_web_plate=0.0
+        # self.flange_plate.tension_capacity_web_plate = 0.0
+        self.flange_plate.tension_capacity_flange_plate=917754.359
+
+        # self.flange_plate.moment_capacity=0
+
+        # web plate
+        self.web_plate.thickness_provided = 12
+        self.web_plate.height = 366.0
+        self.web_plate.length = 152
+        self.web_plate.bolt_line = 1
+        self.web_plate.bolts_one_line = 3
+        self.web_plate.bolts_required = 6
+        self.web_plate.bolt_capacity_red = 56580.32638058333
+        self.web_plate.bolt_force = 53368.918616954594
+        # self.web_plate.moment_demand = 2150000.0
+        self.web_plate.pitch_provided = 0
+
+        self.web_plate.gauge_provided = 150
+        self.web_plate.edge_dist_provided = 33
+        self.web_plate.end_dist_provided = 33
+
+        self.web_plate.block_shear_capacity = 903019.057
+        self.web_plate.shear_yielding_capacity = 530196.4981132657
+        self.web_plate.shear_rupture_capacity = 613561.6780731991
+
+        self.web_plate.shear_capacity_web_plate =  530196.4981132657
+        self.web_plate.tension_capacity_web_plate = 626120.613
+        # self.web_plate.tension_capacity_flange_plate = 0.0
+        #
+        # self.web_plate.moment_capacity = 0
+        self.design_status = True
 
 
 

@@ -8,9 +8,9 @@ import numpy
 from cad.items.ModelUtils import *
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
 
-# from OCC.Display.SimpleGui import init_display
-#
-# display, start_display, add_menu, add_function_to_menu = init_display()
+from OCC.Display.SimpleGui import init_display
+
+display, start_display, add_menu, add_function_to_menu = init_display()
 
 
 class Plate(object):
@@ -74,18 +74,18 @@ v dir                                    |   |                          |
         return prism
 
 
-# L = 10
-# T = 5
-# W = 10
-#
-# origin = numpy.array([0.,0.,0.])
-# uDir = numpy.array([1.,0.,0.])
-# shaftDir = numpy.array([0.,0.,1.])
-#
-# channel = Plate(L, W, T)
-# angles = channel.place(origin, uDir, shaftDir)
-# point = channel.compute_params()
-# prism = channel.create_model()
-# display.DisplayShape(prism, update=True)
-# display.DisableAntiAliasing()
-# start_display()
+L = 10
+T = 5
+W = 10
+
+origin = numpy.array([0.,0.,0.])
+uDir = numpy.array([1.,0.,0.])
+shaftDir = numpy.array([0.,0.,1.])
+
+channel = Plate(L, W, T)
+angles = channel.place(origin, uDir, shaftDir)
+point = channel.compute_params()
+prism = channel.create_model()
+display.DisplayShape(prism, update=True)
+display.DisableAntiAliasing()
+start_display()

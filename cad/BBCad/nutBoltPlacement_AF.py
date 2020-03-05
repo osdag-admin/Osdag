@@ -63,7 +63,7 @@ class NutBoltArray_AF():
             bolt_length_required = 100
             b_AF.H = 1.5 * bolt_length_required
             self.bolts_AF.append(Bolt(b_AF.R, b_AF.T, b_AF.H, b_AF.r))
-            print("bolt",b_AF.R,b_AF.T,b_AF.H, b_AF.r)
+            print("bolt", b_AF.R, b_AF.T, b_AF.H, b_AF.r)
             self.nuts_AF.append(Nut(n_AF.R, n_AF.T, n_AF.H, n_AF.r1))
             print('Nut',(n_AF.R, n_AF.T, n_AF.H, n_AF.r1))
     def initBoltPlaceParams_AF(self, outputobj):
@@ -119,10 +119,9 @@ class NutBoltArray_AF():
         print("hhhh",self.bolts_AF)
         for bolt in self.bolts_AF:
             print("bolt", bolt, "fgfg")
-            # self.models_AF.append(bolt.create_model())
+            self.models_AF.append(bolt.create_model())
         for nut in self.nuts_AF:
-            # self.models_AF.append(nut.create_model())
-            pass
+            self.models_AF.append(nut.create_model())
 
         dbg = self.dbgSphere(self.originAF)
         self.models_AF.append(dbg)

@@ -291,6 +291,9 @@ KEY_DISP_CONN = 'Connectivity *'
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
+## Column End Plate ##
+VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
+####
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'

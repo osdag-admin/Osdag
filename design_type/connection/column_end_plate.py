@@ -22,6 +22,11 @@ class ColumnEndPlate(MomentConnection):
         else:
             existingvalue_key_secsize = ''
 
+        if KEY_CONN in existingvalues:
+            existingvalue_key_conn = existingvalues[KEY_CONN]
+        else:
+            existingvalue_key_conn = ''
+
         if KEY_MATERIAL in existingvalues:
             existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
         else:
@@ -70,6 +75,9 @@ class ColumnEndPlate(MomentConnection):
 
         t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Columns"))
         options_list.append(t4)
+
+        t8 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN_3)
+        options_list.append(t8)
 
         t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
         options_list.append(t15)

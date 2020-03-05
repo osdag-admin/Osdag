@@ -259,8 +259,21 @@ class Section(Material):
         self.rad_of_gy_y = row[14] *100
         self.elast_sec_mod_z = row[15] *1000
         self.elast_sec_mod_y = row[16] *1000
-        self.plast_sec_mod_z = row[17] *1000
-        self.plast_sec_mod_y = row[18] *1000
+        self.plast_sec_mod_z = row[17]
+        print(row[17], "plast_sec_mod_z")
+        if self.plast_sec_mod_z is None:  # Todo: add in database
+            self.plast_sec_mod_z = self.elast_sec_mod_z
+            print(self.plast_sec_mod_z,"plast_sec_mod_z")
+        else:
+            self.plast_sec_mod_z = row[17] *1000
+
+        self.plast_sec_mod_y = row[18]
+        print(row[18], "plast_sec_mod_z")
+        if self.plast_sec_mod_y is None:  # Todo: add in database
+            self.plast_sec_mod_y = self.elast_sec_mod_y
+            print(self.plast_sec_mod_y, "plast_sec_mod_y")
+        else:
+            self.plast_sec_mod_y = row[17] * 1000
         self.source = row[19]
 
         conn.close()
@@ -424,6 +437,7 @@ class Beam(Section):
 
     def __init__(self, designation, material_grade):
         super(Beam, self).__init__(designation, material_grade)
+
         self.connect_to_database_update_other_attributes("Beams", designation)
 
     def min_plate_height(self):
@@ -618,8 +632,12 @@ class Plate(Material):
         :param max_end_dist_round: maximum end distance
         :return: pitch, end distance, height of plate (false if applicable)
         """
+        print(web_plate_h, "web_plate_h web1")
         gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
+        print(gauge, "gauge web")
         web_plate_h = gauge*(bolts_one_line - 1) + edge_dist*2
+        print(web_plate_h, "web_plate_h web")
+
         # print("gauge", gauge,web_plate_h,edge_dist,max_spacing, max_edge_dist)
         if gauge > max_spacing:
             gauge, edge_dist = self.get_spacing_adjusted(gauge, edge_dist, max_spacing)
@@ -628,7 +646,9 @@ class Plate(Material):
                 web_plate_h = False
         else:
             pass
+        print("web", gauge, edge_dist, web_plate_h)
         return gauge, edge_dist, web_plate_h
+
 
     def get_gauge_edge_dist_flange(self, flange_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,web_thickness): #todo anjali
         """
@@ -793,6 +813,7 @@ class Plate(Material):
                         [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,
                                                                                    min_edge_dist, max_spacing,
                                                                                    max_edge_dist)
+                        print("g,e,h ", gauge, edge_dist, web_plate_h)
 
                     if bolt_line == 1:
                         pitch = 0.0
@@ -818,6 +839,7 @@ class Plate(Material):
             bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                   gauge, bolt_capacity,
                                                   bolt_dia)
+            print("g,e,h1 ", gauge, edge_dist, web_plate_h)
             if vres > bolt_capacity_red:
                 self.design_status = False
                 self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"

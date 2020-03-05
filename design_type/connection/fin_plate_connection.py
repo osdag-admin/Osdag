@@ -91,10 +91,6 @@ class FinPlateConnection(ShearConnection):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
     def module_name(self):
         return KEY_DISP_FINPLATE
 
@@ -470,7 +466,6 @@ class FinPlateConnection(ShearConnection):
 
             length = self.supported_section.depth - self.supported_section.notch_ht
 
-
         self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
         self.supported_section.tension_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
 
@@ -496,7 +491,6 @@ class FinPlateConnection(ShearConnection):
                             .format(self.supported_section.shear_yielding_capacity,
                                     self.supported_section.tension_yielding_capacity))
             print("failed in preliminary member checks. Select larger sections or decrease loads")
-
             self.thickness_possible = [i for i in self.plate.thickness if i >= self.supported_section.web_thickness]
 
             if not self.thickness_possible:
@@ -572,6 +566,7 @@ class FinPlateConnection(ShearConnection):
     def get_bolt_grade(self,bolt_capacity_req):
         print(self.design_status, "Getting bolt grade")
         bolt_grade_previous = self.bolt.bolt_grade[-1]
+
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
             count = 1
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,

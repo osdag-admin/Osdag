@@ -5,10 +5,6 @@ Started on 01 - Nov - 2018
 @author: ajmalbabums
 """
 import math
-<<<<<<< HEAD
-=======
-
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 from Common import *
 
 class IS800_2007(object):
@@ -33,17 +29,10 @@ class IS800_2007(object):
     # Table 5 Partial Safety Factors for Materials, gamma_m (dict)
     cl_5_4_1_Table_5 = {"gamma_m0": {'yielding': 1.10, 'buckling': 1.10},
                         "gamma_m1": {'ultimate_stress': 1.25},
-<<<<<<< HEAD
-                        "gamma_mf": {KEY_DP_WELD_TYPE_SHOP: 1.25, KEY_DP_WELD_TYPE_FIELD: 1.25},
-                        "gamma_mb": {KEY_DP_WELD_TYPE_SHOP: 1.25, KEY_DP_WELD_TYPE_FIELD: 1.25},
-                        "gamma_mr": {KEY_DP_WELD_TYPE_SHOP: 1.25, KEY_DP_WELD_TYPE_FIELD: 1.25},
-                        "gamma_mw": {KEY_DP_WELD_TYPE_SHOP: 1.25, KEY_DP_WELD_TYPE_FIELD: 1.50}
-=======
                         "gamma_mf": {KEY_DP_WELD_FAB_SHOP: 1.25, KEY_DP_WELD_FAB_FIELD: 1.25},
                         "gamma_mb": {KEY_DP_WELD_FAB_SHOP: 1.25, KEY_DP_WELD_FAB_FIELD: 1.25},
                         "gamma_mr": {KEY_DP_WELD_FAB_SHOP: 1.25, KEY_DP_WELD_FAB_FIELD: 1.25},
                         "gamma_mw": {KEY_DP_WELD_FAB_SHOP: 1.25, KEY_DP_WELD_FAB_FIELD: 1.50}
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
                         }
 
     # ==========================================================================
@@ -288,13 +277,10 @@ class IS800_2007(object):
         return V_db
 
     # cl. 10.3.3 Shear Capacity of Bearing Bolt
+
     @staticmethod
-<<<<<<< HEAD
-    def cl_10_3_3_bolt_shear_capacity(f_ub, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter=KEY_DP_WELD_TYPE_FIELD):
-=======
 
     def cl_10_3_3_bolt_shear_capacity(f_ub, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
         """Calculate design shear strength of bearing bolt
 
         Args:
@@ -371,12 +357,7 @@ class IS800_2007(object):
 
     # cl. 10.3.4 Bearing Capacity of the Bolt
     @staticmethod
-<<<<<<< HEAD
-    def cl_10_3_4_bolt_bearing_capacity(f_u, f_ub, t, d, e, p, bolt_hole_type='Standard', safety_factor_parameter=KEY_DP_WELD_TYPE_FIELD):
-=======
-
     def cl_10_3_4_bolt_bearing_capacity(f_u, f_ub, t, d, e, p, bolt_hole_type='Standard', safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 
         """Calculate design bearing strength of a bolt on any plate.
 
@@ -409,8 +390,6 @@ class IS800_2007(object):
             V_dpb *= 0.5
         return V_dpb
 
-<<<<<<< HEAD
-=======
 
 
 
@@ -444,7 +423,6 @@ class IS800_2007(object):
 
         return T_db
 
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting
     # -------------------------------------------------------------
@@ -618,11 +596,7 @@ class IS800_2007(object):
 
     # cl. 10.5.7.1.1 Design stresses in fillet welds
     @staticmethod
-<<<<<<< HEAD
-    def cl_10_5_7_1_1_fillet_weld_design_stress(ultimate_stresses, fabrication=KEY_DP_WELD_TYPE_SHOP):
-=======
     def cl_10_5_7_1_1_fillet_weld_design_stress(ultimate_stresses, fabrication=KEY_DP_WELD_FAB_SHOP):
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 
         """Calculate the design strength of fillet weld
 

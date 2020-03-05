@@ -13,7 +13,6 @@ import os
 import pdfkit
 import configparser
 from utils.common import component
-
 # from Connections.connection_calculations import ConnectionCalculations
 
 def save_html(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder):

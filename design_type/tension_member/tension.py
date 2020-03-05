@@ -88,7 +88,6 @@ class Tension(Main):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-
     def module_name(self):
         return KEY_DISP_TENSION
 
@@ -316,7 +315,6 @@ class Tension(Main):
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
-
         t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, existingvalue_key_sec_profile, VALUES_SEC_PROFILE_2)
         options_list.append(t2)
 
@@ -352,7 +350,6 @@ class Tension(Main):
 
         t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
         options_list.append(t12)
-
 
         # t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None)
         # options_list.append(t13)
@@ -583,7 +580,6 @@ class Tension(Main):
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
-
             elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2]:
                 val = option[4]
                 if design_dictionary[option[0]] == val[0]:

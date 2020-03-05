@@ -3,19 +3,12 @@ from utils.common.material import *
 from utils.common.other_standards import *
 from Common import *
 import sqlite3
-<<<<<<< HEAD
-=======
 import logging
-
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
+import logging
 import math
 import numpy as np
 from utils.common.common_calculation import *
 
-<<<<<<< HEAD
-=======
-
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 class Bolt(Material):
 
     def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="",
@@ -27,10 +20,6 @@ class Bolt(Material):
         if diameter is not None:
             self.bolt_diameter = list(np.float_(diameter))
             self.bolt_diameter.sort(key=float)
-<<<<<<< HEAD
-=======
-
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
         self.bolt_type = bolt_type
         self.bolt_hole_type = bolt_hole_type
         self.edge_type = edge_type
@@ -89,29 +78,21 @@ class Bolt(Material):
         repr += "Minimum Pitch: {}\n".format(self.min_pitch_round)
         repr += "Minimum Gauge: {}\n".format(self.min_gauge_round)
         repr += "Minimum Edge Distance: {}\n".format(self.min_edge_dist)
-<<<<<<< HEAD
-=======
         repr += "Minimum Edge Distance: {}\n".format(self.min_edge_dist)
 
 
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
+        repr += "Minimum Edge Distance: {}\n".format(self.min_edge_dist)
+
+
         repr += "Minimum End Distance: {}\n".format(self.min_end_dist)
         repr += "Maximum Edge Distance: {}\n".format(self.max_edge_dist)
         repr += "Maximum End Distance: {}\n".format(self.max_end_dist)
         repr += "Maximum Spacing: {}\n".format(self.max_spacing)
-<<<<<<< HEAD
-
-        repr += "Bolt Shear Capacity: {}\n".format(self.bolt_shear_capacity)
-        repr += "Bolt Bearing Capacity: {}\n".format(self.bolt_bearing_capacity)
-        repr += "Bolt Capacity: {}\n".format(self.bolt_capacity)
-=======
         repr += "Bolt Shear Capacity: {}\n".format(self.bolt_shear_capacity)
         repr += "Bolt Bearing Capacity: {}\n".format(self.bolt_bearing_capacity)
         repr += "Bolt Capacity: {}\n".format(self.bolt_capacity)
 
 
-
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
         return repr
 
     def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, connecting_plates_tk, n_planes):
@@ -150,11 +131,6 @@ class Bolt(Material):
         elif self.bolt_type == "Friction Grip Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_4_3_bolt_slip_resistance(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, n_e=n_planes, mu_f=self.mu_f, bolt_hole_type=self.bolt_hole_type)
-<<<<<<< HEAD
-            self.bolt_bearing_capacity = 'N/A'
-            self.bolt_capacity = self.bolt_shear_capacity
-
-=======
             self.bolt_bearing_capacity = VALUE_NOT_APPLICABLE
             self.bolt_capacity = self.bolt_shear_capacity
 
@@ -179,7 +155,6 @@ class Bolt(Material):
 
 
 
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
     def calculate_bolt_spacing_limits(self, bolt_diameter_provided, connecting_plates_tk):
         self.connecting_plates_tk = list(np.float_(connecting_plates_tk))
         self.bolt_diameter_provided = bolt_diameter_provided
@@ -221,16 +196,11 @@ class Section(Material):
         super(Section, self).__init__(material_grade)
         self.designation = designation
         self.type = "Rolled"
-<<<<<<< HEAD
-        self.mass = 0.0
-        self.area = 0.0
-=======
         self.type2 = "generally"
         self.notch_ht = 0.0
 
         self.mass = 0.0
         self.area  = 0.0
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
         self.depth = 0.0
         self.flange_width = 0.0
         self.web_thickness = 0.0
@@ -249,10 +219,7 @@ class Section(Material):
         self.source = 0.0
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
-<<<<<<< HEAD
-        self.shear_yielding_capacity = 0.0
-        self.shear_rupture_capacity = 0.0
-=======
+
         # self.shear_yielding_capacity = 0.0
         # self.shear_rupture_capacity = 0.0
 
@@ -260,21 +227,16 @@ class Section(Material):
         self.tension_capacity_web = 0.0
         self.shear_capacity_flange = 0.0
         self.shear_capacity_web = 0.0
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
 
-<<<<<<< HEAD
-=======
         self.moment_capacity = 0.0
         self.plastic_moment_capactiy =0.0
         self.moment_d_def_criteria =0.0
 
         self.tension_capacity = 0.0
 
-
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 
     def connect_to_database_update_other_attributes(self, table, designation):
         conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -283,11 +245,7 @@ class Section(Material):
         cur.execute(db_query, (designation,))
         row = cur.fetchone()
         self.mass = row[2]
-<<<<<<< HEAD
-        self.area = row[3]
-=======
         self.area = row[3] *100
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
         self.depth = row[4]
         self.flange_width = row[5]
         self.web_thickness = row[6]
@@ -295,25 +253,28 @@ class Section(Material):
         self.flange_slope = row[8]
         self.root_radius = row[9]
         self.toe_radius = row[10]
-<<<<<<< HEAD
-        self.mom_inertia_z = row[11]
-        self.mom_inertia_y = row[12]
-        self.rad_of_gy_z = row[13]
-        self.rad_of_gy_y = row[14]
-        self.elast_sec_mod_z = row[15]
-        self.elast_sec_mod_y = row[16]
-        self.plast_sec_mod_z = row[17]
-        self.plast_sec_mod_y = row[18]
-=======
         self.mom_inertia_z = row[11]*10000
         self.mom_inertia_y = row[12] *10000
         self.rad_of_gy_z = row[13]* 100
         self.rad_of_gy_y = row[14] *100
         self.elast_sec_mod_z = row[15] *1000
         self.elast_sec_mod_y = row[16] *1000
-        self.plast_sec_mod_z = row[17] *1000
-        self.plast_sec_mod_y = row[18] *1000
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
+        self.plast_sec_mod_z = row[17]
+        print(row[17], "plast_sec_mod_z")
+        if self.plast_sec_mod_z is None:  # Todo: add in database
+            self.plast_sec_mod_z = self.elast_sec_mod_z
+            print(self.plast_sec_mod_z,"plast_sec_mod_z")
+        else:
+            self.plast_sec_mod_z = row[17] *1000
+
+        self.plast_sec_mod_y = row[18]
+        print(row[18], "plast_sec_mod_z")
+        if self.plast_sec_mod_y is None:  # Todo: add in database
+            self.plast_sec_mod_y = self.elast_sec_mod_y
+            print(self.plast_sec_mod_y, "plast_sec_mod_y")
+        else:
+            self.plast_sec_mod_y = row[17] * 1000
+
         self.source = row[19]
 
         conn.close()
@@ -334,11 +295,7 @@ class Section(Material):
         # V_p = (0.6 * A_v * fy) / (math.sqrt(3) * gamma_m0 * 1000)  # kN
         V_p = (A_v * fy) / (math.sqrt(3) * gamma_m0 * 1000)  # kN
 
-<<<<<<< HEAD
-        self.shear_yielding_capacity = V_p
-=======
         self.shear_yielding_capacity = round(V_p,2)
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 
     def tension_yielding(self, length, thickness, fy):
         '''
@@ -353,10 +310,6 @@ class Section(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         # A_v = height * thickness
         tdg = (A_v * fy) / (gamma_m0 * 1000)
-<<<<<<< HEAD
-        self.tension_yielding_capacity = tdg
-        return tdg
-=======
         self.tension_yielding_capacity = round(tdg,2)
 
     def tension_member_yielding(self, A_g, F_y):
@@ -371,7 +324,6 @@ class Section(Material):
 
         self.tension_yielding_capacity = round(T_dg,2)
         # logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 
     def tension_rupture(self, A_n, F_u):
         "preliminary design strength,T_pdn,as governed by rupture at net section"
@@ -379,11 +331,6 @@ class Section(Material):
         "F_u = Ultimate Strength of material"
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-<<<<<<< HEAD
-        T_pdn = 0.9 * A_n * F_u / gamma_m1
-
-        return T_pdn
-=======
         T_pdn = 0.9 * A_n * F_u / gamma_m1/1000
 
         self.tension_rupture_capacity = round(T_pdn,2)
@@ -470,19 +417,12 @@ class Section(Material):
         """
         self.moment_d_def_criteria = 1.5 * (fy / 1.1) * (Z_e) # Nm
         # moment_capacity_sec = self.flange_plate.moment_capacity
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 
     def __repr__(self):
         repr = "Section\n"
         repr += "Designation: {}\n".format(self.designation)
         repr += "fy: {}\n".format(self.fy)
         repr += "fu: {}\n".format(self.fu)
-<<<<<<< HEAD
-        repr += "shear yielding capacity: {}\n".format(self.shear_yielding_capacity)
-        repr += "tension yielding capacity: {}\n".format(self.tension_yielding_capacity)
-        return repr
-
-=======
         # repr += "shear yielding capacity: {}\n".format(self.shear_yielding_capacity)
         repr += "tension yielding capacity: {}\n".format(self.tension_yielding_capacity)
 
@@ -493,8 +433,6 @@ class Section(Material):
         return repr
 
 
-
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 class Beam(Section):
 
     def __init__(self, designation, material_grade):
@@ -504,17 +442,11 @@ class Beam(Section):
     def min_plate_height(self):
         return 0.6 * self.depth
 
-<<<<<<< HEAD
-    def max_plate_height(self):
-
-        clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
-=======
     def max_plate_height(self, connectivity=None, notch_height = 0.0):
         if connectivity in VALUES_CONN_1 or None:
             clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
         else:
             clear_depth = self.depth - notch_height
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
         return clear_depth
 
 class Column(Section):
@@ -531,12 +463,6 @@ class Column(Section):
         clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
         return clear_depth
 
-<<<<<<< HEAD
-
-class Weld(Material):
-
-    def __init__(self, material_grade="", fabrication=KEY_DP_WELD_TYPE_SHOP):
-=======
 class Channel(Section):
 
     def __init__(self, designation, material_grade):
@@ -557,7 +483,6 @@ class Weld(Material):
     def __init__(self, material_grade="", type="fillet", fabrication=KEY_DP_WELD_FAB_SHOP):
         self.design_status = True
         self.type = type
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
         self.size = 0.0
         self.length = 0.0
         self.strength = 0.0
@@ -586,17 +511,10 @@ class Weld(Material):
         T_wv = weld_twist * x_max/Ip_weld
         V_wv = weld_shear/l_weld
         A_wh = weld_axial/l_weld
-<<<<<<< HEAD
-        print(T_wh, T_wv, V_wv, A_wh)
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
         return weld_stress
 
 
-=======
-        weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
-        return weld_stress
-
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 class Plate(Material):
 
     def __init__(self, thickness=[], height=0.0, length=0.0, gap=0.0, material_grade=""):
@@ -624,12 +542,6 @@ class Plate(Material):
         self.end_dist_provided = 0.0
 
         self.block_shear_capacity = 0.0
-<<<<<<< HEAD
-        self.shear_yielding_capacity = 0.0
-        self.shear_rupture_capacity = 0.0
-        self.tension_yielding_capacity = 0.0
-        self.tension_rupture_capacity = 0.0
-=======
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
 
@@ -640,7 +552,6 @@ class Plate(Material):
         self.shear_capacity_web_plate=0.0
         self.tension_capacity_web_plate = 0.0
         self.tension_capacity_flange_plate = 0.0
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
         self.moment_capacity = 0.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
@@ -654,36 +565,23 @@ class Plate(Material):
         web_plate_h_req = float((bolts_one_line - 1) * gauge + 2 * edge_dist)
         return web_plate_h_req
 
-<<<<<<< HEAD
-=======
 
     def get_flange_plate_h_req(self, bolts_one_line, gauge, edge_dist,web_thickness,root_radius): #todo-anjali
         flange_plate_h_req = 2*float(((bolts_one_line/2 - 1) * gauge) + (2 * edge_dist) + web_thickness/2 + root_radius)
         return flange_plate_h_req
 
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
     def get_spacing_adjusted(self, gauge_pitch, edge_end, max_spacing):
         while gauge_pitch > max_spacing:
             edge_end += 5
             gauge_pitch -= 5
         return gauge_pitch, edge_end
 
-<<<<<<< HEAD
-    def get_web_plate_l_bolts_one_line(self, web_plate_h_max, web_plate_h_min, bolts_required,edge_dist, gauge):
-=======
 
     def get_web_plate_l_bolts_one_line(self, web_plate_h_max, web_plate_h_min,bolts_required,edge_dist, gauge):
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
         print('maxh',web_plate_h_max)
         print(web_plate_h_max,edge_dist,gauge)
         max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
         print("max_bolts_one_line", max_bolts_one_line)
-<<<<<<< HEAD
-        self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
-        self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
-        self.height = max(web_plate_h_min, self.get_web_plate_h_req (self.bolts_one_line, gauge, edge_dist))
-        return self.bolt_line, self.bolts_one_line, self.height
-=======
         if max_bolts_one_line >=2:
             self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
             self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
@@ -723,7 +621,6 @@ class Plate(Material):
             bolts_one_line = 0
             height = 0
             return bolt_line, bolts_one_line, height
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 
     def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist):
         """
@@ -735,13 +632,14 @@ class Plate(Material):
         :param max_end_dist_round: maximum end distance
         :return: pitch, end distance, height of plate (false if applicable)
         """
+        print(web_plate_h, "web_plate_h web1")
         gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
+        print(gauge, "gauge web")
         web_plate_h = gauge*(bolts_one_line - 1) + edge_dist*2
-<<<<<<< HEAD
-        print("gauge", gauge,web_plate_h,edge_dist,max_spacing, max_edge_dist)
-=======
+        print(web_plate_h, "web_plate_h web")
+
         # print("gauge", gauge,web_plate_h,edge_dist,max_spacing, max_edge_dist)
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
+
         if gauge > max_spacing:
             gauge, edge_dist = self.get_spacing_adjusted(gauge, edge_dist, max_spacing)
             if edge_dist >= max_edge_dist:
@@ -749,10 +647,11 @@ class Plate(Material):
                 web_plate_h = False
         else:
             pass
+        print("web", gauge, edge_dist, web_plate_h)
         return gauge, edge_dist, web_plate_h
 
-<<<<<<< HEAD
-=======
+
+
     def get_gauge_edge_dist_flange(self, flange_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,web_thickness): #todo anjali
         """
 
@@ -783,7 +682,6 @@ class Plate(Material):
             pass
         return gauge, edge_dist, flange_plate_h
 
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
     def get_vres(self, bolts_one_line, pitch, gauge, bolt_line, shear_load, axial_load, ecc):
         """
 
@@ -833,11 +731,8 @@ class Plate(Material):
         return bolt_capacity_red
 
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge, max_spacing, max_edge_dist,
-<<<<<<< HEAD
-                              shear_load=0.0, axial_load=0.0, gap=0.0, shear_ecc=False, bolt_line_limit=math.inf):
-=======
                               shear_load=0.0, axial_load=0.0, web_moment =0.0,  gap=0.0, shear_ecc=False, bolt_line_limit=math.inf):
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
+
 
         """
 
@@ -860,18 +755,11 @@ class Plate(Material):
         res_force = math.sqrt(shear_load ** 2 + axial_load ** 2)
         bolts_required = max(int(math.ceil(res_force / bolt_capacity)), 2)
         [bolt_line, bolts_one_line, web_plate_h] = \
-<<<<<<< HEAD
-            self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
-                                                min_edge_dist, min_gauge)
-        print("boltdetails0", bolt_line, bolts_one_line, web_plate_h)
-        if bolts_one_line == 1:
-=======
             self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required
                                                 ,min_edge_dist, min_gauge)
         print("boltdetails0", bolt_line, bolts_one_line, web_plate_h)
 
         if bolts_one_line < 2:
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
             self.design_status = False
             self.reason = "Can't fit two bolts in one line. Select lower diameter"
         elif bolt_line > bolt_line_limit:
@@ -892,11 +780,8 @@ class Plate(Material):
             if shear_ecc is True:
                 # If check for shear eccentricity is true, resultant force in bolt is calculated
                 ecc = (pitch * max((bolt_line-1.5), 0)) + end_dist + gap
-<<<<<<< HEAD
-                moment_demand = shear_load * ecc
-=======
                 moment_demand = shear_load * ecc + web_moment
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
+
                 print(2, bolts_one_line, pitch,
                                      gauge, bolt_line, shear_load, axial_load, ecc, web_plate_h)
                 vres = self.get_vres(bolts_one_line, pitch,
@@ -905,12 +790,9 @@ class Plate(Material):
                                                       gauge, bolt_capacity,
                                                       bolt_dia)
                 print(3, vres, bolt_capacity_red)
-<<<<<<< HEAD
-                while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
-=======
 
                 while bolt_line <= bolt_line_limit and vres > bolt_capacity_red and web_plate_h <= web_plate_h_max:
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
+
                     # Length of plate is increased for calculated bolts in one line.
                     # This increases spacing which decreases resultant force
                     print(4, web_plate_h, web_plate_h_max)
@@ -936,6 +818,8 @@ class Plate(Material):
                         [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,
                                                                                    min_edge_dist, max_spacing,
                                                                                    max_edge_dist)
+                        print("g,e,h ", gauge, edge_dist, web_plate_h)
+
 
                     if bolt_line == 1:
                         pitch = 0.0
@@ -961,17 +845,14 @@ class Plate(Material):
             bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                   gauge, bolt_capacity,
                                                   bolt_dia)
+            print("g,e,h1 ", gauge, edge_dist, web_plate_h)
+
             if vres > bolt_capacity_red:
                 self.design_status = False
                 self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
             else:
                 self.design_status = True
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
             self.length = gap + end_dist * 2 + pitch * (bolt_line - 1)
             self.height = web_plate_h
             self.bolt_line = bolt_line
@@ -985,8 +866,6 @@ class Plate(Material):
             self.edge_dist_provided = edge_dist
             self.end_dist_provided = end_dist
 
-<<<<<<< HEAD
-=======
     def get_flange_plate_details(self, bolt_dia, flange_plate_h_min, flange_plate_h_max, bolt_capacity, min_edge_dist, min_gauge, max_spacing, max_edge_dist,web_thickness, root_radius,
                               shear_load=0.0, axial_load=0.0, gap=0.0,  bolt_line_limit=math.inf):
     #todo anjali
@@ -1122,7 +1001,7 @@ class Plate(Material):
             self.gauge_provided = gauge
             self.edge_dist_provided = edge_dist
             self.end_dist_provided = end_dist
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
+
     # Function for block shear capacity calculation
     def blockshear(self, numrow, numcol, pitch, gauge, thk, end_dist, edge_dist, dia_hole, fy, fu):
         '''
@@ -1200,11 +1079,9 @@ class Plate(Material):
     def get_moment_cacacity(self, fy, plate_tk, plate_len):
         self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6
 
-<<<<<<< HEAD
-=======
 
 
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
+
     def __repr__(self):
         repr = "Plate\n"
         repr += "Thickness Provided: {}\n".format(self.thickness_provided)
@@ -1225,14 +1102,11 @@ class Plate(Material):
         repr += "Block Shear Capacity: {}\n".format(self.block_shear_capacity)
         repr += "Shear Yielding Capacity: {}\n".format(self.shear_yielding_capacity)
         repr += "Shear Rupture Capacity: {}\n".format(self.shear_rupture_capacity)
-<<<<<<< HEAD
-=======
 
         repr += "shear_capacity_web_plate: {}\n".format(self.shear_capacity_web_plate)
         repr += "tension_capacity_web plate: {}\n".format( self.tension_capacity_web_plate)
         repr += "tension_capacity_flange_plate: {}\n".format( self.tension_capacity_flange_plate)
 
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
         repr += "Moment Capacity: {}\n".format(self.moment_capacity)
         return repr
 
@@ -1246,10 +1120,7 @@ class Angle(Material):
         self.leg_a_length = 0.0
         self.leg_b_length = 0.0
         self.thickness = 0.0
-<<<<<<< HEAD
-=======
         self.gap = 0.0
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 
         self.connect_to_database_update_other_attributes(designation)
 
@@ -1275,11 +1146,8 @@ class Angle(Material):
 
         conn.close()
 
-<<<<<<< HEAD
-=======
 
 
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 class I_sectional_Properties(object):
 
     def calc_Mass(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):

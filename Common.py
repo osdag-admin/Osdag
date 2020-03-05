@@ -1,7 +1,6 @@
 
 # @author: Amir, Umair, Arsil
 
-
 import operator
 
 
@@ -17,7 +16,6 @@ TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 DESIGN_FLAG = 'False'
-
 VALUE_NOT_APPLICABLE = 'N/A'
 
 import sqlite3
@@ -258,7 +256,6 @@ KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
 
-
 ###################################
 # Key for Storing Module
 
@@ -283,7 +280,6 @@ KEY_DISP_COMPRESSION = 'Compression Member'
 
 DISP_TITLE_CM = 'Connecting members'
 
-
 ###################################
 # Key for Storing Connectivity
 
@@ -295,7 +291,6 @@ VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
 
-
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
 VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
@@ -305,7 +300,6 @@ KEY_IMAGE = 'Image'
 KEY_LENGTH = 'Length(mm)'
 KEY_DISP_LENGTH = 'Length(mm) *'
 
-
 ###################################
 # Key for Storing Supporting_Section sub-key of Member
 
@@ -313,6 +307,8 @@ KEY_SUPTNGSEC = 'Member.Supporting_Section'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 VALUES_COLSEC = connectdb("Columns")
+
+
 KEY_DISP_PRIBM = 'Primary beam *'
 VALUES_PRIBM = connectdb("Beams")
 
@@ -326,7 +322,6 @@ VALUES_BEAMSEC = connectdb("Beams")
 
 KEY_DISP_SECBM = 'Secondary beam *'
 VALUES_SECBM = connectdb("Beams")
-
 
 ###################################
 # Key for Storing Material sub-key of Member
@@ -410,6 +405,14 @@ KEY_DISP_LENGTH = 'Length(mm) *'
 
 
 DISP_TITLE_TENSION = 'Tension Capacity'
+
+
+
+
+
+
+
+
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate'
 
 KEY_FLANGEPLATE_PREFERENCES = 'Flange_Plate.Preferences'
@@ -515,6 +518,8 @@ KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
 KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Web plate shear cap"
 KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
 KEY_DISP_TEN_CAP_WEB_PLATE ="Web_plate tension_capacity_"
+
+
 KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'
 KEY_DISP_SHEARYIELDINGCAP_WEB= 'Shear Yielding Capacity'
 KEY_BLOCKSHEARCAP_WEB='web_plate.block_shear_capacity'
@@ -694,6 +699,8 @@ KEY_SUPTDSEC_POISSON_RATIO = 'Supported_Section.Poisson_Ratio'
 KEY_DISP_SUPTDSEC_POISSON_RATIO = 'Poissons ratio, v'
 KEY_SUPTDSEC_THERMAL_EXP = 'Supported_Section.Thermal_Expansion'
 KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
+
+
 KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
@@ -719,6 +726,12 @@ KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
 KEY_OUT_MIN_PITCH = 'Bolt.MinPitch'
+
+
+
+
+
+
 KEY_OUT_DISP_PITCH = 'Pitch'
 KEY_OUT_END_DIST = 'Bolt.EndDist'
 KEY_OUT_DISP_END_DIST = 'End Distance'
@@ -729,6 +742,8 @@ KEY_OUT_DISP_GAUGE = 'Gauge'
 KEY_OUT_EDGE_DIST = 'Bolt.EdgeDist'
 KEY_OUT_MIN_EDGE_DIST = 'Bolt.MinEdgeDist'
 KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
+
+
 KEY_OUT_DISP_EDGE_DIST = 'Edge Distance'
 
 
@@ -829,7 +844,6 @@ KEY_DISP_TOPANGLE='Top Angle *'
 #     '35 35 x 5', '35 35 x 6', '40 40 x 3', '40 40 x 4', '40 40 x 5', '40 40 x 6', '45 45 x 3', '45 45 x 4', '45 45 x 5', '45 45 x 6', '50 50 x 3', '50 50 x 4', '50 50 x 5', '50 50 x 6', '50 50 x 7', '50 50 x 8', '55 55 x 4', '55 55 x 5', '55 55 x 6', '55 55 x 8', '55 55 x 10', '60 60 x 4', '60 60 x 5', '60 60 x 6', '60 60 x 8', '60 60 x 10', '65 65 x 4', '65 65 x 5', '65 65 x 6', '65 65 x 8', '65 65 x 10', '70 70 x 5', '70 70 x 6', '70 70 x 7', '70 70 x 8', '70 70 x 10', '75 75 x 5', '75 75 x 6', '75 75 x 8', '75 75 x 10', '80 80 x 6', '80 80 x 8', '80 80 x 10', '80 80 x 12', '90 90 x 6', '90 90 x 8', '90 90 x 10', '90 90 x 12', '100 100 x 6', '100 100 x 7', '100 100 x 8', '100 100 x 10', '100 100x 12', '100 100 x 15', '110 110 X 8', '110 110 X 10', '110 110 X 12', '110 110 X 16', '120 120 X 8', '120 120 X 10', '120 120 X 12', '120 120 X 15', '130 130 X 8', '130 130 X 9', '130 130 X 10', '130 130 X 12', '130 130 X 16', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '180 180 X 15', '180 180 X 18', '180 180 X 20', '200 200 X 12', '200 200 X 16', '200 200 X 20', '200 200 X 24', '200 200 X 25', '30 20 X 3', '30 20 X 4', '30 20 X 5', '40 20 X 3', '40 20 X 4', '40 20 X 5', '40 25 X 3', '40 25 X 4', '40 25 X 5', '40 25 X 6', '45 30 X 3', '45 30 X 4', '45 30 X 5', '45 30 X 6', '50 30 X 3', '50 30 X 4', '50 30 X 5', '50 30 X 6', '60 30 X 5', '60 30 X 6', '60 40 X 5', '60 40 X 6', '60 40 X 7', '60 40 X 8', '65 45 X 5', '65 45 X 6', '65 45 X 8', '65 50 X 5', '65 50 X 6', '65 50 X 7', '65 50 X 8', '70 45 X 5', '70 45 X 6', '70 45 X 8', '70 45 X 10', '70 50 X 5', '70 50 X 6', '70 50 X 7', '70 50 X 8', '75 50X 5', '75 50X 6', '75 50X 7', '75 50X 8', '75 50X 10', '80 40 X 5', '80 40 X 6', '80 40 X 7', '80 40 X 8', '80 50 X 5', '80 50 X  6', '80 50 X  8', '80 50 X 10', '80 60 X 6', '80 60 X 7', '80 60 X 8', '90 60 X 6', '90 60 X  8', '90 60 X 10', '90 60 X 12', '90 65 X 6', '90 65 X 7', '90 65 X 8', '90 65 X 10', '100 50 X 6', '100 50 X 7', '100 50 X 8', '100 50 X 10', '100 65 X 6', '100 65 X  7', '100 65 X  8', '100 65 X 10', '100 75 X 6', '100 75 X  8', '100 75 X 10', '100 75 X 12', '120 80 X 8', '120 80 X 10', '120 80 X 12', '125 75 X 6', '125 75 X  8', '125 75 X 10', '125 75 X 12', '125 95 X 6', '125 95 X  8', '125 95 X 10', '125 95 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '150 75 X 8', '150 75 X  9', '150 75 X 10', '150 75 X 12', '150 75 X 15', '150 90 X 10', '150 90 X X 12', '150 90 X X 15', '150 90 X 10', '150 90 X 12', '150 90 X 15', '150 115 X 8', '150 115 X 10', '150 115 X 12', '150 115 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20']
 VALUES_ANGLESEC= ['All', 'Customized']
 
-
 VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
 
@@ -839,7 +853,6 @@ def get_available_cleat_list(input_angle_list, max_leg_length, min_leg_length):
     available_angles = []
     for designation in input_angle_list:
         leg_a_length,leg_b_length = get_leg_lengths(designation)
-
         if operator.le(max(leg_a_length,leg_b_length),max_leg_length) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length):
             available_angles.append(designation)
     return available_angles
@@ -864,7 +877,6 @@ def get_leg_lengths(designation):
     return leg_a_length,leg_b_length
 
 all_angles = connectdb("Angles","popup")
-
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
 print(VALUES_CLEAT_CUSTOMIZED)
 
@@ -919,7 +931,6 @@ KEY_DISP_ENDDIST = 'End Distance'
 
 KEY_EDGEDIST = 'Edge Distance'
 KEY_DISP_EDGEDIST = 'Edge Distance'
-
 
 
 KEY_CONNLOC = 'Conn Location'

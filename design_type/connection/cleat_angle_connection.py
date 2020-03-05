@@ -513,7 +513,6 @@ class CleatAngleConnection(ShearConnection):
         self.bolt.bolt_diameter = list(possible_bolt_dia & user_bolt_dia)
         print (possible_bolt_dia,user_bolt_dia)
         if self.bolt.bolt_diameter:
-
             logger.info(": Selecting optimum bolt diameter")
             self.select_bolt_dia(self)
         else:
@@ -744,7 +743,8 @@ class CleatAngleConnection(ShearConnection):
 
         self.cleat.height = 208.0
         self.cleat.leg_a_length = 100.0
-        self.cleat.leg_b_length = 100.0
+        self.cleat.leg_b_length = 150.0
+
         self.cleat.thickness = 8.0
         self.cleat.r1 = 8.5
         self.cleat.r2 = 4.5

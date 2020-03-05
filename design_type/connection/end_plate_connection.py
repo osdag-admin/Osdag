@@ -181,13 +181,11 @@ class EndPlateConnection(ShearConnection):
         t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
         options_list.append(t11)
 
-
         t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
         options_list.append(t12)
 
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None)
         options_list.append(t13)
-
 
         t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_platethk, VALUES_PLATETHK)
         options_list.append(t14)

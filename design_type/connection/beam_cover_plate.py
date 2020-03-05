@@ -521,8 +521,8 @@ class BeamCoverPlate(MomentConnection):
         # self.load.shear_force = self.load.shear_force * 1000
         # self.load.moment = self.load.moment * 1000000
 
-        self.member_capacity(self)
-        # self.hard_values(self)
+        # self.member_capacity(self)
+        self.hard_values(self)
     def hard_values(self):
         #flange bolt
         self.load.moment = 20 #kN

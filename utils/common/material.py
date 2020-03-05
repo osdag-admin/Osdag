@@ -1,10 +1,7 @@
 import sqlite3
 from Common import *
-<<<<<<< HEAD
-=======
 import logging
 
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
 
 class Material(object):
 
@@ -36,9 +33,6 @@ class Material(object):
         self.fy_40 = row[3]
         self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
         self.fu = row[4]
-<<<<<<< HEAD
-        conn.close()
-=======
         conn.close()
 
     def set_osdaglogger(key):
@@ -73,4 +67,4 @@ class Material(object):
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
+

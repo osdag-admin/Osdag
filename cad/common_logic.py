@@ -232,7 +232,8 @@ class CommonDesignLogic(object):
 
         elif self.connection == KEY_DISP_CLEATANGLE:
             A = CleatAngleConnection()
-            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_a_length, T=A.cleat.thickness,
+
+            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass
@@ -305,7 +306,6 @@ class CommonDesignLogic(object):
         #     nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, nut_space)
         #     beamwebconn = endBeamWebBeamWeb(column, beam, notchObj, Fweld1, plate, nutBoltArray)
         #
-
         elif self.connection == KEY_DISP_CLEATANGLE:
             # nut_space = sBeam_tw + 2 * cleat_thick + nut_T
             # cnut_space = pBeam_tw + cleat_thick + nut_T
@@ -330,11 +330,10 @@ class CommonDesignLogic(object):
             A = FinPlateConnection()
         elif self.connection == KEY_DISP_CLEATANGLE:
             A = CleatAngleConnection()
-            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_a_length, T=A.cleat.thickness,
+            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass
-
         #### PLATE,BOLT,ANGLE AND NUT PARAMETERS #####
 
         # if self.connection == "cleatAngle":
@@ -388,7 +387,6 @@ class CommonDesignLogic(object):
             print(notch_R1, notch_height, (A.supporting_section.flange_width / 2.0 -
                                            (A.supporting_section.web_thickness / 2.0 + gap)) + gap,
                   A.supported_section.flange_width)
-
         elif self.connection == 'SeatedAngle':
             pass
             # seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
@@ -458,7 +456,7 @@ class CommonDesignLogic(object):
             gap = A.plate.gap
         elif self.connection == KEY_DISP_CLEATANGLE:
             A = CleatAngleConnection()
-            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_a_length, T=A.cleat.thickness,
+            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass
@@ -659,7 +657,6 @@ class CommonDesignLogic(object):
                 A = FinPlateConnection()
             elif self.connection == KEY_DISP_CLEATANGLE:
                 A = CleatAngleConnection()
-
             else:
                 pass
 
@@ -708,7 +705,6 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
                 osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                                     update=True)
-
                 if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_ENDPLATE:
                     osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
                     osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
@@ -716,7 +712,6 @@ class CommonDesignLogic(object):
                                         update=True)
 
                 elif self.connection == KEY_DISP_CLEATANGLE:
-
                     osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1,
                                         update=True)
                     osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=Quantity_NOC_BLUE1,

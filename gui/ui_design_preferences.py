@@ -72,6 +72,10 @@ class Ui_Dialog(object):
         self.tabWidget.setFont(font)
         self.tabWidget.setObjectName("tabWidget")
 
+###################################################################
+######################################################################
+######################################################################
+####################################################################
 
 #START
 
@@ -892,8 +896,6 @@ class Ui_Dialog(object):
         self.retranslateUi(DesignPreferences)
         self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
-
-
         module = main.module_name(main)
 
         if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
@@ -954,7 +956,6 @@ class Ui_Dialog(object):
         else:
             pass
 
-
         for ch in tab_Column.children():
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
                 QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
@@ -1009,7 +1010,6 @@ class Ui_Dialog(object):
             elif isinstance(ch, QtWidgets.QComboBox):
                 if ch.objectName() == KEY_SUPTNGSEC_TYPE:
                     Type = ch.currentText()
-
 
         if ch == tab_Column.children()[len(tab_Column.children())-1]:
             conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -1107,7 +1107,6 @@ class Ui_Dialog(object):
             elif isinstance(ch, QtWidgets.QComboBox):
                 if ch.objectName() == KEY_SUPTDSEC_TYPE:
                     Type = ch.currentText()
-
 
         if ch == tab_Beam.children()[len(tab_Beam.children())-1]:
             conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -1289,13 +1288,10 @@ class DesignPreferences(QDialog):
         '''
         @author: Umair
         '''
-
-
         tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         if designation == 'Select Section':
             self.ui.clear_tab("Column")
             return
-
         col_list = []
         col_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(col_attributes, table, designation)

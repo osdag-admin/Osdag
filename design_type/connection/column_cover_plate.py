@@ -483,7 +483,6 @@ class ColumnCoverPlate(MomentConnection):
         # self.load.shear_force = self.load.shear_force* 1000
         # self.load.moment= self.load.moment * 1000000
 
-
     def member_capacity(self):
         #     # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
         #     if self.connectivity in VALUES_CONN_1:
@@ -592,7 +591,6 @@ class ColumnCoverPlate(MomentConnection):
         #       self.supported_section.tension_yielding_capacity, self.load.axial_force)
 
         print("tension_yielding_capacity_web", self.tension_yielding_capacity_web)
-
 
         if self.tension_yielding_capacity_web > self.factored_axial_load:
 
@@ -760,7 +758,6 @@ class ColumnCoverPlate(MomentConnection):
         moment_capacity = 0
         self.flange_plate.get_moment_cacacity(self.flange_plate.fy, self.flange_plate.thickness[0],
                                               self.flange_plate.length)
-
         ###### # capacity Check for flange = min(block, yielding, rupture)
 
         ###### # capacity Check for flange = min(block, yielding, rupture)
@@ -849,7 +846,6 @@ class ColumnCoverPlate(MomentConnection):
         print(self.preference)
         if self.preference == "Outside":
             print(self.preference)
-
             A_vn_flange = (
                                       self.section.flange_width - self.flange_plate.bolts_one_line * self.flange_bolt.dia_hole) * \
                           self.flange_plate.thickness[0]
@@ -1053,7 +1049,6 @@ class ColumnCoverPlate(MomentConnection):
             else:
                 pass
             # print(300, design_status)
-
         ##########################################################################
         # Design of web splice plate
         self.web_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.web_bolt.bolt_diameter[0],
@@ -1126,7 +1121,6 @@ class ColumnCoverPlate(MomentConnection):
             Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
                     self.web_plate.bolt_line - 1) * self.web_bolt.dia_hole + end_dist) * \
                   self.section.web_thickness
-
             # print(17,self.web_plate.bolt_line, self.web_plate.pitch_provided, self.web_plate.bolt_line,
             #      self.web_bolt.dia_hole, self.web_plate.end_dist_provided, self.web_plate.thickness_provided)
             # print(18, self.web_plate.bolt_line, pitch, end_dist, self.section.web_thickness)
@@ -1136,7 +1130,6 @@ class ColumnCoverPlate(MomentConnection):
                                                                                     f_u=self.web_plate.fu,
                                                                                     f_y=self.web_plate.fy)
             # print(19, self.web_plate.thickness_provided, self.web_plate.block_shear_capacity, self.load.axial_force, self.web_plate.pitch_provided)
-
 
             if self.web_plate.block_shear_capacity < self.factored_axial_load:
 
@@ -1156,7 +1149,6 @@ class ColumnCoverPlate(MomentConnection):
             else:
                 design_status_block_shear = True
                 break
-
         Tension_capacity_web_plate = min(self.section.shear_yielding_capacity, self.section.shear_rupture_capacity,
                                          self.section.block_shear_capacity)
 
@@ -1240,7 +1232,6 @@ class ColumnCoverPlate(MomentConnection):
                 else:
                     design_status_block_shear = True
                     break
-
             Tension_capacity_web_plate = min(self.section.tension_yielding_capacity,
                                              self.section.tension_rupture_capacity,
                                              self.section.block_shear_capacity)
@@ -1323,7 +1314,6 @@ class ColumnCoverPlate(MomentConnection):
                     design_status_block_shear = True
                     break
                 # print(design_status_block_shear)
-
             if design_status_block_shear is True:
                 break
             Tension_capacity_web_plate = min(self.section.shear_yielding_capacity,
@@ -1428,7 +1418,6 @@ class ColumnCoverPlate(MomentConnection):
         # Function for block shear capacity calculation
 
     @staticmethod
-
     def block_shear_strength_section(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         """Calculate the block shear strength of bolted connections as per cl. 6.4.1
 
@@ -1474,7 +1463,6 @@ class ColumnCoverPlate(MomentConnection):
         return tdg
 
     @staticmethod
-
     def tension_member_design_due_to_rupture_of_critical_section(A_vn, fu):
         '''
                Args:
@@ -1712,3 +1700,4 @@ class ColumnCoverPlate(MomentConnection):
         tabs.append(t1)
 
         return tabs
+

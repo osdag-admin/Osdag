@@ -5,7 +5,6 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!\
-
 from PyQt5.QtWidgets import QMessageBox, qApp, QScrollArea
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
@@ -60,12 +59,8 @@ from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
-<<<<<<< HEAD
-from design_type.connection.end_plate_connection import EndPlateConnectionInput
-=======
 from design_type.connection.end_plate_connection import EndPlateConnection
->>>>>>> b59cdac55fbccc457557c368c0d2f38e812f2b41
-
+from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
@@ -638,7 +633,6 @@ class Ui_ModuleWindow(QMainWindow):
                 key_customized_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
                 data[t[0] + "_customized"] = t[1]()
-                
 
             elif t[0] == KEY_SECSIZE and (module == KEY_DISP_COMPRESSION or module == KEY_DISP_TENSION):
                 key_customized_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
@@ -789,7 +783,6 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setFont(font)
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-
                 out_layout2.addWidget(l, j, 1, 1, 1)
 
             if type == TYPE_TEXTBOX:
@@ -827,7 +820,6 @@ class Ui_ModuleWindow(QMainWindow):
                 q.setObjectName("_title")
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
-
                 out_layout2.addWidget(q, j, 1, 2, 2)
                 j = j + 1
             i = i + 30
@@ -1091,7 +1083,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.designPrefDialog = DesignPreferences(main)
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
-
         if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
@@ -1508,7 +1499,6 @@ class Ui_ModuleWindow(QMainWindow):
     def return_class(self,name):
         if name == KEY_DISP_FINPLATE:
             return FinPlateConnection
-
         elif name == KEY_DISP_ENDPLATE:
             return EndPlateConnection
         elif name == KEY_DISP_COLUMNCOVERPLATE:
@@ -1619,7 +1609,6 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             main.func_for_validation(main, self, self.design_inputs)
             status = main.design_status
-
             print(status)
 
             # main.set_input_values(main, self.design_inputs, self)
@@ -2025,7 +2014,6 @@ class Ui_ModuleWindow(QMainWindow):
                 self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
         elif module == KEY_DISP_BEAMCOVERPLATE:
             designation_bm = key_5.currentText()
-
             if key_5.currentIndex() != 0:
                 self.designPrefDialog.beam_preferences(designation_bm, material_grade)
         elif module == KEY_DISP_COMPRESSION:
@@ -2092,7 +2080,6 @@ class Ui_ModuleWindow(QMainWindow):
             designation_col = key_2.currentText()
             designation_bm = key_3.currentText()
             if conn in VALUES_CONN_1:
-
                 # self.designPrefDialog.ui.tabWidget.setTabText(
                 #     self.designPrefDialog.ui.tabWidget.indexOf(
                 #     self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)

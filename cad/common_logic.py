@@ -233,7 +233,7 @@ class CommonDesignLogic(object):
 
         elif self.connection == KEY_DISP_CLEATANGLE:
             A = CleatAngleConnection()
-            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_a_length, T=A.cleat.thickness,
+            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass
@@ -333,7 +333,7 @@ class CommonDesignLogic(object):
             A = FinPlateConnection()
         elif self.connection == KEY_DISP_CLEATANGLE:
             A = CleatAngleConnection()
-            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_a_length, T=A.cleat.thickness,
+            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass
@@ -464,7 +464,7 @@ class CommonDesignLogic(object):
             gap = A.plate.gap
         elif self.connection == KEY_DISP_CLEATANGLE:
             A = CleatAngleConnection()
-            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_a_length, T=A.cleat.thickness,
+            angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass

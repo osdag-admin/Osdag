@@ -15,9 +15,9 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 from OCC.Core.gp import gp_Ax1
 from OCC.Core.BRepPrimAPI import *
 
-from OCC.Display.SimpleGui import init_display
-
-display, start_display, add_menu, add_function_to_menu = init_display()
+# from OCC.Display.SimpleGui import init_display
+#
+# display, start_display, add_menu, add_function_to_menu = init_display()
 
 
 class AnchorBolt_A(object):

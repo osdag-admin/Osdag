@@ -751,7 +751,7 @@ class CleatAngleConnection(ShearConnection):
 
         self.cleat.height = 208.0
         self.cleat.leg_a_length = 100.0
-        self.cleat.leg_b_length = 100.0
+        self.cleat.leg_b_length = 150.0
         self.cleat.thickness = 8.0
         self.cleat.r1 = 8.5
         self.cleat.r2 = 4.5

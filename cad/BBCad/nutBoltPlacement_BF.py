@@ -112,11 +112,9 @@ class NutBoltArray_BF():
 
     def create_modelBF(self):
         for bolt in self.bolts_BF:
-            # self.models_BF.append(bolt.create_model())
-            pass
+            self.models_BF.append(bolt.create_model())
         for nut in self.nuts_BF:
-            # self.models_BF.append(nut.create_model())
-            pass
+            self.models_BF.append(nut.create_model())
 
         dbg = self.dbgSphere(self.originBF)
         self.models_BF.append(dbg)

@@ -1118,7 +1118,9 @@ class BeamCoverPlate(MomentConnection):
             Atg = 2 * (( self.flange_plate.bolts_one_line / 2 - 1) * self.flange_plate.gauge_provided + self.flange_plate.edge_dist_provided) * \
                   self.section.flange_thickness
             # todo add in DDCl and diagram
-            Atn = 2 * ((self.flange_plate.bolts_one_line / 2 - 1) * self.flange_plate.gauge_provided - ((self.flange_plate.bolts_one_line / 2 - 1) * self.flange_bolt.dia_hole) + self.flange_plate.edge_dist_provided) * \
+            Atn = 2 * ((self.flange_plate.bolts_one_line / 2 - 1) * self.flange_plate.gauge_provided -
+                       ((self.flange_plate.bolts_one_line / 2 - 1) * self.flange_bolt.dia_hole) +
+                       self.flange_plate.edge_dist_provided) * \
                   self.section.flange_thickness# todo add in DDCl and diagram
             # print(Avg, Avn, Atg, Atn)
             # print(8, self.flange_plate.bolt_line, pitch, end_dist)

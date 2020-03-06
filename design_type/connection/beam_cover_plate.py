@@ -2091,13 +2091,24 @@ class BeamCoverPlate(MomentConnection):
         # self.display_3DModel("Connector", bgcolor)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
 
-
     def tab_list(self):
 
         tabs = []
 
-        t1 = (KEY_DISP_BEAMSEC, self.tab_beam_section)
+        t1 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
         tabs.append(t1)
+
+        t2 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t2)
+
+        t3 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t3)
+
+        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t4)
+
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t5)
 
         return tabs
 

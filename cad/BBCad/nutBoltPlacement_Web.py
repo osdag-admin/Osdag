@@ -69,10 +69,10 @@ class NutBoltArray_Web():
         :param outputobj: This is output dictionary for bolt placement parameters 
         :return: Edge, end, gauge and pitch distances for placement
         '''
-        self.edge_W = outputobj.web_plate.edge_dist_provided
-        self.end_W = outputobj.web_plate.end_dist_provided
-        self.pitch_W = outputobj.web_plate.pitch_provided
-        self.gauge_W = outputobj.web_plate.gauge_provided
+        self.edge_W = outputobj.web_plate.edge_dist_provided    #33
+        self.end_W = outputobj.web_plate.end_dist_provided      #33
+        self.pitch_W = outputobj.web_plate.pitch_provided       #70
+        self.gauge_W = outputobj.web_plate.length - 2* self.edge_W
         self.row_W = outputobj.web_plate.bolts_one_line
         self.col_W = outputobj.web_plate.bolt_line
 

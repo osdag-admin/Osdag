@@ -408,12 +408,12 @@ class Section(Material):
 
         self.tension_capacity = Tc
 
-    def min_rad_gyration_calc(self,key,subkey,mom_inertia_y,mom_inertia_z,rad_y, rad_z,area,Cg_1,Cg_2, thickness=0.0):
+    def min_rad_gyration_calc(self,key,subkey,mom_inertia_y,mom_inertia_z, area,rad_y, rad_z, rad_u =0.0, rad_v=0.0, Cg_1=0,Cg_2 =0, thickness=0.0):
 
         if key == "Channels" and subkey == "Web":
             min_rad = min(rad_y, rad_z)
 
-        elif key == 'Back to Back Channels'  and subkey == "Web":
+        elif key == 'Back to Back Channels' and subkey == "Web":
             Iyy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
             Izz = 2 * mom_inertia_z
             I = min(Iyy, Izz)
@@ -444,7 +444,7 @@ class Section(Material):
             min_rad= math.sqrt(I / (area))
 
         elif key == 'Angles' and (subkey == 'Long Leg' or subkey == 'Short Leg'):
-            min_rad = min(rad_y, rad_z)
+            min_rad = min(rad_u, rad_v)
 
         self.min_radius_gyration = min_rad
 
@@ -1002,8 +1002,8 @@ class Plate(Material):
 class Angle(Section):
 
     def __init__(self, designation, material_grade ):
-        super(Angle, self).__init__(material_grade)
-        # super(Angle, self).__init__(designation, material_grade)
+        # super(Angle, self).__init__(material_grade)
+        super(Angle, self).__init__(designation, material_grade)
 
         self.designation = designation
 
@@ -1018,6 +1018,7 @@ class Angle(Section):
     def __repr__(self):
         repr = "Angle\n"
         repr += "Designation: {}\n".format(self.designation)
+        repr += "rad: {}\n".format(self.rad_of_gy_z)
         return repr
 
     def connect_to_database_update_other_attributes_angles(self, designation):
@@ -1034,6 +1035,8 @@ class Angle(Section):
         axb = axb.lower()
         self.leg_a_length = float(axb.split("x")[0])
         self.leg_b_length = float(axb.split("x")[1])
+        self.max_leg = max(self.leg_a_length,self.leg_b_length)
+        self.min_leg = min(self.leg_a_length, self.leg_b_length)
         self.thickness = row[5]
         self.root_radius = row[6]
         self.toe_radius = row[7]
@@ -1053,6 +1056,36 @@ class Angle(Section):
         self.plast_sec_mod_y = row[22] * 1000
         self.source = row[23]
         conn.close()
+
+    def tension_angle_member_design_due_to_rupture_of_critical_section(self, A_nc, A_go, F_u, F_y, L_c, w, b_s, t):
+        "design strength,T_dn,as governed by rupture at net section"
+        "A_n = net area of the total cross-section"
+        "A_nc = net area of the connected leg"
+        "A_go = gross area of the outstanding leg"
+        "alpha_b,alpha_w = 0.6 - two bolts, 0.7 - three bolts or 0.8 - four or more bolts/welded"
+        "gamma_m1 = partial safety factor for failure in tension by ultimate stress"
+        "F_u = Ultimate Strength of material"
+        "w = outstanding leg width"
+        "b_s = shear lag width"
+        "t = thickness of the leg"
+        "L_c = length of the end connection"
+        "gamma_m0 = partial safety factor for failure in tension by yielding"
+        "F_y = yield stress of the material"
+
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+
+        beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / float(F_u) * float(b_s) / float(L_c)))
+        print(beta)
+
+        if beta <= (F_u * gamma_m0 / F_y * gamma_m1) and beta >= 0.7:
+            beta = beta
+        else:
+            beta = 0.7
+
+        T_dn = (0.9 * A_nc * F_u / gamma_m1) + (beta * A_go * F_y / gamma_m0)
+
+        return T_dn
 
 class I_sectional_Properties(object):
 

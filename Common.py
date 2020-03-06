@@ -853,7 +853,7 @@ VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
 
 
-def get_available_cleat_list(input_angle_list, max_leg_length, min_leg_length):
+def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0):
 
     available_angles = []
     for designation in input_angle_list:

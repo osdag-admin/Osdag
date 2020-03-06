@@ -612,7 +612,7 @@ class BeamCoverPlate(MomentConnection):
         # self.web_plate.moment_demand = 2150000.0
         self.web_plate.pitch_provided = 38
 
-        self.web_plate.gauge_provided = 300
+        self.web_plate.gauge_provided = 150
         self.web_plate.edge_dist_provided = 33
         self.web_plate.end_dist_provided = 33
 

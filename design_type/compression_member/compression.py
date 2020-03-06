@@ -838,13 +838,109 @@ class Compression(Main):
     def tab_list(self):
         tabs = []
 
-        t1 = (KEY_DISP_COLSEC, self.tab_column_section)
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
         tabs.append(t1)
 
-        t2 = (KEY_DISP_BEAMSEC, self.tab_beam_section)
+        t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
         tabs.append(t2)
 
-        t3 = (DISP_TITLE_ANGLE, self.tab_angle_section)
+        t3 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_angle_section)
         tabs.append(t3)
 
+        t4 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t4)
+
+        t5 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t5)
+
+        t6 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t6)
+
+        t7 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t7)
+
         return tabs
+
+    @staticmethod
+    def bolt_values():
+
+        bolt = []
+
+        t1 = (KEY_DP_BOLT_TYPE, KEY_DISP_TYP, TYPE_COMBOBOX, ['Pretensioned', 'Non-pretensioned'])
+        bolt.append(t1)
+
+        t2 = (KEY_DP_BOLT_HOLE_TYPE, KEY_DISP_DP_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'])
+        bolt.append(t2)
+
+        t3 = (KEY_DP_BOLT_MATERIAL_G_O, KEY_DISP_DP_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, '410')
+        bolt.append(t3)
+
+        t4 = (None, None, TYPE_ENTER, None)
+        bolt.append(t4)
+
+        t5 = (None, KEY_DISP_DP_BOLT_DESIGN_PARA, TYPE_TITLE, None)
+        bolt.append(t5)
+
+        t6 = (KEY_DP_BOLT_SLIP_FACTOR, KEY_DISP_DP_BOLT_SLIP_FACTOR, TYPE_COMBOBOX, ['0.2', '0.5', '0.1', '0.25', '0.3',
+                                                                                     '0.33', '0.48', '0.52', '0.55'])
+        bolt.append(t6)
+
+        t7 = (None, None, TYPE_ENTER, None)
+        bolt.append(t7)
+
+        t8 = (None, "NOTE : If slip is permitted under the design load, design the bolt as"
+                    "<br>a bearing bolt and select corresponding bolt grade.", TYPE_NOTE, None)
+        bolt.append(t8)
+
+        t9 = ["textBrowser", "", TYPE_TEXT_BROWSER, BOLT_DESCRIPTION]
+        bolt.append(t9)
+
+        return bolt
+
+    @staticmethod
+    def weld_values():
+
+        weld = []
+
+        t1 = (KEY_DP_WELD_FAB, KEY_DISP_DP_WELD_FAB, TYPE_COMBOBOX, KEY_DP_WELD_FAB_VALUES)
+        weld.append(t1)
+
+        t2 = (KEY_DP_WELD_MATERIAL_G_O, KEY_DISP_DP_WELD_MATERIAL_G_O, TYPE_TEXTBOX, '410')
+        weld.append(t2)
+
+        t3 = ["textBrowser", "", TYPE_TEXT_BROWSER, WELD_DESCRIPTION]
+        weld.append(t3)
+
+        return weld
+
+    @staticmethod
+    def detailing_values():
+        detailing = []
+
+        t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX, [
+            'a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'])
+        detailing.append(t1)
+
+        t2 = (KEY_DP_DETAILING_GAP, KEY_DISP_DP_DETAILING_GAP, TYPE_TEXTBOX, '10')
+        detailing.append(t2)
+
+        t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
+              ['No', 'Yes'])
+        detailing.append(t3)
+
+        t4 = ["textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION]
+        detailing.append(t4)
+
+        return detailing
+
+    @staticmethod
+    def design_values():
+
+        design = []
+
+        t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX, ['Limit State Design',
+                                                                               'Limit State (Capacity based) Design',
+                                                                               'Working Stress Design'])
+        design.append(t1)
+
+        return design

@@ -411,7 +411,7 @@ class FinPlateConnection(ShearConnection):
             flag1 = True
 
         selected_plate_thk = list(np.float_(design_dictionary[KEY_PLATETHK]))
-        supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_MATERIAL])
+        supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_SUPTDSEC_MATERIAL])
         available_plates = [i for i in selected_plate_thk if i >= supported_section.web_thickness]
         if not available_plates:
             QMessageBox.about(window, 'Information',
@@ -448,6 +448,8 @@ class FinPlateConnection(ShearConnection):
 
     def set_input_values(self, design_dictionary):
 
+        print(design_dictionary)
+
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
 
         self.start_time = time.time()
@@ -455,7 +457,7 @@ class FinPlateConnection(ShearConnection):
         self.module = design_dictionary[KEY_MODULE]
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+                           material_grade=design_dictionary[KEY_PLATE_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
         self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],fabrication = design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")

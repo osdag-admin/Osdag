@@ -2,6 +2,7 @@
 # @author: Amir, Umair, Arsil
 
 import operator
+import math
 
 
 TYPE_COMBOBOX = 'ComboBox'
@@ -376,7 +377,9 @@ VALUES_D = ['All', 'Customized']
 # Key for storing Type sub-key of Bolt
 KEY_TYP = 'Bolt.Type'
 KEY_DISP_TYP = 'Type *'
-VALUES_TYP = ['Select Type', 'Friction Grip Bolt', 'Bearing Bolt']
+TYP_BEARING = "Bearing Bolt"
+TYP_FRICTION_GRIP = "Friction Grip Bolt"
+VALUES_TYP = ['Select Type', TYP_FRICTION_GRIP, TYP_BEARING]
 VALUES_TYP_1 = ['Friction Grip Bolt']
 VALUES_TYP_2 = ['Bearing Bolt']
 
@@ -721,12 +724,14 @@ KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
 KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity'
+KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
 KEY_OUT_BOLT_FORCE = 'Bolt.Force'
 KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force'
 KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
+
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
@@ -857,6 +862,11 @@ VALUES_ANGLESEC= ['All', 'Customized']
 
 VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
+
+#Design Report Strings
+DISP_NUM_OF_BOLTS = 'No of Bolts'
+DISP_NUM_OF_ROWS = 'No of Rows'
+DISP_NUM_OF_COLUMNS = 'No of Columns'
 
 
 def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0):

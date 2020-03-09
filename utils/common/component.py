@@ -26,6 +26,14 @@ class Bolt(Material):
         self.bolt_hole_type = bolt_hole_type
         self.edge_type = edge_type
         self.mu_f = float(mu_f)
+
+        self.d_0 = 0.0
+        self.kb = 0.0
+
+        self.kh= 0.0
+
+        self.gamma_mb=0.0
+        self.gamma_mf=0.0
         self.connecting_plates_tk = None
 
         self.bolt_grade_provided = 0.0
@@ -34,6 +42,8 @@ class Bolt(Material):
         self.bolt_shank_area = 0.0
         self.bolt_net_area = 0.0
 
+        self.bolt_shear_capacity = 0.0
+        self.bolt_shear_capacity = 0.0
         self.bolt_shear_capacity = 0.0
         self.bolt_bearing_capacity = 0.0
         self.bolt_capacity = 0.0
@@ -90,12 +100,9 @@ class Bolt(Material):
         repr += "Bolt Shear Capacity: {}\n".format(self.bolt_shear_capacity)
         repr += "Bolt Bearing Capacity: {}\n".format(self.bolt_bearing_capacity)
         repr += "Bolt Capacity: {}\n".format(self.bolt_capacity)
-
-
-
         return repr
 
-    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, connecting_plates_tk, n_planes):
+    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy,n_planes):
         """
 
         :param bolt_type: bearing or friction grip bolt
@@ -115,21 +122,28 @@ class Bolt(Material):
         """
         self.bolt_diameter_provided = bolt_diameter_provided
         self.bolt_grade_provided = bolt_grade_provided
-        self.connecting_plates_tk = list(np.float_(connecting_plates_tk))
-
         [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter_provided)
         [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided)
+
+        t_fu_prev = conn_plates_t_fu_fy[0][0] * conn_plates_t_fu_fy[0][1]
+        thk_considered = conn_plates_t_fu_fy[0][0]
+        fu_considered = conn_plates_t_fu_fy[0][1]
+        for i in conn_plates_t_fu_fy:
+            t_fu = i[0] * i[1]
+            if t_fu <= t_fu_prev:
+                thk_considered = i[0]
+                fu_considered = i[1]
 
         if self.bolt_type == "Bearing Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
-            self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
-                f_u=self.fu, f_ub=self.bolt_fu, t=min(self.connecting_plates_tk), d=self.bolt_diameter_provided,
+            [self.bolt_bearing_capacity,self.d_0,self.kb,self.gamma_mb] = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
+                f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
                 e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
 
         elif self.bolt_type == "Friction Grip Bolt":
-            self.bolt_shear_capacity = IS800_2007.cl_10_4_3_bolt_slip_resistance(
+            self.bolt_shear_capacity,self.kh,self.gamma_mf = IS800_2007.cl_10_4_3_bolt_slip_resistance(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, n_e=n_planes, mu_f=self.mu_f, bolt_hole_type=self.bolt_hole_type)
             self.bolt_bearing_capacity = VALUE_NOT_APPLICABLE
             self.bolt_capacity = self.bolt_shear_capacity
@@ -155,8 +169,9 @@ class Bolt(Material):
 
 
 
-    def calculate_bolt_spacing_limits(self, bolt_diameter_provided, connecting_plates_tk):
-        self.connecting_plates_tk = list(np.float_(connecting_plates_tk))
+    def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy):
+
+        self.connecting_plates_tk = [i[0] for i in conn_plates_t_fu_fy]
         self.bolt_diameter_provided = bolt_diameter_provided
 
         self.min_pitch = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)

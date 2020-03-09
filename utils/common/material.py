@@ -5,7 +5,7 @@ import logging
 
 class Material(object):
 
-    def __init__(self, material_grade):
+    def __init__(self, material_grade=''):
         self.fy_20 = 0.0
         self.fy_20_40 = 0.0
         self.fy_40 = 0.0

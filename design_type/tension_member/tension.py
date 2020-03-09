@@ -683,7 +683,7 @@ class Tension(Main):
 
     def max_force_length(self, design_dictionary):
         if design_dictionary[KEY_SEC_PROFILE] == 'Angles':
-            print (Angle)
+            # print (Angle)
             self.section_size_max = Angle(designation = "200 200 X 25", material_grade=design_dictionary[KEY_MATERIAL])
             self.section_size_max.tension_member_yielding(A_g = (self.section_size_max.area) , F_y = self.section_size_max.fy)
             self.max_member_force = self.section_size_max.tension_yielding_capacity
@@ -736,6 +736,12 @@ class Tension(Main):
         [max_force,length] = self.max_force_length(self, design_dictionary)
         for selectedsize in self.sizelist:
             self.section_size = self.select_section(self,design_dictionary,selectedsize)
+            if design_dictionary[KEY_LOCATION] == "Long Leg":
+               if self.section_size.max_leg < self.section_size.root_radius + self.section_size.thickness + (2 *22):
+                   continue
+            elif design_dictionary[KEY_LOCATION] == 'Short Leg':
+                if self.section_size.min_leg < self.section_size.root_radius + self.section_size.thickness + (2 * 22):
+                    continue
             if design_dictionary[KEY_SEC_PROFILE] in ['Channels','Angles']:
                 self.cross_area = self.section_size.area
                 # self.section_size.min_rad_gyration_calc((self.section_size.rad_of_gy_y),(self.section_size.rad_of_gy_z))
@@ -767,9 +773,9 @@ class Tension(Main):
             if self.cross_area > self.cross_area_prev or previous_size == None:
                 self.section_size.tension_member_yielding(A_g = self.cross_area , F_y =self.section_size.fy)
                 self.K = 1.0
-                print(self.section_size.rad_of_gy_z)
+                # print(self.section_size.rad_of_gy_z)
                 if design_dictionary[KEY_SEC_PROFILE] in ['Angles','Star Angles','Back to Back Angles']:
-                    print(selectedsize)
+                    # print(selectedsize)
                     self.section_size.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],
                                                                 mom_inertia_y=self.section_size.mom_inertia_y,
                                                                 mom_inertia_z=self.section_size.mom_inertia_z,
@@ -887,22 +893,38 @@ class Tension(Main):
 
             # self.res_force = math.sqrt(self.load.shear_force ** 2 + self.load.axial_force ** 2) * 1000
         self.res_force = self.load.axial_force*1000
-        self.plate.thickness_provided = self.closest(self, self.plate_thickness,self.section_size_1.web_thickness)
-        bolts_required_previous = 2
+
+        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+            bolts_required_previous = 2
+            self.thick = self.section_size_1.web_thickness
+            self.plate.thickness_provided = self.closest(self, self.plate_thickness, self.thick)
+        else:
+            bolts_required_previous = 1
+            self.thick = self.section_size_1.thickness
+            self.plate.thickness_provided = self.closest(self, self.plate_thickness, self.thick)
+
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
         count = 0
-        bolts_one_line = 1
+        # bolts_one_line = 1
         for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
             # print(self.bolt.bolt_diameter_provided)
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                     connecting_plates_tk=[self.plate.thickness_provided,
-                                                                          self.section_size.web_thickness])
-
+                                                                          self.thick])
+            # if design_dictionary[KEY_LOCATION] == "Long Leg":
+            #     min_spacing = self.min_plate_height - 2 * self.bolt.min_edge_dist_round
+            # elif design_dictionary[KEY_LOCATION] == 'Short Leg':
+            #     min_spacing = self.min_plate_height - 2 * self.bolt.min_edge_dist_round
+            # else:
+            #     pass
+            #
+            # if min_spacing < 0:
+            #     continue
+            # else:
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                              connecting_plates_tk=[self.plate.thickness_provided,
-                                                                    self.section_size.web_thickness],
+                                              connecting_plates_tk=[self.plate.thickness_provided,self.thick],
                                               n_planes=1)
 
             self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -913,8 +935,7 @@ class Tension(Main):
                                              min_gauge=self.bolt.min_gauge_round,
                                              max_spacing=self.bolt.max_spacing_round,
                                              max_edge_dist=self.bolt.max_edge_dist_round,
-                                             shear_load=0,
-                                             axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
+                                             shear_load=0, axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
                                              shear_ecc=False)
 
             if self.plate.design_status is True:
@@ -931,11 +952,20 @@ class Tension(Main):
                 pass
         bolt_capacity_req = self.bolt.bolt_capacity
 
+        # if min_spacing < 0 and self.bolt.bolt_diameter_provided == 12:
+        #     logger.error("Bolted connection not possible")
+        #     self.design_status = False
+        #     previous_size = self.section_size_1.designation
+        #     self.initial_member_capacity(self, design_dictionary, previous_size)
+        # else:
+        #     pass
+
         if self.plate.design_status is False:
             self.design_status = False
             logger.error(self.plate.reason)
         else:
-            self.get_bolt_grade(self, design_dictionary)
+            pass
+            # self.get_bolt_grade(self, design_dictionary)
 
     def get_bolt_grade(self,design_dictionary):
         bolt_grade_previous = self.bolt.bolt_grade[-1]
@@ -966,7 +996,7 @@ class Tension(Main):
 
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                 connecting_plates_tk=[self.plate.thickness_provided,
-                                                                      self.section_size.web_thickness])
+                                                                      self.thick])
 
         self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                           bolt_grade_provided=self.bolt.bolt_grade_provided,

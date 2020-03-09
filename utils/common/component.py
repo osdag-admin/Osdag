@@ -586,7 +586,7 @@ class Plate(Material):
 
     def __init__(self, thickness=[], height=0.0, length=0.0, gap=0.0, material_grade=""):
         super(Plate, self).__init__(material_grade=material_grade)
-        self.design_status = True
+        self.design_status = False
         self.reason = ""
         self.thickness = list(np.float_(thickness))
         self.thickness.sort(key=float)
@@ -638,12 +638,13 @@ class Plate(Material):
             gauge_pitch -= 5
         return gauge_pitch, edge_end
 
+    #todo changes to be reverted
     def get_web_plate_l_bolts_one_line(self, web_plate_h_max, web_plate_h_min, bolts_required, edge_dist, gauge):
         # print('maxh',web_plate_h_max)
         # print(web_plate_h_max,edge_dist,gauge)
         # print(web_plate_h_max,edge_dist,gauge,"hhhh")
         max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
-        if max_bolts_one_line >=2 :
+        if max_bolts_one_line >=1 :
             # print("max_bolts_one_line", max_bolts_one_line)
             self.bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
             self.bolts_one_line = int(math.ceil(float(bolts_required) / float(self.bolt_line)))
@@ -655,6 +656,8 @@ class Plate(Material):
             self.height = 0
             return self.bolt_line, self.bolts_one_line, self.height
 
+
+    #todo changes to be reverted
     def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist):
         """
 
@@ -665,7 +668,12 @@ class Plate(Material):
         :param max_end_dist_round: maximum end distance
         :return: pitch, end distance, height of plate (false if applicable)
         """
-        gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
+        if bolts_one_line >=2:
+            gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
+        elif bolts_one_line ==1:
+            gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line), multiplier=5)
+            # print(gauge)
+
         web_plate_h = gauge*(bolts_one_line - 1) + edge_dist*2
         # print("gauge", gauge,web_plate_h,edge_dist,max_spacing, max_edge_dist)
         if gauge > max_spacing:
@@ -673,7 +681,8 @@ class Plate(Material):
             if edge_dist >= max_edge_dist:
                 # TODO: add one more bolt to satisfy spacing criteria
                 web_plate_h = False
-        else:
+        elif gauge == 0:
+            egde_dist = web_plate_h/2
             pass
         return gauge, edge_dist, web_plate_h
 
@@ -725,6 +734,7 @@ class Plate(Material):
             bolt_capacity_red = bolt_capacity
         return bolt_capacity_red
 
+    #todo changes to be reverted
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge, max_spacing, max_edge_dist,
                               shear_load=0.0, axial_load=0.0, gap=0.0, shear_ecc=False, bolt_line_limit=math.inf):
 
@@ -747,12 +757,15 @@ class Plate(Material):
 
         # initialising values to start the loop
         res_force = math.sqrt(shear_load ** 2 + axial_load ** 2)
+        print(res_force)
+        print(bolt_capacity)
         bolts_required = max(int(math.ceil(res_force / bolt_capacity)), 2)
+        print (bolts_required)
         [bolt_line, bolts_one_line, web_plate_h] = \
             self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
                                                 min_edge_dist, min_gauge)
         print("boltdetails0", bolt_line, bolts_one_line, web_plate_h)
-        if bolts_one_line < 2:
+        if bolts_one_line < 1:
             self.design_status = False
             self.reason = "Can't fit two bolts in one line. Select lower diameter"
         elif bolt_line > bolt_line_limit:

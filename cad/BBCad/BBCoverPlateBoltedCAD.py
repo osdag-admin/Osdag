@@ -9,6 +9,8 @@ This file is for creating CAD model for cover plate bolted moment connection for
 
 import numpy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
+from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+
 
 
 class BBCoverPlateBoltedCAD(object):
@@ -124,7 +126,7 @@ class BBCoverPlateBoltedCAD(object):
 
     def createInnerPlateAbvFlangeGeometryFront(self):
         shiftY = self.beamLeft.length + self.gap /2 - self.innerplateAbvFlangeFront.W / 2
-        shiftZ = (self.beamLeft.D - 2 * self.beamLeft.t)/2 - self.innerplateAbvFlangeFront.T
+        shiftZ = (self.beamLeft.D/2 - self.beamLeft.T) - self.innerplateAbvFlangeFront.T/2
         shiftX = (self.beamLeft.B - (self.innerplateAbvFlangeFront.L + self.beamLeft.R1))/2
         innerplateAbvFlangeOrigin = numpy.array([shiftX, shiftY, shiftZ])
         innerplateAF_uDir = numpy.array([0.0, 0.0, 1.0])
@@ -133,7 +135,7 @@ class BBCoverPlateBoltedCAD(object):
 
     def createInnerPlateAbvFlangeGeometryBack(self):
         shiftY1 = self.beamLeft.length + self.gap /2 - self.innerplateAbvFlangeFront.W / 2
-        shiftZ1 = (self.beamLeft.D - 2 * self.beamLeft.t)/2 - self.innerplateAbvFlangeFront.T
+        shiftZ1 = (self.beamLeft.D/2 -  self.beamLeft.T) - self.innerplateAbvFlangeFront.T/2
         shiftX1 = (self.beamLeft.B - (self.innerplateAbvFlangeFront.L + self.beamLeft.R1))/2
         innerplateAbvFlangeOrigin1 = numpy.array([-shiftX1, shiftY1, shiftZ1])
         innerplateAF_uDir1 = numpy.array([0.0, 0.0, 1.0])
@@ -142,7 +144,7 @@ class BBCoverPlateBoltedCAD(object):
 
     def createInnerPlateBelwFlangeGeometryFront(self):
         shiftY = self.beamLeft.length + self.gap /2 - self.innerplateAbvFlangeFront.W / 2
-        shiftZ = (self.beamLeft.D - 2 * self.beamLeft.t)/2 - self.innerplateAbvFlangeFront.T
+        shiftZ = (self.beamLeft.D/2 - self.beamLeft.T) - self.innerplateAbvFlangeFront.T/2
         shiftX = (self.beamLeft.B - (self.innerplateAbvFlangeFront.L + self.beamLeft.R1))/2
         innerplateAbvFlangeOrigin = numpy.array([shiftX, shiftY, -shiftZ])
         innerplateAF_uDir = numpy.array([0.0, 0.0, 1.0])
@@ -151,7 +153,7 @@ class BBCoverPlateBoltedCAD(object):
 
     def createInnerPlateBelwFlangeGeometryBack(self):
         shiftY1 = self.beamLeft.length + self.gap /2 - self.innerplateAbvFlangeFront.W / 2
-        shiftZ1 = (self.beamLeft.D - 2 * self.beamLeft.t)/2 - self.innerplateAbvFlangeFront.T
+        shiftZ1 = (self.beamLeft.D/2 - self.beamLeft.T) - self.innerplateAbvFlangeFront.T/2
         shiftX1 = (self.beamLeft.B - (self.innerplateAbvFlangeFront.L + self.beamLeft.R1))/2
         innerplateAbvFlangeOrigin1 = numpy.array([-shiftX1, shiftY1, -shiftZ1])
         innerplateAF_uDir1 = numpy.array([0.0, 0.0, 1.0])
@@ -175,11 +177,10 @@ class BBCoverPlateBoltedCAD(object):
         self.WebPlateRight.place(WebPlateRightOrigin, WPR_uDir, WPR_wDir)
 
     def create_nut_bolt_array_AF(self):
-        if self.flange_splice_preference != 'Outside':
-            nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array(
-                [-self.beamLeft.B / 2, 0.0, (self.plateAbvFlange.T - self.beamLeft.t)/2])
-        else:
-            nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, self.plateAbvFlange.T / 2])
+        # if self.flange_splice_preference != 'Outside':
+        #     nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, (self.plateAbvFlange.T - self.beamLeft.t)/2])
+        # else:
+        nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, self.plateAbvFlange.T / 2])
         gaugeDirAF = numpy.array([1.0, 0, 0])
         pitchDirAF = numpy.array([0, 1.0, 0])
         boltDirAF = numpy.array([0, 0, -1.0])
@@ -187,12 +188,11 @@ class BBCoverPlateBoltedCAD(object):
         self.nut_bolt_array_AF.placeAF(nutBoltOriginAF, gaugeDirAF, pitchDirAF, boltDirAF, width)
 
     def create_nut_bolt_array_BF(self):
-        if self.flange_splice_preference != 'Outside':
-            nutBoltOriginBF = self.plateBelwFlange.sec_origin + numpy.array(
-                [-self.beamLeft.B / 2, 0.0, -(self.plateAbvFlange.T - self.beamLeft.t)/2])
-        else:
-            nutBoltOriginBF = self.plateBelwFlange.sec_origin + numpy.array(
-                [-self.beamLeft.B / 2, 0.0, -self.plateAbvFlange.T / 2])
+        # if self.flange_splice_preference != 'Outside':
+        #     nutBoltOriginBF = self.plateBelwFlange.sec_origin + numpy.array(
+        #         [-self.beamLeft.B / 2, 0.0, -(self.plateAbvFlange.T - self.beamLeft.t)/2])
+        # else:
+        nutBoltOriginBF = self.plateBelwFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, -self.plateAbvFlange.T / 2])
         gaugeDirBF = numpy.array([1.0, 0, 0])
         pitchDirBF = numpy.array([0, 1.0, 0])
         boltDirBF = numpy.array([0, 0, 1.0])
@@ -210,13 +210,30 @@ class BBCoverPlateBoltedCAD(object):
 
 
     def get_nutboltmodelsAF(self):
-        return self.nut_bolt_array_AF.get_modelsAF()
+        nut_bolts = self.nut_bolt_array_AF.get_modelsAF()
+        array = nut_bolts[0]
+        for comp in nut_bolts:
+            array = BRepAlgoAPI_Fuse(comp, array).Shape()
+
+        return array
 
     def get_nutboltmodelsBF(self):
-        return self.nut_bolt_array_BF.get_modelsBF()
+        # return self.nut_bolt_array_BF.get_modelsBF()
+        nut_bolts = self.nut_bolt_array_BF.get_modelsBF()
+        array = nut_bolts[0]
+        for comp in nut_bolts:
+            array = BRepAlgoAPI_Fuse(comp, array).Shape()
+
+        return array
 
     def get_nutboltmodelsWeb(self):
-        return self.nut_bolt_array_Web.get_modelsW()
+        nut_bolts = self.nut_bolt_array_Web.get_modelsW()
+        array = nut_bolts[0]
+        for comp in nut_bolts:
+            array = BRepAlgoAPI_Fuse(comp, array).Shape()
+
+        return array
+        # return self.nut_bolt_array_Web.get_modelsW()
 
     # Below methods are for creating holes in flange and web
     def get_beam_models(self):
@@ -267,15 +284,15 @@ class BBCoverPlateBoltedCAD(object):
 
         '''
         final_beam = self.beamLModel
-        bolt_listLA = self.nut_bolt_array_AF.get_bolt_listLA()
-        bolt_listLB = self.nut_bolt_array_BF.get_bolt_listLB()
-        bolt_listWL = self.nut_bolt_array_Web.get_bolt_web_list()
-        for boltLB in bolt_listLB[:]:
-            final_beam = BRepAlgoAPI_Cut(final_beam, boltLB).Shape()
-        for boltLA in bolt_listLA[:]:
-            final_beam = BRepAlgoAPI_Cut(final_beam, boltLA).Shape()
-        for boltWL in bolt_listWL[:]:
-            final_beam = BRepAlgoAPI_Cut(final_beam, boltWL).Shape()
+        # bolt_listLA = self.nut_bolt_array_AF.get_bolt_listLA()
+        # bolt_listLB = self.nut_bolt_array_BF.get_bolt_listLB()
+        # bolt_listWL = self.nut_bolt_array_Web.get_bolt_web_list()
+        # for boltLB in bolt_listLB[:]:
+        #     final_beam = BRepAlgoAPI_Cut(final_beam, boltLB).Shape()
+        # for boltLA in bolt_listLA[:]:
+        #     final_beam = BRepAlgoAPI_Cut(final_beam, boltLA).Shape()
+        # for boltWL in bolt_listWL[:]:
+        #     final_beam = BRepAlgoAPI_Cut(final_beam, boltWL).Shape()
         return final_beam
 
     def get_beamRModel(self):
@@ -285,15 +302,15 @@ class BBCoverPlateBoltedCAD(object):
 
         '''
         final_beam = self.beamRModel
-        bolt_listRA = self.nut_bolt_array_AF.get_bolt_listRA()
-        bolt_listRB = self.nut_bolt_array_BF.get_bolt_listRB()
-        bolt_listWR = self.nut_bolt_array_Web.get_bolt_web_list()
-        for boltRB in bolt_listRB[:]:
-            final_beam = BRepAlgoAPI_Cut(final_beam, boltRB).Shape()
-        for boltRA in bolt_listRA[:]:
-            final_beam = BRepAlgoAPI_Cut(final_beam, boltRA).Shape()
-        for boltWR in bolt_listWR[:]:
-            final_beam = BRepAlgoAPI_Cut(final_beam, boltWR).Shape()
+        # bolt_listRA = self.nut_bolt_array_AF.get_bolt_listRA()
+        # bolt_listRB = self.nut_bolt_array_BF.get_bolt_listRB()
+        # bolt_listWR = self.nut_bolt_array_Web.get_bolt_web_list()
+        # for boltRB in bolt_listRB[:]:
+        #     final_beam = BRepAlgoAPI_Cut(final_beam, boltRB).Shape()
+        # for boltRA in bolt_listRA[:]:
+        #     final_beam = BRepAlgoAPI_Cut(final_beam, boltRA).Shape()
+        # for boltWR in bolt_listWR[:]:
+        #     final_beam = BRepAlgoAPI_Cut(final_beam, boltWR).Shape()
         return final_beam
 
     def get_WebPlateLeftModel(self):
@@ -303,9 +320,9 @@ class BBCoverPlateBoltedCAD(object):
 
         '''
         final_plateLP = self.WebPlateLeftModel
-        bolt_listLP = self.nut_bolt_array_Web.get_bolt_web_list()
-        for boltLP in bolt_listLP[:]:
-            final_plateLP = BRepAlgoAPI_Cut(final_plateLP, boltLP).Shape()
+        # bolt_listLP = self.nut_bolt_array_Web.get_bolt_web_list()
+        # for boltLP in bolt_listLP[:]:
+        #     final_plateLP = BRepAlgoAPI_Cut(final_plateLP, boltLP).Shape()
         return final_plateLP
 
     def get_WebPlateRightModel(self):
@@ -315,9 +332,9 @@ class BBCoverPlateBoltedCAD(object):
 
         '''
         final_plateRP = self.WebPlateRightModel
-        bolt_listRP = self.nut_bolt_array_Web.get_bolt_web_list()
-        for boltRP in bolt_listRP[:]:
-            final_plateRP = BRepAlgoAPI_Cut(final_plateRP, boltRP).Shape()
+        # bolt_listRP = self.nut_bolt_array_Web.get_bolt_web_list()
+        # for boltRP in bolt_listRP[:]:
+        #     final_plateRP = BRepAlgoAPI_Cut(final_plateRP, boltRP).Shape()
         return final_plateRP
 
     def get_plateAbvFlangeModel(self):
@@ -327,9 +344,9 @@ class BBCoverPlateBoltedCAD(object):
 
         '''
         final_plateAP = self.plateAbvFlangeModel
-        bolt_listAP = self.nut_bolt_array_AF.get_bolt_listLA()
-        for boltAP in bolt_listAP[:]:
-            final_plateAP = BRepAlgoAPI_Cut(final_plateAP, boltAP).Shape()
+        # bolt_listAP = self.nut_bolt_array_AF.get_bolt_listLA()
+        # for boltAP in bolt_listAP[:]:
+        #     final_plateAP = BRepAlgoAPI_Cut(final_plateAP, boltAP).Shape()
         return final_plateAP
 
     def get_plateBelwFlangeModel(self):
@@ -339,9 +356,9 @@ class BBCoverPlateBoltedCAD(object):
 
         '''
         final_plateBP = self.plateBelwFlangeModel
-        bolt_listBP = self.nut_bolt_array_BF.get_bolt_listRB()
-        for boltBP in bolt_listBP[:]:
-            final_plateBP = BRepAlgoAPI_Cut(final_plateBP, boltBP).Shape()
+        # bolt_listBP = self.nut_bolt_array_BF.get_bolt_listRB()
+        # for boltBP in bolt_listBP[:]:
+        #     final_plateBP = BRepAlgoAPI_Cut(final_plateBP, boltBP).Shape()
         return final_plateBP
 
     def get_innerplateAbvFlangeFront(self):
@@ -351,9 +368,9 @@ class BBCoverPlateBoltedCAD(object):
 
         '''
         final = self.innerplateAbvFlangeFrontModel
-        boltt = self.nut_bolt_array_AF.get_bolt_listLA()
-        for a in boltt[:]:
-            final = BRepAlgoAPI_Cut(final, a).Shape()
+        # boltt = self.nut_bolt_array_AF.get_bolt_listLA()
+        # for a in boltt[:]:
+        #     final = BRepAlgoAPI_Cut(final, a).Shape()
         return final
 
     def get_innerplateAbvFlangeBack(self):
@@ -363,9 +380,9 @@ class BBCoverPlateBoltedCAD(object):
 
         '''
         final = self.innerplateAbvFlangeBackModel
-        bolt = self.nut_bolt_array_AF.get_bolt_listLA()
-        for a in bolt[:]:
-            final = BRepAlgoAPI_Cut(final, a).Shape()
+        # bolt = self.nut_bolt_array_AF.get_bolt_listLA()
+        # for a in bolt[:]:
+        #     final = BRepAlgoAPI_Cut(final, a).Shape()
         return final
 
     def get_innerplateBelwFlangeFront(self):
@@ -375,9 +392,9 @@ class BBCoverPlateBoltedCAD(object):
 
         '''
         final = self.innerplateBelwFlangeFrontModel
-        boltt = self.nut_bolt_array_BF.get_bolt_listRB()
-        for a in boltt[:]:
-            final = BRepAlgoAPI_Cut(final, a).Shape()
+        # boltt = self.nut_bolt_array_BF.get_bolt_listRB()
+        # for a in boltt[:]:
+        #     final = BRepAlgoAPI_Cut(final, a).Shape()
         return final
 
     def get_innerplateBelwFlangeBack(self):
@@ -387,7 +404,56 @@ class BBCoverPlateBoltedCAD(object):
 
         '''
         final = self.innerplateBelwFlangeBackModel
-        bolt = self.nut_bolt_array_BF.get_bolt_listRB()
-        for a in bolt[:]:
-            final = BRepAlgoAPI_Cut(final, a).Shape()
+        # bolt = self.nut_bolt_array_BF.get_bolt_listRB()
+        # for a in bolt[:]:
+        #     final = BRepAlgoAPI_Cut(final, a).Shape()
         return final
+
+    def get_beamsModel(self):
+        beamL = self.get_beamLModel()
+        beamR = self.get_beamRModel()
+
+        CAD = BRepAlgoAPI_Fuse(beamL, beamR).Shape()
+
+        return CAD
+
+    def get_flangewebplatesModel(self):
+        plateAbvFlange = self.get_plateAbvFlangeModel()
+        plateBelwFlange = self.get_plateBelwFlangeModel()
+        WebPlateLeft = self.get_WebPlateLeftModel()
+        WebPlateRight = self.get_WebPlateRightModel()
+
+        CAD_list = [plateAbvFlange, plateBelwFlange, WebPlateLeft, WebPlateRight]
+        CAD = CAD_list[0]
+
+        for model in CAD_list[1:]:
+            CAD = BRepAlgoAPI_Fuse(CAD, model).Shape()
+
+        return CAD
+
+    def get_innetplatesModels(self):
+        plateAbvFlangeFront = self.get_innerplateAbvFlangeFront()
+        plateAbvFlangeBack = self.get_innerplateAbvFlangeBack()
+        plateBelwFlangeFront = self.get_innerplateBelwFlangeFront()
+        plateBelwFlangeBack = self.get_innerplateBelwFlangeBack()
+
+        CAD_list = [plateAbvFlangeFront, plateAbvFlangeBack, plateBelwFlangeFront, plateBelwFlangeBack]
+        CAD = CAD_list[0]
+
+        for model in CAD_list[1:]:
+            CAD = BRepAlgoAPI_Fuse(CAD, model).Shape()
+
+        return CAD
+
+    def get_nut_bolt_arrayModels(self):
+        nutboltmodelsAF = self.get_nutboltmodelsAF()
+        nutboltmodelsBF = self.get_nutboltmodelsBF()
+        nutboltmodelsWeb =  self.get_nutboltmodelsWeb()
+
+        CAD_list = [nutboltmodelsAF, nutboltmodelsBF, nutboltmodelsWeb]
+        CAD = CAD_list[0]
+
+        for model in CAD_list[1:]:
+            CAD = BRepAlgoAPI_Fuse(CAD, model).Shape()
+
+        return CAD

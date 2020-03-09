@@ -15,9 +15,15 @@ TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
 TYPE_OUT_BUTTON = 'Output_dock_Button'
 TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
+TYPE_TEXT_BROWSER = 'TextBrowser'
+TYPE_NOTE = 'Note'
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 DESIGN_FLAG = 'False'
 VALUE_NOT_APPLICABLE = 'N/A'
+TYPE_TAB_1 = "TYPE_TAB_1"
+TYPE_TAB_2 = "TYPE_TAB_2"
+TYPE_TAB_3 = "TYPE_TAB_3"
+
 
 import sqlite3
 from utils.common.component import *
@@ -261,6 +267,8 @@ KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
 # Key for Storing Module
 
 KEY_MODULE = 'Module'
+KEY_MAIN_MODULE = 'MainModule'
+KEY_MODULE_STATUS = 'Module.Status'
 
 TYPE_MODULE = 'Window Title'
 
@@ -308,6 +316,7 @@ KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 VALUES_COLSEC = connectdb("Columns")
 
+
 KEY_DISP_PRIBM = 'Primary beam *'
 VALUES_PRIBM = connectdb("Beams")
 
@@ -327,6 +336,8 @@ VALUES_SECBM = connectdb("Beams")
 KEY_MATERIAL = 'Member.Material'
 KEY_DISP_MATERIAL = 'Material *'
 VALUES_MATERIAL = connectdb("Material")
+KEY_SUPTNGSEC_MATERIAL = 'Member.Supporting_Section.Material'
+KEY_SUPTDSEC_MATERIAL = 'Member.Supported_Section.Material'
 
 
 ###################################
@@ -355,7 +366,8 @@ DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
 
 DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
-
+KEY_BOLT_FU = 'Bolt.fu'
+KEY_BOLT_FY = 'Bolt.fy'
 # Key for storing Diameter sub-key of Bolt
 KEY_D = 'Bolt.Diameter'
 KEY_DISP_D = 'Diameter(mm)*'
@@ -380,6 +392,9 @@ DISP_TITLE_PLATE = 'Plate'
 
 # Key for storing Thickness sub-key of Plate
 KEY_PLATETHK = 'Plate.Thickness'
+KEY_PLATE_MATERIAL = 'Plate.Material'
+KEY_PLATE_MIN_HEIGHT = 'Plate.MinHeight'
+KEY_PLATE_MAX_HEIGHT = 'Plate.MaxHeight'
 KEY_DISP_PLATETHK = 'Thickness(mm)*'
 VALUES_PLATETHK = ['All', 'Customized']
 VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
@@ -435,18 +450,18 @@ KEY_EDGEDIST_FLANGE= 'Flange_plate.edge_dist_provided'
 KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 
 KEY_FLANGE_CAPACITY ="Flange_plate.capacity"
-KEY_DISP_FLANGE_CAPACITY= 'capacity'
+KEY_DISP_FLANGE_CAPACITY= 'Capacity'
 KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
-KEY_DISP_FLANGE_TEN_CAPACITY ="flange tension capacity"
+KEY_DISP_FLANGE_TEN_CAPACITY ="Flange ten cap"
 
-KEY_TEN_CAP_FLANGE_PLATE ="Flange_plate.tension_capacity"
-KEY_DISP_TEN_CAP_FLANGE_PLATE ="tension_capacity_flange_plate"
+KEY_FLANGE_PLATE_TEN_CAP ="Flange_plate.tension_capacity"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Flange plate ten cap"
 
 
 KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
 KEY_DISP_BLOCKSHEARCAP_FLANGE='Block Shear Capacity'
 KEY_TENSIONYIELDINGCAP_FLANGE = 'Flange_plate.tension_yielding_capacity'
-KEY_DISP_TENSIONYIELDINGCAP_FLANGE = 'tension yielding capacity'
+KEY_DISP_TENSIONYIELDINGCAP_FLANGE = 'Tension yielding capacity'
 KEY_TENSIONRUPTURECAP_FLANGE= 'Flange_plate.tension_rupture_capacity'
 KEY_DISP_TENSIONRUPTURECAP_FLANGE= 'Tension Rupture Capacity'
 KEY_SHEARYIELDINGCAP_FLANGE= 'Flange_plate.shear_yielding_capacity'
@@ -489,7 +504,7 @@ DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
-VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30','32','36','40']
 
 KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height(mm)'
@@ -510,11 +525,11 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance'
 KEY_WEB_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_CAPACITY= 'capacity'
 KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
-KEY_DISP_WEB_TEN_CAPACITY ="web tension capacity"
+KEY_DISP_WEB_TEN_CAPACITY ="Web tension capacity"
 KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
-KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="shear_capacity_web plate"
+KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Web plate shear cap"
 KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
-KEY_DISP_TEN_CAP_WEB_PLATE ="tension_capacity_web_plate"
+KEY_DISP_TEN_CAP_WEB_PLATE ="Web_plate tension_capacity_"
 
 
 KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'
@@ -562,13 +577,14 @@ KEY_DISP_DP_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 KEY_DP_BOLT_SLIP_FACTOR = 'DesignPreferences.Bolt.Slip_Factor'
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
-KEY_DP_WELD_TYPE = 'DesignPreferences.Weld.Type'
+KEY_DP_WELD_FAB = 'DesignPreferences.Weld.Fab'
 
-KEY_DP_WELD_TYPE_SHOP = 'Shop Weld'
-KEY_DP_WELD_TYPE_FIELD = 'Field weld'
-KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_SHOP, KEY_DP_WELD_TYPE_FIELD]
+KEY_DP_WELD_TYPE = 'Weld.Type'
+KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
+KEY_DP_WELD_FAB_FIELD = 'Field weld'
+KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
 
-KEY_DISP_DP_WELD_TYPE = 'Type of weld'
+KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
 KEY_DP_WELD_MATERIAL_G_O = 'DesignPreferences.Weld.Material_Grade_OverWrite'
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DP_DETAILING_EDGE_TYPE = 'DesignPreferences.Detailing.Edge_type'
@@ -697,11 +713,13 @@ KEY_DISP_SUPTDSEC_POISSON_RATIO = 'Poissons ratio, v'
 KEY_SUPTDSEC_THERMAL_EXP = 'Supported_Section.Thermal_Expansion'
 KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
 
-
+KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
+KEY_OUT_KB = 'Bolt.Kb'
+KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
@@ -711,18 +729,33 @@ KEY_OUT_BOLT_FORCE = 'Bolt.Force'
 KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force'
 KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
+KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
+KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
 KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line'
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
+KEY_OUT_MIN_PITCH = 'Bolt.MinPitch'
+
+
+
+
+
+
 KEY_OUT_DISP_PITCH = 'Pitch'
 KEY_OUT_END_DIST = 'Bolt.EndDist'
 KEY_OUT_DISP_END_DIST = 'End Distance'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
+KEY_OUT_MIN_GAUGE = 'Bolt.MinGauge'
+KEY_OUT_MAX_SPACING = 'Bolt.MaxGauge'
 KEY_OUT_DISP_GAUGE = 'Gauge'
+
 KEY_OUT_EDGE_DIST = 'Bolt.EdgeDist'
+KEY_OUT_MIN_EDGE_DIST = 'Bolt.MinEdgeDist'
+KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
+
 KEY_OUT_DISP_EDGE_DIST = 'Edge Distance'
 
 
@@ -752,6 +785,8 @@ KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
 KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
 KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
+KEY_OUT_WELD_LENGTH = 'Weld.Length'
+KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"
@@ -827,12 +862,12 @@ VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
 
 
-def get_available_cleat_list(input_angle_list, leg_length, relate):
+def get_available_cleat_list(input_angle_list, max_leg_length, min_leg_length):
 
     available_angles = []
     for designation in input_angle_list:
         leg_a_length,leg_b_length = get_leg_lengths(designation)
-        if relate(max(leg_a_length,leg_b_length),leg_length):
+        if operator.le(max(leg_a_length,leg_b_length),max_leg_length) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length):
             available_angles.append(designation)
     return available_angles
 
@@ -856,7 +891,7 @@ def get_leg_lengths(designation):
     return leg_a_length,leg_b_length
 
 all_angles = connectdb("Angles","popup")
-VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 50.0, operator.ge)
+VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
 print(VALUES_CLEAT_CUSTOMIZED)
 
 DISP_TITLE_COMPMEM='Compression member'
@@ -923,3 +958,126 @@ KEY_DISP_LEN_INLINE = 'Total Length in line with tension'
 
 KEY_LEN_OPPLINE = 'Total length opp line with tension'
 KEY_DISP_LEN_OPPLINE = 'Total Length opp line with tension'
+
+
+BOLT_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                "p, li { white-space: pre-wrap; }\n"
+                "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+                "<table border=\"0\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;\" cellspacing=\"2\" cellpadding=\"0\">\n"
+                "<tr>\n"
+                "<td colspan=\"3\">\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">IS 800 Table 20 Typical Average Values for Coefficient of Friction (</span><span style=\" font-family:\'Calibri,sans-serif\'; font-size:9pt;\">µ</span><span style=\" font-family:\'Calibri,sans-serif\'; font-size:9pt; vertical-align:sub;\">f</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">)</span></p></td></tr></table>\n"
+                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p>\n"
+                "<table border=\"0\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;\" cellspacing=\"2\" cellpadding=\"0\">\n"
+                "<tr>\n"
+                "<td width=\"26\"></td>\n"
+                "<td width=\"383\">\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Treatment of Surfaces</span></p></td>\n"
+                "<td width=\"78\">\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  µ_f</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">i)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces not treated</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.2</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">ii)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with short or grit with any loose rust removed, no pitting</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.5</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">iii)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with short or grit and hot-dip galvanized</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.1</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">iv)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with short or grit and spray - metallized with zinc (thickness 50-70 µm)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.25</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">v)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with shot or grit and painted with ethylzinc silicate coat (thickness 30-60 µm)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.3</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">vi)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Sand blasted surface, after light rusting</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.52</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">vii)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with shot or grit and painted with ethylzinc silicate coat (thickness 60-80 µm)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.3</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">viii)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with shot or grit and painted with alcalizinc silicate coat (thickness 60-80 µm)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.3</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">ix)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Surfaces blasted with shot or grit and spray metallized with aluminium (thickness &gt;50 µm)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.5</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">x)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Clean mill scale</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.33</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">xi)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Sand blasted surface</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.48</span></p></td></tr>\n"
+                "<tr>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">xii)</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Red lead painted surface</span></p></td>\n"
+                "<td>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.1</span></p>\n"
+                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></td></tr></table></body></html>")
+
+WELD_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Shop weld takes a material safety factor of 1.25</span></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Field weld takes a material safety factor of 1.5</span></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">(IS 800 - cl. 5. 4. 1 or Table 5)</span></p></body></html>")
+
+DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+               "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+               "p, li { white-space: pre-wrap; }\n"
+               "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[a- sheared or hand flame cut edges] </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">and </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[b - Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">This gap should include the tolerance value of 5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5 mm{tolerance})</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
+               "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+

@@ -117,17 +117,154 @@ class Tension(Main):
             return connectdb("Channels", call_type= "popup")
 
     def tab_list(self):
-
         tabs = []
 
-        t1 = (KEY_DISP_BEAMSEC, self.tab_beam_section)
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
         tabs.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
+        tabs.append(t2)
+
+        t3 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_angle_section)
+        tabs.append(t3)
+
+        t4 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t4)
+
+        t5 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t5)
+
+        t6 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t6)
+
+        t7 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t7)
 
         return tabs
 
     @staticmethod
+    def tab_column_section():
+        supporting_section = []
+
+        t34 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, [])
+        supporting_section.append(t34)
+
+        t1 = (KEY_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_DESIGNATION, TYPE_TEXTBOX, None)
+        supporting_section.append(t1)
+
+        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None)
+        supporting_section.append(t2)
+
+        t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
+        supporting_section.append(t3)
+
+        t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None)
+        supporting_section.append(t4)
+
+        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None)
+        supporting_section.append(t5)
+
+        t6 = (KEY_SUPTNGSEC_DEPTH, KEY_DISP_SUPTNGSEC_DEPTH, TYPE_TEXTBOX, None)
+        supporting_section.append(t6)
+
+        t7 = (KEY_SUPTNGSEC_FLANGE_W, KEY_DISP_SUPTNGSEC_FLANGE_W, TYPE_TEXTBOX, None)
+        supporting_section.append(t7)
+
+        t8 = (KEY_SUPTNGSEC_FLANGE_T, KEY_DISP_SUPTNGSEC_FLANGE_T, TYPE_TEXTBOX, None)
+        supporting_section.append(t8)
+
+        t9 = (KEY_SUPTNGSEC_WEB_T, KEY_DISP_SUPTNGSEC_WEB_T, TYPE_TEXTBOX, None)
+        supporting_section.append(t9)
+
+        t10 = (KEY_SUPTNGSEC_FLANGE_S, KEY_DISP_SUPTNGSEC_FLANGE_S, TYPE_TEXTBOX, None)
+        supporting_section.append(t10)
+
+        t11 = (KEY_SUPTNGSEC_ROOT_R, KEY_DISP_SUPTNGSEC_ROOT_R, TYPE_TEXTBOX, None)
+        supporting_section.append(t11)
+
+        t12 = (KEY_SUPTNGSEC_TOE_R, KEY_DISP_SUPTNGSEC_TOE_R, TYPE_TEXTBOX, None)
+        supporting_section.append(t12)
+
+        t13 = (None, None, TYPE_BREAK, None)
+        supporting_section.append(t13)
+
+        t35 = (None, None, TYPE_ENTER, None)
+        supporting_section.append(t35)
+
+        t14 = (KEY_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'])
+        supporting_section.append(t14)
+
+        t18 = (None, None, TYPE_ENTER, None)
+        supporting_section.append(t18)
+
+        t15 = (KEY_SUPTNGSEC_MOD_OF_ELAST, KEY_SUPTNGSEC_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None)
+        supporting_section.append(t15)
+
+        t16 = (KEY_SUPTNGSEC_MOD_OF_RIGID, KEY_SUPTNGSEC_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None)
+        supporting_section.append(t16)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None)
+        supporting_section.append(t17)
+
+        t18 = (KEY_SUPTNGSEC_MASS, KEY_DISP_SUPTNGSEC_MASS, TYPE_TEXTBOX, None)
+        supporting_section.append(t18)
+
+        t19 = (KEY_SUPTNGSEC_SEC_AREA, KEY_DISP_SUPTNGSEC_SEC_AREA, TYPE_TEXTBOX, None)
+        supporting_section.append(t19)
+
+        t20 = (KEY_SUPTNGSEC_MOA_LZ, KEY_DISP_SUPTNGSEC_MOA_LZ, TYPE_TEXTBOX, None)
+        supporting_section.append(t20)
+
+        t21 = (KEY_SUPTNGSEC_MOA_LY, KEY_DISP_SUPTNGSEC_MOA_LY, TYPE_TEXTBOX, None)
+        supporting_section.append(t21)
+
+        t22 = (KEY_SUPTNGSEC_ROG_RZ, KEY_DISP_SUPTNGSEC_ROG_RZ, TYPE_TEXTBOX, None)
+        supporting_section.append(t22)
+
+        t23 = (KEY_SUPTNGSEC_ROG_RY, KEY_DISP_SUPTNGSEC_ROG_RY, TYPE_TEXTBOX, None)
+        supporting_section.append(t23)
+
+        t24 = (KEY_SUPTNGSEC_EM_ZZ, KEY_DISP_SUPTNGSEC_EM_ZZ, TYPE_TEXTBOX, None)
+        supporting_section.append(t24)
+
+        t25 = (KEY_SUPTNGSEC_EM_ZY, KEY_DISP_SUPTNGSEC_EM_ZY, TYPE_TEXTBOX, None)
+        supporting_section.append(t25)
+
+        t26 = (KEY_SUPTNGSEC_PM_ZPZ, KEY_DISP_SUPTNGSEC_PM_ZPZ, TYPE_TEXTBOX, None)
+        supporting_section.append(t26)
+
+        t27 = (KEY_SUPTNGSEC_PM_ZPY, KEY_DISP_SUPTNGSEC_PM_ZPY, TYPE_TEXTBOX, None)
+        supporting_section.append(t27)
+
+        t28 = (None, None, TYPE_BREAK, None)
+        supporting_section.append(t28)
+
+        t36 = (None, None, TYPE_ENTER, None)
+        supporting_section.append(t36)
+
+        t29 = (KEY_SUPTNGSEC_SOURCE, KEY_DISP_SUPTNGSEC_SOURCE, TYPE_TEXTBOX, None)
+        supporting_section.append(t29)
+
+        t30 = (None, None, TYPE_ENTER, None)
+        supporting_section.append(t30)
+
+        t31 = (KEY_SUPTNGSEC_POISSON_RATIO, KEY_DISP_SUPTNGSEC_POISSON_RATIO, TYPE_TEXTBOX, None)
+        supporting_section.append(t31)
+
+        t32 = (KEY_SUPTNGSEC_THERMAL_EXP, KEY_DISP_SUPTNGSEC_THERMAL_EXP, TYPE_TEXTBOX, None)
+        supporting_section.append(t32)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
+        supporting_section.append(t33)
+
+        return supporting_section
+
+    @staticmethod
     def tab_beam_section():
         supported_section = []
+
+        t34 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, [])
+        supported_section.append(t34)
 
         t1 = (KEY_SUPTDSEC_DESIGNATION, KEY_DISP_SUPTDSEC_DESIGNATION, TYPE_TEXTBOX, None)
         supported_section.append(t1)
@@ -167,6 +304,9 @@ class Tension(Main):
 
         t13 = (None, None, TYPE_BREAK, None)
         supported_section.append(t13)
+
+        t35 = (None, None, TYPE_ENTER, None)
+        supported_section.append(t35)
 
         t14 = (KEY_SUPTDSEC_TYPE, KEY_DISP_SUPTDSEC_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'])
         supported_section.append(t14)
@@ -216,6 +356,9 @@ class Tension(Main):
         t28 = (None, None, TYPE_BREAK, None)
         supported_section.append(t28)
 
+        t36 = (None, None, TYPE_ENTER, None)
+        supported_section.append(t36)
+
         t29 = (KEY_SUPTDSEC_SOURCE, KEY_DISP_SUPTDSEC_SOURCE, TYPE_TEXTBOX, None)
         supported_section.append(t29)
 
@@ -232,6 +375,207 @@ class Tension(Main):
         supported_section.append(t33)
 
         return supported_section
+
+    @staticmethod
+    def tab_angle_section():
+        angle_section = []
+
+        t34 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, [])
+        angle_section.append(t34)
+
+        t1 = (KEY_SUPTDSEC_DESIGNATION, KEY_DISP_SUPTDSEC_DESIGNATION, TYPE_TEXTBOX, None)
+        angle_section.append(t1)
+
+        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None)
+        angle_section.append(t2)
+
+        t3 = (KEY_SUPTDSEC_FU, KEY_DISP_SUPTDSEC_FU, TYPE_TEXTBOX, None)
+        angle_section.append(t3)
+
+        t4 = (KEY_SUPTDSEC_FY, KEY_DISP_SUPTDSEC_FY, TYPE_TEXTBOX, None)
+        angle_section.append(t4)
+
+        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None)
+        angle_section.append(t5)
+
+        t6 = (KEY_SUPTDSEC_DEPTH, KEY_DISP_SUPTDSEC_DEPTH, TYPE_TEXTBOX, None)
+        angle_section.append(t6)
+
+        t7 = (KEY_SUPTDSEC_FLANGE_W, KEY_DISP_SUPTDSEC_FLANGE_W, TYPE_TEXTBOX, None)
+        angle_section.append(t7)
+
+        t8 = (KEY_SUPTDSEC_FLANGE_T, KEY_DISP_SUPTDSEC_FLANGE_T, TYPE_TEXTBOX, None)
+        angle_section.append(t8)
+
+        t9 = (KEY_SUPTDSEC_WEB_T, KEY_DISP_SUPTDSEC_WEB_T, TYPE_TEXTBOX, None)
+        angle_section.append(t9)
+
+        t10 = (KEY_SUPTDSEC_FLANGE_S, KEY_DISP_SUPTDSEC_FLANGE_S, TYPE_TEXTBOX, None)
+        angle_section.append(t10)
+
+        t11 = (KEY_SUPTDSEC_ROOT_R, KEY_DISP_SUPTDSEC_ROOT_R, TYPE_TEXTBOX, None)
+        angle_section.append(t11)
+
+        t12 = (KEY_SUPTDSEC_TOE_R, KEY_DISP_SUPTDSEC_TOE_R, TYPE_TEXTBOX, None)
+        angle_section.append(t12)
+
+        t13 = (None, None, TYPE_BREAK, None)
+        angle_section.append(t13)
+
+        t35 = (None, None, TYPE_ENTER, None)
+        angle_section.append(t35)
+
+        t14 = (KEY_SUPTDSEC_TYPE, KEY_DISP_SUPTDSEC_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'])
+        angle_section.append(t14)
+
+        t18 = (None, None, TYPE_ENTER, None)
+        angle_section.append(t18)
+
+        t15 = (KEY_SUPTDSEC_MOD_OF_ELAST, KEY_SUPTDSEC_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None)
+        angle_section.append(t15)
+
+        t16 = (KEY_SUPTDSEC_MOD_OF_RIGID, KEY_SUPTDSEC_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None)
+        angle_section.append(t16)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None)
+        angle_section.append(t17)
+
+        t18 = (KEY_SUPTDSEC_MASS, KEY_DISP_SUPTDSEC_MASS, TYPE_TEXTBOX, None)
+        angle_section.append(t18)
+
+        t19 = (KEY_SUPTDSEC_SEC_AREA, KEY_DISP_SUPTDSEC_SEC_AREA, TYPE_TEXTBOX, None)
+        angle_section.append(t19)
+
+        t20 = (KEY_SUPTDSEC_MOA_LZ, KEY_DISP_SUPTDSEC_MOA_LZ, TYPE_TEXTBOX, None)
+        angle_section.append(t20)
+
+        t21 = (KEY_SUPTDSEC_MOA_LY, KEY_DISP_SUPTDSEC_MOA_LY, TYPE_TEXTBOX, None)
+        angle_section.append(t21)
+
+        t22 = (KEY_SUPTDSEC_ROG_RZ, KEY_DISP_SUPTDSEC_ROG_RZ, TYPE_TEXTBOX, None)
+        angle_section.append(t22)
+
+        t23 = (KEY_SUPTDSEC_ROG_RY, KEY_DISP_SUPTDSEC_ROG_RY, TYPE_TEXTBOX, None)
+        angle_section.append(t23)
+
+        t24 = (KEY_SUPTDSEC_EM_ZZ, KEY_DISP_SUPTDSEC_EM_ZZ, TYPE_TEXTBOX, None)
+        angle_section.append(t24)
+
+        t25 = (KEY_SUPTDSEC_EM_ZY, KEY_DISP_SUPTDSEC_EM_ZY, TYPE_TEXTBOX, None)
+        angle_section.append(t25)
+
+        t26 = (KEY_SUPTDSEC_PM_ZPZ, KEY_DISP_SUPTDSEC_PM_ZPZ, TYPE_TEXTBOX, None)
+        angle_section.append(t26)
+
+        t27 = (KEY_SUPTDSEC_PM_ZPY, KEY_DISP_SUPTDSEC_PM_ZPY, TYPE_TEXTBOX, None)
+        angle_section.append(t27)
+
+        t28 = (None, None, TYPE_BREAK, None)
+        angle_section.append(t28)
+
+        t36 = (None, None, TYPE_ENTER, None)
+        angle_section.append(t36)
+
+        t29 = (KEY_SUPTDSEC_SOURCE, KEY_DISP_SUPTDSEC_SOURCE, TYPE_TEXTBOX, None)
+        angle_section.append(t29)
+
+        t30 = (None, None, TYPE_ENTER, None)
+        angle_section.append(t30)
+
+        t31 = (KEY_SUPTDSEC_POISSON_RATIO, KEY_DISP_SUPTDSEC_POISSON_RATIO, TYPE_TEXTBOX, None)
+        angle_section.append(t31)
+
+        t32 = (KEY_SUPTDSEC_THERMAL_EXP, KEY_DISP_SUPTDSEC_THERMAL_EXP, TYPE_TEXTBOX, None)
+        angle_section.append(t32)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
+        angle_section.append(t33)
+
+        return angle_section
+
+    @staticmethod
+    def bolt_values():
+
+        bolt = []
+
+        t1 = (KEY_DP_BOLT_TYPE, KEY_DISP_TYP, TYPE_COMBOBOX, ['Pretensioned', 'Non-pretensioned'])
+        bolt.append(t1)
+
+        t2 = (KEY_DP_BOLT_HOLE_TYPE, KEY_DISP_DP_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'])
+        bolt.append(t2)
+
+        t3 = (KEY_DP_BOLT_MATERIAL_G_O, KEY_DISP_DP_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, '410')
+        bolt.append(t3)
+
+        t4 = (None, None, TYPE_ENTER, None)
+        bolt.append(t4)
+
+        t5 = (None, KEY_DISP_DP_BOLT_DESIGN_PARA, TYPE_TITLE, None)
+        bolt.append(t5)
+
+        t6 = (KEY_DP_BOLT_SLIP_FACTOR, KEY_DISP_DP_BOLT_SLIP_FACTOR, TYPE_COMBOBOX, ['0.2', '0.5', '0.1', '0.25', '0.3',
+                                                                                     '0.33', '0.48', '0.52', '0.55'])
+        bolt.append(t6)
+
+        t7 = (None, None, TYPE_ENTER, None)
+        bolt.append(t7)
+
+        t8 = (None, "NOTE : If slip is permitted under the design load, design the bolt as"
+                    "<br>a bearing bolt and select corresponding bolt grade.", TYPE_NOTE, None)
+        bolt.append(t8)
+
+        t9 = ["textBrowser", "", TYPE_TEXT_BROWSER, BOLT_DESCRIPTION]
+        bolt.append(t9)
+
+        return bolt
+
+    @staticmethod
+    def weld_values():
+
+        weld = []
+
+        t1 = (KEY_DP_WELD_FAB, KEY_DISP_DP_WELD_FAB, TYPE_COMBOBOX, KEY_DP_WELD_FAB_VALUES)
+        weld.append(t1)
+
+        t2 = (KEY_DP_WELD_MATERIAL_G_O, KEY_DISP_DP_WELD_MATERIAL_G_O, TYPE_TEXTBOX, '410')
+        weld.append(t2)
+
+        t3 = ["textBrowser", "", TYPE_TEXT_BROWSER, WELD_DESCRIPTION]
+        weld.append(t3)
+
+        return weld
+
+    @staticmethod
+    def detailing_values():
+        detailing = []
+
+        t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX, [
+            'a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'])
+        detailing.append(t1)
+
+        t2 = (KEY_DP_DETAILING_GAP, KEY_DISP_DP_DETAILING_GAP, TYPE_TEXTBOX, '10')
+        detailing.append(t2)
+
+        t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
+              ['No', 'Yes'])
+        detailing.append(t3)
+
+        t4 = ["textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION]
+        detailing.append(t4)
+
+        return detailing
+
+    @staticmethod
+    def design_values():
+
+        design = []
+
+        t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX, ['Limit State Design',
+                                                                               'Limit State (Capacity based) Design',
+                                                                               'Working Stress Design'])
+        design.append(t1)
+
+        return design
 
     def input_values(self, existingvalues={}):
 
@@ -1720,6 +2064,196 @@ class Tension(Main):
         return lst
 
 
+
+    # # todo changes to be reverted
+    # def get_web_plate_l_bolts_one_line(self, web_plate_h_max, web_plate_h_min, bolts_required, edge_dist, gauge):
+    #     # print('maxh',web_plate_h_max)
+    #     # print(web_plate_h_max,edge_dist,gauge)
+    #     # print(web_plate_h_max,edge_dist,gauge,"hhhh")
+    #     max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
+    #     if max_bolts_one_line >= 1:
+    # # print("max_bolts_one_line", max_bolts_one_line)
+    #     else:
+    #     self.bolt_line = 0
+    #     self.bolts_one_line = 0
+    #     self.height = 0
+    #     return self.bolt_line, self.bolts_one_line, self.height
+    #
+
+    # def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist):
+    #     """
+    #
+    #     :param web_plate_l: height of plate
+    #     :param min_end_dist_round: minimum end distance
+    #     :param bolts_one_line: bolts in one line
+    #     :param max_spacing_round: maximum pitch
+    #     :param max_end_dist_round: maximum end distance
+    #     :return: pitch, end distance, height of plate (false if applicable)
+    #     """
+
+    #         gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
+    #         elif bolts_one_line ==1:
+    #             gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line), multiplier=5)
+    #             # print(gauge)
+    #
+    # =======
+    #         print(web_plate_h, "web_plate_h web1")
+    #         gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
+    #         print(gauge, "gauge web")
+    # >>>>>>> 5eeb73b888fd5c20fc6a6fbaa5c942e3fe48dbc3
+    #         web_plate_h = gauge*(bolts_one_line - 1) + edge_dist*2
+    #         print(web_plate_h, "web_plate_h web")
+    #
+    #         # print("gauge", gauge,web_plate_h,edge_dist,max_spacing, max_edge_dist)
+    #         if gauge > max_spacing:
+    #             gauge, edge_dist = self.get_spacing_adjusted(gauge, edge_dist, max_spacing)
+    #             if edge_dist >= max_edge_dist:
+    #                 # TODO: add one more bolt to satisfy spacing criteria
+    #                 web_plate_h = False
+    #         elif gauge == 0:
+    #             egde_dist = web_plate_h/2
+    #             pass
+    #         print("web", gauge, edge_dist, web_plate_h)
+    #         return gauge, edge_dist, web_plate_h
+
+        # todo changes to be reverted
+        # def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist,
+        #                           min_gauge, max_spacing, max_edge_dist,
+        #                           shear_load=0.0, axial_load=0.0, web_moment=0.0, gap=0.0, shear_ecc=False,
+        #                           bolt_line_limit=math.inf):
+        #     """
+        #
+        #     :param bolt_dia: diameter of bolt
+        #     :param end_dist: minimum end distance
+        #     :param pitch: minimum pitch
+        #     :param web_plate_h_min: minimum plate height
+        #     :param web_plate_h_max: maximum plate height
+        #     :param bolt_capacity: capacity of bolt
+        #     :param bolt_line_limit: maximum number of bolt lines allowed
+        #     :param shear_load: load along the height (bolt_line)
+        #     :param axial_load: load along the length
+        #     :param gap: gap between members which adds up to eccentricity
+        #     :param shear_ecc: if eccentricity effect needs to be considered this value should be passed as "True"
+        #     :return: web_plate_h, bolt_line, bolts_one_line, bolts_required, bolt_capacity_red, vres, moment_demand, \
+        #            pitch, gauge, edge_dist, end_dist, a.min_edge_dist_round, a.min_pitch_round, a.max_spacing_round, a.max_edge_dist_round
+        #     """
+        #
+        #     # initialising values to start the loop
+        #     res_force = math.sqrt(shear_load ** 2 + axial_load ** 2)
+        #     print(res_force)
+        #     print(bolt_capacity)
+        #     bolts_required = max(int(math.ceil(res_force / bolt_capacity)), 2)
+        #     print(bolts_required)
+        #     [bolt_line, bolts_one_line, web_plate_h] = \
+        #         self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required
+        #                                             , min_edge_dist, min_gauge)
+        #     print("boltdetails0", bolt_line, bolts_one_line, web_plate_h)
+        #
+        #
+        #     if bolts_one_line < 1:
+        #         self.design_status = False
+        #         self.reason = "Can't fit two bolts in one line. Select lower diameter"
+        #     elif bolt_line > bolt_line_limit:
+        #         self.design_status = False
+        #         self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+        #     else:
+        #         print("boltdetails", bolt_line, bolts_one_line, web_plate_h)
+        #         [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line, min_edge_dist, max_spacing,
+        #                                                                    max_edge_dist)
+        #         print("boltdetails", bolt_line, bolts_one_line, web_plate_h)
+        #     if bolt_line == 1:
+        #         pitch = 0.0
+        #     else:
+        #         pitch = min_gauge
+        #     end_dist = min_edge_dist
+        #     moment_demand = 0.0
+        #     vres = res_force / (bolt_line * bolts_one_line)
+        #
+        #     if shear_ecc is True:
+        #         # If check for shear eccentricity is true, resultant force in bolt is calculated
+        #         ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
+        #         moment_demand = shear_load * ecc + web_moment
+        #         print(2, bolts_one_line, pitch,
+        #               gauge, bolt_line, shear_load, axial_load, ecc, web_plate_h)
+        #         vres = self.get_vres(bolts_one_line, pitch,
+        #                              gauge, bolt_line, shear_load, axial_load, ecc)
+        #         bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+        #                                               gauge, bolt_capacity,
+        #                                               bolt_dia)
+        #         print(3, vres, bolt_capacity_red)
+        #
+        #         while bolt_line <= bolt_line_limit and vres > bolt_capacity_red and web_plate_h <= web_plate_h_max:
+        #             # Length of plate is increased for calculated bolts in one line.
+        #             # This increases spacing which decreases resultant force
+        #             print(4, web_plate_h, web_plate_h_max)
+        #             if web_plate_h + 10 <= web_plate_h_max:
+        #                 web_plate_h += 10
+        #                 print("boltdetails2", bolt_line, bolts_one_line, web_plate_h)
+        #             # If height cannot be increased number of bolts is increased by 1 and loop is repeated
+        #             else:
+        #                 bolts_required += 1
+        #                 print(5, web_plate_h_max, web_plate_h_min, bolts_required,
+        #                       min_edge_dist, min_gauge)
+        #                 [bolt_line, bolts_one_line, web_plate_h] = \
+        #                     self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
+        #                                                         min_edge_dist, min_gauge)
+        #
+        #             print(6, bolts_required, bolt_line, bolts_one_line, web_plate_h)
+        #             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line, min_edge_dist,
+        #                                                                        max_spacing, max_edge_dist)
+        #             while web_plate_h is False:
+        #                 bolts_required += 1
+        #                 [bolt_line, bolts_one_line, web_plate_h] = \
+        #                     self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
+        #                                                         min_edge_dist, min_gauge)
+        #                 [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,
+        #                                                                            min_edge_dist, max_spacing,
+        #                                                                            max_edge_dist)
+        #                 print("g,e,h ", gauge, edge_dist, web_plate_h)
+        #
+        #             if bolt_line == 1:
+        #                 pitch = 0.0
+        #             else:
+        #                 pitch = min_gauge
+        #             ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
+        #             vres = self.get_vres(bolts_one_line, pitch,
+        #                                  gauge, bolt_line, shear_load, axial_load, ecc)
+        #             bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+        #                                                   gauge, bolt_capacity,
+        #                                                   bolt_dia)
+        #             print("bow", vres, bolt_capacity_red)
+        #
+        #     while web_plate_h is False:
+        #         bolts_required += 1
+        #         [bolt_line, bolts_one_line, web_plate_h] = \
+        #             self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
+        #                                                 min_edge_dist, min_gauge)
+        #         [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,
+        #                                                                    min_edge_dist, max_spacing,
+        #                                                                    max_edge_dist)
+        #
+        #     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+        #                                           gauge, bolt_capacity,
+        #                                           bolt_dia)
+        #     print("g,e,h1 ", gauge, edge_dist, web_plate_h)
+        #     if vres > bolt_capacity_red:
+        #         self.design_status = False
+        #         self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+        #     else:
+        #         self.design_status = True
+        #
+        #     self.length = gap + end_dist * 2 + pitch * (bolt_line - 1)
+        #     self.height = web_plate_h
+        #     self.bolt_line = bolt_line
+        #     self.bolts_one_line = bolts_one_line
+        #     self.bolts_required = bolt_line * bolts_one_line
+        #     self.bolt_capacity_red = bolt_capacity_red
+        #     self.bolt_force = vres
+        #     self.moment_demand = moment_demand
+        #     self.pitch_provided = pitch
+        #     self.gauge_provided = gauge
+        #     self.edge_dist_provided = edge_dist
+        #     self.end_dist_provided = end_dist
 
 # For Command Line
 

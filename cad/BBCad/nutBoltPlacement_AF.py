@@ -63,7 +63,7 @@ class NutBoltArray_AF():
             bolt_length_required = 100
             b_AF.H = 1.5 * bolt_length_required
             self.bolts_AF.append(Bolt(b_AF.R, b_AF.T, b_AF.H, b_AF.r))
-            print("bolt",b_AF.R,b_AF.T,b_AF.H, b_AF.r)
+            print("bolt", b_AF.R, b_AF.T, b_AF.H, b_AF.r)
             self.nuts_AF.append(Nut(n_AF.R, n_AF.T, n_AF.H, n_AF.r1))
             print('Nut',(n_AF.R, n_AF.T, n_AF.H, n_AF.r1))
     def initBoltPlaceParams_AF(self, outputobj):
@@ -94,7 +94,7 @@ class NutBoltArray_AF():
                 pos_AF = self.boltOrigin_AF
                 if self.row_AF / 2 < rw_AF or self.row_AF / 2 == rw_AF:
                     self.pitch_new_AF = 2 * self.edge_gauge_AF + self.gap
-                    pos_AF = pos_AF + ((rw_AF-1) * self.pitch_AF + self.pitch_new_AF) * self.pitchDirAF
+                    pos_AF = pos_AF + ((rw_AF - 1) * self.pitch_AF + self.pitch_new_AF) * self.pitchDirAF
                     pos_AF = pos_AF + cl_AF * self.gauge_AF * self.gaugeDirAF
                     self.positions_AF.append(pos_AF)
                 else:

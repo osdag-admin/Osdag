@@ -569,7 +569,7 @@ class Channel(Section):
 
 class Weld(Material):
 
-    def __init__(self, material_grade="", type="fillet", fabrication=KEY_DP_WELD_FAB_SHOP):
+    def __init__(self, material_grade="", material_g_o="",type="fillet", fabrication=KEY_DP_WELD_FAB_SHOP):
         self.design_status = True
         self.type = type
         self.size = 0.0
@@ -577,7 +577,7 @@ class Weld(Material):
         self.strength = 0.0
         self.stress = 0.0
         self.fabrication = fabrication
-        super(Weld, self).__init__(material_grade)
+        self.fu= float(material_g_o)
 
     def __repr__(self):
         repr = "Weld\n"

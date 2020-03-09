@@ -459,7 +459,7 @@ class FinPlateConnection(ShearConnection):
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_PLATE_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
-        self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],fabrication = design_dictionary[KEY_DP_WELD_FAB])
+        self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],fabrication = design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 

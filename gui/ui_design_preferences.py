@@ -1429,6 +1429,7 @@ class DesignPreferences(QDialog):
         self.main_controller = parent
         #self.uiobj = self.main_controller.uiObj
         self.saved = None
+        self.flag = False
         self.sectionalprop = I_sectional_Properties()
         self.ui.btn_save.hide()
         self.ui.btn_close.clicked.connect(self.close_designPref)
@@ -1487,6 +1488,7 @@ class DesignPreferences(QDialog):
         tab_Weld = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
         tab_Detailing = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
         tab_Design = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
+        tab_Connector = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
 
         key_boltHoleType = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_HOLE_TYPE)
         combo_boltHoleType = key_boltHoleType.currentText()
@@ -1506,6 +1508,12 @@ class DesignPreferences(QDialog):
         combo_detailing_memebers = key_detailing_memebers.currentText()
         key_design_method = tab_Design.findChild(QtWidgets.QWidget, KEY_DP_DESIGN_METHOD)
         combo_design_method = key_design_method.currentText()
+        key_plate_material = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
+        combo_plate_material = key_plate_material.currentText()
+        key_plate_material_fu = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU)
+        line_plate_material_fu = key_plate_material_fu.text()
+        key_plate_material_fy = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY)
+        line_plate_material_fy = key_plate_material_fy.text()
         d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
               KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
               KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
@@ -1513,7 +1521,11 @@ class DesignPreferences(QDialog):
               KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
               KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
               KEY_DP_DETAILING_GAP: line_detailingGap,
-              KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers, KEY_DP_DESIGN_METHOD: combo_design_method}
+              KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
+              KEY_DP_DESIGN_METHOD: combo_design_method,
+              KEY_PLATE_MATERIAL: combo_plate_material if combo_plate_material != "Custom" else
+              "Custom "+str(line_plate_material_fu)+" "+str(line_plate_material_fy),
+              }
         return d1
 
     def highlight_slipfactor_description(self):
@@ -1580,7 +1592,6 @@ class DesignPreferences(QDialog):
             self.ui.clear_tab("Column")
             return
 
-
         col_list = []
         col_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(col_attributes, table, designation)
@@ -1589,10 +1600,16 @@ class DesignPreferences(QDialog):
                 ch.setText(designation)
             elif ch.objectName() == KEY_SUPTNGSEC_SOURCE:
                 ch.setText(col_attributes.source)
+            elif ch.objectName() == KEY_SUPTNGSEC_MATERIAL:
+                indx = ch.findText(material_grade, QtCore.Qt.MatchFixedString)
+                if indx >= 0:
+                    ch.setCurrentIndex(indx)
             elif ch.objectName() == KEY_SUPTNGSEC_FU:
                 ch.setText(str(col_attributes.fu))
+                ch.setEnabled(True if material_grade == 'Custom' else False)
             elif ch.objectName() == KEY_SUPTNGSEC_FY:
                 ch.setText(str(col_attributes.fy))
+                ch.setEnabled(True if material_grade == 'Custom' else False)
             elif ch.objectName() == KEY_SUPTNGSEC_DEPTH:
                 ch.setText(str(col_attributes.depth))
                 col_list.append(ch)
@@ -1652,6 +1669,24 @@ class DesignPreferences(QDialog):
             if e.text() != "":
                 e.textChanged.connect(lambda: self.new_sectionalprop_Column(col_list))
 
+        # def f():
+        #     found = False
+        #     material_key = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL)
+        #     for i in range(material_key.count()):
+        #         if material_key.itemText(i) == "Custom":
+        #             found = True
+        #         if i == material_key.count() - 1:
+        #             if found:
+        #                 material_key.setCurrentText("Custom")
+        #                 return
+        #             else:
+        #                 material_key.addItem("Custom")
+        #                 material_key.setCurrentText("Custom")
+        #                 return
+        # for m in material_list:
+        #     if m.text() != "":
+        #         m.textChanged.connect(f)
+
     def beam_preferences(self, designation, material_grade):
         '''
         @author: Umair
@@ -1669,10 +1704,16 @@ class DesignPreferences(QDialog):
                 ch.setText(designation)
             elif ch.objectName() == KEY_SUPTDSEC_SOURCE:
                 ch.setText(beam_attributes.source)
+            elif ch.objectName() == KEY_SUPTDSEC_MATERIAL:
+                indx = ch.findText(material_grade, QtCore.Qt.MatchFixedString)
+                if indx >= 0:
+                    ch.setCurrentIndex(indx)
             elif ch.objectName() == KEY_SUPTDSEC_FU:
                 ch.setText(str(beam_attributes.fu))
+                ch.setEnabled(True if material_grade == 'Custom' else False)
             elif ch.objectName() == KEY_SUPTDSEC_FY:
                 ch.setText(str(beam_attributes.fy))
+                ch.setEnabled(True if material_grade == 'Custom' else False)
             elif ch.objectName() == KEY_SUPTDSEC_DEPTH:
                 ch.setText(str(beam_attributes.depth))
                 beam_list.append(ch)

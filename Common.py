@@ -414,6 +414,9 @@ KEY_IMAGE = 'Image'
 KEY_LENGTH = 'Length(mm)'
 KEY_DISP_LENGTH = 'Length(mm) *'
 
+KEY_SLENDER = "Member.Slenderness"
+KEY_DISP_SLENDER = 'Slenderness'
+
 
 
 DISP_TITLE_TENSION = 'Tension Capacity'

@@ -69,10 +69,13 @@ class NutBoltArray_Web():
         :param outputobj: This is output dictionary for bolt placement parameters 
         :return: Edge, end, gauge and pitch distances for placement
         '''
-        self.edge_W = outputobj.web_plate.edge_dist_provided
-        self.end_W = outputobj.web_plate.end_dist_provided
-        self.pitch_W = outputobj.web_plate.pitch_provided
+        self.edge_W = outputobj.web_plate.edge_dist_provided    #33
+        self.end_W = outputobj.web_plate.end_dist_provided      #33
+        # self.pitch_W = 150     #70
+        # self.gauge_W = outputobj.web_plate.length - 2* self.edge_W
+        self.pitch_W = outputobj.web_plate.length - 2* self.edge_W
         self.gauge_W = outputobj.web_plate.gauge_provided
+
         self.row_W = outputobj.web_plate.bolts_one_line
         self.col_W = outputobj.web_plate.bolt_line
 
@@ -86,8 +89,12 @@ class NutBoltArray_Web():
         for rw_W in range(self.row_W):
             for cl_W in range(self.col_W):
                 pos_W = self.boltOrigin_W
-                pos_W = pos_W + rw_W * self.pitch_W * self.pitchDirW
-                pos_W = pos_W + cl_W * self.gauge_W * self.gaugeDirW
+                # pos_W = pos_W + rw_W * self.pitch_W * self.pitchDirW
+                # pos_W = pos_W + cl_W * self.gauge_W * self.gaugeDirW
+                pos_W = pos_W + rw_W * self.gauge_W * self.pitchDirW
+                pos_W = pos_W + cl_W * self.pitch_W * self.gaugeDirW
+
+
                 self.positions_W.append(pos_W)
 
     def placeW(self, originW, gaugeDirW, pitchDirW, boltDirW):

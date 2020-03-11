@@ -71,11 +71,11 @@ class NutBoltArray_BF():
         '''
         self.edge_BF = outputobj.flange_plate.edge_dist_provided
         self.end_BF = outputobj.flange_plate.end_dist_provided
-        self.edge_gauge_BF = outputobj.flange_plate.gauge_provided
+        self.edge_gauge_BF = outputobj.flange_plate.edge_dist_provided
         self.pitch_BF = outputobj.flange_plate.pitch_provided
-        self.gauge_BF = outputobj.flange_plate.gauge_provided  # Revised gauge distance
-        self.row_BF = outputobj.flange_plate.bolts_one_line
-        self.col_BF = outputobj.flange_plate.bolt_line
+        self.gauge_BF = 100 #outputobj.flange_plate.gauge_provided  # Revised gauge distance
+        self.row_BF = outputobj.flange_plate.bolt_line
+        self.col_BF = outputobj.flange_plate.bolts_one_line
         self.gap = 5
 
     def calculatePositions_BF(self):

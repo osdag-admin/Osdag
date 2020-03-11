@@ -521,8 +521,8 @@ class BeamCoverPlate(MomentConnection):
         # self.load.shear_force = self.load.shear_force * 1000
         # self.load.moment = self.load.moment * 1000000
 
-        # self.member_capacity(self)
-        self.hard_values(self)
+        self.member_capacity(self)
+        #self.hard_values(self)
     def hard_values(self):
         #flange bolt
         self.load.moment = 20 #kN
@@ -1132,7 +1132,7 @@ class BeamCoverPlate(MomentConnection):
                   self.section.flange_thickness
             # todo add in DDCl and diagram
             Atn = 2 * ((self.flange_plate.bolts_one_line / 2 - 1) * self.flange_plate.gauge_provided -
-                       ((self.flange_plate.bolts_one_line / 2 - 1) * self.flange_bolt.dia_hole) +
+                       ((self.flange_plate.bolts_one_line / 2 - 0.5) * self.flange_bolt.dia_hole) +
                        self.flange_plate.edge_dist_provided) * \
                   self.section.flange_thickness# todo add in DDCl and diagram
             # print(Avg, Avn, Atg, Atn)
@@ -1235,7 +1235,7 @@ class BeamCoverPlate(MomentConnection):
                                 self.flange_plate.edge_dist_provided + self.section.root_radius + self.section.web_thickness / 2))
                                * self.flange_plate.thickness_provided)  # todo add in DDCl
                     Atn = 2 * (((((self.flange_plate.bolts_one_line / 2 - 1) * self.flange_plate.gauge_provided) - (
-                            self.flange_plate.bolts_one_line / 2 - 1) * self.flange_bolt.dia_hole)) + (
+                            self.flange_plate.bolts_one_line / 2 - 0.5) * self.flange_bolt.dia_hole)) + (
                                            self.flange_plate.edge_dist_provided + self.section.root_radius + self.section.web_thickness / 2)) * self.flange_plate.thickness_provided
 #                       # todo add in DDCl
                     # print(8, self.flange_plate.bolt_line, pitch, end_dist, self.flange_plate.thickness_provided)
@@ -1331,7 +1331,7 @@ class BeamCoverPlate(MomentConnection):
                     Atg = 2*((((self.flange_plate.bolts_one_line/2 - 1) * self.flange_plate.gauge_provided) + (self.flange_plate.edge_dist_provided +self.section.root_radius + self.section.web_thickness/2))
                          * self.flange_plate.thickness_provided) # todo add in DDCl
                     Atn =  2*(((((self.flange_plate.bolts_one_line/2 - 1) * self.flange_plate.gauge_provided) - (
-                            self.flange_plate.bolts_one_line/2 - 1) * self.flange_bolt.dia_hole)) +
+                            self.flange_plate.bolts_one_line/2 - 0.5) * self.flange_bolt.dia_hole)) +
                               (self.flange_plate.edge_dist_provided +self.section.root_radius + self.section.web_thickness/2)) * self.flange_plate.thickness_provided
                     #todo add in DDCl
 
@@ -1343,7 +1343,7 @@ class BeamCoverPlate(MomentConnection):
                                                                                                  f_u=self.flange_plate.fu,
                                                                                                  f_y=self.flange_plate.fy)
 
-                    #  Block shear strength for inside flange plate under shear
+                    #  Block shear strength for inside flange plate under AXIAL
                     Avg = 2 * (self.flange_plate.end_dist_provided + (
                             self.flange_plate.bolt_line - 1) * self.flange_plate.pitch_provided) \
                           * self.flange_plate.thickness_provided
@@ -1354,7 +1354,8 @@ class BeamCoverPlate(MomentConnection):
                     Atg = 2 * ((self.flange_plate.bolts_one_line/2  - 1) * self.flange_plate.gauge_provided + self.flange_plate.edge_dist_provided )* \
                           self.flange_plate.thickness_provided
                     # todo add in DDCl and diagram
-                    Atn = 2 * ((self.flange_plate.bolts_one_line/2  - 1) * self.flange_plate.gauge_provided - ((self.flange_plate.bolts_one_line/2  - 1) * self.flange_bolt.dia_hole)+ self.flange_plate.edge_dist_provided )* \
+                    Atn = 2 * ((self.flange_plate.bolts_one_line/2  - 1) *
+                               self.flange_plate.gauge_provided - ((self.flange_plate.bolts_one_line/2  - 0.5) * self.flange_bolt.dia_hole)+ self.flange_plate.edge_dist_provided )* \
                           self.flange_plate.thickness_provided
                     # todo add in DDCl
                     flange_plate_block_shear_capacity_inside = self.block_shear_strength_plate(A_vg=Avg, A_vn=Avn,
@@ -1429,7 +1430,7 @@ class BeamCoverPlate(MomentConnection):
 
         ###### # capacity Check for web in axial = min(block, yielding, rupture)
 
-        A_vn_web = (( self.section.depth - (2 * self.section.flange_thickness) - (self.web_plate.bolts_one_line * self.web_bolt.dia_hole))) \
+        A_vn_web =  (( self.section.depth - (2 * self.section.flange_thickness) - (self.web_plate.bolts_one_line * self.web_bolt.dia_hole))) \
                    * self.section.web_thickness
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
         self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
@@ -1451,21 +1452,22 @@ class BeamCoverPlate(MomentConnection):
         while design_status_block_shear == False:
             # print(design_status_block_shear)
             # print(0, self.web_plate.max_end_dist, self.web_plate.end_dist_provided, self.web_plate.max_spacing_round, self.web_plate.pitch_provided)
+            Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
+                  self.section.web_thickness
+            Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
+                    self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole + end_dist) * \
+                  self.section.web_thickness
             Atg = (self.web_plate.edge_dist_provided + (
                     self.web_plate.bolts_one_line - 1) * gauge) * self.section.web_thickness
             Atn = (self.web_plate.edge_dist_provided + (
                     self.web_plate.bolts_one_line - 1) * gauge - (
-                           self.web_plate.bolts_one_line - 0.5) * self.web_bolt.dia_hole) * self.section.web_thickness
-            Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
-                  self.section.web_thickness
-            Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
-                    self.web_plate.bolt_line - 1) * self.web_bolt.dia_hole + end_dist) * \
-                  self.section.web_thickness
+                           self.web_plate.bolts_one_line - 1) * self.web_bolt.dia_hole) * self.section.web_thickness
+
             # print(17,self.web_plate.bolt_line, self.web_plate.pitch_provided, self.web_plate.bolt_line,
             #      self.web_bolt.dia_hole, self.web_plate.end_dist_provided, self.web_plate.thickness_provided)
             # print(18, self.web_plate.bolt_line, pitch, end_dist, self.section.web_thickness)
 
-            self.web_plate.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
+            self.section.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
                                                                                     A_tn=Atn,
                                                                                     f_u=self.web_plate.fu,
                                                                                     f_y=self.web_plate.fy)
@@ -1515,9 +1517,9 @@ class BeamCoverPlate(MomentConnection):
                     2 * self.section.flange_thickness)) * self.section.web_thickness * self.factored_axial_load) / (
                             self.section.area)
 
-        A_vn_web = (self.web_plate.height - (
+        A_vn_web = 2*(self.web_plate.height - (
                     self.web_plate.bolts_one_line * self.web_bolt.dia_hole)) * self.web_plate.thickness_provided
-        A_v_web = self.web_plate.height * self.web_plate.thickness_provided
+        A_v_web = 2*self.web_plate.height * self.web_plate.thickness_provided
         self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
             A_v=A_v_web, fy=self.web_plate.fy)
         self.section.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
@@ -1542,13 +1544,13 @@ class BeamCoverPlate(MomentConnection):
                 Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
                       self.web_plate.thickness_provided
                 Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
-                        self.web_plate.bolt_line - 1) * self.web_bolt.dia_hole + end_dist) * \
+                        self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole + end_dist) * \
                       self.web_plate.thickness_provided
                 Atg = (self.web_plate.edge_dist_provided + (
                         self.web_plate.bolts_one_line - 1) * gauge) * self.web_plate.thickness_provided
                 Atn = (self.web_plate.edge_dist_provided + (
                         self.web_plate.bolts_one_line - 1) * gauge - (
-                               self.web_plate.bolts_one_line - 0.5) * self.web_bolt.dia_hole) * self.web_plate.thickness_provided
+                               self.web_plate.bolts_one_line - 1) * self.web_bolt.dia_hole) * self.web_plate.thickness_provided
 
                 # print(self.web_plate.bolt_line, self.web_plate.pitch_provided, self.web_plate.bolt_line,
                 # self.web_plate.dia_hole, self.web_plate.end_dist_provided, self.web_plate.thickness_provided)
@@ -1602,9 +1604,9 @@ class BeamCoverPlate(MomentConnection):
                 2 * self.section.flange_thickness)) * self.section.web_thickness * self.factored_axial_load) / (
                             self.section.area)
 
-        A_vn_web = (self.web_plate.height - (self.web_plate.bolts_one_line * self.web_bolt.dia_hole)) * \
+        A_vn_web = 2*(self.web_plate.height - (self.web_plate.bolts_one_line * self.web_bolt.dia_hole)) * \
                    self.web_plate.thickness_provided
-        A_v_web = self.web_plate.height * self.web_plate.thickness_provided
+        A_v_web = 2*self.web_plate.height * self.web_plate.thickness_provided
         self.web_plate.shear_yielding_capacity = self.shear_yielding(
             A_v=A_v_web, fy=self.web_plate.fy)
         self.web_plate.shear_rupture_capacity = self.shear_rupture_(
@@ -1626,7 +1628,7 @@ class BeamCoverPlate(MomentConnection):
             while design_status_block_shear == False:
                 Avg = (((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
                 Avn = (((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) + ((
-                            self.web_plate.bolt_line - 1) * self.web_bolt.dia_hole) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
+                            self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
                 Atg = (self.web_plate.edge_dist_provided + (
                             self.web_plate.bolts_one_line - 1) * self.web_plate.gauge_provided) * self.web_plate.thickness_provided
                 Atn = ((((self.web_plate.bolts_one_line - 1)* self.web_plate.gauge_provided)

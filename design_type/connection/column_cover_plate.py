@@ -2069,5 +2069,52 @@ class ColumnCoverPlate(MomentConnection):
     #
     #     return tabs
 
+        # else:
+        #     self.display.EraseAll()
 
+    def call_3DBeam(self, ui, bgcolor):
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
+        if ui.chkBxBeam.isChecked():
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+        # self.display_3DModel("Beam", bgcolor)
+        ui.commLogicObj.display_3DModel("Beam", bgcolor)
 
+    def call_3DConnector(self, ui, bgcolor):
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.ui.chkBx_extndPlate.setChecked(Qt.Checked)
+        if ui.chkBxFinplate.isChecked():
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+        # self.display_3DModel("Connector", bgcolor)
+        ui.commLogicObj.display_3DModel("Connector", bgcolor)
+        # print(self.web_bolt)
+        # print(self.web_plate)
+        # print(self.Tension_capacity_flange_plate)
+        # print(self.Tension_capacity_flange)
+
+    def tab_list(self):
+
+        tabs = []
+
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
+        tabs.append(t1)
+
+        t2 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t2)
+
+        t3 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t3)
+
+        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t4)
+
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t5)
+
+        return tabs

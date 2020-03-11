@@ -389,7 +389,7 @@ class IS800_2007(object):
             V_dpb *= 0.7
         elif bolt_hole_type == 'long_slot':
             V_dpb *= 0.5
-        return V_dpb
+        return V_dpb,d_0,k_b,gamma_mb
 
 
 
@@ -470,7 +470,7 @@ class IS800_2007(object):
             mu_f = 0.55
         V_nsf = mu_f * n_e * K_h * F_0
         V_dsf = V_nsf / gamma_mf
-        return V_dsf
+        return V_dsf,K_h,gamma_mf
 
     # Table 20 Typical Average Values for Coefficient of Friction, mu_f (list)
     cl_10_4_3_Table_20 = [0.20, 0.50, 0.10, 0.25, 0.30, 0.52, 0.30, 0.30, 0.50, 0.33, 0.48, 0.1]

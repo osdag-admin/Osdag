@@ -280,6 +280,7 @@ KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
+KEY_DISP_BASE_PLATE = 'Base Plate Connection'
 
 KEY_DISP_TENSION = 'Tension Members Design'
 KEY_DISP_COMPRESSION = 'Compression Member'
@@ -297,6 +298,7 @@ KEY_DISP_CONN = 'Connectivity *'
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
+VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Gusset Plate with Cleat Angles']
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
@@ -367,10 +369,23 @@ DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
 KEY_BOLT_FU = 'Bolt.fu'
 KEY_BOLT_FY = 'Bolt.fy'
+
+###################################
+# Keys for Storing Anchor Bolt
+DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
+DISP_TITLE_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
+KEY_ANCHOR_BOLT_FU = 'Bolt.fu'
+KEY_ANCHOR_BOLT_FY = 'Bolt.fy'
+
 # Key for storing Diameter sub-key of Bolt
 KEY_D = 'Bolt.Diameter'
 KEY_DISP_D = 'Diameter(mm)*'
 VALUES_D = ['All', 'Customized']
+
+# Key for storing Diameter sub-key of Anchor Bolt
+KEY_DIA_ANCHOR = 'Anchor Bolt.Diameter'
+KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
+VALUES_DIA_ANCHOR = ['All', 'Customized']
 
 # Key for storing Type sub-key of Bolt
 KEY_TYP = 'Bolt.Type'

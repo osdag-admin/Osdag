@@ -27,7 +27,7 @@ DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
 DesignPreferences.Weld.Type: Shop Weld
 Flange_Plate.Preferences: Outside
-Load.Axial: '200'
+Load.Axial: '20'
 Load.Moment: '20'
 Load.Shear: '20'
 Member.Material: E 250 (Fe 410 W)A
@@ -47,4 +47,7 @@ Web_Plate.thickness_provided: &id001
 - '26'
 - '28'
 - '30'
+- '32'
+- '36'
+- '40'
 flange_plate.thickness_provided: *id001

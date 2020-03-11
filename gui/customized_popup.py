@@ -140,9 +140,6 @@ class Ui_Popup(object):
     def on_mButtonToAvailable_clicked(self):
         while self.listWidget_2.count() > 0:
             self.listWidget.addItem(self.listWidget_2.takeItem(0))
-        for item in self.listWidget.selectedItems():
-            self.listWidget.takeItem(self.listWidget.row(item))
-
 
     def on_mButtonToSelected_clicked(self):
         while self.listWidget.count() > 0:

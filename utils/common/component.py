@@ -692,13 +692,27 @@ class Plate(Material):
             bolt_one_side = int(possible_bolt/gauge  +1)
             max_bolts_one_line = 2*bolt_one_side
 
+
             if max_bolts_one_line >= 2:
                 bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
-                bolts_one_line = int(math.ceil(float(bolts_required) / float(bolt_line)))
+                bolts_one_line = max(int(math.ceil(float(bolts_required) / float(bolt_line))),2)
+                if bolts_one_line % 2 == 1:
+                    bolts_one_line = bolts_one_line-1
+                    bolt_line =bolt_line  +1
+                else:
+                    pass
+
                 height =flange_plate_h_max
                 # (
                 #     self.get_flange_plate_h_req(self.bolts_one_line, gauge, edge_dist, web_thickness, root_radius))
                 return bolt_line, bolts_one_line, height
+            # if max_bolts_one_line >= 2:
+            #     bolts_one_line = int(math.ceil(float(bolts_required) / float(max_bolts_one_line)))
+            #     bolt_line = max(int(math.ceil((float(bolts_required) / float( bolts_one_line)))), 1)
+            #     height = flange_plate_h_max
+            #     # (
+            #     #     self.get_flange_plate_h_req(self.bolts_one_line, gauge, edge_dist, web_thickness, root_radius))
+            #     return bolt_line, bolts_one_line, height
             else:
                 bolt_line = 0
                 bolts_one_line = 0
@@ -979,6 +993,7 @@ class Plate(Material):
 
         [bolt_line, bolts_one_line, flange_plate_h] = self.get_flange_plate_l_bolts_one_line(flange_plate_h_max, flange_plate_h_min, bolts_required, min_edge_dist, min_gauge,
                                            web_thickness, root_radius)
+        print("flange",bolt_line, bolts_one_line)
 
         print("boltdetails0", bolt_line, bolts_one_line, flange_plate_h)
 
@@ -1070,6 +1085,8 @@ class Plate(Material):
             bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                   gauge, bolt_capacity,
                                                   bolt_dia)
+
+
             if vres > bolt_capacity_red:
                 self.design_status = False
                 self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"

@@ -644,6 +644,7 @@ class Ui_ModuleWindow(QMainWindow):
                 key_customized_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_5.activated.connect(lambda: popup(key_customized_5, new_list))
                 data[t[0] + "_customized"] = t[1]()
+
             else:
                 pass
 
@@ -1433,38 +1434,50 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 d1 = {}
             design_dictionary.update(d1)
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
-            tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-            material_fu_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
-            material_fy_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
-            material_column = str(material_fu_column)+","+str(material_fy_column)
-            tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-            material_fu_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FU).text()
-            material_fy_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FY).text()
-            material_beam = str(material_fu_beam)+","+str(material_fy_beam)
-            d2 = {KEY_SUPTNGSEC_MATERIAL: material_column, KEY_SUPTDSEC_MATERIAL: material_beam}
-            design_dictionary.update(d2)
-        elif module == KEY_DISP_COMPRESSION:
-            key = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
-            section = key.currentText()
-            if section == 'Beams':
-                tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-                material_fu_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FU).text()
-                material_fy_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FY).text()
-                material_beam = str(material_fu_beam) + "," + str(material_fy_beam)
-                d2 = {KEY_SUPTDSEC_MATERIAL: material_beam}
-                design_dictionary.update(d2)
-
-            elif section == 'Columns':
+        if self.designPrefDialog.flag:
+            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
                 tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-                material_fu_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
-                material_fy_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
-                material_column = str(material_fu_column)+","+str(material_fy_column)
-                d2 = {KEY_SUPTNGSEC_MATERIAL: material_column}
+                key_material_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL).currentText()
+                if key_material_column == "Custom":
+                    material_fu_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
+                    material_fy_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
+                    material_column = "Custom"+" "+str(material_fu_column)+" "+str(material_fy_column)
+                else:
+                    material_column = key_material_column
+                tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+                key_material_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_MATERIAL).currentText()
+                if key_material_beam == "Custom":
+                    material_fu_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FU).text()
+                    material_fy_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FY).text()
+                    material_beam = "Custom"+" "+str(material_fu_beam)+" "+str(material_fy_beam)
+                else:
+                    material_beam = key_material_beam
+                d2 = {KEY_SUPTNGSEC_MATERIAL: material_column, KEY_SUPTDSEC_MATERIAL: material_beam}
                 design_dictionary.update(d2)
+            elif module == KEY_DISP_COMPRESSION:
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+                section = key.currentText()
+                if section == 'Beams':
+                    tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+                    material_fu_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FU).text()
+                    material_fy_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FY).text()
+                    material_beam = str(material_fu_beam) + "," + str(material_fy_beam)
+                    d2 = {KEY_SUPTDSEC_MATERIAL: material_beam}
+                    design_dictionary.update(d2)
 
-            elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
-                pass
+                elif section == 'Columns':
+                    tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+                    material_fu_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
+                    material_fy_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
+                    material_column = str(material_fu_column)+","+str(material_fy_column)
+                    d2 = {KEY_SUPTNGSEC_MATERIAL: material_column}
+                    design_dictionary.update(d2)
+
+                elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
+                    pass
+        else:
+            d2 = {KEY_SUPTNGSEC_MATERIAL: '', KEY_SUPTDSEC_MATERIAL: ''}
+            design_dictionary.update(d2)
 
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
         self.design_inputs = design_dictionary
@@ -1628,7 +1641,7 @@ class Ui_ModuleWindow(QMainWindow):
             #                                                  main.module)
 
 
-            if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_CLEATANGLE):
+            if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_CLEATANGLE):
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 self.commLogicObj.call_3DModel(status)
@@ -1998,19 +2011,41 @@ class Ui_ModuleWindow(QMainWindow):
     '''
 
     def combined_design_prefer(self, module):
+        self.designPrefDialog.flag = True
         key_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
         key_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
         key_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
         key_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
         key_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
         key_6 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
-        tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-        tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-        tab_Angle = self.designPrefDialog.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+        tab_Column = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+        tab_Beam = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+        tab_Angle = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+
+        tab_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Bolt")
+        tab_Weld = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
+        tab_Detailing = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
+        tab_Design = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
+        tab_Connector = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
 
         table_1 = "Columns"
         table_2 = "Beams"
         material_grade = key_4.currentText()
+        material = Material(material_grade)
+        tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
+        tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
+        material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
+        material_connector.setCurrentText(str(material_grade))
+
+        def f(material_g):
+            m = Material(material_g)
+            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(m.fu))
+            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(m.fy))
+
+        material_connector.currentIndexChanged.connect(lambda: f(material_connector.currentText()))
+        tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(material.fu))
+        tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(material.fy))
+
         if module == KEY_DISP_COLUMNCOVERPLATE:
             designation_col = key_5.currentText()
             if key_5.currentIndex() != 0:
@@ -2082,25 +2117,30 @@ class Ui_ModuleWindow(QMainWindow):
 
         elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
             conn = key_1.currentText()
-            designation_col = key_2.currentText()
-            designation_bm = key_3.currentText()
-            if conn in VALUES_CONN_1:
-                # self.designPrefDialog.ui.tabWidget.setTabText(
-                #     self.designPrefDialog.ui.tabWidget.indexOf(
-                #     self.designPrefDialog.ui.tab_Column), KEY_DISP_COLSEC)
-                # self.designPrefDialog.ui.tabWidget.setTabText(
-                #     self.designPrefDialog.ui.tabWidget.indexOf(
-                #         self.designPrefDialog.ui.tab_Beam), KEY_DISP_BEAMSEC)
-                self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
-                self.designPrefDialog.beam_preferences(designation_bm, material_grade)
-            elif conn in VALUES_CONN_2:
 
+            if conn in VALUES_CONN_1:
+                self.designPrefDialog.column_preferences(key_2.currentText(), table_1, material_grade)
+                self.designPrefDialog.beam_preferences(key_3.currentText(), material_grade)
+                column_material = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL)
+                column_material.currentIndexChanged.connect(lambda: self.designPrefDialog.column_preferences(
+                    key_2.currentText(), table_1, column_material.currentText()))
+                beam_material = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_MATERIAL)
+                beam_material.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
+                    key_3.currentText(), beam_material.currentText()))
+
+            elif conn in VALUES_CONN_2:
                 self.designPrefDialog.ui.tabWidget.setTabText(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Column), KEY_DISP_PRIBM)
                 self.designPrefDialog.ui.tabWidget.setTabText(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam), KEY_DISP_SECBM)
-                self.designPrefDialog.column_preferences(designation_col, table_2, material_grade)
-                self.designPrefDialog.beam_preferences(designation_bm, material_grade)
+                self.designPrefDialog.column_preferences(key_2.currentText(), table_2, material_grade)
+                self.designPrefDialog.beam_preferences(key_3.currentText(), material_grade)
+                column_material = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL)
+                column_material.currentIndexChanged.connect(lambda: self.designPrefDialog.column_preferences(
+                    key_2.currentText(), table_2, column_material.currentText()))
+                beam_material = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_MATERIAL)
+                beam_material.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
+                    key_3.currentText(), beam_material.currentText()))
 
     def create_design_report(self):
         self.create_report.show()

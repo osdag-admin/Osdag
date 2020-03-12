@@ -485,13 +485,15 @@ class BeamCoverPlate(MomentConnection):
 
         self.section = Beam(designation=design_dictionary[KEY_SECSIZE],
                               material_grade=design_dictionary[KEY_MATERIAL])
-
+        print("anjali",design_dictionary[KEY_DP_DETAILING_EDGE_TYPE])
         self.web_bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
                              bolt_type=design_dictionary[KEY_TYP], material_grade=design_dictionary[KEY_MATERIAL],
                              bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
                              edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+
                              mu_f=design_dictionary[KEY_DP_BOLT_SLIP_FACTOR],
                              corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+
 
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
                              bolt_type=design_dictionary[KEY_TYP], material_grade=design_dictionary[KEY_MATERIAL],
@@ -870,7 +872,7 @@ class BeamCoverPlate(MomentConnection):
             self.flange_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                         conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
-
+            print(self.flange_bolt.min_edge_dist, self.flange_bolt.edge_type)
 
             if self.preference == "Outside":
                 self.flange_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
@@ -895,11 +897,11 @@ class BeamCoverPlate(MomentConnection):
                                                     flange_plate_h_min=min_plate_height,
                                                     flange_plate_h_max=max_plate_height,
                                                     bolt_capacity=self.flange_bolt.bolt_capacity,
-                                                    min_edge_dist=self.flange_bolt.min_edge_dist,
+                                                    min_edge_dist=self.flange_bolt.min_edge_dist_round,
                                                     min_gauge=self.flange_bolt.min_gauge_round,
-                                                    max_spacing=self.flange_bolt.max_spacing,
-                                                    max_edge_dist=self.flange_bolt.max_edge_dist,
-                                                    axial_load=flange_force,
+                                                    max_spacing=self.flange_bolt.max_spacing_round,
+                                                    max_edge_dist=self.flange_bolt.max_edge_dist_round,
+                                                    axial_load=flange_force, gap=self.flange_plate.gap,
                                                     web_thickness =self.section.web_thickness,
                                                     root_radius= self.section.root_radius)
 
@@ -915,10 +917,10 @@ class BeamCoverPlate(MomentConnection):
                                                  web_plate_h_min=min_web_plate_height,
                                                  web_plate_h_max=max_web_plate_height,
                                                  bolt_capacity=self.web_bolt.bolt_capacity,
-                                                 min_edge_dist=self.web_bolt.min_edge_dist,
+                                                 min_edge_dist=self.web_bolt.min_edge_dist_round,
                                                  min_gauge=self.web_bolt.min_gauge_round,
                                                  max_spacing=self.web_bolt.max_spacing_round,
-                                                 max_edge_dist=self.web_bolt.max_edge_dist
+                                                 max_edge_dist=self.web_bolt.max_edge_dist_round
                                                  , shear_load=self.load.shear_force * 1000, axial_load=axial_force_w,
 
                                                  gap=self.web_plate.gap, shear_ecc=True)
@@ -1057,11 +1059,11 @@ class BeamCoverPlate(MomentConnection):
                                                    flange_plate_h_min=min_plate_height,
                                                    flange_plate_h_max=max_plate_height,
                                                    bolt_capacity=self.flange_bolt.bolt_capacity,
-                                                   min_edge_dist=self.flange_bolt.min_edge_dist,
+                                                   min_edge_dist=self.flange_bolt.min_edge_dist_round,
                                                    min_gauge=self.flange_bolt.min_gauge_round,
-                                                   max_spacing=self.flange_bolt.max_spacing,
-                                                   max_edge_dist=self.flange_bolt.max_edge_dist,
-                                                   axial_load=flange_force,
+                                                   max_spacing=self.flange_bolt.max_spacing_round,
+                                                   max_edge_dist=self.flange_bolt.max_edge_dist_round,
+                                                   axial_load=flange_force,gap=self.flange_plate.gap,
                                                    web_thickness=self.section.web_thickness,
                                                    root_radius=self.section.root_radius)
 
@@ -1075,10 +1077,10 @@ class BeamCoverPlate(MomentConnection):
                                              web_plate_h_min=min_web_plate_height,
                                              web_plate_h_max=max_web_plate_height,
                                              bolt_capacity=self.web_bolt.bolt_capacity,
-                                             min_edge_dist=self.web_bolt.min_edge_dist,
+                                             min_edge_dist=self.web_bolt.min_edge_dist_round,
                                              min_gauge=self.web_bolt.min_gauge_round,
                                              max_spacing=self.web_bolt.max_spacing_round,
-                                             max_edge_dist=self.web_bolt.max_edge_dist
+                                             max_edge_dist=self.web_bolt.max_edge_dist_round
                                              , shear_load=self.load.shear_force * 1000, axial_load=axial_force_w,
 
                                              gap=self.web_plate.gap, shear_ecc=True)
@@ -1703,6 +1705,7 @@ class BeamCoverPlate(MomentConnection):
         self.flange_plate.bolt_line = 2 * self.flange_plate.bolt_line
         self.flange_plate.bolts_one_line = self.flange_plate.bolts_one_line
         self.flange_plate.bolts_required = self.flange_plate.bolt_line *self.flange_plate.bolts_one_line
+        self.flange_plate.midgauge = 2*(self.flange_plate.edge_dist_provided + self.section.root_radius) + self.section.web_thickness
 
 
 

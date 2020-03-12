@@ -736,7 +736,7 @@ class CommonDesignLogic(object):
 
         if self.mainmodule == "Moment Connection":
             # if self.connection == "Beam Coverplate Connection":
-            B = BeamCoverPlate()
+            self.B = BeamCoverPlate()
             # else:
             #     pass
             #
@@ -751,6 +751,7 @@ class CommonDesignLogic(object):
                 if self.B.preference != 'Outside':
                     osdag_display_shape(self.display, self.CPBoltedObj.get_innetplatesModels(), update=True,color='Blue')
 
+
                 osdag_display_shape(self.display, self.CPBoltedObj.get_nut_bolt_arrayModels(), update=True, color=Quantity_NOC_SADDLEBROWN)
 
             elif self.component == "Model":
@@ -759,8 +760,8 @@ class CommonDesignLogic(object):
 
                 #Todo: remove velove commented lines
 
-                # if self.B.preference != 'Outside':
-                #     osdag_display_shape(self.display, self.CPBoltedObj.get_innetplatesModels(), update=True,color='Blue')
+                if self.B.preference != 'Outside':
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innetplatesModels(), update=True,color='Blue')
 
                 osdag_display_shape(self.display, self.CPBoltedObj.get_nut_bolt_arrayModels(), update=True, color=Quantity_NOC_SADDLEBROWN)
 

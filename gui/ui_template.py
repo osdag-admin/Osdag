@@ -1654,6 +1654,8 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_beam.setEnabled(True)
                 self.actionShow_column.setEnabled(True)
                 self.actionShow_finplate.setEnabled(True)
+                # image = main.generate_3D_Cad_image(main, self, self.folder)
+
             else:
                 self.btn3D.setEnabled(False)
                 self.chkBxBeam.setEnabled(False)
@@ -1665,11 +1667,14 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_finplate.setEnabled(False)
 
 
-        # image = main.generate_3D_Cad_image(main,self,self.folder)
+
 
     def osdag_header(self):
-        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
-        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "OsdagHeader.png")))
+        image_path2 = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "ColumnsBeams.png")))
+
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "OsdagHeader.png"))
+        shutil.copyfile(image_path2, os.path.join(str(self.folder), "images_html", "ColumnsBeams.png"))
 
     def output_button_connect(self, main, button_list, b):
         b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))

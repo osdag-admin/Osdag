@@ -263,6 +263,14 @@ KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity'
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
+DISP_MIN_PITCH = 'Min. Pitch (mm)'
+DISP_MAX_PITCH = 'Max. Pitch (mm)'
+DISP_MIN_GAUGE = 'Min. Gauge (mm)'
+DISP_MAX_GAUGE = 'Max. Gauge (mm)'
+DISP_MIN_EDGE = 'Min. Edge Distance (mm)'
+DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
+DISP_MIN_END = 'Min. End Distance (mm)'
+DISP_MAX_END = 'Max. End Distance (mm)'
 
 ###################################
 # Key for Storing Module

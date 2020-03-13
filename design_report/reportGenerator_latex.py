@@ -22,7 +22,7 @@ import datetime
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 
 
-from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn
+from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic
 from pdflatex import PDFLaTeX
@@ -57,7 +57,7 @@ class CreateLatex(Document):
 
         # Add document header
 
-        header = PageStyle("header")
+        header = PageStyle("header",header_thickness=1,footer_thickness=1)
         # Create center header
         with header.create(Head("C")):
             with header.create(Tabularx('|l|p{6cm}|l|X|')) as table:
@@ -86,30 +86,62 @@ class CreateLatex(Document):
         geometry_options = {"top":"1.2in", "bottom":"1in", "left":"0.6in", "right":"0.6in", "headsep":"0.8in"}
         doc = Document(geometry_options=geometry_options,indent=False)
         doc.packages.append(Package('amsmath'))
+        doc.packages.append(Package('graphicx'))
         doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
         doc.preamble.append(header)
         doc.change_document_style("header")
+        image_filename = os.path.join
+        (os.path.dirname(r'C:\Users\Deepthi\Documents\2. projects\Osdag3\ResourceFiles\images'), 'ColumnsBeams.png')
 
         with doc.create(Section('Input Parameters')):
-            with doc.create(Tabularx('|l|X|')) as table:
+            with doc.create(LongTable('|l|l|l|',row_height=1.2)) as table:
                 table.add_hline()
                 for i in uiObj:
-                    table.add_row((i, uiObj[i]))
-                    table.add_hline()
+                    # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
+
+                    print(i)
+                    if i == "Column Details":
+                        merge_rows= len(columndetails)
+                        index=0
+                        for i in columndetails:
+                            # table.add_row("Col.Det.",i,columndetails[i])
+                            if index == 0:
+                                table.add_row((MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm",
+                                filename='images_html/ColumnsBeams.png')), i,columndetails[i]))
+                                index += 1
+                            else:
+                                table.add_row(('', i, columndetails[i]))
+                            table.add_hline(2,3)
+                    elif i=="Beam Details":
+                        index=0
+                        for i in beamdetails:
+                            # table.add_row("Col.Det.",i,columndetails[i])
+                            if index == 0:
+                                table.add_row((MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm",
+                                filename='images_html/ColumnsBeams.png')), i,beamdetails[i]))
+                                index += 1
+                            else:
+                                table.add_row(('', i, beamdetails[i]))
+                            table.add_hline(2, 3)
+                    else:
+                        table.add_hline()
+                        table.add_row(MultiColumn(2, align='|c|', data=i), uiObj[i])
+                        table.add_hline()
+
+
 
         with doc.create(Section('Design Checks')):
-            with doc.create(Tabularx('|l|l|l|X|')) as table:
+            with doc.create(LongTable('|l|p{5cm}|p{5cm}|l|')) as table:
                 table.add_hline()
                 table.add_row(('Check', 'Required', 'Provided', 'Remarks'),color='OsdagGreen')
+                table.add_hline()
+                table.end_table_header()
                 table.add_hline()
                 for check in Design_Check:
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()
 
-
-
-
-        doc.generate_pdf('Fin Plate Report',  clean_tex=False)
+        doc.generate_pdf(filename,clean_tex=False)
 
 # reportsummary = {}
 # reportsummary["ProfileSummary"] = {}

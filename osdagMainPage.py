@@ -377,7 +377,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_cc_endplate.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, ColumnEndPlate)
+            self.ui2.setupUi(self.ui2, ColumnEndPlate,folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

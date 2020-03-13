@@ -6,12 +6,48 @@ import yaml
 import os
 import shutil
 import logging
+import time
 
 class ColumnEndPlate(MomentConnection):
 
     def __init__(self):
         super(ColumnEndPlate, self).__init__()
 
+    def set_osdaglogger(key):
+
+        """
+        Function to set Logger for FinPlate Module
+        """
+
+        # @author Arsil Zunzunia
+        global logger
+        logger = logging.getLogger('osdag')
+
+        logger.setLevel(logging.DEBUG)
+        handler = logging.StreamHandler()
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        handler = logging.FileHandler('logging_text.log')
+
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        # handler.setLevel(logging.INFO)
+        # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        # handler.setFormatter(formatter)
+        # logger.addHandler(handler)
+        handler = OurLog(key)
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+    def module_name(self):
+        return KEY_DISP_COLUMNENDPLATE
 
     def input_values(self, existingvalues={}):
 
@@ -117,6 +153,66 @@ class ColumnEndPlate(MomentConnection):
 
         return options_list
 
+    def spacing(self, status):
+
+        spacing = []
+
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
+        spacing.append(t9)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if status else '')
+        spacing.append(t10)
+
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
+        spacing.append(t11)
+
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
+        spacing.append(t12)
+
+        return spacing
+
+    def plate_details(self, flag):
+        plate_details = []
+
+        t8 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
+        plate_details.append(t8)
+
+        t9 = (KEY_ENDDIST_W, KEY_DISP_END_DIST_W, TYPE_TEXTBOX,
+              self.web_plate.end_dist_provided if flag else '')
+        plate_details.append(t9)
+
+        t10 = (KEY_WEB_GAUGE, KEY_DISP_WEB_PLATE_GAUGE, TYPE_TEXTBOX, self.web_plate.gauge_provided if flag else '')
+        plate_details.append(t10)
+
+        t11 = (KEY_EDGEDIST_W, KEY_DISP_EDGEDIST_W, TYPE_TEXTBOX,
+               self.web_plate.edge_dist_provided if flag else '')
+        plate_details.append(t11)
+        return plate_details
+
+    def set_input_values(self, design_dictionary):
+
+        print(design_dictionary)
+
+        super(ColumnEndPlate, self).set_input_values(self, design_dictionary)
+
+        self.start_time = time.time()
+
+        self.module = design_dictionary[KEY_MODULE]
+
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+                           material_grade=design_dictionary[KEY_PLATE_MATERIAL])
+
+        def hard_values(self):
+            # flange bolt
+            self.load.moment = 20  # kN
+            self.factored_axial_load = 300  # KN
+            self.load.shear_force = 50  # kN
+            self.flange_bolt.bolt_type = "Bearing Bolt"
+            # self.flange_bolt.bolt_hole_type = bolt_hole_type
+            # self.flange_bolt.edge_type = edge_type
+            # self.flange_bolt.mu_f = float(mu_f)
+            self.flange_bolt.connecting_plates_tk = None
+
     @staticmethod
     def grdval_customized():
         b = VALUES_GRD_CUSTOMIZED
@@ -129,7 +225,7 @@ class ColumnEndPlate(MomentConnection):
 
     @staticmethod
     def endplate_thick_customized():
-        d = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED
+        d = VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED
         return d
 
     def customized_input(self):

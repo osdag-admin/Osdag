@@ -1086,7 +1086,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION,KEY_DISP_COLUMNENDPLATE]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
@@ -1094,6 +1094,11 @@ class Ui_ModuleWindow(QMainWindow):
         elif module == KEY_DISP_COLUMNCOVERPLATE:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
+        elif module == KEY_DISP_COLUMNENDPLATE:
+            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
+
+
         elif module == KEY_DISP_BEAMCOVERPLATE:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))

@@ -406,7 +406,7 @@ class IS800_2007(object):
 
 
     @staticmethod
-    def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_TYPE_FIELD):
+    def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
         """Calculate design tensile strength of bearing bolt
 
         Args:
@@ -500,7 +500,7 @@ class IS800_2007(object):
 
     # cl. 10.4.5 Tension Resistance
     @staticmethod
-    def cl_10_4_5_friction_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_TYPE_FIELD):
+    def cl_10_4_5_friction_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
         """Calculate design tensile strength of friction grip bolt
 
         Args:

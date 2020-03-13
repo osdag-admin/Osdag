@@ -835,13 +835,13 @@ class FinPlateConnection(ShearConnection):
             KEY_SHEAR: self.load.shear_force,
 
             KEY_SUPTNGSEC:self.supporting_section.designation,
-            KEY_SUPTNGSEC_MATERIAL:self.material,
+            KEY_SUPTNGSEC_MATERIAL:self.supporting_section.material,
             KEY_SUPTNGSEC_FU:self.supporting_section.fu,
             KEY_SUPTNGSEC_FY:self.supporting_section.fy,
-            "Column Details": r"C:\Users\Deepthi\Documents\2. projects\Osdag3\ResourceFiles\images\Columns_Beams.png",
+            "Column Details": "",
 
             KEY_SUPTDSEC: self.supported_section.designation,
-            KEY_SUPTDSEC_MATERIAL:self.material,
+            KEY_SUPTDSEC_MATERIAL:self.supported_section.material,
             KEY_SUPTDSEC_FU:self.supported_section.fu,
             KEY_SUPTDSEC_FY:self.supported_section.fy,
             "Beam Details": "",

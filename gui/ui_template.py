@@ -1476,8 +1476,21 @@ class Ui_ModuleWindow(QMainWindow):
                 elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
                     pass
         else:
-            d2 = {KEY_SUPTNGSEC_MATERIAL: '', KEY_SUPTDSEC_MATERIAL: ''}
-            design_dictionary.update(d2)
+            common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
+            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+                d2 = {KEY_SUPTNGSEC_MATERIAL: common_material, KEY_SUPTDSEC_MATERIAL: common_material}
+                design_dictionary.update(d2)
+            elif module == KEY_DISP_COMPRESSION:
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+                section = key.currentText()
+                if section == 'Beams':
+                    d2 = {KEY_SUPTDSEC_MATERIAL: common_material}
+                    design_dictionary.update(d2)
+                elif section == 'Columns':
+                    d2 = {KEY_SUPTNGSEC_MATERIAL: common_material}
+                    design_dictionary.update(d2)
+                elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
+                    pass
 
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
         self.design_inputs = design_dictionary

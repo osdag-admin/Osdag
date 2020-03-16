@@ -738,7 +738,7 @@ class Plate(Material):
         :return: pitch, end distance, height of plate (false if applicable)
         """
 
-        if bolts_one_line >= bolt_one_line_limit or bolts_one_line!=1:
+        if bolts_one_line >= bolt_one_line_limit and bolts_one_line!=1:
             gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
         elif bolts_one_line == 1:
             gauge = 0
@@ -897,7 +897,7 @@ class Plate(Material):
                 vres = self.get_vres(bolts_one_line, pitch,
                                      gauge, bolt_line, shear_load, axial_load, ecc)
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
-                                                      gauge, bolt_capacity,
+                                                      gauge, bolt_line, pitch, bolt_capacity,
                                                       bolt_dia)
                 print(3, vres, bolt_capacity_red)
 

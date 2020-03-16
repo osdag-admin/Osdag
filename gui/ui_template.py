@@ -1225,9 +1225,9 @@ class Ui_ModuleWindow(QMainWindow):
         display = self.modelTab._display
 
         # background gradient
-        display.set_bg_gradient_color([23, 1, 32],[23, 1, 32])
+        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
         # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        display.display_triedron()
+        display.display_trihedron()
         display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):

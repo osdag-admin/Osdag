@@ -1470,28 +1470,41 @@ class Tension(Main):
         if design_dictionary[KEY_LOCATION] == 'Long Leg':
             w = self.section_size_1.min_leg
             shear_lag = (self.section_size_1.max_leg - self.plate.edge_dist_provided) + w - self.section_size_1.thickness
-            L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
+            if self.plate.bolt_line !=1:
+                L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
+            else:
+                L_c = 1
             A_go = self.section_size_1.min_leg * self.section_size_1.thickness
             A_nc = (self.section_size_1.max_leg * self.section_size_1.thickness) - (self.bolt.dia_hole * self.plate.bolts_one_line)
+            t = self.section_size_1.thickness
 
         elif design_dictionary[KEY_LOCATION] == 'Short Leg':
             w = self.section_size_1.max_leg
             shear_lag = (self.section_size_1.min_leg - self.plate.edge_dist_provided) + w - self.section_size_1.thickness
-            L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
+            if self.plate.bolt_line != 1:
+                L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
+            else:
+                L_c = 1
+
             A_go = self.section_size_1.max_leg * self.section_size_1.thickness
             A_nc = (self.section_size_1.min_leg * self.section_size_1.thickness) - (self.bolt.dia_hole * self.plate.bolts_one_line)
+            t = self.section_size_1.thickness
 
         elif design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             w = self.section_size_1.flange_width
             shear_lag = (self.plate.edge_dist_provided) + w - self.section_size_1.web_thickness
-            L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
+            if self.plate.bolt_line != 1:
+                L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
+            else:
+                L_c = 1
+
             A_go = self.section_size_1.flange_width * self.section_size_1.flange_thickness
             A_nc = (self.section_size_1.depth * self.section_size_1.web_thickness) - (self.bolt.dia_hole * self.plate.bolts_one_line)
-
+            t = self.section_size_1.web_thickness
         # if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
         #     self.section_size_1.tension_rupture(A_n= member_An,F_u= self.section_size_1.fu)
         # else:
-        self.section_size_1.tension_member_design_due_to_rupture_of_critical_section( A_nc = A_nc , A_go = A_go, F_u = self.section_size_1.fu, F_y = self.section_size_1.fy, L_c = L_c, w = w, b_s = shear_lag, t = self.section_size_1.web_thickness)
+        self.section_size_1.tension_member_design_due_to_rupture_of_critical_section( A_nc = A_nc , A_go = A_go, F_u = self.section_size_1.fu, F_y = self.section_size_1.fy, L_c = L_c, w = w, b_s = shear_lag, t = t)
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Star Angles"]:
             self.section_size_1.tension_rupture_capacity = 2 * self.section_size_1.tension_rupture_capacity

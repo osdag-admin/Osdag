@@ -26,6 +26,7 @@ TYPE_TAB_3 = "TYPE_TAB_3"
 
 
 import sqlite3
+
 from utils.common.component import *
 from utils.common.component import *
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery

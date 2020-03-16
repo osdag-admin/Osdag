@@ -647,7 +647,7 @@ class Tension(Main):
             existingvalue_key_mtrl = ''
 
         if KEY_LENGTH in existingvalues:
-            existingvalue_key_length = existingvalues[KEY_MATERIAL]
+            existingvalue_key_length = existingvalues[KEY_LENGTH]
         else:
             existingvalue_key_length = ''
 
@@ -1275,6 +1275,11 @@ class Tension(Main):
             self.thick = self.section_size_1.thickness
             self.plate.thickness_provided = self.closest(self, self.plate_thickness, self.thick)
 
+        self.bolt_conn_plates_t_fu_fy = []
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+        self.bolt_conn_plates_t_fu_fy.append(
+            (self.thick, self.section_size_1.fu, self.section_size_1.fy))
+
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
         count = 0
@@ -1282,8 +1287,7 @@ class Tension(Main):
         for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
             # print(self.bolt.bolt_diameter_provided)
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                    connecting_plates_tk=[self.plate.thickness_provided,
-                                                                          self.thick])
+                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
             # if design_dictionary[KEY_LOCATION] == "Long Leg":
             #     min_spacing = self.min_plate_height - 2 * self.bolt.min_edge_dist_round
             # elif design_dictionary[KEY_LOCATION] == 'Short Leg':
@@ -1296,7 +1300,7 @@ class Tension(Main):
             # else:
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                              connecting_plates_tk=[self.plate.thickness_provided,self.thick],
+                                              conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
                                               n_planes=1)
 
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
@@ -1366,16 +1370,19 @@ class Tension(Main):
             self.thick = self.section_size_1.thickness
             self.plate.thickness_provided = self.closest(self, self.plate_thickness, self.thick)
 
+        self.bolt_conn_plates_t_fu_fy = []
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+        self.bolt_conn_plates_t_fu_fy.append(
+            (self.thick, self.section_size_1.fu, self.section_size_1.fy))
+
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
             count = 1
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                    connecting_plates_tk=[self.plate.thickness_provided,
-                                                                          self.thick])
+                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                              connecting_plates_tk=[self.plate.thickness_provided,
-                                                                    self.thick],
+                                              conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
                                               n_planes=1)
 
             print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.plate.bolt_force)
@@ -1392,13 +1399,11 @@ class Tension(Main):
             count += 1
 
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                connecting_plates_tk=[self.plate.thickness_provided,
-                                                                      self.thick])
+                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
         self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                           bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                          connecting_plates_tk=[self.plate.thickness_provided,
-                                                                self.thick],
+                                          conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
                                           n_planes=1)
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:

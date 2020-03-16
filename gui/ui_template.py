@@ -1490,7 +1490,7 @@ class Ui_ModuleWindow(QMainWindow):
             d2 = {KEY_SUPTNGSEC_MATERIAL: '', KEY_SUPTDSEC_MATERIAL: ''}
             design_dictionary.update(d2)
 
-        design_dictionary.update(self.designPrefDialog.save_designPref_para())
+        design_dictionary.update(self.designPrefDialog.save_designPref_para(module))
         self.design_inputs = design_dictionary
 
     # def pass_d(self, main, design_dictionary):

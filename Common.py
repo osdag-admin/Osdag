@@ -279,6 +279,8 @@ KEY_DISP_CLEATANGLE = 'Cleat Angle'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
+KEY_DISP_BEAMCOVERPLATEWELD = 'Beam Coverplate  Weld Connection'
+KEY_DISP_COLUMNCOVERPLATEWELD = 'Column Coverplate Weld Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
 
@@ -505,6 +507,10 @@ KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in flange'
 KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
 KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 
+KEY_WELD_TYPE = 'Weld.Type'
+KEY_DISP_WELD_TYPE ='Weld Type'
+VALUES_WELD_TYPE = ["Fillet Weld"]
+
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
@@ -587,6 +593,7 @@ KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 KEY_DP_WELD_FAB = 'DesignPreferences.Weld.Fab'
 
 KEY_DP_WELD_TYPE = 'Weld.Type'
+KEY_DISP_DP_WELD_TYPE ='Weld Type'
 KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
 KEY_DP_WELD_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]

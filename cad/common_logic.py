@@ -12,6 +12,7 @@ from cad.items.plate import Plate
 from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
 from cad.items.angle import Angle
+from PyQt5.QtWidgets import QMainWindow
 
 from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -598,8 +599,8 @@ class CommonDesignLogic(object):
         innerplateBelwFlangeFront = copy.copy(innerplateAbvFlangeBack)
         innerplateBelwFlangeBack = copy.copy(innerplateBelwFlangeFront)
 
-        WebPlateLeft = Plate(L=B.web_plate.length,
-                             W=B.web_plate.height,
+        WebPlateLeft = Plate(L=B.web_plate.height,
+                             W=B.web_plate.length,
                              T=float(B.web_plate.thickness_provided))  # Call to Plate in Component repository
         WebPlateRight = copy.copy(WebPlateLeft)  # Since both the Web plates are identical
 
@@ -614,12 +615,12 @@ class CommonDesignLogic(object):
         nut_Ht = nut_T
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)  # Call to create Nut from Component directory
 
-        numOfBoltsF = 2 * int(B.flange_plate.bolts_required)  # Number of flange bolts for both beams
+        numOfBoltsF = int(B.flange_plate.bolts_required)  # Number of flange bolts for both beams
         nutSpaceF = float(B.flange_plate.thickness_provided) + beam_T  # Space between bolt head and nut for flange bolts
 
         #TODO : update nutSpace from Osdag test
 
-        numOfBoltsW = 2 * int(B.web_plate.bolts_required)  # Number of web bolts for both beams
+        numOfBoltsW = int(B.web_plate.bolts_required)  # Number of web bolts for both beams
         nutSpaceW = 2 * float(B.web_plate.thickness_provided) + beam_tw  # Space between bolt head and nut for web bolts
 
         # Bolt placement for Above Flange bolts, call to nutBoltPlacement_AF.py
@@ -651,6 +652,8 @@ class CommonDesignLogic(object):
         self.display.EraseAll()
         self.display.View_Iso()
         self.display.FitAll()
+
+
 
         self.display.DisableAntiAliasing()
 
@@ -799,6 +802,7 @@ class CommonDesignLogic(object):
                 self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()
 
                 self.display_3DModel("Model", "gradient_bg")
+
             else:
                 self.display.EraseAll()
 

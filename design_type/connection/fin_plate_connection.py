@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
+from design_report.reportGenerator_latex import CreateLatex
 from utils.common.component import *
 # from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
@@ -12,6 +13,7 @@ from Common import *
 from utils.common.load import Load
 import yaml
 from design_report.reportGenerator import save_html
+from Report_functions import *
 import os
 import shutil
 import logging
@@ -431,7 +433,7 @@ class FinPlateConnection(ShearConnection):
             pass
 
     def warn_text(self):
-      
+
         """
         Function to give logger warning when any old value is selected from Column and Beams table.
         """
@@ -447,6 +449,8 @@ class FinPlateConnection(ShearConnection):
 
     def set_input_values(self, design_dictionary):
 
+        print(design_dictionary)
+
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
 
         self.start_time = time.time()
@@ -454,9 +458,9 @@ class FinPlateConnection(ShearConnection):
         self.module = design_dictionary[KEY_MODULE]
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+                           material_grade=design_dictionary[KEY_PLATE_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
-        self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],fabrication = design_dictionary[KEY_DP_WELD_FAB])
+        self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],fabrication = design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
@@ -520,17 +524,20 @@ class FinPlateConnection(ShearConnection):
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
         count = 0
 
+        self.bolt_conn_plates_t_fu_fy = []
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+        self.bolt_conn_plates_t_fu_fy.append((self.supported_section.web_thickness, self.supported_section.fu, self.supported_section.fy))
+
         bolt_force_previous = 0.0
+
 
         for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                    connecting_plates_tk=[self.plate.thickness_provided,
-                                                                          self.supported_section.web_thickness])
+                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                              connecting_plates_tk=[self.plate.thickness_provided,
-                                                                    self.supported_section.web_thickness],
+                                              conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
                                               n_planes=1)
 
             self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -578,13 +585,11 @@ class FinPlateConnection(ShearConnection):
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
             count = 1
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                    connecting_plates_tk=[self.plate.thickness_provided,
-                                                                          self.supported_section.web_thickness])
+                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                              connecting_plates_tk=[self.plate.thickness_provided,
-                                                                    self.supported_section.web_thickness],
+                                              conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
                                               n_planes=1)
 
             print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.plate.bolt_force)
@@ -607,13 +612,11 @@ class FinPlateConnection(ShearConnection):
         print(self.design_status,"getting fin plate details")
 
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                connecting_plates_tk=[self.plate.thickness_provided,
-                                                                      self.supported_section.web_thickness])
+                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
         self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                           bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                          connecting_plates_tk=[self.plate.thickness_provided,
-                                                                self.supported_section.web_thickness],
+                                          conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
                                           n_planes=1)
 
         self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -768,7 +771,7 @@ class FinPlateConnection(ShearConnection):
 
     def design_weld(self,available_welds):
         self.weld.size = available_welds[0]
-        while self.plate.height <= self.max_plate_height:
+        while self.plate.height <= self.max_plate_height+10:
             self.weld.length = self.plate.height
             weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
                 fillet_size=self.weld.size, fusion_face_angle=90)
@@ -806,6 +809,15 @@ class FinPlateConnection(ShearConnection):
         else:
             self.weld.design_status = True
 
+        self.recalculating_bolt_values(self)
+
+    def recalculating_bolt_values(self):
+        self.bolt_conn_plates_t_fu_fy = []
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu,self.plate.fy))
+        self.bolt_conn_plates_t_fu_fy.append((self.supported_section.web_thickness, self.supported_section.fu,self.supported_section.fy))
+
+        self.bolt.calculate_bolt_spacing_limits(self.bolt.bolt_diameter_provided,conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+        self.bolt.calculate_bolt_capacity(self.bolt.bolt_diameter_provided,self.bolt.bolt_grade_provided,conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,n_planes=1)
         self.get_design_status(self)
         print("--- %s seconds ---" % (time.time() - self.start_time))
 
@@ -823,13 +835,13 @@ class FinPlateConnection(ShearConnection):
             KEY_SHEAR: self.load.shear_force,
 
             KEY_SUPTNGSEC:self.supporting_section.designation,
-            KEY_SUPTNGSEC_MATERIAL:self.material,
+            KEY_SUPTNGSEC_MATERIAL:self.supporting_section.material,
             KEY_SUPTNGSEC_FU:self.supporting_section.fu,
             KEY_SUPTNGSEC_FY:self.supporting_section.fy,
             "Column Details": "",
 
             KEY_SUPTDSEC: self.supported_section.designation,
-            KEY_SUPTDSEC_MATERIAL:self.material,
+            KEY_SUPTDSEC_MATERIAL:self.supported_section.material,
             KEY_SUPTDSEC_FU:self.supported_section.fu,
             KEY_SUPTDSEC_FY:self.supported_section.fy,
             "Beam Details": "",
@@ -933,52 +945,90 @@ class FinPlateConnection(ShearConnection):
                 KEY_PLATE_MATERIAL: self.plate.fy,
                 KEY_OUT_PLATETHK: self.plate.thickness_provided}
 
-        self.report_check = [KEY_OUT_BOLT_SHEAR,
-                             KEY_OUT_BOLT_BEARING,
-                             KEY_OUT_BOLT_CAPACITY,
-                             KEY_OUT_BOLTS_REQUIRED,
-                             KEY_OUT_BOLTS_ONE_LINE,
-                             KEY_OUT_BOLT_LINE,
-                             KEY_OUT_PITCH,
-                             KEY_OUT_GAUGE,
-                             KEY_OUT_END_DIST,
-                             KEY_OUT_EDGE_DIST,
-                             KEY_OUT_PLATE_BLK_SHEAR,
-                             KEY_OUT_PLATE_HEIGHT,
-                             KEY_OUT_PLATE_MOM_CAPACITY,
-                             KEY_OUT_WELD_LENGTH_EFF,
-                             KEY_OUT_WELD_STRENGTH]
+
+        self.report_check = []
+        connecting_plates = [self.plate.thickness_provided,self.supported_section.web_thickness]
+
+        bolt_shear_capacity_kn = round(self.bolt.bolt_capacity/1000,2)
+        bolt_bearing_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
+        bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
+        kb_disp= round(self.bolt.kb,2)
+        kh_disp = round(self.bolt.kh, 2)
+        bolt_force_kn=round(self.plate.bolt_force,2)
+        bolt_capacity_red_kn=round(self.plate.bolt_capacity_red,2)
+        if self.bolt.bolt_type == TYP_BEARING:
+            t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.fu,1,self.bolt.bolt_net_area,
+                                                               self.bolt.gamma_mb,bolt_shear_capacity_kn), '')
+            self.report_check.append(t1)
+            t2 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(kb_disp,self.bolt.bolt_diameter_provided,
+                                                                   self.bolt_conn_plates_t_fu_fy,self.bolt.gamma_mb,
+                                                                   bolt_bearing_capacity_kn), '')
+            self.report_check.append(t2)
+            t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '',
+                  bolt_capacity_prov(bolt_shear_capacity_kn,bolt_bearing_capacity_kn,bolt_capacity_kn),
+                  '')
+            self.report_check.append(t3)
+        else:
+
+            t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
+                  HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f,n_e=1,K_h=kh_disp,fub = self.bolt.fu,
+                                          Anb= self.bolt.bolt_net_area,gamma_mf=self.bolt.gamma_mf,
+                                          capacity=bolt_capacity_kn),'')
+            self.report_check.append(t4)
+
+        t5 = (DISP_NUM_OF_BOLTS, get_trial_bolts(self.load.shear_force,self.load.axial_force,bolt_capacity_kn), self.plate.bolts_required, '')
+        self.report_check.append(t5)
+        t6 = (DISP_NUM_OF_COLUMNS, '', self.plate.bolt_line, '')
+        self.report_check.append(t6)
+        t7 = (DISP_NUM_OF_ROWS, '', self.plate.bolts_one_line, '')
+        self.report_check.append(t7)
+        t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+              self.plate.pitch_provided, get_pass_fail(self.bolt.min_pitch, self.plate.pitch_provided,relation='greater'))
+        self.report_check.append(t1)
+        t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
+              self.plate.pitch_provided, get_pass_fail(self.bolt.min_pitch, self.plate.pitch_provided,relation='lesser'))
+        self.report_check.append(t1)
+        t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+              self.plate.gauge_provided, get_pass_fail(self.bolt.min_gauge, self.plate.gauge_provided,relation="greater"))
+        self.report_check.append(t2)
+        t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
+              self.plate.gauge_provided, get_pass_fail(self.bolt.min_gauge, self.plate.gauge_provided,relation="lesser"))
+        self.report_check.append(t2)
+        t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+              self.plate.end_dist_provided, get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided))
+        self.report_check.append(t3)
+        t4 = (DISP_MAX_END, max_edge_end(self.plate.fy, self.plate.thickness_provided),
+              self.plate.end_dist_provided, get_pass_fail(self.bolt.min_edge_dist, self.plate.end_dist_provided))
+        self.report_check.append(t4)
+        t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+              self.plate.edge_dist_provided, get_pass_fail(self.bolt.min_end_dist, self.plate.edge_dist_provided))
+        self.report_check.append(t3)
+        t4 = (DISP_MAX_EDGE, max_edge_end(self.plate.fy, self.plate.thickness_provided),
+              self.plate.edge_dist_provided, get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided))
+        self.report_check.append(t4)
+        t5=(KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn,bolt_capacity_red_kn,
+            get_pass_fail(bolt_force_kn,bolt_capacity_red_kn))
+        self.report_check.append(t5)
+         # KEY_OUT_PLATE_BLK_SHEAR,
+         # KEY_OUT_PLATE_HEIGHT,
+         # KEY_OUT_PLATE_MOM_CAPACITY,
+         # KEY_OUT_WELD_LENGTH_EFF,
+         # KEY_OUT_WELD_STRENGTH]
 
 
         folder = self.select_workspace_folder(self)
-        filename = os.path.join(str(folder), "images_html", "Html_Report.html")
+        print(folder)
+        file_type = "PDF (*.pdf)"
+        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(folder), "untitled.pdf"),file_type)
+        print(filename)
+        # filename = os.path.join(str(folder), "images_html", "TexReport")
         file_name = str(filename)
-        ui.call_designreport(self,file_name, popup_summary, folder)
+        print(file_name)
+        fname_no_ext = filename[0].split(".")[0]
+        CreateLatex.save_latex(CreateLatex(), self.report_result, self.report_input, self.report_check,
+                               self.report_supporting,
+                               self.report_supported, popup_summary, fname_no_ext, folder)
 
-        # Creates PDF
-        config = configparser.ConfigParser()
-        config.readfp(open(r'Osdag.config'))
-        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
-
-        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
-
-        options = {
-            'margin-bottom': '10mm',
-            'footer-right': '[page]'
-        }
-        file_type = "PDF(*.pdf)"
-        fname, _ = QFileDialog.getSaveFileName(None, "Save File As", folder + "/", file_type)
-        fname = str(fname)
-        flag = True
-        if fname == '':
-            flag = False
-            return flag
-        else:
-            pdfkit.from_file(filename, fname, configuration=config, options=options)
-            QMessageBox.about(None, 'Information', "Report Saved")
-
-        # with open("filename", 'w') as out_file:
-        #     yaml.dump(fin_plate_input, out_file)
 
     def select_workspace_folder(self):
         # This function prompts the user to select the workspace folder and returns the name of the workspace folder
@@ -989,22 +1039,19 @@ class FinPlateConnection(ShearConnection):
                                                   desktop_path)
         return folder
 
-
-    def call_3DModel(self,ui,bgcolor):
+    def call_3DModel(self, ui, bgcolor):
         '''
         This routine responsible for displaying 3D Cad model
         :param flag: boolean
         :return:
         '''
-        # if self.design_status is True:
-
         if ui.btn3D.isChecked:
             ui.chkBxCol.setChecked(Qt.Unchecked)
             ui.chkBxBeam.setChecked(Qt.Unchecked)
             ui.chkBxFinplate.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Model",bgcolor)
+        ui.commLogicObj.display_3DModel("Model", bgcolor)
 
-    def call_3DBeam(self,ui,bgcolor):
+    def call_3DBeam(self, ui, bgcolor):
         '''
         Creating and displaying 3D Beam
         '''
@@ -1028,7 +1075,7 @@ class FinPlateConnection(ShearConnection):
             ui.mytabWidget.setCurrentIndex(0)
         ui.commLogicObj.display_3DModel("Column", bgcolor)
 
-    def call_3DFinplate(self,ui,bgcolor):
+    def call_3DFinplate(self, ui, bgcolor):
         '''
         Displaying FinPlate in 3D
         '''
@@ -1041,7 +1088,7 @@ class FinPlateConnection(ShearConnection):
 
         ui.commLogicObj.display_3DModel("Plate", bgcolor)
 
-    def unchecked_allChkBox(self,ui):
+    def unchecked_allChkBox(self, ui):
         '''
         This routine is responsible for unchecking all checkboxes in GUI
         '''
@@ -1051,7 +1098,7 @@ class FinPlateConnection(ShearConnection):
         ui.chkBxCol.setChecked(Qt.Unchecked)
         ui.chkBxFinplate.setChecked(Qt.Unchecked)
 
-    def showColorDialog(self,ui):
+    def showColorDialog(self, ui):
 
         col = QColorDialog.getColor()
         colorTup = col.getRgb()
@@ -1060,50 +1107,21 @@ class FinPlateConnection(ShearConnection):
         b = colorTup[2]
         ui.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
 
-    def generate_3D_Cad_image(self,ui,folder):
+    def generate_3D_Cad_image(self, ui, folder):
 
         # folder = self.select_workspace_folder(self)
 
         # status = self.resultObj['Bolt']['status']
         if self.design_status is True:
-            self.call_3DModel(self, ui,"gradient_bg")
+            self.call_3DModel(self, ui, "gradient_bg")
             data = os.path.join(str(folder), "images_html", "3D_Model.png")
             ui.display.ExportToImage(data)
             ui.display.FitAll()
-            return data
-
         else:
             pass
 
+        return data
 
-    def block_shear_strength_section(self, A_vg, A_vn, A_tg, A_tn, f_u, f_y):
-        """Calculate the block shear strength of bolted connections as per cl. 6.4.1
-
-        Args:
-            A_vg: Minimum gross area in shear along bolt line parallel to external force [in sq. mm] (float)
-            A_vn: Minimum net area in shear along bolt line parallel to external force [in sq. mm] (float)
-            A_tg: Minimum gross area in tension from the bolt hole to the toe of the angle,
-                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
-            A_tn: Minimum net area in tension from the bolt hole to the toe of the angle,
-                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
-            f_u: Ultimate stress of the plate material in MPa (float)
-            f_y: Yield stress of the plate material in MPa (float)
-
-        Return:
-            block shear strength of bolted connection in N (float)
-
-        Note:
-            Reference:
-            IS 800:2007, cl. 6.4.1
-
-        """
-        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-        T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
-        T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
-        Tdb = min(T_db1, T_db2)
-        Tdb = round(Tdb / 1000, 3)
-        return Tdb
 
 
 # For Command Line

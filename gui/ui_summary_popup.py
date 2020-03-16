@@ -15,6 +15,7 @@ import pickle
 import cairosvg
 # from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
+from design_report.reportGenerator_latex import CreateLatex
 
 
 
@@ -172,8 +173,10 @@ class Ui_Dialog1(object):
         self.beam_details = main.report_supported
         self.result = main.report_result
         self.Design_Check = main.report_check
-        save_html(main.report_result, main.report_input, main.report_check, main.report_supporting,main.report_supported, report_summary,fileName, folder)
-
+        # save_html(main.report_result, main.report_input, main.report_check, main.report_supporting,main.report_supported, report_summary,fileName, folder)
+        # CreateLatex.\
+        #     save_latex(CreateLatex(),main.report_result, main.report_input, main.report_check, main.report_supporting,
+        #           main.report_supported, report_summary, fileName, folder)
     def getPopUpInputs(self):
         input_summary = {}
         input_summary["ProfileSummary"] = {}

@@ -577,7 +577,7 @@ class BeamCoverPlate(MomentConnection):
         self.flange_plate.thickness_provided =22
         self.flange_plate.height = 210
         self.flange_plate.length= 232
-        self.flange_plate.bolt_line = 2
+        self.flange_plate.bolt_line = 4
         self.flange_plate.bolts_one_line =2
         self.flange_plate.bolts_required= 8
         self.flange_plate.bolt_capacity_red = 56580.32638058333
@@ -585,9 +585,10 @@ class BeamCoverPlate(MomentConnection):
         # self.flange_plate.moment_demand= 0
         self.flange_plate.pitch_provided = 50
 
-        self.flange_plate.gauge_provided =0.0
-        self.flange_plate.edge_dist_provided =33
-        self.flange_plate.end_dist_provided=33
+        self.flange_plate.gauge_provided = 0.0
+        self.flange_plate.gauge_provided01 = 100
+        self.flange_plate.edge_dist_provided = 33
+        self.flange_plate.end_dist_provided= 33
 
         self.flange_plate.block_shear_capacity = 917754.359
         # self.flange_plate.shear_yielding_capacity = 0.0
@@ -603,13 +604,13 @@ class BeamCoverPlate(MomentConnection):
         self.web_plate.thickness_provided = 12
         self.web_plate.height = 366.0
         self.web_plate.length = 152
-        self.web_plate.bolt_line = 1
+        self.web_plate.bolt_line = 2
         self.web_plate.bolts_one_line = 3
         self.web_plate.bolts_required = 6
         self.web_plate.bolt_capacity_red = 56580.32638058333
         self.web_plate.bolt_force = 53368.918616954594
         # self.web_plate.moment_demand = 2150000.0
-        self.web_plate.pitch_provided = 0
+        self.web_plate.pitch_provided = 38
 
         self.web_plate.gauge_provided = 150
         self.web_plate.edge_dist_provided = 33

@@ -99,7 +99,7 @@ class FinPlateConnection(ShearConnection):
     def input_values(self, existingvalues={}):
 
         '''
-        Function to return a list of tuples to be displayed as the UI.(Input Dock)
+        Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
         '''
 
         # @author: Amir, Umair

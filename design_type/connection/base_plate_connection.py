@@ -1,22 +1,21 @@
 """
+
 @Author:    Danish Ansari - Osdag Team, IIT Bombay
 @Co-author: Aditya Pawar, Project Intern, MIT College (Aurangabad)
 
 
 @Module - Base Plate Connection
            - Pinned Base Plate [Axial + Shear]
-           - Gusseted Base Plate [Bending Moment (major and/or minor axis) + Axial + Shear]
-           - Base Plate with Cleat Angle [Bending Moment (major and/or minor axis) + Axial + Shear]
+           - Gusseted Base Plate [Moment (major and minor axis) + Axial + Shear]
+           - Base Plate with Cleat Angle
 
 
 @Reference(s): 1) IS 800: 2007, General construction in steel - Code of practice (Third revision)
-               2) IS 5624:1993, Foundation bolts [PGD 31: Bolts, Nuts and Fasteners Accessories]
-               3) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 15)
-               4) Limit State Design of Steel Structures by S K Duggal (second edition, Chapter 11)
+               2) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 15)
+               3) Limit State Design of Steel Structures by S K Duggal (second edition, Chapter 11)
 
-     other     5)  Column Bases - Omer Blodgett (chapter 3)
-  references   6) AISC Design Guide 1 - Base Plate and Anchor Rod Design
-               7) Google [google.com]
+     other     4)  Column Bases - Omer Blodgett (chapter 3)
+  references   5) AISC Design Guide 1 - Base Plate and Anchor Rod Design
 
 """
 
@@ -27,11 +26,11 @@ from utils.common.component import *
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
+import yaml
 from design_report.reportGenerator import save_html
 
 import time
 import os
-import yaml
 import shutil
 import logging
 import pickle
@@ -39,7 +38,6 @@ import pdfkit
 import configparser
 import cairosvg
 from io import StringIO
-
 
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -51,9 +49,6 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-
-
-# Start of the analyses and design calculation(s) for base plate
 
 
 class BasePlateConnection(MomentConnection):
@@ -75,6 +70,7 @@ class BasePlateConnection(MomentConnection):
         self.gamma_mb = 0.0
         self.gamma_m0 = 0.0
         self.gamma_m1 = 0.0
+
 
     def set_osdaglogger(key):
         """
@@ -288,7 +284,6 @@ class BasePlateConnection(MomentConnection):
             # self.set_input_values(self, design_dictionary)
         else:
             pass
-
 
 
 

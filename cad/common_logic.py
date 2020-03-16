@@ -615,9 +615,13 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)  # Call to create Nut from Component directory
 
         numOfBoltsF = int(B.flange_plate.bolts_required)  # Number of flange bolts for both beams
-        nutSpaceF = float(B.flange_plate.thickness_provided) + beam_T  # Space between bolt head and nut for flange bolts
+        if B.preference == "Outside":
+            nutSpaceF = float(B.flange_plate.thickness_provided) + beam_T  # Space between bolt head and nut for flange bolts
+        else:
+            nutSpaceF = 2 * float(B.flange_plate.thickness_provided) + beam_T
 
-        #TODO : update nutSpace from Osdag test
+
+            #TODO : update nutSpace from Osdag test
 
         numOfBoltsW = int(B.web_plate.bolts_required)  # Number of web bolts for both beams
         nutSpaceW = 2 * float(B.web_plate.thickness_provided) + beam_tw  # Space between bolt head and nut for web bolts

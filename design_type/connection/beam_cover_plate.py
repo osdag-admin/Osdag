@@ -778,6 +778,13 @@ class BeamCoverPlate(MomentConnection):
                 self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if i >= self.section.web_thickness]
                 self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if i >= self.section.flange_thickness]
 
+                if not self.web_plate_thickness_possible and self.flange_plate_thickness_possible:
+                    logger.error(": Plate thickness should be greater than section  thicknesss.")
+                else:
+                    pass
+                    # print("Selecting bolt diameter")
+                    # self.select_bolt_dia(self)
+
                 self.flange_plate.thickness_provided = self.min_thick_based_on_area(tk=self.section.flange_thickness,
                                                                                     width=self.section.flange_width,
                                                                                     list_of_pt_tk=self.flange_plate_thickness_possible,

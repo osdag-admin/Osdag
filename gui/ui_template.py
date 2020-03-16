@@ -2050,17 +2050,20 @@ class Ui_ModuleWindow(QMainWindow):
         material = Material(material_grade)
         tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
         tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
-        material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
-        material_connector.setCurrentText(str(material_grade))
+        if module != KEY_DISP_TENSION:
+            material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
+            material_connector.setCurrentText(str(material_grade))
 
-        def f(material_g):
-            m = Material(material_g)
-            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(m.fu))
-            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(m.fy))
+            def f(material_g):
+                m = Material(material_g)
+                tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(m.fu))
+                tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(m.fy))
 
-        material_connector.currentIndexChanged.connect(lambda: f(material_connector.currentText()))
-        tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(material.fu))
-        tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(material.fy))
+            material_connector.currentIndexChanged.connect(lambda: f(material_connector.currentText()))
+            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(material.fu))
+            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(material.fy))
+        else:
+            pass
 
         if module == KEY_DISP_COLUMNCOVERPLATE:
             designation_col = key_5.currentText()

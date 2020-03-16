@@ -1109,18 +1109,33 @@ class Tension(Main):
             self.section_size = self.select_section(self,design_dictionary,selectedsize)
             print(self.section_size)
             if design_dictionary[KEY_LOCATION] == "Long Leg":
-               if self.section_size.max_leg < self.section_size.root_radius + self.section_size.thickness + (2 *22):
+               if self.section_size.max_leg < self.section_size.root_radius + self.section_size.thickness + (2 *25):
                    continue
             elif design_dictionary[KEY_LOCATION] == 'Short Leg':
-                if self.section_size.min_leg < self.section_size.root_radius + self.section_size.thickness + (2 * 22):
+                if self.section_size.min_leg < self.section_size.root_radius + self.section_size.thickness + (2 * 25):
                     continue
-            if design_dictionary[KEY_SEC_PROFILE] in ['Channels','Angles']:
-                self.cross_area = self.section_size.area
+            if design_dictionary[KEY_SEC_PROFILE] =='Channels':
+                self.max_plate_height = self.section_size.max_plate_height()
+                if self.max_plate_height < (2 * 30) + (2 * 25):
+                    continue
+                else:
+                    self.cross_area = self.section_size.area
                 # self.section_size.min_rad_gyration_calc((self.section_size.rad_of_gy_y),(self.section_size.rad_of_gy_z))
                 # radius_gyration = self.section_size.min_radius_gyration
 
-            elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Channels', 'Star Angles', 'Back to Back Angles']:
+            elif design_dictionary[KEY_SEC_PROFILE] == 'Back to Back Channels':
+                self.max_plate_height = self.section_size.max_plate_height()
+                if self.max_plate_height < (2 * 30) + (2 * 25):
+                    continue
+                else:
+                    self.cross_area = self.section_size.area * 2
+
+            elif design_dictionary[KEY_SEC_PROFILE] =='Angles':
+                self.cross_area = self.section_size.area
+
+            else:
                 self.cross_area = self.section_size.area * 2
+
                 # self.section_size.min_rad_gyration_bbchannel_calc(mom_inertia_y=self.section_size.mom_inertia_y,
                 #                                                       area=self.section_size.area,
                 #                                                       Cg=self.section_size.Cg,
@@ -1128,8 +1143,7 @@ class Tension(Main):
                 #                                                       thickness=0.0)
                 # radius_gyration = self.section_size.min_rad_gyration_bbchannel
 
-            else:
-                pass
+
 
             if previous_size != None:
                 self.section_size_prev = self.select_section(self, design_dictionary, previous_size)

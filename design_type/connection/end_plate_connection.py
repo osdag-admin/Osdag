@@ -130,7 +130,6 @@ class EndPlateConnection(ShearConnection):
 
         # @author: Amir, Umair
         self.module = KEY_DISP_ENDPLATE
-
         options_list = []
 
         if KEY_CONN in existingvalues:
@@ -185,7 +184,6 @@ class EndPlateConnection(ShearConnection):
 
         t16 = (KEY_MODULE, KEY_DISP_ENDPLATE, TYPE_MODULE, None, None)
         options_list.append(t16)
-
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
@@ -791,7 +789,6 @@ class EndPlateConnection(ShearConnection):
     #     print(self.load)
     #     print(self.bolt)
     #     print(self.plate)
-
 
 
     @staticmethod

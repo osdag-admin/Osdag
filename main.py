@@ -7,6 +7,7 @@ class Main():
     def __init__(self):
         pass
 
+
     # def customized_input(self):
     #
     #     list1 = []
@@ -34,6 +35,7 @@ class Main():
     def plate_thick_customized():
         d = VALUES_PLATETHK_CUSTOMIZED
         return d
+
     #
     # @staticmethod
     # def size_customized():

@@ -5,7 +5,6 @@ Started on 01 - Nov - 2018
 @author: ajmalbabums
 """
 import math
-
 from Common import *
 
 class IS800_2007(object):
@@ -285,6 +284,7 @@ class IS800_2007(object):
         return V_db
 
     # cl. 10.3.3 Shear Capacity of Bearing Bolt
+
     @staticmethod
 
     def cl_10_3_3_bolt_shear_capacity(f_ub, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
@@ -364,7 +364,6 @@ class IS800_2007(object):
 
     # cl. 10.3.4 Bearing Capacity of the Bolt
     @staticmethod
-
     def cl_10_3_4_bolt_bearing_capacity(f_u, f_ub, t, d, e, p, bolt_hole_type='Standard', safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
 
         """Calculate design bearing strength of a bolt on any plate.

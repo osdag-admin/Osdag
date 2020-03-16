@@ -12,7 +12,6 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 
-
 class BBCoverPlateBoltedCAD(object):
     def __init__(self, beamLeft, beamRight, plateAbvFlange, plateBelwFlange, innerplateAbvFlangeFront,innerplateAbvFlangeBack,
                  innerplateBelwFlangeFront, innerplateBelwFlangeBack, WebPlateLeft, WebPlateRight, nut_bolt_array_AF,

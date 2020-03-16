@@ -93,14 +93,13 @@ class FinPlateConnection(ShearConnection):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-
     def module_name(self):
         return KEY_DISP_FINPLATE
 
     def input_values(self, existingvalues={}):
 
         '''
-        Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
+        Function to return a list of tuples to be displayed as the UI.(Input Dock)
         '''
 
         # @author: Amir, Umair
@@ -316,7 +315,6 @@ class FinPlateConnection(ShearConnection):
         t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
         out_list.append(t16)
 
-
         t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity,2) if flag else '')
         out_list.append(t17)
 
@@ -419,7 +417,6 @@ class FinPlateConnection(ShearConnection):
                               "Plate thickness should be greater than suppported section web thicknesss.")
         else:
             flag2=True
-
         if len(missing_fields_list) > 0:
             QMessageBox.information(window, "Information",
                                     generate_missing_fields_error_string(missing_fields_list))
@@ -454,7 +451,6 @@ class FinPlateConnection(ShearConnection):
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
 
         self.start_time = time.time()
-
         self.module = design_dictionary[KEY_MODULE]
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
@@ -474,8 +470,6 @@ class FinPlateConnection(ShearConnection):
         else:
 
             length = self.supported_section.depth - self.supported_section.notch_ht
-
-
 
         self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
         self.supported_section.tension_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
@@ -518,7 +512,6 @@ class FinPlateConnection(ShearConnection):
         self.res_force = math.sqrt(self.load.shear_force ** 2 + self.load.axial_force ** 2) * 1000
 
         self.plate.thickness_provided = min(self.thickness_possible)
-
         bolts_required_previous = 2
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
@@ -610,7 +603,6 @@ class FinPlateConnection(ShearConnection):
     def get_fin_plate_details(self):
 
         print(self.design_status,"getting fin plate details")
-
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                 conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
@@ -672,13 +664,11 @@ class FinPlateConnection(ShearConnection):
                 logger.error(": Plate moment capacity is less than the moment demand [cl. 8.2.1.2]")
                 logger.warning(": Re-design with increased plate dimensions")
 
-
     def section_block_shear_capacity(self):
         #################################
         # Block Shear Check for supporting section
         #################################
         edge_dist_rem = self.plate.edge_dist_provided + self.plate.gap
-
         # design_status_block_shear = False
         # while design_status_block_shear is False:
         #     print(design_status_block_shear)
@@ -1014,7 +1004,6 @@ class FinPlateConnection(ShearConnection):
          # KEY_OUT_PLATE_MOM_CAPACITY,
          # KEY_OUT_WELD_LENGTH_EFF,
          # KEY_OUT_WELD_STRENGTH]
-
 
         folder = self.select_workspace_folder(self)
         print(folder)

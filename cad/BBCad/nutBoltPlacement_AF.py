@@ -59,7 +59,8 @@ class NutBoltArray_AF():
         b_AF = self.bolt
         n_AF = self.nut
         for i in range(self.numOfboltsF):
-            bolt_length_required = float(b_AF.T + self.nutSpaceF)
+            bolt_length_required = float( b_AF.T +self.nutSpaceF)#todo: anjali
+           #  bolt_length_required = float(b_AF.T  + self.nutSpaceF)
             # bolt_length_required = 100
             b_AF.H = 1.5 * bolt_length_required
             self.bolts_AF.append(Bolt(b_AF.R, b_AF.T, b_AF.H, b_AF.r))
@@ -98,7 +99,7 @@ class NutBoltArray_AF():
         """
         self.positions_AF = []
         # self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.gauge_AF / 2) * self.gaugeDirAF
-        self.boltOrigin_AF = self.originAF + self.edge_gauge_AF * self.pitchDirAF + ((self.plateAbvFlangeL - self.gauge_AF)/2 - self.gauge) * self.gaugeDirAF
+        self.boltOrigin_AF = self.originAF + self.edge_gauge_AF * self.pitchDirAF + ((self.plateAbvFlangeL - self.gauge_AF)/2 - ((self.col_AF/2-1)*self.gauge)) * self.gaugeDirAF
 
         for rw_AF in range(self.row_AF):
             for cl_AF in range(self.col_AF):

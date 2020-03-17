@@ -789,8 +789,10 @@ class BeamCoverPlateWeld(MomentConnection):
             self.web_plate_capacity_axial(self)
 
 
+
+
     def web_plate_capacity_axial(self):
-        # A_vn_web = 2 * self.web_plate.thickness_provided
+
         A_v_web = 2 * self.web_plate.height * self.web_plate.thickness_provided
         self.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
             A_v=A_v_web, fy=self.web_plate.fy)

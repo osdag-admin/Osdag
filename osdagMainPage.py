@@ -22,6 +22,8 @@ from design_type.connection.end_plate_connection import EndPlateConnection
 
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
+from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
+
 
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_cover_plate import ColumnCoverPlate
@@ -375,10 +377,16 @@ class OsdagMainWindow(QMainWindow):
                     shutil.rmtree(os.path.join(folder, create_folder))
                     os.mkdir(os.path.join(root_path, create_folder))
 
-        if self.ui.rdbtn_cc_coverplate_bolted.isChecked() or self.ui.rdbtn_cc_coverplate_welded.isChecked():
+        if self.ui.rdbtn_cc_coverplate_bolted.isChecked() :
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, ColumnCoverPlate,folder)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+        elif self.ui.rdbtn_cc_coverplate_welded.isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, ColumnCoverPlateWeld, folder)
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

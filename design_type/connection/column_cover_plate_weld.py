@@ -12,10 +12,10 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFi
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 
 
-class BeamCoverPlateWeld(MomentConnection):
+class ColumnCoverPlateWeld(MomentConnection):
 
     def __init__(self):
-        super(BeamCoverPlateWeld, self).__init__()
+        super(ColumnCoverPlateWeld, self).__init__()
         self.design_status = False
 
 
@@ -106,14 +106,14 @@ class BeamCoverPlateWeld(MomentConnection):
         else:
             existingvalue_key_wplate_thk = ''
 
-        t16 = (KEY_MODULE, KEY_DISP_BEAMCOVERPLATEWELD, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_COLUMNCOVERPLATEWELD, TYPE_MODULE, None, None)
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Beams"))
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Columns"))
         options_list.append(t4)
 
         t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
@@ -383,7 +383,7 @@ class BeamCoverPlateWeld(MomentConnection):
     def warn_text(self):
 
         """
-        Function to give logger warning when any old value is selected from Column and Beams table.
+        Function to give logger warning when any old value is selected from Column and Column table.
         """
 
         # @author Arsil Zunzunia
@@ -440,10 +440,10 @@ class BeamCoverPlateWeld(MomentConnection):
 
     def module_name(self):
 
-        return KEY_DISP_BEAMCOVERPLATEWELD
+        return KEY_DISP_COLUMNCOVERPLATEWELD
 
     def set_input_values(self, design_dictionary):
-        super(BeamCoverPlateWeld, self).set_input_values(self, design_dictionary)
+        super(ColumnCoverPlateWeld, self).set_input_values(self, design_dictionary)
         # self.module = design_dictionary[KEY_MODULE]
         # global design_status
         # self.design_status = False # todo doubt of true or false
@@ -452,7 +452,7 @@ class BeamCoverPlateWeld(MomentConnection):
         # self.connectivity = design_dictionary[KEY_CONN]
         self.preference = design_dictionary[KEY_FLANGEPLATE_PREFERENCES]
 
-        self.section = Beam(designation=design_dictionary[KEY_SECSIZE],
+        self.section = Column(designation=design_dictionary[KEY_SECSIZE],
                               material_grade=design_dictionary[KEY_MATERIAL])
         print("anjali",design_dictionary[KEY_DP_DETAILING_EDGE_TYPE])
         # self.web_bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
@@ -512,7 +512,7 @@ class BeamCoverPlateWeld(MomentConnection):
             length = self.section.depth - (
                     2 * self.section.flange_thickness)  # -(2*self.supported_section.root_radius)
         #     else:
-        #         length = self.supported_section.depth - 50.0  # TODO: Subtract notch height for beam-beam connection
+        #         length = self.supported_section.depth - 50.0  # TODO: Subtract notch height for Column-Column connection
 
         gamma_m0 = 1.1
         self.axial_capacity = (0.3 * self.section.area  * self.section.fy) / gamma_m0 #N
@@ -683,7 +683,7 @@ class BeamCoverPlateWeld(MomentConnection):
                          "than applied loads, Please select larger sections or decrease loads")
 
     def module_name(self):
-        return KEY_DISP_BEAMCOVERPLATE
+        return KEY_DISP_COLUMNCOVERPLATEWELD
 
 
 
@@ -769,9 +769,9 @@ class BeamCoverPlateWeld(MomentConnection):
         '''
              Args:
                  A_v (float) Area under shear
-                 Beam_fy (float) Yield stress of Beam material
+                 Column_fy (float) Yield stress of Column material
              Returns:
-                 Capacity of Beam web in shear yielding
+                 Capacity of Column web in shear yielding
              '''
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         # A_v = height * thickness
@@ -783,9 +783,9 @@ class BeamCoverPlateWeld(MomentConnection):
         '''
                Args:
                    A_vn (float) Net area under shear
-                   Beam_fu (float) Ultimate stress of Beam material
+                   Column_fu (float) Ultimate stress of Column material
                Returns:
-                   Capacity of beam web in shear rupture
+                   Capacity of column web in shear rupture
                '''
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
@@ -799,7 +799,7 @@ class BeamCoverPlateWeld(MomentConnection):
         Args:
             length (float) length of member in direction of shear load
             thickness(float) thickness of member resisting shear
-            beam_fy (float) Yield stress of section material
+            column_fy (float) Yield stress of section material
         Returns:
             Capacity of section in shear yeiding
         '''
@@ -816,9 +816,9 @@ class BeamCoverPlateWeld(MomentConnection):
         '''
                Args:
                    A_vn (float) Net area under shear
-                   Beam_fu (float) Ultimate stress of Beam material
+                   Column_fu (float) Ultimate stress of Column material
                Returns:
-                   Capacity of beam web in shear rupture
+                   Capacity of column web in shear rupture
                '''
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
@@ -974,7 +974,7 @@ class BeamCoverPlateWeld(MomentConnection):
         #     self.createBBCoverPlateBoltedCAD()
         #     self.ui.btn3D.setChecked(Qt.Checked)
         if ui.btn3D.isChecked():
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxCol.setChecked(Qt.Unchecked)
             ui.chkBxFinplate.setChecked(Qt.Unchecked)
             ui.mytabWidget.setCurrentIndex(0)
 
@@ -985,16 +985,16 @@ class BeamCoverPlateWeld(MomentConnection):
         # else:
         #     self.display.EraseAll()
 
-    def call_3DBeam(self, ui, bgcolor):
+    def call_3DCol(self, ui, bgcolor):
         # status = self.resultObj['Bolt']['status']
         # if status is True:
-        #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
-        if ui.chkBxBeam.isChecked():
+        #     self.ui.chkBx_ColSec1.setChecked(Qt.Checked)
+        if ui.chkBxCol.isChecked():
             ui.btn3D.setChecked(Qt.Unchecked)
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxCol.setChecked(Qt.Unchecked)
             ui.mytabWidget.setCurrentIndex(0)
-        # self.display_3DModel("Beam", bgcolor)
-        ui.commLogicObj.display_3DModel("Beam",bgcolor)
+        # self.display_3DModel("Column", bgcolor)
+        ui.commLogicObj.display_3DModel("Column",bgcolor)
 
 
     def call_3DConnector(self, ui, bgcolor):
@@ -1003,7 +1003,7 @@ class BeamCoverPlateWeld(MomentConnection):
         #     self.ui.chkBx_extndPlate.setChecked(Qt.Checked)
         if ui.chkBxFinplate.isChecked():
             ui.btn3D.setChecked(Qt.Unchecked)
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxCol.setChecked(Qt.Unchecked)
             ui.mytabWidget.setCurrentIndex(0)
         # self.display_3DModel("Connector", bgcolor)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
@@ -1012,7 +1012,7 @@ class BeamCoverPlateWeld(MomentConnection):
 
         tabs = []
 
-        t1 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
         tabs.append(t1)
 
         t2 = ("Bolt", TYPE_TAB_2, self.bolt_values)

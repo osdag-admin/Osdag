@@ -510,6 +510,15 @@ KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 KEY_WELD_TYPE = 'Weld.Type'
 KEY_DISP_WELD_TYPE ='Weld Type'
 VALUES_WELD_TYPE = ["Fillet Weld"]
+DISP_FLANGE_TITLE_WELD = 'Flange Weld'
+KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
+KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size(mm)'
+KEY_FLANGE_WELD_STRENGTH = 'Flange_Weld.Strength'
+KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
+KEY_FLANGE_WELD_STRESS = 'Flange_Weld.Stress'
+KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
+KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
+KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
 
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
@@ -536,7 +545,7 @@ KEY_EDGEDIST_W = 'Web_plate.edge_dist_provided'
 KEY_DISP_EDGEDIST_W = 'Edge Distance'
 
 KEY_WEB_CAPACITY ="Web_plate.capacity"
-KEY_DISP_WEB_CAPACITY= 'capacity'
+KEY_DISP_WEB_CAPACITY= 'Capacity'
 KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
 KEY_DISP_WEB_TEN_CAPACITY ="Web tension capacity"
 KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
@@ -566,6 +575,16 @@ KEY_WEB_BOLTS_REQ = "Web_plate.Bolt_required"
 KEY_WEB_DISP_BOLTS_REQ = "Web Bolt Required"
 KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
 KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in web'
+
+DISP_WEB_TITLE_WELD = 'Web Weld'
+KEY_WEB_WELD_SIZE = 'Web_Weld.Size'
+KEY_WEB_DISP_WELD_SIZE = 'Web Weld Size(mm)'
+KEY_WEB_WELD_STRENGTH = 'Web_Weld.Strength'
+KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength(N/mm)'
+KEY_WEB_WELD_STRESS = 'Web_Weld.Stress'
+KEY_WEB_DISP_WELD_STRESS = 'Web Weld Stress(N/mm)'
+KEY_WEB_WELD_LENGTH = 'Web_Weld.Length'
+KEY_WEB_WELD_LENGTH_EFF = 'Web_Weld.EffLength'
 
 
 DISP_TITLE_ENDPLATE = 'End plate'

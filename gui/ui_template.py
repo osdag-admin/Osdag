@@ -625,11 +625,11 @@ class Ui_ModuleWindow(QMainWindow):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
-            elif t[0] == KEY_GRD and (module != KEY_DISP_BEAMCOVERPLATEWELD):
+            elif t[0] == KEY_GRD and (module != KEY_DISP_BEAMCOVERPLATEWELD) and (module != KEY_DISP_COLUMNCOVERPLATEWELD) :
                 key_customized_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_2.activated.connect(lambda: popup(key_customized_2, new_list))
                 data[t[0] + "_customized"] = t[1]()
-            elif t[0] == KEY_D and (module != KEY_DISP_BEAMCOVERPLATEWELD):
+            elif t[0] == KEY_D and (module != KEY_DISP_BEAMCOVERPLATEWELD) and (module != KEY_DISP_COLUMNCOVERPLATEWELD) :
                 key_customized_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -1086,7 +1086,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))

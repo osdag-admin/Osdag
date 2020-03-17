@@ -33,7 +33,6 @@ from io import StringIO
 
 # connectivity = "column_flange_beam_web"
 # supporting_member_section = "HB 400"
-# supported_member_section = "MB 300"
 # fy = 250.0
 # fu = 410.0
 # shear_force = 100.0
@@ -47,10 +46,10 @@ from io import StringIO
 # material = Material(material_grade)
 
 
-class Tension(Main):
+class Tension_bolted(Main):
 
     def __init__(self):
-        super(Tension, self).__init__()
+        super(Tension_bolted, self).__init__()
 
 
         self.design_status = False
@@ -89,7 +88,7 @@ class Tension(Main):
         logger.addHandler(handler)
 
     def module_name(self):
-        return KEY_DISP_TENSION
+        return KEY_DISP_TENSION_BOLTED
 
     def customized_input(self):
 
@@ -607,7 +606,7 @@ class Tension(Main):
         '''
 
         # @author: Amir, Umair
-        self.module = KEY_DISP_TENSION
+        self.module = KEY_DISP_TENSION_BOLTED
 
         options_list = []
 
@@ -681,7 +680,7 @@ class Tension(Main):
         # else:
         #     existingvalue_key_platethk = ''
 
-        t16 = (KEY_MODULE, KEY_DISP_TENSION, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_TENSION_BOLTED, TYPE_MODULE, None, None)
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
@@ -1021,7 +1020,7 @@ class Tension(Main):
 
     def set_input_values(self, design_dictionary):
 
-        super(Tension,self).set_input_values(self, design_dictionary)
+        super(Tension_bolted,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]

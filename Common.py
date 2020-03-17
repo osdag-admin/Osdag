@@ -291,7 +291,8 @@ KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
 
-KEY_DISP_TENSION = 'Tension Members Design'
+KEY_DISP_TENSION_BOLTED = 'Tension Members Bolted Design'
+KEY_DISP_TENSION_WELDED = 'Tension Members Welded Design'
 KEY_DISP_COMPRESSION = 'Compression Member'
 
 
@@ -373,6 +374,10 @@ KEY_DISP_AXIAL = 'Axial (kN) *'
 
 DISP_TITLE_BOLT = 'Bolt'
 DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
+
+DISP_TITLE_WELD = 'Weld'
+DISP_TITLE_WELD_CAPACITY = 'Weld Capacity'
+
 
 DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
@@ -876,7 +881,9 @@ KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
 KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
 KEY_OUT_WELD_LENGTH = 'Weld.Length'
+KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
 KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
+KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"

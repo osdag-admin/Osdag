@@ -1435,7 +1435,7 @@ class Ui_ModuleWindow(QMainWindow):
                 d1 = {}
             design_dictionary.update(d1)
         if self.designPrefDialog.flag:
-            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+            if module not in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
                 tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
                 key_material_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL).currentText()
                 if key_material_column == "Custom":
@@ -1517,8 +1517,12 @@ class Ui_ModuleWindow(QMainWindow):
             return EndPlateConnection
         elif name == KEY_DISP_COLUMNCOVERPLATE:
             return ColumnCoverPlate
+        elif name == KEY_DISP_COLUMNCOVERPLATEWELD:
+            return ColumnCoverPlateWeld
         elif name == KEY_DISP_BEAMCOVERPLATE:
             return BeamCoverPlate
+        elif name == KEY_DISP_BEAMCOVERPLATEWELD:
+            return BeamCoverPlateWeld
         elif name == KEY_DISP_BEAMENDPLATE:
             return BeamEndPlate
         elif name == KEY_DISP_COLUMNENDPLATE:

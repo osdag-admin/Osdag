@@ -765,10 +765,7 @@ class BeamCoverPlate(MomentConnection):
                 A_v=A_v_flange,
                 fy=self.flange_plate.fy)
             print("tension_yielding_capacity_flange", self.tension_yielding_capacity_flange)
-            #
-            # self.section.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
-            #     A_vn=A_vn_flange,
-            #     fu=self.flange_plate.fu)
+
 
 
             if self.tension_yielding_capacity_flange >  self.factored_axial_load :
@@ -778,10 +775,15 @@ class BeamCoverPlate(MomentConnection):
                 self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if i >= self.section.web_thickness]
                 self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if i >= self.section.flange_thickness]
 
-                if not self.web_plate_thickness_possible and self.flange_plate_thickness_possible:
-                    logger.error(": Plate thickness should be greater than section  thicknesss.")
+                if not self.web_plate_thickness_possible :
+                    logger.error(": Web Plate thickness should be greater than section  thicknesss.")
                 else:
                     pass
+                if not self.flange_plate_thickness_possible:
+                    logger.error(": Flange Plate thickness should be greater than section  thicknesss.")
+                else:
+                    pass
+
                     # print("Selecting bolt diameter")
                     # self.select_bolt_dia(self)
 

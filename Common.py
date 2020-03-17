@@ -509,7 +509,7 @@ KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 
 KEY_WELD_TYPE = 'Weld.Type'
 KEY_DISP_WELD_TYPE ='Weld Type'
-VALUES_WELD_TYPE = ["Fillet Weld"]
+VALUES_WELD_TYPE = ["select type","Fillet Weld"]
 DISP_FLANGE_TITLE_WELD = 'Flange Weld'
 KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
 KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size(mm)'

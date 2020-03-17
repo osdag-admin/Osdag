@@ -595,7 +595,7 @@ class FinPlateConnection(ShearConnection):
             print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.plate.bolt_force)
 
             bolt_capacity_reduced = self.plate.get_bolt_red(self.plate.bolts_one_line,
-                                                            self.plate.gauge_provided, self.bolt.bolt_capacity,
+                                                            self.plate.gauge_provided, self.plate.bolt_line, self.plate.pitch_provided,self.bolt.bolt_capacity,
                                                             self.bolt.bolt_diameter_provided)
             if bolt_capacity_reduced < self.plate.bolt_force and count >= 1:
                 self.bolt.bolt_grade_provided = bolt_grade_previous

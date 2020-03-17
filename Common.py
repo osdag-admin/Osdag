@@ -27,6 +27,7 @@ TYPE_TAB_3 = "TYPE_TAB_3"
 
 
 import sqlite3
+
 from utils.common.component import *
 from utils.common.component import *
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
@@ -309,7 +310,7 @@ VALUES_CONN_2 = ['Beam-Beam']
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
-VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
 
 KEY_IMAGE = 'Image'
 
@@ -418,7 +419,10 @@ VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
-VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg','Web']
+VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
+VALUES_LOCATION_2 = ["Web"]
+
 
 KEY_IMAGE = 'Image'
 
@@ -983,7 +987,7 @@ def get_leg_lengths(designation):
 
 all_angles = connectdb("Angles","popup")
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
-print(VALUES_CLEAT_CUSTOMIZED)
+# print(VALUES_CLEAT_CUSTOMIZED)
 
 DISP_TITLE_COMPMEM='Compression member'
 

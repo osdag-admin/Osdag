@@ -8,6 +8,7 @@ from utils.common.is800_2007 import IS800_2007
 class Material(object):
 
     def __init__(self, material_grade=''):
+
         self.fy_20 = 0.0
         self.fy_20_40 = 0.0
         self.fy_40 = 0.0
@@ -15,6 +16,7 @@ class Material(object):
         self.fy = 0.0
         if material_grade not in ["Select Section", "Custom"] and "Custom" not in material_grade:
             self.connect_to_database_to_get_fy_fu(grade=material_grade)
+            self.material=material_grade
         if material_grade.split(" ")[0] == "Custom":
             material = material_grade.split(" ")
             if len(material) == 3:

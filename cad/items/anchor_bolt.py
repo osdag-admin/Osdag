@@ -15,9 +15,9 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 from OCC.Core.gp import gp_Ax1
 from OCC.Core.BRepPrimAPI import *
 
-# from OCC.Display.SimpleGui import init_display
-#
-# display, start_display, add_menu, add_function_to_menu = init_display()
+from OCC.Display.SimpleGui import init_display
+
+display, start_display, add_menu, add_function_to_menu = init_display()
 
 
 class AnchorBolt_A(object):
@@ -198,21 +198,25 @@ class AnchorBolt_Endplate(object):
 
         return Anchor_BOlt
 
-# l = 200
-# c = 105
-# a = 60
-# r = 8
-#
-# origin = numpy.array([0.,0.,0.])
-# uDir = numpy.array([1.,0.,0.])
-# shaftDir = numpy.array([0.,0.,1.])
-#
-# channel = AnchorBolt_A(l,c,a,r)
-# # channel = AnchorBolt_B(l,c,a,r)
-# # channel = AnchorBolt_Endplate(l,c,a,r)
-# angles = channel.place(origin, uDir, shaftDir)
-# point = channel.compute_params()
-# prism = channel.create_model()
-# display.DisplayShape(prism, update=True)
-# display.DisableAntiAliasing()
-# start_display()
+
+
+if __name__ == '__main__':
+
+    l = 400
+    c = 125
+    a = 75
+    r = 12
+
+    origin = numpy.array([0.,0.,0.])
+    uDir = numpy.array([1.,0.,0.])
+    shaftDir = numpy.array([0.,0.,1.])
+
+    channel = AnchorBolt_A(l,c,a,r)
+    # channel = AnchorBolt_B(l,c,a,r)
+    # channel = AnchorBolt_Endplate(l,c,a,r)
+    angles = channel.place(origin, uDir, shaftDir)
+    point = channel.compute_params()
+    prism = channel.create_model()
+    display.DisplayShape(prism, update=True)
+    display.DisableAntiAliasing()
+    start_display()

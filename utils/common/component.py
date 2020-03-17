@@ -4,7 +4,8 @@ from utils.common.other_standards import *
 from Common import *
 import sqlite3
 import logging
-import logging
+from utils.common.material import Material
+
 import math
 import numpy as np
 from utils.common.common_calculation import *
@@ -166,8 +167,13 @@ class Bolt(Material):
         [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter_provided)
         [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided)
 
-        self.bolt_tension_capacity = IS800_2007.cl_10_3_5_bolt_tensile_capacity(
-            f_ub=self.bolt_fu, f_yb=self.bolt_fy, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area)
+        if self.bolt_type == "Bearing Bolt":
+            self.bolt_tension_capacity = IS800_2007.cl_10_3_5_bearing_bolt_tension_resistance(
+                f_ub=self.bolt_fu, f_yb=self.bolt_fy, A_sb=self.bolt_shank_area, A_n=self.bolt_net_area)
+
+        elif self.bolt_type == "Friction Grip Bolt":
+            self.bolt_tension_capacity = IS800_2007.cl_10_4_5_friction_bolt_tension_resistance(
+                f_ub=self.bolt_fu, f_yb=self.bolt_fy, A_sb=self.bolt_shank_area, A_n=self.bolt_net_area)
 
 
 
@@ -735,6 +741,7 @@ class Plate(Material):
         if gauge > max_spacing:
             gauge, edge_dist = self.get_spacing_adjusted(gauge, edge_dist, max_spacing)
             if edge_dist >= max_edge_dist:
+                # TODO: add maximum plate height limit
                 # TODO: add one more bolt to satisfy spacing criteria
                 web_plate_h = False
         else:

@@ -561,6 +561,8 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+                if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
+                    r.setDisabled(True)
 
             if type == TYPE_MODULE:
                 _translate = QtCore.QCoreApplication.translate
@@ -621,7 +623,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         for t in new_list:
 
-            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (module != KEY_DISP_TENSION):
+            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC, KEY_DIA_ANCHOR] and (module != KEY_DISP_TENSION):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -1084,7 +1086,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.designPrefDialog = DesignPreferences(main)
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION, KEY_DISP_BASE_PLATE]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
@@ -1361,6 +1363,11 @@ class Ui_ModuleWindow(QMainWindow):
             elif typ == TYPE_IMAGE:
                 pixmap1 = QPixmap(val)
                 k2.setPixmap(pixmap1)
+            elif typ == TYPE_TEXTBOX:
+                if val:
+                    k2.setEnabled(True)
+                else:
+                    k2.setDisabled(True)
             else:
                 pass
 
@@ -1475,8 +1482,21 @@ class Ui_ModuleWindow(QMainWindow):
                 elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
                     pass
         else:
-            d2 = {KEY_SUPTNGSEC_MATERIAL: '', KEY_SUPTDSEC_MATERIAL: ''}
-            design_dictionary.update(d2)
+            common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
+            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+                d2 = {KEY_SUPTNGSEC_MATERIAL: common_material, KEY_SUPTDSEC_MATERIAL: common_material}
+                design_dictionary.update(d2)
+            elif module == KEY_DISP_COMPRESSION:
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+                section = key.currentText()
+                if section == 'Beams':
+                    d2 = {KEY_SUPTDSEC_MATERIAL: common_material}
+                    design_dictionary.update(d2)
+                elif section == 'Columns':
+                    d2 = {KEY_SUPTNGSEC_MATERIAL: common_material}
+                    design_dictionary.update(d2)
+                elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
+                    pass
 
         design_dictionary.update(self.designPrefDialog.save_designPref_para())
         self.design_inputs = design_dictionary
@@ -1653,6 +1673,8 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_beam.setEnabled(True)
                 self.actionShow_column.setEnabled(True)
                 self.actionShow_finplate.setEnabled(True)
+                # image = main.generate_3D_Cad_image(main, self, self.folder)
+
             else:
                 self.btn3D.setEnabled(False)
                 self.chkBxBeam.setEnabled(False)
@@ -1664,11 +1686,14 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_finplate.setEnabled(False)
 
 
-        # image = main.generate_3D_Cad_image(main,self,self.folder)
+
 
     def osdag_header(self):
-        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
-        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "OsdagHeader.png")))
+        image_path2 = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "ColumnsBeams.png")))
+
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "OsdagHeader.png"))
+        shutil.copyfile(image_path2, os.path.join(str(self.folder), "images_html", "ColumnsBeams.png"))
 
     def output_button_connect(self, main, button_list, b):
         b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))

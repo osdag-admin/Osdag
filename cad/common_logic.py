@@ -12,6 +12,7 @@ from cad.items.plate import Plate
 from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
 from cad.items.angle import Angle
+from PyQt5.QtWidgets import QMainWindow
 
 from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -643,6 +644,8 @@ class CommonDesignLogic(object):
         self.display.View_Iso()
         self.display.FitAll()
 
+
+
         self.display.DisableAntiAliasing()
 
         if bgcolor == "gradient_bg":
@@ -790,6 +793,7 @@ class CommonDesignLogic(object):
                 self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()
 
                 self.display_3DModel("Model", "gradient_bg")
+
             else:
                 self.display.EraseAll()
 

@@ -262,6 +262,14 @@ KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity'
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
+DISP_MIN_PITCH = 'Min. Pitch (mm)'
+DISP_MAX_PITCH = 'Max. Pitch (mm)'
+DISP_MIN_GAUGE = 'Min. Gauge (mm)'
+DISP_MAX_GAUGE = 'Max. Gauge (mm)'
+DISP_MIN_EDGE = 'Min. Edge Distance (mm)'
+DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
+DISP_MIN_END = 'Min. End Distance (mm)'
+DISP_MAX_END = 'Max. End Distance (mm)'
 
 ###################################
 # Key for Storing Module
@@ -275,12 +283,12 @@ TYPE_MODULE = 'Window Title'
 KEY_DISP_FINPLATE = 'Fin Plate'
 KEY_DISP_ENDPLATE = 'End Plate'
 KEY_DISP_CLEATANGLE = 'Cleat Angle'
+KEY_DISP_BASE_PLATE = 'Base Plate'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
-KEY_DISP_BASE_PLATE = 'Base Plate Connection'
 
 KEY_DISP_TENSION = 'Tension Members Design'
 KEY_DISP_COMPRESSION = 'Compression Member'
@@ -298,7 +306,8 @@ KEY_DISP_CONN = 'Connectivity *'
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
-VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Gusset Plate with Cleat Angles']
+VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Base Plate with Cleat Angles', 'Hollow Sections']
+
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
@@ -348,6 +357,15 @@ DISP_TITLE_FSL = 'Factored load'
 # Key for Storing Moment sub-key of Load
 KEY_MOMENT = 'Load.Moment'
 KEY_DISP_MOMENT = 'Moment(kNm)*'
+DISP_TITLE_MOMENT = 'Moment load'
+KEY_MOMENT_MAJOR = 'Load.Moment.Major'
+KEY_DISP_MOMENT_MAJOR = 'Major axis (M<sub>z-z</sub>)'
+KEY_MOMENT_MINOR = 'Load.Moment.Minor'
+KEY_DISP_MOMENT_MINOR = 'Minor axis (M<sub>y-y</sub>)'
+KEY_DIA_ANCHOR = 'Anchor Bolt.Diameter'
+DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
+KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
+VALUES_DIA_ANCHOR = ['All', 'Customized']
 
 ###################################
 # Key for Storing Shear sub-key of Load
@@ -369,23 +387,10 @@ DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
 KEY_BOLT_FU = 'Bolt.fu'
 KEY_BOLT_FY = 'Bolt.fy'
-
-###################################
-# Keys for Storing Anchor Bolt
-DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
-DISP_TITLE_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
-KEY_ANCHOR_BOLT_FU = 'Bolt.fu'
-KEY_ANCHOR_BOLT_FY = 'Bolt.fy'
-
 # Key for storing Diameter sub-key of Bolt
 KEY_D = 'Bolt.Diameter'
 KEY_DISP_D = 'Diameter(mm)*'
 VALUES_D = ['All', 'Customized']
-
-# Key for storing Diameter sub-key of Anchor Bolt
-KEY_DIA_ANCHOR = 'Anchor Bolt.Diameter'
-KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
-VALUES_DIA_ANCHOR = ['All', 'Customized']
 
 # Key for storing Type sub-key of Bolt
 KEY_TYP = 'Bolt.Type'
@@ -795,17 +800,26 @@ KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
+KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
+KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
+KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
-KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity'
+KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
-KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity'
+KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
+KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
+KEY_OUT_DISP_BOLT_VALUE = 'Bolt Value (kN)'
 KEY_OUT_BOLT_FORCE = 'Bolt.Force'
 KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force'
-KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
+KEY_OUT_DISP_BOLT_SHEAR_FORCE = 'Bolt Shear Force (kN)'
+KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
+KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
+KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
+KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 
@@ -816,20 +830,21 @@ KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line'
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
+KEY_OUT_DISP_PITCH = 'Pitch (mm)'
+
 KEY_OUT_MIN_PITCH = 'Bolt.MinPitch'
 
 
 
 
-
-
-KEY_OUT_DISP_PITCH = 'Pitch'
 KEY_OUT_END_DIST = 'Bolt.EndDist'
-KEY_OUT_DISP_END_DIST = 'End Distance'
+KEY_OUT_DISP_END_DIST = 'End Distance (mm)'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
+KEY_OUT_DISP_GAUGE = 'Gauge (mm)'
+
 KEY_OUT_MIN_GAUGE = 'Bolt.MinGauge'
 KEY_OUT_MAX_SPACING = 'Bolt.MaxGauge'
-KEY_OUT_DISP_GAUGE = 'Gauge'
+
 KEY_OUT_EDGE_DIST = 'Bolt.EdgeDist'
 KEY_OUT_MIN_EDGE_DIST = 'Bolt.MinEdgeDist'
 KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
@@ -844,6 +859,7 @@ KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_PLATE_HEIGHT = 'Height (mm)'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
+KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity'
 KEY_OUT_PLATE_BLK_SHEAR = 'Plate.BlockShear'

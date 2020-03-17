@@ -19,6 +19,7 @@ from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
 from design_type.connection.end_plate_connection import EndPlateConnection
+from design_type.connection.base_plate_connection import BasePlateConnection
 
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
@@ -113,6 +114,7 @@ class OsdagMainWindow(QMainWindow):
         self.ui.btn_momentconnection_bb_start.clicked.connect(self.show_moment_connection)
         self.ui.btn_momentconnection_bc_start.clicked.connect(self.unavailable)
         self.ui.btn_momentconnection_cc_start.clicked.connect(self.show_moment_connection_cc)
+        self.ui.btn_baseplate_start.clicked.connect(self.show_base_plate)
 
         self.ui.Tension_Start.clicked.connect(self.show_tension_module)
         self.ui.Compression_Start.clicked.connect(self.show_compression_module)
@@ -353,6 +355,36 @@ class OsdagMainWindow(QMainWindow):
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
             # self.window.show()
             # self.window.closed.connect(self.show)
+
+
+    def show_base_plate(self):
+        folder = self.select_workspace_folder()
+        folder = str(folder)
+        if not os.path.exists(folder):
+            if folder == '':
+                pass
+            else:
+                os.mkdir(folder, 0o755)
+
+        root_path = folder
+        images_html_folder = ['images_html']
+        flag = True
+        for create_folder in images_html_folder:
+            if root_path == '':
+                flag = False
+                return flag
+            else:
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder))
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder))
+
+        self.hide()
+        self.ui2 = Ui_ModuleWindow()
+        self.ui2.setupUi(self.ui2, BasePlateConnection,folder)
+        self.ui2.show()
+        self.ui2.closed.connect(self.show)
 
     def show_moment_connection_cc(self):
         folder = self.select_workspace_folder()

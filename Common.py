@@ -6,7 +6,6 @@ import math
 
 
 TYPE_COMBOBOX = 'ComboBox'
-
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
@@ -285,6 +284,7 @@ TYPE_MODULE = 'Window Title'
 KEY_DISP_FINPLATE = 'Fin Plate'
 KEY_DISP_ENDPLATE = 'End Plate'
 KEY_DISP_CLEATANGLE = 'Cleat Angle'
+KEY_DISP_BASE_PLATE = 'Base Plate'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
@@ -309,6 +309,8 @@ KEY_DISP_CONN = 'Connectivity *'
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
+VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Base Plate with Cleat Angles', 'Hollow Sections']
+
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
@@ -323,7 +325,6 @@ KEY_DISP_LENGTH = 'Length(mm) *'
 # Key for Storing Supporting_Section sub-key of Member
 
 KEY_SUPTNGSEC = 'Member.Supporting_Section'
-
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 VALUES_COLSEC = connectdb("Columns")
@@ -359,6 +360,15 @@ DISP_TITLE_FSL = 'Factored load'
 # Key for Storing Moment sub-key of Load
 KEY_MOMENT = 'Load.Moment'
 KEY_DISP_MOMENT = 'Moment(kNm)*'
+DISP_TITLE_MOMENT = 'Moment load'
+KEY_MOMENT_MAJOR = 'Load.Moment.Major'
+KEY_DISP_MOMENT_MAJOR = 'Major axis (M<sub>z-z</sub>)'
+KEY_MOMENT_MINOR = 'Load.Moment.Minor'
+KEY_DISP_MOMENT_MINOR = 'Minor axis (M<sub>y-y</sub>)'
+KEY_DIA_ANCHOR = 'Anchor Bolt.Diameter'
+DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
+KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
+VALUES_DIA_ANCHOR = ['All', 'Customized']
 
 ###################################
 # Key for Storing Shear sub-key of Load
@@ -444,6 +454,7 @@ DISP_TITLE_TENSION = 'Tension Capacity'
 
 
 
+
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate'
 
 KEY_FLANGEPLATE_PREFERENCES = 'Flange_Plate.Preferences'
@@ -493,7 +504,6 @@ KEY_FLANGE_PLATE_MOM_DEMAND = 'Flange_Plate.MomDemand'
 KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
 KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
-
 KEY_DESIGNATION = "section_size.designation"
 KEY_DISP_DESIGNATION = "Designation"
 
@@ -519,6 +529,7 @@ KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in flange'
 KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
 KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 
+
 KEY_WELD_TYPE = 'Weld.Type'
 KEY_DISP_WELD_TYPE ='Weld Type'
 VALUES_WELD_TYPE = ["select type","Fillet Weld"]
@@ -531,7 +542,6 @@ KEY_FLANGE_WELD_STRESS = 'Flange_Weld.Stress'
 KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
 KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
-
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
@@ -580,7 +590,6 @@ KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
 KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
 KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
-
 KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
 KEY_WEB_DISP_BOLT_LINE = 'Bolt Lines in web'
 KEY_WEB_BOLTS_REQ = "Web_plate.Bolt_required"
@@ -871,6 +880,7 @@ KEY_OUT_EDGE_DIST = 'Bolt.EdgeDist'
 KEY_OUT_MIN_EDGE_DIST = 'Bolt.MinEdgeDist'
 KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
 
+
 KEY_OUT_DISP_EDGE_DIST = 'Edge Distance'
 
 
@@ -889,7 +899,6 @@ KEY_OUT_PLATE_MOM_DEMAND = 'Plate.MomDemand'
 KEY_OUT_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
-
 
 KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
@@ -929,7 +938,6 @@ KEY_SEC_PROFILE = 'Member.Profile'
 KEY_DISP_SEC_PROFILE = 'Section Profile'
 VALUES_SEC_PROFILE = ['Beams', 'Columns', 'Angles', 'Channels', 'Back to Back Angles', 'Back to Back Channels', 'Star Angles']
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
-
 
 KEY_LENZZ = 'Member.Length_zz'
 KEY_DISP_LENZZ = 'Length (z-z)'

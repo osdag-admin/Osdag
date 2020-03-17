@@ -1186,6 +1186,58 @@ class Ui_MainWindow(object):
         self.mytabWidget_2.addTab(self.tab_PEB, "")
         self.gridLayout_7.addWidget(self.mytabWidget_2, 0, 0, 1, 1)
         self.mytabWidget.addTab(self.tab2_momentconnection, "")
+
+
+        #######################################
+
+
+
+
+
+
+        self.tab4_baseplate = QtWidgets.QWidget()
+        font = QtGui.QFont()
+        font.setItalic(False)
+        self.tab4_baseplate.setFont(font)
+        self.tab4_baseplate.setObjectName("tab4_baseplate")
+        self.btn_baseplate_start = QtWidgets.QPushButton(self.tab4_baseplate)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.btn_baseplate_start.sizePolicy().hasHeightForWidth())
+        self.btn_baseplate_start.setSizePolicy(sizePolicy)
+        self.btn_baseplate_start.setMinimumSize(QtCore.QSize(190, 30))
+        self.btn_baseplate_start.setMaximumSize(QtCore.QSize(190, 30))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(11)
+        font.setBold(True)
+        font.setWeight(75)
+        self.btn_baseplate_start.setFont(font)
+        self.btn_baseplate_start.setFocusPolicy(QtCore.Qt.TabFocus)
+        self.btn_baseplate_start.setStyleSheet("QPushButton::hover\n"
+                                                     "{\n"
+                                                     "   background-color: #d97f7f;\n"
+                                                     "   color:#000000 ;\n"
+                                                     "}\n"
+                                                     "\n"
+                                                     "QPushButton\n"
+                                                     "{\n"
+                                                     "background-color: #925a5b;\n"
+                                                     "color:#ffffff;\n"
+                                                     "}")
+        self.btn_baseplate_start.setCheckable(False)
+        self.btn_baseplate_start.setAutoExclusive(False)
+        self.btn_baseplate_start.setAutoDefault(True)
+        self.btn_baseplate_start.setObjectName("btn_baseplate_start")
+        self.btn_baseplate_start.setGeometry(QtCore.QRect(415, 570, 120, 25))
+        self.mytabWidget.addTab(self.tab4_baseplate, "")
+
+
+
+
+        ###########################################
+
         self.tab3_trussconnection = QtWidgets.QWidget()
         self.tab3_trussconnection.setAccessibleName("")
         self.tab3_trussconnection.setObjectName("tab3_trussconnection")
@@ -1447,6 +1499,12 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "This module is not available in the current version."))
         self.mytabWidget.setTabText(self.mytabWidget.indexOf(self.tab3_trussconnection), _translate("MainWindow", "Truss Connection"))
         self.Tension_Start.setText(_translate("MainWindow", "Start"))
+        ####
+        self.mytabWidget.setTabText(self.mytabWidget.indexOf(self.tab4_baseplate), _translate("MainWindow", "Base Plate"))
+        self.btn_baseplate_start.setToolTip(_translate("MainWindow", "Enter"))
+        self.btn_baseplate_start.setText(_translate("MainWindow", "Start"))
+        self.btn_baseplate_start.setShortcut(_translate("MainWindow", "Return"))
+        ####
         self.label_8.setText(_translate("MainWindow", "Bolted"))
         self.label_7.setText(_translate("MainWindow", "Welded"))
         self.Compression_Start.setText(_translate("MainWindow", "Start"))

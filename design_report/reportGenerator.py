@@ -13,8 +13,6 @@ import os
 import pdfkit
 import configparser
 from utils.common import component
-
-
 # from Connections.connection_calculations import ConnectionCalculations
 
 def save_html(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder):
@@ -143,7 +141,6 @@ def save_html(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsumm
         #         rstr += t('td colspan="3" class="detail2"') + space(row2[0]) + row2[1] + t('/td')
         #         rstr += t('td colspan="2" class="detail2 "') + row2[2] + t('/td')
         #         rstr += t('/tr')
-
 #     #
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break

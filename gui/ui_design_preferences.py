@@ -1478,7 +1478,7 @@ class DesignPreferences(QDialog):
                 pass
 
 
-    def save_designPref_para(self):
+    def save_designPref_para(self, module):
         """This routine is responsible for saving all design preferences selected by the user
         """
         '''
@@ -1508,24 +1508,36 @@ class DesignPreferences(QDialog):
         combo_detailing_memebers = key_detailing_memebers.currentText()
         key_design_method = tab_Design.findChild(QtWidgets.QWidget, KEY_DP_DESIGN_METHOD)
         combo_design_method = key_design_method.currentText()
-        key_plate_material = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
-        combo_plate_material = key_plate_material.currentText()
-        key_plate_material_fu = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU)
-        line_plate_material_fu = key_plate_material_fu.text()
-        key_plate_material_fy = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY)
-        line_plate_material_fy = key_plate_material_fy.text()
-        d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
-              KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
-              KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
-              KEY_DP_WELD_FAB: combo_weldType,
-              KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
-              KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
-              KEY_DP_DETAILING_GAP: line_detailingGap,
-              KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
-              KEY_DP_DESIGN_METHOD: combo_design_method,
-              KEY_PLATE_MATERIAL: combo_plate_material if combo_plate_material != "Custom" else
-              "Custom "+str(line_plate_material_fu)+" "+str(line_plate_material_fy),
-              }
+        if module != KEY_DISP_TENSION:
+            key_plate_material = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
+            combo_plate_material = key_plate_material.currentText()
+            key_plate_material_fu = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU)
+            line_plate_material_fu = key_plate_material_fu.text()
+            key_plate_material_fy = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY)
+            line_plate_material_fy = key_plate_material_fy.text()
+            d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+                  KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
+                  KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
+                  KEY_DP_WELD_FAB: combo_weldType,
+                  KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+                  KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+                  KEY_DP_DETAILING_GAP: line_detailingGap,
+                  KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
+                  KEY_DP_DESIGN_METHOD: combo_design_method,
+                  KEY_PLATE_MATERIAL: combo_plate_material if combo_plate_material != "Custom" else
+                  "Custom " + str(line_plate_material_fu) + " " + str(line_plate_material_fy),
+                  }
+        else:
+            d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+                  KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
+                  KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
+                  KEY_DP_WELD_FAB: combo_weldType,
+                  KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+                  KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+                  KEY_DP_DETAILING_GAP: line_detailingGap,
+                  KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
+                  KEY_DP_DESIGN_METHOD: combo_design_method
+                  }
         return d1
 
     def highlight_slipfactor_description(self):

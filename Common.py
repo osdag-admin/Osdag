@@ -27,6 +27,7 @@ TYPE_TAB_3 = "TYPE_TAB_3"
 
 
 import sqlite3
+
 from utils.common.component import *
 from utils.common.component import *
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
@@ -263,6 +264,14 @@ KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity'
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
+DISP_MIN_PITCH = 'Min. Pitch (mm)'
+DISP_MAX_PITCH = 'Max. Pitch (mm)'
+DISP_MIN_GAUGE = 'Min. Gauge (mm)'
+DISP_MAX_GAUGE = 'Max. Gauge (mm)'
+DISP_MIN_EDGE = 'Min. Edge Distance (mm)'
+DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
+DISP_MIN_END = 'Min. End Distance (mm)'
+DISP_MAX_END = 'Max. End Distance (mm)'
 
 ###################################
 # Key for Storing Module
@@ -303,7 +312,7 @@ VALUES_CONN_2 = ['Beam-Beam']
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
-VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
 
 KEY_IMAGE = 'Image'
 
@@ -412,7 +421,10 @@ VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
-VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg','Web']
+VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
+VALUES_LOCATION_2 = ["Web"]
+
 
 KEY_IMAGE = 'Image'
 
@@ -810,17 +822,26 @@ KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
+KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
+KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
+KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
-KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity'
+KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
-KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity'
+KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
+KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
+KEY_OUT_DISP_BOLT_VALUE = 'Bolt Value (kN)'
 KEY_OUT_BOLT_FORCE = 'Bolt.Force'
 KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force'
-KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
+KEY_OUT_DISP_BOLT_SHEAR_FORCE = 'Bolt Shear Force (kN)'
+KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
+KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
+KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
+KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 
@@ -831,20 +852,20 @@ KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line'
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
+KEY_OUT_DISP_PITCH = 'Pitch (mm)'
+
 KEY_OUT_MIN_PITCH = 'Bolt.MinPitch'
 
 
 
 
-
-
-KEY_OUT_DISP_PITCH = 'Pitch'
 KEY_OUT_END_DIST = 'Bolt.EndDist'
-KEY_OUT_DISP_END_DIST = 'End Distance'
+KEY_OUT_DISP_END_DIST = 'End Distance (mm)'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
+KEY_OUT_DISP_GAUGE = 'Gauge (mm)'
+
 KEY_OUT_MIN_GAUGE = 'Bolt.MinGauge'
 KEY_OUT_MAX_SPACING = 'Bolt.MaxGauge'
-KEY_OUT_DISP_GAUGE = 'Gauge'
 
 KEY_OUT_EDGE_DIST = 'Bolt.EdgeDist'
 KEY_OUT_MIN_EDGE_DIST = 'Bolt.MinEdgeDist'
@@ -859,6 +880,7 @@ KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_PLATE_HEIGHT = 'Height (mm)'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
+KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity'
 KEY_OUT_PLATE_BLK_SHEAR = 'Plate.BlockShear'
@@ -991,7 +1013,7 @@ def get_leg_lengths(designation):
 
 all_angles = connectdb("Angles","popup")
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
-print(VALUES_CLEAT_CUSTOMIZED)
+# print(VALUES_CLEAT_CUSTOMIZED)
 
 DISP_TITLE_COMPMEM='Compression member'
 

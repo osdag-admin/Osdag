@@ -655,6 +655,7 @@ class Plate(Material):
         self.length = length
         self.gap = float(gap)
 
+
         self.bolts_required = 0
         self.bolt_capacity_red = 0.0
         self.bolt_line = 0.0
@@ -665,6 +666,7 @@ class Plate(Material):
         self.thickness_provided = 0.0
         self.pitch_provided = 0.0
         self.gauge_provided = 0.0
+        self.midgauge =0.0
         self.edge_dist_provided = 0.0
         self.end_dist_provided = 0.0
 
@@ -731,13 +733,27 @@ class Plate(Material):
             bolt_one_side = int(possible_bolt/gauge  +1)
             max_bolts_one_line = 2*bolt_one_side
 
+
             if max_bolts_one_line >= 2:
                 bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
-                bolts_one_line = int(math.ceil(float(bolts_required) / float(bolt_line)))
+                bolts_one_line = max(int(math.ceil(float(bolts_required) / float(bolt_line))),2)
+                if bolts_one_line % 2 == 1:
+                    bolts_one_line = bolts_one_line-1
+                    bolt_line =bolt_line  +1
+                else:
+                    pass
+
                 height =flange_plate_h_max
                 # (
                 #     self.get_flange_plate_h_req(self.bolts_one_line, gauge, edge_dist, web_thickness, root_radius))
                 return bolt_line, bolts_one_line, height
+            # if max_bolts_one_line >= 2:
+            #     bolts_one_line = int(math.ceil(float(bolts_required) / float(max_bolts_one_line)))
+            #     bolt_line = max(int(math.ceil((float(bolts_required) / float( bolts_one_line)))), 1)
+            #     height = flange_plate_h_max
+            #     # (
+            #     #     self.get_flange_plate_h_req(self.bolts_one_line, gauge, edge_dist, web_thickness, root_radius))
+            #     return bolt_line, bolts_one_line, height
             else:
                 bolt_line = 0
                 bolts_one_line = 0
@@ -786,7 +802,7 @@ class Plate(Material):
         return gauge, edge_dist, web_plate_h
 
 
-    def get_gauge_edge_dist_flange(self, flange_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,web_thickness): #todo anjali
+    def get_gauge_edge_dist_flange(self, flange_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,web_thickness,root_radius): #todo anjali
         """
 
         :param web_plate_l: height of plate
@@ -801,7 +817,7 @@ class Plate(Material):
             """
             gauge is the distance between bolts along bolt line on either side of the web thickness
             """
-            gauge = (int((flange_plate_h/2 - web_thickness/2 - (2 * edge_dist)) / (bolts_one_line/2 - 1))) #
+            gauge = (int((flange_plate_h/2 - web_thickness/2 - (2 * edge_dist)-root_radius) / (bolts_one_line/2 - 1))) #
         else:
             gauge = 0.0
         # multiplier=5)
@@ -1032,6 +1048,7 @@ class Plate(Material):
 
         [bolt_line, bolts_one_line, flange_plate_h] = self.get_flange_plate_l_bolts_one_line(flange_plate_h_max, flange_plate_h_min, bolts_required, min_edge_dist, min_gauge,
                                            web_thickness, root_radius)
+        print("flange",bolt_line, bolts_one_line)
 
         print("boltdetails0", bolt_line, bolts_one_line, flange_plate_h)
 
@@ -1044,7 +1061,7 @@ class Plate(Material):
             self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
         else:
             print("boltdetails", bolt_line, bolts_one_line,flange_plate_h)
-            [gauge, edge_dist, flange_plate_h] = self.get_gauge_edge_dist_flange(flange_plate_h, bolts_one_line, min_edge_dist, max_spacing, max_edge_dist, web_thickness)
+            [gauge, edge_dist, flange_plate_h] = self.get_gauge_edge_dist_flange(flange_plate_h, bolts_one_line, min_edge_dist, max_spacing, max_edge_dist, web_thickness,root_radius)
 
 
             print("boltdetails", bolt_line, bolts_one_line,flange_plate_h)
@@ -1117,19 +1134,21 @@ class Plate(Material):
 
                 [gauge, edge_dist, flange_plate_h] = self.get_gauge_edge_dist_flange(flange_plate_h, bolts_one_line,
                                                                                   min_edge_dist, max_spacing,
-                                                                                  max_edge_dist)
+                                                                                  max_edge_dist,root_radius)
                 print("boltdetailsasaa", bolt_line, bolts_one_line, flange_plate_h)
 
             bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                   gauge, bolt_capacity,
                                                   bolt_dia)
+
+
             if vres > bolt_capacity_red:
                 self.design_status = False
                 self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
             else:
                 self.design_status = True
 
-            self.length = gap + end_dist * 2 + pitch * (bolt_line - 1)
+            self.length = gap/2 + end_dist * 2 + pitch * (bolt_line - 1)
             self.height = flange_plate_h
             self.bolt_line = bolt_line
             self.bolts_one_line = bolts_one_line

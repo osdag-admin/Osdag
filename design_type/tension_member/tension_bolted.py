@@ -1033,6 +1033,15 @@ class Tension_bolted(Main):
 
         self.plate = Plate(thickness=self.plate_thickness,
                            material_grade=design_dictionary[KEY_MATERIAL])
+
+        self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
+                         bolt_type=design_dictionary[KEY_TYP],
+                         bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
+                         material_grade=design_dictionary[KEY_MATERIAL],
+                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                         mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
+                         corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+
         # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
         print("input values are set. Doing preliminary member checks")
         # self.i = 0
@@ -1510,13 +1519,13 @@ class Tension_bolted(Main):
 
         elif design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             w = self.section_size_1.flange_width
-            shear_lag = (self.plate.edge_dist_provided) + w - self.section_size_1.web_thickness
+            shear_lag = (self.plate.edge_dist_provided) + w - self.section_size_1.flange_thickness
             if self.plate.bolt_line != 1:
                 L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
             else:
                 L_c = 1
 
-            A_go = self.section_size_1.flange_width * self.section_size_1.flange_thickness
+            A_go = self.section_size_1.flange_width * self.section_size_1.flange_thickness*2
             A_nc = (self.section_size_1.depth * self.section_size_1.web_thickness) - (self.bolt.dia_hole * self.plate.bolts_one_line)
             t = self.section_size_1.web_thickness
         # if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
@@ -1524,9 +1533,9 @@ class Tension_bolted(Main):
         # else:
         self.section_size_1.tension_member_design_due_to_rupture_of_critical_section( A_nc = A_nc , A_go = A_go, F_u = self.section_size_1.fu, F_y = self.section_size_1.fy, L_c = L_c, w = w, b_s = shear_lag, t = t)
 
-        if design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Star Angles"]:
+        if design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Star Angles", 'Back to Back Channels']:
             self.section_size_1.tension_rupture_capacity = 2 * self.section_size_1.tension_rupture_capacity
-        elif design_dictionary[KEY_SEC_PROFILE] in ["Angles","Channels", 'Back to Back Channels']:
+        elif design_dictionary[KEY_SEC_PROFILE] in ["Angles","Channels"]:
             self.section_size_1.tension_rupture_capacity = self.section_size_1.tension_rupture_capacity
         else:
             pass

@@ -1260,7 +1260,7 @@ class Tension_welded(Main):
         else:
             print("pass")
             self.design_status = True
-            self.select_bolt_dia(self, design_dictionary)
+            # self.select_bolt_dia(self, design_dictionary)
 
 
 

@@ -44,7 +44,8 @@ class Main():
     #     pass
 
     def set_input_values(self, design_dictionary):
-        self.mainmodule = "Tension"
+        pass
+        # self.mainmodule = "Tension"
         # self.connectivity = design_dictionary[KEY_CONN]
 
         # if self.connectivity in VALUES_CONN_1:
@@ -53,12 +54,5 @@ class Main():
         #     self.supporting_section = Beam(designation=design_dictionary[KEY_SUPTNGSEC], material_grade=design_dictionary[KEY_MATERIAL])
 
 
-        self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
-                         bolt_type=design_dictionary[KEY_TYP],
-                         bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
-                         material_grade=design_dictionary[KEY_MATERIAL],
-                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
-                         mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
-                         corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
 
 

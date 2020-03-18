@@ -411,7 +411,7 @@ class FinPlateConnection(ShearConnection):
             flag1 = True
 
         selected_plate_thk = list(np.float_(design_dictionary[KEY_PLATETHK]))
-        supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_SUPTDSEC_MATERIAL])
+        supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_MATERIAL])
         available_plates = [i for i in selected_plate_thk if i >= supported_section.web_thickness]
         if not available_plates:
             QMessageBox.about(window, 'Information',

@@ -771,8 +771,46 @@ class BeamCoverPlateWeld(MomentConnection):
             self.flange_plate.length = 2* (round_up(self.available_long_flange_length + self.flange_weld.size + (self.flange_plate.gap/2),5))
         else:
             self.flange_plate.length = 2* (round_up(self.available_long_flange_length + self.flange_weld.size + (self.flange_plate.gap/2),5))
-            self.flange_plate_capacity_axial(self)
+            self.web_plate_weld(self)
+
+
         print("self.flange_plate.length"  ,  self.flange_plate.length)
+
+
+    def web_plate_weld(self):
+        while True:
+            self.web_weld.size=3
+            self.design_strength_web_weld = self.web_weld.get_weld_strength(connecting_fu = self.web_weld.fu,
+                                                                                  weld_fabrication= KEY_DP_WELD_FAB_SHOP, t_weld =self.web_weld.size, weld_angle=90)
+
+            self.web_plate.height = (self.section.depth - (2 *self.section.flange_thickness) - (2 *self.section.root_radius) - (2*self.web_plate.gap) - (2* self.web_weld.size))
+            self.available_long_web_length =  self.web_plate.height
+            self.Required_weld_web_length_round = (2* self.available_long_web_length  + (4 * self.web_weld.size)) + self.web_plate.height
+            self.web_plate.length =  (round_up(self.available_long_web_length + self.web_weld.size + (self.web_plate.gap/2),5))
+
+            d = self.available_long_web_length -(self.web_weld.size/2)+ self.web_plate.gap
+            b = self.web_plate.height + self.web_weld.size
+            cgy = d ** 2 / (2 * d + b)
+            cgx = b / 2
+            y_max =  (d ** 2 / (2 * d + b))
+            x_max = b /2
+            print(y_max, x_max)
+            ecc = d - (d ** 2 / (2 * b + b))
+            Ip_weld = (8 * d ** 3 + 6 * d * b ** 2 + b ** 3) / 12 - d ** 4 / (2 * d + b)
+            self.weld_twist = (self.factored_axial_load * self.ecc) +self.moment_web
+            self.V_rest = self.web_weld.get_weld_stress( weld_shear=self.factored_axial_load, weld_axial =self.axial_force_w ,
+                                                         weld_twist= self.weld_twist, Ip_weld= Ip_weld, y_max=y_max, x_max = x_max, l_weld_=self.available_long_web_length)
+
+            if self.design_strength_web_weld  > self.V_rest :
+                print
+                ("vreult",self.design_strength_web_weld,self.V_rest)
+
+                break
+            else:
+                self.available_long_web_length =  self.available_long_web_length + 20
+        if  self.design_strength_web_weld  > self.V_rest :
+            self.flange_plate_capacity_axial(self)
+
 
     def flange_plate_capacity_axial(self): # flange plate capacity check in axial
         A_v_flange = self.flange_plate.thickness_provided * self.flange_plate.height

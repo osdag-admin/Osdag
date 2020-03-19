@@ -7,6 +7,7 @@ class Main():
     def __init__(self):
         pass
 
+
     # def customized_input(self):
     #
     #     list1 = []
@@ -34,14 +35,15 @@ class Main():
     def plate_thick_customized():
         d = VALUES_PLATETHK_CUSTOMIZED
         return d
+
     #
     # @staticmethod
     # def size_customized():
     #     d = VALUES_SIZE_CUSTOMIZED
     #     return d
 
-    def input_value_changed(self):
-        pass
+    # def input_value_changed(self):
+    #     pass
 
     def set_input_values(self, design_dictionary):
         self.mainmodule = "Tension"

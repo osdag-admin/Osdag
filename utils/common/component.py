@@ -611,6 +611,7 @@ class Weld(Material):
         self.type = type
         self.size = 0.0
         self.length = 0.0
+        self.height =0.0
         self.strength = 0.0
         self.stress = 0.0
         self.fabrication = fabrication

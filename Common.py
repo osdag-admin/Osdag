@@ -519,6 +519,8 @@ KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in flange'
 KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
 KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 
+KEY_FLANGE_WELD_DETAILS = "Flange detail"
+KEY_DISP_FLANGE_WELD_DETAILS = "Weld Details"
 KEY_WELD_TYPE = 'Weld.Type'
 KEY_DISP_WELD_TYPE ='Weld Type'
 VALUES_WELD_TYPE = ["select type","Fillet Weld"]
@@ -530,7 +532,10 @@ KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
 KEY_FLANGE_WELD_STRESS = 'Flange_Weld.Stress'
 KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
 KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
+KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
+KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
+KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
 
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
@@ -588,6 +593,8 @@ KEY_WEB_DISP_BOLTS_REQ = "Web Bolt Required"
 KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
 KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in web'
 
+KEY_WEB_WELD_DETAILS = "Web detail"
+KEY_DISP_WEB_WELD_DETAILS = "Weld Details"
 DISP_WEB_TITLE_WELD = 'Web Weld'
 KEY_WEB_WELD_SIZE = 'Web_Weld.Size'
 KEY_WEB_DISP_WELD_SIZE = 'Web Weld Size(mm)'
@@ -596,7 +603,10 @@ KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength(N/mm)'
 KEY_WEB_WELD_STRESS = 'Web_Weld.Stress'
 KEY_WEB_DISP_WELD_STRESS = 'Web Weld Stress(N/mm)'
 KEY_WEB_WELD_LENGTH = 'Web_Weld.Length'
+KEY_DISP_WEB_WELD_LENGTH = 'Web Weld Length'
 KEY_WEB_WELD_LENGTH_EFF = 'Web_Weld.EffLength'
+KEY_WEB_WELD_HEIGHT ='Web_Weld.height'
+KEY_DISP_WEB_WELD_HEIGHT = 'Web Weld Height'
 
 
 DISP_TITLE_ENDPLATE = 'End plate'

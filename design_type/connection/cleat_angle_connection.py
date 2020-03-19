@@ -3,7 +3,6 @@ from utils.common.component import *
 from utils.common.component import Bolt, Plate, Weld
 from Common import *
 import sys
-
 from utils.common.load import Load
 import yaml
 import os
@@ -15,7 +14,6 @@ class CleatAngleConnection(ShearConnection):
 
     def __init__(self):
         super(CleatAngleConnection, self).__init__()
-
         self.sptd_leg_length = 0.0
         self.sptng_leg_length = 0.0
         self.design_status = False
@@ -121,7 +119,6 @@ class CleatAngleConnection(ShearConnection):
 
     @staticmethod
     def cleatsec_customized():
-
         a = VALUES_CLEAT_CUSTOMIZED
         return a
 
@@ -232,7 +229,6 @@ class CleatAngleConnection(ShearConnection):
 
         return spacing
 
-
     def output_values(self, flag):
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
@@ -251,7 +247,6 @@ class CleatAngleConnection(ShearConnection):
         t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '')
 
         out_list.append(t3)
-
 
         t4 = (None, DISP_OUT_TITLE_SPTDLEG, TYPE_TITLE, None)
         out_list.append(t4)
@@ -496,7 +491,6 @@ class CleatAngleConnection(ShearConnection):
                             .format(self.supported_section.shear_yielding_capacity))
             print("failed in preliminary member checks. Select larger sections or decrease loads")
 
-
     # def get_possible_bolt_dia(self):
     #     leg_lengths = []
     #     for designation in self.cleat_list:
@@ -532,6 +526,7 @@ class CleatAngleConnection(ShearConnection):
     #                      .format(list(possible_bolt_dia)))
 
 
+
     def select_bolt_dia(self):
 
         self.min_plate_height = self.supported_section.min_plate_height()
@@ -550,6 +545,7 @@ class CleatAngleConnection(ShearConnection):
         self.bolt_conn_plates_t_fu_fy.append((self.supported_section.web_thickness, self.supported_section.fu, self.supported_section.fy))
 
         bolt_force_previous = 0.0
+
 
         for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
@@ -590,6 +586,7 @@ class CleatAngleConnection(ShearConnection):
         bolt_capacity_req = self.bolt.bolt_capacity
 
         if self.sptd_leg.design_status is False:
+
             self.design_status = False
             logger.error(self.sptd_leg.reason)
         # self.sptd_leg.bolt_force = self.load.shear_force * 1000 / self.bolts_one_line_sptd / self.bolt_line_sptd
@@ -794,7 +791,6 @@ class CleatAngleConnection(ShearConnection):
         self.cleat = Angle(designation=designation_angle, material_grade=self.material_grade)
         self.for_3D_view(self)
 
-
     def get_leg_pitch(self, bolt_line, bolt_dia):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT Nominal_Leg, S1, S2, S3 FROM Angle_Pitch " \
@@ -845,6 +841,7 @@ class CleatAngleConnection(ShearConnection):
         self.cleat.height = 208.0
         self.cleat.leg_a_length = 100.0
         self.cleat.leg_b_length = 150.0
+
         self.cleat.thickness = 8.0
         self.cleat.r1 = 8.5
         self.cleat.r2 = 4.5
@@ -867,6 +864,3 @@ if __name__ == '__main__':
         sys.exit(app.exec_())
     except BaseException as e:
         print("ERROR", e)
-
-
-

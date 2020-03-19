@@ -432,29 +432,34 @@ class CleatAngleConnection(ShearConnection):
         super(CleatAngleConnection,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.cleat_list = design_dictionary[KEY_CLEATSEC]
-
         self.material_grade = design_dictionary[KEY_MATERIAL]
         print(self.cleat_list)
 
-        self.sptd_leg = Plate()
+        self.sptd_leg = Plate(material_grade=design_dictionary[KEY_MATERIAL],gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        self.sptng_leg = self.sptd_leg
 
         logger.info("Input values are set. Checking if angle of required thickness is available")
 
         self.check_available_cleat_thk(self)
 
     def check_available_cleat_thk(self):
+        # self.sptd_leg.thickness = []
         if self.connectivity in VALUES_CONN_1:
             min_thickness = min(self.supporting_section.flange_thickness, self.supported_section.web_thickness / 2)
             for designation in self.cleat_list:
                 cleat = Angle(designation=designation,material_grade=self.material_grade)
                 if cleat.thickness <= self.supporting_section.flange_thickness or cleat.thickness*2 <= self.supported_section.web_thickness:
                     self.cleat_list.pop()
+                else:
+                    self.sptd_leg.thickness.append(cleat.thickness)
         else:
             min_thickness = min(self.supporting_section.web_thickness, self.supported_section.web_thickness / 2)
             for designation in self.cleat_list:
                 cleat = Angle(designation=designation,material_grade=self.material_grade)
                 if cleat.thickness <= self.supporting_section.web_thickness or cleat.thickness*2 <= self.supported_section.web_thickness:
                     self.cleat_list.pop()
+                else:
+                    self.sptd_leg.thickness.append(cleat.thickness)
         if self.cleat_list:
             logger.info("Required cleat thickness available. Doing preliminary member checks")
             self.member_capacity(self)
@@ -477,7 +482,7 @@ class CleatAngleConnection(ShearConnection):
 
         if self.supported_section.shear_yielding_capacity > self.load.shear_force:
             logger.info("preliminary member check is satisfactory. Checking if possible Bolt Diameters are available")
-            self.get_possible_bolt_dia(self)
+            self.select_bolt_dia(self)
 
         else:
             self.design_status = False
@@ -486,134 +491,226 @@ class CleatAngleConnection(ShearConnection):
                             .format(self.supported_section.shear_yielding_capacity))
             print("failed in preliminary member checks. Select larger sections or decrease loads")
 
-    def get_possible_bolt_dia(self):
-        leg_lengths = []
-        for designation in self.cleat_list:
-            leg_lengths.append(max(get_leg_lengths(designation)))
-        max_leg_length_available = max(leg_lengths)
+    # def get_possible_bolt_dia(self):
+    #     leg_lengths = []
+    #     for designation in self.cleat_list:
+    #         leg_lengths.append(max(get_leg_lengths(designation)))
+    #     max_leg_length_available = max(leg_lengths)
+    #
+    #     conn = sqlite3.connect(PATH_TO_DATABASE)
+    #     db_query = "SELECT Max_Bolt_Dia FROM Angle_Pitch " \
+    #                "WHERE Nominal_Leg <= ?"
+    #     cur = conn.cursor()
+    #     print(max_leg_length_available)
+    #     print(type(max_leg_length_available))
+    #     # print(len(max_leg_length_available))
+    #
+    #     cur.execute(db_query, (max_leg_length_available,))
+    #     rows = cur.fetchall()
+    #
+    #     possible_bolt_dia = []
+    #     for row in rows:
+    #         possible_bolt_dia.append(row)
+    #     # possible_bolt_dia = list(dict.fromkeys(possible_bolt_dia))
+    #     possible_bolt_dia = [x[0] for x in possible_bolt_dia]
+    #     possible_bolt_dia = set(possible_bolt_dia)
+    #     user_bolt_dia = set(self.bolt.bolt_diameter)
+    #     self.bolt.bolt_diameter = list(possible_bolt_dia & user_bolt_dia)
+    #     print (possible_bolt_dia,user_bolt_dia)
+    #     if self.bolt.bolt_diameter:
+    #         logger.info(": Selecting optimum bolt diameter")
+    #         self.select_bolt_dia(self)
+    #     else:
+    #         self.design_status = False
+    #         logger.error(" : For selected angles {} are possible bolt diameters "
+    #                      .format(list(possible_bolt_dia)))
 
-        conn = sqlite3.connect(PATH_TO_DATABASE)
-        db_query = "SELECT Max_Bolt_Dia FROM Angle_Pitch " \
-                   "WHERE Nominal_Leg <= ?"
-        cur = conn.cursor()
-        print(max_leg_length_available)
-        print(type(max_leg_length_available))
-        # print(len(max_leg_length_available))
-
-        cur.execute(db_query, (max_leg_length_available,))
-        rows = cur.fetchall()
-
-        possible_bolt_dia = []
-        for row in rows:
-            possible_bolt_dia.append(row)
-        # possible_bolt_dia = list(dict.fromkeys(possible_bolt_dia))
-        possible_bolt_dia = [x[0] for x in possible_bolt_dia]
-        possible_bolt_dia = set(possible_bolt_dia)
-        user_bolt_dia = set(self.bolt.bolt_diameter)
-        self.bolt.bolt_diameter = list(possible_bolt_dia & user_bolt_dia)
-        print (possible_bolt_dia,user_bolt_dia)
-        if self.bolt.bolt_diameter:
-            logger.info(": Selecting optimum bolt diameter")
-            self.select_bolt_dia(self)
-        else:
-            self.design_status = False
-            logger.error(" : For selected angles {} are possible bolt diameters "
-                         .format(list(possible_bolt_dia)))
 
 
     def select_bolt_dia(self):
+
         self.min_plate_height = self.supported_section.min_plate_height()
-        self.max_plate_height = self.supported_section.max_plate_height()
+        self.max_plate_height = self.supported_section.max_plate_height(self.connectivity, 50.0)
+        self.res_force = math.sqrt(self.load.shear_force ** 2 + self.load.axial_force ** 2) * 1000
 
-        self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
+        self.sptd_leg.thickness_provided = min(self.sptd_leg.thickness)
 
-        """
-        @ Author: Sourabh Das
-        """
-        count = 0
         bolts_required_previous = 2
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
+        self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
+        count = 0
 
-        for bolt_line_max in [1,2,3]:
-            for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
+        self.bolt_conn_plates_t_fu_fy = []
+        self.bolt_conn_plates_t_fu_fy.append((self.sptd_leg.thickness_provided, self.sptd_leg.fu, self.sptd_leg.fy))
+        self.bolt_conn_plates_t_fu_fy.append((self.supported_section.web_thickness, self.supported_section.fu, self.supported_section.fy))
 
-                self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                        connecting_plates_tk=[self.supported_section.web_thickness])
+        bolt_force_previous = 0.0
 
-                self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                  bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                                  connecting_plates_tk=[self.supported_section.web_thickness],
-                                                  n_planes=2)
 
-                self.bolts_required_sptd = max(int(math.ceil(self.load.shear_force*1000 / self.bolt.bolt_capacity)), 2)
-                [self.bolt_line_sptd, self.bolts_one_line_sptd, web_plate_h] = self.sptd_leg.get_web_plate_l_bolts_one_line(
-                    web_plate_h_min=self.min_plate_height, web_plate_h_max=self.max_plate_height,
-                    bolts_required=self.bolts_required_sptd, edge_dist=self.bolt.min_edge_dist_round,
-                    gauge=self.bolt.min_gauge_round)
-                self.bolts_required_sptd = self.bolt_line_sptd * self.bolts_one_line_sptd
-                print(1, self.bolt.bolt_capacity, self.bolt.bolt_diameter_provided, self.bolts_required_sptd, self.bolts_one_line_sptd,self.bolt_line_sptd)
-                if self.bolts_one_line_sptd > 1:
-
-                    if self.bolt_line_sptd <= bolt_line_max and self.bolts_required_sptd > bolts_required_previous and count >= 1:
-                        self.bolt.bolt_diameter_provided = bolt_diameter_previous
-                        self.bolts_required_sptd = bolts_required_previous
-                        break
-                    bolts_required_previous = self.bolts_required_sptd
-                    bolt_diameter_previous = self.bolt.bolt_diameter_provided
-                    count += 1
-                else:
-                    break
-
-        self.sptd_leg.bolt_force = self.load.shear_force*1000/self.bolts_one_line_sptd/self.bolt_line_sptd
-
-        if self.bolts_one_line_sptd == 1:
-            self.design_status = False
-            logger.error(" : Select bolt of lower diameter/beam of higher depth")
-        elif self.bolt_line_sptd > 3:
-            self.design_status = False
-            logger.error(" : bolt lines cant be more than 3. Select bolt of higher diameter/grade")
-        elif self.bolt_line_sptd == 0:
-            self.design_status = False
-            logger.error(" : Empty bolt diameters list")
-        elif self.bolt.bolt_capacity <= self.sptd_leg.bolt_force:
-            self.design_status = False
-            logger.error(" : Choose bolts of higher Diameter/Grade or choose different connection")
-        else:
-            self.design_status = True
-            self.get_bolt_grade(self)
-
-    def get_bolt_grade(self):
-        bolts_required_previous = self.bolts_required_sptd
-        bolt_grade_previous = self.bolt.bolt_grade_provided
-
-        for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
+        for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                    connecting_plates_tk=[self.supported_section.web_thickness])
+                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                              connecting_plates_tk=[self.supported_section.web_thickness],
-                                              n_planes=2)
+                                              conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                              n_planes=1)
 
-            [self.bolt_line_sptd, self.bolts_one_line_sptd, web_plate_h] = self.sptd_leg.get_web_plate_l_bolts_one_line(
-                web_plate_h_min=self.min_plate_height, web_plate_h_max=self.max_plate_height,
-                bolts_required=self.bolts_required_sptd, edge_dist=self.bolt.min_edge_dist_round,
-                gauge=self.bolt.min_gauge_round)
+            self.sptd_leg.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                             web_plate_h_min=self.min_plate_height,
+                                             web_plate_h_max=self.max_plate_height,
+                                             bolt_capacity=self.bolt.bolt_capacity,
+                                             min_edge_dist=self.bolt.min_edge_dist_round,
+                                             min_gauge=self.bolt.min_gauge_round,
+                                             max_spacing=self.bolt.max_spacing_round,
+                                             max_edge_dist=self.bolt.max_edge_dist_round,
+                                             shear_load=self.load.shear_force * 1000,
+                                             axial_load=self.load.axial_force * 1000, gap=self.sptd_leg.gap,
+                                             shear_ecc=True, bolt_line_limit=3)
 
-            print(2, self.bolt.bolt_capacity, self.bolt.bolt_grade_provided, self.bolts_required_sptd, self.bolts_one_line_sptd)
-            if self.bolts_required_sptd > bolts_required_previous:
+            print(1, self.sptd_leg.bolt_force, self.bolt.bolt_capacity, self.bolt.bolt_diameter_provided,
+                  self.sptd_leg.bolts_required, self.sptd_leg.bolts_one_line)
+            if self.sptd_leg.design_status is True:
+                if self.sptd_leg.bolts_required > bolts_required_previous and count >= 1:
+                    self.bolt.bolt_diameter_provided = bolt_diameter_previous
+                    self.sptd_leg.bolts_required = bolts_required_previous
+                    self.sptd_leg.bolt_force = bolt_force_previous
+                    break
+                bolts_required_previous = self.sptd_leg.bolts_required
+                bolt_diameter_previous = self.bolt.bolt_diameter_provided
+                bolt_force_previous = self.sptd_leg.bolt_force
+                count += 1
+            else:
+                pass
+
+        bolt_capacity_req = self.bolt.bolt_capacity
+
+        if self.sptd_leg.design_status is False:
+
+            self.design_status = False
+            logger.error(self.sptd_leg.reason)
+        # self.sptd_leg.bolt_force = self.load.shear_force * 1000 / self.bolts_one_line_sptd / self.bolt_line_sptd
+
+        # if self.bolts_one_line_sptd == 1:
+        #     self.design_status = False
+        #     logger.error(" : Select bolt of lower diameter/beam of higher depth")
+        # elif self.bolt_line_sptd > 3:
+        #     self.design_status = False
+        #     logger.error(" : bolt lines cant be more than 3. Select bolt of higher diameter/grade")
+        # elif self.bolt_line_sptd == 0:
+        #     self.design_status = False
+        #     logger.error(" : Empty bolt diameters list")
+        # elif self.bolt.bolt_capacity <= self.sptd_leg.bolt_force:
+        #     self.design_status = False
+        #     logger.error(" : Choose bolts of higher Diameter/Grade or choose different connection")
+        # else:
+        #     self.design_status = True
+        #     self.get_bolt_grade(self)
+        else:
+            self.get_bolt_grade(self)
+
+    def get_bolt_grade(self):
+        print(self.design_status, "Getting bolt grade")
+        bolt_grade_previous = self.bolt.bolt_grade[-1]
+
+        for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
+            count = 1
+            self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+
+            self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                              bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                              conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                              n_planes=1)
+
+            print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.sptd_leg.bolt_force)
+
+            bolt_capacity_reduced = self.sptd_leg.get_bolt_red(self.sptd_leg.bolts_one_line,
+                                                            self.sptd_leg.gauge_provided, self.bolt.bolt_capacity,
+                                                            self.bolt.bolt_diameter_provided)
+            if bolt_capacity_reduced < self.sptd_leg.bolt_force and count >= 1:
                 self.bolt.bolt_grade_provided = bolt_grade_previous
-                self.bolts_required_sptd = bolts_required_previous
                 break
-            bolts_required_previous = self.bolts_required_sptd
             bolt_grade_previous = self.bolt.bolt_grade_provided
+            count += 1
 
-        print(self.bolt.bolt_diameter_provided, self.bolts_required_sptd, self.bolt_line_sptd, self.bolts_one_line_sptd)
-        self.get_bolts_required_sptng(self)
+        self.bolt.design_status = True
+        self.get_leg_details(self)
+
+    def get_leg_details(self):
+
+        print(self.design_status,"getting fin plate details")
+
+        self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+
+        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                          bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                          conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                          n_planes=1)
+
+        self.sptd_leg.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                         web_plate_h_min=self.min_plate_height, web_plate_h_max=self.max_plate_height,
+                                         bolt_capacity=self.bolt.bolt_capacity,
+                                         min_edge_dist=self.bolt.min_edge_dist_round,
+                                         min_gauge=self.bolt.min_gauge_round, max_spacing=self.bolt.max_spacing_round,
+                                         max_edge_dist=self.bolt.max_edge_dist_round, shear_load=self.load.shear_force*1000,
+                                         axial_load=self.load.axial_force*1000, gap=self.plate.gap,
+                                         shear_ecc=True, bolt_line_limit=3)
+
+        self.sptng_leg.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                            web_plate_h_min=self.min_plate_height,
+                                            web_plate_h_max=self.max_plate_height,
+                                            bolt_capacity=self.bolt.bolt_capacity,
+                                            min_edge_dist=self.bolt.min_edge_dist_round,
+                                            min_gauge=self.bolt.min_gauge_round,
+                                            max_spacing=self.bolt.max_spacing_round,
+                                            max_edge_dist=self.bolt.max_edge_dist_round,
+                                            shear_load=self.load.shear_force * 1000/2,
+                                            axial_load=self.load.axial_force * 1000/2, gap=self.supported_section.web_thickness/2,
+                                            shear_ecc=True, bolt_line_limit=3)
+
+        if self.plate.design_status is False:
+            self.design_status = False
+            logger.error(self.plate.reason)
+
+        else:
+            self.get_plate_thickness(self)
+
+
+
+    # def get_bolt_grade(self):
+    #     bolts_required_previous = self.bolts_required_sptd
+    #     bolt_grade_previous = self.bolt.bolt_grade_provided
+    #
+    #     for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
+    #         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+    #                                                 connecting_plates_tk=[self.supported_section.web_thickness])
+    #
+    #         self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+    #                                           bolt_grade_provided=self.bolt.bolt_grade_provided,
+    #                                           connecting_plates_tk=[self.supported_section.web_thickness],
+    #                                           n_planes=2)
+    #
+    #         [self.bolt_line_sptd, self.bolts_one_line_sptd, web_plate_h] = self.sptd_leg.get_web_plate_l_bolts_one_line(
+    #             web_plate_h_min=self.min_plate_height, web_plate_h_max=self.max_plate_height,
+    #             bolts_required=self.bolts_required_sptd, edge_dist=self.bolt.min_edge_dist_round,
+    #             gauge=self.bolt.min_gauge_round)
+    #
+    #         print(2, self.bolt.bolt_capacity, self.bolt.bolt_grade_provided, self.bolts_required_sptd, self.bolts_one_line_sptd)
+    #         if self.bolts_required_sptd > bolts_required_previous:
+    #             self.bolt.bolt_grade_provided = bolt_grade_previous
+    #             self.bolts_required_sptd = bolts_required_previous
+    #             break
+    #         bolts_required_previous = self.bolts_required_sptd
+    #         bolt_grade_previous = self.bolt.bolt_grade_provided
+    #
+    #     print(self.bolt.bolt_diameter_provided, self.bolts_required_sptd, self.bolt_line_sptd, self.bolts_one_line_sptd)
+    #     self.get_bolts_required_sptng(self)
 
     def get_bolts_required_sptng(self):
         self.sptng_bolt = self.bolt
-        self.sptng_leg = self.sptd_leg
+        # self.sptng_leg = self.sptd_leg
         self.sptng_bolt.calculate_bolt_capacity(self.bolt.bolt_diameter_provided, self.bolt.bolt_grade_provided,
                                                 [self.supporting_section.flange_thickness], 1)
         self.bolts_required_sptng = max(int(math.ceil(self.load.shear_force * 1000 / self.sptng_bolt.bolt_capacity/2)), 2)

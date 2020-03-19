@@ -42,8 +42,8 @@ class Main():
     #     d = VALUES_SIZE_CUSTOMIZED
     #     return d
 
-    def input_value_changed(self):
-        pass
+    # def input_value_changed(self):
+    #     pass
 
     def set_input_values(self, design_dictionary):
         self.mainmodule = "Tension"

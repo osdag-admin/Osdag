@@ -26,6 +26,7 @@ TYPE_TAB_3 = "TYPE_TAB_3"
 
 
 import sqlite3
+
 from utils.common.component import *
 from utils.common.component import *
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
@@ -287,6 +288,8 @@ KEY_DISP_BASE_PLATE = 'Base Plate'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
+KEY_DISP_BEAMCOVERPLATEWELD = 'Beam Coverplate  Weld Connection'
+KEY_DISP_COLUMNCOVERPLATEWELD = 'Column Coverplate Weld Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
 
@@ -306,12 +309,17 @@ KEY_DISP_CONN = 'Connectivity *'
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
+
+## Column End Plate ##
+VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
+####
+
 VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Base Plate with Cleat Angles', 'Hollow Sections']
 
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
-VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
 
 KEY_IMAGE = 'Image'
 
@@ -428,7 +436,10 @@ VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
-VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg','Web']
+VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
+VALUES_LOCATION_2 = ["Web"]
+
 
 KEY_IMAGE = 'Image'
 
@@ -523,6 +534,26 @@ KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in flange'
 KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
 KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 
+
+KEY_FLANGE_WELD_DETAILS = "Flange detail"
+KEY_DISP_FLANGE_WELD_DETAILS = "Weld Details"
+
+KEY_WELD_TYPE = 'Weld.Type'
+KEY_DISP_WELD_TYPE ='Weld Type'
+VALUES_WELD_TYPE = ["select type","Fillet Weld"]
+DISP_FLANGE_TITLE_WELD = 'Flange Weld'
+KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
+KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size(mm)'
+KEY_FLANGE_WELD_STRENGTH = 'Flange_Weld.Strength'
+KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
+KEY_FLANGE_WELD_STRESS = 'Flange_Weld.Stress'
+KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
+KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
+KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
+KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
+KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
+KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
+
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
@@ -547,7 +578,7 @@ KEY_EDGEDIST_W = 'Web_plate.edge_dist_provided'
 KEY_DISP_EDGEDIST_W = 'Edge Distance'
 
 KEY_WEB_CAPACITY ="Web_plate.capacity"
-KEY_DISP_WEB_CAPACITY= 'capacity'
+KEY_DISP_WEB_CAPACITY= 'Capacity'
 KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
 KEY_DISP_WEB_TEN_CAPACITY ="Web tension capacity"
 KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
@@ -577,6 +608,21 @@ KEY_WEB_DISP_BOLTS_REQ = "Web Bolt Required"
 KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
 KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in web'
 
+KEY_WEB_WELD_DETAILS = "Web detail"
+KEY_DISP_WEB_WELD_DETAILS = "Weld Details"
+DISP_WEB_TITLE_WELD = 'Web Weld'
+KEY_WEB_WELD_SIZE = 'Web_Weld.Size'
+KEY_WEB_DISP_WELD_SIZE = 'Web Weld Size(mm)'
+KEY_WEB_WELD_STRENGTH = 'Web_Weld.Strength'
+KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength(N/mm)'
+KEY_WEB_WELD_STRESS = 'Web_Weld.Stress'
+KEY_WEB_DISP_WELD_STRESS = 'Web Weld Stress(N/mm)'
+KEY_WEB_WELD_LENGTH = 'Web_Weld.Length'
+KEY_DISP_WEB_WELD_LENGTH = 'Web Weld Length'
+KEY_WEB_WELD_LENGTH_EFF = 'Web_Weld.EffLength'
+KEY_WEB_WELD_HEIGHT ='Web_Weld.height'
+KEY_DISP_WEB_WELD_HEIGHT = 'Web Weld Height'
+
 
 DISP_TITLE_ENDPLATE = 'End plate'
 
@@ -585,6 +631,7 @@ KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_ENDPLATE_THICKNESS = ['All', 'Customized']
 VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
+VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
 
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
 
@@ -603,6 +650,7 @@ KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 KEY_DP_WELD_FAB = 'DesignPreferences.Weld.Fab'
 
 KEY_DP_WELD_TYPE = 'Weld.Type'
+KEY_DISP_DP_WELD_TYPE ='Weld Type'
 KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
 KEY_DP_WELD_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
@@ -990,7 +1038,7 @@ def get_leg_lengths(designation):
 
 all_angles = connectdb("Angles","popup")
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
-print(VALUES_CLEAT_CUSTOMIZED)
+# print(VALUES_CLEAT_CUSTOMIZED)
 
 DISP_TITLE_COMPMEM='Compression member'
 

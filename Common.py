@@ -309,6 +309,11 @@ KEY_DISP_CONN = 'Connectivity *'
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
+
+## Column End Plate ##
+VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
+####
+
 VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Base Plate with Cleat Angles', 'Hollow Sections']
 
 
@@ -615,6 +620,7 @@ KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_ENDPLATE_THICKNESS = ['All', 'Customized']
 VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
+VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
 
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
 

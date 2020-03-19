@@ -174,8 +174,9 @@ class Ui_Dialog1(object):
         self.result = main.report_result
         self.Design_Check = main.report_check
         # save_html(main.report_result, main.report_input, main.report_check, main.report_supporting,main.report_supported, report_summary,fileName, folder)
-        CreateLatex.save_latex(CreateLatex(),main.report_result, main.report_input, main.report_check, main.report_supporting,
-                  main.report_supported, report_summary, fileName, folder)
+        # CreateLatex.\
+        #     save_latex(CreateLatex(),main.report_result, main.report_input, main.report_check, main.report_supporting,
+        #           main.report_supported, report_summary, fileName, folder)
     def getPopUpInputs(self):
         input_summary = {}
         input_summary["ProfileSummary"] = {}

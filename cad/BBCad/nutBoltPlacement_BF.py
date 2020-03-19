@@ -73,29 +73,49 @@ class NutBoltArray_BF():
         self.end_BF = outputobj.flange_plate.end_dist_provided
         self.edge_gauge_BF = outputobj.flange_plate.edge_dist_provided
         self.pitch_BF = outputobj.flange_plate.pitch_provided
-        self.gauge_BF = 100 #outputobj.flange_plate.gauge_provided  # Revised gauge distance
+        self.gauge_BF = outputobj.flange_plate.midgauge
+        self.gauge = outputobj.flange_plate.gauge_provided
+        #outputobj.flange_plate.gauge_provided  # Revised gauge distance
         self.row_BF = outputobj.flange_plate.bolt_line
         self.col_BF = outputobj.flange_plate.bolts_one_line
-        self.gap = 5
+        self.gap = outputobj.flange_plate.gap
 
     def calculatePositions_BF(self):
         """
         :return: The positions/coordinates to place the bolts in the form of list, positions_BF = [list of bolting coordinates] 
         """
         self.positions_BF = []
-        self.boltOrigin_BF = self.originBF + self.edge_gauge_BF * self.pitchDirBF + (self.plateBelwFlangeL - self.gauge_BF) / 2 * self.gaugeDirBF
+        self.boltOrigin_BF = self.originBF + self.edge_gauge_BF * self.pitchDirBF + ((self.plateBelwFlangeL - self.gauge_BF) / 2 -((self.col_BF/2-1)*self.gauge)) * self.gaugeDirBF
         for rw_BF in range(self.row_BF):
             for cl_BF in range(self.col_BF):
                 pos_BF = self.boltOrigin_BF
                 if self.row_BF / 2 < rw_BF or self.row_BF / 2 == rw_BF:
                     self.pitch_new_BF = 2 * self.edge_gauge_BF + self.gap
                     pos_BF = pos_BF + ((rw_BF - 1) * self.pitch_BF + self.pitch_new_BF) * self.pitchDirBF
-                    pos_BF = pos_BF + cl_BF * self.gauge_BF * self.gaugeDirBF
+                    if self.col_BF / 2 > cl_BF:
+                        pos_BF = pos_BF + cl_BF * self.gauge * self.gaugeDirBF
+                    else:
+                        pos_BF = pos_BF + (
+                                    cl_BF - 1) * self.gauge * self.gaugeDirBF + 1 * self.gauge_BF * self.gaugeDirBF
                     self.positions_BF.append(pos_BF)
                 else:
                     pos_BF = pos_BF + rw_BF * self.pitch_BF * self.pitchDirBF
-                    pos_BF = pos_BF + cl_BF * self.gauge_BF * self.gaugeDirBF
+                    if self.col_BF / 2 > cl_BF:
+                        pos_BF = pos_BF + cl_BF * self.gauge * self.gaugeDirBF
+                    else:
+                        pos_BF = pos_BF + (
+                                    cl_BF - 1) * self.gauge * self.gaugeDirBF + 1 * self.gauge_BF * self.gaugeDirBF
                     self.positions_BF.append(pos_BF)
+                # pos_BF = self.boltOrigin_BF
+        #                 # if self.row_BF / 2 < rw_BF or self.row_BF / 2 == rw_BF:
+        #                 #     self.pitch_new_BF = 2 * self.edge_gauge_BF + self.gap
+        #                 #     pos_BF = pos_BF + ((rw_BF - 1) * self.pitch_BF + self.pitch_new_BF) * self.pitchDirBF
+        #                 #     pos_BF = pos_BF + cl_BF * self.gauge_BF * self.gaugeDirBF
+        #                 #     self.positions_BF.append(pos_BF)
+        #                 # else:
+        #                 #     pos_BF = pos_BF + rw_BF * self.pitch_BF * self.pitchDirBF
+        #                 #     pos_BF = pos_BF + cl_BF * self.gauge_BF * self.gaugeDirBF
+        #                 #     self.positions_BF.append(pos_BF)
 
     def placeBF(self, originBF, gaugeDirBF, pitchDirBF, boltDirBF, plateBelwFlangeL):
         self.originBF = originBF
@@ -112,9 +132,11 @@ class NutBoltArray_BF():
 
     def create_modelBF(self):
         for bolt in self.bolts_BF:
-            self.models_BF.append(bolt.create_model())
+            # self.models_BF.append(bolt.create_model())
+            pass
         for nut in self.nuts_BF:
-            self.models_BF.append(nut.create_model())
+            # self.models_BF.append(nut.create_model())
+            pass
 
         dbg = self.dbgSphere(self.originBF)
         self.models_BF.append(dbg)

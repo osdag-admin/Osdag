@@ -767,34 +767,38 @@ class BeamCoverPlate(MomentConnection):
                 #             self.supported_section.tension_yielding_capacity > self.load.axial_force:
                 # print("BBB flange member check is satisfactory. Doing bolt checks")
                 self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if i >= self.section.web_thickness]
-                self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if i >= self.section.flange_thickness]
 
-                if not self.web_plate_thickness_possible :
-                    logger.error(": Web Plate thickness should be greater than section  thicknesss.")
+
+                self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if i >= self.section.flange_thickness]
+                if len(self.flange_plate_thickness_possible)  == 0 or   self.web_plate_thickness_possible ==0:
+                    logger.error(":aaaaWeb Plate thickness should be greater than section  thicknesss.")
                 else:
-                    pass
-                if not self.flange_plate_thickness_possible:
-                    logger.error(": Flange Plate thickness should be greater than section  thicknesss.")
-                else:
-                    pass
 
                     # print("Selecting bolt diameter")
                     # self.select_bolt_dia(self)
 
-                self.flange_plate.thickness_provided = self.min_thick_based_on_area(tk=self.section.flange_thickness,
-                                                                                    width=self.section.flange_width,
-                                                                                    list_of_pt_tk=self.flange_plate_thickness_possible,
-                                                                                    t_w=self.section.web_thickness,
-                                                                                    r_1=self.section.root_radius, )
-                self.web_plate.thickness_provided = self.min_thick_based_on_area(tk=self.section.web_thickness,
-                                                                                 width=self.section.depth,
-                                                                                 list_of_pt_tk=self.web_plate_thickness_possible,
-                                                                                 t_w=self.section.web_thickness,
-                                                                                 r_1=self.section.root_radius, )
+                    self.flange_plate.thickness_provided = self.min_thick_based_on_area(tk=self.section.flange_thickness,
+                                                                                        width=self.section.flange_width,
+                                                                                        list_of_pt_tk=self.flange_plate_thickness_possible,
+                                                                                        t_w=self.section.web_thickness,
+                                                                                        r_1=self.section.root_radius, )
+                    self.web_plate.thickness_provided = self.min_thick_based_on_area(tk=self.section.web_thickness,
+                                                                                     width=self.section.depth,
+                                                                                     list_of_pt_tk=self.web_plate_thickness_possible,
+                                                                                     t_w=self.section.web_thickness,
+                                                                                     r_1=self.section.root_radius, )
+                    # if not self.web_plate.thickness_provided :
+                    #     logger.error(": Web Plate thickness should be greater than section  thicknesss.")
+                    # else:
+                    #     pass
+                    # if not self.flange_plate.thickness_provided :
+                    #     logger.error(": Flange Plate thickness should be greater than section  thicknesss.")
+                    # else:
+                    #     pass
 
-                self.section.tension_yielding_capacity = self.tension_yielding_capacity_flange
-                print("tension_yielding_capacity of flange", self.section.tension_yielding_capacity )
-                self.design_status = True
+                    self.section.tension_yielding_capacity = self.tension_yielding_capacity_flange
+                    print("tension_yielding_capacity of flange", self.section.tension_yielding_capacity )
+                    self.design_status = True
             else:
                 self.design_status = False
                 logger.error(" : tension_yielding_capacity  of flange is less "
@@ -1010,7 +1014,7 @@ class BeamCoverPlate(MomentConnection):
             print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.flange_plate.bolt_force)
 
             bolt_capacity_reduced_flange = self.flange_plate.get_bolt_red(self.flange_plate.bolts_one_line,
-                                                            self.flange_plate.gauge_provided, self.flange_bolt.bolt_capacity,
+                                                            self.flange_plate.gauge_provided,self.flange_bolt.bolt_capacity,
                                                             self.bolt.bolt_diameter_provided)
             bolt_capacity_reduced_web = self.web_plate.get_bolt_red(self.web_plate.bolts_one_line,
                                                                           self.web_plate.gauge_provided,

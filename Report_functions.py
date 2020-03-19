@@ -23,49 +23,60 @@ from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
     MediumText, LineBreak, simple_page_number
 from pylatex.utils import bold
 
-def min_pitch_req(d,t):
+def min_pitch(d):
     min_pitch = 2.5*d
-    max_pitch_1 = 32*min(t)
-    max_pitch_2 = 300
-    max_pitch = max(max_pitch_1,max_pitch_2)
     d = str(d)
-    t = str(min(t))
-    max_pitch_1 = str(max_pitch_1)
-    max_pitch_2 = str(max_pitch_2)
-    max_pitch = str(max_pitch)
     min_pitch = str(min_pitch)
 
     min_pitch_eqn = Math(inline=True)
-    min_pitch_eqn.append(NoEscape(r'\begin{aligned} min.~ pitch/gauge &= 2.5 ~ d\\'))
-    min_pitch_eqn.append(NoEscape(r'&= 2.5*' + d + r'=' + min_pitch + r'\\'))
-    min_pitch_eqn.append(NoEscape(r'max.~ pitch/gauge &=\min(32~t,~300~mm)\\'))
-    min_pitch_eqn.append(NoEscape(r' &= \min(32 *~' + t+ r',~ 300 ~mm)='+max_pitch+r'\end{aligned}'))
+    min_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{min}&= 2.5 ~ d&\\'))
+    min_pitch_eqn.append(NoEscape(r'=&2.5*' + d + r'&=' + min_pitch + r'\end{aligned}'))
     return min_pitch_eqn
 
-def min_edge_end_req(d_0,edge_type,f_y,t):
+def max_pitch(t):
+
+    max_pitch_1 = 32*min(t)
+    max_pitch_2 = 300
+    max_pitch = max(max_pitch_1,max_pitch_2)
+    t = str(min(t))
+    max_pitch = str(max_pitch)
+
+
+    max_pitch_eqn = Math(inline=True)
+    max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max} &=\min(32~t,~300~mm)&\\'))
+    max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\end{aligned}'))
+    return max_pitch_eqn
+
+def min_edge_end(d_0,edge_type):
     if edge_type == 'hand_flame_cut':
         factor = 1.7
     else:
         factor = 1.5
     min_edge_dist = round(factor * d_0,2)
-    epsilon = round(math.sqrt(250/f_y),2)
-    max_edge_dist = round(12*t*epsilon,2)
 
     min_edge_dist = str(min_edge_dist)
-    max_edge_dist = str(max_edge_dist)
-    t = str(t)
-    f_y = str(f_y)
-    epsilon = str(epsilon)
+
     factor = str(factor)
     d_0 = str(d_0)
 
     min_end_edge_eqn = Math(inline=True)
-    min_end_edge_eqn.append(NoEscape(r'\begin{aligned} min.~ end/edge &= [1.5~or~ 1.7] * d_0\\'))
-    min_end_edge_eqn.append(NoEscape(r'&= '+factor + r'*' + d_0+r'='+min_edge_dist+r'\\'))
-    min_end_edge_eqn.append(NoEscape(r'max.~ end/edge &=12~ t~ \varepsilon\\'))
-    min_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
-    min_end_edge_eqn.append(NoEscape(r'max.~ end/edge&=12 ~*'+ t + r'*\sqrt{\frac{250}{'+f_y+r'}}\\ &='+max_edge_dist+r'\\ \end{aligned}'))
+    min_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\'))
+    min_end_edge_eqn.append(NoEscape(r'&='+factor + r'*' + d_0+r'='+min_edge_dist+r' \end{aligned}'))
     return min_end_edge_eqn
+
+def max_edge_end(f_y,t):
+
+    epsilon = round(math.sqrt(250/f_y),2)
+    max_edge_dist = round(12*t*epsilon,2)
+    max_edge_dist = str(max_edge_dist)
+    t = str(t)
+    f_y = str(f_y)
+
+    max_end_edge_eqn = Math(inline=True)
+    max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
+    max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
+    max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=12 ~*'+ t + r'*\sqrt{\frac{250}{'+f_y+r'}}\\ &='+max_edge_dist+r'\\ \end{aligned}'))
+    return max_end_edge_eqn
 
 def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
     f_ub = str(f_ub)
@@ -140,18 +151,24 @@ def get_trial_bolts(V_u, A_u,bolt_capacity):
     trial_bolts=str(trial_bolts)
     trial_bolts_eqn = Math(inline=True)
     trial_bolts_eqn.append(NoEscape(r'\begin{aligned}R_{u} &= \sqrt{V_u^2+A_u^2}\\'))
-    trial_bolts_eqn.append(NoEscape(r'n_{trial} = R_u/ V_{bolt}\\'))
-    trial_bolts_eqn.append(NoEscape(r'& = \frac{\sqrt{'+V_u+r'^2+'+A_u+r'^2}}{'+bolt_capacity+ r'}\\'))
-    trial_bolts_eqn.append(NoEscape(r'& ='+trial_bolts+ r'\end{aligned}'))
+    trial_bolts_eqn.append(NoEscape(r'n_{trial} &= R_u/ V_{bolt}\\'))
+    trial_bolts_eqn.append(NoEscape(r'R_{u} &= \frac{\sqrt{'+V_u+r'^2+'+A_u+r'^2}}{'+bolt_capacity+ r'}\\'))
+    trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
     return trial_bolts_eqn
 
-def get_pass_fail(required, provided):
+def get_pass_fail(required, provided,relation='greater'):
     required = float(required)
     provided = float(provided)
-    if required < provided:
-        return 'Pass'
+    if relation == 'greater':
+        if provided > required:
+            return 'Pass'
+        else:
+            return 'Fail'
     else:
-        return 'Fail'
+        if provided < required:
+            return 'Pass'
+        else:
+            return 'Fail'
 
 
     # doc.generate_pdf('report_functions', clean_tex=False)

@@ -80,9 +80,16 @@ class IS800_2007(object):
 
     # cl. 8.4.1 shear strength of bolted connections
     @staticmethod
-    def cl_8_4_design_shear_strength():
+    def cl_8_4_design_shear_strength(A_vg, f_y, gamma_m0):
+        V_d = A_vg * f_y / (math.sqrt(3) * gamma_m0)
+        return V_d
+
         # TODO
-        pass
+        # pass
+
+    def cl_8_2_1_2_design_moment_strength(beta_b, Z_p, f_y, gamma_m0):
+        M_d = beta_b * Z_p * f_y / gamma_m0
+        return M_d
 
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
@@ -203,7 +210,7 @@ class IS800_2007(object):
 
     # cl. 10.2.4.2  Minimum Edge and End Distances
     @staticmethod
-    def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='hand_flame_cut'):
+    def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - Sheared or hand flame cut'):
         """Calculate minimum end and edge distance
 
         Args:
@@ -220,7 +227,7 @@ class IS800_2007(object):
         """
 
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
-        if edge_type == 'hand_flame_cut':
+        if edge_type == 'a - Sheared or hand flame cut':
             return 1.7 * d_0
         else:
             # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
@@ -395,17 +402,17 @@ class IS800_2007(object):
 
 
 
-    @staticmethod
-    def cl_10_3_5_bolt_tensile_capacity(f_ub, f_yb, A_nb, A_sb, safety_factor_parameter='field'):
 
-        """Calculate design tensile strength of a bolt.
+
+    @staticmethod
+    def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+        """Calculate design tensile strength of bearing bolt
 
         Args:
-            f_ub    - Ultimate tensile strength of the bolt in MPa (float)
-            f_yb    - Yield strength of the bolt in MPa (float)
-            d       - Diameter of the bolt in mm (float)
-            A_nb    - Net area of the bolt in mm2 (float)
-            safety_factor_parameter - Either 'field' or 'shop' (str)
+            f_ub - Ultimate tensile strength of the bolt in MPa (float)
+            f_yb - Yield strength of the bolt in MPa (float)
+            A_sb - Shank area of bolt in sq. mm  (float)
+            A_n - Net tensile stress area of the bolts as per IS 1367 in sq. mm  (float)
 
         return:
             T_db - Design tensile strength of bearing bolt in N (float)
@@ -413,15 +420,31 @@ class IS800_2007(object):
         Note:
             Reference:
             IS 800:2007,  cl 10.3.5
-
         """
-
-        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
-        T_nb = min((0.90*f_ub*A_nb), (f_yb*A_sb*(gamma_mb/gamma_m0)))
-        T_db = T_nb/gamma_mb
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+        T_nb = min(0.90 * f_ub * A_n, f_yb * A_sb * gamma_mb / gamma_m0)
+        return T_nb / gamma_mb
 
-        return T_db
+        # cl. 10.3.6 Bolt subjected to combined shear and tension of bearing bolts
+    @staticmethod
+    def cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb, V_db, T_b, T_db):
+        """Check for bolt subjected to combined shear and tension
+
+        Args:
+            V_sb - factored shear force acting on the bolt,
+            V_db - design shear capacity,
+            T_b - factored tensile force acting on the bolt,
+            T_db - design tension capacity.
+
+        return: combined shear and friction value
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.3.6
+        """
+        return (V_sb / V_db) ** 2 + (T_b / T_db) ** 2
+
 
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting
@@ -430,7 +453,7 @@ class IS800_2007(object):
     # cl. 10.4.3 Slip Resistance
     @staticmethod
     def cl_10_4_3_bolt_slip_resistance(f_ub, A_nb, n_e, mu_f, bolt_hole_type='Standard', slip_resistance='service_load'):
-        # TODO : Ensure default slip_resistance = 'service_load' or ultimate_load'
+        # TODO : Ensure default slip_resistance = 'service_load' or 'ultimate_load'
         """Calculate design shear strength of friction grip bolt as governed by slip
 
         Args:
@@ -473,6 +496,91 @@ class IS800_2007(object):
 
     # Table 20 Typical Average Values for Coefficient of Friction, mu_f (list)
     cl_10_4_3_Table_20 = [0.20, 0.50, 0.10, 0.25, 0.30, 0.52, 0.30, 0.30, 0.50, 0.33, 0.48, 0.1]
+
+    # cl. 10.4.5 Tension Resistance
+    @staticmethod
+    def cl_10_4_5_friction_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+        """Calculate design tensile strength of friction grip bolt
+
+        Args:
+            f_ub - Ultimate tensile strength of the bolt in MPa (float)
+            f_yb - Yield strength of the bolt in MPa (float)
+            A_sb - Shank area of bolt in sq. mm  (float)
+            A_n - Net tensile stress area of the bolts as per IS 1367 in sq. mm  (float)
+
+        return:
+            T_df - Design tensile strength of friction grip bolt in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.4.5
+            AMENDMENT NO. 1 (JANUARY 2012) to IS 800:2007
+
+        """
+        gamma_mf = IS800_2007.cl_5_4_1_Table_5['gamma_mf'][safety_factor_parameter]
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5['gamma_m1']['ultimate_stress']
+
+        T_nf = min(0.9 * f_ub * A_n, f_yb * A_sb * gamma_m1 / gamma_m0)
+        return T_nf / gamma_mf
+
+    # cl. 10.4.6 Combined shear and Tension for friction grip bolts
+    @staticmethod
+    def cl_10_4_6_friction_bolt_combined_shear_and_tension(V_sf, V_df, T_f, T_df):
+        """Calculate combined shear and tension of friction grip bolt
+
+                Args:
+                   V_sf - applied factored shear at design load
+                   V_df - design shear strength
+                   T_f - externally applied factored tension at design load
+                   T_df - design tension strength
+
+                return:
+                    combined shear and friction value
+
+                Note:
+                    Reference:
+                    IS 800:2007,  cl 10.4.6
+        """
+        return (V_sf / V_df) ** 2 + (T_f / T_df) ** 2
+
+
+
+
+
+
+
+    @staticmethod
+    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned=False, eta=1.5):
+        """Calculate prying force of friction grip bolt
+
+                       Args:
+                          2 * T_e - Force in
+                          l_v - distance from the bolt centre line to the toe of the fillet weld or to half
+                                the root radius for a rolled section,
+                          beta - 2 for non pre-tensioned bolt and 1 for pre-tensioned bolt
+                          eta - 1.5
+                          b_e - effective width of flange per pair of bolts
+                          f_o - proof stress in consistent units
+                          t - thickness of the end plate
+
+                       return:
+                           Prying force of friction grip bolt
+
+                       Note:
+                           Reference:
+                           IS 800:2007,  cl 10.4.7
+
+        """
+        beta = 2
+        if pre_tensioned is True:
+            beta = 1
+        l_e = min(end_dist, 1.1 * t * math.sqrt(beta * f_o / f_y))
+        Q = (l_v / 2 / l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
+        return Q
+
+
+
 
 
     # -------------------------------------------------------------
@@ -596,7 +704,7 @@ class IS800_2007(object):
 
     # cl. 10.5.7.1.1 Design stresses in fillet welds
     @staticmethod
-    def cl_10_5_7_1_1_fillet_weld_design_stress(ultimate_stresses, fabrication=KEY_DP_WELD_FAB_SHOP):
+    def cl_10_5_7_1_1_fillet_weld_design_stress(f_u, fabrication=KEY_DP_WELD_FAB_SHOP):
 
         """Calculate the design strength of fillet weld
 
@@ -612,8 +720,8 @@ class IS800_2007(object):
             IS 800:2007,  cl 10.5.7.1.1
 
         """
-        f_u = min(ultimate_stresses)
-        f_wn = f_u / math.sqrt(3)
+        # f_u = min(ultimate_stresses)
+        f_wn = (f_u / math.sqrt(3))
         gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][fabrication]
         f_wd = f_wn / gamma_mw
         return f_wd

@@ -12,6 +12,7 @@ from cad.items.plate import Plate
 from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
 from cad.items.angle import Angle
+from PyQt5.QtWidgets import QMainWindow
 
 from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -606,9 +607,13 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)  # Call to create Nut from Component directory
 
         numOfBoltsF = int(B.flange_plate.bolts_required)  # Number of flange bolts for both beams
-        nutSpaceF = float(B.flange_plate.thickness_provided) + beam_T  # Space between bolt head and nut for flange bolts
+        if B.preference == "Outside":
+            nutSpaceF = float(B.flange_plate.thickness_provided) + beam_T  # Space between bolt head and nut for flange bolts
+        else:
+            nutSpaceF = 2 * float(B.flange_plate.thickness_provided) + beam_T
 
-        #TODO : update nutSpace from Osdag test
+
+            #TODO : update nutSpace from Osdag test
 
         numOfBoltsW = int(B.web_plate.bolts_required)  # Number of web bolts for both beams
         nutSpaceW = 2 * float(B.web_plate.thickness_provided) + beam_tw  # Space between bolt head and nut for web bolts
@@ -643,13 +648,15 @@ class CommonDesignLogic(object):
         self.display.View_Iso()
         self.display.FitAll()
 
+
+
         self.display.DisableAntiAliasing()
 
         if bgcolor == "gradient_bg":
 
-            self.display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
+            self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
         else:
-            self.display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
+            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
         if self.mainmodule  == "Shear Connection":
 
@@ -727,7 +734,7 @@ class CommonDesignLogic(object):
 
         if self.mainmodule == "Moment Connection":
             # if self.connection == "Beam Coverplate Connection":
-            B = BeamCoverPlate()
+            self.B = BeamCoverPlate()
             # else:
             #     pass
             #
@@ -742,6 +749,7 @@ class CommonDesignLogic(object):
                 if self.B.preference != 'Outside':
                     osdag_display_shape(self.display, self.CPBoltedObj.get_innetplatesModels(), update=True,color='Blue')
 
+
                 osdag_display_shape(self.display, self.CPBoltedObj.get_nut_bolt_arrayModels(), update=True, color=Quantity_NOC_SADDLEBROWN)
 
             elif self.component == "Model":
@@ -750,8 +758,8 @@ class CommonDesignLogic(object):
 
                 #Todo: remove velove commented lines
 
-                # if self.B.preference != 'Outside':
-                #     osdag_display_shape(self.display, self.CPBoltedObj.get_innetplatesModels(), update=True,color='Blue')
+                if self.B.preference != 'Outside':
+                    osdag_display_shape(self.display, self.CPBoltedObj.get_innetplatesModels(), update=True,color='Blue')
 
                 osdag_display_shape(self.display, self.CPBoltedObj.get_nut_bolt_arrayModels(), update=True, color=Quantity_NOC_SADDLEBROWN)
 
@@ -790,6 +798,7 @@ class CommonDesignLogic(object):
                 self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()
 
                 self.display_3DModel("Model", "gradient_bg")
+
             else:
                 self.display.EraseAll()
 

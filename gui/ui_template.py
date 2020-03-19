@@ -60,7 +60,7 @@ from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
 from design_type.connection.end_plate_connection import EndPlateConnection
-
+from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
@@ -561,6 +561,8 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+                if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
+                    r.setDisabled(True)
 
             if type == TYPE_MODULE:
                 _translate = QtCore.QCoreApplication.translate
@@ -621,7 +623,6 @@ class Ui_ModuleWindow(QMainWindow):
         data = {}
 
         for t in new_list:
-
             if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (
                     module != KEY_DISP_TENSION):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
@@ -671,6 +672,7 @@ class Ui_ModuleWindow(QMainWindow):
                     continue
                 selected = key.currentText()
                 f = c_tup[1]
+
                 if c_tup[0] == KEY_SECSIZE and (module == KEY_DISP_COMPRESSION or module == KEY_DISP_TENSION):
                     options = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText())
                     existing_options = data[c_tup[0] + "_customized"]
@@ -774,7 +776,6 @@ class Ui_ModuleWindow(QMainWindow):
         out_scrollcontent = QtWidgets.QWidget(out_scroll)
         out_layout2 = QtWidgets.QGridLayout(out_scrollcontent)
         out_scrollcontent.setLayout(out_layout2)
-
         out_list = main.output_values(main, False)
         _translate = QtCore.QCoreApplication.translate
 
@@ -1092,21 +1093,23 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(module))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(main)
-
-
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION, KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
+
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
             add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
-        elif module == KEY_DISP_COLUMNCOVERPLATE:
+        elif module in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_COLUMNENDPLATE]:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
-        elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
+
+        elif module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
+
         elif module == KEY_DISP_COMPRESSION:
             pass
         self.designPrefDialog.rejected.connect(self.design_preferences)
@@ -1217,7 +1220,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag Fin Plate")
-
         self.mytabWidget.resize(size[0], size[1])
         self.mytabWidget.addTab(self.modelTab, "")
 
@@ -1378,6 +1380,11 @@ class Ui_ModuleWindow(QMainWindow):
             elif typ == TYPE_IMAGE:
                 pixmap1 = QPixmap(val)
                 k2.setPixmap(pixmap1)
+            elif typ == TYPE_TEXTBOX:
+                if val:
+                    k2.setEnabled(True)
+                else:
+                    k2.setDisabled(True)
             else:
                 pass
 
@@ -1449,6 +1456,7 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 d1 = {}
             design_dictionary.update(d1)
+
         if self.designPrefDialog.flag:
             if module not in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
                 tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
@@ -1491,8 +1499,21 @@ class Ui_ModuleWindow(QMainWindow):
                 elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
                     pass
         else:
-            d2 = {KEY_SUPTNGSEC_MATERIAL: '', KEY_SUPTDSEC_MATERIAL: ''}
-            design_dictionary.update(d2)
+            common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
+            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+                d2 = {KEY_SUPTNGSEC_MATERIAL: common_material, KEY_SUPTDSEC_MATERIAL: common_material}
+                design_dictionary.update(d2)
+            elif module == KEY_DISP_COMPRESSION:
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+                section = key.currentText()
+                if section == 'Beams':
+                    d2 = {KEY_SUPTDSEC_MATERIAL: common_material}
+                    design_dictionary.update(d2)
+                elif section == 'Columns':
+                    d2 = {KEY_SUPTNGSEC_MATERIAL: common_material}
+                    design_dictionary.update(d2)
+                elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
+                    pass
 
         design_dictionary.update(self.designPrefDialog.save_designPref_para(module))
         self.design_inputs = design_dictionary
@@ -1699,7 +1720,6 @@ class Ui_ModuleWindow(QMainWindow):
         b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
 
     def output_button_dialog(self, main, button_list, button):
-
         dialog = QtWidgets.QDialog()
         dialog.resize(350, 170)
         dialog.setFixedSize(dialog.size())
@@ -2042,6 +2062,7 @@ class Ui_ModuleWindow(QMainWindow):
         key_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
         key_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
         key_6 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+
         tab_Column = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         tab_Beam = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
         tab_Angle = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
@@ -2133,8 +2154,6 @@ class Ui_ModuleWindow(QMainWindow):
             # designation_col = 'HB 150'
             # designation_col = '20 20 X 3'
             # designation_col = 'JC 100'
-
-
             # if key_5.currentIndex() == 0:
             # if designation_col[0] == 'Select Section':
             #     print(designation_col[1])

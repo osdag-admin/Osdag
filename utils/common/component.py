@@ -10,7 +10,6 @@ import math
 import numpy as np
 from utils.common.common_calculation import *
 
-
 class Bolt(Material):
 
     def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="",
@@ -22,7 +21,6 @@ class Bolt(Material):
         if diameter is not None:
             self.bolt_diameter = list(np.float_(diameter))
             self.bolt_diameter.sort(key=float)
-
         self.bolt_type = bolt_type
         self.bolt_hole_type = bolt_hole_type
         self.edge_type = edge_type
@@ -94,6 +92,9 @@ class Bolt(Material):
         repr += "Minimum Edge Distance: {}\n".format(self.min_edge_dist)
 
 
+        repr += "Minimum Edge Distance: {}\n".format(self.min_edge_dist)
+
+
         repr += "Minimum End Distance: {}\n".format(self.min_end_dist)
         repr += "Maximum Edge Distance: {}\n".format(self.max_edge_dist)
         repr += "Maximum End Distance: {}\n".format(self.max_end_dist)
@@ -101,6 +102,7 @@ class Bolt(Material):
         repr += "Bolt Shear Capacity: {}\n".format(self.bolt_shear_capacity)
         repr += "Bolt Bearing Capacity: {}\n".format(self.bolt_bearing_capacity)
         repr += "Bolt Capacity: {}\n".format(self.bolt_capacity)
+
         return repr
 
     def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy,n_planes):
@@ -240,6 +242,7 @@ class Section(Material):
         self.source = 0.0
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
+
         # self.shear_yielding_capacity = 0.0
         # self.shear_rupture_capacity = 0.0
 
@@ -259,7 +262,6 @@ class Section(Material):
         self.slenderness = 0.0
         self.min_radius_gyration = 0.0
         # self.min_rad_gyration_bbchannel = 0.0
-
 
 
     def connect_to_database_update_other_attributes(self, table, designation):
@@ -298,6 +300,7 @@ class Section(Material):
             print(self.plast_sec_mod_y, "plast_sec_mod_y")
         else:
             self.plast_sec_mod_y = row[17] * 1000
+
         self.source = row[19]
 
         conn.close()
@@ -528,12 +531,10 @@ class Section(Material):
         return repr
 
 
-
 class Beam(Section):
 
     def __init__(self, designation, material_grade):
         super(Beam, self).__init__(designation, material_grade)
-
         self.connect_to_database_update_other_attributes("Beams", designation)
 
     def min_plate_height(self):
@@ -640,6 +641,7 @@ class Weld(Material):
         A_wh = weld_axial/l_weld
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
         return weld_stress
+
 
 class Plate(Material):
 
@@ -786,6 +788,7 @@ class Plate(Material):
         print(web_plate_h, "web_plate_h web")
 
         # print("gauge", gauge,web_plate_h,edge_dist,max_spacing, max_edge_dist)
+
         if gauge > max_spacing:
             gauge, edge_dist = self.get_spacing_adjusted(gauge, edge_dist, max_spacing)
             if edge_dist >= max_edge_dist:
@@ -798,6 +801,7 @@ class Plate(Material):
 
         print("web", gauge, edge_dist, web_plate_h)
         return gauge, edge_dist, web_plate_h
+
 
     def get_gauge_edge_dist_flange(self, flange_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,web_thickness,root_radius): #todo anjali
         """
@@ -880,6 +884,7 @@ class Plate(Material):
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge, max_spacing, max_edge_dist,
                               shear_load=0.0, axial_load=0.0, web_moment =0.0,  gap=0.0, shear_ecc=False, bolt_line_limit=math.inf,bolt_one_line_limit=2):
 
+
         """
 
         :param bolt_dia: diameter of bolt
@@ -931,6 +936,7 @@ class Plate(Material):
                 # If check for shear eccentricity is true, resultant force in bolt is calculated
                 ecc = (pitch * max((bolt_line-1.5), 0)) + end_dist + gap
                 moment_demand = shear_load * ecc + web_moment
+
                 print(2, bolts_one_line, pitch,
                                      gauge, bolt_line, shear_load, axial_load, ecc, web_plate_h)
                 vres = self.get_vres(bolts_one_line, pitch,
@@ -941,6 +947,7 @@ class Plate(Material):
                 print(3, vres, bolt_capacity_red)
 
                 while bolt_line <= bolt_line_limit and vres > bolt_capacity_red and web_plate_h <= web_plate_h_max:
+
                     # Length of plate is increased for calculated bolts in one line.
                     # This increases spacing which decreases resultant force
                     print(4, web_plate_h, web_plate_h_max)
@@ -967,6 +974,7 @@ class Plate(Material):
                                                                                    min_edge_dist, max_spacing,
                                                                                    max_edge_dist,bolt_one_line_limit)
                         print("g,e,h ", gauge, edge_dist, web_plate_h)
+
 
                     if bolt_line == 1:
                         pitch = 0.0
@@ -995,6 +1003,7 @@ class Plate(Material):
 
 
             print("g,e,h1 ", gauge, edge_dist, web_plate_h)
+
             if vres > bolt_capacity_red:
                 self.design_status = False
                 self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
@@ -1152,6 +1161,7 @@ class Plate(Material):
             self.gauge_provided = gauge
             self.edge_dist_provided = edge_dist
             self.end_dist_provided = end_dist
+
     # Function for block shear capacity calculation
     def blockshear(self, numrow, numcol, pitch, gauge, thk, end_dist, edge_dist, dia_hole, fy, fu):
         '''
@@ -1268,6 +1278,7 @@ class Plate(Material):
 
     def get_moment_cacacity(self, fy, plate_tk, plate_len):
         self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6
+
 
 
 

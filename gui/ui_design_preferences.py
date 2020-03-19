@@ -77,7 +77,6 @@ class Ui_Dialog(object):
 ######################################################################
 ####################################################################
 
-
 #START
 
         # tab_index = 0
@@ -1169,7 +1168,6 @@ class Ui_Dialog(object):
         self.retranslateUi(DesignPreferences)
         self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
-
         module = main.module_name(main)
 
         if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD,KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
@@ -1200,7 +1198,6 @@ class Ui_Dialog(object):
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
-
 
     def clear_tab(self, tab_name):
         '''
@@ -1384,7 +1381,6 @@ class Ui_Dialog(object):
                     Type = ch.currentText()
 
         if ch == tab_Beam.children()[len(tab_Beam.children())-1]:
-
             conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
@@ -1598,7 +1594,6 @@ class DesignPreferences(QDialog):
         '''
         @author: Umair
         '''
-
         tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         if designation == 'Select Section':
             self.ui.clear_tab("Column")

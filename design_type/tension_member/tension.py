@@ -892,7 +892,6 @@ class Tension(Main):
     #                         pass
     #         else:
     #             pass
-
     # def func_for_validation(self, window, design_dictionary):
     #     self.design_status = False
     #     flag = False

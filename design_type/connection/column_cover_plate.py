@@ -895,6 +895,7 @@ class ColumnCoverPlate(MomentConnection):
                                                   n_planes=2)
 
             self.flange_plate.get_flange_plate_details(bolt_dia=self.flange_bolt.bolt_diameter_provided,
+
                                                        flange_plate_h_min=min_plate_height,
                                                        flange_plate_h_max=max_plate_height,
                                                        bolt_capacity=self.flange_bolt.bolt_capacity,
@@ -1773,7 +1774,6 @@ class ColumnCoverPlate(MomentConnection):
         print("bolt dia", self.flange_bolt.bolt_diameter_provided)
 
         if self.design_status == True:
-
             logger.error(": Overall bolted cover plate splice connection design is safe \n")
             logger.debug(" :=========End Of design===========")
         else:
@@ -2080,7 +2080,6 @@ class ColumnCoverPlate(MomentConnection):
     #     f_f = (((moment_load * 1000000) / (column_d - column_f_t)) + (axial_force_f * 1000)) / 1000  # KN
     #     # print(f_f)
     #     return (f_f)
-
     # print(self.web_bolt)
     # print(self.web_plate)
     # print(self.Tension_capacity_flange_plate)
@@ -2149,3 +2148,4 @@ class ColumnCoverPlate(MomentConnection):
         tabs.append(t6)
 
         return tabs
+

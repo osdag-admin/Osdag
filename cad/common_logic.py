@@ -23,7 +23,6 @@ from cad.ShearConnections.CleatAngle.beamWebBeamWebConnectivity import BeamWebBe
 from cad.ShearConnections.CleatAngle.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as cleatColFlangeBeamWeb
 from cad.ShearConnections.CleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
 from cad.ShearConnections.CleatAngle.nutBoltPlacement import NutBoltArray as cleatNutBoltArray
-
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
@@ -234,12 +233,11 @@ class CommonDesignLogic(object):
 
         elif self.connection == KEY_DISP_CLEATANGLE:
             A = CleatAngleConnection()
+
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass
-
-
 
         bolt_dia = int(A.bolt.bolt_diameter_provided)
         bolt_r = bolt_dia / 2.0
@@ -277,7 +275,6 @@ class CommonDesignLogic(object):
         #     notchObj = Notch(R1=notch_R1, height=notch_height,
         #                      width=(pBeam_B / 2.0 - (pBeam_tw / 2.0 + plate_thick)) + plate_thick,
         #                      length=sBeam_B)
-
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
 
             # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -338,9 +335,6 @@ class CommonDesignLogic(object):
                           R1=A.cleat.r1, R2=A.cleat.r2)
         else:
             pass
-
-
-
         #### PLATE,BOLT,ANGLE AND NUT PARAMETERS #####
 
         # if self.connection == "cleatAngle":
@@ -402,7 +396,6 @@ class CommonDesignLogic(object):
             #                      R2=topangle_r2)
         else:
             plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
-
             Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
         supporting = ISection(B=A.supporting_section.flange_width, T=A.supporting_section.flange_thickness,
@@ -430,7 +423,6 @@ class CommonDesignLogic(object):
         #     nut_space = column_tw + int(plate_thick) + nut_T
         #     nutBoltArray = endNutBoltArray(A,bolt, nut, bolt, nut_space)
         #     colwebconn = endColWebBeamWeb(A.supporting_section, A.supported_section, A.weld, A.plate, nutBoltArray)
-
 
         elif self.connection == KEY_DISP_CLEATANGLE:
             # nut_space = beam_tw + 2 * cleat_thick + nut_T
@@ -470,8 +462,6 @@ class CommonDesignLogic(object):
         else:
             pass
 
-
-
         bolt_dia = int(A.bolt.bolt_diameter_provided)
         bolt_r = bolt_dia / 2.0
         bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2.0
@@ -493,6 +483,7 @@ class CommonDesignLogic(object):
             print(notch_R1, notch_height, (A.supporting_section.flange_width / 2.0 -
                                            (A.supporting_section.web_thickness / 2.0 + gap)) + gap,
                   A.supported_section.flange_width)
+
         elif self.connection == 'SeatedAngle':
             pass
             # seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,

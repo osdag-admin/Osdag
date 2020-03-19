@@ -774,6 +774,7 @@ class BeamCoverPlate(MomentConnection):
                 #             self.supported_section.tension_yielding_capacity > self.load.axial_force:
                 # print("BBB flange member check is satisfactory. Doing bolt checks")
                 self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if i >= self.section.web_thickness]
+
                 self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if i >= self.section.flange_thickness]
 
                 self.flange_plate.thickness_provided = self.min_thick_based_on_area(tk=self.section.flange_thickness,

@@ -376,7 +376,7 @@ class Section(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-        beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / float(F_u) * float(b_s) / float(L_c)))
+        beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / 0.9*float(F_u) * float(b_s) / float(L_c)))
         print(beta)
 
         if beta <= (F_u * gamma_m0 / F_y * gamma_m1) and beta >= 0.7:

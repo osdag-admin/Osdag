@@ -828,13 +828,13 @@ class FinPlateConnection(ShearConnection):
             KEY_SUPTNGSEC_MATERIAL:self.supporting_section.material,
             KEY_SUPTNGSEC_FU:self.supporting_section.fu,
             KEY_SUPTNGSEC_FY:self.supporting_section.fy,
-            "Column Details": "",
+            "Column Details": "/ResourceFiles/images/ColumnsBeams.png",
 
             KEY_SUPTDSEC: self.supported_section.designation,
             KEY_SUPTDSEC_MATERIAL:self.supported_section.material,
             KEY_SUPTDSEC_FU:self.supported_section.fu,
             KEY_SUPTDSEC_FY:self.supported_section.fy,
-            "Beam Details": "",
+            "Beam Details": "/ResourceFiles/images/ColumnsBeams.png",
 
             KEY_DP_WELD_TYPE:"Fillet",
             KEY_DP_WELD_FAB: self.weld.fabrication,
@@ -855,7 +855,9 @@ class FinPlateConnection(ShearConnection):
 
             KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
             KEY_DP_DETAILING_GAP: self.plate.gap,
-            KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+            KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences,
+
+             "3d image": "./ResourceFiles/images/3d.png"}
 
         self.report_supporting = {'Mass': self.supporting_section.mass,
                                   'Area(cm2) - A': self.supporting_section.area,
@@ -1005,19 +1007,27 @@ class FinPlateConnection(ShearConnection):
          # KEY_OUT_WELD_LENGTH_EFF,
          # KEY_OUT_WELD_STRENGTH]
 
-        folder = self.select_workspace_folder(self)
-        print(folder)
+        # folder = self.select_workspace_folder(self)
+        # print(folder)
+        config = configparser.ConfigParser()
+        config.read_file(open(r'Osdag.config'))
+        desktop_path = config.get("desktop_path", "path1")
+        print("desk:", desktop_path)
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = rel_path.replace("\\", "/")
+
         file_type = "PDF (*.pdf)"
-        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(folder), "untitled.pdf"),file_type)
-        print(filename)
+        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        print(filename, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         # filename = os.path.join(str(folder), "images_html", "TexReport")
         file_name = str(filename)
-        print(file_name)
+        print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         fname_no_ext = filename[0].split(".")[0]
+        print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         CreateLatex.save_latex(CreateLatex(), self.report_result, self.report_input, self.report_check,
                                self.report_supporting,
-                               self.report_supported, popup_summary, fname_no_ext, folder)
-
+                               self.report_supported, popup_summary, fname_no_ext, ' ', rel_path)
 
     def select_workspace_folder(self):
         # This function prompts the user to select the workspace folder and returns the name of the workspace folder

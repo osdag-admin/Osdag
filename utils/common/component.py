@@ -627,22 +627,32 @@ class Weld(Material):
         repr += "Strength: {}\n".format(self.strength)
         return repr
 
-    def get_weld_strength(self,connecting_fu, weld_fabrication, t_weld, weld_angle):
+    def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         throat_tk = \
-            IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness\
+            IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
                 (t_weld, weld_angle)
         weld_strength = f_wd * throat_tk
         return weld_strength
 
-    def get_weld_stress(self,weld_shear, weld_axial, weld_twist, Ip_weld, y_max, x_max, l_weld):
+    def get_weld_stress(self,weld_shear =0.0, weld_axial=0.0, weld_twist=0.0, Ip_weld=1.0, y_max=0.0, x_max=0.0, l_weld=0.0):
         T_wh = weld_twist * y_max/Ip_weld
         T_wv = weld_twist * x_max/Ip_weld
-        V_wv = weld_shear/l_weld
-        A_wh = weld_axial/l_weld
+        V_wv = weld_shear*1000/l_weld
+        A_wh = weld_axial*1000/l_weld
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
         return weld_stress
 
+    def weld_size(self, plate_thickness, member_thickness):
+
+        max_weld_thickness = int(min(plate_thickness, member_thickness))
+        weld_thickness = round_up((max_weld_thickness-2),1,3)
+        if weld_thickness> 16 :
+            weld_thickness =16
+        else:
+            pass
+
+        self.size = weld_thickness
 
 class Plate(Material):
 

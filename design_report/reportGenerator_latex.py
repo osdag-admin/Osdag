@@ -41,7 +41,7 @@ class CreateLatex(Document):
 
 
     @pyqtSlot()
-    def save_latex(self, outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder):
+    def save_latex(self, outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder, rel_path):
         print('iamhere2')
 
         print(Design_Check)
@@ -107,7 +107,7 @@ class CreateLatex(Document):
                             # table.add_row("Col.Det.",i,columndetails[i])
                             if index == 0:
                                 table.add_row((MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm",
-                                filename='images_html/ColumnsBeams.png')), i,columndetails[i]))
+                                filename=rel_path+uiObj["Column Details"])), i,columndetails[i]))
                                 index += 1
                             else:
                                 table.add_row(('', i, columndetails[i]))
@@ -118,7 +118,7 @@ class CreateLatex(Document):
                             # table.add_row("Col.Det.",i,columndetails[i])
                             if index == 0:
                                 table.add_row((MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm",
-                                filename='images_html/ColumnsBeams.png')), i,beamdetails[i]))
+                                filename=rel_path+uiObj["Beam Details"])), i,beamdetails[i]))
                                 index += 1
                             else:
                                 table.add_row(('', i, beamdetails[i]))
@@ -139,7 +139,7 @@ class CreateLatex(Document):
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()
 
-        doc.generate_pdf(filename,compiler='pdflatex',clean_tex=False)
+        doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
 
 # reportsummary = {}
 # reportsummary["ProfileSummary"] = {}

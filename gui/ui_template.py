@@ -623,27 +623,26 @@ class Ui_ModuleWindow(QMainWindow):
         data = {}
 
         for t in new_list:
-            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (
-                    module != KEY_DISP_TENSION):
+
+            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
-            elif t[0] == KEY_GRD and (module != KEY_DISP_BEAMCOVERPLATEWELD) and (module != KEY_DISP_COLUMNCOVERPLATEWELD) :
+            elif t[0] == KEY_GRD and (module not in [KEY_DISP_TENSION_WELDED,KEY_DISP_BEAMCOVERPLATEWELD,KEY_DISP_COLUMNCOVERPLATEWELD]):
                 key_customized_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_2.activated.connect(lambda: popup(key_customized_2, new_list))
                 data[t[0] + "_customized"] = t[1]()
-            elif t[0] == KEY_D and (module != KEY_DISP_BEAMCOVERPLATEWELD) and (module != KEY_DISP_COLUMNCOVERPLATEWELD) :
+            elif t[0] == KEY_D and (module not in [KEY_DISP_TENSION_WELDED,KEY_DISP_BEAMCOVERPLATEWELD,KEY_DISP_COLUMNCOVERPLATEWELD]):
                 key_customized_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
                 data[t[0] + "_customized"] = t[1]()
-
-            elif t[0] == KEY_SECSIZE and (module == KEY_DISP_COMPRESSION or module == KEY_DISP_TENSION):
+            elif t[0] == KEY_SECSIZE and (module in [KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]):
                 key_customized_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_4.activated.connect(lambda: popup(key_customized_4, new_list))
                 data[t[0] + "_customized"] = t[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
                                                                                     KEY_SEC_PROFILE).currentText())
 
-            elif t[0] in [KEY_WEBPLATE_THICKNESS] and (module != KEY_DISP_TENSION):
+            elif t[0] in [KEY_WEBPLATE_THICKNESS] and (module not in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]):
                 key_customized_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_5.activated.connect(lambda: popup(key_customized_5, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -672,8 +671,7 @@ class Ui_ModuleWindow(QMainWindow):
                     continue
                 selected = key.currentText()
                 f = c_tup[1]
-
-                if c_tup[0] == KEY_SECSIZE and (module == KEY_DISP_COMPRESSION or module == KEY_DISP_TENSION):
+                if c_tup[0] == KEY_SECSIZE and (module in [KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]):
                     options = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText())
                     existing_options = data[c_tup[0] + "_customized"]
                     if selected == "Customized":
@@ -1096,8 +1094,7 @@ class Ui_ModuleWindow(QMainWindow):
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
 
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION, KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
-
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
@@ -1458,7 +1455,8 @@ class Ui_ModuleWindow(QMainWindow):
             design_dictionary.update(d1)
 
         if self.designPrefDialog.flag:
-            if module not in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+
+            if module not in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
                 tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
                 key_material_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL).currentText()
                 if key_material_column == "Custom":
@@ -1500,7 +1498,7 @@ class Ui_ModuleWindow(QMainWindow):
                     pass
         else:
             common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
-            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
                 d2 = {KEY_SUPTNGSEC_MATERIAL: common_material, KEY_SUPTDSEC_MATERIAL: common_material}
                 design_dictionary.update(d2)
             elif module == KEY_DISP_COMPRESSION:
@@ -1520,7 +1518,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     # def pass_d(self, main, design_dictionary):
     #     """
-    #     It sets key variable textEdit and passes it to warn text function present in tension.py for logger
+    #     It sets key variable textEdit and passes it to warn text function present in tension_bolted.py for logger
     #      """
     #
     #     # @author Arsil Zunzunia
@@ -2079,7 +2077,7 @@ class Ui_ModuleWindow(QMainWindow):
         material = Material(material_grade)
         tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
         tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
-        if module != KEY_DISP_TENSION:
+        if module not in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
             material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
             material_connector.setCurrentText(str(material_grade))
 
@@ -2161,7 +2159,7 @@ class Ui_ModuleWindow(QMainWindow):
             #     print(designation_col[0])
             # self.designPrefDialog.column_preferences(designation_col[0], table_c, material_grade)
 
-        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
             conn = key_1.currentText()
 
             if conn in VALUES_CONN_1:

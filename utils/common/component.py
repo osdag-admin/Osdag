@@ -379,7 +379,7 @@ class Section(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-        beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / float(F_u) * float(b_s) / float(L_c)))
+        beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / 0.9*float(F_u) * float(b_s) / float(L_c)))
         print(beta)
 
         if beta <= (F_u * gamma_m0 / F_y * gamma_m1) and beta >= 0.7:
@@ -466,7 +466,7 @@ class Section(Material):
             I = min(Iyy, Izz)
             min_rad= math.sqrt(I / (area))
 
-        elif key == 'Back to Back Angles' and subkey == 'Long Leg':
+        elif key == "Back to Back Angles" and subkey == 'Long Leg':
             Iyy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
             Izz = 2 * mom_inertia_z
             I = min(Iyy, Izz)
@@ -612,6 +612,7 @@ class Weld(Material):
         self.type = type
         self.size = 0.0
         self.length = 0.0
+        self.effective = 0.0
         self.height =0.0
         self.strength = 0.0
         self.stress = 0.0

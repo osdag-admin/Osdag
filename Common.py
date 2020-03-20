@@ -489,10 +489,10 @@ KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 KEY_FLANGE_CAPACITY ="Flange_plate.capacity"
 KEY_DISP_FLANGE_CAPACITY= 'Capacity'
 KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
-KEY_DISP_FLANGE_TEN_CAPACITY ="Flange ten cap"
+KEY_DISP_FLANGE_TEN_CAPACITY ="Tension capacity"
 
 KEY_FLANGE_PLATE_TEN_CAP ="Flange_plate.tension_capacity"
-KEY_DISP_FLANGE_PLATE_TEN_CAP ="Flange plate ten cap"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension cap"
 
 
 KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
@@ -580,11 +580,11 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance'
 KEY_WEB_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_CAPACITY= 'Capacity'
 KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
-KEY_DISP_WEB_TEN_CAPACITY ="Web tension capacity"
+KEY_DISP_WEB_TEN_CAPACITY ="Tension Capacity"
 KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
-KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Web plate shear cap"
+KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Plate Shear Capacity"
 KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
-KEY_DISP_TEN_CAP_WEB_PLATE ="Web_plate tension_capacity_"
+KEY_DISP_TEN_CAP_WEB_PLATE ="Plate Tension Capacity"
 
 
 KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'

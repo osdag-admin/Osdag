@@ -1139,7 +1139,7 @@ class Plate(Material):
                 print("boltdetailsasaa", bolt_line, bolts_one_line, flange_plate_h)
 
             bolt_capacity_red = self.get_bolt_red(bolts_one_line,
-                                                  gauge, bolt_capacity,
+                                                  gauge, bolt_line,pitch,bolt_capacity,
                                                   bolt_dia)
 
 

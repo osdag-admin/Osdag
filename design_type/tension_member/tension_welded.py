@@ -1317,6 +1317,8 @@ class Tension_welded(Main):
         self.weld.get_weld_stress(weld_axial = self.load.axial_force, l_weld = self.weld.effective)
 
         # self.member_check(self, design_dictionary)
+        # self.member_check(self, design_dictionary)
+
 
     def get_weld_strength(self,connecting_fu, weld_fabrication, t_weld, force, weld_angle = 90):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)

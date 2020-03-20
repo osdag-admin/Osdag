@@ -33,7 +33,6 @@ from io import StringIO
 
 # connectivity = "column_flange_beam_web"
 # supporting_member_section = "HB 400"
-# supported_member_section = "MB 300"
 # fy = 250.0
 # fu = 410.0
 # shear_force = 100.0
@@ -47,10 +46,10 @@ from io import StringIO
 # material = Material(material_grade)
 
 
-class Tension(Main):
+class Tension_welded(Main):
 
     def __init__(self):
-        super(Tension, self).__init__()
+        super(Tension_welded, self).__init__()
 
 
         self.design_status = False
@@ -89,7 +88,7 @@ class Tension(Main):
         logger.addHandler(handler)
 
     def module_name(self):
-        return KEY_DISP_TENSION
+        return KEY_DISP_TENSION_WELDED
 
     def customized_input(self):
 
@@ -607,7 +606,8 @@ class Tension(Main):
         '''
 
         # @author: Amir, Umair
-        self.module = KEY_DISP_TENSION
+        self.module = KEY_DISP_TENSION_WELDED
+        self.connection = "Welded"
 
         options_list = []
 
@@ -681,7 +681,7 @@ class Tension(Main):
         # else:
         #     existingvalue_key_platethk = ''
 
-        t16 = (KEY_MODULE, KEY_DISP_TENSION, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_TENSION_WELDED, TYPE_MODULE, None, None)
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
@@ -714,17 +714,17 @@ class Tension(Main):
         t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
         options_list.append(t7)
 
-        t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
-        options_list.append(t8)
-
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D)
-        options_list.append(t10)
-
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
-        options_list.append(t11)
-
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
-        options_list.append(t12)
+        # t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
+        # options_list.append(t8)
+        #
+        # t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D)
+        # options_list.append(t10)
+        #
+        # t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
+        # options_list.append(t11)
+        #
+        # t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
+        # options_list.append(t12)
 
         # t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None)
         # options_list.append(t13)
@@ -791,44 +791,44 @@ class Tension(Main):
                self.efficiency if flag else '')
         out_list.append(t7)
 
-        t8 = (None, DISP_TITLE_BOLT_CAPACITY, TYPE_TITLE, None)
+        t8 = (None, DISP_TITLE_WELD_CAPACITY, TYPE_TITLE, None)
         out_list.append(t8)
 
-        t9 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '')
+        t9 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.weld.size if flag else '')
         out_list.append(t9)
 
-        t10 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '')
+        t10 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, self.weld.strength if flag else '')
 
         out_list.append(t10)
 
-        t11 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag else '')
+        t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, self.weld.stress if flag else '')
         out_list.append(t11)
 
-        bolt_bearing_capacity_disp = ''
-        if flag is True:
-            if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
-                bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-                pass
-            else:
-                bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
+        # bolt_bearing_capacity_disp = ''
+        # if flag is True:
+        #     if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
+        #         bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+        #         pass
+        #     else:
+        #         bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
-        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '')
+        t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, self.weld.length if flag else '')
         out_list.append(t5)
 
-        t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '')
+        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, self.weld.effective if flag else '')
         out_list.append(t13)
 
-        t14 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_FORCE, TYPE_TEXTBOX, round(self.plate.bolt_force / 1000, 2) if flag else '')
-        out_list.append(t14)
-
-        t15 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if flag else '')
-        out_list.append(t15)
-
-        t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if flag else '')
-        out_list.append(t16)
-
-        t17 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
-        out_list.append(t17)
+        # t14 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_FORCE, TYPE_TEXTBOX, round(self.plate.bolt_force / 1000, 2) if flag else '')
+        # out_list.append(t14)
+        #
+        # t15 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if flag else '')
+        # out_list.append(t15)
+        #
+        # t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if flag else '')
+        # out_list.append(t16)
+        #
+        # t17 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
+        # out_list.append(t17)
 
         t18 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
         out_list.append(t18)
@@ -892,6 +892,7 @@ class Tension(Main):
     #                         pass
     #         else:
     #             pass
+
     # def func_for_validation(self, window, design_dictionary):
     #     self.design_status = False
     #     flag = False
@@ -1020,7 +1021,7 @@ class Tension(Main):
 
     def set_input_values(self, design_dictionary):
 
-        super(Tension,self).set_input_values(self, design_dictionary)
+        super(Tension_welded,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
@@ -1033,7 +1034,10 @@ class Tension(Main):
 
         self.plate = Plate(thickness=self.plate_thickness,
                            material_grade=design_dictionary[KEY_MATERIAL])
-        # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
+        self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],
+                         material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+                         fabrication=design_dictionary[KEY_DP_WELD_FAB])
+
         print("input values are set. Doing preliminary member checks")
         # self.i = 0
 
@@ -1256,7 +1260,7 @@ class Tension(Main):
         else:
             print("pass")
             self.design_status = True
-            self.select_bolt_dia(self, design_dictionary)
+            # self.select_bolt_dia(self, design_dictionary)
 
 
 

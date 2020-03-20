@@ -885,6 +885,7 @@ KEY_OUT_MIN_PITCH = 'Bolt.MinPitch'
 
 
 
+
 KEY_OUT_END_DIST = 'Bolt.EndDist'
 KEY_OUT_DISP_END_DIST = 'End Distance (mm)'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
@@ -899,6 +900,32 @@ KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
 
 
 KEY_OUT_DISP_EDGE_DIST = 'Edge Distance'
+
+
+KEY_OUT_SPTNG_BOLT_SHEAR = 'Cleat.Sptng_leg.Shear'
+KEY_OUT_SPTNG_BOLT_BEARING = 'Cleat.Sptng_leg.Bearing'
+KEY_OUT_SPTNG_BOLT_CAPACITY = 'Cleat.Sptng_leg.Capacity'
+KEY_OUT_SPTNG_BOLT_FORCE = 'Cleat.Sptng_leg.Force'
+KEY_OUT_SPTNG_BOLT_LINE = 'Cleat.Sptng_leg.Line'
+KEY_OUT_SPTNG_BOLTS_REQUIRED = 'Cleat.Sptng_leg.Required'
+
+KEY_OUT_SPTNG_BOLT_GRP_CAPACITY = 'Cleat.Sptng_leg.GroupCapacity'
+
+KEY_OUT_SPTNG_BOLTS_ONE_LINE = 'Cleat.Sptng_leg.OneLine'
+
+KEY_OUT_SPTNG_SPACING = 'Cleat.Sptng_leg.spacing'
+
+KEY_OUT_SPTNG_PITCH = 'Cleat.Sptng_leg.Pitch'
+
+KEY_OUT_SPTNG_MIN_PITCH = 'Cleat.Sptng_leg.MinPitch'
+KEY_OUT_SPTNG_END_DIST = 'Cleat.Sptng_leg.EndDist'
+KEY_OUT_SPTNG_GAUGE = 'Cleat.Sptng_leg.Gauge'
+KEY_OUT_SPTNG_MIN_GAUGE = 'Cleat.Sptng_leg.MinGauge'
+KEY_OUT_SPTNG_MAX_SPACING = 'Cleat.Sptng_leg.MaxGauge'
+KEY_OUT_SPTNG_EDGE_DIST = 'Cleat.Sptng_leg.EdgeDist'
+KEY_OUT_SPTNG_MIN_EDGE_DIST = 'Cleat.Sptng_leg.MinEdgeDist'
+KEY_OUT_SPTNG_MAX_EDGE_DIST = 'Cleat.Sptng_leg.MaxEdgeDist'
+
 
 
 KEY_OUT_PLATETHK = 'Plate.Thickness'
@@ -1008,13 +1035,24 @@ DISP_NUM_OF_ROWS = 'No of Rows'
 DISP_NUM_OF_COLUMNS = 'No of Columns'
 
 
-def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0):
+def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):
 
     available_angles = []
     for designation in input_angle_list:
-        leg_a_length,leg_b_length = get_leg_lengths(designation)
-        if operator.le(max(leg_a_length,leg_b_length),max_leg_length) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length):
+        leg_a_length,leg_b_length,t,r_r = get_leg_lengths(designation)
+        if position == "inner":
+            min_leg_length_outer = min_leg_length + t + r_r
+            max_leg_length_outer = max_leg_length + t + r_r
+        else:
+            min_leg_length_outer = min_leg_length
+            max_leg_length_outer = max_leg_length
+
+        print(min_leg_length,max_leg_length)
+        if operator.le(max(leg_a_length,leg_b_length),max_leg_length_outer) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length_outer) and leg_a_length==leg_b_length:
+            print("appended", designation)
             available_angles.append(designation)
+        else:
+            print("popped",designation)
     return available_angles
 
 
@@ -1024,17 +1062,19 @@ def get_leg_lengths(designation):
         Function to fetch designation values from respective Tables.
     """
     conn = sqlite3.connect(PATH_TO_DATABASE)
-    db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
+    db_query = "SELECT AXB, t, R1 FROM Angles WHERE Designation = ?"
     cur = conn.cursor()
     cur.execute(db_query, (designation,))
     row = cur.fetchone()
 
     axb = row[0]
+    t = row[1]
+    r_r = row[2]
     axb = axb.lower()
     leg_a_length = float(axb.split("x")[0])
     leg_b_length = float(axb.split("x")[1])
     conn.close()
-    return leg_a_length,leg_b_length
+    return leg_a_length,leg_b_length,t,r_r
 
 all_angles = connectdb("Angles","popup")
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)

@@ -1094,16 +1094,16 @@ class Ui_ModuleWindow(QMainWindow):
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
 
+
         if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
             add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
-        elif module in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_COLUMNENDPLATE]:
+        elif module == KEY_DISP_COLUMNCOVERPLATE:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
-
-        elif module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD:
+        elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
 
@@ -1224,13 +1224,10 @@ class Ui_ModuleWindow(QMainWindow):
         display = self.modelTab._display
 
         # background gradient
+        display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
+        # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
+        display.display_triedron()
 
-        display.set_bg_gradient_color(23, 1, 32,23, 1, 32)
-
-        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-
-        # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        display.display_trihedron()
         display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):
@@ -1271,7 +1268,7 @@ class Ui_ModuleWindow(QMainWindow):
         status = True
         if status is True:
             if self.fuse_model is None:
-                self.fuse_model = CommonDesignLogic.create2Dcad
+                self.fuse_model = CommonDesignLogic.create2Dcad(self.commLogicObj)
             shape = self.fuse_model
 
             files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
@@ -1693,6 +1690,10 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_column.setEnabled(True)
                 self.actionShow_finplate.setEnabled(True)
                 # image = main.generate_3D_Cad_image(main, self, self.folder)
+                fName = str('./ResourceFiles/images/3d.png')
+                file_extension = fName.split(".")[-1]
+                if file_extension == 'png':
+                    self.display.ExportToImage(fName)
 
             else:
                 self.btn3D.setEnabled(False)
@@ -1703,8 +1704,6 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_beam.setEnabled(False)
                 self.actionShow_column.setEnabled(False)
                 self.actionShow_finplate.setEnabled(False)
-
-
 
 
     def osdag_header(self):

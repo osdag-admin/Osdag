@@ -669,7 +669,7 @@ class Ui_ModuleWindow(QMainWindow):
                     continue
                 selected = key.currentText()
                 f = c_tup[1]
-                if c_tup[0] == KEY_SECSIZE and (module == KEY_DISP_COMPRESSION or module == KEY_DISP_TENSION):
+                if c_tup[0] == KEY_SECSIZE and (module in [KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]):
                     options = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText())
                     existing_options = data[c_tup[0] + "_customized"]
                     if selected == "Customized":

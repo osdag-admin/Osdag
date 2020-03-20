@@ -568,9 +568,9 @@ class BeamCoverPlateWeld(MomentConnection):
         #         length = self.supported_section.depth - 50.0  # TODO: Subtract notch height for beam-beam connection
 
         gamma_m0 = 1.1
-        self.axial_capacity = (0.3 * self.section.area  * self.section.fy) / gamma_m0 #N
-
-        self.factored_axial_load = min(self.load.axial_force * 1000, self.axial_capacity)  # N
+        self.axial_capacity = ( self.section.area  * self.section.fy) / gamma_m0 #N
+        self.axial_load =  0.3 *  self.axial_capacity
+        self.factored_axial_load = max(self.load.axial_force * 1000, self.axial_load)  # N
         print("self.factored_axial_load" ,self.factored_axial_load)
         # self.axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
         #     self.section.area)
@@ -878,24 +878,48 @@ class BeamCoverPlateWeld(MomentConnection):
 
             self.flange_plate_capacity_axial(self)
         else:
+            self.design_status = False
             logger.error(
                 " : Length of flange plate is less than height of the flange plate")
 
 
     def flange_plate_capacity_axial(self): # flange plate capacity check in axial
-        A_v_flange = self.flange_plate.thickness_provided * self.flange_plate.height
+        if  self.preference == "Outside":
+            A_v_flange = self.flange_plate.thickness_provided * self.flange_plate.height
 
-        self.tension_yielding_capacity_flange = self.tension_member_design_due_to_yielding_of_gross_section(
-            A_v=A_v_flange,
-            fy=self.flange_plate.fy)
-        self.tension_rupture_capacity_flange = self.tension_member_design_due_to_rupture_of_critical_section(
-            A_vn=A_v_flange, fu=self.flange_plate.fu)
-        self.flange_plate.tension_capacity_flange_plate = min(self.tension_yielding_capacity_flange,self.tension_rupture_capacity_flange)
-        if self.flange_plate.tension_capacity_flange_plate < self.flange_force:
-            logger.error(" : tension capacity flange is less than applied loads, Please select larger sections or decrease loads")
+            self.flange_plate.tension_yielding_capacity= self.tension_member_design_due_to_yielding_of_gross_section(
+                A_v=A_v_flange,fy=self.flange_plate.fy)
+            self.flange_plate.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
+                A_vn=A_v_flange, fu=self.flange_plate.fu)
+            self.flange_plate.tension_capacity_flange_plate = min(self.flange_plate.tension_yielding_capacity,self.flange_plate.tension_rupture_capacity)
+            if self.flange_plate.tension_capacity_flange_plate < self.flange_force:
+                self.design_status = False
+                logger.error(" : tension capacity flange plate is less than applied loads, Please select larger sections or decrease loads")
+            else:
+                self.web_plate_capacity_axial(self)
         else:
-            self.web_plate_capacity_axial(self)
+            #  yielding,rupture  for  inside flange plate
+            flange_plate_height_inside = (self.section.flange_width - self.section.web_thickness - (
+                        self.section.root_radius / 2)) / 2
+            flange_plate_height_outside = self.flange_plate.height
 
+            A_v_flange = ((2 * flange_plate_height_inside) + self.section.flange_width)* self.flange_plate.thickness_provided
+
+            self.flange_plate.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
+                A_v=A_v_flange,
+                fy=self.flange_plate.fy)
+
+            self.flange_plate.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
+                A_vn=A_v_flange ,
+                fu=self.flange_plate.fu)
+            self.flange_plate.tension_capacity_flange_plate = min( self.flange_plate.tension_yielding_capacity,
+                                                                  self.flange_plate.tension_rupture_capacity )
+            if self.flange_plate.tension_capacity_flange_plate < self.flange_force:
+                self.design_status = False
+                logger.error(
+                    " : Tension capacity flange plate is less than applied loads, Please select larger sections or decrease loads")
+            else:
+                self.web_plate_capacity_axial(self)
 
 
 
@@ -909,8 +933,28 @@ class BeamCoverPlateWeld(MomentConnection):
         self.web_plate.tension_capacity_web_plate = min(self.tension_yielding_capacity_web,
                                                               self.tension_rupture_capacity_web)
         if self.web_plate.tension_capacity_web_plate < self.axial_force_w:
+            self.design_status = False
             logger.error(
-                " : tension capacity flange is less than applied loads, Please select larger sections or decrease loads")
+                " : tension capacity web plate in axial is less than applied loads, Please select larger sections or decrease loads")
+
+        else:
+            self.cap_check_web_shear(self)
+
+    def cap_check_web_shear(self):
+        axial_force_w = ((self.section.depth - (
+                2 * self.section.flange_thickness)) * self.section.web_thickness * self.factored_axial_load) / (
+                            self.section.area)
+
+        A_vn_web = 2 * (self.available_long_web_length + self.web_weld.size) * self.web_plate.thickness_provided
+
+        self.web_plate.shear_yielding_capacity = self.shear_yielding(
+            A_v= A_vn_web , fy=self.web_plate.fy)
+        self.web_plate.shear_rupture_capacity = self.shear_rupture_(
+            A_vn=A_vn_web, fu=self.web_plate.fu)
+        self.web_plate.shear_capacity_web_plate = min(self.web_plate.shear_yielding_capacity ,self.web_plate.shear_rupture_capacity)
+        if self.web_plate.shear_capacity_web_plate < self.axial_force_w:
+            self.design_status = False
+            logger.error(" : Shear capacity web plate is less than applied loads, Please select larger sections or decrease loads")
         else:
             self.cap_check_web_axial(self)
 
@@ -959,7 +1003,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                                     self.section.block_shear_capacity)
             if self.section.tension_capacity_web < self.axial_force_w:
                 logger.error(
-                    " : tension capacity flange is less than applied loads, Please select larger sections or decrease loads")
+                    " : tension capacity web is less than applied loads, Please select larger sections or decrease loads")
             else:
                 pass
 

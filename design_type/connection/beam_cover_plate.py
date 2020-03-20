@@ -637,9 +637,10 @@ class BeamCoverPlate(MomentConnection):
         #         length = self.supported_section.depth - 50.0  # TODO: Subtract notch height for beam-beam connection
 
         gamma_m0 = 1.1
-        self.axial_capacity = (0.3 * self.section.area  * self.section.fy) / gamma_m0 #N
 
-        self.factored_axial_load = min(self.load.axial_force * 1000, self.axial_capacity)  # N
+        self.axial_capacity = (self.section.area * self.section.fy) / gamma_m0  # N
+        self.axial_load = 0.3 * self.axial_capacity
+        self.factored_axial_load = max(self.load.axial_force * 1000, self.axial_load)  # N
         print("self.factored_axial_load" ,self.factored_axial_load)
         # Shear Capacity  # N
 

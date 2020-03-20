@@ -128,8 +128,6 @@ class CreateLatex(Document):
                         table.add_row(MultiColumn(2, align='|c|', data=i), uiObj[i])
                         table.add_hline()
 
-
-
         with doc.create(Section('Design Checks')):
             with doc.create(LongTable('|l|p{5cm}|p{5cm}|l|')) as table:
                 table.add_hline()
@@ -141,7 +139,7 @@ class CreateLatex(Document):
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()
 
-        doc.generate_pdf(filename,clean_tex=False)
+        doc.generate_pdf(filename,compiler='pdflatex',clean_tex=False)
 
 # reportsummary = {}
 # reportsummary["ProfileSummary"] = {}

@@ -77,7 +77,6 @@ class Ui_Dialog(object):
 ######################################################################
 ####################################################################
 
-
 #START
 
         # tab_index = 0
@@ -1169,10 +1168,12 @@ class Ui_Dialog(object):
         self.retranslateUi(DesignPreferences)
         self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
-
         module = main.module_name(main)
 
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
+
+
+
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD,KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
             pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
@@ -1181,12 +1182,12 @@ class Ui_Dialog(object):
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
-        if module == KEY_DISP_COLUMNCOVERPLATE:
+        if module == KEY_DISP_COLUMNCOVERPLATE  and module == KEY_DISP_COLUMNCOVERPLATEWELD:
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
             pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
-        if module == KEY_DISP_BEAMCOVERPLATE:
+        if module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
             pushButton_Clear_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
@@ -1200,7 +1201,6 @@ class Ui_Dialog(object):
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
-
 
     def clear_tab(self, tab_name):
         '''
@@ -1384,7 +1384,6 @@ class Ui_Dialog(object):
                     Type = ch.currentText()
 
         if ch == tab_Beam.children()[len(tab_Beam.children())-1]:
-
             conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
@@ -1598,7 +1597,6 @@ class DesignPreferences(QDialog):
         '''
         @author: Umair
         '''
-
         tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         if designation == 'Select Section':
             self.ui.clear_tab("Column")

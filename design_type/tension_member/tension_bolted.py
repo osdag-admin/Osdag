@@ -891,7 +891,6 @@ class Tension_bolted(Main):
     #                         pass
     #         else:
     #             pass
-
     # def func_for_validation(self, window, design_dictionary):
     #     self.design_status = False
     #     flag = False
@@ -1186,7 +1185,7 @@ class Tension_bolted(Main):
                                                             area=self.section_size.area,
                                                             Cg_1=self.section_size.Cy, Cg_2=0,
                                                             thickness=0.0)
-
+                print(design_dictionary[KEY_SEC_PROFILE], design_dictionary[KEY_LOCATION], self.section_size.min_radius_gyration)
                 self.section_size.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],r=self.section_size.min_radius_gyration)
                     # print(self.section_size.tension_yielding_capacity)
 

@@ -721,7 +721,7 @@ class IS800_2007(object):
 
         """
         # f_u = min(ultimate_stresses)
-        f_wn = (f_u / math.sqrt(3))
+        f_wn = (float(f_u[0]) / math.sqrt(3))
         gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][fabrication]
         f_wd = f_wn / gamma_mw
         return f_wd

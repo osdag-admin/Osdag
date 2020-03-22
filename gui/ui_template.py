@@ -1169,7 +1169,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
         # self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
         # self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
-        self.btn_Design.clicked.connect(self.osdag_header)
+        # self.btn_Design.clicked.connect(self.osdag_header)
         self.actionShow_beam.triggered.connect(lambda: main.call_3DBeam(self,"gradient_bg"))
         self.actionShow_column.triggered.connect(lambda: main.call_3DColumn(self,"gradient_bg"))
         self.actionShow_finplate.triggered.connect(lambda: main.call_3DFinplate(self,"gradient_bg"))
@@ -1530,7 +1530,7 @@ class Ui_ModuleWindow(QMainWindow):
     '''
     def saveDesign_inputs(self):
         fileName, _ = QFileDialog.getSaveFileName(self,
-                                                  "Save Design", os.path.join(' ', "untitled.osi"),
+                                                  "Save Design", os.path.join(self.folder, "untitled.osi"),
                                                   "Input Files(*.osi)")
         if not fileName:
             return
@@ -1564,7 +1564,7 @@ class Ui_ModuleWindow(QMainWindow):
     '''
 
     def loadDesign_inputs(self, op_list, data, new, main):
-        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(' '), ''), "InputFiles(*.osi)")
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(self.folder)), "InputFiles(*.osi)")
         if not fileName:
             return
         try:

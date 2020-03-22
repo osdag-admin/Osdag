@@ -7,7 +7,7 @@
 @Module - Base Plate Connection
            - Pinned Base Plate [Axial + Shear]
            - Gusseted Base Plate [Moment (major and minor axis) + Axial + Shear]
-           - Base Plate with Cleat Angle
+           - Base Plate with Cleat Angle [Moment (major and minor axis) + Axial + Shear]
 
 
 @Reference(s): 1) IS 800: 2007, General construction in steel - Code of practice (Third revision)
@@ -103,7 +103,7 @@ class BasePlateConnection(MomentConnection):
 
     def input_values(self, existingvalues={}):
         """
-        Return a-list of tuple, used to create the Input Dock U.I in Osdag design window.
+        Return a-list of tuple, used to create the Base Plate input dock U.I in Osdag design window.
         """
         self.module = KEY_DISP_BASE_PLATE
 

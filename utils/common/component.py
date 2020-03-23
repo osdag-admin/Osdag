@@ -641,7 +641,7 @@ class Weld(Material):
         V_wv = weld_shear*1000/l_weld
         A_wh = weld_axial*1000/l_weld
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
-        return weld_stress
+        self.stress = weld_stress
 
     def weld_size(self, plate_thickness, member_thickness):
 

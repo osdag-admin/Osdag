@@ -1216,7 +1216,7 @@ class Tension_bolted(Main):
                         self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
                                                                    r=self.section_size_1.min_radius_gyration)
 
-                    elif min_yield_current <= min_yield:
+                    elif min_yield_current < min_yield:
                         min_yield = min_yield_current
                         self.section_size_1 = self.select_section(self, design_dictionary, selectedsize)
                         self.section_size_1.tension_member_yielding(A_g=self.cross_area, F_y=self.section_size.fy)
@@ -1273,6 +1273,7 @@ class Tension_bolted(Main):
         return lst[min(range(len(lst)), key=lambda i: abs(lst[i] - K))]
 
     def select_bolt_dia(self,design_dictionary):
+        print ("bolt")
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             self.min_plate_height = self.section_size_1.min_plate_height()
             self.max_plate_height = self.section_size_1.max_plate_height()
@@ -1617,6 +1618,16 @@ class Tension_bolted(Main):
             self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
 
             if self.plate_tension_capacity > self.load.axial_force:
+                # self.bolt_conn_plates_t_fu_fy = []
+                # self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+                # self.bolt_conn_plates_t_fu_fy.append(
+                #     (self.thick, self.section_size_1.fu, self.section_size_1.fy))
+                #
+                # self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                #                                   bolt_grade_provided=self.bolt.bolt_grade_provided,
+                #                                   conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                #                                   n_planes=1)
+
                 self.design_status = True
                 break
             elif (self.plate_tension_capacity < self.load.axial_force) and self.plate.thickness_provided == self.plate_last:
@@ -1650,7 +1661,7 @@ class Tension_bolted(Main):
     #         A_tg: Minimum gross area in tension from the bolt hole to the toe of the angle,
     #                        end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
     #         A_tn: Minimum net area in tension from the bolt hole to the toe of the angle,
-    #                        end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+    #                        end bolt lin e, perpendicular to the line of force, respectively [in sq. mm] (float)
     #         f_u: Ultimate stress of the plate material in MPa (float)
     #         f_y: Yield stress of the plate material in MPa (float)
     #

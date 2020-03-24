@@ -1492,6 +1492,8 @@ class DesignPreferences(QDialog):
 
         key_boltHoleType = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_HOLE_TYPE)
         combo_boltHoleType = key_boltHoleType.currentText()
+        key_boltTensioning = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_TYPE)
+        combo_boltTensioning = key_boltTensioning.currentText()
         key_boltFu = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O)
         line_boltFu = key_boltFu.text()
         key_slipfactor = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_SLIP_FACTOR)
@@ -1515,6 +1517,7 @@ class DesignPreferences(QDialog):
         key_plate_material_fy = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY)
         line_plate_material_fy = key_plate_material_fy.text()
         d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+              KEY_DP_BOLT_TYPE: combo_boltTensioning,
               KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
               KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
               KEY_DP_WELD_FAB: combo_weldType,

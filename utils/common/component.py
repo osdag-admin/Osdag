@@ -13,7 +13,7 @@ from utils.common.common_calculation import *
 class Bolt(Material):
 
     def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="",
-                 edge_type="", mu_f=0.0, corrosive_influences=True):
+                 edge_type="", mu_f=0.0, corrosive_influences=True, bolt_tensioning=""):
         super(Bolt, self).__init__(material_grade)
         if grade is not None:
             self.bolt_grade = list(np.float_(grade))
@@ -26,6 +26,7 @@ class Bolt(Material):
         self.bolt_hole_type = bolt_hole_type
         self.edge_type = edge_type
         self.mu_f = float(mu_f)
+        self.bolt_tensioning = bolt_tensioning
 
         self.d_0 = 0.0
         self.kb = 0.0

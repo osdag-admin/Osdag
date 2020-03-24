@@ -585,6 +585,10 @@ class BeamCoverPlateWeld(MomentConnection):
         # Shear Capacity  # N
 
 
+
+        # design_shear_capacity = (self.section.depth* self.section.web_thickness * self.section.fy) / (
+
+
         design_shear_capacity = (self.section.depth* self.section.web_thickness * self.section.fy) / (
                 math.sqrt(3) * gamma_m0)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
         if self.load.shear_force * 1000 >= design_shear_capacity:

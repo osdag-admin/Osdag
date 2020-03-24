@@ -1677,9 +1677,9 @@ class Ui_ModuleWindow(QMainWindow):
 
 
             if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_COLUMNCOVERPLATE or main.module == KEY_DISP_CLEATANGLE):
-                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
-                status = main.design_status
-                self.commLogicObj.call_3DModel(status)
+                # self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
+                # status = main.design_status
+                # self.commLogicObj.call_3DModel(status, CleatAngleConnection)
                 # self.callFin2D_Drawing("All")
                 self.btn3D.setEnabled(True)
                 self.chkBxBeam.setEnabled(True)

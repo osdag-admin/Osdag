@@ -633,7 +633,7 @@ class Weld(Material):
             IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness\
                 (t_weld, weld_angle)
         weld_strength = f_wd * throat_tk
-        return weld_strength
+        self.strength = weld_strength
 
     def get_weld_stress(self,weld_shear, weld_axial, weld_twist, Ip_weld, y_max, x_max, l_weld):
         T_wh = weld_twist * y_max/Ip_weld
@@ -641,7 +641,7 @@ class Weld(Material):
         V_wv = weld_shear/l_weld
         A_wh = weld_axial/l_weld
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
-        return weld_stress
+        self.stress = weld_stress
 
 
 class Plate(Material):

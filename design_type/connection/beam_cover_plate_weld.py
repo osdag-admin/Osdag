@@ -796,12 +796,14 @@ class BeamCoverPlateWeld(MomentConnection):
                                                          weld_twist= self.weld_twist, Ip_weld= Ip_weld, y_max=y_max, x_max = x_max, l_weld=  self.available_long_web_length )
 
 
+
             if self.web_weld.strength > self.web_weld.stress :
                 break
             else:
                 self.available_long_web_length =  self.available_long_web_length + 20
 
-        if  self.web_weld.strength   > self.web_weld.stress :
+
+        if  self.web_weld.strength   > self.web_weld.stress:
             self.design_status = True
             self.web_weld.length =round_up(((2 * self.available_long_web_length) + self.web_plate.gap),5)
             self.web_plate.length =round_up((self.web_weld.length + (2 * self.web_weld.size)),5)
@@ -842,6 +844,7 @@ class BeamCoverPlateWeld(MomentConnection):
             self.section.area)
         self.flange_force = (((self.moment_flange * 1000000) / (self.section.depth - self.section.flange_thickness)) + (
             self.axial_force_f))  # todo added web moment -add in ddcl
+
 
 
         self.flange_weld.get_weld_strength(connecting_fu=[self.flange_weld.fu,self.section.fu,self.flange_plate.fu],

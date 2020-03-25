@@ -7,7 +7,7 @@ from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from design_report.reportGenerator_latex import CreateLatex
 from utils.common.component import *
-# from cad.common_logic import CommonDesignLogic
+from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
@@ -425,7 +425,7 @@ class FinPlateConnection(ShearConnection):
             flag = True
 
         if flag and flag1 and flag2:
-            self.set_input_values(self, design_dictionary)
+            self.set_input_values(self, design_dictionary, window)
         else:
             pass
 
@@ -444,7 +444,7 @@ class FinPlateConnection(ShearConnection):
             logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
-    def set_input_values(self, design_dictionary):
+    def set_input_values(self, design_dictionary, window):
 
         print(design_dictionary)
 
@@ -459,6 +459,11 @@ class FinPlateConnection(ShearConnection):
         self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],fabrication = design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
+
+        if self.design_status:
+            self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
+            status = self.design_status
+            self.commLogicObj.call_3DModel(status, FinPlateConnection)
 
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)

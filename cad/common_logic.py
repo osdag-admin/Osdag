@@ -654,9 +654,9 @@ class CommonDesignLogic(object):
 
         if bgcolor == "gradient_bg":
 
-            self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+            self.display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
         else:
-            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+            self.display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
 
         if self.mainmodule  == "Shear Connection":
 

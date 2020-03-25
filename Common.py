@@ -293,7 +293,8 @@ KEY_DISP_COLUMNCOVERPLATEWELD = 'Column Coverplate Weld Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
 
-KEY_DISP_TENSION = 'Tension Members Design'
+KEY_DISP_TENSION_BOLTED = 'Tension Members Bolted Design'
+KEY_DISP_TENSION_WELDED = 'Tension Members Welded Design'
 KEY_DISP_COMPRESSION = 'Compression Member'
 
 
@@ -388,6 +389,10 @@ KEY_DISP_AXIAL = 'Axial (kN) *'
 
 DISP_TITLE_BOLT = 'Bolt'
 DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
+
+DISP_TITLE_WELD = 'Weld'
+DISP_TITLE_WELD_CAPACITY = 'Weld Capacity'
+
 
 DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
@@ -487,10 +492,10 @@ KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 KEY_FLANGE_CAPACITY ="Flange_plate.capacity"
 KEY_DISP_FLANGE_CAPACITY= 'Capacity'
 KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
-KEY_DISP_FLANGE_TEN_CAPACITY ="Flange ten cap"
+KEY_DISP_FLANGE_TEN_CAPACITY ="Tension capacity"
 
 KEY_FLANGE_PLATE_TEN_CAP ="Flange_plate.tension_capacity"
-KEY_DISP_FLANGE_PLATE_TEN_CAP ="Flange plate ten cap"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension cap"
 
 
 KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
@@ -537,6 +542,9 @@ KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
 KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 
 
+KEY_FLANGE_WELD_DETAILS = "Flange detail"
+KEY_DISP_FLANGE_WELD_DETAILS = "Weld Details"
+
 KEY_WELD_TYPE = 'Weld.Type'
 KEY_DISP_WELD_TYPE ='Weld Type'
 VALUES_WELD_TYPE = ["select type","Fillet Weld"]
@@ -548,7 +556,10 @@ KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
 KEY_FLANGE_WELD_STRESS = 'Flange_Weld.Stress'
 KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
 KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
+KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
+KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
+KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
@@ -576,11 +587,11 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance'
 KEY_WEB_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_CAPACITY= 'Capacity'
 KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
-KEY_DISP_WEB_TEN_CAPACITY ="Web tension capacity"
+KEY_DISP_WEB_TEN_CAPACITY ="Tension Capacity"
 KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
-KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Web plate shear cap"
+KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Plate Shear Capacity"
 KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
-KEY_DISP_TEN_CAP_WEB_PLATE ="Web_plate tension_capacity_"
+KEY_DISP_TEN_CAP_WEB_PLATE ="Plate Tension Capacity"
 
 
 KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'
@@ -604,6 +615,8 @@ KEY_WEB_DISP_BOLTS_REQ = "Web Bolt Required"
 KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
 KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in web'
 
+KEY_WEB_WELD_DETAILS = "Web detail"
+KEY_DISP_WEB_WELD_DETAILS = "Weld Details"
 DISP_WEB_TITLE_WELD = 'Web Weld'
 KEY_WEB_WELD_SIZE = 'Web_Weld.Size'
 KEY_WEB_DISP_WELD_SIZE = 'Web Weld Size(mm)'
@@ -612,7 +625,10 @@ KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength(N/mm)'
 KEY_WEB_WELD_STRESS = 'Web_Weld.Stress'
 KEY_WEB_DISP_WELD_STRESS = 'Web Weld Stress(N/mm)'
 KEY_WEB_WELD_LENGTH = 'Web_Weld.Length'
+KEY_DISP_WEB_WELD_LENGTH = 'Web Weld Length'
 KEY_WEB_WELD_LENGTH_EFF = 'Web_Weld.EffLength'
+KEY_WEB_WELD_HEIGHT ='Web_Weld.height'
+KEY_DISP_WEB_WELD_HEIGHT = 'Web Weld Height'
 
 
 DISP_TITLE_ENDPLATE = 'End plate'
@@ -876,6 +892,7 @@ KEY_OUT_MIN_PITCH = 'Bolt.MinPitch'
 
 
 
+
 KEY_OUT_END_DIST = 'Bolt.EndDist'
 KEY_OUT_DISP_END_DIST = 'End Distance (mm)'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
@@ -890,6 +907,32 @@ KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
 
 
 KEY_OUT_DISP_EDGE_DIST = 'Edge Distance'
+
+
+KEY_OUT_SPTNG_BOLT_SHEAR = 'Cleat.Sptng_leg.Shear'
+KEY_OUT_SPTNG_BOLT_BEARING = 'Cleat.Sptng_leg.Bearing'
+KEY_OUT_SPTNG_BOLT_CAPACITY = 'Cleat.Sptng_leg.Capacity'
+KEY_OUT_SPTNG_BOLT_FORCE = 'Cleat.Sptng_leg.Force'
+KEY_OUT_SPTNG_BOLT_LINE = 'Cleat.Sptng_leg.Line'
+KEY_OUT_SPTNG_BOLTS_REQUIRED = 'Cleat.Sptng_leg.Required'
+
+KEY_OUT_SPTNG_BOLT_GRP_CAPACITY = 'Cleat.Sptng_leg.GroupCapacity'
+
+KEY_OUT_SPTNG_BOLTS_ONE_LINE = 'Cleat.Sptng_leg.OneLine'
+
+KEY_OUT_SPTNG_SPACING = 'Cleat.Sptng_leg.spacing'
+
+KEY_OUT_SPTNG_PITCH = 'Cleat.Sptng_leg.Pitch'
+
+KEY_OUT_SPTNG_MIN_PITCH = 'Cleat.Sptng_leg.MinPitch'
+KEY_OUT_SPTNG_END_DIST = 'Cleat.Sptng_leg.EndDist'
+KEY_OUT_SPTNG_GAUGE = 'Cleat.Sptng_leg.Gauge'
+KEY_OUT_SPTNG_MIN_GAUGE = 'Cleat.Sptng_leg.MinGauge'
+KEY_OUT_SPTNG_MAX_SPACING = 'Cleat.Sptng_leg.MaxGauge'
+KEY_OUT_SPTNG_EDGE_DIST = 'Cleat.Sptng_leg.EdgeDist'
+KEY_OUT_SPTNG_MIN_EDGE_DIST = 'Cleat.Sptng_leg.MinEdgeDist'
+KEY_OUT_SPTNG_MAX_EDGE_DIST = 'Cleat.Sptng_leg.MaxEdgeDist'
+
 
 
 KEY_OUT_PLATETHK = 'Plate.Thickness'
@@ -921,7 +964,9 @@ KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
 KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
 KEY_OUT_WELD_LENGTH = 'Weld.Length'
+KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
 KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
+KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"
@@ -1001,13 +1046,24 @@ DISP_NUM_OF_ROWS = 'No of Rows'
 DISP_NUM_OF_COLUMNS = 'No of Columns'
 
 
-def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0):
+def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):
 
     available_angles = []
     for designation in input_angle_list:
-        leg_a_length,leg_b_length = get_leg_lengths(designation)
-        if operator.le(max(leg_a_length,leg_b_length),max_leg_length) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length):
+        leg_a_length,leg_b_length,t,r_r = get_leg_lengths(designation)
+        if position == "inner":
+            min_leg_length_outer = min_leg_length + t + r_r
+            max_leg_length_outer = max_leg_length + t + r_r
+        else:
+            min_leg_length_outer = min_leg_length
+            max_leg_length_outer = max_leg_length
+
+        print(min_leg_length,max_leg_length)
+        if operator.le(max(leg_a_length,leg_b_length),max_leg_length_outer) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length_outer) and leg_a_length==leg_b_length:
+            print("appended", designation)
             available_angles.append(designation)
+        else:
+            print("popped",designation)
     return available_angles
 
 
@@ -1017,17 +1073,19 @@ def get_leg_lengths(designation):
         Function to fetch designation values from respective Tables.
     """
     conn = sqlite3.connect(PATH_TO_DATABASE)
-    db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
+    db_query = "SELECT AXB, t, R1 FROM Angles WHERE Designation = ?"
     cur = conn.cursor()
     cur.execute(db_query, (designation,))
     row = cur.fetchone()
 
     axb = row[0]
+    t = row[1]
+    r_r = row[2]
     axb = axb.lower()
     leg_a_length = float(axb.split("x")[0])
     leg_b_length = float(axb.split("x")[1])
     conn.close()
-    return leg_a_length,leg_b_length
+    return leg_a_length,leg_b_length,t,r_r
 
 all_angles = connectdb("Angles","popup")
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)

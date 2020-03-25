@@ -255,26 +255,26 @@ class IS_5624_1993(object):
 
         Args: anchor_dia (str) - Diameter of the anchor bolt
 
-        Returns: anchor_length (int) - Length of the anchor bolt in mm
+        Returns: anchor_length (int) - Range of length for the anchor bolt in mm
 
         Note: The length of the anchor bolt is decided based on the range suggested by Table 1 of IS 5624:1993.
         The maximum value from this range is used in design calculation.
 
         """
         anchor_length = {
-            'M8': 200,
-            'M10': 250,
-            'M12': 320,
-            'M16': 500,
-            'M20': 800,
-            'M24': 1250,
-            'M30': 2000,
-            'M36': 2500,
-            'M42': 2500,
-            'M48': 3200,
-            'M56': 3200,
-            'M64': 3200,
-            'M72': 3200,
+            'M8': {'min_len': 80, 'max_len': 200},
+            'M10': {'min_len': 100, 'max_len': 250},
+            'M12': {'min_len': 125, 'max_len': 320},
+            'M16': {'min_len': 160, 'max_len': 500},
+            'M20': {'min_len': 200, 'max_len': 800},
+            'M24': {'min_len': 250, 'max_len': 1250},
+            'M30': {'min_len': 320, 'max_len': 2000},
+            'M36': {'min_len': 400, 'max_len': 2500},
+            'M42': {'min_len': 400, 'max_len': 2500},
+            'M48': {'min_len': 630, 'max_len': 3200},
+            'M56': {'min_len': 800, 'max_len': 3200},
+            'M64': {'min_len': 1000, 'max_len': 3200},
+            'M72': {'min_len': 1000, 'max_len': 3200},
         }[str(anchor_dia)]
 
         return anchor_length

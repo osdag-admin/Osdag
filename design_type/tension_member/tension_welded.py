@@ -1297,7 +1297,7 @@ class Tension_welded(Main):
 
         self.weld.weld_size(plate_thickness = self.plate.thickness_provided, member_thickness= self.thick)
 
-        self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.load.axial_force*1000))
+        self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.load.axial_force))
         if design_dictionary[KEY_SEC_PROFILE] == "Channels":
             web_weld = self.section_size_1.depth - 2 * self.weld.size
             flange_weld = round_up(((self.weld.effective - web_weld)/2),5,50)
@@ -1341,13 +1341,13 @@ class Tension_welded(Main):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(t_weld, weld_angle)
         weld_strength = f_wd * throat_tk
-        L_eff = round_up((force/weld_strength),5,100)
+        L_eff = round_up((force*1000/weld_strength),5,100)
         Btw = IS800_2007.cl_10_5_7_3_weld_long_joint(L_eff, throat_tk)
         if L_eff > 150 * throat_tk:
             f_wd = Btw * f_wd
             throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(t_weld, weld_angle)
             weld_strength = f_wd * throat_tk
-            L_eff = round_up((force / weld_strength), 5, 100)
+            L_eff = round_up((force*1000 / weld_strength), 5, 100)
         else:
             pass
 

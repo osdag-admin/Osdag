@@ -763,7 +763,7 @@ class BeamCoverPlateWeld(MomentConnection):
         else:
             pass
 
-        self.design_strength_web_weld = self.web_weld.get_weld_strength(connecting_fu=self.web_weld.fu,
+        self.design_strength_web_weld = self.web_weld.get_weld_strength(connecting_fu=[self.web_weld.fu,self.section.fu,self.web_plate.fu],
                                                                         weld_fabrication=KEY_DP_WELD_FAB_SHOP,
                                                                         t_weld=self.web_weld.size, weld_angle=90)
         self.web_weld.strength =(self.design_strength_web_weld)
@@ -791,15 +791,15 @@ class BeamCoverPlateWeld(MomentConnection):
             Ip_weld = (8 * d ** 3 + 6 * d * b ** 2 + b ** 3) / 12 - d ** 4 / (2 * d + b)
             self.weld_twist = (self.factored_axial_load * self.ecc) +self.moment_web
             # print("self.web_weld_length",self.web_weld_length )
-            self.V_rest = self.web_weld.get_weld_stress( weld_shear=self.factored_axial_load, weld_axial =self.axial_force_w ,
+            self.web_weld.get_weld_stress( weld_shear=self.factored_axial_load, weld_axial =self.axial_force_w ,
                                                          weld_twist= self.weld_twist, Ip_weld= Ip_weld, y_max=y_max, x_max = x_max, l_weld=  self.available_long_web_length )
 
-            if self.design_strength_web_weld  > self.V_rest :
+            if self.design_strength_web_weld  > (self.web_weld.stress/1000):
                 break
             else:
                 self.available_long_web_length =  self.available_long_web_length + 20
 
-        if  self.design_strength_web_weld  > self.V_rest :
+        if  self.design_strength_web_weld  > (self.web_weld.stress/1000):
             self.design_status = True
             self.web_weld.length =round_up(((2 * self.available_long_web_length) + self.web_plate.gap),5)
             self.web_plate.length =round_up((self.web_weld.length + (2 * self.web_weld.size)),5)
@@ -842,7 +842,7 @@ class BeamCoverPlateWeld(MomentConnection):
             self.axial_force_f))  # todo added web moment -add in ddcl
 
 
-        self.design_strength_flange_weld = self.flange_weld.get_weld_strength(connecting_fu=self.flange_weld.fu,
+        self.design_strength_flange_weld = self.flange_weld.get_weld_strength(connecting_fu=[self.flange_weld.fu,self.section.fu,self.flange_plate.fu],
                                                                               weld_fabrication=KEY_DP_WELD_FAB_SHOP,
                                                                               t_weld=self.flange_weld.size,
                                                                               weld_angle=90)

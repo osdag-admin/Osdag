@@ -379,7 +379,7 @@ class Section(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-        beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / 0.9*float(F_u) * float(b_s) / float(L_c)))
+        beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9*float(F_u))* float(b_s) / float(L_c)))
         print(beta)
 
         if beta <= (F_u * gamma_m0 / F_y * gamma_m1) and beta >= 0.7:
@@ -638,7 +638,7 @@ class Weld(Material):
     def get_weld_stress(self,weld_shear =0.0, weld_axial=0.0, weld_twist=0.0, Ip_weld=1.0, y_max=0.0, x_max=0.0, l_weld=0.0):
         T_wh = weld_twist * y_max/Ip_weld
         T_wv = weld_twist * x_max/Ip_weld
-        V_wv = weld_shear*1000/l_weld
+        V_wv = weld_shear*1000 /l_weld
         A_wh = weld_axial*1000/l_weld
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
         self.stress = weld_stress
@@ -646,7 +646,7 @@ class Weld(Material):
     def weld_size(self, plate_thickness, member_thickness):
 
         max_weld_thickness = int(min(plate_thickness, member_thickness))
-        weld_thickness = round_up((max_weld_thickness-2),1,3)
+        weld_thickness = round_down((max_weld_thickness-1.5),1,3)
         if weld_thickness> 16 :
             weld_thickness =16
         else:

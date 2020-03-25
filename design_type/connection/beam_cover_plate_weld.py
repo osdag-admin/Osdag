@@ -795,6 +795,7 @@ class BeamCoverPlateWeld(MomentConnection):
             self.web_weld.get_weld_stress( weld_shear=self.factored_axial_load, weld_axial =self.axial_force_w ,
                                                          weld_twist= self.weld_twist, Ip_weld= Ip_weld, y_max=y_max, x_max = x_max, l_weld=  self.available_long_web_length )
 
+            # if self.web_weld.strength > self.web_weld.stress:
 
             if self.web_weld.strength > self.web_weld.stress :
                 break

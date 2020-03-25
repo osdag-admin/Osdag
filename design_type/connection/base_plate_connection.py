@@ -5,9 +5,9 @@
 
 
 @Module - Base Plate Connection
-           - Pinned Base Plate [Axial + Shear]
+           - Pinned Base Plate (welded and bolted) [Axial + Shear]
            - Gusseted Base Plate [Moment (major and minor axis) + Axial + Shear]
-           - Base Plate with Cleat Angle [Moment (major and minor axis) + Axial + Shear]
+           - Base Plate for hollow sections [Moment (major and minor axis) + Axial + Shear]
 
 
 @Reference(s): 1) IS 800: 2007, General construction in steel - Code of practice (Third revision)
@@ -63,14 +63,59 @@ class BasePlateConnection(MomentConnection):
     """
 
     def __init__(self):
-        """
-        Initialize all attributes.
-        """
+        """Initialize all attributes."""
         super(BasePlateConnection, self).__init__()
-        self.gamma_mb = 0.0
+
+        # attributes for input dock UI
+        self.connectivity = ""
+        self.end_condition = ""
+        self.column_section = ""
+        self.material = ""
+
+        self.load_axial = 0.0
+        self.load_shear = 0.0
+        self.load_moment_major = 0.0
+        self.load_moment_minor = 0.0
+
+        self.anchor_dia = 1
+        self.anchor_type = ""
+
+        self.footing_grade = 0.0
+
+        # attributes for design preferences
+        self.dp_column_designation = ""
+        self.dp_column_type = ""
+        self.dp_column_source = ""
+        self.dp_column_material = ""
+        self.dp_column_fu = 0.0
+        self.dp_column_fy = 0.0
+
+        self.dp_bp_material = ""
+        self.dp_bp_fu = 0.0
+        self.dp_bp_fy = 0.0
+
+        self.dp_anchor_designation = ""
+        self.dp_anchor_type = ""
+        self.dp_anchor_hole = "Standard"
+        self.dp_anchor_fu_overwrite = 0.0
+        self.dp_anchor_friction = 0.0
+
+        self.dp_weld_fab = "Shop Weld"
+        self.dp_weld_fu_overwrite = 0.0
+
+        self.dp_detail_edge_type = "b - Machine flame cut"
+        self.dp_detail_is_corrosive = "No"
+
+        self.dp_design_method = "Limit State Design"
+        self.dp_bp_method = "Effective Area Method"
+
+        # other attributes
         self.gamma_m0 = 0.0
         self.gamma_m1 = 0.0
+        self.gamma_mb = 0.0
+        self.gamma_mw = 0.0
 
+        self.safe = True
 
     def set_osdaglogger(key):
         """
@@ -325,6 +370,19 @@ class BasePlateConnection(MomentConnection):
         tabs.append(t5)
 
         return tabs
+
+# Start calculation
+
+    def bp_parameters(self):
+        """ Initialize variables to use in calculation from input dock and design preference UI.
+
+        Args:
+
+        Returns:
+            None
+
+        """
+
 
 
 

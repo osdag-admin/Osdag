@@ -107,7 +107,7 @@ def connectdb2():
     return l2
 
 
-def connectdb(table_name,call_type="dropdown"):
+def connectdb(table_name, call_type="dropdown"):
 
     """
         Function to fetch designation values from respective Tables.

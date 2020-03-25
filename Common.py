@@ -524,6 +524,10 @@ KEY_DISP_EFFICIENCY = "Efficiency"
 
 DISP_TITLE_BOLTDETAILS ='Bolt Details'
 KEY_BOLT_DETAILS ="Bolt.Details"
+
+DISP_TITLE_BOLT_CAPACITIES = 'Bolt Capacities'
+KEY_BOLT_CAPACITIES = 'Bolt.Capacities'
+
 KEY_DISP_BOLT_DETAILS = "Bolt Details"
 KEY_FLANGE_BOLT_LINE = 'Flange_plate.Bolt_Line'
 KEY_FLANGE_DISP_BOLT_LINE = 'Bolt Lines in flange'
@@ -894,7 +898,9 @@ KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_PLATE_HEIGHT = 'Height (mm)'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
+KEY_OUT_PLATE_WIDTH = 'Plate.Width'
 KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
+c = 'Width (mm)'
 KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity'
 KEY_OUT_PLATE_BLK_SHEAR = 'Plate.BlockShear'

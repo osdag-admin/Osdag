@@ -18,8 +18,6 @@ class ColumnEndPlate(MomentConnection):
         """
         Function to set Logger for FinPlate Module
         """
-
-        # @author Arsil Zunzunia
         global logger
         logger = logging.getLogger('osdag')
 
@@ -177,17 +175,31 @@ class ColumnEndPlate(MomentConnection):
         t8 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
         plate_details.append(t8)
 
-        t9 = (KEY_ENDDIST_W, KEY_DISP_END_DIST_W, TYPE_TEXTBOX,
-              self.web_plate.end_dist_provided if flag else '')
+        t9 = (KEY_OUT_PLATE_WIDTH, KEY_OUT_DISP_PLATE_WIDTH, TYPE_TEXTBOX,self.plate.length if flag else '')
         plate_details.append(t9)
 
-        t10 = (KEY_WEB_GAUGE, KEY_DISP_WEB_PLATE_GAUGE, TYPE_TEXTBOX, self.web_plate.gauge_provided if flag else '')
+        t10 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness if flag else '')
         plate_details.append(t10)
 
-        t11 = (KEY_EDGEDIST_W, KEY_DISP_EDGEDIST_W, TYPE_TEXTBOX,
-               self.web_plate.edge_dist_provided if flag else '')
-        plate_details.append(t11)
         return plate_details
+
+    def output_values(self, flag):
+
+        out_list = []
+
+        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+        out_list.append(t1)
+
+        t2 = (KEY_D, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,self.bolt.bolt_diameter_provided if flag else '')
+        out_list.append(t2)
+
+        t3 = (KEY_GRD, KEY_DISP_GRD, TYPE_TEXTBOX,self.bolt.bolt_grade_provided if flag else '')
+        out_list.append(t3)
+
+        t4 = (None, DISP_TITLE_BOLT_CAPACITIES, TYPE_TITLE, None)
+        out_list.append(t4)
+
+       
 
     def set_input_values(self, design_dictionary):
 
@@ -195,14 +207,32 @@ class ColumnEndPlate(MomentConnection):
 
         super(ColumnEndPlate, self).set_input_values(self, design_dictionary)
 
+        self.section = Column(designation=design_dictionary[KEY_SECSIZE],
+                              material_grade=design_dictionary[KEY_MATERIAL])
+
         self.start_time = time.time()
 
         self.module = design_dictionary[KEY_MODULE]
 
-        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-                           material_grade=design_dictionary[KEY_PLATE_MATERIAL])
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None), material_grade=design_dictionary[KEY_PLATE_MATERIAL])
+        self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
+                         bolt_type=design_dictionary[KEY_TYP], material_grade=design_dictionary[KEY_MATERIAL],
+                         bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
+                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
+                         mu_f=design_dictionary[KEY_DP_BOLT_SLIP_FACTOR],
+                         corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
 
-        def hard_values(self):
+    def detailing(self):
+        self.n_bw = ((self.section.depth -(2 * self.section.flange_thickness - (2 * self.plate.end_dist_provided))) / self.plate.pitch_provided) + 1
+        self.n_bf = ((self.section.flange_width/2) - (self.section.web_thickness/2) - (2 * self.plate.end_dist_provided) / self.plate.pitch_provided) + 1
+        if self.n_bw % 2 == 0:
+            self.p_2 = self.section.depth - (2 * self.section.flange_thickness) - (2 * self.plate.end_dist_provided) - ((self.n_bw - 2) * self.plate.pitch_provided)
+        else:
+            self.p_2 = self.section.depth - (2 * self.section.flange_thickness) - (2 * self.plate.end_dist_provided) - ((self.n_bw - 3) * self.plate.pitch_provided)
+
+        self.x = (self.section.flange_width/2) - (self.section.web_thickness/2) - self.plate.end_dist_provided - (self.n_bf * self.plate.pitch_provided)
+
+    def hard_values(self):
             # flange bolt
             self.load.moment = 20  # kN
             self.factored_axial_load = 300  # KN

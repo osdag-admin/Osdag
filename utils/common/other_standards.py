@@ -6,10 +6,11 @@ Included standards,
     IS 1367 - Part 3 : 2002
     IS 3757 : 1985
     IS 6623 : 2004
+    IS 5624:1993, Foundation Bolts - Specification
 
 Started on 15 - Nov - 2018
 
-@author: ajmalbabums
+@author: ajmalbabums, Danish Ansari
 """
 import math
 
@@ -243,3 +244,37 @@ class IS6623_2004(object):
                'thread': "preferred"}
     }
 
+
+# IS 5624:1993, Foundation Bolts - Specification
+class IS_5624_1993(object):
+    """Specifications of IS 5624:1993"""
+
+    @staticmethod
+    def table1(anchor_dia):
+        """Dimensions and preferred length dia combination of anchor bolt
+
+        Args: anchor_dia (str) - Diameter of the anchor bolt
+
+        Returns: anchor_length (int) - Length of the anchor bolt in mm
+
+        Note: The length of the anchor bolt is decided based on the range suggested by Table 1 of IS 5624:1993.
+        The maximum value from this range is used in design calculation.
+
+        """
+        anchor_length = {
+            'M8': 200,
+            'M10': 250,
+            'M12': 320,
+            'M16': 500,
+            'M20': 800,
+            'M24': 1250,
+            'M30': 2000,
+            'M36': 2500,
+            'M42': 2500,
+            'M48': 3200,
+            'M56': 3200,
+            'M64': 3200,
+            'M72': 3200,
+        }[str(anchor_dia)]
+
+        return anchor_length

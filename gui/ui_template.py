@@ -528,7 +528,10 @@ class Ui_ModuleWindow(QMainWindow):
             type = option[2]
             if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
-                l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
+                if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
+                    l.setGeometry(QtCore.QRect(16, 10 + i, 120, 25))
+                else:
+                    l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -554,7 +557,6 @@ class Ui_ModuleWindow(QMainWindow):
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
-                r.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -562,13 +564,30 @@ class Ui_ModuleWindow(QMainWindow):
                 r.setFont(font)
                 r.setObjectName(option[0])
                 if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
+                    r.setGeometry(QtCore.QRect(160, 10 + i, 150, 27))
                     r.setDisabled(True)
+                else:
+                    r.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
 
             if type == TYPE_MODULE:
                 _translate = QtCore.QCoreApplication.translate
                 MainWindow.setWindowTitle(_translate("MainWindow", option[1]))
                 i = i - 30
                 module = lable
+
+            if type == TYPE_NOTE:
+                l = QtWidgets.QLineEdit(self.dockWidgetContents)
+                l.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(True)
+                font.setWeight(50)
+                l.setFont(font)
+                l.setAlignment(Qt.AlignHCenter)
+                l.setObjectName(option[0] + "_note")
+                # l.setText(_translate("MainWindow", "<html><head/><body><p>" + option[4] + "</p></body></html>"))
+                l.setText(option[4])
+                l.setReadOnly(True)
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
@@ -1224,6 +1243,7 @@ class Ui_ModuleWindow(QMainWindow):
         display = self.modelTab._display
 
         # background gradient
+
         display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
         # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
         # display.display_trihedron()
@@ -1344,6 +1364,8 @@ class Ui_ModuleWindow(QMainWindow):
                 continue
             if typ == TYPE_LABEL:
                 k2_key = k2_key + "_label"
+            if typ == TYPE_NOTE:
+                k2_key = k2_key + "_note"
             k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
             if object_name not in [KEY_END2, KEY_SEC_PROFILE]:
                 val = f(k1.currentText())
@@ -1370,6 +1392,8 @@ class Ui_ModuleWindow(QMainWindow):
             elif typ == TYPE_COMBOBOX_CUSTOMIZED:
                 data[k2_key+"_customized"] = val
             elif typ == TYPE_LABEL:
+                k2.setText(val)
+            elif typ == TYPE_NOTE:
                 k2.setText(val)
             elif typ == TYPE_IMAGE:
                 pixmap1 = QPixmap(val)
@@ -1495,6 +1519,7 @@ class Ui_ModuleWindow(QMainWindow):
                     pass
         else:
             common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
+
             if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
                 d2 = {KEY_SUPTNGSEC_MATERIAL: common_material, KEY_SUPTDSEC_MATERIAL: common_material}
                 design_dictionary.update(d2)

@@ -6,10 +6,11 @@ Included standards,
     IS 1367 - Part 3 : 2002
     IS 3757 : 1985
     IS 6623 : 2004
+    IS 5624:1993, Foundation Bolts - Specification
 
 Started on 15 - Nov - 2018
 
-@author: ajmalbabums
+@author: ajmalbabums, Danish Ansari
 """
 import math
 
@@ -243,3 +244,37 @@ class IS6623_2004(object):
                'thread': "preferred"}
     }
 
+
+# IS 5624:1993, Foundation Bolts - Specification
+class IS_5624_1993(object):
+    """Specifications of IS 5624:1993"""
+
+    @staticmethod
+    def table1(anchor_dia):
+        """Dimensions and preferred length dia combination of anchor bolt
+
+        Args: anchor_dia (str) - Diameter of the anchor bolt
+
+        Returns: anchor_length (int) - Range of length for the anchor bolt in mm
+
+        Note: The length of the anchor bolt is decided based on the range suggested by Table 1 of IS 5624:1993.
+        The maximum value from this range is used in design calculation.
+
+        """
+        anchor_length = {
+            'M8': {'min_len': 80, 'max_len': 200},
+            'M10': {'min_len': 100, 'max_len': 250},
+            'M12': {'min_len': 125, 'max_len': 320},
+            'M16': {'min_len': 160, 'max_len': 500},
+            'M20': {'min_len': 200, 'max_len': 800},
+            'M24': {'min_len': 250, 'max_len': 1250},
+            'M30': {'min_len': 320, 'max_len': 2000},
+            'M36': {'min_len': 400, 'max_len': 2500},
+            'M42': {'min_len': 400, 'max_len': 2500},
+            'M48': {'min_len': 630, 'max_len': 3200},
+            'M56': {'min_len': 800, 'max_len': 3200},
+            'M64': {'min_len': 1000, 'max_len': 3200},
+            'M72': {'min_len': 1000, 'max_len': 3200},
+        }[str(anchor_dia)]
+
+        return anchor_length

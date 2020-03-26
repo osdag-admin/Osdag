@@ -5,9 +5,9 @@
 
 
 @Module - Base Plate Connection
-           - Pinned Base Plate [Axial + Shear]
+           - Pinned Base Plate (welded and bolted) [Axial + Shear]
            - Gusseted Base Plate [Moment (major and minor axis) + Axial + Shear]
-           - Base Plate with Cleat Angle
+           - Base Plate for hollow sections [Moment (major and minor axis) + Axial + Shear]
 
 
 @Reference(s): 1) IS 800: 2007, General construction in steel - Code of practice (Third revision)
@@ -63,14 +63,59 @@ class BasePlateConnection(MomentConnection):
     """
 
     def __init__(self):
-        """
-        Initialize all attributes.
-        """
+        """Initialize all attributes."""
         super(BasePlateConnection, self).__init__()
-        self.gamma_mb = 0.0
+
+        # attributes for input dock UI
+        self.connectivity = ""
+        self.end_condition = ""
+        self.column_section = ""
+        self.material = ""
+
+        self.load_axial = 0.0
+        self.load_shear = 0.0
+        self.load_moment_major = 0.0
+        self.load_moment_minor = 0.0
+
+        self.anchor_dia = 1
+        self.anchor_type = ""
+
+        self.footing_grade = 0.0
+
+        # attributes for design preferences
+        self.dp_column_designation = ""
+        self.dp_column_type = ""
+        self.dp_column_source = ""
+        self.dp_column_material = ""
+        self.dp_column_fu = 0.0
+        self.dp_column_fy = 0.0
+
+        self.dp_bp_material = ""
+        self.dp_bp_fu = 0.0
+        self.dp_bp_fy = 0.0
+
+        self.dp_anchor_designation = ""
+        self.dp_anchor_type = ""
+        self.dp_anchor_hole = "Standard"
+        self.dp_anchor_fu_overwrite = 0.0
+        self.dp_anchor_friction = 0.0
+
+        self.dp_weld_fab = "Shop Weld"
+        self.dp_weld_fu_overwrite = 0.0
+
+        self.dp_detail_edge_type = "b - Machine flame cut"
+        self.dp_detail_is_corrosive = "No"
+
+        self.dp_design_method = "Limit State Design"
+        self.dp_bp_method = "Effective Area Method"
+
+        # other attributes
         self.gamma_m0 = 0.0
         self.gamma_m1 = 0.0
+        self.gamma_mb = 0.0
+        self.gamma_mw = 0.0
 
+        self.safe = True
 
     def set_osdaglogger(key):
         """
@@ -103,7 +148,7 @@ class BasePlateConnection(MomentConnection):
 
     def input_values(self, existingvalues={}):
         """
-        Return a-list of tuple, used to create the Input Dock U.I in Osdag design window.
+        Return a-list of tuple, used to create the Base Plate input dock U.I in Osdag design window.
         """
         self.module = KEY_DISP_BASE_PLATE
 
@@ -162,47 +207,59 @@ class BasePlateConnection(MomentConnection):
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
-        t16 = (KEY_MODULE, KEY_DISP_BASE_PLATE, TYPE_MODULE, None, None)
-        options_list.append(t16)
-
-        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN_BP)
+        t2 = (KEY_MODULE, KEY_DISP_BASE_PLATE, TYPE_MODULE, None, None)
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/base_plate.png")
-        options_list.append(t15)
-
-        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"))  # this might not be required
+        t3 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN_BP)
         options_list.append(t3)
+
+        t4 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/base_plate.png")
+        options_list.append(t4)
+
+        t5 = (KEY_END_CONDITION, KEY_DISP_END_CONDITION, TYPE_NOTE, existingvalue_key_conn, 'Fixed')
+        options_list.append(t5)
+
+        t6 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"))  # this might not be required
+        options_list.append(t6)
 
         # t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, connectdb("Columns"))
         # options_list.append(t4)
 
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
-        options_list.append(t5)
-
-        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
-        options_list.append(t6)
-
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
-        options_list.append(t8)
-
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        t7 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
         options_list.append(t7)
 
-        t17 = (None, DISP_TITLE_MOMENT, TYPE_TITLE, existingvalue_key_axial, None)
-        options_list.append(t17)
+        t8 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
+        options_list.append(t8)
 
-        t18 = (KEY_MOMENT_MAJOR, KEY_DISP_MOMENT_MAJOR, TYPE_TEXTBOX, existingvalue_key_conn, None)
-        options_list.append(t18)
-
-        t19 = (KEY_MOMENT_MINOR, KEY_DISP_MOMENT_MINOR, TYPE_TEXTBOX, existingvalue_key_conn, None)
-        options_list.append(t19)
-
-        t9 = (None, DISP_TITLE_ANCHOR_BOLT, TYPE_TITLE, None, None)
+        t9 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
         options_list.append(t9)
 
-        t10 = (KEY_DIA_ANCHOR, KEY_DISP_DIA_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_DIA_ANCHOR)
+        t10 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
         options_list.append(t10)
+
+        t11 = (KEY_MOMENT, KEY_DISP_MOMENT, '', existingvalue_key_axial, None)
+        options_list.append(t11)
+
+        t12 = (KEY_MOMENT_MAJOR, KEY_DISP_MOMENT_MAJOR, TYPE_TEXTBOX, existingvalue_key_conn, None)
+        options_list.append(t12)
+
+        t13 = (KEY_MOMENT_MINOR, KEY_DISP_MOMENT_MINOR, TYPE_TEXTBOX, existingvalue_key_conn, None)
+        options_list.append(t13)
+
+        t14 = (None, DISP_TITLE_ANCHOR_BOLT, TYPE_TITLE, None, None)
+        options_list.append(t14)
+
+        t15 = (KEY_DIA_ANCHOR, KEY_DISP_DIA_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_DIA_ANCHOR)
+        options_list.append(t15)
+
+        t16 = (KEY_TYP_ANCHOR, KEY_DISP_TYP_ANCHOR, TYPE_COMBOBOX, existingvalue_key_d, VALUES_TYP_ANCHOR)
+        options_list.append(t16)
+
+        t17 = (None, DISP_TITLE_FOOTING, TYPE_TITLE, None, None)
+        options_list.append(t17)
+
+        t18 = (KEY_GRD_FOOTING, KEY_DISP_GRD_FOOTING, TYPE_COMBOBOX, existingvalue_key_d, VALUES_GRD_FOOTING)
+        options_list.append(t18)
 
         # t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
         # options_list.append(t11)
@@ -221,27 +278,36 @@ class BasePlateConnection(MomentConnection):
     def output_values(self, flag):
         return []
 
-    def fn(self):
-        if self in ['Gusseted Base Plate', 'Base Plate with Cleat Angles', 'Hollow Sections']:
+    def major_minor(self):
+        if self in ['Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']:
             return True
         else:
             return False
+
+    def end_condition(self):
+        if self in ['Gusseted Base Plate', 'Hollow Section']:
+            return 'Fixed'
+        else:
+            return 'Pinned'
 
     def input_value_changed(self):
 
         lst = []
 
-        t1 = (KEY_CONN, KEY_MOMENT_MAJOR, TYPE_TEXTBOX, self.fn)
+        t1 = (KEY_CONN, KEY_MOMENT_MAJOR, TYPE_TEXTBOX, self.major_minor)
         lst.append(t1)
 
-        t2 = (KEY_CONN, KEY_MOMENT_MINOR, TYPE_TEXTBOX, self.fn)
+        t2 = (KEY_CONN, KEY_MOMENT_MINOR, TYPE_TEXTBOX, self.major_minor)
         lst.append(t2)
+
+        t3 = (KEY_CONN, KEY_END_CONDITION, TYPE_NOTE, self.end_condition)
+        lst.append(t3)
 
         return lst
 
     @staticmethod
     def diam_bolt_customized():
-        c = connectdb1()
+        c = connectdb2()
         return c
 
     def customized_input(self):
@@ -257,9 +323,9 @@ class BasePlateConnection(MomentConnection):
         flag = False
         option_list = self.input_values(self)
         missing_fields_list = []
-        if design_dictionary[KEY_CONN] == 'Pinned Base Plate':
-            design_dictionary[KEY_MOMENT_MAJOR] = 'Ignore'
-            design_dictionary[KEY_MOMENT_MINOR] = 'Ignore'
+        if design_dictionary[KEY_CONN] == 'Welded-Slab Base':
+            design_dictionary[KEY_MOMENT_MAJOR] = 'Disabled'
+            design_dictionary[KEY_MOMENT_MINOR] = 'Disabled'
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
@@ -284,6 +350,40 @@ class BasePlateConnection(MomentConnection):
             # self.set_input_values(self, design_dictionary)
         else:
             pass
+
+    def tab_list(self):
+        tabs = []
+
+        t1 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t1)
+
+        t2 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t2)
+
+        t3 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t3)
+
+        t4 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t4)
+
+        t5 = ("Connector", TYPE_TAB_2, self.connector_values)
+        tabs.append(t5)
+
+        return tabs
+
+# Start calculation
+
+    def bp_parameters(self):
+        """ Initialize variables to use in calculation from input dock and design preference UI.
+
+        Args:
+
+        Returns:
+            None
+
+        """
+
+
 
 
 

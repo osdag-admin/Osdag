@@ -91,8 +91,23 @@ def connectdb1():
     l2 = tuple_to_str_popup(lst)
     return l2
 
+def connectdb2():
+    """
+    Function to fetch diameter values from Bolt Table
+     """
+    # @author: Amir
 
-def connectdb(table_name,call_type="dropdown"):
+    lst = []
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+    cursor = conn.execute("SELECT Diameter FROM Anchor_Bolt")
+    rows = cursor.fetchall()
+    for row in rows:
+        lst.append(row)
+    l2 = tuple_to_str_popup(lst)
+    return l2
+
+
+def connectdb(table_name, call_type="dropdown"):
 
     """
         Function to fetch designation values from respective Tables.
@@ -316,7 +331,7 @@ VALUES_CONN_2 = ['Beam-Beam']
 VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
 ####
 
-VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Base Plate with Cleat Angles', 'Hollow Sections']
+VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
 
 
 KEY_LOCATION = 'Conn_Location'
@@ -367,7 +382,6 @@ DISP_TITLE_FSL = 'Factored load'
 # Key for Storing Moment sub-key of Load
 KEY_MOMENT = 'Load.Moment'
 KEY_DISP_MOMENT = 'Moment(kNm)*'
-DISP_TITLE_MOMENT = 'Moment load'
 KEY_MOMENT_MAJOR = 'Load.Moment.Major'
 KEY_DISP_MOMENT_MAJOR = 'Major axis (M<sub>z-z</sub>)'
 KEY_MOMENT_MINOR = 'Load.Moment.Minor'
@@ -376,6 +390,13 @@ KEY_DIA_ANCHOR = 'Anchor Bolt.Diameter'
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
 VALUES_DIA_ANCHOR = ['All', 'Customized']
+KEY_TYP_ANCHOR = 'Anchor Bolt.Type'
+KEY_DISP_TYP_ANCHOR = 'Type*'
+VALUES_TYP_ANCHOR = ['Select Type', 'IS 5624-Type A', 'IS 5624-Type B', 'End Plate Type']
+DISP_TITLE_FOOTING = 'Pedestal/Footing'
+KEY_GRD_FOOTING = 'Footing.Grade'
+KEY_DISP_GRD_FOOTING = 'Grade*'
+VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 
 ###################################
 # Key for Storing Shear sub-key of Load
@@ -1009,8 +1030,8 @@ KEY_END2 = 'End_2'
 KEY_DISP_END2 = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
 
-
-
+KEY_END_CONDITION = 'ENd Condition'
+KEY_DISP_END_CONDITION = 'End Cndition'
 
 DISP_TITLE_CLEAT = 'Cleat Angle'
 DISP_TITLE_ANGLE = 'Angle Section'

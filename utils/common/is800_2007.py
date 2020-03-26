@@ -72,6 +72,40 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  7     DESIGN OF COMPRESS1ON MEMBERS   """
+    # -------------------------------------------------------------
+    #   7.4 Column Bases
+    # -------------------------------------------------------------
+
+    # cl. 7.4.1, General
+    @staticmethod
+    def cl_7_4_1_bearing_strength_concrete(concrete_grade):
+        """
+        Args:
+            concrete_grade: grade of concrete used for pedestal/footing.
+
+        Returns:
+            maximum permissible bearing strength of concrete pedestal/footing.
+
+        Note:
+            cl 7.4.1 suggests the maximum bearing strength equal to 0.60 times f_ck,
+            but, the value is amended to 0.45 times f_ck (f_ck is the characteristic strength of concrete)
+        """
+        f_ck = {
+            'M10': 10,
+            'M15': 15,
+            'M20': 20,
+            'M25': 25,
+            'M30': 30,
+            'M35': 35,
+            'M40': 40,
+            'M45': 45,
+            'M50': 50,
+            'M55': 55,
+        }[str(concrete_grade)]
+
+        bearing_strength = 0.45 * f_ck  # MPa (N/mm^2)
+        return bearing_strength
+
     # ==========================================================================
     """    SECTION  8     DESIGN OF MEMBERS SUBJECTED TO BENDING   """
     # -------------------------------------------------------------

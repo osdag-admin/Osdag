@@ -1580,7 +1580,6 @@ class Tension_bolted(Main):
             self.design_status = False
         print(self.section_size_1.designation,"1111")
         if self.section_size_1.tension_capacity > self.load.axial_force *1000:
-            # self.efficiency = round((self.section_size_1.tension_capacity/ self.load.axial_force),2)
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
             self.design_status = True

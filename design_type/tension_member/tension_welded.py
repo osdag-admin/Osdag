@@ -1139,14 +1139,6 @@ class Tension_welded(Main):
             else:
                 self.cross_area = self.section_size.area * 2
 
-                # self.section_size.min_rad_gyration_bbchannel_calc(mom_inertia_y=self.section_size.mom_inertia_y,
-                #                                                       area=self.section_size.area,
-                #                                                       Cg=self.section_size.Cg,
-                #                                                       mom_inertia_z=self.section_size.mom_inertia_z,
-                #                                                       thickness=0.0)
-                # radius_gyration = self.section_size.min_rad_gyration_bbchannel
-
-
 
             if previous_size != None:
                 self.section_size_prev = self.select_section(self, design_dictionary, previous_size)

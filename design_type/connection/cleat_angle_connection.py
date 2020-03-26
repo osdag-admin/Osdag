@@ -3,6 +3,8 @@ from utils.common.component import *
 from utils.common.component import Bolt, Plate, Weld
 from Common import *
 import sys
+from cad.common_logic import CommonDesignLogic
+
 from utils.common.load import Load
 import yaml
 import os
@@ -437,14 +439,14 @@ class CleatAngleConnection(ShearConnection):
             flag = True
 
         if flag and flag1:
-            self.set_input_values(self, design_dictionary)
+            self.set_input_values(self, design_dictionary, window)
         else:
             pass
 
     def module_name(self):
         return KEY_DISP_CLEATANGLE
 
-    def set_input_values(self, design_dictionary):
+    def set_input_values(self, design_dictionary, window):
         print(design_dictionary)
 
         super(CleatAngleConnection,self).set_input_values(self, design_dictionary)
@@ -460,6 +462,11 @@ class CleatAngleConnection(ShearConnection):
         logger.info("Input values are set. Checking if angle of required thickness is available")
 
         self.check_available_cleat_thk(self)
+
+        if self.design_status:
+            self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
+            status = self.design_status
+            self.commLogicObj.call_3DModel(status, CleatAngleConnection)
 
     def check_available_cleat_thk(self):
         self.sptd_leg.thickness = []

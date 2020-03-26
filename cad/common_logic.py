@@ -23,8 +23,8 @@ from cad.ShearConnections.CleatAngle.beamWebBeamWebConnectivity import BeamWebBe
 from cad.ShearConnections.CleatAngle.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as cleatColFlangeBeamWeb
 from cad.ShearConnections.CleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
 from cad.ShearConnections.CleatAngle.nutBoltPlacement import NutBoltArray as cleatNutBoltArray
-from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.connection.cleat_angle_connection import CleatAngleConnection
+# from design_type.connection.fin_plate_connection import FinPlateConnection
+# from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from utilities import osdag_display_shape
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
@@ -226,13 +226,16 @@ class CommonDesignLogic(object):
 
         '''
 
+        A = self.module_class()
+
         if self.connection == KEY_DISP_FINPLATE:
-            A = FinPlateConnection()
+            # A = self.module_class()
+            # A = FinPlateConnection()
             plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
             Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
         elif self.connection == KEY_DISP_CLEATANGLE:
-            A = CleatAngleConnection()
+            # A = CleatAngleConnection()
 
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.r1, R2=A.cleat.r2)
@@ -327,10 +330,13 @@ class CommonDesignLogic(object):
 
         '''
 
-        if self.connection == KEY_DISP_FINPLATE:
-            A = FinPlateConnection()
-        elif self.connection == KEY_DISP_CLEATANGLE:
-            A = CleatAngleConnection()
+        A = self.module_class()
+
+        # if self.connection == KEY_DISP_FINPLATE:
+            # A = self.module_class()
+            # A = FinPlateConnection()
+        if self.connection == KEY_DISP_CLEATANGLE:
+            # A = CleatAngleConnection()
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.r1, R2=A.cleat.r2)
         else:
@@ -452,11 +458,15 @@ class CommonDesignLogic(object):
         Creating 3d cad model with column flange beam web connection
 
         '''
+
+        A = self.module_class()
+
         if self.connection == "Fin Plate":
-            A = FinPlateConnection()
+            # A = self.module_class()
+            # A = FinPlateConnection()
             gap = A.plate.gap
         elif self.connection == KEY_DISP_CLEATANGLE:
-            A = CleatAngleConnection()
+            # A = CleatAngleConnection()
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.r1, R2=A.cleat.r2)
         else:
@@ -660,12 +670,15 @@ class CommonDesignLogic(object):
 
         if self.mainmodule  == "Shear Connection":
 
-            if self.connection == KEY_DISP_FINPLATE:
-                A = FinPlateConnection()
-            elif self.connection == KEY_DISP_CLEATANGLE:
-                A = CleatAngleConnection()
-            else:
-                pass
+            A = self.module_class()
+
+            # if self.connection == KEY_DISP_FINPLATE:
+            #     A = self.module_class()
+            #     # A = FinPlateConnection()
+            # elif self.connection == KEY_DISP_CLEATANGLE:
+            #     A = CleatAngleConnection()
+            # else:
+            #     pass
 
             self.loc = A.connectivity
 
@@ -764,15 +777,20 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.CPBoltedObj.get_nut_bolt_arrayModels(), update=True, color=Quantity_NOC_SADDLEBROWN)
 
 
-    def call_3DModel(self, flag):  # Done
+    def call_3DModel(self, flag, module_class):  # Done
+
+        self.module_class = module_class
 
         if self.mainmodule == "Shear Connection":
 
-            if self.connection == "Fin Plate":
-                A = FinPlateConnection()
-            elif self.connection == KEY_DISP_CLEATANGLE:
-                A = CleatAngleConnection()
-            pass
+            A = self.module_class()
+
+            # if self.connection == "Fin Plate":
+            #     # A = FinPlateConnection()
+            #     A = self.module_class()
+            # elif self.connection == KEY_DISP_CLEATANGLE:
+            #     A = CleatAngleConnection()
+            # pass
 
             self.loc = A.connectivity
 

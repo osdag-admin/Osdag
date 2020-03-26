@@ -772,7 +772,7 @@ class FinPlateConnection(ShearConnection):
                 fillet_size=self.weld.size, fusion_face_angle=90)
             self.weld.eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
                 fillet_size=self.weld.size, available_length=self.weld.length)
-            self.weld.strength = self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
+            self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
                                                 weld_fabrication=self.weld.fabrication,
                                                 t_weld=self.weld.size, weld_angle=90)
             Ip_weld = 2 * self.weld.eff_length ** 3 / 12
@@ -781,18 +781,23 @@ class FinPlateConnection(ShearConnection):
             force_l = self.load.shear_force * 1000
             force_w = 0.00
             force_t = self.plate.moment_demand
-            self.weld.stress = self.weld.get_weld_stress(force_l, force_w, force_t, Ip_weld, y_max,
+            print(self.weld.strength)
+            self.weld.get_weld_stress(force_l, force_w, force_t, Ip_weld, y_max,
                                                         x_max, 2*self.weld.eff_length)
+            print(self.weld.strength, self.weld.stress)
             if self.weld.strength > self.weld.stress:
                 break
             else:
                 t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
-                print(t_weld_req)
-                self.weld.size = list([x for x in available_welds if (t_weld_req <= x)])[0]
-                if self.weld.size is None:
+                print("thicknessreq",t_weld_req)
+                updated_weld_list = list([x for x in available_welds if (t_weld_req <= x)])
+                print(updated_weld_list)
+                if not updated_weld_list:
                     self.plate.height += 10
                     self.weld.size = available_welds[0]
                     logger.warning('weld stress is guiding plate height, trying with length %2.2f mm' % self.plate.height)
+                else:
+                    self.weld.size = updated_weld_list[0]
 
         print(self.weld.size, self.weld.length)
         if self.weld.strength < self.weld.stress:

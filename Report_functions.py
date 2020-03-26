@@ -159,16 +159,19 @@ def get_trial_bolts(V_u, A_u,bolt_capacity):
 def get_pass_fail(required, provided,relation='greater'):
     required = float(required)
     provided = float(provided)
-    if relation == 'greater':
-        if provided > required:
-            return 'Pass'
-        else:
-            return 'Fail'
+    if provided==0:
+        return 'N/A'
     else:
-        if provided < required:
-            return 'Pass'
+        if relation == 'greater':
+            if required > provided:
+                return 'Pass'
+            else:
+                return 'Fail'
         else:
-            return 'Fail'
+            if required < provided:
+                return 'Pass'
+            else:
+                return 'Fail'
 
 
     # doc.generate_pdf('report_functions', clean_tex=False)

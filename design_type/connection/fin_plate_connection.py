@@ -772,7 +772,7 @@ class FinPlateConnection(ShearConnection):
                 fillet_size=self.weld.size, fusion_face_angle=90)
             self.weld.eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
                 fillet_size=self.weld.size, available_length=self.weld.length)
-            self.weld.strength = self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
+            self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
                                                 weld_fabrication=self.weld.fabrication,
                                                 t_weld=self.weld.size, weld_angle=90)
             Ip_weld = 2 * self.weld.eff_length ** 3 / 12
@@ -781,18 +781,23 @@ class FinPlateConnection(ShearConnection):
             force_l = self.load.shear_force * 1000
             force_w = 0.00
             force_t = self.plate.moment_demand
-            self.weld.stress = self.weld.get_weld_stress(force_l, force_w, force_t, Ip_weld, y_max,
+            print(self.weld.strength)
+            self.weld.get_weld_stress(force_l, force_w, force_t, Ip_weld, y_max,
                                                         x_max, 2*self.weld.eff_length)
+            print(self.weld.strength, self.weld.stress)
             if self.weld.strength > self.weld.stress:
                 break
             else:
                 t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
-                print(t_weld_req)
-                self.weld.size = list([x for x in available_welds if (t_weld_req <= x)])[0]
-                if self.weld.size is None:
+                print("thicknessreq",t_weld_req)
+                updated_weld_list = list([x for x in available_welds if (t_weld_req <= x)])
+                print(updated_weld_list)
+                if not updated_weld_list:
                     self.plate.height += 10
                     self.weld.size = available_welds[0]
                     logger.warning('weld stress is guiding plate height, trying with length %2.2f mm' % self.plate.height)
+                else:
+                    self.weld.size = updated_weld_list[0]
 
         print(self.weld.size, self.weld.length)
         if self.weld.strength < self.weld.stress:
@@ -818,72 +823,64 @@ class FinPlateConnection(ShearConnection):
 
     def get_design_status(self):
         if self.plate.design_status is True and self.weld.design_status is True:
+
             self.design_status = True
             logger.info("=== End Of Design ===")
 
-    def save_design(self,ui,popup_summary):
-
+    def save_design(self,popup_summary):
+        # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
         self.report_input = \
             {KEY_MODULE: self.module,
             KEY_MAIN_MODULE: self.mainmodule,
             KEY_CONN: self.connectivity,
-            KEY_SHEAR: self.load.shear_force,
+            KEY_DISP_SHEAR: self.load.shear_force,
+            "Supporting Section Details":"TITLE",
+            "Column Details": r'/ResourceFiles/images/ColumnsBeams".png',
+            "Supported Section Details": "TITLE",
+            "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+            "Bolt Details":"TITLE",
+            KEY_DISP_D: str(self.bolt.bolt_diameter),
+            KEY_DISP_GRD: str(self.bolt.bolt_grade),
+            KEY_DISP_TYP: self.bolt.bolt_type,
+            KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+            KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+            KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+            KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
+            KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences,
+            "Weld Details":"TITLE",
+            KEY_DISP_DP_WELD_TYPE: "Fillet",
+            KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
+            KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
 
-            KEY_SUPTNGSEC:self.supporting_section.designation,
-            KEY_SUPTNGSEC_MATERIAL:self.supporting_section.material,
-            KEY_SUPTNGSEC_FU:self.supporting_section.fu,
-            KEY_SUPTNGSEC_FY:self.supporting_section.fy,
-            "Column Details": "/ResourceFiles/images/ColumnsBeams.png",
+        self.report_supporting = {KEY_DISP_SUPTNGSEC:self.supporting_section.designation,
+                                    KEY_DISP_MATERIAL:self.supporting_section.material,
+                                    KEY_DISP_FU:self.supporting_section.fu,
+                                    KEY_DISP_FY:self.supporting_section.fy,
+                                    'Mass': self.supporting_section.mass,
+                                    'Area(cm2) - A': self.supporting_section.area,
+                                    'D(mm)': self.supporting_section.depth,
+                                    'B(mm)': self.supporting_section.flange_width,
+                                    't(mm)': self.supporting_section.web_thickness,
+                                    'T(mm)': self.supporting_section.flange_thickness,
+                                    'FlangeSlope': self.supporting_section.flange_slope,
+                                    'R1(mm)': self.supporting_section.root_radius,
+                                    'R2(mm)': self.supporting_section.toe_radius,
+                                    'Iz(cm4)': self.supporting_section.mom_inertia_z,
+                                    'Iy(cm4)': self.supporting_section.mom_inertia_y,
+                                    'rz(cm)': self.supporting_section.rad_of_gy_z,
+                                    'ry(cm)': self.supporting_section.rad_of_gy_y,
+                                    'Zz(cm3)': self.supporting_section.elast_sec_mod_z,
+                                    'Zy(cm3)': self.supporting_section.elast_sec_mod_y,
+                                    'Zpz(cm3)': self.supporting_section.plast_sec_mod_z,
+                                    'Zpy(cm3)': self.supporting_section.elast_sec_mod_y}
 
-            KEY_SUPTDSEC: self.supported_section.designation,
-            KEY_SUPTDSEC_MATERIAL:self.supported_section.material,
-            KEY_SUPTDSEC_FU:self.supported_section.fu,
-            KEY_SUPTDSEC_FY:self.supported_section.fy,
-            "Beam Details": "/ResourceFiles/images/ColumnsBeams.png",
-
-            KEY_DP_WELD_TYPE:"Fillet",
-            KEY_DP_WELD_FAB: self.weld.fabrication,
-            'Safety_Factor- ': 1.25,
-            KEY_DP_WELD_MATERIAL_G_O: self.weld.fu,
-
-            KEY_D: self.bolt.bolt_diameter,
-            KEY_GRD: self.bolt.bolt_grade,
-            KEY_TYP: self.bolt.bolt_type,
-            KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-            'Bolt Hole Clearance - bc': 2,
-            KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
-            'k_b': 0.519,
-            "Number of effective interface - ne":1,
-
-            KEY_BOLT_FU: self.bolt.fu,
-            KEY_BOLT_FY: self.bolt.fy,
-
-            KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-            KEY_DP_DETAILING_GAP: self.plate.gap,
-            KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences,
-
-             "3d image": "./ResourceFiles/images/3d.png"}
-
-        self.report_supporting = {'Mass': self.supporting_section.mass,
-                                  'Area(cm2) - A': self.supporting_section.area,
-                                  'D(mm)': self.supporting_section.depth,
-                                  'B(mm)': self.supporting_section.flange_width,
-                                  't(mm)': self.supporting_section.web_thickness,
-                                  'T(mm)': self.supporting_section.flange_thickness,
-                                  'FlangeSlope': self.supporting_section.flange_slope,
-                                  'R1(mm)': self.supporting_section.root_radius,
-                                  'R2(mm)': self.supporting_section.toe_radius,
-                                  'Iz(cm4)': self.supporting_section.mom_inertia_z,
-                                  'Iy(cm4)': self.supporting_section.mom_inertia_y,
-                                  'rz(cm)': self.supporting_section.rad_of_gy_z,
-                                  'ry(cm)': self.supporting_section.rad_of_gy_y,
-                                  'Zz(cm3)': self.supporting_section.elast_sec_mod_z,
-                                  'Zy(cm3)': self.supporting_section.elast_sec_mod_y,
-                                  'Zpz(cm3)': self.supporting_section.plast_sec_mod_z,
-                                  'Zpy(cm3)': self.supporting_section.elast_sec_mod_y}
-
-        self.report_supported = {'Mass': self.supported_section.mass,
-                                'Area(cm2) - A': self.supported_section.area,
+        self.report_supported = {
+                                KEY_DISP_SUPTDSEC: self.supported_section.designation,
+                                KEY_DISP_MATERIAL: self.supported_section.material,
+                                KEY_DISP_FU: self.supported_section.fu,
+                                KEY_DISP_FY: self.supported_section.fy,
+                                'Mass': self.supported_section.mass,
+                                'Area(cm2) - A': round(self.supported_section.area,2),
                                 'D(mm)': self.supported_section.depth,
                                 'B(mm)': self.supported_section.flange_width,
                                 't(mm)': self.supported_section.web_thickness,
@@ -980,31 +977,31 @@ class FinPlateConnection(ShearConnection):
         t7 = (DISP_NUM_OF_ROWS, '', self.plate.bolts_one_line, '')
         self.report_check.append(t7)
         t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
-              self.plate.pitch_provided, get_pass_fail(self.bolt.min_pitch, self.plate.pitch_provided,relation='greater'))
-        self.report_check.append(t1)
-        t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
               self.plate.pitch_provided, get_pass_fail(self.bolt.min_pitch, self.plate.pitch_provided,relation='lesser'))
         self.report_check.append(t1)
+        t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
+              self.plate.pitch_provided, get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided,relation='greater'))
+        self.report_check.append(t1)
         t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
-              self.plate.gauge_provided, get_pass_fail(self.bolt.min_gauge, self.plate.gauge_provided,relation="greater"))
-        self.report_check.append(t2)
-        t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
               self.plate.gauge_provided, get_pass_fail(self.bolt.min_gauge, self.plate.gauge_provided,relation="lesser"))
         self.report_check.append(t2)
+        t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
+              self.plate.gauge_provided, get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided,relation="greater"))
+        self.report_check.append(t2)
         t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
-              self.plate.end_dist_provided, get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided))
+              self.plate.end_dist_provided, get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided,relation='lesser'))
         self.report_check.append(t3)
         t4 = (DISP_MAX_END, max_edge_end(self.plate.fy, self.plate.thickness_provided),
-              self.plate.end_dist_provided, get_pass_fail(self.bolt.min_edge_dist, self.plate.end_dist_provided))
+              self.plate.end_dist_provided, get_pass_fail(self.bolt.max_end_dist, self.plate.end_dist_provided,relation='greater'))
         self.report_check.append(t4)
         t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
-              self.plate.edge_dist_provided, get_pass_fail(self.bolt.min_end_dist, self.plate.edge_dist_provided))
+              self.plate.edge_dist_provided, get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided,relation='lesser'))
         self.report_check.append(t3)
         t4 = (DISP_MAX_EDGE, max_edge_end(self.plate.fy, self.plate.thickness_provided),
-              self.plate.edge_dist_provided, get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided))
+              self.plate.edge_dist_provided, get_pass_fail(self.bolt.max_edge_dist, self.plate.edge_dist_provided,relation="greater"))
         self.report_check.append(t4)
         t5=(KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn,bolt_capacity_red_kn,
-            get_pass_fail(bolt_force_kn,bolt_capacity_red_kn))
+            get_pass_fail(bolt_force_kn,bolt_capacity_red_kn,relation="lesser"))
         self.report_check.append(t5)
          # KEY_OUT_PLATE_BLK_SHEAR,
          # KEY_OUT_PLATE_HEIGHT,
@@ -1014,6 +1011,8 @@ class FinPlateConnection(ShearConnection):
 
         # folder = self.select_workspace_folder(self)
         # print(folder)
+        Disp_3D_image = "./ResourceFiles/images/3d.png"
+
         config = configparser.ConfigParser()
         config.read_file(open(r'Osdag.config'))
         desktop_path = config.get("desktop_path", "path1")
@@ -1032,7 +1031,7 @@ class FinPlateConnection(ShearConnection):
         print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         CreateLatex.save_latex(CreateLatex(), self.report_result, self.report_input, self.report_check,
                                self.report_supporting,
-                               self.report_supported, popup_summary, fname_no_ext, ' ', rel_path)
+                               self.report_supported, popup_summary, fname_no_ext, ' ', rel_path, Disp_3D_image)
 
     def select_workspace_folder(self):
         # This function prompts the user to select the workspace folder and returns the name of the workspace folder

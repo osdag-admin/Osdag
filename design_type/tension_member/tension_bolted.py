@@ -767,19 +767,19 @@ class Tension_bolted(Main):
               self.section_size_1.designation if flag else '')
         out_list.append(t2)
 
-        t3 = (KEY_TENSION_YIELDCAPACITY, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX, self.section_size_1.tension_yielding_capacity if flag else '')
+        t3 = (KEY_TENSION_YIELDCAPACITY, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX, round((self.section_size_1.tension_yielding_capacity/1000),2) if flag else '')
         out_list.append(t3)
 
         t4 = (KEY_TENSION_RUPTURECAPACITY, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
-              self.section_size_1.tension_rupture_capacity if flag else '')
+              round((self.section_size_1.tension_rupture_capacity/1000),2) if flag else '')
         out_list.append(t4)
 
         t5 = (KEY_TENSION_BLOCKSHEARCAPACITY, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
-              self.section_size_1.block_shear_capacity_axial if flag else '')
+              round((self.section_size_1.block_shear_capacity_axial/1000),2) if flag else '')
         out_list.append(t5)
 
         t6 = (KEY_TENSION_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
-              self.section_size_1.tension_capacity if flag else '')
+              round((self.section_size_1.tension_capacity/1000),2) if flag else '')
         out_list.append(t6)
 
         t6 = (KEY_SLENDER, KEY_DISP_SLENDER, TYPE_TEXTBOX,
@@ -1189,7 +1189,7 @@ class Tension_bolted(Main):
                 self.section_size.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],r=self.section_size.min_radius_gyration)
                     # print(self.section_size.tension_yielding_capacity)
 
-                if (self.section_size.tension_yielding_capacity > self.load.axial_force) and self.section_size.slenderness < 400:
+                if (self.section_size.tension_yielding_capacity > self.load.axial_force*1000) and self.section_size.slenderness < 400:
                     min_yield_current = self.section_size.tension_yielding_capacity
                     if min_yield == 0:
                         min_yield = min_yield_current
@@ -1246,7 +1246,7 @@ class Tension_bolted(Main):
                                                                      r=self.section_size_1.min_radius_gyration)
 
                     # print(self.section_size_1.slenderness)
-                elif (self.load.axial_force > max_force) :
+                elif (self.load.axial_force*1000 > max_force) :
                     self.design_status = False
                     logger.error(" : Tension force exceeds tension capacity of maximum available member size")
                     break
@@ -1259,7 +1259,7 @@ class Tension_bolted(Main):
                 else:
                     pass
 
-        if (self.load.axial_force > max_force) or self.length > length:
+        if (self.load.axial_force*1000 > max_force) or self.length > length:
             pass
         else:
             print("pass")
@@ -1506,7 +1506,7 @@ class Tension_bolted(Main):
                 self.section_size_1.tension_blockshear_area_input(A_vg=A_vg, A_vn=A_vn, A_tg=A_tg, A_tn=A_tn,
                                                                   f_u=self.section_size_1.fu, f_y=self.section_size_1.fy)
 
-            if self.section_size_1.block_shear_capacity_axial > self.load.axial_force:
+            if self.section_size_1.block_shear_capacity_axial > self.load.axial_force *1000:
                 break
             else:
                 initial_pitch = self.plate.pitch_provided
@@ -1576,9 +1576,9 @@ class Tension_bolted(Main):
         else:
             self.design_status = False
 
-        if self.section_size_1.tension_capacity > self.load.axial_force:
+        if self.section_size_1.tension_capacity > self.load.axial_force *1000:
             # self.efficiency = round((self.section_size_1.tension_capacity/ self.load.axial_force),2)
-            self.efficiency = round((self.load.axial_force / self.section_size_1.tension_capacity), 2)
+            self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
             self.design_status = True
         else:
@@ -1640,7 +1640,7 @@ class Tension_bolted(Main):
             self.plate.tension_blockshear_area_input(A_vg = A_vg, A_vn = A_vn, A_tg = A_tg, A_tn = A_tn, f_u = self.plate.fu, f_y = self.plate.fy)
             self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
 
-            if self.plate_tension_capacity > self.load.axial_force:
+            if self.plate_tension_capacity > self.load.axial_force*1000:
                 print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
                 # self.bolt_conn_plates_t_fu_fy = []
                 # self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
@@ -1654,7 +1654,7 @@ class Tension_bolted(Main):
 
                 self.design_status = True
                 break
-            elif (self.plate_tension_capacity < self.load.axial_force) and self.plate.thickness_provided == self.plate_last:
+            elif (self.plate_tension_capacity < self.load.axial_force*1000) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
                 logger.error("Plate thickness is not sufficient")
             else:

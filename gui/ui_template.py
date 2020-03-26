@@ -1224,9 +1224,9 @@ class Ui_ModuleWindow(QMainWindow):
         display = self.modelTab._display
 
         # background gradient
-        display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
+        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
         # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        display.display_triedron()
+        display.display_trihedron()
 
         display.View.SetProj(1, 1, 1)
 
@@ -1677,9 +1677,9 @@ class Ui_ModuleWindow(QMainWindow):
 
 
             if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_COLUMNCOVERPLATE or main.module == KEY_DISP_CLEATANGLE):
-                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
-                status = main.design_status
-                self.commLogicObj.call_3DModel(status)
+                # self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
+                # status = main.design_status
+                # self.commLogicObj.call_3DModel(status, CleatAngleConnection)
                 # self.callFin2D_Drawing("All")
                 self.btn3D.setEnabled(True)
                 self.chkBxBeam.setEnabled(True)

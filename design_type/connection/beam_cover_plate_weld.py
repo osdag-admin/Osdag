@@ -285,7 +285,7 @@ class BeamCoverPlateWeld(MomentConnection):
         t15 = (
             KEY_WEB_WELD_STRENGTH, KEY_WEB_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
            round_up(self.web_weld.strength,5) if flag else '')
-        web_weld_details.append(t15)
+        web_weld_details.append(t15) #in N/mm
 
         t16 = (
         KEY_WEB_WELD_STRESS, KEY_WEB_DISP_WELD_STRESS, TYPE_TEXTBOX, round_up(self.web_weld.stress, 5) if flag else '')
@@ -309,11 +309,11 @@ class BeamCoverPlateWeld(MomentConnection):
         t15 = (
             KEY_FLANGE_WELD_STRENGTH, KEY_FLANGE_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
             round_up(self.flange_weld.strength, 5) if flag else '')
-        flange_weld_details.append(t15)
+        flange_weld_details.append(t15) #in N/mm
 
         t16 = (
         KEY_FLANGE_WELD_STRESS, KEY_FLANGE_DISP_WELD_STRESS, TYPE_TEXTBOX, round_up(self.flange_weld.stress, 5) if flag else '')
-        flange_weld_details .append(t16)
+        flange_weld_details .append(t16) #in N/mm
 
         return flange_weld_details
 
@@ -585,6 +585,10 @@ class BeamCoverPlateWeld(MomentConnection):
         # Shear Capacity  # N
 
 
+
+        # design_shear_capacity = (self.section.depth* self.section.web_thickness * self.section.fy) / (
+
+
         design_shear_capacity = (self.section.depth* self.section.web_thickness * self.section.fy) / (
                 math.sqrt(3) * gamma_m0)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
         if self.load.shear_force * 1000 >= design_shear_capacity:
@@ -749,7 +753,7 @@ class BeamCoverPlateWeld(MomentConnection):
 
     def web_plate_weld(self):
         self.min_web_platethk = min(self.web_plate.thickness_provided,self.section.web_thickness)
-        self.web_weld.size = (self.min_web_platethk- 2)
+        self.web_weld.size =int(round_down(self.min_web_platethk- 1.5))
         if self.web_weld.size < 3:
             self.web_weld.size = 3
         else:
@@ -759,10 +763,11 @@ class BeamCoverPlateWeld(MomentConnection):
         else:
             pass
 
-        self.design_strength_web_weld = self.web_weld.get_weld_strength(connecting_fu=self.web_weld.fu,
+        self.web_weld.get_weld_strength(connecting_fu=[self.web_weld.fu,self.section.fu, self.web_plate.fu],
                                                                         weld_fabrication=KEY_DP_WELD_FAB_SHOP,
-                                                                        t_weld=self.web_weld.size, weld_angle=90)
-        self.web_weld.strength =(self.design_strength_web_weld)
+                                                                        t_weld=self.web_weld.size, weld_angle=90) # in N/mm
+        # self.web_weld.strength =(self.design_strength_web_weld)
+        print("assdddffgghghg",self.web_weld.strength)
 
         self.web_plate.height = int(
             self.section.depth - (2 * self.section.flange_thickness) - (2 * self.section.root_radius) - (
@@ -787,15 +792,18 @@ class BeamCoverPlateWeld(MomentConnection):
             Ip_weld = (8 * d ** 3 + 6 * d * b ** 2 + b ** 3) / 12 - d ** 4 / (2 * d + b)
             self.weld_twist = (self.factored_axial_load * self.ecc) +self.moment_web
             # print("self.web_weld_length",self.web_weld_length )
-            self.V_rest = self.web_weld.get_weld_stress( weld_shear=self.factored_axial_load, weld_axial =self.axial_force_w ,
+            self.web_weld.get_weld_stress( weld_shear=self.factored_axial_load, weld_axial =self.axial_force_w ,
                                                          weld_twist= self.weld_twist, Ip_weld= Ip_weld, y_max=y_max, x_max = x_max, l_weld=  self.available_long_web_length )
 
-            if self.design_strength_web_weld  > self.V_rest :
+
+
+            if self.web_weld.strength > self.web_weld.stress :
                 break
             else:
                 self.available_long_web_length =  self.available_long_web_length + 20
 
-        if  self.design_strength_web_weld  > self.V_rest :
+
+        if  self.web_weld.strength   > self.web_weld.stress:
             self.design_status = True
             self.web_weld.length =round_up(((2 * self.available_long_web_length) + self.web_plate.gap),5)
             self.web_plate.length =round_up((self.web_weld.length + (2 * self.web_weld.size)),5)
@@ -823,7 +831,7 @@ class BeamCoverPlateWeld(MomentConnection):
 
     def flange_plate_weld(self):
         self.min_flange_platethk = min(self.flange_plate.thickness_provided, self.section.flange_thickness)
-        self.flange_weld.size = (self.min_flange_platethk - 2)
+        self.flange_weld.size =int(round_down(self.min_flange_platethk - 1.5))
         if self.flange_weld.size < 3:
             self.flange_weld.size = 3
         else:
@@ -838,14 +846,15 @@ class BeamCoverPlateWeld(MomentConnection):
             self.axial_force_f))  # todo added web moment -add in ddcl
 
 
-        self.design_strength_flange_weld = self.flange_weld.get_weld_strength(connecting_fu=self.flange_weld.fu,
+
+        self.flange_weld.get_weld_strength(connecting_fu=[self.flange_weld.fu,self.section.fu,self.flange_plate.fu],
                                                                               weld_fabrication=KEY_DP_WELD_FAB_SHOP,
                                                                               t_weld=self.flange_weld.size,
                                                                               weld_angle=90)
-        print("for req lenth", self.flange_force, self.design_strength_flange_weld)
-        self.flange_weld.strength = (self.design_strength_flange_weld)
-        self.Required_weld_flange_length = self.flange_force / self.design_strength_flange_weld
-        self.Required_weld_flange_length_round = round_up(self.flange_force / self.design_strength_flange_weld, 5) #  c shape half of the splice  plate
+        print("for req lenth",  self.flange_weld.strength )
+
+        self.Required_weld_flange_length = self.flange_force / self.flange_weld.strength
+        self.Required_weld_flange_length_round = round_up(self.flange_force /self.flange_weld.strength , 5) #  c shape half of the splice  plate
         print("Requiredweldlength", self.Required_weld_flange_length_round)
 
         self.flange_plate.height = round_down(

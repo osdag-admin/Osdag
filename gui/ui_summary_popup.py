@@ -165,7 +165,7 @@ class Ui_Dialog1(object):
 
     def save_inputSummary(self,main):
         input_summary = self.getPopUpInputs()
-        main.save_design(main,self,input_summary)
+        main.save_design(main,input_summary)
 
     def call_designreport(self, main,fileName, report_summary, folder):
         self.alist = main.report_input

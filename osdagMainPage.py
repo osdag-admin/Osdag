@@ -25,12 +25,13 @@ from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 
-
+from design_type.tension_member.tension_bolted import Tension_bolted
+from design_type.tension_member.tension_welded import Tension_welded
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
-from design_type.tension_member.tension import Tension
+#from design_type.tension_member.tension import Tension
 # from cad.cad_common import call_3DBeam
 from gui.ui_template import Ui_ModuleWindow
 
@@ -217,32 +218,32 @@ class OsdagMainWindow(QMainWindow):
 
     @pyqtSlot()
     def show_shear_connection(self):
-        folder = self.select_workspace_folder()
-        folder = str(folder)
-        if not os.path.exists(folder):
-            if folder == '':
-                pass
-            else:
-                os.mkdir(folder, 0o755)
-
-        root_path = folder
-        images_html_folder = ['images_html']
-        flag = True
-        for create_folder in images_html_folder:
-            if root_path == '':
-                flag = False
-                return flag
-            else:
-                try:
-                    os.mkdir(os.path.join(root_path, create_folder))
-                except OSError:
-                    shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder))
+        # folder = self.select_workspace_folder()
+        # folder = str(folder)
+        # if not os.path.exists(folder):
+        #     if folder == '':
+        #         pass
+        #     else:
+        #         os.mkdir(folder, 0o755)
+        #
+        # root_path = folder
+        # images_html_folder = ['images_html']
+        # flag = True
+        # for create_folder in images_html_folder:
+        #     if root_path == '':
+        #         flag = False
+        #         return flag
+        #     else:
+        #         try:
+        #             os.mkdir(os.path.join(root_path, create_folder))
+        #         except OSError:
+        #             shutil.rmtree(os.path.join(folder, create_folder))
+        #             os.mkdir(os.path.join(root_path, create_folder))
 
         if self.ui.rdbtn_finplate.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, FinPlateConnection,folder)
+            self.ui2.setupUi(self.ui2, FinPlateConnection, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
@@ -252,7 +253,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_cleat.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, CleatAngleConnection, folder)
+            self.ui2.setupUi(self.ui2, CleatAngleConnection, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
@@ -270,7 +271,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_endplate.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, EndPlateConnection,folder)
+            self.ui2.setupUi(self.ui2, EndPlateConnection, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
@@ -309,38 +310,38 @@ class OsdagMainWindow(QMainWindow):
 
 
     def show_moment_connection(self):
-        folder = self.select_workspace_folder()
-        folder = str(folder)
-        if not os.path.exists(folder):
-            if folder == '':
-                pass
-            else:
-                os.mkdir(folder, 0o755)
-
-        root_path = folder
-        images_html_folder = ['images_html']
-        flag = True
-        for create_folder in images_html_folder:
-            if root_path == '':
-                flag = False
-                return flag
-            else:
-                try:
-                    os.mkdir(os.path.join(root_path, create_folder))
-                except OSError:
-                    shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder))
+        # folder = self.select_workspace_folder()
+        # folder = str(folder)
+        # if not os.path.exists(folder):
+        #     if folder == '':
+        #         pass
+        #     else:
+        #         os.mkdir(folder, 0o755)
+        #
+        # root_path = folder
+        # images_html_folder = ['images_html']
+        # flag = True
+        # for create_folder in images_html_folder:
+        #     if root_path == '':
+        #         flag = False
+        #         return flag
+        #     else:
+        #         try:
+        #             os.mkdir(os.path.join(root_path, create_folder))
+        #         except OSError:
+        #             shutil.rmtree(os.path.join(folder, create_folder))
+        #             os.mkdir(os.path.join(root_path, create_folder))
 
         if self.ui.rdbtn_bb_coverplate_bolted.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, BeamCoverPlate,folder)
+            self.ui2.setupUi(self.ui2, BeamCoverPlate, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
         elif self.ui.rdbtn_bb_coverplate_welded.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, BeamCoverPlateWeld, folder)
+            self.ui2.setupUi(self.ui2, BeamCoverPlateWeld, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
@@ -358,103 +359,103 @@ class OsdagMainWindow(QMainWindow):
 
 
     def show_base_plate(self):
-        folder = self.select_workspace_folder()
-        folder = str(folder)
-        if not os.path.exists(folder):
-            if folder == '':
-                pass
-            else:
-                os.mkdir(folder, 0o755)
-
-        root_path = folder
-        images_html_folder = ['images_html']
-        flag = True
-        for create_folder in images_html_folder:
-            if root_path == '':
-                flag = False
-                return flag
-            else:
-                try:
-                    os.mkdir(os.path.join(root_path, create_folder))
-                except OSError:
-                    shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder))
+        # folder = self.select_workspace_folder()
+        # folder = str(folder)
+        # if not os.path.exists(folder):
+        #     if folder == '':
+        #         pass
+        #     else:
+        #         os.mkdir(folder, 0o755)
+        #
+        # root_path = folder
+        # images_html_folder = ['images_html']
+        # flag = True
+        # for create_folder in images_html_folder:
+        #     if root_path == '':
+        #         flag = False
+        #         return flag
+        #     else:
+        #         try:
+        #             os.mkdir(os.path.join(root_path, create_folder))
+        #         except OSError:
+        #             shutil.rmtree(os.path.join(folder, create_folder))
+        #             os.mkdir(os.path.join(root_path, create_folder))
 
         self.hide()
         self.ui2 = Ui_ModuleWindow()
-        self.ui2.setupUi(self.ui2, BasePlateConnection,folder)
+        self.ui2.setupUi(self.ui2, BasePlateConnection, ' ')
         self.ui2.show()
         self.ui2.closed.connect(self.show)
 
     def show_moment_connection_cc(self):
-        folder = self.select_workspace_folder()
-        folder = str(folder)
-        if not os.path.exists(folder):
-            if folder == '':
-                pass
-            else:
-                os.mkdir(folder, 0o755)
-
-        root_path = folder
-        images_html_folder = ['images_html']
-        flag = True
-        for create_folder in images_html_folder:
-            if root_path == '':
-                flag = False
-                return flag
-            else:
-                try:
-                    os.mkdir(os.path.join(root_path, create_folder))
-                except OSError:
-                    shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder))
+        # folder = self.select_workspace_folder()
+        # folder = str(folder)
+        # if not os.path.exists(folder):
+        #     if folder == '':
+        #         pass
+        #     else:
+        #         os.mkdir(folder, 0o755)
+        #
+        # root_path = folder
+        # images_html_folder = ['images_html']
+        # flag = True
+        # for create_folder in images_html_folder:
+        #     if root_path == '':
+        #         flag = False
+        #         return flag
+        #     else:
+        #         try:
+        #             os.mkdir(os.path.join(root_path, create_folder))
+        #         except OSError:
+        #             shutil.rmtree(os.path.join(folder, create_folder))
+        #             os.mkdir(os.path.join(root_path, create_folder))
 
         if self.ui.rdbtn_cc_coverplate_bolted.isChecked() :
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, ColumnCoverPlate,folder)
+            self.ui2.setupUi(self.ui2, ColumnCoverPlate, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
         elif self.ui.rdbtn_cc_coverplate_welded.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, ColumnCoverPlateWeld, folder)
+            self.ui2.setupUi(self.ui2, ColumnCoverPlateWeld, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
         elif self.ui.rdbtn_cc_endplate.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, ColumnEndPlate,folder)
+            self.ui2.setupUi(self.ui2, ColumnEndPlate, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
     def show_compression_module(self):
-        folder = self.select_workspace_folder()
-        folder = str(folder)
-        if not os.path.exists(folder):
-            if folder == '':
-                pass
-            else:
-                os.mkdir(folder, 0o755)
-
-        root_path = folder
-        images_html_folder = ['images_html']
-        flag = True
-        for create_folder in images_html_folder:
-            if root_path == '':
-                flag = False
-                return flag
-            else:
-                try:
-                    os.mkdir(os.path.join(root_path, create_folder))
-                except OSError:
-                    shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder))
+        # folder = self.select_workspace_folder()
+        # folder = str(folder)
+        # if not os.path.exists(folder):
+        #     if folder == '':
+        #         pass
+        #     else:
+        #         os.mkdir(folder, 0o755)
+        #
+        # root_path = folder
+        # images_html_folder = ['images_html']
+        # flag = True
+        # for create_folder in images_html_folder:
+        #     if root_path == '':
+        #         flag = False
+        #         return flag
+        #     else:
+        #         try:
+        #             os.mkdir(os.path.join(root_path, create_folder))
+        #         except OSError:
+        #             shutil.rmtree(os.path.join(folder, create_folder))
+        #             os.mkdir(os.path.join(root_path, create_folder))
         if self.ui.rdbtn_compression_bolted.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, Compression, folder)
+            self.ui2.setupUi(self.ui2, Compression, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
@@ -466,39 +467,39 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.closed.connect(self.show)
 
     def show_tension_module(self):
-        folder = self.select_workspace_folder()
-        folder = str(folder)
-        if not os.path.exists(folder):
-            if folder == '':
-                pass
-            else:
-                os.mkdir(folder, 0o755)
-
-        root_path = folder
-        images_html_folder = ['images_html']
-        flag = True
-        for create_folder in images_html_folder:
-            if root_path == '':
-                flag = False
-                return flag
-            else:
-                try:
-                    os.mkdir(os.path.join(root_path, create_folder))
-                except OSError:
-                    shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder))
+        # folder = self.select_workspace_folder()
+        # folder = str(folder)
+        # if not os.path.exists(folder):
+        #     if folder == '':
+        #         pass
+        #     else:
+        #         os.mkdir(folder, 0o755)
+        #
+        # root_path = folder
+        # images_html_folder = ['images_html']
+        # flag = True
+        # for create_folder in images_html_folder:
+        #     if root_path == '':
+        #         flag = False
+        #         return flag
+        #     else:
+        #         try:
+        #             os.mkdir(os.path.join(root_path, create_folder))
+        #         except OSError:
+        #             shutil.rmtree(os.path.join(folder, create_folder))
+        #             os.mkdir(os.path.join(root_path, create_folder))
 
         if self.ui.rdbtn_tension_bolted.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2,Tension, folder)
+            self.ui2.setupUi(self.ui2,Tension_bolted, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
         elif self.ui.rdbtn_tension_welded.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, Tension, folder)
+            self.ui2.setupUi(self.ui2, Tension_welded, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

@@ -344,7 +344,7 @@ class Section(Material):
         "gamma_m0 = partial safety factor for failure in tension by yielding"
         "F_y = yield stress of the material"
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        T_dg = (A_g* F_y / gamma_m0)/1000
+        T_dg = (A_g* F_y / gamma_m0)
         # logger.warning(
         #     " : You are using a section (in red color) that is not available in latest version of IS 808")
 
@@ -357,7 +357,7 @@ class Section(Material):
         "F_u = Ultimate Strength of material"
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-        T_pdn = 0.9 * A_n * F_u / gamma_m1/1000
+        T_pdn = 0.9 * A_n * F_u / gamma_m1
 
         self.tension_rupture_capacity = round(T_pdn,2)
 
@@ -389,7 +389,7 @@ class Section(Material):
 
         T_dn = (0.9 * A_nc * F_u / gamma_m1) + (beta * A_go * F_y / gamma_m0)
 
-        self.tension_rupture_capacity = round((T_dn/1000) , 2)
+        self.tension_rupture_capacity = round((T_dn) , 2)
 
 
     def tension_blockshear(self, numrow, numcol, pitch, gauge, thk, end_dist, edge_dist, dia_hole, fy, fu):
@@ -417,7 +417,7 @@ class Section(Material):
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
         Tdb = min(Tdb1, Tdb2)
-        Tdb = round(Tdb / 1000, 3)
+        Tdb = round(Tdb, 3)
         self.block_shear_capacity_axial = round(Tdb,2)
 
     def tension_blockshear_area_input(self,A_vg, A_vn, A_tg, A_tn, f_u, f_y):
@@ -447,7 +447,7 @@ class Section(Material):
         T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
         Tdb = min(T_db1, T_db2)
         # Tdb = round(Tdb, 3)
-        self.block_shear_capacity_axial = round(Tdb/1000,2)
+        self.block_shear_capacity_axial = round(Tdb,2)
 
     def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):
 
@@ -639,8 +639,8 @@ class Weld(Material):
     def get_weld_stress(self,weld_shear =0.0, weld_axial=0.0, weld_twist=0.0, Ip_weld=1.0, y_max=0.0, x_max=0.0, l_weld=0.0):
         T_wh = weld_twist * y_max/Ip_weld
         T_wv = weld_twist * x_max/Ip_weld
-        V_wv = weld_shear*1000 /l_weld
-        A_wh = weld_axial*1000/l_weld
+        V_wv = weld_shear /l_weld
+        A_wh = weld_axial/l_weld
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
         self.stress = weld_stress
 
@@ -1239,7 +1239,7 @@ class Plate(Material):
         T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
         Tdb = min(T_db1, T_db2)
         # Tdb = round(Tdb, 3)
-        self.block_shear_capacity = round(Tdb/1000,2)
+        self.block_shear_capacity = round(Tdb,2)
 
     # Check for shear yielding ###
     def shear_yielding(self, length, thickness, fy):
@@ -1268,7 +1268,7 @@ class Plate(Material):
         A_v = length * thickness
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         # A_v = height * thickness
-        tdg = (A_v * fy) / (gamma_m0 * 1000)
+        tdg = (A_v * fy) / (gamma_m0)
         self.tension_yielding_capacity = tdg
         return tdg
 
@@ -1278,7 +1278,7 @@ class Plate(Material):
         "F_u = Ultimate Strength of material"
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-        T_pdn = 0.9 * A_n * F_u / gamma_m1 / 1000
+        T_pdn = 0.9 * A_n * F_u / gamma_m1
 
         self.tension_rupture_capacity = round(T_pdn, 2)
 

@@ -475,6 +475,9 @@ KEY_FLANGEPLATE_THICKNESS = 'flange_plate.thickness_provided'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
+KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
+KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness(mm)'
+
 KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
 KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'

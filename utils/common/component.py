@@ -640,8 +640,8 @@ class Weld(Material):
     def get_weld_stress(self,weld_shear =0.0, weld_axial=0.0, weld_twist=0.0, Ip_weld=1.0, y_max=0.0, x_max=0.0, l_weld=0.0):
         T_wh = weld_twist * y_max/Ip_weld
         T_wv = weld_twist * x_max/Ip_weld
-        V_wv = weld_shear*1000 /l_weld
-        A_wh = weld_axial*1000/l_weld
+        V_wv = weld_shear /l_weld
+        A_wh = weld_axial/l_weld
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
         self.stress = weld_stress
 

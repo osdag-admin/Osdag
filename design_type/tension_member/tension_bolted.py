@@ -1132,7 +1132,7 @@ class Tension_bolted(Main):
                     continue
             if design_dictionary[KEY_SEC_PROFILE] =='Channels':
                 self.max_plate_height = self.section_size.max_plate_height()
-                if self.max_plate_height < (2.5*self.pitch_round) + (2 * self.edge_dist_min_round):
+                if self.max_plate_height < (self.pitch_round) + (2 * self.edge_dist_min_round):
                     continue
                 else:
                     self.cross_area = self.section_size.area
@@ -1141,7 +1141,7 @@ class Tension_bolted(Main):
 
             elif design_dictionary[KEY_SEC_PROFILE] == 'Back to Back Channels':
                 self.max_plate_height = self.section_size.max_plate_height()
-                if self.max_plate_height < (2.5*self.pitch_round) + (2 * self.edge_dist_min_round):
+                if self.max_plate_height < (self.pitch_round) + (2 * self.edge_dist_min_round):
                     continue
                 else:
                     self.cross_area = self.section_size.area * 2
@@ -1277,6 +1277,7 @@ class Tension_bolted(Main):
 
     def select_bolt_dia(self,design_dictionary):
         print ("bolt")
+        print(self.section_size_1.designation)
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             self.min_plate_height = self.section_size_1.min_plate_height()
             self.max_plate_height = self.section_size_1.max_plate_height()
@@ -1307,8 +1308,11 @@ class Tension_bolted(Main):
 
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
+        bolt_min = min(self.bolt.bolt_diameter)
         count = 0
         # bolts_one_line = 1
+        bolt_design_status_1 = False
+
         for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
             # print(self.bolt.bolt_diameter_provided)
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
@@ -1338,7 +1342,7 @@ class Tension_bolted(Main):
                                                  max_spacing=self.bolt.max_spacing_round,
                                                  max_edge_dist=self.bolt.max_edge_dist_round,
                                                  shear_load=0, axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
-                                                 shear_ecc=False,min_bolts_one_line=2)
+                                                 shear_ecc=False,min_bolts_one_line=2,min_bolt_line=2)
             else:
                 self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
                                                  web_plate_h_min=self.min_plate_height,
@@ -1350,22 +1354,38 @@ class Tension_bolted(Main):
                                                  max_edge_dist=self.bolt.max_edge_dist_round,
                                                  shear_load=0, axial_load=self.load.axial_force * 1000,
                                                  gap=self.plate.gap,
-                                                 shear_ecc=False, min_bolts_one_line=1,min_bolt_line=1)
+                                                 shear_ecc=False, min_bolts_one_line=1,min_bolt_line=2)
 
 
             if self.plate.design_status is True:
-                if self.plate.bolts_required > bolts_required_previous and count >= 1:
+                if self.plate.bolts_required >= bolts_required_previous and count >= 1:
                     self.bolt.bolt_diameter_provided = bolt_diameter_previous
                     self.plate.bolts_required = bolts_required_previous
                     self.plate.bolt_force = bolt_force_previous
+                    bolt_design_status_1 = self.plate.design_status
+                    # bolt_design_status_2 = False
                     break
                 bolts_required_previous = self.plate.bolts_required
                 bolt_diameter_previous = self.bolt.bolt_diameter_provided
                 bolt_force_previous = self.plate.bolt_force
+
                 count += 1
+                bolt_design_status_1 = self.plate.design_status
+                # bolt_design_status_2 = False
             else:
+                # if self.bolt.bolt_diameter_provided == bolt_min:
+                #     bolt_design_status_1 = self.plate.design_status
+                #     bolt_design_status_2 = True
                 pass
         bolt_capacity_req = self.bolt.bolt_capacity
+
+        if self.plate.design_status == False and bolt_design_status_1 !=True:
+            self.design_status = False
+            # logger.error(self.plate.reason)
+        else:
+            self.bolt.bolt_diameter_provided = bolt_diameter_previous
+            self.plate.bolts_required = bolts_required_previous
+            self.plate.bolt_force = bolt_force_previous
 
         # if min_spacing < 0 and self.bolt.bolt_diameter_provided == 12:
         #     logger.error("Bolted connection not possible")
@@ -1375,13 +1395,15 @@ class Tension_bolted(Main):
         # else:
         #     pass
         # print(self.plate.design_status)
-        if self.plate.design_status is False:
-            self.design_status = False
-            logger.error("Bolted connection not possible")
+        if bolt_design_status_1 is True:
+            self.design_status = True
+            self.get_bolt_grade(self, design_dictionary)
 
         else:
-            pass
-            self.get_bolt_grade(self, design_dictionary)
+            self.design_status = False
+            logger.error(self.plate.reason)
+
+
 
     def get_bolt_grade(self,design_dictionary):
         bolt_grade_previous = self.bolt.bolt_grade[-1]
@@ -1441,7 +1463,7 @@ class Tension_bolted(Main):
                                              max_spacing=self.bolt.max_spacing_round,
                                              max_edge_dist=self.bolt.max_edge_dist_round,
                                              shear_load=0, axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
-                                             shear_ecc=False, min_bolts_one_line=2)
+                                             shear_ecc=False, min_bolts_one_line=2,min_bolt_line=2)
         else:
             self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
                                              web_plate_h_min=self.min_plate_height,
@@ -1533,7 +1555,7 @@ class Tension_bolted(Main):
 
         elif design_dictionary[KEY_LOCATION] == 'Short Leg':
             w = self.section_size_1.max_leg
-            shear_lag = (self.plate.edge_dist_provided + self.section_size_1.root_radius + self.section_size_1.thickness) + w - self.section_size_1.thickness
+            shear_lag = (self.plate.edge_dist_provided + self.section_size_1.r1 + self.section_size_1.thickness) + w - self.section_size_1.thickness
             if self.plate.bolt_line != 1:
                 L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
             else:

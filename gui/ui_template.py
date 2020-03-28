@@ -1115,7 +1115,9 @@ class Ui_ModuleWindow(QMainWindow):
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
 
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION, KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
+                          KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION, KEY_DISP_BASE_PLATE,
+                          KEY_DISP_COLUMNENDPLATE]:
 
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
@@ -1478,6 +1480,10 @@ class Ui_ModuleWindow(QMainWindow):
             elif op[2] == TYPE_TEXTBOX:
                 des_val = widget.text()
                 d1 = {op[0]: des_val}
+            elif op[2] == TYPE_NOTE:
+                widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0]+"_note")
+                des_val = widget.text()
+                d1 = {op[0]: des_val}
             else:
                 d1 = {}
             design_dictionary.update(d1)
@@ -1524,6 +1530,23 @@ class Ui_ModuleWindow(QMainWindow):
 
                 elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
                     pass
+            elif module == KEY_DISP_BASE_PLATE:
+                tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+                typ = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_TYPE).currentText()
+                source = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_SOURCE).text()
+                material = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL).text()
+                material_fu = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
+                material_fy = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
+                tab_Base_Plate = self.designPrefDialog.findChild(QtWidgets.QWidget, "Base Plate")
+                bp_material = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_MATERIAL).text()
+                bp_material_fu = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FU).text()
+                bp_material_fy = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FY).text()
+
+                d2 = {KEY_SUPTNGSEC_TYPE: typ, KEY_SUPTNGSEC_SOURCE: source, KEY_SUPTNGSEC_MATERIAL: material,
+                      KEY_SUPTNGSEC_FU: material_fu, KEY_SUPTNGSEC_FY: material_fy, KEY_BASE_PLATE_MATERIAL: bp_material,
+                      KEY_BASE_PLATE_FU: bp_material_fu, KEY_BASE_PLATE_FY: bp_material_fy}
+                design_dictionary.update(d2)
+
         else:
             common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
             if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION,
@@ -2099,14 +2122,19 @@ class Ui_ModuleWindow(QMainWindow):
         tab_Detailing = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
         tab_Design = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
         tab_Connector = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
+        tab_Anchor_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
+        tab_Base_Plate = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Base Plate")
 
         table_1 = "Columns"
         table_2 = "Beams"
         material_grade = key_4.currentText()
         material = Material(material_grade)
-        tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
+        if module != KEY_DISP_BASE_PLATE:
+            tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
+        else:
+            tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
         tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
-        if module != KEY_DISP_TENSION:
+        if module not in [KEY_DISP_TENSION, KEY_DISP_BASE_PLATE]:
             material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
             material_connector.setCurrentText(str(material_grade))
 
@@ -2187,8 +2215,29 @@ class Ui_ModuleWindow(QMainWindow):
             # else:
             #     print(designation_col[0])
             # self.designPrefDialog.column_preferences(designation_col[0], table_c, material_grade)
+        elif module == KEY_DISP_BASE_PLATE:
+            bp_list = []
+            anchor_dia = self.design_inputs[KEY_DIA_ANCHOR][0]
+            anchor_typ = self.design_inputs[KEY_TYP_ANCHOR]
+            designation_col = key_2.currentText()
+            self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
+            self.designPrefDialog.anchor_bolt_preferences(anchor_dia, anchor_typ)
+            bp_material = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_MATERIAL)
+            bp_material.setText(str(material_grade))
+            bp_fu = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FU)
+            bp_list.append(bp_fu)
+            bp_fu.setText(str(material.fu))
+            bp_fy = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FY)
+            bp_list.append(bp_fy)
+            bp_fy.setText(str(material.fy))
 
-        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+            for bp in bp_list:
+                if bp.text() != "":
+                    self.designPrefDialog.fu_fy_validation_connect(bp_list, bp)
+
+
+        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION,
+                            KEY_DISP_BASE_PLATE]:
             conn = key_1.currentText()
 
             if conn in VALUES_CONN_1:

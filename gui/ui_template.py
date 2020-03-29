@@ -1118,17 +1118,17 @@ class Ui_ModuleWindow(QMainWindow):
                           KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION, KEY_DISP_BASE_PLATE,
                           KEY_DISP_COLUMNENDPLATE]:
 
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
-            column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
-            beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
-            add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
-            add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
-        elif module == KEY_DISP_COLUMNCOVERPLATE:
-            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
-        elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
-            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-            add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
+            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
+                column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
+                beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
+                add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
+                add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
+            elif module == KEY_DISP_COLUMNCOVERPLATE:
+                section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+                add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
+            elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
+                section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+                add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
 
         elif module == KEY_DISP_COMPRESSION:
             pass

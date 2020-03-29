@@ -648,5 +648,3 @@ class BasePlateConnection(MomentConnection):
 
 
 
-
-

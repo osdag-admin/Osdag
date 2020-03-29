@@ -1179,9 +1179,9 @@ class Ui_Dialog(object):
         module = main.module_name(main)
 
 
-
-
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD,KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD,
+                          KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,
+                          KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
             pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
@@ -1510,7 +1510,7 @@ class DesignPreferences(QDialog):
             combo_slipfactor = key_slipfactor.currentText()
             key_detailingGap = tab_Detailing.findChild(QtWidgets.QWidget, KEY_DP_DETAILING_GAP)
             line_detailingGap = key_detailingGap.text()
-        else:
+        elif module == KEY_DISP_BASE_PLATE:
             key_boltDesignation = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_DESIGNATION)
             line_boltDesignation = key_boltDesignation.text()
             key_boltHoleType = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_HOLE_TYPE)
@@ -1536,7 +1536,7 @@ class DesignPreferences(QDialog):
         combo_design_method = key_design_method.currentText()
 
         key_design_baseplate = tab_Design.findChild(QtWidgets.QWidget, KEY_DP_DESIGN_BASE_PLATE)
-        if module not in [KEY_DISP_TENSION, KEY_DISP_BASE_PLATE]:
+        if module not in [KEY_DISP_BASE_PLATE]:
             key_plate_material = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
             combo_plate_material = key_plate_material.currentText()
             key_plate_material_fu = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU)
@@ -1556,18 +1556,27 @@ class DesignPreferences(QDialog):
                   "Custom " + str(line_plate_material_fu) + " " + str(line_plate_material_fy),
                   }
         elif module == KEY_DISP_BASE_PLATE:
-            d1 = {KEY_DP_ANCHOR_BOLT_DESIGNATION: line_boltDesignation,
-                  KEY_DP_ANCHOR_BOLT_TYPE: combo_boltType,
-                  KEY_DP_ANCHOR_BOLT_HOLE_TYPE: combo_boltHoleType,
-                  KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: line_boltFu,
-                  KEY_DP_ANCHOR_BOLT_FRICTION: line_boltFriction,
-                  KEY_DP_WELD_FAB: combo_weldType,
-                  KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
-                  KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
-                  KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
-                  KEY_DP_DESIGN_METHOD: combo_design_method,
-                  KEY_DP_DESIGN_BASE_PLATE: key_design_baseplate.text()
-                  }
+            if self.flag:
+                d1 = {KEY_DP_ANCHOR_BOLT_DESIGNATION: line_boltDesignation,
+                      KEY_DP_ANCHOR_BOLT_TYPE: combo_boltType,
+                      KEY_DP_ANCHOR_BOLT_HOLE_TYPE: combo_boltHoleType,
+                      KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: line_boltFu,
+                      KEY_DP_ANCHOR_BOLT_FRICTION: line_boltFriction,
+                      KEY_DP_WELD_FAB: combo_weldType,
+                      KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+                      KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
+                      KEY_DP_DESIGN_METHOD: combo_design_method,
+                      KEY_DP_DESIGN_BASE_PLATE: key_design_baseplate.currentText()
+                      }
+            else:
+                d1 = {KEY_DP_WELD_FAB: combo_weldType,
+                      KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+                      KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
+                      KEY_DP_DESIGN_METHOD: combo_design_method,
+                      KEY_DP_DESIGN_BASE_PLATE: key_design_baseplate.currentText()
+                      }
         else:
             d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
                   KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
@@ -1927,6 +1936,32 @@ class DesignPreferences(QDialog):
 
                             self.rejected.connect(self.closeEvent)
                             return
+                    elif 410 <= fy <= 449:
+                        if not (540 <= fu <= 569):
+                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
+                            self.window_close_flag = False
+
+                            self.rejected.connect(self.closeEvent)
+                            return
+                        else:
+                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
+                            self.window_close_flag = True
+
+                            self.rejected.connect(self.closeEvent)
+                            return
+                    elif 450 <= fy <= 549:
+                        if not (570 <= fu <= 649):
+                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
+                            self.window_close_flag = False
+
+                            self.rejected.connect(self.closeEvent)
+                            return
+                        else:
+                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
+                            self.window_close_flag = True
+
+                            self.rejected.connect(self.closeEvent)
+                            return
                     else:
                         textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
                         self.window_close_flag = False
@@ -1995,6 +2030,32 @@ class DesignPreferences(QDialog):
 
                             self.rejected.connect(self.closeEvent)
                             return
+                    elif 540 <= fu <= 569:
+                        if not (410 <= fy <= 449):
+                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
+                            self.window_close_flag = False
+
+                            self.rejected.connect(self.closeEvent)
+                            return
+                        else:
+                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
+                            self.window_close_flag = True
+
+                            self.rejected.connect(self.closeEvent)
+                            return
+                    elif 570 <= fu <= 649:
+                        if not (450 <= fy <= 549):
+                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
+                            self.window_close_flag = False
+
+                            self.rejected.connect(self.closeEvent)
+                            return
+                        else:
+                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
+                            self.window_close_flag = True
+
+                            self.rejected.connect(self.closeEvent)
+                            return
                     else:
                         textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
                         self.window_close_flag = False
@@ -2002,13 +2063,19 @@ class DesignPreferences(QDialog):
                         self.rejected.connect(self.closeEvent)
                         return
 
+    def anchor_bolt_designation(self, d):
+        length = IS_5624_1993.table1(d)
+        length = str(length['min_len'])
+        designation = str(d) + "X" + length + " IS5624 GALV"
+        return designation
     def anchor_bolt_preferences(self, d, typ):
 
         change_list = []
         tab_anchor_bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
         length = IS_5624_1993.table1(d)
         length = str(length['min_len'])
-        designation = str(d)+"X"+length+" IS5624 GALV"
+        # designation = str(d)+"X"+length+" IS5624 GALV"
+        designation = self.anchor_bolt_designation(d)
         initial_designation = designation
         for ch in tab_anchor_bolt.children():
             if ch.objectName() == KEY_DP_ANCHOR_BOLT_DESIGNATION:
@@ -2024,9 +2091,9 @@ class DesignPreferences(QDialog):
 
         for c in change_list:
             if isinstance(c, QtWidgets.QComboBox):
-                c.currentIndexChanged.connect(lambda: self.anchor_bolt_designation(c, initial_designation))
+                c.currentIndexChanged.connect(lambda: self.anchor_bolt_designation_change(c, initial_designation))
 
-    def anchor_bolt_designation(self, c, initial_des):
+    def anchor_bolt_designation_change(self, c, initial_des):
         des = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt").findChild(QtWidgets.QWidget,
                                                                                       KEY_DP_ANCHOR_BOLT_DESIGNATION)
         des_list = initial_des.split(' ')

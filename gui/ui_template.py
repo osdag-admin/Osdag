@@ -643,7 +643,8 @@ class Ui_ModuleWindow(QMainWindow):
 
         for t in new_list:
 
-            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
+            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC, KEY_DIA_ANCHOR] \
+                    and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -1113,22 +1114,24 @@ class Ui_ModuleWindow(QMainWindow):
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
 
+        #
+        # if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
+        #                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION, KEY_DISP_BASE_PLATE,
+        #                   KEY_DISP_COLUMNENDPLATE]:
 
         if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
-                          KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION, KEY_DISP_BASE_PLATE,
-                          KEY_DISP_COLUMNENDPLATE]:
-
-            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
-                column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
-                beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
-                add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
-                add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
-            elif module == KEY_DISP_COLUMNCOVERPLATE:
-                section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-                add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
-            elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
-                section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-                add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
+                          KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
+                          KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
+            column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
+            beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
+            add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
+            add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
+        elif module == KEY_DISP_COLUMNCOVERPLATE:
+            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
+        elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
+            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+            add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
 
         elif module == KEY_DISP_COMPRESSION:
             pass
@@ -1485,7 +1488,9 @@ class Ui_ModuleWindow(QMainWindow):
 
         if self.designPrefDialog.flag:
 
-            if module not in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
+            if module not in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,
+                              KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,
+                              KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
                 tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
                 key_material_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL).currentText()
                 if key_material_column == "Custom":
@@ -1545,7 +1550,8 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
 
-            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
+            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION,
+                              KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
                 d2 = {KEY_SUPTNGSEC_MATERIAL: common_material, KEY_SUPTDSEC_MATERIAL: common_material}
                 design_dictionary.update(d2)
             elif module == KEY_DISP_COMPRESSION:
@@ -1559,6 +1565,24 @@ class Ui_ModuleWindow(QMainWindow):
                     design_dictionary.update(d2)
                 elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
                     pass
+            elif module == KEY_DISP_BASE_PLATE:
+                des = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentText()
+                anchor_dia = data_list[KEY_DIA_ANCHOR+"_customized"]
+                anchor_typ = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_TYP_ANCHOR).currentText()
+                col_attributes = Section(des, common_material)
+                Section.connect_to_database_update_other_attributes(col_attributes, "Columns", des)
+                d2 = {KEY_SUPTNGSEC_TYPE: "Rolled", KEY_SUPTNGSEC_SOURCE: str(col_attributes.source),
+                      KEY_SUPTNGSEC_MATERIAL: common_material,
+                      KEY_SUPTNGSEC_FU: str(col_attributes.fu), KEY_SUPTNGSEC_FY: str(col_attributes.fy),
+                      KEY_BASE_PLATE_MATERIAL: common_material,
+                      KEY_BASE_PLATE_FU: str(col_attributes.fu), KEY_BASE_PLATE_FY: str(col_attributes.fy),
+                      KEY_DP_ANCHOR_BOLT_DESIGNATION: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0]),
+                      KEY_DP_ANCHOR_BOLT_TYPE: anchor_typ,
+                      KEY_DP_ANCHOR_BOLT_HOLE_TYPE: 'Standard',
+                      KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(col_attributes.fu),
+                      KEY_DP_ANCHOR_BOLT_FRICTION: str(0.30)
+                      }
+                design_dictionary.update(d2)
 
         design_dictionary.update(self.designPrefDialog.save_designPref_para(module))
         self.design_inputs = design_dictionary
@@ -2132,7 +2156,7 @@ class Ui_ModuleWindow(QMainWindow):
             tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
         tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
 
-        if module not in [KEY_DISP_TENSION, KEY_DISP_BASE_PLATE]:
+        if module not in [KEY_DISP_BASE_PLATE]:
             material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
             material_connector.setCurrentText(str(material_grade))
 

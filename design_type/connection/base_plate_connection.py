@@ -217,7 +217,7 @@ class BasePlateConnection(MomentConnection):
         t4 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/base_plate.png")
         options_list.append(t4)
 
-        t5 = (KEY_END_CONDITION, KEY_DISP_END_CONDITION, TYPE_NOTE, existingvalue_key_conn, 'Fixed')
+        t5 = (KEY_END_CONDITION, KEY_DISP_END_CONDITION, TYPE_NOTE, existingvalue_key_conn, 'Pinned')
         options_list.append(t5)
 
         t6 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"))  # this might not be required
@@ -401,7 +401,7 @@ class BasePlateConnection(MomentConnection):
         t6 = (KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, '')
         anchor_bolt.append(t6)
 
-        t7 = (KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DISP_DP_ANCHOR_BOLT_FRICTION, TYPE_TEXTBOX, '')
+        t7 = (KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DISP_DP_ANCHOR_BOLT_FRICTION, TYPE_TEXTBOX, '0.30')
         anchor_bolt.append(t7)
 
         return anchor_bolt
@@ -447,7 +447,7 @@ class BasePlateConnection(MomentConnection):
                                                                                'Working Stress Design'])
         design.append(t1)
 
-        t2 = (KEY_DP_DESIGN_BASE_PLATE, KEY_DISP_DP_DESIGN_BASE_PLATE, TYPE_TEXTBOX, '')
+        t2 = (KEY_DP_DESIGN_BASE_PLATE, KEY_DISP_DP_DESIGN_BASE_PLATE, TYPE_COMBOBOX, ['Effective Area Method'])
         design.append(t2)
 
         return design
@@ -625,7 +625,7 @@ class BasePlateConnection(MomentConnection):
         self.dp_anchor_hole = str(design_dictionary[KEY_DP_ANCHOR_BOLT_HOLE_TYPE])
         self.dp_anchor_fu_overwrite = float(design_dictionary[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O])
         self.dp_anchor_friction = float(design_dictionary[KEY_DP_ANCHOR_BOLT_FRICTION] if
-                                        design_dictionary[KEY_DP_ANCHOR_BOLT_FRICTION] != "" else 0)
+                                        design_dictionary[KEY_DP_ANCHOR_BOLT_FRICTION] != "" else 0.30)
 
         self.dp_weld_fab = str(design_dictionary[KEY_DP_WELD_FAB])
         self.dp_weld_fu_overwrite = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])

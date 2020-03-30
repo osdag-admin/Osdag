@@ -60,7 +60,7 @@ from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
 from design_type.connection.end_plate_connection import EndPlateConnection
-
+from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
@@ -561,6 +561,8 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+                if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
+                    r.setDisabled(True)
 
             if type == TYPE_MODULE:
                 _translate = QtCore.QCoreApplication.translate
@@ -617,36 +619,44 @@ class Ui_ModuleWindow(QMainWindow):
     ###############################
     # @author: Amir
         new_list = main.customized_input(main)
+        print (new_list)
         data = {}
 
         for t in new_list:
 
-            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (module != KEY_DISP_TENSION):
+            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
-            elif t[0] == KEY_GRD:
+            elif t[0] == KEY_GRD and (module not in [KEY_DISP_TENSION_WELDED,KEY_DISP_BEAMCOVERPLATEWELD,KEY_DISP_COLUMNCOVERPLATEWELD]):
                 key_customized_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_2.activated.connect(lambda: popup(key_customized_2, new_list))
                 data[t[0] + "_customized"] = t[1]()
-            elif t[0] == KEY_D:
+            elif t[0] == KEY_D and (module not in [KEY_DISP_TENSION_WELDED,KEY_DISP_BEAMCOVERPLATEWELD,KEY_DISP_COLUMNCOVERPLATEWELD]):
                 key_customized_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
                 data[t[0] + "_customized"] = t[1]()
-                
-            elif t[0] == KEY_SECSIZE and (module == KEY_DISP_COMPRESSION or module == KEY_DISP_TENSION):
+            elif t[0] == KEY_SECSIZE and (module in [KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]):
                 key_customized_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_4.activated.connect(lambda: popup(key_customized_4, new_list))
                 data[t[0] + "_customized"] = t[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
-                                KEY_SEC_PROFILE).currentText())
+                                                                                    KEY_SEC_PROFILE).currentText())
 
-            elif t[0] in [KEY_WEBPLATE_THICKNESS] and (module != KEY_DISP_TENSION):
+            elif t[0] in [KEY_WEBPLATE_THICKNESS] and (module not in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]):
                 key_customized_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_5.activated.connect(lambda: popup(key_customized_5, new_list))
                 data[t[0] + "_customized"] = t[1]()
 
             else:
                 pass
+
+            # elif t[0] == KEY_SEC_PROFILE and (module == KEY_DISP_TENSION):
+            #     key_customized_6 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+            #     key_customized_6.activated.connect(lambda: popup(key_customized_6, new_list))
+            #     data[t[0] + "_customized"] = t[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
+            #                     KEY_SEC_PROFILE).currentText())
+
+
 
         def popup(key, for_custom_list):
 
@@ -661,7 +671,7 @@ class Ui_ModuleWindow(QMainWindow):
                     continue
                 selected = key.currentText()
                 f = c_tup[1]
-                if c_tup[0] == KEY_SECSIZE and (module == KEY_DISP_COMPRESSION or module == KEY_DISP_TENSION):
+                if c_tup[0] == KEY_SECSIZE and (module in [KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]):
                     options = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText())
                     existing_options = data[c_tup[0] + "_customized"]
                     if selected == "Customized":
@@ -764,7 +774,6 @@ class Ui_ModuleWindow(QMainWindow):
         out_scrollcontent = QtWidgets.QWidget(out_scroll)
         out_layout2 = QtWidgets.QGridLayout(out_scrollcontent)
         out_scrollcontent.setLayout(out_layout2)
-
         out_list = main.output_values(main, False)
         _translate = QtCore.QCoreApplication.translate
 
@@ -1082,11 +1091,11 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(module))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(main)
-
-
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+
+
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
@@ -1094,9 +1103,10 @@ class Ui_ModuleWindow(QMainWindow):
         elif module == KEY_DISP_COLUMNCOVERPLATE:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
-        elif module == KEY_DISP_BEAMCOVERPLATE:
+        elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
+
         elif module == KEY_DISP_COMPRESSION:
             pass
         self.designPrefDialog.rejected.connect(self.design_preferences)
@@ -1159,7 +1169,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
         # self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
         # self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
-        self.btn_Design.clicked.connect(self.osdag_header)
+        # self.btn_Design.clicked.connect(self.osdag_header)
         self.actionShow_beam.triggered.connect(lambda: main.call_3DBeam(self,"gradient_bg"))
         self.actionShow_column.triggered.connect(lambda: main.call_3DColumn(self,"gradient_bg"))
         self.actionShow_finplate.triggered.connect(lambda: main.call_3DFinplate(self,"gradient_bg"))
@@ -1207,7 +1217,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag Fin Plate")
-
         self.mytabWidget.resize(size[0], size[1])
         self.mytabWidget.addTab(self.modelTab, "")
 
@@ -1215,9 +1224,10 @@ class Ui_ModuleWindow(QMainWindow):
         display = self.modelTab._display
 
         # background gradient
-        display.set_bg_gradient_color([23, 1, 32],[23, 1, 32])
-        # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        display.display_triedron()
+        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
+        # display.display_trihedron()
+        display.display_trihedron()
         display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):
@@ -1258,7 +1268,7 @@ class Ui_ModuleWindow(QMainWindow):
         status = True
         if status is True:
             if self.fuse_model is None:
-                self.fuse_model = CommonDesignLogic.create2Dcad
+                self.fuse_model = CommonDesignLogic.create2Dcad(self.commLogicObj)
             shape = self.fuse_model
 
             files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
@@ -1346,6 +1356,7 @@ class Ui_ModuleWindow(QMainWindow):
                 val = f(k1.currentText(), key_end1.currentText())
                 k2.clear()
             if typ == TYPE_COMBOBOX:
+                k2.clear()
                 for values in val:
                     k2.addItem(values)
                     k2.setCurrentIndex(0)
@@ -1363,6 +1374,11 @@ class Ui_ModuleWindow(QMainWindow):
             elif typ == TYPE_IMAGE:
                 pixmap1 = QPixmap(val)
                 k2.setPixmap(pixmap1)
+            elif typ == TYPE_TEXTBOX:
+                if val:
+                    k2.setEnabled(True)
+                else:
+                    k2.setDisabled(True)
             else:
                 pass
 
@@ -1434,8 +1450,10 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 d1 = {}
             design_dictionary.update(d1)
+
         if self.designPrefDialog.flag:
-            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+
+            if module not in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
                 tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
                 key_material_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL).currentText()
                 if key_material_column == "Custom":
@@ -1476,15 +1494,28 @@ class Ui_ModuleWindow(QMainWindow):
                 elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
                     pass
         else:
-            d2 = {KEY_SUPTNGSEC_MATERIAL: '', KEY_SUPTDSEC_MATERIAL: ''}
-            design_dictionary.update(d2)
+            common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
+            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
+                d2 = {KEY_SUPTNGSEC_MATERIAL: common_material, KEY_SUPTDSEC_MATERIAL: common_material}
+                design_dictionary.update(d2)
+            elif module == KEY_DISP_COMPRESSION:
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+                section = key.currentText()
+                if section == 'Beams':
+                    d2 = {KEY_SUPTDSEC_MATERIAL: common_material}
+                    design_dictionary.update(d2)
+                elif section == 'Columns':
+                    d2 = {KEY_SUPTNGSEC_MATERIAL: common_material}
+                    design_dictionary.update(d2)
+                elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
+                    pass
 
-        design_dictionary.update(self.designPrefDialog.save_designPref_para())
+        design_dictionary.update(self.designPrefDialog.save_designPref_para(module))
         self.design_inputs = design_dictionary
 
     # def pass_d(self, main, design_dictionary):
     #     """
-    #     It sets key variable textEdit and passes it to warn text function present in tension.py for logger
+    #     It sets key variable textEdit and passes it to warn text function present in tension_bolted.py for logger
     #      """
     #
     #     # @author Arsil Zunzunia
@@ -1499,7 +1530,7 @@ class Ui_ModuleWindow(QMainWindow):
     '''
     def saveDesign_inputs(self):
         fileName, _ = QFileDialog.getSaveFileName(self,
-                                                  "Save Design", os.path.join(' ', "untitled.osi"),
+                                                  "Save Design", os.path.join(self.folder, "untitled.osi"),
                                                   "Input Files(*.osi)")
         if not fileName:
             return
@@ -1517,8 +1548,12 @@ class Ui_ModuleWindow(QMainWindow):
             return EndPlateConnection
         elif name == KEY_DISP_COLUMNCOVERPLATE:
             return ColumnCoverPlate
+        # elif name == KEY_DISP_COLUMNCOVERPLATEWELD:
+        #     return ColumnCoverPlateWeld
         elif name == KEY_DISP_BEAMCOVERPLATE:
             return BeamCoverPlate
+        # elif name == KEY_DISP_BEAMCOVERPLATEWELD:
+        #     return BeamCoverPlateWeld
         elif name == KEY_DISP_BEAMENDPLATE:
             return BeamEndPlate
         elif name == KEY_DISP_COLUMNENDPLATE:
@@ -1529,7 +1564,7 @@ class Ui_ModuleWindow(QMainWindow):
     '''
 
     def loadDesign_inputs(self, op_list, data, new, main):
-        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(' '), ''), "InputFiles(*.osi)")
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(self.folder)), "InputFiles(*.osi)")
         if not fileName:
             return
         try:
@@ -1641,10 +1676,10 @@ class Ui_ModuleWindow(QMainWindow):
             #                                                  main.module)
 
 
-            if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_CLEATANGLE):
-                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
-                status = main.design_status
-                self.commLogicObj.call_3DModel(status)
+            if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_COLUMNCOVERPLATE or main.module == KEY_DISP_CLEATANGLE):
+                # self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
+                # status = main.design_status
+                # self.commLogicObj.call_3DModel(status, CleatAngleConnection)
                 # self.callFin2D_Drawing("All")
                 self.btn3D.setEnabled(True)
                 self.chkBxBeam.setEnabled(True)
@@ -1654,6 +1689,12 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_beam.setEnabled(True)
                 self.actionShow_column.setEnabled(True)
                 self.actionShow_finplate.setEnabled(True)
+                # image = main.generate_3D_Cad_image(main, self, self.folder)
+                fName = str('./ResourceFiles/images/3d.png')
+                file_extension = fName.split(".")[-1]
+                if file_extension == 'png':
+                    self.display.ExportToImage(fName)
+
             else:
                 self.btn3D.setEnabled(False)
                 self.chkBxBeam.setEnabled(False)
@@ -1665,17 +1706,17 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_finplate.setEnabled(False)
 
 
-        # image = main.generate_3D_Cad_image(main,self,self.folder)
-
     def osdag_header(self):
-        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
-        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "OsdagHeader.png")))
+        image_path2 = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "ColumnsBeams.png")))
+
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "OsdagHeader.png"))
+        shutil.copyfile(image_path2, os.path.join(str(self.folder), "images_html", "ColumnsBeams.png"))
 
     def output_button_connect(self, main, button_list, b):
         b.clicked.connect(lambda: self.output_button_dialog(main, button_list, b))
 
     def output_button_dialog(self, main, button_list, button):
-
         dialog = QtWidgets.QDialog()
         dialog.resize(350, 170)
         dialog.setFixedSize(dialog.size())
@@ -2018,6 +2059,7 @@ class Ui_ModuleWindow(QMainWindow):
         key_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
         key_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
         key_6 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+
         tab_Column = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         tab_Beam = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
         tab_Angle = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
@@ -2034,17 +2076,20 @@ class Ui_ModuleWindow(QMainWindow):
         material = Material(material_grade)
         tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
         tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
-        material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
-        material_connector.setCurrentText(str(material_grade))
+        if module not in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
+            material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
+            material_connector.setCurrentText(str(material_grade))
 
-        def f(material_g):
-            m = Material(material_g)
-            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(m.fu))
-            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(m.fy))
+            def f(material_g):
+                m = Material(material_g)
+                tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(m.fu))
+                tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(m.fy))
 
-        material_connector.currentIndexChanged.connect(lambda: f(material_connector.currentText()))
-        tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(material.fu))
-        tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(material.fy))
+            material_connector.currentIndexChanged.connect(lambda: f(material_connector.currentText()))
+            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(material.fu))
+            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(material.fy))
+        else:
+            pass
 
         if module == KEY_DISP_COLUMNCOVERPLATE:
             designation_col = key_5.currentText()
@@ -2106,8 +2151,6 @@ class Ui_ModuleWindow(QMainWindow):
             # designation_col = 'HB 150'
             # designation_col = '20 20 X 3'
             # designation_col = 'JC 100'
-
-
             # if key_5.currentIndex() == 0:
             # if designation_col[0] == 'Select Section':
             #     print(designation_col[1])
@@ -2115,7 +2158,7 @@ class Ui_ModuleWindow(QMainWindow):
             #     print(designation_col[0])
             # self.designPrefDialog.column_preferences(designation_col[0], table_c, material_grade)
 
-        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION]:
+        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
             conn = key_1.currentText()
 
             if conn in VALUES_CONN_1:

@@ -9,6 +9,7 @@ from builtins import str
 import time
 from Report_functions import *
 import math
+from utils.common.common_calculation import *
 # from Common import *
 import os
 import pdfkit
@@ -22,7 +23,7 @@ import datetime
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 
 
-from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn
+from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic
 from pdflatex import PDFLaTeX
@@ -41,10 +42,8 @@ class CreateLatex(Document):
 
 
     @pyqtSlot()
-    def save_latex(self, outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder):
-        print('iamhere2')
+    def save_latex(self, outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder, rel_path, Disp_3d_image):
 
-        print(Design_Check)
 
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
@@ -72,8 +71,6 @@ class CreateLatex(Document):
                 table.add_row(('Date', time.strftime("%d /%m /%Y"), 'Client', client),color='OsdagGreen')
                 table.add_hline()
 
-        print(header)
-
         # Create right footer
         with header.create(Foot("R")):
             header.append(simple_page_number())
@@ -86,30 +83,87 @@ class CreateLatex(Document):
         geometry_options = {"top":"1.2in", "bottom":"1in", "left":"0.6in", "right":"0.6in", "headsep":"0.8in"}
         doc = Document(geometry_options=geometry_options,indent=False)
         doc.packages.append(Package('amsmath'))
+        doc.packages.append(Package('graphicx'))
         doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
         doc.preamble.append(header)
         doc.change_document_style("header")
 
         with doc.create(Section('Input Parameters')):
-            with doc.create(Tabularx('|l|X|')) as table:
+            with doc.create(LongTable('|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|',row_height=1.2)) as table:
                 table.add_hline()
                 for i in uiObj:
-                    table.add_row((i, uiObj[i]))
-                    table.add_hline()
+                    # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
+
+                    print(i)
+                    if i == "Column Details":
+                        table.add_hline()
+                        merge_rows = int(round_up(len(columndetails),2)/2 + 2)
+                        print('Hi', len(columndetails)/2,round_up(len(columndetails),2)/2, merge_rows)
+                        if merge_rows%2 != 0:
+                            columndetails['']=''
+                        a = list(columndetails.keys())
+                        # index=0
+                        for x in range(0,merge_rows):
+                            # table.add_row("Col.Det.",i,columndetails[i])
+                            if x == 0:
+                                table.add_row((MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
+                                filename=r'"'+rel_path+uiObj["Column Details"])), MultiColumn(2, align='|c|', data=a[x]),
+                                              MultiColumn(2, align='|c|', data=columndetails[a[x]]),))
+                                # index += 1
+                            elif x <=3:
+                                table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
+                                              MultiColumn(2, align='|c|', data=columndetails[a[x]]),))
+                            else:
+                                table.add_row(('', a[x], columndetails[a[x]],a[merge_rows+x-4], columndetails[a[merge_rows+x-4]],))
+                            table.add_hline(2,5)
+
+                    elif i=="Beam Details":
+                        table.add_hline()
+                        merge_rows = int(round_up(len(beamdetails), 2) / 2 + 2)
+
+                        if merge_rows % 2 != 0:
+                            beamdetails[''] = ''
+                        a = list(beamdetails.keys())
+
+                        for x in range(0, merge_rows):
+
+                            if x == 0:
+                                table.add_row((
+                                    MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
+                                                                                filename=r'"' + rel_path + uiObj[
+                                                                                    "Beam Details"])),
+                                    MultiColumn(2, align='|c|', data=a[x]),
+                                    MultiColumn(2, align='|c|', data=beamdetails[a[x]]),))
+
+                            elif x <= 3:
+                                table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
+                                              MultiColumn(2, align='|c|', data=beamdetails[a[x]]),))
+                            else:
+                                table.add_row('', a[x], beamdetails[a[x]], a[merge_rows + x - 4],
+                                              beamdetails[a[merge_rows + x - 4]])
+                            table.add_hline(2, 5)
+                    elif uiObj[i] == "TITLE":
+                        table.add_hline()
+                        table.add_row((MultiColumn(5, align='|c|', data=bold(i),),))
+                        table.add_hline()
+                    else:
+                        table.add_hline()
+                        table.add_row((MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
+                        table.add_hline()
+
 
         with doc.create(Section('Design Checks')):
-            with doc.create(Tabularx('|l|l|l|X|')) as table:
+            with doc.create(LongTable('|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|',row_height=1.2)) as table:
                 table.add_hline()
                 table.add_row(('Check', 'Required', 'Provided', 'Remarks'),color='OsdagGreen')
+                table.add_hline()
+                table.end_table_header()
                 table.add_hline()
                 for check in Design_Check:
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()
 
-
-
-
-        doc.generate_pdf('Fin Plate Report',  clean_tex=False)
+        doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
 
 # reportsummary = {}
 # reportsummary["ProfileSummary"] = {}

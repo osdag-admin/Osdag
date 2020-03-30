@@ -130,7 +130,6 @@ class EndPlateConnection(ShearConnection):
 
         # @author: Amir, Umair
         self.module = KEY_DISP_ENDPLATE
-
         options_list = []
 
         if KEY_CONN in existingvalues:
@@ -185,7 +184,6 @@ class EndPlateConnection(ShearConnection):
 
         t16 = (KEY_MODULE, KEY_DISP_ENDPLATE, TYPE_MODULE, None, None)
         options_list.append(t16)
-
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
@@ -658,7 +656,7 @@ class EndPlateConnection(ShearConnection):
                 fillet_size=self.weld.size, fusion_face_angle=90)
             weld_eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
                 fillet_size=self.weld.size, available_length=self.weld.length)
-            self.weld.strength = self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
+            self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
                                                 weld_fabrication=KEY_DP_WELD_FAB_FIELD,
                                                 t_weld=self.weld.size, weld_angle=90)
             # Ip_weld = 2 * weld_eff_length ** 3 / 12
@@ -667,7 +665,7 @@ class EndPlateConnection(ShearConnection):
             force_h = self.load.shear_force * 1000
             force_l = self.load.axial_force * 1000
             # force_t = self.plate.moment_demand
-            self.weld.stress = self.weld.get_weld_stress(force_h, force_l, weld_twist= 0.0, Ip_weld=0.0, y_max=0.0,
+            self.weld.get_weld_stress(force_h, force_l, weld_twist= 0.0, Ip_weld=0.0, y_max=0.0,
                                                         x_max=0.0, l_weld=2*weld_eff_length)
             if self.weld.strength > self.weld.stress:
                 break
@@ -836,7 +834,6 @@ class EndPlateConnection(ShearConnection):
     #     print(self.load)
     #     print(self.bolt)
     #     print(self.plate)
-
 
 
     @staticmethod

@@ -663,6 +663,22 @@ VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZ
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
 
 
+KEY_DP_ANCHOR_BOLT_DESIGNATION = 'DesignPreferences.Anchor_Bolt.Designation'
+KEY_DP_ANCHOR_BOLT_TYPE = 'DesignPreferences.Anchor_Bolt.Type'
+KEY_DISP_DP_ANCHOR_BOLT_TYPE = 'Anchor Bolt type'
+KEY_DP_ANCHOR_BOLT_HOLE_TYPE = 'DesignPreferences.Anchor_Bolt.Bolt_Hole_Type'
+KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE = 'Anchor Bolt hole type'
+KEY_DP_ANCHOR_BOLT_MATERIAL_G_O = 'DesignPreferences.Anchor_Bolt.Material_Grade_OverWrite'
+KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
+KEY_DISP_DP_ANCHOR_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
+KEY_DP_ANCHOR_BOLT_SLIP_FACTOR = 'DesignPreferences.Anchor_Bolt.Slip_Factor'
+KEY_DISP_DP_ANCHOR_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
+KEY_DP_ANCHOR_BOLT_GALVANIZED = 'DesignPreferences.Anchor_Bolt.Galvanized'
+KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED = 'Is galvanized?'
+KEY_DP_ANCHOR_BOLT_LENGTH = 'DesignPreferences.Anchor_Bolt.Length'
+KEY_DISP_DP_ANCHOR_BOLT_LENGTH = 'Length'
+KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficient'
+KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction coefficient between <br>concrete and anchor bolt'
 
 
 KEY_DP_BOLT_TYPE = 'DesignPreferences.Bolt.Type'
@@ -693,6 +709,8 @@ KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'DesignPreferences.Detailing.Corrosive_I
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the members exposed to <br>corrosive influences'
 KEY_DP_DESIGN_METHOD = 'DesignPreferences.Design.Design_Method'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
+KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
+KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate'
 
 KEY_SUPTNGSEC_DESIGNATION = 'Supporting_Section.Designation'
 KEY_DISP_SUPTNGSEC_DESIGNATION = 'Designation'
@@ -810,6 +828,14 @@ KEY_SUPTDSEC_POISSON_RATIO = 'Supported_Section.Poisson_Ratio'
 KEY_DISP_SUPTDSEC_POISSON_RATIO = 'Poissons ratio, v'
 KEY_SUPTDSEC_THERMAL_EXP = 'Supported_Section.Thermal_Expansion'
 KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
+
+
+KEY_BASE_PLATE_MATERIAL = 'Base_Plate.Material'
+KEY_BASE_PLATE_FU = 'Base_Plate.Fu'
+KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
+KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , fy (MPa)'
+KEY_BASE_PLATE_FY = 'Base_Plate.Fy'
+
 
 
 

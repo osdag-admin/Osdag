@@ -11,11 +11,16 @@
 
 
 @Reference(s): 1) IS 800: 2007, General construction in steel - Code of practice (Third revision)
-               2) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 15)
-               3) Limit State Design of Steel Structures by S K Duggal (second edition, Chapter 11)
+               2) IS 808: 1989, Dimensions for hot rolled steel beam, column, channel, and angle sections and
+                                it's subsequent revision(s)
+               3) IS 2062: 2011, Hot rolled medium and high tensile structural steel - specification
+               4) IS 5624: 1993, Foundation bolts
+               5) IS 456: 2000, Plain and reinforced concrete - code of practice
+               6) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 15)
+               7) Limit State Design of Steel Structures by S K Duggal (second edition, Chapter 11)
 
-     other     4)  Column Bases - Omer Blodgett (chapter 3)
-  references   5) AISC Design Guide 1 - Base Plate and Anchor Rod Design
+     other     8)  Column Bases - Omer Blodgett (chapter 3)
+  references   9) AISC Design Guide 1 - Base Plate and Anchor Rod Design
 
 """
 
@@ -26,6 +31,7 @@ from utils.common.component import *
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
+from utils.common.other_standards import *
 import yaml
 from design_report.reportGenerator import save_html
 
@@ -56,9 +62,60 @@ class BasePlateConnection(MomentConnection):
     Perform stress analyses --> design base plate and anchor bolt--> provide connection detailing.
 
     Attributes:
-                gamma_mb (float): partial safety factor for material - resistance of connection - bolts
-                gamma_m0 (float): partial safety factor for material - resistance governed by yielding or buckling
-                gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress
+                connectivity (str): type of base plate connection (pinned - welded, pinned - bolted,
+                gusseted, hollow section).
+                end_condition (str): assume end condition based on base plate type.
+                    Assumption(s):
+                                1) End condition is 'Pinned' for welded and bolted base plate.
+                                2) End condition is 'Fixed' for gusseted and hollow section type base plate.
+                column_section (str): column section [Ref: IS 808: 1989, it's subsequent revision(s),
+                                any new section data added by the user using the 'add section' feature from Osdag GUI.
+                material (str): material grade of the column section [Ref: IS 2062: 2011].
+
+                load_axial (float): Axial compressive load (concentric to column axis).
+                load_shear (float): Shear/horizontal load.
+                load_moment_major (float): Bending moment acting along the major (z-z) axis of the column.
+                load_moment_minor (float): Bending moment acting along the minor (y-y) axis of the column.
+
+                anchor_dia (str): diameter of the anchor bolt [Ref: IS 5624: 1993, page 5].
+                anchor_type (str): type of the anchor bolt [Ref: IS 5624: 1993, Annex A, clause 4].
+
+                footing_grade (str): grade of footing material (concrete) [Ref: IS 456: 2000, table 2].
+
+                dp_column_designation (str): designation of the column as per IS 808.
+                dp_column_type (str): type of manufacturing of the coulmn section (rolled, built-up, welded etc.).
+                dp_column_source (str): source of the database of the column section.
+                                        [Osdag/ResourceFiles/Database/Intg_osdag.sqite].
+                dp_column_material (str): material grade of the column section [Ref: IS 2062: 2011].
+                dp_column_fu (float): ultimate strength of the column section (default if not overwritten).
+                dp_column_fy (float): yield strength of the column section (default if not overwritten).
+
+                dp_bp_material (str): material grade of the base plate [Ref: IS 2062: 2011].
+                dp_bp_fu (float): ultimate strength of the base plate (default if not overwritten).
+                dp_bp_fy (float): yield strength of the base plate (default if not overwritten).
+                    Assumption: The ultimate and yield strength values of base plare are assumed to be same as the
+                                parent (column) material unless and untill overwritten in the design preferences,
+                                with suitable validation.
+
+                dp_anchor_designation (str): designation of the anchor bolt as per IS 5624: 1993, clause 5.
+                dp_anchor_type (str): type of the anchor bolt [Ref: IS 5624: 1993, Annex A, clause 4].
+                dp_anchor_hole (str): type of hole 'Standard' or 'Over-sized'.
+                dp_anchor_fu_overwrite (float): ultimate strength of the anchor bolt corresponding to its grade.
+                dp_anchor_friction (float): coefficient of friction between the anchor bolt and the footing material.
+
+                dp_weld_fab (str): type of weld fabrication, 'Shop Weld' or 'Field Weld'.
+                dp_weld_fu_overwrite (float): ultimate strength of the weld material.
+
+                dp_detail_edge_type (str): type of edge preparation, 'a - hand flame cut' or 'b - Machine flame cut'.
+                dp_detail_is_corrosive (str): is environment corrosive, 'Yes' or 'No'.
+
+                dp_design_method (str): design philosophy used 'Limit State Design'.
+                dp_bp_method (str): analysis method used for base plate 'Effective Area Method'
+
+                gamma_m0 (float): partial safety factor for material - resistance governed by yielding or buckling.
+                gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress.
+                gamma_mb (float): partial safety factor for material - resistance of connection - bolts.
+                gamma_mw (float): partial safety factor for material - resistance of connection - weld.
 
     """
 
@@ -83,30 +140,30 @@ class BasePlateConnection(MomentConnection):
         self.footing_grade = 0.0
 
         # attributes for design preferences
-        self.dp_column_designation = ""
+        self.dp_column_designation = ""  # dp for column
         self.dp_column_type = ""
         self.dp_column_source = ""
         self.dp_column_material = ""
         self.dp_column_fu = 0.0
         self.dp_column_fy = 0.0
 
-        self.dp_bp_material = ""
+        self.dp_bp_material = ""  # dp for base plate
         self.dp_bp_fu = 0.0
         self.dp_bp_fy = 0.0
 
-        self.dp_anchor_designation = ""
+        self.dp_anchor_designation = ""  # dp for anchor bolt
         self.dp_anchor_type = ""
         self.dp_anchor_hole = "Standard"
         self.dp_anchor_fu_overwrite = 0.0
         self.dp_anchor_friction = 0.0
 
-        self.dp_weld_fab = "Shop Weld"
+        self.dp_weld_fab = "Shop Weld"  # dp for weld
         self.dp_weld_fu_overwrite = 0.0
 
-        self.dp_detail_edge_type = "b - Machine flame cut"
+        self.dp_detail_edge_type = "b - Machine flame cut"  # dp for detailing
         self.dp_detail_is_corrosive = "No"
 
-        self.dp_design_method = "Limit State Design"
+        self.dp_design_method = "Limit State Design"  # dp for design
         self.dp_bp_method = "Effective Area Method"
 
         # other attributes
@@ -216,7 +273,7 @@ class BasePlateConnection(MomentConnection):
         t4 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/base_plate.png")
         options_list.append(t4)
 
-        t5 = (KEY_END_CONDITION, KEY_DISP_END_CONDITION, TYPE_NOTE, existingvalue_key_conn, 'Fixed')
+        t5 = (KEY_END_CONDITION, KEY_DISP_END_CONDITION, TYPE_NOTE, existingvalue_key_conn, 'Pinned')
         options_list.append(t5)
 
         t6 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"))  # this might not be required
@@ -348,13 +405,20 @@ class BasePlateConnection(MomentConnection):
         if flag:
             print(design_dictionary)
             # self.set_input_values(self, design_dictionary)
+            self.bp_parameters(self, design_dictionary)
         else:
             pass
 
     def tab_list(self):
         tabs = []
 
-        t1 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        t0 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
+        tabs.append(t0)
+
+        t5 = ("Base Plate", TYPE_TAB_2, self.tab_bp)
+        tabs.append(t5)
+
+        t1 = ("Anchor Bolt", TYPE_TAB_2, self.anchor_bolt_values)
         tabs.append(t1)
 
         t2 = ("Weld", TYPE_TAB_2, self.weld_values)
@@ -366,14 +430,217 @@ class BasePlateConnection(MomentConnection):
         t4 = ("Design", TYPE_TAB_2, self.design_values)
         tabs.append(t4)
 
-        t5 = ("Connector", TYPE_TAB_2, self.connector_values)
-        tabs.append(t5)
+        # t5 = ("Connector", TYPE_TAB_2, self.connector_values)
+        # tabs.append(t5)
 
         return tabs
 
+    @staticmethod
+    def anchor_bolt_values():
+        anchor_bolt = []
+
+        t1 = (KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, '')
+        anchor_bolt.append(t1)
+
+        t2 = (KEY_DP_ANCHOR_BOLT_TYPE, KEY_DISP_DP_ANCHOR_BOLT_TYPE, TYPE_COMBOBOX, VALUES_TYP_ANCHOR)
+        anchor_bolt.append(t2)
+
+        t3 = (KEY_DP_ANCHOR_BOLT_GALVANIZED, KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED, TYPE_COMBOBOX, ['Yes', 'No'])
+        anchor_bolt.append(t3)
+
+        t4 = (KEY_DP_ANCHOR_BOLT_HOLE_TYPE, KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'])
+        anchor_bolt.append(t4)
+
+        t5 = (KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DISP_DP_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX, '')
+        anchor_bolt.append(t5)
+
+        t6 = (KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, '')
+        anchor_bolt.append(t6)
+
+        t7 = (KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DISP_DP_ANCHOR_BOLT_FRICTION, TYPE_TEXTBOX, '0.30')
+        anchor_bolt.append(t7)
+
+        return anchor_bolt
+
+    @staticmethod
+    def tab_bp():
+        tab_bp = []
+        t1 = (KEY_BASE_PLATE_MATERIAL, KEY_DISP_MATERIAL, TYPE_TEXTBOX, None)
+        tab_bp.append(t1)
+
+        t2 = (KEY_BASE_PLATE_FU, KEY_DISP_BASE_PLATE_FU, TYPE_TEXTBOX, None)
+        tab_bp.append(t2)
+
+        t3 = (KEY_BASE_PLATE_FY, KEY_DSIP_BASE_PLATE_FY, TYPE_TEXTBOX, None)
+        tab_bp.append(t3)
+
+        return tab_bp
+
+    @staticmethod
+    def detailing_values():
+        detailing = []
+
+        t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX, [
+            'a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'])
+        detailing.append(t1)
+
+        t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
+              ['No', 'Yes'])
+        detailing.append(t3)
+
+        t4 = ["textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION]
+        detailing.append(t4)
+
+        return detailing
+
+    @staticmethod
+    def design_values():
+
+        design = []
+
+        t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX, ['Limit State Design',
+                                                                               'Limit State (Capacity based) Design',
+                                                                               'Working Stress Design'])
+        design.append(t1)
+
+        t2 = (KEY_DP_DESIGN_BASE_PLATE, KEY_DISP_DP_DESIGN_BASE_PLATE, TYPE_COMBOBOX, ['Effective Area Method'])
+        design.append(t2)
+
+        return design
+
+    @staticmethod
+    def tab_column_section():
+        supporting_section = []
+        t1 = (KEY_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_DESIGNATION, TYPE_TEXTBOX, None)
+        supporting_section.append(t1)
+
+        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None)
+        supporting_section.append(t2)
+
+        # material = connectdb("Material", call_type="popup")
+        # material.append('Custom')
+        t34 = (KEY_SUPTNGSEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_TEXTBOX, None)
+        supporting_section.append(t34)
+
+        # t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
+        # supporting_section.append(t3)
+
+        # t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None)
+        # supporting_section.append(t4)
+
+        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None)
+        supporting_section.append(t5)
+
+        t6 = (KEY_SUPTNGSEC_DEPTH, KEY_DISP_SUPTNGSEC_DEPTH, TYPE_TEXTBOX, None)
+        supporting_section.append(t6)
+
+        t7 = (KEY_SUPTNGSEC_FLANGE_W, KEY_DISP_SUPTNGSEC_FLANGE_W, TYPE_TEXTBOX, None)
+        supporting_section.append(t7)
+
+        t8 = (KEY_SUPTNGSEC_FLANGE_T, KEY_DISP_SUPTNGSEC_FLANGE_T, TYPE_TEXTBOX, None)
+        supporting_section.append(t8)
+
+        t9 = (KEY_SUPTNGSEC_WEB_T, KEY_DISP_SUPTNGSEC_WEB_T, TYPE_TEXTBOX, None)
+        supporting_section.append(t9)
+
+        t10 = (KEY_SUPTNGSEC_FLANGE_S, KEY_DISP_SUPTNGSEC_FLANGE_S, TYPE_TEXTBOX, None)
+        supporting_section.append(t10)
+
+        t11 = (KEY_SUPTNGSEC_ROOT_R, KEY_DISP_SUPTNGSEC_ROOT_R, TYPE_TEXTBOX, None)
+        supporting_section.append(t11)
+
+        t12 = (KEY_SUPTNGSEC_TOE_R, KEY_DISP_SUPTNGSEC_TOE_R, TYPE_TEXTBOX, None)
+        supporting_section.append(t12)
+
+        t13 = (None, None, TYPE_BREAK, None)
+        supporting_section.append(t13)
+
+        t14 = (KEY_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'])
+        supporting_section.append(t14)
+
+        # t18 = (None, None, TYPE_ENTER, None)
+        # supporting_section.append(t18)
+
+        t18 = (None, None, TYPE_ENTER, None)
+        supporting_section.append(t18)
+
+        t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
+        supporting_section.append(t3)
+
+        # t15 = (KEY_SUPTNGSEC_MOD_OF_ELAST, KEY_SUPTNGSEC_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None)
+        # supporting_section.append(t15)
+        #
+        # t16 = (KEY_SUPTNGSEC_MOD_OF_RIGID, KEY_SUPTNGSEC_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None)
+        # supporting_section.append(t16)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None)
+        supporting_section.append(t17)
+
+        t18 = (KEY_SUPTNGSEC_MASS, KEY_DISP_SUPTNGSEC_MASS, TYPE_TEXTBOX, None)
+        supporting_section.append(t18)
+
+        t19 = (KEY_SUPTNGSEC_SEC_AREA, KEY_DISP_SUPTNGSEC_SEC_AREA, TYPE_TEXTBOX, None)
+        supporting_section.append(t19)
+
+        t20 = (KEY_SUPTNGSEC_MOA_LZ, KEY_DISP_SUPTNGSEC_MOA_LZ, TYPE_TEXTBOX, None)
+        supporting_section.append(t20)
+
+        t21 = (KEY_SUPTNGSEC_MOA_LY, KEY_DISP_SUPTNGSEC_MOA_LY, TYPE_TEXTBOX, None)
+        supporting_section.append(t21)
+
+        t22 = (KEY_SUPTNGSEC_ROG_RZ, KEY_DISP_SUPTNGSEC_ROG_RZ, TYPE_TEXTBOX, None)
+        supporting_section.append(t22)
+
+        t23 = (KEY_SUPTNGSEC_ROG_RY, KEY_DISP_SUPTNGSEC_ROG_RY, TYPE_TEXTBOX, None)
+        supporting_section.append(t23)
+
+        t24 = (KEY_SUPTNGSEC_EM_ZZ, KEY_DISP_SUPTNGSEC_EM_ZZ, TYPE_TEXTBOX, None)
+        supporting_section.append(t24)
+
+        t25 = (KEY_SUPTNGSEC_EM_ZY, KEY_DISP_SUPTNGSEC_EM_ZY, TYPE_TEXTBOX, None)
+        supporting_section.append(t25)
+
+        t26 = (KEY_SUPTNGSEC_PM_ZPZ, KEY_DISP_SUPTNGSEC_PM_ZPZ, TYPE_TEXTBOX, None)
+        supporting_section.append(t26)
+
+        t27 = (KEY_SUPTNGSEC_PM_ZPY, KEY_DISP_SUPTNGSEC_PM_ZPY, TYPE_TEXTBOX, None)
+        supporting_section.append(t27)
+
+        t28 = (None, None, TYPE_BREAK, None)
+        supporting_section.append(t28)
+
+        t29 = (KEY_SUPTNGSEC_SOURCE, KEY_DISP_SUPTNGSEC_SOURCE, TYPE_TEXTBOX, None)
+        supporting_section.append(t29)
+
+        # t30 = (None, None, TYPE_ENTER, None)
+        # supporting_section.append(t30)
+
+        t30 = (None, None, TYPE_ENTER, None)
+        supporting_section.append(t30)
+
+        t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None)
+        supporting_section.append(t4)
+
+        # t31 = (KEY_SUPTNGSEC_POISSON_RATIO, KEY_DISP_SUPTNGSEC_POISSON_RATIO, TYPE_TEXTBOX, None)
+        # supporting_section.append(t31)
+        #
+        # t32 = (KEY_SUPTNGSEC_THERMAL_EXP, KEY_DISP_SUPTNGSEC_THERMAL_EXP, TYPE_TEXTBOX, None)
+        # supporting_section.append(t32)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
+        supporting_section.append(t33)
+
+        return supporting_section
+
+    # def dia_to_len(self, d):
+    #
+    #     ob = IS_5624_1993()
+    #     l = ob.table1(d)
+    #     return l
+
 # Start calculation
 
-    def bp_parameters(self):
+    def bp_parameters(self, design_dictionary):
         """ Initialize variables to use in calculation from input dock and design preference UI.
 
         Args:
@@ -382,8 +649,59 @@ class BasePlateConnection(MomentConnection):
             None
 
         """
+        # attributes for input dock UI
+        self.connectivity = str(design_dictionary[KEY_CONN])
+        self.end_condition = str(design_dictionary[KEY_END_CONDITION])
+        self.column_section = str(design_dictionary[KEY_SUPTNGSEC])
+        self.material = str(design_dictionary[KEY_MATERIAL])
 
+        self.load_axial = float(design_dictionary[KEY_AXIAL])
+        self.load_shear = float(design_dictionary[KEY_SHEAR])
+        self.load_moment_major = float(design_dictionary[KEY_MOMENT_MAJOR] if design_dictionary[KEY_MOMENT_MAJOR] != 'Disabled' else 0)
+        self.load_moment_minor = float(design_dictionary[KEY_MOMENT_MINOR] if design_dictionary[KEY_MOMENT_MINOR] != 'Disabled' else 0)
 
+        self.anchor_dia = design_dictionary[KEY_DIA_ANCHOR]
+        self.anchor_type = str(design_dictionary[KEY_TYP_ANCHOR])
+        self.footing_grade = str(design_dictionary[KEY_GRD_FOOTING])
+
+        # attributes for design preferences
+        self.dp_column_designation = str(design_dictionary[KEY_SUPTNGSEC])
+        self.dp_column_type = str(design_dictionary[KEY_SUPTNGSEC_TYPE])
+        self.dp_column_source = str(design_dictionary[KEY_SUPTNGSEC_SOURCE])
+        self.dp_column_material = str(design_dictionary[KEY_SUPTNGSEC_MATERIAL])
+        self.dp_column_fu = float(design_dictionary[KEY_SUPTNGSEC_FU])
+        self.dp_column_fy = float(design_dictionary[KEY_SUPTNGSEC_FY])
+
+        self.dp_bp_material = str(design_dictionary[KEY_BASE_PLATE_MATERIAL])
+        self.dp_bp_fu = float(design_dictionary[KEY_BASE_PLATE_FU])
+        self.dp_bp_fy = float(design_dictionary[KEY_BASE_PLATE_FY])
+
+        self.dp_anchor_designation = str(design_dictionary[KEY_DP_ANCHOR_BOLT_DESIGNATION])
+        self.dp_anchor_type = str(design_dictionary[KEY_DP_ANCHOR_BOLT_TYPE])
+        self.dp_anchor_hole = str(design_dictionary[KEY_DP_ANCHOR_BOLT_HOLE_TYPE])
+        self.dp_anchor_fu_overwrite = float(design_dictionary[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O])
+        self.dp_anchor_friction = float(design_dictionary[KEY_DP_ANCHOR_BOLT_FRICTION] if
+                                        design_dictionary[KEY_DP_ANCHOR_BOLT_FRICTION] != "" else 0.30)
+
+        self.dp_weld_fab = str(design_dictionary[KEY_DP_WELD_FAB])
+        self.dp_weld_fu_overwrite = float(design_dictionary[KEY_DP_WELD_MATERIAL_G_O])
+
+        self.dp_detail_edge_type = str(design_dictionary[KEY_DP_DETAILING_EDGE_TYPE])
+        self.dp_detail_is_corrosive = str(design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+
+        self.dp_design_method = str(design_dictionary[KEY_DP_DESIGN_METHOD])
+        self.dp_bp_method = str(design_dictionary[KEY_DP_DESIGN_BASE_PLATE])
+
+        # other attributes
+        self.gamma_m0 = 1.10
+        self.gamma_m1 = 1.25
+        self.gamma_mb = 1.25
+        if self.dp_weld_fab == 'Shop Weld':
+            self.gamma_mw = 1.25
+        else:
+            self.gamma_mw = 1.50
+
+        self.safe = True
 
 
 

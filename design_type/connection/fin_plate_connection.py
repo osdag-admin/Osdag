@@ -1033,97 +1033,97 @@ class FinPlateConnection(ShearConnection):
                                self.report_supporting,
                                self.report_supported, popup_summary, fname_no_ext, ' ', rel_path, Disp_3D_image)
 
-    def select_workspace_folder(self):
-        # This function prompts the user to select the workspace folder and returns the name of the workspace folder
-        config = configparser.ConfigParser()
-        config.read_file(open(r'Osdag.config'))
-        desktop_path = config.get("desktop_path", "path1")
-        folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
-                                                  desktop_path)
-        return folder
-
-    def call_3DModel(self, ui, bgcolor):
-        '''
-        This routine responsible for displaying 3D Cad model
-        :param flag: boolean
-        :return:
-        '''
-        if ui.btn3D.isChecked:
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
-            ui.chkBxFinplate.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Model", bgcolor)
-
-    def call_3DBeam(self, ui, bgcolor):
-        '''
-        Creating and displaying 3D Beam
-        '''
-        ui.chkBxBeam.setChecked(Qt.Checked)
-        if ui.chkBxBeam.isChecked():
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.chkBxFinplate.setChecked(Qt.Unchecked)
-            ui.btn3D.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-
-        ui.commLogicObj.display_3DModel("Beam", bgcolor)
-
-    def call_3DColumn(self, ui, bgcolor):
-        '''
-        '''
-        ui.chkBxCol.setChecked(Qt.Checked)
-        if ui.chkBxCol.isChecked():
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
-            ui.chkBxFinplate.setChecked(Qt.Unchecked)
-            ui.btn3D.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-        ui.commLogicObj.display_3DModel("Column", bgcolor)
-
-    def call_3DFinplate(self, ui, bgcolor):
-        '''
-        Displaying FinPlate in 3D
-        '''
-        ui.chkBxFinplate.setChecked(Qt.Checked)
-        if ui.chkBxFinplate.isChecked():
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-            ui.btn3D.setChecked(Qt.Unchecked)
-
-        ui.commLogicObj.display_3DModel("Plate", bgcolor)
-
-    def unchecked_allChkBox(self, ui):
-        '''
-        This routine is responsible for unchecking all checkboxes in GUI
-        '''
-
-        ui.btn3D.setChecked(Qt.Unchecked)
-        ui.chkBxBeam.setChecked(Qt.Unchecked)
-        ui.chkBxCol.setChecked(Qt.Unchecked)
-        ui.chkBxFinplate.setChecked(Qt.Unchecked)
-
-    def showColorDialog(self, ui):
-
-        col = QColorDialog.getColor()
-        colorTup = col.getRgb()
-        r = colorTup[0]
-        g = colorTup[1]
-        b = colorTup[2]
-        ui.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
-
-    def generate_3D_Cad_image(self, ui, folder):
-
-        # folder = self.select_workspace_folder(self)
-
-        # status = self.resultObj['Bolt']['status']
-        if self.design_status is True:
-            self.call_3DModel(self, ui, "gradient_bg")
-            data = os.path.join(str(folder), "images_html", "3D_Model.png")
-            ui.display.ExportToImage(data)
-            ui.display.FitAll()
-        else:
-            pass
-
-        return data
+    # def select_workspace_folder(self):
+    #     # This function prompts the user to select the workspace folder and returns the name of the workspace folder
+    #     config = configparser.ConfigParser()
+    #     config.read_file(open(r'Osdag.config'))
+    #     desktop_path = config.get("desktop_path", "path1")
+    #     folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
+    #                                               desktop_path)
+    #     return folder
+    #
+    # def call_3DModel(self, ui, bgcolor):
+    #     '''
+    #     This routine responsible for displaying 3D Cad model
+    #     :param flag: boolean
+    #     :return:
+    #     '''
+    #     if ui.btn3D.isChecked:
+    #         ui.chkBxCol.setChecked(Qt.Unchecked)
+    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #     ui.commLogicObj.display_3DModel("Model", bgcolor)
+    #
+    # def call_3DBeam(self, ui, bgcolor):
+    #     '''
+    #     Creating and displaying 3D Beam
+    #     '''
+    #     ui.chkBxBeam.setChecked(Qt.Checked)
+    #     if ui.chkBxBeam.isChecked():
+    #         ui.chkBxCol.setChecked(Qt.Unchecked)
+    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #         ui.btn3D.setChecked(Qt.Unchecked)
+    #         ui.mytabWidget.setCurrentIndex(0)
+    #
+    #     ui.commLogicObj.display_3DModel("Beam", bgcolor)
+    #
+    # def call_3DColumn(self, ui, bgcolor):
+    #     '''
+    #     '''
+    #     ui.chkBxCol.setChecked(Qt.Checked)
+    #     if ui.chkBxCol.isChecked():
+    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #         ui.btn3D.setChecked(Qt.Unchecked)
+    #         ui.mytabWidget.setCurrentIndex(0)
+    #     ui.commLogicObj.display_3DModel("Column", bgcolor)
+    #
+    # def call_3DFinplate(self, ui, bgcolor):
+    #     '''
+    #     Displaying FinPlate in 3D
+    #     '''
+    #     ui.chkBxFinplate.setChecked(Qt.Checked)
+    #     if ui.chkBxFinplate.isChecked():
+    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #         ui.chkBxCol.setChecked(Qt.Unchecked)
+    #         ui.mytabWidget.setCurrentIndex(0)
+    #         ui.btn3D.setChecked(Qt.Unchecked)
+    #
+    #     ui.commLogicObj.display_3DModel("Plate", bgcolor)
+    #
+    # def unchecked_allChkBox(self, ui):
+    #     '''
+    #     This routine is responsible for unchecking all checkboxes in GUI
+    #     '''
+    #
+    #     ui.btn3D.setChecked(Qt.Unchecked)
+    #     ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #     ui.chkBxCol.setChecked(Qt.Unchecked)
+    #     ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #
+    # def showColorDialog(self, ui):
+    #
+    #     col = QColorDialog.getColor()
+    #     colorTup = col.getRgb()
+    #     r = colorTup[0]
+    #     g = colorTup[1]
+    #     b = colorTup[2]
+    #     ui.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
+    #
+    # def generate_3D_Cad_image(self, ui, folder):
+    #
+    #     # folder = self.select_workspace_folder(self)
+    #
+    #     # status = self.resultObj['Bolt']['status']
+    #     if self.design_status is True:
+    #         self.call_3DModel(self, ui, "gradient_bg")
+    #         data = os.path.join(str(folder), "images_html", "3D_Model.png")
+    #         ui.display.ExportToImage(data)
+    #         ui.display.FitAll()
+    #     else:
+    #         pass
+    #
+    #     return data
 
 
 

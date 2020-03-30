@@ -768,19 +768,19 @@ class Tension_welded(Main):
               self.section_size_1.designation if flag else '')
         out_list.append(t2)
 
-        t3 = (KEY_TENSION_YIELDCAPACITY, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX, self.section_size_1.tension_yielding_capacity if flag else '')
+        t3 = (KEY_TENSION_YIELDCAPACITY, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX, round((self.section_size_1.tension_yielding_capacity/1000),2) if flag else '')
         out_list.append(t3)
 
         t4 = (KEY_TENSION_RUPTURECAPACITY, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
-              self.section_size_1.tension_rupture_capacity if flag else '')
+              round((self.section_size_1.tension_rupture_capacity/1000),2) if flag else '')
         out_list.append(t4)
 
         t5 = (KEY_TENSION_BLOCKSHEARCAPACITY, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
-              self.section_size_1.block_shear_capacity_axial if flag else '')
+              round((self.section_size_1.block_shear_capacity_axial/1000),2) if flag else '')
         out_list.append(t5)
 
         t6 = (KEY_TENSION_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
-              self.section_size_1.tension_capacity if flag else '')
+              round((self.section_size_1.tension_capacity/1000),2) if flag else '')
         out_list.append(t6)
 
         t6 = (KEY_SLENDER, KEY_DISP_SLENDER, TYPE_TEXTBOX,
@@ -839,7 +839,7 @@ class Tension_welded(Main):
         t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
         out_list.append(t20)
 
-        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
+        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, round_up((self.plate.length),5,100) if flag else '')
         out_list.append(t21)
 
         return out_list
@@ -1139,14 +1139,6 @@ class Tension_welded(Main):
             else:
                 self.cross_area = self.section_size.area * 2
 
-                # self.section_size.min_rad_gyration_bbchannel_calc(mom_inertia_y=self.section_size.mom_inertia_y,
-                #                                                       area=self.section_size.area,
-                #                                                       Cg=self.section_size.Cg,
-                #                                                       mom_inertia_z=self.section_size.mom_inertia_z,
-                #                                                       thickness=0.0)
-                # radius_gyration = self.section_size.min_rad_gyration_bbchannel
-
-
 
             if previous_size != None:
                 self.section_size_prev = self.select_section(self, design_dictionary, previous_size)
@@ -1185,7 +1177,7 @@ class Tension_welded(Main):
                 self.section_size.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],r=self.section_size.min_radius_gyration)
                     # print(self.section_size.tension_yielding_capacity)
 
-                if (self.section_size.tension_yielding_capacity > self.load.axial_force) and self.section_size.slenderness < 400:
+                if (self.section_size.tension_yielding_capacity > self.load.axial_force *1000) and self.section_size.slenderness < 400:
                     min_yield_current = self.section_size.tension_yielding_capacity
                     if min_yield == 0:
                         min_yield = min_yield_current
@@ -1243,7 +1235,7 @@ class Tension_welded(Main):
                                                                      r=self.section_size_1.min_radius_gyration)
 
                     # print(self.section_size_1.slenderness)
-                elif (self.load.axial_force > max_force) :
+                elif (self.load.axial_force *1000> max_force) :
                     self.design_status = False
                     logger.error(" : Tension force exceeds tension capacity of maximum available member size")
                     break
@@ -1256,7 +1248,7 @@ class Tension_welded(Main):
                 else:
                     pass
 
-        if (self.load.axial_force > max_force) or self.length > length:
+        if (self.load.axial_force *1000 > max_force) or self.length > length:
             pass
         else:
             print("pass")
@@ -1297,7 +1289,7 @@ class Tension_welded(Main):
 
         self.weld.weld_size(plate_thickness = self.plate.thickness_provided, member_thickness= self.thick)
 
-        self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.load.axial_force))
+        self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.load.axial_force*1000))
         if design_dictionary[KEY_SEC_PROFILE] == "Channels":
             web_weld = self.section_size_1.depth - 2 * self.weld.size
             flange_weld = round_up(((self.weld.effective - web_weld)/2),5,50)
@@ -1328,7 +1320,7 @@ class Tension_welded(Main):
             flange_weld = round_up(((self.weld.effective - web_weld) / 2), 5, 50)
             self.weld.length = round_up((web_weld + 2 * flange_weld),5,100)
 
-        self.weld.get_weld_stress(weld_axial = self.load.axial_force, l_weld = self.weld.effective)
+        self.weld.get_weld_stress(weld_axial = self.load.axial_force*1000, l_weld = self.weld.effective)
 
         if self.weld.strength> self.weld.stress:
             self.design_status = True
@@ -1341,13 +1333,13 @@ class Tension_welded(Main):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(t_weld, weld_angle)
         weld_strength = f_wd * throat_tk
-        L_eff = round_up((force*1000/weld_strength),5,100)
+        L_eff = round_up((force/weld_strength),5,100)
         Btw = IS800_2007.cl_10_5_7_3_weld_long_joint(L_eff, throat_tk)
         if L_eff > 150 * throat_tk:
             f_wd = Btw * f_wd
             throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(t_weld, weld_angle)
             weld_strength = f_wd * throat_tk
-            L_eff = round_up((force*1000 / weld_strength), 5, 100)
+            L_eff = round_up((force/ weld_strength), 5, 100)
         else:
             pass
 
@@ -1408,8 +1400,8 @@ class Tension_welded(Main):
         else:
             self.design_status = False
 
-        if self.section_size_1.tension_capacity > self.load.axial_force:
-            self.efficiency = round((self.load.axial_force / self.section_size_1.tension_capacity), 2)
+        if self.section_size_1.tension_capacity > self.load.axial_force * 1000:
+            self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
             self.design_status = True
         else:
@@ -1499,7 +1491,7 @@ class Tension_welded(Main):
             self.plate.tension_blockshear_area_input(A_vg = A_vg, A_vn = A_vn, A_tg = A_tg, A_tn = A_tn, f_u = self.plate.fu, f_y = self.plate.fy)
             self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
 
-            if self.plate_tension_capacity > self.load.axial_force:
+            if self.plate_tension_capacity > self.load.axial_force *1000:
                 self.design_status = True
                 break
 
@@ -1509,7 +1501,7 @@ class Tension_welded(Main):
                 # else:
                 #     self.select_weld(self,design_dictionary,self.plate.thickness_provided)
 
-            elif (self.plate_tension_capacity < self.load.axial_force) and self.plate.thickness_provided == self.plate_last:
+            elif (self.plate_tension_capacity < self.load.axial_force * 1000) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
                 logger.error("Plate thickness is not sufficient")
             else:

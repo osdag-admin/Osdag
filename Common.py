@@ -271,7 +271,8 @@ DISP_MIN_EDGE = 'Min. Edge Distance (mm)'
 DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
 DISP_MIN_END = 'Min. End Distance (mm)'
 DISP_MAX_END = 'Max. End Distance (mm)'
-
+KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
+KEY_DISP_FY = 'Yield Strength , fy (MPa)'
 ###################################
 # Key for Storing Module
 

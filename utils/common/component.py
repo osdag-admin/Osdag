@@ -54,6 +54,8 @@ class Bolt(Material):
 
         self.bolt_fu = 0.0
         self.bolt_fy = 0.0
+        self.fu_considered = 0.0
+        self.thk_considered = 0.0
 
 
         if corrosive_influences == "Yes":
@@ -144,6 +146,8 @@ class Bolt(Material):
                 f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
                 e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
+            self.fu_considered = fu_considered
+            self.thk_considered = thk_considered
 
         elif self.bolt_type == "Friction Grip Bolt":
             self.bolt_shear_capacity,self.kh,self.gamma_mf = IS800_2007.cl_10_4_3_bolt_slip_resistance(
@@ -344,7 +348,7 @@ class Section(Material):
         "gamma_m0 = partial safety factor for failure in tension by yielding"
         "F_y = yield stress of the material"
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        T_dg = (A_g* F_y / gamma_m0)/1000
+        T_dg = (A_g* F_y / gamma_m0)
         # logger.warning(
         #     " : You are using a section (in red color) that is not available in latest version of IS 808")
 
@@ -357,7 +361,7 @@ class Section(Material):
         "F_u = Ultimate Strength of material"
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-        T_pdn = 0.9 * A_n * F_u / gamma_m1/1000
+        T_pdn = 0.9 * A_n * F_u / gamma_m1
 
         self.tension_rupture_capacity = round(T_pdn,2)
 
@@ -379,8 +383,11 @@ class Section(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-        beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9*float(F_u))* float(b_s) / float(L_c)))
-        print(beta)
+        if L_c == 0:
+            beta = 1.4
+        else:
+            beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
+        # print(beta)
 
         if beta <= (F_u * gamma_m0 / F_y * gamma_m1) and beta >= 0.7:
             beta = beta
@@ -389,7 +396,7 @@ class Section(Material):
 
         T_dn = (0.9 * A_nc * F_u / gamma_m1) + (beta * A_go * F_y / gamma_m0)
 
-        self.tension_rupture_capacity = round((T_dn/1000) , 2)
+        self.tension_rupture_capacity = round((T_dn) , 2)
 
 
     def tension_blockshear(self, numrow, numcol, pitch, gauge, thk, end_dist, edge_dist, dia_hole, fy, fu):
@@ -417,7 +424,7 @@ class Section(Material):
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
         Tdb = min(Tdb1, Tdb2)
-        Tdb = round(Tdb / 1000, 3)
+        Tdb = round(Tdb, 3)
         self.block_shear_capacity_axial = round(Tdb,2)
 
     def tension_blockshear_area_input(self,A_vg, A_vn, A_tg, A_tn, f_u, f_y):
@@ -447,7 +454,7 @@ class Section(Material):
         T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
         Tdb = min(T_db1, T_db2)
         # Tdb = round(Tdb, 3)
-        self.block_shear_capacity_axial = round(Tdb/1000,2)
+        self.block_shear_capacity_axial = round(Tdb,2)
 
     def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):
 
@@ -521,6 +528,7 @@ class Section(Material):
         repr += "Designation: {}\n".format(self.designation)
         repr += "fy: {}\n".format(self.fy)
         repr += "fu: {}\n".format(self.fu)
+
         # repr += "shear yielding capacity: {}\n".format(self.shear_yielding_capacity)
         repr += "tension yielding capacity: {}\n".format(self.tension_yielding_capacity)
 
@@ -1241,7 +1249,7 @@ class Plate(Material):
         T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
         Tdb = min(T_db1, T_db2)
         # Tdb = round(Tdb, 3)
-        self.block_shear_capacity = round(Tdb/1000,2)
+        self.block_shear_capacity = round(Tdb,2)
 
     # Check for shear yielding ###
     def shear_yielding(self, length, thickness, fy):
@@ -1270,7 +1278,7 @@ class Plate(Material):
         A_v = length * thickness
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         # A_v = height * thickness
-        tdg = (A_v * fy) / (gamma_m0 * 1000)
+        tdg = (A_v * fy) / (gamma_m0)
         self.tension_yielding_capacity = tdg
         return tdg
 
@@ -1280,7 +1288,7 @@ class Plate(Material):
         "F_u = Ultimate Strength of material"
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-        T_pdn = 0.9 * A_n * F_u / gamma_m1 / 1000
+        T_pdn = 0.9 * A_n * F_u / gamma_m1
 
         self.tension_rupture_capacity = round(T_pdn, 2)
 

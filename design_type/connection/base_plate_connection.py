@@ -11,11 +11,16 @@
 
 
 @Reference(s): 1) IS 800: 2007, General construction in steel - Code of practice (Third revision)
-               2) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 15)
-               3) Limit State Design of Steel Structures by S K Duggal (second edition, Chapter 11)
+               2) IS 808: 1989, Dimensions for hot rolled steel beam, column, channel, and angle sections and
+                                it's subsequent revision(s)
+               3) IS 2062: 2011, Hot rolled medium and high tensile structural steel - specification
+               4) IS 5624: 1993, Foundation bolts
+               5) IS 456: 2000, Plain and reinforced concrete - code of practice
+               6) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 15)
+               7) Limit State Design of Steel Structures by S K Duggal (second edition, Chapter 11)
 
-     other     4)  Column Bases - Omer Blodgett (chapter 3)
-  references   5) AISC Design Guide 1 - Base Plate and Anchor Rod Design
+     other     8)  Column Bases - Omer Blodgett (chapter 3)
+  references   9) AISC Design Guide 1 - Base Plate and Anchor Rod Design
 
 """
 
@@ -57,9 +62,60 @@ class BasePlateConnection(MomentConnection):
     Perform stress analyses --> design base plate and anchor bolt--> provide connection detailing.
 
     Attributes:
-                gamma_mb (float): partial safety factor for material - resistance of connection - bolts
-                gamma_m0 (float): partial safety factor for material - resistance governed by yielding or buckling
-                gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress
+                connectivity (str): type of base plate connection (pinned - welded, pinned - bolted,
+                gusseted, hollow section).
+                end_condition (str): assume end condition based on base plate type.
+                    Assumption(s):
+                                1) End condition is 'Pinned' for welded and bolted base plate.
+                                2) End condition is 'Fixed' for gusseted and hollow section type base plate.
+                column_section (str): column section [Ref: IS 808: 1989, it's subsequent revision(s),
+                                any new section data added by the user using the 'add section' feature from Osdag GUI.
+                material (str): material grade of the column section [Ref: IS 2062: 2011].
+
+                load_axial (float): Axial compressive load (concentric to column axis).
+                load_shear (float): Shear/horizontal load.
+                load_moment_major (float): Bending moment acting along the major (z-z) axis of the column.
+                load_moment_minor (float): Bending moment acting along the minor (y-y) axis of the column.
+
+                anchor_dia (str): diameter of the anchor bolt [Ref: IS 5624: 1993, page 5].
+                anchor_type (str): type of the anchor bolt [Ref: IS 5624: 1993, Annex A, clause 4].
+
+                footing_grade (str): grade of footing material (concrete) [Ref: IS 456: 2000, table 2].
+
+                dp_column_designation (str): designation of the column as per IS 808.
+                dp_column_type (str): type of manufacturing of the coulmn section (rolled, built-up, welded etc.).
+                dp_column_source (str): source of the database of the column section.
+                                        [Osdag/ResourceFiles/Database/Intg_osdag.sqite].
+                dp_column_material (str): material grade of the column section [Ref: IS 2062: 2011].
+                dp_column_fu (float): ultimate strength of the column section (default if not overwritten).
+                dp_column_fy (float): yield strength of the column section (default if not overwritten).
+
+                dp_bp_material (str): material grade of the base plate [Ref: IS 2062: 2011].
+                dp_bp_fu (float): ultimate strength of the base plate (default if not overwritten).
+                dp_bp_fy (float): yield strength of the base plate (default if not overwritten).
+                    Assumption: The ultimate and yield strength values of base plare are assumed to be same as the
+                                parent (column) material unless and untill overwritten in the design preferences,
+                                with suitable validation.
+
+                dp_anchor_designation (str): designation of the anchor bolt as per IS 5624: 1993, clause 5.
+                dp_anchor_type (str): type of the anchor bolt [Ref: IS 5624: 1993, Annex A, clause 4].
+                dp_anchor_hole (str): type of hole 'Standard' or 'Over-sized'.
+                dp_anchor_fu_overwrite (float): ultimate strength of the anchor bolt corresponding to its grade.
+                dp_anchor_friction (float): coefficient of friction between the anchor bolt and the footing material.
+
+                dp_weld_fab (str): type of weld fabrication, 'Shop Weld' or 'Field Weld'.
+                dp_weld_fu_overwrite (float): ultimate strength of the weld material.
+
+                dp_detail_edge_type (str): type of edge preparation, 'a - hand flame cut' or 'b - Machine flame cut'.
+                dp_detail_is_corrosive (str): is environment corrosive, 'Yes' or 'No'.
+
+                dp_design_method (str): design philosophy used 'Limit State Design'.
+                dp_bp_method (str): analysis method used for base plate 'Effective Area Method'
+
+                gamma_m0 (float): partial safety factor for material - resistance governed by yielding or buckling.
+                gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress.
+                gamma_mb (float): partial safety factor for material - resistance of connection - bolts.
+                gamma_mw (float): partial safety factor for material - resistance of connection - weld.
 
     """
 
@@ -84,30 +140,30 @@ class BasePlateConnection(MomentConnection):
         self.footing_grade = 0.0
 
         # attributes for design preferences
-        self.dp_column_designation = ""
+        self.dp_column_designation = ""  # dp for column
         self.dp_column_type = ""
         self.dp_column_source = ""
         self.dp_column_material = ""
         self.dp_column_fu = 0.0
         self.dp_column_fy = 0.0
 
-        self.dp_bp_material = ""
+        self.dp_bp_material = ""  # dp for base plate
         self.dp_bp_fu = 0.0
         self.dp_bp_fy = 0.0
 
-        self.dp_anchor_designation = ""
+        self.dp_anchor_designation = ""  # dp for anchor bolt
         self.dp_anchor_type = ""
         self.dp_anchor_hole = "Standard"
         self.dp_anchor_fu_overwrite = 0.0
         self.dp_anchor_friction = 0.0
 
-        self.dp_weld_fab = "Shop Weld"
+        self.dp_weld_fab = "Shop Weld"  # dp for weld
         self.dp_weld_fu_overwrite = 0.0
 
-        self.dp_detail_edge_type = "b - Machine flame cut"
+        self.dp_detail_edge_type = "b - Machine flame cut"  # dp for detailing
         self.dp_detail_is_corrosive = "No"
 
-        self.dp_design_method = "Limit State Design"
+        self.dp_design_method = "Limit State Design"  # dp for design
         self.dp_bp_method = "Effective Area Method"
 
         # other attributes
@@ -637,10 +693,13 @@ class BasePlateConnection(MomentConnection):
         self.dp_bp_method = str(design_dictionary[KEY_DP_DESIGN_BASE_PLATE])
 
         # other attributes
-        self.gamma_m0 = 0.0
-        self.gamma_m1 = 0.0
-        self.gamma_mb = 0.0
-        self.gamma_mw = 0.0
+        self.gamma_m0 = 1.10
+        self.gamma_m1 = 1.25
+        self.gamma_mb = 1.25
+        if self.dp_weld_fab == 'Shop Weld':
+            self.gamma_mw = 1.25
+        else:
+            self.gamma_mw = 1.50
 
         self.safe = True
 

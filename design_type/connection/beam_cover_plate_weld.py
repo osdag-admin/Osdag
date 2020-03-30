@@ -597,8 +597,44 @@ class BeamCoverPlateWeld(MomentConnection):
 
         self.member_capacity(self)
         #self.hard_values(self)
+    #
 
-
+    def hard_values(self):
+        # Select Selection  WPB 240* 240 * 60.3 (inside Ouside)- material E 250 fe 450A
+        #refer Osi file (beamsplice240_sectioncheckedo_i.osi)  in resource folder
+        #load
+        self.load.axial_force = 481.745 #KN
+        self.load.shear_force = 10 #KN
+        self.load.moment = 16.636840 #KNM
+        self.section.fy = 230
+        self.section.fu = 410
+        #  Flange Weld
+        self.flange_weld.size = 10 #mm
+        # self.flangespace = 15 #mm
+        self.flange_weld.length = 530
+        self.flange_weld.height = 190
+        #  Flange plate
+        self.flange_plate.thickness_provided = 14
+        self.flange_plate.height =  210
+        self.flange_plate.length = 550
+        #  Web Weld
+        self.web_weld.size = 6  # mm
+        # self.webspace = 15  # mm
+        self.web_weld.length = 350
+        self.web_weld.height = 155
+        #  Web plate
+        self.web_plate.thickness_provided =8
+        self.web_plate.length = 365
+        self.web_plate.height = 170
+        #  Inner Flange weld
+        self.flange_weld.size = 10  # mm
+        self.flange_plate.thickness_provided = 14
+        self.flange_weld.Innerheight= 60
+        self.flange_weld.Innerlength = 550
+        #  Inner Flange plate
+        self.flange_plate.thickness_provided = 14
+        self.flange_plate.Innerheight = 80
+        self.flange_plate.Innerlength = 550
 
 
     def member_capacity(self):
@@ -618,7 +654,9 @@ class BeamCoverPlateWeld(MomentConnection):
         self.axial_capacity = ( self.section.area  * self.section.fy) / gamma_m0 #N
         self.axial_load =  0.3 *  self.axial_capacity
         self.factored_axial_load = max(self.load.axial_force * 1000, self.axial_load)  # N
-        print("self.factored_axial_load" ,self.factored_axial_load)
+        self.load.axial_force =   self.factored_axial_load
+        print ( "ssself.load.axial_force  ",self.load.axial_force )
+        print("ssself.factored_axial_load" ,self.factored_axial_load)
         # self.axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
         #     self.section.area)
         #
@@ -1196,6 +1234,17 @@ class BeamCoverPlateWeld(MomentConnection):
             else:
                 pass
 
+        print(self.section)
+        print(self.load)
+        print("Outside Flange PLate")
+        print(self.flange_weld)
+        print(self.flange_plate)
+        print("Web  PLate")
+        print(self.web_weld)
+        print(self.web_plate)
+        # print(self.web_plate.thickness_provided)
+        # print(self.flange_plate.thickness_provided)
+        print("Inside PLate")
 
 
         if self.design_status == True:

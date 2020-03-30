@@ -1569,6 +1569,8 @@ class Ui_ModuleWindow(QMainWindow):
                 des = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentText()
                 anchor_dia = data_list[KEY_DIA_ANCHOR+"_customized"]
                 anchor_typ = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_TYP_ANCHOR).currentText()
+                if des == 'Select Section':
+                    des = connectdb("Columns", "popup")[0]
                 col_attributes = Section(des, common_material)
                 Section.connect_to_database_update_other_attributes(col_attributes, "Columns", des)
                 d2 = {KEY_SUPTNGSEC_TYPE: "Rolled", KEY_SUPTNGSEC_SOURCE: str(col_attributes.source),

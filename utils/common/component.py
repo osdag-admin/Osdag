@@ -54,6 +54,8 @@ class Bolt(Material):
 
         self.bolt_fu = 0.0
         self.bolt_fy = 0.0
+        self.fu_considered = 0.0
+        self.thk_considered = 0.0
 
 
         if corrosive_influences == "Yes":
@@ -144,6 +146,8 @@ class Bolt(Material):
                 f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
                 e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
+            self.fu_considered = fu_considered
+            self.thk_considered = thk_considered
 
         elif self.bolt_type == "Friction Grip Bolt":
             self.bolt_shear_capacity,self.kh,self.gamma_mf = IS800_2007.cl_10_4_3_bolt_slip_resistance(
@@ -281,8 +285,8 @@ class Section(Material):
         self.toe_radius = row[10]
         self.mom_inertia_z = row[11]*10000
         self.mom_inertia_y = row[12] *10000
-        self.rad_of_gy_z = row[13]* 100
-        self.rad_of_gy_y = row[14] *100
+        self.rad_of_gy_z = row[13]* 10
+        self.rad_of_gy_y = row[14] *10
         self.elast_sec_mod_z = row[15] *1000
         self.elast_sec_mod_y = row[16] *1000
         self.plast_sec_mod_z = row[17]
@@ -379,8 +383,11 @@ class Section(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-        beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9*float(F_u))* float(b_s) / float(L_c)))
-        print(beta)
+        if L_c == 0:
+            beta = 1.4
+        else:
+            beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
+        # print(beta)
 
         if beta <= (F_u * gamma_m0 / F_y * gamma_m1) and beta >= 0.7:
             beta = beta
@@ -613,8 +620,10 @@ class Weld(Material):
         self.type = type
         self.size = 0.0
         self.length = 0.0
+        self.Innerlength = 0.0
         self.effective = 0.0
         self.height =0.0
+        self.Innerheight = 0.0
         self.strength = 0.0
         self.stress = 0.0
         self.fabrication = fabrication
@@ -657,7 +666,7 @@ class Weld(Material):
 
 class Plate(Material):
 
-    def __init__(self, thickness=[], height=0.0, length=0.0, gap=0.0, material_grade=""):
+    def __init__(self, thickness=[], height=0.0,Innerheight=0.0, length=0.0,Innerlength=0.0, gap=0.0, material_grade=""):
         super(Plate, self).__init__(material_grade=material_grade)
         self.design_status = False
         self.reason = ""
@@ -667,7 +676,8 @@ class Plate(Material):
         self.height = height
         self.length = length
         self.gap = float(gap)
-
+        self.Innerlength = Innerlength
+        self.Innerheight = Innerheight
 
         self.bolts_required = 0
         self.bolt_capacity_red = 0.0

@@ -1198,7 +1198,7 @@ class Tension_bolted(Main):
                 self.section_size.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],r=self.section_size.min_radius_gyration)
                     # print(self.section_size.tension_yielding_capacity)
 
-                if (self.section_size.tension_yielding_capacity > self.load.axial_force*1000) and self.section_size.slenderness < 400:
+                if (self.section_size.tension_yielding_capacity >= self.load.axial_force*1000) and self.section_size.slenderness < 400:
                     min_yield_current = self.section_size.tension_yielding_capacity
                     if min_yield == 0:
                         min_yield = min_yield_current
@@ -1566,8 +1566,8 @@ class Tension_bolted(Main):
             t = self.section_size_1.thickness
 
         elif design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
-            w = self.section_size_1.flange_width
-            shear_lag = 2 * ((self.plate.edge_dist_provided + self.section_size_1.root_radius + self.section_size_1.flange_thickness) + w - self.section_size_1.web_thickness)
+            w =  self.section_size_1.flange_width
+            shear_lag = ((self.plate.edge_dist_provided + self.section_size_1.root_radius + self.section_size_1.flange_thickness) + self.section_size_1.flange_width - self.section_size_1.web_thickness)
             if self.plate.bolt_line != 1:
                 L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
             else:
@@ -1601,7 +1601,7 @@ class Tension_bolted(Main):
         else:
             self.design_status = False
         print(self.section_size_1.designation,"1111")
-        if self.section_size_1.tension_capacity > self.load.axial_force *1000:
+        if self.section_size_1.tension_capacity >= self.load.axial_force *1000:
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
             self.design_status = True

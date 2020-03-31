@@ -623,6 +623,7 @@ class Weld(Material):
         self.effective = 0.0
         self.height =0.0
         self.strength = 0.0
+        self.throat = 0.0
         self.stress = 0.0
         self.fabrication = fabrication
         self.fu= float(material_g_o)
@@ -654,7 +655,20 @@ class Weld(Material):
     def weld_size(self, plate_thickness, member_thickness):
 
         max_weld_thickness = int(min(plate_thickness, member_thickness))
-        weld_thickness = round_down((max_weld_thickness-1.5),1,3)
+        if plate_thickness<=10:
+            min_weld_thickness = 3
+        elif plate_thickness>=10 and plate_thickness<=20:
+            min_weld_thickness = 5
+        elif plate_thickness>=20 and plate_thickness<=30:
+            min_weld_thickness = 6
+        else:
+            min_weld_thickness = 10
+        weld_thickness = round_down((max_weld_thickness - 1.5), 1, 3)
+        if weld_thickness < min_weld_thickness:
+            weld_thickness = int(min(plate_thickness, member_thickness))
+        else:
+            pass
+
         if weld_thickness> 16 :
             weld_thickness =16
         else:
@@ -1382,8 +1396,13 @@ class Angle(Section):
         self.thickness = row[5]
         self.r1 = row[6]
         self.r2 = row[7]
-        self.Cz = row[8]
-        self.Cy = row[9]
+        if self.leg_a_length != self.leg_b_length:
+            self.Cz = row[8]*10
+            self.Cy = row[9]*10
+        else:
+            self.Cz = row[8]
+            self.Cy = row[9]
+
         self.mom_inertia_z = row[11] * 10000
         self.mom_inertia_y = row[12] * 10000
         self.mom_inertia_u = row[13] * 10000

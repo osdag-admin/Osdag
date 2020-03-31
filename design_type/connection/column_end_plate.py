@@ -1,5 +1,6 @@
 from design_type.connection.moment_connection import MomentConnection
 from utils.common.component import *
+from PyQt5.QtWidgets import QMessageBox
 from Common import *
 from utils.common.load import Load
 import yaml
@@ -199,7 +200,48 @@ class ColumnEndPlate(MomentConnection):
         t4 = (None, DISP_TITLE_BOLT_CAPACITIES, TYPE_TITLE, None)
         out_list.append(t4)
 
-       
+    def func_for_validation(self, window, design_dictionary):
+        self.design_status = False
+        flag = False
+
+        option_list = self.input_values(self)
+        missing_fields_list = []
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                val = option[4]
+                if design_dictionary[option[0]] == val[0]:
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                if design_dictionary[option[0]] == []:
+                    missing_fields_list.append(option[1])
+
+        if len(missing_fields_list) > 0:
+            QMessageBox.information(window, "Information",
+                                    generate_missing_fields_error_string(missing_fields_list))
+            # flag = False
+        else:
+            flag = True
+
+        if flag:
+            self.set_input_values(self, design_dictionary)
+        else:
+            pass
+
+    def warn_text(self):
+
+        """
+        Function to give logger warning when any old value is selected from Column and Beams table.
+        """
+        global logger
+        red_list = red_list_function()
+        if self.section.designation in red_list:
+            logger.warning(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+            logger.info(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def set_input_values(self, design_dictionary):
 
@@ -213,6 +255,7 @@ class ColumnEndPlate(MomentConnection):
         self.start_time = time.time()
 
         self.module = design_dictionary[KEY_MODULE]
+        self.connection = design_dictionary[KEY_CONN]
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None), material_grade=design_dictionary[KEY_PLATE_MATERIAL])
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
@@ -225,12 +268,68 @@ class ColumnEndPlate(MomentConnection):
     def detailing(self):
         self.n_bw = ((self.section.depth -(2 * self.section.flange_thickness - (2 * self.plate.end_dist_provided))) / self.plate.pitch_provided) + 1
         self.n_bf = ((self.section.flange_width/2) - (self.section.web_thickness/2) - (2 * self.plate.end_dist_provided) / self.plate.pitch_provided) + 1
+
+        if self.connection == 'Flush End Plate':
+            self.no_bolts = self.n_bw * 2 + self.n_bf - 4
+        else:
+            self.no_bolts = self.n_bw * 2 + 2 * self.n_bf - 4
+
         if self.n_bw % 2 == 0:
             self.p_2 = self.section.depth - (2 * self.section.flange_thickness) - (2 * self.plate.end_dist_provided) - ((self.n_bw - 2) * self.plate.pitch_provided)
         else:
             self.p_2 = self.section.depth - (2 * self.section.flange_thickness) - (2 * self.plate.end_dist_provided) - ((self.n_bw - 3) * self.plate.pitch_provided)
 
         self.x = (self.section.flange_width/2) - (self.section.web_thickness/2) - self.plate.end_dist_provided - (self.n_bf * self.plate.pitch_provided)
+
+    def y_sqre(self):
+        if self.connection == 'Flush End Plate':
+            self.y_max = self.section.depth - 3/2 * self.section.flange_thickness - self.plate.end_dist_provided
+        else:
+            self.y_max = self.section.depth - self.section.flange_thickness/2 + self.plate.end_dist_provided
+
+        if self.connection == 'Flush End Plate':
+            if self.n_bf % 2 == 0:
+                for i in range(1,self.n_bf+1):
+                    self.y_sqr1 = (self.section.flange_thickness/2 + self.plate.end_dist_provided + ((i/2) -1) * self.plate.pitch_provided) ** 2
+                    self.y_sqr2 = self.y_sqr1 + (self.p_2 + ((i/2) - 1) * self.plate.pitch_provided) ** 2
+                    self.y_sqr = self.y_sqr1 + self.y_sqr2
+            else:
+                for i in range(1,self.n_bf+1):
+                    self.y_sqr1 = (self.section.flange_thickness/2 + self.plate.end_dist_provided + ((i/2) -1.5) * self.plate.pitch_provided) ** 2
+                    self.y_sqr2 = self.y_sqr1 + (2 * self.p_2 + ((i/2) - 1) * self.plate.pitch_provided) ** 2
+                    self.y_sqr = self.y_sqr1 + self.y_sqr2
+        else:
+            self.y_sqr = self.y_sqr + (2 * self.plate.end_dist_provided + self.section.flange_thickness) ** 2
+
+    def bolt_checks(self):
+        self.t_b = self.load.axial_force/self.no_bolts + self.load.moment * self.y_max/ self.y_sqr
+
+        self.bolt_conn_plates_t_fu_fy=[]
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+
+        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                          bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                          conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                          n_planes=1)
+        self.bolt.calculate_bolt_tension_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                          bolt_grade_provided=self.bolt.bolt_grade_provided)
+
+        self.v_sb = self.load.shear_force/ 2* self.n_bw
+
+        if self.t_b > self.bolt.bolt_tension_capacity:
+            self.design_status = False
+            logger.error("Force is not sufficient")
+            logger.info("Increase bolt diam")
+
+        if self.v_sb > self.bolt.bolt_capacity:
+            self.design_status = False
+            logger.error("Force is not sufficient")
+            logger.info("Increase bolt diam")
+
+        if ((self.v_sb/self.bolt.bolt_capacity) ** 2 + (self.t_b/self.bolt.bolt_tension_capacity) ** 2) > 1.0:
+            self.design_status = False
+            logger.error("Force is not sufficient")
+            logger.info("Increase bolt diam")
 
     def hard_values(self):
             # flange bolt

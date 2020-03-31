@@ -6,7 +6,6 @@ import math
 
 
 TYPE_COMBOBOX = 'ComboBox'
-
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
@@ -27,6 +26,7 @@ TYPE_TAB_3 = "TYPE_TAB_3"
 
 
 import sqlite3
+
 from utils.common.component import *
 from utils.common.component import *
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
@@ -263,7 +263,16 @@ KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity'
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
-
+DISP_MIN_PITCH = 'Min. Pitch (mm)'
+DISP_MAX_PITCH = 'Max. Pitch (mm)'
+DISP_MIN_GAUGE = 'Min. Gauge (mm)'
+DISP_MAX_GAUGE = 'Max. Gauge (mm)'
+DISP_MIN_EDGE = 'Min. Edge Distance (mm)'
+DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
+DISP_MIN_END = 'Min. End Distance (mm)'
+DISP_MAX_END = 'Max. End Distance (mm)'
+KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
+KEY_DISP_FY = 'Yield Strength , fy (MPa)'
 ###################################
 # Key for Storing Module
 
@@ -276,13 +285,17 @@ TYPE_MODULE = 'Window Title'
 KEY_DISP_FINPLATE = 'Fin Plate'
 KEY_DISP_ENDPLATE = 'End Plate'
 KEY_DISP_CLEATANGLE = 'Cleat Angle'
+KEY_DISP_BASE_PLATE = 'Base Plate'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam Coverplate Connection'
 KEY_DISP_COLUMNCOVERPLATE = 'Column Coverplate Connection'
+KEY_DISP_BEAMCOVERPLATEWELD = 'Beam Coverplate  Weld Connection'
+KEY_DISP_COLUMNCOVERPLATEWELD = 'Column Coverplate Weld Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
 
-KEY_DISP_TENSION = 'Tension Members Design'
+KEY_DISP_TENSION_BOLTED = 'Tension Members Bolted Design'
+KEY_DISP_TENSION_WELDED = 'Tension Members Welded Design'
 KEY_DISP_COMPRESSION = 'Compression Member'
 
 
@@ -299,9 +312,16 @@ VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
 
+## Column End Plate ##
+VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
+####
+
+VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Base Plate with Cleat Angles', 'Hollow Sections']
+
+
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
-VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
 
 KEY_IMAGE = 'Image'
 
@@ -312,7 +332,6 @@ KEY_DISP_LENGTH = 'Length(mm) *'
 # Key for Storing Supporting_Section sub-key of Member
 
 KEY_SUPTNGSEC = 'Member.Supporting_Section'
-
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 VALUES_COLSEC = connectdb("Columns")
@@ -348,6 +367,15 @@ DISP_TITLE_FSL = 'Factored load'
 # Key for Storing Moment sub-key of Load
 KEY_MOMENT = 'Load.Moment'
 KEY_DISP_MOMENT = 'Moment(kNm)*'
+DISP_TITLE_MOMENT = 'Moment load'
+KEY_MOMENT_MAJOR = 'Load.Moment.Major'
+KEY_DISP_MOMENT_MAJOR = 'Major axis (M<sub>z-z</sub>)'
+KEY_MOMENT_MINOR = 'Load.Moment.Minor'
+KEY_DISP_MOMENT_MINOR = 'Minor axis (M<sub>y-y</sub>)'
+KEY_DIA_ANCHOR = 'Anchor Bolt.Diameter'
+DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
+KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
+VALUES_DIA_ANCHOR = ['All', 'Customized']
 
 ###################################
 # Key for Storing Shear sub-key of Load
@@ -364,6 +392,10 @@ KEY_DISP_AXIAL = 'Axial (kN) *'
 
 DISP_TITLE_BOLT = 'Bolt'
 DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
+
+DISP_TITLE_WELD = 'Weld'
+DISP_TITLE_WELD_CAPACITY = 'Weld Capacity'
+
 
 DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
@@ -410,7 +442,10 @@ VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '
 
 KEY_LOCATION = 'Conn_Location'
 KEY_DISP_LOCATION = 'Conn_Location *'
-VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Flange', 'Web']
+VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg','Web']
+VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
+VALUES_LOCATION_2 = ["Web"]
+
 
 KEY_IMAGE = 'Image'
 
@@ -430,6 +465,7 @@ DISP_TITLE_TENSION = 'Tension Capacity'
 
 
 
+
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate'
 
 KEY_FLANGEPLATE_PREFERENCES = 'Flange_Plate.Preferences'
@@ -440,10 +476,19 @@ KEY_FLANGEPLATE_THICKNESS = 'flange_plate.thickness_provided'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
+KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
+KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness(mm)'
+
 KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
 KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length'
+
+DISP_TITLE_INNERFLANGESPLICEPLATE = 'Inner Flange splice plate'
+KEY_INNERFLANGE_PLATE_HEIGHT = 'flange_plate.InnerHeight'
+KEY_DISP_INNERFLANGE_PLATE_HEIGHT = 'Height(mm)'
+KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
+KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length'
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
 KEY_DISP_FLANGE_SPACING = 'Spacing'
@@ -459,10 +504,10 @@ KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 KEY_FLANGE_CAPACITY ="Flange_plate.capacity"
 KEY_DISP_FLANGE_CAPACITY= 'Capacity'
 KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
-KEY_DISP_FLANGE_TEN_CAPACITY ="Flange ten cap"
+KEY_DISP_FLANGE_TEN_CAPACITY ="Tension capacity"
 
 KEY_FLANGE_PLATE_TEN_CAP ="Flange_plate.tension_capacity"
-KEY_DISP_FLANGE_PLATE_TEN_CAP ="Flange plate ten cap"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension cap"
 
 
 KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
@@ -479,7 +524,6 @@ KEY_FLANGE_PLATE_MOM_DEMAND = 'Flange_Plate.MomDemand'
 KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
 KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
-
 KEY_DESIGNATION = "section_size.designation"
 KEY_DISP_DESIGNATION = "Designation"
 
@@ -506,6 +550,36 @@ KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
 KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 
 
+KEY_FLANGE_WELD_DETAILS = "Flange detail"
+KEY_DISP_FLANGE_WELD_DETAILS = "Weld Details"
+
+KEY_INNERFLANGE_WELD_DETAILS = "Inner Flange detail"
+KEY_DISP_INNERFLANGE_WELD_DETAILS = "Weld Details"
+
+KEY_WELD_TYPE = 'Weld.Type'
+KEY_DISP_WELD_TYPE ='Weld Type'
+VALUES_WELD_TYPE = ["select type","Fillet Weld"]
+DISP_FLANGE_TITLE_WELD = 'Flange Weld'
+KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
+KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size(mm)'
+KEY_FLANGE_WELD_STRENGTH = 'Flange_Weld.Strength'
+KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
+KEY_FLANGE_WELD_STRESS = 'Flange_Weld.Stress'
+KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
+KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
+KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
+KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
+KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
+KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
+
+KEY_INNERFLANGE_WELD_LENGTH = 'Flange_Weld.InnerLength'
+KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length'
+KEY_INNERFLANGE_WELD_LENGTH_EFF = 'Flange_Weld.InnerEffLength'
+KEY_INNERFLANGE_WELD_HEIGHT ='flange_Weld.Innerheight'
+KEY_DISP_INNERFLANGE_WELD_HEIGHT = 'Height'
+
+
+
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
@@ -530,13 +604,13 @@ KEY_EDGEDIST_W = 'Web_plate.edge_dist_provided'
 KEY_DISP_EDGEDIST_W = 'Edge Distance'
 
 KEY_WEB_CAPACITY ="Web_plate.capacity"
-KEY_DISP_WEB_CAPACITY= 'capacity'
+KEY_DISP_WEB_CAPACITY= 'Capacity'
 KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
-KEY_DISP_WEB_TEN_CAPACITY ="Web tension capacity"
+KEY_DISP_WEB_TEN_CAPACITY ="Tension Capacity"
 KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
-KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Web plate shear cap"
+KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Plate Shear Capacity"
 KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
-KEY_DISP_TEN_CAP_WEB_PLATE ="Web_plate tension_capacity_"
+KEY_DISP_TEN_CAP_WEB_PLATE ="Plate Tension Capacity"
 
 
 KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'
@@ -553,13 +627,27 @@ KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
 KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
 KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
-
 KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
 KEY_WEB_DISP_BOLT_LINE = 'Bolt Lines in web'
 KEY_WEB_BOLTS_REQ = "Web_plate.Bolt_required"
 KEY_WEB_DISP_BOLTS_REQ = "Web Bolt Required"
 KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
 KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in web'
+
+KEY_WEB_WELD_DETAILS = "Web detail"
+KEY_DISP_WEB_WELD_DETAILS = "Weld Details"
+DISP_WEB_TITLE_WELD = 'Web Weld'
+KEY_WEB_WELD_SIZE = 'Web_Weld.Size'
+KEY_WEB_DISP_WELD_SIZE = 'Web Weld Size(mm)'
+KEY_WEB_WELD_STRENGTH = 'Web_Weld.Strength'
+KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength(N/mm)'
+KEY_WEB_WELD_STRESS = 'Web_Weld.Stress'
+KEY_WEB_DISP_WELD_STRESS = 'Web Weld Stress(N/mm)'
+KEY_WEB_WELD_LENGTH = 'Web_Weld.Length'
+KEY_DISP_WEB_WELD_LENGTH = 'Web Weld Length'
+KEY_WEB_WELD_LENGTH_EFF = 'Web_Weld.EffLength'
+KEY_WEB_WELD_HEIGHT ='Web_Weld.height'
+KEY_DISP_WEB_WELD_HEIGHT = 'Web Weld Height'
 
 
 DISP_TITLE_ENDPLATE = 'End plate'
@@ -569,6 +657,7 @@ KEY_DISP_ENDPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_ENDPLATE_THICKNESS = ['All', 'Customized']
 VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
+VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
 
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
 
@@ -587,6 +676,7 @@ KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 KEY_DP_WELD_FAB = 'DesignPreferences.Weld.Fab'
 
 KEY_DP_WELD_TYPE = 'Weld.Type'
+KEY_DISP_DP_WELD_TYPE ='Weld Type'
 KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
 KEY_DP_WELD_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
@@ -784,17 +874,26 @@ KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
+KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
+KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
+KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
-KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity'
+KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
-KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity'
+KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
+KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
+KEY_OUT_DISP_BOLT_VALUE = 'Bolt Value (kN)'
 KEY_OUT_BOLT_FORCE = 'Bolt.Force'
 KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force'
-KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
+KEY_OUT_DISP_BOLT_SHEAR_FORCE = 'Bolt Shear Force (kN)'
+KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
+KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
+KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
+KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 
@@ -805,26 +904,54 @@ KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line'
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
+KEY_OUT_DISP_PITCH = 'Pitch (mm)'
+
 KEY_OUT_MIN_PITCH = 'Bolt.MinPitch'
 
 
 
 
 
-
-KEY_OUT_DISP_PITCH = 'Pitch'
 KEY_OUT_END_DIST = 'Bolt.EndDist'
-KEY_OUT_DISP_END_DIST = 'End Distance'
+KEY_OUT_DISP_END_DIST = 'End Distance (mm)'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
+KEY_OUT_DISP_GAUGE = 'Gauge (mm)'
+
 KEY_OUT_MIN_GAUGE = 'Bolt.MinGauge'
 KEY_OUT_MAX_SPACING = 'Bolt.MaxGauge'
-KEY_OUT_DISP_GAUGE = 'Gauge'
 
 KEY_OUT_EDGE_DIST = 'Bolt.EdgeDist'
 KEY_OUT_MIN_EDGE_DIST = 'Bolt.MinEdgeDist'
 KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
 
+
 KEY_OUT_DISP_EDGE_DIST = 'Edge Distance'
+
+
+KEY_OUT_SPTNG_BOLT_SHEAR = 'Cleat.Sptng_leg.Shear'
+KEY_OUT_SPTNG_BOLT_BEARING = 'Cleat.Sptng_leg.Bearing'
+KEY_OUT_SPTNG_BOLT_CAPACITY = 'Cleat.Sptng_leg.Capacity'
+KEY_OUT_SPTNG_BOLT_FORCE = 'Cleat.Sptng_leg.Force'
+KEY_OUT_SPTNG_BOLT_LINE = 'Cleat.Sptng_leg.Line'
+KEY_OUT_SPTNG_BOLTS_REQUIRED = 'Cleat.Sptng_leg.Required'
+
+KEY_OUT_SPTNG_BOLT_GRP_CAPACITY = 'Cleat.Sptng_leg.GroupCapacity'
+
+KEY_OUT_SPTNG_BOLTS_ONE_LINE = 'Cleat.Sptng_leg.OneLine'
+
+KEY_OUT_SPTNG_SPACING = 'Cleat.Sptng_leg.spacing'
+
+KEY_OUT_SPTNG_PITCH = 'Cleat.Sptng_leg.Pitch'
+
+KEY_OUT_SPTNG_MIN_PITCH = 'Cleat.Sptng_leg.MinPitch'
+KEY_OUT_SPTNG_END_DIST = 'Cleat.Sptng_leg.EndDist'
+KEY_OUT_SPTNG_GAUGE = 'Cleat.Sptng_leg.Gauge'
+KEY_OUT_SPTNG_MIN_GAUGE = 'Cleat.Sptng_leg.MinGauge'
+KEY_OUT_SPTNG_MAX_SPACING = 'Cleat.Sptng_leg.MaxGauge'
+KEY_OUT_SPTNG_EDGE_DIST = 'Cleat.Sptng_leg.EdgeDist'
+KEY_OUT_SPTNG_MIN_EDGE_DIST = 'Cleat.Sptng_leg.MinEdgeDist'
+KEY_OUT_SPTNG_MAX_EDGE_DIST = 'Cleat.Sptng_leg.MaxEdgeDist'
+
 
 
 KEY_OUT_PLATETHK = 'Plate.Thickness'
@@ -833,6 +960,7 @@ KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_PLATE_HEIGHT = 'Height (mm)'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
+KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity'
 KEY_OUT_PLATE_BLK_SHEAR = 'Plate.BlockShear'
@@ -841,7 +969,6 @@ KEY_OUT_PLATE_MOM_DEMAND = 'Plate.MomDemand'
 KEY_OUT_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
 KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
-
 
 KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
@@ -854,7 +981,9 @@ KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
 KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
 KEY_OUT_WELD_LENGTH = 'Weld.Length'
+KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
 KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
+KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"
@@ -881,7 +1010,6 @@ KEY_SEC_PROFILE = 'Member.Profile'
 KEY_DISP_SEC_PROFILE = 'Section Profile'
 VALUES_SEC_PROFILE = ['Beams', 'Columns', 'Angles', 'Channels', 'Back to Back Angles', 'Back to Back Channels', 'Star Angles']
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
-
 
 KEY_LENZZ = 'Member.Length_zz'
 KEY_DISP_LENZZ = 'Length (z-z)'
@@ -935,13 +1063,24 @@ DISP_NUM_OF_ROWS = 'No of Rows'
 DISP_NUM_OF_COLUMNS = 'No of Columns'
 
 
-def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0):
+def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):
 
     available_angles = []
     for designation in input_angle_list:
-        leg_a_length,leg_b_length = get_leg_lengths(designation)
-        if operator.le(max(leg_a_length,leg_b_length),max_leg_length) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length):
+        leg_a_length,leg_b_length,t,r_r = get_leg_lengths(designation)
+        if position == "inner":
+            min_leg_length_outer = min_leg_length + t + r_r
+            max_leg_length_outer = max_leg_length + t + r_r
+        else:
+            min_leg_length_outer = min_leg_length
+            max_leg_length_outer = max_leg_length
+
+        print(min_leg_length,max_leg_length)
+        if operator.le(max(leg_a_length,leg_b_length),max_leg_length_outer) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length_outer) and leg_a_length==leg_b_length:
+            print("appended", designation)
             available_angles.append(designation)
+        else:
+            print("popped",designation)
     return available_angles
 
 
@@ -951,21 +1090,23 @@ def get_leg_lengths(designation):
         Function to fetch designation values from respective Tables.
     """
     conn = sqlite3.connect(PATH_TO_DATABASE)
-    db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
+    db_query = "SELECT AXB, t, R1 FROM Angles WHERE Designation = ?"
     cur = conn.cursor()
     cur.execute(db_query, (designation,))
     row = cur.fetchone()
 
     axb = row[0]
+    t = row[1]
+    r_r = row[2]
     axb = axb.lower()
     leg_a_length = float(axb.split("x")[0])
     leg_b_length = float(axb.split("x")[1])
     conn.close()
-    return leg_a_length,leg_b_length
+    return leg_a_length,leg_b_length,t,r_r
 
 all_angles = connectdb("Angles","popup")
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
-print(VALUES_CLEAT_CUSTOMIZED)
+# print(VALUES_CLEAT_CUSTOMIZED)
 
 DISP_TITLE_COMPMEM='Compression member'
 

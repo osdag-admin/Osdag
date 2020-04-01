@@ -1068,6 +1068,7 @@ class Tension_welded(Main):
             self.section_size_max.tension_member_yielding(A_g=(self.section_size_max.area),
                                                           F_y=self.section_size_max.fy)
             self.max_member_force = self.section_size_max.tension_yielding_capacity * 2
+
             self.section_size_max.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],
                                                         mom_inertia_y=self.section_size_max.mom_inertia_y,
                                                         mom_inertia_z=self.section_size_max.mom_inertia_z,
@@ -1100,17 +1101,20 @@ class Tension_welded(Main):
             # self.rad_gyration = math.sqrt(I / (self.section_size_max.area))
             self.max_length = 400 * self.section_size_max.min_radius_gyration
 
+        print(self.max_member_force)
+
         return self.max_member_force,self.max_length
 
 
     def initial_member_capacity(self,design_dictionary,previous_size = None):
         min_yield = 0
-
         [max_force,length] = self.max_force_length(self, design_dictionary)
+        print(self.max_member_force,"dg")
+
         for selectedsize in self.sizelist:
-            print(selectedsize)
+            # print(self.sizelist)
             self.section_size = self.select_section(self,design_dictionary,selectedsize)
-            print(self.section_size)
+            # print(self.section_size)
 
             if design_dictionary[KEY_SEC_PROFILE] =='Angles' or design_dictionary[KEY_SEC_PROFILE] =='Channels':
                 self.cross_area = self.section_size.area
@@ -1248,6 +1252,17 @@ class Tension_welded(Main):
                                             fy=self.plate.fy)
                 self.net_area = self.section_size_1.depth * self.plate.thickness_provided
 
+            elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == 'Long Leg' :
+                self.plate.tension_yielding(length=2*self.section_size_1.max_leg, thickness=self.plate.thickness_provided,
+                                            fy=self.plate.fy)
+                self.net_area = 2*self.section_size_1.max_leg * self.plate.thickness_provided
+
+            elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == 'Short Leg' :
+                self.plate.tension_yielding(length=2*self.section_size_1.min_leg, thickness=self.plate.thickness_provided,
+                                            fy=self.plate.fy)
+                self.net_area = 2*self.section_size_1.min_leg * self.plate.thickness_provided
+
+
             else:
                 if design_dictionary[KEY_LOCATION] == 'Long Leg':
                     self.plate.tension_yielding(length=self.section_size_1.max_leg,
@@ -1265,13 +1280,18 @@ class Tension_welded(Main):
             if tension_capacity > self.load.axial_force*1000:
                 break
 
-        if tension_capacity > self.load.axial_force * 1000:
+        if tension_capacity >=self.load.axial_force * 1000:
             print(self.plate.thickness_provided)
             self.design_status = True
             self.select_weld(self, design_dictionary)
         else:
-            self.design_status = False
-            logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness")
+            if tension_capacity <= 3345 and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
+                self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
+            elif tension_capacity <= 1672 and design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', "Angles"]:
+                self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
+            else:
+                self.design_status = False
+                logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness")
 
     # def closest(self, lst, K):
     #
@@ -1412,6 +1432,10 @@ class Tension_welded(Main):
             self.plate.height = 2 * self.section_size_1.max_leg
         elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
             self.plate.height = 2 * self.section_size_1.min_leg
+        elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
+            self.plate.height =  self.section_size_1.min_leg
+        elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles","Angles"] and design_dictionary[KEY_LOCATION] == "Long Leg":
+            self.plate.height = self.section_size_1.max_leg
         else:
             self.plate.height = self.section_size_1.depth
 

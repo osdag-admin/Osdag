@@ -1468,6 +1468,8 @@ class BeamCoverPlate(MomentConnection):
         # print(1)
 
         #### Block shear capacity of web in axial ###
+        #### Block shear capacity of web in axial ###
+
 
         while design_status_block_shear == False:
             # print(design_status_block_shear)

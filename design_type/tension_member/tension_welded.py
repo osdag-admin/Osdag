@@ -1408,7 +1408,13 @@ class Tension_welded(Main):
 
 
         self.plate.length = flange_weld + 2 * self.weld.size
-        self.plate.height = self.section_size_1.depth
+        if design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Long Leg":
+            self.plate.height = 2 * self.section_size_1.max_leg
+        elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
+            self.plate.height = 2 * self.section_size_1.min_leg
+        else:
+            self.plate.height = self.section_size_1.depth
+
 
     def member_check(self,design_dictionary):
 
@@ -1491,16 +1497,16 @@ class Tension_welded(Main):
 
         for self.plate.thickness_provided in self.thickness_possible:
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
-                self.plate.tension_yielding(length = self.section_size_1.depth, thickness = self.plate.thickness_provided, fy = self.plate.fy)
-                self.net_area = self.section_size_1.depth * self.plate.thickness_provided
+                self.plate.tension_yielding(length = self.plate.height, thickness = self.plate.thickness_provided, fy = self.plate.fy)
+                self.net_area = self.plate.height * self.plate.thickness_provided
 
             else:
                 if design_dictionary[KEY_LOCATION] == 'Long Leg':
-                    self.plate.tension_yielding(length = self.section_size_1.max_leg, thickness = self.plate.thickness_provided, fy = self.plate.fy)
-                    self.net_area = self.section_size_1.max_leg * self.plate.thickness_provided
+                    self.plate.tension_yielding(length = self.plate.height, thickness = self.plate.thickness_provided, fy = self.plate.fy)
+                    self.net_area = self.plate.height * self.plate.thickness_provided
                 else:
-                    self.plate.tension_yielding(length = self.section_size_1.min_leg, thickness = self.plate.thickness_provided, fy = self.plate.fy)
-                    self.net_area = self.section_size_1.min_leg * self.plate.thickness_provided
+                    self.plate.tension_yielding(length = self.plate.height, thickness = self.plate.thickness_provided, fy = self.plate.fy)
+                    self.net_area = self.plate.height * self.plate.thickness_provided
 
             self.plate.tension_rupture(A_n = self.net_area, F_u = self.plate.fu)
             # if (design_dictionary[KEY_SEC_PROFILE] == "Channels" or design_dictionary[KEY_SEC_PROFILE] =="Back to Back Channels") and design_dictionary[KEY_LOCATION] == "Web":
@@ -1508,7 +1514,7 @@ class Tension_welded(Main):
             if design_dictionary[KEY_SEC_PROFILE] == "Channels":
                 A_vg = self.plate.length *self.plate.thickness_provided *2
                 A_vn = A_vg
-                A_tg = self.section_size_1.depth * self.plate.thickness_provided
+                A_tg = self.plate.height * self.plate.thickness_provided
                 A_tn = A_tg
                 # self.plate.length = (self.weld.length - (self.section_size_1.depth - 2 * self.weld.size) + 4 * self.weld.size)/2
                 # self.plate.height = self.section_size_1.depth
@@ -1516,7 +1522,7 @@ class Tension_welded(Main):
             elif design_dictionary[KEY_SEC_PROFILE] == "Back to Back Channels":
                 A_vg = self.plate.length * self.plate.thickness_provided * 2
                 A_vn = A_vg
-                A_tg = self.section_size_1.depth * self.plate.thickness_provided
+                A_tg = self.plate.height * self.plate.thickness_provided
                 A_tn = A_tg
                 # self.plate.length = ((self.weld.length - 2 * (self.section_size_1.depth - 2 * self.weld.size)) + 8 * self.weld.size)/4
                 # self.plate.height = self.section_size_1.depth
@@ -1524,10 +1530,10 @@ class Tension_welded(Main):
             elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[KEY_LOCATION]== "Long Leg":
                 A_vg = self.plate.length * self.plate.thickness_provided * 2
                 A_vn = A_vg
-                A_tg = self.section_size_1.max_leg * self.plate.thickness_provided
+                A_tg = self.plate.height * self.plate.thickness_provided
                 A_tn = A_tg
-                self.plate.length = ((self.weld.length - 2 * (self.section_size_1.max_leg - 2 * self.weld.size)) + 8 * self.weld.size)/4
-                self.plate.height = self.section_size_1.max_leg
+                # self.plate.length = ((self.weld.length - 2 * (self.section_size_1.max_leg - 2 * self.weld.size)) + 8 * self.weld.size)/4
+                # self.plate.height = self.section_size_1.max_leg
 
             elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
                 A_vg = self.plate.length * self.plate.thickness_provided * 2
@@ -1540,14 +1546,14 @@ class Tension_welded(Main):
             elif design_dictionary[KEY_SEC_PROFILE]== "Angles" and design_dictionary[KEY_LOCATION]== "Long Leg":
                 A_vg = self.plate.length * self.plate.thickness_provided * 2
                 A_vn = A_vg
-                A_tg = self.section_size_1.max_leg * self.plate.thickness_provided
+                A_tg = self.plate.height * self.plate.thickness_provided
                 A_tn = A_tg
                 # self.plate.length = ((self.weld.length - (self.section_size_1.max_leg - 2 * self.weld.size)) + 4 * self.weld.size) / 2
                 # self.plate.height = self.section_size_1.max_leg
             else:
                 A_vg = self.plate.length * self.plate.thickness_provided * 2
                 A_vn = A_vg
-                A_tg = self.section_size_1.min_leg * self.plate.thickness_provided
+                A_tg = self.plate.height * self.plate.thickness_provided
                 A_tn = A_tg
                 # self.plate.length = ((self.weld.length - (self.section_size_1.min_leg - 2 * self.weld.size)) + 4 * self.weld.size) / 2
                 # self.plate.height = self.section_size_1.min_leg

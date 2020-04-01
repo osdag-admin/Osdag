@@ -641,11 +641,12 @@ class BeamCoverPlate(MomentConnection):
         self.axial_capacity = (self.section.area * self.section.fy) / gamma_m0  # N
         self.axial_load = 0.3 * self.axial_capacity
         self.factored_axial_load = max(self.load.axial_force * 1000, self.axial_load)  # N
+        self.load.axial_force = self.factored_axial_load
         print("self.factored_axial_load" ,self.factored_axial_load)
         # Shear Capacity  # N
 
-        design_shear_capacity = (self.section.depth* self.section.web_thickness * self.section.fy) / (
-                math.sqrt(3) * gamma_m0)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
+        design_shear_capacity = ((self.section.depth-(2*self.section.flange_thickness))* self.section.web_thickness * self.section.fy) / (
+                math.sqrt(3) * gamma_m0)   # N # A_v: Total cross sectional area in shear in mm^2 (float)
         if self.load.shear_force * 1000 >= design_shear_capacity:
             self.load.shear_force = design_shear_capacity
         else:
@@ -718,9 +719,9 @@ class BeamCoverPlate(MomentConnection):
         #     self.section.plast_sec_mod_z == self.section.elast_sec_mod_z
         # else:
         #     pass
-        moment_web = (Z_w / ( self.section.plast_sec_mod_z )) * self.load.moment #  KNm todo add in ddcl # z_w of web & z_p  of section
+        self.moment_web = (Z_w / ( self.section.plast_sec_mod_z )) * self.load.moment #  KNm todo add in ddcl # z_w of web & z_p  of section
         print('plast_sec_mod_z',self.section.plast_sec_mod_z)
-        self.moment_flange = ((self.load.moment * 1000000) - moment_web)/1000000 #KNm todo add in ddcl
+        self.moment_flange = ((self.load.moment) - self.moment_web)  #KNmm #KNm todo add in ddcl
 
         if self.load.moment  >  self.section.moment_capacity/1000000:
             self.load.moment =  self.section.moment_capacity
@@ -735,6 +736,9 @@ class BeamCoverPlate(MomentConnection):
         ###WEB MENBER CAPACITY CHECK
 
         ###### # capacity Check for web in axial = min(block, yielding, rupture)
+        self.axial_force_w = ((self.section.depth - (
+                2 * self.section.flange_thickness)) * self.section.web_thickness * self.factored_axial_load) / (
+                                 self.section.area)
 
         # A_vn_web = ( self.section.depth - 2 * self.section.flange_thickness - self.web_plate.bolts_one_line * self.web_bolt.dia_hole) * self.section.web_thickness
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
@@ -748,11 +752,16 @@ class BeamCoverPlate(MomentConnection):
 
         print("tension_yielding_capacity_web", self.tension_yielding_capacity_web)
 
-        if self.tension_yielding_capacity_web >  self.factored_axial_load :
+        if self.tension_yielding_capacity_web >  self.axial_force_w :
 
             self.section.tension_yielding_capacity = self.tension_yielding_capacity_web
-            print("tension_yielding_capacity of web", self.section.tension_yielding_capacity)
+            # print("tension_yielding_capacity of web", self.section.tension_yielding_capacity)
             ### FLANGE MEMBER CAPACITY CHECK
+            self.axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
+                self.section.area)
+            self.flange_force = (
+                    ((self.moment_flange * 1000000) / (self.section.depth - self.section.flange_thickness)) + (
+                self.axial_force_f))
             # A_vn_flange = (self.section.flange_width - self.flange_plate.bolts_one_line * self.flange_bolt.dia_hole) * \
             #               self.section.flange_thickness
             A_v_flange = self.section.flange_thickness * self.section.flange_width
@@ -763,7 +772,7 @@ class BeamCoverPlate(MomentConnection):
             print("tension_yielding_capacity_flange", self.tension_yielding_capacity_flange)
 
 
-            if self.tension_yielding_capacity_flange >  self.factored_axial_load :
+            if self.tension_yielding_capacity_flange >  self.flange_force :
 
                 #             self.supported_section.tension_yielding_capacity > self.load.axial_force:
                 # print("BBB flange member check is satisfactory. Doing bolt checks")
@@ -797,7 +806,7 @@ class BeamCoverPlate(MomentConnection):
                     # else:
                     #     pass
 
-                    self.section.tension_yielding_capacity = self.tension_yielding_capacity_flange
+
                     print("tension_yielding_capacity of flange", self.section.tension_yielding_capacity )
                     self.design_status = True
             else:
@@ -1015,10 +1024,11 @@ class BeamCoverPlate(MomentConnection):
             print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.flange_plate.bolt_force)
 
             bolt_capacity_reduced_flange = self.flange_plate.get_bolt_red(self.flange_plate.bolts_one_line,
-                                                            self.flange_plate.gauge_provided,self.flange_bolt.bolt_capacity,
+                                                            self.flange_plate.gauge_provided,self.flange_plate.bolt_line, self.flange_plate.pitch_provided,self.flange_bolt.bolt_capacity,
                                                             self.bolt.bolt_diameter_provided)
             bolt_capacity_reduced_web = self.web_plate.get_bolt_red(self.web_plate.bolts_one_line,
                                                                           self.web_plate.gauge_provided,
+                                                                    self.web_plate.bolt_line, self.web_plate.pitch_provided,
                                                                           self.web_bolt.bolt_capacity,
                                                                           self.bolt.bolt_diameter_provided)
             if ( bolt_capacity_reduced_flange < self.flange_plate.bolt_force) and  (bolt_capacity_reduced_web  < self.web_plate.bolt_force) and (count >= 1):

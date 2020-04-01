@@ -680,7 +680,9 @@ class IS800_2007(object):
             K = float(K)
         except ValueError:
             return
-        return K * fillet_size
+        throat = max((K * fillet_size), 3)
+
+        return throat
 
     @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):

@@ -839,7 +839,10 @@ class BeamCoverPlateWeld(MomentConnection):
     def web_plate_weld(self):
         self.min_web_platethk = min(self.web_plate.thickness_provided,self.section.web_thickness)
         self.web_weld.size =int(round_down(self.min_web_platethk- 1.5))
-
+        if self.web_weld.size >  self.min_web_platethk :
+            self.web_weld.size = self.min_web_platethk
+        else:
+            pass
 
         if self.web_weld.size < 3:
             self.web_weld.size = 3
@@ -851,6 +854,10 @@ class BeamCoverPlateWeld(MomentConnection):
             pass
         self.webspace = max(15, (self.web_weld.size + 5))
         print("space", self.webspace)
+
+        # self.design_status = False
+        #
+        # while self.design_status == False:
         self.web_weld.get_weld_strength(connecting_fu=[self.web_weld.fu,self.section.fu, self.web_plate.fu],
                                                                         weld_fabrication=KEY_DP_WELD_FAB_SHOP,
                                                                         t_weld=self.web_weld.size, weld_angle=90) # in N/mm
@@ -866,28 +873,31 @@ class BeamCoverPlateWeld(MomentConnection):
 
         while self.design_status == False:
 
-            d = self.available_long_web_length
-            b = self.web_plate.height -(2*self.web_weld.size)
-            cgy = d ** 2 / (2 * d + b)
-            cgx = b / 2
-            y_max =  (d ** 2 / (2 * d + b))
-            x_max = b /2
-            print("dfdbjfk",y_max, x_max)
-            self.ecc = d - (d ** 2 / (2 * d + b))
-            Ip_weld = ((8 * (d ** 3)) + (6 * d * (b ** 2)) + (b ** 3)) / 12 - ((d ** 4) / (2 * d + b)) #mm4
-            self.weld_twist = (self.load.shear_force *1000 * self.ecc) +(self.moment_web*1000000) #Nmm
-            # print("self.web_weld_length",self.web_weld_length )
-            self.l_req_weblength =round_up(((2* self.available_long_web_length) +self.web_plate.height + (2* self.web_weld.size)),5)
-            self.web_weld.get_weld_stress( weld_shear=self.load.shear_force *1000, weld_axial =self.axial_force_w ,
-                                                         weld_twist= self.weld_twist, Ip_weld= Ip_weld, y_max=y_max, x_max = x_max, l_weld=   self.l_req_weblength )
-
-            # if self.web_weld.strength > self.web_weld.stress:
+            self.weld_stress(self,d=self.available_long_web_length, b=(self.web_plate.height -(2*self.web_weld.size)),
+                             shear_force =self.load.shear_force , moment_web =self.moment_web, plate_height=self.web_plate.height,
+                             weld_size =self.web_weld.size, axial_force_w=self.axial_force_w )
+            print("web weld stress", self.web_weld.stress)
 
 
             if self.web_weld.strength > self.web_weld.stress :
                 break
             else:
                 self.available_long_web_length =  self.available_long_web_length + 50
+
+                self.web_plate.length = 2*(self.available_long_web_length +self.web_weld.size) + self.web_plate.gap
+                if self.web_plate.length >= 150 * self.web_weld.throat_tk:
+                    Reduction_factor =IS800_2007.cl_10_5_7_3_weld_long_joint(l_j =self.web_plate.length, t_t=self.web_weld.throat_tk)
+                    self.web_weld.strength = self.web_weld.strength * Reduction_factor
+                    self.weld_stress(self,d=self.available_long_web_length,
+                                     b=(self.web_plate.height - (2 * self.web_weld.size)),
+                                     shear_force=self.load.shear_force, moment_web=self.moment_web,
+                                     plate_height=self.web_plate.height, weld_size=self.web_weld.size,
+                                     axial_force_w=self.axial_force_w)
+                    if self.web_weld.strength > self.web_weld.stress:
+                        self.design_status = True
+                        break
+                    else:
+                        self.available_long_web_length = self.available_long_web_length + 50
 
 
         if  self.web_weld.strength   > self.web_weld.stress:
@@ -1522,7 +1532,43 @@ class BeamCoverPlateWeld(MomentConnection):
         return thickness
 
 
-#
+    def weld_stress( self,d,b,shear_force,moment_web,plate_height,weld_size,axial_force_w):
+        #while calling take the shearforce in KN and moment KNM and axial foce in N
+        # d = self.available_long_web_length
+        # b = self.web_plate.height - (2 * self.web_weld.size)
+        # self.design_status = False
+        #
+        # while self.design_status == False:
+            cgy = d ** 2 / (2 * d + b)
+            cgx = b / 2
+            y_max = (d ** 2 / (2 * d + b))
+            x_max = b / 2
+            print("dfdbjfk", y_max, x_max)
+            ecc = d - (d ** 2 / (2 * d + b))
+            Ip_weld = ((8 * (d ** 3)) + (6 * d * (b ** 2)) + (b ** 3)) / 12 - ((d ** 4) / (2 * d + b))  # mm4
+            weld_twist = (shear_force * 1000 * ecc) + (moment_web * 1000000)  # Nmm
+            # print("self.web_weld_length",self.web_weld_length )
+            self.l_req_weblength = round_up(
+                ((2 * d) + plate_height + (2 * weld_size)), 50)
+            self.web_weld.get_weld_stress(weld_shear=shear_force * 1000, weld_axial=axial_force_w,
+                                          weld_twist=weld_twist, Ip_weld=Ip_weld, y_max=y_max, x_max=x_max,
+                                          l_weld=self.l_req_weblength)
+
+
+            # if self.web_weld.stress  > self.web_weld.strength
+    #
+    # def long_Joint(self,l_req_weblength,d,plate_height,weld_size,gap,throat_tk,strength): #length of joint l_j= length of plate
+    #      # d = self.available_long_web_length
+    #     plate_length = (2*(d+ weld_size)) + gap
+    #
+    #     reduction_factor =  1.2 - ((0.2 *plate_length)/(150*throat_tk))
+    #     while plate_length > 150 * self.web_weld.throat_tk:
+    #         strength = strength * reduction_factor
+    #         req_length =
+
+
+
+
 
     def call_3DModel(self,ui,bgcolor):
         # Call to calculate/create the BB Cover Plate Bolted CAD model

@@ -628,6 +628,7 @@ class Weld(Material):
         self.stress = 0.0
         self.fabrication = fabrication
         self.fu= float(material_g_o)
+        self.throat_tk =0.0
 
     def __repr__(self):
         repr = "Weld\n"
@@ -635,14 +636,16 @@ class Weld(Material):
         repr += "Length: {}\n".format(self.length)
         repr += "Stress: {}\n".format(self.stress)
         repr += "Strength: {}\n".format(self.strength)
+        repr += "throattk: {}\n".format(self.throat_tk )
         return repr
 
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
-        throat_tk = \
+        self.throat_tk = \
             IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
                 (t_weld, weld_angle)
-        weld_strength = f_wd * throat_tk
+        print ("throat_tk",self.throat_tk)
+        weld_strength = f_wd * self.throat_tk
         self.strength = weld_strength
 
     def get_weld_stress(self,weld_shear =0.0, weld_axial=0.0, weld_twist=0.0, Ip_weld=1.0, y_max=0.0, x_max=0.0, l_weld=0.0):

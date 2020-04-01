@@ -476,10 +476,19 @@ KEY_FLANGEPLATE_THICKNESS = 'flange_plate.thickness_provided'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
+KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
+KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness(mm)'
+
 KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
 KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length'
+
+DISP_TITLE_INNERFLANGESPLICEPLATE = 'Inner Flange splice plate'
+KEY_INNERFLANGE_PLATE_HEIGHT = 'flange_plate.InnerHeight'
+KEY_DISP_INNERFLANGE_PLATE_HEIGHT = 'Height(mm)'
+KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
+KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length'
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
 KEY_DISP_FLANGE_SPACING = 'Spacing'
@@ -544,6 +553,9 @@ KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 KEY_FLANGE_WELD_DETAILS = "Flange detail"
 KEY_DISP_FLANGE_WELD_DETAILS = "Weld Details"
 
+KEY_INNERFLANGE_WELD_DETAILS = "Inner Flange detail"
+KEY_DISP_INNERFLANGE_WELD_DETAILS = "Weld Details"
+
 KEY_WELD_TYPE = 'Weld.Type'
 KEY_DISP_WELD_TYPE ='Weld Type'
 VALUES_WELD_TYPE = ["select type","Fillet Weld"]
@@ -559,6 +571,14 @@ KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
 KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
 KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
+
+KEY_INNERFLANGE_WELD_LENGTH = 'Flange_Weld.InnerLength'
+KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length'
+KEY_INNERFLANGE_WELD_LENGTH_EFF = 'Flange_Weld.InnerEffLength'
+KEY_INNERFLANGE_WELD_HEIGHT ='flange_Weld.Innerheight'
+KEY_DISP_INNERFLANGE_WELD_HEIGHT = 'Height'
+
+
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 

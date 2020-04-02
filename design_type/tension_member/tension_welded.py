@@ -1280,14 +1280,20 @@ class Tension_welded(Main):
             if tension_capacity > self.load.axial_force*1000:
                 break
 
+        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels',"Star Angles"]:
+            max_tension_yield = 400*self.plate.fy*40/1.1
+        else:
+            max_tension_yield = 200*self.plate.fy*40/1.1
+
+
         if tension_capacity >=self.load.axial_force * 1000:
             print(self.plate.thickness_provided)
             self.design_status = True
             self.select_weld(self, design_dictionary)
         else:
-            if tension_capacity <= 3345 and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
+            if tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
                 self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
-            elif tension_capacity <= 1672 and design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', "Angles"]:
+            elif tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', "Angles"]:
                 self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
             else:
                 self.design_status = False

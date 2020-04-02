@@ -223,7 +223,7 @@ class Section(Material):
         self.notch_ht = 0.0
 
         self.mass = 0.0
-        self.area  = 0.0
+        self.area = 0.0
         self.depth = 0.0
         self.flange_width = 0.0
         self.web_thickness = 0.0

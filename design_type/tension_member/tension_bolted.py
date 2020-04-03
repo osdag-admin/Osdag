@@ -65,9 +65,16 @@ class Tension_bolted(Main):
         logger.addHandler(handler)
 
     def module_name(self):
+
+        """
+        Function to call the module name
+        """
+
         return KEY_DISP_TENSION_BOLTED
 
     def customized_input(self):
+
+        "Function to populate combobox based on the option selected"
 
         c_lst = []
 
@@ -85,6 +92,9 @@ class Tension_bolted(Main):
         return c_lst
 
     def fn_profile_section(self):
+
+        "Function to populate combobox based on the section type selected"
+
         # print(self,"2")
         if self == 'Beams':
             return connectdb("Beams", call_type="popup")
@@ -108,7 +118,9 @@ class Tension_bolted(Main):
         return lst
 
     def fn_conn_type(self):
-        print(self,"1")
+
+        "Function to populate section size based on the type of section "
+
         if self in ['Angles', 'Back to Back Angles', 'Star Angles']:
             b = VALUES_LOCATION_1
         elif self in ["Channels", "Back to Back Channels"]:
@@ -116,6 +128,9 @@ class Tension_bolted(Main):
         return b
 
     def tab_list(self):
+
+        "Function to create design preference"
+
         tabs = []
 
         t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
@@ -1018,7 +1033,7 @@ class Tension_bolted(Main):
 
     def select_section(self, design_dictionary, selectedsize):
 
-        "selection components class based on the section passed "
+        "selecting components class based on the section passed "
 
         if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Back to Back Angles', 'Star Angles']:
             self.section_size = Angle(designation=selectedsize, material_grade=design_dictionary[KEY_MATERIAL])
@@ -1096,7 +1111,7 @@ class Tension_bolted(Main):
             self.edge_dist_min_round = round_up(self.edge_dist_min, 5)
             self.pitch_round = round_up((2.5*bolt_diameter_min), 5)
 
-            "selection of minimum member size required based on the miniumum size of bolt diameter list "
+            "selection of minimum member size required based on the miniumum size of bolt  in bolt diameter list "
 
             if design_dictionary[KEY_LOCATION] == "Long Leg":
                if self.section_size.max_leg < self.section_size.root_radius + self.section_size.thickness + (2 *self.edge_dist_min_round):
@@ -1589,6 +1604,7 @@ class Tension_bolted(Main):
             self.design_status = False
 
         if self.section_size_1.tension_capacity >= self.load.axial_force *1000:
+            logger.error("In case of reverse load, slenderness value should be less than 180")
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
             self.design_status = True
@@ -1603,6 +1619,8 @@ class Tension_bolted(Main):
 
 
         self.plate_last = self.plate.thickness[-1]
+
+        "recalculating block shear capacity of the bolt based on the change in pitch while block shear check in member design"
 
         [self.bolt_bearing_capacity,self.d_0,self.kb,self.gamma_mb] = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
             e=self.plate.edge_dist_provided, p=self.plate.pitch_provided, bolt_hole_type=self.bolt.bolt_hole_type)
@@ -1670,16 +1688,34 @@ class Tension_bolted(Main):
             self.plate.tension_blockshear_area_input(A_vg = A_vg, A_vn = A_vn, A_tg = A_tg, A_tn = A_tn, f_u = self.plate.fu, f_y = self.plate.fy)
             self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
 
-            if self.plate_tension_capacity > self.load.axial_force*1000:
-                print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
+            if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
+                max_tension_yield = 400 * self.plate.fy * 40 / 1.1
+            else:
+                max_tension_yield = 200 * self.plate.fy * 40 / 1.1
 
-                self.design_status = True
+            if self.plate_tension_capacity > self.load.axial_force*1000:
+                # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
                 break
             elif (self.plate_tension_capacity < self.load.axial_force*1000) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
                 logger.error("Plate thickness is not sufficient")
             else:
                 pass
+
+        if self.plate_tension_capacity > self.load.axial_force*1000:
+            # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
+            self.design_status = True
+        else:
+            if self.plate_tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ["Channels",
+                                                                                               'Back to Back Channels',
+                                                                                               "Star Angles"]:
+                self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
+            elif self.plate_tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles',
+                                                                                                 "Angles"]:
+                self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
+            else:
+                self.design_status = False
+                logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness")
 
             # if self.plate.design_status is False:
             # plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,

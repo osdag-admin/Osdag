@@ -64,9 +64,16 @@ class Tension_welded(Main):
         logger.addHandler(handler)
 
     def module_name(self):
+
+        """
+        Function to call the module name
+        """
         return KEY_DISP_TENSION_WELDED
 
     def customized_input(self):
+
+        "Function to populate combobox based on the option selected"
+
 
         c_lst = []
 
@@ -84,6 +91,10 @@ class Tension_welded(Main):
         return c_lst
 
     def fn_profile_section(self):
+
+        "Function to populate combobox based on the section type selected"
+
+
         if self == 'Beams':
             return connectdb("Beams", call_type="popup")
         elif self == 'Columns':
@@ -106,7 +117,8 @@ class Tension_welded(Main):
         return lst
 
     def fn_conn_type(self):
-        print(self,"1")
+        "Function to populate section size based on the type of section "
+
         if self in ['Angles', 'Back to Back Angles', 'Star Angles']:
             b = VALUES_LOCATION_1
         elif self in ["Channels", "Back to Back Channels"]:
@@ -114,6 +126,9 @@ class Tension_welded(Main):
         return b
 
     def tab_list(self):
+
+        "Function to create design preference"
+
         tabs = []
 
         t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
@@ -733,14 +748,6 @@ class Tension_welded(Main):
         t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, round(self.weld.stress,2) if flag else '')
         out_list.append(t11)
 
-        # bolt_bearing_capacity_disp = ''
-        # if flag is True:
-        #     if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
-        #         bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-        #         pass
-        #     else:
-        #         bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
-
         t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, self.weld.length if flag else '')
         out_list.append(t5)
 
@@ -868,6 +875,9 @@ class Tension_welded(Main):
     #         pass
 
     def func_for_validation(self, window, design_dictionary):
+
+        "check valid inputs and empty inputs in input dock"
+
         self.design_status = False
 
         flag = False
@@ -938,6 +948,8 @@ class Tension_welded(Main):
 
     def set_input_values(self, design_dictionary):
 
+        "initialisation of components required to design a tension member along with connection"
+
         super(Tension_welded,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
@@ -962,6 +974,10 @@ class Tension_welded(Main):
 
 
     def select_section(self, design_dictionary, selectedsize):
+
+        "selecting components class based on the section passed "
+
+
         if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Back to Back Angles', 'Star Angles']:
             self.section_size = Angle(designation=selectedsize, material_grade=design_dictionary[KEY_MATERIAL])
         elif design_dictionary[KEY_SEC_PROFILE] in ['Channels', 'Back to Back Channels']:
@@ -972,6 +988,9 @@ class Tension_welded(Main):
         return self.section_size
 
     def max_force_length(self, design_dictionary):
+
+        "calculated max force and length based on the maximum section size avaialble for diff section type"
+
         if design_dictionary[KEY_SEC_PROFILE] == 'Angles':
             self.section_size_max = Angle(designation = "200 200 X 25", material_grade=design_dictionary[KEY_MATERIAL])
             self.section_size_max.tension_member_yielding(A_g = (self.section_size_max.area) , F_y = self.section_size_max.fy)
@@ -1016,9 +1035,14 @@ class Tension_welded(Main):
 
 
     def initial_member_capacity(self,design_dictionary,previous_size = None):
+
+        "selection of member based on the yield capacity"
+
         min_yield = 0
         [max_force,length] = self.max_force_length(self, design_dictionary)
         print(self.max_member_force,"dg")
+
+        "Loop checking each member from sizelist based on yield capacity"
 
         for selectedsize in self.sizelist:
             # print(self.sizelist)
@@ -1031,6 +1055,7 @@ class Tension_welded(Main):
             else:
                 self.cross_area = self.section_size.area * 2
 
+            "excluding previous section size which failed in rupture and selecting higher section based on the cross section area "
 
             if previous_size != None:
                 self.section_size_prev = self.select_section(self, design_dictionary, previous_size)
@@ -1066,6 +1091,8 @@ class Tension_welded(Main):
 
                 self.section_size.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],r=self.section_size.min_radius_gyration)
                     # print(self.section_size.tension_yielding_capacity)
+
+                "condition for yield and slenderness check "
 
                 if (self.section_size.tension_yielding_capacity >=self.load.axial_force *1000) and self.section_size.slenderness < 400:
                     min_yield_current = self.section_size.tension_yielding_capacity
@@ -1125,10 +1152,14 @@ class Tension_welded(Main):
                                                                      r=self.section_size_1.min_radius_gyration)
 
                     # print(self.section_size_1.slenderness)
+                    "condition to limit loop based on max force derived from max available size"
+
                 elif (self.load.axial_force *1000> max_force) :
                     self.design_status = False
                     logger.error(" : Tension force exceeds tension capacity of maximum available member size")
                     break
+
+                    "condition to limit loop based on max length derived from max available size"
 
                 elif self.length > length:
                     self.design_status = False
@@ -1146,6 +1177,9 @@ class Tension_welded(Main):
             self.initial_plate_check(self, design_dictionary)
 
     def initial_plate_check(self, design_dictionary):
+
+        "Initialisation of plate thickness based on yield strength to determine weld size"
+
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             self.thick = self.section_size_1.web_thickness
         else:
@@ -1192,11 +1226,13 @@ class Tension_welded(Main):
         else:
             max_tension_yield = 200*self.plate.fy*40/1.1
 
+        "Increasing sectionsize to suffice the plate requirement"
 
         if tension_capacity >=self.load.axial_force * 1000:
             print(self.plate.thickness_provided)
             self.design_status = True
             self.select_weld(self, design_dictionary)
+
         else:
             if tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
                 self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
@@ -1207,6 +1243,8 @@ class Tension_welded(Main):
                 logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness")
 
     def select_weld(self,design_dictionary):
+
+        "Selection of weld size based on the initial thickness considered"
 
         self.res_force = self.load.axial_force*1000
 
@@ -1221,7 +1259,9 @@ class Tension_welded(Main):
 
         self.weld_plate_length(self, design_dictionary)
         self.weld.get_weld_stress(weld_axial=self.load.axial_force * 1000, l_weld=self.weld.effective)
-        print(self.plate.length, self.weld.throat, "xfsf")
+        # print(self.plate.length, self.weld.throat, "xfsf")
+
+        "Check for long joint"
 
         while self.plate.length > (150 * self.weld.throat):
 
@@ -1242,12 +1282,16 @@ class Tension_welded(Main):
 
         if self.weld.strength > self.weld.stress:
             self.design_status = True
+            logger.error(self.weld.reason)
             self.member_check(self, design_dictionary)
         else:
             pass
 
 
     def get_weld_strength(self,connecting_fu, weld_fabrication, t_weld, force, weld_angle = 90):
+
+        "Function to calculate weld strength, effective weld length and throat thickness"
+
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(t_weld, weld_angle)
         weld_strength = f_wd * throat_tk
@@ -1257,6 +1301,8 @@ class Tension_welded(Main):
         self.weld.throat = throat_tk
 
     def weld_plate_length (self,design_dictionary):
+
+        "Function to calculate weld length, plate length and plate height"
 
         if design_dictionary[KEY_SEC_PROFILE] == "Channels":
             web_weld = self.section_size_1.depth - 2 * self.weld.size
@@ -1306,6 +1352,8 @@ class Tension_welded(Main):
 
     def member_check(self,design_dictionary):
 
+        "Checking selected section for rupture"
+
         if design_dictionary[KEY_LOCATION] == 'Long Leg':
             w = self.section_size_1.min_leg
             shear_lag = w
@@ -1348,12 +1396,15 @@ class Tension_welded(Main):
 
     def member_recheck(self,design_dictionary):
 
+        "Comparing applied force and tension capacity and if falsed, it return to initial member selection which selects member of higher area"
+
         if self.section_size_1.slenderness < 400:
             self.design_status = True
         else:
             self.design_status = False
 
         if self.section_size_1.tension_capacity >= self.load.axial_force * 1000:
+            logger.error("In case of reverse load, slenderness value should be less than 180")
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
             self.design_status = True
@@ -1363,6 +1414,8 @@ class Tension_welded(Main):
             self.initial_member_capacity(self, design_dictionary, previous_size)
 
     def get_plate_thickness(self,design_dictionary):
+
+        "Calculate plate thickness based on the tension capacity from the available list of plate thickness"
 
         self.plate_last = self.plate.thickness[-1]
 

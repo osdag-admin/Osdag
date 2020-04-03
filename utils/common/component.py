@@ -629,6 +629,7 @@ class Weld(Material):
         self.stress = 0.0
         self.fabrication = fabrication
         self.fu= float(material_g_o)
+        self.reason = 0.0
 
     def __repr__(self):
         repr = "Weld\n"
@@ -668,6 +669,7 @@ class Weld(Material):
         weld_thickness = round_down((max_weld_thickness - 1.5), 1, 3)
         if weld_thickness < min_weld_thickness:
             weld_thickness = int(min(plate_thickness, member_thickness))
+            weld_reason = " Preheating of thicker plate is required"
         else:
             pass
 
@@ -677,6 +679,7 @@ class Weld(Material):
             pass
 
         self.size = weld_thickness
+        self.reason = weld_reason
 
 class Plate(Material):
 

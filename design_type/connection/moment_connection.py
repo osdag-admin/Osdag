@@ -119,7 +119,7 @@ class MomentConnection(Connection):
             flange_thickness (float) - flange thickness of the column section (tf)
             min_area_req (float) - minimum effective bearing area (A_bc)
 
-        Returns: projection 'c' in mm
+        Returns: projection (float) 'c' in 'mm'
 
         Note: The following expression is used to calculate a, b and c [Ref: Design of Steel Structures,
               N. Subramanian, 2nd. edition 2018, Example 15.2]:

@@ -255,26 +255,29 @@ class IS_5624_1993(object):
 
         Args: anchor_dia (str) - Diameter of the anchor bolt
 
-        Returns: anchor_length (int) - Range of length for the anchor bolt in mm
+        Returns: anchor_length (int) - A list with the minimum and maximum length of the anchor bolt in mm
 
         Note: The length of the anchor bolt is decided based on the range suggested by Table 1 of IS 5624:1993.
-        The maximum value from this range is used in design calculation.
+        The average value (rounded off to a higher multiple of 5) of this range is used in design calculation.
 
         """
         anchor_length = {
-            'M8': {'min_len': 80, 'max_len': 200},
-            'M10': {'min_len': 100, 'max_len': 250},
-            'M12': {'min_len': 125, 'max_len': 320},
-            'M16': {'min_len': 160, 'max_len': 500},
-            'M20': {'min_len': 200, 'max_len': 800},
-            'M24': {'min_len': 250, 'max_len': 1250},
-            'M30': {'min_len': 320, 'max_len': 2000},
-            'M36': {'min_len': 400, 'max_len': 2500},
-            'M42': {'min_len': 400, 'max_len': 2500},
-            'M48': {'min_len': 630, 'max_len': 3200},
-            'M56': {'min_len': 800, 'max_len': 3200},
-            'M64': {'min_len': 1000, 'max_len': 3200},
-            'M72': {'min_len': 1000, 'max_len': 3200},
+            'M8':  {'dia': 8, 'min_len': 80, 'max_len': 200, 'avg_len': 140},
+            'M10': {'dia': 10, 'min_len': 100, 'max_len': 250, 'avg_len': 175},
+            'M12': {'dia': 12, 'min_len': 125, 'max_len': 320, 'avg_len': 225},
+            'M16': {'dia': 16, 'min_len': 160, 'max_len': 500, 'avg_len': 330},
+            'M20': {'dia': 20, 'min_len': 200, 'max_len': 800, 'avg_len': 500},
+            'M24': {'dia': 24, 'min_len': 250, 'max_len': 1250, 'avg_len': 750},
+            'M30': {'dia': 30, 'min_len': 320, 'max_len': 2000, 'avg_len': 1160},
+            'M36': {'dia': 36, 'min_len': 400, 'max_len': 2500, 'avg_len': 1450},
+            'M42': {'dia': 42, 'min_len': 400, 'max_len': 2500, 'avg_len': 1450},
+            'M48': {'dia': 48, 'min_len': 630, 'max_len': 3200, 'avg_len': 1915},
+            'M56': {'dia': 56, 'min_len': 800, 'max_len': 3200, 'avg_len': 2000},
+            'M64': {'dia': 64, 'min_len': 1000, 'max_len': 3200, 'avg_len': 2100},
+            'M72': {'dia': 72, 'min_len': 1000, 'max_len': 3200, 'avg_len': 2100},
         }[str(anchor_dia)]
 
-        return anchor_length
+        length_list = [anchor_length.get('dia'), anchor_length.get('min_len'),
+                       anchor_length.get('max_len'), anchor_length.get('avg_len')]
+
+        return length_list

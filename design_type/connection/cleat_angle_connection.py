@@ -439,14 +439,14 @@ class CleatAngleConnection(ShearConnection):
             flag = True
 
         if flag and flag1:
-            self.set_input_values(self, design_dictionary, window)
+            self.set_input_values(self, design_dictionary)
         else:
             pass
 
     def module_name(self):
         return KEY_DISP_CLEATANGLE
 
-    def set_input_values(self, design_dictionary, window):
+    def set_input_values(self, design_dictionary):
         print(design_dictionary)
 
         super(CleatAngleConnection,self).set_input_values(self, design_dictionary)
@@ -463,10 +463,6 @@ class CleatAngleConnection(ShearConnection):
 
         self.check_available_cleat_thk(self)
 
-        if self.design_status:
-            self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
-            status = self.design_status
-            self.commLogicObj.call_3DModel(status, CleatAngleConnection)
 
     def check_available_cleat_thk(self):
         self.sptd_leg.thickness = []

@@ -425,7 +425,7 @@ class FinPlateConnection(ShearConnection):
             flag = True
 
         if flag and flag1 and flag2:
-            self.set_input_values(self, design_dictionary, window)
+            self.set_input_values(self, design_dictionary)
         else:
             pass
 
@@ -444,7 +444,7 @@ class FinPlateConnection(ShearConnection):
             logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
-    def set_input_values(self, design_dictionary, window):
+    def set_input_values(self, design_dictionary):
 
         print(design_dictionary)
 
@@ -460,10 +460,10 @@ class FinPlateConnection(ShearConnection):
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
-        if self.design_status:
-            self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
-            status = self.design_status
-            self.commLogicObj.call_3DModel(status, FinPlateConnection)
+        # if self.design_status:
+        #     self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
+        #     status = self.design_status
+        #     self.commLogicObj.call_3DModel(status, FinPlateConnection)
 
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)
@@ -1043,54 +1043,54 @@ class FinPlateConnection(ShearConnection):
                                                   desktop_path)
         return folder
 
-    def call_3DModel(self, ui, bgcolor):
-        '''
-        This routine responsible for displaying 3D Cad model
-        :param flag: boolean
-        :return:
-        '''
-        if ui.btn3D.isChecked:
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
-            ui.chkBxFinplate.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Model", bgcolor)
-
-    def call_3DBeam(self, ui, bgcolor):
-        '''
-        Creating and displaying 3D Beam
-        '''
-        ui.chkBxBeam.setChecked(Qt.Checked)
-        if ui.chkBxBeam.isChecked():
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.chkBxFinplate.setChecked(Qt.Unchecked)
-            ui.btn3D.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-
-        ui.commLogicObj.display_3DModel("Beam", bgcolor)
-
-    def call_3DColumn(self, ui, bgcolor):
-        '''
-        '''
-        ui.chkBxCol.setChecked(Qt.Checked)
-        if ui.chkBxCol.isChecked():
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
-            ui.chkBxFinplate.setChecked(Qt.Unchecked)
-            ui.btn3D.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-        ui.commLogicObj.display_3DModel("Column", bgcolor)
-
-    def call_3DFinplate(self, ui, bgcolor):
-        '''
-        Displaying FinPlate in 3D
-        '''
-        ui.chkBxFinplate.setChecked(Qt.Checked)
-        if ui.chkBxFinplate.isChecked():
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-            ui.btn3D.setChecked(Qt.Unchecked)
-
-        ui.commLogicObj.display_3DModel("Plate", bgcolor)
+    # def call_3DModel(self, ui, bgcolor):
+    #     '''
+    #     This routine responsible for displaying 3D Cad model
+    #     :param flag: boolean
+    #     :return:
+    #     '''
+    #     if ui.btn3D.isChecked:
+    #         ui.chkBxCol.setChecked(Qt.Unchecked)
+    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #     ui.commLogicObj.display_3DModel("Model", bgcolor)
+    #
+    # def call_3DBeam(self, ui, bgcolor):
+    #     '''
+    #     Creating and displaying 3D Beam
+    #     '''
+    #     ui.chkBxBeam.setChecked(Qt.Checked)
+    #     if ui.chkBxBeam.isChecked():
+    #         ui.chkBxCol.setChecked(Qt.Unchecked)
+    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #         ui.btn3D.setChecked(Qt.Unchecked)
+    #         ui.mytabWidget.setCurrentIndex(0)
+    #
+    #     ui.commLogicObj.display_3DModel("Beam", bgcolor)
+    #
+    # def call_3DColumn(self, ui, bgcolor):
+    #     '''
+    #     '''
+    #     ui.chkBxCol.setChecked(Qt.Checked)
+    #     if ui.chkBxCol.isChecked():
+    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #         ui.btn3D.setChecked(Qt.Unchecked)
+    #         ui.mytabWidget.setCurrentIndex(0)
+    #     ui.commLogicObj.display_3DModel("Column", bgcolor)
+    #
+    # def call_3DFinplate(self, ui, bgcolor):
+    #     '''
+    #     Displaying FinPlate in 3D
+    #     '''
+    #     ui.chkBxFinplate.setChecked(Qt.Checked)
+    #     if ui.chkBxFinplate.isChecked():
+    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #         ui.chkBxCol.setChecked(Qt.Unchecked)
+    #         ui.mytabWidget.setCurrentIndex(0)
+    #         ui.btn3D.setChecked(Qt.Unchecked)
+    #
+    #     ui.commLogicObj.display_3DModel("Plate", bgcolor)
 
     def unchecked_allChkBox(self, ui):
         '''

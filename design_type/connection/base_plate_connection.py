@@ -356,11 +356,20 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t16 = (KEY_TYP_ANCHOR, KEY_DISP_TYP_ANCHOR, TYPE_COMBOBOX, existingvalue_key_d, VALUES_TYP_ANCHOR)
         options_list.append(t16)
 
-        t17 = (None, DISP_TITLE_FOOTING, TYPE_TITLE, None, None)
+        t17 = (KEY_GRD_ANCHOR, KEY_DISP_GRD_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_GRD_ANCHOR)
         options_list.append(t17)
 
-        t18 = (KEY_GRD_FOOTING, KEY_DISP_GRD_FOOTING, TYPE_COMBOBOX, existingvalue_key_d, VALUES_GRD_FOOTING)
+        t18 = (None, DISP_TITLE_FOOTING, TYPE_TITLE, None, None)
         options_list.append(t18)
+
+        t19 = (KEY_GRD_FOOTING, KEY_DISP_GRD_FOOTING, TYPE_COMBOBOX, existingvalue_key_d, VALUES_GRD_FOOTING)
+        options_list.append(t19)
+
+        t20 = (None, DISP_TITLE_WELD, TYPE_TITLE, None)
+        options_list.append(t20)
+
+        t21 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, existingvalue_key_d, VALUES_WELD_TYPE)
+        options_list.append(t21)
 
         # t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
         # options_list.append(t11)
@@ -416,6 +425,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         list1 = []
         t1 = (KEY_DIA_ANCHOR, self.diam_bolt_customized)
         list1.append(t1)
+        t2 = (KEY_GRD_ANCHOR, self.grdval_customized)
+        list1.append(t2)
 
         return list1
 

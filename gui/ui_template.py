@@ -680,8 +680,8 @@ class Ui_ModuleWindow(QMainWindow):
 
         for t in new_list:
 
-            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC, KEY_DIA_ANCHOR,
-                        KEY_GRD_ANCHOR] and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
+            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC, KEY_DIA_ANCHOR]\
+                    and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -702,6 +702,11 @@ class Ui_ModuleWindow(QMainWindow):
             elif t[0] in [KEY_WEBPLATE_THICKNESS] and (module not in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]):
                 key_customized_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_5.activated.connect(lambda: popup(key_customized_5, new_list))
+                data[t[0] + "_customized"] = t[1]()
+
+            elif t[0] == KEY_GRD_ANCHOR and module == KEY_DISP_BASE_PLATE:
+                key_customized_6 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_customized_6.activated.connect(lambda: popup(key_customized_6, new_list))
                 data[t[0] + "_customized"] = t[1]()
 
             else:
@@ -1578,10 +1583,13 @@ class Ui_ModuleWindow(QMainWindow):
                 bp_material = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_MATERIAL).text()
                 bp_material_fu = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FU).text()
                 bp_material_fy = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FY).text()
+                anchor_dia = data_list[KEY_DIA_ANCHOR+"_customized"]
 
                 d2 = {KEY_SUPTNGSEC_TYPE: typ, KEY_SUPTNGSEC_SOURCE: source, KEY_SUPTNGSEC_MATERIAL: material,
                       KEY_SUPTNGSEC_FU: material_fu, KEY_SUPTNGSEC_FY: material_fy, KEY_BASE_PLATE_MATERIAL: bp_material,
-                      KEY_BASE_PLATE_FU: bp_material_fu, KEY_BASE_PLATE_FY: bp_material_fy}
+                      KEY_BASE_PLATE_FU: bp_material_fu, KEY_BASE_PLATE_FY: bp_material_fy,
+                      KEY_DP_ANCHOR_BOLT_LENGTH: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0])[1],
+}
                 design_dictionary.update(d2)
 
         else:
@@ -1615,8 +1623,9 @@ class Ui_ModuleWindow(QMainWindow):
                       KEY_SUPTNGSEC_FU: str(col_attributes.fu), KEY_SUPTNGSEC_FY: str(col_attributes.fy),
                       KEY_BASE_PLATE_MATERIAL: common_material,
                       KEY_BASE_PLATE_FU: str(col_attributes.fu), KEY_BASE_PLATE_FY: str(col_attributes.fy),
-                      KEY_DP_ANCHOR_BOLT_DESIGNATION: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0]),
+                      KEY_DP_ANCHOR_BOLT_DESIGNATION: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0])[0],
                       KEY_DP_ANCHOR_BOLT_TYPE: anchor_typ,
+                      KEY_DP_ANCHOR_BOLT_LENGTH: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0])[1],
                       KEY_DP_ANCHOR_BOLT_HOLE_TYPE: 'Standard',
                       KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(col_attributes.fu),
                       KEY_DP_ANCHOR_BOLT_FRICTION: str(0.30)

@@ -2065,17 +2065,18 @@ class DesignPreferences(QDialog):
 
     def anchor_bolt_designation(self, d):
         length = IS_5624_1993.table1(d)
-        length = str(length['min_len'])
+        length = str(length[1])
         designation = str(d) + "X" + length + " IS5624 GALV"
-        return designation
+        return (designation, length)
+
     def anchor_bolt_preferences(self, d, typ):
 
         change_list = []
         tab_anchor_bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
         length = IS_5624_1993.table1(d)
-        length = str(length['min_len'])
+        length = str(length[1])
         # designation = str(d)+"X"+length+" IS5624 GALV"
-        designation = self.anchor_bolt_designation(d)
+        designation = self.anchor_bolt_designation(d)[0]
         initial_designation = designation
         for ch in tab_anchor_bolt.children():
             if ch.objectName() == KEY_DP_ANCHOR_BOLT_DESIGNATION:

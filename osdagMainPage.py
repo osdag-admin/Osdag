@@ -25,7 +25,8 @@ from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 
-
+from design_type.tension_member.tension_bolted import Tension_bolted
+from design_type.tension_member.tension_welded import Tension_welded
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
@@ -491,14 +492,14 @@ class OsdagMainWindow(QMainWindow):
         if self.ui.rdbtn_tension_bolted.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2,Tension, ' ')
+            self.ui2.setupUi(self.ui2,Tension_bolted, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
         elif self.ui.rdbtn_tension_welded.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, Tension, ' ')
+            self.ui2.setupUi(self.ui2, Tension_welded, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

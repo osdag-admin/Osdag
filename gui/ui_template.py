@@ -1103,7 +1103,8 @@ class Ui_ModuleWindow(QMainWindow):
         elif module == KEY_DISP_COLUMNCOVERPLATE:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
-        elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
+
+        elif module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
 
@@ -1232,10 +1233,10 @@ class Ui_ModuleWindow(QMainWindow):
         display = self.modelTab._display
 
         # background gradient
-        display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
+        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
         # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        display.display_triedron()
-
+        # display.display_trihedron()
+        display.display_trihedron()
         display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):

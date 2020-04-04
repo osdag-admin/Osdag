@@ -391,7 +391,8 @@ class IS800_2007(object):
         V_npb = 2.5 * k_b * d * t * f_u
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         V_dpb = V_npb/gamma_mb
-        if bolt_hole_type == 'Over-sized' or 'short_slot':
+        print(bolt_hole_type)
+        if bolt_hole_type == 'Over-sized' or bolt_hole_type == 'short_slot':
             V_dpb *= 0.7
         elif bolt_hole_type == 'long_slot':
             V_dpb *= 0.5
@@ -483,7 +484,7 @@ class IS800_2007(object):
             gamma_mf = 1.25
         if bolt_hole_type == 'Standard':
             K_h = 1.0
-        elif bolt_hole_type == 'Over-sized' or 'short_slot' or 'long_slot':
+        elif bolt_hole_type == 'Over-sized' or bolt_hole_type == 'short_slot' or bolt_hole_type == 'long_slot':
             K_h = 0.85
         else:
             # TODO : long_slot bolt loaded parallel to slot is given in else
@@ -679,7 +680,9 @@ class IS800_2007(object):
             K = float(K)
         except ValueError:
             return
-        return K * fillet_size
+        throat = max((K * fillet_size),3)
+
+        return throat
 
     @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):
@@ -725,6 +728,31 @@ class IS800_2007(object):
         gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][fabrication]
         f_wd = f_wn / gamma_mw
         return f_wd
+
+    # cl. 10.5.7.3 Long joints
+    @staticmethod
+    def cl_10_5_7_3_weld_long_joint(l_j, t_t):
+
+        """Calculate the reduction factor for long joints in welds
+
+        Args:
+            l_j - length of joints in the direction of force transfer in mm (float)
+            t_t - throat size of the weld in mm (float)
+
+        Returns:
+             Reduction factor, beta_lw for long joints in welds (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.7.3
+
+        """
+        if l_j <= 150 * t_t:
+            return 1.0
+        beta_lw = 1.2 - 0.2 * l_j / (150 * t_t)
+        if beta_lw >= 1.0:
+            beta_lw = 1.0
+        return beta_lw
 
     # -------------------------------------------------------------
     #   10.6 Design of Connections

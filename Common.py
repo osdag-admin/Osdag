@@ -271,7 +271,8 @@ DISP_MIN_EDGE = 'Min. Edge Distance (mm)'
 DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
 DISP_MIN_END = 'Min. End Distance (mm)'
 DISP_MAX_END = 'Max. End Distance (mm)'
-
+KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
+KEY_DISP_FY = 'Yield Strength , fy (MPa)'
 ###################################
 # Key for Storing Module
 
@@ -310,11 +311,9 @@ KEY_DISP_CONN = 'Connectivity *'
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
-
 ## Column End Plate ##
 VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
 ####
-
 VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Base Plate with Cleat Angles', 'Hollow Sections']
 
 
@@ -475,10 +474,19 @@ KEY_FLANGEPLATE_THICKNESS = 'flange_plate.thickness_provided'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
+KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
+KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness(mm)'
+
 KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
 KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length'
+
+DISP_TITLE_INNERFLANGESPLICEPLATE = 'Inner Flange splice plate'
+KEY_INNERFLANGE_PLATE_HEIGHT = 'flange_plate.InnerHeight'
+KEY_DISP_INNERFLANGE_PLATE_HEIGHT = 'Height(mm)'
+KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
+KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length'
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
 KEY_DISP_FLANGE_SPACING = 'Spacing'
@@ -531,6 +539,10 @@ KEY_DISP_EFFICIENCY = "Efficiency"
 
 DISP_TITLE_BOLTDETAILS ='Bolt Details'
 KEY_BOLT_DETAILS ="Bolt.Details"
+
+DISP_TITLE_BOLT_CAPACITIES = 'Bolt Capacities'
+KEY_BOLT_CAPACITIES = 'Bolt.Capacities'
+
 KEY_DISP_BOLT_DETAILS = "Bolt Details"
 KEY_FLANGE_BOLT_LINE = 'Flange_plate.Bolt_Line'
 KEY_FLANGE_DISP_BOLT_LINE = 'Bolt Lines in flange'
@@ -542,6 +554,9 @@ KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
 
 KEY_FLANGE_WELD_DETAILS = "Flange detail"
 KEY_DISP_FLANGE_WELD_DETAILS = "Weld Details"
+
+KEY_INNERFLANGE_WELD_DETAILS = "Inner Flange detail"
+KEY_DISP_INNERFLANGE_WELD_DETAILS = "Weld Details"
 
 KEY_WELD_TYPE = 'Weld.Type'
 KEY_DISP_WELD_TYPE ='Weld Type'
@@ -558,6 +573,14 @@ KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
 KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
 KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
+
+KEY_INNERFLANGE_WELD_LENGTH = 'Flange_Weld.InnerLength'
+KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length'
+KEY_INNERFLANGE_WELD_LENGTH_EFF = 'Flange_Weld.InnerEffLength'
+KEY_INNERFLANGE_WELD_HEIGHT ='flange_Weld.Innerheight'
+KEY_DISP_INNERFLANGE_WELD_HEIGHT = 'Height'
+
+
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
@@ -939,7 +962,9 @@ KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_PLATE_HEIGHT = 'Height (mm)'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
+KEY_OUT_PLATE_WIDTH = 'Plate.Width'
 KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
+c = 'Width (mm)'
 KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity'
 KEY_OUT_PLATE_BLK_SHEAR = 'Plate.BlockShear'

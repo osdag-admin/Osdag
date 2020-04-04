@@ -519,10 +519,23 @@ class Ui_ModuleWindow(QMainWindow):
         self.chkBxCol.setEnabled(False)
         self.chkBxFinplate.setEnabled(False)
 
+        in_widget = QtWidgets.QWidget(self.dockWidgetContents)
+        in_widget.setGeometry(QtCore.QRect(0, 0, 325, 600))
+        in_layout1 = QtWidgets.QVBoxLayout(in_widget)
+        in_scroll = QScrollArea(in_widget)
+        in_layout1.addWidget(in_scroll)
+        in_scroll.setWidgetResizable(True)
+        in_scrollcontent = QtWidgets.QWidget(in_scroll)
+        in_layout2 = QtWidgets.QGridLayout(in_scrollcontent)
+        in_scrollcontent.setLayout(in_layout2)
+        in_scroll.horizontalScrollBar().hide()
+        # in_list = main.output_values(main, False)
+
         option_list = main.input_values(self)
         _translate = QtCore.QCoreApplication.translate
 
         i = 0
+        j = 1
         for option in option_list:
             lable = option[1]
             type = option[2]
@@ -539,10 +552,13 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setFont(font)
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+                l.setFixedSize(l.size())
+                in_layout2.addWidget(l, j, 1, 1, 1)
+                print(j, 'label')
 
             if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)
-                combo.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                combo.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -554,6 +570,8 @@ class Ui_ModuleWindow(QMainWindow):
                 combo.setObjectName(option[0])
                 for item in option[4]:
                     combo.addItem(item)
+                combo.setFixedSize(combo.size())
+                in_layout2.addWidget(combo, j, 2, 1, 1)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
@@ -567,17 +585,20 @@ class Ui_ModuleWindow(QMainWindow):
                     r.setGeometry(QtCore.QRect(160, 10 + i, 150, 27))
                     r.setDisabled(True)
                 else:
-                    r.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                    r.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
+                r.setFixedSize(r.size())
+                in_layout2.addWidget(r, j, 2, 1, 1)
 
             if type == TYPE_MODULE:
                 _translate = QtCore.QCoreApplication.translate
                 MainWindow.setWindowTitle(_translate("MainWindow", option[1]))
                 i = i - 30
                 module = lable
+                j = j - 1
 
             if type == TYPE_NOTE:
                 l = QtWidgets.QLineEdit(self.dockWidgetContents)
-                l.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                l.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(True)
@@ -588,6 +609,9 @@ class Ui_ModuleWindow(QMainWindow):
                 # l.setText(_translate("MainWindow", "<html><head/><body><p>" + option[4] + "</p></body></html>"))
                 l.setText(option[4])
                 l.setReadOnly(True)
+                l.setFixedSize(l.size())
+                in_layout2.addWidget(l, j, 2, 1, 1)
+
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
@@ -597,6 +621,9 @@ class Ui_ModuleWindow(QMainWindow):
                 pixmap = QPixmap(option[4])
                 im.setPixmap(pixmap)
                 i = i + 30
+                im.setFixedSize(im.size())
+                in_layout2.addWidget(im, j, 2, 1, 1)
+                print(j, 'image')
 
             if type == TYPE_IMAGE_COMPRESSION:
                 imc = QtWidgets.QLabel(self.dockWidgetContents)
@@ -606,6 +633,9 @@ class Ui_ModuleWindow(QMainWindow):
                 pixmapc = QPixmap(option[4])
                 imc.setPixmap(pixmapc)
                 i = i + 30
+                imc.setFixedSize(imc.size())
+                in_layout2.addWidget(imc, j, 2, 1, 1)
+
 
             if option[0] in [KEY_AXIAL, KEY_SHEAR]:
                 key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
@@ -620,7 +650,14 @@ class Ui_ModuleWindow(QMainWindow):
                 q.setObjectName("_title")
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
+                q.setFixedSize(q.size())
+                in_layout2.addWidget(q, j, 1, 2, 2)
+                j = j + 1
+
             i = i + 30
+            j = j + 1
+        in_scroll.setWidget(in_scrollcontent)
+
 
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
@@ -643,8 +680,8 @@ class Ui_ModuleWindow(QMainWindow):
 
         for t in new_list:
 
-            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC, KEY_DIA_ANCHOR] \
-                    and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
+            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC, KEY_DIA_ANCHOR,
+                        KEY_GRD_ANCHOR] and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()

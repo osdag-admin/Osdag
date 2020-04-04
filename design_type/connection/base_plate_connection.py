@@ -60,7 +60,7 @@ from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog, QMessageBox
 
 
-class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, Column):
+class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Part3_2002, Column):
     """
     Perform stress analyses --> design base plate and anchor bolt--> provide connection detailing.
 
@@ -202,7 +202,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, Column):
         self.bp_width_provided = 0.0
         self.end_distance = 0.0
         self.edge_distance = 0.0
+        self.pitch_distance = 0.0
+        self.gauge_distance = 0.0
         self.bp_area_provided = 0.0
+        self.anchor_grade_provided = 0.0
+        self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # TODO check if this works
+        self.anchor_area_shank = 0.0
+        self.anchor_area_thread = 0.0
+        self.n_n = 1
+        self.n_s = 0
+        self.shear_capacity_anchor = 0.0
+        self.bearing_capacity_anchor = 0.0
+        self.anchor_capacity = 0.0
 
         self.safe = True
 
@@ -756,11 +767,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, Column):
 
         if self.projection <= 0:
             self.safe = False
-            logger.error("[Analysis Error] The value of the projection (c) as per the Effective Area Method is {}. [Reference:"
+            logger.error(": [Analysis Error] The value of the projection (c) as per the Effective Area Method is {}. [Reference:"
                          " Clause 7.4.1.1, IS 800: 2007]".format(self.projection))
-            logger.error("[Analysis Error] The computed value of the projection occurred out of range.")
-            logger.info("[Analysis Error] Check the column section and its properties.")
-            logger.info("Re-design the connection")
+            logger.error(": [Analysis Error] The computed value of the projection occurred out of range.")
+            logger.info(": [Analysis Error] Check the column section and its properties.")
+            logger.info(": Re-design the connection")
         else:
             pass
 
@@ -769,38 +780,77 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, Column):
                              self.flange_thickness)  # base plate thickness should be larger than the flange thickness
         self.plate_thk = round_up(self.plate_thk, 2)  # mm TODO check standard plate thk output
 
-    def anchor_bolt_design(self):
-        """ Perform design of the anchor bolt
+    def bolt_design_detailing(self):
+        """ Perform design and detailing of the anchor bolt
 
         Args:
 
         Returns:
         """
-        # design of anchor bolt diameter
-        # the listed diameters of anchor bolt are not used in the design due its practical non acceptance
-        self.neglect_anchor_dia = ['M8', 'M10', 'M12', 'M16']
+        # design/assigning of anchor bolt diameter [Reference: based on design experience and sample calculations]
+        self.neglect_anchor_dia = ['M8', 'M10', 'M12', 'M16']  # the listed diameters are neglected due its practical non acceptance
 
         for i in list(self.anchor_dia):
             if i in self.neglect_anchor_dia:
                 self.anchor_dia.remove(i)
             else:
                 pass
-        self.anchor_dia_provided = self.anchor_dia[0]  # providing the least diameter anchor bolt from the list
+        self.anchor_dia_provided = self.anchor_dia[0]  # providing the least diameter anchor bolt from the resulting list (mm)
 
-        # design of anchor bolt length
+        # number of anchor bolts
+        self.anchor_nos_provided = 4  # TODO add condition for number of anchor bolts depending on col depth and force
+
+        # perform detailing checks
+        self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.table1(self.anchor_dia_provided)[0],
+                                                               self.dp_anchor_hole, self.dp_detail_edge_type)
+
+        # Note: end distance is along the depth, whereas, the edge distance is along the flange of the column section
+        self.end_distance = round_up(self.end_distance, 5) + 10  # adding 10 mm extra for a conservative design # mm
+        self.edge_distance = self.end_distance  # mm
+
+        if self. anchor_nos_provided == 4:
+            self.pitch_distance = 0.0
+            self.gauge_distance = self.pitch_distance
+        else:
+            pass  # TODO add pitch and gauge calc for bolts more than 4 nos
+
+        # design strength of anchor bolt [Reference: Clause 10.3.2, IS 800:2007]
+        self.anchor_grade_provided = 0.0  # TODO call from UI - Umair
+        # self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # returns a list [shank area, thread area]
+        self.anchor_area_shank = self.anchor_area[0]  # mm^2
+        self.anchor_area_thread = self.anchor_area[1]  # mm^2
+        self.n_n = 1
+        self.n_s = 0
+
+        self.shear_capacity_anchor = self.cl_10_3_3_bolt_shear_capacity(self.dp_anchor_fu_overwrite, self.anchor_area_thread,
+                                                                        self.anchor_area_shank, self.n_n, self.n_s, self.gamma_mb)
+        self.bearing_capacity_anchor = self.cl_10_3_4_bolt_bearing_capacity(self.dp_bp_fu, self.dp_anchor_fu_overwrite,
+                                                                            self.plate_thk, self.table1(self.anchor_dia_provided)[0],
+                                                                            self.end_distance, self.pitch_distance, self.dp_anchor_hole,
+                                                                            self.gamma_mb)
+        self.shear_capacity_anchor = round(self.shear_capacity_anchor / 1000, 2)  # kN
+        self.bearing_capacity_anchor = round(self.bearing_capacity_anchor / 1000, 2)  # kN
+
+        self.anchor_capacity = min(self.shear_capacity_anchor, self.bearing_capacity_anchor)
+
+        if self.load_shear > 0:
+            logger.info(": [Anchor Bolt] The anchor bolt is not designed to resist any shear force")
+        else:
+            pass
+
+        # design of anchor bolt length [Reference: IS 5624:1993, Table 1]
         self.anchor_length_min = self.table1(self.anchor_dia_provided)[1]
         self.anchor_length_max = self.table1(self.anchor_dia_provided)[2]
-        self.anchor_length_provided = self.table1(self.anchor_dia_provided)[3]
+        self.anchor_length_provided = self.anchor_length_min
 
-        logger.info("[Anchor Bolt] The preferred range of length for anchor bolt of {} grade is as follows:"
+        logger.info(": [Anchor Bolt] The preferred range of length for anchor bolt of thread size {} is as follows:"
                     .format(self.anchor_dia_provided))
-        logger.info("[Anchor Bolt] Minimum length = {} mm and Maximum length = {} mm."
+        logger.info(": [Anchor Bolt] Minimum length = {} mm, Maximum length = {} mm."
                     .format(self.anchor_length_min, self.anchor_length_max))
-        logger.info("[Anchor Bolt] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided))
-        logger.info("[Anchor Bolt] Reference: IS 5624:1993, Table 1.")
-
-        # number of anchor bolts required
-        self.anchor_nos_provided = 4  # TODO add condition for number of anchor bolts
+        logger.info(": [Anchor Bolt] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided))
+        logger.info(": [Anchor Bolt] Designer/Erector should provide adequate anchorage depending on the availability "
+                    "of standard lengths and sizes, satisfying the suggested range.")
+        logger.info(": [Anchor Bolt] Reference: IS 5624:1993, Table 1.")
 
     def design_detail_bp(self):
         """ Design base plate dimensions and provide detailing
@@ -809,14 +859,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, Column):
 
         Returns:
         """
-        # perform detailing checks
-        self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.table1(self.anchor_dia_provided)[0],
-                                                               self.dp_anchor_hole, self.dp_detail_edge_type)
-
-        # end distance is along the depth, whereas, the edge distance is along the flange of the column section
-        self.end_distance = round_up(self.end_distance, 5) + 10  # adding 10 mm extra for a conservative design # mm
-        self.edge_distance = self.end_distance  # mm
-
         if self.connectivity == 'Welded-Slab Base':
             self.bp_length_provided = self.depth + self.projection + self.end_distance  # mm
             self.bp_width_provided = self.flange_width + self.projection + self.edge_distance  # mm

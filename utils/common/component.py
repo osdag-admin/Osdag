@@ -1,4 +1,4 @@
-from utils.common.is800_2007 import IS800_2007
+from utils.common.is800_2007 import IS800_2007, KEY_DP_WELD_FAB_SHOP
 from utils.common.material import *
 from utils.common.other_standards import *
 from Common import *
@@ -618,7 +618,7 @@ class Weld(Material):
         self.strength = 0.0
         self.stress = 0.0
         self.fabrication = fabrication
-        self.fu= float(material_g_o)
+        self.fu = float(material_g_o)
 
     def __repr__(self):
         repr = "Weld\n"

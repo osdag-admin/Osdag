@@ -425,7 +425,7 @@ class FinPlateConnection(ShearConnection):
             flag = True
 
         if flag and flag1 and flag2:
-            self.set_input_values(self, design_dictionary, window)
+            self.set_input_values(self, design_dictionary)
         else:
             pass
 
@@ -444,7 +444,7 @@ class FinPlateConnection(ShearConnection):
             logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
-    def set_input_values(self, design_dictionary, window):
+    def set_input_values(self, design_dictionary):
 
         print(design_dictionary)
 
@@ -460,10 +460,10 @@ class FinPlateConnection(ShearConnection):
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
-        if self.design_status:
-            self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
-            status = self.design_status
-            self.commLogicObj.call_3DModel(status, FinPlateConnection)
+        # if self.design_status:
+        #     self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
+        #     status = self.design_status
+        #     self.commLogicObj.call_3DModel(status, FinPlateConnection)
 
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)
@@ -1031,6 +1031,7 @@ class FinPlateConnection(ShearConnection):
         print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         CreateLatex.save_latex(CreateLatex(), self.report_result, self.report_input, self.report_check,
                                self.report_supporting,
+
                                self.report_supported, popup_summary, fname_no_ext, ' ', rel_path, Disp_3D_image)
 
     # def select_workspace_folder(self):
@@ -1042,6 +1043,7 @@ class FinPlateConnection(ShearConnection):
     #                                               desktop_path)
     #     return folder
     #
+
     # def call_3DModel(self, ui, bgcolor):
     #     '''
     #     This routine responsible for displaying 3D Cad model
@@ -1090,6 +1092,7 @@ class FinPlateConnection(ShearConnection):
     #         ui.btn3D.setChecked(Qt.Unchecked)
     #
     #     ui.commLogicObj.display_3DModel("Plate", bgcolor)
+
     #
     # def unchecked_allChkBox(self, ui):
     #     '''
@@ -1124,7 +1127,6 @@ class FinPlateConnection(ShearConnection):
     #         pass
     #
     #     return data
-
 
 
 # For Command Line

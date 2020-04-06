@@ -856,7 +856,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         for i in self.anchor_grade:
             self.anchor_grade = i
 
-            # TODO: self.anchor_fu should pass to DP anchor fu from here
+            # TODO: self.anchor_fu should be passed to - DP anchor fu from here
             self.anchor_fu = self.get_bolt_fu_fy(self.anchor_grade)  # returns a list with values - [bolt_fu, bolt_fy]
             # self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # returns a list [shank area, thread area]
             self.anchor_area_shank = self.anchor_area[0]  # mm^2
@@ -891,7 +891,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # design of anchor bolt length [Reference: IS 5624:1993, Table 1]
         self.anchor_length_min = self.table1(self.anchor_dia_provided)[1]
         self.anchor_length_max = self.table1(self.anchor_dia_provided)[2]
-        self.anchor_length_provided = self.anchor_length_min
+        self.anchor_length_provided = self.anchor_length_min  # TODO: check for overwritten length value
 
         logger.info(": [Anchor Bolt] The preferred range of length for anchor bolt of thread size {} is as follows:"
                     .format(self.anchor_dia_provided))

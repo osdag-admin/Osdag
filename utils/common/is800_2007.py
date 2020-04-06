@@ -320,7 +320,6 @@ class IS800_2007(object):
     # cl. 10.3.3 Shear Capacity of Bearing Bolt
 
     @staticmethod
-
     def cl_10_3_3_bolt_shear_capacity(f_ub, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
         """Calculate design shear strength of bearing bolt
 

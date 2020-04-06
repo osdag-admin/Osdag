@@ -1253,7 +1253,7 @@ class Tension_welded(Main):
         else:
             self.thick = self.section_size_1.thickness
 
-        self.weld.weld_size(plate_thickness = self.plate.thickness_provided, member_thickness= self.thick)
+        self.weld.weld_size(plate_thickness = self.plate.thickness_provided, member_thickness= self.thick , edge_type= "Rolled")
 
         self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu,self.weld.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.load.axial_force*1000))
 
@@ -1282,7 +1282,7 @@ class Tension_welded(Main):
 
         if self.weld.strength > self.weld.stress:
             self.design_status = True
-            logger.error(self.weld.reason)
+            logger.info(self.weld.reason)
             self.member_check(self, design_dictionary)
         else:
             pass
@@ -1404,7 +1404,7 @@ class Tension_welded(Main):
             self.design_status = False
 
         if self.section_size_1.tension_capacity >= self.load.axial_force * 1000:
-            logger.error("In case of reverse load, slenderness value should be less than 180")
+            logger.info("In case of reverse load, slenderness value should be less than 180")
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
             self.design_status = True

@@ -1604,7 +1604,7 @@ class Tension_bolted(Main):
             self.design_status = False
 
         if self.section_size_1.tension_capacity >= self.load.axial_force *1000:
-            logger.error("In case of reverse load, slenderness value should be less than 180")
+            logger.info("In case of reverse load, slenderness value should be less than 180")
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
             self.design_status = True

@@ -203,6 +203,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_length_max = 1
         self.anchor_length_provided = 1
         self.anchor_nos_provided = 0
+        self.anchor_hole_dia = 0.0
         self.bp_length_provided = 0.0
         self.bp_width_provided = 0.0
         self.end_distance = 0.0
@@ -221,6 +222,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.shear_capacity_anchor = 0.0
         self.bearing_capacity_anchor = 0.0
         self.anchor_capacity = 0.0
+        self.combined_capacity = 0.0
 
         self.safe = True
 
@@ -834,6 +836,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # number of anchor bolts
         self.anchor_nos_provided = 4
 
+        # hole diameter
+        self.anchor_hole_dia = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided, self.dp_anchor_hole)  # mm
+
         # perform detailing checks
         self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.table1(self.anchor_dia_provided)[0],
                                                                self.dp_anchor_hole, self.dp_detail_edge_type)
@@ -875,6 +880,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.bearing_capacity_anchor = round(self.bearing_capacity_anchor / 1000, 2)  # kN
 
             self.anchor_capacity = min(self.shear_capacity_anchor, self.bearing_capacity_anchor)
+
+            self.combined_capacity = 0.0
 
             if self.load_shear > 0:
                 logger.info(": [Anchor Bolt] The anchor bolt is not designed to resist any shear force")

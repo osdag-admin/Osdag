@@ -1157,6 +1157,8 @@ class Tension_welded(Main):
                 elif (self.load.axial_force *1000> max_force) :
                     self.design_status = False
                     logger.error(" : Tension force exceeds tension capacity of maximum available member size")
+                    logger.error(": Design is not safe \n ")
+                    logger.debug(" :=========End Of design===========")
                     break
 
                     "condition to limit loop based on max length derived from max available size"
@@ -1164,6 +1166,8 @@ class Tension_welded(Main):
                 elif self.length > length:
                     self.design_status = False
                     logger.error(" : Member fails in slenderness")
+                    logger.error(": Design is not safe \n ")
+                    logger.debug(" :=========End Of design===========")
                     break
 
                 else:
@@ -1241,6 +1245,8 @@ class Tension_welded(Main):
             else:
                 self.design_status = False
                 logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness")
+                logger.error(": Design is not safe \n ")
+                logger.debug(" :=========End Of design===========")
 
     def select_weld(self,design_dictionary):
 
@@ -1285,7 +1291,9 @@ class Tension_welded(Main):
             logger.info(self.weld.reason)
             self.member_check(self, design_dictionary)
         else:
-            pass
+            self.design_status = False
+            logger.error(": Design is not safe \n ")
+            logger.debug(" :=========End Of design===========")
 
 
     def get_weld_strength(self,connecting_fu, weld_fabrication, t_weld, force, weld_angle = 90):
@@ -1483,13 +1491,24 @@ class Tension_welded(Main):
             print (self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
             if self.plate_tension_capacity > self.load.axial_force *1000:
                 self.design_status = True
+
                 break
 
             elif (self.plate_tension_capacity < self.load.axial_force * 1000) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
                 logger.error("Plate thickness is not sufficient")
+                logger.error(": Design is not safe \n ")
+                logger.debug(" :=========End Of design===========")
             else:
                 pass
+        if self.plate_tension_capacity > self.load.axial_force * 1000:
+            self.design_status = True
+            logger.info(": Overall welded tension member design is safe \n")
+            logger.debug(" :=========End Of design===========")
+        else:
+            self.design_status = False
+            logger.error(": Design is not safe \n ")
+            logger.debug(" :=========End Of design===========")
 
 
 #     def save_design(self,ui,popup_summary):

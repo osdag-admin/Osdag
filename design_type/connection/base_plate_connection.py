@@ -869,8 +869,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.dp_column_type == 'Rolled' or 'Welded':
 
             # section = Column(self.dp_column_designation, self.dp_column_material)
-            self.projection = self.calculate_c(self.column_properties.flange_width, self.column_properties.depth,
-                self.column_properties.web_thickness, self.column_properties.flange_thickness, self.min_area_req)
+            self.projection = self.calculate_c(self.column_bf, self.column_D, self.column_tw, self.column_tf, self.min_area_req)
 
         else:
             pass

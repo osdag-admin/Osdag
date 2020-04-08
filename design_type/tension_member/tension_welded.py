@@ -1345,17 +1345,17 @@ class Tension_welded(Main):
             self.weld.length = (web_weld + 2 * flange_weld)
 
 
-        self.plate.length = flange_weld + 2 * self.weld.size
+        self.plate.length = flange_weld + 4 * self.weld.size
         if design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Long Leg":
-            self.plate.height = 2 * self.section_size_1.max_leg
+            self.plate.height = 2 * self.section_size_1.max_leg + 4 * self.weld.size
         elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
-            self.plate.height = 2 * self.section_size_1.min_leg
+            self.plate.height = 2 * self.section_size_1.min_leg + 4 * self.weld.size
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
-            self.plate.height =  self.section_size_1.min_leg
+            self.plate.height =  self.section_size_1.min_leg + 4 * self.weld.size
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles","Angles"] and design_dictionary[KEY_LOCATION] == "Long Leg":
-            self.plate.height = self.section_size_1.max_leg
+            self.plate.height = self.section_size_1.max_leg + 4 * self.weld.size
         else:
-            self.plate.height = self.section_size_1.depth
+            self.plate.height = self.section_size_1.depth + 4 * self.weld.size
 
 
     def member_check(self,design_dictionary):

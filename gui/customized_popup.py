@@ -8,7 +8,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox, qApp
+from PyQt5.QtWidgets import QMessageBox, qApp, QListWidget, QListWidgetItem
 
 import sqlite3
 from PyQt5.QtCore import pyqtSlot
@@ -16,6 +16,28 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QDialog
 
 #from .ui_template import *
+
+
+class My_ListWidget(QListWidget):
+
+    def addItems(self, Iterable, p_str=None):
+        QListWidget.addItems(self, Iterable)
+
+    def addItem(self, *__args):
+        QListWidget.addItem(self, My_ListWidgetItem(__args[0]))
+
+
+class My_ListWidgetItem(QListWidgetItem):
+
+    def __lt__(self, other):
+        try:
+            import re
+            self_text = str(re.sub("[^0-9]", "", self.text()))
+            other_text = str(re.sub("[^0-9]", "", other.text()))
+            return float(self_text) < float(other_text)
+        except Exception:
+            return QListWidgetItem.__lt__(self, other)
+
 
 class Ui_Popup(object):
 
@@ -38,13 +60,15 @@ class Ui_Popup(object):
         font.setPointSize(14)
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
-        self.listWidget = QtWidgets.QListWidget(MainWindow)
-
+        # self.listWidget = QtWidgets.QListWidget(MainWindow)
+        self.listWidget = My_ListWidget(MainWindow)
         self.listWidget.setGeometry(QtCore.QRect(20, 80, 211, 271))
         self.listWidget.setObjectName("listWidget")
         self.listWidget.setSortingEnabled(True)
         self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.listWidget_2 = QtWidgets.QListWidget(MainWindow)
+        # self.listWidget_2 = QtWidgets.QListWidget(MainWindow)
+        self.listWidget_2 = My_ListWidget(MainWindow)
+
         self.listWidget_2.setGeometry(QtCore.QRect(370, 80, 211, 271))
         self.listWidget_2.setObjectName("listWidget_2")
         self.listWidget_2.setSortingEnabled(True)
@@ -154,11 +178,19 @@ class Ui_Popup(object):
         self.listWidget_2.clear()
         #self.listWidget_2.addItems(items)
         if items not in KEY_EXISTINGVAL_CUSTOMIZED:
-            self.listWidget_2.addItems(KEY_EXISTINGVAL_CUSTOMIZED)
+            for item in KEY_EXISTINGVAL_CUSTOMIZED:
+                # self.listWidget_2.addItems(KEY_EXISTINGVAL_CUSTOMIZED)
+                self.listWidget_2.addItem(item)
+
             a = list(set(items) - set(KEY_EXISTINGVAL_CUSTOMIZED))
-            self.listWidget.addItems(a)
+            for item_a in a:
+                self.listWidget.addItem(item_a)
+            # self.listWidget.addItems(a)
         else:
-            self.listWidget_2.addItems(items)
+            for it in items:
+                self.listWidget_2.addItem(it)
+
+            # self.listWidget_2.addItems(items)
     # def addAvailableItems1(self,items1,KEY_EXISTINGVAL_CUSTOMIZED):
     #     self.listWidget_2.clear()
     #     if items1 != KEY_EXISTINGVAL_CUSTOMIZED and KEY_EXISTINGVAL_CUSTOMIZED != []:

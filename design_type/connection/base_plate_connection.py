@@ -31,6 +31,7 @@ from utils.common.is800_2007 import IS800_2007
 from utils.common.other_standards import IS_5624_1993
 from utils.common.component import *
 from utils.common.material import *
+from utils.common.common_calculation import *
 from Common import *
 from utils.common.load import Load
 from utils.common.other_standards import *
@@ -183,7 +184,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gamma_mb = 0.0
         self.gamma_mw = 0.0
 
-        self.column_properties = Column(designation=self.column_section, material_grade=self.dp_column_material)
         self.column_D = 0.0
         self.column_bf = 0.0
         self.column_tf = 0.0
@@ -474,6 +474,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
     def tab_list(self):
+        self.design_button_status = False
+
         tabs = []
 
         t0 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
@@ -725,11 +727,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.anchor_dia = design_dictionary[KEY_DIA_ANCHOR]
         self.anchor_type = str(design_dictionary[KEY_TYP_ANCHOR])
-        self.anchor_grade = int(design_dictionary[KEY_GRD_ANCHOR])
+        self.anchor_grade = design_dictionary[KEY_GRD_ANCHOR]
 
         self.footing_grade = str(design_dictionary[KEY_GRD_FOOTING])
 
-        self.weld_type = str(design_dictionary[KEY_DISP_WELD_TYPE])
+        self.weld_type = str(design_dictionary[KEY_WELD_TYPE])
 
         # attributes of design preferences
         self.dp_column_designation = str(design_dictionary[KEY_SUPTNGSEC])
@@ -770,6 +772,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.gamma_mw = 1.50
 
         self.safe = True
+        self.column_properties = Column(designation=self.column_section, material_grade=self.dp_column_material)
+
+        self.design_pinned_bp_welded(self)
+        self.bolt_design_detailing(self)
+        self.design_detail_bp(self)
 
     def design_pinned_bp_welded(self):
         """ design pinned base plate (welded connection)
@@ -787,8 +794,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # TODO: add calculation of projection for other type(s) of column section (example: tubular)
         # effective area [Reference: Clause 7.4.1.1, IS 800:2007]
         if self.dp_column_type == 'Rolled' or 'Welded':
-            self.projection = self.calculate_c(self.flange_width, self.depth, self.web_thickness, self.flange_thickness,
-                                               self.min_area_req)
+            # section = Column(self.dp_column_designation, self.dp_column_material)
+            self.projection = self.calculate_c(self.column_properties.flange_width, self.column_properties.depth,
+                self.column_properties.web_thickness, self.column_properties.flange_thickness, self.min_area_req)
         else:
             pass
 
@@ -804,7 +812,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         #  thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
         self.plate_thk = max(self.projection * (math.sqrt((2.5 * self.bearing_strength_concrete * self.gamma_m0) / self.dp_bp_fy)),
-                             self.flange_thickness)  # base plate thickness should be larger than the flange thickness
+                             self.column_properties.flange_thickness)  # base plate thickness should be larger than the flange thickness
 
         # the thicknesses of the flats listed below is obtained from SAIL's product brochure
         self.standard_plate_thk = [8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40, 45, 50, 56, 63, 75, 80, 90, 100, 110, 120]
@@ -831,6 +839,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         for i in sort_bolt:
             self.anchor_dia_provided = i  # anchor dia provided
             break
+
+        self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])
+
 
         # TODO add condition for number of anchor bolts depending on col depth and force
         # number of anchor bolts

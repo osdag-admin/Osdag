@@ -401,6 +401,33 @@ KEY_GRD_FOOTING = 'Footing.Grade'
 KEY_DISP_GRD_FOOTING = 'Grade*'
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 
+KEY_OUT_ANCHOR_BOLT_SHEAR = 'Anchor Bolt.Shear'
+KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_ANCHOR_BOLT_BEARING = 'Anchor Bolt.Bearing'
+KEY_OUT_DISP_ANCHOR_BOLT_BEARING = 'Bearing Capacity (kN)'
+KEY_OUT_ANCHOR_BOLT_CAPACITY = 'Anchor Bolt.Capacity'
+KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
+KEY_OUT_ANCHOR_BOLT_COMBINED = 'Anchor Bolt.Combined'
+KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity'
+
+KEY_OUT_BASEPLATE_THICKNNESS = 'Baseplate.Thickness'
+KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (tp)'
+KEY_OUT_BASEPLATE_LENGTH = 'Baseplate.Length'
+KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (lp)'
+KEY_OUT_BASEPLATE_WIDTH = 'Baseplate.Width'
+KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (wp)'
+DISP_TITLE_DETAILING = 'Detailing'
+KEY_OUT_DETAILING_NO_OF_ANCHOR_BOLT = 'Deatiling.No of Anchor bolts'
+KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'No. of Anchor bolts'
+KEY_OUT_DETAILING_END_DISTANCE = 'Detailing.End Distance'
+KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End distance (e)'
+KEY_OUT_DETAILING_EDGE_DISTANCE = 'Detailing.Edge Distance'
+KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge distance (e')"
+KEY_OUT_DETAILING_PROJECTION = 'Detailing.Projection'
+KEY_OUT_DISP_DETAILING_PROJECTION = 'Projection (c)'
+
+
+
 ###################################
 # Key for Storing Shear sub-key of Load
 KEY_SHEAR = 'Load.Shear'

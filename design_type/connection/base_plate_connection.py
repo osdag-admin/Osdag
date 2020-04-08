@@ -31,6 +31,7 @@ from utils.common.is800_2007 import IS800_2007
 from utils.common.other_standards import IS_5624_1993
 from utils.common.component import *
 from utils.common.material import *
+from utils.common.common_calculation import *
 from Common import *
 from utils.common.load import Load
 from utils.common.other_standards import *
@@ -183,7 +184,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gamma_mb = 0.0
         self.gamma_mw = 0.0
 
-        self.column_properties = Column(designation=self.column_section, material_grade=self.dp_column_material)
         self.column_D = 0.0
         self.column_bf = 0.0
         self.column_tf = 0.0
@@ -401,7 +401,68 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         return options_list
 
     def output_values(self, flag):
-        return []
+        out_list = []
+
+        t1 = (None, DISP_TITLE_ANCHOR_BOLT, TYPE_TITLE, None)
+        out_list.append(t1)
+
+        t2 = (KEY_DIA_ANCHOR, KEY_DISP_DIA_ANCHOR, TYPE_TEXTBOX, self.anchor_dia_provided if flag else '')
+        out_list.append(t2)
+
+        t3 = (KEY_GRD_ANCHOR, KEY_DISP_GRD_ANCHOR, TYPE_TEXTBOX, self.anchor_grade if flag else '')
+        out_list.append(t3)
+
+        t4 = (KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DISP_DP_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX, self.anchor_length_provided if
+        flag else '')
+        out_list.append(t4)
+
+        t5 = (KEY_OUT_ANCHOR_BOLT_SHEAR, KEY_OUT_DISP_ANCHOR_BOLT_SHEAR, TYPE_TEXTBOX, self.shear_capacity_anchor if flag else '')
+        out_list.append(t5)
+
+        t6 = (KEY_OUT_ANCHOR_BOLT_BEARING, KEY_OUT_DISP_ANCHOR_BOLT_BEARING, TYPE_TEXTBOX, self.bearing_capacity_anchor if flag else '')
+        out_list.append(t6)
+
+        t7 = (KEY_OUT_ANCHOR_BOLT_CAPACITY, KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY, TYPE_TEXTBOX, self.anchor_capacity if flag else '')
+        out_list.append(t7)
+
+        t8 = (KEY_OUT_ANCHOR_BOLT_COMBINED, KEY_OUT_DISP_ANCHOR_BOLT_COMBINED, TYPE_TEXTBOX, self.combined_capacity if flag else '')
+        out_list.append(t8)
+
+        t9 = (None, KEY_DISP_BASE_PLATE, TYPE_TITLE, None)
+        out_list.append(t9)
+
+        t10 = (KEY_OUT_BASEPLATE_THICKNNESS, KEY_OUT_DISP_BASEPLATE_THICKNNESS, TYPE_TEXTBOX, self.plate_thk if flag else '')
+        out_list.append(t10)
+
+        t11 = (KEY_OUT_BASEPLATE_LENGTH, KEY_OUT_DISP_BASEPLATE_LENGTH, TYPE_TEXTBOX, self.bp_length_provided if flag else '')
+        out_list.append(t11)
+
+        t12 = (KEY_OUT_BASEPLATE_WIDTH, KEY_OUT_DISP_BASEPLATE_WIDTH, TYPE_TEXTBOX, self.bp_width_provided if flag else '')
+        out_list.append(t12)
+
+        t13 = (None, DISP_TITLE_DETAILING, TYPE_TITLE, None)
+        out_list.append(t13)
+
+        t14 = (KEY_OUT_DETAILING_NO_OF_ANCHOR_BOLT, KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT, TYPE_TEXTBOX,
+               self.anchor_nos_provided if flag else '')
+        out_list.append(t14)
+
+        t15 = (KEY_OUT_DETAILING_END_DISTANCE, KEY_OUT_DISP_DETAILING_END_DISTANCE, TYPE_TEXTBOX,
+               self.end_distance if flag else '')
+        out_list.append(t15)
+
+        t16 = (KEY_OUT_DETAILING_EDGE_DISTANCE, KEY_OUT_DISP_DETAILING_EDGE_DISTANCE, TYPE_TEXTBOX,
+               self.edge_distance if flag else '')
+        out_list.append(t16)
+
+        t17 = (KEY_OUT_DETAILING_PROJECTION, KEY_OUT_DISP_DETAILING_PROJECTION, TYPE_TEXTBOX,
+               self.projection if flag else '')
+        out_list.append(t17)
+
+        # if flag:
+        #     if self.weld_type == 'Fillet Weld':
+
+        return out_list
 
     def major_minor(self):
         if self in ['Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']:
@@ -480,6 +541,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
     def tab_list(self):
+        self.design_button_status = False
+
         tabs = []
 
         t0 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
@@ -731,11 +794,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.anchor_dia = design_dictionary[KEY_DIA_ANCHOR]
         self.anchor_type = str(design_dictionary[KEY_TYP_ANCHOR])
-        self.anchor_grade = int(design_dictionary[KEY_GRD_ANCHOR])
+        self.anchor_grade = design_dictionary[KEY_GRD_ANCHOR]
 
         self.footing_grade = str(design_dictionary[KEY_GRD_FOOTING])
 
-        self.weld_type = str(design_dictionary[KEY_DISP_WELD_TYPE])
+        self.weld_type = str(design_dictionary[KEY_WELD_TYPE])
 
         # attributes of design preferences
         self.dp_column_designation = str(design_dictionary[KEY_SUPTNGSEC])
@@ -767,6 +830,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.dp_bp_method = str(design_dictionary[KEY_DP_DESIGN_BASE_PLATE])
 
         # properties of the column section
+        self.column_properties = Column(designation=self.column_section, material_grade=self.dp_column_material)
+
         self.column_D = self.column_properties.depth
         self.column_bf = self.column_properties.flange_width
         self.column_tf = self.column_properties.flange_thickness
@@ -781,6 +846,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"][self.dp_weld_fab]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
 
         self.safe = True
+
+        self.design_pinned_bp_welded(self)
+        self.bolt_design_detailing(self)
+        self.design_detail_bp(self)
 
     def design_pinned_bp_welded(self):
         """ design pinned base plate (welded connection)
@@ -798,7 +867,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # TODO: add calculation of projection for other type(s) of column section (example: tubular)
         # effective area [Reference: Clause 7.4.1.1, IS 800:2007]
         if self.dp_column_type == 'Rolled' or 'Welded':
-            self.projection = self.calculate_c(self.column_bf, self.column_D, self.column_tw, self.column_tf, self.min_area_req)
+
+            # section = Column(self.dp_column_designation, self.dp_column_material)
+            self.projection = self.calculate_c(self.column_properties.flange_width, self.column_properties.depth,
+                self.column_properties.web_thickness, self.column_properties.flange_thickness, self.min_area_req)
+
         else:
             pass
 
@@ -814,7 +887,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         #  thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
         self.plate_thk = max(self.projection * (math.sqrt((2.5 * self.bearing_strength_concrete * self.gamma_m0) / self.dp_bp_fy)),
-                             self.flange_thickness)  # base plate thickness should be larger than the flange thickness
+                             self.column_properties.flange_thickness)  # base plate thickness should be larger than the flange thickness
 
         # the thicknesses of the flats listed below is obtained from SAIL's product brochure
         self.standard_plate_thk = [8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40, 45, 50, 56, 63, 75, 80, 90, 100, 110, 120]
@@ -841,6 +914,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         for i in sort_bolt:
             self.anchor_dia_provided = i  # anchor dia provided
             break
+
+        self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])
+
 
         # TODO add condition for number of anchor bolts depending on col depth and force
         # number of anchor bolts
@@ -938,8 +1014,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         """
         # design the dimensions of the base plate
         if self.connectivity == 'Welded-Slab Base':
-            self.bp_length_provided = self.depth + self.projection + self.end_distance  # mm
-            self.bp_width_provided = self.flange_width + self.projection + self.edge_distance  # mm
+            self.bp_length_provided = self.column_properties.depth + self.projection + self.end_distance  # mm
+            self.bp_width_provided = self.column_properties.flange_width + self.projection + self.edge_distance  # mm
         else:
             pass
 
@@ -980,7 +1056,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     pass
 
             elif self.connectivity == "Hollow Section":
-                pass  # TODO: add calculations for hollow sections
+
+                # TODO: add calculations for hollow sections
+                self.weld_size = 0
 
             else:
                 pass
@@ -994,6 +1072,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.safe:
             logger.info(": Overall base plate connection design is safe")
             logger.debug(": =========End Of design===========")
+            self.design_status = True
         else:
             logger.info(": Overall base plate connection design is unsafe")
             logger.debug(": =========End Of design===========")
@@ -1021,4 +1100,4 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print(self.projection)
 
         # weld
-        print(self.weld_size)
+        print(self.weld_size if self.weld_type != 'Butt Weld' else '')

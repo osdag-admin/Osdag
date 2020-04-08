@@ -429,7 +429,7 @@ self
             V_dpb *= 0.7
         elif bolt_hole_type == 'long_slot':
             V_dpb *= 0.5
-        return V_dpb,d_0,k_b,gamma_mb
+        return V_dpb
 
 
 

@@ -880,13 +880,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.n_s = 0
 
             self.shear_capacity_anchor = self.cl_10_3_3_bolt_shear_capacity(self.dp_anchor_fu_overwrite, self.anchor_area_thread,
-                                                                            self.anchor_area_shank, self.n_n, self.n_s, self.gamma_mb)
+                                                                            self.anchor_area_shank, self.n_n, self.n_s, self.dp_weld_fab)
             self.shear_capacity_anchor = round(self.shear_capacity_anchor / 1000, 2)  # kN
 
             self.bearing_capacity_anchor = self.cl_10_3_4_bolt_bearing_capacity(self.dp_bp_fu, self.dp_anchor_fu_overwrite,
                                                                                 self.plate_thk, self.table1(self.anchor_dia_provided)[0],
                                                                                 self.end_distance, self.pitch_distance, self.dp_anchor_hole,
-                                                                                self.gamma_mb)
+                                                                                self.dp_weld_fab)
             self.bearing_capacity_anchor = round(self.bearing_capacity_anchor / 1000, 2)  # kN
 
             self.anchor_capacity = min(self.shear_capacity_anchor, self.bearing_capacity_anchor)

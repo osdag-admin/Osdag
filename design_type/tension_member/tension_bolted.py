@@ -1355,7 +1355,7 @@ class Tension_bolted(Main):
 
 
             if self.plate.design_status is True:
-                if self.plate.bolts_required >= bolts_required_previous and count >= 1:
+                if self.plate.bolts_required > bolts_required_previous and count >= 1:
                     self.bolt.bolt_diameter_provided = bolt_diameter_previous
                     self.plate.bolts_required = bolts_required_previous
                     self.plate.bolt_force = bolt_force_previous

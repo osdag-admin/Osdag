@@ -213,7 +213,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.pitch_distance = 0.0
         self.gauge_distance = 0.0
         self.bp_area_provided = 0.0
-        self.anchor_grade_provided = 0.0
         self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # TODO check if this works
         self.anchor_area_shank = 0.0
         self.anchor_area_thread = 0.0
@@ -228,6 +227,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.effective_length = 0.0
         self.strength_unit_len = 0.0
         self.weld_size = 0.0
+        self.weld_size_flange = 0.0
+        self.weld_size_web = 0.0
 
         self.safe = True
 
@@ -952,27 +953,42 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
         # design the weld connecting the column to the base plate
-        if self.dp_column_type == 'Rolled' or 'Welded':
-            self.length_available = 2 * (self.column_bf + self.column_D - (2 * self.column_tf) - (2 * self.column_r1) + self.column_bf -
-                                         self.column_tw - (2 * self.column_r1))  # mm (length available around the column profile)
 
-            # Note: The effective length of weld is calculated by assuming 1% reduction in length at each end return. Since, the total
-            # number of end returns are 12, a total of 12% reduction is incorporated into the 'length available' to calculate the
-            # 'effective length'.
-            self.effective_length = self.length_available - (0.12 * self.length_available)  # mm (effective length of weld)
+        # design of fillet weld
+        if self.weld_type == "Fillet Weld":
 
-            self.strength_unit_len = self.load_axial * 1000 / self.effective_length  # N/mm
-            self.weld_size = (self.strength_unit_len / 0.7 * min(self.dp_weld_fu_overwrite, self.dp_column_fu)) \
-                             * math.sqrt(3) * self.gamma_mw  # mm
-            self.weld_size = max(round_up(self.weld_size, 2), 6)  # minimum size of weld is 6mm
+            if self.connectivity == "Welded-Slab Base" or "Bolted-Slab Base" or "Gusseted Base Plate":
 
-            # providing weld size which is minimum of the calculated value and the flange and web thicknesses
-            self.weld_size = min(self.weld_size, round_down(self.column_tf, 2), round_down(self.column_tw, 2))  # mm
+                if self.dp_column_type == 'Rolled' or 'Welded':
+                    self.length_available = 2 * (self.column_bf + self.column_D - (2 * self.column_tf) - (2 * self.column_r1) +
+                                                 self.column_bf - self.column_tw - (2 * self.column_r1))  # mm
+
+                    # Note: The effective length of weld is calculated by assuming 1% reduction in length at each end return. Since, the
+                    # total number of end returns are 12, a total of 12% reduction is incorporated into the 'length available' to calculate
+                    # the 'effective length'.
+                    self.effective_length = self.length_available - (0.12 * self.length_available)  # mm (effective length of weld)
+
+                    self.strength_unit_len = self.load_axial * 1000 / self.effective_length  # N/mm
+                    self.weld_size = (self.strength_unit_len / 0.7 * min(self.dp_weld_fu_overwrite, self.dp_column_fu)) \
+                                     * math.sqrt(3) * self.gamma_mw  # mm
+                    self.weld_size = max(round_up(self.weld_size, 2), 6)  # minimum size of weld is 6mm
+
+                    # providing weld size which is minimum of the calculated value and the flange and web thicknesses
+                    self.weld_size = min(self.weld_size, round_down(self.column_tf, 2), round_down(self.column_tw, 2))  # mm
+
+                else:  # TODO: add checks for other type(s) of column (built up. star shaped etc)
+                    pass
+
+            elif self.connectivity == "Hollow Section":
+                pass  # TODO: add calculations for hollow sections
+
+            else:
+                pass
+
+        # design of butt weld
         else:
-            pass
-
-        if self.connectivity == 'Welded-Slab Base':
-            pass
+            self.weld_size_flange = self.column_tf  # mm
+            self.weld_size_web = self.column_tw  # mm
 
         # end of calculation
         if self.safe:
@@ -981,3 +997,28 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             logger.info(": Overall base plate connection design is unsafe")
             logger.debug(": =========End Of design===========")
+
+        # printing values for output dock
+
+        # base plate
+        print(self.plate_thk)
+        print(self.bp_length_provided)
+        print(self.bp_width_provided)
+
+        # anchor bolt
+        print(self.anchor_dia_provided)
+        print(self.anchor_grade)
+        print(self.anchor_length_provided)
+        print(self.shear_capacity_anchor)
+        print(self.bearing_capacity_anchor)
+        print(self.anchor_capacity)
+        print(self.combined_capacity)
+
+        # detailing
+        print(self.anchor_nos_provided)
+        print(self.end_distance)
+        print(self.edge_distance)
+        print(self.projection)
+
+        # weld
+        print(self.weld_size)

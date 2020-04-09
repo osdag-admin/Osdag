@@ -862,7 +862,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.bearing_strength_concrete = self.cl_7_4_1_bearing_strength_concrete(self.footing_grade)  # N/mm^2 (MPa)
 
         # minimum required area for the base plate [bearing stress = axial force / area of the base]
-        self.min_area_req = self.load_axial / self.bearing_strength_concrete  # mm^2
+        self.min_area_req = self.load_axial * 1000 / self.bearing_strength_concrete  # mm^2
 
         # TODO: add calculation of projection for other type(s) of column section (example: tubular)
         # effective area [Reference: Clause 7.4.1.1, IS 800:2007]
@@ -1096,7 +1096,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print(self.anchor_nos_provided)
         print(self.end_distance)
         print(self.edge_distance)
-        print(self.projection)
+        print("The projection is {}".format(self.projection))
 
         # weld
         print(self.weld_size if self.weld_type != 'Butt Weld' else '')

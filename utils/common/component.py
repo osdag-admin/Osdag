@@ -655,7 +655,7 @@ class Weld(Material):
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
         self.stress = weld_stress
 
-    def weld_size(self, plate_thickness, member_thickness):
+    def weld_size(self, plate_thickness, member_thickness, edge_type = "Square"):
 
         max_weld_thickness = int(min(plate_thickness, member_thickness))
         if plate_thickness<=10:
@@ -666,11 +666,18 @@ class Weld(Material):
             min_weld_thickness = 6
         else:
             min_weld_thickness = 10
-        weld_thickness = round_down((max_weld_thickness - 1.5), 1, 3)
+
+        if edge_type == "Square":
+            red = 1.5
+        else:
+            red = 0.25 * max_weld_thickness
+
+        weld_thickness = round_down((max_weld_thickness - red), 1, 3)
         if weld_thickness < min_weld_thickness:
             weld_thickness = int(min(plate_thickness, member_thickness))
             weld_reason = " Preheating of thicker plate is required"
         else:
+            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge "
             pass
 
         if weld_thickness> 16 :

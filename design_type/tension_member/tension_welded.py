@@ -1157,6 +1157,8 @@ class Tension_welded(Main):
                 elif (self.load.axial_force *1000> max_force) :
                     self.design_status = False
                     logger.error(" : Tension force exceeds tension capacity of maximum available member size")
+                    logger.error(": Design is not safe \n ")
+                    logger.debug(" :=========End Of design===========")
                     break
 
                     "condition to limit loop based on max length derived from max available size"
@@ -1164,6 +1166,8 @@ class Tension_welded(Main):
                 elif self.length > length:
                     self.design_status = False
                     logger.error(" : Member fails in slenderness")
+                    logger.error(": Design is not safe \n ")
+                    logger.debug(" :=========End Of design===========")
                     break
 
                 else:
@@ -1241,6 +1245,8 @@ class Tension_welded(Main):
             else:
                 self.design_status = False
                 logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness")
+                logger.error(": Design is not safe \n ")
+                logger.debug(" :=========End Of design===========")
 
     def select_weld(self,design_dictionary):
 
@@ -1253,7 +1259,7 @@ class Tension_welded(Main):
         else:
             self.thick = self.section_size_1.thickness
 
-        self.weld.weld_size(plate_thickness = self.plate.thickness_provided, member_thickness= self.thick)
+        self.weld.weld_size(plate_thickness = self.plate.thickness_provided, member_thickness= self.thick , edge_type= "Rolled")
 
         self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu,self.weld.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.load.axial_force*1000))
 
@@ -1282,10 +1288,12 @@ class Tension_welded(Main):
 
         if self.weld.strength > self.weld.stress:
             self.design_status = True
-            logger.error(self.weld.reason)
+            logger.info(self.weld.reason)
             self.member_check(self, design_dictionary)
         else:
-            pass
+            self.design_status = False
+            logger.error(": Design is not safe \n ")
+            logger.debug(" :=========End Of design===========")
 
 
     def get_weld_strength(self,connecting_fu, weld_fabrication, t_weld, force, weld_angle = 90):
@@ -1337,17 +1345,17 @@ class Tension_welded(Main):
             self.weld.length = (web_weld + 2 * flange_weld)
 
 
-        self.plate.length = flange_weld + 2 * self.weld.size
+        self.plate.length = flange_weld + 4 * self.weld.size
         if design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Long Leg":
-            self.plate.height = 2 * self.section_size_1.max_leg
+            self.plate.height = 2 * self.section_size_1.max_leg + 4 * self.weld.size
         elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
-            self.plate.height = 2 * self.section_size_1.min_leg
+            self.plate.height = 2 * self.section_size_1.min_leg + 4 * self.weld.size
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
-            self.plate.height =  self.section_size_1.min_leg
+            self.plate.height =  self.section_size_1.min_leg + 4 * self.weld.size
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles","Angles"] and design_dictionary[KEY_LOCATION] == "Long Leg":
-            self.plate.height = self.section_size_1.max_leg
+            self.plate.height = self.section_size_1.max_leg + 4 * self.weld.size
         else:
-            self.plate.height = self.section_size_1.depth
+            self.plate.height = self.section_size_1.depth + 4 * self.weld.size
 
 
     def member_check(self,design_dictionary):
@@ -1404,7 +1412,7 @@ class Tension_welded(Main):
             self.design_status = False
 
         if self.section_size_1.tension_capacity >= self.load.axial_force * 1000:
-            logger.error("In case of reverse load, slenderness value should be less than 180")
+            logger.info("In case of reverse load, slenderness value should be less than 180")
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
             self.design_status = True
@@ -1483,13 +1491,24 @@ class Tension_welded(Main):
             print (self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
             if self.plate_tension_capacity > self.load.axial_force *1000:
                 self.design_status = True
+
                 break
 
             elif (self.plate_tension_capacity < self.load.axial_force * 1000) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
                 logger.error("Plate thickness is not sufficient")
+                logger.error(": Design is not safe \n ")
+                logger.debug(" :=========End Of design===========")
             else:
                 pass
+        if self.plate_tension_capacity > self.load.axial_force * 1000:
+            self.design_status = True
+            logger.info(": Overall welded tension member design is safe \n")
+            logger.debug(" :=========End Of design===========")
+        else:
+            self.design_status = False
+            logger.error(": Design is not safe \n ")
+            logger.debug(" :=========End Of design===========")
 
 
 #     def save_design(self,ui,popup_summary):

@@ -1243,6 +1243,8 @@ class Tension_bolted(Main):
                 elif (self.load.axial_force*1000 > max_force) :
                     self.design_status = False
                     logger.error(" : Tension force exceeds tension capacity of maximum available member size")
+                    logger.error(": Design is not safe \n ")
+                    logger.debug(" :=========End Of design===========")
                     break
 
                     "condition to limit loop based on max length derived from max available size"
@@ -1250,6 +1252,8 @@ class Tension_bolted(Main):
                 elif self.length > length:
                     self.design_status = False
                     logger.error(" : Member fails in slenderness")
+                    logger.error(": Design is not safe \n ")
+                    logger.debug(" :=========End Of design===========")
                     break
 
                 else:
@@ -1351,7 +1355,7 @@ class Tension_bolted(Main):
 
 
             if self.plate.design_status is True:
-                if self.plate.bolts_required >= bolts_required_previous and count >= 1:
+                if self.plate.bolts_required > bolts_required_previous and count >= 1:
                     self.bolt.bolt_diameter_provided = bolt_diameter_previous
                     self.plate.bolts_required = bolts_required_previous
                     self.plate.bolt_force = bolt_force_previous
@@ -1383,6 +1387,8 @@ class Tension_bolted(Main):
         else:
             self.design_status = False
             logger.error(self.plate.reason)
+            logger.error(": Design is not safe \n ")
+            logger.debug(" :=========End Of design===========")
 
 
 
@@ -1604,7 +1610,7 @@ class Tension_bolted(Main):
             self.design_status = False
 
         if self.section_size_1.tension_capacity >= self.load.axial_force *1000:
-            logger.error("In case of reverse load, slenderness value should be less than 180")
+            logger.info("In case of reverse load, slenderness value should be less than 180")
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
             self.design_status = True
@@ -1699,12 +1705,16 @@ class Tension_bolted(Main):
             elif (self.plate_tension_capacity < self.load.axial_force*1000) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
                 logger.error("Plate thickness is not sufficient")
+                logger.error(": Design is not safe \n ")
+                logger.debug(" :=========End Of design===========")
             else:
                 pass
 
         if self.plate_tension_capacity > self.load.axial_force*1000:
             # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
             self.design_status = True
+            logger.info(": Overall bolted tension member design is safe \n")
+            logger.debug(" :=========End Of design===========")
         else:
             if self.plate_tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ["Channels",
                                                                                                'Back to Back Channels',
@@ -1716,7 +1726,8 @@ class Tension_bolted(Main):
             else:
                 self.design_status = False
                 logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness")
-
+                logger.error(": Design is not safe \n ")
+                logger.debug(" :=========End Of design===========")
             # if self.plate.design_status is False:
             # plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,
             #                            self.plate.shear_yielding_capacity)

@@ -625,13 +625,18 @@ class Weld(Material):
         self.height =0.0
         self.Innerheight = 0.0
         self.strength = 0.0
+        self.throat = 0.0
         self.stress = 0.0
         self.Innerstrength = 0.0
         self.Innerstress = 0.0
 
         self.fabrication = fabrication
         self.fu= float(material_g_o)
+
         self.throat_tk =0.0
+
+        self.reason = 0.0
+
 
     def __repr__(self):
         repr = "Weld\n"
@@ -659,16 +664,38 @@ class Weld(Material):
         weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
         self.stress = weld_stress
 
-    def weld_size(self, plate_thickness, member_thickness):
+    def weld_size(self, plate_thickness, member_thickness, edge_type = "Square"):
 
         max_weld_thickness = int(min(plate_thickness, member_thickness))
-        weld_thickness = round_down((max_weld_thickness-1.5),1,3)
+        if plate_thickness<=10:
+            min_weld_thickness = 3
+        elif plate_thickness>=10 and plate_thickness<=20:
+            min_weld_thickness = 5
+        elif plate_thickness>=20 and plate_thickness<=30:
+            min_weld_thickness = 6
+        else:
+            min_weld_thickness = 10
+
+        if edge_type == "Square":
+            red = 1.5
+        else:
+            red = 0.25 * max_weld_thickness
+
+        weld_thickness = round_down((max_weld_thickness - red), 1, 3)
+        if weld_thickness < min_weld_thickness:
+            weld_thickness = int(min(plate_thickness, member_thickness))
+            weld_reason = " Preheating of thicker plate is required"
+        else:
+            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge "
+            pass
+
         if weld_thickness> 16 :
             weld_thickness =16
         else:
             pass
 
         self.size = weld_thickness
+        self.reason = weld_reason
 
 class Plate(Material):
 
@@ -1386,8 +1413,13 @@ class Angle(Section):
         self.thickness = row[5]
         self.r1 = row[6]
         self.r2 = row[7]
-        self.Cz = row[8]
-        self.Cy = row[9]
+        if self.leg_a_length != self.leg_b_length:
+            self.Cz = row[8]*10
+            self.Cy = row[9]*10
+        else:
+            self.Cz = row[8]
+            self.Cy = row[9]
+
         self.mom_inertia_z = row[11] * 10000
         self.mom_inertia_y = row[12] * 10000
         self.mom_inertia_u = row[13] * 10000

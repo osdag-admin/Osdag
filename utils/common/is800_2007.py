@@ -484,7 +484,7 @@ class IS800_2007(object):
             gamma_mf = 1.25
         if bolt_hole_type == 'Standard':
             K_h = 1.0
-        elif bolt_hole_type == 'Over-sized' or 'short_slot' or 'long_slot':
+        elif bolt_hole_type == 'Over-sized' or bolt_hole_type == 'short_slot' or bolt_hole_type == 'long_slot':
             K_h = 0.85
         else:
             # TODO : long_slot bolt loaded parallel to slot is given in else
@@ -680,7 +680,9 @@ class IS800_2007(object):
             K = float(K)
         except ValueError:
             return
-        throat = max((K * fillet_size), 3)
+
+        throat = max((K * fillet_size),3)
+
 
         return throat
 

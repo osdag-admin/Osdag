@@ -549,7 +549,7 @@ class Beam(Section):
         return 0.6 * self.depth
 
     def max_plate_height(self, connectivity=None, notch_height = 0.0):
-        if connectivity in VALUES_CONN_1 or None:
+        if connectivity in VALUES_CONN_1 or connectivity == None:
             clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
         else:
             clear_depth = self.depth - notch_height
@@ -626,6 +626,9 @@ class Weld(Material):
         self.Innerheight = 0.0
         self.strength = 0.0
         self.stress = 0.0
+        self.Innerstrength = 0.0
+        self.Innerstress = 0.0
+
         self.fabrication = fabrication
         self.fu= float(material_g_o)
         self.throat_tk =0.0
@@ -860,7 +863,7 @@ class Plate(Material):
             pass
         return gauge, edge_dist, flange_plate_h
 
-    def get_vres(self, bolts_one_line, pitch, gauge, bolt_line, shear_load, axial_load, ecc):
+    def get_vres(self, bolts_one_line, pitch, gauge, bolt_line, shear_load, axial_load, ecc,web_moment):
         """1000
 
         :param bolts_one_line: number of bolts in one line
@@ -883,7 +886,7 @@ class Plate(Material):
                 r_sq = r_sq + ((pitch * x) ** 2 + (abs(y) * gauge) ** 2)
         sigma_r_sq = r_sq
         vbv = shear_load / (bolts_one_line * bolt_line)
-        moment_demand = round(shear_load * ecc, 3)
+        moment_demand = round((shear_load * ecc + web_moment), 3)
         print(moment_demand, ymax, sigma_r_sq)
         tmh = moment_demand * ymax / sigma_r_sq
         tmv = moment_demand * xmax / sigma_r_sq
@@ -970,7 +973,7 @@ class Plate(Material):
                 print(2, bolts_one_line, pitch,
                       gauge, bolt_line, shear_load, axial_load, ecc, web_plate_h)
                 vres = self.get_vres(bolts_one_line, pitch,
-                                     gauge, bolt_line, shear_load, axial_load, ecc)
+                                     gauge, bolt_line, shear_load, axial_load, ecc,web_moment)
             else:
                 moment_demand = 0.0
                 vres = resultant_force / (bolt_line * bolts_one_line)
@@ -1019,7 +1022,7 @@ class Plate(Material):
                     print(2, bolts_one_line, pitch,
                           gauge, bolt_line, shear_load, axial_load, ecc, web_plate_h)
                     vres = self.get_vres(bolts_one_line, pitch,
-                                         gauge, bolt_line, shear_load, axial_load, ecc)
+                                         gauge, bolt_line, shear_load, axial_load, ecc,web_moment )
                 else:
                     moment_demand = 0.0
                     vres = vres / (bolt_line * bolts_one_line)

@@ -192,6 +192,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.column_r2 = 0.0
 
         self.bearing_strength_concrete = 0.0
+        self.w = 0.0
         self.min_area_req = 0.0
         self.effective_bearing_area = 0.0
         self.projection = 0.0
@@ -884,19 +885,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             pass
 
-        #  thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
-        self.plate_thk = max(self.projection * (math.sqrt((2.5 * self.bearing_strength_concrete * self.gamma_m0) / self.dp_bp_fy)),
-                             self.column_properties.flange_thickness)  # base plate thickness should be larger than the flange thickness
-
-        # the thicknesses of the flats listed below is obtained from SAIL's product brochure
-        self.standard_plate_thk = [8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40, 45, 50, 56, 63, 75, 80, 90, 100, 110, 120]
-
-        sort_plate = filter(lambda x: self.plate_thk <= x <= 120, self.standard_plate_thk)
-
-        for i in sort_plate:
-            self.plate_thk = i  # plate thickness provided (mm)
-            break
-
     def bolt_design_detailing(self):
         """ Perform design and detailing of the anchor bolt
 
@@ -916,7 +904,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])
 
-
         # TODO add condition for number of anchor bolts depending on col depth and force
         # number of anchor bolts
         self.anchor_nos_provided = 4
@@ -928,12 +915,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.table1(self.anchor_dia_provided)[0],
                                                                self.dp_anchor_hole, self.dp_detail_edge_type)
 
+        # TODO: add max end, edge distance check after the plate thk check
         # Note: end distance is along the depth, whereas, the edge distance is along the flange, of the column section
         self.end_distance = round_up(self.end_distance, 5) + 10  # adding 10 mm extra for a conservative design # mm
-        self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive)
+        # self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive)
 
         self.edge_distance = self.end_distance  # mm
-        self.edge_distance_max = self.end_distance_max
+        # self.edge_distance_max = self.end_distance_max
 
         # TODO add pitch and gauge calc for bolts more than 4 nos
         if self.anchor_nos_provided == 4:
@@ -941,6 +929,38 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.gauge_distance = self.pitch_distance
         else:
             pass
+
+        # design the dimensions of the base plate
+        if self.connectivity == 'Welded-Slab Base':
+            self.bp_length_provided = self.column_properties.depth + self.projection + self.end_distance  # mm
+            self.bp_width_provided = self.column_properties.flange_width + self.projection + self.edge_distance  # mm
+        else:
+            pass
+
+        # check for the provided area against the minimum required area
+        self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
+        if self.bp_area_provided < self.min_area_req:
+            self.safe = False
+            logger.error("[Base Plate] The calculated area of the base plate is less than the required area.")
+            logger.info("[Base Plate] Check the input values and re-design the connection.")
+        else:
+            pass
+
+        # actual bearing pressure acting on the provided area of the base plate
+        self.w = self.load_axial * 1000 / self.bp_area_provided  # N/mm^2 (MPa)
+
+        #  thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
+        self.plate_thk = max(self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.dp_bp_fy)),
+                             self.column_tf)  # base plate thickness should be larger than the flange thickness
+
+        # the thicknesses of the flats listed below is obtained from SAIL's product brochure
+        self.standard_plate_thk = [8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40, 45, 50, 56, 63, 75, 80, 90, 100, 110, 120]
+
+        sort_plate = filter(lambda x: self.plate_thk <= x <= 120, self.standard_plate_thk)
+
+        for i in sort_plate:
+            self.plate_thk = i  # plate thickness provided (mm)
+            break
 
         # design strength of anchor bolt [Reference: Clause 10.3.2, IS 800:2007; Section 3, IS 5624:1993]
         for i in self.anchor_grade:
@@ -1011,22 +1031,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         Returns:
         """
-        # design the dimensions of the base plate
-        if self.connectivity == 'Welded-Slab Base':
-            self.bp_length_provided = self.column_properties.depth + self.projection + self.end_distance  # mm
-            self.bp_width_provided = self.column_properties.flange_width + self.projection + self.edge_distance  # mm
-        else:
-            pass
-
-        # check for the provided area against the minimum required area
-        self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
-        if self.bp_area_provided < self.min_area_req:
-            self.safe = False
-            logger.error("[Base Plate] The calculated area of the base plate is less than the required area.")
-            logger.info("[Base Plate] Check the input values and re-design the connection.")
-        else:
-            pass
-
         # design the weld connecting the column to the base plate
 
         # design of fillet weld
@@ -1100,3 +1104,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # weld
         print(self.weld_size if self.weld_type != 'Butt Weld' else '')
+
+        # col properties
+        print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)
+        print(self.w)

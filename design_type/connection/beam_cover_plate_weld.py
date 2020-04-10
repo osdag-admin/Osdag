@@ -332,12 +332,12 @@ class BeamCoverPlateWeld(MomentConnection):
         Innerflange_weld_details.append(t14)
 
         t15 = (
-            KEY_FLANGE_WELD_STRENGTH, KEY_FLANGE_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
+            KEY_INNERFLANGE_WELD_STRENGTH, KEY_INNERFLANGE_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
             round_up(self.flange_weld.strength, 5) if flag else '')
         Innerflange_weld_details.append(t15) #in N/mm
 
         t16 = (
-        KEY_FLANGE_WELD_STRESS, KEY_FLANGE_DISP_WELD_STRESS, TYPE_TEXTBOX, round_up(self.flange_weld.stress, 5) if flag else '')
+        KEY_INNERFLANGE_WELD_STRESS, KEY_INNERFLANGE_DISP_WELD_STRESS, TYPE_TEXTBOX, round_up(self.flange_weld.Innerstress, 5) if flag else '')
         Innerflange_weld_details .append(t16) #in N/mm
 
         return Innerflange_weld_details
@@ -805,25 +805,34 @@ class BeamCoverPlateWeld(MomentConnection):
                 #             self.supported_section.tension_yielding_capacity > self.load.axial_force:
                 # print("BBB flange member check is satisfactory. Doing bolt checks")
                 self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if i >= self.section.web_thickness]
-                self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if i >= self.section.flange_thickness]
+                if self.preference == "Outside":
+                    self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if
+                                                            i >= self.section.flange_thickness]
+                else:
+                    self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if
+                                                            i >= (self.section.flange_thickness / 2)]
                 if len(self.flange_plate_thickness_possible) == 0 or self.web_plate_thickness_possible == 0:
                     logger.error(":Web Plate thickness should be greater than section  thicknesss.")
                 else:
 
-                    self.flange_plate.thickness_provided = self.min_thick_based_on_area(tk=self.section.flange_thickness,
+                    self.flange_plate.thickness_provided = self.min_thick_based_on_area(self,
+                                                                                        tk=self.section.flange_thickness,
                                                                                         width=self.section.flange_width,
                                                                                         list_of_pt_tk=self.flange_plate_thickness_possible,
                                                                                         t_w=self.section.web_thickness,
-                                                                                        r_1=self.section.root_radius, )
-                    self.web_plate.thickness_provided = self.min_thick_based_on_area(tk=self.section.web_thickness,
+                                                                                        r_1=self.section.root_radius,
+                                                                                        D=self.section.depth,
+                                                                                        preference=self.preference)
+                    self.web_plate.thickness_provided = self.min_thick_based_on_area(self,
+                                                                                     tk=self.section.web_thickness,
                                                                                      width=self.section.depth,
                                                                                      list_of_pt_tk=self.web_plate_thickness_possible,
                                                                                      t_w=self.section.web_thickness,
-                                                                                     r_1=self.section.root_radius, )
+                                                                                     r_1=self.section.root_radius,
+                                                                                     D=self.section.depth, )
 
-                    #self.section.tension_yielding_capacity = self.tension_yielding_capacity_flange
+                    # self.section.tension_yielding_capacity = self.tension_yielding_capacity_flange
                     print("tension__capacity of flange", self.section.tension_capacity_flange)
-                    self.design_status = True
             else:
                 self.design_status = False
                 logger.error(":tension capacity flange is less than applied loads, Please select larger sections or decrease loads")
@@ -839,7 +848,10 @@ class BeamCoverPlateWeld(MomentConnection):
     def web_plate_weld(self):
         self.min_web_platethk = min(self.web_plate.thickness_provided,self.section.web_thickness)
         self.web_weld.size =int(round_down(self.min_web_platethk- 1.5))
-
+        if self.web_weld.size >  self.min_web_platethk :
+            self.web_weld.size = self.min_web_platethk
+        else:
+            pass
 
         if self.web_weld.size < 3:
             self.web_weld.size = 3
@@ -851,6 +863,10 @@ class BeamCoverPlateWeld(MomentConnection):
             pass
         self.webspace = max(15, (self.web_weld.size + 5))
         print("space", self.webspace)
+
+        # self.design_status = False
+        #
+        # while self.design_status == False:
         self.web_weld.get_weld_strength(connecting_fu=[self.web_weld.fu,self.section.fu, self.web_plate.fu],
                                                                         weld_fabrication=KEY_DP_WELD_FAB_SHOP,
                                                                         t_weld=self.web_weld.size, weld_angle=90) # in N/mm
@@ -866,28 +882,31 @@ class BeamCoverPlateWeld(MomentConnection):
 
         while self.design_status == False:
 
-            d = self.available_long_web_length
-            b = self.web_plate.height -(2*self.web_weld.size)
-            cgy = d ** 2 / (2 * d + b)
-            cgx = b / 2
-            y_max =  (d ** 2 / (2 * d + b))
-            x_max = b /2
-            print("dfdbjfk",y_max, x_max)
-            self.ecc = d - (d ** 2 / (2 * d + b))
-            Ip_weld = ((8 * (d ** 3)) + (6 * d * (b ** 2)) + (b ** 3)) / 12 - ((d ** 4) / (2 * d + b)) #mm4
-            self.weld_twist = (self.load.shear_force *1000 * self.ecc) +(self.moment_web*1000000) #Nmm
-            # print("self.web_weld_length",self.web_weld_length )
-            self.l_req_weblength =round_up(((2* self.available_long_web_length) +self.web_plate.height + (2* self.web_weld.size)),5)
-            self.web_weld.get_weld_stress( weld_shear=self.load.shear_force *1000, weld_axial =self.axial_force_w ,
-                                                         weld_twist= self.weld_twist, Ip_weld= Ip_weld, y_max=y_max, x_max = x_max, l_weld=   self.l_req_weblength )
-
-            # if self.web_weld.strength > self.web_weld.stress:
+            self.weld_stress(self,d=self.available_long_web_length, b=(self.web_plate.height -(2*self.web_weld.size)),
+                             shear_force =self.load.shear_force , moment_web =self.moment_web, plate_height=self.web_plate.height,
+                             weld_size =self.web_weld.size, axial_force_w=self.axial_force_w )
+            print("web weld stress", self.web_weld.stress)
 
 
             if self.web_weld.strength > self.web_weld.stress :
                 break
             else:
                 self.available_long_web_length =  self.available_long_web_length + 50
+
+                self.web_plate.length = 2*(self.available_long_web_length +self.web_weld.size) + self.web_plate.gap
+                if self.web_plate.length >= 150 * self.web_weld.throat_tk:
+                    Reduction_factor =IS800_2007.cl_10_5_7_3_weld_long_joint(l_j =self.web_plate.length, t_t=self.web_weld.throat_tk)
+                    self.web_weld.strength = self.web_weld.strength * Reduction_factor
+                    self.weld_stress(self,d=self.available_long_web_length,
+                                     b=(self.web_plate.height - (2 * self.web_weld.size)),
+                                     shear_force=self.load.shear_force, moment_web=self.moment_web,
+                                     plate_height=self.web_plate.height, weld_size=self.web_weld.size,
+                                     axial_force_w=self.axial_force_w)
+                    if self.web_weld.strength > self.web_weld.stress:
+                        self.design_status = True
+                        break
+                    else:
+                        self.available_long_web_length = self.available_long_web_length + 50
 
 
         if  self.web_weld.strength   > self.web_weld.stress:
@@ -898,6 +917,7 @@ class BeamCoverPlateWeld(MomentConnection):
             self.section.depth - (2 * self.section.flange_thickness) - (2 * self.section.root_radius) - (2* self.webspace)),5)
             self.web_weld.height =round_down((self.web_plate.height - (2 * self.web_weld.size)),5)
             self.flange_plate_weld(self)
+            pass
 
         else:
             logger.error(
@@ -967,15 +987,31 @@ class BeamCoverPlateWeld(MomentConnection):
                 # if self.available_long_flange_length  >=  self.flange_plate.height:
                 self.l_req_flangelength = round_up((2* self.available_long_flange_length) +self.flange_plate.height + (2* self.flange_weld.size))
                 self.flange_weld.stress = self.flange_force/ self.l_req_flangelength
-                if self.flange_weld.stress < self.flange_weld.strength:
+                if self.flange_weld.strength > self.flange_weld.stress:
                     if self.available_long_flange_length > self.flange_plate.height:
                         self.design_status = True
                         break
+                    else:
+                        self.available_long_flange_length = self.available_long_flange_length + 50
+                else:
+                    self.available_long_flange_length = self.available_long_flange_length + 50
+                    self.flange_plate.length = 2 * (
+                                self.available_long_flange_length + self.flange_weld.size) + self.flange_plate.gap
+                    self.req_weld_length = round_up((2* self.available_long_flange_length) +self.flange_plate.height + (2* self.flange_weld.size))
+                    if self.flange_plate.length >= 150 * self.flange_weld.throat_tk:
+                        Reduction_factor =IS800_2007.cl_10_5_7_3_weld_long_joint(l_j =self.web_plate.length, t_t=self.web_weld.throat_tk)
+                        self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
+                        self.flange_weld.stress = self.flange_force/ self.req_weld_length
+                        if self.flange_weld.strength > self.flange_weld.stress:
+                            self.design_status = True
+                            break
+                        else:
+                            self.available_long_flange_length = self.available_long_flange_length + 50
 
                     else:
                         self.available_long_flange_length = int(self.available_long_flange_length + 50)
-                else:
-                    self.available_long_flange_length = int(self.available_long_flange_length + 50)
+                # else:
+                #     self.available_long_flange_length = int(self.available_long_flange_length + 50)
 
                 # else:
                      # self.available_long_flange_length = int(self.available_long_flange_length + 50)
@@ -1022,11 +1058,38 @@ class BeamCoverPlateWeld(MomentConnection):
                     if self.available_long_flange_length > self.flange_plate.height:
                         self.design_status = True
                         break
-
                     else:
                         self.available_long_flange_length = int(self.available_long_flange_length + 50)
                 else:
                     self.available_long_flange_length = int(self.available_long_flange_length + 50)
+
+                    self.flange_plate.length = 2 * (
+                            self.available_long_flange_length + self.flange_weld.size) + self.flange_plate.gap
+                    self.req_weld_length = round_up(
+                        (2 * self.available_long_flange_length) + self.flange_plate.height + (
+                                    2 * self.flange_weld.size))
+                    if self.flange_plate.length >= 150 * self.flange_weld.throat_tk:
+                        Reduction_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.web_plate.length,
+                                                                                  t_t=self.web_weld.throat_tk)
+                        self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
+                        self.flange_weld.stress = self.flange_force / self.req_weld_length
+                        if self.flange_weld.strength > self.flange_weld.stress:
+                            self.design_status = True
+                            break
+                        else:
+                            self.available_long_flange_length = self.available_long_flange_length + 50
+
+                    else:
+                        self.available_long_flange_length = int(self.available_long_flange_length + 50)
+                # else:
+
+
+
+
+
+
+                # else:
+                #     self.available_long_flange_length = int(self.available_long_flange_length + 50)
 
                 # self.web_plate_weld(self)
 
@@ -1064,8 +1127,8 @@ class BeamCoverPlateWeld(MomentConnection):
 
                         self.l_req_innerflangelength = (2 * self.available_long_innerflange_length) + self.flange_plate.Innerheight + (
                                                                2 * self.flange_weld.size)
-                        self.flange_weld.stress = self.flange_force / self.l_req_innerflangelength
-                        if self.flange_weld.stress < self.flange_weld.strength:
+                        self.flange_weld.Innerstress = self.flange_force / self.l_req_innerflangelength
+                        if self.flange_weld.Innerstress < self.flange_weld.strength:
                             if self.available_long_innerflange_length > self.flange_plate.Innerheight:
                                 self.design_status = True
                                 break
@@ -1075,6 +1138,24 @@ class BeamCoverPlateWeld(MomentConnection):
                                     self.available_long_innerflange_length + 50)
                         else:
                             self.available_long_innerflange_length = int(self.available_long_innerflange_length + 50)
+                            self.flange_plate.Innerlength = 2 * (
+                                    self.available_long_innerflange_length + self.flange_weld.size) + self.flange_plate.gap
+                            self.req_weld_length = round_up(
+                                (2 * self.available_long_innerflange_length) + self.flange_plate.height + (
+                                        2 * self.flange_weld.size))
+                            if self.flange_plate.Innerlength >= 150 * self.flange_weld.throat_tk:
+                                Reduction_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.flange_plate.Innerlength,
+                                                                                          t_t=self.flange_weld.throat_tk)
+                                self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
+                                self.flange_weld.Innerstress = self.flange_force / self.req_weld_length
+                                if self.flange_weld.strength > self.flange_weld.Innerstress:
+                                    self.design_status = True
+                                    break
+                                else:
+                                    self.available_long_flange_length = self.available_long_flange_length + 50
+
+                            else:
+                                self.available_long_flange_length = int(self.available_long_flange_length + 50)
 
 
 
@@ -1153,12 +1234,12 @@ class BeamCoverPlateWeld(MomentConnection):
     def web_plate_capacity_axial(self):
 
         A_v_web = 2 * self.web_plate.height * self.web_plate.thickness_provided
-        self.web_plate.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
+        self.web_plate.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
             A_v=A_v_web, fy=self.web_plate.fy)
-        self.web_plate.tension_rupture_capacity_web = self.tension_member_design_due_to_rupture_of_critical_section(
+        self.web_plate.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
             A_vn=A_v_web, fu=self.web_plate.fu)
-        self.web_plate.tension_capacity_web_plate = min( self.web_plate.tension_yielding_capacity_web,
-                                                              self.web_plate.tension_rupture_capacity_web )
+        self.web_plate.tension_capacity_web_plate = min( self.web_plate.tension_yielding_capacity,
+                                                              self.web_plate.tension_rupture_capacity )
         if self.web_plate.tension_capacity_web_plate < self.axial_force_w:
             self.design_status = False
             logger.error(
@@ -1502,27 +1583,74 @@ class BeamCoverPlateWeld(MomentConnection):
         print("class_of_section1", class_of_section1)
 
 
-    @staticmethod
-    def min_thick_based_on_area(tk, width, list_of_pt_tk, t_w, r_1,
-                                preference=None):  # area of flange plate should be greater than 1.05 times area of flange
+
+    def min_thick_based_on_area(self, tk, width, list_of_pt_tk, t_w, r_1,D,
+                                preference =None):  # area of flange plate should be greater than 1.05 times area of flange
+        # 20 is the maximum spacing either side of the plate
         flange_crs_sec_area = tk * width
+        self.design_status = True
         for y in list_of_pt_tk:
-            if preference == "Outside+Inside":
+            if preference == "Outside":
+                outerwidth = width - (2 * 20)
+                flange_plate_crs_sec_area = y * outerwidth
+            elif preference == "Outside + Inside":
+                outerwidth = width - (2 * 20)
+                innerwidth = (width - t_w - (2 * r_1) - (4 * 20)) / 2
+                if innerwidth < 50:
+                    logger.error(":Inner Plate not possible")
+                    self.design_status = False
+                else:
+                    pass
 
-                flange_plate_crs_sec_area = (2 * width - t_w - (2 * r_1)) * y
+                flange_plate_crs_sec_area = (outerwidth + (2*innerwidth)) * y
             else:
-                flange_plate_crs_sec_area = y * width
-
-            if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                webwidth = D - (2*tk) -(2*r_1) -(2*20)
+                flange_plate_crs_sec_area = (2*webwidth) * y
+            if  flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
                 thickness = y
                 break
             else:
-                pass
+                self.design_status = False
 
         return thickness
 
+    def weld_stress(self, d, b, shear_force, moment_web, plate_height, weld_size, axial_force_w):
+        # while calling take the shearforce in KN and moment KNM and axial foce in N
+        # d = self.available_long_web_length
+        # b = self.web_plate.height - (2 * self.web_weld.size)
+        # self.design_status = False
+        #
+        # while self.design_status == False:
+        cgy = d ** 2 / (2 * d + b)
+        cgx = b / 2
+        y_max = (d ** 2 / (2 * d + b))
+        x_max = b / 2
+        print("dfdbjfk", y_max, x_max)
+        ecc = d - (d ** 2 / (2 * d + b))
+        Ip_weld = ((8 * (d ** 3)) + (6 * d * (b ** 2)) + (b ** 3)) / 12 - ((d ** 4) / (2 * d + b))  # mm4
+        weld_twist = (shear_force * 1000 * ecc) + (moment_web * 1000000)  # Nmm
+        # print("self.web_weld_length",self.web_weld_length )
+        self.l_req_weblength = round_up(
+            ((2 * d) + plate_height + (2 * weld_size)), 50)
+        self.web_weld.get_weld_stress(weld_shear=shear_force * 1000, weld_axial=axial_force_w,
+                                      weld_twist=weld_twist, Ip_weld=Ip_weld, y_max=y_max, x_max=x_max,
+                                      l_weld=self.l_req_weblength)
 
-#
+
+            # if self.web_weld.stress  > self.web_weld.strength
+    #
+    # def long_Joint(self,l_req_weblength,d,plate_height,weld_size,gap,throat_tk,strength): #length of joint l_j= length of plate
+    #      # d = self.available_long_web_length
+    #     plate_length = (2*(d+ weld_size)) + gap
+    #
+    #     reduction_factor =  1.2 - ((0.2 *plate_length)/(150*throat_tk))
+    #     while plate_length > 150 * self.web_weld.throat_tk:
+    #         strength = strength * reduction_factor
+    #         req_length =
+
+
+
+
 
     def call_3DModel(self,ui,bgcolor):
         # Call to calculate/create the BB Cover Plate Bolted CAD model

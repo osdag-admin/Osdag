@@ -680,7 +680,9 @@ class IS800_2007(object):
             K = float(K)
         except ValueError:
             return
+
         throat = max((K * fillet_size),3)
+
 
         return throat
 

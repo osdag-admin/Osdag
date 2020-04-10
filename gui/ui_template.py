@@ -20,6 +20,7 @@ from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
 from design_type.connection.column_cover_plate import ColumnCoverPlate
+from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from PyQt5.QtGui import QStandardItem
 import os
 import yaml
@@ -57,6 +58,7 @@ from OCC.Core import IGESControl
 from cad.cad3dconnection import cadconnection
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.column_cover_plate import ColumnCoverPlate
+from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
 from design_type.connection.end_plate_connection import EndPlateConnection
@@ -1100,7 +1102,7 @@ class Ui_ModuleWindow(QMainWindow):
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
             add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
-        elif module == KEY_DISP_COLUMNCOVERPLATE:
+        elif module == KEY_DISP_COLUMNCOVERPLATE and module == KEY_DISP_COLUMNCOVERPLATEWELD:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
 
@@ -1233,10 +1235,10 @@ class Ui_ModuleWindow(QMainWindow):
         display = self.modelTab._display
 
         # background gradient
-        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
         # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
         # display.display_trihedron()
-        display.display_trihedron()
+        display.display_triedron()
         display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):

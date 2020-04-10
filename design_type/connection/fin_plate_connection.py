@@ -818,6 +818,11 @@ class FinPlateConnection(ShearConnection):
 
         self.bolt.calculate_bolt_spacing_limits(self.bolt.bolt_diameter_provided,conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
         self.bolt.calculate_bolt_capacity(self.bolt.bolt_diameter_provided,self.bolt.bolt_grade_provided,conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,n_planes=1)
+        self.plate.get_gauge_edge_dist(web_plate_h=self.plate.height, bolts_one_line=self.plate.bolts_one_line,edge_dist=self.plate.edge_dist_provided,
+                                       max_spacing=self.bolt.max_spacing,max_edge_dist=self.bolt.max_edge_dist)
+        self.plate.get_bolt_red(bolts_one_line = self.plate.bolts_one_line,gauge=self.plate.gauge_provided,bolts_line=self.plate.bolt_line,
+                                pitch=self.plate.gauge_provided,bolt_capacity=self.bolt.bolt_capacity,bolt_dia=self.bolt.bolt_diameter_provided)
+
         self.get_design_status(self)
         print("--- %s seconds ---" % (time.time() - self.start_time))
 

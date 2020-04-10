@@ -91,8 +91,23 @@ def connectdb1():
     l2 = tuple_to_str_popup(lst)
     return l2
 
+def connectdb2():
+    """
+    Function to fetch diameter values from Bolt Table
+     """
+    # @author: Amir
 
-def connectdb(table_name,call_type="dropdown"):
+    lst = []
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+    cursor = conn.execute("SELECT Diameter FROM Anchor_Bolt")
+    rows = cursor.fetchall()
+    for row in rows:
+        lst.append(row)
+    l2 = tuple_to_str_popup(lst)
+    return l2
+
+
+def connectdb(table_name, call_type="dropdown"):
 
     """
         Function to fetch designation values from respective Tables.
@@ -314,7 +329,10 @@ VALUES_CONN_2 = ['Beam-Beam']
 ## Column End Plate ##
 VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
 ####
-VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Base Plate with Cleat Angles', 'Hollow Sections']
+
+
+VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
+
 
 
 KEY_LOCATION = 'Conn_Location'
@@ -365,15 +383,24 @@ DISP_TITLE_FSL = 'Factored load'
 # Key for Storing Moment sub-key of Load
 KEY_MOMENT = 'Load.Moment'
 KEY_DISP_MOMENT = 'Moment(kNm)*'
-DISP_TITLE_MOMENT = 'Moment load'
 KEY_MOMENT_MAJOR = 'Load.Moment.Major'
-KEY_DISP_MOMENT_MAJOR = 'Major axis (M<sub>z-z</sub>)'
+KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_MOMENT_MINOR = 'Load.Moment.Minor'
-KEY_DISP_MOMENT_MINOR = 'Minor axis (M<sub>y-y</sub>)'
+KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
 KEY_DIA_ANCHOR = 'Anchor Bolt.Diameter'
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
 VALUES_DIA_ANCHOR = ['All', 'Customized']
+KEY_TYP_ANCHOR = 'Anchor Bolt.Type'
+KEY_DISP_TYP_ANCHOR = 'Type*'
+VALUES_TYP_ANCHOR = ['Select Type', 'IS 5624-Type A', 'IS 5624-Type B', 'End Plate Type']
+KEY_GRD_ANCHOR = 'Anchor Bolt.Grade'
+KEY_DISP_GRD_ANCHOR = 'Grade*'
+VALUES_GRD_ANCHOR = ['All', 'Customized']
+DISP_TITLE_FOOTING = 'Pedestal/Footing'
+KEY_GRD_FOOTING = 'Footing.Grade'
+KEY_DISP_GRD_FOOTING = 'Grade*'
+VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 
 ###################################
 # Key for Storing Shear sub-key of Load
@@ -562,8 +589,8 @@ KEY_INNERFLANGE_WELD_DETAILS = "Inner Flange detail"
 KEY_DISP_INNERFLANGE_WELD_DETAILS = "Weld Details"
 
 KEY_WELD_TYPE = 'Weld.Type'
-KEY_DISP_WELD_TYPE ='Weld Type'
-VALUES_WELD_TYPE = ["select type","Fillet Weld"]
+KEY_DISP_WELD_TYPE = 'Type'
+VALUES_WELD_TYPE = ["Select type", "Fillet Weld", "Butt Weld"]
 DISP_FLANGE_TITLE_WELD = 'Flange Weld'
 KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
 KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size(mm)'
@@ -669,6 +696,22 @@ VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZ
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
 
 
+KEY_DP_ANCHOR_BOLT_DESIGNATION = 'DesignPreferences.Anchor_Bolt.Designation'
+KEY_DP_ANCHOR_BOLT_TYPE = 'DesignPreferences.Anchor_Bolt.Type'
+KEY_DISP_DP_ANCHOR_BOLT_TYPE = 'Anchor Bolt type'
+KEY_DP_ANCHOR_BOLT_HOLE_TYPE = 'DesignPreferences.Anchor_Bolt.Bolt_Hole_Type'
+KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE = 'Anchor Bolt hole type'
+KEY_DP_ANCHOR_BOLT_MATERIAL_G_O = 'DesignPreferences.Anchor_Bolt.Material_Grade_OverWrite'
+KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
+KEY_DISP_DP_ANCHOR_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
+KEY_DP_ANCHOR_BOLT_SLIP_FACTOR = 'DesignPreferences.Anchor_Bolt.Slip_Factor'
+KEY_DISP_DP_ANCHOR_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
+KEY_DP_ANCHOR_BOLT_GALVANIZED = 'DesignPreferences.Anchor_Bolt.Galvanized'
+KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED = 'Is galvanized?'
+KEY_DP_ANCHOR_BOLT_LENGTH = 'DesignPreferences.Anchor_Bolt.Length'
+KEY_DISP_DP_ANCHOR_BOLT_LENGTH = 'Length'
+KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficient'
+KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction coefficient between <br>concrete and anchor bolt'
 
 
 KEY_DP_BOLT_TYPE = 'DesignPreferences.Bolt.Type'
@@ -699,6 +742,8 @@ KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'DesignPreferences.Detailing.Corrosive_I
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the members exposed to <br>corrosive influences'
 KEY_DP_DESIGN_METHOD = 'DesignPreferences.Design.Design_Method'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
+KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
+KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate'
 
 KEY_SUPTNGSEC_DESIGNATION = 'Supporting_Section.Designation'
 KEY_DISP_SUPTNGSEC_DESIGNATION = 'Designation'
@@ -816,6 +861,14 @@ KEY_SUPTDSEC_POISSON_RATIO = 'Supported_Section.Poisson_Ratio'
 KEY_DISP_SUPTDSEC_POISSON_RATIO = 'Poissons ratio, v'
 KEY_SUPTDSEC_THERMAL_EXP = 'Supported_Section.Thermal_Expansion'
 KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
+
+
+KEY_BASE_PLATE_MATERIAL = 'Base_Plate.Material'
+KEY_BASE_PLATE_FU = 'Base_Plate.Fu'
+KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
+KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , fy (MPa)'
+KEY_BASE_PLATE_FY = 'Base_Plate.Fy'
+
 
 
 
@@ -1038,8 +1091,8 @@ KEY_END2 = 'End_2'
 KEY_DISP_END2 = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
 
-
-
+KEY_END_CONDITION = 'ENd Condition'
+KEY_DISP_END_CONDITION = 'End Cndition'
 
 DISP_TITLE_CLEAT = 'Cleat Angle'
 DISP_TITLE_ANGLE = 'Angle Section'

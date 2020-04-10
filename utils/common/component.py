@@ -1,4 +1,4 @@
-from utils.common.is800_2007 import IS800_2007
+from utils.common.is800_2007 import IS800_2007, KEY_DP_WELD_FAB_SHOP
 from utils.common.material import *
 from utils.common.other_standards import *
 from Common import *
@@ -227,7 +227,7 @@ class Section(Material):
         self.notch_ht = 0.0
 
         self.mass = 0.0
-        self.area  = 0.0
+        self.area = 0.0
         self.depth = 0.0
         self.flange_width = 0.0
         self.web_thickness = 0.0
@@ -631,7 +631,7 @@ class Weld(Material):
         self.Innerstress = 0.0
 
         self.fabrication = fabrication
-        self.fu= float(material_g_o)
+        self.fu = float(material_g_o)
 
         self.throat_tk =0.0
 
@@ -1009,7 +1009,7 @@ class Plate(Material):
                                                       gauge, bolt_line, pitch, bolt_capacity,
                                                       bolt_dia)
 
-            while bolt_line <= bolt_line_limit and vres > bolt_capacity_red and web_plate_h <= web_plate_h_max:
+            while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
 
                 print(3, vres, bolt_capacity_red)
 

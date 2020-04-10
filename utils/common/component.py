@@ -1009,7 +1009,7 @@ class Plate(Material):
                                                       gauge, bolt_line, pitch, bolt_capacity,
                                                       bolt_dia)
 
-            while bolt_line <= bolt_line_limit and vres > bolt_capacity_red and web_plate_h <= web_plate_h_max:
+            while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
 
                 print(3, vres, bolt_capacity_red)
 

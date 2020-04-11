@@ -1041,6 +1041,11 @@ class Plate(Material):
                                                                                max_edge_dist)
                     print("g,e,h ", gauge, edge_dist, web_plate_h)
 
+                if bolt_line == 1:
+                    pitch = 0.0
+                else:
+                    pitch = min_gauge
+
                 if shear_ecc is True:
                     # If check for shear eccentricity is true, resultant force in bolt is calculated
                     ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap

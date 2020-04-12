@@ -184,6 +184,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gamma_mb = 0.0
         self.gamma_mw = 0.0
 
+        self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
         self.column_D = 0.0
         self.column_bf = 0.0
         self.column_tf = 0.0
@@ -831,8 +832,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.dp_bp_method = str(design_dictionary[KEY_DP_DESIGN_BASE_PLATE])
 
         # properties of the column section
-        self.column_properties = Column(designation=self.column_section, material_grade=self.dp_column_material)
 
+        self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
         self.column_D = self.column_properties.depth
         self.column_bf = self.column_properties.flange_width
         self.column_tf = self.column_properties.flange_thickness
@@ -848,9 +849,33 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.safe = True
 
+        self.bp_detailing(self)
         self.design_pinned_bp_welded(self)
         self.bolt_design_detailing(self)
         self.design_detail_bp(self)
+
+    def bp_detailing(self):
+        """ initialize basic detailing parameters like the end/edge/pitch/gauge distances, minimum projection from the column
+        flange, length and width of the base plate. These parameters shall be used for the first iteration of the analyses.
+
+        Args:
+
+        Returns:
+        """
+        # assign anchor bolt diameter [Reference: based on design experience, field conditions  and sample calculations]
+        # the following diameters are neglected due its practical non acceptance/unavailability - 'M8', 'M10', 'M12', 'M16'
+
+        sort_bolt = filter(lambda x: 'M20' <= x <= self.anchor_dia[-1], self.anchor_dia)
+
+        for i in sort_bolt:
+            self.anchor_dia_provided = i  # anchor dia provided (str)
+            break
+
+        self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # list of areas [shank area, thread area] (mm^2)
+
+        # TODO add condition for number of anchor bolts depending on col depth and force
+        # number of anchor bolts
+        self.anchor_nos_provided = 4
 
     def design_pinned_bp_welded(self):
         """ design pinned base plate (welded connection)
@@ -892,22 +917,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         Returns:
         """
-        # design/assigning of anchor bolt diameter [Reference: based on design experience, field conditions  and sample calculations]
-        # the following diameters are neglected due its practical non acceptance/unavailability - 'M8', 'M10', 'M12', 'M16'
-        # TODO: add condition for assigning anchor dia for other types of bp
-
-        sort_bolt = filter(lambda x: 'M20' <= x <= self.anchor_dia[-1], self.anchor_dia)
-
-        for i in sort_bolt:
-            self.anchor_dia_provided = i  # anchor dia provided
-            break
-
-        self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])
-
-        # TODO add condition for number of anchor bolts depending on col depth and force
-        # number of anchor bolts
-        self.anchor_nos_provided = 4
-
         # hole diameter
         self.anchor_hole_dia = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided, self.dp_anchor_hole)  # mm
 

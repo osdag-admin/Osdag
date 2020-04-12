@@ -425,7 +425,7 @@ class FinPlateConnection(ShearConnection):
             flag = True
 
         if flag and flag1 and flag2:
-            self.set_input_values(self, design_dictionary, window)
+            self.set_input_values(self, design_dictionary)
         else:
             pass
 
@@ -444,7 +444,7 @@ class FinPlateConnection(ShearConnection):
             logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
-    def set_input_values(self, design_dictionary, window):
+    def set_input_values(self, design_dictionary):
 
         print(design_dictionary)
 
@@ -460,10 +460,10 @@ class FinPlateConnection(ShearConnection):
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
-        if self.design_status:
-            self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
-            status = self.design_status
-            self.commLogicObj.call_3DModel(status, FinPlateConnection)
+        # if self.design_status:
+        #     self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
+        #     status = self.design_status
+        #     self.commLogicObj.call_3DModel(status, FinPlateConnection)
 
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)
@@ -818,6 +818,11 @@ class FinPlateConnection(ShearConnection):
 
         self.bolt.calculate_bolt_spacing_limits(self.bolt.bolt_diameter_provided,conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
         self.bolt.calculate_bolt_capacity(self.bolt.bolt_diameter_provided,self.bolt.bolt_grade_provided,conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,n_planes=1)
+        self.plate.get_gauge_edge_dist(web_plate_h=self.plate.height, bolts_one_line=self.plate.bolts_one_line,edge_dist=self.plate.edge_dist_provided,
+                                       max_spacing=self.bolt.max_spacing,max_edge_dist=self.bolt.max_edge_dist)
+        self.plate.get_bolt_red(bolts_one_line = self.plate.bolts_one_line,gauge=self.plate.gauge_provided,bolts_line=self.plate.bolt_line,
+                                pitch=self.plate.gauge_provided,bolt_capacity=self.bolt.bolt_capacity,bolt_dia=self.bolt.bolt_diameter_provided)
+
         self.get_design_status(self)
         print("--- %s seconds ---" % (time.time() - self.start_time))
 
@@ -1031,100 +1036,102 @@ class FinPlateConnection(ShearConnection):
         print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         CreateLatex.save_latex(CreateLatex(), self.report_result, self.report_input, self.report_check,
                                self.report_supporting,
+
                                self.report_supported, popup_summary, fname_no_ext, ' ', rel_path, Disp_3D_image)
 
-    def select_workspace_folder(self):
-        # This function prompts the user to select the workspace folder and returns the name of the workspace folder
-        config = configparser.ConfigParser()
-        config.read_file(open(r'Osdag.config'))
-        desktop_path = config.get("desktop_path", "path1")
-        folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
-                                                  desktop_path)
-        return folder
+    # def select_workspace_folder(self):
+    #     # This function prompts the user to select the workspace folder and returns the name of the workspace folder
+    #     config = configparser.ConfigParser()
+    #     config.read_file(open(r'Osdag.config'))
+    #     desktop_path = config.get("desktop_path", "path1")
+    #     folder = QFileDialog.getExistingDirectory(None, "Select Workspace Folder (Don't use spaces in the folder name)",
+    #                                               desktop_path)
+    #     return folder
+    #
 
-    def call_3DModel(self, ui, bgcolor):
-        '''
-        This routine responsible for displaying 3D Cad model
-        :param flag: boolean
-        :return:
-        '''
-        if ui.btn3D.isChecked:
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
-            ui.chkBxFinplate.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Model", bgcolor)
+    # def call_3DModel(self, ui, bgcolor):
+    #     '''
+    #     This routine responsible for displaying 3D Cad model
+    #     :param flag: boolean
+    #     :return:
+    #     '''
+    #     if ui.btn3D.isChecked:
+    #         ui.chkBxCol.setChecked(Qt.Unchecked)
+    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #     ui.commLogicObj.display_3DModel("Model", bgcolor)
+    #
+    # def call_3DBeam(self, ui, bgcolor):
+    #     '''
+    #     Creating and displaying 3D Beam
+    #     '''
+    #     ui.chkBxBeam.setChecked(Qt.Checked)
+    #     if ui.chkBxBeam.isChecked():
+    #         ui.chkBxCol.setChecked(Qt.Unchecked)
+    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #         ui.btn3D.setChecked(Qt.Unchecked)
+    #         ui.mytabWidget.setCurrentIndex(0)
+    #
+    #     ui.commLogicObj.display_3DModel("Beam", bgcolor)
+    #
+    # def call_3DColumn(self, ui, bgcolor):
+    #     '''
+    #     '''
+    #     ui.chkBxCol.setChecked(Qt.Checked)
+    #     if ui.chkBxCol.isChecked():
+    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #         ui.btn3D.setChecked(Qt.Unchecked)
+    #         ui.mytabWidget.setCurrentIndex(0)
+    #     ui.commLogicObj.display_3DModel("Column", bgcolor)
+    #
+    # def call_3DFinplate(self, ui, bgcolor):
+    #     '''
+    #     Displaying FinPlate in 3D
+    #     '''
+    #     ui.chkBxFinplate.setChecked(Qt.Checked)
+    #     if ui.chkBxFinplate.isChecked():
+    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #         ui.chkBxCol.setChecked(Qt.Unchecked)
+    #         ui.mytabWidget.setCurrentIndex(0)
+    #         ui.btn3D.setChecked(Qt.Unchecked)
+    #
+    #     ui.commLogicObj.display_3DModel("Plate", bgcolor)
 
-    def call_3DBeam(self, ui, bgcolor):
-        '''
-        Creating and displaying 3D Beam
-        '''
-        ui.chkBxBeam.setChecked(Qt.Checked)
-        if ui.chkBxBeam.isChecked():
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.chkBxFinplate.setChecked(Qt.Unchecked)
-            ui.btn3D.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-
-        ui.commLogicObj.display_3DModel("Beam", bgcolor)
-
-    def call_3DColumn(self, ui, bgcolor):
-        '''
-        '''
-        ui.chkBxCol.setChecked(Qt.Checked)
-        if ui.chkBxCol.isChecked():
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
-            ui.chkBxFinplate.setChecked(Qt.Unchecked)
-            ui.btn3D.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-        ui.commLogicObj.display_3DModel("Column", bgcolor)
-
-    def call_3DFinplate(self, ui, bgcolor):
-        '''
-        Displaying FinPlate in 3D
-        '''
-        ui.chkBxFinplate.setChecked(Qt.Checked)
-        if ui.chkBxFinplate.isChecked():
-            ui.chkBxBeam.setChecked(Qt.Unchecked)
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-            ui.btn3D.setChecked(Qt.Unchecked)
-
-        ui.commLogicObj.display_3DModel("Plate", bgcolor)
-
-    def unchecked_allChkBox(self, ui):
-        '''
-        This routine is responsible for unchecking all checkboxes in GUI
-        '''
-
-        ui.btn3D.setChecked(Qt.Unchecked)
-        ui.chkBxBeam.setChecked(Qt.Unchecked)
-        ui.chkBxCol.setChecked(Qt.Unchecked)
-        ui.chkBxFinplate.setChecked(Qt.Unchecked)
-
-    def showColorDialog(self, ui):
-
-        col = QColorDialog.getColor()
-        colorTup = col.getRgb()
-        r = colorTup[0]
-        g = colorTup[1]
-        b = colorTup[2]
-        ui.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
-
-    def generate_3D_Cad_image(self, ui, folder):
-
-        # folder = self.select_workspace_folder(self)
-
-        # status = self.resultObj['Bolt']['status']
-        if self.design_status is True:
-            self.call_3DModel(self, ui, "gradient_bg")
-            data = os.path.join(str(folder), "images_html", "3D_Model.png")
-            ui.display.ExportToImage(data)
-            ui.display.FitAll()
-        else:
-            pass
-
-        return data
-
+    #
+    # def unchecked_allChkBox(self, ui):
+    #     '''
+    #     This routine is responsible for unchecking all checkboxes in GUI
+    #     '''
+    #
+    #     ui.btn3D.setChecked(Qt.Unchecked)
+    #     ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #     ui.chkBxCol.setChecked(Qt.Unchecked)
+    #     ui.chkBxFinplate.setChecked(Qt.Unchecked)
+    #
+    # def showColorDialog(self, ui):
+    #
+    #     col = QColorDialog.getColor()
+    #     colorTup = col.getRgb()
+    #     r = colorTup[0]
+    #     g = colorTup[1]
+    #     b = colorTup[2]
+    #     ui.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
+    #
+    # def generate_3D_Cad_image(self, ui, folder):
+    #
+    #     # folder = self.select_workspace_folder(self)
+    #
+    #     # status = self.resultObj['Bolt']['status']
+    #     if self.design_status is True:
+    #         self.call_3DModel(self, ui, "gradient_bg")
+    #         data = os.path.join(str(folder), "images_html", "3D_Model.png")
+    #         ui.display.ExportToImage(data)
+    #         ui.display.FitAll()
+    #     else:
+    #         pass
+    #
+    #     return data
 
 
 # For Command Line

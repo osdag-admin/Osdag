@@ -20,6 +20,7 @@ from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
 from design_type.connection.column_cover_plate import ColumnCoverPlate
+from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from PyQt5.QtGui import QStandardItem
 import os
 import yaml
@@ -57,6 +58,7 @@ from OCC.Core import IGESControl
 from cad.cad3dconnection import cadconnection
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.column_cover_plate import ColumnCoverPlate
+from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
 from design_type.connection.end_plate_connection import EndPlateConnection
@@ -1168,10 +1170,11 @@ class Ui_ModuleWindow(QMainWindow):
             beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
             add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
-        elif module == KEY_DISP_COLUMNCOVERPLATE:
+        elif module == KEY_DISP_COLUMNCOVERPLATE and module == KEY_DISP_COLUMNCOVERPLATEWELD:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
-        elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
+
+        elif module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD:
             section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
             add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
 
@@ -1238,18 +1241,26 @@ class Ui_ModuleWindow(QMainWindow):
         # self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
         # self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
         # self.btn_Design.clicked.connect(self.osdag_header)
-        self.actionShow_beam.triggered.connect(lambda: main.call_3DBeam(self,"gradient_bg"))
-        self.actionShow_column.triggered.connect(lambda: main.call_3DColumn(self,"gradient_bg"))
-        self.actionShow_finplate.triggered.connect(lambda: main.call_3DFinplate(self,"gradient_bg"))
-        self.actionShow_all.triggered.connect(lambda: main.call_3DModel(self,"gradient_bg"))
-        self.actionChange_background.triggered.connect(lambda: main.showColorDialog(self))
+        self.actionShow_beam.triggered.connect(lambda: self.call_3DBeam(self, main, "gradient_bg"))
+        self.actionShow_column.triggered.connect(lambda: self.call_3DColumn(self, main, "gradient_bg"))
+        self.actionShow_finplate.triggered.connect(lambda: self.call_3DFinplate(self, main, "gradient_bg"))
+        self.actionShow_all.triggered.connect(lambda: self.call_3DModel(self, main, "gradient_bg"))
+        self.actionChange_background.triggered.connect(lambda: self.showColorDialog(self))
         self.actionSave_3D_model.triggered.connect(self.save3DcadImages)
-        self.btn3D.clicked.connect(lambda: main.call_3DModel(main,self,"gradient_bg"))
-        self.chkBxBeam.clicked.connect(lambda: main.call_3DBeam(main, self,"gradient_bg"))
-        self.chkBxCol.clicked.connect(lambda: main.call_3DColumn(main,self,"gradient_bg"))
-        self.chkBxFinplate.clicked.connect(lambda: main.call_3DFinplate(main, self,"gradient_bg"))
+        self.btn3D.clicked.connect(lambda: self.call_3DModel(self, main, "gradient_bg"))
+        self.chkBxBeam.clicked.connect(lambda: self.call_3DBeam(self, main, "gradient_bg"))
+        self.chkBxCol.clicked.connect(lambda: self.call_3DColumn(self, main, "gradient_bg"))
+        self.chkBxFinplate.clicked.connect(lambda: self.call_3DFinplate(self, main, "gradient_bg"))
         self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
+
+        if main.module_name(main) == KEY_DISP_FINPLATE:
+            self.chkBxFinplate.setText("Finplate")
+            self.actionShow_finplate.setText("Show Finplate")
+        elif main.module_name(main) == KEY_DISP_CLEATANGLE:
+            self.chkBxFinplate.setText("CleatAngle")
+            self.actionShow_finplate.setText("Show CleatAngle")
+
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -1796,12 +1807,17 @@ class Ui_ModuleWindow(QMainWindow):
             # if status is True and main.module == "Fin Plate":
             #     self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
             #                                                  main.module)
-
+            if self.design_inputs[KEY_MODULE] == KEY_DISP_FINPLATE:
+                module_class = FinPlateConnection
+            elif self.design_inputs[KEY_MODULE] == KEY_DISP_CLEATANGLE:
+                module_class = CleatAngleConnection
+            elif self.design_inputs[KEY_MODULE] == KEY_DISP_BEAMCOVERPLATE:
+                module_class = BeamCoverPlate
 
             if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_COLUMNCOVERPLATE or main.module == KEY_DISP_CLEATANGLE):
-                # self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
-                # status = main.design_status
-                # self.commLogicObj.call_3DModel(status, CleatAngleConnection)
+                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
+                status = main.design_status
+                self.commLogicObj.call_3DModel(status, module_class)
                 # self.callFin2D_Drawing("All")
                 self.btn3D.setEnabled(True)
                 self.chkBxBeam.setEnabled(True)
@@ -2148,6 +2164,68 @@ class Ui_ModuleWindow(QMainWindow):
         self.actio_load_input.setText(_translate("MainWindow", "Load input"))
         self.actio_load_input.setShortcut(_translate("MainWindow", "Ctrl+L"))
         print("Done")
+
+
+    def call_3DModel(self, ui, main, bgcolor):
+        '''
+        This routine responsible for displaying 3D Cad model
+        :param flag: boolean
+        :return:
+        '''
+        if ui.btn3D.isChecked:
+            ui.chkBxCol.setChecked(Qt.Unchecked)
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxFinplate.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Model", bgcolor)
+
+    def call_3DBeam(self, ui, main, bgcolor):
+        '''
+        Creating and displaying 3D Beam
+        '''
+        ui.chkBxBeam.setChecked(Qt.Checked)
+        if ui.chkBxBeam.isChecked():
+            ui.chkBxCol.setChecked(Qt.Unchecked)
+            ui.chkBxFinplate.setChecked(Qt.Unchecked)
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+
+        ui.commLogicObj.display_3DModel("Beam", bgcolor)
+
+    def call_3DColumn(self, ui, main, bgcolor):
+        '''
+        '''
+        ui.chkBxCol.setChecked(Qt.Checked)
+        if ui.chkBxCol.isChecked():
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxFinplate.setChecked(Qt.Unchecked)
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+        ui.commLogicObj.display_3DModel("Column", bgcolor)
+
+    def call_3DFinplate(self, ui, main, bgcolor):
+        '''
+        Displaying FinPlate in 3D
+        '''
+        ui.chkBxFinplate.setChecked(Qt.Checked)
+        if ui.chkBxFinplate.isChecked():
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxCol.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+            ui.btn3D.setChecked(Qt.Unchecked)
+        if main.module_name(main) == KEY_DISP_FINPLATE:
+            ui.commLogicObj.display_3DModel("Plate", bgcolor)
+        elif main.module_name(main) == KEY_DISP_CLEATANGLE:
+            ui.commLogicObj.display_3DModel("cleatAngle", bgcolor)
+
+
+    def showColorDialog(self, ui):
+
+        col = QColorDialog.getColor()
+        colorTup = col.getRgb()
+        r = colorTup[0]
+        g = colorTup[1]
+        b = colorTup[2]
+        ui.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
 
 # Function for hiding and showing input and output dock
 

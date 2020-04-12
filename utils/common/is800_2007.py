@@ -519,7 +519,7 @@ self
             gamma_mf = 1.25
         if bolt_hole_type == 'Standard':
             K_h = 1.0
-        elif bolt_hole_type == 'Over-sized' or 'short_slot' or 'long_slot':
+        elif bolt_hole_type == 'Over-sized' or bolt_hole_type == 'short_slot' or bolt_hole_type == 'long_slot':
             K_h = 0.85
         else:
             # TODO : long_slot bolt loaded parallel to slot is given in else
@@ -715,7 +715,11 @@ self
             K = float(K)
         except ValueError:
             return
-        return K * fillet_size
+
+        throat = max((K * fillet_size),3)
+
+
+        return throat
 
     @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):

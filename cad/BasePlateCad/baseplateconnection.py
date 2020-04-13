@@ -13,7 +13,7 @@ import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 class BasePlateCad(object):
-    def __init__(self, column, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb):
+    def __init__(self, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb, concrete):
 
         """
 
@@ -27,14 +27,18 @@ class BasePlateCad(object):
         """
 
         self.column = column
+        self.nut_bolt_array = nut_bolt_array
+        self.bolthight = bolthight
         self.baseplate = baseplate
         self.weldAbvFlang = weldAbvFlang
         self.weldBelwFlang = weldBelwFlang
         self.weldSideWeb = weldSideWeb
-        self.nut_bolt_array = None #nut_bolt_array
-        self.alist = None #alist
-        self.columnModel = None
-        self.baseplateModel = None
+        self.concrete = concrete
+
+
+        # self.alist = None #alist
+        # self.columnModel = None
+        # self.baseplateModel = None
         # self.weldAbvFlang_11Model = None
         # self.weldAbvFlang_12Model = None
         #
@@ -66,22 +70,27 @@ class BasePlateCad(object):
 
         self.createColumnGeometry()
         self.createBasePlateGeometry()
-        # self.createWeldGeometry()
-        # self.create_nut_bolt_array()
+        self.createWeldGeometry()
+        self.createConcreteGeometry()
+        self.create_nut_bolt_array()
 
         self.columnModel = self.column.create_model()
         self.baseplateModel = self.baseplate.create_model()
+        self.nutBoltArrayModels = self,nut_bolt_array.create_model()
 
-        # self.weldAbvFlang_11Model = self.weldAbvFlang_11.create_model()
-        # self.weldAbvFlang_12Model = self.weldAbvFlang_12.create_model()
-        #
-        # self.weldBelwFlang_11Model = self.weldBelwFlang_11.create_model()
-        # self.weldBelwFlang_12Model = self.weldBelwFlang_12.create_model()
-        # self.weldBelwFlang_13Model = self.weldBelwFlang_13.create_model()
-        # self.weldBelwFlang_14Model = self.weldBelwFlang_14.create_model()
-        #
-        # self.weldSideWeb_11Model = self.weldSideWeb_11.create_model()
-        # self.weldSideWeb_12Model = self.weldSideWeb_12.create_model()
+        self.weldAbvFlang_11Model = self.weldAbvFlang_11.create_model()
+        self.weldAbvFlang_12Model = self.weldAbvFlang_12.create_model()
+
+        self.weldBelwFlang_11Model = self.weldBelwFlang_11.create_model()
+        self.weldBelwFlang_12Model = self.weldBelwFlang_12.create_model()
+        self.weldBelwFlang_13Model = self.weldBelwFlang_13.create_model()
+        self.weldBelwFlang_14Model = self.weldBelwFlang_14.create_model()
+
+        self.weldSideWeb_11Model = self.weldSideWeb_11.create_model()
+        self.weldSideWeb_12Model = self.weldSideWeb_12.create_model()
+
+        self.concreteModel = self.concrete.create_model()
+
 
     def createColumnGeometry(self):
         """
@@ -99,53 +108,54 @@ class BasePlateCad(object):
         baseplateL_wDir = numpy.array([1.0, 0.0, 0.0])
         self.baseplate.place(baseplateOriginL, baseplateL_uDir, baseplateL_wDir)
 
+
     def createWeldGeometry(self):
 
         # weld above flange
-        weldAbvFlangOrigin_11 = numpy.array([self.column.B / 2, self.column.length, self.column.D / 2])
+        weldAbvFlangOrigin_11 = numpy.array([self.column.B / 2, -self.column.D / 2, 0.0])
         uDirAbv_11 = numpy.array([0, -1.0, 0])
         wDirAbv_11 = numpy.array([-1.0, 0, 0])
         self.weldAbvFlang_11.place(weldAbvFlangOrigin_11, uDirAbv_11, wDirAbv_11)
 
-        weldAbvFlangOrigin_12 = numpy.array([-self.column.B / 2, self.column.length, -self.column.D / 2])
-        uDirAbv_12 = numpy.array([0, -1.0, 0])
+        weldAbvFlangOrigin_12 = numpy.array([-self.column.B / 2, self.column.D / 2, 0.0])
+        uDirAbv_12 = numpy.array([0, 1.0, 0])
         wDirAbv_12 = numpy.array([1.0, 0, 0])
         self.weldAbvFlang_12.place(weldAbvFlangOrigin_12, uDirAbv_12, wDirAbv_12)
 
         # weld below flange
-        weldBelwFlangOrigin_11 = numpy.array(
-            [self.column.R2 - self.column.B / 2, self.column.length, (self.column.D / 2) - self.column.T])
-        uDirBelw_11 = numpy.array([0, -1.0, 0])
+        weldBelwFlangOrigin_11 = numpy.array([self.column.R2 - self.column.B / 2, -(self.column.D / 2 - self.column.T),  0.0])
+        uDirBelw_11 = numpy.array([0, 1.0, 0])
         wDirBelw_11 = numpy.array([1.0, 0, 0])
         self.weldBelwFlang_11.place(weldBelwFlangOrigin_11, uDirBelw_11, wDirBelw_11)
 
         weldBelwFlangOrigin_12 = numpy.array(
-            [self.column.R1 + self.column.t / 2, self.column.length, (self.column.D / 2) - self.column.T])
-        uDirBelw_12 = numpy.array([0, -1.0, 0])
+            [self.column.R1 + self.column.t / 2,  -(self.column.D / 2 - self.column.T),  0.0])
+        uDirBelw_12 = numpy.array([0, 1.0, 0])
         wDirBelw_12 = numpy.array([1.0, 0, 0])
         self.weldBelwFlang_12.place(weldBelwFlangOrigin_12, uDirBelw_12, wDirBelw_12)
 
         weldBelwFlangOrigin_13 = numpy.array(
-            [-self.column.R1 - self.column.t / 2, self.column.length, -(self.column.D / 2) + self.column.T])
+            [-self.column.R1 - self.column.t / 2, (self.column.D / 2  - self.column.T), 0.0])
         uDirBelw_13 = numpy.array([0, -1.0, 0])
         wDirBelw_13 = numpy.array([-1.0, 0, 0])
         self.weldBelwFlang_13.place(weldBelwFlangOrigin_13, uDirBelw_13, wDirBelw_13)
 
         weldBelwFlangOrigin_14 = numpy.array(
-            [-self.column.R2 + self.column.B / 2, self.column.length, -(self.column.D / 2) + self.column.T])
+            [-self.column.R2 + self.column.B / 2, (self.column.D / 2  - self.column.T), 0.0])
         uDirBelw_14 = numpy.array([0, -1.0, 0])
         wDirBelw_14 = numpy.array([-1.0, 0, 0])
         self.weldBelwFlang_14.place(weldBelwFlangOrigin_14, uDirBelw_14, wDirBelw_14)
 
+
         # Weld side web
-        weldSideWebOrigin_11 = numpy.array([-self.column.t / 2, self.column.length, self.weldSideWeb_21.L / 2])
-        uDirWeb_11 = numpy.array([0, -1.0, 0])
-        wDirWeb_11 = numpy.array([0, 0, -1.0])
+        weldSideWebOrigin_11 = numpy.array([-self.column.t / 2, self.weldSideWeb_11.L/2, 0.0])
+        uDirWeb_11 = numpy.array([0, 0.0, 1.0])
+        wDirWeb_11 = numpy.array([0, -1.0, 0.0])
         self.weldSideWeb_11.place(weldSideWebOrigin_11, uDirWeb_11, wDirWeb_11)
 
-        weldSideWebOrigin_12 = numpy.array([self.column.t / 2, self.column.length, -self.weldSideWeb_21.L / 2])
-        uDirWeb_12 = numpy.array([0, -1.0, 0])
-        wDirWeb_12 = numpy.array([0, 0, 1.0])
+        weldSideWebOrigin_12 = numpy.array([self.column.t / 2, -self.weldSideWeb_12.L/2,  0.0])
+        uDirWeb_12 = numpy.array([0, 0.0, 1.0])
+        wDirWeb_12 = numpy.array([0, 1.0, 0.0])
         self.weldSideWeb_12.place(weldSideWebOrigin_12, uDirWeb_12, wDirWeb_12)
 
     def create_nut_bolt_array(self):
@@ -153,12 +163,24 @@ class BasePlateCad(object):
 
         :return: Geometric Orientation of this component
         """
-        nutboltArrayOrigin = self.baseplate.sec_origin + numpy.array(
-            [0.0, -0.5 * self.baseplate.T, self.baseplate.L / 2])
+        # nutboltArrayOrigin = self.baseplate.sec_origin + numpy.array([0.0, 0.0, self.baseplate.T /2+ 100])
+        nutboltArrayOrigin = numpy.array([ -self.baseplate.W/2 , self.baseplate.L/2, self.bolthight ])
         gaugeDir = numpy.array([1.0, 0, 0])
-        pitchDir = numpy.array([0, 0, -1.0])
-        boltDir = numpy.array([0, 1.0, 0])
+        pitchDir = numpy.array([0, -1.0, 0])
+        boltDir = numpy.array([0, 0, 1.0])
         self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
+
+    def createConcreteGeometry(self):
+        """
+
+        :return: Geometric Orientation of concrete
+        """
+        concreteOrigin = numpy.array([-self.concrete.W/2, 0.0 , -self.baseplate.T - self.concrete.T/2])
+        # concrete_uDir = numpy.array([1.0, 0.0, 0.0])
+        # concrete_wDir = numpy.array([0.0, 0.0, 1.0])
+        concrete_uDir = numpy.array([0.0, 0.0, 1.0])
+        concrete_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.concrete.place(concreteOrigin, concrete_uDir, concrete_wDir)
 
     def get_column_model(self):
         column = self.columnModel
@@ -180,7 +202,8 @@ class BasePlateCad(object):
 
         welded_sec = [self.weldAbvFlang_11Model, self.weldAbvFlang_12Model, self.weldBelwFlang_11Model, self.weldBelwFlang_12Model,
                       self.weldBelwFlang_13Model, self.weldBelwFlang_14Model, self.weldSideWeb_11Model, self.weldSideWeb_12Model]
-        welds = welded_sec
+        welds = welded_sec[0]
+
         for comp in welded_sec[1:]:
             welds = BRepAlgoAPI_Fuse(comp, welds).Shape()
 
@@ -189,6 +212,10 @@ class BasePlateCad(object):
     def get_plate_connector_models(self):
         plate = self.baseplateModel
         return plate
+
+    def get_concrete_models(self):
+        conc = self.concreteModel
+        return conc
 
     def get_connector_models(self):
         plate_connectors = self.get_plate_connector_models()
@@ -206,14 +233,15 @@ class BasePlateCad(object):
     def get_models(self):
         column = self.get_column_model()
         plate_connectors = self.get_plate_connector_models()
-        # welds = self.get_welded_models()
-        # nut_bolt_array = self.get_nut_bolt_array_models()
+        welds = self.get_welded_models()
+        nut_bolt_array = self.get_nut_bolt_array_models()
+        conc = self.get_concrete_models()
 
-        CAD_list = [column, plate_connectors] #, welds, nut_bolt_array]
+        CAD_list = [column, plate_connectors, welds, nut_bolt_array, conc] #, welds, nut_bolt_array]
         CAD = CAD_list[0]
 
-        # for model in CAD_list[1:]:
-        CAD = BRepAlgoAPI_Fuse(column, plate_connectors).Shape()
+        for model in CAD_list[1:]:
+            CAD = BRepAlgoAPI_Fuse(CAD, model).Shape()
 
         return CAD
 
@@ -224,6 +252,10 @@ if __name__ == '__main__':
     from cad.items.plate import Plate
     from cad.items.ISection import ISection
     from cad.items.filletweld import FilletWeld
+    from cad.items.concrete import Concrete
+    from cad.BasePlateCad.nutBoltPlacement import NutBoltArray
+    from cad.items.anchor_bolt import *
+    from cad.items.nut import Nut
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
@@ -240,14 +272,22 @@ if __name__ == '__main__':
     weldAbvFlang = FilletWeld(b=3, h=3, L= 250)
     weldBelwFlang = FilletWeld(b=3, h=3, L= 100)
     weldSideWeb = FilletWeld(b=3, h=3, L= 420)
+    # concrete = Concrete(L= baseplate.W*1.5, W= baseplate.L*1.5, T= baseplate.T*10)
+    concrete = Plate(L= baseplate.L*1.5, W= baseplate.W*1.5, T= baseplate.T*10)
 
     #Todo: Make this class in another file
 
-    # nut_bolt_array = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, alist)
+    bolt = AnchorBolt_A(l= 250, c= 125, a= 75, r= 12)
+    # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12)
+    # bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12)
+    nut = Nut(R= bolt.r*3, T= 24, H= 30, innerR1= bolt.r)
+    numberOfBolts = 4
+    nutSpace = bolt.c + baseplate.T
+    bolthight = nut.T + 50
 
+    nut_bolt_array = NutBoltArray(column, baseplate,  nut, bolt, numberOfBolts, nutSpace)
 
-
-    basePlate = BasePlateCad(column, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb)
+    basePlate = BasePlateCad(column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb, concrete)
 
     basePlate.create_3DModel()
     prism = basePlate.get_models()

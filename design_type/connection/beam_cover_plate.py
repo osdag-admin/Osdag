@@ -718,6 +718,7 @@ class BeamCoverPlate(MomentConnection):
         self.section.moment_d_deformation_criteria(fy= self.section.fy,Z_e = self.section.elast_sec_mod_z)
         # todo add in ddcl
         self.section.moment_capacity = min(  self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria)
+        print("moment_capacity",self.section.moment_capacity )
 
         load_moment = max((0.5 *self.section.moment_capacity),self.load.moment* 1000000) #N
         if  load_moment  >  self.section.moment_capacity:
@@ -727,10 +728,12 @@ class BeamCoverPlate(MomentConnection):
         self.load.moment = load_moment # N
         print("design_bending_strength",  self.load.moment)
 
-        self.moment_web = (Z_w / ( self.section.plast_sec_mod_z )) * self.load.moment #  Nm todo add in ddcl # z_w of web & z_p  of section
+        self.moment_web = (Z_w * self.load.moment / ( self.section.plast_sec_mod_z ))  #  Nm todo add in ddcl # z_w of web & z_p  of section
         print('plast_sec_mod_z',self.section.plast_sec_mod_z)
+        print("Z_W", Z_w)
+        print ("web moment", self.moment_web  )
         self.moment_flange = ((self.load.moment) - self.moment_web)  #Nmm #Nmm todo add in ddcl
-
+        print("moment_flange", self.moment_flange)
 
         ###WEB MENBER CAPACITY CHECK
 

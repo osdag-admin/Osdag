@@ -723,6 +723,7 @@ class Plate(Material):
         self.pitch_provided = 0.0
         self.gauge_provided = 0.0
         self.midgauge =0.0
+        self.midpitch = 0.0
         self.edge_dist_provided = 0.0
         self.end_dist_provided = 0.0
 

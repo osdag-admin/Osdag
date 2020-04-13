@@ -1740,8 +1740,8 @@ class BeamCoverPlate(MomentConnection):
         self.flange_plate.bolts_one_line = self.flange_plate.bolts_one_line
         self.flange_plate.bolts_required = self.flange_plate.bolt_line *self.flange_plate.bolts_one_line
         self.flange_plate.midgauge = 2*(self.flange_plate.edge_dist_provided + self.section.root_radius) + self.section.web_thickness
-        self.web_plate.midpitch_1 = (2*self.web_plate.end_dist_provided) +self.web_plate.gap
-        self.flange_plate.midpitch_2 = (2 * self.flange_plate.end_dist_provided) + self.flange_plate.gap
+        self.web_plate.midpitch = (2*self.web_plate.end_dist_provided) +self.web_plate.gap
+        self.flange_plate.midpitch = (2 * self.flange_plate.end_dist_provided) + self.flange_plate.gap
 
 
         self.web_plate.bolts_one_line =  self.web_plate.bolts_one_line

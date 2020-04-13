@@ -1653,29 +1653,29 @@ class Tension_bolted(Main):
                 self.plate.tension_yielding(length = self.section_size_1.depth, thickness = self.plate.thickness_provided, fy = self.plate.fy)
                 self.net_area = (self.section_size_1.depth * self.plate.thickness_provided) - (
                             self.plate.bolts_one_line * self.bolt.dia_hole*self.plate.thickness_provided)
-                self.plate.height = self.section_size_1.depth + 40.0
+                self.plate.height = self.section_size_1.depth + 30.0
 
             else:
                 if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
                     if design_dictionary[KEY_LOCATION] == 'Long Leg':
                         self.plate.tension_yielding(length = 2 *self.section_size_1.max_leg, thickness = self.plate.thickness_provided, fy = self.plate.fy)
                         self.net_area = (2 * self.section_size_1.max_leg * self.plate.thickness_provided) - (self.plate.bolts_one_line * self.bolt.dia_hole*self.plate.thickness_provided)
-                        self.plate.height = 2 * self.section_size_1.max_leg +40.0
+                        self.plate.height = 2 * self.section_size_1.max_leg +30.0
 
                     else:
                         self.plate.tension_yielding(length = 2* self.section_size_1.min_leg, thickness = self.plate.thickness_provided, fy = self.plate.fy)
                         self.net_area = (2 * self.section_size_1.min_leg * self.plate.thickness_provided) - (self.plate.bolts_one_line * self.bolt.dia_hole*self.plate.thickness_provided)
-                        self.plate.height = 2 * self.section_size_1.min_leg + 40.0
+                        self.plate.height = 2 * self.section_size_1.min_leg + 30.0
 
                 elif design_dictionary[KEY_SEC_PROFILE] in ["Angles", 'Back to Back Angles']:
                     if design_dictionary[KEY_LOCATION] == 'Long Leg':
                         self.plate.tension_yielding(length=2 * self.section_size_1.max_leg,thickness=self.plate.thickness_provided, fy=self.plate.fy)
                         self.net_area = (self.section_size_1.max_leg * self.plate.thickness_provided) - (self.plate.bolts_one_line * self.bolt.dia_hole * self.plate.thickness_provided)
-                        self.plate.height = self.section_size_1.max_leg + 40.0
+                        self.plate.height = self.section_size_1.max_leg + 30.0
                     else:
                         self.plate.tension_yielding(length=2 * self.section_size_1.min_leg,thickness=self.plate.thickness_provided, fy=self.plate.fy)
                         self.net_area = (self.section_size_1.min_leg * self.plate.thickness_provided) - (self.plate.bolts_one_line * self.bolt.dia_hole * self.plate.thickness_provided)
-                        self.plate.height = self.section_size_1.min_leg +40.0
+                        self.plate.height = self.section_size_1.min_leg + 30.0
 
 
             self.plate.tension_rupture(A_n = self.net_area, F_u = self.plate.fu)

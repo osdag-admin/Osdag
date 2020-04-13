@@ -723,6 +723,7 @@ class Plate(Material):
         self.pitch_provided = 0.0
         self.gauge_provided = 0.0
         self.midgauge =0.0
+        self.midpitch = 0.0
         self.edge_dist_provided = 0.0
         self.end_dist_provided = 0.0
 
@@ -1057,7 +1058,7 @@ class Plate(Material):
                                          gauge, bolt_line, shear_load, axial_load, ecc,web_moment )
                 else:
                     moment_demand = 0.0
-                    vres = vres / (bolt_line * bolts_one_line)
+                    vres = resultant_force / (bolt_line * bolts_one_line)
 
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,

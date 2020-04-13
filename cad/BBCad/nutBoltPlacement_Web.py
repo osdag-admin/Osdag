@@ -73,7 +73,8 @@ class NutBoltArray_Web():
         self.end_W = outputobj.web_plate.end_dist_provided      #33
         # self.pitch_W = 150     #70
         # self.gauge_W = outputobj.web_plate.length - 2* self.edge_W
-        self.pitch_W = outputobj.web_plate.length - 2* self.edge_W
+        self.pitch_W = outputobj.web_plate.pitch_provided
+        # self.pitch_MW = outputobj.web_plate.midpitch # todo for gap
         self.gauge_W = outputobj.web_plate.gauge_provided
 
         self.row_W = outputobj.web_plate.bolts_one_line

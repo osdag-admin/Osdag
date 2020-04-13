@@ -1201,6 +1201,10 @@ class Plate(Material):
                                                                                   min_edge_dist, max_spacing,
                                                                                   max_edge_dist,root_radius)
                 print("boltdetailsasaa", bolt_line, bolts_one_line, flange_plate_h)
+            if bolt_line == 1:
+                pitch = 0.0
+            else:
+                pitch = min_gauge
 
             bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                   gauge, bolt_line,pitch,bolt_capacity,
@@ -1213,7 +1217,7 @@ class Plate(Material):
             else:
                 self.design_status = True
 
-            self.length = gap/2 + end_dist * 2 + pitch * (bolt_line - 1)
+            self.length = gap+ end_dist * 2 + pitch * (bolt_line - 1)
             self.height = flange_plate_h
             self.bolt_line = bolt_line
             self.bolts_one_line = bolts_one_line

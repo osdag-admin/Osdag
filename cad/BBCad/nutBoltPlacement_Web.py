@@ -118,10 +118,10 @@ class NutBoltArray_Web():
 
     def create_modelW(self):
         for bolt in self.bolts_W:
-            # self.models_W.append(bolt.create_model())
+            self.models_W.append(bolt.create_model())
             pass
         for nut in self.nuts_W:
-            # self.models_W.append(nut.create_model())
+            self.models_W.append(nut.create_model())
             pass
 
         dbg = self.dbgSphere(self.originW)

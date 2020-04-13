@@ -78,6 +78,7 @@ class NutBoltArray_AF():
         self.end_AF =  outputobj.flange_plate.end_dist_provided         #33
         self.edge_gauge_AF = outputobj.flange_plate.edge_dist_provided  #33
         self.pitch_AF = outputobj.flange_plate.pitch_provided           #50
+        self.midpitch_AF = outputobj.flange_plate.midpitch
         self.gauge_AF = outputobj.flange_plate.midgauge
         self.gauge = outputobj.flange_plate.gauge_provided
 
@@ -105,7 +106,7 @@ class NutBoltArray_AF():
             for cl_AF in range(self.col_AF):
                 pos_AF = self.boltOrigin_AF
                 if self.row_AF / 2 < rw_AF or self.row_AF / 2 == rw_AF:
-                    self.pitch_new_AF = 2 * self.edge_gauge_AF + self.gap
+                    self.pitch_new_AF = self.midpitch_AF
                     pos_AF = pos_AF + ((rw_AF - 1) * self.pitch_AF + self.pitch_new_AF) * self.pitchDirAF
                     if self.col_AF / 2 > cl_AF:
                         pos_AF = pos_AF + cl_AF * self.gauge * self.gaugeDirAF

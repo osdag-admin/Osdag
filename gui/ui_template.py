@@ -2201,8 +2201,8 @@ class Ui_ModuleWindow(QMainWindow):
         material = Material(material_grade)
         if module != KEY_DISP_BASE_PLATE:
             tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
-        else:
-            tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
+        # else:
+        #     tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
         tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
 
         if module not in [KEY_DISP_BASE_PLATE]:

@@ -461,6 +461,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # if flag:
         #     if self.weld_type == 'Fillet Weld':
+        t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None)
+        out_list.append(t18)
+
+        t19 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX,
+               self.weld_size if flag and self.weld_type != 'Butt Weld' else '')
+        out_list.append(t19)
 
         return out_list
 

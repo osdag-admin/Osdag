@@ -1652,6 +1652,8 @@ class DesignPreferences(QDialog):
         tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         if designation == 'Select Section':
             self.ui.clear_tab("Column")
+            self.flag = False
+
             return
 
         col_list = []
@@ -2067,7 +2069,7 @@ class DesignPreferences(QDialog):
     def anchor_bolt_designation(self, d):
         length = str(self.main.anchor_length_provided if self.main.design_button_status else 0)
         designation = str(d) + "X" + length + " IS5624 GALV"
-        return (designation, length)
+        return designation, length
 
     def anchor_bolt_preferences(self, d, typ):
 
@@ -2083,13 +2085,16 @@ class DesignPreferences(QDialog):
                 ch.setText(designation)
                 ch.setReadOnly(True)
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_LENGTH:
-                ch.setText(self.main.anchor_length_provided if self.main.design_button_status else '0')
+                ch.setText(str(self.main.anchor_length_provided) if self.main.design_button_status else '0')
                 change_list.append(ch)
                 # ch.setReadOnly(True)
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_TYPE:
                 ch.setCurrentText(typ)
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_GALVANIZED:
                 change_list.append(ch)
+            elif ch.objectName() == KEY_DP_ANCHOR_BOLT_MATERIAL_G_O:
+                ch.setText(str(self.main.anchor_fu[0]) if self.main.design_button_status else '0')
+
 
         for c in change_list:
             if isinstance(c, QtWidgets.QComboBox):

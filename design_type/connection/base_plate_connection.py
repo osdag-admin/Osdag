@@ -200,12 +200,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.plate_thk = 0.0
         self.standard_plate_thk = []
         self.neglect_anchor_dia = []
+        self.anchor_bolt = ''
         self.anchor_dia_provided = 1
         self.anchor_length_min = 1
         self.anchor_length_max = 1
         self.anchor_length_provided = 1
         self.anchor_nos_provided = 0
         self.anchor_hole_dia = 0.0
+        self.bp_length_min = 0.0
+        self.bp_width_min = 0.0
         self.bp_length_provided = 0.0
         self.bp_width_provided = 0.0
         self.end_distance = 0.0
@@ -231,6 +234,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_size = 0.0
         self.weld_size_flange = 0.0
         self.weld_size_web = 0.0
+
+        self.eccentricity_zz = 0.0
+        self.sigma_max_zz = 0.0
+        self.sigma_min_zz = 0.0
+        self.ze_zz = 0.0
 
         self.safe = True
 
@@ -855,27 +863,63 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.design_detail_bp(self)
 
     def bp_detailing(self):
-        """ initialize basic detailing parameters like the end/edge/pitch/gauge distances, minimum projection from the column
-        flange, length and width of the base plate. These parameters shall be used for the first iteration of the analyses.
+        """ initialize detailing parameters like the end/edge/pitch/gauge distances, length and width of the base plate.
+        These parameters shall be used for the first iteration of the analyses.
 
         Args:
 
         Returns:
         """
-        # assign anchor bolt diameter [Reference: based on design experience, field conditions  and sample calculations]
-        # the following diameters are neglected due its practical non acceptance/unavailability - 'M8', 'M10', 'M12', 'M16'
+        # select anchor bolt diameter [Reference: based on design experience, field conditions  and sample calculations]
+        # the following list of diameters are neglected due its practical non acceptance/unavailability - 'M8', 'M10', 'M12', 'M16'
 
         sort_bolt = filter(lambda x: 'M20' <= x <= self.anchor_dia[-1], self.anchor_dia)
 
         for i in sort_bolt:
-            self.anchor_dia_provided = i  # anchor dia provided (str)
+            self.anchor_bolt = i  # anchor dia provided (str)
             break
 
-        self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # list of areas [shank area, thread area] (mm^2)
+        self.anchor_dia_provided = self.table1(self.anchor_bolt[0])  # mm anchor dia provided (int)
+        self.anchor_area = self.bolt_area(self.anchor_dia_provided)  # list of areas [shank area, thread area] mm^2
+
+        # hole diameter
+        self.anchor_hole_dia = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided, self.dp_anchor_hole)  # mm
 
         # TODO add condition for number of anchor bolts depending on col depth and force
         # number of anchor bolts
         self.anchor_nos_provided = 4
+
+        # perform detailing checks
+        # Note: end distance is along the depth, whereas, the edge distance is along the flange, of the column section
+
+        # end distance [Reference: Clause 10.2.4.2 and 10.2.4.3, IS 800:2007]
+        self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole, self.dp_detail_edge_type)
+        self.end_distance = round_up(self.end_distance, 5) + 15  # mm, adding 15 mm extra
+
+        # TODO: add max end, edge distance check after the plate thk check
+        # self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive)
+
+        # edge distance [Reference: Clause 10.2.4.2 and 10.2.4.3, IS 800:2007]
+        self.edge_distance = self.end_distance  # mm
+        # self.edge_distance_max = self.end_distance_max
+
+        # pitch and gauge distance [Reference: Clause 10.2.2 and 10.2.3.1, IS 800:2007]
+        # TODO add pitch and gauge calc for bolts more than 4 nos
+        if self.anchor_nos_provided == 4:
+            self.pitch_distance = 0.0
+            self.gauge_distance = self.pitch_distance
+        else:
+            pass
+
+        # minimum required dimensions of the base plate [as per the detailing criteria]
+        if self.connectivity == 'Welded-Slab Base' or 'Gusseted Base Plate':
+            self.bp_length_min = round_up(self.depth + 2 * (2 * self.end_distance), 5)  # mm
+            self.bp_width_min = round_up(self.flange_width + 2 * self.edge_distance, 5)  # mm
+
+        elif self.connectivity == 'Bolted-Slab Base':
+            pass
+        else:
+            pass
 
     def design_pinned_bp_welded(self):
         """ design pinned base plate (welded connection)
@@ -884,93 +928,126 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         Returns:
         """
-        # bearing strength of concrete [Reference: Clause 7.4.1, IS 800:2007]
-        self.bearing_strength_concrete = self.cl_7_4_1_bearing_strength_concrete(self.footing_grade)  # N/mm^2 (MPa)
 
-        # minimum required area for the base plate [bearing stress = axial force / area of the base]
-        self.min_area_req = self.load_axial * 1000 / self.bearing_strength_concrete  # mm^2
-
-        # TODO: add calculation of projection for other type(s) of column section (example: tubular)
-        # effective area [Reference: Clause 7.4.1.1, IS 800:2007]
-        if self.dp_column_type == 'Rolled' or 'Welded':
-
-            # section = Column(self.dp_column_designation, self.dp_column_material)
-            self.projection = self.calculate_c(self.column_bf, self.column_D, self.column_tw, self.column_tf, self.min_area_req)
-
-        else:
-            pass
-
-        if self.projection <= 0:
-            self.safe = False
-            logger.error(": [Analysis Error] The value of the projection (c) as per the Effective Area Method is {}. [Reference:"
-                         " Clause 7.4.1.1, IS 800: 2007]".format(self.projection))
-            logger.warning(": [Analysis Error] The computed value of the projection is not suitable for performing the design.")
-            logger.info(": [Analysis Error] Check the column section and its properties.")
-            logger.info(": Re-design the connection")
-        else:
-            pass
-
-    def bolt_design_detailing(self):
-        """ Perform design and detailing of the anchor bolt
+    def bp_analyses(self):
+        """ perform analyses of the base plate
 
         Args:
 
         Returns:
+
+        # TODO: Write algorithm here
         """
-        # hole diameter
-        self.anchor_hole_dia = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided, self.dp_anchor_hole)  # mm
+        # bearing strength of concrete [Reference: Clause 7.4.1, IS 800:2007]
+        self.bearing_strength_concrete = self.cl_7_4_1_bearing_strength_concrete(self.footing_grade)  # N/mm^2 or MPa
 
-        # perform detailing checks
-        self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.table1(self.anchor_dia_provided)[0],
-                                                               self.dp_anchor_hole, self.dp_detail_edge_type)
-
-        # TODO: add max end, edge distance check after the plate thk check
-        # Note: end distance is along the depth, whereas, the edge distance is along the flange, of the column section
-        self.end_distance = round_up(self.end_distance, 5) + 10  # adding 10 mm extra for a conservative design # mm
-        # self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive)
-
-        self.edge_distance = self.end_distance  # mm
-        # self.edge_distance_max = self.end_distance_max
-
-        # TODO add pitch and gauge calc for bolts more than 4 nos
-        if self.anchor_nos_provided == 4:
-            self.pitch_distance = 0.0
-            self.gauge_distance = self.pitch_distance
-        else:
-            pass
-
-        # design the dimensions of the base plate
+        # slab base analyses (pinned connection)
         if self.connectivity == 'Welded-Slab Base':
-            self.bp_length_provided = self.column_properties.depth + self.projection + self.end_distance  # mm
-            self.bp_width_provided = self.column_properties.flange_width + self.projection + self.edge_distance  # mm
-        else:
-            pass
 
-        # check for the provided area against the minimum required area
-        self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
-        if self.bp_area_provided < self.min_area_req:
-            self.safe = False
-            logger.error("[Base Plate] The calculated area of the base plate is less than the required area.")
-            logger.info("[Base Plate] Check the input values and re-design the connection.")
-        else:
-            pass
+            # minimum required area for the base plate [bearing stress = axial force / area of the base]
+            self.min_area_req = self.load_axial * 1000 / self.bearing_strength_concrete  # mm^2
 
-        # actual bearing pressure acting on the provided area of the base plate
-        self.w = self.load_axial * 1000 / self.bp_area_provided  # N/mm^2 (MPa)
+            # calculate projection by the 'Effective Area Method' [Reference: Clause 7.4.1.1, IS 800:2007]
+            if self.dp_column_type == 'Rolled' or 'Welded':
+                self.projection = self.calculate_c(self.column_bf, self.column_D, self.column_tw, self.column_tf, self.min_area_req,
+                                                   self.anchor_hole_dia)  # mm
+                self.projection = max(self.projection, self.end_distance)  # projection should at-least be equal to the end distance
+            else:
+                pass
 
-        #  thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
-        self.plate_thk = max(self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.dp_bp_fy)),
-                             self.column_tf)  # base plate thickness should be larger than the flange thickness
+            if self.projection <= 0:
+                self.safe = False
+                logger.error(": [Analysis Error] The value of the projection (c) as per the Effective Area Method is {} mm. [Reference:"
+                             " Clause 7.4.1.1, IS 800: 2007]".format(self.projection))
+                logger.warning(": [Analysis Error] The computed value of the projection is not suitable for performing the design.")
+                logger.info(": [Analysis Error] Check the column section and its properties.")
+                logger.info(": Re-design the connection")
+            else:
+                pass
 
-        # the thicknesses of the flats listed below is obtained from SAIL's product brochure
-        self.standard_plate_thk = [8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40, 45, 50, 56, 63, 75, 80, 90, 100, 110, 120]
+            self.bp_length_provided = self.depth + 2 * self.projection + 2 * self.end_distance  # mm
+            self.bp_width_provided = self.flange_width + 2 * self.projection + 2 * self.end_distance  # mm
 
-        sort_plate = filter(lambda x: self.plate_thk <= x <= 120, self.standard_plate_thk)
+            # check for the provided area against the minimum required area
+            self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
+
+            # checking if the provided dimensions (length and width) are sufficient
+            bp_dimensions = [self.bp_length_provided, self.bp_width_provided]
+
+            n = 1
+            while self.bp_area_provided < self.min_area_req:
+                bp_update_dimensions = [bp_dimensions[-2], [-1]]
+
+                for i in bp_update_dimensions:
+                    i += 25
+                    bp_dimensions.append(i)
+                    i += 1
+
+                self.bp_area_provided = bp_dimensions[-2] * bp_dimensions[-1]  # mm^2, area according to the desired length and width
+                n += 1
+
+            self.bp_length_provided = bp_dimensions[-2]  # mm, updated length if while loop is True
+            self.bp_width_provided = bp_dimensions[-1]  # mm, updated width if while loop is True
+            self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2, update area if while loop is True
+
+            # actual bearing pressure acting on the provided area of the base plate
+            self.w = self.load_axial * 1000 / self.bp_area_provided  # N/mm^2 (MPa)
+
+            # design of plate thickness
+            #  thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
+            self.plate_thk = max(self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.dp_bp_fy)),
+                                 self.column_tf)  # base plate thickness should be larger than the flange thickness
+
+        elif self.connectivity == 'Gusseted Base Plate':
+
+            self.eccentricity_zz = self.load_moment_major / self.load_axial  # mm, eccentricity about major (z-z) axis
+
+            # Defining cases: Case 1: L >= 6e (compression throughout the BP)
+            #                 Case 2: L < 3e  (compression throughout + moderate tension/uplift in the anchor bolts)
+            #                 Case 3: L >= 3e (compression + high tension/uplift in the anchor bolts)
+
+            if (6 * self.eccentricity_zz) <= self.bp_length_min < (3 * self.eccentricity_zz):  # Case 1 and Case 2
+
+                # fixing length and width of the base plate
+                width_min = 2 * self.load_axial / self.bp_length_min * self.bearing_strength_concrete  # mm
+                if width_min < self.bp_width_min:
+                    width_min = self.bp_width_min
+                else:
+                    pass
+                self.bp_length_provided = max(self.bp_length_min, width_min)  # mm, assigning maximum dimension to length
+                self.bp_width_provided = min(self.bp_length_min, width_min)  # mm, assigning minimum dimension to width
+                self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
+
+                # calculating the maximum and minimum bending stresses
+                self.ze_zz = self.bp_width_provided * self.bp_length_provided ** 2 / 6  # mm^3
+
+                self.sigma_max_zz = (self.load_axial * 1000 / self.bp_area_provided) + (self.load_moment_major / self.ze_zz)  # N/mm^2
+                self.sigma_min_zz = (self.load_axial * 1000 / self.bp_area_provided) - (self.load_moment_major / self.ze_zz)  # N/mm^2
+
+                # calculating moment at the critical section
+                # Assumption: the critical section (critical_xx) acts at a distance of 0.95 times the column depth, along the depth
+                critical_xx = (self.bp_length_provided - 0.95 * self.depth) / 2  # mm
+
+            elif (3 * self.eccentricity_zz) >= self.bp_length_min:
+                pass
+
+        # assigining plate thickness according to the available standard sizes
+        # the thicknesses of the flats (in mm) listed below is obtained from SAIL's product brochure
+        standard_plate_thk = [8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40, 45, 50, 56, 63, 75, 80, 90, 100, 110, 120]
+
+        sort_plate = filter(lambda x: self.plate_thk <= x <= 120, standard_plate_thk)
 
         for i in sort_plate:
             self.plate_thk = i  # plate thickness provided (mm)
             break
 
+    def anchor_bolt_design(self):
+        """ Perform design of - the base plate (thickness) and the anchor bolt
+
+        Args:
+
+        Returns:
+        """
         # design strength of anchor bolt [Reference: Clause 10.3.2, IS 800:2007; Section 3, IS 5624:1993]
         for i in self.anchor_grade:
             self.anchor_grade = i

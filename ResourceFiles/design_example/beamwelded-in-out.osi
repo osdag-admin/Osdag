@@ -8,9 +8,9 @@ DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
 Flange_Plate.Preferences: Outside + Inside
-Load.Axial: '10'
-Load.Moment: '100'
-Load.Shear: '10'
+Load.Axial: '0'
+Load.Moment: '0'
+Load.Shear: '0'
 Member.Material: E 250 (Fe 410 W)A
 Member.Supported_Section.Material: E 250 (Fe 410 W)A
 Member.Supporting_Section.Material: E 250 (Fe 410 W)A

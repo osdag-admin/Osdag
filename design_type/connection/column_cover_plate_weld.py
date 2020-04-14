@@ -642,6 +642,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.flange_plate.Innerlength = 520
         self.flange_plate.gap =10
         self.web_plate.gap = 10
+        self.design_status = True
 
     def member_capacity(self):
 

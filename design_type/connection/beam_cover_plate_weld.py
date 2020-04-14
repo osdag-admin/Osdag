@@ -600,7 +600,7 @@ class BeamCoverPlateWeld(MomentConnection):
     #
 
     def hard_values(self):
-        # Select Selection  WPB 240* 240 * 60.3 (inside Ouside)- material E 250 fe 450A
+        # Select Selection  WPB 240* 240 * 60.3 (inside Ouside)- material E 250 fe 450A, bearing
 
         #load
         self.load.axial_force = 481.745 #KN
@@ -637,6 +637,7 @@ class BeamCoverPlateWeld(MomentConnection):
         self.flange_plate.Innerlength = 510
         self.flange_plate.gap =10
         self.web_plate.gap = 10
+        self.design_status = True
 
     def member_capacity(self):
 

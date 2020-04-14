@@ -605,41 +605,41 @@ class ColumnCoverPlateWeld(MomentConnection):
     #
 
     def hard_values(self):
-        # Select Selection  WPB 240* 240 * 60.3 (inside Ouside)- material E 250 fe 450A
-        # refer Osi file (Columnsplice240_sectioncheckedo_i.osi)  in resource folder
+        # Select Selection  HB 450* (inside Ouside)- material E 250 fe 450A
+
         # load
-        self.load.axial_force = 481.745  # KN
-        self.load.shear_force = 10  # KN
-        self.load.moment = 16.636840  # KNM
+        self.load.axial_force = 740.181  # KN
+        self.load.shear_force = 345.886 # KN
+        self.load.moment = 52745157.413636364  # KNM
         self.section.fy = 230
         self.section.fu = 410
         #  Flange Weld
         self.flange_weld.size = 10  # mm
         # self.flangespace = 15 #mm
-        self.flange_weld.length = 530
-        self.flange_weld.height = 190
+        self.flange_weld.length =500
+        self.flange_weld.height = 200
         #  Flange plate
-        self.flange_plate.thickness_provided = 14
-        self.flange_plate.height = 210
-        self.flange_plate.length = 550
+        self.flange_plate.thickness_provided = 12
+        self.flange_plate.height = 220
+        self.flange_plate.length = 520
         #  Web Weld
-        self.web_weld.size = 6  # mm
+        self.web_weld.size = 9  # mm
         # self.webspace = 15  # mm
-        self.web_weld.length = 350
-        self.web_weld.height = 155
+        self.web_weld.length =730
+        self.web_weld.height = 340
         #  Web plate
-        self.web_plate.thickness_provided = 8
-        self.web_plate.length = 365
-        self.web_plate.height = 170
+        self.web_plate.thickness_provided = 12
+        self.web_plate.length = 750
+        self.web_plate.height = 360
         #  Inner Flange weld
         self.flange_weld.size = 10  # mm
         self.flange_plate.thickness_provided = 14
         self.flange_weld.Innerheight = 60
-        self.flange_weld.Innerlength = 550
+        self.flange_weld.Innerlength = 500
         #  Inner Flange plate
-        self.flange_plate.thickness_provided = 14
-        self.flange_plate.Innerheight = 80
-        self.flange_plate.Innerlength = 550
+        self.flange_plate.thickness_provided = 12
+        self.flange_plate.Innerheight = 70
+        self.flange_plate.Innerlength = 520
 
     def member_capacity(self):
 
@@ -728,6 +728,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.section.moment_d_deformation_criteria(fy=self.section.fy, Z_e=self.section.elast_sec_mod_z)
         # todo add in ddcl
         self.section.moment_capacity = min(self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria)
+        print("moment_capacity", self.section.moment_capacity)
 
         load_moment = max((0.5 * self.section.moment_capacity), self.load.moment * 1000000)  # N
         if load_moment > self.section.moment_capacity:
@@ -737,10 +738,13 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.load.moment = load_moment  # N
         print("design_bending_strength", self.load.moment)
 
-        self.moment_web = (Z_w / (
-            self.section.plast_sec_mod_z)) * self.load.moment  # Nm todo add in ddcl # z_w of web & z_p  of section
+        self.moment_web = (Z_w * self.load.moment / (
+            self.section.plast_sec_mod_z))  # Nm todo add in ddcl # z_w of web & z_p  of section
         print('plast_sec_mod_z', self.section.plast_sec_mod_z)
+        print("Z_W", Z_w)
+        print("web moment", self.moment_web)
         self.moment_flange = ((self.load.moment) - self.moment_web)  # Nmm #Nmm todo add in ddcl
+        print("moment_flange", self.moment_flange)
 
         ###WEB MENBER CAPACITY CHECK
 
@@ -946,7 +950,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         print("space", self.flangespace)
         self.axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
             self.section.area)
-        self.flange_force = (((self.moment_flange * 1000000) / (self.section.depth - self.section.flange_thickness)) + (
+        self.flange_force = (((self.moment_flange) / (self.section.depth - self.section.flange_thickness)) + (
             self.axial_force_f))  # todo added web moment -add in ddcl
 
         self.flange_weld.get_weld_strength(connecting_fu=[self.flange_weld.fu, self.section.fu, self.flange_plate.fu],
@@ -1322,6 +1326,8 @@ class ColumnCoverPlateWeld(MomentConnection):
         print("Web  PLate")
         print(self.web_weld)
         print(self.web_plate)
+        print("flangegap",self.flange_plate.gap)
+        print("webgap",self.web_plate.gap)
         # print(self.web_plate.thickness_provided)
         # print(self.flange_plate.thickness_provided)
         print("Inside PLate")
@@ -1623,11 +1629,11 @@ class ColumnCoverPlateWeld(MomentConnection):
         print("dfdbjfk", y_max, x_max)
         ecc = d - (d ** 2 / (2 * d + b))
         Ip_weld = ((8 * (d ** 3)) + (6 * d * (b ** 2)) + (b ** 3)) / 12 - ((d ** 4) / (2 * d + b))  # mm4
-        weld_twist = (shear_force * 1000 * ecc) + (moment_web * 1000000)  # Nmm
+        weld_twist = (shear_force * ecc) + (moment_web )  # Nmm
         # print("self.web_weld_length",self.web_weld_length )
         self.l_req_weblength = round_up(
             ((2 * d) + plate_height + (2 * weld_size)), 50)
-        self.web_weld.get_weld_stress(weld_shear=shear_force * 1000, weld_axial=axial_force_w,
+        self.web_weld.get_weld_stress(weld_shear=shear_force , weld_axial=axial_force_w,
                                       weld_twist=weld_twist, Ip_weld=Ip_weld, y_max=y_max, x_max=x_max,
                                       l_weld=self.l_req_weblength)
 

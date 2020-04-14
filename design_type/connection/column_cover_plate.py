@@ -606,6 +606,8 @@ class ColumnCoverPlate(MomentConnection):
         # flange plate
         self.flange_plate.thickness_provided = 22
         self.flange_plate.height = 210
+        self.flange_plate.Innerheight = 187.625
+        self.flange_plate.Innerlength = 170.0
         self.flange_plate.length = 232
         self.flange_plate.bolt_line = 4
         self.flange_plate.bolts_one_line = 2
@@ -744,6 +746,7 @@ class ColumnCoverPlate(MomentConnection):
         self.section.moment_d_deformation_criteria(fy=self.section.fy, Z_e=self.section.elast_sec_mod_z)
         # todo add in ddcl
         self.section.moment_capacity = min(self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria)
+        print("moment_capacity", self.section.moment_capacity)
 
         load_moment = max((0.5 * self.section.moment_capacity), self.load.moment * 1000000)  # N
         if load_moment > self.section.moment_capacity:
@@ -753,10 +756,13 @@ class ColumnCoverPlate(MomentConnection):
         self.load.moment = load_moment  # N
         print("design_bending_strength", self.load.moment)
 
-        self.moment_web = (Z_w / (
-            self.section.plast_sec_mod_z)) * self.load.moment  # Nm todo add in ddcl # z_w of web & z_p  of section
+        self.moment_web = (Z_w * self.load.moment / (
+            self.section.plast_sec_mod_z))  # Nm todo add in ddcl # z_w of web & z_p  of section
         print('plast_sec_mod_z', self.section.plast_sec_mod_z)
+        print("Z_W", Z_w)
+        print("web moment", self.moment_web)
         self.moment_flange = ((self.load.moment) - self.moment_web)  # Nmm #Nmm todo add in ddcl
+        print("moment_flange", self.moment_flange)
 
         ###WEB MENBER CAPACITY CHECK
 
@@ -848,9 +854,8 @@ class ColumnCoverPlate(MomentConnection):
             logger.error(" : tension_yielding_capacity   is less "
                          "than applied loads, Please select larger sections or decrease loads")
 
-
     def module_name(self):
-        return KEY_DISP_COLUMNCOVERPLATE
+        return KEY_DISP_BEAMCOVERPLATE
 
     def select_bolt_dia(self):
         min_plate_height = self.section.flange_width
@@ -1471,6 +1476,7 @@ class ColumnCoverPlate(MomentConnection):
                                                                       self.flange_plate.tension_rupture_capacity,
                                                                       self.flange_plate.block_shear_capacity)
                 print("flange_force", flange_force)
+                print("innerplaste length", self.flange_plate.Innerlength)
                 print(self.flange_plate.tension_capacity_flange_plate, "tension_capacity_flange_plate")
                 if self.flange_plate.tension_capacity_flange_plate < flange_force:
                     self.design_status = False
@@ -1794,11 +1800,13 @@ class ColumnCoverPlate(MomentConnection):
         self.flange_plate.bolts_required = self.flange_plate.bolt_line * self.flange_plate.bolts_one_line
         self.flange_plate.midgauge = 2 * (
                     self.flange_plate.edge_dist_provided + self.section.root_radius) + self.section.web_thickness
-        self.flange_plate.midpitch = 2 * self.web_plate.end_dist_provided + self.web_plate.gap
+        self.web_plate.midpitch = (2 * self.web_plate.end_dist_provided) + self.web_plate.gap
+        self.flange_plate.midpitch = (2 * self.flange_plate.end_dist_provided) + self.flange_plate.gap
 
         self.web_plate.bolts_one_line = self.web_plate.bolts_one_line
         self.web_plate.bolt_line = 2 * self.web_plate.bolt_line
         self.web_plate.bolts_required = self.web_plate.bolt_line * self.web_plate.bolts_one_line
+        self.flange_plate.Innerlength = self.flange_plate.length
         # print(600, design_status)
         #     print("self.section.tension_capacity_flange",self.section.tension_capacity_flange)
         #     print("self.section.tension_capacity_web", self.section.tension_capacity_web)
@@ -1829,13 +1837,19 @@ class ColumnCoverPlate(MomentConnection):
         # print(design_status)
         print(
             self.flange_plate.length)
+        print("flange_plate.Innerlength",self.flange_plate.Innerlength)
+        print("flange_plate.Innerheight",self.flange_plate.Innerheight)
+        print("flange_plate.gap",self.flange_plate.gap)
         print(
             self.web_plate.length)
+        print("webplategap",self.web_plate.gap)
         print(
             self.flange_plate.bolts_required)
         print(
             self.web_plate.bolts_required)
         print("bolt dia", self.flange_bolt.bolt_diameter_provided)
+        print("self.web_plate.midpitch",self.web_plate.midpitch)
+        print("flange_plate.midpitch",self.flange_plate.midpitch)
 
         if self.design_status == True:
 

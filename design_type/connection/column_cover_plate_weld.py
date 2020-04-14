@@ -599,8 +599,8 @@ class ColumnCoverPlateWeld(MomentConnection):
         # self.load.shear_force = self.load.shear_force * 1000
         # self.load.moment = self.load.moment * 1000000
 
-        self.member_capacity(self)
-        # self.hard_values(self)
+        # self.member_capacity(self)
+        self.hard_values(self)
 
     #
 
@@ -610,7 +610,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         # load
         self.load.axial_force = 740.181  # KN
         self.load.shear_force = 345.886 # KN
-        self.load.moment = 52745157.413636364  # KNM
+        self.load.moment = 52.745157 # KNM
         self.section.fy = 230
         self.section.fu = 410
         #  Flange Weld
@@ -634,12 +634,14 @@ class ColumnCoverPlateWeld(MomentConnection):
         #  Inner Flange weld
         self.flange_weld.size = 10  # mm
         self.flange_plate.thickness_provided = 14
-        self.flange_weld.Innerheight = 60
+        self.flange_weld.Innerheight = 50
         self.flange_weld.Innerlength = 500
         #  Inner Flange plate
         self.flange_plate.thickness_provided = 12
         self.flange_plate.Innerheight = 70
         self.flange_plate.Innerlength = 520
+        self.flange_plate.gap =10
+        self.web_plate.gap = 10
 
     def member_capacity(self):
 

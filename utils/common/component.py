@@ -890,7 +890,7 @@ class Plate(Material):
             pass
         return gauge, edge_dist, flange_plate_h
 
-    def get_vres(self, bolts_one_line, pitch, gauge, bolt_line, shear_load, axial_load, ecc,web_moment):
+    def get_vres(self, bolts_one_line, pitch, gauge, bolt_line, shear_load, axial_load, ecc,web_moment=0.0):
         """1000
 
         :param bolts_one_line: number of bolts in one line
@@ -1057,7 +1057,7 @@ class Plate(Material):
                                          gauge, bolt_line, shear_load, axial_load, ecc,web_moment )
                 else:
                     moment_demand = 0.0
-                    vres = vres / (bolt_line * bolts_one_line)
+                    vres = resultant_force / (bolt_line * bolts_one_line)
 
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,

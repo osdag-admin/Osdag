@@ -2385,7 +2385,7 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.fu_fy_validation_connect(bp_list, bp)
 
 
-        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION,
+        elif module not in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION,
                             KEY_DISP_BASE_PLATE]:
             conn = key_1.currentText()
 

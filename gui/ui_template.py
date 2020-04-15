@@ -1682,10 +1682,10 @@ class Ui_ModuleWindow(QMainWindow):
             #                                                  main.module)
 
 
-            if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_COLUMNCOVERPLATE or main.module == KEY_DISP_CLEATANGLE):
-                # self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
-                # status = main.design_status
-                # self.commLogicObj.call_3DModel(status, CleatAngleConnection)
+            if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_CLEATANGLE):
+                self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
+                status = main.design_status
+                self.commLogicObj.call_3DModel(status, module_class)
                 # self.callFin2D_Drawing("All")
                 self.btn3D.setEnabled(True)
                 self.chkBxBeam.setEnabled(True)
@@ -2164,7 +2164,31 @@ class Ui_ModuleWindow(QMainWindow):
             #     print(designation_col[0])
             # self.designPrefDialog.column_preferences(designation_col[0], table_c, material_grade)
 
-        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
+
+        elif module == KEY_DISP_BASE_PLATE:
+            bp_list = []
+            anchor_dia = self.design_inputs[KEY_DIA_ANCHOR][0]
+            anchor_typ = self.design_inputs[KEY_TYP_ANCHOR]
+            designation_col = key_2.currentText()
+            self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
+            self.designPrefDialog.anchor_bolt_preferences(anchor_dia, anchor_typ)
+            bp_material = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_MATERIAL)
+            bp_material.setText(str(material_grade))
+            bp_fu = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FU)
+            bp_list.append(bp_fu)
+            bp_fu.setText(str(material.fu))
+            bp_fy = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FY)
+            bp_list.append(bp_fy)
+            bp_fy.setText(str(material.fy))
+
+            for bp in bp_list:
+                if bp.text() != "":
+                    self.designPrefDialog.fu_fy_validation_connect(bp_list, bp)
+
+
+        elif module not in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION,
+                            KEY_DISP_BASE_PLATE]:
+
             conn = key_1.currentText()
 
             if conn in VALUES_CONN_1:

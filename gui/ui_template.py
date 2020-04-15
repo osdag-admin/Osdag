@@ -1577,7 +1577,7 @@ class Ui_ModuleWindow(QMainWindow):
 
             selected_module = main.module_name(main)
             if selected_module == module:
-                self.setDictToUserInputs(uiObj, op_list, data, new)
+                self.setDictToUserInputs(uiObj, op_list, data, new, module)
             else:
                 QMessageBox.information(self, "Information",
                                         "Please load the appropriate Input")
@@ -1593,7 +1593,7 @@ class Ui_ModuleWindow(QMainWindow):
     @author: Umair 
     '''
 
-    def setDictToUserInputs(self, uiObj, op_list, data, new):
+    def setDictToUserInputs(self, uiObj, op_list, data, new, module):
         for op in op_list:
             key_str = op[0]
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
@@ -1606,14 +1606,20 @@ class Ui_ModuleWindow(QMainWindow):
                 key.setText(uiObj[key_str])
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 if key_str in uiObj.keys():
-
                     for n in new:
                         if n[0] == key_str:
-                            if uiObj[key_str] != n[1]():
-                                data[key_str + "_customized"] = uiObj[key_str]
-                                key.setCurrentIndex(1)
+                            if module in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED] and key_str == KEY_SECSIZE:
+                                if uiObj[key_str] != n[1](uiObj[KEY_SEC_PROFILE]):
+                                    data[key_str + "_customized"] = uiObj[key_str]
+                                    key.setCurrentIndex(1)
+                                else:
+                                    pass
                             else:
-                                pass
+                                if uiObj[key_str] != n[1]():
+                                    data[key_str + "_customized"] = uiObj[key_str]
+                                    key.setCurrentIndex(1)
+                                else:
+                                    pass
             else:
                 pass
 

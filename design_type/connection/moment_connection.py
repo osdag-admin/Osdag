@@ -140,6 +140,7 @@ class MomentConnection(Connection):
         r_1 = roots[0]
         r_2 = roots[1]
         r = max(r_1, r_2)  # picking the highest positive value from the roots
+        r = r.real  # separating the imaginary part
 
         projection = common_calculation.round_up(r + anchor_hole_dia, 5)  # mm
 

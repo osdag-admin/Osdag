@@ -238,7 +238,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.eccentricity_zz = 0.0
         self.sigma_max_zz = 0.0
         self.sigma_min_zz = 0.0
+        self.sigma_xx = 0.0
         self.ze_zz = 0.0
+        self.critical_M_xx = 0.0
+        self.n = 1
+        self.anchor_area_tension = 0.0
+        self.f = 0.0
+        self.y = 0.0
+        self.tension_demand_anchor = 0.0
 
         self.safe = True
 
@@ -994,19 +1001,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.w = self.load_axial * 1000 / self.bp_area_provided  # N/mm^2 (MPa)
 
             # design of plate thickness
-            #  thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
-            self.plate_thk = max(self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.dp_bp_fy)),
-                                 self.column_tf)  # base plate thickness should be larger than the flange thickness
+            # thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
+            self.plate_thk = self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.dp_bp_fy))  # mm
 
         elif self.connectivity == 'Gusseted Base Plate':
 
             self.eccentricity_zz = self.load_moment_major / self.load_axial  # mm, eccentricity about major (z-z) axis
 
-            # Defining cases: Case 1: L >= 6e (compression throughout the BP)
-            #                 Case 2: L < 3e  (compression throughout + moderate tension/uplift in the anchor bolts)
-            #                 Case 3: L >= 3e (compression + high tension/uplift in the anchor bolts)
+            # Defining cases: Case 1: e <= L/6        (compression throughout the BP)
+            #                 Case 2: L/6 < e < L/3   (compression throughout + moderate tension/uplift in the anchor bolts)
+            #                 Case 3: e >= L/3        (compression + high tension/uplift in the anchor bolts)
 
-            if (6 * self.eccentricity_zz) <= self.bp_length_min < (3 * self.eccentricity_zz):  # Case 1 and Case 2
+            if self.eccentricity_zz <= self.bp_length_min / 6:  # Case 1
 
                 # fixing length and width of the base plate
                 width_min = 2 * self.load_axial / self.bp_length_min * self.bearing_strength_concrete  # mm
@@ -1014,24 +1020,70 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     width_min = self.bp_width_min
                 else:
                     pass
+
                 self.bp_length_provided = max(self.bp_length_min, width_min)  # mm, assigning maximum dimension to length
                 self.bp_width_provided = min(self.bp_length_min, width_min)  # mm, assigning minimum dimension to width
                 self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
 
                 # calculating the maximum and minimum bending stresses
-                self.ze_zz = self.bp_width_provided * self.bp_length_provided ** 2 / 6  # mm^3
+                self.ze_zz = self.bp_width_provided * self.bp_length_provided ** 2 / 6  # mm^3, elastic section modulus of plate (BL^2/6)
 
                 self.sigma_max_zz = (self.load_axial * 1000 / self.bp_area_provided) + (self.load_moment_major / self.ze_zz)  # N/mm^2
                 self.sigma_min_zz = (self.load_axial * 1000 / self.bp_area_provided) - (self.load_moment_major / self.ze_zz)  # N/mm^2
 
                 # calculating moment at the critical section
+
                 # Assumption: the critical section (critical_xx) acts at a distance of 0.95 times the column depth, along the depth
                 critical_xx = (self.bp_length_provided - 0.95 * self.depth) / 2  # mm
+                self.sigma_xx = (self.sigma_max_zz - self.sigma_min_zz) * (self.bp_length_provided - critical_xx) / self.bp_length_provided
+                self.sigma_xx = self.sigma_xx + self.sigma_min_zz  # N/mm^2, bending stress at the critical section
 
-            elif (3 * self.eccentricity_zz) >= self.bp_length_min:
+                self.critical_M_xx = (self.sigma_xx * critical_xx ** 2 / 2) + (0.5 * critical_xx * (self.sigma_max_zz - self.sigma_xx)
+                                                                    * (2 / 3) * critical_xx)  # N-mm, bending moment at critical section
+
+                # equating critical moment with critical moment to compute the required minimum plate thickness
+                # Assumption: The bending capacity of the plate is (M_d = 1.5*fy*Z_e/gamma_m0) [Reference: Clause 8.2.1.2, IS 800:2007]
+                # Assumption: Z_e of the plate is = b*tp^2 / 6, where b = 1 for a cantilever strip of unit dimension
+
+                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy))  # mm
+
+            else:  # Case 2 and Case 3
+
+                # fixing length and width of the base plate
+                self.bp_length_provided = self.bp_length_min
+                self.bp_width_provided = self.bp_width_min
+
+                # calculating the distance (y) which lies under compression
+                # Reference: Omer Blodgett, Column Bases, section 3.3, equation 13
+
+                self.n = 2 * 10 ** 5 / (5000 * math.sqrt(self.cl_7_4_1_bearing_strength_concrete(self.footing_grade) / 0.45))
+                self.anchor_area_tension = self.anchor_area[0] * (self.anchor_nos_provided / 2)  # mm^2, area of anchor under tension
+                self.f = (self.bp_length_provided / 2) - self.end_distance  # mm
+
+                k1 = 3 * (self.eccentricity_zz - self.bp_length_provided / 2)
+                k2 = (6 * self.n * self.anchor_area_tension / self.bp_width_provided) * (self.f + self.eccentricity_zz)
+                k3 = (self.bp_length_provided / 2 + self.f) * -k2
+
+                # equation for finding 'y' is: y^3 + k1*y^2 + k2*y + k3 = 0
+                roots = np.roots([1, k1, k2, k3])  # finding roots of the equation
+                r_1 = roots[0]
+                r_2 = roots[1]
+                r_3 = roots[2]
+                r = max(r_1, r_2, r_3)
+                r = r.real  # separating the imaginary part
+
+                self.y = round(r, 3)  # mm
+
+                # finding tension in the bolts for maximum permissible bearing stress (0.45*f_ck)
+                self.tension_demand_anchor = (self.bearing_strength_concrete * self.anchor_area_tension * self.n / self.y) * \
+                                             (self.anchor_length_provided / 2 + self.f - self.y)  # N
+                self.tension_demand_anchor = round(self.tension_demand_anchor / 1000, 2)  # kN
+
                 pass
 
-        # assigining plate thickness according to the available standard sizes
+        self.plate_thk = max(self.plate_thk, self.flange_thickness)  # base plate thickness should be larger than the flange thickness
+
+        # assigning plate thickness according to the available standard sizes
         # the thicknesses of the flats (in mm) listed below is obtained from SAIL's product brochure
         standard_plate_thk = [8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40, 45, 50, 56, 63, 75, 80, 90, 100, 110, 120]
 

@@ -84,10 +84,10 @@ class IS800_2007(object):
     def cl_7_4_1_bearing_strength_concrete(concrete_grade):
         """
         Args:
-            concrete_grade: grade of concrete used for pedestal/footing.
+            concrete_grade: grade of concrete used for pedestal/footing (str).
 
         Returns:
-            maximum permissible bearing strength of concrete pedestal/footing.
+            maximum permissible bearing strength of concrete pedestal/footing (float).
 
         Note:
             cl 7.4.1 suggests the maximum bearing strength equal to 0.60 times f_ck,

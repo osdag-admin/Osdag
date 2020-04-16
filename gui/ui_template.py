@@ -1224,9 +1224,9 @@ class Ui_ModuleWindow(QMainWindow):
         display = self.modelTab._display
 
         # background gradient
-        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
         # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        display.display_trihedron()
+        display.display_triedron()
         # display.display_triedron()
         display.View.SetProj(1, 1, 1)
 
@@ -2186,8 +2186,9 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.fu_fy_validation_connect(bp_list, bp)
 
 
-        elif module not in [KEY_DISP_COLUMNCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD,KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION,
-                            KEY_DISP_BASE_PLATE]:
+
+        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,
+                            KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
 
             conn = key_1.currentText()
 

@@ -633,7 +633,7 @@ class FinPlateConnection(ShearConnection):
             self.get_plate_thickness(self)
 
     def get_plate_thickness(self):
-
+        initial_plate_height = self.plate.height
         for self.plate.thickness_provided in self.thickness_possible:
             if self.connectivity in VALUES_CONN_1:
                 self.weld_connecting_plates = [self.supporting_section.flange_thickness, self.plate.thickness_provided]
@@ -641,18 +641,38 @@ class FinPlateConnection(ShearConnection):
                 self.weld_connecting_plates = [self.supporting_section.web_thickness, self.plate.thickness_provided]
             [available_welds,weld_size_min,weld_size_max] = self.get_available_welds(self,self.weld_connecting_plates)
             if available_welds:
-                self.plate_shear_checks(self)
-                if self.plate.design_status is True:
-                    self.design_weld(self, available_welds)
-                    if self.weld.design_status is True:
-                        break
+                while self.plate.height <= self.max_plate_height + 10:
+                    self.plate_shear_checks(self)
+                    if self.plate.design_status is True:
+                        self.design_weld(self, available_welds)
+                        if self.weld.design_status is True:
+                            break
+                    else:
+                        self.plate.height+=10
+                        [self.plate.gauge_provided, self.plate.edge_dist_provided, self.plate.height] =\
+                            self.plate.get_gauge_edge_dist(web_plate_h=self.plate.height,bolts_one_line=self.plate.bolts_one_line,
+                                                       edge_dist=self.plate.edge_dist_provided,max_spacing=self.bolt.max_spacing,
+                                                       max_edge_dist=self.bolt.max_edge_dist)
+                        ecc = (self.plate.pitch_provided * max((self.plate.bolt_line - 1.5), 0)) + self.plate.end_dist_provided + self.plate.gap
+                        self.plate.bolt_force = self.plate.get_vres(bolts_one_line=self.plate.bolts_one_line,pitch=self.plate.pitch_provided,
+                                            gauge=self.plate.gauge_provided,bolt_line=self.plate.bolt_line, shear_load=self.load.shear_force*1000,
+                                            axial_load=self.load.axial_force, ecc = ecc)
+                        self.plate.bolt_capacity_red = self.plate.get_bolt_red(bolts_one_line=self.plate.bolts_one_line,gauge=self.plate.gauge_provided,
+                                                bolts_line=self.plate.bolt_line,pitch=self.plate.pitch_provided,
+                                                bolt_capacity=self.bolt.bolt_capacity,bolt_dia=self.bolt.bolt_diameter_provided)
+                        if self.plate.bolt_capacity_red < self.plate.bolt_force:
+                            self.plate.height =initial_plate_height
+                            break
+
+                if self.plate.design_status == True and self.weld.design_status == True:
+                    self.plate_shear_checks(self)
+                    break
+
             else:
                 logger.error(": For given members and %2.2f mm thick plate, weld sizes should be of range "
                          "%2.2f mm and  %2.2f mm " %self.plate.thickness_provided % weld_size_min
                              % weld_size_max)
                 logger.info(": Cannot design weld with available welds ")
-
-        self.plate_shear_checks(self)
 
         if self.plate.design_status is False:
             plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,
@@ -956,6 +976,9 @@ class FinPlateConnection(ShearConnection):
         bolt_force_kn=round(self.plate.bolt_force,2)
         bolt_capacity_red_kn=round(self.plate.bolt_capacity_red,2)
 
+        t1 = ('SubSection', 'Bolt Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
         if self.bolt.bolt_type == TYP_BEARING:
             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.fu,1,self.bolt.bolt_net_area,
                                                                self.bolt.gamma_mb,bolt_shear_capacity_kn), '')
@@ -1009,6 +1032,28 @@ class FinPlateConnection(ShearConnection):
         t5=(KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn,bolt_capacity_red_kn,
             get_pass_fail(bolt_force_kn,bolt_capacity_red_kn,relation="lesser"))
         self.report_check.append(t5)
+
+        t1 = ('SubSection', 'Plate Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.min_plate_height), self.plate.height,
+              get_pass_fail(self.min_plate_height, self.plate.height,relation="lesser"))
+        self.report_check.append(t1)
+        t1 = (DISP_MAX_PLATE_HEIGHT, max_plate_ht_req(self.connectivity,self.supported_section.depth,
+                                                      self.supported_section.flange_thickness,
+                                                      self.supported_section.root_radius, self.supported_section.notch_ht,
+                                                      self.max_plate_height), self.plate.height,
+              get_pass_fail(self.max_plate_height, self.plate.height,relation="greater"))
+        self.report_check.append(t1)
+        min_plate_length = self.plate.gap +2*self.bolt.min_end_dist+(self.plate.bolt_line-1)*self.bolt.min_pitch
+        t1 = (DISP_MIN_PLATE_LENGTH, min_plate_length_req(self.bolt.min_pitch, self.bolt.min_end_dist,
+                                                      self.plate.bolt_line,min_plate_length), self.plate.length,
+              get_pass_fail(min_plate_length, self.plate.length, relation="lesser"))
+        self.report_check.append(t1)
+        t1 = (DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness), self.plate.thickness_provided,
+              get_pass_fail(self.supported_section.web_thickness, self.plate.thickness_provided, relation="lesser"))
+        self.report_check.append(t1)
+
          # KEY_OUT_PLATE_BLK_SHEAR,
          # KEY_OUT_PLATE_HEIGHT,
          # KEY_OUT_PLATE_MOM_CAPACITY,

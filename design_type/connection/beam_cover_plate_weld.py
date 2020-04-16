@@ -1053,7 +1053,9 @@ class BeamCoverPlateWeld(MomentConnection):
                 self.l_req_flangelength = round_up(
                     ((2 * self.available_long_flange_length) + self.flange_plate.height + (
                             2 * self.flange_weld.size)), 5)
+
                 self.flange_weld.stress = self.flange_force / self.l_req_flangelength
+
                 if self.flange_weld.stress < self.flange_weld.strength:
                     if self.available_long_flange_length > self.flange_plate.height:
                         self.design_status = True

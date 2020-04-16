@@ -1,7 +1,7 @@
 from builtins import str
 import time
 import math
-# from Common import *
+from Common import *
 import os
 import pdfkit
 import configparser
@@ -155,6 +155,44 @@ def get_trial_bolts(V_u, A_u,bolt_capacity,multiple=1):
     trial_bolts_eqn.append(NoEscape(r'R_{u} &= \frac{\sqrt{'+V_u+r'^2+'+A_u+r'^2}}{'+bolt_capacity+ r'}\\'))
     trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
     return trial_bolts_eqn
+
+def min_plate_ht_req(beam_depth,min_plate_ht):
+    beam_depth = str(beam_depth)
+    min_plate_ht = str(min_plate_ht)
+    min_plate_ht_eqn = Math(inline=True)
+    min_plate_ht_eqn.append(NoEscape(r'\begin{aligned}0.6 * d_b&= 0.6 * '+ beam_depth + r'='+min_plate_ht+r'\end{aligned}'))
+    return min_plate_ht_eqn
+
+def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_plate_h):
+    beam_depth = str(beam_depth)
+    beam_f_t = str(beam_f_t)
+    beam_r_r = str(beam_r_r)
+    max_plate_h = str(max_plate_h)
+    max_plate_ht_eqn = Math(inline=True)
+    if connectivity in VALUES_CONN_1:
+        max_plate_ht_eqn.append(NoEscape(r'\begin{aligned} &d_b - 2 (t_{bf} + r_{b1} + gap)\\'))
+        max_plate_ht_eqn.append(NoEscape(r'&='+beam_depth+ '- 2* (' + beam_f_t + '+' + beam_r_r +r'+ 10)\\'))
+    else:
+        max_plate_ht_eqn.append(NoEscape(r'\begin{aligned} &d_b - t_{bf} + r_{b1} - notch_h\\'))
+        max_plate_ht_eqn.append(NoEscape(r'&=' + beam_depth + '-' + beam_f_t + '+' + beam_r_r + '-'+ notch+ r'\\'))
+    max_plate_ht_eqn.append(NoEscape(r'&=' + max_plate_h + '\end{aligned}'))
+    return max_plate_ht_eqn
+
+def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
+    min_pitch = str(min_pitch)
+    min_end_dist = str(min_end_dist)
+    bolt_line = str(bolt_line)
+    min_plate_length_eqn = Math(inline=True)
+    min_plate_length_eqn.append(NoEscape(r'\begin{aligned} &2*e_{min} + (bolt~lines-1) * p_{min})\\'))
+    min_plate_length_eqn.append(NoEscape(r'&=2*' + min_end_dist + '+(' + bolt_line + '-1) * ' + min_pitch + r'\\'))
+    min_plate_length_eqn.append(NoEscape(r'&=' + min_length + '\end{aligned}'))
+    return min_plate_length_eqn
+
+def min_plate_thk_req(t_w):
+    t_w = str(t_w)
+    min_plate_thk_eqn = Math(inline=True)
+    min_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_w='+t_w+'\end{aligned}'))
+    return min_plate_thk_eqn
 
 def get_pass_fail(required, provided,relation='greater'):
     required = float(required)

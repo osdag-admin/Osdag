@@ -154,17 +154,22 @@ class CreateLatex(Document):
 
 
         with doc.create(Section('Design Checks')):
-            with doc.create(LongTable('|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|',row_height=1.2)) as table:
-                table.add_hline()
-                # merge_rows = int(round_up(len(beamdetails), 2) / 2 + 2)#todo
-                table.add_row(('Check', 'Required', 'Provided', 'Remarks'),color='OsdagGreen')
-                table.add_hline()
-                table.end_table_header()
-                table.add_hline()
-                # if Design_Check !=None: #todo
-                for check in Design_Check:
+
+            for check in Design_Check:
+                if check[0] == 'SubSection':
+                    with doc.create(Subsection(check[1])):
+                        with doc.create(LongTable(check[2],row_height=1.2)) as table:
+                            table.add_hline()
+                            table.add_row(('Check', 'Required', 'Provided', 'Remarks'),color='OsdagGreen')
+                            table.add_hline()
+                            table.end_table_header()
+                            table.add_hline()
+                else:
+
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()
+
+
 
         doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
 

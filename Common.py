@@ -91,8 +91,23 @@ def connectdb1():
     l2 = tuple_to_str_popup(lst)
     return l2
 
+def connectdb2():
+    """
+    Function to fetch diameter values from Bolt Table
+     """
+    # @author: Amir
 
-def connectdb(table_name,call_type="dropdown"):
+    lst = []
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+    cursor = conn.execute("SELECT Diameter FROM Anchor_Bolt")
+    rows = cursor.fetchall()
+    for row in rows:
+        lst.append(row)
+    l2 = tuple_to_str_popup(lst)
+    return l2
+
+
+def connectdb(table_name, call_type="dropdown"):
 
     """
         Function to fetch designation values from respective Tables.
@@ -271,6 +286,10 @@ DISP_MIN_EDGE = 'Min. Edge Distance (mm)'
 DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
 DISP_MIN_END = 'Min. End Distance (mm)'
 DISP_MAX_END = 'Max. End Distance (mm)'
+DISP_MIN_PLATE_HEIGHT = 'Min. Plate Height (mm)'
+DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
+DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
+DISP_MIN_PLATE_THICK = 'Min.Plate Thickness (mm)'
 KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
 KEY_DISP_FY = 'Yield Strength , fy (MPa)'
 ###################################
@@ -314,7 +333,10 @@ VALUES_CONN_2 = ['Beam-Beam']
 ## Column End Plate ##
 VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
 ####
-VALUES_CONN_BP = ['Pinned Base Plate', 'Gusseted Base Plate', 'Base Plate with Cleat Angles', 'Hollow Sections']
+
+
+VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
+
 
 
 KEY_LOCATION = 'Conn_Location'
@@ -365,15 +387,24 @@ DISP_TITLE_FSL = 'Factored load'
 # Key for Storing Moment sub-key of Load
 KEY_MOMENT = 'Load.Moment'
 KEY_DISP_MOMENT = 'Moment(kNm)*'
-DISP_TITLE_MOMENT = 'Moment load'
 KEY_MOMENT_MAJOR = 'Load.Moment.Major'
-KEY_DISP_MOMENT_MAJOR = 'Major axis (M<sub>z-z</sub>)'
+KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_MOMENT_MINOR = 'Load.Moment.Minor'
-KEY_DISP_MOMENT_MINOR = 'Minor axis (M<sub>y-y</sub>)'
+KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
 KEY_DIA_ANCHOR = 'Anchor Bolt.Diameter'
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
 VALUES_DIA_ANCHOR = ['All', 'Customized']
+KEY_TYP_ANCHOR = 'Anchor Bolt.Type'
+KEY_DISP_TYP_ANCHOR = 'Type*'
+VALUES_TYP_ANCHOR = ['Select Type', 'IS 5624-Type A', 'IS 5624-Type B', 'End Plate Type']
+KEY_GRD_ANCHOR = 'Anchor Bolt.Grade'
+KEY_DISP_GRD_ANCHOR = 'Grade*'
+VALUES_GRD_ANCHOR = ['All', 'Customized']
+DISP_TITLE_FOOTING = 'Pedestal/Footing'
+KEY_GRD_FOOTING = 'Footing.Grade'
+KEY_DISP_GRD_FOOTING = 'Grade*'
+VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 
 ###################################
 # Key for Storing Shear sub-key of Load
@@ -464,7 +495,7 @@ DISP_TITLE_TENSION = 'Tension Capacity'
 
 
 
-DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate'
+DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate '
 
 KEY_FLANGEPLATE_PREFERENCES = 'Flange_Plate.Preferences'
 KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
@@ -480,16 +511,19 @@ KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness(mm)'
 KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
 KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
-KEY_DISP_FLANGE_PLATE_LENGTH ='Length'
+KEY_DISP_FLANGE_PLATE_LENGTH ='Length (mm)'
 
+
+KEY_INNERPLATE= "flange_plate.Inner_plate_details"
+KEY_DISP_INNERFLANGESPLICEPLATE = "Inner Plate Detials"
 DISP_TITLE_INNERFLANGESPLICEPLATE = 'Inner Flange splice plate'
 KEY_INNERFLANGE_PLATE_HEIGHT = 'flange_plate.InnerHeight'
 KEY_DISP_INNERFLANGE_PLATE_HEIGHT = 'Height(mm)'
 KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
-KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length'
+KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length(mm)'
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
-KEY_DISP_FLANGE_SPACING = 'Spacing'
+KEY_DISP_FLANGE_SPACING = 'Spacing(mm)'
 KEY_FLANGE_PITCH = 'Flange_plate.pitch_provided'
 KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
 KEY_FLANGE_PLATE_GAUGE = "Flange_plate.gauge_provided "
@@ -502,10 +536,10 @@ KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 KEY_FLANGE_CAPACITY ="Flange_plate.capacity"
 KEY_DISP_FLANGE_CAPACITY= 'Capacity'
 KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
-KEY_DISP_FLANGE_TEN_CAPACITY ="Tension capacity"
+KEY_DISP_FLANGE_TEN_CAPACITY ="Tension capacity (kN)"
 
 KEY_FLANGE_PLATE_TEN_CAP ="Flange_plate.tension_capacity"
-KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension cap"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension cap (kN)"
 
 
 KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
@@ -519,9 +553,9 @@ KEY_DISP_SHEARYIELDINGCAP_FLANGE= 'Shear Yielding Capacity'
 KEY_SHEARRUPTURECAP_FLANGE= 'Flange_plate.shear_rupture_capacity'
 KEY_DISP_SHEARRUPTURECAP_FLANGE= 'Shear Rupture Capacity'
 KEY_FLANGE_PLATE_MOM_DEMAND = 'Flange_Plate.MomDemand'
-KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
+KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Moment Demand (kNm)'
 KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
-KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
+KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kNm)'
 KEY_DESIGNATION = "section_size.designation"
 KEY_DISP_DESIGNATION = "Designation"
 
@@ -559,8 +593,8 @@ KEY_INNERFLANGE_WELD_DETAILS = "Inner Flange detail"
 KEY_DISP_INNERFLANGE_WELD_DETAILS = "Weld Details"
 
 KEY_WELD_TYPE = 'Weld.Type'
-KEY_DISP_WELD_TYPE ='Weld Type'
-VALUES_WELD_TYPE = ["select type","Fillet Weld"]
+KEY_DISP_WELD_TYPE = 'Type'
+VALUES_WELD_TYPE = ["Select type", "Fillet Weld", "Butt Weld"]
 DISP_FLANGE_TITLE_WELD = 'Flange Weld'
 KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
 KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size(mm)'
@@ -575,12 +609,14 @@ KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
 KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
 
 KEY_INNERFLANGE_WELD_LENGTH = 'Flange_Weld.InnerLength'
-KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length'
+KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length(mm)'
 KEY_INNERFLANGE_WELD_LENGTH_EFF = 'Flange_Weld.InnerEffLength'
 KEY_INNERFLANGE_WELD_HEIGHT ='flange_Weld.Innerheight'
-KEY_DISP_INNERFLANGE_WELD_HEIGHT = 'Height'
-
-
+KEY_DISP_INNERFLANGE_WELD_HEIGHT = 'Height(mm)'
+KEY_INNERFLANGE_WELD_STRESS = 'Inner_Flange_Weld.Stress'
+KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
+KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
+KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
@@ -592,10 +628,10 @@ VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20'
 KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height(mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
-KEY_DISP_WEB_PLATE_LENGTH ='Length'
+KEY_DISP_WEB_PLATE_LENGTH ='Length(mm)'
 
 KEY_WEB_SPACING ="Web_plate.spacing"
-KEY_DISP_WEB_SPACING = 'Spacing'
+KEY_DISP_WEB_SPACING = 'Spacing(mm)'
 KEY_WEB_PITCH = "Web_plate.pitch_provided"
 KEY_DISP_WEB_PLATE_PITCH ="Pitch"
 KEY_WEB_GAUGE = "Web_plate.gauge_provided "
@@ -608,11 +644,11 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance'
 KEY_WEB_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_CAPACITY= 'Capacity'
 KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
-KEY_DISP_WEB_TEN_CAPACITY ="Tension Capacity"
+KEY_DISP_WEB_TEN_CAPACITY ="Tension Capacity (kN)"
 KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
-KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Plate Shear Capacity"
+KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Plate Shear Capacity (kN)"
 KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
-KEY_DISP_TEN_CAP_WEB_PLATE ="Plate Tension Capacity"
+KEY_DISP_TEN_CAP_WEB_PLATE ="Plate Tension Capacity (kN)"
 
 
 KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'
@@ -626,9 +662,9 @@ KEY_DISP_TENSIONYIELDINGCAP_WEB ='Tension Yielding Capacity'
 KEY_TENSIONRUPTURECAP_WEB ='web_plate.shear_rupture_capacity'
 KEY_DISP_TENSIONRUPTURECAP_WEB ='Tension Rupture Capacity'
 KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
-KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
+KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Moment Demand (kNm)'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
-KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
+KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kNm)'
 KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
 KEY_WEB_DISP_BOLT_LINE = 'Bolt Lines in web'
 KEY_WEB_BOLTS_REQ = "Web_plate.Bolt_required"
@@ -664,6 +700,22 @@ VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZ
 ALL_WELD_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16]
 
 
+KEY_DP_ANCHOR_BOLT_DESIGNATION = 'DesignPreferences.Anchor_Bolt.Designation'
+KEY_DP_ANCHOR_BOLT_TYPE = 'DesignPreferences.Anchor_Bolt.Type'
+KEY_DISP_DP_ANCHOR_BOLT_TYPE = 'Anchor Bolt type'
+KEY_DP_ANCHOR_BOLT_HOLE_TYPE = 'DesignPreferences.Anchor_Bolt.Bolt_Hole_Type'
+KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE = 'Anchor Bolt hole type'
+KEY_DP_ANCHOR_BOLT_MATERIAL_G_O = 'DesignPreferences.Anchor_Bolt.Material_Grade_OverWrite'
+KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
+KEY_DISP_DP_ANCHOR_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
+KEY_DP_ANCHOR_BOLT_SLIP_FACTOR = 'DesignPreferences.Anchor_Bolt.Slip_Factor'
+KEY_DISP_DP_ANCHOR_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
+KEY_DP_ANCHOR_BOLT_GALVANIZED = 'DesignPreferences.Anchor_Bolt.Galvanized'
+KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED = 'Is galvanized?'
+KEY_DP_ANCHOR_BOLT_LENGTH = 'DesignPreferences.Anchor_Bolt.Length'
+KEY_DISP_DP_ANCHOR_BOLT_LENGTH = 'Length'
+KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficient'
+KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction coefficient between <br>concrete and anchor bolt'
 
 
 KEY_DP_BOLT_TYPE = 'DesignPreferences.Bolt.Type'
@@ -694,6 +746,8 @@ KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'DesignPreferences.Detailing.Corrosive_I
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the members exposed to <br>corrosive influences'
 KEY_DP_DESIGN_METHOD = 'DesignPreferences.Design.Design_Method'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
+KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
+KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate'
 
 KEY_SUPTNGSEC_DESIGNATION = 'Supporting_Section.Designation'
 KEY_DISP_SUPTNGSEC_DESIGNATION = 'Designation'
@@ -811,6 +865,14 @@ KEY_SUPTDSEC_POISSON_RATIO = 'Supported_Section.Poisson_Ratio'
 KEY_DISP_SUPTDSEC_POISSON_RATIO = 'Poissons ratio, v'
 KEY_SUPTDSEC_THERMAL_EXP = 'Supported_Section.Thermal_Expansion'
 KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
+
+
+KEY_BASE_PLATE_MATERIAL = 'Base_Plate.Material'
+KEY_BASE_PLATE_FU = 'Base_Plate.Fu'
+KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
+KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , fy (MPa)'
+KEY_BASE_PLATE_FY = 'Base_Plate.Fy'
+
 
 
 
@@ -1033,8 +1095,8 @@ KEY_END2 = 'End_2'
 KEY_DISP_END2 = 'End 2'
 VALUES_END2 = ['Fixed', 'Free', 'Hinged', 'Roller']
 
-
-
+KEY_END_CONDITION = 'ENd Condition'
+KEY_DISP_END_CONDITION = 'End Cndition'
 
 DISP_TITLE_CLEAT = 'Cleat Angle'
 DISP_TITLE_ANGLE = 'Angle Section'

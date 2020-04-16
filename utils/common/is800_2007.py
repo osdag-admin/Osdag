@@ -784,9 +784,11 @@ class IS800_2007(object):
         """
         if l_j <= 150 * t_t:
             return 1.0
-        beta_lw = 1.2 - 0.2 * l_j / (150 * t_t)
+        beta_lw = 1.2 - ((0.2 * l_j) / (150 * t_t))
         if beta_lw >= 1.0:
             beta_lw = 1.0
+        elif beta_lw <= 0.6:
+            beta_lw = 0.6
         return beta_lw
 
     # -------------------------------------------------------------

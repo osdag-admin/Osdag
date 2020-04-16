@@ -560,13 +560,13 @@ KEY_DESIGNATION = "section_size.designation"
 KEY_DISP_DESIGNATION = "Designation"
 
 KEY_TENSION_YIELDCAPACITY = "Member.tension_yielding"
-KEY_DISP_TENSION_YIELDCAPACITY = 'Yield'
+KEY_DISP_TENSION_YIELDCAPACITY = 'Yield (KN)'
 KEY_TENSION_RUPTURECAPACITY = "Member.tension_rupture"
-KEY_DISP_TENSION_RUPTURECAPACITY = 'Rupture'
+KEY_DISP_TENSION_RUPTURECAPACITY = 'Rupture (KN)'
 KEY_TENSION_BLOCKSHEARCAPACITY = "Member.tension_blockshear"
-KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear'
+KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear (KN)'
 KEY_TENSION_CAPACITY = "Member.tension_capacity"
-KEY_DISP_TENSION_CAPACITY = "Tension Capacity"
+KEY_DISP_TENSION_CAPACITY = "Tension Capacity (KN)"
 
 KEY_EFFICIENCY = "Member.efficiency"
 KEY_DISP_EFFICIENCY = "Efficiency"
@@ -949,10 +949,10 @@ KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
 KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
-KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
+KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity (KN)'
 KEY_OUT_DISP_BOLT_VALUE = 'Bolt Value (kN)'
 KEY_OUT_BOLT_FORCE = 'Bolt.Force'
-KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force'
+KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force (KN)'
 KEY_OUT_DISP_BOLT_SHEAR_FORCE = 'Bolt Shear Force (kN)'
 KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
 KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
@@ -962,9 +962,9 @@ KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
-KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines'
+KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
-KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line'
+KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line (nos)'
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
@@ -989,7 +989,7 @@ KEY_OUT_MIN_EDGE_DIST = 'Bolt.MinEdgeDist'
 KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
 
 
-KEY_OUT_DISP_EDGE_DIST = 'Edge Distance'
+KEY_OUT_DISP_EDGE_DIST = 'Edge Distance (mm)'
 
 
 KEY_OUT_SPTNG_BOLT_SHEAR = 'Cleat.Sptng_leg.Shear'

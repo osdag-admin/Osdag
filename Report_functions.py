@@ -182,6 +182,7 @@ def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     min_pitch = str(min_pitch)
     min_end_dist = str(min_end_dist)
     bolt_line = str(bolt_line)
+    min_length = str(min_length)
     min_plate_length_eqn = Math(inline=True)
     min_plate_length_eqn.append(NoEscape(r'\begin{aligned} &2*e_{min} + (bolt~lines-1) * p_{min})\\'))
     min_plate_length_eqn.append(NoEscape(r'&=2*' + min_end_dist + '+(' + bolt_line + '-1) * ' + min_pitch + r'\\'))

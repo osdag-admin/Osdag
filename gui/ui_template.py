@@ -1573,7 +1573,7 @@ class Ui_ModuleWindow(QMainWindow):
                 uiObj = yaml.load(fileObject)
             module = uiObj[KEY_MODULE]
 
-            # module_class = self.return_class(module)
+            module_class = self.return_class(module)
 
             selected_module = main.module_name(main)
             if selected_module == module:
@@ -1685,6 +1685,7 @@ class Ui_ModuleWindow(QMainWindow):
             if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_CLEATANGLE):
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
+                module_class = self.return_class(main.module)
                 self.commLogicObj.call_3DModel(status, module_class)
                 # self.callFin2D_Drawing("All")
                 self.btn3D.setEnabled(True)

@@ -1051,6 +1051,19 @@ class FinPlateConnection(ShearConnection):
         t1 = (DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness), self.plate.thickness_provided,
               get_pass_fail(self.supported_section.web_thickness, self.plate.thickness_provided, relation="lesser"))
         self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_PLATE_BLK_SHEAR, self.load.shear_force, self.plate.block_shear_capacity,
+              get_pass_fail(self.load.shear_force, round(self.plate.block_shear_capacity/1000,2), relation="lesser"))
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_SHEAR_YLD, self.load.shear_force, self.plate.shear_yielding_capacity,
+              get_pass_fail(self.load.shear_force, round(self.plate.shear_yielding_capacity / 1000, 2), relation="lesser"))
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_SHEAR_RUP, self.load.shear_force, self.plate.shear_rupture_capacity,
+              get_pass_fail(self.load.shear_force, round(self.plate.shear_rupture_capacity / 1000, 2), relation="lesser"))
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY, self.plate.moment_demand, self.plate.moment_capacity,
+              get_pass_fail(self.plate.moment_demand, round(self.plate.moment_capacity / 1000000, 2), relation="lesser"))
+        self.report_check.append(t1)
+
 
          # KEY_OUT_PLATE_BLK_SHEAR,
          # KEY_OUT_PLATE_HEIGHT,

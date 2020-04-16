@@ -2282,7 +2282,7 @@ class Ui_ModuleWindow(QMainWindow):
             tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
         tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
 
-        if module not in [KEY_DISP_BASE_PLATE]:
+        if module not in [KEY_DISP_BASE_PLATE,KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
             material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
             material_connector.setCurrentText(str(material_grade))
 
@@ -2385,7 +2385,7 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.fu_fy_validation_connect(bp_list, bp)
 
 
-        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION,
+        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED,
                             KEY_DISP_BASE_PLATE]:
             conn = key_1.currentText()
 

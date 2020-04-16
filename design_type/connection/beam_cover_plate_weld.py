@@ -806,6 +806,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                                         r_1=self.section.root_radius,
                                                                                         D=self.section.depth,
                                                                                         preference=self.preference)
+
                     self.web_plate.thickness_provided = self.min_thick_based_on_area(self,
                                                                                      tk=self.section.web_thickness,
                                                                                      width=self.section.depth,
@@ -814,7 +815,11 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                                      r_1=self.section.root_radius,
                                                                                      D=self.section.depth, )
 
-                    print("tension_yielding_capacity of flange", self.section.tension_yielding_capacity)
+                    if self.web_plate.thickness_provided == 0 or self.flange_plate.thickness_provided == 0:
+                        self.design_status = False
+                        logger.error("flange plate is not possible")
+                    else:
+                        self.design_status = True
 
             else:
                 self.design_status = False
@@ -1048,7 +1053,8 @@ class BeamCoverPlateWeld(MomentConnection):
                 self.l_req_flangelength = round_up(
                     ((2 * self.available_long_flange_length) + self.flange_plate.height + (
                             2 * self.flange_weld.size)), 5)
-                self.flange_weld.stress = self.flange_force / self.l_req_flange                if self.flange_weld.stress < self.flange_weld.strength:
+                self.flange_weld.stress = self.flange_force / self.l_req_flangelength
+                if self.flange_weld.stress < self.flange_weld.strength:
                     if self.available_long_flange_length > self.flange_plate.height:
                         self.design_status = True
                         break
@@ -1595,20 +1601,24 @@ class BeamCoverPlateWeld(MomentConnection):
                 outerwidth = width - (2 * 20)
                 innerwidth = (width - t_w - (2 * r_1) - (4 * 20)) / 2
                 if innerwidth < 50:
-                    logger.error(":Inner Plate not possible")
+                    # logger.error(":Inner Plate not possible")
                     self.design_status = False
                 else:
-                    pass
+                    self.design_status = True
+                    flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y
 
-                flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y
+
             else:
                 webwidth = D - (2 * tk) - (2 * r_1) - (2 * 20)
                 flange_plate_crs_sec_area = (2 * webwidth) * y
-            if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
-                thickness = y
-                break
+            if self.design_status == True:
+                if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                    thickness = y
+                    break
             else:
+                thickness = 0
                 self.design_status = False
+                logger.error(":Inner Plate not possible")
 
         return thickness
 

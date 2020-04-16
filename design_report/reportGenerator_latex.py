@@ -42,8 +42,9 @@ class CreateLatex(Document):
 
 
     @pyqtSlot()
-    def save_latex(self, outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder, rel_path, Disp_3d_image):
-
+    # def save_latex(self, outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder, rel_path, Disp_3d_image):
+    def save_latex(self, outObj, uiObj, Design_Check, beamdetails,  reportsummary, filename, folder,
+                       rel_path, Disp_3d_image,columndetails=None):
 
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
@@ -95,7 +96,7 @@ class CreateLatex(Document):
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
 
                     print(i)
-                    if i == "Column Details":
+                    if i == "Column Details" and columndetails !=None: #todo
                         table.add_hline()
                         merge_rows = int(round_up(len(columndetails),2)/2 + 2)
                         print('Hi', len(columndetails)/2,round_up(len(columndetails),2)/2, merge_rows)
@@ -117,7 +118,7 @@ class CreateLatex(Document):
                                 table.add_row(('', a[x], columndetails[a[x]],a[merge_rows+x-4], columndetails[a[merge_rows+x-4]],))
                             table.add_hline(2,5)
 
-                    elif i=="Beam Details":
+                    elif i=="Beam Details": #todo
                         table.add_hline()
                         merge_rows = int(round_up(len(beamdetails), 2) / 2 + 2)
 
@@ -155,10 +156,12 @@ class CreateLatex(Document):
         with doc.create(Section('Design Checks')):
             with doc.create(LongTable('|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|',row_height=1.2)) as table:
                 table.add_hline()
+                # merge_rows = int(round_up(len(beamdetails), 2) / 2 + 2)#todo
                 table.add_row(('Check', 'Required', 'Provided', 'Remarks'),color='OsdagGreen')
                 table.add_hline()
                 table.end_table_header()
                 table.add_hline()
+                # if Design_Check !=None: #todo
                 for check in Design_Check:
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()

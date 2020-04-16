@@ -5,12 +5,15 @@ from utils.common.component import *
 # from cad.common_logic import CommonDesignLogic
 from Common import *
 from utils.common.load import Load
+from design_report.reportGenerator_latex import CreateLatex
+from Report_functions import *
 import yaml
 import os
 import shutil
 import logging
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
+import configparser
 
 
 class BeamCoverPlate(MomentConnection):
@@ -791,10 +794,11 @@ class BeamCoverPlate(MomentConnection):
                                                                                      r_1=self.section.root_radius,
                                                                                      D=self.section.depth, )
 
-                  
-
-                    print("tension_yielding_capacity of flange", self.section.tension_yielding_capacity )
-                    self.design_status = True
+                    if self.web_plate.thickness_provided == 0 or self.flange_plate.thickness_provided == 0:
+                        self.design_status = False
+                        logger.error("flange plate is not possible")
+                    else:
+                        self.design_status = True
             else:
                 self.design_status = False
                 logger.error(" : tension_yielding_capacity  of flange is less than applied loads, Please select larger sections or decrease loads"
@@ -1795,6 +1799,28 @@ class BeamCoverPlate(MomentConnection):
         else:
             logger.error(": Design is not safe \n ")
             logger.debug(" :=========End Of design===========")
+################################ Design Report #####################################################################################
+
+    # def beam_design_report(self, popup_summary):
+    #     # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
+    #     self.report_input = \
+    #         {KEY_MODULE: self.module,
+    #          KEY_MAIN_MODULE: self.mainmodule,
+    #          KEY_CONN: self.connectivity,
+    #          KEY_DISP_SHEAR: self.load.shear_force,
+    #          KEY_DISP_AXIAL:self.load.axial_force,
+    #          KEY_DISP_MOMENT:self.load.moment,
+    #              "Section Details": "TITLE",
+    #          "Beam Details": r'/ResourceFiles/images/coverplate".png',
+    #          "Supported Section Details": "TITLE",
+    #          KEY_DISP_D: str(self.bolt.bolt_diameter),
+    #          KEY_DISP_GRD: str(self.bolt.bolt_grade),
+    #          KEY_DISP_TYP: self.bolt.bolt_type,
+    #          KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+    #          KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+    #          KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+    #          KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
+    #          KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences
 
         ################################ CAPACITY CHECK #####################################################################################
 
@@ -2054,26 +2080,51 @@ class BeamCoverPlate(MomentConnection):
                 outerwidth = width
                 innerwidth = (width - t_w - (2 * r_1)) / 2
                 if innerwidth < 50:
-                    logger.error(":Inner Plate not possible")
+                    # logger.error(":Inner Plate not possible")
                     self.design_status = False
                 else:
-                    pass
+                    self.design_status = True
+                    flange_plate_crs_sec_area = (outerwidth + (2*innerwidth)) * y
 
-                flange_plate_crs_sec_area = (outerwidth + (2*innerwidth)) * y
+
             else:
                 webwidth = D - (2 * tk) - (2 * r_1)
                 flange_plate_crs_sec_area = 2 * webwidth * y
-            if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
-                thickness = y
-                break
+            if self.design_status == True:
+                if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                    thickness = y
+                    break
             else:
+                thickness = 0
                 self.design_status = False
+                logger.error(":Inner Plate not possible")
 
         return thickness
 
 
-# =======
-#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #     def web_force(column_d, column_f_t, column_t_w, axial_force, column_area):
 #         """
 #         Args:
@@ -2178,3 +2229,180 @@ class BeamCoverPlate(MomentConnection):
         tabs.append(t6)
 
         return tabs
+
+    ################################ Design Report #####################################################################################
+
+    def save_design(self, popup_summary):
+        # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
+        self.report_input = \
+            {KEY_MODULE: self.module,
+             KEY_MAIN_MODULE: self.mainmodule,
+             # KEY_CONN: self.connectivity,
+             KEY_DISP_MOMENT: (self.load.moment/1000000),
+             KEY_DISP_SHEAR: (self.load.shear_force/1000),
+             KEY_DISP_AXIAL:(self.load.axial_force/1000),
+
+             "Section Details": "TITLE",
+              "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+             "Flange plate Details": "TITLE",
+             # "Section Details": "TITLE",
+             "Bolt Details": "TITLE",
+             KEY_DISP_D: str(self.bolt.bolt_diameter),
+             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_TYP: self.bolt.bolt_type,
+             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+             KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+             KEY_DISP_DP_DETAILING_GAP: self.flange_plate.gap,
+             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+        self.report_supported = {KEY_DISP_COLSEC:self.section.designation,
+                                    KEY_DISP_MATERIAL:self.section.material,
+                                    KEY_DISP_FU:self.section.fu,
+                                    KEY_DISP_FY:self.section.fy,
+                                    'Mass': self.section.mass,
+                                    'Area(cm2) - A': self.section.area,
+                                    'D(mm)': self.section.depth,
+                                    'B(mm)': self.section.flange_width,
+                                    't(mm)': self.section.web_thickness,
+                                    'T(mm)': self.section.flange_thickness,
+                                    'FlangeSlope': self.section.flange_slope,
+                                    'R1(mm)': self.section.root_radius,
+                                    'R2(mm)': self.section.toe_radius,
+                                    'Iz(cm4)': self.section.mom_inertia_z,
+                                    'Iy(cm4)': self.section.mom_inertia_y,
+                                    'rz(cm)': self.section.rad_of_gy_z,
+                                    'ry(cm)': self.section.rad_of_gy_y,
+                                    'Zz(cm3)': self.section.elast_sec_mod_z,
+                                    'Zy(cm3)': self.section.elast_sec_mod_y,
+                                    'Zpz(cm3)': self.section.plast_sec_mod_z,
+                                    'Zpy(cm3)': self.section.elast_sec_mod_y}
+        #####Flange plate details
+        self.report_result = \
+            {KEY_MODULE_STATUS: self.design_status,
+
+            # KEY_BOLT_STATUS: self.bolt.design_status,
+            KEY_OUT_FLANGE_BOLT_SHEAR: self.flange_bolt.bolt_shear_capacity,
+            KEY_OUT_FLANGE_BOLT_BEARING: self.flange_bolt.bolt_bearing_capacity,
+            KEY_OUT_FLANGE_BOLT_CAPACITY: self.flange_bolt.bolt_capacity,
+            KEY_OUT_FLANGE_BOLTS_REQUIRED: self.flange_plate.bolts_required,
+            KEY_OUT_FLANGE_BOLT_GRP_CAPACITY: self.flange_bolt.bolt_capacity*self.flange_plate.bolts_required,
+            KEY_OUT_FLANGE_BOLTS_ONE_LINE: self.flange_plate.bolts_one_line,
+            KEY_OUT_FLANGE_BOLT_LINE: self.flange_plate.bolt_line,
+            KEY_OUT_FLANGE_PITCH: self.flange_plate.pitch_provided}
+            # KEY_OUT_FLANGE_MIN_PITCH: self.flange_bolt.min_pitch_round
+            #
+            # KEY_OUT_FLANGE_EDGE_DIST: self.flange_plate.edge_dist_provided,
+            # KEY_OUT_MIN_EDGE_DIST: self.flange_bolt.min_edge_dist_round,
+            # KEY_OUT_MAX_EDGE_DIST: self.flange_bolt.max_edge_dist_round,
+            #
+            # KEY_OUT_END_DIST: self.flange_plate.end_dist_provided,
+            #
+            # KEY_OUT_GAUGE: self.flange_plate.gauge_provided,
+            # KEY_OUT_MIN_GAUGE: self.flange_bolt.min_gauge_round,
+            # KEY_OUT_MAX_SPACING: self.flange_bolt.max_spacing_round,
+            #
+            # KEY_OUT_GRD_PROVIDED: self.flange_bolt.bolt_fu,
+            # KEY_OUT_D_PROVIDED: self.flange_bolt.bolt_diameter_provided}
+        {"Flange plate Details": "TITLE"}
+        self.report_check = []
+
+        connecting_plates = [self.flange_plate.thickness_provided, self.section.flange_thickness]
+
+        bolt_shear_capacity_kn = round(self.flange_bolt.bolt_shear_capacity / 1000, 2)
+        bolt_bearing_capacity_kn = round(self.flange_bolt.bolt_bearing_capacity / 1000, 2)
+        bolt_capacity_kn = round(self.flange_bolt.bolt_capacity / 1000, 2)
+        kb_disp = round(self.flange_bolt.kb, 2)
+        kh_disp = round(self.flange_bolt.kh, 2)
+        bolt_force_kn = round(self.flange_plate.bolt_force, 2)
+        bolt_capacity_red_kn = round(self.flange_plate.bolt_capacity_red, 2)
+        # "Flange plate Details": "TITLE"
+        t5 = ("Flange plate Details")
+        self.report_check.append(t5)
+        if self.flange_bolt.bolt_type == TYP_BEARING:
+            t1 = (KEY_OUT_DISP_FLANGE_BOLT_SHEAR , '', bolt_shear_prov(self.flange_bolt.bolt_fu, 1, self.flange_bolt.bolt_net_area,
+                                                               self.flange_bolt.gamma_mb, bolt_shear_capacity_kn), '')
+            self.report_check.append(t1)
+            t2 = (KEY_OUT_DISP_FLANGE_BOLT_BEARING , '', bolt_bearing_prov(kb_disp, self.bolt.bolt_diameter_provided,
+                                                                   self.bolt_conn_plates_t_fu_fy, self.flange_bolt.gamma_mb,
+                                                                   bolt_bearing_capacity_kn), '')
+            self.report_check.append(t2)
+            t3 = (KEY_OUT_DISP_FLANGE_BOLT_CAPACITY, '',
+                  bolt_capacity_prov(bolt_shear_capacity_kn, bolt_bearing_capacity_kn, bolt_capacity_kn),
+                  '')
+            self.report_check.append(t3)
+        else:
+
+            t4 = (KEY_OUT_DISP_FLANGE_BOLT_SLIP, '',
+                  HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.flange_bolt.bolt_fu,
+                                          Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
+                                          capacity=bolt_capacity_kn), '')
+            self.report_check.append(t4)
+        t5 = (DISP_NUM_OF_BOLTS, get_trial_bolts(V_u=0.0, A_u=(round(self.flange_force/1000,2)),bolt_capacity=bolt_capacity_kn,multiple=2),
+              self.flange_plate.bolts_required, '')
+        self.report_check.append(t5)
+        t6 = (DISP_NUM_OF_COLUMNS, '', self.flange_plate.bolt_line, '')
+        self.report_check.append(t6)
+        t7 = (DISP_NUM_OF_ROWS, '', self.flange_plate.bolts_one_line, '')
+        self.report_check.append(t7)
+
+        t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+              self.flange_plate.pitch_provided,
+              get_pass_fail(self.flange_bolt.min_pitch_round, self.flange_plate.pitch_provided, relation='lesser'))
+        self.report_check.append(t1)
+        t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
+              self.flange_plate.pitch_provided,
+              get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.pitch_provided, relation='greater'))
+        self.report_check.append(t1)
+        t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+              self.flange_plate.gauge_provided,
+              get_pass_fail(self.flange_bolt.min_gauge_round, self.flange_plate.gauge_provided, relation="lesser"))
+        self.report_check.append(t2)
+        t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
+              self.flange_plate.gauge_provided,
+              get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.gauge_provided, relation="greater"))
+        self.report_check.append(t2)
+        t3 = (DISP_MIN_END, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
+              self.flange_plate.end_dist_provided,
+              get_pass_fail(self.flange_bolt.min_end_dist_round, self.flange_plate.end_dist_provided, relation='lesser'))
+        self.report_check.append(t3)
+        t4 = (DISP_MAX_END, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
+              self.flange_plate.end_dist_provided,
+              get_pass_fail(self.flange_bolt.max_end_dist_round, self.flange_plate.end_dist_provided, relation='greater'))
+        self.report_check.append(t4)
+        t3 = (DISP_MIN_EDGE, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
+              self.flange_plate.edge_dist_provided,
+              get_pass_fail(self.flange_bolt.min_edge_dist_round, self.flange_plate.edge_dist_provided, relation='lesser'))
+        self.report_check.append(t3)
+        t4 = (DISP_MAX_EDGE, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
+              self.flange_plate.edge_dist_provided,
+              get_pass_fail(self.flange_bolt.max_edge_dist, self.flange_plate.edge_dist_provided, relation="greater"))
+        self.report_check.append(t4)
+
+
+
+
+        Disp_3D_image = "./ResourceFiles/images/3d.png"
+
+        config = configparser.ConfigParser()
+        config.read_file(open(r'Osdag.config'))
+        desktop_path = config.get("desktop_path", "path1")
+        print("desk:", desktop_path)
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = rel_path.replace("\\", "/")
+
+        file_type = "PDF (*.pdf)"
+        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        print(filename, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        # filename = os.path.join(str(folder), "images_html", "TexReport")
+        file_name = str(filename)
+        print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        fname_no_ext = filename[0].split(".")[0]
+        print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        CreateLatex.save_latex(CreateLatex(), self.report_result, self.report_input,self.report_check,
+                               self.report_supported,
+
+                               popup_summary, fname_no_ext, ' ', rel_path, Disp_3D_image)
+
+
+

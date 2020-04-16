@@ -640,7 +640,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.flange_plate.thickness_provided = 12
         self.flange_plate.Innerheight = 70
         self.flange_plate.Innerlength = 520
-        self.flange_plate.gap =10
+        self.flange_plate.gap = 10
         self.web_plate.gap = 10
         self.design_status = True
 
@@ -819,8 +819,11 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                                                      r_1=self.section.root_radius,
                                                                                      D=self.section.depth, )
 
-                    print("tension_yielding_capacity of flange", self.section.tension_yielding_capacity)
-                    self.design_status = True
+                    if self.web_plate.thickness_provided == 0 or self.flange_plate.thickness_provided == 0:
+                        self.design_status = False
+                        logger.error("flange plate is not possible")
+                    else:
+                        self.design_status = True
             else:
                 self.design_status = False
                 logger.error(
@@ -1601,20 +1604,24 @@ class ColumnCoverPlateWeld(MomentConnection):
                 outerwidth = width - (2 * 20)
                 innerwidth = (width - t_w - (2 * r_1) - (4 * 20)) / 2
                 if innerwidth < 50:
-                    logger.error(":Inner Plate not possible")
+                    # logger.error(":Inner Plate not possible")
                     self.design_status = False
                 else:
-                    pass
+                    self.design_status = True
+                    flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y
 
-                flange_plate_crs_sec_area = (outerwidth + (2*innerwidth)) * y
+
             else:
                 webwidth = D - (2 * tk) - (2 * r_1) - (2 * 20)
                 flange_plate_crs_sec_area = (2 * webwidth) * y
-            if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
-                thickness = y
-                break
+            if self.design_status == True:
+                if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                    thickness = y
+                    break
             else:
+                thickness = 0
                 self.design_status = False
+                logger.error(":Inner Plate not possible")
 
         return thickness
 

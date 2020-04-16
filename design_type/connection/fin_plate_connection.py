@@ -955,6 +955,7 @@ class FinPlateConnection(ShearConnection):
         kh_disp = round(self.bolt.kh, 2)
         bolt_force_kn=round(self.plate.bolt_force,2)
         bolt_capacity_red_kn=round(self.plate.bolt_capacity_red,2)
+        "Title" == ( Flange_plate)
         if self.bolt.bolt_type == TYP_BEARING:
             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.fu,1,self.bolt.bolt_net_area,
                                                                self.bolt.gamma_mb,bolt_shear_capacity_kn), '')

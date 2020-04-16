@@ -412,6 +412,7 @@ KEY_DISP_SHEAR = 'Shear(kN)*'
 KEY_AXIAL = 'Load.Axial'
 KEY_DISP_AXIAL = 'Axial (kN) *'
 
+
 ###################################
 # Keys for Storing Bolt
 
@@ -509,6 +510,8 @@ KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length (mm)'
 
+KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
+
 
 KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 KEY_DISP_INNERFLANGESPLICEPLATE = "Inner Plate Detials"
@@ -580,6 +583,7 @@ KEY_FLANGE_BOLTS_ONE_LINE = 'Flange_plate.Bolt_OneLine'
 KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in flange'
 KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
 KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
+KEY_FLANGE_NUM_BOLTS_REQ = "Flange_plate.Bolt_required"
 
 
 KEY_FLANGE_WELD_DETAILS = "Flange detail"
@@ -614,6 +618,20 @@ KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
 
+KEY_OUT_FLANGE_BOLT_SHEAR ='flange_bolt.bolt_shear_capacity'
+KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity"
+KEY_OUT_FLANGE_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'
+KEY_OUT_DISP_FLANGE_BOLT_BEARING = "Bearing Capacity"
+KEY_OUT_FLANGE_BOLT_CAPACITY = 'flange_bolt.bolt_capacity'
+KEY_OUT_DISP_FLANGE_BOLT_CAPACITY ="Bolt Capacity"
+KEY_OUT_DISP_FLANGE_BOLT_SLIP= 'Slip Resistance'
+KEY_OUT_FLANGE_BOLTS_REQUIRED ='flange_plate.bolts_required'
+KEY_OUT_FLANGE_BOLT_GRP_CAPACITY = 'flange_bolt.grp_bolt_capacity'
+KEY_OUT_FLANGE_BOLTS_ONE_LINE ='flange_plate.bolts_one_line'
+KEY_OUT_FLANGE_BOLT_LINE = 'flange_plate.bolt_line'
+KEY_OUT_FLANGE_PITCH= 'flange_plate.pitch_provided'
+KEY_OUT_MIN_PITCH= 'bolt.min_pitch'
+
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
@@ -625,6 +643,8 @@ KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height(mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
 KEY_DISP_WEB_PLATE_LENGTH ='Length(mm)'
+KEY_OUT_WEB_BOLT_SHEAR ="Web_bolt.shear capacity"
+
 
 KEY_WEB_SPACING ="Web_plate.spacing"
 KEY_DISP_WEB_SPACING = 'Spacing(mm)'
@@ -1123,6 +1143,7 @@ VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 DISP_NUM_OF_BOLTS = 'No of Bolts'
 DISP_NUM_OF_ROWS = 'No of Rows'
 DISP_NUM_OF_COLUMNS = 'No of Columns'
+
 
 
 def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):

@@ -107,7 +107,7 @@ def bolt_bearing_prov(k_b,d,conn_plates_t_fu_fy,gamma_mb,bolt_bearing_capacity):
     bolt_bearing_capacity = str(bolt_bearing_capacity)
     bolt_bearing_eqn = Math(inline=True)
     bolt_bearing_eqn.append(NoEscape(r'\begin{aligned}V_{dpb} &= \frac{2.5~ k_b~ d~ t~ f_u}{\gamma_{mb}}\\'))
-    bolt_bearing_eqn.append(NoEscape(r'&= \frac{2.5~*'+ k_b+'*'+ d+'*'+t+'*' +'*'+f_u+'}{'+gamma_mb+r'}\\'))
+    bolt_bearing_eqn.append(NoEscape(r'&= \frac{2.5~*'+ k_b+'*'+ d+'*'+t+'*'+f_u+'}{'+gamma_mb+r'}\\'))
     bolt_bearing_eqn.append(NoEscape(r'&='+bolt_bearing_capacity+r'\end{aligned}'))
 
     return bolt_bearing_eqn
@@ -142,9 +142,9 @@ def HSFG_bolt_capacity_prov(mu_f,n_e,K_h,fub,Anb,gamma_mf,capacity):
 
     return HSFG_bolt_capacity_eqn
 
-def get_trial_bolts(V_u, A_u,bolt_capacity):
+def get_trial_bolts(V_u, A_u,bolt_capacity,multiple=1):
     res_force = math.sqrt(V_u**2+ A_u**2)
-    trial_bolts = math.ceil(res_force/bolt_capacity)
+    trial_bolts = multiple * math.ceil(res_force/bolt_capacity)
     V_u=str(V_u)
     A_u=str(A_u)
     bolt_capacity=str(bolt_capacity)
@@ -163,12 +163,12 @@ def get_pass_fail(required, provided,relation='greater'):
         return 'N/A'
     else:
         if relation == 'greater':
-            if required > provided:
+            if required >= provided:
                 return 'Pass'
             else:
                 return 'Fail'
         else:
-            if required < provided:
+            if required <= provided:
                 return 'Pass'
             else:
                 return 'Fail'

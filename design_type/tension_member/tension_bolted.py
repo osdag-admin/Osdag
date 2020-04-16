@@ -1495,6 +1495,8 @@ class Tension_bolted(Main):
                                                  gap=self.plate.gap,
                                                  shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2)
 
+        self.plate.edge_dist_provided = round(((self.max_plate_height - ((self.plate.bolts_one_line -1) * self.plate.gauge_provided))/2),2)
+
         self.member_check(self, design_dictionary)
 
 

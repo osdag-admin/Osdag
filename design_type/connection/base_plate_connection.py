@@ -238,6 +238,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.eccentricity_zz = 0.0
         self.sigma_max_zz = 0.0
         self.sigma_min_zz = 0.0
+        self.critical_xx = 0.0
         self.sigma_xx = 0.0
         self.ze_zz = 0.0
         self.critical_M_xx = 0.0
@@ -1034,12 +1035,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # calculating moment at the critical section
 
                 # Assumption: the critical section (critical_xx) acts at a distance of 0.95 times the column depth, along the depth
-                critical_xx = (self.bp_length_provided - 0.95 * self.depth) / 2  # mm
-                self.sigma_xx = (self.sigma_max_zz - self.sigma_min_zz) * (self.bp_length_provided - critical_xx) / self.bp_length_provided
+                self.critical_xx = (self.bp_length_provided - 0.95 * self.depth) / 2  # mm
+                self.sigma_xx = (self.sigma_max_zz - self.sigma_min_zz) * (self.bp_length_provided - self.critical_xx) / \
+                                self.bp_length_provided
                 self.sigma_xx = self.sigma_xx + self.sigma_min_zz  # N/mm^2, bending stress at the critical section
 
-                self.critical_M_xx = (self.sigma_xx * critical_xx ** 2 / 2) + (0.5 * critical_xx * (self.sigma_max_zz - self.sigma_xx)
-                                                                    * (2 / 3) * critical_xx)  # N-mm, bending moment at critical section
+                self.critical_M_xx = (self.sigma_xx * self.critical_xx ** 2 / 2) + (0.5 * self.critical_xx *
+                                                                        (self.sigma_max_zz - self.sigma_xx) * (2 / 3) * self.critical_xx)  # N-mm, bending moment at critical section
 
                 # equating critical moment with critical moment to compute the required minimum plate thickness
                 # Assumption: The bending capacity of the plate is (M_d = 1.5*fy*Z_e/gamma_m0) [Reference: Clause 8.2.1.2, IS 800:2007]
@@ -1074,10 +1076,31 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.y = round(r, 3)  # mm
 
-                # finding tension in the bolts for maximum permissible bearing stress (0.45*f_ck)
+                # finding maximum tension in the bolts for maximum permissible bearing stress (0.45*f_ck)
                 self.tension_demand_anchor = (self.bearing_strength_concrete * self.anchor_area_tension * self.n / self.y) * \
                                              (self.anchor_length_provided / 2 + self.f - self.y)  # N
                 self.tension_demand_anchor = round(self.tension_demand_anchor / 1000, 2)  # kN
+
+                self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.dp_anchor_fu_overwrite)
+
+                # designing the plate thickness
+
+                # finding the length of the critical section from the edge of the base plate
+                self.critical_xx = (self.bp_length_provided - 0.95 * self.depth) / 2  # mm
+                if self.y > self.critical_xx:
+                    self.critical_xx = self.critical_xx
+                else:
+                    self.critical_xx = self.y
+
+                # moment acting at the critical section due to applied loads
+                self.critical_M_xx = (self.critical_xx * self.bearing_strength_concrete * self.bp_width_provided) * \
+                                     (self.critical_xx / 2)  # N-mm
+
+                # equating critical moment with critical moment to compute the required minimum plate thickness
+                # Assumption: The bending capacity of the plate is (M_d = 1.5*fy*Z_e/gamma_m0) [Reference: Clause 8.2.1.2, IS 800:2007]
+                # Assumption: Z_e of the plate is = b*tp^2 / 6, where b = 1 for a cantilever strip of unit dimension
+
+                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy))  # mm
 
                 pass
 

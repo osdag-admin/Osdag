@@ -684,9 +684,9 @@ class Weld(Material):
         weld_thickness = round_down((max_weld_thickness - red), 1, 3)
         if weld_thickness < min_weld_thickness:
             weld_thickness = int(min(plate_thickness, member_thickness))
-            weld_reason = " Preheating of thicker plate is required"
+            weld_reason = " Preheating of thicker plate is required."
         else:
-            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge "
+            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge. "
             pass
 
         if weld_thickness> 16 :
@@ -963,7 +963,7 @@ class Plate(Material):
 
         # initialising values to start the loop
         resultant_force = math.sqrt(shear_load ** 2 + axial_load ** 2)
-        print(resultant_force)
+        print(resultant_force, "daa")
         print(bolt_capacity, "222")
         bolts_required = max(int(math.ceil(resultant_force / bolt_capacity)), min_bolt_line*min_bolts_one_line)
         print (bolts_required)
@@ -976,13 +976,13 @@ class Plate(Material):
 
         if bolts_one_line < min_bolts_one_line:
             self.design_status = False
-            self.reason = "Can't fit two bolts in one line. Select lower diameter"
+            self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line < min_bolt_line:
             self.design_status = False
-            self.reason = "Can't fit two bolts in one line. Select lower diameter"
+            self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line > bolt_line_limit:
             self.design_status = False
-            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
         else:
             print("boltdetails", bolt_line, bolts_one_line,web_plate_h)
             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,min_edge_dist,max_spacing, max_edge_dist)
@@ -1119,10 +1119,10 @@ class Plate(Material):
 
         if bolts_one_line == 1 or bolts_one_line ==0:
             self.design_status = False
-            self.reason = "Can't fit two bolts in one line. Select lower diameter"
+            self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line > bolt_line_limit:
             self.design_status = False
-            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
         else:
             print("boltdetails", bolt_line, bolts_one_line,flange_plate_h)
             [gauge, edge_dist, flange_plate_h] = \
@@ -1214,7 +1214,7 @@ class Plate(Material):
 
             if vres > bolt_capacity_red:
                 self.design_status = False
-                self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+                self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
             else:
                 self.design_status = True
 
@@ -1421,7 +1421,7 @@ class Angle(Section):
         self.max_leg = max(self.leg_a_length,self.leg_b_length)
         self.min_leg = min(self.leg_a_length, self.leg_b_length)
         self.thickness = row[5]
-        self.r1 = row[6]
+        self.root_radius = row[6]
         self.r2 = row[7]
         if self.leg_a_length != self.leg_b_length:
             self.Cz = row[8]*10

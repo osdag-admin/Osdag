@@ -451,22 +451,23 @@ class ColumnEndPlate(MomentConnection):
             # else:
             #     pass
 
-    def get_bolt_diam(self):
-        for i in self.bolt.bolt_diameter:
-            self.bolt_checks(self.bolt.bolt_diameter[i])
-            if self.design_status:
-                self.bolt.bolt_diameter_provided = i
-                break
-
-    def get_bolt_grade(self):
-        for i in self.bolt.bolt_grade:
-            self.bolt_checks(self.bolt.bolt_grade[i])
-            if self.design_status:
-                self.bolt.bolt_grade_provided = i
-                break
+    # def get_bolt_diam(self):
+    #     for i in self.bolt.bolt_diameter:
+    #         self.bolt_checks(self.bolt.bolt_diameter[i])
+    #         if self.design_status:
+    #             self.bolt.bolt_diameter_provided = i
+    #             break
+    #
+    # def get_bolt_grade(self):
+    #     for i in self.bolt.bolt_grade:
+    #         self.bolt_checks(self.bolt.bolt_grade[i])
+    #         if self.design_status:
+    #             self.bolt.bolt_grade_provided = i
+    #             break
 
     def get_bolt_diam(self):
         self.lst1 = []
+        self.lst2 = []
         # self.lst2 = []
         # for (x,y) in (self.bolt.bolt_diameter,self.bolt.bolt_grade):
         self.bolt_conn_plates_t_fu_fy = []
@@ -475,7 +476,7 @@ class ColumnEndPlate(MomentConnection):
             self.pitch = IS800_2007.cl_10_2_2_min_spacing(x)
             self.end_dist = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter[x],self.bolt.bolt_hole_type,self.bolt.edge_type)
 
-            self.n_bw = ((self.section.depth - (2 * self.section.flange_thickness - (2 * self.end_dist))) / self.pitch) + 1
+            self.n_bw = ((self.section.depth - (2 * self.section.flange_thickness + (2 * self.end_dist))) / self.pitch) + 1
             self.n_bf = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) / self.pitch) + 1
 
             if self.connection == 'Flush End Plate':
@@ -541,8 +542,11 @@ class ColumnEndPlate(MomentConnection):
 
             if self.design_status:
                 self.lst1.append(x)
+                self.lst2.append(self.no_bolts)
                 # self.lst2.append(y)
-        self.bolt_diam_provided = min(self.lst1)
+        res = dict(zip(self.lst1, self.lst2))
+        key_min = min(res.keys(), key=(lambda k: res[k]))
+        self.bolt_diam_provided = res[key_min]
         # self.bolt_grade_provided = min(self.lst2)
 
     def get_bolt_grade(self):
@@ -553,8 +557,8 @@ class ColumnEndPlate(MomentConnection):
             self.pitch = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diam_provided)
             self.end_dist = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diam_provided,self.bolt.bolt_hole_type,self.bolt.edge_type)
 
-            self.n_bw = ((self.section.depth - (2 * self.section.flange_thickness - (2 * self.end_dist))) / self.pitch) + 1
-            self.n_bf = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) / self.pitch) + 1
+            self.n_bw = int(math.floor(((self.section.depth - (2 * self.section.flange_thickness + (2 * self.end_dist))) / self.pitch) + 1))
+            self.n_bf = int(math.floor(((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) / self.pitch) + 1))
 
             if self.connection == 'Flush End Plate':
                 self.no_bolts = self.n_bw * 2 + self.n_bf * 4 - 4
@@ -624,13 +628,40 @@ class ColumnEndPlate(MomentConnection):
         # self.bolt_grade_provided = min(self.lst2)
 
     def plate_details(self):
-        self.plate_height = self.section.depth
+        if self.connection == 'Flush End Plate':
+            self.plate_height = self.section.depth
+        else:
+            self.plate_height = self.section.depth + 4 * self.end_dist
         self.plate_width = self.section.flange_width
+        self.y_2 = self.y_max - self.plate.end_dist_provided
+        self.t_b2 = self.load.axial_force / self.no_bolts + self.load.moment * self.y_2 / self.y_sqr
 
         if self.connection == 'Flush End Plate':
-            if self.n_bf == 1:
-                self.m_ep = max(0.5 * self.t_b1 * self.plate.end_dist_provided, self.t_b2 * self.plate.end_dist_provided)
+            if self.n_bf <= 1:
+                self.m_ep = max(0.5 * self.t_b * self.plate.end_dist_provided, self.t_b2 * self.plate.end_dist_provided)
+            else:
+                self.m_ep = self.t_b * self.plate.end_dist_provided
 
+        else:
+            self.m_ep = self.t_b * self.plate.end_dist_provided
+
+        if self.pitch >= self.end_dist*2:
+            self.b_eff = self.end_dist
+        elif self.pitch < self.end_dist*2:
+            self.b_eff = self.pitch
+
+        gamma_m0 = 1.1
+        lst_pl = []
+
+        for x in self.plate.thickness:
+            self.m_dp = self.b_eff * x**2 * self.plate.fy / (4 * gamma_m0)
+            if self.m_dp > self.m_ep:
+                self.design_status = False
+                logger.error('Plate thickness provided is not sufficient')
+                logger.info('Please select higher tplate thickness')
+
+            if self.design_status:
+                lst_pl.append(x)
 
     def hard_values(self):
             # flange bolt

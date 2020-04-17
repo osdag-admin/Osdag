@@ -635,6 +635,7 @@ class FinPlateConnection(ShearConnection):
     def get_plate_thickness(self):
         initial_plate_height = self.plate.height
         for self.plate.thickness_provided in self.thickness_possible:
+            self.plate.height = initial_plate_height
             if self.connectivity in VALUES_CONN_1:
                 self.weld_connecting_plates = [self.supporting_section.flange_thickness, self.plate.thickness_provided]
             else:
@@ -869,17 +870,65 @@ class FinPlateConnection(ShearConnection):
             self.design_status = True
             logger.info("=== End Of Design ===")
 
+    # r'/ResourceFiles/images/ColumnsBeams".png'
     def save_design(self,popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
+        self.report_supporting = {KEY_DISP_SEC_PROFILE:"ISection",
+                                  KEY_DISP_SUPTNGSEC: self.supporting_section.designation,
+                                  KEY_DISP_MATERIAL: self.supporting_section.material,
+                                  KEY_DISP_FU: self.supporting_section.fu,
+                                  KEY_DISP_FY: self.supporting_section.fy,
+                                  'Mass': self.supporting_section.mass,
+                                  'Area(cm2) - A': self.supporting_section.area,
+                                  'D(mm)': self.supporting_section.depth,
+                                  'B(mm)': self.supporting_section.flange_width,
+                                  't(mm)': self.supporting_section.web_thickness,
+                                  'T(mm)': self.supporting_section.flange_thickness,
+                                  'FlangeSlope': self.supporting_section.flange_slope,
+                                  'R1(mm)': self.supporting_section.root_radius,
+                                  'R2(mm)': self.supporting_section.toe_radius,
+                                  'Iz(cm4)': self.supporting_section.mom_inertia_z,
+                                  'Iy(cm4)': self.supporting_section.mom_inertia_y,
+                                  'rz(cm)': self.supporting_section.rad_of_gy_z,
+                                  'ry(cm)': self.supporting_section.rad_of_gy_y,
+                                  'Zz(cm3)': self.supporting_section.elast_sec_mod_z,
+                                  'Zy(cm3)': self.supporting_section.elast_sec_mod_y,
+                                  'Zpz(cm3)': self.supporting_section.plast_sec_mod_z,
+                                  'Zpy(cm3)': self.supporting_section.elast_sec_mod_y}
+
+        self.report_supported = {
+            KEY_DISP_SEC_PROFILE:"ISection", #Image shall be save with this name.png in resource files
+            KEY_DISP_SUPTDSEC: self.supported_section.designation,
+            KEY_DISP_MATERIAL: self.supported_section.material,
+            KEY_DISP_FU: self.supported_section.fu,
+            KEY_DISP_FY: self.supported_section.fy,
+            'Mass': self.supported_section.mass,
+            'Area(cm2) - A': round(self.supported_section.area, 2),
+            'D(mm)': self.supported_section.depth,
+            'B(mm)': self.supported_section.flange_width,
+            't(mm)': self.supported_section.web_thickness,
+            'T(mm)': self.supported_section.flange_thickness,
+            'FlangeSlope': self.supported_section.flange_slope,
+            'R1(mm)': self.supported_section.root_radius,
+            'R2(mm)': self.supported_section.toe_radius,
+            'Iz(cm4)': self.supported_section.mom_inertia_z,
+            'Iy(cm4)': self.supported_section.mom_inertia_y,
+            'rz(cm)': self.supported_section.rad_of_gy_z,
+            'ry(cm)': self.supported_section.rad_of_gy_y,
+            'Zz(cm3)': self.supported_section.elast_sec_mod_z,
+            'Zy(cm3)': self.supported_section.elast_sec_mod_y,
+            'Zpz(cm3)': self.supported_section.plast_sec_mod_z,
+            'Zpy(cm3)': self.supported_section.elast_sec_mod_y}
+
         self.report_input = \
             {KEY_MODULE: self.module,
             KEY_MAIN_MODULE: self.mainmodule,
             KEY_CONN: self.connectivity,
             KEY_DISP_SHEAR: self.load.shear_force,
-            "Supporting Section Details":"TITLE",
-            "Column Details": r'/ResourceFiles/images/ColumnsBeams".png',
-            "Supported Section Details": "TITLE",
-            "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+            "Supporting Section":"TITLE",
+            "Supporting Section Details": self.report_supporting,
+            "Supported Section":"TITLE",
+            "Supported Section Details": self.report_supported,
             "Bolt Details":"TITLE",
             KEY_DISP_D: str(self.bolt.bolt_diameter),
             KEY_DISP_GRD: str(self.bolt.bolt_grade),
@@ -893,51 +942,6 @@ class FinPlateConnection(ShearConnection):
             KEY_DISP_DP_WELD_TYPE: "Fillet",
             KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
             KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
-
-        self.report_supporting = {KEY_DISP_SUPTNGSEC:self.supporting_section.designation,
-                                    KEY_DISP_MATERIAL:self.supporting_section.material,
-                                    KEY_DISP_FU:self.supporting_section.fu,
-                                    KEY_DISP_FY:self.supporting_section.fy,
-                                    'Mass': self.supporting_section.mass,
-                                    'Area(cm2) - A': self.supporting_section.area,
-                                    'D(mm)': self.supporting_section.depth,
-                                    'B(mm)': self.supporting_section.flange_width,
-                                    't(mm)': self.supporting_section.web_thickness,
-                                    'T(mm)': self.supporting_section.flange_thickness,
-                                    'FlangeSlope': self.supporting_section.flange_slope,
-                                    'R1(mm)': self.supporting_section.root_radius,
-                                    'R2(mm)': self.supporting_section.toe_radius,
-                                    'Iz(cm4)': self.supporting_section.mom_inertia_z,
-                                    'Iy(cm4)': self.supporting_section.mom_inertia_y,
-                                    'rz(cm)': self.supporting_section.rad_of_gy_z,
-                                    'ry(cm)': self.supporting_section.rad_of_gy_y,
-                                    'Zz(cm3)': self.supporting_section.elast_sec_mod_z,
-                                    'Zy(cm3)': self.supporting_section.elast_sec_mod_y,
-                                    'Zpz(cm3)': self.supporting_section.plast_sec_mod_z,
-                                    'Zpy(cm3)': self.supporting_section.elast_sec_mod_y}
-
-        self.report_supported = {
-                                KEY_DISP_SUPTDSEC: self.supported_section.designation,
-                                KEY_DISP_MATERIAL: self.supported_section.material,
-                                KEY_DISP_FU: self.supported_section.fu,
-                                KEY_DISP_FY: self.supported_section.fy,
-                                'Mass': self.supported_section.mass,
-                                'Area(cm2) - A': round(self.supported_section.area,2),
-                                'D(mm)': self.supported_section.depth,
-                                'B(mm)': self.supported_section.flange_width,
-                                't(mm)': self.supported_section.web_thickness,
-                                'T(mm)': self.supported_section.flange_thickness,
-                                'FlangeSlope': self.supported_section.flange_slope,
-                                'R1(mm)': self.supported_section.root_radius,
-                                'R2(mm)': self.supported_section.toe_radius,
-                                'Iz(cm4)': self.supported_section.mom_inertia_z,
-                                'Iy(cm4)': self.supported_section.mom_inertia_y,
-                                'rz(cm)': self.supported_section.rad_of_gy_z,
-                                'ry(cm)': self.supported_section.rad_of_gy_y,
-                                'Zz(cm3)': self.supported_section.elast_sec_mod_z,
-                                'Zy(cm3)': self.supported_section.elast_sec_mod_y,
-                                'Zpz(cm3)': self.supported_section.plast_sec_mod_z,
-                                'Zpy(cm3)': self.supported_section.elast_sec_mod_y}
 
 
         self.report_check = []
@@ -1104,8 +1108,7 @@ class FinPlateConnection(ShearConnection):
         # filename = os.path.join(str(folder), "images_html", "TexReport")
         file_name = str(filename)
         fname_no_ext = filename[0].split(".")[0]
-        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, self.report_supporting,
-                               self.report_supported, popup_summary, fname_no_ext, rel_path, Disp_3D_image)
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_3D_image)
 
 # For Command Line
 

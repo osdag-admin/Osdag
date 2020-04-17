@@ -820,8 +820,8 @@ class BeamCoverPlate(MomentConnection):
 
 
     def select_bolt_dia(self):
-        min_plate_height = self.section.flange_width
-        max_plate_height = self.section.flange_width
+        self.min_plate_height = self.section.flange_width
+        self.max_plate_height = self.section.flange_width
 
         axial_force_f =  self.factored_axial_load  * self.section.flange_width * self.section.flange_thickness / (
                 self.section.area )
@@ -896,8 +896,8 @@ class BeamCoverPlate(MomentConnection):
                                                      n_planes=2)
 
             self.flange_plate.get_flange_plate_details(bolt_dia=self.flange_bolt.bolt_diameter_provided,
-                                                    flange_plate_h_min=min_plate_height,
-                                                    flange_plate_h_max=max_plate_height,
+                                                    flange_plate_h_min=self.min_plate_height,
+                                                    flange_plate_h_max=self.max_plate_height,
                                                     bolt_capacity=self.flange_bolt.bolt_capacity,
                                                     min_edge_dist=self.flange_bolt.min_edge_dist_round,
                                                     min_gauge=self.flange_bolt.min_gauge_round,
@@ -909,15 +909,15 @@ class BeamCoverPlate(MomentConnection):
 
 
 
-            min_web_plate_height = self.section.min_plate_height()
-            max_web_plate_height = self.section.max_plate_height()
+            self.min_web_plate_height = self.section.min_plate_height()
+            self.max_web_plate_height = self.section.max_plate_height()
             axial_force_w = ((self.section.depth - (
                         2 * self.section.flange_thickness)) * self.section.web_thickness * self.factored_axial_load) / (
                                         self.section.area )
 
             self.web_plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
-                                                 web_plate_h_min=min_web_plate_height,
-                                                 web_plate_h_max=max_web_plate_height,
+                                                 web_plate_h_min=self.min_web_plate_height,
+                                                 web_plate_h_max=self.max_web_plate_height,
                                                  bolt_capacity=self.web_bolt.bolt_capacity,
                                                  min_edge_dist=self.web_bolt.min_edge_dist_round,
                                                  min_gauge=self.web_bolt.min_gauge_round,
@@ -1042,8 +1042,8 @@ class BeamCoverPlate(MomentConnection):
 
     def get_plate_details(self):
 
-        min_plate_height = self.section.flange_width
-        max_plate_height = self.section.flange_width
+        self.min_plate_height = self.section.flange_width
+        self.max_plate_height = self.section.flange_width
 
         axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
             self.section.area)
@@ -1073,8 +1073,8 @@ class BeamCoverPlate(MomentConnection):
                                               n_planes=2)
 
         self.flange_plate.get_flange_plate_details(bolt_dia=self.flange_bolt.bolt_diameter_provided,
-                                                   flange_plate_h_min=min_plate_height,
-                                                   flange_plate_h_max=max_plate_height,
+                                                   flange_plate_h_min=self.min_plate_height,
+                                                   flange_plate_h_max=self.max_plate_height,
                                                    bolt_capacity=self.flange_bolt.bolt_capacity,
                                                    min_edge_dist=self.flange_bolt.min_edge_dist_round,
                                                    min_gauge=self.flange_bolt.min_gauge_round,
@@ -1084,15 +1084,15 @@ class BeamCoverPlate(MomentConnection):
                                                    web_thickness=self.section.web_thickness,
                                                    root_radius=self.section.root_radius)
 
-        min_web_plate_height = self.section.min_plate_height()
-        max_web_plate_height = self.section.max_plate_height()
+        self.min_web_plate_height = self.section.min_plate_height()
+        self.max_web_plate_height = self.section.max_plate_height()
         axial_force_w = ((self.section.depth - (
                 2 * self.section.flange_thickness)) * self.section.web_thickness * self.factored_axial_load) / (
                             self.section.area)
 
         self.web_plate.get_web_plate_details(bolt_dia=self.web_bolt.bolt_diameter_provided,
-                                             web_plate_h_min=min_web_plate_height,
-                                             web_plate_h_max=max_web_plate_height,
+                                             web_plate_h_min=self.min_web_plate_height,
+                                             web_plate_h_max=self.max_web_plate_height,
                                              bolt_capacity=self.web_bolt.bolt_capacity,
                                              min_edge_dist=self.web_bolt.min_edge_dist_round,
                                              min_gauge=self.web_bolt.min_gauge_round,
@@ -1742,6 +1742,8 @@ class BeamCoverPlate(MomentConnection):
         self.web_plate.bolts_required = self.web_plate.bolt_line * self.web_plate.bolts_one_line
         self.flange_plate.Innerlength = self.flange_plate.length
 
+        self.min_plate_length = (((self.flange_plate.bolt_line / 2 - 1) * self.flange_bolt.min_pitch) + (2*self.flange_bolt.min_end_dist) + (self.flange_plate.gap/2))
+        print("self.min_plate_length",self.min_plate_length)
     # print(600, design_status)
     #     print("self.section.tension_capacity_flange",self.section.tension_capacity_flange)
     #     print("self.section.tension_capacity_web", self.section.tension_capacity_web)
@@ -2303,6 +2305,8 @@ class BeamCoverPlate(MomentConnection):
         innerflange_kh_disp = round(self.flange_bolt.kh, 2)
         innerflange_bolt_force_kn = round(self.flange_plate.bolt_force, 2)
         innerflange_bolt_capacity_red_kn = round(self.flange_plate.bolt_capacity_red, 2)
+        min_plate_length = (((self.flange_plate.bolt_line / 2 - 1) * self.flange_bolt.min_pitch) + (2*self.flange_bolt.min_end_dist) + (self.flange_plate.gap/2))
+
         # "Flange plate Details": "TITLE"
 
         t1 = ('SubSection', 'Flange Bolt Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
@@ -2337,31 +2341,31 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t7)
             t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
                   self.flange_plate.pitch_provided,
-                  get_pass_fail(self.flange_bolt.min_pitch_round, self.flange_plate.pitch_provided, relation='lesser'))
+                  get_pass_fail(self.flange_bolt.min_pitch, self.flange_plate.pitch_provided, relation='lesser'))
             self.report_check.append(t1)
             t1 = (DISP_MAX_PITCH, max_pitch(flange_connecting_plates),
                   self.flange_plate.pitch_provided,
-                  get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.pitch_provided, relation='greater'))
+                  get_pass_fail(self.flange_bolt.max_spacing, self.flange_plate.pitch_provided, relation='greater'))
             self.report_check.append(t1)
             t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
                   self.flange_plate.gauge_provided,
-                  get_pass_fail(self.flange_bolt.min_gauge_round, self.flange_plate.gauge_provided, relation="lesser"))
+                  get_pass_fail(self.flange_bolt.min_gauge, self.flange_plate.gauge_provided, relation="lesser"))
             self.report_check.append(t2)
             t2 = (DISP_MAX_GAUGE, max_pitch(flange_connecting_plates),
                   self.flange_plate.gauge_provided,
-                  get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.gauge_provided, relation="greater"))
+                  get_pass_fail(self.flange_bolt.max_spacing, self.flange_plate.gauge_provided, relation="greater"))
             self.report_check.append(t2)
             t3 = (DISP_MIN_END, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
                   self.flange_plate.end_dist_provided,
-                  get_pass_fail(self.flange_bolt.min_end_dist_round, self.flange_plate.end_dist_provided, relation='lesser'))
+                  get_pass_fail(self.flange_bolt.min_end_dist, self.flange_plate.end_dist_provided, relation='lesser'))
             self.report_check.append(t3)
             t4 = (DISP_MAX_END, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
                   self.flange_plate.end_dist_provided,
-                  get_pass_fail(self.flange_bolt.max_end_dist_round, self.flange_plate.end_dist_provided, relation='greater'))
+                  get_pass_fail(self.flange_bolt.max_end_dist, self.flange_plate.end_dist_provided, relation='greater'))
             self.report_check.append(t4)
             t3 = (DISP_MIN_EDGE, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
                   self.flange_plate.edge_dist_provided,
-                  get_pass_fail(self.flange_bolt.min_edge_dist_round, self.flange_plate.edge_dist_provided, relation='lesser'))
+                  get_pass_fail(self.flange_bolt.min_edge_dist, self.flange_plate.edge_dist_provided, relation='lesser'))
             self.report_check.append(t3)
             t4 = (DISP_MAX_EDGE, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
                   self.flange_plate.edge_dist_provided,
@@ -2401,35 +2405,35 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t7)
             t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
                   self.flange_plate.pitch_provided,
-                  get_pass_fail(self.flange_bolt.min_pitch_round, self.flange_plate.pitch_provided, relation='lesser'))
+                  get_pass_fail(self.flange_bolt.min_pitch, self.flange_plate.pitch_provided, relation='lesser'))
             self.report_check.append(t1)
             t1 = (DISP_MAX_PITCH, max_pitch(innerflange_connecting_plates),
                   self.flange_plate.pitch_provided,
-                  get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.pitch_provided,
+                  get_pass_fail(self.flange_bolt.max_spacing, self.flange_plate.pitch_provided,
                                 relation='greater'))
             self.report_check.append(t1)
             t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
                   self.flange_plate.gauge_provided,
-                  get_pass_fail(self.flange_bolt.min_gauge_round, self.flange_plate.gauge_provided, relation="lesser"))
+                  get_pass_fail(self.flange_bolt.min_gauge, self.flange_plate.gauge_provided, relation="lesser"))
             self.report_check.append(t2)
             t2 = (DISP_MAX_GAUGE, max_pitch(innerflange_connecting_plates),
                   self.flange_plate.gauge_provided,
-                  get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.gauge_provided,
+                  get_pass_fail(self.flange_bolt.max_spacing, self.flange_plate.gauge_provided,
                                 relation="greater"))
             self.report_check.append(t2)
             t3 = (DISP_MIN_END, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
                   self.flange_plate.end_dist_provided,
-                  get_pass_fail(self.flange_bolt.min_end_dist_round, self.flange_plate.end_dist_provided,
+                  get_pass_fail(self.flange_bolt.min_end_dist, self.flange_plate.end_dist_provided,
                                 relation='lesser'))
             self.report_check.append(t3)
             t4 = (DISP_MAX_END, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
                   self.flange_plate.end_dist_provided,
-                  get_pass_fail(self.flange_bolt.max_end_dist_round, self.flange_plate.end_dist_provided,
+                  get_pass_fail(self.flange_bolt.max_end_dist, self.flange_plate.end_dist_provided,
                                 relation='greater'))
             self.report_check.append(t4)
             t3 = (DISP_MIN_EDGE, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
                   self.flange_plate.edge_dist_provided,
-                  get_pass_fail(self.flange_bolt.min_edge_dist_round, self.flange_plate.edge_dist_provided,
+                  get_pass_fail(self.flange_bolt.min_edge_dist, self.flange_plate.edge_dist_provided,
                                 relation='lesser'))
             self.report_check.append(t3)
             t4 = (DISP_MAX_EDGE, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
@@ -2483,35 +2487,35 @@ class BeamCoverPlate(MomentConnection):
         self.report_check.append(t7)
         t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
               self.web_plate.pitch_provided,
-              get_pass_fail(self.web_bolt.min_pitch_round, self.web_plate.pitch_provided, relation='lesser'))
+              get_pass_fail(self.web_bolt.min_pitch, self.web_plate.pitch_provided, relation='lesser'))
         self.report_check.append(t1)
         t1 = (DISP_MAX_PITCH, max_pitch(web_connecting_plates),
               self.web_plate.pitch_provided,
-              get_pass_fail(self.web_bolt.max_spacing_round, self.web_plate.pitch_provided,
+              get_pass_fail(self.web_bolt.max_spacing, self.web_plate.pitch_provided,
                             relation='greater'))
         self.report_check.append(t1)
         t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
               self.web_plate.gauge_provided,
-              get_pass_fail(self.web_bolt.min_gauge_round, self.web_plate.gauge_provided, relation="lesser"))
+              get_pass_fail(self.web_bolt.min_gauge, self.web_plate.gauge_provided, relation="lesser"))
         self.report_check.append(t2)
         t2 = (DISP_MAX_GAUGE, max_pitch(web_connecting_plates),
               self.web_plate.gauge_provided,
-              get_pass_fail(self.flange_bolt.max_spacing_round, self.web_plate.gauge_provided,
+              get_pass_fail(self.flange_bolt.max_spacing, self.web_plate.gauge_provided,
                             relation="greater"))
         self.report_check.append(t2)
         t3 = (DISP_MIN_END, min_edge_end(self.web_bolt.dia_hole, self.bolt.edge_type),
               self.web_plate.end_dist_provided,
-              get_pass_fail(self.web_bolt.min_end_dist_round, self.web_plate.end_dist_provided,
+              get_pass_fail(self.web_bolt.min_end_dist, self.web_plate.end_dist_provided,
                             relation='lesser'))
         self.report_check.append(t3)
         t4 = (DISP_MAX_END, max_edge_end(self.web_plate.fy, self.web_plate.thickness_provided),
               self.web_plate.end_dist_provided,
-              get_pass_fail(self.web_bolt.max_end_dist_round, self.web_plate.end_dist_provided,
+              get_pass_fail(self.web_bolt.max_end_dist, self.web_plate.end_dist_provided,
                             relation='greater'))
         self.report_check.append(t4)
         t3 = (DISP_MIN_EDGE, min_edge_end(self.web_bolt.dia_hole, self.bolt.edge_type),
               self.web_plate.edge_dist_provided,
-              get_pass_fail(self.web_bolt.min_edge_dist_round, self.web_plate.edge_dist_provided,
+              get_pass_fail(self.web_bolt.min_edge_dist, self.web_plate.edge_dist_provided,
                             relation='lesser'))
         self.report_check.append(t3)
         t4 = (DISP_MAX_EDGE, max_edge_end(self.web_plate.fy, self.web_plate.thickness_provided),
@@ -2523,29 +2527,25 @@ class BeamCoverPlate(MomentConnection):
         t1 = ('SubSection', 'Flange plate Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
-        t1 = (
-        DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth, self.min_plate_height), self.plate.height,
-        get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+        t1 = (DISP_MIN_PLATE_HEIGHT, min_flange_plate_ht_req(beam_width = self.section.flange_width,min_flange_plate_ht= self.min_plate_height), self.flange_plate.height,
+            get_pass_fail(self.min_plate_height, self.flange_plate.height, relation="lesser"))
         self.report_check.append(t1)
-        t1 = (DISP_MAX_PLATE_HEIGHT, max_plate_ht_req(self.connectivity, self.supported_section.depth,
-                                                      self.supported_section.flange_thickness,
-                                                      self.supported_section.root_radius,
-                                                      self.supported_section.notch_ht,
-                                                      self.max_plate_height), self.plate.height,
-              get_pass_fail(self.max_plate_height, self.plate.height, relation="greater"))
-        self.report_check.append(t1)
-        min_plate_length = self.plate.gap + 2 * self.bolt.min_end_dist + (
-                    self.plate.bolt_line - 1) * self.bolt.min_pitch
-        t1 = (DISP_MIN_PLATE_LENGTH, min_plate_length_req(self.bolt.min_pitch, self.bolt.min_end_dist,
-                                                          self.plate.bolt_line, min_plate_length), self.plate.length,
-              get_pass_fail(min_plate_length, self.plate.length, relation="lesser"))
-        self.report_check.append(t1)
-        t1 = (
-        DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness), self.plate.thickness_provided,
-        get_pass_fail(self.supported_section.web_thickness, self.plate.thickness_provided, relation="lesser"))
+        t1 = (DISP_MAX_PLATE_HEIGHT,max_flange_plate_ht_req(beam_width=self.section.flange_width, max_flange_plate_ht=self.max_plate_height),
+            self.flange_plate.height,get_pass_fail(self.max_plate_height, self.flange_plate.height, relation="greater"))
         self.report_check.append(t1)
 
+        min_plate_length = 2*(((self.flange_plate.bolt_line / 2 - 1) * self.flange_bolt.min_pitch) + (2*self.flange_bolt.min_end_dist) + (self.flange_plate.gap/2))
 
+        t1 = (DISP_MIN_PLATE_LENGTH, min_flange_plate_length_req(min_pitch=self.flange_bolt.min_pitch, min_end_dist= self.flange_bolt.min_end_dist,
+                                                                 bolt_line= self.flange_plate.bolt_line,min_length= min_plate_length,gap=self.flange_plate.gap), self.flange_plate.length,
+              get_pass_fail(min_plate_length, self.flange_plate.length, relation="lesser"))
+        self.report_check.append(t1)
+        # t1 = (
+        # DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness), self.plate.thickness_provided,
+        # get_pass_fail(self.supported_section.web_thickness, self.plate.thickness_provided, relation="lesser"))
+        # self.report_check.append(t1)
+        #
+        #
 
 
 

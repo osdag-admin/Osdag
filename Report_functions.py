@@ -48,7 +48,7 @@ def max_pitch(t):
     return max_pitch_eqn
 
 def min_edge_end(d_0,edge_type):
-    if edge_type == 'hand_flame_cut':
+    if edge_type == 'a - Sheared or hand flame cut':
         factor = 1.7
     else:
         factor = 1.5
@@ -163,6 +163,25 @@ def min_plate_ht_req(beam_depth,min_plate_ht):
     min_plate_ht_eqn.append(NoEscape(r'\begin{aligned}0.6 * d_b&= 0.6 * '+ beam_depth + r'='+min_plate_ht+r'\end{aligned}'))
     return min_plate_ht_eqn
 
+def min_flange_plate_ht_req(beam_width,min_flange_plate_ht):
+    beam_width = str(beam_width)
+    min_flange_plate_ht = str(min_flange_plate_ht)
+    min_flange_plate_ht_eqn = Math(inline=True)
+    min_flange_plate_ht_eqn.append(NoEscape(r'\begin{aligned}min~flange~plate~ht &= beam~width\\'))
+    min_flange_plate_ht_eqn.append(NoEscape(r'&='+min_flange_plate_ht+r'\end{aligned}'))
+
+    return min_flange_plate_ht_eqn
+
+def max_flange_plate_ht_req(beam_width,max_flange_plate_ht):
+    beam_width = str(beam_width)
+    max_flange_plate_ht = str(max_flange_plate_ht)
+    max_flange_plate_ht_eqn = Math(inline=True)
+    max_flange_plate_ht_eqn.append(NoEscape(r'\begin{aligned}min~flange~plate~ht &= beam~width\\'))
+    max_flange_plate_ht_eqn.append(NoEscape(r'&='+max_flange_plate_ht+r'\end{aligned}'))
+
+    return max_flange_plate_ht_eqn
+
+
 def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_plate_h):
     beam_depth = str(beam_depth)
     beam_f_t = str(beam_f_t)
@@ -187,6 +206,21 @@ def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     min_plate_length_eqn.append(NoEscape(r'&=2*' + min_end_dist + '+(' + bolt_line + '-1) * ' + min_pitch + r'\\'))
     min_plate_length_eqn.append(NoEscape(r'&=' + min_length + '\end{aligned}'))
     return min_plate_length_eqn
+
+def min_flange_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length,gap):
+    min_pitch = str( min_pitch)
+    min_end_dist = str(min_end_dist)
+    bolt_line = str(bolt_line)
+    min_length = str(min_length)
+    gap = str(gap)
+    min_flange_plate_length_eqn = Math(inline=True)
+    min_flange_plate_length_eqn.append(NoEscape(r'\begin{aligned} & 2[2*e_{min} + ({\frac{bolt~lines}{2}}-1) * p_{min})]\\'))
+    min_flange_plate_length_eqn.append(NoEscape(r'& +\frac{gap}{2}]\\'))
+    min_flange_plate_length_eqn.append(NoEscape(r'&=2*[(2*' + min_end_dist +r' + (\frac{'+bolt_line+r'}{2}' + r'-1) * ' + min_pitch + r'\\'))
+    min_flange_plate_length_eqn.append(NoEscape(r'&= + \frac{'+gap+r'}{2}]\\'))
+
+    min_flange_plate_length_eqn.append(NoEscape(r'&=' + min_length + '\end{aligned}'))
+    return min_flange_plate_length_eqn
 
 def min_plate_thk_req(t_w):
     t_w = str(t_w)

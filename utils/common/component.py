@@ -186,14 +186,14 @@ class Bolt(Material):
         self.connecting_plates_tk = [i[0] for i in conn_plates_t_fu_fy]
         self.bolt_diameter_provided = bolt_diameter_provided
 
-        self.min_pitch = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)
-        self.min_gauge = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)
-        self.min_edge_dist = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
-                                                                            self.edge_type)
+        self.min_pitch = round((IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)),2)
+        self.min_gauge = round((IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)),2)
+        self.min_edge_dist = round((IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
+                                                                            self.edge_type)),2)
         self.min_end_dist = self.min_edge_dist
         self.max_spacing = IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk)
-        self.max_edge_dist = IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
-                                                                        self.corrosive_influences)
+        self.max_edge_dist = round((IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
+                                                                        self.corrosive_influences)),2)
         self.max_end_dist = self.max_edge_dist
         self.min_pitch_round = round_up(self.min_pitch, 5)
         self.min_gauge_round = round_up(self.min_gauge, 5)

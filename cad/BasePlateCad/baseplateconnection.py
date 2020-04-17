@@ -277,7 +277,9 @@ if __name__ == '__main__':
 
     #Todo: Make this class in another file
 
-    bolt = AnchorBolt_A(l= 250, c= 125, a= 75, r= 12)
+
+    ex_length = (50 + 24 + baseplate.T)  # nut.T = 24
+    bolt = AnchorBolt_A(l= 250, c= 125, a= 75, r= 12, ex= ex_length)
     # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12)
     # bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12)
     nut = Nut(R= bolt.r*3, T= 24, H= 30, innerR1= bolt.r)
@@ -291,14 +293,24 @@ if __name__ == '__main__':
 
     basePlate.create_3DModel()
     prism = basePlate.get_models()
+    column = basePlate.get_column_model()
+    plate = basePlate.get_plate_connector_models()
+    weld = basePlate.get_welded_models()
+    nut_bolt = basePlate.get_nut_bolt_array_models()
+    conc = basePlate.get_concrete_models()
 
     Point = gp_Pnt(0.0, 0.0, 0.0)
     display.DisplayMessage(Point, "Origin")
 
-    p2 = gp_Pnt(0.0, -baseplate.W/2, -baseplate.T/2)
-    display.DisplayMessage(p2, "BasePlate")
+    # p2 = gp_Pnt(0.0, -baseplate.W/2, -baseplate.T/2)
+    # display.DisplayMessage(p2, "BasePlate")
 
-    display.DisplayShape(prism, update=True)
+    # display.DisplayShape(prism, update=True)
+    display.DisplayShape(column, update=True)
+    display.DisplayColoredShape(plate, color='BLUE', update=True)
+    display.DisplayColoredShape(weld, color='RED', update=True)
+    display.DisplayColoredShape(nut_bolt, color='YELLOW', update=True)
+    display.DisplayShape(conc, color='CYAN', transparency=0.5,  update=True)
     display.DisableAntiAliasing()
     start_display()
     # display.ExportToImage("/home/rahul/Osdag_workspace/3DtestbasePlatw.png")

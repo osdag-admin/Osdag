@@ -125,10 +125,10 @@ class NutBoltArray():
         pos3 = pos2 + self.pitch * self.pitchDir
         pos4 = pos3 - self.gauge * self.gaugeDir
 
-        self.ab1.place(pos1, gaugeDir, boltDir)
-        self.ab2.place(pos2, gaugeDir, boltDir)
-        self.ab3.place(pos3, gaugeDir, boltDir)
-        self.ab4.place(pos4, gaugeDir, boltDir)
+        self.ab1.place(pos1 - (self.bolt.ex )*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.ab2.place(pos2 - (self.bolt.ex )*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.ab3.place(pos3 - (self.bolt.ex )*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.ab4.place(pos4 - (self.bolt.ex )*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
         self.nt1.place(pos1 - (self.nt1.T+50)*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
         self.nt2.place(pos2 - (self.nt1.T+50)*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
@@ -184,19 +184,22 @@ if __name__ == '__main__':
     pitchDir = numpy.array([0, 1.0, 0])
     boltDir = numpy.array([0, 0, 1.0])
 
-    l = 550
-    c = 225
-    a = 175
-    r = 24
-    bolt = AnchorBolt_A(l= 250, c= 125, a= 75, r= 12)
-    # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12)
-    # bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12)
 
-    nut = Nut(R= bolt.r*3, T= 24, H= 30, innerR1= bolt.r)
 
     numberOfBolts = 4
     column = ISection(B=250, T=13.7, D=450, t=9.8, R1= 14.0, R2= 7.0, alpha= 94, length= 1500, notchObj= None)
     baseplate = Plate(L=650, W=500, T=30)
+
+    l = 550
+    c = 225
+    a = 175
+    r = 24
+    ex_length = (50 + 24 + baseplate.T)  # nut.T = 24
+    bolt = AnchorBolt_A(l= 250, c= 125, a= 75, r= 12, ex= ex_length)
+    # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12)
+    # bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12)
+
+    nut = Nut(R= bolt.r*3, T= 24, H= 30, innerR1= bolt.r)
 
     nutSpace = bolt.c + baseplate.T
 

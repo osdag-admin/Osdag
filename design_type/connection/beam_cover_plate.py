@@ -923,7 +923,7 @@ class BeamCoverPlate(MomentConnection):
                                                  min_gauge=self.web_bolt.min_gauge_round,
                                                  max_spacing=self.web_bolt.max_spacing_round,
                                                  max_edge_dist=self.web_bolt.max_edge_dist_round
-                                                 ,shear_load=self.load.shear_force , axial_load=axial_force_w, web_moment = self.moment_web,
+                                                 ,shear_load=self.load.shear_force , axial_load=self.axial_force_w, web_moment = self.moment_web,
 
                                                  gap=(self.web_plate.gap/2), shear_ecc=True)
 
@@ -1098,7 +1098,7 @@ class BeamCoverPlate(MomentConnection):
                                              min_gauge=self.web_bolt.min_gauge_round,
                                              max_spacing=self.web_bolt.max_spacing_round,
                                              max_edge_dist=self.web_bolt.max_edge_dist_round
-                                             , shear_load=self.load.shear_force, axial_load=axial_force_w,web_moment = self.moment_web,
+                                             , shear_load=self.load.shear_force, axial_load=self.axial_force_w,web_moment = self.moment_web,
 
                                              gap=(self.web_plate.gap/2), shear_ecc=True)
         if self.flange_plate.design_status is False or self.flange_plate.design_status is False :
@@ -2103,28 +2103,6 @@ class BeamCoverPlate(MomentConnection):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #     def web_force(column_d, column_f_t, column_t_w, axial_force, column_area):
 #         """
 #         Args:
@@ -2235,7 +2213,7 @@ class BeamCoverPlate(MomentConnection):
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
         self.report_input = \
-            {KEY_MODULE: self.module,
+            {KEY_MODULE: self.module_name,
              KEY_MAIN_MODULE: self.mainmodule,
              # KEY_CONN: self.connectivity,
              KEY_DISP_MOMENT: (self.load.moment/1000000),
@@ -2277,106 +2255,297 @@ class BeamCoverPlate(MomentConnection):
                                     'Zpz(cm3)': self.section.plast_sec_mod_z,
                                     'Zpy(cm3)': self.section.elast_sec_mod_y}
         #####Flange plate details
-        self.report_result = \
-            {KEY_MODULE_STATUS: self.design_status,
+        # self.report_result = \
+        #     {KEY_MODULE_STATUS: self.design_status,
+        #
+        #     # KEY_BOLT_STATUS: self.bolt.design_status,
+        #     KEY_OUT_FLANGE_BOLT_SHEAR: self.flange_bolt.bolt_shear_capacity,
+        #     KEY_OUT_FLANGE_BOLT_BEARING: self.flange_bolt.bolt_bearing_capacity,
+        #     KEY_OUT_FLANGE_BOLT_CAPACITY: self.flange_bolt.bolt_capacity,
+        #     KEY_FLANGE_NUM_BOLTS_REQ : self.flange_plate.bolts_required,
+        #     KEY_FLANGE_BOLT_GRP_CAPACITY : self.flange_bolt.bolt_capacity*self.flange_plate.bolts_required,
+        #     KEY_FLANGE_BOLTS_ONE_LINE : self.flange_plate.bolts_one_line,
+        #     KEY_FLANGE_BOLT_LINE: self.flange_plate.bolt_line,
+        #     KEY_FLANGE_PITCH: self.flange_plate.pitch_provided
+        #     KEY_OUT_FLANGE_MIN_PITCH: self.flange_bolt.min_pitch_round
+        #
+        #     KEY_EDGEDIST_FLANGE: self.flange_plate.edge_dist_provided,
+        #     KEY_OUT_FLANGE_MIN_EDGE_DIST: self.flange_bolt.min_edge_dist_round,
+        #     KEY_OUT_FLANGE_MAX_EDGE_DIST: self.flange_bolt.max_edge_dist_round,
+        #
+        #     KEY_ENDDIST_FLANGE: self.flange_plate.end_dist_provided,
+        #
+        #     KEY_FLANGE_PLATE_GAUGE: self.flange_plate.gauge_provided,
+        #     KEY_OUT_FLANGE_MIN_GAUGE: self.flange_bolt.min_gauge_round,
+        #     KEY_OUT_FLANGE_MAX_SPACING: self.flange_bolt.max_spacing_round,
+        #
+        #     KEY_OUT_GRD_PROVIDED: self.flange_bolt.bolt_fu,
+        #     KEY_D: self.bolt.bolt_diameter_provided}
 
-            # KEY_BOLT_STATUS: self.bolt.design_status,
-            KEY_OUT_FLANGE_BOLT_SHEAR: self.flange_bolt.bolt_shear_capacity,
-            KEY_OUT_FLANGE_BOLT_BEARING: self.flange_bolt.bolt_bearing_capacity,
-            KEY_OUT_FLANGE_BOLT_CAPACITY: self.flange_bolt.bolt_capacity,
-            KEY_OUT_FLANGE_BOLTS_REQUIRED: self.flange_plate.bolts_required,
-            KEY_OUT_FLANGE_BOLT_GRP_CAPACITY: self.flange_bolt.bolt_capacity*self.flange_plate.bolts_required,
-            KEY_OUT_FLANGE_BOLTS_ONE_LINE: self.flange_plate.bolts_one_line,
-            KEY_OUT_FLANGE_BOLT_LINE: self.flange_plate.bolt_line,
-            KEY_OUT_FLANGE_PITCH: self.flange_plate.pitch_provided}
-            # KEY_OUT_FLANGE_MIN_PITCH: self.flange_bolt.min_pitch_round
-            #
-            # KEY_OUT_FLANGE_EDGE_DIST: self.flange_plate.edge_dist_provided,
-            # KEY_OUT_MIN_EDGE_DIST: self.flange_bolt.min_edge_dist_round,
-            # KEY_OUT_MAX_EDGE_DIST: self.flange_bolt.max_edge_dist_round,
-            #
-            # KEY_OUT_END_DIST: self.flange_plate.end_dist_provided,
-            #
-            # KEY_OUT_GAUGE: self.flange_plate.gauge_provided,
-            # KEY_OUT_MIN_GAUGE: self.flange_bolt.min_gauge_round,
-            # KEY_OUT_MAX_SPACING: self.flange_bolt.max_spacing_round,
-            #
-            # KEY_OUT_GRD_PROVIDED: self.flange_bolt.bolt_fu,
-            # KEY_OUT_D_PROVIDED: self.flange_bolt.bolt_diameter_provided}
-        {"Flange plate Details": "TITLE"}
         self.report_check = []
+        #####Outer plate#####
+        flange_connecting_plates = [self.flange_plate.thickness_provided, self.section.flange_thickness]
 
-        connecting_plates = [self.flange_plate.thickness_provided, self.section.flange_thickness]
+        flange_bolt_shear_capacity_kn = round(self.flange_bolt.bolt_shear_capacity / 1000, 2)
+        flange_bolt_bearing_capacity_kn = round(self.flange_bolt.bolt_bearing_capacity / 1000, 2)
+        flange_bolt_capacity_kn = round(self.flange_bolt.bolt_capacity / 1000, 2)
+        flange_kb_disp = round(self.flange_bolt.kb, 2)
+        flange_kh_disp = round(self.flange_bolt.kh, 2)
+        flange_bolt_force_kn = round(self.flange_plate.bolt_force, 2)
+        flange_bolt_capacity_red_kn = round(self.flange_plate.bolt_capacity_red, 2)
+        ########Inner plate#####
+        innerflange_connecting_plates = [self.flange_plate.thickness_provided, self.section.flange_thickness]
 
-        bolt_shear_capacity_kn = round(self.flange_bolt.bolt_shear_capacity / 1000, 2)
-        bolt_bearing_capacity_kn = round(self.flange_bolt.bolt_bearing_capacity / 1000, 2)
-        bolt_capacity_kn = round(self.flange_bolt.bolt_capacity / 1000, 2)
-        kb_disp = round(self.flange_bolt.kb, 2)
-        kh_disp = round(self.flange_bolt.kh, 2)
-        bolt_force_kn = round(self.flange_plate.bolt_force, 2)
-        bolt_capacity_red_kn = round(self.flange_plate.bolt_capacity_red, 2)
+        innerflange_bolt_shear_capacity_kn = round(self.flange_bolt.bolt_shear_capacity / 1000, 2)
+        innerflange_bolt_bearing_capacity_kn = round(self.flange_bolt.bolt_bearing_capacity / 1000, 2)
+        innerflange_bolt_capacity_kn = round(self.flange_bolt.bolt_capacity / 1000, 2)
+        innerflange_kb_disp = round(self.flange_bolt.kb, 2)
+        innerflange_kh_disp = round(self.flange_bolt.kh, 2)
+        innerflange_bolt_force_kn = round(self.flange_plate.bolt_force, 2)
+        innerflange_bolt_capacity_red_kn = round(self.flange_plate.bolt_capacity_red, 2)
         # "Flange plate Details": "TITLE"
-        t5 = ("Flange plate Details")
-        self.report_check.append(t5)
-        if self.flange_bolt.bolt_type == TYP_BEARING:
-            t1 = (KEY_OUT_DISP_FLANGE_BOLT_SHEAR , '', bolt_shear_prov(self.flange_bolt.bolt_fu, 1, self.flange_bolt.bolt_net_area,
-                                                               self.flange_bolt.gamma_mb, bolt_shear_capacity_kn), '')
+
+        t1 = ('SubSection', 'Flange Bolt Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        if self.preference == "Outside":
+            if self.flange_bolt.bolt_type == TYP_BEARING:
+                t1 = (KEY_OUT_DISP_FLANGE_BOLT_SHEAR , '', bolt_shear_prov(self.flange_bolt.bolt_fu, 1, self.flange_bolt.bolt_net_area,
+                                                                   self.flange_bolt.gamma_mb, flange_bolt_shear_capacity_kn), '')
+                self.report_check.append(t1)
+                t2 = (KEY_OUT_DISP_FLANGE_BOLT_BEARING , '', bolt_bearing_prov(flange_kb_disp, self.bolt.bolt_diameter_provided,
+                                                                       self.bolt_conn_plates_t_fu_fy, self.flange_bolt.gamma_mb,
+                                                                       flange_bolt_bearing_capacity_kn), '')
+                self.report_check.append(t2)
+                t3 = (KEY_OUT_DISP_FLANGE_BOLT_CAPACITY, '',
+                      bolt_capacity_prov(flange_bolt_shear_capacity_kn, flange_bolt_bearing_capacity_kn, flange_bolt_capacity_kn),
+                      '')
+                self.report_check.append(t3)
+            else:
+
+                t4 = (KEY_OUT_DISP_FLANGE_BOLT_SLIP, '',
+                      HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=flange_kh_disp, fub=self.flange_bolt.bolt_fu,
+                                              Anb=self.bolt.bolt_net_area, gamma_mf=self.web_bolt.gamma_mf,
+                                              capacity=flange_bolt_capacity_kn), '')
+                self.report_check.append(t4)
+            t5 = (DISP_NUM_OF_BOLTS, get_trial_bolts(V_u=0.0, A_u=(round(self.flange_force/1000,2)),bolt_capacity=flange_bolt_capacity_kn,multiple=2),
+                  self.flange_plate.bolts_required, '')
+            self.report_check.append(t5)
+            t6 = (DISP_NUM_OF_COLUMNS, '', self.flange_plate.bolt_line, '')
+            self.report_check.append(t6)
+            t7 = (DISP_NUM_OF_ROWS, '', self.flange_plate.bolts_one_line, '')
+            self.report_check.append(t7)
+            t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+                  self.flange_plate.pitch_provided,
+                  get_pass_fail(self.flange_bolt.min_pitch_round, self.flange_plate.pitch_provided, relation='lesser'))
             self.report_check.append(t1)
-            t2 = (KEY_OUT_DISP_FLANGE_BOLT_BEARING , '', bolt_bearing_prov(kb_disp, self.bolt.bolt_diameter_provided,
-                                                                   self.bolt_conn_plates_t_fu_fy, self.flange_bolt.gamma_mb,
-                                                                   bolt_bearing_capacity_kn), '')
+            t1 = (DISP_MAX_PITCH, max_pitch(flange_connecting_plates),
+                  self.flange_plate.pitch_provided,
+                  get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.pitch_provided, relation='greater'))
+            self.report_check.append(t1)
+            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+                  self.flange_plate.gauge_provided,
+                  get_pass_fail(self.flange_bolt.min_gauge_round, self.flange_plate.gauge_provided, relation="lesser"))
             self.report_check.append(t2)
-            t3 = (KEY_OUT_DISP_FLANGE_BOLT_CAPACITY, '',
-                  bolt_capacity_prov(bolt_shear_capacity_kn, bolt_bearing_capacity_kn, bolt_capacity_kn),
+            t2 = (DISP_MAX_GAUGE, max_pitch(flange_connecting_plates),
+                  self.flange_plate.gauge_provided,
+                  get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.gauge_provided, relation="greater"))
+            self.report_check.append(t2)
+            t3 = (DISP_MIN_END, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
+                  self.flange_plate.end_dist_provided,
+                  get_pass_fail(self.flange_bolt.min_end_dist_round, self.flange_plate.end_dist_provided, relation='lesser'))
+            self.report_check.append(t3)
+            t4 = (DISP_MAX_END, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
+                  self.flange_plate.end_dist_provided,
+                  get_pass_fail(self.flange_bolt.max_end_dist_round, self.flange_plate.end_dist_provided, relation='greater'))
+            self.report_check.append(t4)
+            t3 = (DISP_MIN_EDGE, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
+                  self.flange_plate.edge_dist_provided,
+                  get_pass_fail(self.flange_bolt.min_edge_dist_round, self.flange_plate.edge_dist_provided, relation='lesser'))
+            self.report_check.append(t3)
+            t4 = (DISP_MAX_EDGE, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
+                  self.flange_plate.edge_dist_provided,
+                  get_pass_fail(self.flange_bolt.max_edge_dist, self.flange_plate.edge_dist_provided, relation="greater"))
+            self.report_check.append(t4)
+        else :
+            if self.flange_bolt.bolt_type == TYP_BEARING:
+                t1 = (KEY_OUT_DISP_FLANGE_BOLT_SHEAR, '',
+                      bolt_shear_prov(self.flange_bolt.bolt_fu, 2, self.flange_bolt.bolt_net_area,
+                                      self.flange_bolt.gamma_mb, innerflange_bolt_shear_capacity_kn), '')
+                self.report_check.append(t1)
+                t2 = (KEY_OUT_DISP_FLANGE_BOLT_BEARING, '',
+                      bolt_bearing_prov(innerflange_kb_disp, self.bolt.bolt_diameter_provided,
+                                        self.bolt_conn_plates_t_fu_fy, self.flange_bolt.gamma_mb,
+                                        innerflange_bolt_bearing_capacity_kn), '')
+                self.report_check.append(t2)
+                t3 = (KEY_OUT_DISP_FLANGE_BOLT_CAPACITY, '',
+                      bolt_capacity_prov(innerflange_bolt_shear_capacity_kn, innerflange_bolt_bearing_capacity_kn,
+                                         innerflange_bolt_capacity_kn),
+                      '')
+                self.report_check.append(t3)
+            else:
+
+                t4 = (KEY_OUT_DISP_FLANGE_BOLT_SLIP, '',
+                      HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=innerflange_kh_disp,
+                                              fub=self.flange_bolt.bolt_fu,
+                                              Anb=self.bolt.bolt_net_area, gamma_mf=self.web_bolt.gamma_mf,
+                                              capacity=innerflange_bolt_capacity_kn), '')
+                self.report_check.append(t4)
+            t5 = (DISP_NUM_OF_BOLTS, get_trial_bolts(V_u=0.0, A_u=(round(self.flange_force / 1000, 2)),
+                                                     bolt_capacity=flange_bolt_capacity_kn, multiple=2),
+                  self.flange_plate.bolts_required, '')
+            self.report_check.append(t5)
+            t6 = (DISP_NUM_OF_COLUMNS, '', self.flange_plate.bolt_line, '')
+            self.report_check.append(t6)
+            t7 = (DISP_NUM_OF_ROWS, '', self.flange_plate.bolts_one_line, '')
+            self.report_check.append(t7)
+            t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+                  self.flange_plate.pitch_provided,
+                  get_pass_fail(self.flange_bolt.min_pitch_round, self.flange_plate.pitch_provided, relation='lesser'))
+            self.report_check.append(t1)
+            t1 = (DISP_MAX_PITCH, max_pitch(innerflange_connecting_plates),
+                  self.flange_plate.pitch_provided,
+                  get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.pitch_provided,
+                                relation='greater'))
+            self.report_check.append(t1)
+            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+                  self.flange_plate.gauge_provided,
+                  get_pass_fail(self.flange_bolt.min_gauge_round, self.flange_plate.gauge_provided, relation="lesser"))
+            self.report_check.append(t2)
+            t2 = (DISP_MAX_GAUGE, max_pitch(innerflange_connecting_plates),
+                  self.flange_plate.gauge_provided,
+                  get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.gauge_provided,
+                                relation="greater"))
+            self.report_check.append(t2)
+            t3 = (DISP_MIN_END, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
+                  self.flange_plate.end_dist_provided,
+                  get_pass_fail(self.flange_bolt.min_end_dist_round, self.flange_plate.end_dist_provided,
+                                relation='lesser'))
+            self.report_check.append(t3)
+            t4 = (DISP_MAX_END, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
+                  self.flange_plate.end_dist_provided,
+                  get_pass_fail(self.flange_bolt.max_end_dist_round, self.flange_plate.end_dist_provided,
+                                relation='greater'))
+            self.report_check.append(t4)
+            t3 = (DISP_MIN_EDGE, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
+                  self.flange_plate.edge_dist_provided,
+                  get_pass_fail(self.flange_bolt.min_edge_dist_round, self.flange_plate.edge_dist_provided,
+                                relation='lesser'))
+            self.report_check.append(t3)
+            t4 = (DISP_MAX_EDGE, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
+                  self.flange_plate.edge_dist_provided,
+                  get_pass_fail(self.flange_bolt.max_edge_dist, self.flange_plate.edge_dist_provided,
+                                relation="greater"))
+            self.report_check.append(t4)
+
+
+        web_connecting_plates = [self.web_plate.thickness_provided, self.section.web_thickness]
+
+        web_bolt_shear_capacity_kn = round(self.web_bolt.bolt_shear_capacity / 1000, 2)
+        web_bolt_bearing_capacity_kn = round(self.web_bolt.bolt_bearing_capacity / 1000, 2)
+        web_bolt_capacity_kn = round(self.web_bolt.bolt_capacity / 1000, 2)
+        web_kb_disp = round(self.web_bolt.kb, 2)
+        web_kh_disp = round(self.web_bolt.kh, 2)
+        web_bolt_force_kn = round(self.web_plate.bolt_force, 2)
+        web_bolt_capacity_red_kn = round(self.web_plate.bolt_capacity_red, 2)
+
+
+        t1 = ('SubSection', 'Web Bolt Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        if self.flange_bolt.bolt_type == TYP_BEARING:
+            t1 = (KEY_OUT_DISP_WEB_BOLT_SHEAR , '', bolt_shear_prov(self.web_bolt.bolt_fu, 2, self.web_bolt.bolt_net_area,
+                                                               self.web_bolt.gamma_mb, web_bolt_shear_capacity_kn), '')
+            self.report_check.append(t1)
+            t2 = (KEY_OUT_DISP_WEB_BOLT_BEARING , '', bolt_bearing_prov(web_kb_disp, self.bolt.bolt_diameter_provided,
+                                                                   self.bolt_conn_plates_web_t_fu_fy, self.web_bolt.gamma_mb,
+                                                                   web_bolt_bearing_capacity_kn), '')
+            self.report_check.append(t2)
+            t3 = (KEY_OUT_DISP_WEB_BOLT_CAPACITY, '',
+                  bolt_capacity_prov(web_bolt_shear_capacity_kn, web_bolt_bearing_capacity_kn, web_bolt_capacity_kn),
                   '')
             self.report_check.append(t3)
         else:
 
-            t4 = (KEY_OUT_DISP_FLANGE_BOLT_SLIP, '',
-                  HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.flange_bolt.bolt_fu,
-                                          Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
-                                          capacity=bolt_capacity_kn), '')
+            t4 = (KEY_OUT_DISP_WEB_BOLT_SLIP, '',
+                  HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=web_kh_disp, fub=self.web_bolt.bolt_fu,
+                                          Anb=self.web_bolt.bolt_net_area, gamma_mf=self.web_bolt.gamma_mf,
+                                          capacity=web_bolt_capacity_kn), '')
             self.report_check.append(t4)
-        t5 = (DISP_NUM_OF_BOLTS, get_trial_bolts(V_u=0.0, A_u=(round(self.flange_force/1000,2)),bolt_capacity=bolt_capacity_kn,multiple=2),
-              self.flange_plate.bolts_required, '')
-        self.report_check.append(t5)
-        t6 = (DISP_NUM_OF_COLUMNS, '', self.flange_plate.bolt_line, '')
-        self.report_check.append(t6)
-        t7 = (DISP_NUM_OF_ROWS, '', self.flange_plate.bolts_one_line, '')
-        self.report_check.append(t7)
 
+        t5 = (DISP_NUM_OF_BOLTS, get_trial_bolts(V_u=self.load.shear_force/1000, A_u=(round(self.axial_force_w/ 1000, 2)),
+                                                 bolt_capacity=web_bolt_capacity_kn, multiple=2),
+              self.web_plate.bolts_required, '') ### todo no of bolts
+        self.report_check.append(t5)
+        t6 = (DISP_NUM_OF_COLUMNS, '', self.web_plate.bolt_line, '')
+        self.report_check.append(t6)
+
+        t7 = (DISP_NUM_OF_ROWS, '', self.web_plate.bolts_one_line, '')
+        self.report_check.append(t7)
         t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
-              self.flange_plate.pitch_provided,
-              get_pass_fail(self.flange_bolt.min_pitch_round, self.flange_plate.pitch_provided, relation='lesser'))
+              self.web_plate.pitch_provided,
+              get_pass_fail(self.web_bolt.min_pitch_round, self.web_plate.pitch_provided, relation='lesser'))
         self.report_check.append(t1)
-        t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
-              self.flange_plate.pitch_provided,
-              get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.pitch_provided, relation='greater'))
+        t1 = (DISP_MAX_PITCH, max_pitch(web_connecting_plates),
+              self.web_plate.pitch_provided,
+              get_pass_fail(self.web_bolt.max_spacing_round, self.web_plate.pitch_provided,
+                            relation='greater'))
         self.report_check.append(t1)
         t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
-              self.flange_plate.gauge_provided,
-              get_pass_fail(self.flange_bolt.min_gauge_round, self.flange_plate.gauge_provided, relation="lesser"))
+              self.web_plate.gauge_provided,
+              get_pass_fail(self.web_bolt.min_gauge_round, self.web_plate.gauge_provided, relation="lesser"))
         self.report_check.append(t2)
-        t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
-              self.flange_plate.gauge_provided,
-              get_pass_fail(self.flange_bolt.max_spacing_round, self.flange_plate.gauge_provided, relation="greater"))
+        t2 = (DISP_MAX_GAUGE, max_pitch(web_connecting_plates),
+              self.web_plate.gauge_provided,
+              get_pass_fail(self.flange_bolt.max_spacing_round, self.web_plate.gauge_provided,
+                            relation="greater"))
         self.report_check.append(t2)
-        t3 = (DISP_MIN_END, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
-              self.flange_plate.end_dist_provided,
-              get_pass_fail(self.flange_bolt.min_end_dist_round, self.flange_plate.end_dist_provided, relation='lesser'))
+        t3 = (DISP_MIN_END, min_edge_end(self.web_bolt.dia_hole, self.bolt.edge_type),
+              self.web_plate.end_dist_provided,
+              get_pass_fail(self.web_bolt.min_end_dist_round, self.web_plate.end_dist_provided,
+                            relation='lesser'))
         self.report_check.append(t3)
-        t4 = (DISP_MAX_END, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
-              self.flange_plate.end_dist_provided,
-              get_pass_fail(self.flange_bolt.max_end_dist_round, self.flange_plate.end_dist_provided, relation='greater'))
+        t4 = (DISP_MAX_END, max_edge_end(self.web_plate.fy, self.web_plate.thickness_provided),
+              self.web_plate.end_dist_provided,
+              get_pass_fail(self.web_bolt.max_end_dist_round, self.web_plate.end_dist_provided,
+                            relation='greater'))
         self.report_check.append(t4)
-        t3 = (DISP_MIN_EDGE, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
-              self.flange_plate.edge_dist_provided,
-              get_pass_fail(self.flange_bolt.min_edge_dist_round, self.flange_plate.edge_dist_provided, relation='lesser'))
+        t3 = (DISP_MIN_EDGE, min_edge_end(self.web_bolt.dia_hole, self.bolt.edge_type),
+              self.web_plate.edge_dist_provided,
+              get_pass_fail(self.web_bolt.min_edge_dist_round, self.web_plate.edge_dist_provided,
+                            relation='lesser'))
         self.report_check.append(t3)
-        t4 = (DISP_MAX_EDGE, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
-              self.flange_plate.edge_dist_provided,
-              get_pass_fail(self.flange_bolt.max_edge_dist, self.flange_plate.edge_dist_provided, relation="greater"))
+        t4 = (DISP_MAX_EDGE, max_edge_end(self.web_plate.fy, self.web_plate.thickness_provided),
+              self.web_plate.edge_dist_provided,
+              get_pass_fail(self.web_bolt.max_edge_dist, self.web_plate.edge_dist_provided,
+                            relation="greater"))
         self.report_check.append(t4)
+        ######Flange plate check####
+        t1 = ('SubSection', 'Flange plate Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t1 = (
+        DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth, self.min_plate_height), self.plate.height,
+        get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+        self.report_check.append(t1)
+        t1 = (DISP_MAX_PLATE_HEIGHT, max_plate_ht_req(self.connectivity, self.supported_section.depth,
+                                                      self.supported_section.flange_thickness,
+                                                      self.supported_section.root_radius,
+                                                      self.supported_section.notch_ht,
+                                                      self.max_plate_height), self.plate.height,
+              get_pass_fail(self.max_plate_height, self.plate.height, relation="greater"))
+        self.report_check.append(t1)
+        min_plate_length = self.plate.gap + 2 * self.bolt.min_end_dist + (
+                    self.plate.bolt_line - 1) * self.bolt.min_pitch
+        t1 = (DISP_MIN_PLATE_LENGTH, min_plate_length_req(self.bolt.min_pitch, self.bolt.min_end_dist,
+                                                          self.plate.bolt_line, min_plate_length), self.plate.length,
+              get_pass_fail(min_plate_length, self.plate.length, relation="lesser"))
+        self.report_check.append(t1)
+        t1 = (
+        DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness), self.plate.thickness_provided,
+        get_pass_fail(self.supported_section.web_thickness, self.plate.thickness_provided, relation="lesser"))
+        self.report_check.append(t1)
+
+
 
 
 
@@ -2399,10 +2568,8 @@ class BeamCoverPlate(MomentConnection):
         print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         fname_no_ext = filename[0].split(".")[0]
         print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
-        CreateLatex.save_latex(CreateLatex(), self.report_result, self.report_input,self.report_check,
-                               self.report_supported,
-
-                               popup_summary, fname_no_ext, ' ', rel_path, Disp_3D_image)
+        CreateLatex.save_latex(CreateLatex(), self.report_input,self.report_check,
+                               self.report_supported, popup_summary, fname_no_ext, ' ', rel_path, Disp_3D_image)
 
 
 

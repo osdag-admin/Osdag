@@ -629,12 +629,24 @@ KEY_OUT_DISP_FLANGE_BOLT_BEARING = "Bearing Capacity"
 KEY_OUT_FLANGE_BOLT_CAPACITY = 'flange_bolt.bolt_capacity'
 KEY_OUT_DISP_FLANGE_BOLT_CAPACITY ="Bolt Capacity"
 KEY_OUT_DISP_FLANGE_BOLT_SLIP= 'Slip Resistance'
-KEY_OUT_FLANGE_BOLTS_REQUIRED ='flange_plate.bolts_required'
-KEY_OUT_FLANGE_BOLT_GRP_CAPACITY = 'flange_bolt.grp_bolt_capacity'
-KEY_OUT_FLANGE_BOLTS_ONE_LINE ='flange_plate.bolts_one_line'
-KEY_OUT_FLANGE_BOLT_LINE = 'flange_plate.bolt_line'
-KEY_OUT_FLANGE_PITCH= 'flange_plate.pitch_provided'
-KEY_OUT_MIN_PITCH= 'bolt.min_pitch'
+KEY_FLANGE_BOLT_GRP_CAPACITY = 'flange_bolt.grp_bolt_capacity'
+KEY_OUT_FLANGE_BOLT_GRP_CAPACITY = 'flange bolt grp bolt capacity'
+KEY_OUT_MIN_PITCH= 'Min_pitch'
+KEY_OUT_GRD_PROVIDED='flange_bolt.bolt_fu'
+KEY_OUT_FLANGE_MIN_PITCH= 'flange_bolt.min_pitch_round'
+KEY_OUT_FLANGE_MIN_EDGE_DIST= 'flange_bolt.min_edge_dist_round'
+KEY_OUT_FLANGE_MAX_EDGE_DIST='flange_bolt.max_edge_dist_round'
+
+KEY_OUT_WEB_BOLT_SHEAR ='web_bolt.bolt_shear_capacity'
+KEY_OUT_DISP_WEB_BOLT_SHEAR = "Shear Capacity"
+KEY_OUT_WEB_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'
+KEY_OUT_DISP_WEB_BOLT_BEARING = "Bearing Capacity"
+KEY_OUT_WEB_BOLT_CAPACITY = 'flange_bolt.bolt_capacity'
+KEY_OUT_DISP_WEB_BOLT_CAPACITY ="Bolt Capacity"
+KEY_OUT_DISP_WEB_BOLT_SLIP= 'Slip Resistance'
+KEY_WEB_BOLT_GRP_CAPACITY = 'flange_bolt.grp_bolt_capacity'
+KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'flange bolt grp bolt capacity'
+
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
@@ -1147,7 +1159,6 @@ VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 DISP_NUM_OF_BOLTS = 'No of Bolts'
 DISP_NUM_OF_ROWS = 'No of Rows'
 DISP_NUM_OF_COLUMNS = 'No of Columns'
-
 
 
 def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):

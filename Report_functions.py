@@ -184,7 +184,7 @@ def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     bolt_line = str(bolt_line)
     min_length = str(min_length)
     min_plate_length_eqn = Math(inline=True)
-    min_plate_length_eqn.append(NoEscape(r'\begin{aligned} &2*e_{min} + (bolt~lines-1) * p_{min})\\'))
+    min_plate_length_eqn.append(NoEscape(r'\begin{aligned} &2*e_{min} + (n~c-1) * p_{min})\\'))
     min_plate_length_eqn.append(NoEscape(r'&=2*' + min_end_dist + '+(' + bolt_line + '-1) * ' + min_pitch + r'\\'))
     min_plate_length_eqn.append(NoEscape(r'&=' + min_length + '\end{aligned}'))
     return min_plate_length_eqn
@@ -195,6 +195,95 @@ def min_plate_thk_req(t_w):
     min_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_w='+t_w+'\end{aligned}'))
     return min_plate_thk_eqn
 
+def shear_yield_prov(h,t, f_y, gamma, V_dg):
+    h = str(h)
+    t = str(t)
+    f_y = str(f_y)
+    gamma = str(gamma)
+    V_dg = str(V_dg)
+    shear_yield_eqn = Math(inline=True)
+    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{dg} &= \frac{A_v*f_y}{sqrt{3}*\gamma_{mo}}\\'))
+    shear_yield_eqn.append(NoEscape(r'&=\frac{'+h+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
+    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + '\end{aligned}'))
+    return shear_yield_eqn
+
+def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn):
+    h = str(h)
+    t = str(t)
+    n_r = str(n_r)
+    d_o = str(d_o)
+    f_u = str(fu)
+    v_dn = str(v_dn)
+    shear_rup_eqn = Math(inline=True)
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= 0.75*A_{vn}*f_u\\'))
+    shear_rup_eqn.append(NoEscape(r'&=0.75*'+h+'-('+n_r+'*'+d_o+')*'+t+'*'+f_u+r'\\'))
+    shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
+    return shear_rup_eqn
+
+def shear_capacity_prov(V_dy, V_dn, V_db):
+    V_d = min(V_dy,V_dn,V_db)
+    V_d = str(V_d)
+    V_dy = str(V_dy)
+    V_dn = str(V_dn)
+    V_db = str(V_db)
+    shear_capacity_eqn = Math(inline=True)
+    shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= Min(V_{dy},V_{dn},V_{db})\\'))
+    shear_capacity_eqn.append(NoEscape(r'&= Min('+V_dy+','+V_dn+','+V_db+r')\\'))
+    shear_capacity_eqn.append(NoEscape(r'&='+V_d + '\end{aligned}'))
+    return shear_capacity_eqn
+
+def tension_yield_prov(l,t, f_y, gamma, T_dg):
+    l = str(l)
+    t = str(t)
+    f_y = str(f_y)
+    gamma = str(gamma)
+    T_dg = str(T_dg)
+    tension_yield_eqn = Math(inline=True)
+    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{A_g*f_y}{\gamma_{mo}}\\'))
+    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
+    tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
+    return tension_yield_eqn
+
+def tension_rupture_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
+    w_p = str(w_p)
+    t_p = str(t_p)
+    n_c = str(n_c)
+    d_o = str(d_o)
+    f_u = str(fu)
+    T_dn = str(T_dn)
+    gamma_m1 = str(gamma_m1)
+    Tensile_rup_eqn = Math(inline=True)
+    Tensile_rup_eqn.append(NoEscape(r'\begin{aligned} T_{dn} &= \frac{0.9*A_{n}*f_u}{\gamma_{m1}}\\'))
+    Tensile_rup_eqn.append(NoEscape(r'&=\frac{0.9*('+w_p+'-'+n_c+'*'+d_o+')*'+t_p+'*'+f_u+r'}{'+gamma_m1+r'}\\'))
+    Tensile_rup_eqn.append(NoEscape(r'&=' + T_dn + '\end{aligned}'))
+    return Tensile_rup_eqn
+
+def tensile_capacity_prov(T_dg, T_dn, T_db):
+    T_d = min(T_dg,T_dn,T_db)
+    T_d = str(T_d)
+    T_dg = str(T_dg)
+    T_dn = str(T_dn)
+    T_db = str(T_db)
+    shear_capacity_eqn = Math(inline=True)
+    shear_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= Min(T_{dg},T_{dn},T_{db})\\'))
+    shear_capacity_eqn.append(NoEscape(r'&= Min('+T_dg+','+T_dn+','+T_db+r')\\'))
+    shear_capacity_eqn.append(NoEscape(r'&='+T_d + '\end{aligned}'))
+    return shear_capacity_eqn
+
+def mom_axial_IR_prov(M,M_d,N,N_d,IR):
+    M = str(M)
+    M_d = str(M_d)
+    N = str(N)
+    N_d = str(N_d)
+    IR = str(IR)
+    mom_axial_IR_eqn = Math(inline=True)
+    mom_axial_IR_eqn.append(NoEscape(r'\begin{aligned} \frac{'+M+'}{'+M_d+r'}+\frac{'+N+'}{'+N_d+'}='+IR+r'\end{aligned}'))
+    return mom_axial_IR_eqn
+def IR_req(IR):
+    IR = str(IR)
+    IR_req_eqn = Math(inline=True)
+    IR_req_eqn.append(NoEscape(r'\begin{aligned} \leq'+IR+'\end{aligned}'))
+    return IR_req_eqn
 def get_pass_fail(required, provided,relation='greater'):
     required = float(required)
     provided = float(provided)

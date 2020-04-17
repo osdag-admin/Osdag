@@ -42,7 +42,7 @@ class CreateLatex(Document):
 
 
     @pyqtSlot()
-    def save_latex(self, outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder, rel_path, Disp_3d_image):
+    def save_latex(self, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, rel_path, Disp_3d_image):
 
 
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])

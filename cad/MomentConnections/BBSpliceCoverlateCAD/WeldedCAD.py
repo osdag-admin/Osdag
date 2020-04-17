@@ -43,16 +43,16 @@ class CCSpliceCoverPlateWeldedCAD(object):
         self.column1Model = self.column1.create_model()
         self.column2Model = self.column2.create_model()
         #
-        # self.flangePlate1Model = self.flangePlate1.create_model()
-        # self.flangePlate2Model = self.flangePlate2.create_model()
+        self.flangePlate1Model = self.flangePlate1.create_model()
+        self.flangePlate2Model = self.flangePlate2.create_model()
         #
-        # self.innerFlangePlate1Model = self.innerFlangePlate1.create_model()
-        # self.innerFlangePlate2Model = self.innerFlangePlate2.create_model()
-        # self.innerFlangePlate3Model = self.innerFlangePlate3.create_model()
-        # self.innerFlangePlate4Model = self.innerFlangePlate4.create_model()
+        self.innerFlangePlate1Model = self.innerFlangePlate1.create_model()
+        self.innerFlangePlate2Model = self.innerFlangePlate2.create_model()
+        self.innerFlangePlate3Model = self.innerFlangePlate3.create_model()
+        self.innerFlangePlate4Model = self.innerFlangePlate4.create_model()
         #
-        # self.webPlate1Model = self.webPlate1.create_model()
-        # self.webPlate2Model = self.webPlate2.create_model()
+        self.webPlate1Model = self.webPlate1.create_model()
+        self.webPlate2Model = self.webPlate2.create_model()
 
     def createColumnGeometry(self):
         """
@@ -71,45 +71,45 @@ class CCSpliceCoverPlateWeldedCAD(object):
 
 
     def createPlateGeometry(self):
-        flangePlate1Origin = numpy.array([-self.flangePlate.W/2, (self.column.D + self.flangePlate.T)/2, 0.0])
-        flangePlate1_uDir = numpy.array([0.0, 1.0, 0.0])
-        flangePlate1_wDir = numpy.array([1.0, 0.0, 0.0])
+        flangePlate1Origin = numpy.array([0.0, self.flangePlate.W/2, (self.column.D + self.flangePlate.T)/2])
+        flangePlate1_uDir = numpy.array([0.0, 0.0, 1.0])
+        flangePlate1_wDir = numpy.array([0.0, -1.0, 0.0])
         self.flangePlate1.place(flangePlate1Origin, flangePlate1_uDir, flangePlate1_wDir)
 
-        flangePlate2Origin = numpy.array([-self.flangePlate.W/2, -(self.column.D + self.flangePlate.T)/2, 0.0])
-        flangePlate2_uDir = numpy.array([0.0, 1.0, 0.0])
-        flangePlate2_wDir = numpy.array([1.0, 0.0, 0.0])
+        flangePlate2Origin = numpy.array([0.0, -self.flangePlate.W/2, -(self.column.D + self.flangePlate.T)/2])
+        flangePlate2_uDir = numpy.array([0.0, 0.0, 1.0])
+        flangePlate2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.flangePlate2.place(flangePlate2Origin, flangePlate2_uDir, flangePlate2_wDir)
 
         innerFlangePlatespacing = self.flangespace + self.column.t/2 + self.column.R1
-        innerFlangePlate1Origin = numpy.array([innerFlangePlatespacing,  (self.column.D - self.innerFlangePlate.T)/2 - self.column.T, 0.0])
-        innerFlangePlate1_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerFlangePlate1_wDir = numpy.array([1.0, 0.0, 0.0])
+        innerFlangePlate1Origin = numpy.array([0.0, innerFlangePlatespacing,  (self.column.D - self.innerFlangePlate.T)/2 - self.column.T])
+        innerFlangePlate1_uDir = numpy.array([0.0, 0.0, 1.0])
+        innerFlangePlate1_wDir = numpy.array([0.0, 1.0, 0.0])
         self.innerFlangePlate1.place(innerFlangePlate1Origin, innerFlangePlate1_uDir, innerFlangePlate1_wDir)
 
-        innerFlangePlate2Origin = numpy.array([innerFlangePlatespacing, -(self.column.D - self.innerFlangePlate.T)/2 + self.column.T, 0.0])
-        innerFlangePlate2_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerFlangePlate2_wDir = numpy.array([1.0, 0.0, 0.0])
+        innerFlangePlate2Origin = numpy.array([0.0, innerFlangePlatespacing, -(self.column.D - self.innerFlangePlate.T)/2 + self.column.T])
+        innerFlangePlate2_uDir = numpy.array([0.0, 0.0, 1.0])
+        innerFlangePlate2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.innerFlangePlate2.place(innerFlangePlate2Origin, innerFlangePlate2_uDir, innerFlangePlate2_wDir)
 
-        innerFlangePlate3Origin = numpy.array([-innerFlangePlatespacing, -(self.column.D --- self.innerFlangePlate.T)/2 + self.column.T, 0.0])
-        innerFlangePlate3_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerFlangePlate3_wDir = numpy.array([-1.0, 0.0, 0.0])
+        innerFlangePlate3Origin = numpy.array([0.0, -innerFlangePlatespacing, -(self.column.D - self.innerFlangePlate.T)/2 + self.column.T])
+        innerFlangePlate3_uDir = numpy.array([0.0, 0.0, 1.0])
+        innerFlangePlate3_wDir = numpy.array([0.0, -1.0, 0.0])
         self.innerFlangePlate3.place(innerFlangePlate3Origin, innerFlangePlate3_uDir, innerFlangePlate3_wDir)
 
-        innerFlangePlate4Origin = numpy.array([-innerFlangePlatespacing, (self.column.D - self.innerFlangePlate.T)/2 - self.column.T, 0.0])
-        innerFlangePlate4_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerFlangePlate4_wDir = numpy.array([-1.0, 0.0, 0.0])
+        innerFlangePlate4Origin = numpy.array([0.0, -innerFlangePlatespacing, (self.column.D - self.innerFlangePlate.T)/2 - self.column.T])
+        innerFlangePlate4_uDir = numpy.array([0.0, 0.0, 1.0])
+        innerFlangePlate4_wDir = numpy.array([0.0, -1.0, 0.0])
         self.innerFlangePlate4.place(innerFlangePlate4Origin, innerFlangePlate4_uDir, innerFlangePlate4_wDir)
 
-        webPlate1Origin = numpy.array([(self.column.t + self.webPlate.T)/2, -self.webPlate.W/2, 0.0])
-        webPlate1_uDir = numpy.array([1.0, 0.0, 0.0])
-        webPlate1_wDir = numpy.array([0.0, 1.0, 0.0])
+        webPlate1Origin = numpy.array([0.0,(self.column.t + self.webPlate.T)/2, -self.webPlate.W/2])
+        webPlate1_uDir = numpy.array([0.0, 1.0, 0.0])
+        webPlate1_wDir = numpy.array([0.0, 0.0, 1.0])
         self.webPlate1.place(webPlate1Origin, webPlate1_uDir, webPlate1_wDir)
 
-        webPlate2Origin = numpy.array([-(self.column.t + self.webPlate.T)/2, -self.webPlate.W/2, 0.0])
-        webPlate2_uDir = numpy.array([1.0, 0.0, 0.0])
-        webPlate2_wDir = numpy.array([0.0, 1.0, 0.0])
+        webPlate2Origin = numpy.array([0.0, -(self.column.t + self.webPlate.T)/2, -self.webPlate.W/2])
+        webPlate2_uDir = numpy.array([0.0, 1.0, 0.0])
+        webPlate2_wDir = numpy.array([0.0, 0.0, 1.0])
         self.webPlate2.place(webPlate2Origin, webPlate2_uDir, webPlate2_wDir)
 
     def get_column_models(self):
@@ -125,12 +125,13 @@ class CCSpliceCoverPlateWeldedCAD(object):
         """
         :return: CAD model for all the plates
         """
-        plates_sec = [self.flangePlate1Model, self.flangePlate2Model, self.innerFlangePlate1Model, self.innerFlangePlate2Model, self.innerFlangePlate3Model, self.innerFlangePlate4Model, self.webPlate1Model, self.webPlate2Model]
+        plates_sec = [self.flangePlate1Model, self.flangePlate2Model, self.innerFlangePlate1Model, self.innerFlangePlate2Model, self.innerFlangePlate3Model, self.innerFlangePlate4Model, self.webPlate1Model, self.webPlate2Model] #
 
         plates = plates_sec[0]
 
         for comp in plates_sec[1:]:
             plates = BRepAlgoAPI_Fuse(comp, plates).Shape()
+
 
         return plates
 
@@ -163,14 +164,14 @@ if __name__ == '__main__':
 
     CCSpliceCoverPlateCAD.create_3DModel()
     column = CCSpliceCoverPlateCAD.get_column_models()
-    # plates = CCSpliceCoverPlateCAD.get_plate_models()
+    plates = CCSpliceCoverPlateCAD.get_plate_models()
 
     Point = gp_Pnt(0.0, 0.0, 0.0)
     display.DisplayMessage(Point, "Origin")
 
     # display.View.Rotate(45, 90, 45)
     display.DisplayShape(column, update=True)
-    # display.DisplayColoredShape(plates, color='BLUE', update=True)
+    display.DisplayColoredShape(plates, color='BLUE', update=True)
 
     display.DisableAntiAliasing()
     start_display()

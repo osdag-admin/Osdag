@@ -5,6 +5,12 @@ from Common import *
 import sqlite3
 import logging
 from utils.common.material import Material
+from builtins import str
+from Common import *
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
+from pylatex.utils import italic, NoEscape
+
+
 
 import math
 import numpy as np
@@ -267,6 +273,10 @@ class Section(Material):
         self.min_radius_gyration = 0.0
         # self.min_rad_gyration_bbchannel = 0.0
 
+        self.member_yield_eqn =0.0
+        self.member_rup_eqn = 0.0
+        self.member_block_eqn = 0.0
+
 
     def connect_to_database_update_other_attributes(self, table, designation):
         conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -349,10 +359,19 @@ class Section(Material):
         "F_y = yield stress of the material"
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         T_dg = (A_g* F_y / gamma_m0)
+        Ag = str(A_g)
+        fy = str(F_y)
+        gamma_m0 = str(gamma_m0)
+        memb_yield = str(round((T_dg/1000),2))
         # logger.warning(
         #     " : You are using a section (in red color) that is not available in latest version of IS 808")
+        member_yield_eqn = Math(inline=True)
+        member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
+        member_yield_eqn.append(NoEscape(r'&= \frac{' + Ag + '*' + fy + '}{' + gamma_m0 + r'}\\'))
+        member_yield_eqn.append(NoEscape(r'&= ' + memb_yield + r'\end{aligned}'))
 
         self.tension_yielding_capacity = round(T_dg,2)
+        self.member_yield_eqn = member_yield_eqn
         # logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def tension_rupture(self, A_n, F_u):
@@ -395,6 +414,27 @@ class Section(Material):
             beta = 0.7
 
         T_dn = (0.9 * A_nc * F_u / gamma_m1) + (beta * A_go * F_y / gamma_m0)
+        w = str(w)
+        t = str(t)
+        fy = str(F_y)
+        fu = str(F_u)
+        b_s = str(b_s)
+        L_c = str(L_c)
+        A_nc = str(A_nc)
+        A_go = str(A_go)
+        gamma_m0 = str(gamma_m0)
+        gamma_m1 = str(gamma_m1)
+        member_rup_eqn = Math(inline=True)
+        member_rup_eqn.append(NoEscape(r'\begin{aligned}\beta &= 1.4 - 0.076 \frac{w}{t}*\frac{f_{y}}{f_{u}}*\frac{b_s}{L_c}\leq\frac{0.9*f_{u}*\gamma_{m0}}{f_{y}*\gamma_{m1}} \geq 0.7 \end{aligned}'))
+        # member_rup_eqn.append(NoEscape(r'\begin{aligned}&\beta &= 1.4-0.076(w/t)(f_{y}/f_{u})(b_s/L_c)\leq(0.9f_{u}\gamma_{m0}/f_{y}\gamma_{m1}) \geq 0.7\\'))
+
+
+        # member_rup_eqn.append(NoEscape(r'&= 1.4 -0.76 \frac {' + w + '}{' + t + '} \frac {' + F_y + '}{' + F_u + '} \frac {' + bs + '}{' + L_c + '} +'\leq'+ \frac {' +0.9 + '*'+ F_u +'}{'+ F_y +'\gamma_{m1}'+ '}\geq 0.7 \\'))
+        # member_rup_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
+        # member_rup_eqn.append(NoEscape(r'&= \frac{' + Ag + '*' + fy + '}{' + gamma_m0 + r'}\\'))
+        # member_rup_eqn.append(NoEscape(r'&= ' + memb_yield + r'\end{aligned}'))
+
+        self.member_rup_eqn = member_rup_eqn
 
         self.tension_rupture_capacity = round((T_dn) , 2)
 
@@ -454,6 +494,24 @@ class Section(Material):
         T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
         Tdb = min(T_db1, T_db2)
         # Tdb = round(Tdb, 3)
+        A_vg = str(A_vg)
+        A_vn = str(A_vn)
+        A_tg = str(A_tg)
+        A_tn = str(A_tn)
+        f_y = str(f_y)
+        f_u = str(f_u)
+        gamma_m1 = str(gamma_m1)
+        gamma_m0 = str(gamma_m0)
+
+        member_block_eqn = Math(inline=True)
+        member_block_eqn.append(NoEscape(r'\begin{aligned}T_{db1} &= \frac{A_{vg} f_y}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_u}{\gamma_{m1}} \end{aligned}'))
+
+        # member_block_eqn.append(NoEscape(r'&= \frac{' + A_vg + '*' + f_y + '}{" 1.732*' + gamma_m0 + 'r'} + &+ +'\frac{"0.9*" + A_vn + '*' + f_u + '}{'+1.732+'*' + gamma_m0 + r'} '\\'))
+        # member_block_eqn.append(NoEscape(r'&= ' + memb_yield + r'\end{aligned}'))
+
+
+
+        self.member_block_eqn =member_block_eqn
         self.block_shear_capacity_axial = round(Tdb,2)
 
     def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):

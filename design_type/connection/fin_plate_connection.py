@@ -921,48 +921,48 @@ class FinPlateConnection(ShearConnection):
                                 'Zy(cm3)': self.supported_section.elast_sec_mod_y,
                                 'Zpz(cm3)': self.supported_section.plast_sec_mod_z,
                                 'Zpy(cm3)': self.supported_section.elast_sec_mod_y}
-        self.report_result = \
-            {KEY_MODULE_STATUS: self.design_status,
-                KEY_BOLT_STATUS: self.bolt.design_status,
-                KEY_OUT_BOLT_SHEAR: self.bolt.bolt_shear_capacity,
-                KEY_OUT_BOLT_BEARING: self.bolt.bolt_bearing_capacity,
-                KEY_OUT_BOLT_CAPACITY: self.bolt.bolt_capacity,
-                KEY_OUT_BOLTS_REQUIRED: self.plate.bolts_required,
-                KEY_OUT_BOLT_GRP_CAPACITY: self.bolt.bolt_capacity*self.plate.bolts_required,
-                KEY_OUT_BOLTS_ONE_LINE: self.plate.bolts_one_line,
-                KEY_OUT_BOLT_LINE: self.plate.bolt_line,
-                KEY_OUT_PITCH: self.plate.pitch_provided,
-                KEY_OUT_MIN_PITCH: self.bolt.min_pitch,
-
-                KEY_OUT_EDGE_DIST: self.plate.edge_dist_provided,
-                KEY_OUT_MIN_EDGE_DIST: self.bolt.min_edge_dist,
-                KEY_OUT_MAX_EDGE_DIST: self.bolt.max_edge_dist,
-
-                KEY_OUT_END_DIST: self.plate.end_dist_provided,
-
-                KEY_OUT_GAUGE: self.plate.gauge_provided,
-                KEY_OUT_MIN_GAUGE: self.bolt.min_gauge,
-                KEY_OUT_MAX_SPACING: self.bolt.max_spacing,
-
-                KEY_OUT_GRD_PROVIDED: self.bolt.bolt_fu,
-                KEY_OUT_D_PROVIDED: self.bolt.bolt_diameter_provided,
-                KEY_OUT_KB: 0.519,
-                KEY_OUT_BOLT_HOLE: 26,
-                KEY_OUT_WELD_SIZE: self.weld.size,
-                KEY_OUT_WELD_STRESS: self.weld.stress,
-                KEY_OUT_WELD_STRENGTH: self.weld.strength,
-                KEY_DP_WELD_MATERIAL_G_O: self.weld.fu,
-                KEY_OUT_WELD_LENGTH: self.weld.length,
-                KEY_OUT_WELD_LENGTH_EFF: self.weld.eff_length,
-                KEY_PLATE_MIN_HEIGHT: self.min_plate_height,
-                KEY_PLATE_MAX_HEIGHT: self.max_plate_height,
-                KEY_OUT_PLATE_MOM_DEMAND: self.plate.moment_demand,
-                KEY_OUT_PLATE_MOM_CAPACITY: self.plate.moment_capacity,
-                KEY_OUT_PLATE_HEIGHT: self.plate.height,
-                KEY_OUT_PLATE_LENGTH: self.plate.length,
-                KEY_OUT_PLATE_BLK_SHEAR: self.plate.block_shear_capacity,
-                KEY_PLATE_MATERIAL: self.plate.fy,
-                KEY_OUT_PLATETHK: self.plate.thickness_provided}
+        # self.report_result = \
+        #     {KEY_MODULE_STATUS: self.design_status,
+        #         KEY_BOLT_STATUS: self.bolt.design_status,
+        #         KEY_OUT_BOLT_SHEAR: self.bolt.bolt_shear_capacity,
+        #         KEY_OUT_BOLT_BEARING: self.bolt.bolt_bearing_capacity,
+        #         KEY_OUT_BOLT_CAPACITY: self.bolt.bolt_capacity,
+        #         KEY_OUT_BOLTS_REQUIRED: self.plate.bolts_required,
+        #         KEY_OUT_BOLT_GRP_CAPACITY: self.bolt.bolt_capacity*self.plate.bolts_required,
+        #         KEY_OUT_BOLTS_ONE_LINE: self.plate.bolts_one_line,
+        #         KEY_OUT_BOLT_LINE: self.plate.bolt_line,
+        #         KEY_OUT_PITCH: self.plate.pitch_provided,
+        #         KEY_OUT_MIN_PITCH: self.bolt.min_pitch,
+        #
+        #         KEY_OUT_EDGE_DIST: self.plate.edge_dist_provided,
+        #         KEY_OUT_MIN_EDGE_DIST: self.bolt.min_edge_dist,
+        #         KEY_OUT_MAX_EDGE_DIST: self.bolt.max_edge_dist,
+        #
+        #         KEY_OUT_END_DIST: self.plate.end_dist_provided,
+        #
+        #         KEY_OUT_GAUGE: self.plate.gauge_provided,
+        #         KEY_OUT_MIN_GAUGE: self.bolt.min_gauge,
+        #         KEY_OUT_MAX_SPACING: self.bolt.max_spacing,
+        #
+        #         KEY_OUT_GRD_PROVIDED: self.bolt.bolt_fu,
+        #         KEY_OUT_D_PROVIDED: self.bolt.bolt_diameter_provided,
+        #         KEY_OUT_KB: 0.519,
+        #         KEY_OUT_BOLT_HOLE: 26,
+        #         KEY_OUT_WELD_SIZE: self.weld.size,
+        #         KEY_OUT_WELD_STRESS: self.weld.stress,
+        #         KEY_OUT_WELD_STRENGTH: self.weld.strength,
+        #         KEY_DP_WELD_MATERIAL_G_O: self.weld.fu,
+        #         KEY_OUT_WELD_LENGTH: self.weld.length,
+        #         KEY_OUT_WELD_LENGTH_EFF: self.weld.eff_length,
+        #         KEY_PLATE_MIN_HEIGHT: self.min_plate_height,
+        #         KEY_PLATE_MAX_HEIGHT: self.max_plate_height,
+        #         KEY_OUT_PLATE_MOM_DEMAND: self.plate.moment_demand,
+        #         KEY_OUT_PLATE_MOM_CAPACITY: self.plate.moment_capacity,
+        #         KEY_OUT_PLATE_HEIGHT: self.plate.height,
+        #         KEY_OUT_PLATE_LENGTH: self.plate.length,
+        #         KEY_OUT_PLATE_BLK_SHEAR: self.plate.block_shear_capacity,
+        #         KEY_PLATE_MATERIAL: self.plate.fy,
+        #         KEY_OUT_PLATETHK: self.plate.thickness_provided}
 
 
         self.report_check = []
@@ -1031,7 +1031,7 @@ class FinPlateConnection(ShearConnection):
             get_pass_fail(bolt_force_kn,bolt_capacity_red_kn,relation="lesser"))
         self.report_check.append(t5)
 
-        t1 = ('SubSection', 'Plate Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection','Plate Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.min_plate_height), self.plate.height,
@@ -1078,10 +1078,10 @@ class FinPlateConnection(ShearConnection):
         print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         fname_no_ext = filename[0].split(".")[0]
         print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
-        CreateLatex.save_latex(CreateLatex(), self.report_result, self.report_input, self.report_check,
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check,
                                self.report_supporting,
 
-                               self.report_supported, popup_summary, fname_no_ext, ' ', rel_path, Disp_3D_image)
+                               popup_summary, fname_no_ext, ' ', rel_path, Disp_3D_image, self.report_supported)
 
     # def select_workspace_folder(self):
     #     # This function prompts the user to select the workspace folder and returns the name of the workspace folder

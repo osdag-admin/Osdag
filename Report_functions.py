@@ -182,6 +182,7 @@ def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     min_pitch = str(min_pitch)
     min_end_dist = str(min_end_dist)
     bolt_line = str(bolt_line)
+    min_length = str(min_length)
     min_plate_length_eqn = Math(inline=True)
     min_plate_length_eqn.append(NoEscape(r'\begin{aligned} &2*e_{min} + (bolt~lines-1) * p_{min})\\'))
     min_plate_length_eqn.append(NoEscape(r'&=2*' + min_end_dist + '+(' + bolt_line + '-1) * ' + min_pitch + r'\\'))
@@ -210,6 +211,48 @@ def get_pass_fail(required, provided,relation='greater'):
                 return 'Pass'
             else:
                 return 'Fail'
+
+# def member_yield(Ag, fy, gamma_m0, member_yield):
+#     Ag = str(Ag)
+#     fy = str(fy)
+#     gamma_m0 = str(gamma_m0)
+#     member_yield = str(member_yield)
+#     member_yield_eqn = Math(inline=True)
+#     member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
+#     member_yield_eqn.append(NoEscape(r'&= \frac{' + Ag + '*' + fy + '}{'+ gamma_m0 + r'}\\'))
+#     member_yield_eqn.append(NoEscape(r'&= ' + member_yield + r'\end{aligned}'))
+#     return member_yield_eqn
+#
+# def member_rupture(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1):
+#     Ag = str(Ag)
+#     fy = str(fy)
+#     gamma_m0 = str(gamma_m0)
+#     member_yield = str(member_yield)
+#     member_yield_eqn = Math(inline=True)
+#     member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
+#     member_yield_eqn.append(NoEscape(r'&= \frac{' + Ag + '*' + fy + '}{' + gamma_m0 + r'}\\'))
+#     member_yield_eqn.append(NoEscape(r'&= ' + member_yield + r'\end{aligned}'))
+#     return member_yield_eqn
+#
+#     gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+#     gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+#
+#     if L_c == 0:
+#         beta = 1.4
+#     else:
+#         beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
+#     # print(beta)
+#
+#     if beta <= (F_u * gamma_m0 / F_y * gamma_m1) and beta >= 0.7:
+#         beta = beta
+#     else:
+#         beta = 0.7
+#
+#     T_dn = (0.9 * A_nc * F_u / gamma_m1) + (beta * A_go * F_y / gamma_m0)
+
+
+
+
 
 
     # doc.generate_pdf('report_functions', clean_tex=False)

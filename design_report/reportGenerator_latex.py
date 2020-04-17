@@ -42,7 +42,7 @@ class CreateLatex(Document):
 
 
     @pyqtSlot()
-    def save_latex(self, outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder, rel_path, Disp_3d_image):
+    def save_latex(self, uiObj, Design_Check, section_1, reportsummary, filename, folder, rel_path, Disp_3d_image, section_2=None):
 
 
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
@@ -97,33 +97,33 @@ class CreateLatex(Document):
                     print(i)
                     if i == "Column Details":
                         table.add_hline()
-                        merge_rows = int(round_up(len(columndetails),2)/2 + 2)
-                        print('Hi', len(columndetails)/2,round_up(len(columndetails),2)/2, merge_rows)
+                        merge_rows = int(round_up(len(section_1),2)/2 + 2)
+                        print('Hi', len(section_1)/2,round_up(len(section_1),2)/2, merge_rows)
                         if merge_rows%2 != 0:
-                            columndetails['']=''
-                        a = list(columndetails.keys())
+                            section_1['']=''
+                        a = list(section_1.keys())
                         # index=0
                         for x in range(0,merge_rows):
-                            # table.add_row("Col.Det.",i,columndetails[i])
+                            # table.add_row("Col.Det.",i,section_1[i])
                             if x == 0:
                                 table.add_row((MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
                                 filename=r'"'+rel_path+uiObj["Column Details"])), MultiColumn(2, align='|c|', data=a[x]),
-                                              MultiColumn(2, align='|c|', data=columndetails[a[x]]),))
+                                              MultiColumn(2, align='|c|', data=section_1[a[x]]),))
                                 # index += 1
                             elif x <=3:
                                 table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
-                                              MultiColumn(2, align='|c|', data=columndetails[a[x]]),))
+                                              MultiColumn(2, align='|c|', data=section_1[a[x]]),))
                             else:
-                                table.add_row(('', a[x], columndetails[a[x]],a[merge_rows+x-4], columndetails[a[merge_rows+x-4]],))
+                                table.add_row(('', a[x], section_1[a[x]],a[merge_rows+x-4], section_1[a[merge_rows+x-4]],))
                             table.add_hline(2,5)
 
-                    elif i=="Beam Details":
+                    elif i=="Beam Details" and section_2 != None:
                         table.add_hline()
-                        merge_rows = int(round_up(len(beamdetails), 2) / 2 + 2)
+                        merge_rows = int(round_up(len(section_2), 2) / 2 + 2)
 
                         if merge_rows % 2 != 0:
-                            beamdetails[''] = ''
-                        a = list(beamdetails.keys())
+                            section_2[''] = ''
+                        a = list(section_2.keys())
 
                         for x in range(0, merge_rows):
 
@@ -133,14 +133,14 @@ class CreateLatex(Document):
                                                                                 filename=r'"' + rel_path + uiObj[
                                                                                     "Beam Details"])),
                                     MultiColumn(2, align='|c|', data=a[x]),
-                                    MultiColumn(2, align='|c|', data=beamdetails[a[x]]),))
+                                    MultiColumn(2, align='|c|', data=section_2[a[x]]),))
 
                             elif x <= 3:
                                 table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
-                                              MultiColumn(2, align='|c|', data=beamdetails[a[x]]),))
+                                              MultiColumn(2, align='|c|', data=section_2[a[x]]),))
                             else:
-                                table.add_row('', a[x], beamdetails[a[x]], a[merge_rows + x - 4],
-                                              beamdetails[a[merge_rows + x - 4]])
+                                table.add_row('', a[x], section_2[a[x]], a[merge_rows + x - 4],
+                                              section_2[a[merge_rows + x - 4]])
                             table.add_hline(2, 5)
                     elif uiObj[i] == "TITLE":
                         table.add_hline()
@@ -183,8 +183,8 @@ class CreateLatex(Document):
 # reportsummary["AdditionalComments"] = 'a'
 # reportsummary["Client"] = 'a'
 #
-# # def save_latex(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder):
-# #     call_latex(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder)
+# # def save_latex(outObj, uiObj, Design_Check, section_1, section_2,reportsummary, filename, folder):
+# #     call_latex(outObj, uiObj, Design_Check, section_1, section_2,reportsummary, filename, folder)
 # report_check =[]
 # t1 = ('Bolt_shear', report_bolt_shear_check)
 # report_check.append(t1)
@@ -243,7 +243,7 @@ class CreateLatex(Document):
 #
 # # from Connections.connection_calculations import ConnectionCalculations
 #
-# def save_html(outObj, uiObj, Design_Check, columndetails, beamdetails,reportsummary, filename, folder):
+# def save_html(outObj, uiObj, Design_Check, section_1, section_2,reportsummary, filename, folder):
 #     fileName = (filename)
 #     myfile = open(fileName, "w")
 #     myfile.write(t('! DOCTYPE html'))
@@ -307,7 +307,7 @@ class CreateLatex(Document):
 #             rstr += t('tr')
 #             rstr += t('td rowspan = "17" align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
 #             # rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
-#             spec = extract_details(columndetails)
+#             spec = extract_details(section_1)
 #             for k in spec:
 #                 # rstr += t('tr')
 #                 rstr += t('td colspan = "2" width = "300" class="detail2"') + space(k[0]) + k[1] + t('/td')
@@ -319,7 +319,7 @@ class CreateLatex(Document):
 #             row = [0, datapng, ""]
 #             rstr += t('tr')
 #             rstr += t('td rowspan = "17" align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-#             spec = extract_details(beamdetails)
+#             spec = extract_details(section_2)
 #             for l in spec:
 #                 # rstr += t('tr')
 #                 rstr += t('td colspan = "2" width = "300" class="detail2"') + space(l[0]) + l[1] + t('/td')
@@ -340,7 +340,7 @@ class CreateLatex(Document):
 #         #         rstr += t('tr')
 #         #         rstr += t('td rowspan = "17" align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
 #         #         # rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
-#         #         spec = extract_details(columndetails)
+#         #         spec = extract_details(section_1)
 #         #         for k in spec:
 #         #             # rstr += t('tr')
 #         #             rstr += t('td colspan = "2" width = "300" class="detail2"') + space(k[0]) + k[1] + t('/td')
@@ -357,7 +357,7 @@ class CreateLatex(Document):
 #         #         row = [0, datapng, ""]
 #         #         rstr += t('tr')
 #         #         rstr += t('td rowspan = "17" align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-#         #         spec = extract_details(beamdetails)
+#         #         spec = extract_details(section_2)
 #         #         for l in spec:
 #         #             # rstr += t('tr')
 #         #             rstr += t('td colspan = "2" width = "300" class="detail2"') + space(l[0]) + l[1] + t('/td')
@@ -471,7 +471,7 @@ class CreateLatex(Document):
 #
 #         elif i == KEY_OUT_PITCH:
 #             minPitch = str(int(2.5 * float(outObj[KEY_OUT_D_PROVIDED])))
-#             maxPitch = str(300) if 32 * float(beamdetails["t(mm)"]) > 300 else str(int(math.ceil(32 * float(beamdetails["t(mm)"]))))
+#             maxPitch = str(300) if 32 * float(section_2["t(mm)"]) > 300 else str(int(math.ceil(32 * float(section_2["t(mm)"]))))
 #             if int(outObj[KEY_OUT_PITCH]) < int(minPitch) or int(outObj[KEY_OUT_PITCH]) > int(maxPitch):
 #                 i = [0, "Bolt pitch (mm)", "&#8805;2.5*d = p, &#8804; Min(32*tmin, 300) = 300 <br> [cl. 10.2.2]",
 #                               ("" + str(outObj[KEY_OUT_PITCH]) + ""),
@@ -483,7 +483,7 @@ class CreateLatex(Document):
 #
 #         elif i == KEY_OUT_GAUGE:
 #             minGauge = str(int(2.5 * float(outObj[KEY_OUT_D_PROVIDED])))
-#             maxGauge = str(300) if 32 * float(beamdetails["t(mm)"]) > 300 else str(int(math.ceil(32 * float(beamdetails["t(mm)"]))))
+#             maxGauge = str(300) if 32 * float(section_2["t(mm)"]) > 300 else str(int(math.ceil(32 * float(section_2["t(mm)"]))))
 #             if (int(outObj[KEY_OUT_GAUGE]) < int(minGauge) or int(outObj[KEY_OUT_GAUGE]) > int(maxGauge)):
 #                 i = [0, "Bolt gauge (mm)", "&#8805;2.5*d = g,&#8804; Min(32*tmin, 300) = 300 <br> [cl. 10.2.2]",
 #                               ("" + str(outObj[KEY_OUT_GAUGE]) + ""), "<p align=center style=color:red><b>Fail</b></p>"]

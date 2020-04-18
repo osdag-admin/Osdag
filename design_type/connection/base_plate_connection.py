@@ -144,7 +144,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_dia = []
         self.anchor_type = ""
         self.anchor_grade = []
-        self.anchor_fu = 0.0
+        self.anchor_fu_fy = []
 
         self.footing_grade = 0.0
 
@@ -219,14 +219,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gauge_distance = 0.0
         self.bp_area_provided = 0.0
         self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # TODO check if this works
-        self.anchor_area_shank = 0.0
-        self.anchor_area_thread = 0.0
-        self.n_n = 1
-        self.n_s = 0
         self.shear_capacity_anchor = 0.0
         self.bearing_capacity_anchor = 0.0
         self.anchor_capacity = 0.0
-        self.combined_capacity = 0.0
+        self.combined_capacity_anchor = 0.0
 
         self.length_available = 0.0
         self.effective_length = 0.0
@@ -247,6 +243,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.f = 0.0
         self.y = 0.0
         self.tension_demand_anchor = 0.0
+        self.tension_capacity_anchor = 0.0
+        self.tension_bolts_req = 1
 
         self.safe = True
 
@@ -865,14 +863,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.safe = True
 
-        self.bp_detailing(self)
-        self.design_pinned_bp_welded(self)
+        self.bp_analyses_parameters(self)
         self.bolt_design_detailing(self)
         self.design_detail_bp(self)
 
-    def bp_detailing(self):
-        """ initialize detailing parameters like the end/edge/pitch/gauge distances, length and width of the base plate.
-        These parameters shall be used for the first iteration of the analyses.
+    def bp_analyses_parameters(self):
+        """ initialize detailing parameters like the end/edge/pitch/gauge distances, anchor bolt diameter and grade,
+         length and width of the base plate.
+        These parameters are be used to run the first iteration of the analyses and improvise accordingly.
 
         Args:
 
@@ -880,7 +878,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         """
         # select anchor bolt diameter [Reference: based on design experience, field conditions  and sample calculations]
         # the following list of diameters are neglected due its practical non acceptance/unavailability - 'M8', 'M10', 'M12', 'M16'
+        # M20 and M24 are the preferred choices for the design
 
+        self.anchor_dia = self.anchor_dia + ['M20', 'M24']  # adding M20 and M24 diameters if the list passed does not include them
         sort_bolt = filter(lambda x: 'M20' <= x <= self.anchor_dia[-1], self.anchor_dia)
 
         for i in sort_bolt:
@@ -892,6 +892,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # hole diameter
         self.anchor_hole_dia = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided, self.dp_anchor_hole)  # mm
+
+        # assign anchor grade from the selected list
+        # trying the design with the highest selected grade
+        self.anchor_grade = list(reversed(self.anchor_grade))
+        for i in self.anchor_grade:
+            self.anchor_grade = i
+            break
+
+        # TODO: self.anchor_fu should be passed to - DP anchor fu from here
+        self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade)  # returns a list with strength values - [bolt_fu, bolt_fy]
 
         # TODO add condition for number of anchor bolts depending on col depth and force
         # number of anchor bolts
@@ -922,20 +932,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # minimum required dimensions of the base plate [as per the detailing criteria]
         if self.connectivity == 'Welded-Slab Base' or 'Gusseted Base Plate':
             self.bp_length_min = round_up(self.depth + 2 * (2 * self.end_distance), 5)  # mm
-            self.bp_width_min = round_up(self.flange_width + 2 * self.edge_distance, 5)  # mm
+            self.bp_width_min = round_up(self.flange_width + 1.5 * self.edge_distance + 1.5 * self.edge_distance, 5)  # mm
 
         elif self.connectivity == 'Bolted-Slab Base':
             pass
         else:
             pass
-
-    def design_pinned_bp_welded(self):
-        """ design pinned base plate (welded connection)
-
-        Args:
-
-        Returns:
-        """
 
     def bp_analyses(self):
         """ perform analyses of the base plate
@@ -1041,7 +1043,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.sigma_xx = self.sigma_xx + self.sigma_min_zz  # N/mm^2, bending stress at the critical section
 
                 self.critical_M_xx = (self.sigma_xx * self.critical_xx ** 2 / 2) + (0.5 * self.critical_xx *
-                                                                        (self.sigma_max_zz - self.sigma_xx) * (2 / 3) * self.critical_xx)  # N-mm, bending moment at critical section
+                                                                                    (self.sigma_max_zz - self.sigma_xx) * (
+                                                                                                2 / 3) * self.critical_xx)  # N-mm, bending moment at critical section
 
                 # equating critical moment with critical moment to compute the required minimum plate thickness
                 # Assumption: The bending capacity of the plate is (M_d = 1.5*fy*Z_e/gamma_m0) [Reference: Clause 8.2.1.2, IS 800:2007]
@@ -1081,7 +1084,26 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                              (self.anchor_length_provided / 2 + self.f - self.y)  # N
                 self.tension_demand_anchor = round(self.tension_demand_anchor / 1000, 2)  # kN
 
-                self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.dp_anchor_fu_overwrite)
+                self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                              self.anchor_area[0], self.anchor_area[1],
+                                                                                              safety_factor_parameter=self.dp_weld_fab)  # N
+                self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
+                # design number of anchor bolts required to resist tension
+                # Assumption: The minimum number of anchor bolts is 2, for stability purpose
+                self.tension_bolts_req = max(self.tension_demand_anchor / self.tension_capacity_anchor, 2)
+
+                if self.tension_bolts_req > 3:
+                    self.safe = False
+                    # TODO: Add log messages or update the design with more bolts
+                else:
+                    pass
+
+                # computing the actual bending stress at the compression side
+                # TODO: complete this check
+                # self.flange_force_axial = self.dp_bp_fy * (self.flange_width * self.flange_thickness)  # N, load transferred by the flange
+                # self.flange_force_moment = self.load_moment_major / (self.depth - self.flange_thickness)  # N, tension acting at the flange
+                # self.bp_area_compression = self.y * self.bp_width_provided  # mm^2, area of the base plate under compression
 
                 # designing the plate thickness
 
@@ -1102,7 +1124,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy))  # mm
 
-                pass
+        elif self.connectivity == "Bolted-Slab Base":
+            pass
+        elif self.connectivity == "Hollow Section":
+            pass
+
+        # assign appropriate plate thickness
 
         self.plate_thk = max(self.plate_thk, self.flange_thickness)  # base plate thickness should be larger than the flange thickness
 
@@ -1117,56 +1144,83 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             break
 
     def anchor_bolt_design(self):
-        """ Perform design of - the base plate (thickness) and the anchor bolt
+        """ Perform design checks for the anchor bolt
 
         Args:
 
         Returns:
         """
-        # design strength of anchor bolt [Reference: Clause 10.3.2, IS 800:2007; Section 3, IS 5624:1993]
-        for i in self.anchor_grade:
-            self.anchor_grade = i
+        # design strength of the anchor bolt [Reference: Clause 10.3.2, IS 800:2007; Section 3, IS 5624:1993]
+        # Assumption: number of shear planes passing through - the thread is 1 (n_n) and through the shank is 0 (n_s)
 
-            # TODO: self.anchor_fu should be passed to - DP anchor fu from here
-            self.anchor_fu = self.get_bolt_fu_fy(self.anchor_grade)  # returns a list with values - [bolt_fu, bolt_fy]
-            # self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # returns a list [shank area, thread area]
-            self.anchor_area_shank = self.anchor_area[0]  # mm^2
-            self.anchor_area_thread = self.anchor_area[1]  # mm^2
-            self.n_n = 1
-            self.n_s = 0
+        self.shear_capacity_anchor = self.cl_10_3_3_bolt_shear_capacity(self.dp_anchor_fu_overwrite, self.anchor_area[1],
+                                                                        self.anchor_area[0], 1, 0, self.dp_weld_fab)
+        self.shear_capacity_anchor = round(self.shear_capacity_anchor / 1000, 2)  # kN
 
-            self.shear_capacity_anchor = self.cl_10_3_3_bolt_shear_capacity(self.dp_anchor_fu_overwrite, self.anchor_area_thread,
-                                                                            self.anchor_area_shank, self.n_n, self.n_s, self.dp_weld_fab)
-            self.shear_capacity_anchor = round(self.shear_capacity_anchor / 1000, 2)  # kN
+        self.bearing_capacity_anchor = self.cl_10_3_4_bolt_bearing_capacity(self.dp_bp_fu, self.dp_anchor_fu_overwrite,
+                                                                            self.plate_thk, self.table1(self.anchor_dia_provided)[0],
+                                                                            self.end_distance, self.pitch_distance, self.dp_anchor_hole,
+                                                                            self.dp_weld_fab)
+        self.bearing_capacity_anchor = round(self.bearing_capacity_anchor / 1000, 2)  # kN
 
-            self.bearing_capacity_anchor = self.cl_10_3_4_bolt_bearing_capacity(self.dp_bp_fu, self.dp_anchor_fu_overwrite,
-                                                                                self.plate_thk, self.table1(self.anchor_dia_provided)[0],
-                                                                                self.end_distance, self.pitch_distance, self.dp_anchor_hole,
-                                                                                self.dp_weld_fab)
-            self.bearing_capacity_anchor = round(self.bearing_capacity_anchor / 1000, 2)  # kN
+        self.anchor_capacity = min(self.shear_capacity_anchor, self.bearing_capacity_anchor)  # kN
 
-            self.anchor_capacity = min(self.shear_capacity_anchor, self.bearing_capacity_anchor)
+        # information message to the user
+        if self.load_shear > 0:
+            logger.info(": [Anchor Bolt] The anchor bolt is not designed to resist any shear force")
+        else:
+            pass
 
-            self.combined_capacity = 0.0
+        # combined shear + tension capacity check of the anchor bolts subjected to tension
+        # Assumption: Although the anchor bolt does not carry any shear force, this check is made to ensure its serviceability
+        # The anchor bolts under tension might be subjected to shear forces (accidentally) due to incorrect erection practice
+        v_sb = self.load_shear / self.tension_bolts_req  # kN
+        v_db = self.anchor_capacity  # kN
+        t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
+        t_db = self.tension_capacity_anchor  # kN
+        self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(v_sb, v_db, t_b, t_db)
 
-            if self.load_shear > 0:
-                logger.info(": [Anchor Bolt] The anchor bolt is not designed to resist any shear force")
-            else:
-                pass
+        if self.combined_capacity_anchor > 1.0:
+            self.safe = False
+            logger.error(": [Large Shear Force] The shear force acting on the base plate is large.")
+            logger.info(": [Large Shear Force] Provide shear key to safely transfer the shear force.")
+            logger.error(": [Anchor Bolt] The anchor bolt fails due to combined shear + tension [Reference: Clause 10.3.6, IS 800:2007].")
+        else:
+            pass
 
-            if self.safe:
-                break
-            else:
-                logger.error(": [Anchor Bolt] Unexpected failure occurred.")
-                logger.error(": [Anchor Bolt] Cannot compute capacity checks for the anchor bolt.")
-                logger.info(": [Anchor Bolt] Check the input values and re-design the connection.")
+        if self.safe:
+            pass
+        else:
+            logger.error(": [Anchor Bolt] Unexpected failure occurred.")
+            logger.error(": [Anchor Bolt] Cannot compute capacity checks for the anchor bolt.")
+            logger.info(": [Anchor Bolt] Check the input values and re-design the connection.")
 
-        # design of anchor bolt length [Reference: IS 5624:1993, Table 1]
+        # validation of anchor bolt length [Reference: IS 5624:1993, Table 1]
         self.anchor_length_min = self.table1(self.anchor_dia_provided)[1]
         self.anchor_length_max = self.table1(self.anchor_dia_provided)[2]
 
-        if self.dp_anchor_length == 0:
+        # design of anchor length [Reference: Design of Steel Structures by N. Subramanian 2nd. edition 2018, Example 15.5]
+        if self.connectivity == 'Welded-Slab Base':
             self.anchor_length_provided = self.anchor_length_min  # mm
+
+        # Equation: T_b = k * sqrt(fck) * (anchor_length_req)^1.5
+        elif self.connectivity == 'Gusseted Base Plate':
+            # length of anchor for cast-in situ anchor bolts (k = 15.5)
+            self.anchor_length_provided = (self.tension_capacity_anchor * 1000 /
+                                           (15.5 * math.sqrt(self.bearing_strength_concrete / 0.45))) ** (1 / 1.5)  # mm
+            self.anchor_length_provided = max(self.anchor_length_provided, self.anchor_length_min)
+
+            logger.info(": [Anchor Bolt Length] The length of the anchor bolt is computed assuming the anchor bolt is casted in-situ during"
+                        " the erection of the column.")
+
+        elif self.connectivity == 'Bolted-Slab Base':
+            pass
+        elif self.connectivity == 'Hollow Section':
+            pass
+
+        # calling value of the anchor length from user from design preferences
+        if self.dp_anchor_length == 0:
+            self.anchor_length_provided = self.anchor_length_provided  # mm
         else:
             self.anchor_length_provided = self.dp_anchor_length
 

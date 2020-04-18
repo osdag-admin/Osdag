@@ -640,7 +640,7 @@ class FinPlateConnection(ShearConnection):
                 self.weld_connecting_plates = [self.supporting_section.flange_thickness, self.plate.thickness_provided]
             else:
                 self.weld_connecting_plates = [self.supporting_section.web_thickness, self.plate.thickness_provided]
-            [available_welds,weld_size_min,weld_size_max] = self.get_available_welds(self,self.weld_connecting_plates)
+            [available_welds,self.weld_size_min,self.weld_size_max] = self.get_available_welds(self,self.weld_connecting_plates)
             if available_welds:
                 while self.plate.height <= self.max_plate_height + 10:
                     self.plate_shear_checks(self)
@@ -671,8 +671,8 @@ class FinPlateConnection(ShearConnection):
 
             else:
                 logger.error(": For given members and %2.2f mm thick plate, weld sizes should be of range "
-                         "%2.2f mm and  %2.2f mm " %self.plate.thickness_provided % weld_size_min
-                             % weld_size_max)
+                         "%2.2f mm and  %2.2f mm " %self.plate.thickness_provided % self.weld_size_min
+                             % self.weld_size_max)
                 logger.info(": Cannot design weld with available welds ")
 
         if self.plate.design_status is False:
@@ -806,7 +806,7 @@ class FinPlateConnection(ShearConnection):
         self.weld.size = available_welds[0]
         while self.plate.height <= self.max_plate_height+10:
             self.weld.length = self.plate.height
-            weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            self.weld.throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
                 fillet_size=self.weld.size, fusion_face_angle=90)
             self.weld.eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
                 fillet_size=self.weld.size, available_length=self.weld.length)
@@ -817,7 +817,7 @@ class FinPlateConnection(ShearConnection):
             y_max = self.weld.eff_length / 2
             x_max = 0
             force_l = self.load.shear_force * 1000
-            force_w = 0.00
+            force_w = self.load.axial_force*1000
             force_t = self.plate.moment_demand
             print(self.weld.strength)
             self.weld.get_weld_stress(force_l, force_w, force_t, Ip_weld, y_max,
@@ -1091,6 +1091,29 @@ class FinPlateConnection(ShearConnection):
               mom_axial_IR_prov(round(self.plate.moment_demand/1000000,2),round(self.plate.moment_capacity/1000000,2),
                                 self.load.axial_force,round(self.plate.tension_capacity/1000,2),self.plate.IR),
               get_pass_fail(1, self.plate.IR, relation="greater"))
+        self.report_check.append(t1)
+
+        ##################
+        # Weld Checks
+        ##################
+        t1 = ('SubSection', 'Weld Checks', '|p{4cm}|p{7.0cm}|p{3.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t1 = (DISP_MIN_WELD_SIZE, min_weld_size_req(self.weld_connecting_plates,self.weld_size_min), self.weld.size,
+              get_pass_fail(self.weld_size_min, self.weld.size, relation="leq"))
+        self.report_check.append(t1)
+        t1 = (DISP_MAX_WELD_SIZE, max_weld_size_req(self.weld_connecting_plates, self.weld_size_max), self.weld.size,
+              get_pass_fail(self.weld_size_min, self.weld.size, relation="geq"))
+        self.report_check.append(t1)
+        Ip_weld = round(2 * self.weld.eff_length ** 3 / 12,2)
+        weld_conn_plates_fu = [self.supporting_section.fu, self.plate.fu]
+        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.weld.fabrication]
+        t1 = (DISP_WELD_STRENGTH, weld_strength_req(V=self.load.shear_force*1000,A=self.load.axial_force*1000,
+                                                    M=self.plate.moment_demand,Ip_w=Ip_weld,
+                                                    y_max= self.weld.eff_length/2,x_max=0.0,l_w=2*self.weld.eff_length,
+                                                    R_w=self.weld.stress),
+              weld_strength_prov(weld_conn_plates_fu, gamma_mw, self.weld.throat_tk,self.weld.strength),
+              get_pass_fail(self.weld.stress, self.weld.strength, relation="lesser"))
         self.report_check.append(t1)
 
         Disp_3D_image = "./ResourceFiles/images/3d.png"

@@ -21,7 +21,7 @@ import pdflatex
 import sys
 import datetime
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
-
+import pylatex as pyl
 
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
@@ -84,6 +84,7 @@ class CreateLatex(Document):
         doc = Document(geometry_options=geometry_options,indent=False)
         doc.packages.append(Package('amsmath'))
         doc.packages.append(Package('graphicx'))
+        doc.packages.append(Package('needspace'))
         doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
         doc.preamble.append(header)
         doc.change_document_style("header")
@@ -141,7 +142,7 @@ class CreateLatex(Document):
                 else:
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()
-
+        doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
         with doc.create(Section('3D View')):
             with doc.create(Figure(position='h!')) as view_3D:
                 view_3dimg_path = rel_path + Disp_3d_image

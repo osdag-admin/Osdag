@@ -650,10 +650,10 @@ class Weld(Material):
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         self.throat_tk = \
-            IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
-                (t_weld, weld_angle)
+            round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
+                (t_weld, weld_angle),2)
         print ("throat_tk",self.throat_tk)
-        weld_strength = f_wd * self.throat_tk
+        weld_strength = round(f_wd * self.throat_tk,2)
         self.strength = weld_strength
 
     def get_weld_stress(self,weld_shear =0.0, weld_axial=0.0, weld_twist=0.0, Ip_weld=1.0, y_max=0.0, x_max=0.0, l_weld=0.0):
@@ -661,7 +661,7 @@ class Weld(Material):
         T_wv = weld_twist * x_max/Ip_weld
         V_wv = weld_shear /l_weld
         A_wh = weld_axial/l_weld
-        weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
+        weld_stress = round(math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2),2)
         self.stress = weld_stress
 
     def weld_size(self, plate_thickness, member_thickness, edge_type = "Square"):

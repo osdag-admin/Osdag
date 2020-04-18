@@ -297,6 +297,9 @@ KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (V_d) (kN)'
 KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
 KEY_DISP_FY = 'Yield Strength , fy (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
+DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
+DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
+DISP_WELD_STRENGTH = 'Weld Strength (kN/mm)'
 ###################################
 # Key for Storing Module
 

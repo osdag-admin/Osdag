@@ -607,7 +607,7 @@ class ColumnCoverPlate(MomentConnection):
         self.web_plate.end_dist_provided = 40
         #  Inner Flange plate
         self.flange_plate.thickness_provided = 8
-        self.flange_plate.Innerheight = 115.6
+        self.flange_plate.Innerheight = 104.35
         self.flange_plate.Innerlength = 270
         self.flange_plate.gap = 10
         self.web_plate.gap = 10
@@ -795,8 +795,11 @@ class ColumnCoverPlate(MomentConnection):
                                                                                      r_1=self.section.root_radius,
                                                                                      D=self.section.depth, )
 
-                    print("tension_yielding_capacity of flange", self.section.tension_yielding_capacity)
-                    self.design_status = True
+                    if self.web_plate.thickness_provided == 0 or self.flange_plate.thickness_provided == 0:
+                        self.design_status = False
+                        logger.error("flange plate is not possible")
+                    else:
+                        self.design_status = True
             else:
                 self.design_status = False
                 logger.error(
@@ -1340,7 +1343,7 @@ class ColumnCoverPlate(MomentConnection):
 
                 #  yielding,rupture  for  inside flange plate
                 self.flange_plate.Innerheight = (self.section.flange_width - self.section.web_thickness - (
-                            self.section.root_radius / 2)) / 2
+                            self.section.root_radius * 2)) / 2
                 flange_plate_height_outside = self.flange_plate.height
                 self.flange_plate.Innerlength = self.flange_plate.length
 
@@ -2080,20 +2083,23 @@ class ColumnCoverPlate(MomentConnection):
                 outerwidth = width
                 innerwidth = (width - t_w - (2 * r_1)) / 2
                 if innerwidth < 50:
-                    logger.error(":Inner Plate not possible")
+                    # logger.error(":Inner Plate not possible")
                     self.design_status = False
                 else:
-                    pass
+                    self.design_status = True
+                    flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y
 
-                flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y
             else:
                 webwidth = D - (2 * tk) - (2 * r_1)
                 flange_plate_crs_sec_area = 2 * webwidth * y
-            if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
-                thickness = y
-                break
+            if self.design_status == True:
+                if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                    thickness = y
+                    break
             else:
+                thickness = 0
                 self.design_status = False
+                logger.error(":Inner Plate not possible")
 
         return thickness
 

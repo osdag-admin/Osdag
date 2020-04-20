@@ -1174,19 +1174,24 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # combined shear + tension capacity check of the anchor bolts subjected to tension
         # Assumption: Although the anchor bolt does not carry any shear force, this check is made to ensure its serviceability
         # The anchor bolts under tension might be subjected to shear forces (accidentally) due to incorrect erection practice
-        v_sb = self.load_shear / self.tension_bolts_req  # kN
-        v_db = self.anchor_capacity  # kN
-        t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
-        t_db = self.tension_capacity_anchor  # kN
-        self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(v_sb, v_db, t_b, t_db)
 
-        if self.combined_capacity_anchor > 1.0:
-            self.safe = False
-            logger.error(": [Large Shear Force] The shear force acting on the base plate is large.")
-            logger.info(": [Large Shear Force] Provide shear key to safely transfer the shear force.")
-            logger.error(": [Anchor Bolt] The anchor bolt fails due to combined shear + tension [Reference: Clause 10.3.6, IS 800:2007].")
+        if self.connectivity == 'Gusseted Base Plate':
+            v_sb = self.load_shear / self.tension_bolts_req  # kN
+            v_db = self.anchor_capacity  # kN
+            t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
+            t_db = self.tension_capacity_anchor  # kN
+            self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(v_sb, v_db, t_b, t_db)
+
+            if self.combined_capacity_anchor > 1.0:
+                self.safe = False
+                logger.error(": [Large Shear Force] The shear force acting on the base plate is large.")
+                logger.info(": [Large Shear Force] Provide shear key to safely transfer the shear force.")
+                logger.error(": [Anchor Bolt] The anchor bolt fails due to combined shear + tension [Reference: Clause 10.3.6, IS 800:2007].")
+            else:
+                pass
+
         else:
-            pass
+            self.combined_capacity_anchor = 'NA'
 
         if self.safe:
             pass
@@ -1314,28 +1319,35 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # printing values for output dock
 
-        # base plate
-        print(self.plate_thk)
-        print(self.bp_length_provided)
-        print(self.bp_width_provided)
-
         # anchor bolt
         print(self.anchor_dia_provided)
         print(self.anchor_grade)
-        print(self.anchor_length_provided)
+        print(self.anchor_length_provided)  # Length (mm)
         print(self.shear_capacity_anchor)
         print(self.bearing_capacity_anchor)
-        print(self.anchor_capacity)
-        print(self.combined_capacity)
+        print(self.anchor_capacity)  # Bolt capacity (kN)
+        print(self.combined_capacity_anchor)  # Combined capacity (kN)
+        print(self.tension_capacity_anchor)  # Tension capacity (kN) (show only for 'Gusseted Base Plate' connectivity)
+
+        # base plate
+        print(self.plate_thk)  # Thickness (mm)
+        print(self.bp_length_provided)  # Length (mm)
+        print(self.bp_width_provided)  # Width (mm)
+
+        # Gusset Plate (this section and subsection is only for 'Gusseted Base Plate' connectivity)
+
+        # details coming soon...
 
         # detailing
         print(self.anchor_nos_provided)
-        print(self.end_distance)
-        print(self.edge_distance)
-        print("The projection is {}".format(self.projection))
+        print(self.pitch_distance)  # Pitch Distance (mm) (show only when this value is not 'Null')
+        print(self.gauge_distance)  # Gauge Distance (mm) mm (show only when this value is not 'Null')
+        print(self.end_distance)  # mm
+        print(self.edge_distance)  # mm
+        print(self.projection)  # mm (show only for 'Welded-Slab Base' connectivity)
 
         # weld
-        print(self.weld_size if self.weld_type != 'Butt Weld' else '')
+        print(self.weld_size if self.weld_type != 'Butt Weld' else '')  # Weld size (mm)
 
         # col properties
         print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)

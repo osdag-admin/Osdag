@@ -186,16 +186,7 @@ class Bolt(Material):
         self.connecting_plates_tk = [i[0] for i in conn_plates_t_fu_fy]
         self.bolt_diameter_provided = bolt_diameter_provided
 
-<<<<<<< HEAD
-        self.min_pitch = round((IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)),2)
-        self.min_gauge = round((IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)),2)
-        self.min_edge_dist = round((IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
-                                                                            self.edge_type)),2)
-        self.min_end_dist = self.min_edge_dist
-        self.max_spacing = IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk)
-        self.max_edge_dist = round((IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
-                                                                        self.corrosive_influences)),2)
-=======
+
         self.min_pitch = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided),2)
         self.min_gauge = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided),2)
         self.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
@@ -204,7 +195,7 @@ class Bolt(Material):
         self.max_spacing = round(IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk),2)
         self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
                                                                         self.corrosive_influences),2)
->>>>>>> 53b66531dde3a1127630fe93935a242e13fed4ba
+
         self.max_end_dist = self.max_edge_dist
         self.min_pitch_round = round_up(self.min_pitch, 5)
         self.min_gauge_round = round_up(self.min_gauge, 5)
@@ -257,14 +248,18 @@ class Section(Material):
         self.source = 0.0
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
+        self.block_shear_capacity = 0.0
 
         # self.shear_yielding_capacity = 0.0
         # self.shear_rupture_capacity = 0.0
 
         self.tension_capacity_flange = 0.0
-        self.tension_capacity_web = 0.0
         self.shear_capacity_flange = 0.0
+        self.tension_capacity_web = 0.0
         self.shear_capacity_web = 0.0
+        self.tension_yielding_capacity_web=0.0
+        self.tension_rupture_capacity_web=0.0
+        self.block_shear_capacity_web=0.0
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
@@ -1097,6 +1092,7 @@ class Plate(Material):
             self.gauge_provided = gauge
             self.edge_dist_provided = edge_dist
             self.end_dist_provided = end_dist
+
 
     def get_flange_plate_details(self, bolt_dia, flange_plate_h_min, flange_plate_h_max, bolt_capacity, min_edge_dist, min_gauge, max_spacing, max_edge_dist,web_thickness, root_radius,
                               shear_load=0.0, axial_load=0.0, gap=0.0,  bolt_line_limit=math.inf):

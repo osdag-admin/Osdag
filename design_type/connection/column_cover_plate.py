@@ -607,7 +607,7 @@ class ColumnCoverPlate(MomentConnection):
         self.web_plate.end_dist_provided = 40
         #  Inner Flange plate
         self.flange_plate.thickness_provided = 8
-        self.flange_plate.Innerheight = 115.6
+        self.flange_plate.Innerheight = 104.35
         self.flange_plate.Innerlength = 270
         self.flange_plate.gap = 10
         self.web_plate.gap = 10
@@ -1343,7 +1343,7 @@ class ColumnCoverPlate(MomentConnection):
 
                 #  yielding,rupture  for  inside flange plate
                 self.flange_plate.Innerheight = (self.section.flange_width - self.section.web_thickness - (
-                            self.section.root_radius / 2)) / 2
+                            self.section.root_radius * 2)) / 2
                 flange_plate_height_outside = self.flange_plate.height
                 self.flange_plate.Innerlength = self.flange_plate.length
 

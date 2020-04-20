@@ -156,6 +156,8 @@ def get_trial_bolts(V_u, A_u,bolt_capacity,multiple=1):
     trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
     return trial_bolts_eqn
 
+
+
 def min_plate_ht_req(beam_depth,min_plate_ht):
     beam_depth = str(beam_depth)
     min_plate_ht = str(min_plate_ht)
@@ -163,7 +165,7 @@ def min_plate_ht_req(beam_depth,min_plate_ht):
     min_plate_ht_eqn.append(NoEscape(r'\begin{aligned}0.6 * d_b&= 0.6 * '+ beam_depth + r'='+min_plate_ht+r'\end{aligned}'))
     return min_plate_ht_eqn
 
-def min_flange_plate_ht_req(beam_width,min_flange_plate_ht):
+def min_flange_plate_ht_req(beam_width,min_flange_plate_ht):## when only outside plate is considered
     beam_width = str(beam_width)
     min_flange_plate_ht = str(min_flange_plate_ht)
     min_flange_plate_ht_eqn = Math(inline=True)
@@ -172,14 +174,17 @@ def min_flange_plate_ht_req(beam_width,min_flange_plate_ht):
 
     return min_flange_plate_ht_eqn
 
-def max_flange_plate_ht_req(beam_width,max_flange_plate_ht):
-    beam_width = str(beam_width)
-    max_flange_plate_ht = str(max_flange_plate_ht)
-    max_flange_plate_ht_eqn = Math(inline=True)
-    max_flange_plate_ht_eqn.append(NoEscape(r'\begin{aligned}min~flange~plate~ht &= beam~width\\'))
-    max_flange_plate_ht_eqn.append(NoEscape(r'&='+max_flange_plate_ht+r'\end{aligned}'))
+def min_inner_flange_plate_ht_req(beam_width, web_thickness,root_radius,min_inner_flange_plate_ht): ## when inside and outside plate is considered #todo
+    beam_width = str(beam_width) ### same function used for max height
+    min_inner_flange_plate_ht = str(min_inner_flange_plate_ht)
+    web_thickness=str(web_thickness)
+    root_radius=str(root_radius)
+    min_inner_flange_plate_ht_eqn = Math(inline=True)
+    min_inner_flange_plate_ht_eqn.append(NoEscape(r'\begin{aligned}&= \frac{B -t- (2*R1)}{2}\\'))
+    min_inner_flange_plate_ht_eqn.append(NoEscape(r'&=\frac{'+beam_width+ r' -' +web_thickness+ r' - 2*'+ root_radius+r'}{2}\\'))
+    min_inner_flange_plate_ht_eqn.append(NoEscape(r'&='+min_inner_flange_plate_ht+r'\end{aligned}'))
 
-    return max_flange_plate_ht_eqn
+    return min_inner_flange_plate_ht_eqn
 
 
 def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_plate_h):
@@ -236,21 +241,22 @@ def shear_yield_prov(h,t, f_y, gamma, V_dg):
     gamma = str(gamma)
     V_dg = str(V_dg)
     shear_yield_eqn = Math(inline=True)
-    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{dg} &= \frac{A_v*f_y}{sqrt{3}*\gamma_{mo}}\\'))
+    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{dg} &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo}}\\'))
     shear_yield_eqn.append(NoEscape(r'&=\frac{'+h+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
     shear_yield_eqn.append(NoEscape(r'&=' + V_dg + '\end{aligned}'))
     return shear_yield_eqn
 
-def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn):
+def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn,multiple =1):
     h = str(h)
     t = str(t)
     n_r = str(n_r)
     d_o = str(d_o)
     f_u = str(fu)
     v_dn = str(v_dn)
+    multiple = str(multiple)
     shear_rup_eqn = Math(inline=True)
-    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= 0.75*A_{vn}*f_u\\'))
-    shear_rup_eqn.append(NoEscape(r'&=0.75*'+h+'-('+n_r+'*'+d_o+')*'+t+'*'+f_u+r'\\'))
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.75*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+    shear_rup_eqn.append(NoEscape(r'&='+multiple+ r'*('+h+'-('+n_r+'*'+d_o+'))*'+t+'*'+f_u+r'\\'))
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
     return shear_rup_eqn
 
@@ -274,7 +280,7 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     T_dg = str(T_dg)
     tension_yield_eqn = Math(inline=True)
     tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{A_g*f_y}{\gamma_{mo}}\\'))
-    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
+    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
 

@@ -21,7 +21,7 @@ import pdflatex
 import sys
 import datetime
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
-
+import pylatex as pyl
 
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
@@ -42,8 +42,8 @@ class CreateLatex(Document):
 
 
     @pyqtSlot()
-    def save_latex(self, uiObj, Design_Check, section_1, reportsummary, filename, folder, rel_path, Disp_3d_image, section_2=None):
 
+    def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
 
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
@@ -84,6 +84,7 @@ class CreateLatex(Document):
         doc = Document(geometry_options=geometry_options,indent=False)
         doc.packages.append(Package('amsmath'))
         doc.packages.append(Package('graphicx'))
+        doc.packages.append(Package('needspace'))
         doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
         doc.preamble.append(header)
         doc.change_document_style("header")
@@ -95,53 +96,29 @@ class CreateLatex(Document):
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
 
                     print(i)
-                    if i == "Column Details":
+                    if type(uiObj[i]) == dict:
                         table.add_hline()
-                        merge_rows = int(round_up(len(section_1),2)/2 + 2)
-                        print('Hi', len(section_1)/2,round_up(len(section_1),2)/2, merge_rows)
+                        sectiondetails=uiObj[i]
+                        image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
+                        Img_path = r'/ResourceFiles/images/'+image_name+r'".png'
+                        merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+                        print('Hi', len(sectiondetails)/2,round_up(len(sectiondetails),2)/2, merge_rows)
                         if merge_rows%2 != 0:
-                            section_1['']=''
-                        a = list(section_1.keys())
+                            sectiondetails['']=''
+                        a = list(sectiondetails.keys())
                         # index=0
-                        for x in range(0,merge_rows):
-                            # table.add_row("Col.Det.",i,section_1[i])
-                            if x == 0:
+                        for x in range(1,merge_rows):
+                            # table.add_row("Col.Det.",i,columndetails[i])
+                            if x == 1:
                                 table.add_row((MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
-                                filename=r'"'+rel_path+uiObj["Column Details"])), MultiColumn(2, align='|c|', data=a[x]),
-                                              MultiColumn(2, align='|c|', data=section_1[a[x]]),))
-                                # index += 1
-                            elif x <=3:
+                                filename=r'"'+rel_path+Img_path)), MultiColumn(2, align='|c|', data=a[x]),
+                                              MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+                            elif x <=4:
                                 table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
-                                              MultiColumn(2, align='|c|', data=section_1[a[x]]),))
+                                              MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
                             else:
-                                table.add_row(('', a[x], section_1[a[x]],a[merge_rows+x-4], section_1[a[merge_rows+x-4]],))
+                                table.add_row(('', a[x], sectiondetails[a[x]],a[merge_rows+x-4], sectiondetails[a[merge_rows+x-4]],))
                             table.add_hline(2,5)
-
-                    elif i=="Beam Details" and section_2 != None:
-                        table.add_hline()
-                        merge_rows = int(round_up(len(section_2), 2) / 2 + 2)
-
-                        if merge_rows % 2 != 0:
-                            section_2[''] = ''
-                        a = list(section_2.keys())
-
-                        for x in range(0, merge_rows):
-
-                            if x == 0:
-                                table.add_row((
-                                    MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
-                                                                                filename=r'"' + rel_path + uiObj[
-                                                                                    "Beam Details"])),
-                                    MultiColumn(2, align='|c|', data=a[x]),
-                                    MultiColumn(2, align='|c|', data=section_2[a[x]]),))
-
-                            elif x <= 3:
-                                table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
-                                              MultiColumn(2, align='|c|', data=section_2[a[x]]),))
-                            else:
-                                table.add_row('', a[x], section_2[a[x]], a[merge_rows + x - 4],
-                                              section_2[a[merge_rows + x - 4]])
-                            table.add_hline(2, 5)
                     elif uiObj[i] == "TITLE":
                         table.add_hline()
                         table.add_row((MultiColumn(5, align='|c|', data=bold(i),),))
@@ -165,10 +142,17 @@ class CreateLatex(Document):
                 else:
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()
+        doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        with doc.create(Section('3D View')):
+            with doc.create(Figure(position='h!')) as view_3D:
+                view_3dimg_path = rel_path + Disp_3d_image
+                view_3D.add_image(filename=r'"' + view_3dimg_path,width=NoEscape(r'\linewidth'))
+                view_3D.add_caption('3D View')
 
 
 
         doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+
 
 # reportsummary = {}
 # reportsummary["ProfileSummary"] = {}
@@ -693,3 +677,4 @@ class CreateLatex(Document):
 #
 # if __name__ == '__main__':
 #     ReportGenerator()
+

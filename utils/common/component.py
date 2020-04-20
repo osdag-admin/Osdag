@@ -192,14 +192,14 @@ class Bolt(Material):
         self.connecting_plates_tk = [i[0] for i in conn_plates_t_fu_fy]
         self.bolt_diameter_provided = bolt_diameter_provided
 
-        self.min_pitch = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)
-        self.min_gauge = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)
-        self.min_edge_dist = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
-                                                                            self.edge_type)
+        self.min_pitch = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided),2)
+        self.min_gauge = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided),2)
+        self.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
+                                                                            self.edge_type),2)
         self.min_end_dist = self.min_edge_dist
-        self.max_spacing = IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk)
-        self.max_edge_dist = IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
-                                                                        self.corrosive_influences)
+        self.max_spacing = round(IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk),2)
+        self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
+                                                                        self.corrosive_influences),2)
         self.max_end_dist = self.max_edge_dist
         self.min_pitch_round = round_up(self.min_pitch, 5)
         self.min_gauge_round = round_up(self.min_gauge, 5)
@@ -708,10 +708,10 @@ class Weld(Material):
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         self.throat_tk = \
-            IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
-                (t_weld, weld_angle)
+            round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
+                (t_weld, weld_angle),2)
         print ("throat_tk",self.throat_tk)
-        weld_strength = f_wd * self.throat_tk
+        weld_strength = round(f_wd * self.throat_tk,2)
         self.strength = weld_strength
 
     def get_weld_stress(self,weld_shear =0.0, weld_axial=0.0, weld_twist=0.0, Ip_weld=1.0, y_max=0.0, x_max=0.0, l_weld=0.0):
@@ -719,7 +719,7 @@ class Weld(Material):
         T_wv = weld_twist * x_max/Ip_weld
         V_wv = weld_shear /l_weld
         A_wh = weld_axial/l_weld
-        weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
+        weld_stress = round(math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2),2)
         self.stress = weld_stress
 
     def weld_size(self, plate_thickness, member_thickness, edge_type = "Square"):
@@ -788,9 +788,10 @@ class Plate(Material):
         self.block_shear_capacity = 0.0
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
-
+        self.tension_capacity = 0.0
         self.shear_yielding_capacity = 0.0
         self.shear_rupture_capacity = 0.0
+        self.shear_capacity = 0.0
 
 
         self.shear_capacity_web_plate=0.0
@@ -1315,7 +1316,7 @@ class Plate(Material):
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
         Tdb = min(Tdb1, Tdb2)
-        Tdb = round(Tdb / 1000, 3)
+        Tdb = round(Tdb, 3)
         self.block_shear_capacity = Tdb
 
     def tension_blockshear_area_input(self,A_vg, A_vn, A_tg, A_tn, f_u, f_y):
@@ -1359,8 +1360,8 @@ class Plate(Material):
         '''
         A_v = length * thickness
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        V_p = (0.6 * A_v * fy) / (math.sqrt(3) * gamma_m0 * 1000)  # kN
-        self.shear_yielding_capacity = V_p
+        V_p = (0.6 * A_v * fy) / (math.sqrt(3) * gamma_m0)  # N
+        self.shear_yielding_capacity = round(V_p,2)
 
     def tension_yielding(self, length, thickness, fy):
         '''
@@ -1375,7 +1376,7 @@ class Plate(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         # A_v = height * thickness
         tdg = (A_v * fy) / (gamma_m0)
-        self.tension_yielding_capacity = tdg
+        self.tension_yielding_capacity = round(tdg,2)
         return tdg
 
     def tension_rupture(self, A_n, F_u):
@@ -1400,8 +1401,8 @@ class Plate(Material):
             Capacity of beam web in shear rupture
         '''
         A_vn = (length - bolts_one_line * dia_hole) * thickness
-        R_n = (0.75 * fu * A_vn) / 1000  # kN
-        self.shear_rupture_capacity = R_n
+        R_n = (0.75 * fu * A_vn)
+        self.shear_rupture_capacity = round(R_n,2)
 
     def get_moment_cacacity(self, fy, plate_tk, plate_len):
         self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6

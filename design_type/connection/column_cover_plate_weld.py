@@ -615,7 +615,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.section.fu = 410
         #  Flange Weld
         self.flange_weld.size = 10  # mm
-        # self.flangespace = 15 #mm
+        self.flangespace = 15 #mm
         self.flange_weld.length =500
         self.flange_weld.height = 200
         #  Flange plate
@@ -624,7 +624,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.flange_plate.length = 520
         #  Web Weld
         self.web_weld.size = 9  # mm
-        # self.webspace = 15  # mm
+        self.webspace = 15  # mm
         self.web_weld.length =730
         self.web_weld.height = 340
         #  Web plate

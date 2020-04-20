@@ -274,8 +274,9 @@ def get_oldbeamcombolist():
 ########
 # Common Display Strings
 ############
-KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity'
+KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity (V_dy) (kN)'
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
+KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity (V_dn) (kN)'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
 DISP_MIN_PITCH = 'Min. Pitch (mm)'
@@ -290,8 +291,15 @@ DISP_MIN_PLATE_HEIGHT = 'Min. Plate Height (mm)'
 DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
 DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
 DISP_MIN_PLATE_THICK = 'Min.Plate Thickness (mm)'
+KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (V_db) (kN)'
+KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension (T_db) (kN)'
+KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (V_d) (kN)'
 KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
 KEY_DISP_FY = 'Yield Strength , fy (MPa)'
+KEY_DISP_IR = 'Interaction Ratio'
+DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
+DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
+DISP_WELD_STRENGTH = 'Weld Strength (kN/mm)'
 ###################################
 # Key for Storing Module
 
@@ -563,13 +571,13 @@ KEY_DESIGNATION = "section_size.designation"
 KEY_DISP_DESIGNATION = "Designation"
 
 KEY_TENSION_YIELDCAPACITY = "Member.tension_yielding"
-KEY_DISP_TENSION_YIELDCAPACITY = 'Yield'
+KEY_DISP_TENSION_YIELDCAPACITY = 'Tension Yielding Capacity (KN)'
 KEY_TENSION_RUPTURECAPACITY = "Member.tension_rupture"
-KEY_DISP_TENSION_RUPTURECAPACITY = 'Rupture'
+KEY_DISP_TENSION_RUPTURECAPACITY = 'Tension Rupture Capacity(KN)'
 KEY_TENSION_BLOCKSHEARCAPACITY = "Member.tension_blockshear"
-KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear'
+KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear (KN)'
 KEY_TENSION_CAPACITY = "Member.tension_capacity"
-KEY_DISP_TENSION_CAPACITY = "Tension Capacity"
+KEY_DISP_TENSION_CAPACITY = "Tension Capacity (KN)"
 
 KEY_EFFICIENCY = "Member.efficiency"
 KEY_DISP_EFFICIENCY = "Efficiency"
@@ -981,10 +989,10 @@ KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
 KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
-KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity'
+KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity (KN)'
 KEY_OUT_DISP_BOLT_VALUE = 'Bolt Value (kN)'
 KEY_OUT_BOLT_FORCE = 'Bolt.Force'
-KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force'
+KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force (KN)'
 KEY_OUT_DISP_BOLT_SHEAR_FORCE = 'Bolt Shear Force (kN)'
 KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
 KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
@@ -994,9 +1002,9 @@ KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
-KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines'
+KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
-KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line'
+KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line (nos)'
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
@@ -1021,7 +1029,7 @@ KEY_OUT_MIN_EDGE_DIST = 'Bolt.MinEdgeDist'
 KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
 
 
-KEY_OUT_DISP_EDGE_DIST = 'Edge Distance'
+KEY_OUT_DISP_EDGE_DIST = 'Edge Distance (mm)'
 
 
 KEY_OUT_SPTNG_BOLT_SHEAR = 'Cleat.Sptng_leg.Shear'
@@ -1064,9 +1072,9 @@ KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity'
 KEY_OUT_PLATE_BLK_SHEAR = 'Plate.BlockShear'
 KEY_OUT_DISP_PLATE_BLK_SHEAR = 'Block Shear Capacity'
 KEY_OUT_PLATE_MOM_DEMAND = 'Plate.MomDemand'
-KEY_OUT_DISP_PLATE_MOM_DEMAND = 'Moment Demand'
+KEY_OUT_DISP_PLATE_MOM_DEMAND = 'Moment Demand(kNm)'
 KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
-KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity'
+KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kNm)'
 
 KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'

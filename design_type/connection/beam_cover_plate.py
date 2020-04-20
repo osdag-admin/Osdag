@@ -2238,7 +2238,7 @@ class BeamCoverPlate(MomentConnection):
                                   'Zpy(cm3)': self.section.elast_sec_mod_y}
 
         self.report_input = \
-            {KEY_MODULE: self.module_name,
+            {KEY_MODULE: self.module,
              KEY_MAIN_MODULE: self.mainmodule,
              # KEY_CONN: self.connectivity,
              KEY_DISP_MOMENT: self.load.moment,

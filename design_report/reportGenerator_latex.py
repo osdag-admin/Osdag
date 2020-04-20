@@ -129,7 +129,7 @@ class CreateLatex(Document):
                         table.add_row(
                             (MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
                         table.add_hline()
-
+        doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
         with doc.create(Section('Design Checks')):
             for check in Design_Check:
                 if check[0] == 'SubSection':

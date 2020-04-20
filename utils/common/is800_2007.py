@@ -162,7 +162,7 @@ class IS800_2007(object):
             "24+"  : {'Standard': 3.0, 'Over-sized': 8.0, 'short_slot': 10.0, 'long_slot': 2.5}
         }
         import re
-        d = str(re.sub("[^0-9]", "", str(d)))
+        # d = str(re.sub("[^0-9]", "", str(d)))
         d = int(d)
 
         if d < 12:

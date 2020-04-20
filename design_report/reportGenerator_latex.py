@@ -101,7 +101,10 @@ class CreateLatex(Document):
                         sectiondetails=uiObj[i]
                         image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
                         Img_path = r'/ResourceFiles/images/'+image_name+r'".png'
-                        merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+                        if (len(sectiondetails))% 2 == 0:
+                            merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+                        else:
+                            merge_rows = int(round_up(len(sectiondetails), 2) / 2 + 3)
                         print('Hi', len(sectiondetails)/2,round_up(len(sectiondetails),2)/2, merge_rows)
                         if merge_rows%2 != 0:
                             sectiondetails['']=''

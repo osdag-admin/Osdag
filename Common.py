@@ -572,7 +572,7 @@ KEY_DISP_TENSION_YIELDCAPACITY = 'Tension Yielding Capacity (KN)'
 KEY_TENSION_RUPTURECAPACITY = "Member.tension_rupture"
 KEY_DISP_TENSION_RUPTURECAPACITY = 'Tension Rupture Capacity(KN)'
 KEY_TENSION_BLOCKSHEARCAPACITY = "Member.tension_blockshear"
-KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear (KN)'
+KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear Capacity (KN)'
 KEY_TENSION_CAPACITY = "Member.tension_capacity"
 KEY_DISP_TENSION_CAPACITY = "Tension Capacity (KN)"
 

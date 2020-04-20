@@ -870,7 +870,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def bp_analyses_parameters(self):
         """ initialize detailing parameters like the end/edge/pitch/gauge distances, anchor bolt diameter and grade,
          length and width of the base plate.
-        These parameters are be used to run the first iteration of the analyses and improvise accordingly.
+        These parameters are used to run the first iteration of the analyses and improvise accordingly.
 
         Args:
 
@@ -1239,8 +1239,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     "of standard lengths and sizes, satisfying the suggested range.")
         logger.info(": [Anchor Bolt] Reference: IS 5624:1993, Table 1.")
 
-    def design_detail_bp(self):
-        """ Design base plate dimensions, weld and provide detailing
+    def design_weld(self):
+        """ design weld for the base plate
 
         Args:
 
@@ -1251,9 +1251,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # design of fillet weld
         if self.weld_type == "Fillet Weld":
 
-            if self.connectivity == "Welded-Slab Base" or "Bolted-Slab Base" or "Gusseted Base Plate":
+            if self.connectivity == "Welded-Slab Base" or "Gusseted Base Plate":
 
                 if self.dp_column_type == 'Rolled' or 'Welded':
+
+                    # available length for welding along the perimeter of the column
                     self.length_available = 2 * (self.column_bf + self.column_D - (2 * self.column_tf) - (2 * self.column_r1) +
                                                  self.column_bf - self.column_tw - (2 * self.column_r1))  # mm
 
@@ -1262,7 +1264,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     # the 'effective length'.
                     self.effective_length = self.length_available - (0.12 * self.length_available)  # mm (effective length of weld)
 
-                    self.strength_unit_len = self.load_axial * 1000 / self.effective_length  # N/mm
+                    # strength of weld per unit length
+                    if self.connectivity == 'Welded-Slab Base':
+                        self.strength_unit_len = self.load_axial * 1000 / self.effective_length  # N/mm
+                    else:
+                        self.strength_unit_len = (self.load_moment_major / (self.depth - self.flange_thickness)) / self.effective_length
+                        # N/mm
+
+                    # weld size
                     self.weld_size = (self.strength_unit_len / 0.7 * min(self.dp_weld_fu_overwrite, self.dp_column_fu)) \
                                      * math.sqrt(3) * self.gamma_mw  # mm
                     self.weld_size = max(round_up(self.weld_size, 2), 6)  # minimum size of weld is 6mm
@@ -1274,17 +1283,25 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     pass
 
             elif self.connectivity == "Hollow Section":
-
                 # TODO: add calculations for hollow sections
                 self.weld_size = 0
 
             else:
                 pass
 
-        # design of butt weld
+        # design of butt/groove weld
         else:
             self.weld_size_flange = self.column_tf  # mm
             self.weld_size_web = self.column_tw  # mm
+
+    def design_gusset_plate(self):
+        """ design the gusset plate
+
+        Args:
+
+        Returns:
+        """
+        pass
 
         # end of calculation
         if self.safe:

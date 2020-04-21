@@ -7,6 +7,7 @@ Started on 01 - Nov - 2018
 import math
 from Common import *
 
+
 class IS800_2007(object):
     """Perform calculations on steel design as per IS 800:2007
 
@@ -37,6 +38,7 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  6     DESIGN OF TENSION MEMBERS   """
+
     # -------------------------------------------------------------
     #   6.4 Design Strength Due to Block Shear
     # -------------------------------------------------------------
@@ -72,6 +74,7 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  7     DESIGN OF COMPRESS1ON MEMBERS   """
+
     # -------------------------------------------------------------
     #   7.4 Column Bases
     # -------------------------------------------------------------
@@ -81,10 +84,10 @@ class IS800_2007(object):
     def cl_7_4_1_bearing_strength_concrete(concrete_grade):
         """
         Args:
-            concrete_grade: grade of concrete used for pedestal/footing.
+            concrete_grade: grade of concrete used for pedestal/footing (str).
 
         Returns:
-            maximum permissible bearing strength of concrete pedestal/footing.
+            maximum permissible bearing strength of concrete pedestal/footing (float).
 
         Note:
             cl 7.4.1 suggests the maximum bearing strength equal to 0.60 times f_ck,
@@ -108,6 +111,7 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  8     DESIGN OF MEMBERS SUBJECTED TO BENDING   """
+
     # -------------------------------------------------------------
     #   8.4 Shear
     # -------------------------------------------------------------
@@ -129,6 +133,7 @@ class IS800_2007(object):
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
     # ==========================================================================
     """   SECTION  10    CONNECTIONS    """
+
     # -------------------------------------------------------------
     #   10.1 General
     # -------------------------------------------------------------
@@ -142,7 +147,7 @@ class IS800_2007(object):
         """Calculate bolt hole diameter as per Table 19 of IS 800:2007
 
         Args:
-             d - Nominal diameter of fastener in mm (float)
+             d - Nominal diameter of fastener in mm (float or str)
              bolt_hole_type - Either 'Standard' or 'Over-sized' or 'short_slot' or 'long_slot' (str)
 
         Returns:
@@ -158,8 +163,8 @@ class IS800_2007(object):
         table_19 = {
             "12-14": {'Standard': 1.0, 'Over-sized': 3.0, 'short_slot': 4.0, 'long_slot': 2.5},
             "16-22": {'Standard': 2.0, 'Over-sized': 4.0, 'short_slot': 6.0, 'long_slot': 2.5},
-            "24"   : {'Standard': 2.0, 'Over-sized': 6.0, 'short_slot': 8.0, 'long_slot': 2.5},
-            "24+"  : {'Standard': 3.0, 'Over-sized': 8.0, 'short_slot': 10.0, 'long_slot': 2.5}
+            "24": {'Standard': 2.0, 'Over-sized': 6.0, 'short_slot': 8.0, 'long_slot': 2.5},
+            "24+": {'Standard': 3.0, 'Over-sized': 8.0, 'short_slot': 10.0, 'long_slot': 2.5}
         }
         import re
         d = str(re.sub("[^0-9]", "", str(d)))
@@ -216,7 +221,7 @@ class IS800_2007(object):
 
         """
         t = min(plate_thicknesses)
-        return min(32*t, 300.0)
+        return min(32 * t, 300.0)
 
     # cl. 10.2.3.2 Maximum pitch in tension and compression members
     @staticmethod
@@ -238,9 +243,9 @@ class IS800_2007(object):
         """
         t = min(plate_thicknesses)
         if member_type == 'tension':
-            return min(16*t, 200.0)
+            return min(16 * t, 200.0)
         elif member_type == 'compression':
-            return min(12*t, 200.0)
+            return min(12 * t, 200.0)
         else:
             # TODO compression members wherein forces are transferred through butting faces is given in else
             return 4.5 * d
@@ -260,9 +265,8 @@ class IS800_2007(object):
         Note:
             Reference:
             IS 800:2007, cl. 10.2.4.2
-self
-        """
 
+        """
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
         if edge_type == 'a - Sheared or hand flame cut':
             return 1.7 * d_0
@@ -344,7 +348,7 @@ self
         """
         V_nsb = f_ub / math.sqrt(3) * (n_n * A_nb + n_s * A_sb)
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
-        V_dsb = V_nsb/gamma_mb
+        V_dsb = V_nsb / gamma_mb
         return V_dsb
 
     # cl. 10.3.3.1 Long joints
@@ -412,7 +416,7 @@ self
             e       - End distance of the fastener along bearing direction in mm (float)
             p       - Pitch distance of the fastener along bearing direction in mm (float)
             bolt_hole_type - Either 'Standard' or 'Over-sized' or 'short_slot' or 'long_slot' (str)
-            safety_factor_parameter - Either 'field' or 'shop' (str)
+            safety_factor_parameter - Either 'Field' or 'Shop' (str)
 
         return:
             V_dpb - Design bearing strength of bearing bolt in N (float)
@@ -423,23 +427,22 @@ self
 
         """
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
-        k_b = min(e/(3.0*d_0), p/(3.0*d_0)-0.25, f_ub/f_u, 1.0)
+
+        if p > 0.0:
+            k_b = min(e / (3.0 * d_0), p / (3.0 * d_0) - 0.25, f_ub / f_u, 1.0)
+        else:
+            k_b = min(e / (3.0 * d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
+
         V_npb = 2.5 * k_b * d * t * f_u
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
-        V_dpb = V_npb/gamma_mb
-        print(bolt_hole_type)
+        V_dpb = V_npb / gamma_mb
+
         if bolt_hole_type == 'Over-sized' or bolt_hole_type == 'short_slot':
             V_dpb *= 0.7
         elif bolt_hole_type == 'long_slot':
             V_dpb *= 0.5
+
         return V_dpb
-
-
-
-
-
-
-
 
     @staticmethod
     def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
@@ -464,6 +467,7 @@ self
         return T_nb / gamma_mb
 
         # cl. 10.3.6 Bolt subjected to combined shear and tension of bearing bolts
+
     @staticmethod
     def cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb, V_db, T_b, T_db):
         """Check for bolt subjected to combined shear and tension
@@ -481,7 +485,6 @@ self
             IS 800:2007,  cl 10.3.6
         """
         return (V_sb / V_db) ** 2 + (T_b / T_db) ** 2
-
 
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting
@@ -520,7 +523,7 @@ self
             gamma_mf = 1.25
         if bolt_hole_type == 'Standard':
             K_h = 1.0
-        elif bolt_hole_type == 'Over-sized' or 'short_slot' or 'long_slot':
+        elif bolt_hole_type == 'Over-sized' or bolt_hole_type == 'short_slot' or bolt_hole_type == 'long_slot':
             K_h = 0.85
         else:
             # TODO : long_slot bolt loaded parallel to slot is given in else
@@ -529,7 +532,7 @@ self
             mu_f = 0.55
         V_nsf = mu_f * n_e * K_h * F_0
         V_dsf = V_nsf / gamma_mf
-        return V_dsf,K_h,gamma_mf
+        return V_dsf, K_h, gamma_mf
 
     # Table 20 Typical Average Values for Coefficient of Friction, mu_f (list)
     cl_10_4_3_Table_20 = [0.20, 0.50, 0.10, 0.25, 0.30, 0.52, 0.30, 0.30, 0.50, 0.33, 0.48, 0.1]
@@ -581,12 +584,6 @@ self
         """
         return (V_sf / V_df) ** 2 + (T_f / T_df) ** 2
 
-
-
-
-
-
-
     @staticmethod
     def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned=False, eta=1.5):
         """Calculate prying force of friction grip bolt
@@ -615,10 +612,6 @@ self
         l_e = min(end_dist, 1.1 * t * math.sqrt(beta * f_o / f_y))
         Q = (l_v / 2 / l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
         return Q
-
-
-
-
 
     # -------------------------------------------------------------
     #   10.5 Welds and Welding
@@ -652,7 +645,7 @@ self
             min_weld_size = 6
         else:  # thicker_part_thickness <= 50.0:
             min_weld_size = 10
-        #TODO else:
+        # TODO else:
         if min_weld_size > thinner_part_thickness:
             min_weld_size = thinner_part_thickness
         return min_weld_size
@@ -716,7 +709,10 @@ self
             K = float(K)
         except ValueError:
             return
-        return K * fillet_size
+
+        throat = max((K * fillet_size), 3)
+
+        return throat
 
     @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):

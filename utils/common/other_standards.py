@@ -167,7 +167,7 @@ class IS1367_Part3_2002(object):
             IS 1367 (Part 3) :2002 Table 6
         """
         try:
-            shank_area = round(math.pi * bolt_diameter ** 2 / 4)
+            shank_area = round(math.pi * bolt_diameter ** 2 / 4)  # mm^2
         except ValueError:
             return
 

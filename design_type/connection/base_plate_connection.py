@@ -184,7 +184,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gamma_mb = 0.0
         self.gamma_mw = 0.0
 
-        self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+        # self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
         self.column_D = 0.0
         self.column_bf = 0.0
         self.column_tf = 0.0
@@ -937,8 +937,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # minimum required dimensions of the base plate [as per the detailing criteria]
         if self.connectivity == 'Welded-Slab Base' or 'Gusseted Base Plate':
-            self.bp_length_min = round_up(self.depth + 2 * (2 * self.end_distance), 5)  # mm
-            self.bp_width_min = round_up(self.flange_width + 1.5 * self.edge_distance + 1.5 * self.edge_distance, 5)  # mm
+            self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
+            self.bp_width_min = round_up(self.column_bf + 1.5 * self.edge_distance + 1.5 * self.edge_distance, 5)  # mm
 
         elif self.connectivity == 'Bolted-Slab Base':
             pass
@@ -981,8 +981,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             else:
                 pass
 
-            self.bp_length_provided = self.depth + 2 * self.projection + 2 * self.end_distance  # mm
-            self.bp_width_provided = self.flange_width + 2 * self.projection + 2 * self.end_distance  # mm
+            self.bp_length_provided = self.column_D + 2 * self.projection + 2 * self.end_distance  # mm
+            self.bp_width_provided = self.column_bf + 2 * self.projection + 2 * self.end_distance  # mm
 
             # check for the provided area against the minimum required area
             self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
@@ -1043,7 +1043,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # calculating moment at the critical section
 
                 # Assumption: the critical section (critical_xx) acts at a distance of 0.95 times the column depth, along the depth
-                self.critical_xx = (self.bp_length_provided - 0.95 * self.depth) / 2  # mm
+                self.critical_xx = (self.bp_length_provided - 0.95 * self.column_D) / 2  # mm
                 self.sigma_xx = (self.sigma_max_zz - self.sigma_min_zz) * (self.bp_length_provided - self.critical_xx) / \
                                 self.bp_length_provided
                 self.sigma_xx = self.sigma_xx + self.sigma_min_zz  # N/mm^2, bending stress at the critical section
@@ -1107,14 +1107,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 # computing the actual bending stress at the compression side
                 # TODO: complete this check
-                # self.flange_force_axial = self.dp_bp_fy * (self.flange_width * self.flange_thickness)  # N, load transferred by the flange
-                # self.flange_force_moment = self.load_moment_major / (self.depth - self.flange_thickness)  # N, tension acting at the flange
+                # self.flange_force_axial = self.dp_bp_fy * (self.column_bf * self.column_tf)  # N, load transferred by the flange
+                # self.flange_force_moment = self.load_moment_major / (self.column_D - self.column_tf)  # N, tension acting at the flange
                 # self.bp_area_compression = self.y * self.bp_width_provided  # mm^2, area of the base plate under compression
 
                 # designing the plate thickness
 
                 # finding the length of the critical section from the edge of the base plate
-                self.critical_xx = (self.bp_length_provided - 0.95 * self.depth) / 2  # mm
+                self.critical_xx = (self.bp_length_provided - 0.95 * self.column_D) / 2  # mm
                 if self.y > self.critical_xx:
                     self.critical_xx = self.critical_xx
                 else:
@@ -1137,7 +1137,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # assign appropriate plate thickness
 
-        self.plate_thk = max(self.plate_thk, self.flange_thickness)  # base plate thickness should be larger than the flange thickness
+        self.plate_thk = max(self.plate_thk, self.column_tf)  # base plate thickness should be larger than the flange thickness
 
         # assigning plate thickness according to the available standard sizes
         # the thicknesses of the flats (in mm) listed below is obtained from SAIL's product brochure
@@ -1279,7 +1279,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if self.connectivity == 'Welded-Slab Base':
                         self.strength_unit_len = self.load_axial * 1000 / self.effective_length  # N/mm
                     else:
-                        self.strength_unit_len = (self.load_moment_major / (self.depth - self.flange_thickness)) / self.effective_length
+                        self.strength_unit_len = (self.load_moment_major / (self.column_D - self.column_tf)) / self.effective_length
                         # N/mm
 
                     # weld size

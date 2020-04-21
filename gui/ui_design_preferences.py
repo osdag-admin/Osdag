@@ -1539,7 +1539,7 @@ class DesignPreferences(QDialog):
         combo_design_method = key_design_method.currentText()
 
         key_design_baseplate = tab_Design.findChild(QtWidgets.QWidget, KEY_DP_DESIGN_BASE_PLATE)
-        if module not in [KEY_DISP_BASE_PLATE]:
+        if module not in [KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
             key_plate_material = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
             combo_plate_material = key_plate_material.currentText()
             key_plate_material_fu = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU)

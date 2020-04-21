@@ -7,16 +7,16 @@ DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
 DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-Flange_Plate.Preferences: Outside
-Load.Axial: '10'
-Load.Moment: '100'
-Load.Shear: '10'
+Flange_Plate.Preferences: Outside + Inside
+Load.Axial: '0'
+Load.Moment: '0'
+Load.Shear: '0'
 Member.Material: E 250 (Fe 410 W)A
-Member.Supported_Section.Material: ''
-Member.Supporting_Section.Material: ''
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
 Module: Beam Coverplate  Weld Connection
 Plate.Material: E 165 (Fe 290)
-Section Size: UB 1016 x 305 x 222
+Section Size: WPB 240x240x60.3
 Web_Plate.thickness_provided: &id001
 - '6'
 - '8'

@@ -48,7 +48,7 @@ def max_pitch(t):
     return max_pitch_eqn
 
 def min_edge_end(d_0,edge_type):
-    if edge_type == 'hand_flame_cut':
+    if edge_type == 'a - Sheared or hand flame cut':
         factor = 1.7
     else:
         factor = 1.5
@@ -107,7 +107,7 @@ def bolt_bearing_prov(k_b,d,conn_plates_t_fu_fy,gamma_mb,bolt_bearing_capacity):
     bolt_bearing_capacity = str(bolt_bearing_capacity)
     bolt_bearing_eqn = Math(inline=True)
     bolt_bearing_eqn.append(NoEscape(r'\begin{aligned}V_{dpb} &= \frac{2.5~ k_b~ d~ t~ f_u}{\gamma_{mb}}\\'))
-    bolt_bearing_eqn.append(NoEscape(r'&= \frac{2.5~*'+ k_b+'*'+ d+'*'+t+'*' +'*'+f_u+'}{'+gamma_mb+r'}\\'))
+    bolt_bearing_eqn.append(NoEscape(r'&= \frac{2.5~*'+ k_b+'*'+ d+'*'+t+'*'+f_u+'}{'+gamma_mb+r'}\\'))
     bolt_bearing_eqn.append(NoEscape(r'&='+bolt_bearing_capacity+r'\end{aligned}'))
 
     return bolt_bearing_eqn
@@ -142,9 +142,9 @@ def HSFG_bolt_capacity_prov(mu_f,n_e,K_h,fub,Anb,gamma_mf,capacity):
 
     return HSFG_bolt_capacity_eqn
 
-def get_trial_bolts(V_u, A_u,bolt_capacity):
+def get_trial_bolts(V_u, A_u,bolt_capacity,multiple=1):
     res_force = math.sqrt(V_u**2+ A_u**2)
-    trial_bolts = math.ceil(res_force/bolt_capacity)
+    trial_bolts = multiple * math.ceil(res_force/bolt_capacity)
     V_u=str(V_u)
     A_u=str(A_u)
     bolt_capacity=str(bolt_capacity)
@@ -156,12 +156,36 @@ def get_trial_bolts(V_u, A_u,bolt_capacity):
     trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
     return trial_bolts_eqn
 
+
+
 def min_plate_ht_req(beam_depth,min_plate_ht):
     beam_depth = str(beam_depth)
     min_plate_ht = str(min_plate_ht)
     min_plate_ht_eqn = Math(inline=True)
     min_plate_ht_eqn.append(NoEscape(r'\begin{aligned}0.6 * d_b&= 0.6 * '+ beam_depth + r'='+min_plate_ht+r'\end{aligned}'))
     return min_plate_ht_eqn
+
+def min_flange_plate_ht_req(beam_width,min_flange_plate_ht):## when only outside plate is considered
+    beam_width = str(beam_width)
+    min_flange_plate_ht = str(min_flange_plate_ht)
+    min_flange_plate_ht_eqn = Math(inline=True)
+    min_flange_plate_ht_eqn.append(NoEscape(r'\begin{aligned}min~flange~plate~ht &= beam~width\\'))
+    min_flange_plate_ht_eqn.append(NoEscape(r'&='+min_flange_plate_ht+r'\end{aligned}'))
+
+    return min_flange_plate_ht_eqn
+
+def min_inner_flange_plate_ht_req(beam_width, web_thickness,root_radius,min_inner_flange_plate_ht): ## when inside and outside plate is considered #todo
+    beam_width = str(beam_width) ### same function used for max height
+    min_inner_flange_plate_ht = str(min_inner_flange_plate_ht)
+    web_thickness=str(web_thickness)
+    root_radius=str(root_radius)
+    min_inner_flange_plate_ht_eqn = Math(inline=True)
+    min_inner_flange_plate_ht_eqn.append(NoEscape(r'\begin{aligned}&= \frac{B -t- (2*R1)}{2}\\'))
+    min_inner_flange_plate_ht_eqn.append(NoEscape(r'&=\frac{'+beam_width+ r' -' +web_thickness+ r' - 2*'+ root_radius+r'}{2}\\'))
+    min_inner_flange_plate_ht_eqn.append(NoEscape(r'&='+min_inner_flange_plate_ht+r'\end{aligned}'))
+
+    return min_inner_flange_plate_ht_eqn
+
 
 def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_plate_h):
     beam_depth = str(beam_depth)
@@ -189,6 +213,21 @@ def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     min_plate_length_eqn.append(NoEscape(r'&=' + min_length + '\end{aligned}'))
     return min_plate_length_eqn
 
+def min_flange_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length,gap):
+    min_pitch = str( min_pitch)
+    min_end_dist = str(min_end_dist)
+    bolt_line = str(bolt_line)
+    min_length = str(min_length)
+    gap = str(gap)
+    min_flange_plate_length_eqn = Math(inline=True)
+    min_flange_plate_length_eqn.append(NoEscape(r'\begin{aligned} & 2[2*e_{min} + ({\frac{bolt~lines}{2}}-1) * p_{min})]\\'))
+    min_flange_plate_length_eqn.append(NoEscape(r'& +\frac{gap}{2}]\\'))
+    min_flange_plate_length_eqn.append(NoEscape(r'&=2*[(2*' + min_end_dist +r' + (\frac{'+bolt_line+r'}{2}' + r'-1) * ' + min_pitch + r'\\'))
+    min_flange_plate_length_eqn.append(NoEscape(r'&= + \frac{'+gap+r'}{2}]\\'))
+
+    min_flange_plate_length_eqn.append(NoEscape(r'&=' + min_length + '\end{aligned}'))
+    return min_flange_plate_length_eqn
+
 def min_plate_thk_req(t_w):
     t_w = str(t_w)
     min_plate_thk_eqn = Math(inline=True)
@@ -202,21 +241,22 @@ def shear_yield_prov(h,t, f_y, gamma, V_dg):
     gamma = str(gamma)
     V_dg = str(V_dg)
     shear_yield_eqn = Math(inline=True)
-    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{dg} &= \frac{A_v*f_y}{sqrt{3}*\gamma_{mo}}\\'))
+    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{dg} &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo}}\\'))
     shear_yield_eqn.append(NoEscape(r'&=\frac{'+h+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
     shear_yield_eqn.append(NoEscape(r'&=' + V_dg + '\end{aligned}'))
     return shear_yield_eqn
 
-def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn):
+def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn,multiple =1):
     h = str(h)
     t = str(t)
     n_r = str(n_r)
     d_o = str(d_o)
     f_u = str(fu)
     v_dn = str(v_dn)
+    multiple = str(multiple)
     shear_rup_eqn = Math(inline=True)
-    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= 0.75*A_{vn}*f_u\\'))
-    shear_rup_eqn.append(NoEscape(r'&=0.75*'+h+'-('+n_r+'*'+d_o+')*'+t+'*'+f_u+r'\\'))
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.75*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+    shear_rup_eqn.append(NoEscape(r'&='+multiple+ r'*('+h+'-('+n_r+'*'+d_o+'))*'+t+'*'+f_u+r'\\'))
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
     return shear_rup_eqn
 
@@ -356,7 +396,7 @@ def get_pass_fail(required, provided,relation='greater'):
         return 'N/A'
     else:
         if relation == 'greater':
-            if required > provided:
+            if required >= provided:
                 return 'Pass'
             else:
                 return 'Fail'
@@ -371,7 +411,7 @@ def get_pass_fail(required, provided,relation='greater'):
             else:
                 return 'Fail'
         else:
-            if required < provided:
+            if required <= provided:
                 return 'Pass'
             else:
                 return 'Fail'

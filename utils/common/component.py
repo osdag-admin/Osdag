@@ -148,13 +148,27 @@ class Bolt(Material):
         if self.bolt_type == "Bearing Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
-            [self.bolt_bearing_capacity,self.d_0,self.kb,self.gamma_mb] = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
+            self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                 f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
                 e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
             self.fu_considered = fu_considered
             self.thk_considered = thk_considered
+            d = self.bolt_diameter_provided
+            e = self.min_edge_dist_round
+            p = self.min_pitch_round
+            bolt_hole_type = self.bolt_hole_type
+            f_u = fu_considered
+            f_ub = self.bolt_fu
+            safety_factor_parameter = KEY_DP_WELD_FAB_FIELD
+            # Since field or shop both is 1.25 we are not taking safety_factor_parameter as input
 
+            self.d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
+            if p > 0.0:
+                self.kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, f_ub / f_u, 1.0)
+            else:
+                self.kb = min(e / (3.0 * self.d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
+            self.gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         elif self.bolt_type == "Friction Grip Bolt":
             self.bolt_shear_capacity,self.kh,self.gamma_mf = IS800_2007.cl_10_4_3_bolt_slip_resistance(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, n_e=n_planes, mu_f=self.mu_f, bolt_hole_type=self.bolt_hole_type)
@@ -192,6 +206,7 @@ class Bolt(Material):
         self.connecting_plates_tk = [i[0] for i in conn_plates_t_fu_fy]
         self.bolt_diameter_provided = bolt_diameter_provided
 
+
         self.min_pitch = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided),2)
         self.min_gauge = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided),2)
         self.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
@@ -200,6 +215,7 @@ class Bolt(Material):
         self.max_spacing = round(IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk),2)
         self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
                                                                         self.corrosive_influences),2)
+
         self.max_end_dist = self.max_edge_dist
         self.min_pitch_round = round_up(self.min_pitch, 5)
         self.min_gauge_round = round_up(self.min_gauge, 5)
@@ -252,14 +268,18 @@ class Section(Material):
         self.source = 0.0
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
+        self.block_shear_capacity = 0.0
 
         # self.shear_yielding_capacity = 0.0
         # self.shear_rupture_capacity = 0.0
 
         self.tension_capacity_flange = 0.0
-        self.tension_capacity_web = 0.0
         self.shear_capacity_flange = 0.0
+        self.tension_capacity_web = 0.0
         self.shear_capacity_web = 0.0
+        self.tension_yielding_capacity_web=0.0
+        self.tension_rupture_capacity_web=0.0
+        self.block_shear_capacity_web=0.0
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
@@ -1143,6 +1163,7 @@ class Plate(Material):
             self.gauge_provided = gauge
             self.edge_dist_provided = edge_dist
             self.end_dist_provided = end_dist
+
 
     def get_flange_plate_details(self, bolt_dia, flange_plate_h_min, flange_plate_h_max, bolt_capacity, min_edge_dist, min_gauge, max_spacing, max_edge_dist,web_thickness, root_radius,
                               shear_load=0.0, axial_load=0.0, gap=0.0,  bolt_line_limit=math.inf):

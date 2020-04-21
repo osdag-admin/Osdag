@@ -1480,7 +1480,7 @@ class Angle(Section):
         self.min_leg = min(self.leg_a_length, self.leg_b_length)
         self.thickness = row[5]
         self.root_radius = row[6]
-        self.r2 = row[7]
+        self.toe_radius = row[7]
         if self.leg_a_length != self.leg_b_length:
             self.Cz = row[8]*10
             self.Cy = row[9]*10

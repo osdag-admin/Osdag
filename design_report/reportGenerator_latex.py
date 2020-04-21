@@ -102,15 +102,16 @@ class CreateLatex(Document):
                         image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
                         Img_path = r'/ResourceFiles/images/'+image_name+r'".png'
                         if (len(sectiondetails))% 2 == 0:
-                            merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+                        # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+                            merge_rows = int(round_up((len(sectiondetails)/2),1,0) + 2)
                         else:
-                            merge_rows = int(round_up(len(sectiondetails), 2) / 2 + 3)
+                            merge_rows = int(round_up((len(sectiondetails)/2),1,0) + 1)
                         print('Hi', len(sectiondetails)/2,round_up(len(sectiondetails),2)/2, merge_rows)
                         if merge_rows%2 != 0:
                             sectiondetails['']=''
                         a = list(sectiondetails.keys())
                         # index=0
-                        for x in range(1,merge_rows):
+                        for x in range(1,(merge_rows+1)):
                             # table.add_row("Col.Det.",i,columndetails[i])
                             if x == 1:
                                 table.add_row((MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",

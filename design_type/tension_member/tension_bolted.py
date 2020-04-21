@@ -1778,35 +1778,64 @@ class Tension_bolted(Main):
         else:
             image = "Unequal"
 
+        if self.sec_profile in ["Channels", "Back to Back Channels"]:
+            self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
+                                      # Image shall be save with this name.png in resource files
+                                      KEY_DISP_SECSIZE: self.section_size_1.designation,
+                                      KEY_DISP_MATERIAL: self.section_size_1.material,
+                                      KEY_DISP_FU: self.section_size_1.fu,
+                                      KEY_DISP_FY: self.section_size_1.fy,
+                                      'Mass': self.section_size_1.mass,
+                                      'Area(mm2) - A': self.section_size_1.area,
+                                      'D(mm)': self.section_size_1.depth,
+                                      'B(mm)': self.section_size_1.flange_width,
+                                      't(mm)': self.section_size_1.web_thickness,
+                                      'T(mm)': self.section_size_1.flange_thickness,
+                                      'FlangeSlope': self.section_size_1.flange_slope,
+                                      'R1(mm)': self.section_size_1.root_radius,
+                                      'R2(mm)': self.section_size_1.toe_radius,
+                                      'Cy(mm)': self.section_size_1.Cy,
+                                      'Iz(mm4)': self.section_size_1.mom_inertia_z,
+                                      'Iy(mm4)': self.section_size_1.mom_inertia_y,
+                                      'rz(mm)': self.section_size_1.rad_of_gy_z,
+                                      'ry(mm)': self.section_size_1.rad_of_gy_y,
+                                      'Zz(mm3)': self.section_size_1.elast_sec_mod_z,
+                                      'Zy(mm3)': self.section_size_1.elast_sec_mod_y,
+                                      'Zpz(mm3)': self.section_size_1.plast_sec_mod_z,
+                                      'Zpy(mm3)': self.section_size_1.elast_sec_mod_y}
+        else:
+            self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
+                                      # Image shall be save with this name.png in resource files
+                                      KEY_DISP_SECSIZE: (self.section_size_1.designation,self.sec_profile),                                      KEY_DISP_MATERIAL: self.section_size_1.material,
+                                      KEY_DISP_FU: self.section_size_1.fu,
+                                      KEY_DISP_FY: self.section_size_1.fy,
+                                      'Mass': self.section_size_1.mass,
+                                      'Area(mm2) - A': round((self.section_size_1.area),2),
+                                      'A(mm)': self.section_size_1.max_leg,
+                                      'B(mm)': self.section_size_1.min_leg,
+                                      't(mm)': self.section_size_1.web_thickness,
+                                      'R1(mm)': self.section_size_1.root_radius,
+                                      'R2(mm)': self.section_size_1.toe_radius,
+                                      'Cy(mm)': self.section_size_1.Cy,
+                                      'Cz(mm)': self.section_size_1.Cz,
+                                      'Iz(mm4)': self.section_size_1.mom_inertia_z,
+                                      'Iy(mm4)': self.section_size_1.mom_inertia_y,
+                                      'Iu(mm4)': self.section_size_1.mom_inertia_u,
+                                      'Iv(mm4)': self.section_size_1.mom_inertia_v,
+                                      'rz(mm)': self.section_size_1.rad_of_gy_z,
+                                      'ry(mm)': round((self.section_size_1.rad_of_gy_y),2),
+                                      'ru(mm)': self.section_size_1.rad_of_gy_u,
+                                      'rv(mm)': round((self.section_size_1.rad_of_gy_v),2),
+                                      'Zz(mm3)': self.section_size_1.elast_sec_mod_z,
+                                      'Zy(mm3)': self.section_size_1.elast_sec_mod_y,
+                                      'Zpz(mm3)': self.section_size_1.plast_sec_mod_z,
+                                      'Zpy(mm3)': self.section_size_1.elast_sec_mod_y}
 
-        self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
-                                  # Image shall be save with this name.png in resource files
-                                  KEY_DISP_SECSIZE: self.section_size_1.designation,
-                                  KEY_DISP_MATERIAL: self.section_size_1.material,
-                                  KEY_DISP_FU: self.section_size_1.fu,
-                                  KEY_DISP_FY: self.section_size_1.fy,
-                                  'Mass': self.section_size_1.mass,
-                                  'Area(mm2) - A': self.section_size_1.area,
-                                  'D(mm)': self.section_size_1.depth,
-                                  'B(mm)': self.section_size_1.flange_width,
-                                  't(mm)': self.section_size_1.web_thickness,
-                                  'T(mm)': self.section_size_1.flange_thickness,
-                                  'FlangeSlope': self.section_size_1.flange_slope,
-                                  'R1(mm)': self.section_size_1.root_radius,
-                                  'R2(mm)': self.section_size_1.toe_radius,
-                                  'Cy(mm)': self.section_size_1.Cy,
-                                  'Iz(mm4)': self.section_size_1.mom_inertia_z,
-                                  'Iy(mm4)': self.section_size_1.mom_inertia_y,
-                                  'rz(mm)': self.section_size_1.rad_of_gy_z,
-                                  'ry(mm)': self.section_size_1.rad_of_gy_y,
-                                  'Zz(mm3)': self.section_size_1.elast_sec_mod_z,
-                                  'Zy(mm3)': self.section_size_1.elast_sec_mod_y,
-                                  'Zpz(mm3)': self.section_size_1.plast_sec_mod_z,
-                                  'Zpy(mm3)': self.section_size_1.elast_sec_mod_y}
 
         self.report_input = \
             {KEY_MODULE: self.module,
              KEY_DISP_AXIAL: self.load.axial_force,
+             KEY_DISP_LENGTH: self.length,
              "Section": "TITLE",
              "Section Details":self.report_supporting,
              # "Supported Section Details": "TITLE",
@@ -1833,6 +1862,9 @@ class Tension_bolted(Main):
         member_yield_kn = round((self.section_size_1.tension_yielding_capacity/1000),2)
         member_rupture_kn = round((self.section_size_1.tension_rupture_capacity/1000),2)
         member_blockshear_kn = round((self.section_size_1.block_shear_capacity_axial/1000),2)
+        plate_yield_kn = round((self.plate.tension_yielding_capacity/1000),2)
+        plate_rupture_kn = round((self.plate.tension_rupture_capacity/ 1000), 2)
+        plate_blockshear_kn = round((self.plate.block_shear_capacity / 1000), 2)
         bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
         bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
         bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
@@ -1851,14 +1883,17 @@ class Tension_bolted(Main):
         self.report_check.append(t3)
         t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '',blockshear_prov(Tdb= member_blockshear_kn), '')
         self.report_check.append(t4)
-        t5 = (KEY_DISP_SLENDER, slenderness_limit(), slenderness( 1, self.length,self.section_size_1.min_radius_gyration, self.section_size_1.slenderness), '')
+        t8 = (KEY_DISP_TENSION_CAPACITY, '', tensile_capacity_prov(member_yield_kn, member_rupture_kn, member_blockshear_kn),get_pass_fail(self.load.axial_force,self.section_size_1.tension_capacity, relation="lesser"))
+        self.report_check.append(t8)
+        t5 = (KEY_DISP_SLENDER, slenderness_limit(), slenderness( 1, self.length,round(self.section_size_1.min_radius_gyration,2), self.section_size_1.slenderness), '')
         self.report_check.append(t5)
         t6 = (KEY_DISP_EFFICIENCY, efficiency_limit(),
               efficiency(self.load.axial_force, self.section_size_1.tension_capacity, self.efficiency), '')
         self.report_check.append(t6)
 
         t7 = ('SubSection', 'Bolt Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
+        self.report_check.append(t7)
+
         if self.bolt.bolt_type == TYP_BEARING:
             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.fu, 1, self.bolt.bolt_net_area,
                                                                self.bolt.gamma_mb, bolt_shear_capacity_kn), '')
@@ -1923,6 +1958,85 @@ class Tension_bolted(Main):
         t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn, bolt_capacity_red_kn,
               get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="lesser"))
         self.report_check.append(t5)
+
+        t7 = ('SubSection', 'Gusset Plate Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t7)
+
+
+
+        if self.sec_profile in ["Channels", 'Back to Back Channels']:
+            t3 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.section_size_1.depth, self.min_plate_height),
+                  self.plate.height,
+                  get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+            t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                  tension_yield_prov(l = self.section_size_1.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), '')
+            t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_prov(self.section_size_1.depth, self.plate.thickness_provided,self.plate.bolts_one_line, self.bolt.dia_hole,self.plate.fu, gamma_m1,plate_rupture_kn), '')
+
+        elif self.sec_profile in ["Angles", 'Back to Back Angles']:
+            if self.loc == "Long Leg":
+                t3 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.section_size_1.max_leg, self.min_plate_height),
+                      self.plate.height,
+                      get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+                t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                      tension_yield_prov(l=self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
+                                         gamma=gamma_m0, T_dg =plate_yield_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                      tension_rupture_prov(self.section_size_1.max_leg, self.plate.thickness_provided,
+                                           self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                           plate_rupture_kn), '')
+
+            else:
+                t3 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.section_size_1.min_leg, self.min_plate_height),
+                      self.plate.height,
+                      get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+                t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                      tension_yield_prov(l=self.section_size_1.min_leg, t=self.plate.thickness_provided,
+                                         f_y=self.plate.fy,
+                                         gamma=gamma_m0, T_dg=plate_yield_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                      tension_rupture_prov(self.section_size_1.min_leg, self.plate.thickness_provided,
+                                           self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                           plate_rupture_kn), '')
+        else:
+            if self.loc == "Long Leg":
+                t3 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(2*self.section_size_1.max_leg, self.min_plate_height),
+                      self.plate.height,
+                      get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+                t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                      tension_yield_prov(l=2*self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
+                                         gamma=gamma_m0, T_dg=plate_yield_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                      tension_rupture_prov(2*self.section_size_1.max_leg, self.plate.thickness_provided,
+                                           self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                           plate_rupture_kn), '')
+            else:
+                t3 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(2*self.section_size_1.min_leg, self.min_plate_height),
+                      self.plate.height,
+                      get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+                t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                      tension_yield_prov(l=2*self.section_size_1.min_leg, t=self.plate.thickness_provided,
+                                         f_y=self.plate.fy,
+                                         gamma=gamma_m0, T_dg=plate_yield_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                      tension_rupture_prov(2 * self.section_size_1.min_leg, self.plate.thickness_provided,
+                                           self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                           plate_rupture_kn), '')
+        self.report_check.append(t3)
+        self.report_check.append(t2)
+        self.report_check.append(t1)
+
+        t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=plate_blockshear_kn), '')
+        self.report_check.append(t4)
+
+        t8 = (
+        KEY_DISP_TENSION_CAPACITY, '', tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
+        get_pass_fail(self.load.axial_force, self.plate_tension_capacity, relation="lesser"))
+        self.report_check.append(t8)
+
+
+
+
+
 
         # t1 = ('SubSection', 'Plate Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         # self.report_check.append(t1)

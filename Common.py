@@ -608,7 +608,8 @@ KEY_DISP_TENSION_YIELDCAPACITY = 'Tension Yielding Capacity (kN)'
 KEY_TENSION_RUPTURECAPACITY = "Member.tension_rupture"
 KEY_DISP_TENSION_RUPTURECAPACITY = 'Tension Rupture Capacity(kN)'
 KEY_TENSION_BLOCKSHEARCAPACITY = "Member.tension_blockshear"
-KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear (kN)'
+KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear Capacity (KN)'
+
 KEY_TENSION_CAPACITY = "Member.tension_capacity"
 KEY_DISP_TENSION_CAPACITY = "Tension Capacity (kN)"
 
@@ -1102,6 +1103,10 @@ KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 c = 'Width (mm)'
 KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity'
+KEY_OUT_PLATE_YIELD = 'Plate.Yield'
+KEY_OUT_DISP_PLATE_YIELD = 'Yield Capacity'
+KEY_OUT_PLATE_RUPTURE = 'Plate.Rupture'
+KEY_OUT_DISP_PLATE_RUPTURE = 'Rupture Capacity'
 KEY_OUT_PLATE_BLK_SHEAR = 'Plate.BlockShear'
 KEY_OUT_DISP_PLATE_BLK_SHEAR = 'Block Shear Capacity'
 KEY_OUT_PLATE_MOM_DEMAND = 'Plate.MomDemand'
@@ -1111,6 +1116,19 @@ KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kNm)'
 
 KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
+
+
+
+KEY_OUT_DISP_MEMB_TEN_YIELD = 'Tension Yield Capacity (KN)'
+KEY_OUT_DISP_MEMB_TEN_RUPTURE = 'Tension Rupture Capacity'
+KEY_OUT_DISP_MEMB_BLK_SHEAR = 'Block Shear Capacity'
+KEY_OUT_DISP_MEMB_BLK_SHEAR = 'Block Shear Capacity'
+
+
+
+
+
+
 
 DISP_TITLE_WELD = 'Weld'
 KEY_OUT_WELD_SIZE = 'Weld.Size'

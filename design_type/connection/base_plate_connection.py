@@ -893,7 +893,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchor_bolt = i  # anchor dia provided (str)
             break
 
-        self.anchor_dia_provided = self.table1(self.anchor_bolt[0])  # mm anchor dia provided (int)
+        self.anchor_dia_provided = self.table1(self.anchor_bolt)[0]  # mm anchor dia provided (int)
         self.anchor_area = self.bolt_area(self.anchor_dia_provided)  # list of areas [shank area, thread area] mm^2
 
         # hole diameter
@@ -1316,9 +1316,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # end of calculation
         if self.safe:
+            self.design_status = True
             logger.info(": Overall base plate connection design is safe")
             logger.debug(": =========End Of design===========")
-            self.design_status = True
         else:
             logger.info(": Overall base plate connection design is unsafe")
             logger.debug(": =========End Of design===========")

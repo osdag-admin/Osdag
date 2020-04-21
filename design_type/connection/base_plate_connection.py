@@ -804,9 +804,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.material = str(design_dictionary[KEY_MATERIAL])
 
         self.load_axial = float(design_dictionary[KEY_AXIAL])
+        self.load_axial = self.load_axial * 10 ** 3  # N
+
         self.load_shear = float(design_dictionary[KEY_SHEAR])
+        self.load_shear = self.load_shear * 10 ** 3  # N
+
         self.load_moment_major = float(design_dictionary[KEY_MOMENT_MAJOR] if design_dictionary[KEY_MOMENT_MAJOR] != 'Disabled' else 0)
+        self.load_moment_major = self.load_moment_major * 10 ** 6  # N-mm
+
         self.load_moment_minor = float(design_dictionary[KEY_MOMENT_MINOR] if design_dictionary[KEY_MOMENT_MINOR] != 'Disabled' else 0)
+        self.load_moment_minor = self.load_moment_minor * 10 ** 6  # N-mm
 
         self.anchor_dia = design_dictionary[KEY_DIA_ANCHOR]
         self.anchor_type = str(design_dictionary[KEY_TYP_ANCHOR])
@@ -864,8 +871,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.safe = True
 
         self.bp_analyses_parameters(self)
-        self.bolt_design_detailing(self)
-        self.design_detail_bp(self)
+        self.bp_analyses(self)
+        self.anchor_bolt_design(self)
+        self.design_weld(self)
+        self.design_gusset_plate(self)
 
     def bp_analyses_parameters(self):
         """ initialize detailing parameters like the end/edge/pitch/gauge distances, anchor bolt diameter and grade,
@@ -955,7 +964,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.connectivity == 'Welded-Slab Base':
 
             # minimum required area for the base plate [bearing stress = axial force / area of the base]
-            self.min_area_req = self.load_axial * 1000 / self.bearing_strength_concrete  # mm^2
+            self.min_area_req = self.load_axial / self.bearing_strength_concrete  # mm^2
 
             # calculate projection by the 'Effective Area Method' [Reference: Clause 7.4.1.1, IS 800:2007]
             if self.dp_column_type == 'Rolled' or 'Welded':
@@ -1001,7 +1010,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2, update area if while loop is True
 
             # actual bearing pressure acting on the provided area of the base plate
-            self.w = self.load_axial * 1000 / self.bp_area_provided  # N/mm^2 (MPa)
+            self.w = self.load_axial / self.bp_area_provided  # N/mm^2 (MPa)
 
             # design of plate thickness
             # thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
@@ -1018,7 +1027,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if self.eccentricity_zz <= self.bp_length_min / 6:  # Case 1
 
                 # fixing length and width of the base plate
-                width_min = 2 * self.load_axial / self.bp_length_min * self.bearing_strength_concrete  # mm
+                width_min = 2 * self.load_axial / (self.bp_length_min * self.bearing_strength_concrete)  # mm
                 if width_min < self.bp_width_min:
                     width_min = self.bp_width_min
                 else:
@@ -1031,8 +1040,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # calculating the maximum and minimum bending stresses
                 self.ze_zz = self.bp_width_provided * self.bp_length_provided ** 2 / 6  # mm^3, elastic section modulus of plate (BL^2/6)
 
-                self.sigma_max_zz = (self.load_axial * 1000 / self.bp_area_provided) + (self.load_moment_major / self.ze_zz)  # N/mm^2
-                self.sigma_min_zz = (self.load_axial * 1000 / self.bp_area_provided) - (self.load_moment_major / self.ze_zz)  # N/mm^2
+                self.sigma_max_zz = (self.load_axial / self.bp_area_provided) + (self.load_moment_major / self.ze_zz)  # N/mm^2
+                self.sigma_min_zz = (self.load_axial / self.bp_area_provided) - (self.load_moment_major / self.ze_zz)  # N/mm^2
 
                 # calculating moment at the critical section
 
@@ -1042,9 +1051,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                 self.bp_length_provided
                 self.sigma_xx = self.sigma_xx + self.sigma_min_zz  # N/mm^2, bending stress at the critical section
 
-                self.critical_M_xx = (self.sigma_xx * self.critical_xx ** 2 / 2) + (0.5 * self.critical_xx *
-                                                                                    (self.sigma_max_zz - self.sigma_xx) * (
-                                                                                                2 / 3) * self.critical_xx)  # N-mm, bending moment at critical section
+                self.critical_M_xx = (self.sigma_xx * self.critical_xx ** 2 / 2) + \
+                                     (0.5 * self.critical_xx * (self.sigma_max_zz - self.sigma_xx) * (2 / 3) * self.critical_xx)
+                # N-mm, bending moment at critical section
 
                 # equating critical moment with critical moment to compute the required minimum plate thickness
                 # Assumption: The bending capacity of the plate is (M_d = 1.5*fy*Z_e/gamma_m0) [Reference: Clause 8.2.1.2, IS 800:2007]
@@ -1080,8 +1089,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.y = round(r, 3)  # mm
 
                 # finding maximum tension in the bolts for maximum permissible bearing stress (0.45*f_ck)
-                self.tension_demand_anchor = (self.bearing_strength_concrete * self.anchor_area_tension * self.n / self.y) * \
-                                             (self.anchor_length_provided / 2 + self.f - self.y)  # N
+                self.tension_demand_anchor = ((self.bearing_strength_concrete * self.anchor_area_tension * self.n) / self.y) * \
+                                             ((self.bp_length_provided / 2) + self.f - self.y)  # N
                 self.tension_demand_anchor = round(self.tension_demand_anchor / 1000, 2)  # kN
 
                 self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
@@ -1115,6 +1124,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.critical_xx = self.y
 
                 # moment acting at the critical section due to applied loads
+                # Assumption: The moment acting at the critical section is taken as 0.45*f_ck*B*critical_xx (plastic moment)
                 self.critical_M_xx = (self.critical_xx * self.bearing_strength_concrete * self.bp_width_provided) * \
                                      (self.critical_xx / 2)  # N-mm
 
@@ -1122,7 +1132,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # Assumption: The bending capacity of the plate is (M_d = 1.5*fy*Z_e/gamma_m0) [Reference: Clause 8.2.1.2, IS 800:2007]
                 # Assumption: Z_e of the plate is = b*tp^2 / 6, where b = 1 for a cantilever strip of unit dimension
 
-                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy))  # mm
+                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy * self.bp_width_provided))  # mm
 
         elif self.connectivity == "Bolted-Slab Base":
             pass
@@ -1157,10 +1167,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                         self.anchor_area[0], 1, 0, self.dp_weld_fab)
         self.shear_capacity_anchor = round(self.shear_capacity_anchor / 1000, 2)  # kN
 
-        self.bearing_capacity_anchor = self.cl_10_3_4_bolt_bearing_capacity(self.dp_bp_fu, self.dp_anchor_fu_overwrite,
-                                                                            self.plate_thk, self.table1(self.anchor_dia_provided)[0],
-                                                                            self.end_distance, self.pitch_distance, self.dp_anchor_hole,
-                                                                            self.dp_weld_fab)
+        self.bearing_capacity_anchor = self.cl_10_3_4_bolt_bearing_capacity(self.dp_bp_fu, self.dp_anchor_fu_overwrite, self.plate_thk,
+                                                                            self.anchor_dia_provided, self.end_distance,
+                                                                            self.pitch_distance, self.dp_anchor_hole, self.dp_weld_fab)
         self.bearing_capacity_anchor = round(self.bearing_capacity_anchor / 1000, 2)  # kN
 
         self.anchor_capacity = min(self.shear_capacity_anchor, self.bearing_capacity_anchor)  # kN
@@ -1176,7 +1185,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # The anchor bolts under tension might be subjected to shear forces (accidentally) due to incorrect erection practice
 
         if self.connectivity == 'Gusseted Base Plate':
-            v_sb = self.load_shear / self.tension_bolts_req  # kN
+            v_sb = self.load_shear * 10 ** -3 / self.anchor_nos_provided  # kN
             v_db = self.anchor_capacity  # kN
             t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
             t_db = self.tension_capacity_anchor  # kN
@@ -1186,12 +1195,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.safe = False
                 logger.error(": [Large Shear Force] The shear force acting on the base plate is large.")
                 logger.info(": [Large Shear Force] Provide shear key to safely transfer the shear force.")
-                logger.error(": [Anchor Bolt] The anchor bolt fails due to combined shear + tension [Reference: Clause 10.3.6, IS 800:2007].")
+                logger.error(": [Anchor Bolt] The anchor bolt fails due to combined shear + tension [Reference: Clause 10.3.6, "
+                             "IS 800:2007].")
             else:
                 pass
 
         else:
-            self.combined_capacity_anchor = 'NA'
+            self.combined_capacity_anchor = 0
 
         if self.safe:
             pass
@@ -1201,8 +1211,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             logger.info(": [Anchor Bolt] Check the input values and re-design the connection.")
 
         # validation of anchor bolt length [Reference: IS 5624:1993, Table 1]
-        self.anchor_length_min = self.table1(self.anchor_dia_provided)[1]
-        self.anchor_length_max = self.table1(self.anchor_dia_provided)[2]
+        self.anchor_length_min = self.table1(self.anchor_bolt)[1]
+        self.anchor_length_max = self.table1(self.anchor_bolt)[2]
 
         # design of anchor length [Reference: Design of Steel Structures by N. Subramanian 2nd. edition 2018, Example 15.5]
         if self.connectivity == 'Welded-Slab Base':
@@ -1271,13 +1281,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     # strength of weld per unit length
                     if self.connectivity == 'Welded-Slab Base':
-                        self.strength_unit_len = self.load_axial * 1000 / self.effective_length  # N/mm
+                        self.strength_unit_len = self.load_axial / self.effective_length  # N/mm
                     else:
                         self.strength_unit_len = (self.load_moment_major / (self.column_D - self.column_tf)) / self.effective_length
                         # N/mm
 
                     # weld size
-                    self.weld_size = (self.strength_unit_len / 0.7 * min(self.dp_weld_fu_overwrite, self.dp_column_fu)) \
+                    self.weld_size = (self.strength_unit_len / (0.7 * min(self.dp_weld_fu_overwrite, self.dp_column_fu))) \
                                      * math.sqrt(3) * self.gamma_mw  # mm
                     self.weld_size = max(round_up(self.weld_size, 2), 6)  # minimum size of weld is 6mm
 
@@ -1327,7 +1337,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print(self.bearing_capacity_anchor)
         print(self.anchor_capacity)  # Bolt capacity (kN)
         print(self.combined_capacity_anchor)  # Combined capacity (kN)
-        print(self.tension_capacity_anchor)  # Tension capacity (kN) (show only for 'Gusseted Base Plate' connectivity)
+        if self.connectivity == 'Gusseted Base Plate':
+            print(self.tension_capacity_anchor)  # Tension capacity (kN) (show only for 'Gusseted Base Plate' connectivity)
+        else:
+            pass
 
         # base plate
         print(self.plate_thk)  # Thickness (mm)
@@ -1344,7 +1357,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print(self.gauge_distance)  # Gauge Distance (mm) mm (show only when this value is not 'Null')
         print(self.end_distance)  # mm
         print(self.edge_distance)  # mm
-        print(self.projection)  # mm (show only for 'Welded-Slab Base' connectivity)
+        if self.connectivity == 'Welded-Slab Base':
+            print(self.projection)  # mm (show only for 'Welded-Slab Base' connectivity)
+        else:
+            pass
 
         # weld
         print(self.weld_size if self.weld_type != 'Butt Weld' else '')  # Weld size (mm)

@@ -1444,6 +1444,7 @@ class DesignPreferences(QDialog):
         self.ui.btn_close.clicked.connect(self.close_designPref)
         self.ui.btn_defaults.clicked.connect(self.default_fn)
         self.module = main.module_name(main)
+        self.main = main
         self.window_close_flag = True
 
 
@@ -2066,8 +2067,7 @@ class DesignPreferences(QDialog):
                         return
 
     def anchor_bolt_designation(self, d):
-        length = IS_5624_1993.table1(d)
-        length = str(length[1])
+        length = str(self.main.anchor_length_provided if self.main.design_button_status else 0)
         designation = str(d) + "X" + length + " IS5624 GALV"
         return (designation, length)
 
@@ -2075,8 +2075,8 @@ class DesignPreferences(QDialog):
 
         change_list = []
         tab_anchor_bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
-        length = IS_5624_1993.table1(d)
-        length = str(length[1])
+        # length = IS_5624_1993.table1(d)
+        # length = str(length[1])
         # designation = str(d)+"X"+length+" IS5624 GALV"
         designation = self.anchor_bolt_designation(d)[0]
         initial_designation = designation
@@ -2085,8 +2085,9 @@ class DesignPreferences(QDialog):
                 ch.setText(designation)
                 ch.setReadOnly(True)
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_LENGTH:
-                ch.setText(length)
-                ch.setReadOnly(True)
+                ch.setText(self.main.anchor_length_provided if self.main.design_button_status else '0')
+                change_list.append(ch)
+                # ch.setReadOnly(True)
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_TYPE:
                 ch.setCurrentText(typ)
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_GALVANIZED:
@@ -2095,15 +2096,23 @@ class DesignPreferences(QDialog):
         for c in change_list:
             if isinstance(c, QtWidgets.QComboBox):
                 c.currentIndexChanged.connect(lambda: self.anchor_bolt_designation_change(c, initial_designation))
+            elif isinstance(c, QtWidgets.QLineEdit):
+                c.textChanged.connect(lambda: self.anchor_bolt_designation_change(c, initial_designation))
 
     def anchor_bolt_designation_change(self, c, initial_des):
         des = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt").findChild(QtWidgets.QWidget,
                                                                                       KEY_DP_ANCHOR_BOLT_DESIGNATION)
-        des_list = initial_des.split(' ')
-        new_des = des_list[0]+" "+des_list[1]
-        if c.currentText() == 'Yes':
-            des.setText(initial_des)
-        elif c.currentText() == 'No':
+        if isinstance(c, QtWidgets.QComboBox):
+            des_list = initial_des.split(' ')
+            new_des = des_list[0]+" "+des_list[1]
+            if c.currentText() == 'Yes':
+                des.setText(initial_des)
+            elif c.currentText() == 'No':
+                des.setText(new_des)
+        elif isinstance(c, QtWidgets.QLineEdit):
+            des_list = initial_des.split('X')
+            des_list_2 = des_list[1].split(' ')
+            new_des = str(des_list[0])+'X'+str(c.text())+' '+str(des_list_2[1])+' '+str(des_list_2[2])
             des.setText(new_des)
 
     def closeEvent(self, event):

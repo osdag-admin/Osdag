@@ -5,6 +5,12 @@ from Common import *
 import sqlite3
 import logging
 from utils.common.material import Material
+from builtins import str
+from Common import *
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
+from pylatex.utils import italic, NoEscape
+
+
 
 import math
 import numpy as np
@@ -142,13 +148,27 @@ class Bolt(Material):
         if self.bolt_type == "Bearing Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
-            [self.bolt_bearing_capacity,self.d_0,self.kb,self.gamma_mb] = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
+            self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                 f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
                 e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
             self.fu_considered = fu_considered
             self.thk_considered = thk_considered
+            d = self.bolt_diameter_provided
+            e = self.min_edge_dist_round
+            p = self.min_pitch_round
+            bolt_hole_type = self.bolt_hole_type
+            f_u = fu_considered
+            f_ub = self.bolt_fu
+            safety_factor_parameter = KEY_DP_WELD_FAB_FIELD
+            # Since field or shop both is 1.25 we are not taking safety_factor_parameter as input
 
+            self.d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
+            if p > 0.0:
+                self.kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, f_ub / f_u, 1.0)
+            else:
+                self.kb = min(e / (3.0 * self.d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
+            self.gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         elif self.bolt_type == "Friction Grip Bolt":
             self.bolt_shear_capacity,self.kh,self.gamma_mf = IS800_2007.cl_10_4_3_bolt_slip_resistance(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, n_e=n_planes, mu_f=self.mu_f, bolt_hole_type=self.bolt_hole_type)
@@ -271,7 +291,12 @@ class Section(Material):
         self.tension_capacity = 0.0
         self.slenderness = 0.0
         self.min_radius_gyration = 0.0
+        self.beta =0.0
         # self.min_rad_gyration_bbchannel = 0.0
+
+        # self.member_yield_eqn =0.0
+        # self.member_rup_eqn = 0.0
+        # self.member_block_eqn = 0.0
 
 
     def connect_to_database_update_other_attributes(self, table, designation):
@@ -355,10 +380,19 @@ class Section(Material):
         "F_y = yield stress of the material"
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         T_dg = (A_g* F_y / gamma_m0)
+        # Ag = str(A_g)
+        # fy = str(F_y)
+        # gamma_m0 = str(gamma_m0)
+        # memb_yield = str(round((T_dg/1000),2))
         # logger.warning(
         #     " : You are using a section (in red color) that is not available in latest version of IS 808")
+        # member_yield_eqn = Math(inline=True)
+        # member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
+        # member_yield_eqn.append(NoEscape(r'&= \frac{' + Ag + '*' + fy + '}{' + gamma_m0 + r'}\\'))
+        # member_yield_eqn.append(NoEscape(r'&= ' + memb_yield + r'\end{aligned}'))
 
         self.tension_yielding_capacity = round(T_dg,2)
+        # self.member_yield_eqn = member_yield_eqn
         # logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def tension_rupture(self, A_n, F_u):
@@ -390,17 +424,36 @@ class Section(Material):
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
         if L_c == 0:
-            beta = 1.4
+            self.beta = 1.4
         else:
-            beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
+            self.beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
         # print(beta)
 
-        if beta <= (F_u * gamma_m0 / F_y * gamma_m1) and beta >= 0.7:
-            beta = beta
+        if self.beta <= (F_u * gamma_m0 / F_y * gamma_m1) and self.beta >= 0.7:
+            self.beta = self.beta
         else:
-            beta = 0.7
+            self.beta = 0.7
 
-        T_dn = (0.9 * A_nc * F_u / gamma_m1) + (beta * A_go * F_y / gamma_m0)
+        T_dn = (0.9 * A_nc * F_u / gamma_m1) + (self.beta * A_go * F_y / gamma_m0)
+        # w = str(w)
+        # t = str(t)
+        # fy = str(F_y)
+        # fu = str(F_u)
+        # b_s = str(b_s)
+        # L_c = str(L_c)
+        # A_nc = str(A_nc)
+        # A_go = str(A_go)
+        # gamma_m0 = str(gamma_m0)
+        # gamma_m1 = str(gamma_m1)
+        # member_rup_eqn = Math(inline=True)
+        # member_rup_eqn.append(NoEscape(r'\begin{aligned}\beta &= 1.4 - 0.076 \frac{w}{t}*\frac{f_{y}}{f_{u}}*\frac{b_s}{L_c}\leq\frac{0.9*f_{u}*\gamma_{m0}}{f_{y}*\gamma_{m1}} \geq 0.7 \end{aligned}'))
+        # member_rup_eqn.append(NoEscape(r'\begin{aligned}&\beta &= 1.4-0.076(w/t)(f_{y}/f_{u})(b_s/L_c)\leq(0.9f_{u}\gamma_{m0}/f_{y}\gamma_{m1}) \geq 0.7\\'))
+        # member_rup_eqn.append(NoEscape(r'&= 1.4 -0.76 \frac {' + w + '}{' + t + '} \frac {' + F_y + '}{' + F_u + '} \frac {' + bs + '}{' + L_c + '} +'\leq'+ \frac {' +0.9 + '*'+ F_u +'}{'+ F_y +'\gamma_{m1}'+ '}\geq 0.7 \\'))
+        # member_rup_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
+        # member_rup_eqn.append(NoEscape(r'&= \frac{' + Ag + '*' + fy + '}{' + gamma_m0 + r'}\\'))
+        # member_rup_eqn.append(NoEscape(r'&= ' + memb_yield + r'\end{aligned}'))
+
+        # self.member_rup_eqn = member_rup_eqn
 
         self.tension_rupture_capacity = round((T_dn) , 2)
 
@@ -460,6 +513,24 @@ class Section(Material):
         T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
         Tdb = min(T_db1, T_db2)
         # Tdb = round(Tdb, 3)
+        # A_vg = str(A_vg)
+        # A_vn = str(A_vn)
+        # A_tg = str(A_tg)
+        # A_tn = str(A_tn)
+        # f_y = str(f_y)
+        # f_u = str(f_u)
+        # gamma_m1 = str(gamma_m1)
+        # gamma_m0 = str(gamma_m0)
+
+        # member_block_eqn = Math(inline=True)
+        # member_block_eqn.append(NoEscape(r'\begin{aligned}T_{db1} &= \frac{A_{vg} f_y}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_u}{\gamma_{m1}} \end{aligned}'))
+
+        # member_block_eqn.append(NoEscape(r'&= \frac{' + A_vg + '*' + f_y + '}{" 1.732*' + gamma_m0 + 'r'} + &+ +'\frac{"0.9*" + A_vn + '*' + f_u + '}{'+1.732+'*' + gamma_m0 + r'} '\\'))
+        # member_block_eqn.append(NoEscape(r'&= ' + memb_yield + r'\end{aligned}'))
+
+
+
+        # self.member_block_eqn =member_block_eqn
         self.block_shear_capacity_axial = round(Tdb,2)
 
     def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):
@@ -1431,7 +1502,7 @@ class Angle(Section):
         self.min_leg = min(self.leg_a_length, self.leg_b_length)
         self.thickness = row[5]
         self.root_radius = row[6]
-        self.r2 = row[7]
+        self.toe_radius = row[7]
         if self.leg_a_length != self.leg_b_length:
             self.Cz = row[8]*10
             self.Cy = row[9]*10

@@ -1663,6 +1663,7 @@ class Ui_ModuleWindow(QMainWindow):
         elif trigger_type == "Design_Pref":
             pass
         else:
+            main.design_button_status = True
             main.func_for_validation(main, self, self.design_inputs)
             status = main.design_status
             print(status)

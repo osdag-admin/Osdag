@@ -413,16 +413,49 @@ DISP_TITLE_FOOTING = 'Pedestal/Footing'
 KEY_GRD_FOOTING = 'Footing.Grade'
 KEY_DISP_GRD_FOOTING = 'Grade*'
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
+
 # Factored load
 KEY_DISP_FAC_SHEAR_LOAD ='Factored shear load'
 KEY_DISP_FAC_AXIAL_FORCE='Factored axial load'
 KEY_DISP_FAC_MOMENT_LOAD='Factored moment load'
+
 # capacity
 KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity A_c"
 KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity S_c"
 KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity M_c"
 KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment_Capacity'
 KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria M_d_c'
+
+
+
+KEY_OUT_ANCHOR_BOLT_SHEAR = 'Anchor Bolt.Shear'
+KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_ANCHOR_BOLT_BEARING = 'Anchor Bolt.Bearing'
+KEY_OUT_DISP_ANCHOR_BOLT_BEARING = 'Bearing Capacity (kN)'
+KEY_OUT_ANCHOR_BOLT_CAPACITY = 'Anchor Bolt.Capacity'
+KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
+KEY_OUT_ANCHOR_BOLT_COMBINED = 'Anchor Bolt.Combined'
+KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity'
+
+KEY_OUT_BASEPLATE_THICKNNESS = 'Baseplate.Thickness'
+KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (tp)'
+KEY_OUT_BASEPLATE_LENGTH = 'Baseplate.Length'
+KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (lp)'
+KEY_OUT_BASEPLATE_WIDTH = 'Baseplate.Width'
+KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (wp)'
+DISP_TITLE_DETAILING = 'Detailing'
+KEY_OUT_DETAILING_NO_OF_ANCHOR_BOLT = 'Deatiling.No of Anchor bolts'
+KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'No. of Anchor bolts'
+KEY_OUT_DETAILING_END_DISTANCE = 'Detailing.End Distance'
+KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End distance (e)'
+KEY_OUT_DETAILING_EDGE_DISTANCE = 'Detailing.Edge Distance'
+KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge distance (e')"
+KEY_OUT_DETAILING_PROJECTION = 'Detailing.Projection'
+KEY_OUT_DISP_DETAILING_PROJECTION = 'Projection (c)'
+
+
+
+
 ###################################
 # Key for Storing Shear sub-key of Load
 KEY_SHEAR = 'Load.Shear'
@@ -584,7 +617,8 @@ KEY_DISP_TENSION_YIELDCAPACITY = 'Tension Yielding Capacity (kN)'
 KEY_TENSION_RUPTURECAPACITY = "Member.tension_rupture"
 KEY_DISP_TENSION_RUPTURECAPACITY = 'Tension Rupture Capacity(kN)'
 KEY_TENSION_BLOCKSHEARCAPACITY = "Member.tension_blockshear"
-KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear (kN)'
+KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear Capacity (KN)'
+
 KEY_TENSION_CAPACITY = "Member.tension_capacity"
 KEY_DISP_TENSION_CAPACITY = "Tension Capacity (kN)"
 
@@ -1078,6 +1112,10 @@ KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 c = 'Width (mm)'
 KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity'
+KEY_OUT_PLATE_YIELD = 'Plate.Yield'
+KEY_OUT_DISP_PLATE_YIELD = 'Yield Capacity'
+KEY_OUT_PLATE_RUPTURE = 'Plate.Rupture'
+KEY_OUT_DISP_PLATE_RUPTURE = 'Rupture Capacity'
 KEY_OUT_PLATE_BLK_SHEAR = 'Plate.BlockShear'
 KEY_OUT_DISP_PLATE_BLK_SHEAR = 'Block Shear Capacity'
 KEY_OUT_PLATE_MOM_DEMAND = 'Plate.MomDemand'
@@ -1087,6 +1125,19 @@ KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kNm)'
 
 KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
+
+
+
+KEY_OUT_DISP_MEMB_TEN_YIELD = 'Tension Yield Capacity (KN)'
+KEY_OUT_DISP_MEMB_TEN_RUPTURE = 'Tension Rupture Capacity'
+KEY_OUT_DISP_MEMB_BLK_SHEAR = 'Block Shear Capacity'
+KEY_OUT_DISP_MEMB_BLK_SHEAR = 'Block Shear Capacity'
+
+
+
+
+
+
 
 DISP_TITLE_WELD = 'Weld'
 KEY_OUT_WELD_SIZE = 'Weld.Size'

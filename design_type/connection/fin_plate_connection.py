@@ -943,7 +943,6 @@ class FinPlateConnection(ShearConnection):
             KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
             KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
 
-
         self.report_check = []
         connecting_plates = [self.plate.thickness_provided,self.supported_section.web_thickness]
 
@@ -1012,7 +1011,7 @@ class FinPlateConnection(ShearConnection):
             get_pass_fail(bolt_force_kn,bolt_capacity_red_kn,relation="lesser"))
         self.report_check.append(t5)
 
-        t1 = ('SubSection', 'Plate Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection','Plate Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.min_plate_height), self.plate.height,
@@ -1120,10 +1119,10 @@ class FinPlateConnection(ShearConnection):
 
         Disp_3D_image = "./ResourceFiles/images/3d.png"
 
-        config = configparser.ConfigParser()
-        config.read_file(open(r'Osdag.config'))
-        desktop_path = config.get("desktop_path", "path1")
-        print("desk:", desktop_path)
+        # config = configparser.ConfigParser()
+        # config.read_file(open(r'Osdag.config'))
+        # desktop_path = config.get("desktop_path", "path1")
+        # print("desk:", desktop_path)
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
@@ -1133,7 +1132,9 @@ class FinPlateConnection(ShearConnection):
         # filename = os.path.join(str(folder), "images_html", "TexReport")
         file_name = str(filename)
         fname_no_ext = filename[0].split(".")[0]
+
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_3D_image)
+
 
 # For Command Line
 

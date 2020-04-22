@@ -279,8 +279,8 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     gamma = str(gamma)
     T_dg = str(T_dg)
     tension_yield_eqn = Math(inline=True)
-    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{A_g*f_y}{\gamma_{mo}}\\'))
-    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
+    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\'))
+    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
 
@@ -474,7 +474,101 @@ def get_pass_fail(required, provided,relation='greater'):
             else:
                 return 'Fail'
 
+def member_yield_prov(Ag, fy, gamma_m0, member_yield):
+    Ag = str(Ag)
+    fy = str(fy)
+    gamma_m0 = str(gamma_m0)
+    member_yield = str(member_yield)
+    member_yield_eqn = Math(inline=True)
+    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
+    member_yield_eqn.append(NoEscape(r'&= \frac{' + Ag + '*' + fy + '}{'+ gamma_m0 + r'}\\'))
+    member_yield_eqn.append(NoEscape(r'&= ' + member_yield + r'\end{aligned}'))
+    return member_yield_eqn
 
+def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,beta,member_rup):
+    w = str(w)
+    t = str(t)
+    fy = str(F_y)
+    fu = str(F_u)
+    b_s = str(b_s)
+    L_c = str(L_c)
+    A_nc = str(A_nc)
+    A_go = str(A_go)
+    gamma_m0 = str(gamma_m0)
+    gamma_m1 = str(gamma_m1)
+    beta = str(round(beta,2))
+    member_rup = str(member_rup)
+    member_rup_eqn = Math(inline=True)
+    member_rup_eqn.append(NoEscape(r'\begin{aligned}\beta &= 1.4 - 0.076*\frac{w}{t}*\frac{f_{y}}{f_{u}}*\frac{b_s}{L_c}\\'))
+    member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9*f_{u}*\gamma_{m0}}{f_{y}*\gamma_{m1}} \geq 0.7 \\'))
+    member_rup_eqn.append(NoEscape(r'&= 1.4 - 0.076*\frac{'+ w +'}{'+ t + r'}*\frac{'+ fy +'}{'+ fu + r'}*\frac{'+ b_s +'}{' + L_c + r' }\\'))
+    member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9* '+ fu + '*'+ gamma_m0 +'}{' +fy+'*'+gamma_m1 + r'} \geq 0.7 \\'))
+    member_rup_eqn.append(NoEscape(r'&= '+ beta + r'\\'))
+    member_rup_eqn.append(NoEscape(r'T_{dn} &= \frac{0.9*A_{nc}*f_{u}}{\gamma_{m1}} + \frac{\beta * A_{go} * f_{y}}{\gamma_{m0}}\\'))
+    member_rup_eqn.append(NoEscape(r'&= \frac{0.9* '+ A_nc +'*' + fu + '}{'+ gamma_m1 + r'} + \frac{' + beta + '*' + A_go + '*' + fy + '}{' + gamma_m0 + r'}\\'))
+    member_rup_eqn.append(NoEscape(r'&= '+ member_rup + r'\end{aligned}'))
+
+    return member_rup_eqn
+
+def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u = None, f_y = None ,gamma_m0 = None ,gamma_m1 = None):
+    Tdb = str(Tdb)
+    A_vg = str(A_vg)
+    A_vn = str(A_vn)
+    A_tg = str(A_tg)
+    A_tn = str(A_tn)
+    f_y = str(f_y)
+    f_u = str(f_u)
+    gamma_m1 = str(gamma_m1)
+    gamma_m0 = str(gamma_m0)
+
+    member_block_eqn = Math(inline=True)
+    member_block_eqn.append(NoEscape(r'\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
+    member_block_eqn.append(NoEscape(r'T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+    member_block_eqn.append(NoEscape(r'& min(T_{db1}, T_{db2})= ' + Tdb + r'\end{aligned}'))
+    # member_block_eqn.append(NoEscape(r'&= \frac{' + A_vg + '*' + f_y + '}{" 1.732*' + gamma_m0 + 'r'} + &+ +'\frac{"0.9*" + A_vn + '*' + f_u + '}{'+1.732+'*' + gamma_m0 + r'} '\\'))
+
+
+    return member_block_eqn
+
+def slenderness_limit():
+
+    slenderlimit_eqn = Math(inline=True)
+    slenderlimit_eqn.append(NoEscape(r'\begin{aligned}\frac{K * L}{r} &\leq 400\end{aligned}'))
+
+    return slenderlimit_eqn
+
+def slenderness(K, L, r, slender):
+    K = str(K)
+    L = str(L)
+    r = str(r)
+    slender = str(slender)
+
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned}\frac{K * L}{r} &= \frac{'+K+'*'+L+'}{'+r+ r'}\\'))
+    slender_eqn.append(NoEscape(r'&= ' + slender + r'\end{aligned}'))
+
+    return slender_eqn
+
+def efficiency_limit():
+    efflimit_eqn = Math(inline=True)
+    efflimit_eqn.append(NoEscape(r'\begin{aligned} Efficiency &\leq 1 \end{aligned}'))
+
+    return efflimit_eqn
+
+def efficiency(F, Td, eff):
+    F = str(F)
+    Td = str(round(Td/1000,2))
+    eff = str(eff)
+    eff_eqn = Math(inline=True)
+    eff_eqn.append(NoEscape(r'\begin{aligned} Efficiency &= \frac{F}{Td}&=\frac{'+F+'}{'+Td+r'}\\'))
+    eff_eqn.append(NoEscape(r'&= ' + eff + r'\end{aligned}'))
+
+    return eff_eqn
+    # slender = (float(K) * float(L)) / float(r)
+    #
+    # self.slenderness = round(slender, 2)
+    #
+    #
     # doc.generate_pdf('report_functions', clean_tex=False)
 
 

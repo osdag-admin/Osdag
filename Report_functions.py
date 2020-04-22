@@ -284,6 +284,7 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
 
+
 def tension_rupture_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
     w_p = str(w_p)
     t_p = str(t_p)
@@ -387,6 +388,63 @@ def weld_strength_prov(conn_plates_weld_fu,gamma_mw,t_t,f_w):
     weld_strength_eqn.append(NoEscape(r'&='+f_w+r'\end{aligned}'))
 
     return weld_strength_eqn
+
+def axial_capacity(area,fy, gamma_m0,axial_capacity): #todo anjali
+    area = str(area)
+    fy=str(fy)
+    gamma_m0=str(gamma_m0)
+    axial_capacity = str(axial_capacity)
+    axial_capacity_eqn = Math(inline=True)
+    axial_capacity_eqn.append(NoEscape(r'\begin{aligned} A_c &=\frac{A*f_y}{\gamma_{m0}}\\'))
+    axial_capacity_eqn.append(NoEscape(r'&=\frac{'+area+'*'+fy+'}{'+ gamma_m0+r'}\\'))
+    axial_capacity_eqn.append(NoEscape(r'&=' + axial_capacity + r'\end{aligned}'))
+    return axial_capacity_eqn
+#
+def shear_capacity(h, t,f_y, gamma_m0,shear_capacity): # same as #todo anjali
+
+    h = str(h)
+    t = str(t)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    shear_capacity = str(shear_capacity)
+    shear_yield_eqn = Math(inline=True)
+    shear_yield_eqn.append(NoEscape(r'\begin{aligned} S_c &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo}}\\'))
+    shear_yield_eqn.append(NoEscape(r'&=\frac{' + h + r'*' + t + r'*' + f_y + r'}{\sqrt{3}*' + gamma_m0 + r'}\\'))
+    shear_yield_eqn.append(NoEscape(r'&=' + shear_capacity + r'\end{aligned}'))
+    return shear_yield_eqn
+#
+#
+def plastic_moment_capacty(beta_b, Z_p, f_y, gamma_m0 ,plastic_moment_capacty):  # same as #todo anjali
+
+    beta_b = str(beta_b)
+    Z_p = str(Z_p)
+    f_y = str(f_y)
+    gamma_m0 =str(gamma_m0 )
+    plastic_moment_capacty = str(plastic_moment_capacty)
+    plastic_moment_capacty_eqn = Math(inline=True)
+    plastic_moment_capacty_eqn.append(NoEscape(r'\begin{aligned} P_m_c &= \frac{beta_b*Z_p *fy}{\gamma_{mo}}\\'))
+    plastic_moment_capacty_eqn.append(NoEscape(r'&=\frac{' + beta_b + r'*' +Z_p + r'*' + f_y + r'}{' + gamma_m0 + r'}\\'))
+    plastic_moment_capacty_eqn.append(NoEscape(r'&=' + plastic_moment_capacty + r'\end{aligned}'))
+    return plastic_moment_capacty_eqn
+
+def moment_d_deformation_criteria(fy,Z_e,Mdc):
+    fy = str(fy)
+    Z_e = str(Z_e)
+    Mdc =str(Mdc)
+    moment_d_deformation_criteria_eqn= Math(inline=True)
+    moment_d_deformation_criteria_eqn.append(NoEscape(r'\begin{aligned} Mdc &= \frac{1.5 *Z_e *fy}{1.1}\\'))
+    moment_d_deformation_criteria_eqn.append(NoEscape(r'&= \frac{1.5 *'+Z_e +'*' +fy +r'}{1.1}\\'))
+    moment_d_deformation_criteria_eqn.append(NoEscape(r'&= ' + Mdc+ r'\end{aligned}'))
+    return  moment_d_deformation_criteria_eqn
+
+# def moment_capacity (P_m_c , M_d_c, M_c):
+#     P_m_c = str(P_m_c)
+#     M_d_c =str(M_d_c)
+#     M_c = str (M_c)
+#     moment_capacity_eqn = Math(inline=True)
+#     moment_capacity_eqn.append(NoEscape(r'\begin{aligned} M_c &= Min(P_m_c,M_d_c)\\'))
+#     moment_capacity_eqn.append(NoEscape(r'&= Min('+P_m_c+',' + M_d_c+r')\\'))
+#     moment_capacity_eqn.append(NoEscape(r'&= ' + M_c + r')\\'))
 
 
 def get_pass_fail(required, provided,relation='greater'):

@@ -417,6 +417,12 @@ VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 
 KEY_DISP_FAC_SHEAR_LOAD ='Factored shear load'
 KEY_DISP_FAC_AXIAL_FORCE='Factored axial load'
 KEY_DISP_FAC_MOMENT_LOAD='Factored moment load'
+# capacity
+KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity A_c"
+KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity S_c"
+KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity M_c"
+KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment_Capacity'
+KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria M_d_c'
 ###################################
 # Key for Storing Shear sub-key of Load
 KEY_SHEAR = 'Load.Shear'

@@ -1422,21 +1422,27 @@ class Ui_ModuleWindow(QMainWindow):
             (object_name, k2_key, typ, f) = tup
             if object_name != k1.objectName():
                 continue
-            if typ == TYPE_LABEL:
+            if typ in [TYPE_LABEL, TYPE_OUT_LABEL]:
                 k2_key = k2_key + "_label"
             if typ == TYPE_NOTE:
                 k2_key = k2_key + "_note"
-            k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
-            if object_name not in [KEY_END2, KEY_SEC_PROFILE]:
+
+            if typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
+                k2 = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, k2_key)
+            else:
+                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
+
+            if object_name != KEY_END2:
                 val = f(k1.currentText())
-                k2.clear()
-            elif object_name == KEY_SEC_PROFILE:
-                val = f(k1.currentText())
-                k2.setCurrentIndex(0)
-            elif object_name == KEY_END2:
+            else:
                 key_end1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_END1)
                 val = f(k1.currentText(), key_end1.currentText())
-                k2.clear()
+
+            # if object_name not in [KEY_SEC_PROFILE, KEY_WELD_TYPE, KEY_CONN]:
+            #     k2.clear()
+            if object_name == KEY_SEC_PROFILE:
+                k2.setCurrentIndex(0)
+
             if typ == TYPE_COMBOBOX:
                 k2.clear()
                 for values in val:
@@ -1463,6 +1469,11 @@ class Ui_ModuleWindow(QMainWindow):
                     k2.setEnabled(True)
                 else:
                     k2.setDisabled(True)
+            elif typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
+                if val:
+                    k2.setVisible(False)
+                else:
+                    k2.setVisible(True)
             else:
                 pass
 
@@ -1802,6 +1813,11 @@ class Ui_ModuleWindow(QMainWindow):
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
+                    if option[0] in [KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DETAILING_GAUGE_DISTANCE]:
+                        txt.setVisible(True if option[3] else False)
+                        txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
+                        txt_label.setVisible(True if option[3] else False)
+
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
@@ -2279,8 +2295,8 @@ class Ui_ModuleWindow(QMainWindow):
         material = Material(material_grade)
         if module != KEY_DISP_BASE_PLATE:
             tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
-        else:
-            tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
+        # else:
+        #     tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
         tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
 
         if module not in [KEY_DISP_BASE_PLATE]:

@@ -441,8 +441,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t7 = (KEY_OUT_ANCHOR_BOLT_CAPACITY, KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY, TYPE_TEXTBOX, self.anchor_capacity if flag else '')
         out_list.append(t7)
 
-        t8 = (KEY_OUT_ANCHOR_BOLT_COMBINED, KEY_OUT_DISP_ANCHOR_BOLT_COMBINED, TYPE_TEXTBOX, self.combined_capacity if flag else '')
+        t8 = (KEY_OUT_ANCHOR_BOLT_COMBINED, KEY_OUT_DISP_ANCHOR_BOLT_COMBINED, TYPE_TEXTBOX, self.combined_capacity_anchor if flag else '')
         out_list.append(t8)
+
+        t20 = (KEY_OUT_ANCHOR_BOLT_TENSION, KEY_OUT_DISP_ANCHOR_BOLT_TENSION, TYPE_TEXTBOX,
+               self.tension_capacity_anchor if flag and self.connectivity == 'Gusseted Base Plate' else '')
+        out_list.append(t20)
 
         t9 = (None, KEY_DISP_BASE_PLATE, TYPE_TITLE, None)
         out_list.append(t9)
@@ -463,6 +467,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                self.anchor_nos_provided if flag else '')
         out_list.append(t14)
 
+        t21 = (KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DISP_DETAILING_PITCH_DISTANCE, TYPE_TEXTBOX,
+               self.end_distance if flag else '')
+        out_list.append(t21)
+
+        t22 = (KEY_OUT_DETAILING_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX,
+               self.end_distance if flag else '')
+        out_list.append(t22)
+
         t15 = (KEY_OUT_DETAILING_END_DISTANCE, KEY_OUT_DISP_DETAILING_END_DISTANCE, TYPE_TEXTBOX,
                self.end_distance if flag else '')
         out_list.append(t15)
@@ -472,7 +484,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t16)
 
         t17 = (KEY_OUT_DETAILING_PROJECTION, KEY_OUT_DISP_DETAILING_PROJECTION, TYPE_TEXTBOX,
-               self.projection if flag else '')
+               self.projection if flag and self.connectivity == 'Welded-Slab Base' else '')
         out_list.append(t17)
 
         # if flag:
@@ -498,6 +510,24 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             return 'Pinned'
 
+    def out_weld(self):
+        if self == 'Butt Weld':
+            return True
+        else:
+            return False
+
+    def out_anchor_tension(self):
+        if self != 'Gusseted Base Plate':
+            return True
+        else:
+            return False
+
+    def out_detail_projection(self):
+        if self != 'Welded-Slab Base':
+            return True
+        else:
+            return False
+
     def input_value_changed(self):
 
         lst = []
@@ -510,6 +540,24 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t3 = (KEY_CONN, KEY_END_CONDITION, TYPE_NOTE, self.end_condition)
         lst.append(t3)
+
+        t4 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE, TYPE_OUT_DOCK, self.out_weld)
+        lst.append(t4)
+
+        t5 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE, TYPE_OUT_LABEL, self.out_weld)
+        lst.append(t5)
+
+        t6 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_TENSION, TYPE_OUT_DOCK, self.out_anchor_tension)
+        lst.append(t6)
+
+        t7 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_TENSION, TYPE_OUT_LABEL, self.out_anchor_tension)
+        lst.append(t7)
+
+        t8 = (KEY_CONN, KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_DOCK, self.out_detail_projection)
+        lst.append(t8)
+
+        t9 = (KEY_CONN, KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_LABEL, self.out_detail_projection)
+        lst.append(t9)
 
         return lst
 

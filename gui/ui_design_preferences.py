@@ -2095,7 +2095,7 @@ class DesignPreferences(QDialog):
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_GALVANIZED:
                 change_list.append(ch)
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_MATERIAL_G_O:
-                ch.setText(str(self.main.anchor_fu[0]) if self.main.design_button_status else '0')
+                ch.setText(str(self.main.anchor_fu_fy[0]) if self.main.design_button_status else '0')
 
 
         for c in change_list:

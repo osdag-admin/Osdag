@@ -804,6 +804,7 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+                r.setReadOnly(True)
                 out_layout2.addWidget(r, j, 2, 1, 1)
 
             if type == TYPE_OUT_BUTTON:

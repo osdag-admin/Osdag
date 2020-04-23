@@ -4,7 +4,7 @@ Created on 31-Mar-2016
 
 @author: darshan
 '''
-#testing
+
 import sys
 # from PyQt5 import Qt
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject

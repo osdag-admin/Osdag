@@ -2078,6 +2078,7 @@ class Ui_ModuleWindow(QMainWindow):
         tab_Column = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         tab_Beam = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
         tab_Angle = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+        tab_Channel = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Channel")
 
         tab_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Bolt")
         tab_Weld = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
@@ -2124,6 +2125,8 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
                 if tab_Beam is not None:
                     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Beam, KEY_DISP_BEAMSEC)
                 self.designPrefDialog.beam_preferences(designation[0], material_grade)
@@ -2139,6 +2142,8 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
                 self.designPrefDialog.column_preferences(designation[0], table_1, material_grade)
                 if tab_Column is not None:
                     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Column, KEY_DISP_COLSEC)
@@ -2154,15 +2159,21 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
                 if tab_Angle is not None:
                     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Angle, DISP_TITLE_ANGLE)
                 # self.designPrefDialog.ui.tabWidget.removeTab(
                 #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 # table_c = "Angles"
             elif key_6.currentIndex() in [3, 5]:
-                pass
-                # self.designPrefDialog.ui.tabWidget.removeTab(
-                #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+                self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Channel, "Channel")
                 # table_c = "Channels"
 
             # designation_col = 'JB 150'

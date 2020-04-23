@@ -504,7 +504,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             return False
 
-    def end_condition(self):
+    def label_end_condition(self):
         if self in ['Gusseted Base Plate', 'Hollow Section']:
             return 'Fixed'
         else:
@@ -528,6 +528,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             return False
 
+    def out_anchor_combined(self):
+        if self != 'Welded-Slab Base':
+            return True
+        else:
+            return False
+
     def input_value_changed(self):
 
         lst = []
@@ -538,7 +544,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t2 = (KEY_CONN, KEY_MOMENT_MINOR, TYPE_TEXTBOX, self.major_minor)
         lst.append(t2)
 
-        t3 = (KEY_CONN, KEY_END_CONDITION, TYPE_NOTE, self.end_condition)
+        t3 = (KEY_CONN, KEY_END_CONDITION, TYPE_NOTE, self.label_end_condition)
         lst.append(t3)
 
         t4 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE, TYPE_OUT_DOCK, self.out_weld)
@@ -558,6 +564,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t9 = (KEY_CONN, KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_LABEL, self.out_detail_projection)
         lst.append(t9)
+
+        t10 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_DOCK, self.out_anchor_combined)
+        lst.append(t10)
+
+        t10 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_LABEL, self.out_anchor_combined)
+        lst.append(t10)
 
         return lst
 
@@ -1115,6 +1127,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy))  # mm
 
+                self.tension_capacity_anchor = 0
+
             else:  # Case 2 and Case 3
 
                 # fixing length and width of the base plate
@@ -1239,20 +1253,26 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # The anchor bolts under tension might be subjected to shear forces (accidentally) due to incorrect erection practice
 
         if self.connectivity == 'Gusseted Base Plate':
-            v_sb = self.load_shear * 10 ** -3 / self.anchor_nos_provided  # kN
-            v_db = self.anchor_capacity  # kN
-            t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
-            t_db = self.tension_capacity_anchor  # kN
-            self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(v_sb, v_db, t_b, t_db)
 
-            if self.combined_capacity_anchor > 1.0:
-                self.safe = False
-                logger.error(": [Large Shear Force] The shear force acting on the base plate is large.")
-                logger.info(": [Large Shear Force] Provide shear key to safely transfer the shear force.")
-                logger.error(": [Anchor Bolt] The anchor bolt fails due to combined shear + tension [Reference: Clause 10.3.6, "
-                             "IS 800:2007].")
+            if self.eccentricity_zz <= self.bp_length_min / 6:
+                self.combined_capacity_anchor = 0
+
             else:
-                pass
+                v_sb = self.load_shear * 10 ** -3 / self.anchor_nos_provided  # kN
+                v_db = self.anchor_capacity  # kN
+                t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
+                t_db = self.tension_capacity_anchor  # kN
+                self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(v_sb, v_db, t_b, t_db)
+                self.combined_capacity_anchor = round(self.combined_capacity_anchor, 3)
+
+                if self.combined_capacity_anchor > 1.0:
+                    self.safe = False
+                    logger.error(": [Large Shear Force] The shear force acting on the base plate is large.")
+                    logger.info(": [Large Shear Force] Provide shear key to safely transfer the shear force.")
+                    logger.error(": [Anchor Bolt] The anchor bolt fails due to combined shear + tension [Reference: Clause 10.3.6, "
+                                 "IS 800:2007].")
+                else:
+                    pass
 
         else:
             self.combined_capacity_anchor = 0
@@ -1274,13 +1294,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # Equation: T_b = k * sqrt(fck) * (anchor_length_req)^1.5
         elif self.connectivity == 'Gusseted Base Plate':
-            # length of anchor for cast-in situ anchor bolts (k = 15.5)
-            self.anchor_length_provided = (self.tension_capacity_anchor * 1000 /
-                                           (15.5 * math.sqrt(self.bearing_strength_concrete / 0.45))) ** (1 / 1.5)  # mm
-            self.anchor_length_provided = max(self.anchor_length_provided, self.anchor_length_min)
 
-            logger.info(": [Anchor Bolt Length] The length of the anchor bolt is computed assuming the anchor bolt is casted in-situ during"
-                        " the erection of the column.")
+            if self.eccentricity_zz <= self.bp_length_min / 6:
+                self.anchor_length_provided = self.anchor_length_min  # mm
+
+            else:
+                # length of anchor for cast-in situ anchor bolts (k = 15.5)
+                self.anchor_length_provided = (self.tension_capacity_anchor * 1000 /
+                                               (15.5 * math.sqrt(self.bearing_strength_concrete / 0.45))) ** (1 / 1.5)  # mm
+                self.anchor_length_provided = max(self.anchor_length_provided, self.anchor_length_min)
+
+            logger.info(": [Anchor Bolt Length] The length of the anchor bolt is computed assuming the anchor bolt is casted in-situ"
+                        " during the erection of the column.")
 
         elif self.connectivity == 'Bolted-Slab Base':
             pass
@@ -1296,17 +1321,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.anchor_length_provided < self.anchor_length_min or self.anchor_length_provided > self.anchor_length_max:
             self.safe = False
             logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
-        else:
-            pass
 
-        logger.info(": [Anchor Bolt] The preferred range of length for the anchor bolt of thread size {} is as follows:"
-                    .format(self.anchor_dia_provided))
-        logger.info(": [Anchor Bolt] Minimum length = {} mm, Maximum length = {} mm."
-                    .format(self.anchor_length_min, self.anchor_length_max))
-        logger.info(": [Anchor Bolt] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided))
-        logger.info(": [Anchor Bolt] Designer/Erector should provide adequate anchorage depending on the availability "
-                    "of standard lengths and sizes, satisfying the suggested range.")
-        logger.info(": [Anchor Bolt] Reference: IS 5624:1993, Table 1.")
+        else:
+            logger.info(": [Anchor Bolt] The preferred range of length for the anchor bolt of thread size {} is as follows:"
+                        .format(self.anchor_dia_provided))
+            logger.info(": [Anchor Bolt] Minimum length = {} mm, Maximum length = {} mm."
+                        .format(self.anchor_length_min, self.anchor_length_max))
+            logger.info(": [Anchor Bolt] The provided length of the anchor bolt is {} mm".format(self.anchor_length_provided))
+            logger.info(": [Anchor Bolt] Designer/Erector should provide adequate anchorage depending on the availability "
+                        "of standard lengths and sizes, satisfying the suggested range.")
+            logger.info(": [Anchor Bolt] Reference: IS 5624:1993, Table 1.")
 
     def design_weld(self):
         """ design weld for the base plate

@@ -1405,7 +1405,10 @@ class Ui_ModuleWindow(QMainWindow):
         # For list in Customized combobox
 
         for custom_combo in new_list:
-            data[custom_combo[0] + "_customized"] = custom_combo[1]()
+            if op_list[0][1] in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED] and custom_combo[0] == KEY_SECSIZE:
+                data[custom_combo[0] + "_customized"] = custom_combo[1]('Angles')
+            else:
+                data[custom_combo[0] + "_customized"] = custom_combo[1]()
 
         # For output dock
 

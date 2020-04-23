@@ -1115,6 +1115,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy))  # mm
 
+                self.tension_capacity_anchor = 0
+
             else:  # Case 2 and Case 3
 
                 # fixing length and width of the base plate
@@ -1244,6 +1246,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
             t_db = self.tension_capacity_anchor  # kN
             self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(v_sb, v_db, t_b, t_db)
+            self.combined_capacity_anchor = round(self.combined_capacity_anchor, 3)
 
             if self.combined_capacity_anchor > 1.0:
                 self.safe = False

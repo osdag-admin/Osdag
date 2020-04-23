@@ -4,13 +4,10 @@ Created on 29-Nov-2014
 @author: Anand Swaroop
 '''
 import numpy
-from Connections.Component.ModelUtils import *
+from cad.items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
 #from notch import Notch
-from Connections.Component.notch import Notch
-
-# from OCC.Display.SimpleGui import init_display
-# display, start_display, add_menu, add_function_to_menu = init_display()
+from cad.items.notch import Notch
 """
 
 
@@ -113,20 +110,25 @@ class Channel(object):
         return prism
 
 
-# B = 20
-# T = 2
-# D = 40
-# t = 1.5
-# L = 100
-#
-# origin = numpy.array([0.,0.,0.])
-# uDir = numpy.array([1.,0.,0.])
-# shaftDir = numpy.array([0.,0.,1.])
-#
-# angle = Channel(B, T, D, t, 0, 0, L)
-# angles = angle.place(origin, uDir, shaftDir)
-# point = angle.compute_params()
-# prism = angle.create_model()
-# display.DisplayShape(prism, update=True)
-# display.DisableAntiAliasing()
-# start_display()
+if __name__ == '__main__':
+    from OCC.Display.SimpleGui import init_display
+
+    display, start_display, add_menu, add_function_to_menu = init_display()
+    
+    B = 20
+    T = 2
+    D = 40
+    t = 1.5
+    L = 100
+
+    origin = numpy.array([0.,0.,0.])
+    uDir = numpy.array([1.,0.,0.])
+    shaftDir = numpy.array([0.,0.,1.])
+
+    channel = Channel(B, T, D, t, 0, 0, L)
+    channels = channel.place(origin, uDir, shaftDir)
+    point = channel.compute_params()
+    prism = channel.create_model()
+    display.DisplayShape(prism, update=True)
+    display.DisableAntiAliasing()
+    start_display()

@@ -1421,4 +1421,4 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # col properties
         print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)
-        print(self.w)
+        # print(self.w)

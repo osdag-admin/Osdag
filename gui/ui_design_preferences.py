@@ -1517,7 +1517,8 @@ class DesignPreferences(QDialog):
             line_plate_material_fu = key_plate_material_fu.text()
             key_plate_material_fy = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY)
             line_plate_material_fy = key_plate_material_fy.text()
-            d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+            d1 = {KEY_DP_BOLT_TYPE:combo_boltTensioning,
+                  KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
                   KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
                   KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
                   KEY_DP_WELD_FAB: combo_weldType,

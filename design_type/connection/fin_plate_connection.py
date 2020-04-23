@@ -782,8 +782,8 @@ class FinPlateConnection(ShearConnection):
             force_w = 0.00
             force_t = self.plate.moment_demand
             print(self.weld.strength)
-            self.weld.get_weld_stress(force_l, force_w, force_t, Ip_weld, y_max,
-                                                        x_max, 2*self.weld.eff_length)
+            self.weld.get_weld_stress(weld_axial=force_l, weld_shear=force_w, weld_twist=force_t, Ip_weld=Ip_weld, y_max=y_max,
+                                                        x_max=x_max, l_weld=2*self.weld.eff_length)
             print(self.weld.strength, self.weld.stress)
             if self.weld.strength > self.weld.stress:
                 break

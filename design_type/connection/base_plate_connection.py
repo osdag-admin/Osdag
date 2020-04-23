@@ -504,7 +504,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             return False
 
-    def end_condition(self):
+    def label_end_condition(self):
         if self in ['Gusseted Base Plate', 'Hollow Section']:
             return 'Fixed'
         else:
@@ -528,6 +528,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             return False
 
+    def out_anchor_combined(self):
+        if self != 'Welded-Slab Base':
+            return True
+        else:
+            return False
+
     def input_value_changed(self):
 
         lst = []
@@ -538,7 +544,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t2 = (KEY_CONN, KEY_MOMENT_MINOR, TYPE_TEXTBOX, self.major_minor)
         lst.append(t2)
 
-        t3 = (KEY_CONN, KEY_END_CONDITION, TYPE_NOTE, self.end_condition)
+        t3 = (KEY_CONN, KEY_END_CONDITION, TYPE_NOTE, self.label_end_condition)
         lst.append(t3)
 
         t4 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE, TYPE_OUT_DOCK, self.out_weld)
@@ -558,6 +564,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t9 = (KEY_CONN, KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_LABEL, self.out_detail_projection)
         lst.append(t9)
+
+        t10 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_DOCK, self.out_anchor_combined)
+        lst.append(t10)
+
+        t10 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_LABEL, self.out_anchor_combined)
+        lst.append(t10)
 
         return lst
 
@@ -1243,7 +1255,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.connectivity == 'Gusseted Base Plate':
 
             if self.eccentricity_zz <= self.bp_length_min / 6:
-                pass
+                self.combined_capacity_anchor = 0
 
             else:
                 v_sb = self.load_shear * 10 ** -3 / self.anchor_nos_provided  # kN

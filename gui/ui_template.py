@@ -858,6 +858,8 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                 out_layout2.addWidget(l, j, 1, 1, 1)
+                if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
+                    l.setVisible(False)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents_out)
@@ -870,6 +872,8 @@ class Ui_ModuleWindow(QMainWindow):
                 r.setObjectName(option[0])
                 r.setReadOnly(True)
                 out_layout2.addWidget(r, j, 2, 1, 1)
+                if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
+                    r.setVisible(False)
 
             if type == TYPE_OUT_BUTTON:
                 v = option[3]

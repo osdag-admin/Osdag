@@ -2395,6 +2395,7 @@ class Ui_ModuleWindow(QMainWindow):
             self.designPrefDialog.anchor_bolt_preferences(anchor_dia, anchor_typ)
             bp_material = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_MATERIAL)
             bp_material.setText(str(material_grade))
+            bp_material.setReadOnly(True)
             bp_fu = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FU)
             bp_list.append(bp_fu)
             bp_fu.setText(str(material.fu))

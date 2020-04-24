@@ -1404,7 +1404,10 @@ class Ui_ModuleWindow(QMainWindow):
         # For list in Customized combobox
 
         for custom_combo in new_list:
-            data[custom_combo[0] + "_customized"] = custom_combo[1]()
+            if op_list[0][1] in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED] and custom_combo[0] == KEY_SECSIZE:
+                data[custom_combo[0] + "_customized"] = custom_combo[1]('Angles')
+            else:
+                data[custom_combo[0] + "_customized"] = custom_combo[1]()
 
         # For output dock
 
@@ -2161,8 +2164,16 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
+                self.designPrefDialog.angle_preferences(designation[0], material_grade)
                 if tab_Angle is not None:
                     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Angle, DISP_TITLE_ANGLE)
+                designation_list = tab_Angle.findChild(QtWidgets.QWidget, KEY_SECSIZE)
+                designation_list.setCurrentIndex(0)
+                designation_list.clear()
+                for item in designation:
+                    designation_list.addItem(item)
+                designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.angle_preferences(
+                    designation_list.currentText() if designation_list.currentText() else '20 20 X 3', material_grade))
                 # self.designPrefDialog.ui.tabWidget.removeTab(
                 #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 # table_c = "Angles"
@@ -2173,7 +2184,8 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
-                self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Channel, "Channel")
+                if tab_Channel is not None:
+                    self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Channel, "Channel")
                 # table_c = "Channels"
 
             # designation_col = 'JB 150'

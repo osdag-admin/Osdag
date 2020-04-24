@@ -1774,7 +1774,7 @@ class DesignPreferences(QDialog):
         '''
         tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
         if designation == 'Select Section':
-            self.ui.clear_tab("Beam")
+            self.ui.clear_tab("Angle")
             return
 
         beam_attributes = Section(designation, material_grade)
@@ -1853,6 +1853,15 @@ class DesignPreferences(QDialog):
         for e in beam_list:
             if e.text() != "":
                 e.textChanged.connect(lambda: self.new_sectionalprop_Beam(beam_list))
+
+    def angle_preferences(self,designation,material_grade):
+        tab_Angle = self.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+
+        # if designation == 'Select Section':
+        #     self.ui.clear_tab("Angle")
+        #     return
+        ch=tab_Angle.findChild(QtWidgets.QWidget, KEY_ANGLE_DESIGNATION)
+        ch.setText(designation)
 
     def fu_fy_validation_connect(self, fu_fy_list, f):
         f.textChanged.connect(lambda: self.fu_fy_validation(fu_fy_list, f))

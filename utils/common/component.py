@@ -1533,6 +1533,8 @@ class I_sectional_Properties(object):
         self.M = 7850 * self.A / 10000
         return round(self.M,1)
 
+
+
     def calc_Area(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
         self.A = ((2*B*t_f) + ((D-2*t_f)*t_w))/100
         return round(self.A,1)

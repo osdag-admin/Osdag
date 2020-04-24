@@ -257,7 +257,7 @@ class SeatedAngleConnection(ShearConnection):
 
 
     def set_input_values(self, design_dictionary):
-        super(EndPlateConnection,self).set_input_values(self, design_dictionary)
+        super(SeatedAngleConnection,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])

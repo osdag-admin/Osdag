@@ -1502,6 +1502,17 @@ class DesignPreferences(QDialog):
         tab_Detailing = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
         tab_Design = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
         tab_Connector = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
+
+        #
+        # key_boltHoleType = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_HOLE_TYPE)
+        # combo_boltHoleType = key_boltHoleType.currentText()
+        key_boltTensioning = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_TYPE)
+        combo_boltTensioning = key_boltTensioning.currentText()
+        # key_boltFu = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O)
+        # line_boltFu = key_boltFu.text()
+        # key_slipfactor = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_SLIP_FACTOR)
+        # combo_slipfactor = key_slipfactor.currentText()
+
         tab_Anchor_Bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
 
         if module != KEY_DISP_BASE_PLATE:
@@ -1526,6 +1537,7 @@ class DesignPreferences(QDialog):
             line_boltType = key_boltType.currentText()
             key_boltFriction = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_FRICTION)
             line_boltFriction = key_boltFriction.text()
+
         key_weldType = tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_FAB)
         combo_weldType = key_weldType.currentText()
         key_weldFu = tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O)
@@ -1546,7 +1558,8 @@ class DesignPreferences(QDialog):
             line_plate_material_fu = key_plate_material_fu.text()
             key_plate_material_fy = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY)
             line_plate_material_fy = key_plate_material_fy.text()
-            d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+            d1 = {KEY_DP_BOLT_TYPE: combo_boltTensioning,
+                  KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
                   KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
                   KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
                   KEY_DP_WELD_FAB: combo_weldType,

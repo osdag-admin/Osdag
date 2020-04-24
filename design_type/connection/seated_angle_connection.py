@@ -266,7 +266,24 @@ class SeatedAngleConnection(ShearConnection):
         print("input values are set. Doing preliminary member checks")
         self.member_capacity(self)
 
+    def member_capacity(self):
+        # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
+        if self.supported_section.type == "Rolled":
+            length = self.supported_section.depth
+        else:
+            length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # For Built-up section
 
+        self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
+
+        if self.supported_section.shear_yielding_capacity > self.load.shear_force :
+            print("preliminary member check is satisfactory. Doing bolt checks")
+            self.design_status = True
+            # self.select_bolt_plate_arrangement(self)
+        else:
+            self.design_status = False
+            logger.error(" : shear yielding capacity {} is less than applied load, Please select larger sections or decrease loads"
+                            .format(self.supported_section.shear_yielding_capacity))
+            print("failed in preliminary member checks. Select larger sections or decrease loads")
 
 
 

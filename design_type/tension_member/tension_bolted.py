@@ -1579,7 +1579,7 @@ class Tension_bolted(Main):
             else:
                 L_c = 0
             A_go = self.section_size_1.min_leg * self.section_size_1.thickness
-            A_nc = (self.section_size_1.max_leg * self.section_size_1.thickness) - (self.bolt.dia_hole * self.plate.bolts_one_line*self.section_size_1.thickness)
+            A_nc = ((self.section_size_1.max_leg-self.section_size_1.thickness) * self.section_size_1.thickness) - (self.bolt.dia_hole * self.plate.bolts_one_line*self.section_size_1.thickness)
             t = self.section_size_1.thickness
 
         elif design_dictionary[KEY_LOCATION] == 'Short Leg':
@@ -1591,7 +1591,7 @@ class Tension_bolted(Main):
                 L_c = 0
 
             A_go = self.section_size_1.max_leg * self.section_size_1.thickness
-            A_nc = (self.section_size_1.min_leg * self.section_size_1.thickness) - (self.section_size_1.thickness*self.bolt.dia_hole * self.plate.bolts_one_line)
+            A_nc = ((self.section_size_1.min_leg -self.section_size_1.thickness) * self.section_size_1.thickness) - (self.section_size_1.thickness*self.bolt.dia_hole * self.plate.bolts_one_line)
             t = self.section_size_1.thickness
 
         elif design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
@@ -1603,7 +1603,7 @@ class Tension_bolted(Main):
                 L_c = 0
 
             A_go = self.section_size_1.flange_width * self.section_size_1.flange_thickness*2
-            A_nc = (self.section_size_1.depth * self.section_size_1.web_thickness) - (self.bolt.dia_hole * self.plate.bolts_one_line * self.section_size_1.web_thickness)
+            A_nc = ((self.section_size_1.depth - 2 * self.section_size_1.flange_thickness) * self.section_size_1.web_thickness) - (self.bolt.dia_hole * self.plate.bolts_one_line * self.section_size_1.web_thickness)
             t = self.section_size_1.web_thickness
 
         self.section_size_1.tension_member_design_due_to_rupture_of_critical_section( A_nc = A_nc , A_go = A_go, F_u = self.section_size_1.fu, F_y = self.section_size_1.fy, L_c = L_c, w = w, b_s = shear_lag, t = t)
@@ -1657,8 +1657,8 @@ class Tension_bolted(Main):
 
         "recalculating block shear capacity of the bolt based on the change in pitch while block shear check in member design"
 
-        [self.bolt_bearing_capacity,self.d_0,self.kb,self.gamma_mb] = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
-            e=self.plate.edge_dist_provided, p=self.plate.pitch_provided, bolt_hole_type=self.bolt.bolt_hole_type)
+        self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
+            e=self.plate.end_dist_provided, p=self.plate.pitch_provided, bolt_hole_type=self.bolt.bolt_hole_type)
 
         self.bolt.bolt_bearing_capacity = self.bolt_bearing_capacity
 
@@ -1875,7 +1875,7 @@ class Tension_bolted(Main):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-        t1 = ('SubSection', 'Member Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Member Checks', '|p{3cm}|p{5cm}|p{7cm}|p{1cm}|')
         self.report_check.append(t1)
         t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(self.section_size_1.area,self.section_size_1.fy,gamma_m0,member_yield_kn), '')
         self.report_check.append(t2)
@@ -1891,7 +1891,7 @@ class Tension_bolted(Main):
               efficiency(self.load.axial_force, self.section_size_1.tension_capacity, self.efficiency), '')
         self.report_check.append(t6)
 
-        t7 = ('SubSection', 'Bolt Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t7 = ('SubSection', 'Bolt Checks', '|p{3cm}|p{5cm}|p{7cm}|p{1cm}|')
         self.report_check.append(t7)
 
         if self.bolt.bolt_type == TYP_BEARING:
@@ -1959,7 +1959,7 @@ class Tension_bolted(Main):
               get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="lesser"))
         self.report_check.append(t5)
 
-        t7 = ('SubSection', 'Gusset Plate Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t7 = ('SubSection', 'Gusset Plate Checks', '|p{3cm}|p{5cm}|p{7cm}|p{1cm}|')
         self.report_check.append(t7)
 
 
@@ -2073,7 +2073,12 @@ class Tension_bolted(Main):
 
         # folder = self.select_workspace_folder(self)
         # print(folder)
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+        # Disp_3D_image = "./ResourceFiles/images/3d.png"
+
+        Disp_image ={KEY_DISP_3D: "3d",
+                     KEY_DISP_FRONT: "Front",
+                     KEY_DISP_TOP: "Top",
+                     KEY_DISP_SIDE: "Side"}
 
         config = configparser.ConfigParser()
         config.read_file(open(r'Osdag.config'))
@@ -2093,7 +2098,7 @@ class Tension_bolted(Main):
         fname_no_ext = filename[0].split(".")[0]
         print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_3D_image)
+                               rel_path, Disp_image)
 
         # if self.plate.design_status is False:
             # plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,

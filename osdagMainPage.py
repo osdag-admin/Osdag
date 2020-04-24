@@ -462,7 +462,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_compression_welded.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, Compression)
+            self.ui2.setupUi(self.ui2, Compression, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

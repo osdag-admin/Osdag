@@ -526,6 +526,7 @@ class Ui_ModuleWindow(QMainWindow):
         for option in option_list:
             lable = option[1]
             type = option[2]
+
             if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
@@ -741,9 +742,9 @@ class Ui_ModuleWindow(QMainWindow):
 # OUTPUT DOCK
 #############
         """
-        
-        @author: Umair 
-        
+
+        @author: Umair
+
         """
 
         self.outputDock = QtWidgets.QDockWidget(MainWindow)
@@ -1385,7 +1386,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     # Function for Reset Button
     '''
-    @author: Umair, Amir 
+    @author: Umair, Amir
     '''
 
     def reset_fn(self, op_list, out_list, new_list, data):
@@ -1404,7 +1405,10 @@ class Ui_ModuleWindow(QMainWindow):
         # For list in Customized combobox
 
         for custom_combo in new_list:
-            data[custom_combo[0] + "_customized"] = custom_combo[1]()
+            if op_list[0][1] in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED] and custom_combo[0] == KEY_SECSIZE:
+                data[custom_combo[0] + "_customized"] = custom_combo[1]('Angles')
+            else:
+                data[custom_combo[0] + "_customized"] = custom_combo[1]()
 
         # For output dock
 
@@ -1428,7 +1432,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for Design Button
     '''
-    @author: Umair 
+    @author: Umair
     '''
 
     def design_fn(self, op_list, data_list):
@@ -1527,7 +1531,7 @@ class Ui_ModuleWindow(QMainWindow):
         # main.set_input_values(main, design_dictionary)
 # Function for saving inputs in a file
     '''
-    @author: Umair 
+    @author: Umair
     '''
     def saveDesign_inputs(self):
         fileName, _ = QFileDialog.getSaveFileName(self,
@@ -1561,7 +1565,7 @@ class Ui_ModuleWindow(QMainWindow):
             return ColumnEndPlate
 # Function for getting inputs from a file
     '''
-    @author: Umair 
+    @author: Umair
     '''
 
     def loadDesign_inputs(self, op_list, data, new, main):
@@ -1572,11 +1576,13 @@ class Ui_ModuleWindow(QMainWindow):
             in_file = str(fileName)
             with open(in_file, 'r') as fileObject:
                 uiObj = yaml.load(fileObject)
+
             module = uiObj[KEY_MODULE]
 
             module_class = self.return_class(module)
 
             selected_module = main.module_name(main)
+
             if selected_module == module:
                 self.setDictToUserInputs(uiObj, op_list, data, new, module)
             else:
@@ -1591,12 +1597,14 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for loading inputs from a file to Ui
     '''
-    @author: Umair 
+    @author: Umair
     '''
 
     def setDictToUserInputs(self, uiObj, op_list, data, new, module):
+
         for op in op_list:
             key_str = op[0]
+
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
             if op[2] == TYPE_COMBOBOX:
                 if key_str in uiObj.keys():
@@ -2063,7 +2071,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for getting input for design preferences from input dock
     '''
-    @author: Umair 
+    @author: Umair
     '''
 
     def combined_design_prefer(self, module):

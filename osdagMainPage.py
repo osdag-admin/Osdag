@@ -466,6 +466,7 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
+    #@pyqtSlot()
     def show_tension_module(self):
         # folder = self.select_workspace_folder()
         # folder = str(folder)

@@ -1,7 +1,6 @@
 from design_type.connection.shear_connection import ShearConnection
 
 import time
-from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog

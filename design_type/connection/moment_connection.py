@@ -2,6 +2,7 @@ from design_type.connection.connection import Connection
 from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column
 from Common import *
 from utils.common.load import Load
+from utils.common import common_calculation
 
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp
@@ -13,6 +14,9 @@ from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 import pickle
 import logging
+import cmath
+
+
 class MomentConnection(Connection):
     def __init__(self):
         super(MomentConnection, self).__init__()
@@ -103,3 +107,48 @@ class MomentConnection(Connection):
 
     def tension_member_design_due_to_rupture_of_critical_section(A_vn, fu):
         pass
+
+    # Base Plate module
+    @staticmethod
+    def calculate_c(flange_width, depth, web_thickness, flange_thickness, min_area_req):
+        """ calculate the projection 'c' based on the effective area method for rolled and welded columns only.
+
+        Args:
+            flange_width (float) - flange width of the column section (bf)
+            depth (float) - depth of the column section (h)
+            web_thickness (float) - web thickness of the column section (tw)
+            flange_thickness (float) - flange thickness of the column section (tf)
+            min_area_req (float) - minimum effective bearing area (A_bc)
+
+        Returns: projection (float) 'c' in 'mm'
+
+        Note: The following expression is used to calculate a, b and c [Ref: Design of Steel Structures,
+              N. Subramanian, 2nd. edition 2018, Example 15.2]:
+
+              A_bc = (bf + 2c) (h + 2c) - [{h - 2(tf + c)}(bf - tw)]
+        """
+        a = 4
+        b = (4 * flange_width) + (2 * depth) - (2 * web_thickness)
+        c = (2 * flange_thickness * flange_width) + (depth * web_thickness) + (2 * flange_thickness * web_thickness)\
+            - min_area_req
+
+        # calculate the discriminant
+        d = b ** 2 - (4 * a * c)
+
+        # find two solutions
+        sol_1 = (- b - cmath.sqrt(d)) / (2 * a)
+        sol_2 = (- b + cmath.sqrt(d)) / (2 * a)
+
+        # extracting the real numbers
+        sol_1 = sol_1.real
+        sol_2 = sol_2.real
+
+        # return positive values only
+        if sol_1 <= 0 and sol_2 > 0:
+            c = common_calculation.round_up(sol_2, 5)
+        else:
+            c = 0.0
+
+        return c  # mm
+
+

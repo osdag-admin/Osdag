@@ -73,3 +73,14 @@ v dir                                    |   |                          |
         prism = makePrismFromFace(aFace, extrudeDir)
 
         return prism
+
+
+#TOdo : delete this
+    # def create_wire(self):
+    #     edges = makeEdgesFromPoints(self.points)
+    #     wire = makeWireFromEdges(edges)
+    #     aFace = makeFaceFromWire(wire)
+    #     extrudeDir = self.W * self.wDir  # extrudeDir is a numpy array
+    #     prism = makePrismFromFace(aFace, extrudeDir)
+    #
+    #     return extrudeDir

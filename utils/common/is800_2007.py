@@ -72,6 +72,40 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  7     DESIGN OF COMPRESS1ON MEMBERS   """
+    # -------------------------------------------------------------
+    #   7.4 Column Bases
+    # -------------------------------------------------------------
+
+    # cl. 7.4.1, General
+    @staticmethod
+    def cl_7_4_1_bearing_strength_concrete(concrete_grade):
+        """
+        Args:
+            concrete_grade: grade of concrete used for pedestal/footing.
+
+        Returns:
+            maximum permissible bearing strength of concrete pedestal/footing.
+
+        Note:
+            cl 7.4.1 suggests the maximum bearing strength equal to 0.60 times f_ck,
+            but, the value is amended to 0.45 times f_ck (f_ck is the characteristic strength of concrete)
+        """
+        f_ck = {
+            'M10': 10,
+            'M15': 15,
+            'M20': 20,
+            'M25': 25,
+            'M30': 30,
+            'M35': 35,
+            'M40': 40,
+            'M45': 45,
+            'M50': 50,
+            'M55': 55,
+        }[str(concrete_grade)]
+
+        bearing_strength = 0.45 * f_ck  # MPa (N/mm^2)
+        return bearing_strength
+
     # ==========================================================================
     """    SECTION  8     DESIGN OF MEMBERS SUBJECTED TO BENDING   """
     # -------------------------------------------------------------
@@ -127,6 +161,9 @@ class IS800_2007(object):
             "24"   : {'Standard': 2.0, 'Over-sized': 6.0, 'short_slot': 8.0, 'long_slot': 2.5},
             "24+"  : {'Standard': 3.0, 'Over-sized': 8.0, 'short_slot': 10.0, 'long_slot': 2.5}
         }
+        import re
+        # d = str(re.sub("[^0-9]", "", str(d)))
+        d = int(d)
 
         if d < 12:
             clearance = 0
@@ -223,7 +260,7 @@ class IS800_2007(object):
         Note:
             Reference:
             IS 800:2007, cl. 10.2.4.2
-
+self
         """
 
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
@@ -286,7 +323,6 @@ class IS800_2007(object):
     # cl. 10.3.3 Shear Capacity of Bearing Bolt
 
     @staticmethod
-
     def cl_10_3_3_bolt_shear_capacity(f_ub, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
         """Calculate design shear strength of bearing bolt
 
@@ -376,7 +412,7 @@ class IS800_2007(object):
             e       - End distance of the fastener along bearing direction in mm (float)
             p       - Pitch distance of the fastener along bearing direction in mm (float)
             bolt_hole_type - Either 'Standard' or 'Over-sized' or 'short_slot' or 'long_slot' (str)
-            safety_factor_parameter - Either 'field' or 'shop' (str)
+            safety_factor_parameter - Either 'Field' or 'Shop' (str)
 
         return:
             V_dpb - Design bearing strength of bearing bolt in N (float)
@@ -387,23 +423,22 @@ class IS800_2007(object):
 
         """
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
-        k_b = min(e/(3.0*d_0), p/(3.0*d_0)-0.25, f_ub/f_u, 1.0)
+
+        if p > 0.0:
+            k_b = min(e/(3.0*d_0), p/(3.0*d_0)-0.25, f_ub/f_u, 1.0)
+        else:
+            k_b = min(e / (3.0 * d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
+
         V_npb = 2.5 * k_b * d * t * f_u
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         V_dpb = V_npb/gamma_mb
-        print(bolt_hole_type)
+
         if bolt_hole_type == 'Over-sized' or bolt_hole_type == 'short_slot':
             V_dpb *= 0.7
         elif bolt_hole_type == 'long_slot':
             V_dpb *= 0.5
-        return V_dpb,d_0,k_b,gamma_mb
 
-
-
-
-
-
-
+        return V_dpb
 
     @staticmethod
     def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
@@ -484,7 +519,7 @@ class IS800_2007(object):
             gamma_mf = 1.25
         if bolt_hole_type == 'Standard':
             K_h = 1.0
-        elif bolt_hole_type == 'Over-sized' or 'short_slot' or 'long_slot':
+        elif bolt_hole_type == 'Over-sized' or bolt_hole_type == 'short_slot' or bolt_hole_type == 'long_slot':
             K_h = 0.85
         else:
             # TODO : long_slot bolt loaded parallel to slot is given in else
@@ -684,7 +719,11 @@ class IS800_2007(object):
             K = float(K)
         except ValueError:
             return
-        return K * fillet_size
+
+        throat = max((K * fillet_size),3)
+
+
+        return throat
 
     @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):
@@ -751,9 +790,11 @@ class IS800_2007(object):
         """
         if l_j <= 150 * t_t:
             return 1.0
-        beta_lw = 1.2 - 0.2 * l_j / (150 * t_t)
+        beta_lw = 1.2 - ((0.2 * l_j) / (150 * t_t))
         if beta_lw >= 1.0:
             beta_lw = 1.0
+        elif beta_lw <= 0.6:
+            beta_lw = 0.6
         return beta_lw
 
     # -------------------------------------------------------------

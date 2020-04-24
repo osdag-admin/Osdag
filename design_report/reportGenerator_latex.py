@@ -42,7 +42,7 @@ class CreateLatex(Document):
 
     @pyqtSlot()
 
-    def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_image):
+    def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
         groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
@@ -155,78 +155,87 @@ class CreateLatex(Document):
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
         doc.append(NewPage())
 
-        # with doc.create(Section('3D View')):
-        #     with doc.create(Figure(position='h!')) as view_3D:
-        #         view_3dimg_path = rel_path + Disp_3d_image
-        #         view_3D.add_image(filename=r'"' + view_3dimg_path, width=NoEscape(r'\linewidth'))
-        #         view_3D.add_caption('3D View')
         with doc.create(Section('3D View')):
-            with doc.create(LongTable('|p{8cm}|p{8cm}|')) as table:
-                table.add_hline()
-                Disp_len = len(Disp_image)
-                image = []
-                for key in Disp_image.keys():
-                    image.append(key)
-
-                for x in range(0,(Disp_len-1),2):
-
-                    # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
-
-                    # print(i)
-                    # if type(uiObj[i]) == dict:
-                    #     table.add_hline()
-                    #     sectiondetails = uiObj[i]
-
-                    image_name1 = Disp_image[image[x]]
-                    Img_path1 = r'/ResourceFiles/images/' + image_name1 + r'".png'
-
-                    image_name2 = Disp_image[image[x+1]]
-                    Img_path2 = r'/ResourceFiles/images/' + image_name2 + r'".png'
-                    # if (len(sectiondetails)) % 2 == 0:
-                    #     # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
-                    #     merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 2)
-                    # else:
-                    #     merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 1)
-                    # print('Hi', len(sectiondetails) / 2, round_up(len(sectiondetails), 2) / 2, merge_rows)
-                    # if merge_rows % 2 != 0:
-                    #     sectiondetails[''] = ''
-                    # a = list(sectiondetails.keys())
-                    # # index=0
-                    # for x in range(1, (merge_rows + 1)):
-                    #     # table.add_row("Col.Det.",i,columndetails[i])
-                    if x == 0:
-                        table.add_row(
-                            (MultiRow(10,data=StandAloneGraphic(image_options="width=8cm,height=6cm",
-                                                                         filename=r'"' + rel_path + Img_path1)),
-                             MultiRow(10,data=StandAloneGraphic(image_options="width=8cm,height=6cm",
-                                                                          filename=r'"' + rel_path + Img_path2))))
-                    # else:
-                    #     # doc.append(NewPage())
-                    #     table.add_row(
-                    #         (MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=8cm,height=6cm",
-                    #                                                      filename=r'"' + rel_path + Img_path1)),
-                    #          MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=8cm,height=6cm",
-                    #                                                      filename=r'"' + rel_path + Img_path2))))
-                    # table.add_hline()
-
-
-                    #      MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),)))
-                    # #         elif x <= 4:
-                    #             table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
-                    #                            MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
-                    #         else:
-                    #             table.add_row(('', a[x], sectiondetails[a[x]], a[merge_rows + x - 4],
-                    #                            sectiondetails[a[merge_rows + x - 4]],))
-                    #         table.add_hline(2, 5)
-                    # elif uiObj[i] == "TITLE":
-                    #     table.add_hline()
-                    #     table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
-                    #     table.add_hline()
-                    # else:
-                    #     table.add_hline()
-                    #     table.add_row(
-                    #         (MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
-                    #     table.add_hline()
+            with doc.create(Figure(position='h!')) as view_3D:
+                view_3dimg_path = rel_path + Disp_3d_image
+                view_3D.add_image(filename=r'"' + view_3dimg_path, width=NoEscape(r'\linewidth'))
+                view_3D.add_caption('3D View')
+        # with doc.create(Section('3D View')):
+        #         # Disp_len = len(Disp_image)
+        #         image = []
+        #         for key in Disp_image.keys():
+        #             image.append(key)
+        #
+        #         image_name1 = Disp_image[image[0]]
+        #         Img_path1 = r'/ResourceFiles/images/' + image_name1 + r'".png'
+        #
+        #         image_name2 = Disp_image[image[1]]
+        #         Img_path2 = r'/ResourceFiles/images/' + image_name2 + r'".png'
+        #
+        #         image_name3 = Disp_image[image[2]]
+        #         Img_path3 = r'/ResourceFiles/images/' + image_name3 + r'".png'
+        #
+        #         image_name4 = Disp_image[image[3]]
+        #         Img_path4 = r'/ResourceFiles/images/' + image_name4 + r'".png'
+        #
+        #         # for x in range(0,(Disp_len-1),2):
+        #
+        #             # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
+        #
+        #             # print(i)
+        #             # if type(uiObj[i]) == dict:
+        #             #     table.add_hline()
+        #             #     sectiondetails = uiObj[i]
+        #         with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height= 5)) as table:
+        #             table.add_hline()
+        #
+        #
+        #             # if (len(sectiondetails)) % 2 == 0:
+        #             #     # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+        #             #     merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 2)
+        #             # else:
+        #             #     merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 1)
+        #             # print('Hi', len(sectiondetails) / 2, round_up(len(sectiondetails), 2) / 2, merge_rows)
+        #             # if merge_rows % 2 != 0:
+        #             #     sectiondetails[''] = ''
+        #             # a = list(sectiondetails.keys())
+        #             # # index=0
+        #             # for x in range(1, (merge_rows + 1)):
+        #             #     # table.add_row("Col.Det.",i,columndetails[i])
+        #             # if x == 0:
+        #             table.add_row((MultiRow(10,data=StandAloneGraphic(image_options="width=8cm,height=6cm",
+        #                                                              filename=r'"' + rel_path + Img_path1)),
+        #                  MultiRow(10,data=StandAloneGraphic(image_options="width=8cm,height=6cm",
+        #                                                               filename=r'"' + rel_path + Img_path2))))
+        #
+        #         with doc.create(LongTable('|p{8cm}|p{8cm}|',row_height= 5)) as table:
+        #             table.add_hline()
+        #             # else:
+        #                 # doc.append(NewPage())
+        #             table.add_row((MultiRow(10, data=StandAloneGraphic(image_options="width=8cm,height=6cm",
+        #                                                              filename=r'"' + rel_path + Img_path3)),
+        #                  MultiRow(10, data=StandAloneGraphic(image_options="width=8cm,height=6cm",
+        #                                                              filename=r'"' + rel_path + Img_path4))))
+        #             # table.add_hline()
+        #
+        #
+        #             #      MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),)))
+        #             # #         elif x <= 4:
+        #             #             table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
+        #             #                            MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+        #             #         else:
+        #             #             table.add_row(('', a[x], sectiondetails[a[x]], a[merge_rows + x - 4],
+        #             #                            sectiondetails[a[merge_rows + x - 4]],))
+        #             #         table.add_hline(2, 5)
+        #             # elif uiObj[i] == "TITLE":
+        #             #     table.add_hline()
+        #             #     table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
+        #             #     table.add_hline()
+        #             # else:
+        #             #     table.add_hline()
+        #             #     table.add_row(
+        #             #         (MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
+        #             #     table.add_hline()
 
         doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
 

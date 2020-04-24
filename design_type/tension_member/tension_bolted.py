@@ -2073,12 +2073,12 @@ class Tension_bolted(Main):
 
         # folder = self.select_workspace_folder(self)
         # print(folder)
-        # Disp_3D_image = "./ResourceFiles/images/3d.png"
+        Disp_3D_image = "./ResourceFiles/images/3d.png"
 
-        Disp_image ={KEY_DISP_3D: "3d",
-                     KEY_DISP_FRONT: "Front",
-                     KEY_DISP_TOP: "Top",
-                     KEY_DISP_SIDE: "Side"}
+        # Disp_image ={KEY_DISP_3D: "3d",
+        #              KEY_DISP_FRONT: "Front",
+        #              KEY_DISP_TOP: "Top",
+        #              KEY_DISP_SIDE: "Side"}
 
         config = configparser.ConfigParser()
         config.read_file(open(r'Osdag.config'))
@@ -2098,7 +2098,7 @@ class Tension_bolted(Main):
         fname_no_ext = filename[0].split(".")[0]
         print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_image)
+                               rel_path, Disp_3D_image)
 
         # if self.plate.design_status is False:
             # plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,

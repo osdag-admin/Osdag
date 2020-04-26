@@ -174,7 +174,7 @@ class MomentConnection(Connection, IS800_2007):
 
         # rounding up the weld size to a higher multiple of 2 with a minimum value of the weld size being
         # as per Table 21 of IS 800:2007
-        weld_size = round_up(weld_size, 2, weld_size_minimum)  # mm
+        weld_size = common_calculation.round_up(weld_size, 2, weld_size_minimum)  # mm
 
         return weld_size
 

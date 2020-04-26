@@ -226,6 +226,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.length_available_total = 0.0
         self.effective_length_flange = 0.0
+        self.total_eff_len_gusset_available = 0.0
         self.effective_length_web = 0.0
         self.load_axial_flange = 0.0
         self.load_axial_web = 0.0
@@ -236,6 +237,27 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_size_web = 0.0
         self.gusset_along_flange = 'No'
         self.gusset_along_web = 'No'
+        self.gusset_plate_length = 0.0
+        self.stiffener_plate_length = 0.0
+        self.gusset_fy = self.dp_column_fy
+        self.stiffener_fy = self.dp_column_fy
+        self.epsilon = 1
+        self.gusset_plate_thick = 0.0
+        self.stiffener_plate_thick = 0.0
+        self.gusset_plate_height = 0.0
+        self.stiffener_plate_height = 0.0
+
+        self.shear_on_gusset = 0.0
+        self.moment_on_gusset = 0.0
+        self.shear_capacity_gusset = 0.0
+        self.z_e_gusset = 0.0
+        self.moment_capacity_gusset = 0.0
+
+        self.shear_on_stiffener = 0.0
+        self.moment_on_stiffener = 0.0
+        self.shear_capacity_stiffener = 0.0
+        self.z_e_stiffener = 0.0
+        self.moment_capacity_stiffener = 0.0
 
         self.eccentricity_zz = 0.0
         self.sigma_max_zz = 0.0
@@ -1350,24 +1372,26 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # design of fillet weld
         if self.weld_type == 'Fillet Weld':
 
+            weld_fu = min(self.dp_weld_fu_overwrite, self.dp_column_fu)
+
             if self.dp_column_type == 'Rolled' or 'Welded':
 
                 # defining the maximum limit of weld size that can be provided, which is equal to/less than the flange/web thickness
-                weld_size_flange_max = self.column_tf  # mm
-                weld_size_web_max = self.column_tw  # mm
+                weld_size_flange_max = round_down(self.column_tf, 2)  # mm
+                weld_size_web_max = round_down(self.column_tw, 2)  # mm
 
                 # available length for welding along the flange and web of the column, without the stiffeners
                 length_available_flange = 2 * (self.column_bf + (self.column_bf - self.column_tw - (2 * self.column_r1)))  # mm
                 length_available_web = 2 * (self.column_D - (2 * self.column_tf) - (2 * self.column_r1))  # mm
 
                 # total available length for welding along the perimeter of the column (flange + web)
-                self.length_available_total = length_available_flange + length_available_web
+                # self.length_available_total = length_available_flange + length_available_web
 
                 # Note: The effective length of weld is calculated by assuming 1% reduction in length at each end return. Since, the
                 # total number of end returns are 12, a total of 12% reduction (8% at flange and 4% at web) is incorporated into the
-                # 'length available' to calculate the 'effective length'.
-                self.effective_length_flange = length_available_flange - (0.8 * length_available_flange)  # mm
-                self.effective_length_web = length_available_web - (0.4 * length_available_web)  # mm
+                # respective 'effective' lengths.
+                self.effective_length_flange = length_available_flange - (0.08 * length_available_flange)  # mm
+                self.effective_length_web = length_available_web - (0.04 * length_available_web)  # mm
 
                 if self.connectivity == 'Welded-Slab Base' or 'Gusseted Base Plate':
 
@@ -1393,21 +1417,38 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     if self.connectivity == 'Welded-Slab Base':
                         self.weld_size_web = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len_web,
-                                                                                        [self.dp_weld_fu_overwrite, self.dp_column_fu],
-                                                                                        [self.plate_thk, self.column_tw], self.dp_weld_fab)  # mm
+                                                                                            [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                            [self.plate_thk, self.column_tw], self.dp_weld_fab)  # mm
                     else:
                         self.weld_size_web = self.weld_size_flange
 
                     # providing the size of the weld at the flange at-least equal to that at the web
-                    self.weld_size_flange = max(self.weld_size_flange, self.weld_size_web)
+                    # self.weld_size_flange = max(self.weld_size_flange, self.weld_size_web)
 
                     # check against maximum allowed size
                     # checking if gusset plates are required for providing extra length of weld
                     if self.weld_size_flange > weld_size_flange_max:
                         self.gusset_along_flange = 'Yes'
 
+                        # length available on the gusset plate for welding, assuming 6 mm weld connecting the gusset to the column flange
+                        len_gusset_available = self.bp_width_provided + (self.bp_width_provided - self.column_bf - 2 * 6)  # mm
+                        eff_len_gusset_available = len_gusset_available - (0.04 * len_gusset_available)  # mm, effective length assuming 4% reduction
+
+                        # for each column connected to the gusset plate
+                        self.total_eff_len_gusset_available = (self.effective_length_flange / 2) + eff_len_gusset_available  # mm
+
+                        # improvised weld size at flange after adding the gusset plate
+                        self.strength_unit_len_flange = self.load_axial_flange / self.total_eff_len_gusset_available  # N/mm
+
+                        self.weld_size_flange = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len_flange,
+                                                                                               [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                               [self.plate_thk, self.column_tf], self.dp_weld_fab)
+
                     if self.weld_size_web > weld_size_web_max:
-                        self.gusset_along_web = 'Yes'
+                        if self.gusset_along_flange == 'Yes':
+                            self.gusset_along_web = 'Yes'
+
+                            self.weld_size_web = self.weld_size_flange
 
                 elif self.connectivity == "Hollow Section":
                     # TODO: add calculations for hollow sections
@@ -1425,14 +1466,105 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.weld_size_web = self.column_tw  # mm
 
     def design_gusset_plate(self):
-        """ design the gusset plate
+        """ design the gusset and the stiffener plate
 
         Args:
 
         Returns:
         """
         if self.connectivity == 'Welded-Slab Base' or 'Gusseted Base Plate':
-            pass
+
+            if self.gusset_along_flange == 'Yes':
+
+                # layout of the gusset and the stiffener plate
+                self.gusset_plate_length = self.bp_width_provided  # mm, gusset plate is along the flange of the column
+                self.stiffener_plate_length = (self.bp_length_provided - self.column_D) / 2  # mm. stiffener plate is across the flange of the column
+
+                gusset_outstand_length = (self.gusset_plate_length - self.column_bf) / 2  # mm
+                stiffener_outstand_length = self.stiffener_plate_length  # mm
+
+                self.gusset_fy = self.dp_column_fy  # MPa
+                self.stiffener_fy = self.dp_column_fy  # MPa
+                self.epsilon = math.sqrt(250 / self.gusset_fy)
+
+                # thickness of the gusset/stiffener plate as per Table 2 of IS 800:2007 [b/t_f <= 13.6 * epsilon]
+                # considering the maximum outstanding length to calculate the thickness of the gusset/stiffener
+                thk_req = (max(gusset_outstand_length, stiffener_outstand_length)) / (13.6 * self.epsilon)  # mm
+
+                # gusset/stiffener plate should be at-least equal to the flange thickness
+                self.gusset_plate_thick = round_up(thk_req, 2, self.column_tf)  # mm
+                self.stiffener_plate_thick = self.gusset_plate_thick  # mm
+
+                # height of the gusset/stiffener plate
+                # the size of the landing is 100 mm along vertical dimension and 50 mm along horizontal dimension
+                # the assumed inclination of the gusset/stiffener plate is 45 degrees
+                self.gusset_plate_height = self.gusset_plate_length + 100  # mm
+                self.stiffener_plate_height = self.stiffener_plate_length + 100  # mm
+
+                # shear yielding and moment capacity checks for the gusset/stiffener plates
+
+                # gusset plate
+
+                # shear and moment acting on the gusset plate
+                self.shear_on_gusset = self.sigma_xx * self.gusset_plate_length * self.gusset_plate_height
+                self.shear_on_gusset = round((self.shear_on_gusset / 1000), 3)  # kN
+
+                self.moment_on_gusset = self.sigma_xx * self.gusset_plate_height * self.gusset_plate_length ** 2 * 0.5
+                self.moment_on_gusset = round((self.moment_on_gusset * 10 ** -6), 3)  # kN-m
+
+                # shear yielding capacity and moment capacity of the gusset plate
+                self.shear_capacity_gusset = IS800_2007.cl_8_4_design_shear_strength(self.gusset_plate_height * self.gusset_plate_thick,
+                                                                                     self.gusset_fy)
+                self.shear_capacity_gusset = round((self.shear_capacity_gusset / 1000), 3)  # kN
+
+                self.z_e_gusset = (self.gusset_plate_thick * self.gusset_plate_height ** 2) / 6  # mm^3
+                self.moment_capacity_gusset = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_gusset, 0, self.gusset_fy,
+                                                                                           section_class='semi-compact')
+                self.moment_capacity_gusset = round((self.moment_capacity_gusset * 10 ** -6), 3)  # kN-m
+
+                # checks
+                if self.shear_on_gusset > (0.6 * self.shear_capacity_gusset):
+                    self.design_status = False
+                else:
+                    pass
+
+                if self.moment_on_gusset > self.moment_capacity_gusset:
+                    self.design_status = False
+                else:
+                    pass
+
+                # stiffener plate
+
+                # shear and moment acting on the stiffener plate
+                self.shear_on_stiffener = ((self.sigma_max_zz + self.sigma_xx) / 2) * self.stiffener_plate_length * self.stiffener_plate_height
+                self.shear_on_stiffener = round((self.shear_on_gusset / 1000), 3)  # kN
+
+                self.moment_on_stiffener = (self.sigma_xx * self.stiffener_plate_height * self.stiffener_plate_length ** 2 * 0.5) + \
+                                           (0.5 * self.stiffener_plate_length * (self.sigma_max_zz - self.sigma_xx) * self.stiffener_plate_height *
+                                            (2 / 3) * self.stiffener_plate_length)
+                self.moment_on_stiffener = round((self.moment_on_stiffener * 10 ** -6), 3)  # kN-m
+
+                # shear yielding capacity and moment capacity of the stiffener plate
+                self.shear_capacity_stiffener = IS800_2007.cl_8_4_design_shear_strength(self.stiffener_plate_height * self.stiffener_plate_thick,
+                                                                                        self.stiffener_fy)
+                self.shear_capacity_stiffener = round((self.shear_capacity_stiffener / 1000), 3)  # kN
+
+                self.z_e_stiffener = (self.stiffener_plate_thick * self.stiffener_plate_height ** 2) / 6  # mm^3
+                self.moment_capacity_stiffener = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener, 0, self.stiffener_fy,
+                                                                                              section_class='semi-compact')
+                self.moment_capacity_stiffener = round((self.moment_capacity_stiffener * 10 ** -6), 3)  # kN-m
+
+                # checks
+                if self.shear_on_stiffener > (0.6 * self.shear_capacity_stiffener):
+                    self.design_status = False
+                else:
+                    pass
+
+                if self.moment_on_stiffener > self.moment_capacity_stiffener:
+                    self.design_status = False
+                else:
+                    pass
+
         else:
             pass
 

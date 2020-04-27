@@ -291,6 +291,11 @@ DISP_MIN_PLATE_HEIGHT = 'Min. Plate Height (mm)'
 DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
 DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
 DISP_MIN_PLATE_THICK = 'Min.Plate Thickness (mm)'
+
+DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Height (mm)'
+DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Height (mm)'
+DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
+
 KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (V_db) (kN)'
 KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension (T_db) (kN)'
 KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (V_d) (kN)'

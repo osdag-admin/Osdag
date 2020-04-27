@@ -2384,15 +2384,33 @@ class BeamCoverPlate(MomentConnection):
         else:
             t1 = ('SubSection', 'Inner and Outer flange plate Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
+            ####OUTER PLATE####
+            t1 = (DISP_MIN_PLATE_HEIGHT, min_flange_plate_ht_req(beam_width=self.section.flange_width,
+                                                                 min_flange_plate_ht=self.min_plate_height),
+                  self.flange_plate.height,
+                  get_pass_fail(self.min_plate_height, self.flange_plate.height, relation="lesser"))
+            self.report_check.append(t1)
 
-            t1 = (DISP_MIN_PLATE_HEIGHT, min_inner_flange_plate_ht_req(beam_width=self.section.flange_width,
+            min_plate_length = 2 * (((self.flange_plate.bolt_line / 2 - 1) * self.flange_bolt.min_pitch) + (
+                        2 * self.flange_bolt.min_end_dist) + (self.flange_plate.gap / 2))
+
+            t1 = (DISP_MIN_PLATE_LENGTH, min_flange_plate_length_req(min_pitch=self.flange_bolt.min_pitch,
+                                                                     min_end_dist=self.flange_bolt.min_end_dist,
+                                                                     bolt_line=self.flange_plate.bolt_line,
+                                                                     min_length=min_plate_length,
+                                                                     gap=self.flange_plate.gap),
+                  self.flange_plate.length,
+                  get_pass_fail(min_plate_length, self.flange_plate.length, relation="lesser"))
+            self.report_check.append(t1)
+            ######INNER PLATE
+            t1 = (DISP_MIN_PLATE_INNERHEIGHT, min_inner_flange_plate_ht_req(beam_width=self.section.flange_width,
                                                                        web_thickness=self.section.web_thickness,
                                                                        root_radius= self.section.root_radius,
                                                                        min_inner_flange_plate_ht= self.flange_plate.Innerheight),
                   self.flange_plate.Innerheight,
                   get_pass_fail(self.flange_plate.Innerheight, self.flange_plate.Innerheight, relation="lesser"))
             self.report_check.append(t1)
-            t1 = (DISP_MAX_PLATE_HEIGHT,  min_inner_flange_plate_ht_req(beam_width=self.section.flange_width,
+            t1 = (DISP_MAX_PLATE_INNERHEIGHT,  min_inner_flange_plate_ht_req(beam_width=self.section.flange_width,
                                                                        web_thickness=self.section.web_thickness,
                                                                        root_radius= self.section.root_radius,
                                                                        min_inner_flange_plate_ht= self.flange_plate.Innerheight),
@@ -2404,7 +2422,7 @@ class BeamCoverPlate(MomentConnection):
             min_plate_length = 2 * (((self.flange_plate.bolt_line / 2 - 1) * self.flange_bolt.min_pitch) + (
                         2 * self.flange_bolt.min_end_dist) + (self.flange_plate.gap / 2))
 
-            t1 = (DISP_MIN_PLATE_LENGTH, min_flange_plate_length_req(min_pitch=self.flange_bolt.min_pitch,
+            t1 = (DISP_MIN_PLATE_INNERLENGTH, min_flange_plate_length_req(min_pitch=self.flange_bolt.min_pitch,
                                                                      min_end_dist=self.flange_bolt.min_end_dist,
                                                                      bolt_line=self.flange_plate.bolt_line,
                                                                      min_length=min_plate_length,

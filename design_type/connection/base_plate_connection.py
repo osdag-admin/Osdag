@@ -206,6 +206,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_length_max = 1
         self.anchor_length_provided = 1
         self.anchor_nos_provided = 0
+        self.anchor_axial_tension = 0
         self.anchor_hole_dia = 0.0
         self.bp_length_min = 0.0
         self.bp_width_min = 0.0
@@ -265,6 +266,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_size_gusset_vertical = 0.0
         self.weld_size_stiffener = 0.0
 
+        self.gusseted_bp_case = ''
         self.eccentricity_zz = 0.0
         self.sigma_max_zz = 0.0
         self.sigma_min_zz = 0.0
@@ -1096,6 +1098,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # TODO add condition for number of anchor bolts depending on col depth and force
         # number of anchor bolts
         self.anchor_nos_provided = 4
+        self.anchor_axial_tension = 0
 
         # perform detailing checks
         # Note: end distance is along the depth, whereas, the edge distance is along the flange, of the column section
@@ -1541,7 +1544,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     # defining conditions for providing gusset/stiffener plates for each connectivity
                     if self.connectivity == 'Welded-Slab Base':
-                        if self.gusset_along_flange or self.gusset_along_web == 'Yes':
+                        if (self.gusset_along_flange or self.gusset_along_web) == 'Yes':
                             self.gusset_along_flange = 'Yes'
                             self.gusset_along_web = 'Yes'
                         else:
@@ -1719,7 +1722,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # details coming soon...
 
         # detailing
-        print(self.anchor_nos_provided)
+        print(self.anchor_nos_provided)  # total number of anchor bolts
+        print(self.anchor_axial_tension)  # (optional) total number of anchor bolts inside the column for axial tension
         print(self.pitch_distance)  # Pitch Distance (mm) (show only when this value is not 'Null')
         print(self.gauge_distance)  # Gauge Distance (mm) mm (show only when this value is not 'Null')
         print(self.end_distance)  # mm
@@ -1733,6 +1737,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # Details tab (this is supposed to be taken from Osdag 2 - details to be given soon)
 
         # Gusset Plate
+        print(self.gusset_plate_length)
+        print(self.gusset_plate_height)
+        print(self.gusset_plate_thick)
+
         print(self.gusset_plate_thick)  # Thickness (mm)
         print(self.shear_on_gusset)  # Shear Demand (kN)
         print(self.shear_capacity_gusset)  # Shear Capacity (kN)
@@ -1740,6 +1748,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print(self.moment_capacity_gusset)  # Moment Capacity (kN-m)
 
         # Stiffener Plate
+        print(self.stiffener_plate_length)
+        print(self.stiffener_plate_height)
+        print(self.stiffener_plate_thick)
+
         print(self.stiffener_plate_thick)  # Thickness (mm)
         print(self.shear_on_stiffener)  # Shear Demand (kN)
         print(self.shear_capacity_stiffener)  # Shear Capacity (kN)

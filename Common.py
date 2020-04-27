@@ -414,17 +414,17 @@ KEY_GRD_FOOTING = 'Footing.Grade'
 KEY_DISP_GRD_FOOTING = 'Grade*'
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 
-# Factored load
-KEY_DISP_FAC_SHEAR_LOAD ='Factored shear load'
-KEY_DISP_FAC_AXIAL_FORCE='Factored axial load'
-KEY_DISP_FAC_MOMENT_LOAD='Factored moment load'
+# Applied load
+KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load Vu (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load Au (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load Mu (kNm)'
 
 # capacity
-KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity A_c"
-KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity S_c"
-KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity M_c"
-KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment_Capacity'
-KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria M_d_c'
+KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member Ac (kN)"
+KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member Sc (kN)"
+KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member Mc (kNm)"
+KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity Pmc (kNm)'
+KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria Mdc (kNm)'
 
 
 
@@ -596,15 +596,15 @@ KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity  (kN)"
 
 
 KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
-KEY_DISP_BLOCKSHEARCAP_FLANGE='Flange Block Shear Capacity'
+KEY_DISP_BLOCKSHEARCAP_FLANGE='Flange Block Shear Capacity (kN)'
 KEY_TENSIONYIELDINGCAP_FLANGE = 'Flange_plate.tension_yielding_capacity'
-KEY_DISP_TENSIONYIELDINGCAP_FLANGE = 'Flange Tension Yielding Capacity'
+KEY_DISP_TENSIONYIELDINGCAP_FLANGE = 'Flange Tension Yielding Capacity (kN)'
 KEY_TENSIONRUPTURECAP_FLANGE= 'Flange_plate.tension_rupture_capacity'
-KEY_DISP_TENSIONRUPTURECAP_FLANGE= 'Flange Tension Rupture Capacity'
+KEY_DISP_TENSIONRUPTURECAP_FLANGE= 'Flange Tension Rupture Capacity (kN)'
 KEY_SHEARYIELDINGCAP_FLANGE= 'Flange_plate.shear_yielding_capacity'
-KEY_DISP_SHEARYIELDINGCAP_FLANGE= 'Shear Yielding Capacity'
+KEY_DISP_SHEARYIELDINGCAP_FLANGE= 'Shear Yielding Capacity (kN)'
 KEY_SHEARRUPTURECAP_FLANGE= 'Flange_plate.shear_rupture_capacity'
-KEY_DISP_SHEARRUPTURECAP_FLANGE= 'Shear Rupture Capacity'
+KEY_DISP_SHEARRUPTURECAP_FLANGE= 'Shear Rupture Capacity (kN)'
 KEY_FLANGE_PLATE_MOM_DEMAND = 'Flange_Plate.MomDemand'
 KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Flange Moment Demand (kNm)'
 KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
@@ -674,14 +674,14 @@ KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
 
 KEY_OUT_FLANGE_BOLT_SHEAR ='flange_bolt.bolt_shear_capacity'
-KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity"
+KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity (kN)"
 KEY_OUT_FLANGE_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'
-KEY_OUT_DISP_FLANGE_BOLT_BEARING = "Bearing Capacity"
+KEY_OUT_DISP_FLANGE_BOLT_BEARING = "Bearing Capacity (kN)"
 KEY_OUT_FLANGE_BOLT_CAPACITY = 'flange_bolt.bolt_capacity'
-KEY_OUT_DISP_FLANGE_BOLT_CAPACITY ="Bolt Capacity"
+KEY_OUT_DISP_FLANGE_BOLT_CAPACITY ="Bolt Capacity (kN)"
 KEY_OUT_DISP_FLANGE_BOLT_SLIP= 'Slip Resistance'
 KEY_FLANGE_BOLT_GRP_CAPACITY = 'flange_bolt.grp_bolt_capacity'
-KEY_OUT_FLANGE_BOLT_GRP_CAPACITY = 'flange bolt grp bolt capacity'
+KEY_OUT_FLANGE_BOLT_GRP_CAPACITY = 'flange bolt grp bolt capacity (kN)'
 KEY_OUT_MIN_PITCH= 'Min_pitch'
 KEY_OUT_GRD_PROVIDED='flange_bolt.bolt_fu'
 KEY_OUT_FLANGE_MIN_PITCH= 'flange_bolt.min_pitch_round'
@@ -689,14 +689,14 @@ KEY_OUT_FLANGE_MIN_EDGE_DIST= 'flange_bolt.min_edge_dist_round'
 KEY_OUT_FLANGE_MAX_EDGE_DIST='flange_bolt.max_edge_dist_round'
 
 KEY_OUT_WEB_BOLT_SHEAR ='web_bolt.bolt_shear_capacity'
-KEY_OUT_DISP_WEB_BOLT_SHEAR = "Shear Capacity"
+KEY_OUT_DISP_WEB_BOLT_SHEAR = "Shear Capacity (kN)"
 KEY_OUT_WEB_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'
-KEY_OUT_DISP_WEB_BOLT_BEARING = "Bearing Capacity"
+KEY_OUT_DISP_WEB_BOLT_BEARING = "Bearing Capacity (kN)"
 KEY_OUT_WEB_BOLT_CAPACITY = 'flange_bolt.bolt_capacity'
-KEY_OUT_DISP_WEB_BOLT_CAPACITY ="Bolt Capacity"
+KEY_OUT_DISP_WEB_BOLT_CAPACITY ="Bolt Capacity (kN)"
 KEY_OUT_DISP_WEB_BOLT_SLIP= 'Slip Resistance'
 KEY_WEB_BOLT_GRP_CAPACITY = 'flange_bolt.grp_bolt_capacity'
-KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'flange bolt grp bolt capacity'
+KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'flange bolt grp bolt capacity (kN)'
 
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
@@ -735,15 +735,15 @@ KEY_DISP_TEN_CAP_WEB_PLATE ="Plate Tension Capacity (kN)"
 
 
 KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'
-KEY_DISP_SHEARYIELDINGCAP_WEB= 'Web Shear Yielding Capacity'
+KEY_DISP_SHEARYIELDINGCAP_WEB= 'Web Shear Yielding Capacity (kN)'
 KEY_BLOCKSHEARCAP_WEB='web_plate.block_shear_capacity'
-KEY_DISP_BLOCKSHEARCAP_WEB='Web Block Shear Capacity'
+KEY_DISP_BLOCKSHEARCAP_WEB='Web Block Shear Capacity (kN)'
 KEY_SHEARRUPTURECAP_WEB= 'web_plate.shear_rupture_capacity'
-KEY_DISP_SHEARRUPTURECAP_WEB= 'Web Shear Rupture Capacity'
+KEY_DISP_SHEARRUPTURECAP_WEB= 'Web Shear Rupture Capacity (kN)'
 KEY_TENSIONYIELDINGCAP_WEB = "web_plate.tension_yielding_capacity"
-KEY_DISP_TENSIONYIELDINGCAP_WEB ='Web Tension Yielding Capacity'
+KEY_DISP_TENSIONYIELDINGCAP_WEB ='Web Tension Yielding Capacity (kN)'
 KEY_TENSIONRUPTURECAP_WEB ='web_plate.shear_rupture_capacity'
-KEY_DISP_TENSIONRUPTURECAP_WEB ='Web Tension Rupture Capacity'
+KEY_DISP_TENSIONRUPTURECAP_WEB ='Web Tension Rupture Capacity (kN)'
 KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
 KEY_WEB_DISP_PLATE_MOM_DEMAND = 'web Moment Demand (kNm)'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'

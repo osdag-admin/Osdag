@@ -645,24 +645,22 @@ class BeamCoverPlate(MomentConnection):
         print("self.factored_axial_load" ,self.factored_axial_load)
 
         # Shear Capacity  # N
-        shear_capacity = ((self.section.depth-(2*self.section.flange_thickness))* self.section.web_thickness * self.section.fy) / (
+        self.shear_capacity1 = ((self.section.depth-(2*self.section.flange_thickness))* self.section.web_thickness * self.section.fy) / (
                 math.sqrt(3) * gamma_m0)   # N # A_v: Total cross sectional area in shear in mm^2 (float)
-        shear_load = 0.6 * shear_capacity  #N
-        self.fact_shear_load = max (shear_load, self.load.shear_force *1000) #N
-        if self.fact_shear_load > shear_capacity:
-            self.fact_shear_load = shear_capacity
+        self.shear_load1 = 0.6 * self.shear_capacity1  #N
+        self.fact_shear_load = max (self.shear_load1, self.load.shear_force *1000) #N
+        if self.fact_shear_load > self.shear_capacity1:
+            self.fact_shear_load = self.shear_capacity1
         else:
             pass
         # self.load.shear_force = self.fact_shear_load  #N
         print('shear_force',self.load.shear_force)
 
 
-        self.Z_p = float(
-            (self.section.web_thickness * (
-                        self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4)  # mm3
-        self.Z_e = float(
-            (self.section.web_thickness * (
-                        self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 6)  # mm3
+        self.Z_p = round(((self.section.web_thickness * (
+                        self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4),)  # mm3
+        self.Z_e = round(((self.section.web_thickness * (
+                        self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 6),2)  # mm3
         if self.section.type == "Rolled":
 
             self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
@@ -706,16 +704,21 @@ class BeamCoverPlate(MomentConnection):
         self.section.plastic_moment_capacty(beta_b = self.beta_b, Z_p = self.Z_p, fy= self.section.fy) # N # for section #todo add in ddcl
         self.section.moment_d_deformation_criteria(fy= self.section.fy,Z_e = self.section.elast_sec_mod_z)
         # todo add in ddcl
+        self.Pmc =self.section.plastic_moment_capactiy
+        self.Mdc =self.section.moment_d_def_criteria
         self.section.moment_capacity = min(  self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria)
         print("moment_capacity",self.section.moment_capacity )
-
-        self.load_moment = max((0.5 *self.section.moment_capacity),self.load.moment* 1000000) #N
+        self.load_moment_min = 0.5 *self.section.moment_capacity
+        self.load_moment = max( self.load_moment_min ,self.load.moment* 1000000) #N
         if  self.load_moment  >  self.section.moment_capacity:
             self.load_moment =  self.section.moment_capacity
         else:
             pass
         # self.load.moment = load_moment # N
         print("design_bending_strength",  self.load.moment)
+
+        print("self.load_moment", self.load_moment)
+        print("self.load_moment_min",self.load_moment_min)
 
         self.moment_web = (Z_w * self.load_moment / ( self.section.plast_sec_mod_z ))  #  Nm todo add in ddcl # z_w of web & z_p  of section
         print('plast_sec_mod_z',self.section.plast_sec_mod_z)
@@ -2235,12 +2238,12 @@ class BeamCoverPlate(MomentConnection):
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
-                                  KEY_DISP_COLSEC: self.section.designation,
+                                  KEY_DISP_BEAMSEC : self.section.designation,
                                   KEY_DISP_MATERIAL: self.section.material,
                                   KEY_DISP_FU: self.section.fu,
                                   KEY_DISP_FY: self.section.fy,
                                   'Mass': self.section.mass,
-                                  'Area(cm2) - A': self.section.area,
+                                  'Area(mm2) - A': self.section.area,
                                   'D(mm)': self.section.depth,
                                   'B(mm)': self.section.flange_width,
                                   't(mm)': self.section.web_thickness,
@@ -2248,14 +2251,14 @@ class BeamCoverPlate(MomentConnection):
                                   'FlangeSlope': self.section.flange_slope,
                                   'R1(mm)': self.section.root_radius,
                                   'R2(mm)': self.section.toe_radius,
-                                  'Iz(cm4)': self.section.mom_inertia_z,
-                                  'Iy(cm4)': self.section.mom_inertia_y,
-                                  'rz(cm)': self.section.rad_of_gy_z,
-                                  'ry(cm)': self.section.rad_of_gy_y,
-                                  'Zz(cm3)': self.section.elast_sec_mod_z,
-                                  'Zy(cm3)': self.section.elast_sec_mod_y,
-                                  'Zpz(cm3)': self.section.plast_sec_mod_z,
-                                  'Zpy(cm3)': self.section.elast_sec_mod_y}
+                                  'Iz(mm4)': self.section.mom_inertia_z,
+                                  'Iy(mm4)': self.section.mom_inertia_y,
+                                  'rz(mm)': self.section.rad_of_gy_z,
+                                  'ry(mm)': self.section.rad_of_gy_y,
+                                  'Zz(mm3)': self.section.elast_sec_mod_z,
+                                  'Zy(mm3)': self.section.elast_sec_mod_y,
+                                  'Zpz(mm3)': self.section.plast_sec_mod_z,
+                                  'Zpy(mm3)': self.section.elast_sec_mod_y}
 
         self.report_input = \
             {KEY_MODULE: self.module,
@@ -2308,32 +2311,50 @@ class BeamCoverPlate(MomentConnection):
 
 
 
-        t1 = ('SubSection', 'Load Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Member Capacity','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, '', axial_capacity(area=self.section.area ,fy =self.section.fy,
-                                                        gamma_m0=gamma_m0,axial_capacity= self.axial_capacity/1000 ),'')
+                                                        gamma_m0=gamma_m0,axial_capacity= round(self.axial_capacity/1000 , 2) ),'')
         self.report_check.append(t1)
         h = self.section.depth - (2 * self.section.flange_thickness)
-        shear_capacity1 = ((self.section.depth - (
+        self.shear_capacity1 = round(((self.section.depth - (
                     2 * self.section.flange_thickness)) * self.section.web_thickness * self.section.fy) / (
-                                 math.sqrt(3) * gamma_m0)
-        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '', shear_capacity(h=h, t =self.section.web_thickness ,f_y =self.section.fy, gamma_m0=gamma_m0,shear_capacity = shear_capacity1/1000),
+                                 math.sqrt(3) * gamma_m0) ,2)
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '', shear_capacity(h=h, t =self.section.web_thickness ,f_y =self.section.fy, gamma_m0=gamma_m0,shear_capacity = self.shear_capacity1/1000),
               '')
+        self.Pmc = self.section.plastic_moment_capactiy
         self.report_check.append(t1)
-        # t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY,'', plastic_moment_capacty(beta_b =self.beta_b, Z_p=self.Z_p, f_y=self.section.fy, gamma_m0 =gamma_m0 , plastic_moment_capacty = self.section.plastic_moment_capacty),  '')
-        # self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY,'', plastic_moment_capacty(beta_b =self.beta_b, Z_p=self.Z_p, f_y=self.section.fy, gamma_m0 =gamma_m0 , Pmc = round(self.Pmc/1000000,2)),  '')
+        self.report_check.append(t1)
+        self.Mdc =self.section.moment_d_def_criteria
+        t1 = (KEY_OUT_DISP_MOMENT_D_DEFORMATION, '',moment_d_deformation_criteria(fy = self.section.fy, Z_e = self.section.elast_sec_mod_z, Mdc= round(self.Mdc/1000000,2)), '')
+        self.report_check.append(t1)
 
-        # t1 = (KEY_OUT_DISP_MOMENT_D_DEFORMATION, '',moment_d_deformation_criteria(fy = self.section.fy, Z_e = self.section.elast_sec_mod_z, Mdc=self.section.moment_d_deformation_criteria), '')
-        # self.report_check.append(t1)
-
-        # t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, '',moment_capacity(P_m_c= self.section.plastic_moment_capactiy, M_d_c =self.section.moment_d_def_criteria, M_c = self.section.moment_capacity), '')
-        # self.report_check.append(t1)
-
-
+        t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, '',moment_capacity(Pmc= round(self.Pmc/1000000,2), Mdc = round(self.Mdc/1000000,2), M_c = round(self.section.moment_capacity/1000000,2)), '')
+        self.report_check.append(t1)
 
 
+        t1 = ('SubSection', 'Load Considered','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, min_axial_capacity(axial_capacity =round(self.axial_capacity/1000 , 2) ,min_ac= round(self.min_axial_load/1000 , 2)),
+                                            prov_axial_load(axial_input =self.load.axial_force ,min_ac= round(self.min_axial_load/1000 , 2),app_axial_load =round(self.factored_axial_load/1000 ,2)),
+              get_pass_fail(self.min_axial_load/1000, self.factored_axial_load/1000, relation='lesser'))
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, min_shear_capacity(shear_capacity=round(self.shear_capacity1 / 1000, 2),
+                                                               min_sc=round(self.shear_load1/ 1000, 2)),
+              prov_shear_load(shear_input=self.load.shear_force ,
+                              min_sc=round(self.shear_load1 / 1000, 2),
+                              app_shear_load=round( self.fact_shear_load / 1000, 2)),
+              get_pass_fail(self.shear_load1/1000,  self.fact_shear_load/1000, relation='lesser'))
+        self.report_check.append(t1)
 
+        t1 = (KEY_DISP_APPLIED_MOMENT_LOAD, min_moment_capacity(moment_capacity=round( self.section.moment_capacity / 1000000, 2),
+                                                               min_mc=round( self.load_moment_min  / 1000000, 2)),
+              prov_moment_load(moment_input=self.load.moment, min_mc=round( self.load_moment_min  / 1000000, 2),
+                              app_moment_load=round(self.load_moment / 1000000, 2)),
+              get_pass_fail(round( self.load_moment_min  / 1000000, 2), round(self.load_moment/1000000 , 2), relation="lesser"))
+        self.report_check.append(t1)
 
 
 
@@ -2513,11 +2534,12 @@ class BeamCoverPlate(MomentConnection):
                                           Anb=self.web_bolt.bolt_net_area, gamma_mf=self.web_bolt.gamma_mf,
                                           capacity=web_bolt_capacity_kn), '')
             self.report_check.append(t4)
-        #
-        # t5 = (DISP_NUM_OF_BOLTS, get_trial_bolts(V_u=0, A_u=0,
-        #                                          bolt_capacity=  web_bolt_capacity_red_kn , multiple=2,force= res_force),
-        #       self.web_plate.bolts_required, '') ### todo no of bolts
-        self.report_check.append(t5)
+        t5 = (DISP_NUM_OF_BOLTS,
+              get_trial_bolts(V_u=round(self.fact_shear_load/1000 ,2), A_u=(round(self.axial_force_w/ 1000, 2)), bolt_capacity=web_bolt_capacity_kn,
+                              multiple=2),
+              self.web_plate.bolts_required, '')
+        self.report_check.append(t5)# todo no of bolts
+
         t6 = (DISP_NUM_OF_COLUMNS, '', self.web_plate.bolt_line, '')
         self.report_check.append(t6)
 
@@ -2792,11 +2814,11 @@ class BeamCoverPlate(MomentConnection):
         t1 = (KEY_DISP_PLATE_BLK_SHEAR_SHEAR, '', round(self.web_plate.block_shear_capacity_shear / 1000, 2), '')
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_WEBPLATE_SHEAR_CAPACITY, round(self.load.shear_force/1000,2),
+        t1 = (KEY_DISP_WEBPLATE_SHEAR_CAPACITY, round(self.fact_shear_load/1000,2),
               shear_capacity_prov(round(self.web_plate.shear_yielding_capacity / 1000, 2),
                                   round(self.web_plate.shear_rupture_capacity / 1000, 2),
                                   round(self.web_plate.block_shear_capacity / 1000, 2)),
-              get_pass_fail(round(self.load.shear_force/1000,2), round(self.web_plate.shear_capacity_web_plate  / 1000, 2), relation="lesser"))
+              get_pass_fail(round(self.fact_shear_load/1000,2), round(self.web_plate.shear_capacity_web_plate  / 1000, 2), relation="lesser"))
         self.report_check.append(t1)
 
         Disp_3D_image = "./ResourceFiles/images/3d.png"

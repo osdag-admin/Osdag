@@ -21,18 +21,22 @@ Connectivity: Column flange-Beam web
 DesignPreferences.Bolt.Bolt_Hole_Type: Standard
 DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
 DesignPreferences.Bolt.Slip_Factor: '0.3'
+DesignPreferences.Bolt.Type: Pretensioned
 DesignPreferences.Design.Design_Method: Limit State Design
 DesignPreferences.Detailing.Corrosive_Influences: 'No'
 DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
 DesignPreferences.Detailing.Gap: '10'
+DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-DesignPreferences.Weld.Type: Shop Weld
 Load.Axial: '30'
-Load.Shear: '20'
+Load.Shear: '150'
 Member.Material: E 250 (Fe 410 W)B
-Member.Supported_Section: JB 200
-Member.Supporting_Section: HB 150
+Member.Supported_Section: UB 406 x 178 x 74
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section: PBP 300X222.9
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
 Module: Fin Plate
+Plate.Material: E 250 (Fe 410 W)A
 Plate.Thickness:
 - '3'
 - '4'

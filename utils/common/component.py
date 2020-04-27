@@ -822,6 +822,7 @@ class Plate(Material):
         self.shear_capacity_web_plate=0.0
         self.tension_capacity_web_plate = 0.0
         self.tension_capacity_flange_plate = 0.0
+        self.block_shear_capacity_shear = 0.0
         self.moment_capacity = 0.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)

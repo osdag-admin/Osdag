@@ -594,8 +594,8 @@ class CommonDesignLogic(object):
                                T=float(B.flange_plate.thickness_provided))  # Call to Plate in Component repository
         plateBelwFlange = copy.copy(plateAbvFlange)  # Since both the flange plates are identical
 
-        innerplateAbvFlangeFront = Plate(L=B.flange_plate.height,
-                                         W=B.flange_plate.length,
+        innerplateAbvFlangeFront = Plate(L=B.flange_plate.Innerheight,
+                                         W=B.flange_plate.Innerlength,
                                          T=float(B.flange_plate.thickness_provided))
         innerplateAbvFlangeBack = copy.copy(innerplateAbvFlangeFront)
         innerplateBelwFlangeFront = copy.copy(innerplateAbvFlangeBack)

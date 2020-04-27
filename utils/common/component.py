@@ -175,6 +175,15 @@ class Bolt(Material):
             self.bolt_bearing_capacity = VALUE_NOT_APPLICABLE
             self.bolt_capacity = self.bolt_shear_capacity
 
+    def calculate_kb(self, e,p,d_0,f_ub,f_u):
+
+        if p > 0.0:
+            kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, f_ub / f_u, 1.0)
+        else:
+            kb = min(e / (3.0 * self.d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
+
+        return kb
+
 
     def calculate_bolt_tension_capacity(self, bolt_diameter_provided, bolt_grade_provided):
         """

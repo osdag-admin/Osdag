@@ -429,6 +429,7 @@ self
         else:
             k_b = min(e / (3.0 * d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
 
+        k_b = round(k_b,2)
         V_npb = 2.5 * k_b * d * t * f_u
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         V_dpb = V_npb/gamma_mb

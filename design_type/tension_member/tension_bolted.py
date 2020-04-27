@@ -1156,6 +1156,7 @@ class Tension_bolted(Main):
             else:
                 self.cross_area_prev = 0
 
+
             if self.cross_area > self.cross_area_prev or previous_size == None:
                 self.section_size.tension_member_yielding(A_g = self.cross_area , F_y =self.section_size.fy)
                 self.K = 1.0
@@ -1183,9 +1184,11 @@ class Tension_bolted(Main):
                     # print(self.section_size.tension_yielding_capacity)
 
                 "condition for yield and slenderness check "
+                member_design = False
 
                 if (self.section_size.tension_yielding_capacity >= self.load.axial_force*1000) and self.section_size.slenderness < 400:
                     min_yield_current = self.section_size.tension_yielding_capacity
+                    member_design = True
                     if min_yield == 0:
                         min_yield = min_yield_current
                         self.section_size_1 = self.select_section(self, design_dictionary, selectedsize)
@@ -1255,7 +1258,7 @@ class Tension_bolted(Main):
 
                 elif self.length > length:
                     self.design_status = False
-                    logger.error(" : Member fails in slenderness.")
+                    logger.error(" : Length exceeds maximum length of maximum available member size .")
                     logger.error(": Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
                     break
@@ -1263,8 +1266,11 @@ class Tension_bolted(Main):
                 else:
                     pass
 
-        if (self.load.axial_force*1000 > max_force) or self.length > length:
-            pass
+        if member_design == False:
+            logger.info(" : Tension force or Slenderness value exceeds the limit for maximum available member size.")
+            logger.error(": Design is not safe. \n ")
+            logger.debug(" :=========End Of design===========")
+
         else:
             print("pass")
             self.design_status = True
@@ -1615,12 +1621,12 @@ class Tension_bolted(Main):
         else:
             pass
 
-        self.w = w
-        self.A_go = A_go
-        self.A_nc = A_nc
-        self.t = t
-        self.L_c = L_c
-        self.b_s = shear_lag
+        self.w = round((w),2)
+        self.A_go = round((A_go),2)
+        self.A_nc = round((A_nc),2)
+        self.t = round((t),2)
+        self.L_c = round((L_c),2)
+        self.b_s = round((shear_lag),2)
 
         self.section_size_1.tension_blockshear_area_input (A_vg = A_vg, A_vn = A_vn, A_tg = A_tg, A_tn = A_tn, f_u = self.section_size_1.fu, f_y = self.section_size_1.fy)
         self. K = 1
@@ -1657,8 +1663,10 @@ class Tension_bolted(Main):
 
         "recalculating block shear capacity of the bolt based on the change in pitch while block shear check in member design"
 
-        self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
+        self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.bolt_fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
             e=self.plate.end_dist_provided, p=self.plate.pitch_provided, bolt_hole_type=self.bolt.bolt_hole_type)
+
+        self.bolt.kb = self.bolt.calculate_kb(e=self.plate.end_dist_provided, p=self.plate.pitch_provided, d_0= self.bolt.dia_hole, f_ub=self.bolt.bolt_fu,f_u=self.bolt.fu_considered)
 
         self.bolt.bolt_bearing_capacity = self.bolt_bearing_capacity
 
@@ -1781,7 +1789,7 @@ class Tension_bolted(Main):
         if self.sec_profile in ["Channels", "Back to Back Channels"]:
             self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
                                       # Image shall be save with this name.png in resource files
-                                      KEY_DISP_SECSIZE: self.section_size_1.designation,
+                                      KEY_DISP_SECSIZE: (self.section_size_1.designation,self.sec_profile),
                                       KEY_DISP_MATERIAL: self.section_size_1.material,
                                       KEY_DISP_FU: self.section_size_1.fu,
                                       KEY_DISP_FY: self.section_size_1.fy,
@@ -1824,7 +1832,7 @@ class Tension_bolted(Main):
                                       'Iv(mm4)': self.section_size_1.mom_inertia_v,
                                       'rz(mm)': self.section_size_1.rad_of_gy_z,
                                       'ry(mm)': round((self.section_size_1.rad_of_gy_y),2),
-                                      'ru(mm)': self.section_size_1.rad_of_gy_u,
+                                      'ru(mm)': round((self.section_size_1.rad_of_gy_u),2),
                                       'rv(mm)': round((self.section_size_1.rad_of_gy_v),2),
                                       'Zz(mm3)': self.section_size_1.elast_sec_mod_z,
                                       'Zy(mm3)': self.section_size_1.elast_sec_mod_y,
@@ -1844,6 +1852,9 @@ class Tension_bolted(Main):
              KEY_DISP_D: str(self.bolt.bolt_diameter),
              KEY_DISP_GRD: str(self.bolt.bolt_grade),
              KEY_DISP_TYP: self.bolt.bolt_type,
+             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+             KEY_DISP_DP_BOLT_FU: round(self.bolt.bolt_fu,2),
+             KEY_DISP_DP_BOLT_FY: round(self.bolt.bolt_fy,2),
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
              KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
@@ -1874,12 +1885,17 @@ class Tension_bolted(Main):
         bolt_capacity_red_kn = round(self.plate.bolt_capacity_red/1000, 2)
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        if self.sec_profile in ["Back to Back Angles", "Star Angles", "Back to Back Channels"]:
+            multiple = 2
+        else:
+            multiple =1
+
 
         t1 = ('SubSection', 'Member Checks', '|p{3cm}|p{5cm}|p{7cm}|p{1cm}|')
         self.report_check.append(t1)
-        t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(self.section_size_1.area,self.section_size_1.fy,gamma_m0,member_yield_kn), '')
+        t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(self.section_size_1.area,self.section_size_1.fy,gamma_m0,member_yield_kn,multiple), '')
         self.report_check.append(t2)
-        t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',member_rupture_prov(self.A_nc,self.A_go,self.section_size_1.fu, self.section_size_1.fy, self.L_c,self.w,self.b_s, self.t,gamma_m0,gamma_m1,self.section_size_1.beta,member_rupture_kn), '')
+        t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',member_rupture_prov(self.A_nc,self.A_go,self.section_size_1.fu, self.section_size_1.fy, self.L_c,self.w,self.b_s, self.t,gamma_m0,gamma_m1,self.section_size_1.beta,member_rupture_kn,multiple), '')
         self.report_check.append(t3)
         t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '',blockshear_prov(Tdb= member_blockshear_kn), '')
         self.report_check.append(t4)
@@ -1895,7 +1911,7 @@ class Tension_bolted(Main):
         self.report_check.append(t7)
 
         if self.bolt.bolt_type == TYP_BEARING:
-            t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.fu, 1, self.bolt.bolt_net_area,
+            t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, self.planes, self.bolt.bolt_net_area,
                                                                self.bolt.gamma_mb, bolt_shear_capacity_kn), '')
             self.report_check.append(t1)
             t2 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(kb_disp, self.bolt.bolt_diameter_provided,

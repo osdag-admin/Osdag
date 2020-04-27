@@ -280,7 +280,7 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     T_dg = str(T_dg)
     tension_yield_eqn = Math(inline=True)
     tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\'))
-    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
+    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
 
@@ -416,18 +416,19 @@ def get_pass_fail(required, provided,relation='greater'):
             else:
                 return 'Fail'
 
-def member_yield_prov(Ag, fy, gamma_m0, member_yield):
+def member_yield_prov(Ag, fy, gamma_m0, member_yield,multiple = 1):
     Ag = str(Ag)
     fy = str(fy)
     gamma_m0 = str(gamma_m0)
+    multiple = str(multiple)
     member_yield = str(member_yield)
     member_yield_eqn = Math(inline=True)
     member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
-    member_yield_eqn.append(NoEscape(r'&= \frac{' + Ag + '*' + fy + '}{'+ gamma_m0 + r'}\\'))
+    member_yield_eqn.append(NoEscape(r'&= \frac{'+ multiple + '*' + Ag + '*' + fy + '}{'+ gamma_m0 + r'}\\'))
     member_yield_eqn.append(NoEscape(r'&= ' + member_yield + r'\end{aligned}'))
     return member_yield_eqn
 
-def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,beta,member_rup):
+def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,beta,member_rup,multiple = 1):
     w = str(w)
     t = str(t)
     fy = str(F_y)
@@ -440,6 +441,7 @@ def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,b
     gamma_m1 = str(gamma_m1)
     beta = str(round(beta,2))
     member_rup = str(member_rup)
+    multiple = str(multiple)
     member_rup_eqn = Math(inline=True)
     member_rup_eqn.append(NoEscape(r'\begin{aligned}\beta &= 1.4 - 0.076*\frac{w}{t}*\frac{f_{y}}{f_{u}}*\frac{b_s}{L_c}\\'))
     member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9*f_{u}*\gamma_{m0}}{f_{y}*\gamma_{m1}} \geq 0.7 \\'))
@@ -447,7 +449,7 @@ def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,b
     member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9* '+ fu + '*'+ gamma_m0 +'}{' +fy+'*'+gamma_m1 + r'} \geq 0.7 \\'))
     member_rup_eqn.append(NoEscape(r'&= '+ beta + r'\\'))
     member_rup_eqn.append(NoEscape(r'T_{dn} &= \frac{0.9*A_{nc}*f_{u}}{\gamma_{m1}} + \frac{\beta * A_{go} * f_{y}}{\gamma_{m0}}\\'))
-    member_rup_eqn.append(NoEscape(r'&= \frac{0.9* '+ A_nc +'*' + fu + '}{'+ gamma_m1 + r'} + \frac{' + beta + '*' + A_go + '*' + fy + '}{' + gamma_m0 + r'}\\'))
+    member_rup_eqn.append(NoEscape(r'&= '+multiple+ r'*(\frac{0.9* '+ A_nc +'*' + fu + '}{'+ gamma_m1 + r'} + \frac{' + beta + '*' + A_go + '*' + fy + '}{' + gamma_m0 + r'})\\'))
     member_rup_eqn.append(NoEscape(r'&= '+ member_rup + r'\end{aligned}'))
 
     return member_rup_eqn

@@ -803,6 +803,10 @@ KEY_DP_BOLT_SLIP_FACTOR = 'DesignPreferences.Bolt.Slip_Factor'
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 KEY_DP_WELD_FAB = 'DesignPreferences.Weld.Fab'
 
+KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
+KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
+
+
 KEY_DP_WELD_TYPE = 'Weld.Type'
 KEY_DISP_DP_WELD_TYPE ='Weld Type'
 KEY_DP_WELD_FAB_SHOP = 'Shop Weld'

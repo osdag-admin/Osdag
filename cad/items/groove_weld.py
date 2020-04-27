@@ -47,3 +47,23 @@ class GrooveWeld(object):
         return prism
 
 
+if __name__ == '__main__':
+
+    from OCC.Display.SimpleGui import init_display
+    display, start_display, add_menu, add_function_to_menu = init_display()
+
+    b = 10
+    h = 10
+    L = 10
+
+    origin = numpy.array([0.,0.,0.])
+    uDir = numpy.array([1.,0.,0.])
+    wDir = numpy.array([0.,0.,1.])
+
+    channel = GrooveWeld(b, h, L)
+    angles = channel.place(origin, uDir, wDir)
+    point = channel.compute_params()
+    prism = channel.create_model()
+    display.DisplayShape(prism, update=True)
+    display.DisableAntiAliasing()
+    start_display()

@@ -138,7 +138,7 @@ class CreateLatex(Document):
             for check in Design_Check:
                 if check[0] == 'SubSection':
                     with doc.create(Subsection(check[1])):
-                        with doc.create(LongTable(check[2], row_height=1.2)) as table:
+                        with doc.create(LongTable(check[2], row_height=1.2)) as table: # todo anjali remove
                             table.add_hline()
                             table.add_row(('Check', 'Required', 'Provided', 'Remarks'), color='OsdagGreen')
                             table.add_hline()

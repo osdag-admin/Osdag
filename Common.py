@@ -688,6 +688,9 @@ KEY_OUT_FLANGE_MIN_PITCH= 'flange_bolt.min_pitch_round'
 KEY_OUT_FLANGE_MIN_EDGE_DIST= 'flange_bolt.min_edge_dist_round'
 KEY_OUT_FLANGE_MAX_EDGE_DIST='flange_bolt.max_edge_dist_round'
 
+KEY_OUT_DISP_FORCES_FLANGE = 'Forces Carried by Flange'
+KEY_OUT_DISP_FORCES_WEB= 'Forces Carried by Web'
+
 KEY_OUT_WEB_BOLT_SHEAR ='web_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_WEB_BOLT_SHEAR = "Shear Capacity (kN)"
 KEY_OUT_WEB_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'

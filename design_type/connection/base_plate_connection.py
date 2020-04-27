@@ -239,6 +239,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gusset_along_web = 'No'
         self.gusset_plate_length = 0.0
         self.stiffener_plate_length = 0.0
+        self.gusset_outstand_length = 0.0
+        self.stiffener_outstand_length = 0.0
         self.gusset_fy = self.dp_column_fy
         self.stiffener_fy = self.dp_column_fy
         self.epsilon = 1
@@ -258,6 +260,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.shear_capacity_stiffener = 0.0
         self.z_e_stiffener = 0.0
         self.moment_capacity_stiffener = 0.0
+
+        self.weld_size_gusset = 0.0
+        self.weld_size_gusset_vertical = 0.0
+        self.weld_size_stiffener = 0.0
 
         self.eccentricity_zz = 0.0
         self.sigma_max_zz = 0.0
@@ -1120,6 +1126,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             if self.eccentricity_zz <= self.bp_length_min / 6:  # Case 1
 
+                self.gusseted_bp_case = 'Case1'
+
                 # fixing length and width of the base plate
                 width_min = 2 * self.load_axial / (self.bp_length_min * self.bearing_strength_concrete)  # mm
                 if width_min < self.bp_width_min:
@@ -1158,6 +1166,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.tension_capacity_anchor = 0
 
             else:  # Case 2 and Case 3
+                self.gusseted_bp_case = 'Case2&3'
 
                 # fixing length and width of the base plate
                 self.bp_length_provided = self.bp_length_min
@@ -1445,10 +1454,20 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                                [self.plate_thk, self.column_tf], self.dp_weld_fab)
 
                     if self.weld_size_web > weld_size_web_max:
-                        if self.gusset_along_flange == 'Yes':
-                            self.gusset_along_web = 'Yes'
+                        self.gusset_along_web = 'Yes'
 
-                            self.weld_size_web = self.weld_size_flange
+                        self.weld_size_web = self.weld_size_flange
+
+                    # defining conditions for providing gusset/stiffener plates for each connectivity
+                    if self.connectivity == 'Welded-Slab Base':
+                        if self.gusset_along_flange or self.gusset_along_web == 'Yes':
+                            self.gusset_along_flange = 'Yes'
+                            self.gusset_along_web = 'Yes'
+                        else:
+                            pass
+                    else:
+                        self.gusset_along_flange = 'Yes'
+                        self.gusset_along_web = 'Yes'
 
                 elif self.connectivity == "Hollow Section":
                     # TODO: add calculations for hollow sections
@@ -1477,11 +1496,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if self.gusset_along_flange == 'Yes':
 
                 # layout of the gusset and the stiffener plate
-                self.gusset_plate_length = self.bp_width_provided  # mm, gusset plate is along the flange of the column
-                self.stiffener_plate_length = (self.bp_length_provided - self.column_D) / 2  # mm. stiffener plate is across the flange of the column
+                self.gusset_plate_length = self.bp_width_provided  # mm (each), gusset plate is along the flange of the column
+                self.stiffener_plate_length = (self.bp_length_provided - self.column_D) / 2  # mm (each), stiffener plate is across the flange of the column
 
-                gusset_outstand_length = (self.gusset_plate_length - self.column_bf) / 2  # mm
-                stiffener_outstand_length = self.stiffener_plate_length  # mm
+                self.gusset_outstand_length = (self.gusset_plate_length - self.column_bf) / 2  # mm
+                self.stiffener_outstand_length = self.stiffener_plate_length  # mm
 
                 self.gusset_fy = self.dp_column_fy  # MPa
                 self.stiffener_fy = self.dp_column_fy  # MPa
@@ -1489,7 +1508,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 # thickness of the gusset/stiffener plate as per Table 2 of IS 800:2007 [b/t_f <= 13.6 * epsilon]
                 # considering the maximum outstanding length to calculate the thickness of the gusset/stiffener
-                thk_req = (max(gusset_outstand_length, stiffener_outstand_length)) / (13.6 * self.epsilon)  # mm
+                thk_req = (max(self.gusset_outstand_length, self.stiffener_outstand_length)) / (13.6 * self.epsilon)  # mm
 
                 # gusset/stiffener plate should be at-least equal to the flange thickness
                 self.gusset_plate_thick = round_up(thk_req, 2, self.column_tf)  # mm
@@ -1498,18 +1517,30 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # height of the gusset/stiffener plate
                 # the size of the landing is 100 mm along vertical dimension and 50 mm along horizontal dimension
                 # the assumed inclination of the gusset/stiffener plate is 45 degrees
-                self.gusset_plate_height = self.gusset_plate_length + 100  # mm
                 self.stiffener_plate_height = self.stiffener_plate_length + 100  # mm
+                self.gusset_plate_height = max((self.gusset_outstand_length + 100), self.stiffener_plate_height)  # mm
+
+                # defining stresses for the connectivity types
+                if self.connectivity == 'Welded-Slab Base':
+                    self.sigma_max_zz = self.w
+                    self.sigma_xx = self.w
+                else:
+                    if self.gusseted_bp_case == 'Case1':
+                        self.sigma_max_zz = self.sigma_max_zz
+                        self.sigma_xx = self.sigma_xx
+                    else:
+                        self.sigma_max_zz = 0.45 * self.bearing_strength_concrete
+                        self.sigma_xx = 0.45 * self.bearing_strength_concrete
 
                 # shear yielding and moment capacity checks for the gusset/stiffener plates
 
                 # gusset plate
 
                 # shear and moment acting on the gusset plate
-                self.shear_on_gusset = self.sigma_xx * self.gusset_plate_length * self.gusset_plate_height
+                self.shear_on_gusset = self.sigma_xx * self.gusset_outstand_length * self.gusset_plate_height  # for each gusset plate
                 self.shear_on_gusset = round((self.shear_on_gusset / 1000), 3)  # kN
 
-                self.moment_on_gusset = self.sigma_xx * self.gusset_plate_height * self.gusset_plate_length ** 2 * 0.5
+                self.moment_on_gusset = self.sigma_xx * self.gusset_plate_height * self.gusset_outstand_length ** 2 * 0.5
                 self.moment_on_gusset = round((self.moment_on_gusset * 10 ** -6), 3)  # kN-m
 
                 # shear yielding capacity and moment capacity of the gusset plate
@@ -1537,7 +1568,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 # shear and moment acting on the stiffener plate
                 self.shear_on_stiffener = ((self.sigma_max_zz + self.sigma_xx) / 2) * self.stiffener_plate_length * self.stiffener_plate_height
-                self.shear_on_stiffener = round((self.shear_on_gusset / 1000), 3)  # kN
+                self.shear_on_stiffener = round((self.shear_on_stiffener / 1000), 3)  # kN
 
                 self.moment_on_stiffener = (self.sigma_xx * self.stiffener_plate_height * self.stiffener_plate_length ** 2 * 0.5) + \
                                            (0.5 * self.stiffener_plate_length * (self.sigma_max_zz - self.sigma_xx) * self.stiffener_plate_height *
@@ -1564,6 +1595,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.design_status = False
                 else:
                     pass
+
+                # weld size on the gusset and the stiffener plates
+                self.weld_size_gusset = self.weld_size_flange  # mm
+                self.weld_size_gusset_vertical = 6  # mm
+                self.weld_size_stiffener = self.weld_size_web  # mm
 
         else:
             pass
@@ -1612,8 +1648,32 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             pass
 
-        # weld
-        print(self.weld_size if self.weld_type != 'Butt Weld' else '')  # Weld size (mm)
+        # Gusset/Stiffener Plate
+        # Details tab (this is supposed to be taken from Osdag 2 - details to be given soon)
+
+        # Gusset Plate
+        print(self.gusset_plate_thick)  # Thickness (mm)
+        print(self.shear_on_gusset)  # Shear Demand (kN)
+        print(self.shear_capacity_gusset)  # Shear Capacity (kN)
+        print(self.moment_on_gusset)  # Moment Demand (kN-m)
+        print(self.moment_capacity_gusset)  # Moment Capacity (kN-m)
+
+        # Stiffener Plate
+        print(self.stiffener_plate_thick)  # Thickness (mm)
+        print(self.shear_on_stiffener)  # Shear Demand (kN)
+        print(self.shear_capacity_stiffener)  # Shear Capacity (kN)
+        print(self.moment_on_stiffener)  # Moment Demand (kN-m)
+        print(self.moment_capacity_stiffener)  # Moment Capacity (kN-m)
+
+
+        # Weld
+
+        print(self.weld_size_flange if self.weld_type != 'Butt Weld' else '')  # Size at Flange (mm)
+        print(self.weld_size_web if self.weld_type != 'Butt Weld' else '')  # Size at Web (mm)
+        print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # Size at Gusset/Stiffener (mm)
+
+        # this might not be required
+        print(self.weld_size if self.weld_type != 'Butt Weld' else '')  # Weld size (mm) 
 
         # col properties
         print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)

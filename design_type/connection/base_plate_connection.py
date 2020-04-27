@@ -1698,6 +1698,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             logger.debug(": =========End Of design===========")
 
         # printing values for output dock
+        # connectivity types: 'Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section'
 
         # anchor bolt
         print(self.anchor_dia_provided)

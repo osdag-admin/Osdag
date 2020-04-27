@@ -17,7 +17,7 @@ from gui.ui_ask_question import Ui_AskQuestion
 # from design_type.connection.fin_plate_connection import DesignReportDialog
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
-from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
+from design_type.connection.seated_angle_connection import SeatedAngleConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.base_plate_connection import BasePlateConnection
 
@@ -262,7 +262,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_seat.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2,SeatedAngleConnectionInput)
+            self.ui2.setupUi(self.ui2, SeatedAngleConnection, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
@@ -462,7 +462,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_compression_welded.isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2, Compression)
+            self.ui2.setupUi(self.ui2, Compression, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 

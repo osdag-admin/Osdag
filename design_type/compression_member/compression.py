@@ -834,16 +834,6 @@ class Compression(Main):
         # angle_section.append(t33)
 
         return angle_section
-    
-    @staticmethod
-    def tab_channel_section():
-        #Channel Tab method for adding tab elements
-        channel_section=[]
-        # sample fields added
-        t1 = (KEY_ANGLE_DESIGNATION, KEY_DISP_ANGLE_DESIGNATION, TYPE_TEXTBOX, None)
-        channel_section.append(t1)
-
-        return channel_section
 
     def tab_list(self):
 
@@ -858,23 +848,18 @@ class Compression(Main):
         t3 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_angle_section)
         tabs.append(t3)
 
-        t4 = ("Channel", TYPE_TAB_1, self.tab_channel_section)
+        t4 = ("Bolt", TYPE_TAB_2, self.bolt_values)
         tabs.append(t4)
 
-        t5 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        t5 = ("Weld", TYPE_TAB_2, self.weld_values)
         tabs.append(t5)
 
-        t6 = ("Weld", TYPE_TAB_2, self.weld_values)
+        t6 = ("Detailing", TYPE_TAB_2, self.detailing_values)
         tabs.append(t6)
 
-        t7 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        t7 = ("Design", TYPE_TAB_2, self.design_values)
         tabs.append(t7)
 
-        t8 = ("Design", TYPE_TAB_2, self.design_values)
-        tabs.append(t8)
-
-        t9 = ("Connector", TYPE_TAB_2, self.connector_values)
-        tabs.append(t9)
         return tabs
 
     @staticmethod
@@ -960,19 +945,3 @@ class Compression(Main):
         design.append(t1)
 
         return design
-    @staticmethod
-    def connector_values():
-        connector = []
-
-        material = connectdb("Material", call_type="popup")
-        material.append('Custom')
-        t1 = (KEY_PLATE_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material)
-        connector.append(t1)
-
-        t2 = (KEY_PLATE_FU, KEY_DISP_PLATE_FU, TYPE_TEXTBOX, None)
-        connector.append(t2)
-
-        t3 = (KEY_PLATE_FY, KEY_DISP_PLATE_FY, TYPE_TEXTBOX, None)
-        connector.append(t3)
-
-        return connector

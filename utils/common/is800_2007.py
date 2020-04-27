@@ -587,11 +587,11 @@ self
 
 
     @staticmethod
-    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned, eta=1.5):
+    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned=False, eta=1.5):
         """Calculate prying force of friction grip bolt
 
                        Args:
-                          2 * T_e - Force in 2 bolts on either sides of the web/plate
+                          2 * T_e - Force in
                           l_v - distance from the bolt centre line to the toe of the fillet weld or to half
                                 the root radius for a rolled section,
                           beta - 2 for non pre-tensioned bolt and 1 for pre-tensioned bolt
@@ -609,14 +609,10 @@ self
 
         """
         beta = 2
-        if pre_tensioned == 'Pretensioned':
+        if pre_tensioned is True:
             beta = 1
-        print(pre_tensioned)
         l_e = min(end_dist, 1.1 * t * math.sqrt(beta * f_o / f_y))
-        if (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2))) <= 0:
-            Q = 0.0
-        else:
-            Q = (l_v / 2 / l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
+        Q = (l_v / 2 / l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
         return Q
 
 

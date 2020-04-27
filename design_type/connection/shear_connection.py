@@ -107,11 +107,11 @@ class ShearConnection(Connection):
         self.material = Material(material_grade=design_dictionary[KEY_MATERIAL])
 
         if self.connectivity in VALUES_CONN_1:
-            self.supporting_section = Column(designation=design_dictionary[KEY_SUPTNGSEC], material_grade=design_dictionary[KEY_MATERIAL])
+            self.supporting_section = Column(designation=design_dictionary[KEY_SUPTNGSEC], material_grade=design_dictionary[KEY_SUPTNGSEC_MATERIAL])
         else:
-            self.supporting_section = Beam(designation=design_dictionary[KEY_SUPTNGSEC], material_grade=design_dictionary[KEY_MATERIAL])
+            self.supporting_section = Beam(designation=design_dictionary[KEY_SUPTNGSEC], material_grade=design_dictionary[KEY_SUPTNGSEC_MATERIAL])
 
-        self.supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC], material_grade=design_dictionary[KEY_MATERIAL])
+        self.supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC], material_grade=design_dictionary[KEY_SUPTDSEC_MATERIAL])
         self.supported_section.notch_ht = round_up(self.supporting_section.flange_thickness * 2, 5)
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
                          bolt_type=design_dictionary[KEY_TYP],
@@ -119,8 +119,7 @@ class ShearConnection(Connection):
                          material_grade=design_dictionary[KEY_MATERIAL],
                          edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
                          mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
-                         corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES],
-                         bolt_tensioning=design_dictionary[KEY_DP_BOLT_TYPE])
+                         corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
 
         self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None))
 

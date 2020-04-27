@@ -58,7 +58,7 @@ from cad.cad3dconnection import cadconnection
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
-from design_type.connection.seated_angle_connection import SeatedAngleConnection
+from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
@@ -526,7 +526,6 @@ class Ui_ModuleWindow(QMainWindow):
         for option in option_list:
             lable = option[1]
             type = option[2]
-
             if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
@@ -625,7 +624,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         for t in new_list:
 
-            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC, KEY_SEATEDANGLE] and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
+            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -1405,10 +1404,7 @@ class Ui_ModuleWindow(QMainWindow):
         # For list in Customized combobox
 
         for custom_combo in new_list:
-            if op_list[0][1] in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED] and custom_combo[0] == KEY_SECSIZE:
-                data[custom_combo[0] + "_customized"] = custom_combo[1]('Angles')
-            else:
-                data[custom_combo[0] + "_customized"] = custom_combo[1]()
+            data[custom_combo[0] + "_customized"] = custom_combo[1]()
 
         # For output dock
 
@@ -1574,15 +1570,14 @@ class Ui_ModuleWindow(QMainWindow):
             return
         try:
             in_file = str(fileName)
+            print(in_file)
             with open(in_file, 'r') as fileObject:
                 uiObj = yaml.load(fileObject)
-
             module = uiObj[KEY_MODULE]
 
             module_class = self.return_class(module)
 
             selected_module = main.module_name(main)
-
             if selected_module == module:
                 self.setDictToUserInputs(uiObj, op_list, data, new, module)
             else:
@@ -1601,10 +1596,8 @@ class Ui_ModuleWindow(QMainWindow):
     '''
 
     def setDictToUserInputs(self, uiObj, op_list, data, new, module):
-
         for op in op_list:
             key_str = op[0]
-
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
             if op[2] == TYPE_COMBOBOX:
                 if key_str in uiObj.keys():
@@ -1672,10 +1665,13 @@ class Ui_ModuleWindow(QMainWindow):
             pass
         else:
             main.design_button_status = True
-            main.func_for_validation(main, self, self.design_inputs)
+            error = main.func_for_validation(main, self, self.design_inputs)
             status = main.design_status
             print(status)
 
+            if error is not None:   # if list is not empty means error occurred.
+
+                self.show_error_msg(error)
             # main.set_input_values(main, self.design_inputs, self)
             # DESIGN_FLAG = 'True'
 
@@ -1728,6 +1724,8 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_column.setEnabled(False)
                 self.actionShow_finplate.setEnabled(False)
 
+    def show_error_msg(self, error):
+        QMessageBox.about(self,'information',error[0])  # show only first error message.
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "OsdagHeader.png")))
@@ -2086,7 +2084,6 @@ class Ui_ModuleWindow(QMainWindow):
         tab_Column = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         tab_Beam = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
         tab_Angle = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
-        tab_Channel = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Channel")
 
         tab_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Bolt")
         tab_Weld = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
@@ -2133,8 +2130,6 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
                 if tab_Beam is not None:
                     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Beam, KEY_DISP_BEAMSEC)
                 self.designPrefDialog.beam_preferences(designation[0], material_grade)
@@ -2150,8 +2145,6 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
                 self.designPrefDialog.column_preferences(designation[0], table_1, material_grade)
                 if tab_Column is not None:
                     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Column, KEY_DISP_COLSEC)
@@ -2167,30 +2160,15 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
-                self.designPrefDialog.angle_preferences(designation[0], material_grade)
                 if tab_Angle is not None:
                     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Angle, DISP_TITLE_ANGLE)
-                designation_list = tab_Angle.findChild(QtWidgets.QWidget, KEY_SECSIZE)
-                designation_list.setCurrentIndex(0)
-                designation_list.clear()
-                for item in designation:
-                    designation_list.addItem(item)
-                designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.angle_preferences(
-                    designation_list.currentText() if designation_list.currentText() else '20 20 X 3', material_grade))
                 # self.designPrefDialog.ui.tabWidget.removeTab(
                 #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 # table_c = "Angles"
             elif key_6.currentIndex() in [3, 5]:
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
-                if tab_Channel is not None:
-                    self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Channel, "Channel")
+                pass
+                # self.designPrefDialog.ui.tabWidget.removeTab(
+                #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 # table_c = "Channels"
 
             # designation_col = 'JB 150'

@@ -19,7 +19,7 @@ from utils.common.common_calculation import *
 class Bolt(Material):
 
     def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="",
-                 edge_type="", mu_f=0.0, corrosive_influences=True):
+                 edge_type="", mu_f=0.0, corrosive_influences=True, bolt_tensioning=""):
         super(Bolt, self).__init__(material_grade)
         if grade is not None:
             self.bolt_grade = list(np.float_(grade))
@@ -31,6 +31,7 @@ class Bolt(Material):
         self.bolt_hole_type = bolt_hole_type
         self.edge_type = edge_type
         self.mu_f = float(mu_f)
+        self.bolt_tensioning = bolt_tensioning
 
         self.d_0 = 0.0
         self.kb = 0.0
@@ -733,10 +734,16 @@ class Weld(Material):
         weld_strength = round(f_wd * self.throat_tk,2)
         self.strength = weld_strength
 
-    def get_weld_stress(self,weld_shear =0.0, weld_axial=0.0, weld_twist=0.0, Ip_weld=1.0, y_max=0.0, x_max=0.0, l_weld=0.0):
-        T_wh = weld_twist * y_max/Ip_weld
-        T_wv = weld_twist * x_max/Ip_weld
-        V_wv = weld_shear /l_weld
+
+    def get_weld_stress(self,weld_shear, weld_axial, l_weld, weld_twist=0.0, Ip_weld=None, y_max=0.0, x_max=0.0):
+        if weld_twist != 0.0:
+            T_wh = weld_twist * y_max/Ip_weld
+            T_wv = weld_twist * x_max/Ip_weld
+        else:
+            T_wh = 0.0
+            T_wv = 0.0
+        V_wv = weld_shear/l_weld
+
         A_wh = weld_axial/l_weld
         weld_stress = round(math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2),2)
         self.stress = weld_stress
@@ -770,7 +777,6 @@ class Weld(Material):
             weld_thickness =16
         else:
             pass
-
         self.size = weld_thickness
         self.reason = weld_reason
 
@@ -1532,8 +1538,6 @@ class I_sectional_Properties(object):
         self.A = ((2 * B * t_f) + ((D - 2 * t_f) * t_w)) / 100
         self.M = 7850 * self.A / 10000
         return round(self.M,1)
-
-
 
     def calc_Area(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
         self.A = ((2*B*t_f) + ((D-2*t_f)*t_w))/100

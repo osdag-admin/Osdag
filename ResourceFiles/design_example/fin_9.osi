@@ -17,10 +17,11 @@ Bolt.Grade:
 - '10.9'
 - '12.9'
 Bolt.Type: Bearing Bolt
-Connectivity: Column flange-Beam web
+Connectivity: Beam-Beam
 DesignPreferences.Bolt.Bolt_Hole_Type: Standard
 DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
 DesignPreferences.Bolt.Slip_Factor: '0.3'
+DesignPreferences.Bolt.Type: Pretensioned
 DesignPreferences.Design.Design_Method: Limit State Design
 DesignPreferences.Detailing.Corrosive_Influences: 'No'
 DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
@@ -32,7 +33,7 @@ Load.Shear: '50'
 Member.Material: E 250 (Fe 410 W)A
 Member.Supported_Section: MB 250
 Member.Supported_Section.Material: E 250 (Fe 410 W)A
-Member.Supporting_Section: PBP 260X87.3
+Member.Supporting_Section: NPB 300x150x36.5
 Member.Supporting_Section.Material: E 250 (Fe 410 W)A
 Module: Fin Plate
 Plate.Material: E 165 (Fe 290)

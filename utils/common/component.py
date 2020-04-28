@@ -5,6 +5,12 @@ from Common import *
 import sqlite3
 import logging
 from utils.common.material import Material
+from builtins import str
+from Common import *
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
+from pylatex.utils import italic, NoEscape
+
+
 
 import math
 import numpy as np
@@ -13,7 +19,7 @@ from utils.common.common_calculation import *
 class Bolt(Material):
 
     def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="",
-                 edge_type="", mu_f=0.0, corrosive_influences=True):
+                 edge_type="", mu_f=0.0, corrosive_influences=True, bolt_tensioning=""):
         super(Bolt, self).__init__(material_grade)
         if grade is not None:
             self.bolt_grade = list(np.float_(grade))
@@ -25,6 +31,7 @@ class Bolt(Material):
         self.bolt_hole_type = bolt_hole_type
         self.edge_type = edge_type
         self.mu_f = float(mu_f)
+        self.bolt_tensioning = bolt_tensioning
 
         self.d_0 = 0.0
         self.kb = 0.0
@@ -142,13 +149,27 @@ class Bolt(Material):
         if self.bolt_type == "Bearing Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
-            [self.bolt_bearing_capacity,self.d_0,self.kb,self.gamma_mb] = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
+            self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                 f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
                 e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
             self.fu_considered = fu_considered
             self.thk_considered = thk_considered
+            d = self.bolt_diameter_provided
+            e = self.min_edge_dist_round
+            p = self.min_pitch_round
+            bolt_hole_type = self.bolt_hole_type
+            f_u = fu_considered
+            f_ub = self.bolt_fu
+            safety_factor_parameter = KEY_DP_WELD_FAB_FIELD
+            # Since field or shop both is 1.25 we are not taking safety_factor_parameter as input
 
+            self.d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
+            if p > 0.0:
+                self.kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, f_ub / f_u, 1.0)
+            else:
+                self.kb = min(e / (3.0 * self.d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
+            self.gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         elif self.bolt_type == "Friction Grip Bolt":
             self.bolt_shear_capacity,self.kh,self.gamma_mf = IS800_2007.cl_10_4_3_bolt_slip_resistance(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, n_e=n_planes, mu_f=self.mu_f, bolt_hole_type=self.bolt_hole_type)
@@ -186,14 +207,16 @@ class Bolt(Material):
         self.connecting_plates_tk = [i[0] for i in conn_plates_t_fu_fy]
         self.bolt_diameter_provided = bolt_diameter_provided
 
-        self.min_pitch = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)
-        self.min_gauge = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided)
-        self.min_edge_dist = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
-                                                                            self.edge_type)
+
+        self.min_pitch = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided),2)
+        self.min_gauge = round(IS800_2007.cl_10_2_2_min_spacing(self.bolt_diameter_provided),2)
+        self.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_provided, self.bolt_hole_type,
+                                                                            self.edge_type),2)
         self.min_end_dist = self.min_edge_dist
-        self.max_spacing = IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk)
-        self.max_edge_dist = IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
-                                                                        self.corrosive_influences)
+        self.max_spacing = round(IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk),2)
+        self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
+                                                                        self.corrosive_influences),2)
+
         self.max_end_dist = self.max_edge_dist
         self.min_pitch_round = round_up(self.min_pitch, 5)
         self.min_gauge_round = round_up(self.min_gauge, 5)
@@ -246,14 +269,18 @@ class Section(Material):
         self.source = 0.0
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
+        self.block_shear_capacity = 0.0
 
         # self.shear_yielding_capacity = 0.0
         # self.shear_rupture_capacity = 0.0
 
         self.tension_capacity_flange = 0.0
-        self.tension_capacity_web = 0.0
         self.shear_capacity_flange = 0.0
+        self.tension_capacity_web = 0.0
         self.shear_capacity_web = 0.0
+        self.tension_yielding_capacity_web=0.0
+        self.tension_rupture_capacity_web=0.0
+        self.block_shear_capacity_web=0.0
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
@@ -265,7 +292,12 @@ class Section(Material):
         self.tension_capacity = 0.0
         self.slenderness = 0.0
         self.min_radius_gyration = 0.0
+        self.beta =0.0
         # self.min_rad_gyration_bbchannel = 0.0
+
+        # self.member_yield_eqn =0.0
+        # self.member_rup_eqn = 0.0
+        # self.member_block_eqn = 0.0
 
 
     def connect_to_database_update_other_attributes(self, table, designation):
@@ -349,10 +381,19 @@ class Section(Material):
         "F_y = yield stress of the material"
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         T_dg = (A_g* F_y / gamma_m0)
+        # Ag = str(A_g)
+        # fy = str(F_y)
+        # gamma_m0 = str(gamma_m0)
+        # memb_yield = str(round((T_dg/1000),2))
         # logger.warning(
         #     " : You are using a section (in red color) that is not available in latest version of IS 808")
+        # member_yield_eqn = Math(inline=True)
+        # member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
+        # member_yield_eqn.append(NoEscape(r'&= \frac{' + Ag + '*' + fy + '}{' + gamma_m0 + r'}\\'))
+        # member_yield_eqn.append(NoEscape(r'&= ' + memb_yield + r'\end{aligned}'))
 
         self.tension_yielding_capacity = round(T_dg,2)
+        # self.member_yield_eqn = member_yield_eqn
         # logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def tension_rupture(self, A_n, F_u):
@@ -384,17 +425,36 @@ class Section(Material):
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
         if L_c == 0:
-            beta = 1.4
+            self.beta = 1.4
         else:
-            beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
+            self.beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
         # print(beta)
 
-        if beta <= (F_u * gamma_m0 / F_y * gamma_m1) and beta >= 0.7:
-            beta = beta
+        if self.beta <= (F_u * gamma_m0 / F_y * gamma_m1) and self.beta >= 0.7:
+            self.beta = self.beta
         else:
-            beta = 0.7
+            self.beta = 0.7
 
-        T_dn = (0.9 * A_nc * F_u / gamma_m1) + (beta * A_go * F_y / gamma_m0)
+        T_dn = (0.9 * A_nc * F_u / gamma_m1) + (self.beta * A_go * F_y / gamma_m0)
+        # w = str(w)
+        # t = str(t)
+        # fy = str(F_y)
+        # fu = str(F_u)
+        # b_s = str(b_s)
+        # L_c = str(L_c)
+        # A_nc = str(A_nc)
+        # A_go = str(A_go)
+        # gamma_m0 = str(gamma_m0)
+        # gamma_m1 = str(gamma_m1)
+        # member_rup_eqn = Math(inline=True)
+        # member_rup_eqn.append(NoEscape(r'\begin{aligned}\beta &= 1.4 - 0.076 \frac{w}{t}*\frac{f_{y}}{f_{u}}*\frac{b_s}{L_c}\leq\frac{0.9*f_{u}*\gamma_{m0}}{f_{y}*\gamma_{m1}} \geq 0.7 \end{aligned}'))
+        # member_rup_eqn.append(NoEscape(r'\begin{aligned}&\beta &= 1.4-0.076(w/t)(f_{y}/f_{u})(b_s/L_c)\leq(0.9f_{u}\gamma_{m0}/f_{y}\gamma_{m1}) \geq 0.7\\'))
+        # member_rup_eqn.append(NoEscape(r'&= 1.4 -0.76 \frac {' + w + '}{' + t + '} \frac {' + F_y + '}{' + F_u + '} \frac {' + bs + '}{' + L_c + '} +'\leq'+ \frac {' +0.9 + '*'+ F_u +'}{'+ F_y +'\gamma_{m1}'+ '}\geq 0.7 \\'))
+        # member_rup_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
+        # member_rup_eqn.append(NoEscape(r'&= \frac{' + Ag + '*' + fy + '}{' + gamma_m0 + r'}\\'))
+        # member_rup_eqn.append(NoEscape(r'&= ' + memb_yield + r'\end{aligned}'))
+
+        # self.member_rup_eqn = member_rup_eqn
 
         self.tension_rupture_capacity = round((T_dn) , 2)
 
@@ -454,6 +514,24 @@ class Section(Material):
         T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
         Tdb = min(T_db1, T_db2)
         # Tdb = round(Tdb, 3)
+        # A_vg = str(A_vg)
+        # A_vn = str(A_vn)
+        # A_tg = str(A_tg)
+        # A_tn = str(A_tn)
+        # f_y = str(f_y)
+        # f_u = str(f_u)
+        # gamma_m1 = str(gamma_m1)
+        # gamma_m0 = str(gamma_m0)
+
+        # member_block_eqn = Math(inline=True)
+        # member_block_eqn.append(NoEscape(r'\begin{aligned}T_{db1} &= \frac{A_{vg} f_y}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_u}{\gamma_{m1}} \end{aligned}'))
+
+        # member_block_eqn.append(NoEscape(r'&= \frac{' + A_vg + '*' + f_y + '}{" 1.732*' + gamma_m0 + 'r'} + &+ +'\frac{"0.9*" + A_vn + '*' + f_u + '}{'+1.732+'*' + gamma_m0 + r'} '\\'))
+        # member_block_eqn.append(NoEscape(r'&= ' + memb_yield + r'\end{aligned}'))
+
+
+
+        # self.member_block_eqn =member_block_eqn
         self.block_shear_capacity_axial = round(Tdb,2)
 
     def tension_capacity_calc(self, tension_member_yielding, tension_rupture, tension_blockshear):
@@ -650,18 +728,24 @@ class Weld(Material):
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         self.throat_tk = \
-            IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
-                (t_weld, weld_angle)
+            round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
+                (t_weld, weld_angle),2)
         print ("throat_tk",self.throat_tk)
-        weld_strength = f_wd * self.throat_tk
+        weld_strength = round(f_wd * self.throat_tk,2)
         self.strength = weld_strength
 
-    def get_weld_stress(self,weld_shear =0.0, weld_axial=0.0, weld_twist=0.0, Ip_weld=1.0, y_max=0.0, x_max=0.0, l_weld=0.0):
-        T_wh = weld_twist * y_max/Ip_weld
-        T_wv = weld_twist * x_max/Ip_weld
-        V_wv = weld_shear /l_weld
+
+    def get_weld_stress(self,weld_shear, weld_axial, l_weld, weld_twist=0.0, Ip_weld=None, y_max=0.0, x_max=0.0):
+        if weld_twist != 0.0:
+            T_wh = weld_twist * y_max/Ip_weld
+            T_wv = weld_twist * x_max/Ip_weld
+        else:
+            T_wh = 0.0
+            T_wv = 0.0
+        V_wv = weld_shear/l_weld
+
         A_wh = weld_axial/l_weld
-        weld_stress = math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2)
+        weld_stress = round(math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2),2)
         self.stress = weld_stress
 
     def weld_size(self, plate_thickness, member_thickness, edge_type = "Square"):
@@ -684,16 +768,15 @@ class Weld(Material):
         weld_thickness = round_down((max_weld_thickness - red), 1, 3)
         if weld_thickness < min_weld_thickness:
             weld_thickness = int(min(plate_thickness, member_thickness))
-            weld_reason = " Preheating of thicker plate is required"
+            weld_reason = " Preheating of thicker plate is required."
         else:
-            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge "
+            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge. "
             pass
 
         if weld_thickness> 16 :
             weld_thickness =16
         else:
             pass
-
         self.size = weld_thickness
         self.reason = weld_reason
 
@@ -730,14 +813,16 @@ class Plate(Material):
         self.block_shear_capacity = 0.0
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
-
+        self.tension_capacity = 0.0
         self.shear_yielding_capacity = 0.0
         self.shear_rupture_capacity = 0.0
+        self.shear_capacity = 0.0
 
 
         self.shear_capacity_web_plate=0.0
         self.tension_capacity_web_plate = 0.0
         self.tension_capacity_flange_plate = 0.0
+        self.block_shear_capacity_shear = 0.0
         self.moment_capacity = 0.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
@@ -963,7 +1048,7 @@ class Plate(Material):
 
         # initialising values to start the loop
         resultant_force = math.sqrt(shear_load ** 2 + axial_load ** 2)
-        print(resultant_force)
+        print(resultant_force, "daa")
         print(bolt_capacity, "222")
         bolts_required = max(int(math.ceil(resultant_force / bolt_capacity)), min_bolt_line*min_bolts_one_line)
         print (bolts_required)
@@ -976,13 +1061,13 @@ class Plate(Material):
 
         if bolts_one_line < min_bolts_one_line:
             self.design_status = False
-            self.reason = "Can't fit two bolts in one line. Select lower diameter"
+            self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line < min_bolt_line:
             self.design_status = False
-            self.reason = "Can't fit two bolts in one line. Select lower diameter"
+            self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line > bolt_line_limit:
             self.design_status = False
-            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
         else:
             print("boltdetails", bolt_line, bolts_one_line,web_plate_h)
             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,min_edge_dist,max_spacing, max_edge_dist)
@@ -1086,6 +1171,7 @@ class Plate(Material):
             self.edge_dist_provided = edge_dist
             self.end_dist_provided = end_dist
 
+
     def get_flange_plate_details(self, bolt_dia, flange_plate_h_min, flange_plate_h_max, bolt_capacity, min_edge_dist, min_gauge, max_spacing, max_edge_dist,web_thickness, root_radius,
                               shear_load=0.0, axial_load=0.0, gap=0.0,  bolt_line_limit=math.inf):
     #todo anjali
@@ -1119,10 +1205,10 @@ class Plate(Material):
 
         if bolts_one_line == 1 or bolts_one_line ==0:
             self.design_status = False
-            self.reason = "Can't fit two bolts in one line. Select lower diameter"
+            self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line > bolt_line_limit:
             self.design_status = False
-            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+            self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
         else:
             print("boltdetails", bolt_line, bolts_one_line,flange_plate_h)
             [gauge, edge_dist, flange_plate_h] = \
@@ -1214,7 +1300,7 @@ class Plate(Material):
 
             if vres > bolt_capacity_red:
                 self.design_status = False
-                self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
+                self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
             else:
                 self.design_status = True
 
@@ -1257,7 +1343,7 @@ class Plate(Material):
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
         Tdb = min(Tdb1, Tdb2)
-        Tdb = round(Tdb / 1000, 3)
+        Tdb = round(Tdb, 3)
         self.block_shear_capacity = Tdb
 
     def tension_blockshear_area_input(self,A_vg, A_vn, A_tg, A_tn, f_u, f_y):
@@ -1301,8 +1387,8 @@ class Plate(Material):
         '''
         A_v = length * thickness
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        V_p = (0.6 * A_v * fy) / (math.sqrt(3) * gamma_m0 * 1000)  # kN
-        self.shear_yielding_capacity = V_p
+        V_p = (0.6 * A_v * fy) / (math.sqrt(3) * gamma_m0)  # N
+        self.shear_yielding_capacity = round(V_p,2)
 
     def tension_yielding(self, length, thickness, fy):
         '''
@@ -1317,7 +1403,7 @@ class Plate(Material):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         # A_v = height * thickness
         tdg = (A_v * fy) / (gamma_m0)
-        self.tension_yielding_capacity = tdg
+        self.tension_yielding_capacity = round(tdg,2)
         return tdg
 
     def tension_rupture(self, A_n, F_u):
@@ -1342,8 +1428,8 @@ class Plate(Material):
             Capacity of beam web in shear rupture
         '''
         A_vn = (length - bolts_one_line * dia_hole) * thickness
-        R_n = (0.75 * fu * A_vn) / 1000  # kN
-        self.shear_rupture_capacity = R_n
+        R_n = (0.75 * fu * A_vn)
+        self.shear_rupture_capacity = round(R_n,2)
 
     def get_moment_cacacity(self, fy, plate_tk, plate_len):
         self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6
@@ -1421,8 +1507,8 @@ class Angle(Section):
         self.max_leg = max(self.leg_a_length,self.leg_b_length)
         self.min_leg = min(self.leg_a_length, self.leg_b_length)
         self.thickness = row[5]
-        self.r1 = row[6]
-        self.r2 = row[7]
+        self.root_radius = row[6]
+        self.toe_radius = row[7]
         if self.leg_a_length != self.leg_b_length:
             self.Cz = row[8]*10
             self.Cy = row[9]*10

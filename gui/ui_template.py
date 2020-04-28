@@ -58,7 +58,7 @@ from cad.cad3dconnection import cadconnection
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
-from design_type.connection.seated_angle_connection import SeatedAngleConnectionInput
+from design_type.connection.seated_angle_connection import SeatedAngleConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
@@ -624,7 +624,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         for t in new_list:
 
-            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC] and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
+            if t[0] in [KEY_PLATETHK, KEY_FLANGEPLATE_THICKNESS, KEY_ENDPLATE_THICKNESS, KEY_CLEATSEC, KEY_SEATEDANGLE] and (module not in [KEY_DISP_TENSION_WELDED, KEY_DISP_TENSION_BOLTED]):
                 key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
                 key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
                 data[t[0] + "_customized"] = t[1]()
@@ -1224,6 +1224,7 @@ class Ui_ModuleWindow(QMainWindow):
         display = self.modelTab._display
 
         # background gradient
+        # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
         display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
         # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
         display.display_triedron()
@@ -1403,7 +1404,10 @@ class Ui_ModuleWindow(QMainWindow):
         # For list in Customized combobox
 
         for custom_combo in new_list:
-            data[custom_combo[0] + "_customized"] = custom_combo[1]()
+            if op_list[0][1] in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED] and custom_combo[0] == KEY_SECSIZE:
+                data[custom_combo[0] + "_customized"] = custom_combo[1]('Angles')
+            else:
+                data[custom_combo[0] + "_customized"] = custom_combo[1]()
 
         # For output dock
 
@@ -1573,7 +1577,7 @@ class Ui_ModuleWindow(QMainWindow):
                 uiObj = yaml.load(fileObject)
             module = uiObj[KEY_MODULE]
 
-            # module_class = self.return_class(module)
+            module_class = self.return_class(module)
 
             selected_module = main.module_name(main)
             if selected_module == module:
@@ -1662,6 +1666,7 @@ class Ui_ModuleWindow(QMainWindow):
         elif trigger_type == "Design_Pref":
             pass
         else:
+            main.design_button_status = True
             main.func_for_validation(main, self, self.design_inputs)
             status = main.design_status
             print(status)
@@ -1680,11 +1685,18 @@ class Ui_ModuleWindow(QMainWindow):
             # if status is True and main.module == "Fin Plate":
             #     self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
             #                                                  main.module)
+            if self.design_inputs[KEY_MODULE] == KEY_DISP_FINPLATE:
+                module_class = FinPlateConnection
+            elif self.design_inputs[KEY_MODULE] == KEY_DISP_CLEATANGLE:
+                module_class = CleatAngleConnection
+            elif self.design_inputs[KEY_MODULE] == KEY_DISP_BEAMCOVERPLATE:
+                module_class = BeamCoverPlate
 
 
             if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_CLEATANGLE):
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
+                module_class = self.return_class(main.module)
                 self.commLogicObj.call_3DModel(status, module_class)
                 # self.callFin2D_Drawing("All")
                 self.btn3D.setEnabled(True)
@@ -2069,6 +2081,7 @@ class Ui_ModuleWindow(QMainWindow):
         tab_Column = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         tab_Beam = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
         tab_Angle = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+        tab_Channel = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Channel")
 
         tab_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Bolt")
         tab_Weld = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
@@ -2082,7 +2095,10 @@ class Ui_ModuleWindow(QMainWindow):
         material = Material(material_grade)
         tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
         tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
-        if module not in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
+
+
+        if module not in [KEY_DISP_BASE_PLATE,KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
+
             material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
             material_connector.setCurrentText(str(material_grade))
 
@@ -2112,6 +2128,8 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
                 if tab_Beam is not None:
                     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Beam, KEY_DISP_BEAMSEC)
                 self.designPrefDialog.beam_preferences(designation[0], material_grade)
@@ -2127,6 +2145,8 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
                 self.designPrefDialog.column_preferences(designation[0], table_1, material_grade)
                 if tab_Column is not None:
                     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Column, KEY_DISP_COLSEC)
@@ -2142,15 +2162,30 @@ class Ui_ModuleWindow(QMainWindow):
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 self.designPrefDialog.ui.tabWidget.removeTab(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
+                self.designPrefDialog.angle_preferences(designation[0], material_grade)
                 if tab_Angle is not None:
                     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Angle, DISP_TITLE_ANGLE)
+                designation_list = tab_Angle.findChild(QtWidgets.QWidget, KEY_SECSIZE)
+                designation_list.setCurrentIndex(0)
+                designation_list.clear()
+                for item in designation:
+                    designation_list.addItem(item)
+                designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.angle_preferences(
+                    designation_list.currentText() if designation_list.currentText() else '20 20 X 3', material_grade))
                 # self.designPrefDialog.ui.tabWidget.removeTab(
                 #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
                 # table_c = "Angles"
             elif key_6.currentIndex() in [3, 5]:
-                pass
-                # self.designPrefDialog.ui.tabWidget.removeTab(
-                #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
+                self.designPrefDialog.ui.tabWidget.removeTab(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+                if tab_Channel is not None:
+                    self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Channel, "Channel")
                 # table_c = "Channels"
 
             # designation_col = 'JB 150'
@@ -2187,8 +2222,10 @@ class Ui_ModuleWindow(QMainWindow):
 
 
 
-        elif module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,
+
+        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,
                             KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
+
 
             conn = key_1.currentText()
 

@@ -2,6 +2,7 @@ from design_type.connection.connection import Connection
 from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column
 from Common import *
 from utils.common.load import Load
+from utils.common import common_calculation
 
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp
@@ -144,7 +145,7 @@ class MomentConnection(Connection):
 
         # return positive values only
         if sol_1 <= 0 and sol_2 > 0:
-            c = round_up(sol_2, 5)
+            c = common_calculation.round_up(sol_2, 5)
         else:
             c = 0.0
 

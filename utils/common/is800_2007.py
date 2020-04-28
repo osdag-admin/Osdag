@@ -161,6 +161,9 @@ class IS800_2007(object):
             "24"   : {'Standard': 2.0, 'Over-sized': 6.0, 'short_slot': 8.0, 'long_slot': 2.5},
             "24+"  : {'Standard': 3.0, 'Over-sized': 8.0, 'short_slot': 10.0, 'long_slot': 2.5}
         }
+        import re
+        # d = str(re.sub("[^0-9]", "", str(d)))
+        d = int(d)
 
         if d < 12:
             clearance = 0
@@ -257,7 +260,7 @@ class IS800_2007(object):
         Note:
             Reference:
             IS 800:2007, cl. 10.2.4.2
-
+self
         """
 
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
@@ -409,7 +412,7 @@ class IS800_2007(object):
             e       - End distance of the fastener along bearing direction in mm (float)
             p       - Pitch distance of the fastener along bearing direction in mm (float)
             bolt_hole_type - Either 'Standard' or 'Over-sized' or 'short_slot' or 'long_slot' (str)
-            safety_factor_parameter - Either 'field' or 'shop' (str)
+            safety_factor_parameter - Either 'Field' or 'Shop' (str)
 
         return:
             V_dpb - Design bearing strength of bearing bolt in N (float)
@@ -420,23 +423,22 @@ class IS800_2007(object):
 
         """
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
-        k_b = min(e/(3.0*d_0), p/(3.0*d_0)-0.25, f_ub/f_u, 1.0)
+
+        if p > 0.0:
+            k_b = min(e/(3.0*d_0), p/(3.0*d_0)-0.25, f_ub/f_u, 1.0)
+        else:
+            k_b = min(e / (3.0 * d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
+
         V_npb = 2.5 * k_b * d * t * f_u
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         V_dpb = V_npb/gamma_mb
-        print(bolt_hole_type)
+
         if bolt_hole_type == 'Over-sized' or bolt_hole_type == 'short_slot':
             V_dpb *= 0.7
         elif bolt_hole_type == 'long_slot':
             V_dpb *= 0.5
-        return V_dpb,d_0,k_b,gamma_mb
 
-
-
-
-
-
-
+        return V_dpb
 
     @staticmethod
     def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
@@ -585,11 +587,11 @@ class IS800_2007(object):
 
 
     @staticmethod
-    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned=False, eta=1.5):
+    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned, eta=1.5):
         """Calculate prying force of friction grip bolt
 
                        Args:
-                          2 * T_e - Force in
+                          2 * T_e - Force in 2 bolts on either sides of the web/plate
                           l_v - distance from the bolt centre line to the toe of the fillet weld or to half
                                 the root radius for a rolled section,
                           beta - 2 for non pre-tensioned bolt and 1 for pre-tensioned bolt
@@ -607,10 +609,14 @@ class IS800_2007(object):
 
         """
         beta = 2
-        if pre_tensioned is True:
+        if pre_tensioned == 'Pretensioned':
             beta = 1
+        print(pre_tensioned)
         l_e = min(end_dist, 1.1 * t * math.sqrt(beta * f_o / f_y))
-        Q = (l_v / 2 / l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
+        if (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2))) <= 0:
+            Q = 0.0
+        else:
+            Q = (l_v / 2 / l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
         return Q
 
 
@@ -784,9 +790,11 @@ class IS800_2007(object):
         """
         if l_j <= 150 * t_t:
             return 1.0
-        beta_lw = 1.2 - 0.2 * l_j / (150 * t_t)
+        beta_lw = 1.2 - ((0.2 * l_j) / (150 * t_t))
         if beta_lw >= 1.0:
             beta_lw = 1.0
+        elif beta_lw <= 0.6:
+            beta_lw = 0.6
         return beta_lw
 
     # -------------------------------------------------------------

@@ -3,10 +3,13 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
+from design_report.reportGenerator_latex import CreateLatex
+import configparser
 from utils.common.component import *
 # from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
 from Common import *
+from Report_functions import *
 from utils.common.load import Load
 import yaml
 from design_report.reportGenerator import save_html
@@ -86,8 +89,8 @@ class Tension_bolted(Main):
         c_lst.append(t3)
         t4 = (KEY_PLATETHK, self.plate_thick_customized)
         c_lst.append(t4)
-        t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
-        c_lst.append(t5)
+        # t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
+        # c_lst.append(t5)
 
         return c_lst
 
@@ -1006,6 +1009,7 @@ class Tension_bolted(Main):
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
+        self.loc = design_dictionary[KEY_LOCATION]
         self.plate_thickness = [3,4,6,8,10,12,16,20,24,28,30,32,36,40]
         # print(self.sizelist)
         self.length = float(design_dictionary[KEY_LENGTH])
@@ -1238,12 +1242,12 @@ class Tension_bolted(Main):
 
                     # print(self.section_size_1.slenderness)
 
-                    "condition to limit loop based on max force derived from max available size"
+                    "condition to limit loop based on max force derived from max available size."
 
                 elif (self.load.axial_force*1000 > max_force) :
                     self.design_status = False
-                    logger.error(" : Tension force exceeds tension capacity of maximum available member size")
-                    logger.error(": Design is not safe \n ")
+                    logger.error(" : Tension force exceeds tension capacity of maximum available member size.")
+                    logger.error(": Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
                     break
 
@@ -1251,8 +1255,8 @@ class Tension_bolted(Main):
 
                 elif self.length > length:
                     self.design_status = False
-                    logger.error(" : Member fails in slenderness")
-                    logger.error(": Design is not safe \n ")
+                    logger.error(" : Member fails in slenderness.")
+                    logger.error(": Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
                     break
 
@@ -1283,16 +1287,31 @@ class Tension_bolted(Main):
 
 
             # self.res_force = math.sqrt(self.load.shear_force ** 2 + self.load.axial_force ** 2) * 1000
-        self.res_force = self.load.axial_force*1000
+        self.res_force = max((self.load.axial_force*1000),(0.3*self.section_size_1.tension_yielding_capacity))
 
-        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+
+        if design_dictionary[KEY_SEC_PROFILE] == "Channels":
             bolts_required_previous = 2
             self.thick = self.section_size_1.web_thickness
+            self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+        elif design_dictionary[KEY_SEC_PROFILE]== 'Back to Back Channels':
+            bolts_required_previous = 2
+            self.thick = 2 * self.section_size_1.web_thickness
+            self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+        elif design_dictionary[KEY_SEC_PROFILE]== 'Back to Back Angles':
+            bolts_required_previous = 1
+            self.thick = 2* self.section_size_1.thickness
             self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
         else:
             bolts_required_previous = 1
             self.thick = self.section_size_1.thickness
             self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+
+
+        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Angles', 'Star Angles']:
+            self.planes = 1
+        else:
+            self.planes = 2
 
         self.bolt_conn_plates_t_fu_fy = []
         self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
@@ -1314,7 +1333,7 @@ class Tension_bolted(Main):
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
                                               conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-                                              n_planes=1)
+                                              n_planes=self.planes)
 
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
                 self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -1325,7 +1344,7 @@ class Tension_bolted(Main):
                                                  min_gauge=self.bolt.min_gauge_round,
                                                  max_spacing=self.bolt.max_spacing_round,
                                                  max_edge_dist=self.bolt.max_edge_dist_round,
-                                                 shear_load=0, axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
+                                                 shear_load=0, axial_load=self.res_force, gap=self.plate.gap,
                                                  shear_ecc=False,min_bolts_one_line=2,min_bolt_line=2)
             else:
                 if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
@@ -1337,7 +1356,7 @@ class Tension_bolted(Main):
                                                      min_gauge=self.bolt.min_gauge_round,
                                                      max_spacing=self.bolt.max_spacing_round,
                                                      max_edge_dist=self.bolt.max_edge_dist_round,
-                                                     shear_load=0, axial_load=self.load.axial_force/2 * 1000,
+                                                     shear_load=0, axial_load=self.res_force/2,
                                                      gap=self.plate.gap,
                                                      shear_ecc=False, min_bolts_one_line=1,min_bolt_line=2)
                 else:
@@ -1349,7 +1368,7 @@ class Tension_bolted(Main):
                                                      min_gauge=self.bolt.min_gauge_round,
                                                      max_spacing=self.bolt.max_spacing_round,
                                                      max_edge_dist=self.bolt.max_edge_dist_round,
-                                                     shear_load=0, axial_load=self.load.axial_force* 1000,
+                                                     shear_load=0, axial_load=self.res_force,
                                                      gap=self.plate.gap,
                                                      shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2)
 
@@ -1387,7 +1406,7 @@ class Tension_bolted(Main):
         else:
             self.design_status = False
             logger.error(self.plate.reason)
-            logger.error(": Design is not safe \n ")
+            logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
 
 
@@ -1399,12 +1418,12 @@ class Tension_bolted(Main):
 
         bolt_grade_previous = self.bolt.bolt_grade[-1]
         bolts_required_previous = self.plate.bolts_required
-        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
-            self.thick = self.section_size_1.web_thickness
-            self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
-        else:
-            self.thick = self.section_size_1.thickness
-            self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+        # if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+        #     self.thick = self.section_size_1.web_thickness
+        #     self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+        # else:
+        #     self.thick = self.section_size_1.thickness
+        #     self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
 
         self.bolt_conn_plates_t_fu_fy = []
         self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
@@ -1419,7 +1438,7 @@ class Tension_bolted(Main):
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
                                               conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-                                              n_planes=1)
+                                              n_planes=self.planes)
 
             # print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.plate.bolt_force)
 
@@ -1440,7 +1459,7 @@ class Tension_bolted(Main):
         self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                           bolt_grade_provided=self.bolt.bolt_grade_provided,
                                           conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-                                          n_planes=1)
+                                          n_planes=self.planes)
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -1451,7 +1470,7 @@ class Tension_bolted(Main):
                                              min_gauge=self.bolt.min_gauge_round,
                                              max_spacing=self.bolt.max_spacing_round,
                                              max_edge_dist=self.bolt.max_edge_dist_round,
-                                             shear_load=0, axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
+                                             shear_load=0, axial_load=self.res_force, gap=self.plate.gap,
                                              shear_ecc=False, min_bolts_one_line=2,min_bolt_line=2)
         else:
             if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
@@ -1463,7 +1482,7 @@ class Tension_bolted(Main):
                                                  min_gauge=self.bolt.min_gauge_round,
                                                  max_spacing=self.bolt.max_spacing_round,
                                                  max_edge_dist=self.bolt.max_edge_dist_round,
-                                                 shear_load=0, axial_load=self.load.axial_force / 2 * 1000,
+                                                 shear_load=0, axial_load=self.res_force / 2,
                                                  gap=self.plate.gap,
                                                  shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2)
 
@@ -1476,9 +1495,11 @@ class Tension_bolted(Main):
                                                  min_gauge=self.bolt.min_gauge_round,
                                                  max_spacing=self.bolt.max_spacing_round,
                                                  max_edge_dist=self.bolt.max_edge_dist_round,
-                                                 shear_load=0, axial_load=self.load.axial_force * 1000,
+                                                 shear_load=0, axial_load=self.res_force,
                                                  gap=self.plate.gap,
                                                  shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2)
+
+        self.plate.edge_dist_provided = round(((self.max_plate_height - ((self.plate.bolts_one_line -1) * self.plate.gauge_provided))/2),2)
 
         self.member_check(self, design_dictionary)
 
@@ -1552,7 +1573,7 @@ class Tension_bolted(Main):
 
         if design_dictionary[KEY_LOCATION] == 'Long Leg':
             w = self.section_size_1.min_leg
-            shear_lag = (self.plate.edge_dist_provided + self.section_size_1.r1+ self.section_size_1.thickness) + w - self.section_size_1.thickness
+            shear_lag = (self.plate.edge_dist_provided + self.section_size_1.root_radius+ self.section_size_1.thickness) + w - self.section_size_1.thickness
             if self.plate.bolt_line !=1:
                 L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
             else:
@@ -1563,7 +1584,7 @@ class Tension_bolted(Main):
 
         elif design_dictionary[KEY_LOCATION] == 'Short Leg':
             w = self.section_size_1.max_leg
-            shear_lag = (self.plate.edge_dist_provided + self.section_size_1.r1 + self.section_size_1.thickness) + w - self.section_size_1.thickness
+            shear_lag = (self.plate.edge_dist_provided + self.section_size_1.root_radius + self.section_size_1.thickness) + w - self.section_size_1.thickness
             if self.plate.bolt_line != 1:
                 L_c = (self.plate.pitch_provided * (self.plate.bolt_line - 1))
             else:
@@ -1594,6 +1615,13 @@ class Tension_bolted(Main):
         else:
             pass
 
+        self.w = w
+        self.A_go = A_go
+        self.A_nc = A_nc
+        self.t = t
+        self.L_c = L_c
+        self.b_s = shear_lag
+
         self.section_size_1.tension_blockshear_area_input (A_vg = A_vg, A_vn = A_vn, A_tg = A_tg, A_tn = A_tn, f_u = self.section_size_1.fu, f_y = self.section_size_1.fy)
         self. K = 1
         self.section_size_1.design_check_for_slenderness(K = self.K, L = design_dictionary[KEY_LENGTH], r = self.section_size_1.min_radius_gyration)
@@ -1610,10 +1638,11 @@ class Tension_bolted(Main):
             self.design_status = False
 
         if self.section_size_1.tension_capacity >= self.load.axial_force *1000:
-            logger.info("In case of reverse load, slenderness value should be less than 180")
+            self.design_status = True
+            logger.info("In case of reverse load, slenderness value should be less than 180.")
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
-            self.design_status = True
+
         else:
             print("recheck")
             previous_size = self.section_size_1.designation
@@ -1654,42 +1683,52 @@ class Tension_bolted(Main):
                 self.net_area = (self.section_size_1.depth * self.plate.thickness_provided) - (
                             self.plate.bolts_one_line * self.bolt.dia_hole*self.plate.thickness_provided)
                 self.plate.height = self.section_size_1.depth + 30.0
+                A_vg = ((self.plate.pitch_provided * (self.plate.bolt_line - 1) + self.plate.end_dist_provided) * self.plate.thickness_provided)
+                A_vn = ((self.plate.pitch_provided * (self.plate.bolt_line - 1) + self.plate.end_dist_provided) - ((self.plate.bolt_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
+                A_tg = (self.section_size_1.depth- self.plate.edge_dist_provided - self.section_size_1.root_radius- self.section_size_1.flange_thickness) * self.plate.thickness_provided
+                A_tn = ((self.section_size_1.depth- self.plate.edge_dist_provided - self.section_size_1.root_radius- self.section_size_1.flange_thickness)  - ((self.plate.bolts_one_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
 
             else:
                 if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
+                    A_vg = ((self.plate.pitch_provided * (
+                                self.plate.bolt_line - 1) + self.plate.end_dist_provided) * self.plate.thickness_provided)
+                    A_vn = ((self.plate.pitch_provided * (self.plate.bolt_line - 1) + self.plate.end_dist_provided) - (
+                            (self.plate.bolt_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
                     if design_dictionary[KEY_LOCATION] == 'Long Leg':
                         self.plate.tension_yielding(length = 2 *self.section_size_1.max_leg, thickness = self.plate.thickness_provided, fy = self.plate.fy)
                         self.net_area = (2 * self.section_size_1.max_leg * self.plate.thickness_provided) - (self.plate.bolts_one_line * self.bolt.dia_hole*self.plate.thickness_provided)
                         self.plate.height = 2 * self.section_size_1.max_leg +30.0
-
+                        A_tg = (2 * self.section_size_1.max_leg - self.plate.edge_dist_provided) * self.plate.thickness_provided
+                        A_tn = ((2 * self.section_size_1.max_leg - self.plate.edge_dist_provided) - ((self.plate.bolts_one_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
                     else:
                         self.plate.tension_yielding(length = 2* self.section_size_1.min_leg, thickness = self.plate.thickness_provided, fy = self.plate.fy)
                         self.net_area = (2 * self.section_size_1.min_leg * self.plate.thickness_provided) - (self.plate.bolts_one_line * self.bolt.dia_hole*self.plate.thickness_provided)
                         self.plate.height = 2 * self.section_size_1.min_leg + 30.0
+                        A_tg = (2 * self.section_size_1.min_leg - self.plate.edge_dist_provided) * self.plate.thickness_provided
+                        A_tn = ((2 * self.section_size_1.min_leg - self.plate.edge_dist_provided) - ((self.plate.bolts_one_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
+
 
                 elif design_dictionary[KEY_SEC_PROFILE] in ["Angles", 'Back to Back Angles']:
+                    A_vg = ((self.plate.pitch_provided * (
+                                self.plate.bolt_line - 1) + self.plate.end_dist_provided) * self.plate.thickness_provided)
+                    A_vn = ((self.plate.pitch_provided * (self.plate.bolt_line - 1) + self.plate.end_dist_provided) - (
+                                (self.plate.bolt_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
+
                     if design_dictionary[KEY_LOCATION] == 'Long Leg':
-                        self.plate.tension_yielding(length=2 * self.section_size_1.max_leg,thickness=self.plate.thickness_provided, fy=self.plate.fy)
+                        self.plate.tension_yielding(length=self.section_size_1.max_leg,thickness=self.plate.thickness_provided, fy=self.plate.fy)
                         self.net_area = (self.section_size_1.max_leg * self.plate.thickness_provided) - (self.plate.bolts_one_line * self.bolt.dia_hole * self.plate.thickness_provided)
                         self.plate.height = self.section_size_1.max_leg + 30.0
+                        A_tg = (self.section_size_1.max_leg - self.plate.edge_dist_provided- self.section_size_1.root_radius - self.section_size_1.thickness) * self.plate.thickness_provided
+                        A_tn = ((self.section_size_1.max_leg - self.plate.edge_dist_provided- self.section_size_1.root_radius - self.section_size_1.thickness) - ((self.plate.bolts_one_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
                     else:
-                        self.plate.tension_yielding(length=2 * self.section_size_1.min_leg,thickness=self.plate.thickness_provided, fy=self.plate.fy)
+                        self.plate.tension_yielding(length=self.section_size_1.min_leg,thickness=self.plate.thickness_provided, fy=self.plate.fy)
                         self.net_area = (self.section_size_1.min_leg * self.plate.thickness_provided) - (self.plate.bolts_one_line * self.bolt.dia_hole * self.plate.thickness_provided)
                         self.plate.height = self.section_size_1.min_leg + 30.0
-
+                        A_tg = (self.section_size_1.min_leg - self.plate.edge_dist_provided- self.section_size_1.root_radius - self.section_size_1.thickness) * self.plate.thickness_provided
+                        A_tn = ((self.section_size_1.min_leg - self.plate.edge_dist_provided- self.section_size_1.root_radius - self.section_size_1.thickness) - ((self.plate.bolts_one_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
 
             self.plate.tension_rupture(A_n = self.net_area, F_u = self.plate.fu)
-            if design_dictionary[KEY_SEC_PROFILE] == "Star Angles" :
-                A_vg = ((self.plate.pitch_provided * (self.plate.bolt_line - 1) + self.plate.end_dist_provided) * self.plate.thickness_provided)
-                A_vn = ((self.plate.pitch_provided * (self.plate.bolt_line - 1) + self.plate.end_dist_provided) - (
-                        (self.plate.bolt_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
-                A_tg =  (2 *self.section_size_1.thickness + 2 * self.section_size_1.root_radius + 3 * self.plate.edge_dist_provided + 2*(self.plate.gauge_provided * (self.plate.bolts_one_line/2- 1)))* self.plate.thickness_provided
-                A_tn = (2 *self.section_size_1.thickness + 2 * self.section_size_1.root_radius + 3 * self.plate.edge_dist_provided + 2 * (self.plate.gauge_provided * (self.plate.bolts_one_line/2 - 1)) -((self.plate.bolts_one_line - 0.5)* self.bolt.dia_hole))* self.plate.thickness_provided
-            else:
-                A_vg = ((self.plate.pitch_provided * (self.plate.bolt_line - 1) + self.plate.end_dist_provided) * self.plate.thickness_provided)
-                A_vn = ((self.plate.pitch_provided * (self.plate.bolt_line - 1) + self.plate.end_dist_provided) - ((self.plate.bolt_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
-                A_tg = (self.plate.edge_dist_provided + (self.plate.gauge_provided * (self.plate.bolts_one_line - 1))) * self.plate.thickness_provided
-                A_tn = ((self.plate.edge_dist_provided + self.plate.gauge_provided * (self.plate.bolts_one_line - 1)) - ((self.plate.bolts_one_line - 0.5) * self.bolt.dia_hole)) * self.plate.thickness_provided
+
 
             self.plate.tension_blockshear_area_input(A_vg = A_vg, A_vn = A_vn, A_tg = A_tg, A_tn = A_tn, f_u = self.plate.fu, f_y = self.plate.fy)
             self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
@@ -1699,21 +1738,21 @@ class Tension_bolted(Main):
             else:
                 max_tension_yield = 200 * self.plate.fy * 40 / 1.1
 
-            if self.plate_tension_capacity > self.load.axial_force*1000:
+            if self.plate_tension_capacity > self.res_force:
                 # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
                 break
-            elif (self.plate_tension_capacity < self.load.axial_force*1000) and self.plate.thickness_provided == self.plate_last:
+            elif (self.plate_tension_capacity < self.res_force) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
-                logger.error("Plate thickness is not sufficient")
-                logger.error(": Design is not safe \n ")
-                logger.debug(" :=========End Of design===========")
+                logger.error("Plate thickness is not sufficient.")
+                # logger.error(": Design is not safe. \n ")
+                # logger.debug(" :=========End Of design===========")
             else:
                 pass
 
-        if self.plate_tension_capacity > self.load.axial_force*1000:
-            # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
+        if self.plate_tension_capacity > self.res_force:
+            print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
             self.design_status = True
-            logger.info(": Overall bolted tension member design is safe \n")
+            logger.info(": Overall bolted tension member design is safe. \n")
             logger.debug(" :=========End Of design===========")
         else:
             if self.plate_tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ["Channels",
@@ -1725,10 +1764,344 @@ class Tension_bolted(Main):
                 self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
             else:
                 self.design_status = False
-                logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness")
-                logger.error(": Design is not safe \n ")
+                logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness.")
+                logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
-            # if self.plate.design_status is False:
+                print(self.design_status)
+
+    def save_design(self, popup_summary):
+        # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
+        if self.sec_profile in ["Channels", "Back to Back Channels"]:
+            image = "Channel"
+        elif self.section_size_1.max_leg == self.section_size_1.min_leg:
+            image = "Equal"
+        else:
+            image = "Unequal"
+
+        if self.sec_profile in ["Channels", "Back to Back Channels"]:
+            self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
+                                      # Image shall be save with this name.png in resource files
+                                      KEY_DISP_SECSIZE: self.section_size_1.designation,
+                                      KEY_DISP_MATERIAL: self.section_size_1.material,
+                                      KEY_DISP_FU: self.section_size_1.fu,
+                                      KEY_DISP_FY: self.section_size_1.fy,
+                                      'Mass': self.section_size_1.mass,
+                                      'Area(mm2) - A': self.section_size_1.area,
+                                      'D(mm)': self.section_size_1.depth,
+                                      'B(mm)': self.section_size_1.flange_width,
+                                      't(mm)': self.section_size_1.web_thickness,
+                                      'T(mm)': self.section_size_1.flange_thickness,
+                                      'FlangeSlope': self.section_size_1.flange_slope,
+                                      'R1(mm)': self.section_size_1.root_radius,
+                                      'R2(mm)': self.section_size_1.toe_radius,
+                                      'Cy(mm)': self.section_size_1.Cy,
+                                      'Iz(mm4)': self.section_size_1.mom_inertia_z,
+                                      'Iy(mm4)': self.section_size_1.mom_inertia_y,
+                                      'rz(mm)': self.section_size_1.rad_of_gy_z,
+                                      'ry(mm)': self.section_size_1.rad_of_gy_y,
+                                      'Zz(mm3)': self.section_size_1.elast_sec_mod_z,
+                                      'Zy(mm3)': self.section_size_1.elast_sec_mod_y,
+                                      'Zpz(mm3)': self.section_size_1.plast_sec_mod_z,
+                                      'Zpy(mm3)': self.section_size_1.elast_sec_mod_y}
+        else:
+            self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
+                                      # Image shall be save with this name.png in resource files
+                                      KEY_DISP_SECSIZE: (self.section_size_1.designation,self.sec_profile),                                      KEY_DISP_MATERIAL: self.section_size_1.material,
+                                      KEY_DISP_FU: self.section_size_1.fu,
+                                      KEY_DISP_FY: self.section_size_1.fy,
+                                      'Mass': self.section_size_1.mass,
+                                      'Area(mm2) - A': round((self.section_size_1.area),2),
+                                      'A(mm)': self.section_size_1.max_leg,
+                                      'B(mm)': self.section_size_1.min_leg,
+                                      't(mm)': self.section_size_1.web_thickness,
+                                      'R1(mm)': self.section_size_1.root_radius,
+                                      'R2(mm)': self.section_size_1.toe_radius,
+                                      'Cy(mm)': self.section_size_1.Cy,
+                                      'Cz(mm)': self.section_size_1.Cz,
+                                      'Iz(mm4)': self.section_size_1.mom_inertia_z,
+                                      'Iy(mm4)': self.section_size_1.mom_inertia_y,
+                                      'Iu(mm4)': self.section_size_1.mom_inertia_u,
+                                      'Iv(mm4)': self.section_size_1.mom_inertia_v,
+                                      'rz(mm)': self.section_size_1.rad_of_gy_z,
+                                      'ry(mm)': round((self.section_size_1.rad_of_gy_y),2),
+                                      'ru(mm)': self.section_size_1.rad_of_gy_u,
+                                      'rv(mm)': round((self.section_size_1.rad_of_gy_v),2),
+                                      'Zz(mm3)': self.section_size_1.elast_sec_mod_z,
+                                      'Zy(mm3)': self.section_size_1.elast_sec_mod_y,
+                                      'Zpz(mm3)': self.section_size_1.plast_sec_mod_z,
+                                      'Zpy(mm3)': self.section_size_1.elast_sec_mod_y}
+
+
+        self.report_input = \
+            {KEY_MODULE: self.module,
+             KEY_DISP_AXIAL: self.load.axial_force,
+             KEY_DISP_LENGTH: self.length,
+             "Section": "TITLE",
+             "Section Details":self.report_supporting,
+             # "Supported Section Details": "TITLE",
+             # "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+             "Bolt Details": "TITLE",
+             KEY_DISP_D: str(self.bolt.bolt_diameter),
+             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_TYP: self.bolt.bolt_type,
+             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+             KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+             KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
+             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+             # "Weld Details": "TITLE",
+             # KEY_DISP_DP_WELD_TYPE: "Fillet",
+             # KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
+             # KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
+
+
+
+        self.report_check = []
+        connecting_plates = [self.plate.thickness_provided, self.section_size_1.web_thickness]
+        self.load.shear_force = 0.0
+        member_yield_kn = round((self.section_size_1.tension_yielding_capacity/1000),2)
+        member_rupture_kn = round((self.section_size_1.tension_rupture_capacity/1000),2)
+        member_blockshear_kn = round((self.section_size_1.block_shear_capacity_axial/1000),2)
+        plate_yield_kn = round((self.plate.tension_yielding_capacity/1000),2)
+        plate_rupture_kn = round((self.plate.tension_rupture_capacity/ 1000), 2)
+        plate_blockshear_kn = round((self.plate.block_shear_capacity / 1000), 2)
+        bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
+        bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+        bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
+        kb_disp = round(self.bolt.kb, 2)
+        kh_disp = round(self.bolt.kh, 2)
+        bolt_force_kn = round(self.plate.bolt_force/1000, 2)
+        bolt_capacity_red_kn = round(self.plate.bolt_capacity_red/1000, 2)
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+
+        t1 = ('SubSection', 'Member Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(self.section_size_1.area,self.section_size_1.fy,gamma_m0,member_yield_kn), '')
+        self.report_check.append(t2)
+        t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',member_rupture_prov(self.A_nc,self.A_go,self.section_size_1.fu, self.section_size_1.fy, self.L_c,self.w,self.b_s, self.t,gamma_m0,gamma_m1,self.section_size_1.beta,member_rupture_kn), '')
+        self.report_check.append(t3)
+        t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '',blockshear_prov(Tdb= member_blockshear_kn), '')
+        self.report_check.append(t4)
+        t8 = (KEY_DISP_TENSION_CAPACITY, '', tensile_capacity_prov(member_yield_kn, member_rupture_kn, member_blockshear_kn),get_pass_fail(self.load.axial_force,self.section_size_1.tension_capacity, relation="lesser"))
+        self.report_check.append(t8)
+        t5 = (KEY_DISP_SLENDER, slenderness_limit(), slenderness( 1, self.length,round(self.section_size_1.min_radius_gyration,2), self.section_size_1.slenderness), '')
+        self.report_check.append(t5)
+        t6 = (KEY_DISP_EFFICIENCY, efficiency_limit(),
+              efficiency(self.load.axial_force, self.section_size_1.tension_capacity, self.efficiency), '')
+        self.report_check.append(t6)
+
+        t7 = ('SubSection', 'Bolt Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t7)
+
+        if self.bolt.bolt_type == TYP_BEARING:
+            t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.fu, 1, self.bolt.bolt_net_area,
+                                                               self.bolt.gamma_mb, bolt_shear_capacity_kn), '')
+            self.report_check.append(t1)
+            t2 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(kb_disp, self.bolt.bolt_diameter_provided,
+                                                                   self.bolt_conn_plates_t_fu_fy,
+                                                                   self.bolt.gamma_mb,
+                                                                   bolt_bearing_capacity_kn), '')
+            self.report_check.append(t2)
+            t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '',
+                  bolt_capacity_prov(bolt_shear_capacity_kn, bolt_bearing_capacity_kn, bolt_capacity_kn),
+                  '')
+            self.report_check.append(t3)
+        else:
+
+            t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
+                  HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.bolt.fu,
+                                          Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
+                                          capacity=bolt_capacity_kn), '')
+            self.report_check.append(t4)
+
+        t5 = (
+        DISP_NUM_OF_BOLTS, get_trial_bolts(self.load.shear_force, self.load.axial_force, bolt_capacity_kn),
+        self.plate.bolts_required, '')
+        self.report_check.append(t5)
+        t6 = (DISP_NUM_OF_COLUMNS, '', self.plate.bolt_line, '')
+        self.report_check.append(t6)
+        t7 = (DISP_NUM_OF_ROWS, '', self.plate.bolts_one_line, '')
+        self.report_check.append(t7)
+        t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+              self.plate.pitch_provided,
+              get_pass_fail(self.bolt.min_pitch, self.plate.pitch_provided, relation='lesser'))
+        self.report_check.append(t1)
+        t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
+              self.plate.pitch_provided,
+              get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided, relation='greater'))
+        self.report_check.append(t1)
+        t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+              self.plate.gauge_provided,
+              get_pass_fail(self.bolt.min_gauge, self.plate.gauge_provided, relation="lesser"))
+        self.report_check.append(t2)
+        t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
+              self.plate.gauge_provided,
+              get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided, relation="greater"))
+        self.report_check.append(t2)
+        t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+              self.plate.end_dist_provided,
+              get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided, relation='lesser'))
+        self.report_check.append(t3)
+        t4 = (DISP_MAX_END, max_edge_end(self.plate.fy, self.plate.thickness_provided),
+              self.plate.end_dist_provided,
+              get_pass_fail(self.bolt.max_end_dist, self.plate.end_dist_provided, relation='greater'))
+        self.report_check.append(t4)
+        t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+              self.plate.edge_dist_provided,
+              get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided, relation='lesser'))
+        self.report_check.append(t3)
+        t4 = (DISP_MAX_EDGE, max_edge_end(self.plate.fy, self.plate.thickness_provided),
+              self.plate.edge_dist_provided,
+              get_pass_fail(self.bolt.max_edge_dist, self.plate.edge_dist_provided, relation="greater"))
+        self.report_check.append(t4)
+        t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn, bolt_capacity_red_kn,
+              get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="lesser"))
+        self.report_check.append(t5)
+
+        t7 = ('SubSection', 'Gusset Plate Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t7)
+
+
+
+        if self.sec_profile in ["Channels", 'Back to Back Channels']:
+            t3 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.section_size_1.depth, self.min_plate_height),
+                  self.plate.height,
+                  get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+            t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                  tension_yield_prov(l = self.section_size_1.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), '')
+            t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_prov(self.section_size_1.depth, self.plate.thickness_provided,self.plate.bolts_one_line, self.bolt.dia_hole,self.plate.fu, gamma_m1,plate_rupture_kn), '')
+
+        elif self.sec_profile in ["Angles", 'Back to Back Angles']:
+            if self.loc == "Long Leg":
+                t3 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.section_size_1.max_leg, self.min_plate_height),
+                      self.plate.height,
+                      get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+                t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                      tension_yield_prov(l=self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
+                                         gamma=gamma_m0, T_dg =plate_yield_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                      tension_rupture_prov(self.section_size_1.max_leg, self.plate.thickness_provided,
+                                           self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                           plate_rupture_kn), '')
+
+            else:
+                t3 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.section_size_1.min_leg, self.min_plate_height),
+                      self.plate.height,
+                      get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+                t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                      tension_yield_prov(l=self.section_size_1.min_leg, t=self.plate.thickness_provided,
+                                         f_y=self.plate.fy,
+                                         gamma=gamma_m0, T_dg=plate_yield_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                      tension_rupture_prov(self.section_size_1.min_leg, self.plate.thickness_provided,
+                                           self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                           plate_rupture_kn), '')
+        else:
+            if self.loc == "Long Leg":
+                t3 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(2*self.section_size_1.max_leg, self.min_plate_height),
+                      self.plate.height,
+                      get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+                t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                      tension_yield_prov(l=2*self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
+                                         gamma=gamma_m0, T_dg=plate_yield_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                      tension_rupture_prov(2*self.section_size_1.max_leg, self.plate.thickness_provided,
+                                           self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                           plate_rupture_kn), '')
+            else:
+                t3 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(2*self.section_size_1.min_leg, self.min_plate_height),
+                      self.plate.height,
+                      get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+                t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                      tension_yield_prov(l=2*self.section_size_1.min_leg, t=self.plate.thickness_provided,
+                                         f_y=self.plate.fy,
+                                         gamma=gamma_m0, T_dg=plate_yield_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                      tension_rupture_prov(2 * self.section_size_1.min_leg, self.plate.thickness_provided,
+                                           self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
+                                           plate_rupture_kn), '')
+        self.report_check.append(t3)
+        self.report_check.append(t2)
+        self.report_check.append(t1)
+
+        t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=plate_blockshear_kn), '')
+        self.report_check.append(t4)
+
+        t8 = (
+        KEY_DISP_TENSION_CAPACITY, '', tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
+        get_pass_fail(self.load.axial_force, self.plate_tension_capacity, relation="lesser"))
+        self.report_check.append(t8)
+
+
+
+
+
+
+        # t1 = ('SubSection', 'Plate Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        # self.report_check.append(t1)
+        #
+        # t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth, self.min_plate_height),
+        #       self.plate.height,
+        #       get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+        # self.report_check.append(t1)
+        # t1 = (DISP_MAX_PLATE_HEIGHT, max_plate_ht_req(self.connectivity, self.supported_section.depth,
+        #                                               self.supported_section.flange_thickness,
+        #                                               self.supported_section.root_radius,
+        #                                               self.supported_section.notch_ht,
+        #                                               self.max_plate_height), self.plate.height,
+        #       get_pass_fail(self.max_plate_height, self.plate.height, relation="greater"))
+        # self.report_check.append(t1)
+        # min_plate_length = self.plate.gap + 2 * self.bolt.min_end_dist + (
+        #             self.plate.bolt_line - 1) * self.bolt.min_pitch
+        # t1 = (DISP_MIN_PLATE_LENGTH, min_plate_length_req(self.bolt.min_pitch, self.bolt.min_end_dist,
+        #                                                   self.plate.bolt_line, min_plate_length),
+        #       self.plate.length,
+        #       get_pass_fail(min_plate_length, self.plate.length, relation="lesser"))
+        # self.report_check.append(t1)
+        # t1 = (DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness),
+        #       self.plate.thickness_provided,
+        #       get_pass_fail(self.supported_section.web_thickness, self.plate.thickness_provided,
+        #                     relation="lesser"))
+        # self.report_check.append(t1)
+
+        # KEY_OUT_PLATE_BLK_SHEAR,
+        # KEY_OUT_PLATE_HEIGHT,
+        # KEY_OUT_PLATE_MOM_CAPACITY,
+        # KEY_OUT_WELD_LENGTH_EFF,
+        # KEY_OUT_WELD_STRENGTH]
+
+        # folder = self.select_workspace_folder(self)
+        # print(folder)
+        Disp_3D_image = "./ResourceFiles/images/3d.png"
+
+        # Disp_image ={KEY_DISP_3D: "3d",
+        #              KEY_DISP_FRONT: "Front",
+        #              KEY_DISP_TOP: "Top",
+        #              KEY_DISP_SIDE: "Side"}
+
+
+        config = configparser.ConfigParser()
+        config.read_file(open(r'Osdag.config'))
+        desktop_path = config.get("desktop_path", "path1")
+        print("desk:", desktop_path)
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = rel_path.replace("\\", "/")
+
+        file_type = "PDF (*.pdf)"
+        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As",
+                                               os.path.join(str(' '), "untitled.pdf"), file_type)
+        print(filename, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        # filename = os.path.join(str(folder), "images_html", "TexReport")
+        file_name = str(filename)
+        print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        fname_no_ext = filename[0].split(".")[0]
+        print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
+                               rel_path, Disp_3D_image)
+
+        # if self.plate.design_status is False:
             # plate_shear_capacity = min(self.plate.block_shear_capacity, self.plate.shear_rupture_capacity,
             #                            self.plate.shear_yielding_capacity)
             # if self.load.shear_force > plate_shear_capacity:
@@ -1906,7 +2279,7 @@ class Tension_bolted(Main):
 #                                   'Zpy(cm3)': self.supporting_section.elast_sec_mod_y}
 #
 #         self.report_supported = {'Mass': 86.9, 'Area(cm2) - A': 111.0, 'D(mm)': 500.0, 'B(mm)': 180.0, 't(mm)': 10.2,
-#                                                     'T(mm)': 17.2, 'FlangeSlope': 98, 'R1(mm)': 17.0, 'R2(mm)': 8.5, 'Iz(cm4)': 45228.0,
+#                                                     'T(mm)': 17.2, 'FlangeSlope': 98, 'root_radius(mm)': 17.0, 'R2(mm)': 8.5, 'Iz(cm4)': 45228.0,
 #                                                     'Iy(cm4)': 1320.0, 'rz(cm)': 20.2, 'ry(cm)': 3.5, 'Zz(cm3)': 1809.1, 'Zy(cm3)': 147.0,
 #                                                     'Zpz(cm3)': 2074.8, 'Zpy(cm3)': 266.7}
 #         self.report_result = {"thinnerplate": 10.2,

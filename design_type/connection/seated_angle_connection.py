@@ -1,5 +1,29 @@
+"""
+Started on 1st February, 2020.
+
+@author: sourabhdas
+
+
+Module: Shear End plate connection
+
+Reference:
+            1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
+            2) Design of Steel structures by Dr. N Subramanian (chapter 5 and 6)
+            3) Fundamentals of Structural steel design by M.L Gambhir
+            4) AISC Design Examples V14
+
+
+
+ASCII diagram
+
+
+"""
+
+
+
 from design_type.connection.shear_connection import ShearConnection
 from utils.common.component import *
+from utils.common.material import *
 from utils.common.component import Bolt, Plate, Weld
 from Common import *
 from utils.common.load import Load
@@ -7,20 +31,57 @@ import yaml
 import os
 import shutil
 import logging
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
 
-class SeatedAngleConnectionInput(ShearConnection):
 
-    def __init__(self, connectivity, supporting_member_section, supported_member_section, fu, fy, shear_load,
-                 bolt_diameter, bolt_type, bolt_grade, seated_angle_section, top_angle_section):
+class SeatedAngleConnection(ShearConnection):
 
-        super(SeatedAngleConnectionInput, self).__init__(connectivity, supporting_member_section,
-                                                         supported_member_section, fu, fy, shear_load,
-                                                         bolt_diameter, bolt_type, bolt_grade)
+    def __init__(self):
+
+        super(SeatedAngleConnection, self).__init__()
         self.seated_angle = Angle(designation=seated_angle_section, material=self.material)
         self.top_angle = Angle(designation=top_angle_section, material=self.material)
 
-    def input_values(self, existingvalues={}):
+        self.design_status = False
 
+    def set_osdaglogger(key):
+
+        """
+        Function to set Logger for End Plate Module
+        """
+
+        # @author Arsil Zunzunia
+        global logger
+        logger = logging.getLogger('osdag')
+
+        logger.setLevel(logging.DEBUG)
+        handler = logging.StreamHandler()
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        handler = logging.FileHandler('logging_text.log')
+
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        # handler.setLevel(logging.INFO)
+        # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        # handler.setFormatter(formatter)
+        # logger.addHandler(handler)
+        handler = OurLog(key)
+        # handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+    def module_name(self):
+        return KEY_DISP_SEATED_ANGLE
+
+    def input_values(self, existingvalues={}):
+        self.module = KEY_DISP_SEATED_ANGLE
         options_list = []
 
         if KEY_CONN in existingvalues:
@@ -73,6 +134,9 @@ class SeatedAngleConnectionInput(ShearConnection):
         else:
             existingvalue_key_seatedangle = ''
 
+        t16 = (KEY_MODULE, KEY_DISP_SEATED_ANGLE, TYPE_MODULE, None, None)
+        options_list.append(t16)
+
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
@@ -120,6 +184,125 @@ class SeatedAngleConnectionInput(ShearConnection):
 
         return options_list
 
+    def func_for_validation(self, window, design_dictionary):
+        self.design_status = False
+        flag = False
+        flag1 = False
+        option_list = self.input_values(self)
+        missing_fields_list = []
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                val = option[4]
+                if design_dictionary[option[0]] == val[0]:
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                if design_dictionary[option[0]] == []:
+                    missing_fields_list.append(option[1])
+
+        if design_dictionary[KEY_CONN] == 'Column web-Beam web':
+            column = design_dictionary[KEY_SUPTNGSEC]
+            beam = design_dictionary[KEY_SUPTDSEC]
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            cursor = conn.execute("SELECT D FROM COLUMNS WHERE Designation = ( ? ) ", (column,))
+            lst = []
+            rows = cursor.fetchall()
+            for row in rows:
+                lst.append(row)
+            c_val = lst[0][0]
+            cursor2 = conn.execute("SELECT B FROM BEAMS WHERE Designation = ( ? )", (beam,))
+            lst1 = []
+            rows1 = cursor2.fetchall()
+            for row1 in rows1:
+                lst1.append(row1)
+            b_val = lst1[0][0]
+            if c_val <= b_val:
+                QMessageBox.about(window, 'Information',
+                                  "Beam width is higher than clear depth of column web "
+                                  "(No provision in Osdag till now)")
+            else:
+                flag1 = True
+        else:
+            flag1 = True
+
+        if len(missing_fields_list) > 0:
+            QMessageBox.information(window, "Information",
+                                    generate_missing_fields_error_string(missing_fields_list))
+            # flag = False
+        else:
+            flag = True
+
+        if flag and flag1:
+            self.set_input_values(self, design_dictionary)
+        else:
+            pass
+
+    def warn_text(self):
+
+        """
+        Function to give logger warning when any old value is selected from Column and Beams table.
+        """
+
+        # @author Arsil Zunzunia
+        global logger
+        red_list = red_list_function()
+        if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
+            logger.warning(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+            logger.info(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+
+
+
+    def set_input_values(self, design_dictionary):
+        super(SeatedAngleConnection,self).set_input_values(self, design_dictionary)
+        self.module = design_dictionary[KEY_MODULE]
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL], material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O], fabrication=design_dictionary[KEY_DP_WELD_FAB])
+        # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
+        print("input values are set. Doing preliminary member checks")
+        self.member_capacity(self)
+
+    def member_capacity(self):
+        # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
+        if self.supported_section.type == "Rolled":
+            length = self.supported_section.depth
+        else:
+            length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # For Built-up section
+
+        self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
+
+        if self.supported_section.shear_yielding_capacity > self.load.shear_force :
+            print("preliminary member check is satisfactory. Doing bolt checks")
+            self.design_status = True
+            # self.select_bolt_plate_arrangement(self)
+        else:
+            self.design_status = False
+            logger.error(" : shear yielding capacity {} is less than applied load, Please select larger sections or decrease loads"
+                            .format(self.supported_section.shear_yielding_capacity))
+            print("failed in preliminary member checks. Select larger sections or decrease loads")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     @staticmethod
     def pltthk_customized():
         a = VALUES_PLATETHK_CUSTOMIZED
@@ -140,7 +323,7 @@ class SeatedAngleConnectionInput(ShearConnection):
         list1 = []
         t1 = (KEY_GRD, self.grdval_customized)
         list1.append(t1)
-        # t2 = (KEY_PLATETHK,SeatedAngleConnectionInput.pltthk_customized)
+        # t2 = (KEY_PLATETHK,SeatedAngleConnection.pltthk_customized)
         # list1.append(t2)
         t3 = (KEY_D, self.diam_bolt_customized)
         list1.append(t3)

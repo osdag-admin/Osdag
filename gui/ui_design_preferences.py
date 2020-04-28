@@ -1444,6 +1444,7 @@ class DesignPreferences(QDialog):
         self.ui.btn_close.clicked.connect(self.close_designPref)
         self.ui.btn_defaults.clicked.connect(self.default_fn)
         self.module = main.module_name(main)
+        self.main = main
         self.window_close_flag = True
 
 
@@ -1501,6 +1502,17 @@ class DesignPreferences(QDialog):
         tab_Detailing = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
         tab_Design = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
         tab_Connector = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
+
+        #
+        # key_boltHoleType = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_HOLE_TYPE)
+        # combo_boltHoleType = key_boltHoleType.currentText()
+        key_boltTensioning = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_TYPE)
+        combo_boltTensioning = key_boltTensioning.currentText()
+        # key_boltFu = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O)
+        # line_boltFu = key_boltFu.text()
+        # key_slipfactor = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_SLIP_FACTOR)
+        # combo_slipfactor = key_slipfactor.currentText()
+
         tab_Anchor_Bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
 
         if module != KEY_DISP_BASE_PLATE:
@@ -1525,6 +1537,7 @@ class DesignPreferences(QDialog):
             line_boltType = key_boltType.currentText()
             key_boltFriction = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_FRICTION)
             line_boltFriction = key_boltFriction.text()
+
         key_weldType = tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_FAB)
         combo_weldType = key_weldType.currentText()
         key_weldFu = tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O)
@@ -1538,14 +1551,15 @@ class DesignPreferences(QDialog):
         combo_design_method = key_design_method.currentText()
 
         key_design_baseplate = tab_Design.findChild(QtWidgets.QWidget, KEY_DP_DESIGN_BASE_PLATE)
-        if module not in [KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
+        if module not in [KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COMPRESSION]:
             key_plate_material = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
             combo_plate_material = key_plate_material.currentText()
             key_plate_material_fu = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU)
             line_plate_material_fu = key_plate_material_fu.text()
             key_plate_material_fy = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY)
             line_plate_material_fy = key_plate_material_fy.text()
-            d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+            d1 = {KEY_DP_BOLT_TYPE: combo_boltTensioning,
+                  KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
                   KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
                   KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
                   KEY_DP_WELD_FAB: combo_weldType,
@@ -1773,7 +1787,7 @@ class DesignPreferences(QDialog):
         '''
         tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
         if designation == 'Select Section':
-            self.ui.clear_tab("Beam")
+            self.ui.clear_tab("Angle")
             return
 
         beam_attributes = Section(designation, material_grade)
@@ -1852,6 +1866,15 @@ class DesignPreferences(QDialog):
         for e in beam_list:
             if e.text() != "":
                 e.textChanged.connect(lambda: self.new_sectionalprop_Beam(beam_list))
+
+    def angle_preferences(self,designation,material_grade):
+        tab_Angle = self.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+
+        # if designation == 'Select Section':
+        #     self.ui.clear_tab("Angle")
+        #     return
+        ch=tab_Angle.findChild(QtWidgets.QWidget, KEY_ANGLE_DESIGNATION)
+        ch.setText(designation)
 
     def fu_fy_validation_connect(self, fu_fy_list, f):
         f.textChanged.connect(lambda: self.fu_fy_validation(fu_fy_list, f))
@@ -2066,8 +2089,7 @@ class DesignPreferences(QDialog):
                         return
 
     def anchor_bolt_designation(self, d):
-        length = IS_5624_1993.table1(d)
-        length = str(length[1])
+        length = str(self.main.anchor_length_provided if self.main.design_button_status else 0)
         designation = str(d) + "X" + length + " IS5624 GALV"
         return (designation, length)
 
@@ -2075,8 +2097,8 @@ class DesignPreferences(QDialog):
 
         change_list = []
         tab_anchor_bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
-        length = IS_5624_1993.table1(d)
-        length = str(length[1])
+        # length = IS_5624_1993.table1(d)
+        # length = str(length[1])
         # designation = str(d)+"X"+length+" IS5624 GALV"
         designation = self.anchor_bolt_designation(d)[0]
         initial_designation = designation
@@ -2085,8 +2107,9 @@ class DesignPreferences(QDialog):
                 ch.setText(designation)
                 ch.setReadOnly(True)
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_LENGTH:
-                ch.setText(length)
-                ch.setReadOnly(True)
+                ch.setText(self.main.anchor_length_provided if self.main.design_button_status else '0')
+                change_list.append(ch)
+                # ch.setReadOnly(True)
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_TYPE:
                 ch.setCurrentText(typ)
             elif ch.objectName() == KEY_DP_ANCHOR_BOLT_GALVANIZED:
@@ -2095,15 +2118,23 @@ class DesignPreferences(QDialog):
         for c in change_list:
             if isinstance(c, QtWidgets.QComboBox):
                 c.currentIndexChanged.connect(lambda: self.anchor_bolt_designation_change(c, initial_designation))
+            elif isinstance(c, QtWidgets.QLineEdit):
+                c.textChanged.connect(lambda: self.anchor_bolt_designation_change(c, initial_designation))
 
     def anchor_bolt_designation_change(self, c, initial_des):
         des = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt").findChild(QtWidgets.QWidget,
                                                                                       KEY_DP_ANCHOR_BOLT_DESIGNATION)
-        des_list = initial_des.split(' ')
-        new_des = des_list[0]+" "+des_list[1]
-        if c.currentText() == 'Yes':
-            des.setText(initial_des)
-        elif c.currentText() == 'No':
+        if isinstance(c, QtWidgets.QComboBox):
+            des_list = initial_des.split(' ')
+            new_des = des_list[0]+" "+des_list[1]
+            if c.currentText() == 'Yes':
+                des.setText(initial_des)
+            elif c.currentText() == 'No':
+                des.setText(new_des)
+        elif isinstance(c, QtWidgets.QLineEdit):
+            des_list = initial_des.split('X')
+            des_list_2 = des_list[1].split(' ')
+            new_des = str(des_list[0])+'X'+str(c.text())+' '+str(des_list_2[1])+' '+str(des_list_2[2])
             des.setText(new_des)
 
     def closeEvent(self, event):

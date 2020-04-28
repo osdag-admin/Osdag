@@ -85,8 +85,8 @@ class Tension_welded(Main):
         c_lst.append(t3)
         t4 = (KEY_PLATETHK, self.plate_thick_customized)
         c_lst.append(t4)
-        t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
-        c_lst.append(t5)
+        # t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
+        # c_lst.append(t5)
 
         return c_lst
 
@@ -1156,8 +1156,8 @@ class Tension_welded(Main):
 
                 elif (self.load.axial_force *1000> max_force) :
                     self.design_status = False
-                    logger.error(" : Tension force exceeds tension capacity of maximum available member size")
-                    logger.error(": Design is not safe \n ")
+                    logger.error(" : Tension force exceeds tension capacity of maximum available member size.")
+                    logger.error(": Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
                     break
 
@@ -1165,8 +1165,8 @@ class Tension_welded(Main):
 
                 elif self.length > length:
                     self.design_status = False
-                    logger.error(" : Member fails in slenderness")
-                    logger.error(": Design is not safe \n ")
+                    logger.error(" : Member fails in slenderness.")
+                    logger.error(": Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
                     break
 
@@ -1183,6 +1183,7 @@ class Tension_welded(Main):
     def initial_plate_check(self, design_dictionary):
 
         "Initialisation of plate thickness based on yield strength to determine weld size"
+        self.res_force = max((self.load.axial_force*1000),(0.3*self.section_size_1.tension_yielding_capacity))
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             self.thick = self.section_size_1.web_thickness
@@ -1222,7 +1223,7 @@ class Tension_welded(Main):
 
             tension_capacity = min (self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity)
 
-            if tension_capacity > self.load.axial_force*1000:
+            if tension_capacity > self.res_force:
                 break
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels',"Star Angles"]:
@@ -1232,7 +1233,7 @@ class Tension_welded(Main):
 
         "Increasing sectionsize to suffice the plate requirement"
 
-        if tension_capacity >=self.load.axial_force * 1000:
+        if tension_capacity >=self.res_force:
             print(self.plate.thickness_provided)
             self.design_status = True
             self.select_weld(self, design_dictionary)
@@ -1244,46 +1245,64 @@ class Tension_welded(Main):
                 self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
             else:
                 self.design_status = False
-                logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness")
-                logger.error(": Design is not safe \n ")
+                logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness.")
+                logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
 
     def select_weld(self,design_dictionary):
 
         "Selection of weld size based on the initial thickness considered"
 
-        self.res_force = self.load.axial_force*1000
+        # self.res_force = self.load.axial_force*1000
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             self.thick = self.section_size_1.web_thickness
+            self.thick_1 = self.section_size_1.flange_thickness
         else:
             self.thick = self.section_size_1.thickness
 
         self.weld.weld_size(plate_thickness = self.plate.thickness_provided, member_thickness= self.thick , edge_type= "Rolled")
 
-        self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu,self.weld.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.load.axial_force*1000))
+        self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu,self.weld.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.res_force))
 
-        self.weld_plate_length(self, design_dictionary)
-        self.weld.get_weld_stress(weld_axial=self.load.axial_force * 1000, l_weld=self.weld.effective)
+        self.weld_plate_length(self, design_dictionary,"web_weld")
+        self.weld.get_weld_stress(weld_axial=self.res_force, l_weld=self.weld.effective)
         # print(self.plate.length, self.weld.throat, "xfsf")
+        if self.plate.length > (150 * self.weld.throat) and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+            logger.info(" To avoid Long Joint Limit, weld is provided only on the flanges.")
+            self.weld.weld_size(plate_thickness=self.plate.thickness_provided, member_thickness=self.thick_1,edge_type="Rolled")
+            self.get_weld_strength(self, connecting_fu=[self.section_size_1.fu, self.plate.fu, self.weld.fu],
+                                   weld_fabrication=self.weld.fabrication, t_weld=self.weld.size,
+                                   force=(self.res_force))
+            self.weld_plate_length(self, design_dictionary)
+            self.weld.get_weld_stress(weld_axial=self.res_force, l_weld=self.weld.effective)
 
-        "Check for long joint"
+        # "Check for long joint"
+        # if self.plate.length > (150 * self.weld.throat):
+        #     logger.info(" Length of Joint is more than Long Joint Limit. Hence not possible.")
+        #     logger.error(": Design is not safe. \n ")
+        #     logger.debug(" :=========End Of design===========")
 
         while self.plate.length > (150 * self.weld.throat):
 
             Btw = IS800_2007.cl_10_5_7_3_weld_long_joint(self.plate.length, self.weld.throat)
 
             self.weld.strength = Btw * self.weld.strength
-            self.weld.effective = (self.load.axial_force * 1000 / self.weld.strength)
+            # self.weld.effective = (self.load.axial_force * 1000 / self.weld.strength)
+            self.weld.get_weld_stress(weld_axial = self.res_force, l_weld = self.weld.length)
 
-            self.weld.get_weld_stress(weld_axial = self.load.axial_force*1000, l_weld = self.weld.effective)
-
-            if self.weld.strength> self.weld.stress:
+            if self.weld.strength> self.weld.stress or Btw <= 0.6:
                 self.weld_plate_length(self, design_dictionary)
                 break
             else:
-                self.weld.effective = round_up((self.load.axial_force *1000/self.weld.strength),50,1)
+                self.weld.effective = round_up((self.res_force/self.weld.strength),100,1)
                 self.weld_plate_length(self, design_dictionary)
+
+        if self.weld.strength < self.weld.stress and Btw <= 0.6:
+            previous_size = self.section_size_1.designation
+            self.initial_member_capacity(self, design_dictionary, previous_size)
+        else:
+            pass
 
 
         if self.weld.strength > self.weld.stress:
@@ -1292,7 +1311,8 @@ class Tension_welded(Main):
             self.member_check(self, design_dictionary)
         else:
             self.design_status = False
-            logger.error(": Design is not safe \n ")
+            logger.error(": The member failes in long joint \n ")
+            logger.error(": Design is not safe.\n ")
             logger.debug(" :=========End Of design===========")
 
 
@@ -1308,44 +1328,62 @@ class Tension_welded(Main):
         self.weld.effective = L_eff
         self.weld.throat = throat_tk
 
-    def weld_plate_length (self,design_dictionary):
+    def weld_plate_length (self,design_dictionary, web = None):
 
         "Function to calculate weld length, plate length and plate height"
 
         if design_dictionary[KEY_SEC_PROFILE] == "Channels":
-            web_weld = self.section_size_1.depth - 2 * self.weld.size
+            if web == "web_weld":
+                web_weld = self.section_size_1.depth - 2 * self.weld.size
+            else:
+                web_weld = 0.0
             flange_weld = round_up(((self.weld.effective - web_weld) / 2), 1, 50)
             self.weld.length = (web_weld + 2 * flange_weld)
 
         elif design_dictionary[KEY_SEC_PROFILE] == 'Back to Back Channels':
-            web_weld = 2 * (self.section_size_1.depth - 2 * self.weld.size)
+            if web == "web_weld":
+                web_weld = 2 * (self.section_size_1.depth - 2 * self.weld.size)
+            else:
+                web_weld = 0.0
             flange_weld = round_up(((self.weld.effective - web_weld) / 4), 1, 50)
             self.weld.length = (web_weld + 4 * flange_weld)
 
         elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[
             KEY_LOCATION] == "Long Leg":
-            web_weld = 2 * (self.section_size_1.max_leg - 2 * self.weld.size)
+            if web == "web_weld":
+                web_weld = 2 * (self.section_size_1.max_leg - 2 * self.weld.size)
+            else:
+                web_weld = 0.0
             flange_weld = round_up(((self.weld.effective - web_weld) / 4), 1, 50)
             self.weld.length = (web_weld + 4 * flange_weld)
 
         elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[
             KEY_LOCATION] == "Short Leg":
-            web_weld = 2 * (self.section_size_1.min_leg - 2 * self.weld.size)
+            if web == "web_weld":
+                web_weld = 2 * (self.section_size_1.min_leg - 2 * self.weld.size)
+            else:
+                web_weld = 0.0
             flange_weld = round_up(((self.weld.effective - web_weld) / 4), 1, 50)
             self.weld.length = (web_weld + 4 * flange_weld)
 
         elif design_dictionary[KEY_SEC_PROFILE] == "Angles" and design_dictionary[KEY_LOCATION] == "Long Leg":
-            web_weld = (self.section_size_1.max_leg - 2 * self.weld.size)
+            if web == "web_weld":
+                web_weld = (self.section_size_1.max_leg - 2 * self.weld.size)
+            else:
+                web_weld = 0.0
             flange_weld = round_up(((self.weld.effective - web_weld) / 2), 1, 50)
             self.weld.length = (web_weld + 2 * flange_weld)
 
         else:
-            web_weld = (self.section_size_1.min_leg - 2 * self.weld.size)
+            if web == "web_weld":
+                web_weld = (self.section_size_1.min_leg - 2 * self.weld.size)
+            else:
+                web_weld = 0.0
             flange_weld = round_up(((self.weld.effective - web_weld) / 2), 1, 50)
             self.weld.length = (web_weld + 2 * flange_weld)
 
 
-        self.plate.length = flange_weld + 4 * self.weld.size
+        self.plate.length = flange_weld + max((4 * self.weld.size),30)
         if design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Long Leg":
             self.plate.height = 2 * self.section_size_1.max_leg + max((4 * self.weld.size),30)
         elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
@@ -1365,7 +1403,7 @@ class Tension_welded(Main):
         if design_dictionary[KEY_LOCATION] == 'Long Leg':
             w = self.section_size_1.min_leg
             shear_lag = w
-            L_c = self.plate.length
+            L_c = (self.plate.length - max((2 * self.weld.size),15))
             A_go = self.section_size_1.min_leg * self.section_size_1.thickness
             A_nc = (self.section_size_1.max_leg * self.section_size_1.thickness)
             t = self.section_size_1.thickness
@@ -1373,7 +1411,7 @@ class Tension_welded(Main):
         elif design_dictionary[KEY_LOCATION] == 'Short Leg':
             w = self.section_size_1.max_leg
             shear_lag = w
-            L_c = self.plate.length
+            L_c = (self.plate.length - max((2 * self.weld.size),15))
             A_go = self.section_size_1.max_leg * self.section_size_1.thickness
             A_nc = (self.section_size_1.min_leg * self.section_size_1.thickness)
             t = self.section_size_1.thickness
@@ -1381,7 +1419,7 @@ class Tension_welded(Main):
         elif design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             w = self.section_size_1.flange_width
             shear_lag = w
-            L_c = self.plate.length
+            L_c = (self.plate.length - max((2 * self.weld.size),15))
             A_go = self.section_size_1.flange_width * self.section_size_1.flange_thickness*2
             A_nc = (self.section_size_1.depth * self.section_size_1.web_thickness)
             t = self.section_size_1.web_thickness
@@ -1412,10 +1450,11 @@ class Tension_welded(Main):
             self.design_status = False
 
         if self.section_size_1.tension_capacity >= self.load.axial_force * 1000:
-            logger.info("In case of reverse load, slenderness value should be less than 180")
+            self.design_status = True
+            logger.info("In case of reverse load, slenderness value should be less than 180.")
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
-            self.design_status = True
+
         else:
             print("recheck")
             previous_size = self.section_size_1.designation
@@ -1432,82 +1471,82 @@ class Tension_welded(Main):
 
         for self.plate.thickness_provided in self.thickness_possible:
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
-                self.plate.tension_yielding(length = self.plate.height, thickness = self.plate.thickness_provided, fy = self.plate.fy)
-                self.net_area = self.plate.height * self.plate.thickness_provided
+                self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
+                self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided
 
             else:
                 if design_dictionary[KEY_LOCATION] == 'Long Leg':
-                    self.plate.tension_yielding(length = self.plate.height, thickness = self.plate.thickness_provided, fy = self.plate.fy)
-                    self.net_area = self.plate.height * self.plate.thickness_provided
+                    self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
+                    self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided
                 else:
-                    self.plate.tension_yielding(length = self.plate.height, thickness = self.plate.thickness_provided, fy = self.plate.fy)
-                    self.net_area = self.plate.height * self.plate.thickness_provided
+                    self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
+                    self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided
 
             self.plate.tension_rupture(A_n = self.net_area, F_u = self.plate.fu)
 
-            if design_dictionary[KEY_SEC_PROFILE] == "Channels":
-                A_vg = self.plate.length *self.plate.thickness_provided *2
-                A_vn = A_vg
-                A_tg = self.plate.height * self.plate.thickness_provided
-                A_tn = A_tg
-                # self.plate.length = (self.weld.length - (self.section_size_1.depth - 2 * self.weld.size) + 4 * self.weld.size)/2
-                # self.plate.height = self.section_size_1.depth
-
-            elif design_dictionary[KEY_SEC_PROFILE] == "Back to Back Channels":
-                A_vg = self.plate.length * self.plate.thickness_provided * 2
-                A_vn = A_vg
-                A_tg = self.plate.height * self.plate.thickness_provided
-                A_tn = A_tg
-
-            elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[KEY_LOCATION]== "Long Leg":
-                A_vg = self.plate.length * self.plate.thickness_provided * 2
-                A_vn = A_vg
-                A_tg = self.plate.height * self.plate.thickness_provided
-                A_tn = A_tg
-
-            elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
-                A_vg = self.plate.length * self.plate.thickness_provided * 2
-                A_vn = A_vg
-                A_tg = self.section_size_1.min_leg * self.plate.thickness_provided
-                A_tn = A_tg
-                # self.plate.length = ((self.weld.length - 2 * (self.section_size_1.min_leg - 2 * self.weld.size)) + 8 * self.weld.size) / 4
-                # self.plate.height = self.section_size_1.max_leg
-
-            elif design_dictionary[KEY_SEC_PROFILE]== "Angles" and design_dictionary[KEY_LOCATION]== "Long Leg":
-                A_vg = self.plate.length * self.plate.thickness_provided * 2
-                A_vn = A_vg
-                A_tg = self.plate.height * self.plate.thickness_provided
-                A_tn = A_tg
-
-            else:
-                A_vg = self.plate.length * self.plate.thickness_provided * 2
-                A_vn = A_vg
-                A_tg = self.plate.height * self.plate.thickness_provided
-                A_tn = A_tg
+            # if design_dictionary[KEY_SEC_PROFILE] == "Channels":
+            #     A_vg = (self.plate.length - max((2 * self.weld.size),15)) *self.plate.thickness_provided
+            #     A_vn = A_vg
+            #     A_tg = (self.plate.height - max((2 * self.weld.size),15))* self.plate.thickness_provided
+            #     A_tn = A_tg
+            #     # self.plate.length = (self.weld.length - (self.section_size_1.depth - 2 * self.weld.size) + 4 * self.weld.size)/2
+            #     # self.plate.height = self.section_size_1.depth
+            #
+            # elif design_dictionary[KEY_SEC_PROFILE] == "Back to Back Channels":
+            #     A_vg = (self.plate.length- max((2 * self.weld.size),15)) * self.plate.thickness_provided
+            #     A_vn = A_vg
+            #     A_tg = (self.plate.height - max((2 * self.weld.size),15))* self.plate.thickness_provided
+            #     A_tn = A_tg
+            #
+            # elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[KEY_LOCATION]== "Long Leg":
+            #     A_vg = (self.plate.length - max((2 * self.weld.size),15)) * self.plate.thickness_provided
+            #     A_vn = A_vg
+            #     A_tg = (self.plate.height - max((2 * self.weld.size),15))* self.plate.thickness_provided
+            #     A_tn = A_tg
+            #
+            # elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
+            #     A_vg = (self.plate.length - max((2 * self.weld.size),15)) * self.plate.thickness_provided
+            #     A_vn = A_vg
+            #     A_tg = (self.plate.height - max((2 * self.weld.size),15))* self.plate.thickness_provided
+            #     A_tn = A_tg
+            #     # self.plate.length = ((self.weld.length - 2 * (self.section_size_1.min_leg - 2 * self.weld.size)) + 8 * self.weld.size) / 4
+            #     # self.plate.height = self.section_size_1.max_leg
+            #
+            # elif design_dictionary[KEY_SEC_PROFILE]== "Angles" and design_dictionary[KEY_LOCATION]== "Long Leg":
+            #     A_vg = (self.plate.length - max((2 * self.weld.size),15)) * self.plate.thickness_provided
+            #     A_vn = A_vg
+            #     A_tg = (self.plate.height- max((2 * self.weld.size),15))* self.plate.thickness_provided
+            #     A_tn = A_tg
+            #
+            # else:
+            A_vg = (self.plate.length - max((2 * self.weld.size),15)) * self.plate.thickness_provided
+            A_vn = A_vg
+            A_tg = (self.plate.height - max((2 * self.weld.size),15))* self.plate.thickness_provided
+            A_tn = A_tg
 
 
             self.plate.tension_blockshear_area_input(A_vg = A_vg, A_vn = A_vn, A_tg = A_tg, A_tn = A_tn, f_u = self.plate.fu, f_y = self.plate.fy)
             self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
             print (self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
-            if self.plate_tension_capacity > self.load.axial_force *1000:
+            if self.plate_tension_capacity > self.res_force:
                 self.design_status = True
 
                 break
 
-            elif (self.plate_tension_capacity < self.load.axial_force * 1000) and self.plate.thickness_provided == self.plate_last:
+            elif (self.plate_tension_capacity < self.res_force) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
-                logger.error("Plate thickness is not sufficient")
-                logger.error(": Design is not safe \n ")
+                logger.error("Plate thickness is not sufficient.")
+                logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
             else:
                 pass
-        if self.plate_tension_capacity > self.load.axial_force * 1000:
+        if self.plate_tension_capacity > self.res_force:
             self.design_status = True
-            logger.info(": Overall welded tension member design is safe \n")
+            logger.info(": Overall welded tension member design is safe. \n")
             logger.debug(" :=========End Of design===========")
         else:
             self.design_status = False
-            logger.error(": Design is not safe \n ")
+            logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
 
 

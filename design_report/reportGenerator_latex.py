@@ -31,7 +31,8 @@ import os
 from pylatex.base_classes import Environment, CommandBase, Arguments
 from pylatex.package import Package
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
-    MediumText, LineBreak, simple_page_number
+    MediumText, LineBreak, simple_page_number, NewPage
+
 
 from pylatex.utils import bold
 

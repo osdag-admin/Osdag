@@ -380,9 +380,11 @@ def min_weld_size_req(conn_plates_weld,min_weld_size):
     weld_min = str(min_weld_size)
 
     min_weld_size_eqn = Math(inline=True)
-    min_weld_size_eqn.append(NoEscape(r'\begin{aligned} Thickness~of~Thicker~part&\\'))
-    min_weld_size_eqn.append(NoEscape(r'=Max('+t1+','+t2+r')&='+tmax+r'\\'))
-    min_weld_size_eqn.append(NoEscape(r'IS800:2007~cl.10.5.2.3~Table 21,&\\ t_{w_{min}} &=' + weld_min + r'\end{aligned}'))
+    min_weld_size_eqn.append(NoEscape(r'\begin{aligned} &Thickness~of~Thicker~part\\'))
+    min_weld_size_eqn.append(NoEscape(r'\noindent &=max('+t1+','+t2+r')\\'))
+    min_weld_size_eqn.append(NoEscape(r'&='+tmax+r'\\'))
+    min_weld_size_eqn.append(NoEscape(r'&IS800:2007~cl.10.5.2.3~Table 21,\\'))
+    min_weld_size_eqn.append(NoEscape(r' &t_{w_{min}}=' + weld_min + r'\end{aligned}'))
     return min_weld_size_eqn
 
 def max_weld_size_req(conn_plates_weld,max_weld_size):

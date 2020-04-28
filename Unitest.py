@@ -108,7 +108,7 @@ class TestClass_for_FinPlate(unittest.TestCase):  # Similarly make other classes
     finplate = Modules()
 
     # Make the number of functions equal to number of input files.
-    
+
     def test_0(self):
 
         file_name = list_of_dict_finplate[0][0]   #index 0

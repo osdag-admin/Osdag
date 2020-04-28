@@ -1,10 +1,3 @@
-"""This file is redundant. Use report_generator.py"""
-
-'''
-Created on Dec 10, 2015
-
-@author: deepa
-'''
 from builtins import str
 import time
 from Report_functions import *

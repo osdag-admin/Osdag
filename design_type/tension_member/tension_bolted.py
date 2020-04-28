@@ -2075,6 +2075,12 @@ class Tension_bolted(Main):
         # print(folder)
         Disp_3D_image = "./ResourceFiles/images/3d.png"
 
+        # Disp_image ={KEY_DISP_3D: "3d",
+        #              KEY_DISP_FRONT: "Front",
+        #              KEY_DISP_TOP: "Top",
+        #              KEY_DISP_SIDE: "Side"}
+
+
         config = configparser.ConfigParser()
         config.read_file(open(r'Osdag.config'))
         desktop_path = config.get("desktop_path", "path1")

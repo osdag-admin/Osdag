@@ -692,25 +692,42 @@ class ColumnEndPlate(MomentConnection):
                 self.lst1.append(x)
                 self.lst2.append(self.no_bolts)
                 # self.lst2.append(y)
-                res = dict(zip(self.lst1, self.lst2))
+                self.res   = dict(zip(self.lst1, self.lst2))
                 # key_min = min(res.keys(), key=(lambda k: res[k]))
-                key_min = min(res, key=res.get)
-                self.bolt_diam_provided = key_min
-                # return self.bolt_diam_provided
-                print("diam list",self.lst1)
-                print("no of bolts list",self.lst2)
-                print("dict",res)
-                print("Bolt diam prov", self.bolt_diam_provided)
-                print("Selecting bolt grade")
-                self.get_bolt_grade(self)
-                self.design_status = True
+                # key_min = min(res, key=res.get)
+                # self.bolt_diam_provided = key_min
+                # # return self.bolt_diam_provided
+                # print("diam list",self.lst1)
+                # print("no of bolts list",self.lst2)
+                # print("dict",res)
+                # print("Bolt diam prov", self.bolt_diam_provided)
+                # print("Selecting bolt grade")
+                # self.get_bolt_grade(self)
+                # self.design_status = True
             else:
-                if self.t_b > self.bolt.bolt_tension_capacity:
-                    self.design_status = False
-                    logger.error("tension capacity and moment capacity of member is less than applied axial force and momemt")
+                pass
+                # if self.t_b > self.bolt.bolt_tension_capacity:
+                #     self.design_status = False
+                #     logger.error("tension capacity and moment capacity of member is less than applied axial force and momemt")
                 # elif self.v_sb > self.bolt.bolt_capacity:
                 #     self.design_status = False
                 #     logger.error("shear capacity of member is less than applied shear")
+        if len(self.lst1) !=0:
+            key_min = min(self.res, key=self.res.get)
+            self.bolt_diam_provided = key_min
+            # return self.bolt_diam_provided
+            print("diam list", self.lst1)
+            print("no of bolts list", self.lst2)
+            print("dict", self.res)
+            print("Bolt diam prov", self.bolt_diam_provided)
+            print("Selecting bolt grade")
+            # self.get_bolt_grade(self)
+            self.design_status = True
+            self.get_bolt_grade(self)
+
+        else:
+            self.design_status = False
+            logger.error("tension capacity and moment capacity of member is less than applied axial force and momemt")
 
         #     if self.design_status:
         #         self.lst1.append(x)

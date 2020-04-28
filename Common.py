@@ -435,11 +435,13 @@ KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
 
 
 KEY_OUT_BASEPLATE_THICKNNESS = 'Baseplate.Thickness'
-KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (tp)'
+KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (mm)'
 KEY_OUT_BASEPLATE_LENGTH = 'Baseplate.Length'
-KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (lp)'
+KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (mm)'
 KEY_OUT_BASEPLATE_WIDTH = 'Baseplate.Width'
-KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (wp)'
+KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (mm)'
+
+
 DISP_TITLE_DETAILING = 'Detailing'
 KEY_OUT_DETAILING_NO_OF_ANCHOR_BOLT = 'Deatiling.No of Anchor bolts'
 KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'No. of Anchor bolts'
@@ -454,6 +456,31 @@ KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (e')"
 KEY_OUT_DETAILING_PROJECTION = 'Detailing.Projection'
 KEY_OUT_DISP_DETAILING_PROJECTION = 'Projection (c)'
 
+
+DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
+KEY_OUT_GUSSET_PLATE_THICKNNESS = 'GussetPlate.Thickness'
+KEY_OUT_DISP_GUSSET_PLATE_THICKNESS = 'Thickness (mm)'
+KEY_OUT_GUSSET_PLATE_SHEAR_DEMAND = 'GussetPlate.Shear_Demand'
+KEY_OUT_DISP_GUSSET_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_GUSSET_PLATE_SHEAR = 'GussetPlate.Shear'
+KEY_OUT_DISP_GUSSET_PLATE_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_GUSSET_PLATE_MOMENT_DEMAND = 'GussetPlate.Moment_Demand'
+KEY_OUT_DISP_GUSSET_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_GUSSET_PLATE_MOMENT = 'GussetPlate.Moment'
+KEY_OUT_DISP_GUSSET_PLATE_MOMENT = 'Moment Capacity (kN-m)'
+
+
+DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'
+KEY_OUT_STIFFENER_PLATE_THICKNNESS = 'StiffenerPlate.Thickness'
+KEY_OUT_DISP_STIFFENER_PLATE_THICKNESS = 'Thickness (mm)'
+KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND = 'StiffenerPlate.Shear_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_STIFFENER_PLATE_SHEAR = 'StiffenerPlate.Shear'
+KEY_OUT_DISP_STIFFENER_PLATE_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND = 'StiffenerPlate.Moment_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_STIFFENER_PLATE_MOMENT = 'StiffenerPlate.Moment'
+KEY_OUT_DISP_STIFFENER_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 
 
 ###################################
@@ -950,6 +977,7 @@ KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>
 
 
 KEY_BASE_PLATE_MATERIAL = 'Base_Plate.Material'
+KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_BASE_PLATE_FU = 'Base_Plate.Fu'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
 KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , fy (MPa)'
@@ -1121,9 +1149,14 @@ KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kNm)'
 KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
 
-DISP_TITLE_WELD = 'Weld'
 KEY_OUT_WELD_SIZE = 'Weld.Size'
 KEY_OUT_DISP_WELD_SIZE = 'Size(mm)'
+KEY_OUT_WELD_SIZE_FLANGE = 'Weld.Size_flange'
+KEY_OUT_DISP_WELD_SIZE_FLANGE = 'Size at Flange (mm)'
+KEY_OUT_WELD_SIZE_WEB = 'Weld.Size_web'
+KEY_OUT_DISP_WELD_SIZE_WEB = 'Size at Web (mm)'
+KEY_OUT_WELD_SIZE_STIFFENER = 'Weld.Size_stiffener'
+KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Gusset/Stiffener (mm)'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
 KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'

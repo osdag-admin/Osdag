@@ -3,6 +3,7 @@ from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column
 from Common import *
 from utils.common.load import Load
 from utils.common import common_calculation
+from utils.common.is800_2007 import IS800_2007
 import numpy as np
 
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
@@ -18,7 +19,7 @@ import logging
 import cmath
 
 
-class MomentConnection(Connection):
+class MomentConnection(Connection, IS800_2007):
     def __init__(self):
         super(MomentConnection, self).__init__()
 
@@ -145,5 +146,37 @@ class MomentConnection(Connection):
         projection = common_calculation.round_up(r + anchor_hole_dia, 5)  # mm
 
         return projection
+
+    @staticmethod
+    def calc_weld_size_from_strength_per_unit_len(strength_unit_len, ultimate_stresses, elements_welded, fabrication=KEY_DP_WELD_FAB_SHOP):
+
+        """Calculate the size of fillet weld
+
+        Args:
+            strength_unit_len - Strength of weld per/unit length in MPa (float)
+            ultimate_stresses - Ultimate stresses of weld and parent metal in MPa (list or tuple)
+            elements_welded - List of thicknesses of the two elements being welded in mm (list or tuple)
+            fabrication - Either 'shop' or 'field' (str)
+
+        Returns:
+            Size of the weld (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.7.1.1
+
+        """
+        f_u = min(ultimate_stresses)
+        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][fabrication]
+        weld_size = (strength_unit_len / (0.7 * f_u)) * math.sqrt(3) * gamma_mw
+
+        weld_size_minimum = IS800_2007.cl_10_5_2_3_min_weld_size(elements_welded[0], elements_welded[1])
+
+        # rounding up the weld size to a higher multiple of 2 with a minimum value of the weld size being
+        # as per Table 21 of IS 800:2007
+        weld_size = common_calculation.round_up(weld_size, 2, weld_size_minimum)  # mm
+
+        return weld_size
+
 
 

@@ -8,6 +8,8 @@ from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
 import yaml
 import os
+from design_report.reportGenerator_latex import CreateLatex
+from Report_functions import *
 import shutil
 import logging
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
@@ -1484,7 +1486,10 @@ class BeamCoverPlateWeld(MomentConnection):
     #     flange_force = (((self.moment_flange * 1000000) / (self.section.depth - self.section.flange_thickness)) + (
     #         axial_force_f))
 
+
     ################################ Design Report #####################################################################################
+
+
 
     def save_design(self, popup_summary):
 
@@ -1512,16 +1517,12 @@ class BeamCoverPlateWeld(MomentConnection):
                                   'Zpy(mm3)': self.section.elast_sec_mod_y}
         self.report_input = \
             {KEY_MODULE: self.module,
+
              KEY_MAIN_MODULE: self.mainmodule ,
              # KEY_CONN: self.connectivity,
              KEY_DISP_MOMENT: self.load.moment,
              KEY_DISP_SHEAR: self.load.shear_force ,
              KEY_DISP_AXIAL: self.load.axial_force,
-
-             # KEY_DISP_FAC_SHEAR_LOAD :round(self.fact_shear_load/1000,2),
-             # KEY_DISP_FAC_AXIAL_FORCE : round(self.factored_axial_load/1000,2),
-             # KEY_DISP_FAC_MOMENT_LOAD :round(self.load_moment/1000000.2),
-
 
              "Section": "TITLE",
              "Section Details": self.report_supporting,
@@ -1530,39 +1531,97 @@ class BeamCoverPlateWeld(MomentConnection):
              KEY_DISP_DP_WELD_TYPE: "Fillet",
              KEY_DISP_DP_WELD_FAB: self.flange_weld.fabrication,
              KEY_DISP_DP_WELD_MATERIAL_G_O: self.flange_weld.fu}
-             # KEY_FLANGE_DISP_WELD_SIZE: str(self.flange_weld.size)
-             #KEY_WEB_DISP_WELD_SIZE: str(self.web_weld.size)}
-
 
 
         self.report_check = []
         #####Outer plate#####
+
+        self.flange_weld_connecting_plates = [self.section.flange_thickness, self.flange_plate.thickness_provided]
+        self.flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.flange_thickness,self.flange_plate.thickness_provided)
+
+        # flange_get_weld_strenght_kn = round(self.flange_weld.get_weld_strenght / 1000, 2)
+
+        t1 = ('SubSection', 'Weld Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t2 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
+                                                    min_weld_size=self.flange_weld_size_min),
+              self.flange_weld.size,
+              get_pass_fail(self.flange_weld_size_min, self.flange_weld.size, relation="lesser"))
+        self.report_check.append(t2)
+        t2 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
+                                                    max_weld_size=self.min_flange_platethk),
+              self.flange_weld.size,
+              get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
+        self.report_check.append(t2)
+
+######################
+
         flange_connecting_plates = [self.flange_plate.thickness_provided, self.section.flange_thickness]
         # flange_get_weld_strenght_kn = round(self.flange_weld.get_weld_strenght / 1000, 2)
 
-        t1 = ('SubSection', 'Weld Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Weld Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         self.flange_weld_connecting_plates = [self.section.flange_thickness, self.flange_plate.thickness_provided]
-        t1 = (DISP_MIN_WELD_SIZE,min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
-                                                   min_weld_size=self.min_flange_platethk ),
-              self.flange_weld.size ,
-              get_pass_fail(self.min_flange_platethk,  self.flange_weld.size, relation="leq") )
+        t1 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
+                                                    min_weld_size=self.min_flange_platethk),
+              self.flange_weld.size,
+              get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="leq"))
         self.report_check.append(t1)
-        t1 = (DISP_MAX_WELD_SIZE,max_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
-                                                   max_weld_size=self.min_flange_platethk ) ,
-              self.flange_weld.size ,
-              get_pass_fail(self.min_flange_platethk,  self.flange_weld.size, relation="geq") )
+        t1 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
+                                                    max_weld_size=self.min_flange_platethk),
+              self.flange_weld.size,
+              get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
         self.report_check.append(t1)
         self.web_weld_connecting_plates = [self.section.web_thickness, self.web_plate.thickness_provided]
-        t1 = (DISP_MIN_WELD_SIZE,min_weld_size_req(conn_plates_weld=self.web_weld_connecting_plates,
-                                                   min_weld_size=self.min_web_platethk ),
-              self.web_weld.size ,
-              get_pass_fail(self.min_web_platethk,  self.web_weld.size, relation="leq") )
+        t1 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.web_weld_connecting_plates,
+                                                    min_weld_size=self.min_web_platethk),
+              self.web_weld.size,
+              get_pass_fail(self.min_web_platethk, self.web_weld.size, relation="leq"))
         self.report_check.append(t1)
 
         t1 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.web_weld_connecting_plates,
-                                                max_weld_size=self.min_flange_platethk),
+                                                    max_weld_size=self.min_flange_platethk),
               self.web_weld.size,
               get_pass_fail(self.min_flange_platethk, self.web_weld.size, relation="geq"))
         self.report_check.append(t1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        Disp_3D_image = "./ResourceFiles/images/3d.png"
+
+        config = configparser.ConfigParser()
+        config.read_file(open(r'Osdag.config'))
+        desktop_path = config.get("desktop_path", "path1")
+        print("desk:", desktop_path)
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = rel_path.replace("\\", "/")
+
+        file_type = "PDF (*.pdf)"
+        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"),
+                                               file_type)
+        print(filename, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        # filename = os.path.join(str(folder), "images_html", "TexReport")
+        file_name = str(filename)
+        print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        fname_no_ext = filename[0].split(".")[0]
+        print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
+                               rel_path, Disp_3D_image)
+
 

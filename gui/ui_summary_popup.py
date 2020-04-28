@@ -164,7 +164,11 @@ class Ui_Dialog1(object):
         Dialog.setTabOrder(self.txt_additionalComments, self.buttonBox)
 
     def save_inputSummary(self,main):
-        input_summary = self.getPopUpInputs()
+        input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
+        file_type = "PDF (*.pdf)"
+        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        fname_no_ext = filename[0].split(".")[0]
+        input_summary['filename'] = fname_no_ext
         main.save_design(main,input_summary)
 
 

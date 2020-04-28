@@ -192,6 +192,7 @@ def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_pla
     beam_f_t = str(beam_f_t)
     beam_r_r = str(beam_r_r)
     max_plate_h = str(max_plate_h)
+    notch = str(notch)
     max_plate_ht_eqn = Math(inline=True)
     if connectivity in VALUES_CONN_1:
         max_plate_ht_eqn.append(NoEscape(r'\begin{aligned} &d_b - 2 (t_{bf} + r_{b1} + gap)\\'))
@@ -283,6 +284,7 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
+
 
 def tension_rupture_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
     w_p = str(w_p)
@@ -387,6 +389,124 @@ def weld_strength_prov(conn_plates_weld_fu,gamma_mw,t_t,f_w):
     weld_strength_eqn.append(NoEscape(r'&='+f_w+r'\end{aligned}'))
 
     return weld_strength_eqn
+
+def axial_capacity(area,fy, gamma_m0,axial_capacity): #todo anjali
+    area = str(area)
+    fy=str(fy)
+    gamma_m0=str(gamma_m0)
+    axial_capacity = str(axial_capacity)
+    axial_capacity_eqn = Math(inline=True)
+    axial_capacity_eqn.append(NoEscape(r'\begin{aligned} Ac &=\frac{A*f_y}{\gamma_{m0} *1000}\\'))
+    axial_capacity_eqn.append(NoEscape(r'&=\frac{'+area+'*'+fy+'}{'+ gamma_m0+r'* 1000}\\'))
+    axial_capacity_eqn.append(NoEscape(r'&=' + axial_capacity + r'\end{aligned}'))
+    return axial_capacity_eqn
+
+def min_axial_capacity(axial_capacity,min_ac): #todo anjali
+    min_ac = str(min_ac)
+    axial_capacity = str(axial_capacity)
+    min_ac_eqn = Math(inline=True)
+    min_ac_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
+    min_ac_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
+    min_ac_eqn.append(NoEscape(r'&=' + min_ac + r'\end{aligned}'))
+    return min_ac_eqn
+
+def prov_axial_load(axial_input,min_ac,app_axial_load):
+    min_ac = str(min_ac)
+    axial_input = str(axial_input)
+    app_axial_load = str(app_axial_load)
+    prov_axial_load_eqn = Math(inline=True)
+    prov_axial_load_eqn.append(NoEscape(r'\begin{aligned} Au &= max(A,Ac_{min} )\\'))
+    prov_axial_load_eqn.append(NoEscape(r'&= max( ' + axial_input + ',' + min_ac + r')\\'))
+    prov_axial_load_eqn.append(NoEscape(r'&=' + app_axial_load + r'\end{aligned}'))
+    return prov_axial_load_eqn
+#
+def shear_capacity(h, t,f_y, gamma_m0,shear_capacity): # same as #todo anjali
+
+    h = str(h)
+    t = str(t)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    shear_capacity = str(shear_capacity)
+    shear_capacity_eqn = Math(inline=True)
+    shear_capacity_eqn.append(NoEscape(r'\begin{aligned} S_c &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo} *1000}\\'))
+    shear_capacity_eqn.append(NoEscape(r'&=\frac{' + h + r'*' + t + r'*' + f_y + r'}{\sqrt{3}*' + gamma_m0 + r' *1000}\\'))
+    shear_capacity_eqn.append(NoEscape(r'&=' + shear_capacity + r'\end{aligned}'))
+    return shear_capacity_eqn
+#
+#
+def min_shear_capacity(shear_capacity,min_sc): #todo anjali
+    min_sc = str(min_sc)
+    shear_capacity = str(shear_capacity)
+    min_sc_eqn = Math(inline=True)
+    min_sc_eqn.append(NoEscape(r'\begin{aligned} Sc_{min} &= 0.6 * A_c\\'))
+    min_sc_eqn.append(NoEscape(r'&= 0.6 *' + shear_capacity +r'\\'))
+    min_sc_eqn.append(NoEscape(r'&=' + min_sc + r'\end{aligned}'))
+    return min_sc_eqn
+
+def prov_shear_load(shear_input,min_sc,app_shear_load):
+    min_sc = str(min_sc)
+    shear_input = str(shear_input)
+    app_shear_load = str(app_shear_load)
+    app_shear_load_eqn = Math(inline=True)
+    app_shear_load_eqn.append(NoEscape(r'\begin{aligned} Vu &= max(V,Vc_{min})\\'))
+    app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',' + min_sc + r')\\'))
+    app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r'\end{aligned}'))
+    return app_shear_load_eqn
+
+
+
+
+def plastic_moment_capacty(beta_b, Z_p, f_y, gamma_m0 ,Pmc):  # same as #todo anjali
+
+    beta_b = str(beta_b)
+    Z_p = str(Z_p)
+    f_y = str(f_y)
+    gamma_m0 =str(gamma_m0 )
+    Pmc = str(Pmc)
+    Pmc_eqn = Math(inline=True)
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} Pmc &= \frac{\beta_b * Z_p *fy}{\gamma_{mo} * 1000000}\\'))
+    Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_b + r'*' +Z_p + r'*' + f_y + r'}{' + gamma_m0 + r' * 1000000}\\'))
+    Pmc_eqn.append(NoEscape(r'&=' + Pmc + r'\end{aligned}'))
+    return Pmc_eqn
+
+def moment_d_deformation_criteria(fy,Z_e,Mdc):
+    fy = str(fy)
+    Z_e = str(Z_e)
+    Mdc =str(Mdc)
+    Mdc_eqn= Math(inline=True)
+    Mdc_eqn.append(NoEscape(r'\begin{aligned} Mdc &= \frac{1.5 *Z_e *fy}{1.1}\\'))
+    Mdc_eqn.append(NoEscape(r'&= \frac{1.5 *r'+Z_e + r'*' +fy +r'}{1.1}\\'))
+    Mdc_eqn.append(NoEscape(r'&= ' + Mdc+ r'\end{aligned}'))
+    return  Mdc_eqn
+
+def moment_capacity (Pmc , Mdc, M_c):
+    Pmc = str(Pmc)
+    Mdc =str(Mdc)
+    M_c = str (M_c)
+    M_c_eqn = Math(inline=True)
+    M_c_eqn.append(NoEscape(r'\begin{aligned} M_c &= min(Pmc,Mdc)\\'))
+    M_c_eqn.append(NoEscape(r'&=min('+Pmc+','+Mdc+ r')\\'))
+    M_c_eqn.append(NoEscape(r'&=' + M_c + r'\end{aligned}'))
+    return M_c_eqn
+
+def min_moment_capacity(moment_capacity,min_mc): #todo anjali
+    min_mc = str(min_mc)
+    moment_capacity = str(moment_capacity)
+    min_mc_eqn = Math(inline=True)
+    min_mc_eqn.append(NoEscape(r'\begin{aligned} Mc_{min} &= 0.5 * M_c\\'))
+    min_mc_eqn.append(NoEscape(r'&= 0.5 *' + moment_capacity +r'\\'))
+    min_mc_eqn.append(NoEscape(r'&=' + min_mc + r'\end{aligned}'))
+    return min_mc_eqn
+
+def prov_moment_load(moment_input,min_mc,app_moment_load):
+    min_mc = str(min_mc)
+    moment_input = str(moment_input)
+    app_moment_load = str(app_moment_load)
+    app_moment_load_eqn = Math(inline=True)
+    app_moment_load_eqn.append(NoEscape(r'\begin{aligned} Mu &= max(M,Mc_{min} )\\'))
+    app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r')\\'))
+    app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\end{aligned}'))
+    return  app_moment_load_eqn
 
 
 def get_pass_fail(required, provided,relation='greater'):

@@ -1,6 +1,7 @@
 from design_type.connection.shear_connection import ShearConnection
 
 import time
+from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
@@ -86,11 +87,12 @@ class FinPlateConnection(ShearConnection):
         # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         # handler.setFormatter(formatter)
         # logger.addHandler(handler)
-        handler = OurLog(key)
-        # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        if key is not None:
+            handler = OurLog(key)
+            # handler.setLevel(logging.DEBUG)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def module_name(self):
         return KEY_DISP_FINPLATE
@@ -344,6 +346,7 @@ class FinPlateConnection(ShearConnection):
         return out_list
 
     def func_for_validation(self, window, design_dictionary):
+        all_errors = []
         self.design_status = False
         flag = False
         flag1 = False
@@ -381,9 +384,8 @@ class FinPlateConnection(ShearConnection):
                 lst1.append(row1)
             s_val = lst1[0][0]
             if p_val <= s_val:
-                QMessageBox.about(window, 'Information',
-                                  "Secondary beam depth is higher than clear depth of primary beam web "
-                                  "(No provision in Osdag till now)")
+                error = "Secondary beam depth is higher than clear depth of primary beam web " + "\n" + "(No provision in Osdag till now)"
+                all_errors.append(error)
             else:
                 flag1 = True
 
@@ -398,11 +400,10 @@ class FinPlateConnection(ShearConnection):
 
             s_beam_details = cursor2.fetchone()
             s_val = s_beam_details[0]
-            print(p_val,s_val)
+            #print(p_val,s_val)
             if p_val <= s_val:
-                QMessageBox.about(window, 'Information',
-                                  "Secondary beam width is higher than clear depth of primary column web "
-                                  "(No provision in Osdag till now)")
+                error = "Secondary beam width is higher than clear depth of primary column web " + "\n" + "(No provision in Osdag till now)"
+                all_errors.append(error)
             else:
                 flag1 = True
         else:
@@ -412,13 +413,13 @@ class FinPlateConnection(ShearConnection):
         supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_MATERIAL])
         available_plates = [i for i in selected_plate_thk if i >= supported_section.web_thickness]
         if not available_plates:
-            QMessageBox.about(window, 'Information',
-                              "Plate thickness should be greater than suppported section web thicknesss.")
+            error = "Plate thickness should be greater than suppported section web thicknesss."
+            all_errors.append(error)
         else:
             flag2=True
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    generate_missing_fields_error_string(missing_fields_list))
+            error = generate_missing_fields_error_string(missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -426,7 +427,7 @@ class FinPlateConnection(ShearConnection):
         if flag and flag1 and flag2:
             self.set_input_values(self, design_dictionary)
         else:
-            pass
+            return all_errors
 
     def warn_text(self):
 
@@ -1126,11 +1127,11 @@ class FinPlateConnection(ShearConnection):
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
 
-        file_type = "PDF (*.pdf)"
-        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        #file_type = "PDF (*.pdf)"
+        #filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
         # filename = os.path.join(str(folder), "images_html", "TexReport")
-        file_name = str(filename)
-        fname_no_ext = filename[0].split(".")[0]
+        #file_name = str(filename)
+        fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_3D_image)
 

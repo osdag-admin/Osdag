@@ -1346,6 +1346,7 @@ class BeamCoverPlateWeld(MomentConnection):
         flange_crs_sec_area = tk * width
         self.design_status = True
         for y in list_of_pt_tk:
+
             if preference != None:
                 if preference == "Outside":
                     outerwidth = width - (2 * 20)
@@ -1361,7 +1362,9 @@ class BeamCoverPlateWeld(MomentConnection):
                     outerwidth = width - (2 * 20)
                     innerwidth = (width - t_w - (2 * r_1) - (4 * 20)) / 2
                     if innerwidth < 50:
+                        thickness = 0
                         self.design_status = False
+
                     else:
                         self.design_status = True
                         flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y

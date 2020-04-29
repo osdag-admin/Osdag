@@ -1,3 +1,91 @@
+'''
+    INSTRUCTIONS TO USE OSDAG MAIN PAGE TEMPLATE(OsdagMainWindow):
+----------------------------------------------------------------------------------------------------
+    Note: This code is designed to handle a 3 level structure, e.g. ,
+
+..................................................................................................................
+.                            Modules (Main Dictionary)                                                           .
+.        _______________________|______________________________________________________..........                .    ((LEVEL 1))
+.        |               |          |            |                    |               |                          .
+.    Module_1        Module_2    Module_3     Module_4             Module_5     Module_6         (Keys of Main Dictionary)
+........|..............|............|...........|....................|...............|............................            
+        |              |            |           |                    |               |
+        |              |            |           |                    |               |
+        |              |            | [List/Tuple of Module Variants]|               |                           
+        |              |            |                                |               |                           
+        |              |    [List/Tuple of Module Variants]          |               |                           
+        |      (UNDER DEVELOPMENT)                             (UNDER DEVELOPMENT)   |                           
+........|............................................................................|............................
+.   ____|________________________________.....               ________________________|______......     (Sub Dictionaries)     
+.   |                   |               |                    |              |              |                     .     ((LEVEL 2))
+.   Submodule_1    Submodule_2    Submodule_3           Submodule_1    Submodule_2    Submodule_3     (Keys of Sub Dictionaries) 
+.       |               |               |                |                  |              |                     .
+........|...............|...............|................|..................|..............|......................
+        |               |               |                |                  |              |                     
+        |               |               |                |                  |              |                     
+        |               |               |                |                  |              |                      
+        |               |      (UNDER DEVELOPMENT)       |                  |              |                     
+        |               |                  [List/Tuple of Module Variants]  |              |                     
+        |  [List/Tuple of Module Variants]                                  |  [List/Tuple of Module Variants]   
+        |                                                                   |                                    
+........|...................................................................|.....................................
+.   ____|________________________________.....               _______________|_______________......     (Sub-Sub Dictionaries)     
+.   |                   |               |                    |              |              |                     .     ((LEVEL 3))
+. Sub-Submodule_1  Sub-Submodule_2  Sub-Submodule_3  Sub-Submodule_1  Sub-Submodule_2  Sub-Submodule_3 (Keys of Sub-Sub Dictionaries) 
+.       |               |               |                    |                  |              |                 .
+........|...............|...............|....................|..................|..............|..................
+        |               |               |                    |                  |              |
+        |    (UNDER DEVELOPMENT)        |     [List/Tuple of Module Variants]  |    [List/Tuple of Module Variants]
+        |                   [List/Tuple of Module Variants]     [List/Tuple of Module Variants]
+[List/Tuple of Module Variants]
+
+
+The Rules/Steps to use the template are(OsdagMainWindow):
+-----------------------------------------------------------------------------
+1) The data for the template structuring will go into a variable called self.Modules .
+
+2) self.Modules must be a dictionary with keys as the name of modules in string format (LEVEL 1).
+
+3) The values to these keys can be a dictionary(Modules), a List/Tuple(Module Variants) or self.Under_Development :
+        (i) If the value is a dictionary then it should contain keys as modules in string format and for values 
+            read RULE 4 . (LEVEL 2)
+       (ii) If the value is a List/Tuple then it should contain sub-lists/sub-tuples informing about the module variants :
+                    (a) The module variants as sub-list/sub-tuple will have 3 values, Module_Name, Image_Path and Object_Name .
+                    (b) The List/Tuple can have several sub-lists/sub-tuples but the last element should be a method,
+                        which connects to the start button on the module variants' page and help launch a certain module.
+      (iii) If the value is self.Under_Development then that module/module variant is marked as UNDER DEVELOPMENT.
+
+4) In case of RULE 3(i) if value of any sub-module key is a dictionary then that dictionary will follow the RULE 3 
+   all over again and the values of the keys can be a dictionary(Sub-Modules), a List/Tuple(Sub-Module Variants) or 
+   self.Under_Development:
+        (i) If the value is a dictionary then it should contain keys as sub-modules in string format and for values 
+            read RULE 5 . (LEVEL 3)
+       (ii) If the value is a List/Tuple then it should contain sub-lists/sub-tuples informing about the module variants :
+                    (a) The module variants as sub-list/sub-tuple will have 3 values, Module_Name, Image_Path and Object_Name .
+                    (b) The List/Tuple can have several sub-lists/sub-tuples but the last element should be a method,
+                        which connects to the start button on the module variants' page and help launch a certain module.
+      (iii) If the value is self.Under_Development then that module/module variant is marked as UNDER DEVELOPMENT.
+
+5) In case of RULE 4(i) if the value of any sub-module key is a dictionary then that dictionary will have keys as sub-sub-module
+   and the values can either be a List/Tuple(Sub-Sub-Module Variants) or self.Under_Development but not another dictionary:
+        (i) If the value is a List/Tuple then it should contain sub-lists/sub-tuples informing about the module variants :
+                    (a) The module variants as sub-list/sub-tuple will have 3 values, Module_Name, Image_Path and Object_Name .
+                    (b) The List/Tuple can have several sub-lists/sub-tuples but the last element should be a method,
+                        which connects to the start button on the module variants' page and help launch a certain module.
+       (ii) If the value is self.Under_Development then that module/module variant is marked as UNDER DEVELOPMENT.
+
+6) Object_Name, the third value in the sub-lists/sub-tuples, is used to tie to the Radiobuttons on each page thus making it easier to locate them. This is further used
+   in the methods to search the Radiobutton using it for the respective modules to be launched .
+
+7) Any further Levels will result in an error .
+'''
+
+
+
+
+
+
+
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication, QWidget, QLabel, QGridLayout, QVBoxLayout, QTabWidget, QRadioButton, QButtonGroup, QSizePolicy
 from PyQt5.QtGui import QIcon
@@ -101,13 +189,13 @@ class Submodule_Page(QWidget):
 class Submodule_Widget(QWidget):
     def __init__(self,Iterative,parent):
         super().__init__()
-        Name,Image,ObjName=Iterative
+        Module_Name,Image_Path,Object_Name=Iterative
         layout=QVBoxLayout()
         self.setLayout(layout)
-        label=QLabel(Name)
+        label=QLabel(Module_Name)
         layout.addWidget(label)
         self.rdbtn=QRadioButton()
-        self.rdbtn.setObjectName(ObjName)
+        self.rdbtn.setObjectName(Object_Name)
         self.rdbtn.setIcon(QIcon('C:/Users/satya/Desktop/Osdag3/ResourceFiles/images/finplate.png'))
         self.rdbtn.setIconSize(QSize(300,300))
         layout.addWidget(self.rdbtn)
@@ -163,13 +251,16 @@ class OsdagMainWindow(QMainWindow):
                                                     'Column to Column' :[
                                                                 ('Cover Plate Bolted','Cover Plate Bolted Image','C2C_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','Cover Plate Welded Image','C2C_Cover_Plate_Welded'),
+                                                                ('Cover Plate Welded','Cover Plate Welded Image','C2C_Cover_Plate_Welded1'),
+                                                                ('Cover Plate Welded','Cover Plate Welded Image','C2C_Cover_Plate_Welded2'),
+                                                                ('Cover Plate Welded','Cover Plate Welded Image','C2C_Cover_Plate_Welded3'),
                                                                 ('Cover Plate Connection','Cover Plate Connection Image','C2C_Cover_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
-                                                    'PEB' : 'UNDER DEVELOPMENT',
+                                                    'PEB' : self.Under_Development,
                                                     },
-                                'Base Plate': 'UNDER DEVELOPMENT',
-                                'Truss Connection' : 'UNDER DEVELOPMENT',
+                                'Base Plate': self.Under_Development,
+                                'Truss Connection' : self.Under_Development,
                                 },
                 'Tension Member' : [
                             ('Bolted','Bolted Image','Tension_Bolted'),
@@ -181,13 +272,13 @@ class OsdagMainWindow(QMainWindow):
                             ('Welded','Welded Image','Compression_Welded'),
                             self.show_compression_module,
                                        ],
-                'Flexural Member' : 'UNDER DEVELOPMENT',
-                'Beam-Column' : 'UNDER DEVELOPMENT',
-                'Plate Girder' : 'UNDER DEVELOPMENT',
-                'Truss' : 'UNDER DEVELOPMENT',
-                '2D Frame' : 'UNDER DEVELOPMENT',
-                '3D Frame' : 'UNDER DEVELOPMENT',
-                'Group Design' : 'UNDER DEVELOPMENT',
+                'Flexural Member' : self.Under_Development,
+                'Beam-Column' : self.Under_Development,
+                'Plate Girder' : self.Under_Development,
+                'Truss' : self.Under_Development,
+                '2D Frame' : self.Under_Development,
+                '3D Frame' : self.Under_Development,
+                'Group Design' : self.Under_Development,
                 }
 
 ####################################### UI Formation ################################

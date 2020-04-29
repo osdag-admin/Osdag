@@ -2,9 +2,6 @@ Bolt.Diameter:
 - '12'
 - '16'
 - '20'
-- '24'
-- '30'
-- '36'
 Bolt.Grade:
 - '3.6'
 - '4.6'
@@ -21,18 +18,22 @@ Connectivity: Column flange-Beam web
 DesignPreferences.Bolt.Bolt_Hole_Type: Standard
 DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
 DesignPreferences.Bolt.Slip_Factor: '0.3'
+DesignPreferences.Bolt.Type: Pretensioned
 DesignPreferences.Design.Design_Method: Limit State Design
 DesignPreferences.Detailing.Corrosive_Influences: 'No'
 DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
 DesignPreferences.Detailing.Gap: '10'
+DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-DesignPreferences.Weld.Type: Shop Weld
-Load.Axial: '20'
+Load.Axial: '80'
 Load.Shear: '200'
 Member.Material: E 250 (Fe 410 W)A
-Member.Supported_Section: LB(P) 300
-Member.Supporting_Section: HB 350
+Member.Supported_Section: MB 350
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section: PBP 360X133
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
 Module: Fin Plate
+Plate.Material: E 250 (Fe 410 W)A
 Plate.Thickness:
 - '3'
 - '4'

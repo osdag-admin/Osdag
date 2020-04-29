@@ -419,6 +419,7 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
         if self.connection == "Fin Plate":  # finColWebBeamWeb
+            gap = A.plate.gap
             nut_space = A.supported_section.web_thickness + int(A.plate.thickness_provided) + nut_T
             nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colwebconn = FinColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)

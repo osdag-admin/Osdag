@@ -1850,7 +1850,7 @@ class BeamCoverPlate(MomentConnection):
                         class_of_section1 = "plastic"
                     elif column_d / column_t_w <= (max(105 * epsilon / (1 + r1)), (42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2*r1)), column_d / column_t_w >= (
+                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2*r2)), column_d / column_t_w >= (
                             42 * epsilon)):
                         class_of_section1 = "semi-compact"
                     # else:
@@ -1862,7 +1862,7 @@ class BeamCoverPlate(MomentConnection):
                     elif column_d / column_t_w <= max((105 * epsilon / (1 + (r1 * 1.5))), (
                             42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2*r1)), (
+                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2*r2)), (
                             42 * epsilon)):
                         class_of_section1 = "semi-compact"
                     # else:
@@ -1882,7 +1882,7 @@ class BeamCoverPlate(MomentConnection):
         #         print('fail')
         # else:
         #     pass
-        print("class_of_section", class_of_section1 )
+        # print("class_of_section", class_of_section1 )
         if class_of_section1 == "plastic":
             class_of_section1 = 1
         elif class_of_section1 == "compact":
@@ -1907,6 +1907,14 @@ class BeamCoverPlate(MomentConnection):
                 if preference == "Outside":
                     outerwidth = width
                     flange_plate_crs_sec_area = y * width
+                    if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                        thickness = y
+                        self.design_status = True
+                        break
+                    else:
+                        thickness = 0
+                        self.design_status = False
+
                 elif preference == "Outside + Inside":
                     outerwidth = width
                     innerwidth = (width - t_w - (2 * r_1)) / 2
@@ -1917,13 +1925,13 @@ class BeamCoverPlate(MomentConnection):
                     else:
                         self.design_status = True
                         flange_plate_crs_sec_area = (outerwidth + (2*innerwidth)) * y
-                if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
-                    thickness = y
-                    self.design_status = True
-                    break
-                else:
-                    thickness = 0
-                    self.design_status = False
+                        if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                            thickness = y
+                            self.design_status = True
+                            break
+                        else:
+                            thickness = 0
+                            self.design_status = False
 
             else:
                 webwidth = D - (2 * tk) - (2 * r_1)
@@ -1936,7 +1944,6 @@ class BeamCoverPlate(MomentConnection):
                 else:
                     thickness = 0
                     self.design_status = False
-                # logger.error(":Inner Plate not possible")
 
         return thickness
 

@@ -1348,31 +1348,48 @@ class BeamCoverPlateWeld(MomentConnection):
         flange_crs_sec_area = tk * width
         self.design_status = True
         for y in list_of_pt_tk:
-            if preference == "Outside":
-                outerwidth = width - (2 * 20)
-                flange_plate_crs_sec_area = y * outerwidth
-            elif preference == "Outside + Inside":
-                outerwidth = width - (2 * 20)
-                innerwidth = (width - t_w - (2 * r_1) - (4 * 20)) / 2
-                if innerwidth < 50:
-                    # logger.error(":Inner Plate not possible")
-                    self.design_status = False
-                else:
-                    self.design_status = True
-                    flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y
+
+            if preference != None:
+                if preference == "Outside":
+                    outerwidth = width - (2 * 20)
+                    flange_plate_crs_sec_area = y * outerwidth
+                    if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                        thickness = y
+                        self.design_status = True
+                        break
+                    else:
+                        thickness = 0
+                        self.design_status = False
+                elif preference == "Outside + Inside":
+                    outerwidth = width - (2 * 20)
+                    innerwidth = (width - t_w - (2 * r_1) - (4 * 20)) / 2
+                    if innerwidth < 50:
+                        thickness = 0
+                        self.design_status = False
+
+                    else:
+                        self.design_status = True
+                        flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y
+                        if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                            thickness = y
+                            self.design_status = True
+                            break
+                        else:
+                            thickness = 0
+                            self.design_status = False
 
 
             else:
                 webwidth = D - (2 * tk) - (2 * r_1) - (2 * 20)
-                flange_plate_crs_sec_area = (2 * webwidth) * y
-            if self.design_status == True:
-                if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                web_crs_area = t_w * webwidth
+                web_plate_crs_sec_area = (2 * webwidth) * y
+                if web_plate_crs_sec_area >= web_crs_area * 1.05:
                     thickness = y
+                    self.design_status = True
                     break
-            else:
-                thickness = 0
-                self.design_status = False
-                logger.error(":Inner Plate not possible")
+                else:
+                    thickness = 0
+                    self.design_status = False
 
         return thickness
 

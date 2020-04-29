@@ -100,7 +100,7 @@ if __name__ == '__main__':
     uDir = numpy.array([1.,0.,0.])
     wDir = numpy.array([0.,0.,1.])
 
-    channel = StiffenerPlate(L, W, T)
+    channel = StiffenerPlate(L, W, T, 2,2,2,2,2,2,2,2)
     channels = channel.place(origin, uDir, wDir)
     point = channel.compute_params()
     prism = channel.create_model()

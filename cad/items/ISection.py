@@ -115,14 +115,14 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    B = 10
-    T = 5
-    D = 20
-    t = 5
+    B = 40
+    T = 3
+    D = 50
+    t = 2
     R1 = 5
     R2 = 5
     alpha = 1
-    length = 1
+    length = 200
     width = 10
     hight = 10
     notchObj = Notch(R1, hight, width, length)

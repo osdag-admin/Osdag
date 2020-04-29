@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     b = 10
     h = 10
-    coneAngle = 10
+    coneAngle = 90
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])

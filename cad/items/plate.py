@@ -91,8 +91,8 @@ if __name__ == '__main__':
     display, start_display, add_menu, add_function_to_menu = init_display()
 
     L = 10
-    T = 10
-    W = 1
+    T = 2
+    W = 8
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])

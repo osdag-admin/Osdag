@@ -53,8 +53,8 @@ if __name__ == '__main__':
     display, start_display, add_menu, add_function_to_menu = init_display()
 
     b = 10
-    h = 10
-    L = 10
+    h = 15
+    L = 50
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])

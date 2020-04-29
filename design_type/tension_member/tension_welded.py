@@ -90,8 +90,8 @@ class Tension_welded(Main):
         c_lst.append(t3)
         t4 = (KEY_PLATETHK, self.plate_thick_customized)
         c_lst.append(t4)
-        t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
-        c_lst.append(t5)
+        # t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
+        # c_lst.append(t5)
 
         return c_lst
 
@@ -1411,7 +1411,7 @@ class Tension_welded(Main):
             shear_lag = w
             L_c = (self.plate.length - max((2 * self.weld.size),15))
             A_go = self.section_size_1.min_leg * self.section_size_1.thickness
-            A_nc = ((self.section_size_1.max_leg-self.section_size_1.thickness) * self.section_size_1.thickness)
+            A_nc = (self.section_size_1.max_leg * self.section_size_1.thickness)
             t = self.section_size_1.thickness
 
         elif design_dictionary[KEY_LOCATION] == 'Short Leg':
@@ -1419,7 +1419,7 @@ class Tension_welded(Main):
             shear_lag = w
             L_c = (self.plate.length - max((2 * self.weld.size),15))
             A_go = self.section_size_1.max_leg * self.section_size_1.thickness
-            A_nc = ((self.section_size_1.min_leg - self.section_size_1.thickness) * self.section_size_1.thickness)
+            A_nc = (self.section_size_1.min_leg * self.section_size_1.thickness)
             t = self.section_size_1.thickness
 
         elif design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
@@ -1427,7 +1427,7 @@ class Tension_welded(Main):
             shear_lag = w
             L_c = (self.plate.length - max((2 * self.weld.size),15))
             A_go = self.section_size_1.flange_width * self.section_size_1.flange_thickness*2
-            A_nc = ((self.section_size_1.depth - 2* self.section_size_1.flange_thickness)* self.section_size_1.web_thickness)
+            A_nc = (self.section_size_1.depth * self.section_size_1.web_thickness)
             t = self.section_size_1.web_thickness
 
         self.section_size_1.tension_member_design_due_to_rupture_of_critical_section( A_nc = A_nc , A_go = A_go, F_u = self.section_size_1.fu, F_y = self.section_size_1.fy, L_c = L_c, w = w, b_s = shear_lag, t = t)

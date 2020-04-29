@@ -168,3 +168,27 @@ class Angle(object):
 
         prism = mkFillet.Shape()
         return prism
+
+if __name__ == '__main__':
+
+    from OCC.Display.SimpleGui import init_display
+    display, start_display, add_menu, add_function_to_menu = init_display()
+
+    L = 1
+    A = 20
+    B = 15
+    T = 5
+    R1 = 8
+    R2 = 5
+
+    origin = numpy.array([0.,0.,0.])
+    uDir = numpy.array([1.,0.,0.])
+    wDir = numpy.array([0.,0.,1.])
+
+    channel = Angle(L, A, B, T, R1, R2)
+    angles = channel.place(origin, uDir, wDir)
+    point = channel.computeParams()
+    prism = channel.create_model()
+    display.DisplayShape(prism, update=True)
+    display.DisableAntiAliasing()
+    start_display()

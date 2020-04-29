@@ -39,3 +39,25 @@ class FilletWeld(object):
         extrudeDir = self.L * (self.wDir)  # extrudeDir is a numpy array
         prism = makePrismFromFace(aFace, extrudeDir)
         return prism
+
+
+if __name__ == '__main__':
+
+    from OCC.Display.SimpleGui import init_display
+    display, start_display, add_menu, add_function_to_menu = init_display()
+
+    b = 10
+    h = 10
+    L = 50
+
+    origin = numpy.array([0.,0.,0.])
+    uDir = numpy.array([1.,0.,0.])
+    shaftDir = numpy.array([0.,0.,1.])
+
+    channel = FilletWeld(b, h, L)
+    angles = channel.place(origin, uDir, shaftDir)
+    point = channel.compute_params()
+    prism = channel.create_model()
+    display.DisplayShape(prism, update=True)
+    display.DisableAntiAliasing()
+    start_display()

@@ -108,3 +108,33 @@ class ISection(object):
             prism = BRepAlgoAPI_Cut(prism, notchModel).Shape()
 
         return prism
+
+
+if __name__ == '__main__':
+
+    from OCC.Display.SimpleGui import init_display
+    display, start_display, add_menu, add_function_to_menu = init_display()
+
+    B = 10
+    T = 5
+    D = 20
+    t = 5
+    R1 = 5
+    R2 = 5
+    alpha = 1
+    length = 1
+    width = 10
+    hight = 10
+    notchObj = Notch(R1, hight, width, length)
+
+    origin = numpy.array([0.,0.,0.])
+    uDir = numpy.array([1.,0.,0.])
+    shaftDir = numpy.array([0.,0.,1.])
+
+    channel = ISection(B, T, D, t, R1, R2, alpha, length, notchObj)
+    angles = channel.place(origin, uDir, shaftDir)
+    point = channel.compute_params()
+    prism = channel.create_model()
+    display.DisplayShape(prism, update=True)
+    display.DisableAntiAliasing()
+    start_display()

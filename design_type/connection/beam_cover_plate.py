@@ -2043,7 +2043,7 @@ class BeamCoverPlate(MomentConnection):
 
         self.report_input = \
             {KEY_MODULE: self.module,
-             KEY_MAIN_MODULE: self.mainmodul ,
+             KEY_MAIN_MODULE: self.mainmodule,
              # KEY_CONN: self.connectivity,
              KEY_DISP_MOMENT: self.load.moment,
              KEY_DISP_SHEAR: self.load.shear_force ,

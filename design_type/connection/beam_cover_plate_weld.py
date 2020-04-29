@@ -1641,20 +1641,20 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                ff=round(self.flange_force / 1000, 2), ), '')
         self.report_check.append(t23)
         # flange_get_weld_strenght_kn = round(self.flange_weld.get_weld_strenght / 1000, 2)
-    # if self.preference ="Outside"
-        t2 = ('SubSection', 'Flange Weld Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t2)
-
-        t2 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
-                                                    min_weld_size=self.flange_weld_size_min),
-              self.flange_weld.size,
-              get_pass_fail(self.flange_weld_size_min, self.flange_weld.size, relation="lesser"))
-        self.report_check.append(t2)
-        t2 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
-                                                    max_weld_size=self.min_flange_platethk),
-              self.flange_weld.size,
-              get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
-        self.report_check.append(t2)
+    ##todo# if self.preference ="Outside"
+    #     t2 = ('SubSection', 'Flange Weld Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+    #     self.report_check.append(t2)
+    #
+    #  todo   t2 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
+    #                                                 min_weld_size=self.flange_weld_size_min),
+    #           self.flange_weld.size,
+    #           get_pass_fail(self.flange_weld_size_min, self.flange_weld.size, relation="lesser"))
+    #     self.report_check.append(t2)
+    #     t2 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
+    #                                                 max_weld_size=self.min_flange_platethk),
+    #           self.flange_weld.size,
+    #           get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
+    #     self.report_check.append(t2)
 
         # else :
     #Outside

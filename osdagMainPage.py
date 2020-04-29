@@ -200,7 +200,7 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         layout.addWidget(label)
         self.rdbtn=QRadioButton()
         self.rdbtn.setObjectName(Object_Name)
-        self.rdbtn.setIcon(QIcon('C:/Users/satya/Desktop/Osdag3/ResourceFiles/images/finplate.png'))
+        self.rdbtn.setIcon(QIcon(Image_Path))
         self.rdbtn.setIconSize(QSize(300,300))
         layout.addWidget(self.rdbtn)
         self.setStyleSheet(
@@ -237,27 +237,27 @@ class OsdagMainWindow(QMainWindow):
         self.Modules={
                 'Connection' : {
                                 'Shear Connection' : [
-                                    ('Fin Plate','Fin Plate Image','Fin_Plate'),
-                                    ('Cleat Angle','Cleat Angle Image','Cleat_Angle'),
-                                    ('End Plate','End Plate Image','End_Plate'),
-                                    ('Seated Angle','Seated Angle Image','Seated_Angle'),
+                                    ('Fin Plate','ResourceFiles/images/finplate.png','Fin_Plate'),
+                                    ('Cleat Angle','ResourceFiles/images/cleatAngle.png','Cleat_Angle'),
+                                    ('End Plate','ResourceFiles/images/endplate.png','End_Plate'),
+                                    ('Seated Angle','ResourceFiles/images/seatedAngle1.png','Seated_Angle'),
                                     self.show_shear_connection,
                                                     ],
                                 'Moment Connection' :{
                                                     'Beam to Beam' :[
-                                                                ('Cover Plate Bolted','Cover Plate Bolted Image','B2B_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded','Cover Plate Welded Image','B2B_Cover_Plate_Welded'),
-                                                                ('Cover Plate Connection','Cover Plate Connection Image','B2B_Cover_Plate_Connection'),
+                                                                ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','B2B_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded','ResourceFiles/images/coverplate.png','B2B_Cover_Plate_Welded'),
+                                                                ('End Plate Connection','ResourceFiles/images/endplate.png','B2B_End_Plate_Connection'),
                                                                 self.show_moment_connection,
                                                                     ],
                                                     'Beam to Column' :[
-                                                                ('End Plate Connection','End Plate Connection Image','B2C_End_Plate_Connection'),
+                                                                ('End Plate Connection','ResourceFiles/images/beam_column_endplate.png','B2C_End_Plate_Connection'),
                                                                 self.show_base_plate,
                                                                       ],
                                                     'Column to Column' :[
-                                                                ('Cover Plate Bolted','Cover Plate Bolted Image','C2C_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded','Cover Plate Welded Image','C2C_Cover_Plate_Welded'),
-                                                                ('Cover Plate Connection','Cover Plate Connection Image','C2C_Cover_Plate_Connection'),
+                                                                ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
+                                                                ('End Plate Connection','ResourceFiles/images/endplate.png','C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
                                                     'PEB' : self.Under_Development,
@@ -266,13 +266,13 @@ class OsdagMainWindow(QMainWindow):
                                 'Truss Connection' : self.Under_Development,
                                 },
                 'Tension Member' : [
-                            ('Bolted','Bolted Image','Tension_Bolted'),
-                            ('Welded','Welded Image','Tension_Welded'),
+                            ('Bolted','ResourceFiles/images/beam_column_endplate.png','Tension_Bolted'),
+                            ('Welded','ResourceFiles/images/finplate.png','Tension_Welded'),
                             self.show_tension_module,
                                    ],
                 'Compression Member' : [
-                            ('Bolted','Bolted Image','Compression_Bolted'),
-                            ('Welded','Welded Image','Compression_Welded'),
+                            ('Bolted','ResourceFiles/images/beam_column_endplate.png','Compression_Bolted'),
+                            ('Welded','ResourceFiles/images/finplate.png','Compression_Welded'),
                             self.show_compression_module,
                                        ],
                 'Flexural Member' : self.Under_Development,
@@ -387,9 +387,9 @@ class OsdagMainWindow(QMainWindow):
         self.showMaximized()
 
 ################################ UI Methods ###############################################
-
+    
     def selection_change(self):
-        loc = self.comboBox_help.currentText()
+        loc = self.ui.comboBox_help.currentText()
         if loc == "Design Examples":
             self.design_examples()
         elif loc == "Video Tutorials":
@@ -561,7 +561,7 @@ class OsdagMainWindow(QMainWindow):
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
             # self.window.show()
             # self.window.closed.connect(self.show)
-        elif self.findChild(QRadioButton,'B2B_Cover_Plate_Connection').isChecked():
+        elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2,BeamEndPlate,' ')
@@ -637,7 +637,7 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
-        elif self.findChild(QRadioButton,'C2C_Cover_Plate_Connection').isChecked():
+        elif self.findChild(QRadioButton,'C2C_End_Plate_Connection').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, ColumnEndPlate, ' ')

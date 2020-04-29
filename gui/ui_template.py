@@ -622,30 +622,33 @@ class Ui_ModuleWindow(QMainWindow):
         updated_list = main.input_value_changed(main)
         data = {}
         d = {}
-        for t in new_list:
-            Combobox_key = t[0]
-            d[Combobox_key] = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-            onchange_key_popup = [item for item in updated_list if item[1] == t[0]]
-            if onchange_key_popup != []:
-                data[t[0] + "_customized"] = t[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
-                                                                                    onchange_key_popup[0][0]).currentText())
-            else:
-                data[t[0] + "_customized"] = t[1]()
+        if new_list != []:
+            for t in new_list:
+                Combobox_key = t[0]
+                d[Combobox_key] = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                print('updatedlist',updated_list)
+                if updated_list != None:
+                    onchange_key_popup = [item for item in updated_list if item[1] == t[0]]
+                    if onchange_key_popup != []:
+                        data[t[0] + "_customized"] = t[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
+                                                                                            onchange_key_popup[0][0]).currentText())
+                else:
+                    data[t[0] + "_customized"] = t[1]()
 
-        try:
-            d.get(new_list[0][0]).activated.connect(lambda: popup(d.get(new_list[0][0]), new_list))
-            d.get(new_list[1][0]).activated.connect(lambda: popup(d.get(new_list[1][0]), new_list))
-            d.get(new_list[2][0]).activated.connect(lambda: popup(d.get(new_list[2][0]), new_list))
-            d.get(new_list[3][0]).activated.connect(lambda: popup(d.get(new_list[3][0]), new_list))
-            d.get(new_list[4][0]).activated.connect(lambda: popup(d.get(new_list[4][0]), new_list))
-            d.get(new_list[5][0]).activated.connect(lambda: popup(d.get(new_list[5][0]), new_list))
-            d.get(new_list[6][0]).activated.connect(lambda: popup(d.get(new_list[6][0]), new_list))
-            d.get(new_list[7][0]).activated.connect(lambda: popup(d.get(new_list[7][0]), new_list))
-            d.get(new_list[8][0]).activated.connect(lambda: popup(d.get(new_list[8][0]), new_list))
-            d.get(new_list[9][0]).activated.connect(lambda: popup(d.get(new_list[9][0]), new_list))
-            d.get(new_list[10][0]).activated.connect(lambda: popup(d.get(new_list[10][0]), new_list))
-        except IndexError:
-            pass
+            try:
+                d.get(new_list[0][0]).activated.connect(lambda: popup(d.get(new_list[0][0]), new_list))
+                d.get(new_list[1][0]).activated.connect(lambda: popup(d.get(new_list[1][0]), new_list))
+                d.get(new_list[2][0]).activated.connect(lambda: popup(d.get(new_list[2][0]), new_list))
+                d.get(new_list[3][0]).activated.connect(lambda: popup(d.get(new_list[3][0]), new_list))
+                d.get(new_list[4][0]).activated.connect(lambda: popup(d.get(new_list[4][0]), new_list))
+                d.get(new_list[5][0]).activated.connect(lambda: popup(d.get(new_list[5][0]), new_list))
+                d.get(new_list[6][0]).activated.connect(lambda: popup(d.get(new_list[6][0]), new_list))
+                d.get(new_list[7][0]).activated.connect(lambda: popup(d.get(new_list[7][0]), new_list))
+                d.get(new_list[8][0]).activated.connect(lambda: popup(d.get(new_list[8][0]), new_list))
+                d.get(new_list[9][0]).activated.connect(lambda: popup(d.get(new_list[9][0]), new_list))
+                d.get(new_list[10][0]).activated.connect(lambda: popup(d.get(new_list[10][0]), new_list))
+            except IndexError:
+                pass
 
         def popup(key, for_custom_list):
 

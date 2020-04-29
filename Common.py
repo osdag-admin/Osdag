@@ -1467,3 +1467,59 @@ DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" 
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
 
+
+######### Just FOR Documentation ########
+KEY_DISP_GUSSET = 'Gusset Connection'
+
+DISP_TITLE_CM = 'Connecting members'
+
+KEY_MEMBER_COUNT = 'Member.Count'
+KEY_DISP_MEMBER_COUNT = 'Member Count'
+VALUES_MEM_COUNT = ['1','2','3','4','5','6','7']
+
+KEY_SEC_PROFILE = 'Member.Profile'
+KEY_DISP_SEC_PROFILE = 'Section Profile'
+VALUES_SEC_PROFILE = ['Angles', 'Channels']
+
+KEY_SECSIZE = 'Member.Designation'
+KEY_DISP_SECSIZE = 'Section Size*'
+VALUES_SECSIZE = ['All', 'Customized']
+
+KEY_MATERIAL = 'Member.Material'
+KEY_DISP_MATERIAL = 'Material *'
+VALUES_MATERIAL = connectdb("Material")
+
+DISP_TITLE_LOADS = 'Factored load'
+KEY_AXIAL = 'Load.Axial'
+KEY_DISP_AXIAL = 'Axial (kN) *'
+VALUES_AXIAL = ['Minimum','Customized']
+
+# Key for storing Diameter sub-key of Bolt
+KEY_D = 'Bolt.Diameter'
+KEY_DISP_D = 'Diameter(mm)*'
+VALUES_D = ['All', 'Customized']
+
+# Key for storing Type sub-key of Bolt
+KEY_TYP = 'Bolt.Type'
+KEY_DISP_TYP = 'Type *'
+TYP_BEARING = "Bearing Bolt"
+TYP_FRICTION_GRIP = "Friction Grip Bolt"
+VALUES_TYP = ['Select Type', TYP_FRICTION_GRIP, TYP_BEARING]
+VALUES_TYP_1 = ['Friction Grip Bolt']
+VALUES_TYP_2 = ['Bearing Bolt']
+
+# Key for storing Grade sub-key of Bolt
+KEY_GRD = 'Bolt.Grade'
+KEY_DISP_GRD = 'Grade *'
+VALUES_GRD = ['All', 'Customized']
+VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+
+
+DISP_TITLE_PLATE = 'Plate'
+KEY_PLATETHK = 'Plate.Thickness'
+VALUES_PLATETHK = ['All', 'Customized']
+VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+
+
+
+

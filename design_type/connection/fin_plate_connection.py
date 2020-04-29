@@ -104,6 +104,7 @@ class FinPlateConnection(ShearConnection):
 
         # @author: Amir, Umair
         self.module = KEY_DISP_FINPLATE
+        print('Het I am existing values', existingvalues)
 
         options_list = []
 

@@ -632,9 +632,11 @@ class Ui_ModuleWindow(QMainWindow):
                     if onchange_key_popup != []:
                         data[t[0] + "_customized"] = t[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
                                                                                             onchange_key_popup[0][0]).currentText())
+                    else:
+                        data[t[0] + "_customized"] = t[1]()
                 else:
                     data[t[0] + "_customized"] = t[1]()
-
+            print(data)
             try:
                 d.get(new_list[0][0]).activated.connect(lambda: popup(d.get(new_list[0][0]), new_list))
                 d.get(new_list[1][0]).activated.connect(lambda: popup(d.get(new_list[1][0]), new_list))
@@ -687,6 +689,7 @@ class Ui_ModuleWindow(QMainWindow):
                 else:
                     options = f()
                     existing_options = data[c_tup[0] + "_customized"]
+                    print('options, existing options', options,existing_options)
                     if selected == "Customized":
                        data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                        if data[c_tup[0] + "_customized"] == []:

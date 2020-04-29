@@ -1014,6 +1014,7 @@ KEY_DISP_ANGLE_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <
 KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
+KEY_OUT_DISP_DIA_PROVIDED = 'Diameter(d) (mm)'
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
@@ -1021,6 +1022,7 @@ KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
 KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
+KEY_DISP_BOLT_HOLE = 'Bolt Hole Diameter(d0) (mm)'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
@@ -1038,7 +1040,7 @@ KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
-
+KEY_OUT_LONG_JOINT = 'Long Joint Reduction'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
@@ -1219,9 +1221,9 @@ VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
 
 #Design Report Strings
-DISP_NUM_OF_BOLTS = 'No of Bolts'
-DISP_NUM_OF_ROWS = 'No of Rows'
-DISP_NUM_OF_COLUMNS = 'No of Columns'
+DISP_NUM_OF_BOLTS = 'No of Bolts (n)'
+DISP_NUM_OF_ROWS = 'No of Rows (nr)'
+DISP_NUM_OF_COLUMNS = 'No of Columns (nc)'
 
 
 def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):

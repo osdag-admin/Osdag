@@ -284,7 +284,7 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
 
-def tension_rupture_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
+def tension_rupture_bolted_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
     w_p = str(w_p)
     t_p = str(t_p)
     n_c = str(n_c)
@@ -292,23 +292,44 @@ def tension_rupture_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
     f_u = str(fu)
     T_dn = str(T_dn)
     gamma_m1 = str(gamma_m1)
-    Tensile_rup_eqn = Math(inline=True)
-    Tensile_rup_eqn.append(NoEscape(r'\begin{aligned} T_{dn} &= \frac{0.9*A_{n}*f_u}{\gamma_{m1}}\\'))
-    Tensile_rup_eqn.append(NoEscape(r'&=\frac{0.9*('+w_p+'-'+n_c+'*'+d_o+')*'+t_p+'*'+f_u+r'}{'+gamma_m1+r'}\\'))
-    Tensile_rup_eqn.append(NoEscape(r'&=' + T_dn + '\end{aligned}'))
-    return Tensile_rup_eqn
+    Tensile_rup_eqnb = Math(inline=True)
+    Tensile_rup_eqnb.append(NoEscape(r'\begin{aligned} T_{dn} &= \frac{0.9*A_{n}*f_u}{\gamma_{m1}}\\'))
+    Tensile_rup_eqnb.append(NoEscape(r'&=\frac{0.9*('+w_p+'-'+n_c+'*'+d_o+')*'+t_p+'*'+f_u+r'}{'+gamma_m1+r'}\\'))
+    Tensile_rup_eqnb.append(NoEscape(r'&=' + T_dn + '\end{aligned}'))
+    return Tensile_rup_eqnb
 
-def tensile_capacity_prov(T_dg, T_dn, T_db):
-    T_d = min(T_dg,T_dn,T_db)
-    T_d = str(T_d)
+def tension_rupture_welded_prov(w_p, t_p, fu,gamma_m1,T_dn):
+    w_p = str(w_p)
+    t_p = str(t_p)
+    f_u = str(fu)
+    T_dn = str(T_dn)
+    gamma_m1 = str(gamma_m1)
+    Tensile_rup_eqnw = Math(inline=True)
+    Tensile_rup_eqnw.append(NoEscape(r'\begin{aligned} T_{dn} &= \frac{0.9*A_{n}*f_u}{\gamma_{m1}}\\'))
+    Tensile_rup_eqnw.append(NoEscape(r'&=\frac{0.9*'+w_p+'*'+t_p+'*'+f_u+r'}{'+gamma_m1+r'}\\'))
+    Tensile_rup_eqnw.append(NoEscape(r'&=' + T_dn + '\end{aligned}'))
+    return Tensile_rup_eqnw
+
+def tensile_capacity_prov(T_dg, T_dn, T_db =None):
+
     T_dg = str(T_dg)
     T_dn = str(T_dn)
     T_db = str(T_db)
-    shear_capacity_eqn = Math(inline=True)
-    shear_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= Min(T_{dg},T_{dn},T_{db})\\'))
-    shear_capacity_eqn.append(NoEscape(r'&= Min('+T_dg+','+T_dn+','+T_db+r')\\'))
-    shear_capacity_eqn.append(NoEscape(r'&='+T_d + '\end{aligned}'))
-    return shear_capacity_eqn
+    tension_capacity_eqn = Math(inline=True)
+    if T_db != None:
+        T_d = min(T_dg,T_dn,T_db)
+        T_d = str(T_d)
+        tension_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= Min(T_{dg},T_{dn},T_{db})\\'))
+        tension_capacity_eqn.append(NoEscape(r'&= Min(' + T_dg + ',' + T_dn + ',' + T_db + r')\\'))
+    else:
+        T_d = min(T_dg, T_dn)
+        tension_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= Min(T_{dg},T_{dn})\\'))
+        tension_capacity_eqn.append(NoEscape(r'&= Min(' + T_dg + ',' + T_dn +  r')\\'))
+
+
+
+    tension_capacity_eqn.append(NoEscape(r'&='+T_d + '\end{aligned}'))
+    return tension_capacity_eqn
 
 def mom_axial_IR_prov(M,M_d,N,N_d,IR):
     M = str(M)
@@ -417,13 +438,13 @@ def get_pass_fail(required, provided,relation='greater'):
                 return 'Fail'
 
 def member_yield_prov(Ag, fy, gamma_m0, member_yield,multiple = 1):
-    Ag = str(Ag)
+    Ag = str(round(Ag,2))
     fy = str(fy)
     gamma_m0 = str(gamma_m0)
     multiple = str(multiple)
     member_yield = str(member_yield)
     member_yield_eqn = Math(inline=True)
-    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{A_g ~ f_y}{\gamma_{m0}}\\'))
+    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{'+ multiple + r' * A_g ~ f_y}{\gamma_{m0}}\\'))
     member_yield_eqn.append(NoEscape(r'&= \frac{'+ multiple + '*' + Ag + '*' + fy + '}{'+ gamma_m0 + r'}\\'))
     member_yield_eqn.append(NoEscape(r'&= ' + member_yield + r'\end{aligned}'))
     return member_yield_eqn
@@ -448,7 +469,7 @@ def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,b
     member_rup_eqn.append(NoEscape(r'&= 1.4 - 0.076*\frac{'+ w +'}{'+ t + r'}*\frac{'+ fy +'}{'+ fu + r'}*\frac{'+ b_s +'}{' + L_c + r' }\\'))
     member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9* '+ fu + '*'+ gamma_m0 +'}{' +fy+'*'+gamma_m1 + r'} \geq 0.7 \\'))
     member_rup_eqn.append(NoEscape(r'&= '+ beta + r'\\'))
-    member_rup_eqn.append(NoEscape(r'T_{dn} &= \frac{0.9*A_{nc}*f_{u}}{\gamma_{m1}} + \frac{\beta * A_{go} * f_{y}}{\gamma_{m0}}\\'))
+    member_rup_eqn.append(NoEscape(r'T_{dn} &= '+multiple+'*' r'(\frac{0.9*A_{nc}*f_{u}}{\gamma_{m1}} + \frac{\beta * A_{go} * f_{y}}{\gamma_{m0}})\\'))
     member_rup_eqn.append(NoEscape(r'&= '+multiple+ r'*(\frac{0.9* '+ A_nc +'*' + fu + '}{'+ gamma_m1 + r'} + \frac{' + beta + '*' + A_go + '*' + fy + '}{' + gamma_m0 + r'})\\'))
     member_rup_eqn.append(NoEscape(r'&= '+ member_rup + r'\end{aligned}'))
 
@@ -508,6 +529,106 @@ def efficiency(F, Td, eff):
     eff_eqn.append(NoEscape(r'&= ' + eff + r'\end{aligned}'))
 
     return eff_eqn
+
+def gusset_ht(beam_depth, clearance, height, mul = 1):
+    beam_depth = str(beam_depth)
+    clearance = str(clearance)
+    height = str(height)
+    mul = str(mul)
+    plate_ht_eqn = Math(inline=True)
+    plate_ht_eqn.append(
+        NoEscape(r'\begin{aligned} H &= '+mul+ '* Depth + clearance 'r'\\'))
+    plate_ht_eqn.append(
+        NoEscape(r'&=('+mul+'*' + beam_depth + ')+' + clearance + r'\\'))
+    plate_ht_eqn.append(NoEscape(r'&= '  + height + r'\end{aligned}'))
+    return plate_ht_eqn
+
+def gusset_lt_b(nc,p,e,length):
+    nc = str(nc)
+    p = str(p)
+    e = str(e)
+    length = str(length)
+    length_htb_eqn = Math(inline=True)
+    length_htb_eqn.append(
+        NoEscape(r'\begin{aligned} L &= (nc -1) * p + 2 * e\\'))
+    length_htb_eqn.append(
+        NoEscape(r'&= ('+nc+'-1) *'+ p + '+ (2 *'+ e + r')\\'))
+    length_htb_eqn.append(NoEscape(r'&= ' + length + r'\end{aligned}'))
+    return length_htb_eqn
+
+def gusset_lt_w(weld,cls,length):
+    weld = str(weld)
+    cls = str(cls)
+    length = str(length)
+    length_htw_eqn = Math(inline=True)
+    length_htw_eqn.append(
+        NoEscape(r'\begin{aligned} L &= Flange weld + clearance 'r'\\'))
+    length_htw_eqn.append(
+        NoEscape(r'&= '+ weld + '+' + cls + r'\\'))
+    length_htw_eqn.append(NoEscape(r'&= ' + length + r'\end{aligned}'))
+    return length_htw_eqn
+
+def long_joint_bolted_req():
+    long_joint_bolted_eqn = Math(inline=True)
+    long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\geq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& if~l < 15 * d~then~V_{rd} = V_{db} \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& l = ((nc~or~nr) - 1) * (p~or~g) \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& \beta_{ij} = 1.075 - l/(200 * d) \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& but~0.75\leq\beta_{ij}\leq1.0 \end{aligned}'))
+
+
+    return long_joint_bolted_eqn
+
+def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr):
+    lc = (nc - 1) * p
+    lr = (nr - 1) * g
+    l = max(lc,lr)
+    lt = 15 * d
+    B = 1.075 - (l / (200 * d))
+    Bi = B
+    nc= str(nc)
+    nr= str(nr)
+    g= str(g)
+    p = str(p)
+    d = str(d)
+    Tc = str(Tc)
+    Tr = str(Tr)
+    if B<=0.75:
+        B =0.75
+    elif B>=1:
+        B =1
+    else:
+        B=B
+    B = str(B)
+    Bi = str(Bi)
+    lc_str = str(lc)
+    lr_str = str(lr)
+    l_str = str(l)
+    lt_str = str(lt)
+    long_joint_bolted_eqn = Math(inline=True)
+    # long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
+    # long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
+    if l < (lt):
+        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= ((nc~or~nr) - 1) * (p~or~g) \\'))
+        long_joint_bolted_eqn.append(NoEscape(r' &= ('+nc+' - 1) * '+p+ '='+lc_str+ r'\\'))
+        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + ' - 1) * ' + g + '=' + lr_str + r'\\'))
+        long_joint_bolted_eqn.append(NoEscape(r' l&= '+ l_str + r'\\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * '+d+' = '+lt_str +r' \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& since,~l < 15 * d~then~V_{rd} = V_{db} \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+Tc+r' \end{aligned}'))
+    else:
+        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= ((nc~or~nr) - 1) * (p~or~g) \\'))
+        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nc + ' - 1) * ' + p + '=' + lc_str + r'\\'))
+        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + ' - 1) * ' + g + '=' + lr_str + r'\\'))
+        long_joint_bolted_eqn.append(NoEscape(r' l&= ' + l_str + r'\\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& since,~l \geq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& \beta_{ij} = 1.075 - '+ l_str +'/(200*'+d+') ='+Bi+r'\\'))
+        long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \end{aligned}'))
+
+    return long_joint_bolted_eqn
+
     # slender = (float(K) * float(L)) / float(r)
     #
     # self.slenderness = round(slender, 2)

@@ -2294,7 +2294,7 @@ class BeamCoverPlate(MomentConnection):
                                                                         self.bolt_conn_plates_web_t_fu_fy,
                                                                         self.web_bolt.gamma_mb,
                                                                         web_bolt_bearing_capacity_kn), '')
-            self.report_check.append(t2)
+
             t3 = (KEY_OUT_DISP_WEB_BOLT_CAPACITY, '',bolt_capacity_prov(web_bolt_shear_capacity_kn,
                                                                         web_bolt_bearing_capacity_kn,
                                                                         web_bolt_capacity_kn),'')

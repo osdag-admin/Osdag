@@ -1657,7 +1657,7 @@ class Tension_bolted(Main):
 
         "recalculating block shear capacity of the bolt based on the change in pitch while block shear check in member design"
 
-        [self.bolt_bearing_capacity,self.d_0,self.kb,self.gamma_mb] = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
+        self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
             e=self.plate.edge_dist_provided, p=self.plate.pitch_provided, bolt_hole_type=self.bolt.bolt_hole_type)
 
         self.bolt.bolt_bearing_capacity = self.bolt_bearing_capacity

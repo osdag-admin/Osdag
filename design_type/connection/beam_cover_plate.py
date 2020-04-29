@@ -2071,7 +2071,7 @@ class BeamCoverPlate(MomentConnection):
         flange_connecting_plates = [self.flange_plate.thickness_provided, self.section.flange_thickness]
 
         flange_bolt_shear_capacity_kn = round(self.flange_bolt.bolt_shear_capacity / 1000, 2)
-        flange_bolt_bearing_capacity_kn = round(self.flange_bolt.bolt_bearing_capacity / 1000, 2)
+        # flange_bolt_bearing_capacity_kn = round(self.flange_bolt.bolt_bearing_capacity / 1000, 2)
         flange_bolt_capacity_kn = round(self.flange_bolt.bolt_capacity / 1000, 2)
         flange_kb_disp = round(self.flange_bolt.kb, 2)
         flange_kh_disp = round(self.flange_bolt.kh, 2)
@@ -2082,7 +2082,7 @@ class BeamCoverPlate(MomentConnection):
         innerflange_connecting_plates = [self.flange_plate.thickness_provided, self.section.flange_thickness]
 
         innerflange_bolt_shear_capacity_kn = round(self.flange_bolt.bolt_shear_capacity / 1000, 2)
-        innerflange_bolt_bearing_capacity_kn = round(self.flange_bolt.bolt_bearing_capacity / 1000, 2)
+
         innerflange_bolt_capacity_kn = round(self.flange_bolt.bolt_capacity / 1000, 2)
         innerflange_kb_disp = round(self.flange_bolt.kb, 2)
         innerflange_kh_disp = round(self.flange_bolt.kh, 2)
@@ -2180,6 +2180,7 @@ class BeamCoverPlate(MomentConnection):
 
         if self.preference == "Outside":
             if self.flange_bolt.bolt_type == TYP_BEARING:
+                flange_bolt_bearing_capacity_kn = round(self.flange_bolt.bolt_bearing_capacity / 1000, 2)
                 t1 = (KEY_OUT_DISP_FLANGE_BOLT_SHEAR , '', bolt_shear_prov(self.flange_bolt.bolt_fu, 1,
                                                                            self.flange_bolt.bolt_net_area,
                                                                            self.flange_bolt.gamma_mb,
@@ -2206,6 +2207,7 @@ class BeamCoverPlate(MomentConnection):
                 self.report_check.append(t4)
         else:
             if self.flange_bolt.bolt_type == TYP_BEARING:
+                innerflange_bolt_bearing_capacity_kn = round(self.flange_bolt.bolt_bearing_capacity / 1000, 2)
                 t1 = (KEY_OUT_DISP_FLANGE_BOLT_SHEAR, '',bolt_shear_prov(self.flange_bolt.bolt_fu, 2,
                                                                          self.flange_bolt.bolt_net_area,
                                                                          self.flange_bolt.gamma_mb,
@@ -2278,7 +2280,7 @@ class BeamCoverPlate(MomentConnection):
         web_connecting_plates = [self.web_plate.thickness_provided, self.section.web_thickness]
 
         web_bolt_shear_capacity_kn = round(self.web_bolt.bolt_shear_capacity / 1000, 2)
-        web_bolt_bearing_capacity_kn = round(self.web_bolt.bolt_bearing_capacity / 1000, 2)
+        # web_bolt_bearing_capacity_kn = round(self.web_bolt.bolt_bearing_capacity / 1000, 2)
         web_bolt_capacity_kn = round(self.web_bolt.bolt_capacity / 1000, 2)
         web_kb_disp = round(self.web_bolt.kb, 2)
         web_kh_disp = round(self.web_bolt.kh, 2)
@@ -2291,6 +2293,7 @@ class BeamCoverPlate(MomentConnection):
         t1 = ('SubSection', 'Web Bolt Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         if self.flange_bolt.bolt_type == TYP_BEARING:
+            web_bolt_bearing_capacity_kn = round(self.web_bolt.bolt_bearing_capacity / 1000, 2)
             t1 = (KEY_OUT_DISP_WEB_BOLT_SHEAR , '', bolt_shear_prov(self.web_bolt.bolt_fu, 2,
                                                                     self.web_bolt.bolt_net_area,
                                                                     self.web_bolt.gamma_mb,

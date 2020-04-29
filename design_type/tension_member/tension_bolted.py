@@ -89,8 +89,8 @@ class Tension_bolted(Main):
         c_lst.append(t3)
         t4 = (KEY_PLATETHK, self.plate_thick_customized)
         c_lst.append(t4)
-        t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
-        c_lst.append(t5)
+        # t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
+        # c_lst.append(t5)
 
         return c_lst
 
@@ -1657,7 +1657,7 @@ class Tension_bolted(Main):
 
         "recalculating block shear capacity of the bolt based on the change in pitch while block shear check in member design"
 
-        [self.bolt_bearing_capacity,self.d_0,self.kb,self.gamma_mb] = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
+        self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
             e=self.plate.edge_dist_provided, p=self.plate.pitch_provided, bolt_hole_type=self.bolt.bolt_hole_type)
 
         self.bolt.bolt_bearing_capacity = self.bolt_bearing_capacity
@@ -2074,6 +2074,12 @@ class Tension_bolted(Main):
         # folder = self.select_workspace_folder(self)
         # print(folder)
         Disp_3D_image = "./ResourceFiles/images/3d.png"
+
+        # Disp_image ={KEY_DISP_3D: "3d",
+        #              KEY_DISP_FRONT: "Front",
+        #              KEY_DISP_TOP: "Top",
+        #              KEY_DISP_SIDE: "Side"}
+
 
         config = configparser.ConfigParser()
         config.read_file(open(r'Osdag.config'))

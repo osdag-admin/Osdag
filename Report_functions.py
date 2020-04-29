@@ -239,6 +239,7 @@ def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_pla
     beam_f_t = str(beam_f_t)
     beam_r_r = str(beam_r_r)
     max_plate_h = str(max_plate_h)
+    notch = str(notch)
     max_plate_ht_eqn = Math(inline=True)
     if connectivity in VALUES_CONN_1:
         max_plate_ht_eqn.append(NoEscape(r'\begin{aligned} &d_b - 2 (t_{bf} + r_{b1} + gap)\\'))

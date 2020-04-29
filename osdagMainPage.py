@@ -44,11 +44,11 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 -----------------------------------------------------------------------------
 1) The data for the template structuring will go into a variable called self.Modules .
 
-2) self.Modules must be a dictionary with keys as the name of modules in string format (LEVEL 1).
+2) self.Modules must be a dictionary with keys as the name of modules in string format (LEVEL 1: Left Panel Buttons).
 
 3) The values to these keys can be a dictionary(Modules), a List/Tuple(Module Variants) or self.Under_Development :
         (i) If the value is a dictionary then it should contain keys as modules in string format and for values 
-            read RULE 4 . (LEVEL 2)
+            read RULE 4 . (LEVEL 2: Tab for each module)
        (ii) If the value is a List/Tuple then it should contain sub-lists/sub-tuples informing about the module variants :
                     (a) The module variants as sub-list/sub-tuple will have 3 values, Module_Name, Image_Path and Object_Name .
                     (b) The List/Tuple can have several sub-lists/sub-tuples but the last element should be a method,
@@ -59,7 +59,7 @@ The Rules/Steps to use the template are(OsdagMainWindow):
    all over again and the values of the keys can be a dictionary(Sub-Modules), a List/Tuple(Sub-Module Variants) or 
    self.Under_Development:
         (i) If the value is a dictionary then it should contain keys as sub-modules in string format and for values 
-            read RULE 5 . (LEVEL 3)
+            read RULE 5 . (LEVEL 3 Sub Tab for each tab)
        (ii) If the value is a List/Tuple then it should contain sub-lists/sub-tuples informing about the module variants :
                     (a) The module variants as sub-list/sub-tuple will have 3 values, Module_Name, Image_Path and Object_Name .
                     (b) The List/Tuple can have several sub-lists/sub-tuples but the last element should be a method,
@@ -90,10 +90,15 @@ from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication, QWidget, QLabel, QGridLayout, QVBoxLayout, QTabWidget, QRadioButton, QButtonGroup, QSizePolicy
 from PyQt5.QtGui import QIcon
 from PyQt5 import uic
+import math
 import sys
 from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
+from gui.ui_design_summary import Ui_DesignReport
+from gui.LeftPanel_Button import Ui_LPButton
+from gui.Submodule_Page import Ui_Submodule_Page
+from gui.ui_OsdagMainPage import Ui_MainWindow
 # from design_type.connection.fin_plate_connection import design_report_show
 # from design_type.connection.fin_plate_connection import DesignReportDialog
 from design_type.connection.fin_plate_connection import FinPlateConnection
@@ -114,14 +119,12 @@ from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
 #from design_type.tension_member.tension import Tension
 # from cad.cad_common import call_3DBeam
-from gui.ui_template import Ui_ModuleWindow
 
 import configparser
 import os
 import os.path
 import subprocess
 from gui.ui_template import Ui_ModuleWindow
-from gui.ui_design_summary import Ui_DesignReport
 
 
 
@@ -147,7 +150,7 @@ class MyAskQuestion(QDialog):
         self.ui.setupUi(self)
         self.osdagmainwindow = parent
 
-class New_Tab_Widget(QTabWidget):
+class New_Tab_Widget(QTabWidget):           # Empty Custom Tab Widget
     def __init__(self):
         super().__init__()
         self.setTabShape(QTabWidget.Triangular)
@@ -181,12 +184,13 @@ class New_Tab_Widget(QTabWidget):
             '''
                         )
 
-class Submodule_Page(QWidget):
+class Submodule_Page(QWidget):             # Module Varaints' page with a GridLayout and a Start Button
     def __init__(self):
         super().__init__()
-        uic.loadUi('gui/Submodule_Page.ui',self)
+        self.ui=Ui_Submodule_Page()
+        self.ui.setupUi(self)
 
-class Submodule_Widget(QWidget):
+class Submodule_Widget(QWidget):            # Module Variant widget with a Name, RadioButton and an Image
     def __init__(self,Iterative,parent):
         super().__init__()
         Module_Name,Image_Path,Object_Name=Iterative
@@ -220,13 +224,15 @@ class ModulePage(QWidget):              # Empty Page with a layout
 class LeftPanelButton(QWidget):          # Custom Button widget for the Left Panel
     def __init__(self,text):
         super().__init__()
-        uic.loadUi('gui/LeftPanel_Button.ui',self)
-        self.LP_Button.setText(text)  #LP_Button is the QPushButton widget inside the LeftPanelButton Widget
+        self.ui=Ui_LPButton()
+        self.ui.setupUi(self)
+        self.ui.LP_Button.setText(text)  #LP_Button is the QPushButton widget inside the LeftPanelButton Widget
 class OsdagMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('gui/ui_OsdagMainPage.ui',self)
-        self.comboBox_help.currentIndexChanged.connect(self.selection_change)
+        self.ui=Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
         self.Under_Development='UNDER DEVELOPMENT'
         self.Modules={
                 'Connection' : {
@@ -251,9 +257,6 @@ class OsdagMainWindow(QMainWindow):
                                                     'Column to Column' :[
                                                                 ('Cover Plate Bolted','Cover Plate Bolted Image','C2C_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','Cover Plate Welded Image','C2C_Cover_Plate_Welded'),
-                                                                ('Cover Plate Welded','Cover Plate Welded Image','C2C_Cover_Plate_Welded1'),
-                                                                ('Cover Plate Welded','Cover Plate Welded Image','C2C_Cover_Plate_Welded2'),
-                                                                ('Cover Plate Welded','Cover Plate Welded Image','C2C_Cover_Plate_Welded3'),
                                                                 ('Cover Plate Connection','Cover Plate Connection Image','C2C_Cover_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
@@ -286,10 +289,10 @@ class OsdagMainWindow(QMainWindow):
         for ModuleName in self.Modules:                      #Level 1 dictionary handling
             Button= LeftPanelButton(ModuleName)
             self.ButtonConnection(Button,list(self.Modules.keys()),ModuleName)  
-            self.verticalLayout.addWidget(Button)       
+            self.ui.verticalLayout.addWidget(Button)       
             if(type(self.Modules[ModuleName])==dict):        #level 2 dictionary handling
                 Page= ModulePage()
-                self.myStackedWidget.addWidget(Page)
+                self.ui.myStackedWidget.addWidget(Page)
                 Current_Module=self.Modules[ModuleName]
                 Tab_Widget=New_Tab_Widget()
                 Page.layout.addWidget(Tab_Widget)
@@ -309,19 +312,20 @@ class OsdagMainWindow(QMainWindow):
                                 Sub_Tab_Widget.addTab(New_Sub_Tab,Sub_Sub_Module)
                                 group=QButtonGroup(QWidget(Page))
                                 row,col=0,0
+                                n=math.floor((len(Current_SubModule[Sub_Sub_Module])-2)/2)
 
                                 for Selection in Current_SubModule[Sub_Sub_Module][:-1]:
                                     widget=Submodule_Widget(Selection,New_Sub_Tab)
                                     group.addButton(widget.rdbtn)
-                                    New_Sub_Tab.gridLayout.addWidget(widget,row,col)
+                                    New_Sub_Tab.ui.gridLayout.addWidget(widget,row,col)
 
-                                    if(col==1):
+                                    if(col==n and len(Current_SubModule[Sub_Sub_Module])!=3):
                                         row+=1
                                         col=0
 
                                     else:
                                         col+=1
-                                New_Sub_Tab.StartButton.clicked.connect(Current_SubModule[Sub_Sub_Module][-1])
+                                New_Sub_Tab.ui.StartButton.clicked.connect(Current_SubModule[Sub_Sub_Module][-1])
 
                             elif(Current_SubModule[Sub_Sub_Module]==self.Under_Development):   # Final Under Development Handling
                                 Sub_Tab_Widget.addTab(self.UnderDevelopmentModule(),Sub_Sub_Module)
@@ -334,19 +338,20 @@ class OsdagMainWindow(QMainWindow):
                         Tab_Widget.addTab(New_Tab,Submodule)
                         group=QButtonGroup(QWidget(Page))
                         row,col=0,0
+                        n=math.floor((len(Current_Module[Submodule])-2)/2)
 
                         for Selection in Current_Module[Submodule][:-1]:
                             widget=Submodule_Widget(Selection,New_Tab)
                             group.addButton(widget.rdbtn)
-                            New_Tab.gridLayout.addWidget(widget,row,col)
+                            New_Tab.ui.gridLayout.addWidget(widget,row,col)
 
-                            if(col==1):
+                            if(col==n and len(Current_Module[Submodule])!=3):
                                 row+=1
                                 col=0
 
                             else:
                                 col+=1
-                        New_Tab.StartButton.clicked.connect(Current_Module[Submodule][-1])
+                        New_Tab.ui.StartButton.clicked.connect(Current_Module[Submodule][-1])
 
                     elif(Current_Module[Submodule]==self.Under_Development):       #Level 3 Under Development handling
                         Tab_Widget.addTab(self.UnderDevelopmentModule(),Submodule)
@@ -356,28 +361,30 @@ class OsdagMainWindow(QMainWindow):
 
             elif(type(self.Modules[ModuleName]) in [list,tuple]):            # Level 2 list/tuple handling
                 Page= Submodule_Page()
-                self.myStackedWidget.addWidget(Page)
+                self.ui.myStackedWidget.addWidget(Page)
                 group=QButtonGroup(QWidget(Page))
                 row,col=0,0
+                n=math.floor((len(self.Modules[ModuleName])-2)/2)
 
                 for Selection in self.Modules[ModuleName][:-1]:
                     widget=Submodule_Widget(Selection,Page)
                     group.addButton(widget.rdbtn)
-                    Page.gridLayout.addWidget(widget,row,col)
+                    Page.ui.gridLayout.addWidget(widget,row,col)
 
-                    if(col==1):
+                    if(col==n and len(self.Modules[ModuleName])!=3):
                         row+=1
                         col=0
 
                     else:
                         col+=1
-                Page.StartButton.clicked.connect(self.Modules[ModuleName][-1])
+                Page.ui.StartButton.clicked.connect(self.Modules[ModuleName][-1])
 
             elif(self.Modules[ModuleName]==self.Under_Development):           #Level 2 Under Development handling
-                self.myStackedWidget.addWidget(self.UnderDevelopmentModule())
+                self.ui.myStackedWidget.addWidget(self.UnderDevelopmentModule())
 
             else:
                 raise ValueError
+        self.showMaximized()
 
 ################################ UI Methods ###############################################
 
@@ -419,7 +426,7 @@ class OsdagMainWindow(QMainWindow):
         return Page
 
     def ButtonConnection(self,Button,Modules,ModuleName):
-        Button.LP_Button.clicked.connect(lambda : self.myStackedWidget.setCurrentIndex(Modules.index(ModuleName)+1))
+        Button.ui.LP_Button.clicked.connect(lambda : self.ui.myStackedWidget.setCurrentIndex(Modules.index(ModuleName)+1))
 
 #################################### Module Launchers ##########################################
     

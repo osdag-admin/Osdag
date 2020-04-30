@@ -84,12 +84,12 @@ class Tension_welded(Main):
 
         t1 = (KEY_SECSIZE, self.fn_profile_section)
         c_lst.append(t1)
-        t2 = (KEY_GRD, self.grdval_customized)
-        c_lst.append(t2)
-        t3 = (KEY_D, self.diam_bolt_customized)
-        c_lst.append(t3)
-        t4 = (KEY_PLATETHK, self.plate_thick_customized)
-        c_lst.append(t4)
+        # t2 = (KEY_GRD, self.grdval_customized)
+        # c_lst.append(t2)
+        # t3 = (KEY_D, self.diam_bolt_customized)
+        # c_lst.append(t3)
+        # t4 = (KEY_PLATETHK, self.plate_thick_customized)
+        # c_lst.append(t4)
         # t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
         # c_lst.append(t5)
 
@@ -1705,6 +1705,7 @@ class Tension_welded(Main):
                 t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
                       tension_rupture_welded_prov(self.section_size_1.depth, self.plate.thickness_provided,
                                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
+<<<<<<< HEAD
 
 
             else:
@@ -1717,6 +1718,20 @@ class Tension_welded(Main):
                       tension_rupture_welded_prov(self.section_size_1.depth, self.plate.thickness_provided,
                                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
+=======
+
+
+            else:
+                t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
+                t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                      tension_yield_prov(l=self.section_size_1.min_leg, t=self.plate.thickness_provided,
+                                         f_y=self.plate.fy,
+                                         gamma=gamma_m0, T_dg=plate_yield_kn), '')
+                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                      tension_rupture_welded_prov(self.section_size_1.depth, self.plate.thickness_provided,
+                                                  self.plate.fu, gamma_m1, plate_rupture_kn), '')
+
+>>>>>>> mentor/restructure
         else:
             if self.loc == "Long Leg":
                 t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht(self.section_size_1.depth, self.clearance,self.plate.height,1),"")

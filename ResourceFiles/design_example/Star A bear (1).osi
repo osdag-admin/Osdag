@@ -30,7 +30,7 @@ DesignPreferences.Weld.Material_Grade_OverWrite: '410'
 Length(mm): '2000'
 Load.Axial: '400'
 Member.Material: E 250 (Fe 410 W)A
-Member.Profile: Angles
+Member.Profile: Star Angles
 Module: Tension Members Bolted Design
 Section Size:
 - 20 20 X 3

@@ -32,3 +32,7 @@ if __name__ == '__main__':
         sys.exit(app.exec_())
     except:
         print("ERROR")
+<<<<<<< HEAD
+=======
+
+>>>>>>> mentor/restructure

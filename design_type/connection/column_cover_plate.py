@@ -2137,22 +2137,31 @@ class ColumnCoverPlate(MomentConnection):
                 if preference == "Outside":
                     outerwidth = width
                     flange_plate_crs_sec_area = y * width
+                    if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                        thickness = y
+                        self.design_status = True
+                        break
+                    else:
+                        thickness = 0
+                        self.design_status = False
+
                 elif preference == "Outside + Inside":
                     outerwidth = width
                     innerwidth = (width - t_w - (2 * r_1)) / 2
                     if innerwidth < 50:
                         # logger.error(":Inner Plate not possible")
                         self.design_status = False
+                        thickness = 0
                     else:
                         self.design_status = True
                         flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y
-                if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
-                    thickness = y
-                    self.design_status = True
-                    break
-                else:
-                    thickness = 0
-                    self.design_status = False
+                        if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                            thickness = y
+                            self.design_status = True
+                            break
+                        else:
+                            thickness = 0
+                            self.design_status = False
 
             else:
                 webwidth = D - (2 * tk) - (2 * r_1)
@@ -2165,7 +2174,6 @@ class ColumnCoverPlate(MomentConnection):
                 else:
                     thickness = 0
                     self.design_status = False
-                # logger.error(":Inner Plate not possible")
 
         return thickness
 

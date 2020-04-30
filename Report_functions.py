@@ -156,7 +156,54 @@ def get_trial_bolts(V_u, A_u,bolt_capacity,multiple=1):
     trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
     return trial_bolts_eqn
 
+def forces_in_web(Au,T,A,t,D,Zw,Mu,Z,Mw,Aw):
+    Au = str(Au)
+    T = str(T)
+    A = str(A)
+    t = str(t)
+    D = str(D)
+    Zw = str(Zw)
+    Mu = str(Mu)
+    Z = str(Z)
+    Mw = str(Mw)
+    Aw = str(Aw)
+    forcesinweb_eqn = Math(inline=True)
 
+    forcesinweb_eqn.append(NoEscape(r'\begin{aligned}A_w &= Axial~ force~ in~ web  \\'))
+    forcesinweb_eqn.append(NoEscape(r'  &= \frac{(D- 2*T)*t* Au }{A} \\'))
+    forcesinweb_eqn.append(NoEscape(r'&= \frac{(' + D + '- 2*' + T + ')*' + t + '*' + Au + ' }{' + A + r'} \\'))
+    forcesinweb_eqn.append(NoEscape(r'&=' + Aw + r'\\'))
+    forcesinweb_eqn.append(NoEscape( r'M_w &= Moment ~in ~web  \\'))
+    forcesinweb_eqn.append(NoEscape(r' &= \frac{Z_w * Mu}{Z} \\'))
+    forcesinweb_eqn.append(NoEscape(r'&= \frac{' + Zw + ' * ' + Mu + '}{' + Z + r'} \\'))
+    forcesinweb_eqn.append(NoEscape(r'&=' + Mw + r'\end{aligned}'))
+    return forcesinweb_eqn
+
+def forces_in_flange(Au, B,T,A,D,Mu,Mw,Mf,Af,ff):
+    Au =str(Au)
+    B=str(B)
+    T=str(T)
+    A=str(A)
+    D=str(D)
+    Mu=str(Mu)
+    Mw=str(Mw)
+    Mf=str(Mf)
+    Af=str(Af)
+    ff = str(ff)
+    forcesinflange_eqn= Math(inline=True)
+    forcesinflange_eqn.append(NoEscape(r'\begin{aligned} A_f&= Axial~force~ in ~flange  \\'))
+    forcesinflange_eqn.append(NoEscape(r'&= \frac{Au * B *T}{A} \\'))
+    forcesinflange_eqn.append(NoEscape(r'&= \frac{' + Au + ' * ' + B + '*' + T + '}{' + A + r'} \\'))
+    forcesinflange_eqn.append(NoEscape(r'&=' + Af + r'\\'))
+    forcesinflange_eqn.append(NoEscape(r'M_f& =Moment~ in~ flange \\'))
+    forcesinflange_eqn.append(NoEscape(r' & = Mu-M_w\\'))
+    forcesinflange_eqn.append(NoEscape(r'&= ' + Mu + '-' + Mw + r'\\'))
+    forcesinflange_eqn.append(NoEscape(r'&=' + Mf + r'\\'))
+    forcesinflange_eqn.append(NoEscape(r' f_f& =flange~force  \\'))
+    forcesinflange_eqn.append(NoEscape(r'& = \frac{M_f *1000}{D-T} + A_f \\'))
+    forcesinflange_eqn.append(NoEscape(r'&= \frac{' + Mf + '}{' + D + '-' + T + '} +' + Af + r' \\'))
+    forcesinflange_eqn.append(NoEscape(r'&=' + ff + r'\end{aligned}'))
+    return forcesinflange_eqn
 
 def min_plate_ht_req(beam_depth,min_plate_ht):
     beam_depth = str(beam_depth)
@@ -356,9 +403,11 @@ def min_weld_size_req(conn_plates_weld,min_weld_size):
     weld_min = str(min_weld_size)
 
     min_weld_size_eqn = Math(inline=True)
-    min_weld_size_eqn.append(NoEscape(r'\begin{aligned} Thickness~of~Thicker~part&\\'))
-    min_weld_size_eqn.append(NoEscape(r'=Max('+t1+','+t2+r')&='+tmax+r'\\'))
-    min_weld_size_eqn.append(NoEscape(r'IS800:2007~cl.10.5.2.3~Table 21,&\\ t_{w_{min}} &=' + weld_min + r'\end{aligned}'))
+    min_weld_size_eqn.append(NoEscape(r'\begin{aligned} &Thickness~of~Thicker~part\\'))
+    min_weld_size_eqn.append(NoEscape(r'\noindent &=max('+t1+','+t2+r')\\'))
+    min_weld_size_eqn.append(NoEscape(r'&='+tmax+r'\\'))
+    min_weld_size_eqn.append(NoEscape(r'&IS800:2007~cl.10.5.2.3~Table 21,\\'))
+    min_weld_size_eqn.append(NoEscape(r' &t_{w_{min}}=' + weld_min + r'\end{aligned}'))
     return min_weld_size_eqn
 
 def max_weld_size_req(conn_plates_weld,max_weld_size):
@@ -497,7 +546,7 @@ def moment_d_deformation_criteria(fy,Z_e,Mdc):
     Mdc =str(Mdc)
     Mdc_eqn= Math(inline=True)
     Mdc_eqn.append(NoEscape(r'\begin{aligned} Mdc &= \frac{1.5 *Z_e *fy}{1.1}\\'))
-    Mdc_eqn.append(NoEscape(r'&= \frac{1.5 *r'+Z_e + r'*' +fy +r'}{1.1}\\'))
+    Mdc_eqn.append(NoEscape(r'&= \frac{1.5 *'+Z_e + '*' +fy +r'}{1.1}\\'))
     Mdc_eqn.append(NoEscape(r'&= ' + Mdc+ r'\end{aligned}'))
     return  Mdc_eqn
 
@@ -610,7 +659,7 @@ def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u 
     member_block_eqn = Math(inline=True)
     member_block_eqn.append(NoEscape(r'\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
     member_block_eqn.append(NoEscape(r'T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
-    member_block_eqn.append(NoEscape(r'& min(T_{db1}, T_{db2})= ' + Tdb + r'\end{aligned}'))
+    member_block_eqn.append(NoEscape(r'T_{db} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\end{aligned}'))
     # member_block_eqn.append(NoEscape(r'&= \frac{' + A_vg + '*' + f_y + '}{" 1.732*' + gamma_m0 + 'r'} + &+ +'\frac{"0.9*" + A_vn + '*' + f_u + '}{'+1.732+'*' + gamma_m0 + r'} '\\'))
 
 

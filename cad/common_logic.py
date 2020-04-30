@@ -23,6 +23,12 @@ from cad.ShearConnections.CleatAngle.beamWebBeamWebConnectivity import BeamWebBe
 from cad.ShearConnections.CleatAngle.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as cleatColFlangeBeamWeb
 from cad.ShearConnections.CleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
 from cad.ShearConnections.CleatAngle.nutBoltPlacement import NutBoltArray as cleatNutBoltArray
+
+from cad.ShearConnections.Endplate.beamWebBeamWebConnectivity import BeamWebBeamWeb as EndBeamWebBeamWeb
+from cad.ShearConnections.Endplate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as EndColFlangeBeamWeb
+from cad.ShearConnections.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb as EndColWebBeamWeb
+from cad.ShearConnections.Endplate.nutBoltPlacement import NutBoltArray as endNutBoltArray
+
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
@@ -228,7 +234,7 @@ class CommonDesignLogic(object):
 
         A = self.module_class()
 
-        if self.connection == KEY_DISP_FINPLATE:
+        if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_ENDPLATE:
             # A = self.module_class()
             # A = FinPlateConnection()
             plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
@@ -265,8 +271,15 @@ class CommonDesignLogic(object):
                                          A.supporting_section.web_thickness / 2.0 + gap)) + gap,
                              length=A.supported_section.flange_width)
 
+        elif self.connection == KEY_DISP_ENDPLATE:
+            gap = A.plate.T
+            notchObj = Notch(R1=notch_R1, height=notch_height,
+                             width=(A.supporting_section.flange_width / 2.0 - (
+                                         A.supporting_section.web_thickness / 2.0 + gap)) + gap,
+                             length=A.supported_section.flange_width)
+
         elif self.connection == KEY_DISP_CLEATANGLE:
-            gap = A.cleat.gap
+            # gap = A.cleat.gap
             notchObj = Notch(R1=notch_R1,
                              height=notch_height,
                              width=(A.supporting_section.flange_width / 2.0 - (
@@ -274,13 +287,10 @@ class CommonDesignLogic(object):
                              length=A.supported_section.flange_width)
             print(notch_R1,notch_height,(A.supporting_section.flange_width / 2.0 -
                                          (A.supporting_section.web_thickness / 2.0 + gap)) + gap, A.supported_section.flange_width)
-        # elif self.connection == "Endplate":
-        #     notchObj = Notch(R1=notch_R1, height=notch_height,
-        #                      width=(pBeam_B / 2.0 - (pBeam_tw / 2.0 + plate_thick)) + plate_thick,
-        #                      length=sBeam_B)
-        # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
 
-            # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
+        column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
+
+        beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
 
         supporting = ISection(B=A.supporting_section.flange_width, T=A.supporting_section.flange_thickness,
                               D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
@@ -305,10 +315,11 @@ class CommonDesignLogic(object):
             nutBoltArray = finNutBoltArray(A.bolt,  A.plate, nut, bolt, nut_space)
             beamwebconn = FinBeamWebBeamWeb(supporting, supported, notchObj, plate, Fweld1, nutBoltArray, gap)
             # column, beam, notch, plate, Fweld, nut_bolt_array
-        # elif self.connection == "Endplate":
-        #     nut_space = sBeam_tw + plate_thick + nut_T
-        #     nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, nut_space)
-        #     beamwebconn = endBeamWebBeamWeb(column, beam, notchObj, Fweld1, plate, nutBoltArray)
+
+        elif self.connection == KEY_DISP_ENDPLATE:
+            nut_space = A.supported_section.web_thickness + A.plate.thickness_provided + nut_T
+            nutBoltArray = endNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
+            beamwebconn = EndBeamWebBeamWeb(supporting, supported, notchObj, Fweld1, plate, nutBoltArray)
         #
         elif self.connection == KEY_DISP_CLEATANGLE:
             # nut_space = sBeam_tw + 2 * cleat_thick + nut_T
@@ -332,9 +343,12 @@ class CommonDesignLogic(object):
 
         A = self.module_class()
 
-        # if self.connection == KEY_DISP_FINPLATE:
+        if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_ENDPLATE:
             # A = self.module_class()
             # A = FinPlateConnection()
+            plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
+            Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
+
         if self.connection == KEY_DISP_CLEATANGLE:
             # A = CleatAngleConnection()
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
@@ -425,11 +439,10 @@ class CommonDesignLogic(object):
             colwebconn = FinColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
 
 
-
-        # elif self.connection == "Endplate":
-        #     nut_space = column_tw + int(plate_thick) + nut_T
-        #     nutBoltArray = endNutBoltArray(A,bolt, nut, bolt, nut_space)
-        #     colwebconn = endColWebBeamWeb(A.supporting_section, A.supported_section, A.weld, A.plate, nutBoltArray)
+        elif self.connection == KEY_DISP_ENDPLATE:
+            nut_space = A.supported_section.web_thickness + A.plate.thickness_provided + nut_T
+            nutBoltArray = endNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
+            colwebconn = EndColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray)
 
         elif self.connection == KEY_DISP_CLEATANGLE:
             # nut_space = beam_tw + 2 * cleat_thick + nut_T
@@ -545,6 +558,12 @@ class CommonDesignLogic(object):
             cnut_space = A.supporting_section.web_thickness + A.cleat.thickness + nut_T
             nut_bolt_array = cleatNutBoltArray(A.cleat, nut, bolt, nut_space, cnut_space)
             colflangeconn = cleatColFlangeBeamWeb(supporting, supported, angle, nut_bolt_array, gap)
+
+        elif self.connection == KEY_DISP_ENDPLATE:
+            nut_space = A.supported_section.web_thickness + A.plate.thickness_provided + nut_T
+            nutBoltArray = endNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
+            colflangeconn = EndColFlangeBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray)
+
 
         else:
             pass

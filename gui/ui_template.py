@@ -636,7 +636,8 @@ class Ui_ModuleWindow(QMainWindow):
                         data[t[0] + "_customized"] = t[1]()
                 else:
                     data[t[0] + "_customized"] = t[1]()
-            print(data)
+            print('data',data)
+            print('newlist',new_list)
             try:
                 d.get(new_list[0][0]).activated.connect(lambda: popup(d.get(new_list[0][0]), new_list))
                 d.get(new_list[1][0]).activated.connect(lambda: popup(d.get(new_list[1][0]), new_list))

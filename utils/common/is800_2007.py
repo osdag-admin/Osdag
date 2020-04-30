@@ -197,7 +197,7 @@ class IS800_2007(object):
             "24+": {'Standard': 3.0, 'Over-sized': 8.0, 'short_slot': 10.0, 'long_slot': 2.5}
         }
         import re
-        # d = str(re.sub("[^0-9]", "", str(d)))
+        d = str(re.sub("[^0-9]", "", str(d)))
         d = int(d)
 
         if d < 12:
@@ -809,11 +809,9 @@ class IS800_2007(object):
         """
         if l_j <= 150 * t_t:
             return 1.0
-        beta_lw = 1.2 - ((0.2 * l_j) / (150 * t_t))
+        beta_lw = 1.2 - 0.2 * l_j / (150 * t_t)
         if beta_lw >= 1.0:
             beta_lw = 1.0
-        elif beta_lw <= 0.6:
-            beta_lw = 0.6
         return beta_lw
 
     # -------------------------------------------------------------

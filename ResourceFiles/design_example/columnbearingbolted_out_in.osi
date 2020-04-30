@@ -27,13 +27,13 @@ DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
 Flange_Plate.Preferences: Outside + Inside
-Load.Axial: '0'
-Load.Moment: '0'
-Load.Shear: '0'
+Load.Axial: '10'
+Load.Moment: '10'
+Load.Shear: '10'
 Member.Material: E 250 (Fe 410 W)A
-Module: Beam Coverplate Connection
+Module: Column Coverplate Connection
 Plate.Material: E 165 (Fe 290)
-Section Size: WPB 240x240x60.3
+Section Size: UC 356 x 406 x 467
 Web_Plate.thickness_provided: &id001
 - '6'
 - '8'

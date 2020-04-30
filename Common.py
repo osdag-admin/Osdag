@@ -291,6 +291,11 @@ DISP_MIN_PLATE_HEIGHT = 'Min. Plate Height (mm)'
 DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
 DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
 DISP_MIN_PLATE_THICK = 'Min.Plate Thickness (mm)'
+
+DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Height (mm)'
+DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Height (mm)'
+DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
+
 KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (V_db) (kN)'
 KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension (T_db) (kN)'
 KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (V_d) (kN)'
@@ -688,6 +693,9 @@ KEY_OUT_GRD_PROVIDED='flange_bolt.bolt_fu'
 KEY_OUT_FLANGE_MIN_PITCH= 'flange_bolt.min_pitch_round'
 KEY_OUT_FLANGE_MIN_EDGE_DIST= 'flange_bolt.min_edge_dist_round'
 KEY_OUT_FLANGE_MAX_EDGE_DIST='flange_bolt.max_edge_dist_round'
+
+KEY_OUT_DISP_FORCES_FLANGE = 'Forces Carried by Flange'
+KEY_OUT_DISP_FORCES_WEB= 'Forces Carried by Web'
 
 KEY_OUT_WEB_BOLT_SHEAR ='web_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_WEB_BOLT_SHEAR = "Shear Capacity (kN)"

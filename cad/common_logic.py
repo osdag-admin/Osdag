@@ -419,7 +419,7 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
         if self.connection == "Fin Plate":  # finColWebBeamWeb
-            gap =self.plate.gap
+            gap = A.plate.gap
             nut_space = A.supported_section.web_thickness + int(A.plate.thickness_provided) + nut_T
             nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colwebconn = FinColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
@@ -594,8 +594,8 @@ class CommonDesignLogic(object):
                                T=float(B.flange_plate.thickness_provided))  # Call to Plate in Component repository
         plateBelwFlange = copy.copy(plateAbvFlange)  # Since both the flange plates are identical
 
-        innerplateAbvFlangeFront = Plate(L=B.flange_plate.height,
-                                         W=B.flange_plate.length,
+        innerplateAbvFlangeFront = Plate(L=B.flange_plate.Innerheight,
+                                         W=B.flange_plate.Innerlength,
                                          T=float(B.flange_plate.thickness_provided))
         innerplateAbvFlangeBack = copy.copy(innerplateAbvFlangeFront)
         innerplateBelwFlangeFront = copy.copy(innerplateAbvFlangeBack)

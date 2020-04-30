@@ -87,8 +87,8 @@ class Tension_bolted(Main):
         c_lst.append(t2)
         t3 = (KEY_D, self.diam_bolt_customized)
         c_lst.append(t3)
-        t4 = (KEY_PLATETHK, self.plate_thick_customized)
-        c_lst.append(t4)
+        # t4 = (KEY_PLATETHK, self.plate_thick_customized)
+        # c_lst.append(t4)
         # t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
         # c_lst.append(t5)
 
@@ -2121,10 +2121,10 @@ class Tension_bolted(Main):
         #              KEY_DISP_SIDE: "Side"}
 
 
-        config = configparser.ConfigParser()
-        config.read_file(open(r'Osdag.config'))
-        desktop_path = config.get("desktop_path", "path1")
-        print("desk:", desktop_path)
+        # config = configparser.ConfigParser()
+        # config.read_file(open(r'Osdag.config'))
+        # desktop_path = config.get("desktop_path", "path1")
+        # print("desk:", desktop_path)
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")

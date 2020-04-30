@@ -104,6 +104,7 @@ class FinPlateConnection(ShearConnection):
 
         # @author: Amir, Umair
         self.module = KEY_DISP_FINPLATE
+        print('Het I am existing values', existingvalues)
 
         options_list = []
 
@@ -1064,7 +1065,7 @@ class FinPlateConnection(ShearConnection):
                                                              round(self.plate.tension_yielding_capacity / 1000, 2)),'')
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_prov(self.plate.length, self.plate.thickness_provided,
+        t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_bolted_prov(self.plate.length, self.plate.thickness_provided,
                                                         self.plate.bolts_one_line, self.bolt.dia_hole,
                                                         self.plate.fu,gamma_m1,
                                                         round(self.plate.tension_rupture_capacity / 1000, 2)),'')

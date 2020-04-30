@@ -813,6 +813,10 @@ KEY_DP_BOLT_SLIP_FACTOR = 'DesignPreferences.Bolt.Slip_Factor'
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 KEY_DP_WELD_FAB = 'DesignPreferences.Weld.Fab'
 
+KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
+KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
+
+
 KEY_DP_WELD_TYPE = 'Weld.Type'
 KEY_DISP_DP_WELD_TYPE ='Weld Type'
 KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
@@ -1020,6 +1024,7 @@ KEY_DISP_ANGLE_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <
 KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
+KEY_OUT_DISP_DIA_PROVIDED = 'Diameter(d) (mm)'
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
@@ -1027,6 +1032,7 @@ KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
 KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
+KEY_DISP_BOLT_HOLE = 'Bolt Hole Diameter(d0) (mm)'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
@@ -1046,7 +1052,7 @@ KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
-
+KEY_OUT_LONG_JOINT = 'Long Joint Reduction'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
@@ -1230,9 +1236,9 @@ VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
 
 #Design Report Strings
-DISP_NUM_OF_BOLTS = 'No of Bolts'
-DISP_NUM_OF_ROWS = 'No of Rows'
-DISP_NUM_OF_COLUMNS = 'No of Columns'
+DISP_NUM_OF_BOLTS = 'No of Bolts (n)'
+DISP_NUM_OF_ROWS = 'No of Rows (nr)'
+DISP_NUM_OF_COLUMNS = 'No of Columns (nc)'
 
 
 def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):
@@ -1466,4 +1472,60 @@ DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" 
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
+
+
+######### Just FOR Documentation ########
+KEY_DISP_GUSSET = 'Gusset Connection'
+
+DISP_TITLE_CM = 'Connecting members'
+
+KEY_MEMBER_COUNT = 'Member.Count'
+KEY_DISP_MEMBER_COUNT = 'Member Count'
+VALUES_MEM_COUNT = ['1','2','3','4','5','6','7']
+
+KEY_SEC_PROFILE = 'Member.Profile'
+KEY_DISP_SEC_PROFILE = 'Section Profile'
+VALUES_SEC_PROFILE = ['Angles', 'Channels']
+
+KEY_SECSIZE = 'Member.Designation'
+KEY_DISP_SECSIZE = 'Section Size*'
+VALUES_SECSIZE = ['All', 'Customized']
+
+KEY_MATERIAL = 'Member.Material'
+KEY_DISP_MATERIAL = 'Material *'
+VALUES_MATERIAL = connectdb("Material")
+
+DISP_TITLE_LOADS = 'Factored load'
+KEY_AXIAL = 'Load.Axial'
+KEY_DISP_AXIAL = 'Axial (kN) *'
+VALUES_AXIAL = ['Minimum','Customized']
+
+# Key for storing Diameter sub-key of Bolt
+KEY_D = 'Bolt.Diameter'
+KEY_DISP_D = 'Diameter(mm)*'
+VALUES_D = ['All', 'Customized']
+
+# Key for storing Type sub-key of Bolt
+KEY_TYP = 'Bolt.Type'
+KEY_DISP_TYP = 'Type *'
+TYP_BEARING = "Bearing Bolt"
+TYP_FRICTION_GRIP = "Friction Grip Bolt"
+VALUES_TYP = ['Select Type', TYP_FRICTION_GRIP, TYP_BEARING]
+VALUES_TYP_1 = ['Friction Grip Bolt']
+VALUES_TYP_2 = ['Bearing Bolt']
+
+# Key for storing Grade sub-key of Bolt
+KEY_GRD = 'Bolt.Grade'
+KEY_DISP_GRD = 'Grade *'
+VALUES_GRD = ['All', 'Customized']
+VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+
+
+DISP_TITLE_PLATE = 'Plate'
+KEY_PLATETHK = 'Plate.Thickness'
+VALUES_PLATETHK = ['All', 'Customized']
+VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+
+
+
 

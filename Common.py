@@ -299,6 +299,8 @@ KEY_DISP_FY = 'Yield Strength , fy (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
 DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
 DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
+DISP_THROAT = 'Throat Thickness (mm)'
+DISP_EFF = 'Effective Length (mm)'
 DISP_WELD_STRENGTH = 'Weld Strength (kN/mm)'
 ###################################
 # Key for Storing Module
@@ -1024,7 +1026,6 @@ KEY_DISP_ANGLE_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <
 KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
-KEY_OUT_DISP_DIA_PROVIDED = 'Diameter(d) (mm)'
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
@@ -1032,7 +1033,7 @@ KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
 KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
-KEY_DISP_BOLT_HOLE = 'Bolt Hole Diameter(d0) (mm)'
+KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
@@ -1109,7 +1110,7 @@ KEY_OUT_SPTNG_MIN_EDGE_DIST = 'Cleat.Sptng_leg.MinEdgeDist'
 KEY_OUT_SPTNG_MAX_EDGE_DIST = 'Cleat.Sptng_leg.MaxEdgeDist'
 
 
-
+KEY_OUT_DISP_PLATETHK_REP = 'Thickness (tp) (mm)'
 KEY_OUT_PLATETHK = 'Plate.Thickness'
 KEY_OUT_DISP_PLATETHK = 'Thickness (mm)'
 KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
@@ -1236,9 +1237,9 @@ VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
 
 #Design Report Strings
-DISP_NUM_OF_BOLTS = 'No of Bolts (n)'
-DISP_NUM_OF_ROWS = 'No of Rows (nr)'
-DISP_NUM_OF_COLUMNS = 'No of Columns (nc)'
+DISP_NUM_OF_BOLTS = 'No of Bolts'
+DISP_NUM_OF_ROWS = 'No of Rows'
+DISP_NUM_OF_COLUMNS = 'No of Columns'
 
 
 def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):

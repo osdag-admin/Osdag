@@ -761,7 +761,7 @@ class Weld(Material):
 
     def weld_size(self, plate_thickness, member_thickness, edge_type = "Square"):
 
-        max_weld_thickness = int(min(plate_thickness, member_thickness))
+        max_weld_thickness = (min(plate_thickness, member_thickness))
         if plate_thickness<=10:
             min_weld_thickness = 3
         elif plate_thickness>=10 and plate_thickness<=20:

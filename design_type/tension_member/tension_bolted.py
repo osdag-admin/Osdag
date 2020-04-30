@@ -2070,8 +2070,7 @@ class Tension_bolted(Main):
         t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=plate_blockshear_kn), '')
         self.report_check.append(t4)
 
-        t8 = (
-        KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
+        t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
         get_pass_fail(self.load.axial_force, self.plate_tension_capacity, relation="lesser"))
         self.report_check.append(t8)
 

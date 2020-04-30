@@ -250,10 +250,7 @@ class OsdagMainWindow(QMainWindow):
                                                                 ('End Plate Connection','ResourceFiles/images/endplate.png','B2B_End_Plate_Connection'),
                                                                 self.show_moment_connection,
                                                                     ],
-                                                    'Beam to Column' :[
-                                                                ('End Plate Connection','ResourceFiles/images/beam_column_endplate.png','B2C_End_Plate_Connection'),
-                                                                self.show_base_plate,
-                                                                      ],
+                                                    'Beam to Column': self.Under_Development,
                                                     'Column to Column' :[
                                                                 ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
@@ -262,7 +259,10 @@ class OsdagMainWindow(QMainWindow):
                                                                     ],
                                                     'PEB' : self.Under_Development,
                                                     },
-                                'Base Plate': self.Under_Development,
+                                'Base Plate':[
+                                        ('Base Plate', 'ResourceFiles/images/BasePlate.jpeg', 'Base_Plate'),
+                                        self.show_base_plate,
+                                            ],
                                 'Truss Connection' : self.Under_Development,
                                 },
                 'Tension Member' : [
@@ -594,12 +594,12 @@ class OsdagMainWindow(QMainWindow):
         #         except OSError:
         #             shutil.rmtree(os.path.join(folder, create_folder))
         #             os.mkdir(os.path.join(root_path, create_folder))
-
-        self.hide()
-        self.ui2 = Ui_ModuleWindow()
-        self.ui2.setupUi(self.ui2, BasePlateConnection, ' ')
-        self.ui2.show()
-        self.ui2.closed.connect(self.show)
+        if self.findChild(QRadioButton, 'Base_Plate').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, BasePlateConnection, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
 
     def show_moment_connection_cc(self):
         # folder = self.select_workspace_folder()

@@ -794,6 +794,8 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setObjectName(option[0] + "_label")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                 out_layout2.addWidget(l, j, 1, 1, 1)
+                if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
+                    l.setVisible(False)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents_out)
@@ -804,7 +806,10 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+                r.setReadOnly(True)
                 out_layout2.addWidget(r, j, 2, 1, 1)
+                if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
+                    r.setVisible(False)
 
             if type == TYPE_OUT_BUTTON:
                 v = option[3]
@@ -1343,7 +1348,7 @@ class Ui_ModuleWindow(QMainWindow):
             (object_name, k2_key, typ, f) = tup
             if object_name != k1.objectName():
                 continue
-            if typ == TYPE_LABEL:
+            if typ in [TYPE_LABEL, TYPE_OUT_LABEL]:
                 k2_key = k2_key + "_label"
             k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
             if object_name not in [KEY_END2, KEY_SEC_PROFILE]:
@@ -1351,11 +1356,15 @@ class Ui_ModuleWindow(QMainWindow):
                 k2.clear()
             elif object_name == KEY_SEC_PROFILE:
                 val = f(k1.currentText())
-                k2.setCurrentIndex(0)
-            elif object_name == KEY_END2:
+            else:
                 key_end1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_END1)
                 val = f(k1.currentText(), key_end1.currentText())
-                k2.clear()
+
+            # if object_name not in [KEY_SEC_PROFILE, KEY_WELD_TYPE, KEY_CONN]:
+            #     k2.clear()
+            if object_name == KEY_SEC_PROFILE:
+                k2.setCurrentIndex(0)
+
             if typ == TYPE_COMBOBOX:
                 k2.clear()
                 for values in val:
@@ -1380,6 +1389,11 @@ class Ui_ModuleWindow(QMainWindow):
                     k2.setEnabled(True)
                 else:
                     k2.setDisabled(True)
+            elif typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
+                if val:
+                    k2.setVisible(False)
+                else:
+                    k2.setVisible(True)
             else:
                 pass
 
@@ -1676,6 +1690,11 @@ class Ui_ModuleWindow(QMainWindow):
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
+                    if option[0] in [KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DETAILING_GAUGE_DISTANCE]:
+                        txt.setVisible(True if option[3] else False)
+                        txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
+                        txt_label.setVisible(True if option[3] else False)
+
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
@@ -2084,12 +2103,18 @@ class Ui_ModuleWindow(QMainWindow):
         tab_Detailing = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
         tab_Design = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
         tab_Connector = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
+        tab_Anchor_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
+        tab_Base_Plate = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Base Plate")
 
         table_1 = "Columns"
         table_2 = "Beams"
         material_grade = key_4.currentText()
         material = Material(material_grade)
-        tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
+
+        if module != KEY_DISP_BASE_PLATE:
+            tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
+        # else:
+        #     tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
         tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
 
 
@@ -2186,6 +2211,7 @@ class Ui_ModuleWindow(QMainWindow):
             self.designPrefDialog.anchor_bolt_preferences(anchor_dia, anchor_typ)
             bp_material = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_MATERIAL)
             bp_material.setText(str(material_grade))
+            bp_material.setReadOnly(True)
             bp_fu = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FU)
             bp_list.append(bp_fu)
             bp_fu.setText(str(material.fu))

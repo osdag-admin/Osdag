@@ -37,11 +37,13 @@ class ColumnCoverPlate(MomentConnection):
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        handler = OurLog(key)
-        handler.setLevel(logging.WARNING)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+
+        if key is not None:
+            handler = OurLog(key)
+            handler.setLevel(logging.WARNING)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def input_values(self, existingvalues={}):
 
@@ -169,6 +171,20 @@ class ColumnCoverPlate(MomentConnection):
         # options_list.append(t14)
 
         return options_list
+
+    def customized_input(self):
+
+        list1 = []
+        t1 = (KEY_GRD, self.grdval_customized)
+        list1.append(t1)
+        t3 = (KEY_D, self.diam_bolt_customized)
+        list1.append(t3)
+        t4 = (KEY_WEBPLATE_THICKNESS, self.plate_thick_customized)
+        list1.append(t4)
+        t5 = (KEY_FLANGEPLATE_THICKNESS, self.plate_thick_customized)
+        list1.append(t5)
+
+        return list1
 
     def flangespacing(self, flag):
 
@@ -422,6 +438,7 @@ class ColumnCoverPlate(MomentConnection):
         return out_list
 
     def func_for_validation(self, window, design_dictionary):
+        all_errors = []
         self.design_status = False
         flag = False
 
@@ -437,8 +454,8 @@ class ColumnCoverPlate(MomentConnection):
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -446,7 +463,7 @@ class ColumnCoverPlate(MomentConnection):
         if flag:
             self.set_input_values(self, design_dictionary)
         else:
-            pass
+            all_errors
 
     def warn_text(self):
 
@@ -552,7 +569,8 @@ class ColumnCoverPlate(MomentConnection):
         self.web_plate = Plate(thickness=design_dictionary.get(KEY_WEBPLATE_THICKNESS, None),
                                material_grade=design_dictionary[KEY_MATERIAL],
                                gap=design_dictionary[KEY_DP_DETAILING_GAP])
-    
+
+
 
         self.member_capacity(self)
         # self.hard_values(self)
@@ -2897,4 +2915,3 @@ class ColumnCoverPlate(MomentConnection):
         print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)
-

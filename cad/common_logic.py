@@ -12,7 +12,6 @@ from cad.items.plate import Plate
 from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
 from cad.items.angle import Angle
-from PyQt5.QtWidgets import QMainWindow
 
 from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -419,6 +418,7 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
         if self.connection == "Fin Plate":  # finColWebBeamWeb
+            gap = A.plate.gap
             nut_space = A.supported_section.web_thickness + int(A.plate.thickness_provided) + nut_T
             nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colwebconn = FinColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
@@ -941,5 +941,3 @@ class CommonDesignLogic(object):
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
 
         return final_model
-
-

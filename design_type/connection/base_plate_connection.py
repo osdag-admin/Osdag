@@ -252,10 +252,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        handler = OurLog(key)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+
+        if key is not None:
+            handler = OurLog(key)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def module_name(self):
         """
@@ -509,6 +511,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         return list1
 
     def func_for_validation(self, window, design_dictionary):
+        all_errors = []
         self.design_status = False
         flag = False
         option_list = self.input_values(self)
@@ -529,8 +532,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    generate_missing_fields_error_string(missing_fields_list))
+            error = self.generate_missing_fields_error_string(self,missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -540,7 +543,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # self.set_input_values(self, design_dictionary)
             self.bp_parameters(self, design_dictionary)
         else:
-            pass
+            all_errors
+
+
 
     def tab_list(self):
         self.design_button_status = False

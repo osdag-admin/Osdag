@@ -166,6 +166,16 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         return options_list
 
+    def customized_input(self):
+
+        list1 = []
+        t4 = (KEY_WEBPLATE_THICKNESS, self.plate_thick_customized)
+        list1.append(t4)
+        t5 = (KEY_FLANGEPLATE_THICKNESS, self.plate_thick_customized)
+        list1.append(t5)
+
+        return list1
+
     # def flangespacing(self, flag):
     #
     #     flangespacing = []
@@ -1695,5 +1705,3 @@ class ColumnCoverPlateWeld(MomentConnection):
         #     self.moment_flange = ((self.load.moment * 1000000) - moment_web) / 1000000
         #     flange_force = (((self.moment_flange * 1000000) / (self.section.depth - self.section.flange_thickness)) + (
         #         axial_force_f))
-
-

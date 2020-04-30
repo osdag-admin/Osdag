@@ -19,7 +19,7 @@ from utils.common.common_calculation import *
 class Bolt(Material):
 
     def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="",
-                 edge_type="", mu_f=0.0, corrosive_influences=True):
+                 edge_type="", mu_f=0.0, corrosive_influences=True, bolt_tensioning=""):
         super(Bolt, self).__init__(material_grade)
         if grade is not None:
             self.bolt_grade = list(np.float_(grade))
@@ -31,6 +31,7 @@ class Bolt(Material):
         self.bolt_hole_type = bolt_hole_type
         self.edge_type = edge_type
         self.mu_f = float(mu_f)
+        self.bolt_tensioning = bolt_tensioning
 
         self.d_0 = 0.0
         self.kb = 0.0
@@ -144,7 +145,7 @@ class Bolt(Material):
             if t_fu <= t_fu_prev:
                 thk_considered = i[0]
                 fu_considered = i[1]
-
+        self.d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(self.bolt_diameter_provided, self.bolt_hole_type)
         if self.bolt_type == "Bearing Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
@@ -163,7 +164,7 @@ class Bolt(Material):
             safety_factor_parameter = KEY_DP_WELD_FAB_FIELD
             # Since field or shop both is 1.25 we are not taking safety_factor_parameter as input
 
-            self.d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
+
             if p > 0.0:
                 self.kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, f_ub / f_u, 1.0)
             else:
@@ -174,6 +175,15 @@ class Bolt(Material):
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, n_e=n_planes, mu_f=self.mu_f, bolt_hole_type=self.bolt_hole_type)
             self.bolt_bearing_capacity = VALUE_NOT_APPLICABLE
             self.bolt_capacity = self.bolt_shear_capacity
+
+    def calculate_kb(self, e,p,d_0,f_ub,f_u):
+
+        if p > 0.0:
+            kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, f_ub / f_u, 1.0)
+        else:
+            kb = min(e / (3.0 * self.d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
+
+        return kb
 
 
     def calculate_bolt_tension_capacity(self, bolt_diameter_provided, bolt_grade_provided):
@@ -433,6 +443,8 @@ class Section(Material):
             self.beta = self.beta
         else:
             self.beta = 0.7
+
+        self.beta = round(self.beta,2)
 
         T_dn = (0.9 * A_nc * F_u / gamma_m1) + (self.beta * A_go * F_y / gamma_m0)
         # w = str(w)
@@ -733,10 +745,16 @@ class Weld(Material):
         weld_strength = round(f_wd * self.throat_tk,2)
         self.strength = weld_strength
 
-    def get_weld_stress(self,weld_shear =0.0, weld_axial=0.0, weld_twist=0.0, Ip_weld=1.0, y_max=0.0, x_max=0.0, l_weld=0.0):
-        T_wh = weld_twist * y_max/Ip_weld
-        T_wv = weld_twist * x_max/Ip_weld
-        V_wv = weld_shear /l_weld
+
+    def get_weld_stress(self,weld_shear, weld_axial, l_weld, weld_twist=0.0, Ip_weld=None, y_max=0.0, x_max=0.0):
+        if weld_twist != 0.0:
+            T_wh = weld_twist * y_max/Ip_weld
+            T_wv = weld_twist * x_max/Ip_weld
+        else:
+            T_wh = 0.0
+            T_wv = 0.0
+        V_wv = weld_shear/l_weld
+
         A_wh = weld_axial/l_weld
         weld_stress = round(math.sqrt((T_wh+A_wh)**2 + (T_wv+V_wv)**2),2)
         self.stress = weld_stress
@@ -770,7 +788,6 @@ class Weld(Material):
             weld_thickness =16
         else:
             pass
-
         self.size = weld_thickness
         self.reason = weld_reason
 
@@ -853,9 +870,9 @@ class Plate(Material):
             height = max(web_plate_h_min, self.get_web_plate_h_req (bolts_one_line, gauge, edge_dist))
             return bolt_line, bolts_one_line, height
         else:
-            bolt_line= 0
-            bolts_one_line=0
-            height=0
+            bolt_line = 0
+            bolts_one_line = 0
+            height = 0
             return bolt_line, bolts_one_line, height
 
 
@@ -1096,7 +1113,8 @@ class Plate(Material):
                 # Length of plate is increased for calculated bolts in one line.
                 # This increases spacing which decreases resultant force
                 print(4, web_plate_h, web_plate_h_max)
-                if web_plate_h + 10 <= web_plate_h_max:
+                if web_plate_h + 10 <= web_plate_h_max and shear_ecc is True and gauge!=0:
+                # gauge is recalculated only if there is shear ecc or else increase in bolt is the only option
                     web_plate_h += 10
                     print("boltdetails2", bolt_line, bolts_one_line, web_plate_h)
                 # If height cannot be increased number of bolts is increased by 1 and loop is repeated

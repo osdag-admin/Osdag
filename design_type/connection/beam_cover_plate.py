@@ -160,6 +160,21 @@ class BeamCoverPlate(MomentConnection):
 
         return options_list
 
+    def customized_input(self):
+
+        list1 = []
+        t1 = (KEY_GRD, self.grdval_customized)
+        list1.append(t1)
+        t3 = (KEY_D, self.diam_bolt_customized)
+        list1.append(t3)
+        t4 = (KEY_WEBPLATE_THICKNESS, self.plate_thick_customized)
+        list1.append(t4)
+        t5 = (KEY_FLANGEPLATE_THICKNESS, self.plate_thick_customized)
+        list1.append(t5)
+
+        return list1
+
+
     def flangespacing(self, flag):
 
         flangespacing = []
@@ -449,7 +464,7 @@ class BeamCoverPlate(MomentConnection):
             logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
-  
+
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
@@ -623,7 +638,7 @@ class BeamCoverPlate(MomentConnection):
         self.design_status = True
 
     def member_capacity(self):
-    
+
         if self.section.type == "Rolled":
             length = self.section.depth
         else:
@@ -695,12 +710,12 @@ class BeamCoverPlate(MomentConnection):
             Z_w = self.Z_p
         elif self.class_of_section == 3:
             Z_w = self.Z_e
-       
+
         if self.class_of_section == 1 or self.class_of_section ==2:
             self.beta_b = 1
         elif self.class_of_section == 3:
             self.beta_b = self.Z_e / self.Z_p
-     
+
         self.section.plastic_moment_capacty(beta_b = self.beta_b, Z_p = self.Z_p, fy= self.section.fy) # N # for section #todo add in ddcl
         self.section.moment_d_deformation_criteria(fy= self.section.fy,Z_e = self.section.elast_sec_mod_z)
         # todo add in ddcl
@@ -739,7 +754,7 @@ class BeamCoverPlate(MomentConnection):
         self.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
             A_v=A_v_web, fy=self.section.fy)
 
-       
+
         print("tension_yielding_capacity_web", self.tension_yielding_capacity_web)
 
         if self.tension_yielding_capacity_web >  self.axial_force_w :

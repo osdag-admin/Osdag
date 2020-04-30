@@ -84,12 +84,12 @@ class Tension_welded(Main):
 
         t1 = (KEY_SECSIZE, self.fn_profile_section)
         c_lst.append(t1)
-        t2 = (KEY_GRD, self.grdval_customized)
-        c_lst.append(t2)
-        t3 = (KEY_D, self.diam_bolt_customized)
-        c_lst.append(t3)
-        t4 = (KEY_PLATETHK, self.plate_thick_customized)
-        c_lst.append(t4)
+        # t2 = (KEY_GRD, self.grdval_customized)
+        # c_lst.append(t2)
+        # t3 = (KEY_D, self.diam_bolt_customized)
+        # c_lst.append(t3)
+        # t4 = (KEY_PLATETHK, self.plate_thick_customized)
+        # c_lst.append(t4)
         # t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
         # c_lst.append(t5)
 

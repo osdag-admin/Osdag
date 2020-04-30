@@ -2,9 +2,6 @@ Bolt.Diameter:
 - '12'
 - '16'
 - '20'
-- '24'
-- '30'
-- '36'
 Bolt.Grade:
 - '3.6'
 - '4.6'
@@ -28,12 +25,12 @@ DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
 DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-Load.Axial: '30'
-Load.Shear: '30'
-Member.Material: E 250 (Fe 410 W)B
-Member.Supported_Section: LB 300
+Load.Axial: '80'
+Load.Shear: '200'
+Member.Material: E 250 (Fe 410 W)A
+Member.Supported_Section: MB 350
 Member.Supported_Section.Material: E 250 (Fe 410 W)A
-Member.Supporting_Section: PBP 300X222.9
+Member.Supporting_Section: PBP 360X133
 Member.Supporting_Section.Material: E 250 (Fe 410 W)A
 Module: Fin Plate
 Plate.Material: E 250 (Fe 410 W)A

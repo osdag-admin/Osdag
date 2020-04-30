@@ -238,7 +238,7 @@ class CommonDesignLogic(object):
             # A = CleatAngleConnection()
 
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
-                          R1=A.cleat.r1, R2=A.cleat.r2)
+                          R1=A.cleat.root_radius, R2=A.cleat.toe_radius)
         else:
             pass
 
@@ -469,7 +469,7 @@ class CommonDesignLogic(object):
         elif self.connection == KEY_DISP_CLEATANGLE:
             # A = CleatAngleConnection()
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
-                          R1=A.cleat.r1, R2=A.cleat.r2)
+                          R1=A.cleat.root_radius, R2=A.cleat.toe_radius)
         else:
             pass
 

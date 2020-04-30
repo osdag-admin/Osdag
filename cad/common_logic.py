@@ -238,7 +238,7 @@ class CommonDesignLogic(object):
             # A = CleatAngleConnection()
 
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
-                          R1=A.cleat.r1, R2=A.cleat.r2)
+                          R1=A.cleat.root_radius, R2=A.cleat.toe_radius)
         else:
             pass
 
@@ -419,6 +419,7 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
         if self.connection == "Fin Plate":  # finColWebBeamWeb
+            gap =self.plate.gap
             nut_space = A.supported_section.web_thickness + int(A.plate.thickness_provided) + nut_T
             nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colwebconn = FinColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
@@ -468,7 +469,7 @@ class CommonDesignLogic(object):
         elif self.connection == KEY_DISP_CLEATANGLE:
             # A = CleatAngleConnection()
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
-                          R1=A.cleat.r1, R2=A.cleat.r2)
+                          R1=A.cleat.root_radius, R2=A.cleat.toe_radius)
         else:
             pass
 

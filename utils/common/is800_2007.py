@@ -121,9 +121,21 @@ class IS800_2007(object):
         # TODO
         # pass
 
+    @staticmethod
     def cl_8_2_1_2_design_moment_strength(beta_b, Z_p, f_y, gamma_m0):
         M_d = beta_b * Z_p * f_y / gamma_m0
         return M_d
+
+    @staticmethod
+    def cl_8_7_1_3_stiff_bearing_length(shear_force, web_thickness, flange_thickness, root_radius, fy):
+        #     This function returns the stiff bearing length, b1 for web local yielding and web crippling check
+        #     Minimum value of b1 is not defined in IS 800, reference has been made to AISC for such cases (CL. J10-2)
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+        bearing_length = round((float(shear_force) * 1000) * gamma_m0 / web_thickness / fy, 3)
+        b1_req = bearing_length - (flange_thickness + root_radius)
+        k = flange_thickness + root_radius
+        b1 = min(b1_req, k)
+        return b1
 
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """

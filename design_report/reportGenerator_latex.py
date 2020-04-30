@@ -125,9 +125,13 @@ class CreateLatex(Document):
                             (MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
                         table.add_hline()
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        doc.append(NewPage())
+        count = 0
         with doc.create(Section('Design Checks')):
             for check in Design_Check:
                 if check[0] == 'SubSection':
+                    if count >=1:
+                        doc.append(NewPage())
                     with doc.create(Subsection(check[1])):
                         with doc.create(LongTable(check[2], row_height=1.2)) as table: # todo anjali remove
                             table.add_hline()
@@ -135,6 +139,7 @@ class CreateLatex(Document):
                             table.add_hline()
                             table.end_table_header()
                             table.add_hline()
+                            count = count + 1
                 else:
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()

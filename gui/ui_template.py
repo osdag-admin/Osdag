@@ -1695,9 +1695,12 @@ class Ui_ModuleWindow(QMainWindow):
                 module_class = CleatAngleConnection
             elif self.design_inputs[KEY_MODULE] == KEY_DISP_BEAMCOVERPLATE:
                 module_class = BeamCoverPlate
+            elif self.design_inputs[KEY_MODULE] == KEY_DISP_ENDPLATE:
+                module_class = EndPlateConnection
 
 
-            if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE or main.module == KEY_DISP_CLEATANGLE):
+            if status is True and (main.module == KEY_DISP_FINPLATE or main.module == KEY_DISP_BEAMCOVERPLATE
+                                   or main.module == KEY_DISP_CLEATANGLE or main.module == KEY_DISP_ENDPLATE):
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)

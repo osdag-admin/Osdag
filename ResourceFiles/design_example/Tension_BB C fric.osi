@@ -16,7 +16,8 @@ Bolt.Grade:
 - '9.8'
 - '10.9'
 - '12.9'
-Bolt.Type: Bearing Bolt
+Bolt.Type: Friction Grip Bolt
+Conn_Location: Web
 DesignPreferences.Bolt.Bolt_Hole_Type: Standard
 DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
 DesignPreferences.Bolt.Slip_Factor: '0.3'
@@ -24,27 +25,16 @@ DesignPreferences.Design.Design_Method: Limit State Design
 DesignPreferences.Detailing.Corrosive_Influences: 'No'
 DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
 DesignPreferences.Detailing.Gap: '10'
+DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-DesignPreferences.Weld.Type: Shop Weld
-Flange_Plate.Preferences: Outside
-Load.Axial: '200'
-Load.Moment: '20'
-Load.Shear: '20'
+Length(mm): '4000'
+Load.Axial: '600'
 Member.Material: E 250 (Fe 410 W)A
-Module: Column Coverplate Connection
-Section Size: HB 450
-Web_Plate.thickness_provided: &id001
-- '6'
-- '8'
-- '10'
-- '12'
-- '14'
-- '16'
-- '18'
-- '20'
-- '22'
-- '24'
-- '26'
-- '28'
-- '30'
-flange_plate.thickness_provided: *id001
+Member.Profile: Back to Back Channels
+Module: Tension Members Bolted Design
+Section Size:
+- JC 100
+- JC 125
+- JC 150
+- JC 175
+- JC 200

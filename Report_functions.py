@@ -361,6 +361,22 @@ def min_weld_size_req(conn_plates_weld,min_weld_size):
     min_weld_size_eqn.append(NoEscape(r'IS800:2007~cl.10.5.2.3~Table 21,&\\ t_{w_{min}} &=' + weld_min + r'\end{aligned}'))
     return min_weld_size_eqn
 
+
+def min_weld_size_req_01(conn_plates_weld, red, min_weld_size):
+    # t1 = str(conn_plates_weld[0])
+    # t2 = str(conn_plates_weld[0])
+    tmax = min(conn_plates_weld)
+    tmin = int (tmax - red)
+    tmin = str(tmin)
+    tmax= str(tmax)
+    weld_min = str(min_weld_size)
+
+    min_weld_size_eqn = Math(inline=True)
+    min_weld_size_eqn.append(NoEscape(r'\begin{aligned} & t_{w_{min}} based on thinner part \\'))
+    min_weld_size_eqn.append(NoEscape(r'&='+tmax+ 'or' +tmin+ r'\\'))
+    min_weld_size_eqn.append(NoEscape(r'&IS800:2007~cl.10.5.2.3~Table 21,&\\ t_{w_{min}} based on thicker part=' + weld_min + r'\end{aligned}'))
+    return min_weld_size_eqn
+
 def max_weld_size_req(conn_plates_weld,max_weld_size):
     t1 = str(conn_plates_weld[0])
     t2 = str(conn_plates_weld[0])
@@ -677,7 +693,7 @@ def gusset_lt_b_prov(nc,p,e,length):
     length_htb_eqn.append(NoEscape(r'&= ' + length + r'\end{aligned}'))
     return length_htb_eqn
 
-def gusset_lt_w(weld,cls,length):
+def gusset_lt_w_prov(weld,cls,length):
     weld = str(weld)
     cls = str(cls)
     length = str(length)

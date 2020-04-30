@@ -1101,6 +1101,8 @@ class Tension_bolted(Main):
 
         [max_force,length] = self.max_force_length(self, design_dictionary)
 
+        member_design = False
+
         "Loop checking each member from sizelist based on yield capacity"
 
         for selectedsize in self.sizelist:
@@ -1184,7 +1186,6 @@ class Tension_bolted(Main):
                     # print(self.section_size.tension_yielding_capacity)
 
                 "condition for yield and slenderness check "
-                member_design = False
 
                 if (self.section_size.tension_yielding_capacity >= self.load.axial_force*1000) and self.section_size.slenderness < 400:
                     min_yield_current = self.section_size.tension_yielding_capacity

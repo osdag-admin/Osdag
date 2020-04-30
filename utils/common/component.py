@@ -790,6 +790,8 @@ class Weld(Material):
             pass
         self.size = weld_thickness
         self.reason = weld_reason
+        self.red = red
+        self.min_weld = min_weld_thickness
 
 class Plate(Material):
 

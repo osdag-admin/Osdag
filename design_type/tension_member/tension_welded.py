@@ -1047,7 +1047,7 @@ class Tension_welded(Main):
         min_yield = 0
         [max_force,length] = self.max_force_length(self, design_dictionary)
         print(self.max_member_force,"dg")
-
+        member_design = False
         "Loop checking each member from sizelist based on yield capacity"
 
         for selectedsize in self.sizelist:
@@ -1102,6 +1102,7 @@ class Tension_welded(Main):
 
                 if (self.section_size.tension_yielding_capacity >=self.load.axial_force *1000) and self.section_size.slenderness < 400:
                     min_yield_current = self.section_size.tension_yielding_capacity
+                    member_design = True
                     if min_yield == 0:
                         min_yield = min_yield_current
                         self.section_size_1 = self.select_section(self, design_dictionary, selectedsize)
@@ -1179,8 +1180,12 @@ class Tension_welded(Main):
                 else:
                     pass
 
-        if (self.load.axial_force *1000 > max_force) or self.length > length:
-            pass
+
+        if member_design == False:
+            logger.info(" : Tension force or Slenderness value exceeds the limit for maximum available member size.")
+            logger.error(": Design is not safe. \n ")
+            logger.debug(" :=========End Of design===========")
+
         else:
             print("pass")
             self.design_status = True
@@ -1272,7 +1277,7 @@ class Tension_welded(Main):
         self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu,self.weld.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.res_force))
 
         self.weld_plate_length(self, design_dictionary,"web_weld")
-        self.weld.get_weld_stress(weld_axial=self.res_force, l_weld=self.weld.effective)
+        self.weld.get_weld_stress(weld_shear=0,weld_axial=self.res_force, l_weld=self.weld.effective)
         # print(self.plate.length, self.weld.throat, "xfsf")
         if self.plate.length > (150 * self.weld.throat) and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             logger.info(" To avoid Long Joint Limit, weld is provided only on the flanges.")
@@ -1281,7 +1286,7 @@ class Tension_welded(Main):
                                    weld_fabrication=self.weld.fabrication, t_weld=self.weld.size,
                                    force=(self.res_force))
             self.weld_plate_length(self, design_dictionary)
-            self.weld.get_weld_stress(weld_axial=self.res_force, l_weld=self.weld.effective)
+            self.weld.get_weld_stress(weld_shear=0,weld_axial=self.res_force, l_weld=self.weld.effective)
 
         # "Check for long joint"
         # if self.plate.length > (150 * self.weld.throat):
@@ -1295,7 +1300,7 @@ class Tension_welded(Main):
 
             self.weld.strength = Btw * self.weld.strength
             # self.weld.effective = (self.load.axial_force * 1000 / self.weld.strength)
-            self.weld.get_weld_stress(weld_axial = self.res_force, l_weld = self.weld.length)
+            self.weld.get_weld_stress(weld_shear=0,weld_axial = self.res_force, l_weld = self.weld.length)
 
             if self.weld.strength> self.weld.stress or Btw <= 0.6:
                 self.weld_plate_length(self, design_dictionary)
@@ -1662,6 +1667,7 @@ class Tension_welded(Main):
             multiple = 2
         else:
             multiple =1
+        self.weld_connecting_plates = [self.plate.thickness_provided,self.thick]
 
 
         t1 = ('SubSection', 'Member Checks', '|p{3cm}|p{5cm}|p{7cm}|p{1cm}|')
@@ -1674,23 +1680,38 @@ class Tension_welded(Main):
         # self.report_check.append(t4)
         t8 = (KEY_DISP_TENSION_CAPACITY, '', tensile_capacity_prov(member_yield_kn, member_rupture_kn, None),get_pass_fail(self.load.axial_force,self.section_size_1.tension_capacity, relation="lesser"))
         self.report_check.append(t8)
-        t5 = (KEY_DISP_SLENDER, slenderness_limit(), slenderness( 1, self.length,round(self.section_size_1.min_radius_gyration,2), self.section_size_1.slenderness), '')
+        t5 = (KEY_DISP_SLENDER, slenderness_req(), slenderness_prov( 1, self.length,round(self.section_size_1.min_radius_gyration,2), self.section_size_1.slenderness), '')
         self.report_check.append(t5)
-        t6 = (KEY_DISP_EFFICIENCY, efficiency_limit(),
-              efficiency(self.load.axial_force, self.section_size_1.tension_capacity, self.efficiency), '')
+        t6 = (KEY_DISP_EFFICIENCY, efficiency_req(),
+              efficiency_prov(self.load.axial_force, self.section_size_1.tension_capacity, self.efficiency), '')
         self.report_check.append(t6)
 
-        t7 = ('SubSection', 'Bolt Checks', '|p{3cm}|p{5cm}|p{7cm}|p{1cm}|')
+        t7 = ('SubSection', 'Weld Checks', '|p{3cm}|p{5cm}|p{7cm}|p{1cm}|')
         self.report_check.append(t7)
+
+        weld_thickness = round_down((min(self.weld_connecting_plates) - self.red), 1, 3)
+        if weld_thickness < self.weld.min_weld:
+            weld_thickness = int(min(self.weld_connecting_plates))
+        else:
+            pass
+
+        t1 = (DISP_MIN_WELD_SIZE, min_weld_size_req_01(self.weld_connecting_plates, self.weld.red, self.weld.min_weld), self.weld.size,
+              get_pass_fail(weld_thickness, self.weld.size, relation="leq"))
+        self.report_check.append(t1)
+        # t1 = (DISP_MAX_WELD_SIZE, max_weld_size_req(self.weld_connecting_plates, self.weld_size_max), self.weld.size,
+        #       get_pass_fail(self.weld_size_min, self.weld.size, relation="geq"))
 
 
 
         t7 = ('SubSection', 'Gusset Plate Checks', '|p{3cm}|p{5cm}|p{7cm}|p{1cm}|')
         self.report_check.append(t7)
 
+
+
+
         self.clearance =  max((4 * self.weld.size),30)
         if self.sec_profile in ["Channels", 'Back to Back Channels']:
-            t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
+            t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                   tension_yield_prov(l = self.section_size_1.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), '')
             t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_welded_prov(self.section_size_1.depth, self.plate.thickness_provided,self.plate.fu, gamma_m1,plate_rupture_kn), '')
@@ -1698,7 +1719,7 @@ class Tension_welded(Main):
         elif self.sec_profile in ["Angles", 'Back to Back Angles']:
             if self.loc == "Long Leg":
                 t3 = (KEY_OUT_DISP_PLATE_HEIGHT, '',
-                      gusset_ht(self.section_size_1.depth, self.clearance, self.plate.height, 1), "")
+                      gusset_ht_prov(self.section_size_1.depth, self.clearance, self.plate.height, 1), "")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
                                          gamma=gamma_m0, T_dg =plate_yield_kn), '')
@@ -1708,7 +1729,7 @@ class Tension_welded(Main):
 
 
             else:
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
+                t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=self.section_size_1.min_leg, t=self.plate.thickness_provided,
                                          f_y=self.plate.fy,
@@ -1719,7 +1740,7 @@ class Tension_welded(Main):
 
         else:
             if self.loc == "Long Leg":
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
+                t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=2*self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
                                          gamma=gamma_m0, T_dg=plate_yield_kn), '')
@@ -1729,7 +1750,7 @@ class Tension_welded(Main):
 
             else:
                 t3 = (KEY_OUT_DISP_PLATE_HEIGHT, '',
-                      gusset_ht(self.section_size_1.depth, self.clearance, self.plate.height, 1), "")
+                      gusset_ht_prov(self.section_size_1.depth, self.clearance, self.plate.height, 1), "")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=2*self.section_size_1.min_leg, t=self.plate.thickness_provided,
                                          f_y=self.plate.fy,
@@ -1740,7 +1761,7 @@ class Tension_welded(Main):
 
         self.report_check.append(t3)
         t4 = (KEY_OUT_DISP_PLATE_LENGTH, '',
-              gusset_lt_w(self.flange_weld, self.clearance,self.plate.length), "")
+              gusset_lt_w_prov(self.flange_weld, self.clearance,self.plate.length), "")
         self.report_check.append(t4)
 
         self.report_check.append(t2)

@@ -637,8 +637,7 @@ class Ui_ModuleWindow(QMainWindow):
                         data[t[0] + "_customized"] = t[1]()
                 else:
                     data[t[0] + "_customized"] = t[1]()
-            print('data',data)
-            print('newlist',new_list)
+
             try:
                 d.get(new_list[0][0]).activated.connect(lambda: popup(d.get(new_list[0][0]), new_list))
                 d.get(new_list[1][0]).activated.connect(lambda: popup(d.get(new_list[1][0]), new_list))
@@ -740,9 +739,9 @@ class Ui_ModuleWindow(QMainWindow):
 # OUTPUT DOCK
 #############
         """
-        
-        @author: Umair 
-        
+
+        @author: Umair
+
         """
 
         self.outputDock = QtWidgets.QDockWidget(MainWindow)
@@ -1384,7 +1383,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     # Function for Reset Button
     '''
-    @author: Umair, Amir 
+    @author: Umair, Amir
     '''
 
     def reset_fn(self, op_list, out_list, new_list, data):
@@ -1430,7 +1429,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for Design Button
     '''
-    @author: Umair 
+    @author: Umair
     '''
 
     def design_fn(self, op_list, data_list):
@@ -1529,7 +1528,7 @@ class Ui_ModuleWindow(QMainWindow):
         # main.set_input_values(main, design_dictionary)
 # Function for saving inputs in a file
     '''
-    @author: Umair 
+    @author: Umair
     '''
     def saveDesign_inputs(self):
         fileName, _ = QFileDialog.getSaveFileName(self,
@@ -1567,7 +1566,7 @@ class Ui_ModuleWindow(QMainWindow):
             return CleatAngleConnection
 # Function for getting inputs from a file
     '''
-    @author: Umair 
+    @author: Umair
     '''
 
     def loadDesign_inputs(self, op_list, data, new, main):
@@ -1579,7 +1578,7 @@ class Ui_ModuleWindow(QMainWindow):
             with open(in_file, 'r') as fileObject:
                 uiObj = yaml.load(fileObject)
             module = uiObj[KEY_MODULE]
-
+            print('djhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh',uiObj)
             module_class = self.return_class(module)
 
             selected_module = main.module_name(main)
@@ -1597,7 +1596,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for loading inputs from a file to Ui
     '''
-    @author: Umair 
+    @author: Umair
     '''
 
     def setDictToUserInputs(self, uiObj, op_list, data, new, module):
@@ -1670,10 +1669,12 @@ class Ui_ModuleWindow(QMainWindow):
             pass
         else:
             main.design_button_status = True
-            main.func_for_validation(main, self, self.design_inputs)
+            error = main.func_for_validation(main, self, self.design_inputs)
             status = main.design_status
             print(status)
 
+            if error is not None:
+                self.show_error_msg(error)
             # main.set_input_values(main, self.design_inputs, self)
             # DESIGN_FLAG = 'True'
 
@@ -1729,6 +1730,8 @@ class Ui_ModuleWindow(QMainWindow):
                 self.actionShow_column.setEnabled(False)
                 self.actionShow_finplate.setEnabled(False)
 
+    def show_error_msg(self, error):
+        QMessageBox.about(self,'information',error[0])  # show only first error message.
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "OsdagHeader.png")))
@@ -2072,7 +2075,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 # Function for getting input for design preferences from input dock
     '''
-    @author: Umair 
+    @author: Umair
     '''
 
     def combined_design_prefer(self, module):

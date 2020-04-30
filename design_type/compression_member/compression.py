@@ -35,11 +35,12 @@ class Compression(Main):
         # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         # handler.setFormatter(formatter)
         # logger.addHandler(handler)
-        handler = OurLog(key)
-        # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        if key is not None:
+            handler = OurLog(key)
+            # handler.setLevel(logging.DEBUG)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def customized_input(self):
 
@@ -215,6 +216,8 @@ class Compression(Main):
         return lst
 
     def func_for_validation(self, window, design_dictionary):
+
+        all_errors = []
         self.design_status = False
         flag = False
         option_list = self.input_values(self)
@@ -229,8 +232,9 @@ class Compression(Main):
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+
+            error = self.generate_missing_fields_error_string(self,missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -239,7 +243,7 @@ class Compression(Main):
             # self.set_input_values(self, design_dictionary)
             print(design_dictionary)
         else:
-            pass
+            return all_errors
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
@@ -834,7 +838,7 @@ class Compression(Main):
         # angle_section.append(t33)
 
         return angle_section
-    
+
     @staticmethod
     def tab_channel_section():
         #Channel Tab method for adding tab elements

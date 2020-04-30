@@ -932,6 +932,7 @@ class Tension_bolted(Main):
 
     def func_for_validation(self, window, design_dictionary):
 
+        all_errors = []
         "check valid inputs and empty inputs in input dock"
         print(design_dictionary,'djsgggggggggggggggggggggggggggggggggggggggggggggggggggggggg')
         self.design_status = False
@@ -949,8 +950,8 @@ class Tension_bolted(Main):
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -959,7 +960,7 @@ class Tension_bolted(Main):
             self.set_input_values(self, design_dictionary)
             # print(design_dictionary)
         else:
-            pass
+            return all_errors
 
 
 

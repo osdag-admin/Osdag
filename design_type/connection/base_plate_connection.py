@@ -543,7 +543,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # self.set_input_values(self, design_dictionary)
             self.bp_parameters(self, design_dictionary)
         else:
-            all_errors
+            return all_errors
 
 
 

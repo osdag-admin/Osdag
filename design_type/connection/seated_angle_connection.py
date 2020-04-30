@@ -94,11 +94,12 @@ class SeatedAngleConnection(ShearConnection):
         # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         # handler.setFormatter(formatter)
         # logger.addHandler(handler)
-        handler = OurLog(key)
-        # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        if key is not None:
+            handler = OurLog(key)
+            # handler.setLevel(logging.DEBUG)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def module_name(self):
         return KEY_DISP_SEATED_ANGLE
@@ -214,6 +215,8 @@ class SeatedAngleConnection(ShearConnection):
         return options_list
 
     def func_for_validation(self, window, design_dictionary):
+
+        all_errors = []
         self.design_status = False
         flag = False
         flag1 = False
@@ -248,9 +251,8 @@ class SeatedAngleConnection(ShearConnection):
                 lst1.append(row1)
             b_val = lst1[0][0]
             if c_val <= b_val:
-                QMessageBox.about(window, 'Information',
-                                  "Beam width is higher than clear depth of column web "
-                                  "(No provision in Osdag till now)")
+                error = "Beam width is higher than clear depth of column web " + "\n" + "(No provision in Osdag till now)"
+                all_errors.append(error)
             else:
                 flag1 = True
         else:
@@ -266,7 +268,7 @@ class SeatedAngleConnection(ShearConnection):
         if flag and flag1:
             self.set_input_values(self, design_dictionary)
         else:
-            pass
+             return all_errors
 
     def warn_text(self):
 

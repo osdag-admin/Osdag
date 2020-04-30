@@ -442,7 +442,7 @@ class CleatAngleConnection(ShearConnection):
         if flag and flag1:
             self.set_input_values(self, design_dictionary)
         else:
-            all_errors
+            return all_errors
 
     def module_name(self):
         return KEY_DISP_CLEATANGLE

@@ -261,7 +261,7 @@ class IS_5624_1993(object):
         The average value is rounded off to a higher multiple of 5.
 
         """
-        anchor_length = {
+        anchor_details = {
             'M8': {'dia': 8, 'min_len': 80, 'max_len': 200, 'avg_len': 140},
             'M10': {'dia': 10, 'min_len': 100, 'max_len': 250, 'avg_len': 175},
             'M12': {'dia': 12, 'min_len': 125, 'max_len': 320, 'avg_len': 225},
@@ -277,7 +277,7 @@ class IS_5624_1993(object):
             'M72': {'dia': 72, 'min_len': 1000, 'max_len': 3200, 'avg_len': 2100},
         }[str(anchor_dia)]
 
-        anchor_details_list = [anchor_length.get('dia'), anchor_length.get('min_len'),
-                               anchor_length.get('max_len'), anchor_length.get('avg_len')]
+        anchor_details_list = [anchor_details.get('dia'), anchor_details.get('min_len'),
+                               anchor_details.get('max_len'), anchor_details.get('avg_len')]
 
         return anchor_details_list

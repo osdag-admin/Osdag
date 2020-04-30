@@ -1,0 +1,38 @@
+DesignPreferences.Bolt.Bolt_Hole_Type: Standard
+DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
+DesignPreferences.Bolt.Slip_Factor: '0.3'
+DesignPreferences.Design.Design_Method: Limit State Design
+DesignPreferences.Detailing.Corrosive_Influences: 'No'
+DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
+DesignPreferences.Detailing.Gap: '10'
+DesignPreferences.Weld.Fab: Shop Weld
+DesignPreferences.Weld.Material_Grade_OverWrite: '410'
+Flange_Plate.Preferences: Outside + Inside
+Load.Axial: '10'
+Load.Moment: '10'
+Load.Shear: '10'
+Member.Material: E 250 (Fe 410 W)A
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
+Module: Beam Coverplate  Weld Connection
+Plate.Material: E 165 (Fe 290)
+Section Size: UB 610 x 229 x 140
+Web_Plate.thickness_provided: &id001
+- '6'
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '24'
+- '26'
+- '28'
+- '30'
+- '32'
+- '36'
+- '40'
+Weld.Type: Fillet Weld
+flange_plate.thickness_provided: *id001

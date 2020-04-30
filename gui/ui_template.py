@@ -621,6 +621,7 @@ class Ui_ModuleWindow(QMainWindow):
         new_list = main.customized_input(main)
         updated_list = main.input_value_changed(main)
         data = {}
+
         d = {}
         if new_list != []:
             for t in new_list:
@@ -1548,6 +1549,8 @@ class Ui_ModuleWindow(QMainWindow):
             return FinPlateConnection
         elif name == KEY_DISP_ENDPLATE:
             return EndPlateConnection
+        elif name==KEY_DISP_CLEATANGLE:
+            return CleatAngleConnection
         elif name == KEY_DISP_COLUMNCOVERPLATE:
             return ColumnCoverPlate
         # elif name == KEY_DISP_COLUMNCOVERPLATEWELD:

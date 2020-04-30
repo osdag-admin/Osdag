@@ -291,6 +291,11 @@ DISP_MIN_PLATE_HEIGHT = 'Min. Plate Height (mm)'
 DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
 DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
 DISP_MIN_PLATE_THICK = 'Min.Plate Thickness (mm)'
+
+DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Height (mm)'
+DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Height (mm)'
+DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
+
 KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (V_db) (kN)'
 KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension (T_db) (kN)'
 KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (V_d) (kN)'
@@ -690,6 +695,9 @@ KEY_OUT_GRD_PROVIDED='flange_bolt.bolt_fu'
 KEY_OUT_FLANGE_MIN_PITCH= 'flange_bolt.min_pitch_round'
 KEY_OUT_FLANGE_MIN_EDGE_DIST= 'flange_bolt.min_edge_dist_round'
 KEY_OUT_FLANGE_MAX_EDGE_DIST='flange_bolt.max_edge_dist_round'
+
+KEY_OUT_DISP_FORCES_FLANGE = 'Forces Carried by Flange'
+KEY_OUT_DISP_FORCES_WEB= 'Forces Carried by Web'
 
 KEY_OUT_WEB_BOLT_SHEAR ='web_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_WEB_BOLT_SHEAR = "Shear Capacity (kN)"
@@ -1225,7 +1233,7 @@ KEY_SEATEDANGLE='Seated Angle'
 KEY_DISP_SEATEDANGLE='Seated Angle *'
 # VALUES_SEATEDANGLE=['20 20 X 3', '20 20 X 4', '25 25 x 3', '25 25 x 4', '25 25 x 5', '30 30 x 3', '30 30 x 4', '30 30 x 5', '35 35 x 3', '35 35 x 4', '35 35 x 5', '35 35 x 6', '40 40 x 3', '40 40 x 4', '40 40 x 5', '40 40 x 6', '45 45 x 3', '45 45 x 4', '45 45 x 5', '45 45 x 6', '50 50 x 3', '50 50 x 4', '50 50 x 5', '50 50 x 6', '50 50 x 7', '50 50 x 8', '55 55 x 4', '55 55 x 5', '55 55 x 6', '55 55 x 8', '55 55 x 10', '60 60 x 4', '60 60 x 5', '60 60 x 6', '60 60 x 8', '60 60 x 10', '65 65 x 4', '65 65 x 5', '65 65 x 6', '65 65 x 8', '65 65 x 10', '70 70 x 5', '70 70 x 6', '70 70 x 7', '70 70 x 8', '70 70 x 10', '75 75 x 5', '75 75 x 6', '75 75 x 8', '75 75 x 10', '80 80 x 6', '80 80 x 8', '80 80 x 10', '80 80 x 12', '90 90 x 6', '90 90 x 8', '90 90 x 10', '90 90 x 12', '100 100 x 6', '100 100 x 7', '100 100 x 8', '100 100 x 10', '100 100x 12', '100 100 x 15', '110 110 X 8', '110 110 X 10', '110 110 X 12', '110 110 X 16', '120 120 X 8', '120 120 X 10', '120 120 X 12', '120 120 X 15', '130 130 X 8', '130 130 X 9', '130 130 X 10', '130 130 X 12', '130 130 X 16', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '180 180 X 15', '180 180 X 18', '180 180 X 20', '200 200 X 12', '200 200 X 16', '200 200 X 20', '200 200 X 24', '200 200 X 25', '30 20 X 3', '30 20 X 4', '30 20 X 5', '40 20 X 3', '40 20 X 4', '40 20 X 5', '40 25 X 3', '40 25 X 4', '40 25 X 5', '40 25 X 6', '45 30 X 3', '45 30 X 4', '45 30 X 5', '45 30 X 6', '50 30 X 3', '50 30 X 4', '50 30 X 5', '50 30 X 6', '60 30 X 5', '60 30 X 6', '60 40 X 5', '60 40 X 6', '60 40 X 7', '60 40 X 8', '65 45 X 5', '65 45 X 6', '65 45 X 8', '65 50 X 5', '65 50 X 6', '65 50 X 7', '65 50 X 8', '70 45 X 5', '70 45 X 6', '70 45 X 8', '70 45 X 10', '70 50 X 5', '70 50 X 6', '70 50 X 7', '70 50 X 8', '75 50X 5', '75 50X 6', '75 50X 7', '75 50X 8', '75 50X 10', '80 40 X 5', '80 40 X 6', '80 40 X 7', '80 40 X 8', '80 50 X 5', '80 50 X  6', '80 50 X  8', '80 50 X 10', '80 60 X 6', '80 60 X 7', '80 60 X 8', '90 60 X 6', '90 60 X  8', '90 60 X 10', '90 60 X 12', '90 65 X 6', '90 65 X 7', '90 65 X 8', '90 65 X 10', '100 50 X 6', '100 50 X 7', '100 50 X 8', '100 50 X 10', '100 65 X 6', '100 65 X  7', '100 65 X  8', '100 65 X 10', '100 75 X 6', '100 75 X  8', '100 75 X 10', '100 75 X 12', '120 80 X 8', '120 80 X 10', '120 80 X 12', '125 75 X 6', '125 75 X  8', '125 75 X 10', '125 75 X 12', '125 95 X 6', '125 95 X  8', '125 95 X 10', '125 95 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '150 75 X 8', '150 75 X  9', '150 75 X 10', '150 75 X 12', '150 75 X 15', '150 90 X 10', '150 90 X X 12', '150 90 X X 15', '150 90 X 10', '150 90 X 12', '150 90 X 15', '150 115 X 8', '150 115 X 10', '150 115 X 12', '150 115 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20']
 
-KEY_TOPANGLE='TopAngle'
+KEY_TOPANGLE='Top Angle'
 KEY_DISP_TOPANGLE='Top Angle *'
 # VALUES_TOPANGLE=[
 #     '20 20 X 3', '20 20 X 4', '25 25 x 3', '25 25 x 4', '25 25 x 5',
@@ -1473,59 +1481,6 @@ DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" 
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
-
-
-######### Just FOR Documentation ########
-KEY_DISP_GUSSET = 'Gusset Connection'
-
-DISP_TITLE_CM = 'Connecting members'
-
-KEY_MEMBER_COUNT = 'Member.Count'
-KEY_DISP_MEMBER_COUNT = 'Member Count'
-VALUES_MEM_COUNT = ['1','2','3','4','5','6','7']
-
-KEY_SEC_PROFILE = 'Member.Profile'
-KEY_DISP_SEC_PROFILE = 'Section Profile'
-VALUES_SEC_PROFILE = ['Angles', 'Channels']
-
-KEY_SECSIZE = 'Member.Designation'
-KEY_DISP_SECSIZE = 'Section Size*'
-VALUES_SECSIZE = ['All', 'Customized']
-
-KEY_MATERIAL = 'Member.Material'
-KEY_DISP_MATERIAL = 'Material *'
-VALUES_MATERIAL = connectdb("Material")
-
-DISP_TITLE_LOADS = 'Factored load'
-KEY_AXIAL = 'Load.Axial'
-KEY_DISP_AXIAL = 'Axial (kN) *'
-VALUES_AXIAL = ['Minimum','Customized']
-
-# Key for storing Diameter sub-key of Bolt
-KEY_D = 'Bolt.Diameter'
-KEY_DISP_D = 'Diameter(mm)*'
-VALUES_D = ['All', 'Customized']
-
-# Key for storing Type sub-key of Bolt
-KEY_TYP = 'Bolt.Type'
-KEY_DISP_TYP = 'Type *'
-TYP_BEARING = "Bearing Bolt"
-TYP_FRICTION_GRIP = "Friction Grip Bolt"
-VALUES_TYP = ['Select Type', TYP_FRICTION_GRIP, TYP_BEARING]
-VALUES_TYP_1 = ['Friction Grip Bolt']
-VALUES_TYP_2 = ['Bearing Bolt']
-
-# Key for storing Grade sub-key of Bolt
-KEY_GRD = 'Bolt.Grade'
-KEY_DISP_GRD = 'Grade *'
-VALUES_GRD = ['All', 'Customized']
-VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
-
-
-DISP_TITLE_PLATE = 'Plate'
-KEY_PLATETHK = 'Plate.Thickness'
-VALUES_PLATETHK = ['All', 'Customized']
-VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
 
 

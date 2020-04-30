@@ -12,7 +12,6 @@ from cad.items.plate import Plate
 from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
 from cad.items.angle import Angle
-from PyQt5.QtWidgets import QMainWindow
 
 from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -962,5 +961,3 @@ class CommonDesignLogic(object):
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
 
         return final_model
-
-

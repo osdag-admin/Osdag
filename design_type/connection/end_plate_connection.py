@@ -108,11 +108,12 @@ class EndPlateConnection(ShearConnection):
         # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         # handler.setFormatter(formatter)
         # logger.addHandler(handler)
-        handler = OurLog(key)
-        # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        if key is not None:
+            handler = OurLog(key)
+            # handler.setLevel(logging.DEBUG)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def module_name(self):
         return KEY_DISP_ENDPLATE
@@ -233,6 +234,7 @@ class EndPlateConnection(ShearConnection):
         return options_list
 
     def func_for_validation(self, window, design_dictionary):
+        all_errors = []
         self.design_status = False
         flag = False
         flag1 = False
@@ -269,17 +271,16 @@ class EndPlateConnection(ShearConnection):
                 lst1.append(row1)
             s_val = lst1[0][0]
             if p_val <= s_val:
-                QMessageBox.about(window, 'Information',
-                                  "Secondary beam depth is higher than clear depth of primary beam web "
-                                  "(No provision in Osdag till now)")
+                error = "Secondary beam depth is higher than clear depth of primary beam web " + "\n" + "(No provision in Osdag till now)"
+                all_errors.append(error)
             else:
                 flag1 = True
         else:
             flag1 = True
 
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    generate_missing_fields_error_string(missing_fields_list))
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -287,7 +288,7 @@ class EndPlateConnection(ShearConnection):
         if flag and flag1:
             self.set_input_values(self, design_dictionary)
         else:
-            pass
+            return all_errors
 
 
     def warn_text(self):
@@ -306,6 +307,29 @@ class EndPlateConnection(ShearConnection):
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
 
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
 
     def set_input_values(self, design_dictionary):
         super(EndPlateConnection,self).set_input_values(self, design_dictionary)
@@ -931,6 +955,9 @@ class EndPlateConnection(ShearConnection):
 
         return capacities
 # main()
+
+print(time.clock() - start_time, "seconds")
+
 
 
 

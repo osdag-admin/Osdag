@@ -1670,7 +1670,6 @@ class Tension_bolted(Main):
             self.bolt.kb = self.bolt.calculate_kb(e=self.plate.end_dist_provided, p=self.plate.pitch_provided, d_0= self.bolt.dia_hole, f_ub=self.bolt.bolt_fu,f_u=self.bolt.fu_considered)
 
             self.bolt.bolt_bearing_capacity = self.bolt_bearing_capacity
-<<<<<<< HEAD
 
 
             self.bolt.bolt_capacity = min(self.bolt.bolt_bearing_capacity,self.bolt.bolt_shear_capacity)
@@ -1682,19 +1681,6 @@ class Tension_bolted(Main):
                                                         self.plate.pitch_provided, self.bolt.bolt_capacity,
                                                         self.bolt.bolt_diameter_provided)
 
-=======
-
-
-            self.bolt.bolt_capacity = min(self.bolt.bolt_bearing_capacity,self.bolt.bolt_shear_capacity)
-        else:
-            pass
-
-        self.plate.bolt_capacity_red = self.plate.get_bolt_red(self.plate.bolts_one_line,
-                                                        self.plate.gauge_provided, self.plate.bolt_line,
-                                                        self.plate.pitch_provided, self.bolt.bolt_capacity,
-                                                        self.bolt.bolt_diameter_provided)
-
->>>>>>> mentor/restructure
         self.plate.length = (self.plate.bolt_line - 1) * self.plate.pitch_provided + 2 * self.plate.end_dist_provided
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:

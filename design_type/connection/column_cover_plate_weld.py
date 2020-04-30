@@ -1720,7 +1720,7 @@ class ColumnCoverPlateWeld(MomentConnection):
 
 
 
-<<<<<<< HEAD
+
         # def flange_force(self,):
         #     axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
         #         self.section.area)
@@ -1729,7 +1729,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         #     self.moment_flange = ((self.load.moment * 1000000) - moment_web) / 1000000
         #     flange_force = (((self.moment_flange * 1000000) / (self.section.depth - self.section.flange_thickness)) + (
         #         axial_force_f))
-=======
+
     def save_design(self, popup_summary):
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
                                   KEY_DISP_COLSEC: self.section.designation,
@@ -1815,4 +1815,3 @@ class ColumnCoverPlateWeld(MomentConnection):
         print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)
->>>>>>> mentor/restructure

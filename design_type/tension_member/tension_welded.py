@@ -1705,8 +1705,6 @@ class Tension_welded(Main):
                 t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
                       tension_rupture_welded_prov(self.section_size_1.depth, self.plate.thickness_provided,
                                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
-<<<<<<< HEAD
-
 
             else:
                 t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
@@ -1718,20 +1716,6 @@ class Tension_welded(Main):
                       tension_rupture_welded_prov(self.section_size_1.depth, self.plate.thickness_provided,
                                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
-=======
-
-
-            else:
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
-                t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
-                      tension_yield_prov(l=self.section_size_1.min_leg, t=self.plate.thickness_provided,
-                                         f_y=self.plate.fy,
-                                         gamma=gamma_m0, T_dg=plate_yield_kn), '')
-                t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
-                      tension_rupture_welded_prov(self.section_size_1.depth, self.plate.thickness_provided,
-                                                  self.plate.fu, gamma_m1, plate_rupture_kn), '')
-
->>>>>>> mentor/restructure
         else:
             if self.loc == "Long Leg":
                 t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht(self.section_size_1.depth, self.clearance,self.plate.height,1),"")

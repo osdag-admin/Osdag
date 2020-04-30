@@ -662,14 +662,10 @@ class BeamCoverPlate(MomentConnection):
             self.beta_b = 1
         elif self.class_of_section == 3:
             self.beta_b = self.Z_e / self.Z_p
-<<<<<<< HEAD
+
 
         self.section.plastic_moment_capacty(beta_b = self.beta_b, Z_p = self.Z_p, fy= self.section.fy) # N # for section #todo add in ddcl
-=======
-     
-        self.section.plastic_moment_capacty(beta_b = self.beta_b, Z_p = self.Z_p,
-                                            fy= self.section.fy) # N # for section
->>>>>>> mentor/restructure
+
         self.section.moment_d_deformation_criteria(fy= self.section.fy,Z_e = self.section.elast_sec_mod_z)
 
         self.Pmc =self.section.plastic_moment_capactiy

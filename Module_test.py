@@ -34,6 +34,8 @@ all_modules = {'Base Plate':BasePlateConnection, 'Beam Coverplate  Weld Connecti
 
 
 '''
+NOTE -> test cases are running on the modules available in available_module dict.
+
 Add more modules from all_modules dict to available_modules for testing or simply use all_modules dict if you want to run test for all modules.
 
 available_module dictionary is used in -
@@ -44,7 +46,7 @@ available_module dictionary is used in -
 Make sure to make the necessary changes in above functions/methods if you are changing the name of available_module.
 '''
 
-available_module = {'Column Coverplate Weld Connection': ColumnCoverPlateWeld}
+available_module = {'Fin Plate':FinPlateConnection,'Tension Members Bolted Design':Tension_bolted, 'Column Coverplate Weld Connection': ColumnCoverPlateWeld}
 
 
 

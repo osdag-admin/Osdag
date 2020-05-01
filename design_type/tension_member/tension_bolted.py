@@ -1108,7 +1108,7 @@ class Tension_bolted(Main):
         "Loop checking each member from sizelist based on yield capacity"
 
         for selectedsize in self.sizelist:
-            # print(selectedsize)
+            print('selectedsize',selectedsize)
             self.section_size = self.select_section(self,design_dictionary,selectedsize)
             bolt_diameter_min= min(self.bolt.bolt_diameter)
 

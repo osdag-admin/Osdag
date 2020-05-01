@@ -1527,6 +1527,7 @@ class Ui_ModuleWindow(QMainWindow):
                 d1 = {}
             design_dictionary.update(d1)
 
+
         if self.designPrefDialog.flag:
 
             if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,
@@ -1707,9 +1708,10 @@ class Ui_ModuleWindow(QMainWindow):
             module = uiObj[KEY_MODULE]
 
             # module_class = self.return_class(module)
-
+            print('loading inputs',uiObj, op_list, data, new)
             selected_module = main.module_name(main)
             if selected_module == module:
+                print(uiObj, op_list, data, new)
                 self.setDictToUserInputs(uiObj, op_list, data, new)
             else:
                 QMessageBox.information(self, "Information",
@@ -1739,14 +1741,35 @@ class Ui_ModuleWindow(QMainWindow):
                 key.setText(uiObj[key_str])
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 if key_str in uiObj.keys():
-
                     for n in new:
-                        if n[0] == key_str:
+
+                        if n[0] == key_str and n[0] == KEY_SECSIZE:
+                            if uiObj[key_str] != n[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
+                                                          KEY_SEC_PROFILE).currentText()):
+                                data[key_str + "_customized"] = uiObj[key_str]
+                                key.setCurrentIndex(1)
+                            else:
+                                pass
+                        elif n[0] == key_str and n[0] != KEY_SECSIZE:
                             if uiObj[key_str] != n[1]():
                                 data[key_str + "_customized"] = uiObj[key_str]
                                 key.setCurrentIndex(1)
                             else:
                                 pass
+                # n = [i for i in new if i[0] == key_str]
+                # if key_str == KEY_SECSIZE:
+                #
+                #     if uiObj[key_str] != n[1](uiObj[KEY_SEC_PROFILE]):
+                #         data[key_str + "_customized"] = uiObj[key_str]
+                #         key.setCurrentIndex(1)
+                #     else:
+                #         pass
+                # else:
+                #     if uiObj[key_str] != n[1]():
+                #         data[key_str + "_customized"] = uiObj[key_str]
+                #         key.setCurrentIndex(1)
+                #     else:
+                #         pass
             else:
                 pass
 

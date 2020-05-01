@@ -114,17 +114,59 @@ class IS800_2007(object):
 
     # cl. 8.4.1 shear strength of bolted connections
     @staticmethod
-    def cl_8_4_design_shear_strength(A_vg, f_y, gamma_m0):
-        V_d = A_vg * f_y / (math.sqrt(3) * gamma_m0)
+    def cl_8_4_design_shear_strength(A_vg, f_y):
+        """ Calculate the design shear strength in yielding as per cl. 8.4
+
+        Args:
+             A_vg: Gross area of the component in square mm (float)
+             f_y: Yield stress of the component material in MPa (float)
+
+        Returns:
+             Design shear strength in yielding of the component in N
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        V_d = ((A_vg * f_y) / (math.sqrt(3) * gamma_m0))  # N
+
         return V_d
 
-        # TODO
-        # pass
-
+    # cl 8.2.1.2 design bending strength of the cross-section
     @staticmethod
-    def cl_8_2_1_2_design_moment_strength(beta_b, Z_p, f_y, gamma_m0):
-        M_d = beta_b * Z_p * f_y / gamma_m0
+    def cl_8_2_1_2_design_moment_strength(Z_e, Z_p, f_y, section_class='semi-compact'):
+        """ Calculate the design bending strength as per cl. 8.2.1.2
+
+        Args:
+            Z_e: Elastic section modulus of the cross-section in cubic mm (float)
+            Z_p: Plastic section modulus of the cross-section in cubic mm (float)
+            f_y: Yield stress of the component material in MPa (float)
+            section_class: Classification of the section (plastic, compact or semi-compact) as per Table 2 (str)
+
+        Returns:
+            Design bending strength of the cross-section in N-mm (float)
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+
+        if section_class == 'semi-compact':
+            M_d = (Z_e * f_y) / gamma_m0  # N-mm
+        else:
+            M_d = (1.0 * Z_p * f_y) / gamma_m0  # N-mm
+
         return M_d
+
+    # ==========================================================================
+    """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
+    # ==========================================================================
+    """   SECTION  10    CONNECTIONS    """
+
+    # -------------------------------------------------------------
+    #   10.1 General
+    # -------------------------------------------------------------
+    # -------------------------------------------------------------
+    #   10.2 Location Details of Fasteners
+    # -------------------------------------------------------------
+
+    # cl. 10.2.1 Clearances for Holes for Fasteners
 
     @staticmethod
     def cl_8_7_1_3_stiff_bearing_length(shear_force, web_thickness, flange_thickness, root_radius, fy):

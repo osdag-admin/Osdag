@@ -1166,8 +1166,8 @@ class Tension_welded(Main):
                 elif (self.load.axial_force *1000> max_force) :
                     self.design_status = False
                     logger.error(" : Tension force exceeds tension capacity of maximum available member size.")
-                    logger.error(": Design is not safe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    # logger.error(": Design is not safe. \n ")
+                    # logger.debug(" :=========End Of design===========")
                     break
 
                     "condition to limit loop based on max length derived from max available size"
@@ -1175,8 +1175,8 @@ class Tension_welded(Main):
                 elif self.length > length:
                     self.design_status = False
                     logger.error(" : Member fails in slenderness.")
-                    logger.error(": Design is not safe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    # logger.error(": Design is not safe. \n ")
+                    # logger.debug(" :=========End Of design===========")
                     break
 
                 else:
@@ -1184,7 +1184,7 @@ class Tension_welded(Main):
 
 
         if member_design == False:
-            logger.info(" : Tension force or Slenderness value exceeds the limit for maximum available member size.")
+            logger.error(" : Tension force or Slenderness value exceeds the limit for maximum available member size.")
             logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
 
@@ -1619,13 +1619,13 @@ class Tension_welded(Main):
                                       't(mm)': self.section_size_1.thickness,
                                       'R1(mm)': self.section_size_1.root_radius,
                                       'R2(mm)': self.section_size_1.toe_radius,
-                                      'Cy(mm)': self.section_size_1.Cy,
+                                      'Cy(mm)': round(self.section_size_1.Cy,2),
                                       'Cz(mm)': self.section_size_1.Cz,
                                       'Iz(mm4)': self.section_size_1.mom_inertia_z,
                                       'Iy(mm4)': self.section_size_1.mom_inertia_y,
                                       'Iu(mm4)': self.section_size_1.mom_inertia_u,
                                       'Iv(mm4)': self.section_size_1.mom_inertia_v,
-                                      'rz(mm)': self.section_size_1.rad_of_gy_z,
+                                      'rz(mm)': round(self.section_size_1.rad_of_gy_z,2),
                                       'ry(mm)': round((self.section_size_1.rad_of_gy_y),2),
                                       'ru(mm)': round((self.section_size_1.rad_of_gy_u),2),
                                       'rv(mm)': round((self.section_size_1.rad_of_gy_v),2),

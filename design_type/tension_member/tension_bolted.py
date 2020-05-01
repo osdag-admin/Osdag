@@ -1253,8 +1253,8 @@ class Tension_bolted(Main):
                 elif (self.load.axial_force*1000 > max_force) :
                     self.design_status = False
                     logger.error(" : Tension force exceeds tension capacity of maximum available member size.")
-                    logger.error(": Design is not safe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    # logger.error(": Design is not safe. \n ")
+                    # logger.debug(" :=========End Of design===========")
                     break
 
                     "condition to limit loop based on max length derived from max available size"
@@ -1262,15 +1262,15 @@ class Tension_bolted(Main):
                 elif self.length > length:
                     self.design_status = False
                     logger.error(" : Length exceeds maximum length of maximum available member size .")
-                    logger.error(": Design is not safe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    # logger.error(": Design is not safe. \n ")
+                    # logger.debug(" :=========End Of design===========")
                     break
 
                 else:
                     pass
 
         if member_design == False:
-            logger.info(" : Tension force or Slenderness value exceeds the limit for maximum available member size.")
+            logger.error(" : Tension force or Slenderness value exceeds the limit for maximum available member size.")
             logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
 

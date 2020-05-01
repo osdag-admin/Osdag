@@ -1,10 +1,3 @@
-"""This file is redundant. Use report_generator.py"""
-
-'''
-Created on Dec 10, 2015
-
-@author: deepa
-'''
 from builtins import str
 import time
 from Report_functions import *
@@ -20,7 +13,6 @@ from pylatex.utils import italic, bold
 import pdflatex
 import sys
 import datetime
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 import pylatex as pyl
 
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
@@ -40,8 +32,6 @@ class CreateLatex(Document):
 
     def __init__(self):
         super().__init__()
-
-    @pyqtSlot()
 
     def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])

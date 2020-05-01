@@ -62,10 +62,11 @@ class Tension_bolted(Main):
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        handler = OurLog(key)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        if key is not None:
+            handler = OurLog(key)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def module_name(self):
 
@@ -931,8 +932,9 @@ class Tension_bolted(Main):
 
     def func_for_validation(self, window, design_dictionary):
 
+        all_errors = []
         "check valid inputs and empty inputs in input dock"
-
+        print(design_dictionary,'djsgggggggggggggggggggggggggggggggggggggggggggggggggggggggg')
         self.design_status = False
 
         flag = False
@@ -948,8 +950,8 @@ class Tension_bolted(Main):
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -958,7 +960,7 @@ class Tension_bolted(Main):
             self.set_input_values(self, design_dictionary)
             # print(design_dictionary)
         else:
-            pass
+            return all_errors
 
 
 
@@ -987,7 +989,7 @@ class Tension_bolted(Main):
         return information
 
     def warn_text(self):
-      
+
         """
         Function to give logger warning when any old value is selected from Column and Beams table.
         """
@@ -2132,15 +2134,16 @@ class Tension_bolted(Main):
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
 
-        file_type = "PDF (*.pdf)"
-        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As",
-                                               os.path.join(str(' '), "untitled.pdf"), file_type)
-        print(filename, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        #file_type = "PDF (*.pdf)"
+        #filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As",
+                                               #os.path.join(str(' '), "untitled.pdf"), file_type)
+        #print(filename, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         # filename = os.path.join(str(folder), "images_html", "TexReport")
-        file_name = str(filename)
-        print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
-        fname_no_ext = filename[0].split(".")[0]
-        print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        #file_name = str(filename)
+        #print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        #fname_no_ext = filename[0].split(".")[0]
+        #print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)
 

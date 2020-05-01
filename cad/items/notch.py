@@ -7,6 +7,30 @@ from OCC.Core.gp import gp_Circ, gp_Ax2
 import numpy
 from cad.items.ModelUtils import make_edge, getGpPt, getGpDir, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
 
+'''
+
+                                     X-------------------------X
+                                  X                         X  |
+                               X                         X     |
+                            X                         X        |
+              ^      a6  X-------------------------X  a1       |
+              |          |                         |           |
+              |          |                         |           |
+              |          |                         |           |
+              |          |              a3         |           |
+            height   a7  X            +            |  a2       |
+              |          XX         X              |           |
+              |           XX      X   R1           |           X
+              |            XX   X                  |        X
+              |              XX                    |     X
+              |                 XX                 |  X
+              v          X          XX-------------X  
+                       a9           a5              a4
+
+                        <---------- width -------->
+'''
+
+
 class Notch(object):
     '''
     '''

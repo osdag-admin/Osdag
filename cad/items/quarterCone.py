@@ -3,6 +3,29 @@ from cad.items.ModelUtils import getGpPt, getGpDir, makeEdgesFromPoints, makeWir
 from OCC.Core.gp import gp_Ax1
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeRevol
 
+'''
+                             
+                                 a3                                  
+               -----               X  XX                               ^ 
+                 /                X|       XX                          |     
+                /                X |           XX                      |      
+               /                X  |              XX                   |
+              /                X   |                 XX                |
+             /                X    |                   XX              b
+            /                X     |                     XX            |
+           h                X      |                       XX          |
+          /                X       |__  90                  XX         |
+         /                X        |  |                       X        |
+        /                X         X---------------------------X a1    V
+       /                X       X  a2                  X       
+      /                X     X               X          
+     /                X   X         X
+    /                X X    X                                                                 
+ -----              XX             <------------ b ------------>
+          
+
+'''
+
 class QuarterCone(object):
 
     def __init__(self, b, h, coneAngle):

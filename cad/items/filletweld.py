@@ -6,7 +6,25 @@ Created on 27-May-2015
 import numpy
 from cad.items.ModelUtils import getGpPt, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
 
+'''
 
+                        ^   a2 X
+                        |      | X
+                        |      |   X
+                        |      |     X
+                        |      |       X
+                        +      |         X
+                        h      |           X
+                        +      |             X
+                        |      |               X
+                        |      |                 X
+                        v   a1 +-------------------X a3
+
+
+                               <------- b --------->
+
+
+'''
 class FilletWeld(object):
 
     def __init__(self, b, h, L):

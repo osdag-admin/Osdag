@@ -4,13 +4,40 @@ Created on 15-May-2019
 @author: Anand Swaroop
 
 
-
-
-
 '''
 import numpy
 from cad.items.ModelUtils import *
 
+'''
+                                                X---------------X
+                                              X               X |
+                                            X               X   |
+                                          X               X     |
+                                        X               X       |
+                                      X               X         |
+                                    X               X           |
+                                  X               X             |
+                           a2   X               X               |
+                        ^     X---------------X                 |
+                        |     |               | a1              |
+                        |     |               |                 |
+                        |     |               |                 |
+                        |     |               |                 X
+                        +     |               |               X
+                        h     |               |             X
+                        +     |               |           X
+                        |     |               |         X
+                        |     |               |       X
+                        |     |               |     X
+                        |     |               |   X
+                        |     |               | X
+                        v     +---------------X
+                           a3                   a4
+
+                              <----- b ------->
+
+
+'''
 
 class GrooveWeld(object):
 

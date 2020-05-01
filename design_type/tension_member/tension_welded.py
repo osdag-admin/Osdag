@@ -1718,7 +1718,7 @@ class Tension_welded(Main):
         self.report_check.append(t1)
 
         t1 = (DISP_THROAT, throat_req(), throat_prov(self.weld.size, self.Kt),
-              get_pass_fail(3.0, self.weld.size, relation="geq"))
+              get_pass_fail(3.0, self.weld.size, relation="leq"))
         self.report_check.append(t1)
 
         t1 = (DISP_EFF, "", display_prov(self.weld.length,"l_w"), "")

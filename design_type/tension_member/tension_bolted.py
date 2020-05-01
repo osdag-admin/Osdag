@@ -2064,7 +2064,9 @@ class Tension_bolted(Main):
         self.report_check.append(t4)
         t5 = (KEY_OUT_DISP_PLATETHK_REP, '',display_prov(self.plate.thickness_provided,"t_p"), "")
         self.report_check.append(t5)
+
         self.report_check.append(t2)
+
         self.report_check.append(t1)
 
         t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=plate_blockshear_kn), '')

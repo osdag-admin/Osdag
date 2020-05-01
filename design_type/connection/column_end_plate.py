@@ -262,7 +262,7 @@ class ColumnEndPlate(MomentConnection):
         out_list.append(t16)
 
         t17 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, self.m_dp if flag else '')
-        out_list.append(t16)
+        out_list.append(t17)
 
         return out_list
 

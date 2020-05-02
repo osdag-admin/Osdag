@@ -1552,10 +1552,11 @@ class BeamCoverPlateWeld(MomentConnection):
 
 
         self.report_check = []
-        #####Flange Weld Check#####
+
 
         self.flange_weld_connecting_plates = [self.section.flange_thickness, self.flange_plate.thickness_provided]
         self.flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.flange_thickness,self.flange_plate.thickness_provided)
+
         h = self.section.depth - (2 * self.section.flange_thickness)
         self.Pmc = self.section.plastic_moment_capactiy
         self.Mdc = self.section.moment_d_def_criteria
@@ -1569,8 +1570,8 @@ class BeamCoverPlateWeld(MomentConnection):
                                                               axial_capacity= round(self.axial_capacity/1000 , 2) ),'')
         self.report_check.append(t1)
 
-<<<<<<< HEAD
-=======
+
+
         # flange_get_weld_strenght_kn = round(self.flange_weld.get_weld_strenght / 1000, 2)
         h = self.section.depth - (2 * self.section.flange_thickness)
         self.Pmc = self.section.plastic_moment_capactiy
@@ -1658,7 +1659,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                 Af=round(self.axial_force_f / 1000, 2),
                                                                 ff=round(self.flange_force / 1000, 2), ), '')
         self.report_check.append(t23)
->>>>>>> 06d0e48f950f29b50027ef4c1afc0085fdfde858
+
 
         self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
                                       self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0) ,2)
@@ -1730,87 +1731,41 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                Af=round(self.axial_force_f / 1000, 2),
                                                                ff=round(self.flange_force / 1000, 2), ), '')
         self.report_check.append(t23)
-        # flange_get_weld_strenght_kn = round(self.flange_weld.get_weld_strenght / 1000, 2)
-    ##todo# if self.preference ="Outside"
-    #     t2 = ('SubSection', 'Flange Weld Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-    #     self.report_check.append(t2)
+            ####weld design check remains same for outside and " outside +inside" ####
+
+        t1 = ('SubSection', 'Flange Weld  Design Check ', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t2 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
+                                                    min_weld_size=self.flange_weld_size_min),
+               self.flange_weld.size,
+               get_pass_fail(self.flange_weld_size_min, self.flange_weld.size, relation="lesser"))
+        self.report_check.append(t2)
+        t2 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
+                                                     max_weld_size=self.min_flange_platethk),
+               self.flange_weld.size,
+               get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
+        self.report_check.append(t2)
+        t2 = (KEY_FLANGE_DISP_WELD_STRENGTH, flange_weld_stress( F_f=self.flange_force,F_rl=self.l_req_flangelength,F_ws= self.flange_weld.stress),
+
+               self.flange_weld.strength,
+                get_pass_fail(self.flange_weld.stress,self.flange_weld.strength, relation="lesser"))
+        self.report_check.append(t2)
+
+    # if  self.preference == "Outside":
     #
-    #  todo   t2 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
-    #                                                 min_weld_size=self.flange_weld_size_min),
-    #           self.flange_weld.size,
-    #           get_pass_fail(self.flange_weld_size_min, self.flange_weld.size, relation="lesser"))
-    #     self.report_check.append(t2)
-    #     t2 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
-    #                                                 max_weld_size=self.min_flange_platethk),
-    #           self.flange_weld.size,
-    #           get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
-    #     self.report_check.append(t2)
-
-        # else :
-    #Outside
-    #ioutside+nside
-
-
-
-        # t2 =(KEY_FLANGE_DISP_WELD_STRENGTH, weld_strength_req(V=self.load.shear_force*1000,A=self.load.axial_force*1000,
-        #                                             M=self.plate.moment_demand,Ip_w=Ip_weld,
-        #                                             y_max= self.flange_weld.eff_length/2,x_max=0.0,l_w=2*self.flange_weld.eff_length,
-        #                                             R_w=self.flange_weld.stress),
-        #      weld_strength_prov(flange_weld_conn_plates_fu, gamma_mw, self.flange_weld.throat_tk, self.flange_weld.strength),
-        #      get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
-        # self.report_check.append(t2)
-        # t2 =(KEY_FLANGE_DISP_WELD_STRESS, weld_stress)
-
-######################
-
-       # flange_connecting_plates = [self.flange_plate.thickness_provided, self.section.flange_thickness]
-        # flange_get_weld_strenght_kn = round(self.flange_weld.get_weld_strenght / 1000, 2)
-
-
-       # t1 = ('SubSection', 'Weld Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-       # self.report_check.append(t1)
-       # self.flange_weld_connecting_plates = [self.section.flange_thickness, self.flange_plate.thickness_provided]
-       # t1 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
-        #                                            min_weld_size=self.min_flange_platethk),
-        #      self.flange_weld.size,
-        #      get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="leq"))
-        #
-
-        #t1 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.web_weld_connecting_plates,
-         #                                           max_weld_size=self.min_flange_platethk),
-         #     self.web_weld.size,
-        #      get_pass_fail(self.min_flange_platethk, self.web_weld.size, relation="geq"))
-       # self.report_check.append(t1)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        t1 = ('SubSection', ' Outer Flange  plate Check ', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        t1 = (DISP_MIN_PLATE_HEIGHT, height_of_flange_cover_plate(B=self.section.flange_width,sp=self.flangespace,b_fp=self.flange_plate.height),
+               self.flange_weld.height,
+               get_pass_fail( self.flange_plate.height,self.flange_weld.height, relation="lesser"))
+        self.report_check.append(t1)
+        t1 = (DISP_MIN_PLATE_LENGTH,  min_flange_plate_Lenght_req(l=self.available_long_flange_length,s=self.flange_weld.size,g=self.flange_plate.gap,l_fp=self.flange_plate.length),
+              self.flange_weld.length,
+              get_pass_fail(self.flange_plate.length, self.flange_weld.length, relation="lesser"))
+        self.report_check.append(t1)
 
         Disp_3D_image = "./ResourceFiles/images/3d.png"
-
         config = configparser.ConfigParser()
         config.read_file(open(r'Osdag.config'))
         desktop_path = config.get("desktop_path", "path1")

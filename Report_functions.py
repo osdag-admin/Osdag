@@ -828,8 +828,8 @@ def throat_req():
 def throat_prov(tw,f):
     tt = tw * f
     t_t= max(tt,3)
-    tw = str(tw)
-    f= str(f)
+    tw = str(round(tw,2))
+    f= str(round(f,2))
     tt = str(round(tt,2))
     t_t = str(round(t_t,2))
 

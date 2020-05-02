@@ -659,7 +659,7 @@ class EndPlateConnection(ShearConnection):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         plate_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(1.0, Z_p, self.plate.fy, gamma_m0)
         A_vg = p_h* p_th
-        plate_shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_vg, self.plate.fy, gamma_m0)
+        plate_shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_vg, self.plate.fy)
 
         A_vg = ((n_row-1)*pitch + end)*p_th
         A_vn = ((n_row-1)*pitch + end - (float(n_row)-0.5) * bolt_hole_dia) *p_th

@@ -426,13 +426,17 @@ KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load Au (kN)'
 KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load Mu (kNm)'
 
 # capacity
-KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member Ac (kN)"
-KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member Sc (kN)"
-KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member Mc (kNm)"
+DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"
+KEY_MEMBER_CAPACITY = "section.memcapacity"
+KEY_DISP_MEMBER_CAPACITY = "Member Capacity"
+KEY_MEMBER_AXIALCAPACITY='section.MomCapacity'
+KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Ac (kN)"
+KEY_MEMBER_SHEAR_CAPACITY='section.MomCapacity'
+KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Sc (kN)"
+KEY_MEMBER_MOM_CAPACITY='section.MomCapacity'
+KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Mc (kNm)"
 KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity Pmc (kNm)'
 KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria Mdc (kNm)'
-
-
 
 KEY_OUT_ANCHOR_BOLT_SHEAR = 'Anchor Bolt.Shear'
 KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
@@ -559,14 +563,14 @@ KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
 VALUES_FLANGEPLATE_PREFERENCES = ['Cover plate location', 'Outside','Outside + Inside']
 
 KEY_FLANGEPLATE_THICKNESS = 'flange_plate.thickness_provided'
-KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
+KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
-KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness(mm)'
+KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness (mm)'
 
 KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
-KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
+KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height (mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length (mm)'
 
@@ -577,12 +581,12 @@ KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 KEY_DISP_INNERFLANGESPLICEPLATE = "Inner Plate Detials"
 DISP_TITLE_INNERFLANGESPLICEPLATE = 'Inner Flange splice plate'
 KEY_INNERFLANGE_PLATE_HEIGHT = 'flange_plate.InnerHeight'
-KEY_DISP_INNERFLANGE_PLATE_HEIGHT = 'Height(mm)'
+KEY_DISP_INNERFLANGE_PLATE_HEIGHT = 'Height (mm)'
 KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
-KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length(mm)'
+KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length (mm)'
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
-KEY_DISP_FLANGE_SPACING = 'Spacing(mm)'
+KEY_DISP_FLANGE_SPACING = 'Spacing (mm)'
 KEY_FLANGE_PITCH = 'Flange_plate.pitch_provided'
 KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
 KEY_FLANGE_PLATE_GAUGE = "Flange_plate.gauge_provided "
@@ -598,7 +602,7 @@ KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
 KEY_DISP_FLANGE_TEN_CAPACITY ="Flange Tension Capacity (kN)"
 
 KEY_FLANGE_PLATE_TEN_CAP ="Flange_plate.tension_capacity"
-KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity  (kN)"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity (kN)"
 
 
 KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
@@ -621,7 +625,7 @@ KEY_DISP_DESIGNATION = "Designation"
 KEY_TENSION_YIELDCAPACITY = "Member.tension_yielding"
 KEY_DISP_TENSION_YIELDCAPACITY = 'Tension Yielding Capacity (kN)'
 KEY_TENSION_RUPTURECAPACITY = "Member.tension_rupture"
-KEY_DISP_TENSION_RUPTURECAPACITY = 'Tension Rupture Capacity(kN)'
+KEY_DISP_TENSION_RUPTURECAPACITY = 'Tension Rupture Capacity (kN)'
 KEY_TENSION_BLOCKSHEARCAPACITY = "Member.tension_blockshear"
 KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear Capacity (KN)'
 
@@ -658,11 +662,11 @@ KEY_DISP_WELD_TYPE = 'Type'
 VALUES_WELD_TYPE = ["Select type", "Fillet Weld", "Butt Weld"]
 DISP_FLANGE_TITLE_WELD = 'Flange Weld'
 KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
-KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size(mm)'
+KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size (mm)'
 KEY_FLANGE_WELD_STRENGTH = 'Flange_Weld.Strength'
-KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
+KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 KEY_FLANGE_WELD_STRESS = 'Flange_Weld.Stress'
-KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
+KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
 KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
@@ -670,14 +674,14 @@ KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
 KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
 
 KEY_INNERFLANGE_WELD_LENGTH = 'Flange_Weld.InnerLength'
-KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length(mm)'
+KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length (mm)'
 KEY_INNERFLANGE_WELD_LENGTH_EFF = 'Flange_Weld.InnerEffLength'
 KEY_INNERFLANGE_WELD_HEIGHT ='flange_Weld.Innerheight'
-KEY_DISP_INNERFLANGE_WELD_HEIGHT = 'Height(mm)'
+KEY_DISP_INNERFLANGE_WELD_HEIGHT = 'Height (mm)'
 KEY_INNERFLANGE_WELD_STRESS = 'Inner_Flange_Weld.Stress'
-KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
+KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
-KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
+KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
 KEY_OUT_FLANGE_BOLT_SHEAR ='flange_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity (kN)"
@@ -699,31 +703,31 @@ KEY_OUT_DISP_FORCES_WEB= 'Forces Carried by Web'
 
 KEY_OUT_WEB_BOLT_SHEAR ='web_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_WEB_BOLT_SHEAR = "Shear Capacity (kN)"
-KEY_OUT_WEB_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'
+KEY_OUT_WEB_BOLT_BEARING = 'web_bolt.bolt_bearing_capacity'
 KEY_OUT_DISP_WEB_BOLT_BEARING = "Bearing Capacity (kN)"
-KEY_OUT_WEB_BOLT_CAPACITY = 'flange_bolt.bolt_capacity'
+KEY_OUT_WEB_BOLT_CAPACITY = 'web_bolt.bolt_capacity'
 KEY_OUT_DISP_WEB_BOLT_CAPACITY ="Bolt Capacity (kN)"
 KEY_OUT_DISP_WEB_BOLT_SLIP= 'Slip Resistance'
-KEY_WEB_BOLT_GRP_CAPACITY = 'flange_bolt.grp_bolt_capacity'
-KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'flange bolt grp bolt capacity (kN)'
+KEY_WEB_BOLT_GRP_CAPACITY = 'web_bolt.grp_bolt_capacity'
+KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'Web bolt grp bolt capacity (kN)'
 
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
-KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
+KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30','32','36','40']
 
 KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
-KEY_DISP_WEB_PLATE_HEIGHT = 'Height(mm)'
+KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
-KEY_DISP_WEB_PLATE_LENGTH ='Length(mm)'
+KEY_DISP_WEB_PLATE_LENGTH ='Length (mm)'
 KEY_OUT_WEB_BOLT_SHEAR ="Web_bolt.shear capacity"
 
 
 KEY_WEB_SPACING ="Web_plate.spacing"
-KEY_DISP_WEB_SPACING = 'Spacing(mm)'
+KEY_DISP_WEB_SPACING = 'Spacing (mm)'
 KEY_WEB_PITCH = "Web_plate.pitch_provided"
 KEY_DISP_WEB_PLATE_PITCH ="Pitch"
 KEY_WEB_GAUGE = "Web_plate.gauge_provided "
@@ -736,7 +740,7 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance'
 KEY_WEB_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_CAPACITY= 'Capacity'
 KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
-KEY_DISP_WEB_TEN_CAPACITY ="Tension Capacity (kN)"
+KEY_DISP_WEB_TEN_CAPACITY ="Web Tension Capacity (kN)"
 KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
 KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Plate Shear Capacity (kN)"
 KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
@@ -754,7 +758,7 @@ KEY_DISP_TENSIONYIELDINGCAP_WEB ='Web Tension Yielding Capacity (kN)'
 KEY_TENSIONRUPTURECAP_WEB ='web_plate.shear_rupture_capacity'
 KEY_DISP_TENSIONRUPTURECAP_WEB ='Web Tension Rupture Capacity (kN)'
 KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
-KEY_WEB_DISP_PLATE_MOM_DEMAND = 'web Moment Demand (kNm)'
+KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Web Moment Demand (kNm)'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
 KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kNm)'
 KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
@@ -768,11 +772,11 @@ KEY_WEB_WELD_DETAILS = "Web detail"
 KEY_DISP_WEB_WELD_DETAILS = "Weld Details"
 DISP_WEB_TITLE_WELD = 'Web Weld'
 KEY_WEB_WELD_SIZE = 'Web_Weld.Size'
-KEY_WEB_DISP_WELD_SIZE = 'Web Weld Size(mm)'
+KEY_WEB_DISP_WELD_SIZE = 'Web Weld Size (mm)'
 KEY_WEB_WELD_STRENGTH = 'Web_Weld.Strength'
-KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength(N/mm)'
+KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength (N/mm)'
 KEY_WEB_WELD_STRESS = 'Web_Weld.Stress'
-KEY_WEB_DISP_WELD_STRESS = 'Web Weld Stress(N/mm)'
+KEY_WEB_DISP_WELD_STRESS = 'Web Weld Stress (N/mm)'
 KEY_WEB_WELD_LENGTH = 'Web_Weld.Length'
 KEY_DISP_WEB_WELD_LENGTH = 'Web Weld Length'
 KEY_WEB_WELD_LENGTH_EFF = 'Web_Weld.EffLength'

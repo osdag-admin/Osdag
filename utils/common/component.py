@@ -276,20 +276,21 @@ class Section(Material):
         self.plast_sec_mod_z = 0.0
         self.plast_sec_mod_y = 0.0
         self.source = 0.0
+
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
         self.block_shear_capacity = 0.0
+        self.tension_capacity_flange = 0.0
+
+        self.tension_yielding_capacity_web = 0.0  #
+        self.tension_rupture_capacity_web = 0.0
+        self.block_shear_capacity_web = 0.0
+        self.tension_capacity_web = 0.0
 
         # self.shear_yielding_capacity = 0.0
         # self.shear_rupture_capacity = 0.0
-
-        self.tension_capacity_flange = 0.0
         self.shear_capacity_flange = 0.0
-        self.tension_capacity_web = 0.0
         self.shear_capacity_web = 0.0
-        self.tension_yielding_capacity_web=0.0
-        self.tension_rupture_capacity_web=0.0
-        self.block_shear_capacity_web=0.0
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0

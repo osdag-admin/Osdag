@@ -4,6 +4,8 @@ from design_type.connection.moment_connection import MomentConnection
 from utils.common.component import *
 from Common import *
 from utils.common.load import Load
+from design_report.reportGenerator_latex import CreateLatex
+from Report_functions import *
 import yaml
 import os
 from design_report.reportGenerator_latex import CreateLatex
@@ -1446,7 +1448,8 @@ class BeamCoverPlateWeld(MomentConnection):
         # else:
         #     self.display.EraseAll()
 
-    def call_3DBeam(self, ui, bgcolor):
+    def \
+            call_3DBeam(self, ui, bgcolor):
         # status = self.resultObj['Bolt']['status']
         # if status is True:
         #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
@@ -1501,20 +1504,13 @@ class BeamCoverPlateWeld(MomentConnection):
     #     flange_force = (((self.moment_flange * 1000000) / (self.section.depth - self.section.flange_thickness)) + (
     #         axial_force_f))
 
-# self.weld_connecting_plates = [self.section.flange_thickness,self.flange_plate.thickness_provided]
-# t1 = (DISP_MIN_WELD_SIZE_FLANGE,# for display
-#       min_weld_size_req(conn_plates_weld = self.weld_connecting_plates,min_weld_size= self.min_flange_platethk ), # Required
-#     self.flange_weld.size, #provided
-#      get_pass_fail(self.min_flange_platethk,  self.flange_weld.size, relation="leq")) # relation
-#         self.report_check.append(t1)
-# t2 = (DISP_MIN_WELD_SIZE,min_weld_size_req(conn_plates_weld=self.weld_connecting_plates,
-#                                                    min_weld_size=self.min_flange_platethk ) ,
-#               self.flange_weld.size ,
-#               get_pass_fail(self.min_flange_platethk,  self.flange_weld.size, relation="leq") )
-# self.report_check.append(t2)
+
+    ################################ Design Report #####################################################################################
+
 
 
     def save_design(self, popup_summary):
+
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
                                   KEY_DISP_BEAMSEC: self.section.designation,
                                   KEY_DISP_MATERIAL: self.section.material,
@@ -1539,12 +1535,12 @@ class BeamCoverPlateWeld(MomentConnection):
                                   'Zpy(mm3)': self.section.elast_sec_mod_y}
         self.report_input = \
             {KEY_MODULE: self.module,
-             KEY_MAIN_MODULE: self.mainmodule,
+
+             KEY_MAIN_MODULE: self.mainmodule ,
              # KEY_CONN: self.connectivity,
              KEY_DISP_MOMENT: self.load.moment,
-             KEY_DISP_SHEAR: self.load.shear_force,
+             KEY_DISP_SHEAR: self.load.shear_force ,
              KEY_DISP_AXIAL: self.load.axial_force,
-
 
              "Section": "TITLE",
              "Section Details": self.report_supporting,
@@ -1556,9 +1552,25 @@ class BeamCoverPlateWeld(MomentConnection):
 
 
         self.report_check = []
-        #####Outer plate#####
+
+
         self.flange_weld_connecting_plates = [self.section.flange_thickness, self.flange_plate.thickness_provided]
         self.flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.flange_thickness,self.flange_plate.thickness_provided)
+
+        h = self.section.depth - (2 * self.section.flange_thickness)
+        self.Pmc = self.section.plastic_moment_capactiy
+        self.Mdc = self.section.moment_d_def_criteria
+
+        t1 = ('SubSection', 'Member Capacity','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, '', axial_capacity(area=self.section.area ,
+                                                              fy =self.section.fy,
+                                                              gamma_m0=gamma_m0,
+                                                              axial_capacity= round(self.axial_capacity/1000 , 2) ),'')
+        self.report_check.append(t1)
+
+
 
         # flange_get_weld_strenght_kn = round(self.flange_weld.get_weld_strenght / 1000, 2)
         h = self.section.depth - (2 * self.section.flange_thickness)
@@ -1648,33 +1660,115 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                 ff=round(self.flange_force / 1000, 2), ), '')
         self.report_check.append(t23)
 
-        t1 = ('SubSection', 'Weld Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+
+        self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
+                                      self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0) ,2)
+
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '', shear_capacity(h=h, t =self.section.web_thickness,
+                                                              f_y =self.section.fy, gamma_m0=gamma_m0,
+                                                              shear_capacity = self.shear_capacity1/1000), '')
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY,'', plastic_moment_capacty(beta_b =self.beta_b,
+                                                            Z_p=self.Z_p, f_y=self.section.fy,
+                                                            gamma_m0 =gamma_m0 , Pmc = round(self.Pmc/1000000,2)),  '')
+        self.report_check.append(t1)
+
+        t1 = (KEY_OUT_DISP_MOMENT_D_DEFORMATION, '',moment_d_deformation_criteria(fy = self.section.fy,
+                                                            Z_e = self.section.elast_sec_mod_z,
+                                                            Mdc= round(self.Mdc/1000000,2)), '')
+        self.report_check.append(t1)
+
+        t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, '',moment_capacity(Pmc= round(self.Pmc/1000000,2),
+                                                               Mdc = round(self.Mdc/1000000,2),
+                                                               M_c = round(self.section.moment_capacity/1000000,2)), '')
+        self.report_check.append(t1)
+
+
+        t1 = ('SubSection', 'Load Considered','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, min_axial_capacity(axial_capacity =round(self.axial_capacity/1000 , 2),
+                                                                min_ac= round(self.min_axial_load/1000 , 2)),
+                                                                prov_axial_load(axial_input =self.load.axial_force,
+                                                                min_ac= round(self.min_axial_load/1000 , 2),
+                                                                app_axial_load =round(self.factored_axial_load/1000 ,2)),
+                                                                get_pass_fail(self.min_axial_load/1000,
+                                                                self.factored_axial_load/1000, relation='lesser'))
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, min_shear_capacity(shear_capacity=round(self.shear_capacity1 / 1000, 2),
+                                                              min_sc=round(self.shear_load1/ 1000, 2)),
+                                                              prov_shear_load(shear_input=self.load.shear_force ,
+                                                              min_sc=round(self.shear_load1 / 1000, 2),
+                                                              app_shear_load=round( self.fact_shear_load / 1000, 2)),
+                                                              get_pass_fail(self.shear_load1/1000,
+                                                              self.fact_shear_load/1000, relation='lesser'))
+        self.report_check.append(t1)
+
+        t1 = (KEY_DISP_APPLIED_MOMENT_LOAD, min_moment_capacity(moment_capacity=round( self.section.moment_capacity / 1000000, 2),
+                                                               min_mc=round( self.load_moment_min  / 1000000, 2)),
+                                                               prov_moment_load(moment_input=self.load.moment,
+                                                               min_mc=round( self.load_moment_min  / 1000000, 2),
+                                                               app_moment_load=round(self.load_moment / 1000000, 2)),
+                                                               get_pass_fail(round( self.load_moment_min  / 1000000, 2),
+                                                               round(self.load_moment/1000000 , 2), relation="lesser"))
+        self.report_check.append(t1)
+
+        t23 = (KEY_OUT_DISP_FORCES_WEB, '', forces_in_web(Au=round(self.factored_axial_load / 1000, 2),
+                                                          T=self.section.flange_thickness, A=self.section.area,
+                                                          t=self.section.web_thickness, D=self.section.depth,
+                                                          Zw=self.Z_p, Mu=round(self.load_moment / 1000000, 2),
+                                                          Z=self.section.plast_sec_mod_z,
+                                                          Mw=round(self.moment_web / 1000000, 2),
+                                                          Aw=round(self.axial_force_w / 1000, 2)), '')
+        self.report_check.append(t23)
+
+        t23 = (KEY_OUT_DISP_FORCES_FLANGE, '',forces_in_flange(Au=round(self.factored_axial_load / 1000, 2),
+                                                               B=self.section.flange_width,
+                                                               T=self.section.flange_thickness, A=self.section.area,
+                                                               D=self.section.depth,
+                                                               Mu=round(self.load_moment / 1000000, 2),
+                                                               Mw=round(self.moment_web / 1000000, 2),
+                                                               Mf=round(self.moment_flange / 1000000, 2),
+                                                               Af=round(self.axial_force_f / 1000, 2),
+                                                               ff=round(self.flange_force / 1000, 2), ), '')
+        self.report_check.append(t23)
+            ####weld design check remains same for outside and " outside +inside" ####
+
+        t1 = ('SubSection', 'Flange Weld  Design Check ', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         t2 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
                                                     min_weld_size=self.flange_weld_size_min),
-              self.flange_weld.size,
-              get_pass_fail(self.flange_weld_size_min, self.flange_weld.size, relation="lesser"))
+               self.flange_weld.size,
+               get_pass_fail(self.flange_weld_size_min, self.flange_weld.size, relation="lesser"))
         self.report_check.append(t2)
         t2 = (DISP_MAX_WELD_SIZE, max_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
-                                                    max_weld_size=self.min_flange_platethk),
-              self.flange_weld.size,
-              get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
+                                                     max_weld_size=self.min_flange_platethk),
+               self.flange_weld.size,
+               get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
+        self.report_check.append(t2)
+        t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,
+              flange_weld_stress(F_f=self.flange_force, F_rl=self.l_req_flangelength, F_ws=self.flange_weld.stress),
+
+              self.flange_weld.strength,
+              get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
         self.report_check.append(t2)
 
+        # if  self.preference == "Outside":
+        t1 = ('SubSection', ' Outer Flange  plate Check ', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        t1 = (DISP_MIN_PLATE_HEIGHT, height_of_flange_cover_plate(B=self.section.flange_width, sp=self.flangespace,
+                                                                  b_fp=self.flange_plate.height),
+              self.flange_weld.height,
+              get_pass_fail(self.flange_plate.height, self.flange_weld.height, relation="lesser"))
+        self.report_check.append(t1)
+        t1 = (DISP_MIN_PLATE_LENGTH,
+              min_flange_plate_Lenght_req(l=self.available_long_flange_length, s=self.flange_weld.size,
+                                          g=self.flange_plate.gap, l_fp=self.flange_plate.length),
+              self.flange_weld.length,
+              get_pass_fail(self.flange_plate.length, self.flange_weld.length, relation="lesser"))
+        self.report_check.append(t1)
 
-
-
-
-
-
-
-
-
-
-
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
-
+    Disp_3D_image = "./ResourceFiles/images/3d.png"
         config = configparser.ConfigParser()
         config.read_file(open(r'Osdag.config'))
         desktop_path = config.get("desktop_path", "path1")

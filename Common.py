@@ -31,7 +31,7 @@ import sqlite3
 
 from utils.common.component import *
 from utils.common.component import *
-from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+#from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 import logging
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.column_cover_plate import ColumnCoverPlate

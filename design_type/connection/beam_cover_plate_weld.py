@@ -1746,25 +1746,29 @@ class BeamCoverPlateWeld(MomentConnection):
                self.flange_weld.size,
                get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
         self.report_check.append(t2)
-        t2 = (KEY_FLANGE_DISP_WELD_STRENGTH, flange_weld_stress( F_f=self.flange_force,F_rl=self.l_req_flangelength,F_ws= self.flange_weld.stress),
+        t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,
+              flange_weld_stress(F_f=self.flange_force, F_rl=self.l_req_flangelength, F_ws=self.flange_weld.stress),
 
-               self.flange_weld.strength,
-                get_pass_fail(self.flange_weld.stress,self.flange_weld.strength, relation="lesser"))
+              self.flange_weld.strength,
+              get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
         self.report_check.append(t2)
 
-    # if  self.preference == "Outside":
+        # if  self.preference == "Outside":
         t1 = ('SubSection', ' Outer Flange  plate Check ', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
-        t1 = (DISP_MIN_PLATE_HEIGHT, height_of_flange_cover_plate(B=self.section.flange_width,sp=self.flangespace,b_fp=self.flange_plate.height),
-                self.flange_weld.height,
-                get_pass_fail( self.flange_plate.height,self.flange_weld.height, relation="lesser"))
+        t1 = (DISP_MIN_PLATE_HEIGHT, height_of_flange_cover_plate(B=self.section.flange_width, sp=self.flangespace,
+                                                                  b_fp=self.flange_plate.height),
+              self.flange_weld.height,
+              get_pass_fail(self.flange_plate.height, self.flange_weld.height, relation="lesser"))
         self.report_check.append(t1)
-        t1 = (DISP_MIN_PLATE_LENGTH,  min_flange_plate_Lenght_req(l=self.available_long_flange_length,s=self.flange_weld.size,g=self.flange_plate.gap,l_fp=self.flange_plate.length),
-                self.flange_weld.length,
-                get_pass_fail(self.flange_plate.length, self.flange_weld.length, relation="lesser"))
+        t1 = (DISP_MIN_PLATE_LENGTH,
+              min_flange_plate_Lenght_req(l=self.available_long_flange_length, s=self.flange_weld.size,
+                                          g=self.flange_plate.gap, l_fp=self.flange_plate.length),
+              self.flange_weld.length,
+              get_pass_fail(self.flange_plate.length, self.flange_weld.length, relation="lesser"))
         self.report_check.append(t1)
 
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+    Disp_3D_image = "./ResourceFiles/images/3d.png"
         config = configparser.ConfigParser()
         config.read_file(open(r'Osdag.config'))
         desktop_path = config.get("desktop_path", "path1")

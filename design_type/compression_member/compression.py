@@ -1,6 +1,5 @@
 from main import Main
 from Common import *
-#from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
 
 
 class Compression(Main):

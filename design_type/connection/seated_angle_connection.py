@@ -50,17 +50,9 @@ from utils.common.material import *
 from utils.common.component import Bolt, Plate, Weld
 from Common import *
 from utils.common.load import Load
-import yaml
-import os
-import shutil
 import logging
-#from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
 
-'''
 
-        Please don't add any unnecessary imports like PyQt5
-
-'''
 class SeatedAngleConnection(ShearConnection):
 
     def __init__(self):

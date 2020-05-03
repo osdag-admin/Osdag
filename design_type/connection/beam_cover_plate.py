@@ -7,17 +7,8 @@ from Common import *
 from utils.common.load import Load
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
-import yaml
-import os
-import shutil
 import logging
-#from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-#from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-import configparser
 
-'''
-Please don't add any unnecessary imports like PyQt5 
-'''
 
 class BeamCoverPlate(MomentConnection):
 
@@ -670,7 +661,6 @@ class BeamCoverPlate(MomentConnection):
         elif self.class_of_section == 3:
             self.beta_b = self.Z_e / self.Z_p
 
-
         self.section.plastic_moment_capacty(beta_b = self.beta_b, Z_p = self.Z_p, fy= self.section.fy) # N # for section #todo add in ddcl
 
         self.section.moment_d_deformation_criteria(fy= self.section.fy,Z_e = self.section.elast_sec_mod_z)
@@ -707,6 +697,7 @@ class BeamCoverPlate(MomentConnection):
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
         self.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
                                              A_v=A_v_web, fy=self.section.fy)
+
 
 
         print("tension_yielding_capacity_web", self.tension_yielding_capacity_web)

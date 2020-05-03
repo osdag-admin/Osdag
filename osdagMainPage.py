@@ -384,7 +384,7 @@ class OsdagMainWindow(QMainWindow):
 
             else:
                 raise ValueError
-        self.show()
+        self.showMaximized()
 
 ################################ UI Methods ###############################################
 
@@ -754,11 +754,7 @@ class OsdagMainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = OsdagMainWindow()
-
     window.show()
-    #qtmodern.styles.dark(app)
-    #mw = qtmodern.windows.ModernWindow(window)
-    #mw.show()
     # app.exec_()
     # sys.exit(app.exec_())
     try:

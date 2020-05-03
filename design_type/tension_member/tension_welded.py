@@ -1,6 +1,4 @@
 from design_type.connection.shear_connection import ShearConnection
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from design_report.reportGenerator_latex import CreateLatex
@@ -10,24 +8,12 @@ from utils.common.component import *
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
-import yaml
 from design_report.reportGenerator import save_html
-import os
-import shutil
 import logging
-import pickle
-import pdfkit
-import configparser
+
 from main import Main
-import configparser
-import os
 
-import cairosvg
-from io import StringIO
 
-'''
-Please don't add any unnecessary imports like PyQt5 and CommonDesignLogic
-'''
 class Tension_welded(Main):
 
     def __init__(self):

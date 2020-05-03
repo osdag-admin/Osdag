@@ -10,16 +10,9 @@ from utils.common.component import *
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
-import yaml
-from design_report.reportGenerator import  save_html
 from Report_functions import *
-import os
 import logging
 
-
-import configparser
-
-from io import StringIO
 
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
@@ -38,11 +31,7 @@ from io import StringIO
 # weld_size = 6
 # material_grade = "E 250 (Fe 410 W)B"
 # material = Material(material_grade)
-'''
 
-        Please don't add any unnecessary imports like PyQt5
-
-'''
 
 class FinPlateConnection(ShearConnection):
 

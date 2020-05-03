@@ -2,10 +2,10 @@ from design_type.connection.moment_connection import MomentConnection
 from design_report.reportGenerator_latex import CreateLatex
 
 from utils.common.component import *
-from cad.common_logic import CommonDesignLogic
+#from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
 from Common import *
-from PyQt5.QtWidgets import QMessageBox
+#from PyQt5.QtWidgets import QMessageBox
 from Common import *
 from Report_functions import *
 import os
@@ -16,12 +16,16 @@ import yaml
 import os
 import shutil
 import time
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
+#from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
 import pickle
 import pdfkit
 import configparser
 import cairosvg
 from io import StringIO
+
+'''
+Please don't add any unnecessary imports like PyQt5 and CommonDesignLogic
+'''
 
 class ColumnEndPlate(MomentConnection):
 

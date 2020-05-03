@@ -38,7 +38,11 @@ from io import StringIO
 # weld_size = 6
 # material_grade = "E 250 (Fe 410 W)B"
 # material = Material(material_grade)
+'''
 
+        Please don't add any unnecessary imports like PyQt5
+
+'''
 
 class FinPlateConnection(ShearConnection):
 

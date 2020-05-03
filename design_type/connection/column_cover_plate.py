@@ -10,7 +10,6 @@ import yaml
 import os
 import shutil
 import logging
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
 
 
 

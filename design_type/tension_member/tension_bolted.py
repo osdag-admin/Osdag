@@ -16,14 +16,7 @@ from design_report.reportGenerator import save_html
 import os
 import shutil
 import logging
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtGui import QTextCharFormat
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
+
 import pickle
 import pdfkit
 import configparser
@@ -31,6 +24,9 @@ from main import Main
 import cairosvg
 from io import StringIO
 
+'''
+Please don't add any unnecessary imports like PyQt5 and CommonDesignLogic
+'''
 
 class Tension_bolted(Main):
 

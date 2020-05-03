@@ -3,15 +3,19 @@ from utils.common.component import *
 from utils.common.component import Bolt, Plate, Weld
 from Common import *
 import sys
-from cad.common_logic import CommonDesignLogic
+#from cad.common_logic import CommonDesignLogic
 
 from utils.common.load import Load
 import yaml
 import os
 import shutil
 import logging
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
+#from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
+'''
 
+        Please don't add any unnecessary imports like PyQt5
+
+'''
 class CleatAngleConnection(ShearConnection):
 
     def __init__(self):

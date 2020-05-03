@@ -10,10 +10,12 @@ from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
 import shutil
 import logging
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
+#from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
+#from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 
-
+'''
+Please don't add any unnecessary imports like PyQt5 and CommonDesignLogic
+'''
 class BeamCoverPlateWeld(MomentConnection):
 
     def __init__(self):

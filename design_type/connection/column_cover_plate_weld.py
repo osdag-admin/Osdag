@@ -1798,7 +1798,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.report_check.append(t2)
 
 
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         #config = configparser.ConfigParser()
         #config.read_file(open(r'Osdag.config'))

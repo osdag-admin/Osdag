@@ -552,7 +552,7 @@ class EndPlateConnection(ShearConnection):
 
                                 ##### O U T P U T   D I C T I O N A R Y   F O R M A T #####
                                 row = [int(self.plate.bolts_row_required),                              # 0-Rows of Bolts
-                                       'M'+str(int(self.bolt.bolt_diameter_provided)),                  #1-Bolt Diameter
+                                       str(int(self.bolt.bolt_diameter_provided)),                      #1-Bolt Diameter
                                        self.bolt.bolt_grade_provided,                                   #2-Bolt Grade
                                        int(self.plate.thickness_provided),                              #3-Plate Thickness
                                        int(self.plate.height),                                          #4-Plate Height
@@ -620,7 +620,7 @@ class EndPlateConnection(ShearConnection):
 
     def set_values_to_class(self):
         self.bolt.bolt_diameter_provided = self.output[0][1]
-        self.plate.thickness = self.output[0][3]
+        self.plate.thickness_provided = self.output[0][3]
         self.plate.height = self.output[0][4]
         self.plate.width = self.output[0][5]
         self.plate.pitch_provided = self.output[0][13]
@@ -628,6 +628,9 @@ class EndPlateConnection(ShearConnection):
         self.plate.end_dist_provided = self.output[0][15]
         self.plate.edge_dist_provided = self.output[0][16]
         self.plate.bolts_one_line = self.output[0][0]
+        self.plate.bolt_line = 2                               # only one line of bolts provided on each side of web
+        self.weld.length = self.output[0][4]
+        self.weld.size = self.output[0][23]
 
     def get_bolt_IR(self,bolt_shear_capacity,bolt_tension_capacity,no_bolt):
         while True:
@@ -656,7 +659,7 @@ class EndPlateConnection(ShearConnection):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         plate_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(1.0, Z_p, self.plate.fy, gamma_m0)
         A_vg = p_h* p_th
-        plate_shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_vg, self.plate.fy, gamma_m0)
+        plate_shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_vg, self.plate.fy)
 
         A_vg = ((n_row-1)*pitch + end)*p_th
         A_vn = ((n_row-1)*pitch + end - (float(n_row)-0.5) * bolt_hole_dia) *p_th

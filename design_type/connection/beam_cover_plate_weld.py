@@ -1753,16 +1753,15 @@ class BeamCoverPlateWeld(MomentConnection):
         self.report_check.append(t2)
 
     # if  self.preference == "Outside":
-    #
         t1 = ('SubSection', ' Outer Flange  plate Check ', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         t1 = (DISP_MIN_PLATE_HEIGHT, height_of_flange_cover_plate(B=self.section.flange_width,sp=self.flangespace,b_fp=self.flange_plate.height),
-               self.flange_weld.height,
-               get_pass_fail( self.flange_plate.height,self.flange_weld.height, relation="lesser"))
+                self.flange_weld.height,
+                get_pass_fail( self.flange_plate.height,self.flange_weld.height, relation="lesser"))
         self.report_check.append(t1)
         t1 = (DISP_MIN_PLATE_LENGTH,  min_flange_plate_Lenght_req(l=self.available_long_flange_length,s=self.flange_weld.size,g=self.flange_plate.gap,l_fp=self.flange_plate.length),
-              self.flange_weld.length,
-              get_pass_fail(self.flange_plate.length, self.flange_weld.length, relation="lesser"))
+                self.flange_weld.length,
+                get_pass_fail(self.flange_plate.length, self.flange_weld.length, relation="lesser"))
         self.report_check.append(t1)
 
         Disp_3D_image = "./ResourceFiles/images/3d.png"

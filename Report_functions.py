@@ -340,8 +340,8 @@ def height_of_flange_cover_plate(B,sp,b_fp):
     sp = str(sp)
     b_fp = str (b_fp)
     height_for_flange_cover_plate_eqn =Math(inline=True)
-    height_for_flange_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= \{B - 2*sp} \\'))
-    height_for_flange_cover_plate_eqn.append(NoEscape(r'&= \{' + B + ' - 2 * ' + sp + '} \\'))
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= \B - 2*sp \\'))
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'&= \{'+B+'-2*'+sp+r'} \\'))
     height_for_flange_cover_plate_eqn.append(NoEscape(r'&=' + b_fp + '\end{aligned}'))
     return height_for_flange_cover_plate_eqn
 
@@ -351,9 +351,9 @@ def min_flange_plate_Lenght_req(l,s,g,l_fp):
     g = str (g)
     l_fp = str(l_fp)
     min_flange_plate_Length_eqn = Math(inline=True)
-    min_flange_plate_Length_eqn.append(NoEscape(r'\begin{aligned} l_{fp} & = [ 2*(l_wl + 2*s) + g]\\'))
-   # min_flange_plate_Length_eqn.append(NoEscape(r'&= \{'+2+'*'+(+' +l_wl+' +
-    min_flange_plate_Length_eqn.append(NoEscape(r'&= + \frac{'+g+r'}]\\'))
+    min_flange_plate_Length_eqn.append(NoEscape(r'\begin{aligned} l_{fp} & = \{ 2*(l+ 2*s) + g}}\\'))
+    min_flange_plate_Length_eqn.append(NoEscape(r'&= \{2*('+l+'+2*'+s+')+'+g+r'}\\'))
+   # min_flange_plate_Length_eqn.append(NoEscape(r'&= + \frac{'+g+r'}]\\'))
     min_flange_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
     return min_flange_plate_Length_eqn
 
@@ -395,6 +395,30 @@ def spacing (sp,s):
     space_provided_eqn.append(NoEscape(r'&= Max(' + 15 + ','  +( s+5) + r')\\'))
     space_provided_eqn.append(NoEscape(r'&=' + sp + '\end{aligned}'))
     return space_provided_eqn
+
+def throat_thickness_req(t,t_t):
+    t_t <= .7*t
+    t_t >= 3
+    t = str(t)
+    t_t = str(t_t)
+    throat_thickness_eqn = Math(inline=True)
+    throat_thickness_eqn.append(NoEscape(r'\begin{aligned} [t_t& <= .7*t ]; [t_t& = >= 3]\\'))
+    throat_thickness_eqn.append(NoEscape(r'&='+ t_t+ '\end{aligned}'))
+    return throat_thickness_eqn
+
+def height_of_inner_flange_cover_plate(b_fp,B,t_w,r_r,sp):
+   # sp= max(15,s+5)
+    b_fp =str(b_fp)
+    B = str(B)
+    t_w =str(t_w)
+    r_r = str(r_r)
+    sp = str(sp)
+    #s = str(s)
+    ht_inner_flange_cover_plate_eqn =  Math(inline=True)
+    ht_inner_flange_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_fp &= \frac{B-t_w -2*r_r -4*sp}{2}\\'))
+    ht_inner_flange_cover_plate_eqn.append(NoEscape(r'&= \frac{'+B+'-'+t_w+'-2' +'*'+r_r+' -4' + '*' +sp +r'}{2}\\'))
+    ht_inner_flange_cover_plate_eqn.append(NoEscape(r'&= ' + b_fp+ r'\end{aligned}'))
+    return  ht_inner_flange_cover_plate_eqn
 
 
 def mom_axial_IR_prov(M,M_d,N,N_d,IR):

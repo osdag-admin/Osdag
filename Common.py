@@ -636,6 +636,7 @@ KEY_BOLT_DETAILS ="Bolt.Details"
 
 DISP_TITLE_BOLT_CAPACITIES = 'Bolt Capacities'
 KEY_BOLT_CAPACITIES = 'Bolt.Capacities'
+DISP_THROAT_THICKNESS = "Throat Thickness"
 
 KEY_DISP_BOLT_DETAILS = "Bolt Details"
 KEY_FLANGE_BOLT_LINE = 'Flange_plate.Bolt_Line'

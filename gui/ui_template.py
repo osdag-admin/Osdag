@@ -1824,14 +1824,14 @@ class Ui_ModuleWindow(QMainWindow):
             # DESIGN_FLAG = 'True'
 
             out_list = main.output_values(main, status)
+            print('outlist', out_list)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
-                    if option[0] in [KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DETAILING_GAUGE_DISTANCE]:
-                        txt.setVisible(True if option[3] else False)
-                        txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
-                        txt_label.setVisible(True if option[3] else False)
+                    txt.setVisible(True if option[3] else False)
+                    txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
+                    txt_label.setVisible(True if option[3] else False)
 
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)

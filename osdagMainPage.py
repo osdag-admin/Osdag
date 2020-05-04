@@ -1,18 +1,104 @@
-#!/home/deepa-c/miniconda2/bin/python
 '''
-Created on 31-Mar-2016
+    INSTRUCTIONS TO USE OSDAG MAIN PAGE TEMPLATE(OsdagMainWindow):
+----------------------------------------------------------------------------------------------------
+    Note: This code is designed to handle a 3 level structure, e.g. ,
 
-@author: darshan
+..................................................................................................................
+.                            Modules (Main Dictionary)                                                           .
+.        _______________________|______________________________________________________..........                .    ((LEVEL 1))
+.        |               |          |            |                    |               |                          .
+.    Module_1        Module_2    Module_3     Module_4             Module_5     Module_6         (Keys of Main Dictionary)
+........|..............|............|...........|....................|...............|............................
+        |              |            |           |                    |               |
+        |              |            |           |                    |               |
+        |              |            | [List/Tuple of Module Variants]|               |
+        |              |            |                                |               |
+        |              |    [List/Tuple of Module Variants]          |               |
+        |      (UNDER DEVELOPMENT)                             (UNDER DEVELOPMENT)   |
+........|............................................................................|............................
+.   ____|________________________________.....               ________________________|______......     (Sub Dictionaries)
+.   |                   |               |                    |              |              |                     .     ((LEVEL 2))
+.   Submodule_1    Submodule_2    Submodule_3           Submodule_1    Submodule_2    Submodule_3     (Keys of Sub Dictionaries)
+.       |               |               |                |                  |              |                     .
+........|...............|...............|................|..................|..............|......................
+        |               |               |                |                  |              |
+        |               |               |                |                  |              |
+        |               |               |                |                  |              |
+        |               |      (UNDER DEVELOPMENT)       |                  |              |
+        |               |                  [List/Tuple of Module Variants]  |              |
+        |  [List/Tuple of Module Variants]                                  |  [List/Tuple of Module Variants]
+        |                                                                   |
+........|...................................................................|.....................................
+.   ____|________________________________.....               _______________|_______________......     (Sub-Sub Dictionaries)
+.   |                   |               |                    |              |              |                     .     ((LEVEL 3))
+. Sub-Submodule_1  Sub-Submodule_2  Sub-Submodule_3  Sub-Submodule_1  Sub-Submodule_2  Sub-Submodule_3 (Keys of Sub-Sub Dictionaries)
+.       |               |               |                    |                  |              |                 .
+........|...............|...............|....................|..................|..............|..................
+        |               |               |                    |                  |              |
+        |    (UNDER DEVELOPMENT)        |     [List/Tuple of Module Variants]  |    [List/Tuple of Module Variants]
+        |                   [List/Tuple of Module Variants]     [List/Tuple of Module Variants]
+[List/Tuple of Module Variants]
+
+
+The Rules/Steps to use the template are(OsdagMainWindow):
+-----------------------------------------------------------------------------
+1) The data for the template structuring will go into a variable called self.Modules .
+
+2) self.Modules must be a dictionary with keys as the name of modules in string format (LEVEL 1: Left Panel Buttons).
+
+3) The values to these keys can be a dictionary(Modules), a List/Tuple(Module Variants) or self.Under_Development :
+        (i) If the value is a dictionary then it should contain keys as modules in string format and for values
+            read RULE 4 . (LEVEL 2: Tab for each module)
+       (ii) If the value is a List/Tuple then it should contain sub-lists/sub-tuples informing about the module variants :
+                    (a) The module variants as sub-list/sub-tuple will have 3 values, Module_Name, Image_Path and Object_Name .
+                    (b) The List/Tuple can have several sub-lists/sub-tuples but the last element should be a method,
+                        which connects to the start button on the module variants' page and help launch a certain module.
+      (iii) If the value is self.Under_Development then that module/module variant is marked as UNDER DEVELOPMENT.
+
+4) In case of RULE 3(i) if value of any sub-module key is a dictionary then that dictionary will follow the RULE 3
+   all over again and the values of the keys can be a dictionary(Sub-Modules), a List/Tuple(Sub-Module Variants) or
+   self.Under_Development:
+        (i) If the value is a dictionary then it should contain keys as sub-modules in string format and for values
+            read RULE 5 . (LEVEL 3 Sub Tab for each tab)
+       (ii) If the value is a List/Tuple then it should contain sub-lists/sub-tuples informing about the module variants :
+                    (a) The module variants as sub-list/sub-tuple will have 3 values, Module_Name, Image_Path and Object_Name .
+                    (b) The List/Tuple can have several sub-lists/sub-tuples but the last element should be a method,
+                        which connects to the start button on the module variants' page and help launch a certain module.
+      (iii) If the value is self.Under_Development then that module/module variant is marked as UNDER DEVELOPMENT.
+
+5) In case of RULE 4(i) if the value of any sub-module key is a dictionary then that dictionary will have keys as sub-sub-module
+   and the values can either be a List/Tuple(Sub-Sub-Module Variants) or self.Under_Development but not another dictionary:
+        (i) If the value is a List/Tuple then it should contain sub-lists/sub-tuples informing about the module variants :
+                    (a) The module variants as sub-list/sub-tuple will have 3 values, Module_Name, Image_Path and Object_Name .
+                    (b) The List/Tuple can have several sub-lists/sub-tuples but the last element should be a method,
+                        which connects to the start button on the module variants' page and help launch a certain module.
+       (ii) If the value is self.Under_Development then that module/module variant is marked as UNDER DEVELOPMENT.
+
+6) Object_Name, the third value in the sub-lists/sub-tuples, is used to tie to the Radiobuttons on each page thus making it easier to locate them. This is further used
+   in the methods to search the Radiobutton using it for the respective modules to be launched .
+
+7) Any further Levels will result in an error .
 '''
 
+
+
+
+
+
+
+from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize
+from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication, QWidget, QLabel, QGridLayout, QVBoxLayout, QTabWidget, QRadioButton, QButtonGroup, QSizePolicy
+from PyQt5.QtGui import QIcon
+from PyQt5 import uic
+import math
 import sys
-# from PyQt5 import Qt
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
-from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication
-from gui.ui_OsdagMainPage import Ui_MainWindow
 from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
+from gui.ui_design_summary import Ui_DesignReport
+from gui.LeftPanel_Button import Ui_LPButton
+from gui.Submodule_Page import Ui_Submodule_Page
+from gui.ui_OsdagMainPage import Ui_MainWindow
 # from design_type.connection.fin_plate_connection import design_report_show
 # from design_type.connection.fin_plate_connection import DesignReportDialog
 from design_type.connection.fin_plate_connection import FinPlateConnection
@@ -33,45 +119,13 @@ from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
 #from design_type.tension_member.tension import Tension
 # from cad.cad_common import call_3DBeam
-from gui.ui_template import Ui_ModuleWindow
 
-# from design_type.connection.main_controller import MainController
+import configparser
 import os
 import os.path
 import subprocess
-import shutil
-import configparser
-from PyQt5.QtWidgets import QMessageBox, qApp
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
-from gui.ui_design_preferences import Ui_Dialog
-import os
-import json
-import logging
-from drawing_2D.Svg_Window import SvgWindow
-import sys
-
-from OCC.Core import BRepTools
-from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from OCC.Core import IGESControl
-from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
-from OCC.Core.Interface import Interface_Static_SetCVal
-from OCC.Core.IFSelect import IFSelect_RetDone
-from OCC.Core.StlAPI import StlAPI_Writer
-
-import pdfkit
-import subprocess
-import os.path
-import pickle
-import shutil
-import cairosvg
-import configparser
-from gui.ui_OsdagMainPage import Ui_MainWindow
 from gui.ui_template import Ui_ModuleWindow
-from gui.ui_design_summary import Ui_DesignReport
-# from design_type.connection.main_controller import MainController
+
 
 
 class MyTutorials(QDialog):
@@ -96,45 +150,243 @@ class MyAskQuestion(QDialog):
         self.ui.setupUi(self)
         self.osdagmainwindow = parent
 
+class New_Tab_Widget(QTabWidget):           # Empty Custom Tab Widget
+    def __init__(self):
+        super().__init__()
+        self.setTabShape(QTabWidget.Triangular)
+        self.setStyleSheet(
+            '''
+            QTabBar::tab {
+                margin-right: 10;
+                border-top-left-radius: 2px ;
+                border-top-right-radius: 2px ;
+                border-bottom-left-radius: 0px ;
+                border-bottom-right-radius: 0px ;
+                height: 40px;
+                width: 200px;
+                background-color: #925a5b;
+                color:#ffffff;
+                font-family: "Arial", Helvetica, sans-serif;
+                font-size: 18px;
+                font-weight: bold;
+                        }
+
+            QTabBar::tab::selected{
+	            background-color: #d97f7f;
+                color:#000000 ;
+                        }
+
+            QTabBar::tab::hover{
+                background-color: #d97f7f;
+                color:#000000 ;
+                        }
+
+            '''
+                        )
+
+class Submodule_Page(QWidget):             # Module Varaints' page with a GridLayout and a Start Button
+    def __init__(self):
+        super().__init__()
+        self.ui=Ui_Submodule_Page()
+        self.ui.setupUi(self)
+
+class Submodule_Widget(QWidget):            # Module Variant widget with a Name, RadioButton and an Image
+    def __init__(self,Iterative,parent):
+        super().__init__()
+        Module_Name,Image_Path,Object_Name=Iterative
+        layout=QVBoxLayout()
+        self.setLayout(layout)
+        label=QLabel(Module_Name)
+        layout.addWidget(label)
+        self.rdbtn=QRadioButton()
+        self.rdbtn.setObjectName(Object_Name)
+        self.rdbtn.setIcon(QIcon(Image_Path))
+        self.rdbtn.setIconSize(QSize(300,300))
+        layout.addWidget(self.rdbtn)
+        self.setStyleSheet(
+                    '''
+                        QLabel{
+                            font-family: "Arial", Helvetica, sans-serif;
+                            font-size: 20px;
+                            font-weight: bold;
+                              }
+                    '''
+                )
+        self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+
+class ModulePage(QWidget):              # Empty Page with a layout
+    def __init__(self):
+        super().__init__()
+        self.layout=QGridLayout()
+        self.setLayout(self.layout)
+        self.layout.setContentsMargins(0,5,0,0)
+
+class LeftPanelButton(QWidget):          # Custom Button widget for the Left Panel
+    def __init__(self,text):
+        super().__init__()
+        self.ui=Ui_LPButton()
+        self.ui.setupUi(self)
+        self.ui.LP_Button.setText(text)  #LP_Button is the QPushButton widget inside the LeftPanelButton Widget
 class OsdagMainWindow(QMainWindow):
     def __init__(self):
-        QMainWindow.__init__(self)
-        #show_msg = pyqtSignal()
-        self.ui = Ui_MainWindow()
+        super().__init__()
+        self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
-        self.showMaximized()
-        list_of_items = {'Osdagpage': 0, 'connectionpage': 1, 'Tension': 2,'Compression': 3, 'beamtocolumnpage': 4,'flexuralpage': 5}
-        self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
-        self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
-        self.ui.btn_compression.clicked.connect(
-            lambda: self.change_desgin_page(list_of_items['Compression'], list_of_items['Osdagpage']))
-        self.ui.btn_tension.clicked.connect(
-            lambda: self.change_desgin_page(list_of_items['Tension'], list_of_items['Osdagpage']))
-       # self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
-        self.ui.btn_shearconnection_start.clicked.connect(self.show_shear_connection)
-        self.ui.btn_momentconnection_bb_start.clicked.connect(self.show_moment_connection)
-        self.ui.btn_momentconnection_bc_start.clicked.connect(self.unavailable)
-        self.ui.btn_momentconnection_cc_start.clicked.connect(self.show_moment_connection_cc)
-        self.ui.btn_baseplate_start.clicked.connect(self.show_base_plate)
-
-        self.ui.Tension_Start.clicked.connect(self.show_tension_module)
-        self.ui.Compression_Start.clicked.connect(self.show_compression_module)
-
-        self.ui.btn_beamCol.clicked.connect(self.unavailable)
-        # self.ui.btn_compression.clicked.connect(self.unavailable)
-        self.ui.btn_flexural.clicked.connect(self.unavailable)
-        self.ui.btn_truss.clicked.connect(self.unavailable)
-        self.ui.btn_2dframe.clicked.connect(self.unavailable)
-        self.ui.btn_3dframe.clicked.connect(self.unavailable)
-        self.ui.btn_groupdesign.clicked.connect(self.unavailable)
-        # self.ui.btn_tension.clicked.connect(self.unavailable)
-        self.ui.btn_plate.clicked.connect(self.unavailable)
-        self.ui.comboBox_help.setCurrentIndex(0)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
-        #self.ui.rdbtn_beamtobeam.clicked.connect(lambda: self.change_desgin_page(list_of_items['beamtobeampage'], list_of_items['Osdagpage']))
-        #self.ui.rdbtn_beamcolumn.clicked.connect(lambda: self.change_desgin_page(list_of_items['beamtocolumnpage'], list_of_items['Osdagpage']))
-        #self.ui.rdbtn_peb.setDisabled(True)
-        #self.ui.rdbtn_colcol.setDisabled(True)
+        self.Under_Development='UNDER DEVELOPMENT'
+        self.Modules={
+                'Connection' : {
+                                'Shear Connection' : [
+                                    ('Fin Plate','ResourceFiles/images/finplate.png','Fin_Plate'),
+                                    ('Cleat Angle','ResourceFiles/images/cleatAngle.png','Cleat_Angle'),
+                                    ('End Plate','ResourceFiles/images/endplate.png','End_Plate'),
+                                    ('Seated Angle','ResourceFiles/images/seatedAngle1.png','Seated_Angle'),
+                                    self.show_shear_connection,
+                                                    ],
+                                'Moment Connection' :{
+                                                    'Beam to Beam' :[
+                                                                ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','B2B_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded','ResourceFiles/images/coverplate.png','B2B_Cover_Plate_Welded'),
+                                                                ('End Plate Connection','ResourceFiles/images/endplate.png','B2B_End_Plate_Connection'),
+                                                                self.show_moment_connection,
+                                                                    ],
+                                                    'Beam to Column': self.Under_Development,
+                                                    'Column to Column' :[
+                                                                ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
+                                                                ('End Plate Connection','ResourceFiles/images/column_end_plate.jpg','C2C_End_Plate_Connection'),
+                                                                self.show_moment_connection_cc,
+                                                                    ],
+                                                    'PEB' : self.Under_Development,
+                                                    },
+                                'Base Plate':[
+                                        ('Base Plate', 'ResourceFiles/images/BasePlate.jpeg', 'Base_Plate'),
+                                        self.show_base_plate,
+                                            ],
+                                'Truss Connection' : self.Under_Development,
+                                },
+                'Tension Member' : [
+                            ('Bolted','ResourceFiles/images/beam_column_endplate.png','Tension_Bolted'),
+                            ('Welded','ResourceFiles/images/finplate.png','Tension_Welded'),
+                            self.show_tension_module,
+                                   ],
+                'Compression Member' : [
+                            ('Bolted','ResourceFiles/images/beam_column_endplate.png','Compression_Bolted'),
+                            ('Welded','ResourceFiles/images/finplate.png','Compression_Welded'),
+                            self.show_compression_module,
+                                       ],
+                'Flexural Member' : self.Under_Development,
+                'Beam-Column' : self.Under_Development,
+                'Plate Girder' : self.Under_Development,
+                'Truss' : self.Under_Development,
+                '2D Frame' : self.Under_Development,
+                '3D Frame' : self.Under_Development,
+                'Group Design' : self.Under_Development,
+                }
+
+####################################### UI Formation ################################
+
+        for ModuleName in self.Modules:                      #Level 1 dictionary handling
+            Button= LeftPanelButton(ModuleName)
+            self.ButtonConnection(Button,list(self.Modules.keys()),ModuleName)
+            self.ui.verticalLayout.addWidget(Button)
+            if(type(self.Modules[ModuleName])==dict):        #level 2 dictionary handling
+                Page= ModulePage()
+                self.ui.myStackedWidget.addWidget(Page)
+                Current_Module=self.Modules[ModuleName]
+                Tab_Widget=New_Tab_Widget()
+                Page.layout.addWidget(Tab_Widget)
+                for Submodule in Current_Module:
+                    if(type(Current_Module[Submodule])==dict):          #Level 3 dictionary handling
+                        New_Tab=ModulePage()
+                        Tab_Widget.addTab(New_Tab,Submodule)
+                        Sub_Page= ModulePage()
+                        New_Tab.layout.addWidget(Sub_Page)
+                        Current_SubModule=Current_Module[Submodule]
+                        Sub_Tab_Widget=New_Tab_Widget()
+                        Sub_Page.layout.addWidget(Sub_Tab_Widget)
+
+                        for Sub_Sub_Module in Current_SubModule:
+                            if(type(Current_SubModule[Sub_Sub_Module]) in [list,tuple]):        # Final List/tuple Handling
+                                New_Sub_Tab=Submodule_Page()
+                                Sub_Tab_Widget.addTab(New_Sub_Tab,Sub_Sub_Module)
+                                group=QButtonGroup(QWidget(Page))
+                                row,col=0,0
+                                n=math.floor((len(Current_SubModule[Sub_Sub_Module])-2)/2)
+
+                                for Selection in Current_SubModule[Sub_Sub_Module][:-1]:
+                                    widget=Submodule_Widget(Selection,New_Sub_Tab)
+                                    group.addButton(widget.rdbtn)
+                                    New_Sub_Tab.ui.gridLayout.addWidget(widget,row,col)
+
+                                    if(col==n and len(Current_SubModule[Sub_Sub_Module])!=3):
+                                        row+=1
+                                        col=0
+
+                                    else:
+                                        col+=1
+                                New_Sub_Tab.ui.StartButton.clicked.connect(Current_SubModule[Sub_Sub_Module][-1])
+
+                            elif(Current_SubModule[Sub_Sub_Module]==self.Under_Development):   # Final Under Development Handling
+                                Sub_Tab_Widget.addTab(self.UnderDevelopmentModule(),Sub_Sub_Module)
+
+                            else:
+                                raise ValueError
+
+                    elif(type(Current_Module[Submodule]) in [list,tuple]):      #Level 3 list/tuple handling
+                        New_Tab=Submodule_Page()
+                        Tab_Widget.addTab(New_Tab,Submodule)
+                        group=QButtonGroup(QWidget(Page))
+                        row,col=0,0
+                        n=math.floor((len(Current_Module[Submodule])-2)/2)
+
+                        for Selection in Current_Module[Submodule][:-1]:
+                            widget=Submodule_Widget(Selection,New_Tab)
+                            group.addButton(widget.rdbtn)
+                            New_Tab.ui.gridLayout.addWidget(widget,row,col)
+
+                            if(col==n and len(Current_Module[Submodule])!=3):
+                                row+=1
+                                col=0
+
+                            else:
+                                col+=1
+                        New_Tab.ui.StartButton.clicked.connect(Current_Module[Submodule][-1])
+
+                    elif(Current_Module[Submodule]==self.Under_Development):       #Level 3 Under Development handling
+                        Tab_Widget.addTab(self.UnderDevelopmentModule(),Submodule)
+
+                    else:
+                        raise ValueError
+
+            elif(type(self.Modules[ModuleName]) in [list,tuple]):            # Level 2 list/tuple handling
+                Page= Submodule_Page()
+                self.ui.myStackedWidget.addWidget(Page)
+                group=QButtonGroup(QWidget(Page))
+                row,col=0,0
+                n=math.floor((len(self.Modules[ModuleName])-2)/2)
+
+                for Selection in self.Modules[ModuleName][:-1]:
+                    widget=Submodule_Widget(Selection,Page)
+                    group.addButton(widget.rdbtn)
+                    Page.ui.gridLayout.addWidget(widget,row,col)
+
+                    if(col==n and len(self.Modules[ModuleName])!=3):
+                        row+=1
+                        col=0
+
+                    else:
+                        col+=1
+                Page.ui.StartButton.clicked.connect(self.Modules[ModuleName][-1])
+
+            elif(self.Modules[ModuleName]==self.Under_Development):           #Level 2 Under Development handling
+                self.ui.myStackedWidget.addWidget(self.UnderDevelopmentModule())
+
+            else:
+                raise ValueError
+        self.showMaximized()
+
+################################ UI Methods ###############################################
 
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()
@@ -149,27 +401,6 @@ class OsdagMainWindow(QMainWindow):
         # elif loc == "FAQ":
         #     pass
 
-    def disable_desgin_buttons(self):
-        self.ui.btn_beamCol.setEnabled(False)
-        self.ui.btn_compression.setEnabled(False)
-        self.ui.btn_connection.setEnabled(False)
-        self.ui.btn_flexural.setEnabled(False)
-        self.ui.btn_plate.setEnabled(False)
-        self.ui.btn_tension.setEnabled(False)
-
-    def enable_desgin_buttons(self):
-        self.ui.btn_beamCol.setEnabled(True)
-        self.ui.btn_compression.setEnabled(True)
-        self.ui.btn_connection.setEnabled(True)
-        self.ui.btn_flexural.setEnabled(True)
-        self.ui.btn_plate.setEnabled(True)
-        self.ui.btn_tension.setEnabled(True)
-
-    def change_desgin_page(self, current, previous):
-        if not current:
-            current = previous
-        self.ui.myStackedWidget.setCurrentIndex(current)
-
     def select_workspace_folder(self):
         # This function prompts the user to select the workspace folder and returns the name of the workspace folder
         config = configparser.ConfigParser()
@@ -178,43 +409,26 @@ class OsdagMainWindow(QMainWindow):
         folder = QFileDialog.getExistingDirectory(self, "Select Workspace Folder (Don't use spaces in the folder name)", desktop_path)
         return folder
 
+    @staticmethod
+    def UnderDevelopmentModule():
+        Page= ModulePage()
+        label=QLabel('This Module is Currently Under Devopment')
+        Page.layout.addWidget(label)
+        label.setAlignment(Qt.AlignCenter)
+        Page.setStyleSheet(
+            '''
+                QLabel{
+                    font-family: "Times New Roman", Times, serif;
+                    font-size: 30px;
+                }
+            '''
+        )
+        return Page
 
-    # ********************************* Help Action *********************************************************************************************
+    def ButtonConnection(self,Button,Modules,ModuleName):
+        Button.ui.LP_Button.clicked.connect(lambda : self.ui.myStackedWidget.setCurrentIndex(Modules.index(ModuleName)+1))
 
-
-    def about_osdag(self):
-        dialog = MyAboutOsdag(self)
-        dialog.show()
-
-    def open_osdag(self):
-         self.about_osdag()
-
-    def tutorials(self):
-        dialog = MyTutorials(self)
-        dialog.show()
-
-    def open_tutorials(self):
-        self.tutorials()
-
-    def ask_question(self):
-        dialog = MyAskQuestion(self)
-        dialog.show()
-
-    def open_question(self):
-        self.ask_question()
-
-    def design_examples(self):
-        root_path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'design_example', '_build', 'html')
-        for html_file in os.listdir(root_path):
-           if html_file.startswith('index'):
-               if sys.platform == ("win32" or "win64"):
-                   os.startfile("%s/%s" % (root_path, html_file))
-               else:
-                   opener ="open" if sys.platform == "darwin" else "xdg-open"
-                   subprocess.call([opener, "%s/%s" % (root_path, html_file)])
-
-    def unavailable(self):
-         QMessageBox.about(self, "INFO", "This module is not available in the current version.")
+#################################### Module Launchers ##########################################
 
     @pyqtSlot()
     def show_shear_connection(self):
@@ -240,7 +454,7 @@ class OsdagMainWindow(QMainWindow):
         #             shutil.rmtree(os.path.join(folder, create_folder))
         #             os.mkdir(os.path.join(root_path, create_folder))
 
-        if self.ui.rdbtn_finplate.isChecked():
+        if self.findChild(QRadioButton,'Fin_Plate').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, FinPlateConnection, ' ')
@@ -250,7 +464,7 @@ class OsdagMainWindow(QMainWindow):
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
             # self.window.show()
             # self.window.closed.connect(self.show)
-        elif self.ui.rdbtn_cleat.isChecked():
+        elif self.findChild(QRadioButton,'Cleat_Angle').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, CleatAngleConnection, ' ')
@@ -259,7 +473,7 @@ class OsdagMainWindow(QMainWindow):
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
             # self.window.show()
             # self.window.closed.connect(self.show)
-        elif self.ui.rdbtn_seat.isChecked():
+        elif self.findChild(QRadioButton,'Seated_Angle').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, SeatedAngleConnection, ' ')
@@ -268,7 +482,7 @@ class OsdagMainWindow(QMainWindow):
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
             # self.window.show()
             # self.window.closed.connect(self.show)
-        elif self.ui.rdbtn_endplate.isChecked():
+        elif self.findChild(QRadioButton,'End_Plate').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, EndPlateConnection, ' ')
@@ -332,13 +546,13 @@ class OsdagMainWindow(QMainWindow):
         #             shutil.rmtree(os.path.join(folder, create_folder))
         #             os.mkdir(os.path.join(root_path, create_folder))
 
-        if self.ui.rdbtn_bb_coverplate_bolted.isChecked():
+        if self.findChild(QRadioButton,'B2B_Cover_Plate_Bolted').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, BeamCoverPlate, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-        elif self.ui.rdbtn_bb_coverplate_welded.isChecked():
+        elif self.findChild(QRadioButton,'B2B_Cover_Plate_Welded').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, BeamCoverPlateWeld, ' ')
@@ -347,10 +561,10 @@ class OsdagMainWindow(QMainWindow):
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
             # self.window.show()
             # self.window.closed.connect(self.show)
-        elif self.ui.rdbtn_bb_endplate.isChecked():
+        elif self.findChild(QRadioButton,'B2B_End_Plate_Connection').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
-            self.ui2.setupUi(self.ui2,BeamEndPlate)
+            self.ui2.setupUi(self.ui2,BeamEndPlate,' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
             # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
@@ -380,12 +594,12 @@ class OsdagMainWindow(QMainWindow):
         #         except OSError:
         #             shutil.rmtree(os.path.join(folder, create_folder))
         #             os.mkdir(os.path.join(root_path, create_folder))
-
-        self.hide()
-        self.ui2 = Ui_ModuleWindow()
-        self.ui2.setupUi(self.ui2, BasePlateConnection, ' ')
-        self.ui2.show()
-        self.ui2.closed.connect(self.show)
+        if self.findChild(QRadioButton, 'Base_Plate').isChecked():
+            self.hide()
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, BasePlateConnection, ' ')
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
 
     def show_moment_connection_cc(self):
         # folder = self.select_workspace_folder()
@@ -410,20 +624,20 @@ class OsdagMainWindow(QMainWindow):
         #             shutil.rmtree(os.path.join(folder, create_folder))
         #             os.mkdir(os.path.join(root_path, create_folder))
 
-        if self.ui.rdbtn_cc_coverplate_bolted.isChecked() :
+        if self.findChild(QRadioButton,'C2C_Cover_Plate_Bolted').isChecked() :
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, ColumnCoverPlate, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-        elif self.ui.rdbtn_cc_coverplate_welded.isChecked():
+        elif self.findChild(QRadioButton,'C2C_Cover_Plate_Welded').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, ColumnCoverPlateWeld, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
-        elif self.ui.rdbtn_cc_endplate.isChecked():
+        elif self.findChild(QRadioButton,'C2C_End_Plate_Connection').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, ColumnEndPlate, ' ')
@@ -452,14 +666,14 @@ class OsdagMainWindow(QMainWindow):
         #         except OSError:
         #             shutil.rmtree(os.path.join(folder, create_folder))
         #             os.mkdir(os.path.join(root_path, create_folder))
-        if self.ui.rdbtn_compression_bolted.isChecked():
+        if self.findChild(QRadioButton,'Compression_Bolted').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, Compression, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
-        elif self.ui.rdbtn_compression_welded.isChecked():
+        elif self.findChild(QRadioButton,'Compression_Welded').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, Compression, ' ')
@@ -489,90 +703,56 @@ class OsdagMainWindow(QMainWindow):
         #             shutil.rmtree(os.path.join(folder, create_folder))
         #             os.mkdir(os.path.join(root_path, create_folder))
 
-        if self.ui.rdbtn_tension_bolted.isChecked():
+        if self.findChild(QRadioButton,'Tension_Bolted').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2,Tension_bolted, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
-        elif self.ui.rdbtn_tension_welded.isChecked():
+        elif self.findChild(QRadioButton,'Tension_Welded').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow()
             self.ui2.setupUi(self.ui2, Tension_welded, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
 
-class MainController(QMainWindow):
-    closed = pyqtSignal()
-    def __init__(self, Ui_ModuleWindow, main, folder):
-        super(MainController,self).__init__()
-        QMainWindow.__init__(self)
-        self.ui = Ui_ModuleWindow()
-        self.ui.setupUi(self, main, folder)
-        self.folder = folder
-        self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
-        self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
+################################# Help Actions ############################################
 
-        # self.ui.btn_CreateDesign.clicked.connect(design_report(Ui_DesignReport))
-        # self.design_report = DesignReportDialog(self)
-        # self.ui.actionCreate_design_report.triggered.connect(DesignReportDialog.exec)
+    def about_osdag(self):
+        dialog = MyAboutOsdag(self)
+        dialog.show()
+
+    def open_osdag(self):
+         self.about_osdag()
+
+    def tutorials(self):
+        dialog = MyTutorials(self)
+        dialog.show()
+
+    def open_tutorials(self):
+        self.tutorials()
+
+    def ask_question(self):
+        dialog = MyAskQuestion(self)
+        dialog.show()
+
+    def open_question(self):
+        self.ask_question()
+
+    def design_examples(self):
+        root_path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'design_example', '_build', 'html')
+        for html_file in os.listdir(root_path):
+           if html_file.startswith('index'):
+               if sys.platform == ("win32" or "win64"):
+                   os.startfile("%s/%s" % (root_path, html_file))
+               else:
+                   opener ="open" if sys.platform == "darwin" else "xdg-open"
+                   subprocess.call([opener, "%s/%s" % (root_path, html_file)])
 
 
-    def dockbtn_clicked(self, widget):
-
-        '''(QWidget) -> None
-
-        This method dock and undock widget(QdockWidget)
-        '''
-
-        flag = widget.isHidden()
-        if (flag):
-
-            widget.show()
-        else:
-            widget.hide()
-
-    def closeEvent(self, event):
-        '''
-        Closing finPlate window.
-        '''
-        reply = QMessageBox.question(self, 'Message',
-                                     "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
-
-        if reply == QMessageBox.Yes:
-            self.closed.emit()
-            event.accept()
-        else:
-            event.ignore()
-
-# Back up the reference to the exceptionhook
-sys._excepthook = sys.excepthook
-def the_exception_hook(exctype, value, traceback):
-    '''Finds the error occurs when Osdag crashes
-
-    Args:
-        exctype: type of error
-        value: information of the error
-        traceback: trace the object
-
-    Returns:
-        system exit(1)
-    '''
-    # Print the error and traceback
-    print("Error occurred: ", (exctype, value, traceback))
-    # Call the normal Exception hook after
-    sys.__excepthook__(exctype, value, traceback)
-    sys.exit(1)
-
-# Set the exception hook to our wrapping function
-sys.excepthook = the_exception_hook
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # folder_path = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'
-    # # folder_path = r'C:\Users\Win10\Desktop'
-    #folder_path = r'C:\Users\pc\Desktop'
-    # window = MainController(Ui_ModuleWindow, FinPlateConnection, folder_path)
     window = OsdagMainWindow()
     window.show()
     # app.exec_()

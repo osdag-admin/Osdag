@@ -114,16 +114,70 @@ class IS800_2007(object):
 
     # cl. 8.4.1 shear strength of bolted connections
     @staticmethod
-    def cl_8_4_design_shear_strength(A_vg, f_y, gamma_m0):
-        V_d = A_vg * f_y / (math.sqrt(3) * gamma_m0)
+    def cl_8_4_design_shear_strength(A_vg, f_y):
+        """ Calculate the design shear strength in yielding as per cl. 8.4
+
+        Args:
+             A_vg: Gross area of the component in square mm (float)
+             f_y: Yield stress of the component material in MPa (float)
+
+        Returns:
+             Design shear strength in yielding of the component in N
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        V_d = ((A_vg * f_y) / (math.sqrt(3) * gamma_m0))  # N
+
         return V_d
 
-        # TODO
-        # pass
+    # cl 8.2.1.2 design bending strength of the cross-section
+    @staticmethod
+    def cl_8_2_1_2_design_moment_strength(Z_e, Z_p, f_y, section_class='semi-compact'):
+        """ Calculate the design bending strength as per cl. 8.2.1.2
 
-    def cl_8_2_1_2_design_moment_strength(beta_b, Z_p, f_y, gamma_m0):
-        M_d = beta_b * Z_p * f_y / gamma_m0
+        Args:
+            Z_e: Elastic section modulus of the cross-section in cubic mm (float)
+            Z_p: Plastic section modulus of the cross-section in cubic mm (float)
+            f_y: Yield stress of the component material in MPa (float)
+            section_class: Classification of the section (plastic, compact or semi-compact) as per Table 2 (str)
+
+        Returns:
+            Design bending strength of the cross-section in N-mm (float)
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+
+        if section_class == 'semi-compact':
+            M_d = (Z_e * f_y) / gamma_m0  # N-mm
+        else:
+            M_d = (1.0 * Z_p * f_y) / gamma_m0  # N-mm
+
         return M_d
+
+    # ==========================================================================
+    """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
+    # ==========================================================================
+    """   SECTION  10    CONNECTIONS    """
+
+    # -------------------------------------------------------------
+    #   10.1 General
+    # -------------------------------------------------------------
+    # -------------------------------------------------------------
+    #   10.2 Location Details of Fasteners
+    # -------------------------------------------------------------
+
+    # cl. 10.2.1 Clearances for Holes for Fasteners
+
+    @staticmethod
+    def cl_8_7_1_3_stiff_bearing_length(shear_force, web_thickness, flange_thickness, root_radius, fy):
+        #     This function returns the stiff bearing length, b1 for web local yielding and web crippling check
+        #     Minimum value of b1 is not defined in IS 800, reference has been made to AISC for such cases (CL. J10-2)
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+        bearing_length = round((float(shear_force) * 1000) * gamma_m0 / web_thickness / fy, 3)
+        b1_req = bearing_length - (flange_thickness + root_radius)
+        k = flange_thickness + root_radius
+        b1 = min(b1_req, k)
+        return b1
 
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
@@ -429,6 +483,7 @@ self
         else:
             k_b = min(e / (3.0 * d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
 
+        k_b = round(k_b,2)
         V_npb = 2.5 * k_b * d * t * f_u
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         V_dpb = V_npb/gamma_mb
@@ -698,7 +753,7 @@ self
 
         Note:
             Reference:
-            IS 800:2007,  cl 10.5.3.2
+            IS 800:2007,  cl 10.5.3.2zzz
 
         """
         table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
@@ -726,12 +781,50 @@ self
         return throat
 
     @staticmethod
+    def cl_10_5_3_2_fillet_weld_effective_throat_thickness_constant( fusion_face_angle=90):
+
+        """Calculate effective throat thickness of fillet weld for stress calculation
+
+        Args:
+            fusion_face_angle - Angle between fusion faces in degrees (int)
+
+        Returns:
+            Effective throat thickness of fillet weld constant
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.3.2zzz
+
+        """
+        table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
+        fusion_face_angle = int(round(fusion_face_angle))
+        if 60 <= fusion_face_angle <= 90:
+            K = table_22['60-90']
+        elif 91 <= fusion_face_angle <= 100:
+            K = table_22['91-100']
+        elif 101 <= fusion_face_angle <= 106:
+            K = table_22['101-106']
+        elif 107 <= fusion_face_angle <= 113:
+            K = table_22['107-113']
+        elif 114 <= fusion_face_angle <= 120:
+            K = table_22['114-120']
+        else:
+            K = "NOT DEFINED"
+        try:
+            K = float(K)
+        except ValueError:
+            return
+
+        return K
+
+
+    @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):
 
         """Calculate effective length of fillet weld from available length to weld in practice
 
         Args:
-            fillet_size - Size of fillet weld in mm (float)
+            #fillet_size - Size of fillet weld in mm (float)
             available_length - Available length in mm to weld the plates in practice (float)
 
         Returns:
@@ -796,6 +889,7 @@ self
         elif beta_lw <= 0.6:
             beta_lw = 0.6
         return beta_lw
+
 
     # -------------------------------------------------------------
     #   10.6 Design of Connections

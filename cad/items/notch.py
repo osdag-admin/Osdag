@@ -7,6 +7,30 @@ from OCC.Core.gp import gp_Circ, gp_Ax2
 import numpy
 from cad.items.ModelUtils import make_edge, getGpPt, getGpDir, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
 
+'''
+
+                                     X-------------------------X
+                                  X                         X  |
+                               X                         X     |
+                            X                         X        |
+              ^      a6  X-------------------------X  a1       |
+              |          |                         |           |
+              |          |                         |           |
+              |          |                         |           |
+              |          |              a3         |           |
+            height   a7  X            +            |  a2       |
+              |          XX         X              |           |
+              |           XX      X   R1           |           X
+              |            XX   X                  |        X
+              |              XX                    |     X
+              |                 XX                 |  X
+              v          X          XX-------------X  
+                       a9           a5              a4
+
+                        <---------- width -------->
+'''
+
+
 class Notch(object):
     '''
     '''
@@ -97,10 +121,10 @@ if __name__ == '__main__':
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])
 
-    channel = Notch(R1, hight, width, length)
-    angles = channel.place(origin, uDir, shaftDir)
-    point = channel.compute_params()
-    prism = channel.create_model()
+    notch = Notch(R1, hight, width, length)
+    _place = notch.place(origin, uDir, shaftDir)
+    point = notch.compute_params()
+    prism = notch.create_model()
     display.DisplayShape(prism, update=True)
     display.DisableAntiAliasing()
     start_display()

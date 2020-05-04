@@ -126,7 +126,7 @@ if __name__ == '__main__':
     shaftDir = numpy.array([0.,0.,1.])
 
     channel = Channel(B, T, D, t, 0, 0, L)
-    channels = channel.place(origin, uDir, shaftDir)
+    _place = channel.place(origin, uDir, shaftDir)
     point = channel.compute_params()
     prism = channel.create_model()
     display.DisplayShape(prism, update=True)

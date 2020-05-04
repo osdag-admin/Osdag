@@ -6,7 +6,25 @@ Created on 27-May-2015
 import numpy
 from cad.items.ModelUtils import getGpPt, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
 
+'''
 
+                        ^   a2 X
+                        |      | X
+                        |      |   X
+                        |      |     X
+                        |      |       X
+                        +      |         X
+                        h      |           X
+                        +      |             X
+                        |      |               X
+                        |      |                 X
+                        v   a1 +-------------------X a3
+
+
+                               <------- b --------->
+
+
+'''
 class FilletWeld(object):
 
     def __init__(self, b, h, L):
@@ -54,10 +72,10 @@ if __name__ == '__main__':
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])
 
-    channel = FilletWeld(b, h, L)
-    angles = channel.place(origin, uDir, shaftDir)
-    point = channel.compute_params()
-    prism = channel.create_model()
+    FWeld = FilletWeld(b, h, L)
+    _place = FWeld.place(origin, uDir, shaftDir)
+    point = FWeld.compute_params()
+    prism = FWeld.create_model()
     display.DisplayShape(prism, update=True)
     display.DisableAntiAliasing()
     start_display()

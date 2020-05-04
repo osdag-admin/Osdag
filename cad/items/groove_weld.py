@@ -4,13 +4,40 @@ Created on 15-May-2019
 @author: Anand Swaroop
 
 
-
-
-
 '''
 import numpy
 from cad.items.ModelUtils import *
 
+'''
+                                                X---------------X
+                                              X               X |
+                                            X               X   |
+                                          X               X     |
+                                        X               X       |
+                                      X               X         |
+                                    X               X           |
+                                  X               X             |
+                           a2   X               X               |
+                        ^     X---------------X                 |
+                        |     |               | a1              |
+                        |     |               |                 |
+                        |     |               |                 |
+                        |     |               |                 X
+                        +     |               |               X
+                        h     |               |             X
+                        +     |               |           X
+                        |     |               |         X
+                        |     |               |       X
+                        |     |               |     X
+                        |     |               |   X
+                        |     |               | X
+                        v     +---------------X
+                           a3                   a4
+
+                              <----- b ------->
+
+
+'''
 
 class GrooveWeld(object):
 
@@ -60,10 +87,10 @@ if __name__ == '__main__':
     uDir = numpy.array([1.,0.,0.])
     wDir = numpy.array([0.,0.,1.])
 
-    channel = GrooveWeld(b, h, L)
-    angles = channel.place(origin, uDir, wDir)
-    point = channel.compute_params()
-    prism = channel.create_model()
+    GWeld = GrooveWeld(b, h, L)
+    _place = GWeld.place(origin, uDir, wDir)
+    point = GWeld.compute_params()
+    prism = GWeld.create_model()
     display.DisplayShape(prism, update=True)
     display.DisableAntiAliasing()
     start_display()

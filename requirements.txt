@@ -1,0 +1,7 @@
+pdfkit
+pyyaml
+openpyxl
+Pygments
+XlsxWriter
+pylatex
+numpy

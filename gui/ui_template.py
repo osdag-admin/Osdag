@@ -1691,11 +1691,6 @@ class Ui_ModuleWindow(QMainWindow):
     @author: Umair
     '''
 
-    # Function for getting inputs from a file
-    '''
-    @author: Umair 
-    '''
-
     def loadDesign_inputs(self, op_list, data, new, main):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", os.path.join(str(self.folder)),
                                                   "InputFiles(*.osi)")
@@ -1725,7 +1720,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     # Function for loading inputs from a file to Ui
     '''
-    @author: Umair 
+    @author: Umair
     '''
 
     def setDictToUserInputs(self, uiObj, op_list, data, new):
@@ -1814,7 +1809,6 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             main.design_button_status = True
             error = main.func_for_validation(main, self, self.design_inputs)
-
             status = main.design_status
             print(status)
 

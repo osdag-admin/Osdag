@@ -8,16 +8,16 @@ import configparser
 # from utils.common import component
 from pylatex import Document, Section, Subsection
 from pylatex.utils import italic, bold
-import pdflatex
+#import pdflatex
 import sys
 import datetime
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
+#from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 
 
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic, NoEscape
-from pdflatex import PDFLaTeX
+#from pdflatex import PDFLaTeX
 import os
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
     MediumText, LineBreak, simple_page_number

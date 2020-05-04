@@ -4,6 +4,7 @@ import yaml
 import sys
 import unittest
 
+
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnection

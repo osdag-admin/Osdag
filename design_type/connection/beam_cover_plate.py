@@ -7,13 +7,7 @@ from Common import *
 from utils.common.load import Load
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
-import yaml
-import os
-import shutil
 import logging
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-import configparser
 
 
 class BeamCoverPlate(MomentConnection):
@@ -667,7 +661,6 @@ class BeamCoverPlate(MomentConnection):
         elif self.class_of_section == 3:
             self.beta_b = self.Z_e / self.Z_p
 
-
         self.section.plastic_moment_capacty(beta_b = self.beta_b, Z_p = self.Z_p, fy= self.section.fy) # N # for section #todo add in ddcl
 
         self.section.moment_d_deformation_criteria(fy= self.section.fy,Z_e = self.section.elast_sec_mod_z)
@@ -704,6 +697,7 @@ class BeamCoverPlate(MomentConnection):
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
         self.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
                                              A_v=A_v_web, fy=self.section.fy)
+
 
 
         print("tension_yielding_capacity_web", self.tension_yielding_capacity_web)
@@ -2653,7 +2647,7 @@ class BeamCoverPlate(MomentConnection):
               get_pass_fail(round(self.fact_shear_load/1000,2), round(self.web_plate.shear_capacity_web_plate  / 1000, 2), relation="lesser"))
         self.report_check.append(t1)
 
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         #config = configparser.ConfigParser()
         #config.read_file(open(r'Osdag.config'))

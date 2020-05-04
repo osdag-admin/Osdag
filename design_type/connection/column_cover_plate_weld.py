@@ -6,12 +6,8 @@ from Common import *
 from utils.common.load import Load
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
-import yaml
-import os
-import shutil
+
 import logging
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 
 
 class ColumnCoverPlateWeld(MomentConnection):
@@ -1798,7 +1794,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.report_check.append(t2)
 
 
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         #config = configparser.ConfigParser()
         #config.read_file(open(r'Osdag.config'))

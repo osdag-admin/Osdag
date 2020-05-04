@@ -2,9 +2,6 @@ from design_type.connection.moment_connection import MomentConnection
 from utils.common.component import *
 from Common import *
 from utils.common.load import Load
-import yaml
-import os
-import shutil
 import logging
 
 class BeamEndPlate(MomentConnection):

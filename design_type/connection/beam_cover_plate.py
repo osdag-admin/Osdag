@@ -7,13 +7,7 @@ from Common import *
 from utils.common.load import Load
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
-import yaml
-import os
-import shutil
 import logging
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-import configparser
 
 
 class BeamCoverPlate(MomentConnection):
@@ -45,10 +39,14 @@ class BeamCoverPlate(MomentConnection):
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        handler = OurLog(key)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+
+        if key is not None:
+            handler = OurLog(key)
+            handler.setLevel(logging.WARNING)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+
 
     def input_values(self, existingvalues={}):
 
@@ -396,7 +394,9 @@ class BeamCoverPlate(MomentConnection):
 
         return out_list
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, window, design_dictionary):\
+
+        all_errors = []
         self.design_status = False
         flag = False
 
@@ -412,8 +412,8 @@ class BeamCoverPlate(MomentConnection):
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -421,7 +421,7 @@ class BeamCoverPlate(MomentConnection):
         if flag:
             self.set_input_values(self, design_dictionary)
         else:
-            pass
+            return all_errors
 
     def warn_text(self):
 
@@ -438,7 +438,7 @@ class BeamCoverPlate(MomentConnection):
             logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
-  
+
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
@@ -604,7 +604,7 @@ class BeamCoverPlate(MomentConnection):
 
 
     def member_capacity(self):
-    
+
         if self.section.type == "Rolled":
             length = self.section.depth
         else:
@@ -677,14 +677,14 @@ class BeamCoverPlate(MomentConnection):
             Z_w = self.Z_p
         elif self.class_of_section == 3:
             Z_w = self.Z_e
-       
+
         if self.class_of_section == 1 or self.class_of_section ==2:
             self.beta_b = 1
         elif self.class_of_section == 3:
             self.beta_b = self.Z_e / self.Z_p
-     
-        self.section.plastic_moment_capacty(beta_b = self.beta_b, Z_p = self.Z_p,
-                                            fy= self.section.fy) # N # for section
+
+        self.section.plastic_moment_capacty(beta_b = self.beta_b, Z_p = self.Z_p, fy= self.section.fy) # N # for section #todo add in ddcl
+
         self.section.moment_d_deformation_criteria(fy= self.section.fy,Z_e = self.section.elast_sec_mod_z)
 
         self.Pmc =self.section.plastic_moment_capactiy
@@ -720,8 +720,7 @@ class BeamCoverPlate(MomentConnection):
         self.section.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
                                              A_v=A_v_web, fy=self.section.fy)
 
-       
-        print("tension_yielding_capacity_web", self.section.tension_yielding_capacity_web )
+
 
         if self.section.tension_yielding_capacity_web  >  self.axial_force_w :
 
@@ -2681,25 +2680,18 @@ class BeamCoverPlate(MomentConnection):
                             round(self.web_plate.shear_capacity_web_plate / 1000, 2), relation="lesser"))
         self.report_check.append(t1)
 
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
 
-        config = configparser.ConfigParser()
-        config.read_file(open(r'Osdag.config'))
-        desktop_path = config.get("desktop_path", "path1")
-        print("desk:", desktop_path)
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
+
+        #config = configparser.ConfigParser()
+        #config.read_file(open(r'Osdag.config'))
+        #desktop_path = config.get("desktop_path", "path1")
+        #print("desk:", desktop_path)
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
 
-        file_type = "PDF (*.pdf)"
-        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"),
-                                               file_type)
-        print(filename, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
-        # filename = os.path.join(str(folder), "images_html", "TexReport")
-        file_name = str(filename)
-        print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
-        fname_no_ext = filename[0].split(".")[0]
-        print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)
 

@@ -7,13 +7,11 @@ from utils.common.load import Load
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
 import yaml
+
 import os
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
-import shutil
 import logging
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 
 
 class BeamCoverPlateWeld(MomentConnection):
@@ -39,11 +37,13 @@ class BeamCoverPlateWeld(MomentConnection):
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        handler = OurLog(key)
-        handler.setLevel(logging.WARNING)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+
+        if key is not None:
+            handler = OurLog(key)
+            handler.setLevel(logging.WARNING)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def input_values(self, existingvalues={}):
 
@@ -319,6 +319,8 @@ class BeamCoverPlateWeld(MomentConnection):
         return out_list
 
     def func_for_validation(self, window, design_dictionary):
+
+        all_errors = []
         self.design_status = False
         flag = False
 
@@ -334,8 +336,8 @@ class BeamCoverPlateWeld(MomentConnection):
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -343,7 +345,7 @@ class BeamCoverPlateWeld(MomentConnection):
         if flag:
             self.set_input_values(self, design_dictionary)
         else:
-            pass
+            return all_errors
 
     def warn_text(self):
 
@@ -1532,7 +1534,20 @@ class BeamCoverPlateWeld(MomentConnection):
     #         axial_force_f))
 
 
+
     ################################ Design Report #####################################################################################
+
+
+# self.weld_connecting_plates = [self.section.flange_thickness,self.flange_plate.thickness_provided]
+# t1 = (DISP_MIN_WELD_SIZE_FLANGE,# for display
+#       min_weld_size_req(conn_plates_weld = self.weld_connecting_plates,min_weld_size= self.min_flange_platethk ), # Required
+#     self.flange_weld.size, #provided
+#      get_pass_fail(self.min_flange_platethk,  self.flange_weld.size, relation="leq")) # relation
+#         self.report_check.append(t1)
+# t2 = (DISP_MIN_WELD_SIZE,min_weld_size_req(conn_plates_weld=self.weld_connecting_plates,
+#                                                    min_weld_size=self.min_flange_platethk ) ,
+#               self.flange_weld.size ,
+#               get_pass_fail(self.min_flange_platethk,  self.flange_weld.size, relation="leq") )
 
 
 
@@ -1583,23 +1598,8 @@ class BeamCoverPlateWeld(MomentConnection):
 
         self.flange_weld_connecting_plates = [self.section.flange_thickness, self.flange_plate.thickness_provided]
         self.flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.flange_thickness,self.flange_plate.thickness_provided)
+        self.Kt = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness_constant()
 
-        h = self.section.depth - (2 * self.section.flange_thickness)
-        self.Pmc = self.section.plastic_moment_capactiy
-        self.Mdc = self.section.moment_d_def_criteria
-
-        t1 = ('SubSection', 'Member Capacity','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, '', axial_capacity(area=self.section.area ,
-                                                              fy =self.section.fy,
-                                                              gamma_m0=gamma_m0,
-                                                              axial_capacity= round(self.axial_capacity/1000 , 2) ),'')
-        self.report_check.append(t1)
-
-
-
-        # flange_get_weld_strenght_kn = round(self.flange_weld.get_weld_strenght / 1000, 2)
         h = self.section.depth - (2 * self.section.flange_thickness)
         self.Pmc = self.section.plastic_moment_capactiy
         self.Mdc = self.section.moment_d_def_criteria
@@ -1638,7 +1638,7 @@ class BeamCoverPlateWeld(MomentConnection):
               '')
         self.report_check.append(t1)
 
-        t1 = ('SubSection', 'Load Considered', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Load Consideration', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, min_axial_capacity(axial_capacity=round(self.axial_capacity / 1000, 2),
                                                                min_ac=round(self.min_axial_load / 1000, 2)),
@@ -1709,6 +1709,9 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                Mdc = round(self.Mdc/1000000,2),
                                                                M_c = round(self.section.moment_capacity/1000000,2)), '')
         self.report_check.append(t1)
+
+        t1 = (DISP_THROAT, throat_req(), throat_prov(self.flange_weld.size, self.Kt),
+              get_pass_fail(3.0, self.flange_weld.size, relation="leq"))
 
 
         t1 = ('SubSection', 'Load Considered','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
@@ -1802,6 +1805,7 @@ class BeamCoverPlateWeld(MomentConnection):
                   get_pass_fail(self.min_length_required, self.flange_plate.length, relation="lesser"))
             self.report_check.append(t1)
 
+
         else:
             t1 = ('SubSection', 'Flange Plate Check-Outside/Inside', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
@@ -1828,9 +1832,11 @@ class BeamCoverPlateWeld(MomentConnection):
                                           b_ifp=self.flange_plate.Innerheight),
                   get_pass_fail(self.min_height_required, self.flange_plate.Innerheight, relation="lesser"))
             self.report_check.append(t1)
+
             t1 = (DISP_MAX_PLATE_INNERHEIGHT,inner_plate_height_weld(B = self.section.flange_width, sp =self.flangespace,
                                             t_w= self.section.web_thickness, r_1 = self.section.root_radius ,
                                             b_ifp =self.flange_plate.Innerheight),self.flange_plate.Innerheight,
+
                   get_pass_fail(self.flange_plate.Innerheight, self.flange_plate.Innerheight, relation="lesser"))
             self.report_check.append(t1)
 
@@ -1841,25 +1847,17 @@ class BeamCoverPlateWeld(MomentConnection):
             self.report_check.append(t1)
 
 
+
         Disp_3D_image = "./ResourceFiles/images/3d.png"
         config = configparser.ConfigParser()
         config.read_file(open(r'Osdag.config'))
         desktop_path = config.get("desktop_path", "path1")
         print("desk:", desktop_path)
+
         print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
 
-        file_type = "PDF (*.pdf)"
-        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"),
-                                               file_type)
-        print(filename, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
-        # filename = os.path.join(str(folder), "images_html", "TexReport")
-        file_name = str(filename)
-        print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
-        fname_no_ext = filename[0].split(".")[0]
-        print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)
-
-

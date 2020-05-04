@@ -8,16 +8,16 @@ import configparser
 # from utils.common import component
 from pylatex import Document, Section, Subsection
 from pylatex.utils import italic, bold
-import pdflatex
+#import pdflatex
 import sys
 import datetime
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
+#from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 
 
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic, NoEscape
-from pdflatex import PDFLaTeX
+#from pdflatex import PDFLaTeX
 import os
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
     MediumText, LineBreak, simple_page_number
@@ -330,7 +330,7 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     gamma = str(gamma)
     T_dg = str(T_dg)
     tension_yield_eqn = Math(inline=True)
-    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\'))
+    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{l*t_p*f_y}{\gamma_{mo}}\\'))
     tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
@@ -370,6 +370,16 @@ def flange_plate_Length_req(l_w,s,g,l_fp): #weld
     return min_flange_plate_Length_eqn
 
 
+def flange_weld_stress(F_f,F_rl,F_ws):
+    F_rl = str(F_rl)
+    F_ws = str(F_ws)
+    F_f =str(F_f)
+    flange_weld_stress_eqn = Math(inline=True)
+    flange_weld_stress_eqn.append(NoEscape(r'\begin{aligned} Stress &= \frac{F_f*1000}{F_{rl}}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r' &= \frac{' + F_f + '*1000}{' + F_rl + r'}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r'&= ' + F_ws + r'\end{aligned}'))
+
+    return flange_weld_stress_eqn
 
 
 def tension_rupture_bolted_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
@@ -399,25 +409,28 @@ def tension_rupture_welded_prov(w_p, t_p, fu,gamma_m1,T_dn):
     Tensile_rup_eqnw.append(NoEscape(r'&=' + T_dn + '\end{aligned}'))
     return Tensile_rup_eqnw
 
-def tensile_capacity_prov(T_dg, T_dn, T_db =None):
+def tensile_capacity_prov(T_dg, T_dn, T_db =0.0):
 
-    T_dg = str(T_dg)
-    T_dn = str(T_dn)
-    T_db = str(T_db)
     tension_capacity_eqn = Math(inline=True)
-    if T_db != None:
+    if T_db != 0.0:
         T_d = min(T_dg,T_dn,T_db)
         T_d = str(T_d)
+        T_dg = str(T_dg)
+        T_dn = str(T_dn)
+        T_db = str(T_db)
         tension_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= Min(T_{dg},T_{dn},T_{db})\\'))
         tension_capacity_eqn.append(NoEscape(r'&= Min(' + T_dg + ',' + T_dn + ',' + T_db + r')\\'))
     else:
         T_d = min(T_dg, T_dn)
+        T_dg = str(T_dg)
+        T_dn = str(T_dn)
+        T_d = str(T_d)
         tension_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= Min(T_{dg},T_{dn})\\'))
-        tension_capacity_eqn.append(NoEscape(r'&= Min(' + T_dg + ',' + T_dn +  r')\\'))
+        tension_capacity_eqn.append(NoEscape(r'&= Min(' + T_dg + ',' + T_dn + r')\\'))
 
 
 
-    tension_capacity_eqn.append(NoEscape(r'&='+T_d + '\end{aligned}'))
+    tension_capacity_eqn.append(NoEscape(r'&='+ T_d + '\end{aligned}'))
     return tension_capacity_eqn
 
 def spacing (sp,s):
@@ -460,16 +473,33 @@ def min_weld_size_req(conn_plates_weld,min_weld_size):
     min_weld_size_eqn.append(NoEscape(r' &t_{w_{min}}=' + weld_min + r'\end{aligned}'))
     return min_weld_size_eqn
 
+
+def min_weld_size_req_01(conn_plates_weld, red, min_weld_size):
+    # t1 = str(conn_plates_weld[0])
+    # t2 = str(conn_plates_weld[0])
+    tmax = min(conn_plates_weld)
+    tmin = int (tmax - red)
+    tmin = str(tmin)
+    tmax= str(int(tmax))
+    weld_min = str(min_weld_size)
+
+    min_weld_size_eqn = Math(inline=True)
+    min_weld_size_eqn.append(NoEscape(r'\begin{aligned} & t_{w_{min}}~based~on~thinner~part\\'))
+    min_weld_size_eqn.append(NoEscape(r'& ='+tmax+ '~or~' +tmin+ r'\\'))
+    min_weld_size_eqn.append(NoEscape(r'& IS800:2007~cl.10.5.2.3~Table 21\\' ))
+    min_weld_size_eqn.append(NoEscape(r'& t_{w_{min}}~based~on~thicker~part=' + weld_min + r'\end{aligned}'))
+    return min_weld_size_eqn
+
 def max_weld_size_req(conn_plates_weld,max_weld_size):
     t1 = str(conn_plates_weld[0])
-    t2 = str(conn_plates_weld[0])
+    t2 = str(conn_plates_weld[1])
     t_min = str(min(conn_plates_weld))
     weld_max = str(max_weld_size)
 
     max_weld_size_eqn = Math(inline=True)
-    max_weld_size_eqn.append(NoEscape(r'\begin{aligned} Thickness~of~Thinner~part&\\'))
-    max_weld_size_eqn.append(NoEscape(r'=Min('+t1+','+t2+r')&='+t_min+r'\\'))
-    max_weld_size_eqn.append(NoEscape(r't_{w_{max}} &=' + weld_max + r'\end{aligned}'))
+    max_weld_size_eqn.append(NoEscape(r'\begin{aligned} & Thickness~of~Thinner~part\\'))
+    max_weld_size_eqn.append(NoEscape(r'&=Min('+t1+','+t2+r')='+t_min+r'\\'))
+    max_weld_size_eqn.append(NoEscape(r'&t_{w_{max}} =' + weld_max + r'\end{aligned}'))
     return max_weld_size_eqn
 
 
@@ -506,7 +536,7 @@ def weld_strength_prov(conn_plates_weld_fu,gamma_mw,t_t,f_w):
     f_w = str(f_w)
     weld_strength_eqn = Math(inline=True)
     weld_strength_eqn.append(NoEscape(r'\begin{aligned} f_w &=\frac{t_t*f_u}{\sqrt{3}*\gamma_{mw}}\\'))
-    weld_strength_eqn.append(NoEscape(r'&=\frac{'+t_t+'*'+f_u+'}{\sqrt{3}}*'+ gamma_mw+r'\\'))
+    weld_strength_eqn.append(NoEscape(r'&=\frac{'+t_t+'*'+f_u+'}{\sqrt{3}*'+ gamma_mw+r'}\\'))
     weld_strength_eqn.append(NoEscape(r'&='+f_w+r'\end{aligned}'))
 
     return weld_strength_eqn
@@ -573,8 +603,6 @@ def prov_shear_load(shear_input,min_sc,app_shear_load):
     app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',' + min_sc + r')\\'))
     app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r'\end{aligned}'))
     return app_shear_load_eqn
-
-
 
 
 def plastic_moment_capacty(beta_b, Z_p, f_y, gamma_m0 ,Pmc):  # same as #todo anjali
@@ -787,7 +815,7 @@ def gusset_lt_b_prov(nc,p,e,length):
     length_htb_eqn.append(NoEscape(r'&= ' + length + r'\end{aligned}'))
     return length_htb_eqn
 
-def gusset_lt_w(weld,cls,length):
+def gusset_lt_w_prov(weld,cls,length):
     weld = str(weld)
     cls = str(cls)
     length = str(length)
@@ -817,7 +845,7 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr):
     l = max(lc,lr)
     lt = 15 * d
     B = 1.075 - (l / (200 * d))
-    Bi = B
+    Bi = round(B,2)
     nc= str(nc)
     nr= str(nr)
     g= str(g)
@@ -831,7 +859,7 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr):
         B =1
     else:
         B=B
-    B = str(B)
+    B = str(round(B,2))
     Bi = str(Bi)
     lc_str = str(lc)
     lr_str = str(lr)
@@ -859,6 +887,55 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr):
         long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \end{aligned}'))
 
     return long_joint_bolted_eqn
+
+def throat_req():
+    throat_eqn = Math(inline=True)
+    throat_eqn.append(NoEscape(r'\begin{aligned} t_t &\geq 3 \end{aligned}'))
+
+    return throat_eqn
+
+def throat_prov(tw,f):
+    tt = tw * f
+    t_t= max(tt,3)
+    tw = str(round(tw,2))
+    f= str(round(f,2))
+    tt = str(round(tt,2))
+    t_t = str(round(t_t,2))
+
+    throat_eqn = Math(inline=True)
+    throat_eqn.append(NoEscape(r'\begin{aligned} t_t & = '+ f+'* t_w 'r'\\'))
+    throat_eqn.append(NoEscape(r'& = ' + f + '*'+ tw +'='+tt+r'\\'))
+    throat_eqn.append(NoEscape(r't_t & = ' + t_t + r'\end{aligned}'))
+
+    return throat_eqn
+
+# def eff_len_prov(l):
+#     l =str(l)
+#     eff_len_eqn = Math(inline=True)
+#     eff_len_eqn.append(NoEscape(r'\begin{aligned} l_w &='+l+ r' \end{aligned}'))
+#
+#     return eff_len_eqn
+#
+# def diameter_prov(d):
+#     d = str(d)
+#     diameter_eqn = Math(inline=True)
+#     diameter_eqn.append(NoEscape(r'\begin{aligned} d &=' + d + r' \end{aligned}'))
+#
+#     return diameter_eqn
+#
+# def diahole_prov(d0):
+#     d0 = str(d0)
+#     diahole_eqn = Math(inline=True)
+#     diahole_eqn.append(NoEscape(r'\begin{aligned} d &=' + d0 + r' \end{aligned}'))
+
+    return diahole_eqn
+
+def display_prov(v,t):
+    v = str(v)
+    display_eqn = Math(inline=True)
+    display_eqn.append(NoEscape(r'\begin{aligned} '+t+' &=' + v + r' \end{aligned}'))
+
+    return display_eqn
 
     # slender = (float(K) * float(L)) / float(r)
     #

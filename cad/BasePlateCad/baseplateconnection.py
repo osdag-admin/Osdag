@@ -121,7 +121,7 @@ class BasePlateCad(object):
 
             self.gusset2Model = self.gusset2.create_model()
 
-            stiffener_gap = self.column.B/2-50
+            stiffener_gap = self.column.B*0.4
             stiffener1OriginL = numpy.array([self.stiffener.T/2+stiffener_gap, self.column.D/2+self.stiffener.L/2+self.gusset.T, self.stiffener.W/2])
             stiffener1L_uDir = numpy.array([0.0, -1.0, 0.0])
             stiffener1L_wDir = numpy.array([-1.0, 0.0, 0.0])
@@ -335,15 +335,15 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    column = ISection(B=250, T=13.7, D=450, t=9.8, R1= 14.0, R2= 7.0, alpha= 94, length= 1500, notchObj= None)
-    baseplate = Plate(L=650, W=500, T=30)
-    weldAbvFlang = FilletWeld(b=3, h=3, L= 250)
-    weldBelwFlang = FilletWeld(b=3, h=3, L= 100)
-    weldSideWeb = FilletWeld(b=3, h=3, L= 420)
+    column = ISection(B=250, T=13.7, D=450, t=9.8, R1= 15.0, R2= 7.5, alpha= 94, length= 1500, notchObj= None)
+    baseplate = Plate(L=650, W=415, T=45)
+    weldAbvFlang = FilletWeld(b=10, h=10, L= 250)
+    weldBelwFlang = FilletWeld(b=10, h=10, L= 100)
+    weldSideWeb = FilletWeld(b=10, h=10, L= 420)
     # concrete = Concrete(L= baseplate.W*1.5, W= baseplate.L*1.5, T= baseplate.T*10)
     concrete = Plate(L= baseplate.L*1.5, W= baseplate.W*1.5, T= baseplate.T*10)
 
-    gusset = StiffenerPlate(L= baseplate.W, W= 200, T= 10, L11 = (baseplate.W - (column.B+100))/2, L12= 200-100, R11= (baseplate.W - (column.B+100))/2, R12= 200-100)
+    gusset = StiffenerPlate(L= baseplate.W, W= 200, T= 14, L11 = (baseplate.W - (column.B+100))/2, L12= 200-100, R11= (baseplate.W - (column.B+100))/2, R12= 200-100)
     stiffener = StiffenerPlate(L= (baseplate.L-column.D-2*gusset.T)/2, W= gusset.W, T= gusset.T, L11= (baseplate.L-column.D-2*gusset.T)/2-50, L12= gusset.W-100)
 
     type = 'gusset' # 'no_gusset'

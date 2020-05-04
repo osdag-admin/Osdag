@@ -158,5 +158,4 @@ class CreateLatex(Document):
                 view_3D.add_image(filename=r'"' + view_3dimg_path, width=NoEscape(r'\linewidth'))
                 view_3D.add_caption('3D View')
 
-
         doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)

@@ -168,6 +168,16 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         return options_list
 
+    def customized_input(self):
+
+        list1 = []
+        t4 = (KEY_WEBPLATE_THICKNESS, self.plate_thick_customized)
+        list1.append(t4)
+        t5 = (KEY_FLANGEPLATE_THICKNESS, self.plate_thick_customized)
+        list1.append(t5)
+
+        return list1
+
     # def flangespacing(self, flag):
     #
     #     flangespacing = []
@@ -219,15 +229,8 @@ class ColumnCoverPlateWeld(MomentConnection):
                round_up(self.flange_plate.tension_capacity_flange_plate / 1000, 5) if flag else '')
         flangecapacity.append(t30)
 
-        # t28 = (KEY_FLANGE_PLATE_MOM_DEMAND, KEY_FLANGE_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
-        #        round_up(self.flange_plate.moment_demand / 1000000, 5) if flag else '')
-        # flangecapacity.append(t28)
-        #
-        # t29 = (KEY_FLANGE_PLATE_MOM_CAPACITY, KEY_FLANGE_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
-        #        round_up(self.flange_plate.moment_capacity/1000, 5) if flag else '')
-        # flangecapacity.append( t29)
-
         return flangecapacity
+
 
     def webcapacity(self, flag):
 
@@ -236,39 +239,11 @@ class ColumnCoverPlateWeld(MomentConnection):
                round_up(self.section.tension_capacity_web / 1000, 5) if flag else '')
         webcapacity.append(t30)
         t30 = (KEY_TEN_CAP_WEB_PLATE, KEY_DISP_TEN_CAP_WEB_PLATE, TYPE_TEXTBOX,
-               round_up(self.web_plate.tension_capacity_web_plate / 1000, 5) if flag else '')
+               round_up(self.web_plate.tension_capacity_web_plate/ 1000, 5) if flag else '')
         webcapacity.append(t30)
         t30 = (KEY_WEBPLATE_SHEAR_CAPACITY, KEY_DISP_WEBPLATE_SHEAR_CAPACITY, TYPE_TEXTBOX,
                round_up(self.web_plate.shear_capacity_web_plate / 1000, 5) if flag else '')
         webcapacity.append(t30)
-
-        # t30 = (KEY_TENSIONYIELDINGCAP_WEB, KEY_DISP_TENSIONYIELDINGCAP_WEB, TYPE_TEXTBOX,
-        #        round(self.web_plate.tension_yielding_capacity / 1000, 2) if flag else '')
-        # webcapacity.append(t30)
-        #
-        # t31 = (KEY_TENSIONRUPTURECAP_WEB, KEY_DISP_TENSIONRUPTURECAP_WEB, TYPE_TEXTBOX,
-        #        round(self.web_plate.tension_rupture_capacity / 1000, 2) if flag else '')
-        # webcapacity.append(t31)
-        #
-        # t12 = (KEY_SHEARYIELDINGCAP_WEB, KEY_DISP_SHEARYIELDINGCAP_WEB, TYPE_TEXTBOX,
-        #        round(self.web_plate.shear_yielding_capacity/1000, 2) if flag else '')
-        # webcapacity.append(t12)
-        #
-        # t13 = (KEY_BLOCKSHEARCAP_WEB, KEY_DISP_BLOCKSHEARCAP_WEB, TYPE_TEXTBOX,
-        #        round(self.web_plate.block_shear_capacity/1000, 2) if flag else '')
-        # webcapacity.append(t13)
-        #
-        # t14 = (KEY_SHEARRUPTURECAP_WEB, KEY_DISP_SHEARRUPTURECAP_WEB, TYPE_TEXTBOX,
-        #        round(self.web_plate.shear_rupture_capacity/1000, 2) if flag else '')
-        # webcapacity.append(t14)
-
-        # t15 = (KEY_WEB_PLATE_MOM_DEMAND, KEY_WEB_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
-        #        round_up(self.web_plate.moment_demand / 1000000, 5) if flag else '')
-        # webcapacity.append(t15)
-        #
-        # t16 = (KEY_WEB_PLATE_MOM_CAPACITY, KEY_WEB_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
-        #        round_up(self.web_plate.moment_capacity/1000, 5) if flag else '')
-        # webcapacity.append(t16)
         return webcapacity
 
     def web_weld_details(self, flag):
@@ -763,34 +738,31 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         # A_vn_web = ( self.section.depth - 2 * self.section.flange_thickness - self.web_plate.bolts_one_line * self.web_bolt.dia_hole) * self.section.web_thickness
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
-        self.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
+        self.section.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
             A_v=A_v_web, fy=self.section.fy)
 
-        print("tension_yielding_capacity_web", self.tension_yielding_capacity_web)
+        print("tension_yielding_capacity_web", self.section.tension_yielding_capacity_web)
 
-        if self.tension_yielding_capacity_web > self.axial_force_w:
+        if self.section.tension_yielding_capacity_web > self.axial_force_w:
 
-            self.section.tension_yielding_capacity = self.tension_yielding_capacity_web
-            # print("tension_yielding_capacity of web", self.section.tension_yielding_capacity)
+            # self.section.tension_yielding_capacity = self.section.tension_yielding_capacity_web
+
             ### FLANGE MEMBER CAPACITY CHECK
             self.axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
                 self.section.area)  # N
             self.flange_force = (
                     ((self.moment_flange) / (self.section.depth - self.section.flange_thickness)) + (
                 self.axial_force_f))
-            # A_vn_flange = (self.section.flange_width - self.flange_plate.bolts_one_line * self.flange_bolt.dia_hole) * \
-            #               self.section.flange_thickness
+
             A_v_flange = self.section.flange_thickness * self.section.flange_width
 
-            self.tension_yielding_capacity_flange = self.tension_member_design_due_to_yielding_of_gross_section(
+            self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
                 A_v=A_v_flange,
                 fy=self.flange_plate.fy)
-            print("tension_yielding_capacity_flange", self.tension_yielding_capacity_flange)
+            print("tension_yielding_capacity_flange", self.section.tension_yielding_capacity)
 
-            if self.tension_yielding_capacity_flange > self.flange_force:
+            if self.section.tension_yielding_capacity > self.flange_force:
 
-                #             self.supported_section.tension_yielding_capacity > self.load.axial_force:
-                # print("BBB flange member check is satisfactory. Doing bolt checks")
                 self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if
                                                      i >= (self.section.web_thickness / 2)]
 
@@ -804,9 +776,6 @@ class ColumnCoverPlateWeld(MomentConnection):
                 if len(self.flange_plate_thickness_possible) == 0 or self.web_plate_thickness_possible == 0:
                     logger.error(":aaaaWeb Plate thickness should be greater than section  thicknesss.")
                 else:
-
-                    # print("Selecting bolt diameter")
-                    # self.select_bolt_dia(self)
 
                     self.flange_plate.thickness_provided = self.min_thick_based_on_area(self,
                                                                                         tk=self.section.flange_thickness,
@@ -833,7 +802,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                 self.design_status = False
                 logger.error(
                     " : tension_yielding_capacity  of flange is less than applied loads, Please select larger sections or decrease loads"
-                )
+                    )
                 print(" BBB failed in flange member checks. Select larger sections or decrease loads")
         else:
             self.design_status = False
@@ -1188,7 +1157,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                 logger.error(
                     ":tension capacity flange plate is less than applied loads, Please select larger sections or decrease loads")
             else:
-                self.web_plate_capacity_axial(self)
+                self.recheck_flange_capacity_axial(self)
         else:
             #  yielding,rupture  for  inside flange plate
             flange_plate_height_inside = self.flange_plate.Innerheight
@@ -1211,17 +1180,33 @@ class ColumnCoverPlateWeld(MomentConnection):
                 logger.error(
                     ":Tension capacity flange plate is less than applied loads, Please select larger sections or decrease loads")
             else:
-                self.web_plate_capacity_axial(self)
+                self.recheck_flange_capacity_axial(self)
+
+    def recheck_flange_capacity_axial(self):
+        A_v_flange = self.section.flange_thickness * self.section.flange_width
+
+        self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
+            A_v=A_v_flange, fy=self.section.fy)
+        self.section.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
+            A_vn=A_v_flange, fu=self.section.fu)
+        self.section.tension_capacity_flange = min(self.section.tension_yielding_capacity,
+                                                   self.section.tension_rupture_capacity)
+        if self.section.tension_capacity_flange < self.flange_force:
+            self.design_status = False
+            logger.error(
+                ":tension capacity flange is less than applied loads, Please select larger sections or decrease loads")
+        else:
+            self.web_plate_capacity_axial(self)
 
     def web_plate_capacity_axial(self):
 
         A_v_web = 2 * self.web_plate.height * self.web_plate.thickness_provided
-        self.web_plate.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
+        self.web_plate.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
             A_v=A_v_web, fy=self.web_plate.fy)
-        self.web_plate.tension_rupture_capacity_web = self.tension_member_design_due_to_rupture_of_critical_section(
+        self.web_plate.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
             A_vn=A_v_web, fu=self.web_plate.fu)
-        self.web_plate.tension_capacity_web_plate = min(self.web_plate.tension_yielding_capacity_web,
-                                                        self.web_plate.tension_rupture_capacity_web)
+        self.web_plate.tension_capacity_web_plate = min(self.web_plate.tension_yielding_capacity,
+                                                        self.web_plate.tension_rupture_capacity)
         if self.web_plate.tension_capacity_web_plate < self.axial_force_w:
             self.design_status = False
             logger.error(
@@ -1252,9 +1237,9 @@ class ColumnCoverPlateWeld(MomentConnection):
                 2 * self.section.flange_thickness)) * self.section.web_thickness * self.factored_axial_load) / (
                                  self.section.area)
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
-        self.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
+        self.section.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
             A_v=A_v_web, fy=self.web_plate.fy)
-        self.tension_rupture_capacity_web = self.tension_member_design_due_to_rupture_of_critical_section(
+        self.section.tension_rupture_capacity_web = self.tension_member_design_due_to_rupture_of_critical_section(
             A_vn=A_v_web, fu=self.web_plate.fu)
         for self.web_plate.thickness_provided in self.web_plate_thickness_possible:
             design_status_block_shear = False
@@ -1271,14 +1256,14 @@ class ColumnCoverPlateWeld(MomentConnection):
                 #      self.web_bolt.dia_hole, self.web_plate.end_dist_provided, self.web_plate.thickness_provided)
                 # print(18, self.web_plate.bolt_line, pitch, end_dist, self.section.web_thickness)
 
-                self.section.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn,
-                                                                                      A_tg=Atg,
-                                                                                      A_tn=Atn,
-                                                                                      f_u=self.web_plate.fu,
-                                                                                      f_y=self.web_plate.fy)
+                self.section.block_shear_capacity_web = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn,
+                                                                                          A_tg=Atg,
+                                                                                          A_tn=Atn,
+                                                                                          f_u=self.web_plate.fu,
+                                                                                          f_y=self.web_plate.fy)
 
                 # self.section.block_shear_capacity = 2 * self.section.block_shear_capacity
-                if self.section.block_shear_capacity < self.axial_force_w:
+                if self.section.block_shear_capacity_web < self.axial_force_w:
                     self.available_long_web_length = self.available_long_web_length + 50
 
                 else:
@@ -1287,9 +1272,9 @@ class ColumnCoverPlateWeld(MomentConnection):
             if design_status_block_shear == True:
                 break
         if design_status_block_shear == True:
-            self.section.tension_capacity_web = min(self.tension_yielding_capacity_web,
-                                                    self.tension_rupture_capacity_web,
-                                                    self.section.block_shear_capacity)
+            self.section.tension_capacity_web = min(self.section.tension_yielding_capacity_web,
+                                                    self.section.tension_rupture_capacity_web,
+                                                    self.section.block_shear_capacity_web)
             if self.section.tension_capacity_web < self.axial_force_w:
                 logger.error(
                     ":tension capacity web is less than applied loads, Please select larger sections or decrease loads")

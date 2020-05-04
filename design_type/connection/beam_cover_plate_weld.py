@@ -1588,6 +1588,7 @@ class BeamCoverPlateWeld(MomentConnection):
         #####Outer plate#####
         self.flange_weld_connecting_plates = [self.section.flange_thickness, self.flange_plate.thickness_provided]
         self.flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.flange_thickness,self.flange_plate.thickness_provided)
+        self.Kt = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness_constant()
 
         # flange_get_weld_strenght_kn = round(self.flange_weld.get_weld_strenght / 1000, 2)
         h = self.section.depth - (2 * self.section.flange_thickness)
@@ -1692,6 +1693,10 @@ class BeamCoverPlateWeld(MomentConnection):
         self.report_check.append(t2)
 
 
+        t1 = (DISP_THROAT, throat_req(), throat_prov(self.flange_weld.size, self.Kt),
+              get_pass_fail(3.0, self.flange_weld.size, relation="leq"))
+
+        self.report_check.append(t1)
         t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,
               flange_weld_stress(F_f=round(self.flange_force / 1000, 2), F_rl=self.l_req_flangelength,
                                  F_ws=self.flange_weld.stress),

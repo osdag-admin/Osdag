@@ -19,20 +19,24 @@ Bolt.Grade:
 Bolt.Type: Bearing Bolt
 Connectivity: Column flange-Beam web
 DesignPreferences.Bolt.Bolt_Hole_Type: Standard
-DesignPreferences.Bolt.Material_Grade_OverWrite: '800'
-DesignPreferences.Bolt.Slip_Factor: '0.55'
+DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
+DesignPreferences.Bolt.Slip_Factor: '0.3'
+DesignPreferences.Bolt.Type: Pretensioned
 DesignPreferences.Design.Design_Method: Limit State Design
 DesignPreferences.Detailing.Corrosive_Influences: 'No'
 DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
 DesignPreferences.Detailing.Gap: '10'
+DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-DesignPreferences.Weld.Type: Shop weld
 Load.Axial: '10'
 Load.Shear: '10'
 Member.Material: E 250 (Fe 410 W)A
 Member.Supported_Section: JB 200
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
 Member.Supporting_Section: HB 350
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
 Module: Fin Plate
+Plate.Material: E 250 (Fe 410 W)A
 Plate.Thickness:
 - '3'
 - '4'

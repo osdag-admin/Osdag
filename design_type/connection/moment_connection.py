@@ -134,7 +134,7 @@ class MomentConnection(Connection, IS800_2007):
         """
         a = 4
         b = (4 * flange_width) + (2 * depth) - (2 * web_thickness)
-        c = (2 * flange_thickness * flange_width) + (depth * web_thickness) + (2 * flange_thickness * web_thickness)\
+        c = (2 * flange_thickness * flange_width) + (depth * web_thickness) + (2 * flange_thickness * web_thickness) \
             - min_area_req
 
         roots = np.roots([a, b, c])  # finding roots of the equation
@@ -177,6 +177,3 @@ class MomentConnection(Connection, IS800_2007):
         weld_size = common_calculation.round_up(weld_size, 2, weld_size_minimum)  # mm
 
         return weld_size
-
-
-

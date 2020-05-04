@@ -1743,34 +1743,38 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # Gusset Plate
         print(self.gusset_along_flange)
-        print(self.gusset_plate_length)
-        print(self.gusset_plate_height)
-        print(self.gusset_plate_thick)
+        if self.gusset_along_flange == 'Yes':
+            print(self.gusset_plate_length)
+            print(self.gusset_plate_height)
+            print(self.gusset_plate_thick)
 
-        print(self.gusset_plate_thick)  # Thickness (mm)
-        print(self.shear_on_gusset)  # Shear Demand (kN)
-        print(self.shear_capacity_gusset)  # Shear Capacity (kN)
-        print(self.moment_on_gusset)  # Moment Demand (kN-m)
-        print(self.moment_capacity_gusset)  # Moment Capacity (kN-m)
+            print(self.gusset_plate_thick)  # Thickness (mm)
+            print(self.shear_on_gusset)  # Shear Demand (kN)
+            print(self.shear_capacity_gusset)  # Shear Capacity (kN)
+            print(self.moment_on_gusset)  # Moment Demand (kN-m)
+            print(self.moment_capacity_gusset)  # Moment Capacity (kN-m)
 
         # Stiffener Plate
-        print(self.gusset_along_web)
-        print(self.stiffener_plate_length)
-        print(self.stiffener_plate_height)
-        print(self.stiffener_plate_thick)
+        if self.gusset_along_web == 'Yes':
+            print(self.gusset_along_web)
+            print(self.stiffener_plate_length)
+            print(self.stiffener_plate_height)
+            print(self.stiffener_plate_thick)
 
-        print(self.stiffener_plate_thick)  # Thickness (mm)
-        print(self.shear_on_stiffener)  # Shear Demand (kN)
-        print(self.shear_capacity_stiffener)  # Shear Capacity (kN)
-        print(self.moment_on_stiffener)  # Moment Demand (kN-m)
-        print(self.moment_capacity_stiffener)  # Moment Capacity (kN-m)
+            print(self.stiffener_plate_thick)  # Thickness (mm)
+            print(self.shear_on_stiffener)  # Shear Demand (kN)
+            print(self.shear_capacity_stiffener)  # Shear Capacity (kN)
+            print(self.moment_on_stiffener)  # Moment Demand (kN-m)
+            print(self.moment_capacity_stiffener)  # Moment Capacity (kN-m)
 
 
         # Weld
 
         print(self.weld_size_flange if self.weld_type != 'Butt Weld' else '')  # Size at Flange (mm)
         print(self.weld_size_web if self.weld_type != 'Butt Weld' else '')  # Size at Web (mm)
-        print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # Size at Gusset/Stiffener (mm)
+
+        if self.gusset_along_flange == 'Yes':
+            print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # Size at Gusset/Stiffener (mm)
 
         # this might not be required
         # print(self.weld_size if self.weld_type != 'Butt Weld' else '')  # Weld size (mm)

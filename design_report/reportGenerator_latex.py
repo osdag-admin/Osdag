@@ -1,10 +1,3 @@
-"""This file is redundant. Use report_generator.py"""
-
-'''
-Created on Dec 10, 2015
-
-@author: deepa
-'''
 from builtins import str
 import time
 from Report_functions import *
@@ -20,7 +13,6 @@ from pylatex.utils import italic, bold
 import pdflatex
 import sys
 import datetime
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 import pylatex as pyl
 
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
@@ -31,7 +23,8 @@ import os
 from pylatex.base_classes import Environment, CommandBase, Arguments
 from pylatex.package import Package
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
-    MediumText, LineBreak, simple_page_number
+    MediumText, LineBreak, simple_page_number, NewPage
+
 
 from pylatex.utils import bold
 
@@ -40,9 +33,7 @@ class CreateLatex(Document):
     def __init__(self):
         super().__init__()
 
-    @pyqtSlot()
     def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
-
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
         groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
@@ -98,14 +89,18 @@ class CreateLatex(Document):
                         table.add_hline()
                         sectiondetails = uiObj[i]
                         image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
-                        Img_path = r'/ResourceFiles/images/' + image_name + r'".png'
-                        merge_rows = int(round_up(len(sectiondetails), 2) / 2 + 2)
-                        print('Hi', len(sectiondetails) / 2, round_up(len(sectiondetails), 2) / 2, merge_rows)
-                        if merge_rows % 2 != 0:
-                            sectiondetails[''] = ''
+                        Img_path = r'/ResourceFiles/images/'+image_name+r'".png'
+                        if (len(sectiondetails))% 2 == 0:
+                        # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+                            merge_rows = int(round_up((len(sectiondetails)/2),1,0) + 2)
+                        else:
+                            merge_rows = int(round_up((len(sectiondetails)/2),1,0) + 1)
+                        print('Hi', len(sectiondetails)/2,round_up(len(sectiondetails),2)/2, merge_rows)
+                        if merge_rows%2 != 0:
+                            sectiondetails['']=''
                         a = list(sectiondetails.keys())
                         # index=0
-                        for x in range(1, merge_rows):
+                        for x in range(1,(merge_rows+1)):
                             # table.add_row("Col.Det.",i,columndetails[i])
                             if x == 1:
                                 table.add_row(
@@ -130,20 +125,28 @@ class CreateLatex(Document):
                             (MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
                         table.add_hline()
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        doc.append(NewPage())
+        count = 0
         with doc.create(Section('Design Checks')):
             for check in Design_Check:
                 if check[0] == 'SubSection':
+                    if count >=1:
+                        doc.append(NewPage())
                     with doc.create(Subsection(check[1])):
-                        with doc.create(LongTable(check[2], row_height=1.2)) as table:
+                        with doc.create(LongTable(check[2], row_height=1.2)) as table: # todo anjali remove
                             table.add_hline()
                             table.add_row(('Check', 'Required', 'Provided', 'Remarks'), color='OsdagGreen')
                             table.add_hline()
                             table.end_table_header()
                             table.add_hline()
+                            count = count + 1
                 else:
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+
+        doc.append(NewPage())
+
         with doc.create(Section('3D View')):
             with doc.create(Figure(position='h!')) as view_3D:
                 view_3dimg_path = rel_path + Disp_3d_image

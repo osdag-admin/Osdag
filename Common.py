@@ -423,9 +423,10 @@ KEY_DISP_GRD_FOOTING = 'Grade*'
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 
 # Applied load
-KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load Vu (kN)'
-KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load Au (kN)'
-KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load Mu (kNm)'
+KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load (kNm)'
+KEY_DISP_AXIAL_FORCE_CON= 'Axial Load Considered (kN)'
 
 # capacity
 KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member Ac (kN)"
@@ -483,7 +484,7 @@ DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
 
 DISP_TITLE_WELD = 'Weld'
 DISP_TITLE_WELD_CAPACITY = 'Weld Capacity'
-
+DISP_TITLE_END_CONNECTION = 'End Connection'
 
 DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
@@ -512,6 +513,8 @@ VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8',
 #################################
 # Key for storing Plate
 DISP_TITLE_PLATE = 'Plate'
+DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
+
 
 # Key for storing Thickness sub-key of Plate
 KEY_PLATETHK = 'Plate.Thickness'
@@ -1123,8 +1126,10 @@ KEY_OUT_PLATETHK = 'Plate.Thickness'
 KEY_OUT_DISP_PLATETHK = 'Thickness (mm)'
 KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_PLATE_HEIGHT = 'Height (mm)'
+KEY_OUT_DISP_PLATE_MIN_HEIGHT = 'Min.Height (mm)'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
+KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Length (mm)'
 KEY_OUT_PLATE_WIDTH = 'Plate.Width'
 KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 c = 'Width (mm)'

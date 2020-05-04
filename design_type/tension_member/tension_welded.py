@@ -676,6 +676,7 @@ class Tension_welded(Main):
         t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, existingvalue_key_length, None)
         options_list.append(t5)
 
+
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
         options_list.append(t6)
 
@@ -741,6 +742,9 @@ class Tension_welded(Main):
                self.efficiency if flag else '')
         out_list.append(t7)
 
+        t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None)
+        out_list.append(t8)
+
         t8 = (None, DISP_TITLE_WELD_CAPACITY, TYPE_TITLE, None)
         out_list.append(t8)
 
@@ -760,16 +764,16 @@ class Tension_welded(Main):
         t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, self.weld.effective if flag else '')
         out_list.append(t13)
 
-        t18 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
+        t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None)
         out_list.append(t18)
 
         t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '')
         out_list.append(t19)
 
-        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
         out_list.append(t20)
 
-        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
+        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
         out_list.append(t21)
 
         return out_list

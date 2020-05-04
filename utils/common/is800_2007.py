@@ -227,6 +227,7 @@ class IS800_2007(object):
             IS 800:2007, cl. 10.2.3.1
 
         """
+        # print(plate_thicknesses)
         t = min(plate_thicknesses)
         return min(32*t, 300.0)
 

@@ -772,6 +772,9 @@ class Tension_bolted(Main):
                self.efficiency if flag else '')
         out_list.append(t7)
 
+        t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None)
+        out_list.append(t8)
+
         t8 = (None, DISP_TITLE_BOLT_CAPACITY, TYPE_TITLE, None)
         out_list.append(t8)
 
@@ -811,16 +814,16 @@ class Tension_bolted(Main):
         t17 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
         out_list.append(t17)
 
-        t18 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
+        t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None)
         out_list.append(t18)
 
         t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '')
         out_list.append(t19)
 
-        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
         out_list.append(t20)
 
-        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
+        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
         out_list.append(t21)
 
         return out_list
@@ -1302,19 +1305,26 @@ class Tension_bolted(Main):
         if design_dictionary[KEY_SEC_PROFILE] == "Channels":
             bolts_required_previous = 2
             self.thick = self.section_size_1.web_thickness
-            self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+
         elif design_dictionary[KEY_SEC_PROFILE]== 'Back to Back Channels':
             bolts_required_previous = 2
             self.thick = 2 * self.section_size_1.web_thickness
-            self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+
         elif design_dictionary[KEY_SEC_PROFILE]== 'Back to Back Angles':
             bolts_required_previous = 1
             self.thick = 2* self.section_size_1.thickness
-            self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+
         else:
             bolts_required_previous = 1
             self.thick = self.section_size_1.thickness
-            self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+
+        thickness_provided = [i for i in self.plate_thickness if i >= self.thick or i==40.0]
+        if len(thickness_provided) >= 2:
+            self.plate.thickness_provided = min(thickness_provided)
+        else:
+            # thickness_provided.append(40.0)
+            # print(thickness_provided)
+            self.plate.thickness_provided = thickness_provided[0]
 
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Angles', 'Star Angles']:
@@ -1410,6 +1420,7 @@ class Tension_bolted(Main):
 
         if bolt_design_status_1 is True:
             self.design_status = True
+            print("bolt ok")
             self.get_bolt_grade(self, design_dictionary)
 
         else:
@@ -1648,7 +1659,6 @@ class Tension_bolted(Main):
 
         if self.section_size_1.tension_capacity >= self.load.axial_force *1000:
             self.design_status = True
-            logger.info("In case of reverse load, slenderness value should be less than 180.")
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
 
@@ -1762,29 +1772,28 @@ class Tension_bolted(Main):
             if self.plate_tension_capacity > self.res_force:
                 # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
                 break
-            elif (self.plate_tension_capacity < self.res_force) and self.plate.thickness_provided == self.plate_last:
-                self.design_status = False
-                logger.error("Plate thickness is not sufficient.")
-                # logger.error(": Design is not safe. \n ")
-                # logger.debug(" :=========End Of design===========")
+            # elif (self.plate_tension_capacity < self.res_force) and self.plate.thickness_provided == self.plate_last:
+            #     self.design_status = False
+            #     logger.error("Plate thickness is not sufficient.")
+            #     # logger.error(": Design is not safe. \n ")
+            #     # logger.debug(" :=========End Of design===========")
             else:
                 pass
 
         if self.plate_tension_capacity > self.res_force:
             print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
             self.design_status = True
+            logger.info("In case of reverse load, slenderness value should be less than 180.")
             logger.info(": Overall bolted tension member design is safe. \n")
             logger.debug(" :=========End Of design===========")
         else:
-            if self.plate_tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ["Channels",
-                                                                                               'Back to Back Channels',
-                                                                                               "Star Angles"]:
+            if self.plate_tension_capacity < max_tension_yield and self.res_force < max_tension_yield:
+                print(self.section_size_1.designation, "hsdvdhsd")
                 self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
-            elif self.plate_tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles',
-                                                                                                 "Angles"]:
-                self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
+
             else:
                 self.design_status = False
+                logger.error("Plate thickness is not sufficient.")
                 logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness.")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
@@ -1920,6 +1929,15 @@ class Tension_bolted(Main):
         t6 = (KEY_DISP_EFFICIENCY, efficiency_req(),
               efficiency_prov(self.load.axial_force, self.section_size_1.tension_capacity, self.efficiency), '')
         self.report_check.append(t6)
+        t1 = (KEY_DISP_AXIAL_FORCE_CON, min_axial_capacity(axial_capacity=round((self.section_size_1.tension_yielding_capacity/1000), 2),
+                                                               min_ac=round(((0.3*self.section_size_1.tension_yielding_capacity) / 1000), 2)),
+              prov_axial_load(axial_input=self.load.axial_force,
+                              min_ac=round(((0.3*self.section_size_1.tension_yielding_capacity) / 1000), 2),
+                              app_axial_load=round(self.res_force / 1000, 2)),
+              get_pass_fail(round(((0.3*self.section_size_1.tension_yielding_capacity) / 1000), 2),
+                            self.res_force / 1000, relation='lesser'))
+        self.report_check.append(t1)
+
 
 
         t7 = ('SubSection', 'Bolt Checks', '|p{2.5cm}|p{5cm}|p{7.5cm}|p{1cm}|')

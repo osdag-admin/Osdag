@@ -1808,7 +1808,7 @@ class Ui_ModuleWindow(QMainWindow):
             pass
         else:
             main.design_button_status = True
-            error = main.func_for_validation(main, self, self.design_inputs)
+            error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
             print(status)
 

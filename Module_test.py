@@ -111,7 +111,7 @@ class Modules:
 
         pdf_created = False
         main.set_osdaglogger(None)
-        error = main.func_for_validation(main,self,file_data)  # validating files and setting inputs (although we know files are valid).
+        error = main.func_for_validation(main,file_data)  # validating files and setting inputs (although we know files are valid).
 
         if error is None:  # if ran successfully and all input values are set without any error. Now create pdf
 

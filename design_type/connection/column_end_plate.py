@@ -254,7 +254,7 @@ class ColumnEndPlate(MomentConnection):
 
         return out_list
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
 
         all_errors = []
         self.design_status = False

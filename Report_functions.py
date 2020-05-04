@@ -276,6 +276,9 @@ def min_flange_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length,gap
     min_flange_plate_length_eqn.append(NoEscape(r'&=' + min_length + '\end{aligned}'))
     return min_flange_plate_length_eqn
 
+
+
+
 def min_plate_thk_req(t_w):
     t_w = str(t_w)
     min_plate_thk_eqn = Math(inline=True)
@@ -332,6 +335,30 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
 
+def height_of_flange_cover_plate(B,sp,b_fp):
+    B = str(B)
+    sp = str(sp)
+    b_fp = str (b_fp)
+    height_for_flange_cover_plate_eqn =Math(inline=True)
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= \{B - 2*sp} \\'))
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'&= \{' + B + ' - 2 * ' + sp + '} \\'))
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'&=' + b_fp + '\end{aligned}'))
+    return height_for_flange_cover_plate_eqn
+
+def min_flange_plate_Lenght_req(l,s,g,l_fp):
+    l = str(l)
+    s = str (s)
+    g = str (g)
+    l_fp = str(l_fp)
+    min_flange_plate_Length_eqn = Math(inline=True)
+    min_flange_plate_Length_eqn.append(NoEscape(r'\begin{aligned} l_{fp} & = [ 2*(l_wl + 2*s) + g]\\'))
+   # min_flange_plate_Length_eqn.append(NoEscape(r'&= \{'+2+'*'+(+' +l_wl+' +
+    min_flange_plate_Length_eqn.append(NoEscape(r'&= + \frac{'+g+r'}]\\'))
+    min_flange_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
+    return min_flange_plate_Length_eqn
+
+
+
 
 def tension_rupture_bolted_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
 
@@ -380,6 +407,17 @@ def tensile_capacity_prov(T_dg, T_dn, T_db =None):
 
     tension_capacity_eqn.append(NoEscape(r'&='+T_d + '\end{aligned}'))
     return tension_capacity_eqn
+
+def spacing (sp,s):
+    sp = max(15,s+5)
+    sp = str(sp)
+    s = str(s)
+    space_provided_eqn = Math(inline=True)
+    space_provided_eqn.append(NoEscape(r'\begin{aligned} sp &= Max(15,(s+5))\\'))
+    space_provided_eqn.append(NoEscape(r'&= Max(' + 15 + ','  +( s+5) + r')\\'))
+    space_provided_eqn.append(NoEscape(r'&=' + sp + '\end{aligned}'))
+    return space_provided_eqn
+
 
 def mom_axial_IR_prov(M,M_d,N,N_d,IR):
     M = str(M)
@@ -644,6 +682,17 @@ def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,b
     member_rup_eqn.append(NoEscape(r'&= '+ member_rup + r'\end{aligned}'))
 
     return member_rup_eqn
+
+def flange_weld_stress(F_f,F_rl,F_ws):
+    F_f = str(F_f)
+    F_rl = str(F_rl)
+    F_ws = str(F_ws)
+    flange_weld_stress_eqn = Math(inline=True)
+    flange_weld_stress_eqn.append(NoEscape(r'\begin{aligned} stress &= \frac{F_f}{F_rl}'))
+    flange_weld_stress_eqn.append(NoEscape(r' &= \frac{'+F_f+'}{'+F_rl+ r'}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r'&= ' + F_ws+ r'\end{aligned}'))
+
+    return flange_weld_stress_eqn
 
 def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u = None, f_y = None ,gamma_m0 = None ,gamma_m1 = None):
     Tdb = str(Tdb)

@@ -8,30 +8,30 @@
 .        _______________________|______________________________________________________..........                .    ((LEVEL 1))
 .        |               |          |            |                    |               |                          .
 .    Module_1        Module_2    Module_3     Module_4             Module_5     Module_6         (Keys of Main Dictionary)
-........|..............|............|...........|....................|...............|............................            
+........|..............|............|...........|....................|...............|............................
         |              |            |           |                    |               |
         |              |            |           |                    |               |
-        |              |            | [List/Tuple of Module Variants]|               |                           
-        |              |            |                                |               |                           
-        |              |    [List/Tuple of Module Variants]          |               |                           
-        |      (UNDER DEVELOPMENT)                             (UNDER DEVELOPMENT)   |                           
+        |              |            | [List/Tuple of Module Variants]|               |
+        |              |            |                                |               |
+        |              |    [List/Tuple of Module Variants]          |               |
+        |      (UNDER DEVELOPMENT)                             (UNDER DEVELOPMENT)   |
 ........|............................................................................|............................
-.   ____|________________________________.....               ________________________|______......     (Sub Dictionaries)     
+.   ____|________________________________.....               ________________________|______......     (Sub Dictionaries)
 .   |                   |               |                    |              |              |                     .     ((LEVEL 2))
-.   Submodule_1    Submodule_2    Submodule_3           Submodule_1    Submodule_2    Submodule_3     (Keys of Sub Dictionaries) 
+.   Submodule_1    Submodule_2    Submodule_3           Submodule_1    Submodule_2    Submodule_3     (Keys of Sub Dictionaries)
 .       |               |               |                |                  |              |                     .
 ........|...............|...............|................|..................|..............|......................
-        |               |               |                |                  |              |                     
-        |               |               |                |                  |              |                     
-        |               |               |                |                  |              |                      
-        |               |      (UNDER DEVELOPMENT)       |                  |              |                     
-        |               |                  [List/Tuple of Module Variants]  |              |                     
-        |  [List/Tuple of Module Variants]                                  |  [List/Tuple of Module Variants]   
-        |                                                                   |                                    
+        |               |               |                |                  |              |
+        |               |               |                |                  |              |
+        |               |               |                |                  |              |
+        |               |      (UNDER DEVELOPMENT)       |                  |              |
+        |               |                  [List/Tuple of Module Variants]  |              |
+        |  [List/Tuple of Module Variants]                                  |  [List/Tuple of Module Variants]
+        |                                                                   |
 ........|...................................................................|.....................................
-.   ____|________________________________.....               _______________|_______________......     (Sub-Sub Dictionaries)     
+.   ____|________________________________.....               _______________|_______________......     (Sub-Sub Dictionaries)
 .   |                   |               |                    |              |              |                     .     ((LEVEL 3))
-. Sub-Submodule_1  Sub-Submodule_2  Sub-Submodule_3  Sub-Submodule_1  Sub-Submodule_2  Sub-Submodule_3 (Keys of Sub-Sub Dictionaries) 
+. Sub-Submodule_1  Sub-Submodule_2  Sub-Submodule_3  Sub-Submodule_1  Sub-Submodule_2  Sub-Submodule_3 (Keys of Sub-Sub Dictionaries)
 .       |               |               |                    |                  |              |                 .
 ........|...............|...............|....................|..................|..............|..................
         |               |               |                    |                  |              |
@@ -47,7 +47,7 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 2) self.Modules must be a dictionary with keys as the name of modules in string format (LEVEL 1: Left Panel Buttons).
 
 3) The values to these keys can be a dictionary(Modules), a List/Tuple(Module Variants) or self.Under_Development :
-        (i) If the value is a dictionary then it should contain keys as modules in string format and for values 
+        (i) If the value is a dictionary then it should contain keys as modules in string format and for values
             read RULE 4 . (LEVEL 2: Tab for each module)
        (ii) If the value is a List/Tuple then it should contain sub-lists/sub-tuples informing about the module variants :
                     (a) The module variants as sub-list/sub-tuple will have 3 values, Module_Name, Image_Path and Object_Name .
@@ -55,10 +55,10 @@ The Rules/Steps to use the template are(OsdagMainWindow):
                         which connects to the start button on the module variants' page and help launch a certain module.
       (iii) If the value is self.Under_Development then that module/module variant is marked as UNDER DEVELOPMENT.
 
-4) In case of RULE 3(i) if value of any sub-module key is a dictionary then that dictionary will follow the RULE 3 
-   all over again and the values of the keys can be a dictionary(Sub-Modules), a List/Tuple(Sub-Module Variants) or 
+4) In case of RULE 3(i) if value of any sub-module key is a dictionary then that dictionary will follow the RULE 3
+   all over again and the values of the keys can be a dictionary(Sub-Modules), a List/Tuple(Sub-Module Variants) or
    self.Under_Development:
-        (i) If the value is a dictionary then it should contain keys as sub-modules in string format and for values 
+        (i) If the value is a dictionary then it should contain keys as sub-modules in string format and for values
             read RULE 5 . (LEVEL 3 Sub Tab for each tab)
        (ii) If the value is a List/Tuple then it should contain sub-lists/sub-tuples informing about the module variants :
                     (a) The module variants as sub-list/sub-tuple will have 3 values, Module_Name, Image_Path and Object_Name .
@@ -180,7 +180,7 @@ class New_Tab_Widget(QTabWidget):           # Empty Custom Tab Widget
                 background-color: #d97f7f;
                 color:#000000 ;
                         }
- 
+
             '''
                         )
 
@@ -213,14 +213,14 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
                     '''
                 )
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
-        
+
 class ModulePage(QWidget):              # Empty Page with a layout
     def __init__(self):
         super().__init__()
         self.layout=QGridLayout()
         self.setLayout(self.layout)
         self.layout.setContentsMargins(0,5,0,0)
-        
+
 class LeftPanelButton(QWidget):          # Custom Button widget for the Left Panel
     def __init__(self,text):
         super().__init__()
@@ -254,7 +254,7 @@ class OsdagMainWindow(QMainWindow):
                                                     'Column to Column' :[
                                                                 ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
-                                                                ('End Plate Connection','ResourceFiles/images/endplate.png','C2C_End_Plate_Connection'),
+                                                                ('End Plate Connection','ResourceFiles/images/column_end_plate.jpg','C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
                                                     'PEB' : self.Under_Development,
@@ -288,8 +288,8 @@ class OsdagMainWindow(QMainWindow):
 
         for ModuleName in self.Modules:                      #Level 1 dictionary handling
             Button= LeftPanelButton(ModuleName)
-            self.ButtonConnection(Button,list(self.Modules.keys()),ModuleName)  
-            self.ui.verticalLayout.addWidget(Button)       
+            self.ButtonConnection(Button,list(self.Modules.keys()),ModuleName)
+            self.ui.verticalLayout.addWidget(Button)
             if(type(self.Modules[ModuleName])==dict):        #level 2 dictionary handling
                 Page= ModulePage()
                 self.ui.myStackedWidget.addWidget(Page)
@@ -387,7 +387,7 @@ class OsdagMainWindow(QMainWindow):
         self.showMaximized()
 
 ################################ UI Methods ###############################################
-    
+
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()
         if loc == "Design Examples":
@@ -429,7 +429,7 @@ class OsdagMainWindow(QMainWindow):
         Button.ui.LP_Button.clicked.connect(lambda : self.ui.myStackedWidget.setCurrentIndex(Modules.index(ModuleName)+1))
 
 #################################### Module Launchers ##########################################
-    
+
     @pyqtSlot()
     def show_shear_connection(self):
         # folder = self.select_workspace_folder()
@@ -716,7 +716,7 @@ class OsdagMainWindow(QMainWindow):
             self.ui2.setupUi(self.ui2, Tension_welded, ' ')
             self.ui2.show()
             self.ui2.closed.connect(self.show)
-    
+
 ################################# Help Actions ############################################
 
     def about_osdag(self):
@@ -761,4 +761,3 @@ if __name__ == '__main__':
         sys.exit(app.exec_())
     except BaseException as e:
         print("ERROR", e)
-        

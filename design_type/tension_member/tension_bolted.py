@@ -1,35 +1,21 @@
 from design_type.connection.shear_connection import ShearConnection
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from design_report.reportGenerator_latex import CreateLatex
-import configparser
+
 from utils.common.component import *
 # from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
 from Common import *
 from Report_functions import *
 from utils.common.load import Load
-import yaml
-from design_report.reportGenerator import save_html
-import os
-import shutil
+
+
 import logging
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtGui import QTextCharFormat
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-import pickle
-import pdfkit
-import configparser
+
+
 from main import Main
-import cairosvg
-from io import StringIO
+
 
 
 class Tension_bolted(Main):
@@ -62,10 +48,11 @@ class Tension_bolted(Main):
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-        handler = OurLog(key)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        if key is not None:
+            handler = OurLog(key)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def module_name(self):
 
@@ -931,8 +918,9 @@ class Tension_bolted(Main):
 
     def func_for_validation(self, window, design_dictionary):
 
+        all_errors = []
         "check valid inputs and empty inputs in input dock"
-
+        print(design_dictionary,'djsgggggggggggggggggggggggggggggggggggggggggggggggggggggggg')
         self.design_status = False
 
         flag = False
@@ -948,8 +936,8 @@ class Tension_bolted(Main):
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -958,7 +946,7 @@ class Tension_bolted(Main):
             self.set_input_values(self, design_dictionary)
             # print(design_dictionary)
         else:
-            pass
+            return all_errors
 
 
 
@@ -987,7 +975,7 @@ class Tension_bolted(Main):
         return information
 
     def warn_text(self):
-      
+
         """
         Function to give logger warning when any old value is selected from Column and Beams table.
         """
@@ -1101,10 +1089,12 @@ class Tension_bolted(Main):
 
         [max_force,length] = self.max_force_length(self, design_dictionary)
 
+        member_design = False
+
         "Loop checking each member from sizelist based on yield capacity"
 
         for selectedsize in self.sizelist:
-            # print(selectedsize)
+            print('selectedsize',selectedsize)
             self.section_size = self.select_section(self,design_dictionary,selectedsize)
             bolt_diameter_min= min(self.bolt.bolt_diameter)
 
@@ -1184,7 +1174,6 @@ class Tension_bolted(Main):
                     # print(self.section_size.tension_yielding_capacity)
 
                 "condition for yield and slenderness check "
-                member_design = False
 
                 if (self.section_size.tension_yielding_capacity >= self.load.axial_force*1000) and self.section_size.slenderness < 400:
                     min_yield_current = self.section_size.tension_yielding_capacity
@@ -1250,8 +1239,8 @@ class Tension_bolted(Main):
                 elif (self.load.axial_force*1000 > max_force) :
                     self.design_status = False
                     logger.error(" : Tension force exceeds tension capacity of maximum available member size.")
-                    logger.error(": Design is not safe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    # logger.error(": Design is not safe. \n ")
+                    # logger.debug(" :=========End Of design===========")
                     break
 
                     "condition to limit loop based on max length derived from max available size"
@@ -1259,15 +1248,15 @@ class Tension_bolted(Main):
                 elif self.length > length:
                     self.design_status = False
                     logger.error(" : Length exceeds maximum length of maximum available member size .")
-                    logger.error(": Design is not safe. \n ")
-                    logger.debug(" :=========End Of design===========")
+                    # logger.error(": Design is not safe. \n ")
+                    # logger.debug(" :=========End Of design===========")
                     break
 
                 else:
                     pass
 
         if member_design == False:
-            logger.info(" : Tension force or Slenderness value exceeds the limit for maximum available member size.")
+            logger.error(" : Tension force or Slenderness value exceeds the limit for maximum available member size.")
             logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
 
@@ -1812,7 +1801,7 @@ class Tension_bolted(Main):
                                       'FlangeSlope': self.section_size_1.flange_slope,
                                       'R1(mm)': self.section_size_1.root_radius,
                                       'R2(mm)': self.section_size_1.toe_radius,
-                                      'Cy(mm)': self.section_size_1.Cy,
+                                      'Cy(mm)': round(self.section_size_1.Cy,2),
                                       'Iz(mm4)': self.section_size_1.mom_inertia_z,
                                       'Iy(mm4)': self.section_size_1.mom_inertia_y,
                                       'rz(mm)': self.section_size_1.rad_of_gy_z,
@@ -1923,13 +1912,13 @@ class Tension_bolted(Main):
 
         self.report_check.append(t7)
 
-        t6 = (KEY_OUT_DISP_DIA_PROVIDED, "Bolt Quantity Optimisation", self.bolt.bolt_diameter_provided, '')
+        t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt.bolt_diameter_provided,"d"), '')
         self.report_check.append(t6)
 
         t8 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Grade Optimisation", self.bolt.bolt_grade_provided, '')
         self.report_check.append(t8)
 
-        t8 = (KEY_DISP_BOLT_HOLE, " ", self.bolt.d_0, '')
+        t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt.d_0,"d_0"), '')
         self.report_check.append(t8)
 
         if self.bolt.bolt_type == TYP_BEARING:
@@ -1956,11 +1945,11 @@ class Tension_bolted(Main):
 
         t5 = (
         DISP_NUM_OF_BOLTS, get_trial_bolts(self.load.shear_force, self.load.axial_force, bolt_capacity_kn),
-        self.plate.bolts_required, '')
+        display_prov(self.plate.bolts_required,"n"), '')
         self.report_check.append(t5)
-        t6 = (DISP_NUM_OF_COLUMNS, '', self.plate.bolt_line, '')
+        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.plate.bolt_line,"n_c"), '')
         self.report_check.append(t6)
-        t7 = (DISP_NUM_OF_ROWS, '', self.plate.bolts_one_line, '')
+        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.plate.bolts_one_line,"n_r"), '')
         self.report_check.append(t7)
         t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
               self.plate.pitch_provided,
@@ -2061,14 +2050,17 @@ class Tension_bolted(Main):
               gusset_lt_b_prov(self.plate.bolt_line, self.plate.pitch_provided,self.plate.end_dist_provided,self.plate.length)
               , "")
         self.report_check.append(t4)
+        t5 = (KEY_OUT_DISP_PLATETHK_REP, '',display_prov(self.plate.thickness_provided,"t_p"), "")
+        self.report_check.append(t5)
+
         self.report_check.append(t2)
+
         self.report_check.append(t1)
 
         t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=plate_blockshear_kn), '')
         self.report_check.append(t4)
 
-        t8 = (
-        KEY_DISP_TENSION_CAPACITY, '', tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
+        t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
         get_pass_fail(self.load.axial_force, self.plate_tension_capacity, relation="lesser"))
         self.report_check.append(t8)
 
@@ -2112,7 +2104,7 @@ class Tension_bolted(Main):
 
         # folder = self.select_workspace_folder(self)
         # print(folder)
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         # Disp_image ={KEY_DISP_3D: "3d",
         #              KEY_DISP_FRONT: "Front",
@@ -2128,15 +2120,16 @@ class Tension_bolted(Main):
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
 
-        file_type = "PDF (*.pdf)"
-        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As",
-                                               os.path.join(str(' '), "untitled.pdf"), file_type)
-        print(filename, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        #file_type = "PDF (*.pdf)"
+        #filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As",
+                                               #os.path.join(str(' '), "untitled.pdf"), file_type)
+        #print(filename, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         # filename = os.path.join(str(folder), "images_html", "TexReport")
-        file_name = str(filename)
-        print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
-        fname_no_ext = filename[0].split(".")[0]
-        print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        #file_name = str(filename)
+        #print(file_name, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        #fname_no_ext = filename[0].split(".")[0]
+        #print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)
 

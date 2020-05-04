@@ -1,10 +1,3 @@
-"""This file is redundant. Use report_generator.py"""
-
-'''
-Created on Dec 10, 2015
-
-@author: deepa
-'''
 from builtins import str
 import time
 from Report_functions import *
@@ -17,16 +10,15 @@ import configparser
 # from utils.common import component
 from pylatex import Document, Section, Subsection
 from pylatex.utils import italic, bold
-import pdflatex
+#import pdflatex
 import sys
 import datetime
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 import pylatex as pyl
 
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic
-from pdflatex import PDFLaTeX
+#from pdflatex import PDFLaTeX
 import os
 from pylatex.base_classes import Environment, CommandBase, Arguments
 from pylatex.package import Package
@@ -40,8 +32,6 @@ class CreateLatex(Document):
 
     def __init__(self):
         super().__init__()
-
-    @pyqtSlot()
 
     def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
@@ -99,7 +89,7 @@ class CreateLatex(Document):
                         table.add_hline()
                         sectiondetails = uiObj[i]
                         image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
-                        Img_path = r'/ResourceFiles/images/'+image_name+r'".png'
+                        Img_path = '/ResourceFiles/images/'+image_name+'.png'
                         if (len(sectiondetails))% 2 == 0:
                         # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
                             merge_rows = int(round_up((len(sectiondetails)/2),1,0) + 2)
@@ -115,7 +105,7 @@ class CreateLatex(Document):
                             if x == 1:
                                 table.add_row(
                                     (MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
-                                                                                 filename=r'"' + rel_path + Img_path)),
+                                                                                 filename=rel_path + Img_path)),
                                      MultiColumn(2, align='|c|', data=a[x]),
                                      MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
                             elif x <= 4:
@@ -135,9 +125,13 @@ class CreateLatex(Document):
                             (MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
                         table.add_hline()
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        doc.append(NewPage())
+        count = 0
         with doc.create(Section('Design Checks')):
             for check in Design_Check:
                 if check[0] == 'SubSection':
+                    if count >=1:
+                        doc.append(NewPage())
                     with doc.create(Subsection(check[1])):
                         with doc.create(LongTable(check[2], row_height=1.2)) as table: # todo anjali remove
                             table.add_hline()
@@ -145,6 +139,7 @@ class CreateLatex(Document):
                             table.add_hline()
                             table.end_table_header()
                             table.add_hline()
+                            count = count + 1
                 else:
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()
@@ -155,7 +150,7 @@ class CreateLatex(Document):
         with doc.create(Section('3D View')):
             with doc.create(Figure(position='h!')) as view_3D:
                 view_3dimg_path = rel_path + Disp_3d_image
-                view_3D.add_image(filename=r'"' + view_3dimg_path, width=NoEscape(r'\linewidth'))
+                view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
                 view_3D.add_caption('3D View')
 
         doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)

@@ -1,4 +1,5 @@
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*- 
 # @author: Amir, Umair, Arsil
 
 import operator
@@ -13,6 +14,8 @@ TYPE_IMAGE = 'Image'
 TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
 TYPE_OUT_BUTTON = 'Output_dock_Button'
+TYPE_OUT_DOCK = 'Output_dock_Item'
+TYPE_OUT_LABEL = 'Output_dock_Label'
 TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
 TYPE_TEXT_BROWSER = 'TextBrowser'
@@ -29,7 +32,7 @@ import sqlite3
 
 from utils.common.component import *
 from utils.common.component import *
-from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+
 import logging
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.column_cover_plate import ColumnCoverPlate
@@ -121,7 +124,7 @@ def connectdb(table_name, call_type="dropdown"):
 
     elif table_name == "Channels":
         cursor = conn.execute("SELECT Designation FROM Channels")
-       
+
     elif table_name == "Beams":
         cursor = conn.execute("SELECT Designation FROM Beams")
 
@@ -134,10 +137,10 @@ def connectdb(table_name, call_type="dropdown"):
     else:
         cursor = conn.execute("SELECT Designation FROM Columns")
     rows = cursor.fetchall()
-     
+
     for row in rows:
         lst.append(row)
-   
+
     final_lst = tuple_to_str(lst,call_type)
     return final_lst
 
@@ -304,6 +307,8 @@ KEY_DISP_FY = 'Yield Strength , fy (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
 DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
 DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
+DISP_THROAT = 'Throat Thickness (mm)'
+DISP_EFF = 'Effective Length (mm)'
 DISP_WELD_STRENGTH = 'Weld Strength (kN/mm)'
 ###################################
 # Key for Storing Module
@@ -420,6 +425,18 @@ KEY_GRD_FOOTING = 'Footing.Grade'
 KEY_DISP_GRD_FOOTING = 'Grade*'
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 
+
+KEY_OUT_ANCHOR_BOLT_SHEAR = 'Anchor Bolt.Shear'
+KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_ANCHOR_BOLT_BEARING = 'Anchor Bolt.Bearing'
+KEY_OUT_DISP_ANCHOR_BOLT_BEARING = 'Bearing Capacity (kN)'
+KEY_OUT_ANCHOR_BOLT_CAPACITY = 'Anchor Bolt.Capacity'
+KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
+KEY_OUT_ANCHOR_BOLT_COMBINED = 'Anchor Bolt.Combined'
+KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity'
+KEY_OUT_ANCHOR_BOLT_TENSION = 'Anchor Bolt.Tension'
+KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
+
 # Applied load
 KEY_DISP_APPLIED_SHEAR_LOAD ='Shear Load Vu (kN)'
 KEY_DISP_APPLIED_AXIAL_FORCE='Axial Load Au (kN)'
@@ -453,18 +470,45 @@ KEY_OUT_BASEPLATE_LENGTH = 'Baseplate.Length'
 KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (lp)'
 KEY_OUT_BASEPLATE_WIDTH = 'Baseplate.Width'
 KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (wp)'
+
 DISP_TITLE_DETAILING = 'Detailing'
 KEY_OUT_DETAILING_NO_OF_ANCHOR_BOLT = 'Deatiling.No of Anchor bolts'
 KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'No. of Anchor bolts'
+KEY_OUT_DETAILING_PITCH_DISTANCE = 'Detailing.Pitch Distance'
+KEY_OUT_DISP_DETAILING_PITCH_DISTANCE = 'Pitch Distance (mm)'
+KEY_OUT_DETAILING_GAUGE_DISTANCE = 'Detailing.Gauge Distance'
+KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE = 'Gauge Distance (mm)'
 KEY_OUT_DETAILING_END_DISTANCE = 'Detailing.End Distance'
-KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End distance (e)'
+KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End Distance (e)'
 KEY_OUT_DETAILING_EDGE_DISTANCE = 'Detailing.Edge Distance'
-KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge distance (e')"
+KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (e')"
 KEY_OUT_DETAILING_PROJECTION = 'Detailing.Projection'
 KEY_OUT_DISP_DETAILING_PROJECTION = 'Projection (c)'
 
+DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
+KEY_OUT_GUSSET_PLATE_THICKNNESS = 'GussetPlate.Thickness'
+KEY_OUT_DISP_GUSSET_PLATE_THICKNESS = 'Thickness (mm)'
+KEY_OUT_GUSSET_PLATE_SHEAR_DEMAND = 'GussetPlate.Shear_Demand'
+KEY_OUT_DISP_GUSSET_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_GUSSET_PLATE_SHEAR = 'GussetPlate.Shear'
+KEY_OUT_DISP_GUSSET_PLATE_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_GUSSET_PLATE_MOMENT_DEMAND = 'GussetPlate.Moment_Demand'
+KEY_OUT_DISP_GUSSET_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_GUSSET_PLATE_MOMENT = 'GussetPlate.Moment'
+KEY_OUT_DISP_GUSSET_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 
 
+DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'
+KEY_OUT_STIFFENER_PLATE_THICKNNESS = 'StiffenerPlate.Thickness'
+KEY_OUT_DISP_STIFFENER_PLATE_THICKNESS = 'Thickness (mm)'
+KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND = 'StiffenerPlate.Shear_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_STIFFENER_PLATE_SHEAR = 'StiffenerPlate.Shear'
+KEY_OUT_DISP_STIFFENER_PLATE_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND = 'StiffenerPlate.Moment_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_STIFFENER_PLATE_MOMENT = 'StiffenerPlate.Moment'
+KEY_OUT_DISP_STIFFENER_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 
 ###################################
 # Key for Storing Shear sub-key of Load
@@ -493,7 +537,7 @@ KEY_BOLT_FU = 'Bolt.fu'
 KEY_BOLT_FY = 'Bolt.fy'
 # Key for storing Diameter sub-key of Bolt
 KEY_D = 'Bolt.Diameter'
-KEY_DISP_D = 'Diameter(mm)*'
+KEY_DISP_D = 'Diameter (mm)*'
 VALUES_D = ['All', 'Customized']
 
 # Key for storing Type sub-key of Bolt
@@ -540,7 +584,7 @@ VALUES_LOCATION_2 = ["Web"]
 KEY_IMAGE = 'Image'
 
 KEY_LENGTH = 'Length(mm)'
-KEY_DISP_LENGTH = 'Length(mm) *'
+KEY_DISP_LENGTH = 'Length (mm) *'
 
 KEY_SLENDER = "Member.Slenderness"
 KEY_DISP_SLENDER = 'Slenderness'
@@ -627,13 +671,13 @@ KEY_DISP_TENSION_YIELDCAPACITY = 'Tension Yielding Capacity (kN)'
 KEY_TENSION_RUPTURECAPACITY = "Member.tension_rupture"
 KEY_DISP_TENSION_RUPTURECAPACITY = 'Tension Rupture Capacity (kN)'
 KEY_TENSION_BLOCKSHEARCAPACITY = "Member.tension_blockshear"
-KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear Capacity (KN)'
+KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear Capacity (kN)'
 
 KEY_TENSION_CAPACITY = "Member.tension_capacity"
 KEY_DISP_TENSION_CAPACITY = "Tension Capacity (kN)"
 
 KEY_EFFICIENCY = "Member.efficiency"
-KEY_DISP_EFFICIENCY = "Efficiency"
+KEY_DISP_EFFICIENCY = "Utilization Ratio"
 
 DISP_TITLE_BOLTDETAILS ='Bolt Details'
 KEY_BOLT_DETAILS ="Bolt.Details"
@@ -968,6 +1012,7 @@ KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>
 
 
 KEY_BASE_PLATE_MATERIAL = 'Base_Plate.Material'
+KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_BASE_PLATE_FU = 'Base_Plate.Fu'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
 KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , fy (MPa)'
@@ -1036,7 +1081,6 @@ KEY_DISP_ANGLE_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <
 KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
-KEY_OUT_DISP_DIA_PROVIDED = 'Diameter(d) (mm)'
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
@@ -1044,17 +1088,17 @@ KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
 KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
-KEY_DISP_BOLT_HOLE = 'Bolt Hole Diameter(d0) (mm)'
+KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
 KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
-KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity (KN)'
+KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity (kN)'
 KEY_OUT_DISP_BOLT_VALUE = 'Bolt Value (kN)'
 KEY_OUT_BOLT_FORCE = 'Bolt.Force'
-KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force (KN)'
+KEY_OUT_DISP_BOLT_FORCE = 'Bolt Force (kN)'
 KEY_OUT_DISP_BOLT_SHEAR_FORCE = 'Bolt Shear Force (kN)'
 KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
 KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
@@ -1121,7 +1165,7 @@ KEY_OUT_SPTNG_MIN_EDGE_DIST = 'Cleat.Sptng_leg.MinEdgeDist'
 KEY_OUT_SPTNG_MAX_EDGE_DIST = 'Cleat.Sptng_leg.MaxEdgeDist'
 
 
-
+KEY_OUT_DISP_PLATETHK_REP = 'Thickness (tp) (mm)'
 KEY_OUT_PLATETHK = 'Plate.Thickness'
 KEY_OUT_DISP_PLATETHK = 'Thickness (mm)'
 KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
@@ -1152,24 +1196,48 @@ KEY_OUT_DISP_PLATE_MOM_CAPACITY_SEP = 'Moment Capacity per Bolt (kN-m)'
 KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
 
+KEY_OUT_WELD_SIZE = 'Weld.Size'
+KEY_OUT_DISP_WELD_SIZE = 'Size(mm)'
+KEY_OUT_WELD_SIZE_FLANGE = 'Weld.Size_flange'
+KEY_OUT_DISP_WELD_SIZE_FLANGE = 'Size at Flange (mm)'
+KEY_OUT_WELD_SIZE_WEB = 'Weld.Size_web'
+KEY_OUT_DISP_WELD_SIZE_WEB = 'Size at Web (mm)'
+KEY_OUT_WELD_SIZE_STIFFENER = 'Weld.Size_stiffener'
+KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Gusset/Stiffener (mm)'
+KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
+KEY_OUT_WELD_STRESS = 'Weld.Stress'
+KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
+KEY_OUT_WELD_LENGTH = 'Weld.Length'
+KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
+KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
+KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
+
 KEY_OUT_DISP_MEMB_TEN_YIELD = 'Tension Yield Capacity (KN)'
 KEY_OUT_DISP_MEMB_TEN_RUPTURE = 'Tension Rupture Capacity'
 KEY_OUT_DISP_MEMB_BLK_SHEAR = 'Block Shear Capacity'
 KEY_OUT_DISP_MEMB_BLK_SHEAR = 'Block Shear Capacity'
 
 
-
-
-
+KEY_OUT_NO_BOLTS_FLANGE = 'ColumnEndPlate.nbf'
+KEY_OUT_DISP_NO_BOLTS_FLANGE = 'No. of bolts along Flange'
+KEY_OUT_NO_BOLTS_WEB = 'ColumnEndPlate.nbw'
+KEY_OUT_DISP_NO_BOLTS_WEB = 'No. of bolts along Web'
+KEY_OUT_NO_BOLTS = 'ColumnEndPlate.nb'
+KEY_OUT_DISP_NO_BOLTS = 'Total no. of Bolts'
+KEY_PITCH_2_FLANGE = 'ColumnEndPlate.p2_flange'
+KEY_DISP_PITCH_2_FLANGE = 'Pitch2 along Flange'
+KEY_PITCH_2_WEB = 'ColumnEndPlate.p2_web'
+KEY_DISP_PITCH_2_WEB = 'Pitch2 along Web'
 
 
 DISP_TITLE_WELD = 'Weld'
 KEY_OUT_WELD_SIZE = 'Weld.Size'
-KEY_OUT_DISP_WELD_SIZE = 'Size(mm)'
+KEY_OUT_DISP_WELD_SIZE = 'Size (mm)'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
-KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
-KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
+KEY_OUT_DISP_WELD_STRESS = 'Stress (N/mm)'
 KEY_OUT_WELD_LENGTH = 'Weld.Length'
 KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
 KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
@@ -1236,7 +1304,7 @@ KEY_SEATEDANGLE='Seated Angle'
 KEY_DISP_SEATEDANGLE='Seated Angle *'
 # VALUES_SEATEDANGLE=['20 20 X 3', '20 20 X 4', '25 25 x 3', '25 25 x 4', '25 25 x 5', '30 30 x 3', '30 30 x 4', '30 30 x 5', '35 35 x 3', '35 35 x 4', '35 35 x 5', '35 35 x 6', '40 40 x 3', '40 40 x 4', '40 40 x 5', '40 40 x 6', '45 45 x 3', '45 45 x 4', '45 45 x 5', '45 45 x 6', '50 50 x 3', '50 50 x 4', '50 50 x 5', '50 50 x 6', '50 50 x 7', '50 50 x 8', '55 55 x 4', '55 55 x 5', '55 55 x 6', '55 55 x 8', '55 55 x 10', '60 60 x 4', '60 60 x 5', '60 60 x 6', '60 60 x 8', '60 60 x 10', '65 65 x 4', '65 65 x 5', '65 65 x 6', '65 65 x 8', '65 65 x 10', '70 70 x 5', '70 70 x 6', '70 70 x 7', '70 70 x 8', '70 70 x 10', '75 75 x 5', '75 75 x 6', '75 75 x 8', '75 75 x 10', '80 80 x 6', '80 80 x 8', '80 80 x 10', '80 80 x 12', '90 90 x 6', '90 90 x 8', '90 90 x 10', '90 90 x 12', '100 100 x 6', '100 100 x 7', '100 100 x 8', '100 100 x 10', '100 100x 12', '100 100 x 15', '110 110 X 8', '110 110 X 10', '110 110 X 12', '110 110 X 16', '120 120 X 8', '120 120 X 10', '120 120 X 12', '120 120 X 15', '130 130 X 8', '130 130 X 9', '130 130 X 10', '130 130 X 12', '130 130 X 16', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '150 150 X 10', '150 150 X 12', '150 150 X 15', '150 150 X 16', '150 150 X 18', '150 150 X 20', '180 180 X 15', '180 180 X 18', '180 180 X 20', '200 200 X 12', '200 200 X 16', '200 200 X 20', '200 200 X 24', '200 200 X 25', '30 20 X 3', '30 20 X 4', '30 20 X 5', '40 20 X 3', '40 20 X 4', '40 20 X 5', '40 25 X 3', '40 25 X 4', '40 25 X 5', '40 25 X 6', '45 30 X 3', '45 30 X 4', '45 30 X 5', '45 30 X 6', '50 30 X 3', '50 30 X 4', '50 30 X 5', '50 30 X 6', '60 30 X 5', '60 30 X 6', '60 40 X 5', '60 40 X 6', '60 40 X 7', '60 40 X 8', '65 45 X 5', '65 45 X 6', '65 45 X 8', '65 50 X 5', '65 50 X 6', '65 50 X 7', '65 50 X 8', '70 45 X 5', '70 45 X 6', '70 45 X 8', '70 45 X 10', '70 50 X 5', '70 50 X 6', '70 50 X 7', '70 50 X 8', '75 50X 5', '75 50X 6', '75 50X 7', '75 50X 8', '75 50X 10', '80 40 X 5', '80 40 X 6', '80 40 X 7', '80 40 X 8', '80 50 X 5', '80 50 X  6', '80 50 X  8', '80 50 X 10', '80 60 X 6', '80 60 X 7', '80 60 X 8', '90 60 X 6', '90 60 X  8', '90 60 X 10', '90 60 X 12', '90 65 X 6', '90 65 X 7', '90 65 X 8', '90 65 X 10', '100 50 X 6', '100 50 X 7', '100 50 X 8', '100 50 X 10', '100 65 X 6', '100 65 X  7', '100 65 X  8', '100 65 X 10', '100 75 X 6', '100 75 X  8', '100 75 X 10', '100 75 X 12', '120 80 X 8', '120 80 X 10', '120 80 X 12', '125 75 X 6', '125 75 X  8', '125 75 X 10', '125 75 X 12', '125 95 X 6', '125 95 X  8', '125 95 X 10', '125 95 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '135 65 X 8', '135 65 X 10', '135 65 X 12', '150 75 X 8', '150 75 X  9', '150 75 X 10', '150 75 X 12', '150 75 X 15', '150 90 X 10', '150 90 X X 12', '150 90 X X 15', '150 90 X 10', '150 90 X 12', '150 90 X 15', '150 115 X 8', '150 115 X 10', '150 115 X 12', '150 115 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 100 X 10', '200 100 X 12', '200 100 X 15', '200 100 X 16', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20', '200 150 X 10', '200 150 X 12', '200 150 X 15', '200 150 X 16', '200 150 X 18', '200 150 X 20']
 
-KEY_TOPANGLE='TopAngle'
+KEY_TOPANGLE='Top Angle'
 KEY_DISP_TOPANGLE='Top Angle *'
 # VALUES_TOPANGLE=[
 #     '20 20 X 3', '20 20 X 4', '25 25 x 3', '25 25 x 4', '25 25 x 5',
@@ -1248,9 +1316,9 @@ VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 # DISPLAY_TITLE_ANGLESEC='Select Sections'
 
 #Design Report Strings
-DISP_NUM_OF_BOLTS = 'No of Bolts (n)'
-DISP_NUM_OF_ROWS = 'No of Rows (nr)'
-DISP_NUM_OF_COLUMNS = 'No of Columns (nc)'
+DISP_NUM_OF_BOLTS = 'No of Bolts'
+DISP_NUM_OF_ROWS = 'No of Rows'
+DISP_NUM_OF_COLUMNS = 'No of Columns'
 
 
 def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):
@@ -1379,7 +1447,7 @@ BOLT_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"htt
                 "<td width=\"383\">\n"
                 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Treatment of Surfaces</span></p></td>\n"
                 "<td width=\"78\">\n"
-                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  µ_f</span></p></td></tr>\n"
+                "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  µ_f</span></p></td></tr>\n"
                 "<tr>\n"
                 "<td>\n"
                 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">i)</span></p></td>\n"
@@ -1484,7 +1552,3 @@ DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" 
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>")
-
-
-
-

@@ -1627,7 +1627,7 @@ class BeamCoverPlateWeld(MomentConnection):
               '')
         self.report_check.append(t1)
 
-        t1 = ('SubSection', 'Load Considered', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Load Consideration', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, min_axial_capacity(axial_capacity=round(self.axial_capacity / 1000, 2),
                                                                min_ac=round(self.min_axial_load / 1000, 2)),
@@ -1691,15 +1691,75 @@ class BeamCoverPlateWeld(MomentConnection):
         self.report_check.append(t2)
 
 
+        t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,
+              flange_weld_stress(F_f=round(self.flange_force / 1000, 2), F_rl=self.l_req_flangelength,
+                                 F_ws=self.flange_weld.stress),
 
+              self.flange_weld.strength,
+              get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
+        self.report_check.append(t2)
 
+        if self.preference == "Outside":
+            self.min_height_required = 50
+            self.min_length_required = self.flange_plate.height
+            t1 = ('SubSection', 'Flange Plate Check', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+            t1 = (DISP_MIN_PLATE_HEIGHT, self.min_height_required,
+                  height_of_flange_cover_plate(B=self.section.flange_width, sp=self.flangespace,
+                                               b_fp=self.flange_plate.height),
+                  get_pass_fail(self.min_height_required, self.flange_plate.height, relation="lesser"))
 
+            self.report_check.append(t1)
+            t1 = (DISP_MAX_PLATE_HEIGHT,
+                  height_of_flange_cover_plate(B=self.section.flange_width, sp=self.flangespace,
+                                               b_fp=self.flange_plate.height), self.flange_plate.height,
+                  get_pass_fail(self.flange_plate.height, self.flange_plate.height, relation="lesser"))
+            self.report_check.append(t1)
+            t1 = (DISP_MIN_PLATE_LENGTH, self.min_length_required,
+                  flange_plate_Length_req(l_w=self.flange_weld.length, s=self.flange_weld.size,
+                                              g=self.flange_plate.gap, l_fp=self.flange_plate.length),
+                  get_pass_fail(self.min_length_required, self.flange_plate.length, relation="lesser"))
+            self.report_check.append(t1)
 
+        else:
+            t1 = ('SubSection', 'Flange Plate Check-Outside/Inside', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
 
+            self.min_height_required = 50
+            self.min_length_required = self.flange_plate.height
+            ###Outside####
+            t1 = (DISP_MIN_PLATE_HEIGHT, self.min_height_required,
+                  height_of_flange_cover_plate(B=self.section.flange_width, sp=self.flangespace,
+                                               b_fp=self.flange_plate.height),
+                  get_pass_fail(self.min_height_required, self.flange_plate.height, relation="lesser"))
+            self.report_check.append(t1)
+            t1 = (DISP_MIN_PLATE_LENGTH, self.min_length_required,
+                  flange_plate_Length_req(l_w=self.flange_weld.length, s=self.flange_weld.size,
+                                              g=self.flange_plate.gap, l_fp=self.flange_plate.length),
+                  get_pass_fail(self.min_length_required, self.flange_plate.length, relation="lesser"))
+            self.report_check.append(t1)
 
+            ####Inside###
 
+            t1 = (DISP_MIN_PLATE_INNERHEIGHT, self.min_height_required,
+                  inner_plate_height_weld(B=self.section.flange_width, sp=self.flangespace,
+                                          t_w=self.section.web_thickness, r_1=self.section.root_radius,
+                                          b_ifp=self.flange_plate.Innerheight),
+                  get_pass_fail(self.min_height_required, self.flange_plate.Innerheight, relation="lesser"))
+            self.report_check.append(t1)
+            t1 = (DISP_MAX_PLATE_INNERHEIGHT, inner_plate_height_weld(B=self.section.flange_width, sp=self.flangespace,
+                                                                      t_w=self.section.web_thickness,
+                                                                      r_1=self.section.root_radius,
+                                                                      b_ifp=self.flange_plate.Innerheight),
+                  self.flange_plate.Innerheight,
+                  get_pass_fail(self.flange_plate.Innerheight, self.flange_plate.Innerheight, relation="lesser"))
+            self.report_check.append(t1)
 
-
+            t1 = (DISP_MIN_PLATE_INNERLENGTH, self.min_length_required,
+                  flange_plate_Length_req(l_w=self.flange_weld.Innerlength, s=self.flange_weld.size,
+                                              g=self.flange_plate.gap, l_fp=self.flange_plate.Innerlength),
+                  get_pass_fail(self.min_length_required, self.flange_plate.Innerlength, relation="lesser"))
+            self.report_check.append(t1)
 
         Disp_3D_image = "./ResourceFiles/images/3d.png"
 

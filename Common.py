@@ -421,9 +421,9 @@ KEY_DISP_GRD_FOOTING = 'Grade*'
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 
 # Applied load
-KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load Vu (kN)'
-KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load Au (kN)'
-KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load Mu (kNm)'
+KEY_DISP_APPLIED_SHEAR_LOAD ='Shear Load Vu (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE='Axial Load Au (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Moment Load Mu (kNm)'
 
 # capacity
 DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"

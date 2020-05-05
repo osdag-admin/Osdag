@@ -717,7 +717,10 @@ class Ui_ModuleWindow(QMainWindow):
                     continue
                 selected = key.currentText()
                 f = c_tup[1]
-                onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0]]
+                if updated_list != None:
+                    onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0]]
+                else:
+                    onchange_key_popup = []
                 if onchange_key_popup != []:
                     # if c_tup[0] == KEY_SECSIZE:
                     options = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, onchange_key_popup[0][0]).currentText())
@@ -1808,7 +1811,7 @@ class Ui_ModuleWindow(QMainWindow):
             pass
         else:
             main.design_button_status = True
-            error = main.func_for_validation(main, self, self.design_inputs)
+            error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
             print(status)
 

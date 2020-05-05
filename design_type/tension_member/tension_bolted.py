@@ -941,8 +941,11 @@ class Tension_bolted(Main):
         self.design_status = False
 
         flag = False
+        flag1 = False
+        flag2 = False
         option_list = self.input_values(self)
         missing_fields_list = []
+
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
@@ -951,6 +954,33 @@ class Tension_bolted(Main):
                 val = option[4]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
+            # elif option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH:
+            #     val = option[4]
+            #     if val <=1000:
+            #         error = "Length of Tension member should be higher than 1000 mm"
+            #         all_errors.append(error)
+            #     else:
+            #         flag1 = True
+
+            else:
+                pass
+
+            if option[2] == TYPE_TEXTBOX and option[0]==KEY_LENGTH:
+                # val = option[4]
+                # print(design_dictionary[option[0]], "jhvhj")
+                if float(design_dictionary[option[0]]) <= 0.0 :
+                    error = "Value can't be equal or less than zero"
+                    all_errors.append(error)
+                else:
+                    flag1 = True
+
+            if option[2] == TYPE_TEXTBOX and option[0] == KEY_AXIAL:
+
+                if float(design_dictionary[option[0]]) <= 0.0:
+                    error = "Value can't be equal or less than zero"
+                    all_errors.append(error)
+                else:
+                    flag2 = True
 
         if len(missing_fields_list) > 0:
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
@@ -958,8 +988,9 @@ class Tension_bolted(Main):
             # flag = False
         else:
             flag = True
-
-        if flag:
+        print (all_errors,"ysdgh")
+        print (flag,flag1,flag2)
+        if flag  and flag1 and flag2:
             self.set_input_values(self, design_dictionary)
             # print(design_dictionary)
         else:

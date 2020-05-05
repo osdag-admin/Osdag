@@ -502,7 +502,7 @@ self
 
     # cl. 10.4.3 Slip Resistance
     @staticmethod
-    def cl_10_4_3_bolt_slip_resistance(f_ub, A_nb, n_e, mu_f, bolt_hole_type='Standard', slip_resistance='service_load'):
+    def cl_10_4_3_bolt_slip_resistance(f_ub, A_nb, n_e, mu_f, bolt_hole_type='Standard', slip_resistance='ultimate_load'):
         # TODO : Ensure default slip_resistance = 'service_load' or 'ultimate_load'
         """Calculate design shear strength of friction grip bolt as governed by slip
 

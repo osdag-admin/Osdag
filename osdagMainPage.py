@@ -123,6 +123,7 @@ from design_type.compression_member.compression import Compression
 import configparser
 import os
 import os.path
+import shutil
 import subprocess
 from gui.ui_template import Ui_ModuleWindow
 
@@ -387,6 +388,11 @@ class OsdagMainWindow(QMainWindow):
         self.showMaximized()
 
 ################################ UI Methods ###############################################
+
+    def closeEvent(self, event):
+        if (not os.path.exists('ResourceFiles/Database/Intg_osdag.sql')) or os.path.getmtime('ResourceFiles/Database/Intg_osdag.sqlite')>os.path.getmtime('ResourceFiles/Database/Intg_osdag.sql'):
+            cmd='sqlite3 ResourceFiles/Database/Intg_osdag.sqlite .dump > ResourceFiles/Database/Intg_osdag.sql'
+            os.system(cmd)
 
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()
@@ -752,6 +758,27 @@ class OsdagMainWindow(QMainWindow):
 
 
 if __name__ == '__main__':
+
+############################ Pre-Build Database Updation/Creation #################
+
+    if not os.path.exists('ResourceFiles/Database/Intg_osdag.sqlite'):
+        cmd=f'sqlite3 ResourceFiles/Database/Intg_osdag.sqlite < ResourceFiles/Database/Intg_osdag.sql'
+        os.system(cmd)
+    elif os.path.getmtime('ResourceFiles/Database/Intg_osdag.sql')>os.path.getmtime('ResourceFiles/Database/Intg_osdag.sqlite'):
+        try:
+            shutil.move('ResourceFiles/Database/Intg_osdag.sqlite','ResourceFiles/Database/temp/Intg_osdag.sqlite')
+            cmd=f'sqlite3 ResourceFiles/Database/Intg_osdag.sqlite < ResourceFiles/Database/Intg_osdag.sql'
+            error=os.system(cmd)
+            if error!=0:
+                raise Exception('SQL convertion to SQLite error')
+            os.remove('ResourceFiles/Database/temp/Intg_osdag.sqlite')
+        except Exception as e:
+            os.remove('ResourceFiles/Database/Intg_osdag.sqlite')
+            shutil.move('ResourceFiles/Database/temp/Intg_osdag.sqlite','ResourceFiles/Database/Intg_osdag.sqlite')
+            print('Error: ',e)
+
+######################### Application Build #############################
+
     app = QApplication(sys.argv)
     window = OsdagMainWindow()
     window.show()

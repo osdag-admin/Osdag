@@ -2290,7 +2290,11 @@ class BeamCoverPlate(MomentConnection):
               self.flange_plate.edge_dist_provided,
               get_pass_fail(self.flange_bolt.max_edge_dist, self.flange_plate.edge_dist_provided, relation="greater"))
         self.report_check.append(t4)
-
+        t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
+               long_joint_bolted_prov(self.flange_plate.bolt_line, self.flange_plate.bolts_one_line, self.flange_plate.pitch_provided,
+                                      self.flange_plate.gauge_provided, self.bolt.bolt_diameter_provided, flange_bolt_capacity_kn ,
+                                      flange_bolt_capacity_red_kn), "")
+        self.report_check.append(t10)
 
         web_connecting_plates = [self.web_plate.thickness_provided, self.section.web_thickness]
 
@@ -2300,12 +2304,12 @@ class BeamCoverPlate(MomentConnection):
         web_kb_disp = round(self.web_bolt.kb, 2)
         web_kh_disp = round(self.web_bolt.kh, 2)
         web_bolt_force_kn = round(self.web_plate.bolt_force/1000, 2)
-        web_bolt_capacity_red_kn = round(self.web_plate.bolt_capacity_red, 2)
+        web_bolt_capacity_red_kn = round(self.web_plate.bolt_capacity_red/1000, 2)
         res_force = self.web_plate.bolt_force * self.web_plate.bolt_line*self.web_plate.bolts_one_line
         print("res_focce", res_force)
 
 
-        t1 = ('SubSection', 'Web Bolt Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Web Bolt Checks', '|p{4cm}|p{5cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         if self.flange_bolt.bolt_type == TYP_BEARING:
             web_bolt_bearing_capacity_kn = round(self.web_bolt.bolt_bearing_capacity / 1000, 2)
@@ -2337,6 +2341,13 @@ class BeamCoverPlate(MomentConnection):
                                                 bolt_capacity=web_bolt_capacity_kn,multiple=2),
                                                 self.web_plate.bolts_required, '')
         self.report_check.append(t5)# todo no of bolts
+        # t5 = (DISP_NUM_OF_BOLTS, get_trial_bolts(self.load.shear_force, self.load.axial_force, bolt_capacity_kn),
+        #     display_prov(self.plate.bolts_required, "n"), '')
+        # self.report_check.append(t5)
+        t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.web_plate.bolt_line, "n_c"), '')
+        self.report_check.append(t6)
+        t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.web_plate.bolts_one_line, "n_r"), '')
+        self.report_check.append(t7)
 
         t6 = (DISP_NUM_OF_COLUMNS, '', self.web_plate.bolt_line, '')
         self.report_check.append(t6)
@@ -2381,6 +2392,48 @@ class BeamCoverPlate(MomentConnection):
               get_pass_fail(self.web_bolt.max_edge_dist, self.web_plate.edge_dist_provided,
                             relation="greater"))
         self.report_check.append(t4)
+
+        t10 =(KEY_OUT_REQ_PARA_BOLT,'',parameter_req_bolt_force(bolts_one_line =self.web_plate.bolts_one_line
+                                                                ,gauge=self.web_plate.gauge_provided,
+                                                                ymax = round(self.web_plate.ymax,2),
+                                                                xmax =round(self.web_plate.xmax,2),
+                                                                bolt_line =self.web_plate.bolt_line,
+                                                                pitch = self.web_plate.pitch_provided,
+                                                                length_avail = self.web_plate.length_avail),'')
+        self.report_check.append(t10)
+
+        t10 = (KEY_OUT_REQ_MOMENT_DEMAND_BOLT,'', moment_demand_req_bolt_force(bolts_one_line = self.web_plate.bolts_one_line,
+                                                           bolt_line = self.web_plate.bolt_line,
+                                                           shear_load = round(self.fact_shear_load/1000,2),
+                                                           web_moment = round(self.moment_web/1000000,2),ecc =self.web_plate.ecc,
+                                                           moment_demand = round(self.web_plate.moment_demand/1000000,2)),'' )
+        self.report_check.append(t10)
+
+
+        t10 = (KEY_OUT_BOLT_FORCE, '', Vres_bolts(bolts_one_line=self.web_plate.bolts_one_line,
+                                                 ymax=round(self.web_plate.ymax,2),
+                                                  xmax=round(self.web_plate.xmax,2), bolt_line=self.web_plate.bolt_line,
+                                                  shear_load=round(self.fact_shear_load / 1000, 2),
+                                                  axial_load=round(self.axial_force_w / 1000, 2),
+                                                  moment_demand=round(self.web_plate.moment_demand / 1000000, 2),
+                                                  r=round(self.web_plate.sigma_r_sq/1000,2),
+                                                  vbv=round(self.web_plate.vbv/1000,2), tmv=round(self.web_plate.tmv/1000,2),
+                                                  tmh=round(self.web_plate.tmh/1000,2), abh= round(self.web_plate.abh/1000,2),
+                                                  vres=round(self.web_plate.bolt_force / 1000, 2)), '')
+        self.report_check.append(t10)
+
+        t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
+               long_joint_bolted_prov(self.web_plate.bolt_line, self.web_plate.bolts_one_line,
+                                      self.web_plate.pitch_provided,
+                                      self.web_plate.gauge_provided, self.bolt.bolt_diameter_provided,
+                                      web_bolt_capacity_kn,
+                                      web_bolt_capacity_red_kn), "")
+        self.report_check.append(t10)
+
+        t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.web_plate.bolt_force / 1000, 2), web_bolt_capacity_red_kn,
+              get_pass_fail(round(self.web_plate.bolt_force / 1000, 2),  web_bolt_capacity_red_kn, relation="lesser"))
+        self.report_check.append(t5)
+
         ######Flange plate check####
         if self.preference == "Outside":
             t1 = ('SubSection', 'Outer flange plate Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')

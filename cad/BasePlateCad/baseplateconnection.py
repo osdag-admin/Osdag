@@ -13,7 +13,8 @@ import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 class BasePlateCad(object):
-    def __init__(self, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb, concrete):
+    def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+                 concrete):
 
         """
 
@@ -26,6 +27,7 @@ class BasePlateCad(object):
         :param alist: input and output values
         """
 
+        self.BP = BP
         self.column = column
         self.nut_bolt_array = nut_bolt_array
         self.bolthight = bolthight

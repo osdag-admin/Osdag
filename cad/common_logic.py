@@ -693,9 +693,11 @@ class CommonDesignLogic(object):
         column = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
                           alpha=column_alpha, length=column_length, notchObj=None)
         baseplate = Plate(L=float(BP.bp_length_provided), W=float(BP.bp_width_provided), T=float(BP.plate_thk))
-        weldAbvFlang = FilletWeld(b=10, h=10, L=250)
-        weldBelwFlang = FilletWeld(b=10, h=10, L=100)
-        weldSideWeb = FilletWeld(b=10, h=10, L=420)
+        weldAbvFlang = FilletWeld(b=float(BP.weld_size_flange), h=float(BP.weld_size_flange), L=column.B)
+        weldBelwFlang = FilletWeld(b=float(BP.weld_size_flange), h=float(BP.weld_size_flange),
+                                   L=(column.B - column.t - 2 * (column.R1 + column.R2)) / 2)
+        weldSideWeb = FilletWeld(b=float(BP.weld_size_web), h=float(BP.weld_size_web),
+                                 L=column.D - 2 * (column.t + column.R1))
 
         concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=baseplate.T * 10)
 
@@ -711,7 +713,8 @@ class CommonDesignLogic(object):
 
         nut_bolt_array = bpNutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
 
-        basePlate = BasePlateCad(column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+        basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang,
+                                 weldSideWeb,
                                  concrete)
         basePlate.create_3DModel()
 

@@ -80,11 +80,28 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 7) Any further Levels will result in an error .
 '''
 
+import os
+import shutil
 
+############################ Pre-Build Database Updation/Creation #################
 
-
-
-
+if not os.path.exists('ResourceFiles/Database/Intg_osdag.sqlite'):
+    cmd=f'sqlite3 ResourceFiles/Database/Intg_osdag.sqlite < ResourceFiles/Database/Intg_osdag.sql'
+    os.system(cmd)
+elif os.path.getmtime('ResourceFiles/Database/Intg_osdag.sql')>os.path.getmtime('ResourceFiles/Database/Intg_osdag.sqlite'):
+    try:
+        shutil.move('ResourceFiles/Database/Intg_osdag.sqlite','ResourceFiles/Database/temp/Intg_osdag.sqlite')
+        cmd=f'sqlite3 ResourceFiles/Database/Intg_osdag.sqlite < ResourceFiles/Database/Intg_osdag.sql'
+        error=os.system(cmd)
+        if error!=0:
+            raise Exception('SQL convertion to SQLite error')
+        os.remove('ResourceFiles/Database/temp/Intg_osdag.sqlite')
+        print('Database Updated')
+    except Exception as e:
+        os.remove('ResourceFiles/Database/Intg_osdag.sqlite')
+        shutil.move('ResourceFiles/Database/temp/Intg_osdag.sqlite','ResourceFiles/Database/Intg_osdag.sqlite')
+        print('Error: ',e)
+#########################################################################################
 
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication, QWidget, QLabel, QGridLayout, QVBoxLayout, QTabWidget, QRadioButton, QButtonGroup, QSizePolicy
@@ -121,7 +138,6 @@ from design_type.compression_member.compression import Compression
 # from cad.cad_common import call_3DBeam
 
 import configparser
-import os
 import os.path
 import subprocess
 from gui.ui_template import Ui_ModuleWindow
@@ -387,6 +403,12 @@ class OsdagMainWindow(QMainWindow):
         self.showMaximized()
 
 ################################ UI Methods ###############################################
+
+    def closeEvent(self, event):
+        if (not os.path.exists('ResourceFiles/Database/Intg_osdag.sql')) or os.path.getmtime('ResourceFiles/Database/Intg_osdag.sqlite')>os.path.getmtime('ResourceFiles/Database/Intg_osdag.sql'):
+            cmd='sqlite3 ResourceFiles/Database/Intg_osdag.sqlite .dump > ResourceFiles/Database/Intg_osdag.sql'
+            os.system(cmd)
+            print('DUMP updated')
 
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()

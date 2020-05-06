@@ -1602,11 +1602,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.gusset_plate_thick = round_up(thk_req, 2, self.column_tf)  # mm
                 self.stiffener_plate_thick = self.gusset_plate_thick  # mm
 
+                # update the length pf the stiffener plate
+                self.stiffener_plate_length = self.stiffener_plate_length - self.gusset_plate_thick  # mm
+
                 # height of the gusset/stiffener plate
                 # the size of the landing is 100 mm along vertical dimension and 50 mm along horizontal dimension
                 # the assumed inclination of the gusset/stiffener plate is 45 degrees
-                self.stiffener_plate_height = self.stiffener_plate_length + 100  # mm
-                self.gusset_plate_height = max((self.gusset_outstand_length + 100), self.stiffener_plate_height)  # mm
+                self.stiffener_plate_height = self.stiffener_plate_length + 50  # mm
+                self.gusset_plate_height = max((self.gusset_outstand_length + 50), self.stiffener_plate_height)  # mm
 
                 # defining stresses for the connectivity types
                 if self.connectivity == 'Welded-Slab Base':

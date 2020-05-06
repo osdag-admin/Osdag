@@ -64,6 +64,7 @@ from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
+from design_type.connection.base_plate_connection import BasePlateConnection
 
 from cad.cad3dconnection import cadconnection
 
@@ -1689,6 +1690,8 @@ class Ui_ModuleWindow(QMainWindow):
             return ColumnEndPlate
         elif name == KEY_DISP_CLEATANGLE:
             return CleatAngleConnection
+        elif name == KEY_DISP_BASE_PLATE:
+            return BasePlateConnection
 # Function for getting inputs from a file
     '''
     @author: Umair
@@ -1821,14 +1824,15 @@ class Ui_ModuleWindow(QMainWindow):
             # DESIGN_FLAG = 'True'
 
             out_list = main.output_values(main, status)
+            print('outlist', out_list)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
-                    if option[0] in [KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DETAILING_GAUGE_DISTANCE]:
-                        txt.setVisible(True if option[3] else False)
-                        txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
-                        txt_label.setVisible(True if option[3] else False)
+                    txt.setVisible(True if option[3] else False)
+                    txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
+                    txt_label.setVisible(True if option[3] else False)
+
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
@@ -1845,7 +1849,7 @@ class Ui_ModuleWindow(QMainWindow):
                 module_class = EndPlateConnection
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_CLEATANGLE,
-                    KEY_DISP_ENDPLATE]:
+                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
@@ -2248,6 +2252,7 @@ class Ui_ModuleWindow(QMainWindow):
         table_2 = "Beams"
         material_grade = key_4.currentText()
         material = Material(material_grade)
+
         if module != KEY_DISP_BASE_PLATE:
             tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
         # else:

@@ -85,7 +85,7 @@ def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
     gamma_mb= str(gamma_mb)
     bolt_shear_capacity=str(bolt_shear_capacity)
     bolt_shear_eqn = Math(inline=True)
-    bolt_shear_eqn.append(NoEscape(r'\begin{aligned}V_{dsb} &= \frac{f_ub ~n_n~ A_{nb}}{\sqrt{3} ~\gamma_{mb}}\\'))
+    bolt_shear_eqn.append(NoEscape(r'\begin{aligned}V_{dsb} &= \frac{f_{ub} ~n_n~ A_{nb}}{\sqrt{3} ~\gamma_{mb}}\\'))
     bolt_shear_eqn.append(NoEscape(r'&= \frac{'+f_ub+'*'+n_n+'*'+a_nb+'}{\sqrt{3}~*~'+ gamma_mb+r'}\\'))
     bolt_shear_eqn.append(NoEscape(r'&= '+bolt_shear_capacity+r'\end{aligned}'))
     return bolt_shear_eqn
@@ -516,6 +516,7 @@ def tensile_capacity_prov(T_dg, T_dn, T_db =0.0):
     tension_capacity_eqn.append(NoEscape(r'&='+ T_d + '\end{aligned}'))
     return tension_capacity_eqn
 
+
 def mom_axial_IR_prov(M,M_d,N,N_d,IR):
     M = str(M)
     M_d = str(M_d)
@@ -730,7 +731,19 @@ def prov_moment_load(moment_input,min_mc,app_moment_load):
     app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\end{aligned}'))
     return  app_moment_load_eqn
 
-
+def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn,multiple =1):
+    h = str(h)
+    t = str(t)
+    n_r = str(n_r)
+    d_o = str(d_o)
+    f_u = str(fu)
+    v_dn = str(v_dn)
+    multiple = str(multiple)
+    shear_rup_eqn = Math(inline=True)
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+    shear_rup_eqn.append(NoEscape(r'&='+multiple+ r'*('+h+'-('+n_r+'*'+d_o+'))*'+t+'*'+f_u+r'\\'))
+    shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
+    return shear_rup_eqn
 def get_pass_fail(required, provided,relation='greater'):
     required = float(required)
     provided = float(provided)

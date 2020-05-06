@@ -438,22 +438,22 @@ KEY_OUT_ANCHOR_BOLT_TENSION = 'Anchor Bolt.Tension'
 KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
 
 # Applied load
-KEY_DISP_APPLIED_SHEAR_LOAD ='Shear Load Vu (kN)'
-KEY_DISP_APPLIED_AXIAL_FORCE='Axial Load Au (kN)'
-KEY_DISP_APPLIED_MOMENT_LOAD='Moment Load Mu (kNm)'
+KEY_DISP_APPLIED_SHEAR_LOAD ='Shear Load (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE='Axial Load (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Moment Load (kNm)'
 
 # capacity
 DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"
 KEY_MEMBER_CAPACITY = "section.memcapacity"
 KEY_DISP_MEMBER_CAPACITY = "Member Capacity"
 KEY_MEMBER_AXIALCAPACITY='section.MomCapacity'
-KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Ac (kN)"
+KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity (kN)"
 KEY_MEMBER_SHEAR_CAPACITY='section.MomCapacity'
-KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Sc (kN)"
+KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity (kN)"
 KEY_MEMBER_MOM_CAPACITY='section.MomCapacity'
-KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Mc (kNm)"
-KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity Pmc (kNm)'
-KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria Mdc (kNm)'
+KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity (kNm)"
+KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity (kNm)'
+KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
 
 KEY_OUT_ANCHOR_BOLT_SHEAR = 'Anchor Bolt.Shear'
 KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'

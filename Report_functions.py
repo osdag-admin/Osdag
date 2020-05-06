@@ -399,17 +399,40 @@ def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn,multiple =1):
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
     return shear_rup_eqn
 
-def shear_capacity_prov(V_dy, V_dn, V_db):
-    V_d = min(V_dy,V_dn,V_db)
-    V_d = str(V_d)
-    V_dy = str(V_dy)
-    V_dn = str(V_dn)
-    V_db = str(V_db)
-    shear_capacity_eqn = Math(inline=True)
-    shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= Min(V_{dy},V_{dn},V_{db})\\'))
-    shear_capacity_eqn.append(NoEscape(r'&= Min('+V_dy+','+V_dn+','+V_db+r')\\'))
-    shear_capacity_eqn.append(NoEscape(r'&='+V_d + '\end{aligned}'))
-    return shear_capacity_eqn
+def shear_Rupture_prov(h, t,  fu,v_dn):  #weld
+    h = str(h)
+    t = str(t)
+
+    f_u = str(fu)
+    v_dn = str(v_dn)
+
+    shear_rup_eqn = Math(inline=True)
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+    shear_rup_eqn.append(NoEscape(r'&=(0.9*'+h+'*'+t+'*'+f_u+r'\\'))
+    shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
+    return shear_rup_eqn
+
+def shear_capacity_prov(V_dy, V_dn, V_db=0.0):
+
+ shear_capacity_eqn = Math(inline=True)
+ if  V_db !=0.0:
+     V_d = min(V_dy,V_dn,V_db)
+     V_d = str(V_d)
+     V_dy = str(V_dy)
+     V_dn = str(V_dn)
+     V_db = str(V_db)
+     shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= Min(V_{dy},V_{dn},V_{db})\\'))
+     shear_capacity_eqn.append(NoEscape(r'&= Min('+V_dy+','+V_dn+','+V_db+r')\\'))
+ else:
+     V_d = min(V_dy, V_dn)
+     V_d = str(V_d)
+     V_dy = str(V_dy)
+     V_dn = str(V_dn)
+     shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= Min(V_{dy},V_{dn})\\'))
+     shear_capacity_eqn.append(NoEscape(r'&= Min(' + V_dy + ',' + V_dn + r')\\'))
+
+ shear_capacity_eqn.append(NoEscape(r'&='+V_d + '\end{aligned}'))
+ return shear_capacity_eqn
 
 def tension_yield_prov(l,t, f_y, gamma, T_dg):
     l = str(l)
@@ -428,10 +451,26 @@ def height_of_flange_cover_plate(B,sp,b_fp): #weld
     sp = str(sp)
     b_fp = str (b_fp)
     height_for_flange_cover_plate_eqn =Math(inline=True)
+
     height_for_flange_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= {B - 2*sp} \\'))
     height_for_flange_cover_plate_eqn.append(NoEscape(r'&= {' + B + ' - 2 * ' + sp + r'} \\'))
+
     height_for_flange_cover_plate_eqn.append(NoEscape(r'&=' + b_fp + '\end{aligned}'))
     return height_for_flange_cover_plate_eqn
+
+def height_of_web_cover_plate(D,sp,b_wp,tf): #weld
+    D = str(D)
+    sp = str(sp)
+    b_wp = str (b_wp)
+    tf= str(tf)
+    height_for_web_cover_plate_eqn =Math(inline=True)
+
+    height_for_web_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= {D-2*tf - 2*sp} \\'))
+    height_for_web_cover_plate_eqn.append(NoEscape(r'&= {' + D + ' - 2 * ' +tf+'- 2 *'+ sp + r'} \\'))
+
+    height_for_web_cover_plate_eqn.append(NoEscape(r'&=' + b_wp + '\end{aligned}'))
+    return height_for_web_cover_plate_eqn
+
 
 def inner_plate_height_weld(B,sp,t_w,r_1, b_ifp):#weld
     B = str(B)
@@ -446,16 +485,18 @@ def inner_plate_height_weld(B,sp,t_w,r_1, b_ifp):#weld
     return inner_plate_height_weld_eqn
 
 
-def flange_plate_Length_req(l_w,s,g,l_fp): #weld
+def plate_Length_req(l_w,s,g,l_fp): #weld
     l_w = str(l_w)
     s = str (s)
     g = str (g)
     l_fp = str(l_fp)
-    min_flange_plate_Length_eqn = Math(inline=True)
-    min_flange_plate_Length_eqn.append(NoEscape(r'\begin{aligned} l_{fp} & = [2*(l_{w} + 2*s) + g]\\'))
-    min_flange_plate_Length_eqn.append(NoEscape(r'&= [2*('+ l_w + '2*'+s+') +' + g+ r']\\'))
-    min_flange_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
-    return min_flange_plate_Length_eqn
+    min_plate_Length_eqn = Math(inline=True)
+
+    min_plate_Length_eqn.append(NoEscape(r'\begin{aligned} l_{fp} & = [2*(l_{w} + 2*s) + g]\\'))
+    min_plate_Length_eqn.append(NoEscape(r'&= [2*('+ l_w +'+2*'+s+') +' + g+ r']\\'))
+
+    min_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
+    return min_plate_Length_eqn
 
 
 def flange_weld_stress(F_f,F_rl,F_ws):
@@ -529,6 +570,30 @@ def spacing (sp,s):
     space_provided_eqn.append(NoEscape(r'&= Max(' + 15 + ','  +( s+5) + r')\\'))
     space_provided_eqn.append(NoEscape(r'&=' + sp + '\end{aligned}'))
     return space_provided_eqn
+
+def throat_thickness_req(t,t_t):
+    t_t <= .7*t
+    t_t >= 3
+    t = str(t)
+    t_t = str(t_t)
+    throat_thickness_eqn = Math(inline=True)
+    throat_thickness_eqn.append(NoEscape(r'\begin{aligned} [t_t& <= .7*t ]; [t_t& = >= 3]\\'))
+    throat_thickness_eqn.append(NoEscape(r'&='+ t_t+ '\end{aligned}'))
+    return throat_thickness_eqn
+
+def height_of_inner_flange_cover_plate(b_fp,B,t_w,r_r,sp):
+   # sp= max(15,s+5)
+    b_fp =str(b_fp)
+    B = str(B)
+    t_w =str(t_w)
+    r_r = str(r_r)
+    sp = str(sp)
+    #s = str(s)
+    ht_inner_flange_cover_plate_eqn =  Math(inline=True)
+    ht_inner_flange_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_fp &= \frac{B-t_w -2*r_r -4*sp}{2}\\'))
+    ht_inner_flange_cover_plate_eqn.append(NoEscape(r'&= \frac{'+B+'-'+t_w+'-2' +'*'+r_r+' -4' + '*' +sp +r'}{2}\\'))
+    ht_inner_flange_cover_plate_eqn.append(NoEscape(r'&= ' + b_fp+ r'\end{aligned}'))
+    return  ht_inner_flange_cover_plate_eqn
 
 
 def mom_axial_IR_prov(M,M_d,N,N_d,IR):

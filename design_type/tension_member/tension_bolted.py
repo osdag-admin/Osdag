@@ -1046,7 +1046,7 @@ class Tension_bolted(Main):
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
         self.loc = design_dictionary[KEY_LOCATION]
-        self.plate_thickness = [3,4,6,8,10,12,16,20,24,28,30,32,36,40]
+        self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
         # print(self.sizelist)
         self.length = float(design_dictionary[KEY_LENGTH])
         # print(self.bolt)
@@ -1615,7 +1615,8 @@ class Tension_bolted(Main):
                 break
             else:
                 initial_pitch = self.plate.pitch_provided
-                if self.plate.pitch_provided <= self.bolt.max_spacing_round:
+                length_avail = max(((self.plate.bolts_one_line - 1) * self.plate.gauge_provided), ((self.plate.bolt_line - 1) * self.plate.pitch_provided))
+                if self.plate.pitch_provided <= self.bolt.max_spacing_round and length_avail <= (15 * self.bolt.bolt_diameter_provided):
                     self.plate.pitch_provided = self.plate.pitch_provided + 5
                 else:
                     self.plate.bolt_line = self.plate.bolt_line + 1
@@ -1706,6 +1707,7 @@ class Tension_bolted(Main):
         self.plate_last = self.plate.thickness[-1]
 
         "recalculating block shear capacity of the bolt based on the change in pitch while block shear check in member design"
+
         if design_dictionary[KEY_TYP] == 'Bearing Bolt':
             self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.bolt_fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
                 e=self.plate.end_dist_provided, p=self.plate.pitch_provided, bolt_hole_type=self.bolt.bolt_hole_type)
@@ -1719,10 +1721,19 @@ class Tension_bolted(Main):
         else:
             pass
 
+        # capacity = False
+        # while capacity == False:
         self.plate.bolt_capacity_red = self.plate.get_bolt_red(self.plate.bolts_one_line,
                                                         self.plate.gauge_provided, self.plate.bolt_line,
                                                         self.plate.pitch_provided, self.bolt.bolt_capacity,
                                                         self.bolt.bolt_diameter_provided)
+            # if self.plate.bolt_force < self.plate.bolt_capacity_red:
+            #     capacity = True
+            #     break
+            # else:
+            #     self.plate.bolt_line = self.plate.bolt_line + 1
+            #     self.plate.bolt_force = self.res_force/(self.plate.bolt_line * self.plate.bolts_one_line)
+
 
         self.plate.length = (self.plate.bolt_line - 1) * self.plate.pitch_provided + 2 * self.plate.end_dist_provided
 
@@ -1796,9 +1807,9 @@ class Tension_bolted(Main):
             self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
 
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
-                max_tension_yield = 400 * self.plate.fy * 40 / 1.1
+                max_tension_yield = 400 * self.plate.fy * 80 / 1.1
             else:
-                max_tension_yield = 200 * self.plate.fy * 40 / 1.1
+                max_tension_yield = 200 * self.plate.fy * 80 / 1.1
 
             if self.plate_tension_capacity > self.res_force:
                 # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
@@ -1813,10 +1824,16 @@ class Tension_bolted(Main):
 
         if self.plate_tension_capacity > self.res_force:
             print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
-            self.design_status = True
-            logger.info("In case of reverse load, slenderness value should be less than 180.")
-            logger.info(": Overall bolted tension member design is safe. \n")
-            logger.debug(" :=========End Of design===========")
+            if (2 * self.plate.length + 100) > self.length:
+                self.design_status = False
+                logger.info("Plate length exceeds the Member length")
+                logger.error(": Design is not safe. \n ")
+                logger.debug(" :=========End Of design===========")
+            else:
+                self.design_status = True
+                logger.info("In case of reverse load, slenderness value should be less than 180.")
+                logger.info(": Overall bolted tension member design is safe. \n")
+                logger.debug(" :=========End Of design===========")
         else:
             if self.plate_tension_capacity < max_tension_yield and self.res_force < max_tension_yield:
                 print(self.section_size_1.designation, "hsdvdhsd")

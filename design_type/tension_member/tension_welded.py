@@ -966,7 +966,8 @@ class Tension_welded(Main):
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
         self.loc = design_dictionary[KEY_LOCATION]
-        self.plate_thickness = [3,4,6,8,10,12,16,20,24,28,30,32,36,40]
+        self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
+
         # print(self.sizelist)
         self.length = float(design_dictionary[KEY_LENGTH])
         # print(self.bolt)
@@ -1244,9 +1245,9 @@ class Tension_welded(Main):
                 break
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels',"Star Angles"]:
-            max_tension_yield = 400*self.plate.fy*40/1.1
+            max_tension_yield = 400*self.plate.fy*80/1.1
         else:
-            max_tension_yield = 200*self.plate.fy*40/1.1
+            max_tension_yield = 200*self.plate.fy*80/1.1
 
         "Increasing sectionsize to suffice the plate requirement"
 
@@ -1256,10 +1257,9 @@ class Tension_welded(Main):
             self.select_weld(self, design_dictionary)
 
         else:
-            if tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
+            if tension_capacity < max_tension_yield and self.res_force < max_tension_yield:
                 self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
-            elif tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', "Angles"]:
-                self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
+
             else:
                 self.design_status = False
                 logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness.")
@@ -1325,7 +1325,6 @@ class Tension_welded(Main):
 
         if self.weld.strength > self.weld.stress:
             self.design_status = True
-            logger.info(self.weld.reason)
             self.member_check(self, design_dictionary)
         else:
             self.design_status = False
@@ -1477,7 +1476,7 @@ class Tension_welded(Main):
 
         if self.section_size_1.tension_capacity >= self.load.axial_force * 1000:
             self.design_status = True
-            logger.info("In case of reverse load, slenderness value should be less than 180.")
+
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
 
@@ -1563,14 +1562,21 @@ class Tension_welded(Main):
             elif (self.plate_tension_capacity < self.res_force) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
                 logger.error("Plate thickness is not sufficient.")
-                logger.error(": Design is not safe. \n ")
-                logger.debug(" :=========End Of design===========")
+
             else:
                 pass
         if self.plate_tension_capacity > self.res_force:
-            self.design_status = True
-            logger.info(": Overall welded tension member design is safe. \n")
-            logger.debug(" :=========End Of design===========")
+            if (2 * self.plate.length + 100) > self.length:
+                self.design_status = False
+                logger.info("Plate length exceeds the Member length")
+                logger.error(": Design is not safe. \n ")
+                logger.debug(" :=========End Of design===========")
+            else:
+                self.design_status = True
+                logger.info("In case of reverse load, slenderness value should be less than 180.")
+                logger.info(self.weld.reason)
+                logger.info(": Overall welded tension member design is safe. \n")
+                logger.debug(" :=========End Of design===========")
         else:
             self.design_status = False
             logger.error(": Design is not safe. \n ")

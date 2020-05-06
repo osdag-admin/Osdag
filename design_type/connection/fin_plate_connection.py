@@ -10,16 +10,9 @@ from utils.common.component import *
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
-import yaml
-from design_report.reportGenerator import  save_html
 from Report_functions import *
-import os
 import logging
 
-
-import configparser
-
-from io import StringIO
 
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
@@ -336,7 +329,7 @@ class FinPlateConnection(ShearConnection):
 
         return out_list
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
         all_errors = []
         self.design_status = False
         flag = False
@@ -1132,7 +1125,7 @@ class FinPlateConnection(ShearConnection):
               get_pass_fail(self.weld.stress, self.weld.strength, relation="lesser"))
         self.report_check.append(t1)
 
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         # config = configparser.ConfigParser()
         # config.read_file(open(r'Osdag.config'))

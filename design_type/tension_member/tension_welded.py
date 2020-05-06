@@ -1,6 +1,4 @@
 from design_type.connection.shear_connection import ShearConnection
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from design_report.reportGenerator_latex import CreateLatex
@@ -10,28 +8,11 @@ from utils.common.component import *
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
-import yaml
 from design_report.reportGenerator import save_html
-import os
-import shutil
 import logging
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtGui import QTextCharFormat
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-import pickle
-import pdfkit
-import configparser
-from main import Main
-import configparser
-import os
 
-import cairosvg
-from io import StringIO
+from main import Main
+
 
 class Tension_welded(Main):
 
@@ -880,7 +861,7 @@ class Tension_welded(Main):
     #     else:
     #         pass
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
 
         all_errors = []
         "check valid inputs and empty inputs in input dock"
@@ -1818,7 +1799,7 @@ class Tension_welded(Main):
         get_pass_fail(self.load.axial_force, self.plate_tension_capacity, relation="lesser"))
         self.report_check.append(t8)
 
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         # Disp_image ={KEY_DISP_3D: "3d",
         #              KEY_DISP_FRONT: "Front",

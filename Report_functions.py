@@ -8,16 +8,16 @@ import configparser
 # from utils.common import component
 from pylatex import Document, Section, Subsection
 from pylatex.utils import italic, bold
-import pdflatex
+#import pdflatex
 import sys
 import datetime
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
+#from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 
 
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic, NoEscape
-from pdflatex import PDFLaTeX
+#from pdflatex import PDFLaTeX
 import os
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
     MediumText, LineBreak, simple_page_number
@@ -199,7 +199,7 @@ def forces_in_flange(Au, B,T,A,D,Mu,Mw,Mf,Af,ff):
     forcesinflange_eqn.append(NoEscape(r' & = Mu-M_w\\'))
     forcesinflange_eqn.append(NoEscape(r'&= ' + Mu + '-' + Mw + r'\\'))
     forcesinflange_eqn.append(NoEscape(r'&=' + Mf + r'\\'))
-    forcesinflange_eqn.append(NoEscape(r' f_f& =flange~force  \\'))
+    forcesinflange_eqn.append(NoEscape(r' F_f& =flange~force  \\'))
     forcesinflange_eqn.append(NoEscape(r'& = \frac{M_f *1000}{D-T} + A_f \\'))
     forcesinflange_eqn.append(NoEscape(r'&= \frac{' + Mf + '}{' + D + '-' + T + '} +' + Af + r' \\'))
     forcesinflange_eqn.append(NoEscape(r'&=' + ff + r'\end{aligned}'))
@@ -332,6 +332,50 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
 
+def height_of_flange_cover_plate(B,sp,b_fp): #weld
+    B = str(B)
+    sp = str(sp)
+    b_fp = str (b_fp)
+    height_for_flange_cover_plate_eqn =Math(inline=True)
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= {B - 2*sp} \\'))
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'&= {' + B + ' - 2 * ' + sp + r'} \\'))
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'&=' + b_fp + '\end{aligned}'))
+    return height_for_flange_cover_plate_eqn
+
+def inner_plate_height_weld(B,sp,t_w,r_1, b_ifp):#weld
+    B = str(B)
+    sp = str(sp)
+    t_w = str (t_w)
+    r_1 = str(r_1)
+    b_ifp = str(b_ifp)
+    inner_plate_height_weld_eqn =Math(inline=True)
+    inner_plate_height_weld_eqn.append(NoEscape(r'\begin{aligned} b_{ifp} &= \frac{B - 4*sp - t_w - 2*r_1}{2} \\'))
+    inner_plate_height_weld_eqn.append(NoEscape(r'&= \frac{'+B +'- 4*'+sp+'-' +t_w+ '- 2*'+r_1+r'} {2} \\'))
+    inner_plate_height_weld_eqn.append(NoEscape(r'&=' + b_ifp + '\end{aligned}'))
+    return inner_plate_height_weld_eqn
+
+
+def flange_plate_Length_req(l_w,s,g,l_fp): #weld
+    l_w = str(l_w)
+    s = str (s)
+    g = str (g)
+    l_fp = str(l_fp)
+    min_flange_plate_Length_eqn = Math(inline=True)
+    min_flange_plate_Length_eqn.append(NoEscape(r'\begin{aligned} l_{fp} & = [2*(l_{w} + 2*s) + g]\\'))
+    min_flange_plate_Length_eqn.append(NoEscape(r'&= [2*('+ l_w + '2*'+s+') +' + g+ r']\\'))
+    min_flange_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
+    return min_flange_plate_Length_eqn
+
+def flange_weld_stress(F_f,F_rl,F_ws):
+    F_rl = str(F_rl)
+    F_ws = str(F_ws)
+    F_f =str(F_f)
+    flange_weld_stress_eqn = Math(inline=True)
+    flange_weld_stress_eqn.append(NoEscape(r'\begin{aligned} Stress &= \frac{F_f*1000}{F_{rl}}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r' &= \frac{' + F_f + '*1000}{' + F_rl + r'}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r'&= ' + F_ws + r'\end{aligned}'))
+
+    return flange_weld_stress_eqn
 
 def tension_rupture_bolted_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
 
@@ -543,8 +587,6 @@ def prov_shear_load(shear_input,min_sc,app_shear_load):
     app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',' + min_sc + r')\\'))
     app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r'\end{aligned}'))
     return app_shear_load_eqn
-
-
 
 
 def plastic_moment_capacty(beta_b, Z_p, f_y, gamma_m0 ,Pmc):  # same as #todo anjali

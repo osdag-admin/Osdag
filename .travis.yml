@@ -1,0 +1,38 @@
+language: generic
+
+
+dist: bionic
+
+before_install:
+  - sudo apt-get install python3-setuptools
+
+install:
+    #- sudo apt-get install lmodern
+    #- sudo apt install texlive-latex-base
+    - source ./texlive/texlive_install.sh
+    - pip3 install wheel
+    - pip3 install --user -r requirements.txt
+
+
+cache:
+  directories:
+    - /tmp/texlive
+    - $HOME/.texlive
+    - $HOME/.cache/pip
+
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+
+#before_script: cd $TRAVIS_BUILD_DIR/src/
+
+addons:
+  apt:
+    packages:
+      - python3-pip
+
+
+#before_script: cd $TRAVIS_BUILD_DIR/src/
+
+script:
+    #- pdflatex fin.tex
+    - python3 Module_test.py

@@ -6,17 +6,7 @@ from utils.common import common_calculation
 from utils.common.is800_2007 import IS800_2007
 import numpy as np
 
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtGui import QTextCharFormat
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
-import pickle
 import logging
-import cmath
 
 
 class MomentConnection(Connection, IS800_2007):

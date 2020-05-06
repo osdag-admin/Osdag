@@ -4,6 +4,7 @@ import yaml
 import sys
 import unittest
 
+
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnection
@@ -110,7 +111,7 @@ class Modules:
 
         pdf_created = False
         main.set_osdaglogger(None)
-        error = main.func_for_validation(main,self,file_data)  # validating files and setting inputs (although we know files are valid).
+        error = main.func_for_validation(main,file_data)  # validating files and setting inputs (although we know files are valid).
 
         if error is None:  # if ran successfully and all input values are set without any error. Now create pdf
 

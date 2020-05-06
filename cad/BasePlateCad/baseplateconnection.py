@@ -76,7 +76,7 @@ class BasePlateCad(object):
 
         self.columnModel = self.column.create_model()
         self.baseplateModel = self.baseplate.create_model()
-        self.nutBoltArrayModels = self,nut_bolt_array.create_model()
+        self.nutBoltArrayModels = self.nut_bolt_array.create_model()
 
         self.weldAbvFlang_11Model = self.weldAbvFlang_11.create_model()
         self.weldAbvFlang_12Model = self.weldAbvFlang_12.create_model()
@@ -256,6 +256,7 @@ if __name__ == '__main__':
     from cad.BasePlateCad.nutBoltPlacement import NutBoltArray
     from cad.items.anchor_bolt import *
     from cad.items.nut import Nut
+    # from design_type.connection.base_plate_connection import BasePlateConnection as BP
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
@@ -267,6 +268,7 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
 
+    # cal = BP.design_gusset_plate()
     column = ISection(B=250, T=13.7, D=450, t=9.8, R1= 14.0, R2= 7.0, alpha= 94, length= 1500, notchObj= None)
     baseplate = Plate(L=650, W=500, T=30)
     weldAbvFlang = FilletWeld(b=3, h=3, L= 250)

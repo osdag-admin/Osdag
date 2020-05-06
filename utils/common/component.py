@@ -53,6 +53,18 @@ class Bolt(Material):
         self.bolt_shear_capacity = 0.0
         self.bolt_bearing_capacity = 0.0
         self.bolt_capacity = 0.0
+        self.ymax = 0.0
+        self.xmax = 0.0
+        self.sigma_r_sq =0.0
+        self.moment_demand = 0.0
+        self.vres = 0.0
+        self.length_avail = 0.0
+        self.ecc = 0.0
+        self.vbv = 0.0
+        self.tmh = 0.0
+        self.abh = 0.0
+        self.tmv = 0.0
+        self.vres = 0.0
 
         # self.bolt_shear_capacity_disp =round(self.bolt_shear_capacity/1000, 2)
         # self.bolt_bearing_capacity_disp = round(self.bolt_bearing_capacity/1000, 2)
@@ -839,6 +851,19 @@ class Plate(Material):
         self.block_shear_capacity_shear = 0.0
         self.moment_capacity = 0.0
 
+        self.ymax = 0.0
+        self.xmax = 0.0
+        self.sigma_r_sq = 0.0
+        self.moment_demand = 0.0
+        self.vres = 0.0
+        self.length_avail = 0.0
+        self.ecc = 0.0
+        self.vbv = 0.0
+        self.tmh = 0.0
+        self.abh = 0.0
+        self.tmv = 0.0
+        self.vres = 0.0
+
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
         # self.block_shear_capacity_disp = round(self.block_shear_capacity/1000, 2)
         # self.shear_yielding_capacity_disp = round(self.shear_yielding_capacity/1000, 2)
@@ -1019,6 +1044,17 @@ class Plate(Material):
         tmv = moment_demand * xmax / sigma_r_sq
         abh = axial_load / (bolts_one_line * bolt_line)
         vres = math.sqrt((vbv + tmv) ** 2 + (tmh+abh) ** 2)
+        self.ymax = ymax
+        self.xmax = xmax
+        self.sigma_r_sq = sigma_r_sq
+        self.moment_demand = moment_demand
+        self.length_avail =length_avail
+        self.vbv = vbv
+        self.tmh = tmh
+        self.abh = abh
+        self.tmv = tmv
+        self.ecc = ecc
+        self.vres =vres
         return vres
 
     def get_bolt_red(self, bolts_one_line, gauge, bolts_line, pitch, bolt_capacity, bolt_dia):

@@ -861,7 +861,7 @@ class Tension_welded(Main):
     #     else:
     #         pass
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
 
         all_errors = []
         "check valid inputs and empty inputs in input dock"

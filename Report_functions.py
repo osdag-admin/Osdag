@@ -85,7 +85,7 @@ def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
     gamma_mb= str(gamma_mb)
     bolt_shear_capacity=str(bolt_shear_capacity)
     bolt_shear_eqn = Math(inline=True)
-    bolt_shear_eqn.append(NoEscape(r'\begin{aligned}V_{dsb} &= \frac{f_ub ~n_n~ A_{nb}}{\sqrt{3} ~\gamma_{mb}}\\'))
+    bolt_shear_eqn.append(NoEscape(r'\begin{aligned}V_{dsb} &= \frac{f_{ub} ~n_n~ A_{nb}}{\sqrt{3} ~\gamma_{mb}}\\'))
     bolt_shear_eqn.append(NoEscape(r'&= \frac{'+f_ub+'*'+n_n+'*'+a_nb+'}{\sqrt{3}~*~'+ gamma_mb+r'}\\'))
     bolt_shear_eqn.append(NoEscape(r'&= '+bolt_shear_capacity+r'\end{aligned}'))
     return bolt_shear_eqn
@@ -155,6 +155,94 @@ def get_trial_bolts(V_u, A_u,bolt_capacity,multiple=1):
     trial_bolts_eqn.append(NoEscape(r'R_{u} &= \frac{\sqrt{'+V_u+r'^2+'+A_u+r'^2}}{'+bolt_capacity+ r'}\\'))
     trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
     return trial_bolts_eqn
+
+def parameter_req_bolt_force(bolts_one_line,gauge,ymax,xmax,bolt_line,pitch,length_avail):
+    """
+       bolts_one_line =n_r
+       bolt_line = n_c
+       """
+    bolts_one_line = str(bolts_one_line)
+    ymax = str(ymax)
+    xmax = str(xmax)
+    gauge = str(gauge)
+    pitch = str(pitch)
+    bolt_line = str(bolt_line)
+    length_avail = str(length_avail)
+
+    parameter_req_bolt_force_eqn = Math(inline=True)
+    parameter_req_bolt_force_eqn.append(NoEscape(r'\begin{aligned} l_n~~~ &= length~available \\'))
+    parameter_req_bolt_force_eqn.append(NoEscape(r' l_n~~~ &= (n_r - 1) * g\\'))
+    parameter_req_bolt_force_eqn.append(NoEscape(r' &= ('+bolts_one_line+' - 1) *'+ gauge+ r'\\'))
+    parameter_req_bolt_force_eqn.append(NoEscape(r' & ='+length_avail+ r'\\'))
+
+    parameter_req_bolt_force_eqn.append(NoEscape(r' y_{max} &= l_n / 2\\'))
+    parameter_req_bolt_force_eqn.append(NoEscape(r' &= '+length_avail+ r' / 2 \\'))
+    parameter_req_bolt_force_eqn.append(NoEscape(r' & =' + ymax + r'\\'))
+
+    parameter_req_bolt_force_eqn.append(NoEscape(r'x_{max} &= p * (n_c - 1) / 2 \\'))
+    parameter_req_bolt_force_eqn.append(NoEscape(r' &= '+pitch+' * ('+bolt_line+ r'- 1) / 2 \\'))
+    parameter_req_bolt_force_eqn.append(NoEscape(r' & =' + xmax + r'\end{aligned}'))
+
+    return parameter_req_bolt_force_eqn
+
+def moment_demand_req_bolt_force(bolts_one_line,bolt_line,shear_load,
+               web_moment,moment_demand,ecc):
+    bolts_one_line = str(bolts_one_line)
+    bolt_line = str(bolt_line)
+    ecc = str(ecc)
+    web_moment = str(web_moment)
+    moment_demand = str(moment_demand)
+    shear_load = str(shear_load)
+    loads_req_bolt_force_eqn = Math(inline=True)
+
+    loads_req_bolt_force_eqn.append(NoEscape(r'\begin{aligned}  M_d~~ &= (V_u * ecc + M_w)\\'))
+    loads_req_bolt_force_eqn.append(NoEscape(r' &= ('+shear_load+' * '+ecc+' + '+web_moment+r')\\'))
+    loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\end{aligned}'))
+    return loads_req_bolt_force_eqn
+
+def Vres_bolts(bolts_one_line,ymax,xmax,bolt_line,axial_load
+               ,moment_demand,r,vbv,tmv,tmh,abh,vres,shear_load): #vres bolt web
+    """
+    bolts_one_line =n_r
+    bolt_line = n_c
+    """
+    bolts_one_line =str(bolts_one_line)
+    ymax =str(ymax)
+    xmax =str(xmax)
+    bolt_line = str(bolt_line)
+
+    r = str(r)
+    moment_demand = str(moment_demand)
+    axial_load =str(axial_load)
+    shear_load = str(shear_load)
+    vbv =str(vbv)
+    tmv =str(tmv)
+    tmh =str(tmh)
+    abh =str(abh)
+    vres = str(vres)
+    Vres_bolts_eqn = Math(inline=True)
+
+    Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} vbv~~ &= V_u / (n_r * n_c)\\'))
+    Vres_bolts_eqn.append(NoEscape(r' &= \frac{'+shear_load+ '}{ ('+bolts_one_line +'*'+ bolt_line+r')}\\'))
+    Vres_bolts_eqn.append(NoEscape(r' & =' + vbv + r'\\'))
+
+    Vres_bolts_eqn.append(NoEscape(r'tmh~ &= \frac{M_d * y_{max} }{ \Sigma r_i^2} \\'))
+    Vres_bolts_eqn.append(NoEscape(r' &= \frac{'+moment_demand+' *'+ ymax+'}{'+r+r'}\\'))
+    Vres_bolts_eqn.append(NoEscape(r' & =' + tmh + r'\\'))
+
+    Vres_bolts_eqn.append(NoEscape(r' tmv ~&= \frac{M_d * x_{max}}{\Sigma r_i^2}\\'))
+    Vres_bolts_eqn.append(NoEscape(r'&= \frac{' +moment_demand+' * '+xmax+'}{'+r+ r'}\\'))
+    Vres_bolts_eqn.append(NoEscape(r' & =' + tmv + r'\\'))
+
+    Vres_bolts_eqn.append(NoEscape(r' abh~ & = \frac{A_u }{(n_r * n_c)}\\'))
+    Vres_bolts_eqn.append(NoEscape(r'  & =\frac{'+axial_load+'}{ ('+bolts_one_line+' *' +bolt_line+r')}\\'))
+    Vres_bolts_eqn.append(NoEscape(r' & =' + abh + r'\\'))
+    Vres_bolts_eqn.append(NoEscape(r' vres &=\sqrt{(vbv +tmv) ^ 2 + (tmh+abh) ^ 2}\\'))
+    # Vres_bolts_eqn.append(NoEscape(r' vres &= \sqrt((vbv + tmv) ^ 2 + (tmh + abh) ^ 2)\\'))
+    Vres_bolts_eqn.append(NoEscape(r'  &= \sqrt{('+vbv+' +'+ tmv+') ^2 + ('+tmh +'+'+ abh+r') ^ 2}\\'))
+    Vres_bolts_eqn.append(NoEscape(r' & =' + vres +  r'\end{aligned}'))
+
+    return Vres_bolts_eqn
 
 def forces_in_web(Au,T,A,t,D,Zw,Mu,Z,Mw,Aw):
     Au = str(Au)
@@ -428,10 +516,9 @@ def tensile_capacity_prov(T_dg, T_dn, T_db =0.0):
         tension_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= Min(T_{dg},T_{dn})\\'))
         tension_capacity_eqn.append(NoEscape(r'&= Min(' + T_dg + ',' + T_dn + r')\\'))
 
-
-
     tension_capacity_eqn.append(NoEscape(r'&='+ T_d + '\end{aligned}'))
     return tension_capacity_eqn
+
 
 def spacing (sp,s):
     sp = max(15,s+5)
@@ -453,6 +540,7 @@ def mom_axial_IR_prov(M,M_d,N,N_d,IR):
     mom_axial_IR_eqn = Math(inline=True)
     mom_axial_IR_eqn.append(NoEscape(r'\begin{aligned} \frac{'+M+'}{'+M_d+r'}+\frac{'+N+'}{'+N_d+'}='+IR+r'\end{aligned}'))
     return mom_axial_IR_eqn
+
 def IR_req(IR):
     IR = str(IR)
     IR_req_eqn = Math(inline=True)
@@ -657,7 +745,19 @@ def prov_moment_load(moment_input,min_mc,app_moment_load):
     app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\end{aligned}'))
     return  app_moment_load_eqn
 
-
+def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn,multiple =1):
+    h = str(h)
+    t = str(t)
+    n_r = str(n_r)
+    d_o = str(d_o)
+    f_u = str(fu)
+    v_dn = str(v_dn)
+    multiple = str(multiple)
+    shear_rup_eqn = Math(inline=True)
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+    shear_rup_eqn.append(NoEscape(r'&='+multiple+ r'*('+h+'-('+n_r+'*'+d_o+'))*'+t+'*'+f_u+r'\\'))
+    shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
+    return shear_rup_eqn
 def get_pass_fail(required, provided,relation='greater'):
     required = float(required)
     provided = float(provided)

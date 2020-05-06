@@ -19,7 +19,7 @@ import logging
 import cmath
 
 
-class MomentConnection(Connection):
+class MomentConnection(Connection, IS800_2007):
     def __init__(self):
         super(MomentConnection, self).__init__()
 
@@ -177,9 +177,3 @@ class MomentConnection(Connection):
         weld_size = common_calculation.round_up(weld_size, 2, weld_size_minimum)  # mm
 
         return weld_size
-
-
-
-
-
-

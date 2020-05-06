@@ -13,6 +13,7 @@ from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
 from cad.items.angle import Angle
 from cad.items.anchor_bolt import AnchorBolt_A, AnchorBolt_B, AnchorBolt_Endplate
+from cad.items.stiffener_plate import StiffenerPlate
 
 from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -701,11 +702,17 @@ class CommonDesignLogic(object):
 
         concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=baseplate.T * 10)
 
+        gusset = StiffenerPlate(L=BP.gusset_plate_length, W=BP.gusset_plate_height, T=BP.gusset_plate_thick,
+                                L11=(BP.gusset_plate_length - (column.B + 100)) / 2, L12=BP.gusset_plate_height - 100,
+                                R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
+        stiffener = StiffenerPlate(L=BP.stiffener_plate_length, W=BP.stiffener_plate_height, T=BP.stiffener_plate_thick,
+                                   L11=BP.stiffener_plate_length - 50, L12=BP.stiffener_plate_height - 100)
+
         ex_length = (50 + 24 + baseplate.T)  # nut.T = 24
         bolt = AnchorBolt_A(l=float(BP.anchor_length_provided), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
                             ex=ex_length)
-        # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12)
-        # bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12)
+        # bolt = AnchorBolt_B(l= float(BP.anchor_length_provided),  r= float(BP.anchor_dia_provided) / 2, ex=ex_length)
+        # bolt = AnchorBolt_Endplate(l= float(BP.anchor_length_provided), r= float(BP.anchor_dia_provided) / 2, ex=ex_length)
         nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
         numberOfBolts = 4
         nutSpace = bolt.c + baseplate.T
@@ -714,8 +721,7 @@ class CommonDesignLogic(object):
         nut_bolt_array = bpNutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
 
         basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang,
-                                 weldSideWeb,
-                                 concrete)
+                                 weldSideWeb, concrete, gusset, stiffener)
         basePlate.create_3DModel()
 
         return basePlate

@@ -182,7 +182,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.standard_plate_thk = []
         self.neglect_anchor_dia = []
         self.anchor_bolt = ''
-        self.anchor_dia_provided = 1
+        self.anchor_dia_provided = 'M8'
         self.anchor_length_min = 1
         self.anchor_length_max = 1
         self.anchor_length_provided = 1
@@ -298,6 +298,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         """
         Return a-list of tuple, used to create the Base Plate input dock U.I in Osdag design window.
         """
+
         self.module = KEY_DISP_BASE_PLATE
 
         options_list = []
@@ -970,6 +971,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         Returns: None
         """
         # attributes of input dock
+        self.mainmodule = "Moment Connection"
         self.connectivity = str(design_dictionary[KEY_CONN])
         self.end_condition = str(design_dictionary[KEY_END_CONDITION])
         self.column_section = str(design_dictionary[KEY_SUPTNGSEC])

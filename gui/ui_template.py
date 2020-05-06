@@ -64,6 +64,7 @@ from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
+from design_type.connection.base_plate_connection import BasePlateConnection
 
 from cad.cad3dconnection import cadconnection
 
@@ -1281,9 +1282,9 @@ class Ui_ModuleWindow(QMainWindow):
 
         # background gradient
         # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-        display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
+        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
         # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        display.display_triedron()
+        display.display_trihedron()
         # display.display_triedron()
         display.View.SetProj(1, 1, 1)
 
@@ -1689,6 +1690,8 @@ class Ui_ModuleWindow(QMainWindow):
             return ColumnEndPlate
         elif name == KEY_DISP_CLEATANGLE:
             return CleatAngleConnection
+        elif name == KEY_DISP_BASE_PLATE:
+            return BasePlateConnection
 # Function for getting inputs from a file
     '''
     @author: Umair
@@ -1845,7 +1848,7 @@ class Ui_ModuleWindow(QMainWindow):
                 module_class = EndPlateConnection
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_CLEATANGLE,
-                    KEY_DISP_ENDPLATE]:
+                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)

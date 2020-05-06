@@ -709,10 +709,17 @@ class CommonDesignLogic(object):
                                    L11=BP.stiffener_plate_length - 50, L12=BP.stiffener_plate_height - 100)
 
         ex_length = (50 + 24 + baseplate.T)  # nut.T = 24
-        bolt = AnchorBolt_A(l=float(BP.anchor_length_provided), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
-                            ex=ex_length)
-        # bolt = AnchorBolt_B(l= float(BP.anchor_length_provided),  r= float(BP.anchor_dia_provided) / 2, ex=ex_length)
-        # bolt = AnchorBolt_Endplate(l= float(BP.anchor_length_provided), r= float(BP.anchor_dia_provided) / 2, ex=ex_length)
+        BOLT_D
+
+        if BP.anchor_type == 'IS 5624-Type A':
+            bolt = AnchorBolt_A(l=float(BP.anchor_length_provided), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
+                                ex=ex_length)
+        elif BP.anchor_type == 'IS 5624-Type B':
+            bolt = AnchorBolt_B(l=float(BP.anchor_length_provided), r=float(BP.anchor_dia_provided) / 2, ex=ex_length)
+        elif BP.anchor_type == 'End Plate Type':
+            bolt = AnchorBolt_Endplate(l=float(BP.anchor_length_provided), r=float(BP.anchor_dia_provided) / 2,
+                                       ex=ex_length)
+
         nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
         numberOfBolts = 4
         nutSpace = bolt.c + baseplate.T

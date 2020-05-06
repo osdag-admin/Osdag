@@ -1,4 +1,5 @@
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*- 
 # @author: Amir, Umair, Arsil
 
 import operator
@@ -13,6 +14,8 @@ TYPE_IMAGE = 'Image'
 TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
 TYPE_OUT_BUTTON = 'Output_dock_Button'
+TYPE_OUT_DOCK = 'Output_dock_Item'
+TYPE_OUT_LABEL = 'Output_dock_Label'
 TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
 TYPE_TEXT_BROWSER = 'TextBrowser'
@@ -29,7 +32,7 @@ import sqlite3
 
 from utils.common.component import *
 from utils.common.component import *
-from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+
 import logging
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.column_cover_plate import ColumnCoverPlate
@@ -422,6 +425,7 @@ KEY_GRD_FOOTING = 'Footing.Grade'
 KEY_DISP_GRD_FOOTING = 'Grade*'
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 
+
 # Applied load
 KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load (kN)'
 KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load (kN)'
@@ -445,24 +449,72 @@ KEY_OUT_ANCHOR_BOLT_CAPACITY = 'Anchor Bolt.Capacity'
 KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
 KEY_OUT_ANCHOR_BOLT_COMBINED = 'Anchor Bolt.Combined'
 KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity'
+KEY_OUT_ANCHOR_BOLT_TENSION = 'Anchor Bolt.Tension'
+KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
+
+# Applied load
+KEY_DISP_APPLIED_SHEAR_LOAD ='Shear Load Vu (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE='Axial Load Au (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Moment Load Mu (kNm)'
+
+# capacity
+DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"
+KEY_MEMBER_CAPACITY = "section.memcapacity"
+KEY_DISP_MEMBER_CAPACITY = "Member Capacity"
+KEY_MEMBER_AXIALCAPACITY='section.MomCapacity'
+KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Ac (kN)"
+KEY_MEMBER_SHEAR_CAPACITY='section.MomCapacity'
+KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Sc (kN)"
+KEY_MEMBER_MOM_CAPACITY='section.MomCapacity'
+KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Mc (kNm)"
+KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity Pmc (kNm)'
+KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria Mdc (kNm)'
 
 KEY_OUT_BASEPLATE_THICKNNESS = 'Baseplate.Thickness'
-KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (tp)'
+KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (mm)'
 KEY_OUT_BASEPLATE_LENGTH = 'Baseplate.Length'
-KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (lp)'
+KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (mm)'
 KEY_OUT_BASEPLATE_WIDTH = 'Baseplate.Width'
 KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (wp)'
+
 DISP_TITLE_DETAILING = 'Detailing'
 KEY_OUT_DETAILING_NO_OF_ANCHOR_BOLT = 'Deatiling.No of Anchor bolts'
 KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'No. of Anchor bolts'
+KEY_OUT_DETAILING_PITCH_DISTANCE = 'Detailing.Pitch Distance'
+KEY_OUT_DISP_DETAILING_PITCH_DISTANCE = 'Pitch Distance (mm)'
+KEY_OUT_DETAILING_GAUGE_DISTANCE = 'Detailing.Gauge Distance'
+KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE = 'Gauge Distance (mm)'
 KEY_OUT_DETAILING_END_DISTANCE = 'Detailing.End Distance'
-KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End distance (e)'
+KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End Distance (e)'
 KEY_OUT_DETAILING_EDGE_DISTANCE = 'Detailing.Edge Distance'
-KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge distance (e')"
+KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (e')"
 KEY_OUT_DETAILING_PROJECTION = 'Detailing.Projection'
 KEY_OUT_DISP_DETAILING_PROJECTION = 'Projection (c)'
 
+DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
+KEY_OUT_GUSSET_PLATE_THICKNNESS = 'GussetPlate.Thickness'
+KEY_OUT_DISP_GUSSET_PLATE_THICKNESS = 'Thickness (mm)'
+KEY_OUT_GUSSET_PLATE_SHEAR_DEMAND = 'GussetPlate.Shear_Demand'
+KEY_OUT_DISP_GUSSET_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_GUSSET_PLATE_SHEAR = 'GussetPlate.Shear'
+KEY_OUT_DISP_GUSSET_PLATE_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_GUSSET_PLATE_MOMENT_DEMAND = 'GussetPlate.Moment_Demand'
+KEY_OUT_DISP_GUSSET_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_GUSSET_PLATE_MOMENT = 'GussetPlate.Moment'
+KEY_OUT_DISP_GUSSET_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 
+
+DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'
+KEY_OUT_STIFFENER_PLATE_THICKNNESS = 'StiffenerPlate.Thickness'
+KEY_OUT_DISP_STIFFENER_PLATE_THICKNESS = 'Thickness (mm)'
+KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND = 'StiffenerPlate.Shear_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_STIFFENER_PLATE_SHEAR = 'StiffenerPlate.Shear'
+KEY_OUT_DISP_STIFFENER_PLATE_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND = 'StiffenerPlate.Moment_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_STIFFENER_PLATE_MOMENT = 'StiffenerPlate.Moment'
+KEY_OUT_DISP_STIFFENER_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 
 
 ###################################
@@ -564,14 +616,14 @@ KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
 VALUES_FLANGEPLATE_PREFERENCES = ['Cover plate location', 'Outside','Outside + Inside']
 
 KEY_FLANGEPLATE_THICKNESS = 'flange_plate.thickness_provided'
-KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness(mm)*'
+KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
-KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness(mm)'
+KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness (mm)'
 
 KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
-KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height(mm)'
+KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height (mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length (mm)'
 
@@ -582,12 +634,12 @@ KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 KEY_DISP_INNERFLANGESPLICEPLATE = "Inner Plate Detials"
 DISP_TITLE_INNERFLANGESPLICEPLATE = 'Inner Flange splice plate'
 KEY_INNERFLANGE_PLATE_HEIGHT = 'flange_plate.InnerHeight'
-KEY_DISP_INNERFLANGE_PLATE_HEIGHT = 'Height(mm)'
+KEY_DISP_INNERFLANGE_PLATE_HEIGHT = 'Height (mm)'
 KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
-KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length(mm)'
+KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length (mm)'
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
-KEY_DISP_FLANGE_SPACING = 'Spacing(mm)'
+KEY_DISP_FLANGE_SPACING = 'Spacing (mm)'
 KEY_FLANGE_PITCH = 'Flange_plate.pitch_provided'
 KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
 KEY_FLANGE_PLATE_GAUGE = "Flange_plate.gauge_provided "
@@ -603,7 +655,7 @@ KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
 KEY_DISP_FLANGE_TEN_CAPACITY ="Flange Tension Capacity (kN)"
 
 KEY_FLANGE_PLATE_TEN_CAP ="Flange_plate.tension_capacity"
-KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity  (kN)"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity (kN)"
 
 
 KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
@@ -663,11 +715,11 @@ KEY_DISP_WELD_TYPE = 'Type'
 VALUES_WELD_TYPE = ["Select type", "Fillet Weld", "Butt Weld"]
 DISP_FLANGE_TITLE_WELD = 'Flange Weld'
 KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
-KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size(mm)'
+KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size (mm)'
 KEY_FLANGE_WELD_STRENGTH = 'Flange_Weld.Strength'
-KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
+KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 KEY_FLANGE_WELD_STRESS = 'Flange_Weld.Stress'
-KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
+KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
 KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
@@ -675,14 +727,14 @@ KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
 KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
 
 KEY_INNERFLANGE_WELD_LENGTH = 'Flange_Weld.InnerLength'
-KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length(mm)'
+KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length (mm)'
 KEY_INNERFLANGE_WELD_LENGTH_EFF = 'Flange_Weld.InnerEffLength'
 KEY_INNERFLANGE_WELD_HEIGHT ='flange_Weld.Innerheight'
-KEY_DISP_INNERFLANGE_WELD_HEIGHT = 'Height(mm)'
+KEY_DISP_INNERFLANGE_WELD_HEIGHT = 'Height (mm)'
 KEY_INNERFLANGE_WELD_STRESS = 'Inner_Flange_Weld.Stress'
-KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress(N/mm)'
+KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
-KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength(N/mm)'
+KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
 KEY_OUT_FLANGE_BOLT_SHEAR ='flange_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity (kN)"
@@ -704,31 +756,31 @@ KEY_OUT_DISP_FORCES_WEB= 'Forces Carried by Web'
 
 KEY_OUT_WEB_BOLT_SHEAR ='web_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_WEB_BOLT_SHEAR = "Shear Capacity (kN)"
-KEY_OUT_WEB_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'
+KEY_OUT_WEB_BOLT_BEARING = 'web_bolt.bolt_bearing_capacity'
 KEY_OUT_DISP_WEB_BOLT_BEARING = "Bearing Capacity (kN)"
-KEY_OUT_WEB_BOLT_CAPACITY = 'flange_bolt.bolt_capacity'
+KEY_OUT_WEB_BOLT_CAPACITY = 'web_bolt.bolt_capacity'
 KEY_OUT_DISP_WEB_BOLT_CAPACITY ="Bolt Capacity (kN)"
 KEY_OUT_DISP_WEB_BOLT_SLIP= 'Slip Resistance'
-KEY_WEB_BOLT_GRP_CAPACITY = 'flange_bolt.grp_bolt_capacity'
-KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'flange bolt grp bolt capacity (kN)'
+KEY_WEB_BOLT_GRP_CAPACITY = 'web_bolt.grp_bolt_capacity'
+KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'Web bolt grp bolt capacity (kN)'
 
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
-KEY_DISP_WEBPLATE_THICKNESS = 'Thickness(mm)*'
+KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
 VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30','32','36','40']
 
 KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
-KEY_DISP_WEB_PLATE_HEIGHT = 'Height(mm)'
+KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
-KEY_DISP_WEB_PLATE_LENGTH ='Length(mm)'
+KEY_DISP_WEB_PLATE_LENGTH ='Length (mm)'
 KEY_OUT_WEB_BOLT_SHEAR ="Web_bolt.shear capacity"
 
 
 KEY_WEB_SPACING ="Web_plate.spacing"
-KEY_DISP_WEB_SPACING = 'Spacing(mm)'
+KEY_DISP_WEB_SPACING = 'Spacing (mm)'
 KEY_WEB_PITCH = "Web_plate.pitch_provided"
 KEY_DISP_WEB_PLATE_PITCH ="Pitch"
 KEY_WEB_GAUGE = "Web_plate.gauge_provided "
@@ -741,7 +793,7 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance'
 KEY_WEB_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_CAPACITY= 'Capacity'
 KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
-KEY_DISP_WEB_TEN_CAPACITY ="Tension Capacity (kN)"
+KEY_DISP_WEB_TEN_CAPACITY ="Web Tension Capacity (kN)"
 KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
 KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Plate Shear Capacity (kN)"
 KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
@@ -759,7 +811,7 @@ KEY_DISP_TENSIONYIELDINGCAP_WEB ='Web Tension Yielding Capacity (kN)'
 KEY_TENSIONRUPTURECAP_WEB ='web_plate.shear_rupture_capacity'
 KEY_DISP_TENSIONRUPTURECAP_WEB ='Web Tension Rupture Capacity (kN)'
 KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
-KEY_WEB_DISP_PLATE_MOM_DEMAND = 'web Moment Demand (kNm)'
+KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Web Moment Demand (kNm)'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
 KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kNm)'
 KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
@@ -773,11 +825,11 @@ KEY_WEB_WELD_DETAILS = "Web detail"
 KEY_DISP_WEB_WELD_DETAILS = "Weld Details"
 DISP_WEB_TITLE_WELD = 'Web Weld'
 KEY_WEB_WELD_SIZE = 'Web_Weld.Size'
-KEY_WEB_DISP_WELD_SIZE = 'Web Weld Size(mm)'
+KEY_WEB_DISP_WELD_SIZE = 'Web Weld Size (mm)'
 KEY_WEB_WELD_STRENGTH = 'Web_Weld.Strength'
-KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength(N/mm)'
+KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength (N/mm)'
 KEY_WEB_WELD_STRESS = 'Web_Weld.Stress'
-KEY_WEB_DISP_WELD_STRESS = 'Web Weld Stress(N/mm)'
+KEY_WEB_DISP_WELD_STRESS = 'Web Weld Stress (N/mm)'
 KEY_WEB_WELD_LENGTH = 'Web_Weld.Length'
 KEY_DISP_WEB_WELD_LENGTH = 'Web Weld Length'
 KEY_WEB_WELD_LENGTH_EFF = 'Web_Weld.EffLength'
@@ -969,6 +1021,7 @@ KEY_DISP_SUPTDSEC_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>
 
 
 KEY_BASE_PLATE_MATERIAL = 'Base_Plate.Material'
+KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_BASE_PLATE_FU = 'Base_Plate.Fu'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
 KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , fy (MPa)'
@@ -1154,15 +1207,39 @@ KEY_OUT_DISP_PLATE_MOM_CAPACITY_SEP = 'Moment Capacity per Bolt (kN-m)'
 KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
 
+KEY_OUT_WELD_SIZE = 'Weld.Size'
+KEY_OUT_DISP_WELD_SIZE = 'Size(mm)'
+KEY_OUT_WELD_SIZE_FLANGE = 'Weld.Size_flange'
+KEY_OUT_DISP_WELD_SIZE_FLANGE = 'Size at Flange (mm)'
+KEY_OUT_WELD_SIZE_WEB = 'Weld.Size_web'
+KEY_OUT_DISP_WELD_SIZE_WEB = 'Size at Web (mm)'
+KEY_OUT_WELD_SIZE_STIFFENER = 'Weld.Size_stiffener'
+KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Gusset/Stiffener (mm)'
+KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
+KEY_OUT_WELD_STRESS = 'Weld.Stress'
+KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
+KEY_OUT_WELD_LENGTH = 'Weld.Length'
+KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
+KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
+KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
+
 KEY_OUT_DISP_MEMB_TEN_YIELD = 'Tension Yield Capacity (KN)'
 KEY_OUT_DISP_MEMB_TEN_RUPTURE = 'Tension Rupture Capacity'
 KEY_OUT_DISP_MEMB_BLK_SHEAR = 'Block Shear Capacity'
 KEY_OUT_DISP_MEMB_BLK_SHEAR = 'Block Shear Capacity'
 
 
-
-
-
+KEY_OUT_NO_BOLTS_FLANGE = 'ColumnEndPlate.nbf'
+KEY_OUT_DISP_NO_BOLTS_FLANGE = 'No. of bolts along Flange'
+KEY_OUT_NO_BOLTS_WEB = 'ColumnEndPlate.nbw'
+KEY_OUT_DISP_NO_BOLTS_WEB = 'No. of bolts along Web'
+KEY_OUT_NO_BOLTS = 'ColumnEndPlate.nb'
+KEY_OUT_DISP_NO_BOLTS = 'Total no. of Bolts'
+KEY_PITCH_2_FLANGE = 'ColumnEndPlate.p2_flange'
+KEY_DISP_PITCH_2_FLANGE = 'Pitch2 along Flange'
+KEY_PITCH_2_WEB = 'ColumnEndPlate.p2_web'
+KEY_DISP_PITCH_2_WEB = 'Pitch2 along Web'
 
 
 DISP_TITLE_WELD = 'Weld'

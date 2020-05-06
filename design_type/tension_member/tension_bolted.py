@@ -1,35 +1,21 @@
 from design_type.connection.shear_connection import ShearConnection
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from design_report.reportGenerator_latex import CreateLatex
-import configparser
+
 from utils.common.component import *
 # from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
 from Common import *
 from Report_functions import *
 from utils.common.load import Load
-import yaml
-from design_report.reportGenerator import save_html
-import os
-import shutil
+
+
 import logging
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtGui import QTextCharFormat
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-import pickle
-import pdfkit
-import configparser
+
+
 from main import Main
-import cairosvg
-from io import StringIO
+
 
 
 class Tension_bolted(Main):
@@ -933,7 +919,7 @@ class Tension_bolted(Main):
     #     else:
     #         pass
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
 
         all_errors = []
         "check valid inputs and empty inputs in input dock"
@@ -1142,7 +1128,7 @@ class Tension_bolted(Main):
         "Loop checking each member from sizelist based on yield capacity"
 
         for selectedsize in self.sizelist:
-            # print(selectedsize)
+            print('selectedsize',selectedsize)
             self.section_size = self.select_section(self,design_dictionary,selectedsize)
             bolt_diameter_min= min(self.bolt.bolt_diameter)
 
@@ -2184,7 +2170,7 @@ class Tension_bolted(Main):
 
         # folder = self.select_workspace_folder(self)
         # print(folder)
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         # Disp_image ={KEY_DISP_3D: "3d",
         #              KEY_DISP_FRONT: "Front",

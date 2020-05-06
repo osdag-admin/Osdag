@@ -308,7 +308,7 @@ KEY_DISP_IR = 'Interaction Ratio'
 DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
 DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
 DISP_THROAT = 'Throat Thickness (mm)'
-DISP_EFF = 'Effective Length (mm)'
+
 DISP_WELD_STRENGTH = 'Weld Strength (kN/mm)'
 ###################################
 # Key for Storing Module
@@ -715,9 +715,12 @@ KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
 KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
+
+KEY_DISP_WELD_LEN_EFF_OUTSIDE = 'EffLength. Outer flange'
+KEY_DISP_WELD_LEN_EFF_INSIDE = 'EffLength. Inner flange'
 KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
 KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
-
+DISP_EFF = "Effective length"
 KEY_INNERFLANGE_WELD_LENGTH = 'Flange_Weld.InnerLength'
 KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length (mm)'
 KEY_INNERFLANGE_WELD_LENGTH_EFF = 'Flange_Weld.InnerEffLength'

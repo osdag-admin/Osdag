@@ -213,13 +213,11 @@ class BeamCoverPlateWeld(MomentConnection):
         t14 = (KEY_FLANGE_WELD_SIZE, KEY_FLANGE_DISP_WELD_SIZE, TYPE_TEXTBOX, self.flange_weld.size if flag else '')
         flange_weld_details.append(t14)
 
-        t15 = (
-            KEY_FLANGE_WELD_STRENGTH, KEY_FLANGE_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
-            round_up(self.flange_weld.strength, 5) if flag else '')
+        t15 = (KEY_FLANGE_WELD_STRENGTH, KEY_FLANGE_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
+            self.flange_weld.strength if flag else '')
         flange_weld_details.append(t15) #in N/mm
 
-        t16 = (
-        KEY_FLANGE_WELD_STRESS, KEY_FLANGE_DISP_WELD_STRESS, TYPE_TEXTBOX, round_up(self.flange_weld.stress, 5) if flag else '')
+        t16 = (KEY_FLANGE_WELD_STRESS, KEY_FLANGE_DISP_WELD_STRESS, TYPE_TEXTBOX,self.flange_weld.stress if flag else '')
         flange_weld_details .append(t16) #in N/mm
 
         return flange_weld_details
@@ -239,10 +237,10 @@ class BeamCoverPlateWeld(MomentConnection):
         Innerflange_weld_details.append(t14)
 
         t15 = (KEY_INNERFLANGE_WELD_STRENGTH, KEY_INNERFLANGE_DISP_WELD_STRENGTH, TYPE_TEXTBOX,
-            round_up(self.flange_weld.strength, 5) if flag else '')
+             self.flange_weld.strength if flag else '')
         Innerflange_weld_details.append(t15) #in N/mm
 
-        t16 = (KEY_INNERFLANGE_WELD_STRESS, KEY_INNERFLANGE_DISP_WELD_STRESS, TYPE_TEXTBOX, round_up(self.flange_weld.Innerstress, 5) if flag else '')
+        t16 = (KEY_INNERFLANGE_WELD_STRESS, KEY_INNERFLANGE_DISP_WELD_STRESS, TYPE_TEXTBOX, self.flange_weld.stress if flag else '')
         Innerflange_weld_details .append(t16) #in N/mm
 
         return Innerflange_weld_details
@@ -271,6 +269,7 @@ class BeamCoverPlateWeld(MomentConnection):
         t21 = (KEY_WEB_WELD_DETAILS, KEY_DISP_WEB_WELD_DETAILS, TYPE_OUT_BUTTON, ['Web Plate Weld', self.web_weld_details])
         out_list.append(t21)
 
+
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
         out_list.append(t17)
 
@@ -278,23 +277,19 @@ class BeamCoverPlateWeld(MomentConnection):
                self.flange_plate.height if flag else '')
         out_list.append(t18)
 
-        t19 = (
-            KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
+        t19 = (KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
             self.flange_plate.length if flag else '')
         out_list.append(t19)
 
         t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
                self.flange_plate.thickness_provided if flag else '')
         out_list.append(t20)
-        t21 = (
-            KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity])
+        t21 = (KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity])
         out_list.append(t21)
 
-
-        t21 = (
-        KEY_FLANGE_WELD_DETAILS, KEY_DISP_FLANGE_WELD_DETAILS, TYPE_OUT_BUTTON, ['Flange Plate Weld', self.flange_weld_details])
+        t21 = (KEY_FLANGE_WELD_DETAILS, KEY_DISP_FLANGE_WELD_DETAILS, TYPE_OUT_BUTTON,
+            ['Flange Plate Weld', self.flange_weld_details])
         out_list.append(t21)
-
         t17 = (None, DISP_TITLE_INNERFLANGESPLICEPLATE, TYPE_TITLE, None)
         out_list.append(t17)
 
@@ -302,8 +297,7 @@ class BeamCoverPlateWeld(MomentConnection):
                self.flange_plate.Innerheight if flag else '')
         out_list.append(t18)
 
-        t19 = (
-            KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
+        t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
             self.flange_plate.Innerlength if flag else '')
         out_list.append(t19)
 
@@ -653,7 +647,7 @@ class BeamCoverPlateWeld(MomentConnection):
             print("Selecting bolt diameter")
             self.web_plate_weld(self)
         else:
-            logger.error(" : tension_yielding_capacity   is less "
+            logger.error(" : tension_yielding_capacity is less "
                          "than applied loads, Please select larger sections or decrease loads")
 
     def web_plate_weld(self):
@@ -757,213 +751,122 @@ class BeamCoverPlateWeld(MomentConnection):
                                            t_weld=self.flange_weld.size,
                                            weld_angle=90)
         print("for req lenth", self.flange_weld.strength)
-        ###########ONLY OUTSIDE##################################################3
+        ########### ONLY OUTSIDE ##################################################3
         if self.preference == "Outside":
             self.Required_weld_flange_length = self.flange_force / self.flange_weld.strength
             self.Required_weld_flange_length_round = round_up(self.flange_force / self.flange_weld.strength,
                                                               5)  # c shape half of the splice  plate
             print("Requiredweldlength", self.Required_weld_flange_length_round)
 
-            self.flange_plate.height = round_down(self.section.flange_width - (2 * self.flangespace))  # width of the flange plate
+            self.flange_plate.height = (self.section.flange_width - (2 * self.flangespace))  # width of the flange plate
 
-            self.available_long_flange_length = int((self.Required_weld_flange_length_round - self.flange_plate.height - (
-                        2 * self.flange_weld.size)) / 2)  # half of the one side of the flange plate
+            self.available_long_flange_length = round_up(int((self.Required_weld_flange_length_round - self.flange_plate.height - (
+                        2 * self.flange_weld.size)) / 2),5,self.flange_plate.height)  # half of the one side of the flange plate
             print("self.available_long_length", self.available_long_flange_length)
 
-            self.design_status = False
+            self.l_req_flangelength = ((2 * self.available_long_flange_length) + self.flange_plate.height - (2 * self.flange_weld.size))
+            self.flange_weld.stress = self.flange_force / self.l_req_flangelength
+            self.flange_plate.length = 2 * (self.available_long_flange_length + (2 * self.flange_weld.size)) + self.flange_plate.gap
 
-            while self.design_status == False:
-
-                self.l_req_flangelength = round_up((2 * self.available_long_flange_length) + self.flange_plate.height - (2 * self.flange_weld.size))
+            while self.flange_plate.length >= 150 * self.flange_weld.throat_tk:
+                Reduction_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.web_plate.length,
+                                                                          t_t=self.web_weld.throat_tk)
+                self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
                 self.flange_weld.stress = self.flange_force / self.l_req_flangelength
                 if self.flange_weld.strength > self.flange_weld.stress:
-                    if self.available_long_flange_length > self.flange_plate.height:
-                        self.design_status = True
-                        break
-                    else:
-                        self.available_long_flange_length = self.available_long_flange_length + 50
+                    break
                 else:
                     self.available_long_flange_length = self.available_long_flange_length + 50
-                    self.flange_plate.length = 2 * (self.available_long_flange_length + (2*self.flange_weld.size)) + self.flange_plate.gap
-                    self.req_weld_length = round_up((2 * self.available_long_flange_length) + self.flange_plate.height - (
-                                2 * self.flange_weld.size))
-                    if self.flange_plate.length >= 150 * self.flange_weld.throat_tk:
-                        Reduction_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.web_plate.length,
-                                                                                  t_t=self.web_weld.throat_tk)
-                        self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
-                        self.flange_weld.stress = self.flange_force / self.req_weld_length
-                        if self.flange_weld.strength > self.flange_weld.stress:
-                            self.design_status = True
-                            break
-                        else:
-                            self.available_long_flange_length = self.available_long_flange_length + 50
+                    self.l_req_flangelength = ((2 * self.available_long_flange_length) + self.flange_plate.height - (
+                            2 * self.flange_weld.size))
+                    self.flange_plate.length = 2 * (
+                                self.available_long_flange_length + (2 * self.flange_weld.size)) + self.flange_plate.gap
 
-                    else:
-                        self.available_long_flange_length = int(self.available_long_flange_length + 50)
-
-
-            print("length", self.available_long_flange_length)
-            if self.design_status == True:
-
+                print("length", self.available_long_flange_length)
+            if self.flange_weld.strength > self.flange_weld.stress:
+                self.design_status = True
                 self.flange_weld.length = round_up(self.available_long_flange_length, 5)
-                self.flange_plate.length = round_up(2*(self.available_long_flange_length + (2 * self.flange_weld.size)) + self.flange_plate.gap, 5)
+                self.flange_plate.length = round_up(2 * (self.available_long_flange_length + (2 * self.flange_weld.size)) + self.flange_plate.gap, 5)
                 self.flange_plate.height = round_down((self.section.flange_width - (2 * self.flangespace)), 5)
                 self.flange_weld.height = round_down((self.flange_plate.height - (2 * self.flange_weld.size)), 5)
-
+                self.l_req_flangelength = round_up(((2 * self.available_long_flange_length) + self.flange_plate.height - (
+                            2 * self.flange_weld.size)), 5)
+                self.flange_weld.strength = round_up(self.flange_weld.strength,5)
+                self.flange_weld.stress = round_up(self.flange_weld.stress,5)
                 self.flange_plate_capacity_axial(self)
             else:
                 self.design_status = False
-                logger.error(":Length of flange plate is less than height of the flange plate")
+                logger.error(":strength of weld is less than height of the weld stress")  # todo
+
+
         else:
-            ################outside###############################
+            ################ OUTSIDE + INSIDE ###############################
             self.Required_weld_flange_length = self.flange_force / self.flange_weld.strength
-            self.Required_weld_flange_length_round = round_up(self.flange_force / self.flange_weld.strength, 5)  # c shape half of the splice  plate
-            print("Requiredweldlength", self.Required_weld_flange_length_round)
-
-            self.flange_plate.height = round_down(
-                self.section.flange_width - (2 * self.flangespace), 5)  # width of the flange plate
-
-            self.available_long_flange_length = int(
-                (self.Required_weld_flange_length_round - self.flange_plate.height - (
-                        2 * self.flange_weld.size)) / 2)  # half of the one side of the flange plate
-            print("self.available_long_length", self.available_long_flange_length)
-
-            self.design_status = False
-
-            while self.design_status == False:
-
-                # if self.available_long_flange_length  >=  self.flange_plate.height:
-                self.l_req_flangelength = round_up(
-                    ((2 * self.available_long_flange_length) + self.flange_plate.height - (
-                            2 * self.flange_weld.size)), 5)
-
-                self.flange_weld.stress = self.flange_force / self.l_req_flangelength
-
-                if self.flange_weld.stress < self.flange_weld.strength:
-                    if self.available_long_flange_length > self.flange_plate.height:
-                        self.design_status = True
-                        break
-                    else:
-                        self.available_long_flange_length = int(self.available_long_flange_length + 50)
-                else:
-                    self.available_long_flange_length = int(self.available_long_flange_length + 50)
-
-                    self.flange_plate.length = 2 * (
-                            self.available_long_flange_length + (2* self.flange_weld.size)) + self.flange_plate.gap
-                    self.req_weld_length = round_up(
-                        (2 * self.available_long_flange_length) + self.flange_plate.height -(
-                                2 * self.flange_weld.size))
-                    if self.flange_plate.length >= 150 * self.flange_weld.throat_tk:
-                        Reduction_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.web_plate.length,
-                                                                                  t_t=self.web_weld.throat_tk)
-                        self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
-                        self.flange_weld.stress = self.flange_force / self.req_weld_length
-                        if self.flange_weld.strength > self.flange_weld.stress:
-                            self.design_status = True
-                            break
-                        else:
-                            self.available_long_flange_length = self.available_long_flange_length + 50
-
-                    else:
-                        self.available_long_flange_length = int(self.available_long_flange_length + 50)
-
-            print("length", self.available_long_flange_length)
-            if self.design_status == True:
-
-                self.flange_weld.length = round_up((self.available_long_flange_length), 5)
-                self.flange_plate.length = round_up(2 * (self.available_long_flange_length + (2* self.flange_weld.size)) + self.flange_plate.gap, 5)
-                self.flange_plate.height = round_down((self.section.flange_width - (2 * self.flangespace)), 5)
-                self.flange_weld.height = round_down((self.flange_plate.height - (2 * self.flange_weld.size)), 5)
-
-                pass
-            else:
-                self.design_status = False
-                logger.error(
-                    ":Length of flange plate is less than height of the flange plate")
-
-            ###########Inside#######################
-            # self.design_status =True
-            self.total_height_of_inner_plate = (
-                    self.section.flange_width - (4 * self.flangespace) - self.section.web_thickness - (
+            self.total_height_of_inner_plate = (self.section.flange_width - (4 * self.flangespace) - self.section.web_thickness - (
                     2 * self.section.root_radius))  # total width of the inner flange plate
             if self.total_height_of_inner_plate > 0:
 
-                self.flange_plate.Innerheight = round_down((self.total_height_of_inner_plate / 2), 5)
+                self.flange_plate.Innerheight = (self.total_height_of_inner_plate / 2)
                 if self.flange_plate.Innerheight < 50:
                     self.design_status = False
-                    logger.error(
-                        " : Inner plate is not possible, select preference outside")
+                    logger.error(" : Inner plate is not possible, select preference outside")
                 else:
                     pass
-
-                self.flange_weld.Innerheight = round_down((self.flange_plate.Innerheight - 2 * self.flange_weld.size),
-                                                          5)
-                if self.flange_weld.Innerheight <= 0:
-                    self.design_status = False
-                    logger.error(
-                        " :Inner plate is not possible, select preference outside")
-                else:
-                    self.available_long_innerflange_length = self.available_long_flange_length
-                    self.design_status = False
-                    while self.design_status == False:
-
-                        self.l_req_innerflangelength = (2 * self.available_long_innerflange_length) + self.flange_plate.Innerheight - (
-                                                               2 * self.flange_weld.size)
-                        self.flange_weld.Innerstress = self.flange_force / self.l_req_innerflangelength
-                        if self.flange_weld.Innerstress < self.flange_weld.strength:
-                            if self.available_long_innerflange_length > self.flange_plate.Innerheight:
-                                self.design_status = True
-                                break
-
-                            else:
-                                self.available_long_innerflange_length = int(
-                                    self.available_long_innerflange_length + 50)
-                        else:
-                            self.available_long_innerflange_length = int(self.available_long_innerflange_length + 50)
-                            self.flange_plate.Innerlength = 2 * (self.available_long_innerflange_length + (2*self.flange_weld.size)) + self.flange_plate.gap
-                            self.req_weld_length = round_up((2 * self.available_long_innerflange_length) + self.flange_plate.height - (
-                                        2 * self.flange_weld.size))
-                            if self.flange_plate.Innerlength >= 150 * self.flange_weld.throat_tk:
-                                Reduction_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(
-                                    l_j=self.flange_plate.Innerlength,
-                                    t_t=self.flange_weld.throat_tk)
-                                self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
-                                self.flange_weld.Innerstress = self.flange_force / self.req_weld_length
-                                if self.flange_weld.strength > self.flange_weld.Innerstress:
-                                    self.design_status = True
-                                    break
-                                else:
-                                    self.available_long_flange_length = self.available_long_flange_length + 50
-
-                            else:
-                                self.available_long_flange_length = int(self.available_long_flange_length + 50)
-
-                print("self.available_long_length", self.available_long_flange_length)
             else:
-                self.flange_plate.Innerheight = 0
-                self.flange_weld.Innerheight = 0
-                self.flange_plate.Innerlength = 0
-                self.flange_weld.Innerlength = 0
                 self.design_status = False
-                logger.error(" : Inner plate is not possible, Select outside preference")
 
-            if self.design_status == True:
+            self.flange_plate.height = (self.section.flange_width - (2 * self.flangespace))
+            self.Area_flange_plates = ((2 * self.flange_plate.Innerheight) + self.flange_plate.height) * self.flange_plate.thickness_provided
+            self.Outside_plate_area = self.flange_plate.height* self.flange_plate.thickness_provided
+            self.Area_ratio = self.Outside_plate_area /self.Area_flange_plates
+            self.weld_eff_length_outer = round_up(self.Required_weld_flange_length *self.Area_ratio ,5)
+
+            # self.flange_plate.height = round_down(self.section.flange_width - (2 * self.flangespace), 5)  # width of the flange plate
+
+            self.available_long_flange_length = round_up(int((self.weld_eff_length_outer - self.flange_plate.height - (
+                        2 * self.flange_weld.size)) / 2),5,(self.flange_plate.height/2)) # half of the one side of the flange plate
+
+            self.flange_plate.length = ((2 * (self.available_long_flange_length + (2 * self.flange_weld.size))
+                                                + self.flange_plate.gap))
+            self.l_req_flangelength =((6 * self.available_long_flange_length) + self.flange_plate.height +
+                                                2 * self.flange_plate.Innerheight - (6 * self.flange_weld.size))
+
+            while self.flange_plate.length >= 150 * self.flange_weld.throat_tk:
+                self.flange_weld.stress = self.flange_force / self.l_req_flangelength
+                Reduction_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.web_plate.length,
+                                                                          t_t=self.web_weld.throat_tk)
+                self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
+                if self.flange_weld.strength > self.flange_weld.stress:
+                    break
+                else:
+                    self.available_long_flange_length = self.available_long_flange_length + 50
+                    self.l_req_flangelength = round_up(((6 * self.available_long_flange_length) + self.flange_plate.height +
+                                                    2 * self.flange_plate.Innerheight - (6 * self.flange_weld.size)), 5)
+                    self.flange_plate.length = ((2 * (self.available_long_flange_length + (2 * self.flange_weld.size))
+                                                 + self.flange_plate.gap), 5, self.flange_plate.height)
+
+            if self.flange_weld.strength > self.flange_weld.stress:
+                self.design_status = True
                 # Outer Plate Details
                 self.flange_weld.length = round_up((self.available_long_flange_length), 5)
-                self.flange_plate.length = round_up(2*(self.available_long_flange_length + (2 * self.flange_weld.size)) + self.flange_plate.gap, 5)
+                self.flange_plate.length = round_up((2 * (self.available_long_flange_length + (2 * self.flange_weld.size))
+                                                + self.flange_plate.gap),5,self.flange_plate.height)
                 self.flange_plate.height = round_down((self.section.flange_width - (2 * self.flangespace)), 5)
                 self.flange_weld.height = round_down((self.flange_plate.height - (2 * self.flange_weld.size)), 5)
+                self.l_req_flangelength = round_up(((6 * self.available_long_flange_length) + self.flange_plate.height +
+                                                2 * self.flange_plate.Innerheight - (6 * self.flange_weld.size)),5)
                 # Inner Plate Details
-                self.flange_weld.Innerlength = round_up((self.available_long_innerflange_length), 5)
-                self.flange_plate.Innerlength = round_up(2*(self.available_long_innerflange_length + (2 * self.flange_weld.size)) + self.flange_plate.gap,5)
-                self.flange_plate.Innerheight = round_down(self.total_height_of_inner_plate / 2, 5)
+                self.flange_weld.Innerlength =  self.flange_weld.length
+                self.flange_plate.Innerlength = self.flange_plate.length
+                self.flange_plate.Innerheight = round_down( self.flange_plate.Innerheight , 5)
                 self.flange_weld.Innerheight = round_down((self.flange_plate.Innerheight - 2 * self.flange_weld.size),5)
-
+                self.flange_weld.strength = round_up(self.flange_weld.strength, 5)
+                self.flange_weld.stress = round_up(self.flange_weld.stress, 5)
                 self.flange_plate_capacity_axial(self)
+                pass
             else:
                 self.design_status = False
-                logger.error(" : Length of flange plate is less than height of the flange plate")
-
+                logger.error(":strength of weld is less than height of the weld stress")
 
     def flange_plate_capacity_axial(self):  # flange plate capacity check in axial
         if self.preference == "Outside":
@@ -983,10 +886,10 @@ class BeamCoverPlateWeld(MomentConnection):
                 self.recheck_flange_capacity_axial(self)
         else:
             #  yielding,rupture  for  inside flange plate
-            flange_plate_height_inside = self.flange_plate.Innerheight
-            flange_plate_height_outside = self.flange_plate.height
+            # flange_plate_height_inside = self.flange_plate.Innerheight
+            # flange_plate_height_outside = self.flange_plate.height
 
-            A_v_flange = ((2 * flange_plate_height_inside) + self.flange_plate.height) * self.flange_plate.thickness_provided
+            A_v_flange = ((2 * self.flange_plate.Innerheight) + self.flange_plate.height) * self.flange_plate.thickness_provided
 
             self.flange_plate.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
                 A_v=A_v_flange,
@@ -1431,17 +1334,17 @@ class BeamCoverPlateWeld(MomentConnection):
         # while self.design_status == False:
         cgy = d ** 2 / (2 * d + b)
         cgx = b / 2
-        y_max = (d ** 2 / (2 * d + b))
-        x_max = b / 2
-        print("dfdbjfk", y_max, x_max)
-        ecc = d - (d ** 2 / (2 * d + b))
-        Ip_weld = ((8 * (d ** 3)) + (6 * d * (b ** 2)) + (b ** 3)) / 12 - ((d ** 4) / (2 * d + b))  # mm4
-        weld_twist = (shear_force * ecc) + (moment_web)  # Nmm
+        self.y_max = (d ** 2 / (2 * d + b))
+        self.x_max = b / 2
+        # print("dfdbjfk", y_max, x_max)
+        self.ecc = d - (d ** 2 / (2 * d + b))
+        self.Ip_weld = ((8 * (d ** 3)) + (6 * d * (b ** 2)) + (b ** 3)) / 12 - ((d ** 4) / (2 * d + b))  # mm4
+        self.weld_twist = (shear_force * self.ecc) + (moment_web)  # Nmm
         # print("self.web_weld_length",self.web_weld_length )
         self.l_req_weblength = round_up(
             ((2 * d) + plate_height + (2 * weld_size)), 50)
         self.web_weld.get_weld_stress(weld_shear=shear_force, weld_axial=axial_force_w,
-                                      weld_twist=weld_twist, Ip_weld=Ip_weld, y_max=y_max, x_max=x_max,
+                                      weld_twist=  self.weld_twist, Ip_weld=self.Ip_weld, y_max=self.y_max , x_max= self.x_max ,
                                       l_weld=self.l_req_weblength)
 
         # if self.web_weld.stress  > self.web_weld.strength
@@ -1697,8 +1600,9 @@ class BeamCoverPlateWeld(MomentConnection):
         #
 
         t1 = ('SubSection', 'Flange Weld  Design Check ', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
 
+        self.report_check.append(t1)
+        # Flange Weld size#
         t2 = (DISP_MIN_WELD_SIZE, min_weld_size_req(conn_plates_weld=self.flange_weld_connecting_plates,
                                                     min_weld_size=self.flange_weld_size_min),
                self.flange_weld.size,
@@ -1711,84 +1615,54 @@ class BeamCoverPlateWeld(MomentConnection):
                get_pass_fail(self.min_flange_platethk, self.flange_weld.size, relation="geq"))
         self.report_check.append(t2)
 
-# throat thickness
+        # Throat thickness #
         t1 = (DISP_THROAT, throat_req(), throat_prov(self.flange_weld.size, self.Kt),
         get_pass_fail(3.0, self.flange_weld.size, relation="leq"))
         self.report_check.append(t1)
 
-        t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,
-              flange_weld_stress(F_f=round(self.flange_force/1000,2), F_rl=self.l_req_flangelength, F_ws=round(self.flange_weld.stress,2)),
+        #####Strength of the weld ####
+        if self.preference == "Outside":
+            t1 = (DISP_EFF, "", eff_len_prov(l_w=self.flange_weld.length,b_fp= self.flange_plate.height,
+                                             s=self.flange_weld.size, l_eff =self.l_req_flangelength), "")
+            self.report_check.append(t1)
+            t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,
+                  flange_weld_stress(F_f=round(self.flange_force/1000,2), l_eff=self.l_req_flangelength, F_ws=round(self.flange_weld.stress,2)),
+                  weld_strength_prov(conn_plates_weld_fu =  flange_weld_conn_plates_fu,gamma_mw =gamma_mw ,t_t =self.flange_weld.throat_tk,
+                                     f_w =self.flange_weld.strength),
+                  get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
+            self.report_check.append(t2)
+            # Outside +Inside#
+        else:
+            #Outside
+            t1 = (KEY_DISP_WELD_LEN_EFF_OUTSIDE , "", eff_len_prov(l_w=self.flange_weld.length, b_fp=self.flange_plate.height,
+                                             s=self.flange_weld.size, l_eff=self.l_req_flangelength), "")
+            self.report_check.append(t1)
+            t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,
+                  flange_weld_stress(F_f=round(self.flange_force / 1000, 2), l_eff=self.l_req_flangelength,
+                                     F_ws=round(self.flange_weld.stress, 2)),
 
-              weld_strength_prov(conn_plates_weld_fu =  flange_weld_conn_plates_fu,gamma_mw =gamma_mw ,t_t =self.flange_weld.throat_tk,
-                                 f_w =self.flange_weld.strength),
-              get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
-        self.report_check.append(t2)
+                  weld_strength_prov(conn_plates_weld_fu=flange_weld_conn_plates_fu, gamma_mw=gamma_mw,
+                                     t_t=self.flange_weld.throat_tk,
+                                     f_w=self.flange_weld.strength),
+                  get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
+            self.report_check.append(t2)
+            #Inside
+            t1 = (KEY_DISP_WELD_LEN_EFF_INSIDE , "", eff_len_prov(l_w=self.flange_weld.length, b_fp=self.flange_plate.Innerheight,
+                                             s=self.flange_weld.size, l_eff=self.l_req_innerflangelength), "")
+            self.report_check.append(t1)
+            t2 = (KEY_INNERFLANGE_DISP_WELD_STRENGTH,
+                  flange_weld_stress(F_f=round(self.flange_force / 1000, 2), l_eff=self.l_req_innerflangelength,
+                                     F_ws=round(self.flange_weld.Innerstress, 2)),
+                  weld_strength_prov(conn_plates_weld_fu=flange_weld_conn_plates_fu, gamma_mw=gamma_mw,
+                                     t_t=self.flange_weld.throat_tk,
+                                     f_w=self.flange_weld.strength),
+                  get_pass_fail(self.flange_weld.Innerstress , self.flange_weld.strength, relation="lesser"))
+            self.report_check.append(t2)
 
-
-        #t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,
-        #      flange_weld_stress(F_f=self.flange_force, F_rl=self.l_req_flangelength, F_ws=self.flange_weld.stress),
-        #      weld_strength_prov(weld_conn_plates_fu, gamma_mw, self.throat_tk,self.flange_weld.strength),
-
-
-             # weld_strength_prov(conn_plates_weld_fu,gamma_mw,t_t=self.throat_tk,f_w=self.weld_stress) ,
-         #     get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
-        #self.report_check.append(t2)
-
-
-        #
-        # self.report_check.append(t2)
-        #
-        # t2= (DISP_THROAT_THICKNESS,throat_thickness_req(t=self.min_flange_platethk,t_t=self.throat_tk),
-        #        self.throat_tk,
-        #        get_pass_fail(self.throat_tk , self.throat_tk, relation="geq"))
-        # self.report_check.append(t2)
-
-        # if  self.preference == "Outside":
-
-   # if self.preference == "Outside":
-
-#         t1 = ('SubSection', ' Outer Flange  plate Check ', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
-#         self.report_check.append(t1)
-#
-#         t1 = (DISP_MIN_PLATE_HEIGHT, height_of_flange_cover_plate(B=self.section.flange_width, sp=self.flangespace,
-#                                                                   b_fp=self.flange_plate.height),
-#               self.flange_plate.height,
-#               get_pass_fail(self.flange_plate.height, self.flange_plate.height, relation="lesser"))
-#         self.report_check.append(t1)
-#         t1 = (DISP_MIN_PLATE_LENGTH,
-#               min_flange_plate_Lenght_req(l=self.available_long_flange_length, s=self.flange_weld.size,g=self.flange_plate.gap, l_fp=self.flange_plate.length),
-#               self.flange_plate.length,
-#               get_pass_fail(self.flange_plate.length, self.flange_plate.length, relation="lesser"))
-#         self.report_check.append(t1)
-#
-# #    else:
-#         t1 = ('SubSection', 'Inner and Outer flange plate Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
-#         self.report_check.append(t1)
-#         ####OUTER PLATE####
-#         t1 = (DISP_MIN_PLATE_HEIGHT, height_of_flange_cover_plate(B=self.section.flange_width, sp=self.flangespace,
-#                                                                   b_fp=self.flange_plate.height),
-#               self.flange_plate.height,
-#               get_pass_fail(self.flange_plate.height, self.flange_plate.height, relation="lesser"))
-#         self.report_check.append(t1)
-#         t1 = (DISP_MIN_PLATE_LENGTH,
-#               min_flange_plate_Lenght_req(l=self.available_long_flange_length, s=self.flange_weld.size,
-#                                           g=self.flange_plate.gap, l_fp=self.flange_plate.length),
-#               self.flange_plate.length,
-#               get_pass_fail(self.flange_plate.length, self.flange_plate.length, relation="lesser"))
-#         self.report_check.append(t1)
-#         ######INNER PLATE
-#         t1 = (DISP_MIN_PLATE_INNERHEIGHT,height_of_inner_flange_cover_plate(b_fp=self.flange_plate.Innerheight,B=self.section.flange_width,
-#                                                                                t_w=self.section.web_thickness,r_r=self.section.root_radius,
-#                                                                                sp=self.flangespace),
-#               self.flange_plate.Innerheight,
-#               get_pass_fail(self.flange_plate.Innerheight, self.flange_plate.Innerheight, relation="lesser"))
-#         self.report_check.append(t1)
-#
-#
-# =======
         if  self.preference == "Outside":
             self.min_height_required = 50
             self.min_length_required = self.flange_plate.height
+
             t1 = ('SubSection', 'Flange Plate Check', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t1 = (DISP_MIN_PLATE_HEIGHT,self.min_height_required, height_of_flange_cover_plate(B=self.section.flange_width, sp=self.flangespace,
@@ -1875,8 +1749,19 @@ class BeamCoverPlateWeld(MomentConnection):
                 get_pass_fail(3.0, self.web_weld.size, relation="leq"))
             self.report_check.append(t1)
 
+            t10 = (KEY_OUT_REQ_MOMENT_DEMAND_BOLT, '',
+                   moment_demand_req_bolt_force(shear_load=round(self.fact_shear_load / 1000, 2),
+                                                web_moment=round(self.moment_web / 1000000, 2), ecc=self.ecc,
+                                                moment_demand=round(self.weld_twist / 1000000, 2)), '')
+            self.report_check.append(t10)
             t2 = (KEY_WEB_DISP_WELD_STRENGTH,
-              weld_strength_req(V=self.axial_force_w,A=self.load.shear_force,M=self.moment_web,Ip_w=40,y_max=10,x_max=10,l_w=self.l_req_weblength,R_w=round(self.web_weld.stress,2)),
+              weld_strength_req(V=round(self.axial_force_w/1000,2),A=round(self.load.shear_force,2),
+                                M=round(self.moment_web/1000000,2),
+                                Ip_w= self.Ip_weld,
+                                y_max=self.y_max,
+                                x_max=self.x_max,
+                                l_w=self.l_req_weblength,
+                                R_w=round(self.web_weld.stress,2)),
 
               weld_strength_prov(conn_plates_weld_fu =  web_weld_conn_plates_fu,gamma_mw =Gamma_mw ,t_t =self.web_weld.throat_tk,
                                  f_w =self.web_weld.strength),
@@ -2062,10 +1947,9 @@ class BeamCoverPlateWeld(MomentConnection):
                                                           round(self.web_plate.shear_yielding_capacity / 1000, 2)), '')
            self.report_check.append(t1)
 
-           t1 = (KEY_DISP_SHEAR_RUP, '', shear_Rupture_prov(self.web_plate.height, self.web_plate.thickness_provided,
-
-                                                            self.web_plate.fu,
-                                                            round(self.web_plate.shear_rupture_capacity / 1000, 2)),'')
+           t1 = (KEY_DISP_SHEAR_RUP, '', shear_Rupture_prov_weld(self.web_plate.height, self.web_plate.thickness_provided,
+                                                                 self.web_plate.fu,
+                                                                 round(self.web_plate.shear_rupture_capacity / 1000, 2),gamma_m0),'')
 
            self.report_check.append(t1)
 
@@ -2090,3 +1974,150 @@ class BeamCoverPlateWeld(MomentConnection):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)
+    ##############outside#######
+    # if self.flange_weld.strength > self.flange_weld.stress:
+    #     if self.available_long_flange_length > self.flange_plate.height:
+    #         self.design_status = True
+    #         break
+    #     else:
+    #         self.available_long_flange_length = self.available_long_flange_length + 50
+    # else:
+    #     self.available_long_flange_length = self.available_long_flange_length + 50
+    #     self.flange_plate.length = 2 * (self.available_long_flange_length + (2*self.flange_weld.size)) + self.flange_plate.gap
+    #     self.l_req_flangelength = round_up((2 * self.available_long_flange_length) + self.flange_plate.height - (
+    #                 2 * self.flange_weld.size))
+##############outside#######
+    # if self.flange_weld.stress < self.flange_weld.strength:
+    # if self.available_long_flange_length > self.flange_plate.height:
+    #     self.design_status = True
+    #     break
+    # else:
+    #     self.available_long_flange_length = int(self.available_long_flange_length + 50)
+    # else:
+    #     self.available_long_flange_length = int(self.available_long_flange_length + 50)
+    #
+    #     self.flange_plate.length = 2 * (
+    #             self.available_long_flange_length + (2* self.flange_weld.size)) + self.flange_plate.gap
+    #     self.l_req_flangelength = round_up(
+    #         (2 * self.available_long_flange_length) + self.flange_plate.height -(
+    #                 2 * self.flange_weld.size))
+    #     if self.flange_plate.length >= 150 * self.flange_weld.throat_tk:
+    #         Reduction_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.web_plate.length,
+    #                                                                   t_t=self.web_weld.throat_tk)
+    #         self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
+    #         self.flange_weld.stress = self.flange_force / self.l_req_flangelength
+    #         if self.flange_weld.strength > self.flange_weld.stress:
+    #             self.design_status = True
+    #             break
+    #         else:
+    #             self.available_long_flange_length = self.available_long_flange_length + 50
+    #
+    #     else:
+    #         self.available_long_flange_length = int(self.available_long_flange_length + 50)
+
+# print("length", self.available_long_flange_length)
+# if  self.flange_weld.strength > self.flange_weld.stress:
+#     self.design_status = True
+#     self.flange_weld.length = round_up((self.available_long_flange_length), 5)
+#     self.flange_plate.length = round_up(2 * (self.available_long_flange_length + (2* self.flange_weld.size)) + self.flange_plate.gap, 5)
+#     self.flange_plate.height = round_down((self.section.flange_width - (2 * self.flangespace)), 5)
+#     self.flange_weld.height = round_down((self.flange_plate.height - (2 * self.flange_weld.size)), 5)
+#     self.l_req_flangelength = self.l_req_flangelength
+#     # Inner Plate Details
+#     self.flange_weld.Innerlength = round_up((self.available_long_flange_length), 5)
+#     self.flange_plate.Innerlength = round_up(2 * (self.available_long_flange_length + (2 * self.flange_weld.size)) + self.flange_plate.gap,
+#         5)
+#     self.flange_plate.Innerheight = round_down(self.total_height_of_inner_plate / 2, 5)
+#     self.flange_weld.Innerheight = round_down((self.flange_plate.Innerheight - 2 * self.flange_weld.size),
+#                                               5)
+#     # self.l_req_innerflangelength = self.l_req_innerflangelength
+#     self.flange_plate_capacity_axial(self)
+#     pass
+# else:
+#     self.design_status = False
+#     logger.error(
+#         ":Length of flange plate is less than height of the flange plate")
+
+###########Inside#######################
+# self.design_status =True
+# self.total_height_of_inner_plate = (
+#         self.section.flange_width - (4 * self.flangespace) - self.section.web_thickness - (
+#         2 * self.section.root_radius))  # total width of the inner flange plate
+# if self.total_height_of_inner_plate > 0:
+#
+#     self.flange_plate.Innerheight = round_down((self.total_height_of_inner_plate / 2), 5)
+#     if self.flange_plate.Innerheight < 50:
+#         self.design_status = False
+#         logger.error(
+#             " : Inner plate is not possible, select preference outside")
+#     else:
+#         pass
+#
+#     self.flange_weld.Innerheight = round_down((self.flange_plate.Innerheight - 2 * self.flange_weld.size),
+#                                               5)
+#     if self.flange_weld.Innerheight <= 0:
+#         self.design_status = False
+#         logger.error(
+#             " :Inner plate is not possible, select preference outside")
+#     else:
+#         self.available_long_innerflange_length = self.available_long_flange_length
+#         self.design_status = False
+#         while self.design_status == False:
+#
+#             self.l_req_innerflangelength = (2 * self.available_long_innerflange_length) + self.flange_plate.Innerheight - (
+#                                                    2 * self.flange_weld.size)
+#             self.flange_weld.Innerstress = self.flange_force / self.l_req_innerflangelength
+#             if self.flange_weld.Innerstress < self.flange_weld.strength:
+#                 if self.available_long_innerflange_length > self.flange_plate.Innerheight:
+#                     self.design_status = True
+#                     break
+#
+#                 else:
+#                     self.available_long_innerflange_length = int(
+#                         self.available_long_innerflange_length + 50)
+#             else:
+#                 self.available_long_innerflange_length = int(self.available_long_innerflange_length + 50)
+#                 self.flange_plate.Innerlength = 2 * (self.available_long_innerflange_length + (2*self.flange_weld.size)) + self.flange_plate.gap
+#                 self.l_req_innerflangelength = round_up((2 * self.available_long_innerflange_length) + self.flange_plate.height - (
+#                             2 * self.flange_weld.size))
+#                 if self.flange_plate.Innerlength >= 150 * self.flange_weld.throat_tk:
+#                     Reduction_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(
+#                         l_j=self.flange_plate.Innerlength,
+#                         t_t=self.flange_weld.throat_tk)
+#                     self.flange_weld.strength = self.flange_weld.strength * Reduction_factor
+#                     self.flange_weld.Innerstress = self.flange_force / self.l_req_innerflangelength
+#                     if self.flange_weld.strength > self.flange_weld.Innerstress:
+#                         self.design_status = True
+#                         break
+#                     else:
+#                         self.available_long_flange_length = self.available_long_flange_length + 50
+#
+#                 else:
+#                     self.available_long_flange_length = int(self.available_long_flange_length + 50)
+#
+#     print("self.available_long_length", self.available_long_flange_length)
+# else:
+#     self.flange_plate.Innerheight = 0
+#     self.flange_weld.Innerheight = 0
+#     self.flange_plate.Innerlength = 0
+#     self.flange_weld.Innerlength = 0
+#     self.design_status = False
+#     logger.error(" : Inner plate is not possible, Select outside preference")
+#
+# if self.design_status == True:
+#     # Outer Plate Details
+#     self.flange_weld.length = round_up((self.available_long_flange_length), 5)
+#     self.flange_plate.length = round_up(2*(self.available_long_flange_length + (2 * self.flange_weld.size)) + self.flange_plate.gap, 5)
+#     self.flange_plate.height = round_down((self.section.flange_width - (2 * self.flangespace)), 5)
+#     self.flange_weld.height = round_down((self.flange_plate.height - (2 * self.flange_weld.size)), 5)
+#     self.l_req_flangelength = self.l_req_flangelength
+#     # Inner Plate Details
+#     self.flange_weld.Innerlength = round_up((self.available_long_innerflange_length), 5)
+#     self.flange_plate.Innerlength = round_up(2*(self.available_long_innerflange_length + (2 * self.flange_weld.size)) + self.flange_plate.gap,5)
+#     self.flange_plate.Innerheight = round_down(self.total_height_of_inner_plate / 2, 5)
+#     self.flange_weld.Innerheight = round_down((self.flange_plate.Innerheight - 2 * self.flange_weld.size),5)
+#     self.l_req_innerflangelength = self.l_req_innerflangelength
+#     self.flange_plate_capacity_axial(self)
+# else:
+#     self.design_status = False
+#     logger.error(" : Length of flange plate is less than height of the flange plate")

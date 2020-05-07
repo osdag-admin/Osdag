@@ -90,7 +90,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     def open_summary_popup(self, main):
         self.new_window = QtWidgets.QDialog()
-        self.new_ui = Ui_Dialog1()
+        self.new_ui = Ui_Dialog1(self.design_exist)
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
@@ -1839,6 +1839,7 @@ class Ui_ModuleWindow(QMainWindow):
             # if status is True and main.module == "Fin Plate":
             #     self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
             #                                                  main.module)
+            self.design_exist = False
             if self.design_inputs[KEY_MODULE] == KEY_DISP_FINPLATE:
                 module_class = FinPlateConnection
             elif self.design_inputs[KEY_MODULE] == KEY_DISP_CLEATANGLE:
@@ -1868,6 +1869,7 @@ class Ui_ModuleWindow(QMainWindow):
                 file_extension = fName.split(".")[-1]
                 if file_extension == 'png':
                     self.display.ExportToImage(fName)
+                self.design_exist = True
 
             else:
                 self.btn3D.setEnabled(False)

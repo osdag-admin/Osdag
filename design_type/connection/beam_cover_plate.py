@@ -2405,11 +2405,11 @@ class BeamCoverPlate(MomentConnection):
                                                                 length_avail = self.web_plate.length_avail),'')
         self.report_check.append(t10)
 
-        t10 = (KEY_OUT_REQ_MOMENT_DEMAND_BOLT,'', moment_demand_req_bolt_force(bolts_one_line = self.web_plate.bolts_one_line,
-                                                           bolt_line = self.web_plate.bolt_line,
-                                                           shear_load = round(self.fact_shear_load/1000,2),
-                                                           web_moment = round(self.moment_web/1000000,2),ecc =self.web_plate.ecc,
-                                                           moment_demand = round(self.web_plate.moment_demand/1000000,2)),'' )
+        t10 = (KEY_OUT_REQ_MOMENT_DEMAND_BOLT, '', moment_demand_req_bolt_force(shear_load=round(self.fact_shear_load / 1000, 2),
+                                                                                web_moment=round(self.moment_web / 1000000, 2),
+                                                                                ecc=self.web_plate.ecc,
+                                                                                moment_demand=round(self.web_plate.moment_demand / 1000000, 2)), '')
+
         self.report_check.append(t10)
 
 
@@ -2697,7 +2697,7 @@ class BeamCoverPlate(MomentConnection):
         t1 = (KEY_DISP_SHEAR_RUP, '', shear_rupture_prov_beam(self.web_plate.height , self.web_plate.thickness_provided,
                                                          self.web_plate.bolt_line/2, self.web_bolt.dia_hole,
                                                          self.web_plate.fu,
-                                                         round(self.web_plate.shear_rupture_capacity / 1000, 2),multiple=0.9),'')
+                                                         round(self.web_plate.shear_rupture_capacity / 1000, 2)),'')
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_PLATE_BLK_SHEAR_SHEAR, '', blockshear_prov(Tdb =round(self.web_plate.block_shear_capacity_shear / 1000, 2)), '')

@@ -394,6 +394,31 @@ def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn,multiple =1):
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
     return shear_rup_eqn
 
+def shear_Rupture_prov_weld(h, t,  fu,v_dn,gamma_mo):  #weld
+    h = str(h)
+    t = str(t)
+    gamma_mo =  str(gamma_mo)
+    f_u = str(fu)
+    v_dn = str(v_dn)
+
+    shear_rup_eqn = Math(inline=True)
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+    shear_rup_eqn.append(NoEscape(r'&=(0.9*'+h+'*'+t+'*'+f_u+'}{\sqrt{3}*' +gamma_mo+ r'}\\'))
+    shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
+    return shear_rup_eqn
+
+def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn):
+    h = str(h)
+    t = str(t)
+    n_r = str(n_r)
+    d_o = str(d_o)
+    f_u = str(fu)
+    v_dn = str(v_dn)
+    shear_rup_eqn = Math(inline=True)
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+    shear_rup_eqn.append(NoEscape(r'&= 0.9 *(' + h + '-(' + n_r + '*' + d_o + '))*' + t + '*' + f_u + r'\\'))
+    shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
+    return shear_rup_eqn
 def shear_capacity_prov(V_dy, V_dn, V_db):
     V_d = min(V_dy,V_dn,V_db)
     V_d = str(V_d)
@@ -452,13 +477,13 @@ def flange_plate_Length_req(l_w,s,g,l_fp): #weld
     min_flange_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
     return min_flange_plate_Length_eqn
 
-def flange_weld_stress(F_f,F_rl,F_ws):
-    F_rl = str(F_rl)
+def flange_weld_stress(F_f,l_eff,F_ws):
+    l_eff = str(l_eff)
     F_ws = str(F_ws)
     F_f =str(F_f)
     flange_weld_stress_eqn = Math(inline=True)
-    flange_weld_stress_eqn.append(NoEscape(r'\begin{aligned} Stress &= \frac{F_f*1000}{F_{rl}}\\'))
-    flange_weld_stress_eqn.append(NoEscape(r' &= \frac{' + F_f + '*1000}{' + F_rl + r'}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r'\begin{aligned} Stress &= \frac{F_f*1000}{l_{eff}}}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r' &= \frac{' + F_f + '*1000}{' + l_eff + r'}\\'))
     flange_weld_stress_eqn.append(NoEscape(r'&= ' + F_ws + r'\end{aligned}'))
 
     return flange_weld_stress_eqn
@@ -982,6 +1007,17 @@ def throat_prov(tw,f):
 
     return throat_eqn
 
+def eff_len_prov(l_eff, b_fp, s, l_w):
+    l_eff = str(l_eff)
+    l_w = str(l_w)
+    b_fp = str(b_fp)
+    s = str(s)
+    eff_len_eqn = Math(inline=True)
+    eff_len_eqn.append(NoEscape(r'\begin{aligned} l_eff &= (2*l_w) + b_{fp} - 2*s\\'))
+    eff_len_eqn.append(NoEscape(r'&= (2*' + l_w + ') +' + b_fp + ' - 2*' + s + r'\\'))
+    eff_len_eqn.append(NoEscape(r'& = ' + l_eff + r'\end{aligned}'))
+
+    return eff_len_eqn
 # def eff_len_prov(l):
 #     l =str(l)
 #     eff_len_eqn = Math(inline=True)

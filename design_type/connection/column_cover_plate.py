@@ -2309,6 +2309,15 @@ class ColumnCoverPlate(MomentConnection):
 
         t1 = ('SubSection', 'Flange Bolt Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
+        t6 = (
+        KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt.bolt_diameter_provided, "d"), '')
+        self.report_check.append(t6)
+
+        t8 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Grade Optimisation", self.bolt.bolt_grade_provided, '')
+        self.report_check.append(t8)
+
+        t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt.d_0, "d_0"), '')
+        self.report_check.append(t8)
 
         if self.preference == "Outside":
             if self.flange_bolt.bolt_type == TYP_BEARING:

@@ -33,6 +33,7 @@ class CreateLatex(Document):
     def __init__(self):
         super().__init__()
 
+
     def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
@@ -89,18 +90,20 @@ class CreateLatex(Document):
                         table.add_hline()
                         sectiondetails = uiObj[i]
                         image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
-                        Img_path = '/ResourceFiles/images/'+image_name+'.png'
-                        if (len(sectiondetails))% 2 == 0:
-                        # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
-                            merge_rows = int(round_up((len(sectiondetails)/2),1,0) + 2)
+
+                        Img_path = r'/ResourceFiles/images/' + image_name + r'".png'
+                        if (len(sectiondetails)) % 2 == 0:
+                            # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+                            merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 2)
+
                         else:
-                            merge_rows = int(round_up((len(sectiondetails)/2),1,0) + 1)
-                        print('Hi', len(sectiondetails)/2,round_up(len(sectiondetails),2)/2, merge_rows)
-                        if merge_rows%2 != 0:
-                            sectiondetails['']=''
+                            merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 1)
+                        print('Hi', len(sectiondetails) / 2, round_up(len(sectiondetails), 2) / 2, merge_rows)
+                        if merge_rows % 2 != 0:
+                            sectiondetails[''] = ''
                         a = list(sectiondetails.keys())
                         # index=0
-                        for x in range(1,(merge_rows+1)):
+                        for x in range(1, (merge_rows + 1)):
                             # table.add_row("Col.Det.",i,columndetails[i])
                             if x == 1:
                                 table.add_row(
@@ -133,7 +136,7 @@ class CreateLatex(Document):
                     if count >=1:
                         doc.append(NewPage())
                     with doc.create(Subsection(check[1])):
-                        with doc.create(LongTable(check[2], row_height=1.2)) as table: # todo anjali remove
+                        with doc.create(LongTable(check[2], row_height=1.2)) as table:  # todo anjali remove
                             table.add_hline()
                             table.add_row(('Check', 'Required', 'Provided', 'Remarks'), color='OsdagGreen')
                             table.add_hline()
@@ -154,3 +157,4 @@ class CreateLatex(Document):
                 view_3D.add_caption('3D View')
 
         doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+

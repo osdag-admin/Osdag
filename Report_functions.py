@@ -394,64 +394,85 @@ def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn,multiple =1):
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
     return shear_rup_eqn
 
-def shear_Rupture_prov_weld(h, t,  fu,v_dn,gamma_mo):  #weld
-    h = str(h)
-    t = str(t)
-    gamma_mo =  str(gamma_mo)
-    f_u = str(fu)
-    v_dn = str(v_dn)
 
-    shear_rup_eqn = Math(inline=True)
-    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
-    shear_rup_eqn.append(NoEscape(r'&=(0.9*'+h+'*'+t+'*'+f_u+'}{\sqrt{3}*' +gamma_mo+ r'}\\'))
-    shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
-    return shear_rup_eqn
+# def shear_Rupture_prov_weld(h, t,  fu,v_dn,gamma_mo):  #weld
+#     h = str(h)
+#     t = str(t)
+#     gamma_mo =  str(gamma_mo)
+#     f_u = str(fu)
+#     v_dn = str(v_dn)
+#
+#     shear_rup_eqn = Math(inline=True)
+#     shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+#     shear_rup_eqn.append(NoEscape(r'&=(0.9*'+h+'*'+t+'*'+f_u+'}{\sqrt{3}*' +gamma_mo+ r'}\\'))
+#     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
+#     return shear_rup_eqn
 
-def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn):
-    h = str(h)
-    t = str(t)
-    n_r = str(n_r)
-    d_o = str(d_o)
-    f_u = str(fu)
-    v_dn = str(v_dn)
-    shear_rup_eqn = Math(inline=True)
-    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
-    shear_rup_eqn.append(NoEscape(r'&= 0.9 *(' + h + '-(' + n_r + '*' + d_o + '))*' + t + '*' + f_u + r'\\'))
-    shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
-    return shear_rup_eqn
-def shear_capacity_prov(V_dy, V_dn, V_db):
-    V_d = min(V_dy,V_dn,V_db)
-    V_d = str(V_d)
-    V_dy = str(V_dy)
-    V_dn = str(V_dn)
-    V_db = str(V_db)
-    shear_capacity_eqn = Math(inline=True)
-    shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= Min(V_{dy},V_{dn},V_{db})\\'))
-    shear_capacity_eqn.append(NoEscape(r'&= Min('+V_dy+','+V_dn+','+V_db+r')\\'))
-    shear_capacity_eqn.append(NoEscape(r'&='+V_d + '\end{aligned}'))
-    return shear_capacity_eqn
+# def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn):
+#     h = str(h)
+#     t = str(t)
+#     n_r = str(n_r)
+#     d_o = str(d_o)
+#     f_u = str(fu)
+#     v_dn = str(v_dn)
+#     shear_rup_eqn = Math(inline=True)
+#     shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+#     shear_rup_eqn.append(NoEscape(r'&= 0.9 *(' + h + '-(' + n_r + '*' + d_o + '))*' + t + '*' + f_u + r'\\'))
+#     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
+#     return shear_rup_eqn
+# def shear_capacity_prov(V_dy, V_dn, V_db):
+#     V_d = min(V_dy,V_dn,V_db)
+#     V_d = str(V_d)
+#     V_dy = str(V_dy)
+#     V_dn = str(V_dn)
+#     V_db = str(V_db)
+#     shear_capacity_eqn = Math(inline=True)
+#     shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= Min(V_{dy},V_{dn},V_{db})\\'))
+#     shear_capacity_eqn.append(NoEscape(r'&= Min('+V_dy+','+V_dn+','+V_db+r')\\'))
+#     shear_capacity_eqn.append(NoEscape(r'&='+V_d + '\end{aligned}'))
+#     return shear_capacity_eqn
 
-def tension_yield_prov(l,t, f_y, gamma, T_dg):
-    l = str(l)
-    t = str(t)
-    f_y = str(f_y)
-    gamma = str(gamma)
-    T_dg = str(T_dg)
-    tension_yield_eqn = Math(inline=True)
-    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{l*t_p*f_y}{\gamma_{mo}}\\'))
-    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
-    tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
-    return tension_yield_eqn
+# def shear_Rupture_prov(h, t,  fu,v_dn):  #weld
+#     h = str(h)
+#     t = str(t)
+#
+#     f_u = str(fu)
+#     v_dn = str(v_dn)
+#
+#     shear_rup_eqn = Math(inline=True)
+#     shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+#     shear_rup_eqn.append(NoEscape(r'&=(0.9*'+h+'*'+t+'*'+f_u+r'\\'))
+#     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
+#     return shear_rup_eqn
+
+
+
 
 def height_of_flange_cover_plate(B,sp,b_fp): #weld
     B = str(B)
     sp = str(sp)
     b_fp = str (b_fp)
     height_for_flange_cover_plate_eqn =Math(inline=True)
+
     height_for_flange_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= {B - 2*sp} \\'))
     height_for_flange_cover_plate_eqn.append(NoEscape(r'&= {' + B + ' - 2 * ' + sp + r'} \\'))
+
     height_for_flange_cover_plate_eqn.append(NoEscape(r'&=' + b_fp + '\end{aligned}'))
     return height_for_flange_cover_plate_eqn
+
+def height_of_web_cover_plate(D,sp,b_wp,tf): #weld
+    D = str(D)
+    sp = str(sp)
+    b_wp = str (b_wp)
+    tf= str(tf)
+    height_for_web_cover_plate_eqn =Math(inline=True)
+
+    height_for_web_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= {D-2*tf - 2*sp} \\'))
+    height_for_web_cover_plate_eqn.append(NoEscape(r'&= {' + D + ' - 2 * ' +tf+'- 2 *'+ sp + r'} \\'))
+
+    height_for_web_cover_plate_eqn.append(NoEscape(r'&=' + b_wp + '\end{aligned}'))
+    return height_for_web_cover_plate_eqn
+
 
 def inner_plate_height_weld(B,sp,t_w,r_1, b_ifp):#weld
     B = str(B)
@@ -466,16 +487,19 @@ def inner_plate_height_weld(B,sp,t_w,r_1, b_ifp):#weld
     return inner_plate_height_weld_eqn
 
 
-def flange_plate_Length_req(l_w,s,g,l_fp): #weld
+def plate_Length_req(l_w,s,g,l_fp): #weld
     l_w = str(l_w)
     s = str (s)
     g = str (g)
     l_fp = str(l_fp)
-    min_flange_plate_Length_eqn = Math(inline=True)
-    min_flange_plate_Length_eqn.append(NoEscape(r'\begin{aligned} l_{fp} & = [2*(l_{w} + 2*s) + g]\\'))
-    min_flange_plate_Length_eqn.append(NoEscape(r'&= [2*('+ l_w + '2*'+s+') +' + g+ r']\\'))
-    min_flange_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
-    return min_flange_plate_Length_eqn
+    min_plate_Length_eqn = Math(inline=True)
+
+    min_plate_Length_eqn.append(NoEscape(r'\begin{aligned} l_{fp} & = [2*(l_{w} + 2*s) + g]\\'))
+    min_plate_Length_eqn.append(NoEscape(r'&= [2*('+ l_w +'+2*'+s+') +' + g+ r']\\'))
+
+    min_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
+    return min_plate_Length_eqn
+
 
 def flange_weld_stress(F_f,l_eff,F_ws):
     l_eff = str(l_eff)
@@ -487,6 +511,18 @@ def flange_weld_stress(F_f,l_eff,F_ws):
     flange_weld_stress_eqn.append(NoEscape(r'&= ' + F_ws + r'\end{aligned}'))
 
     return flange_weld_stress_eqn
+
+def tension_yield_prov(l,t, f_y, gamma, T_dg):
+    l = str(l)
+    t = str(t)
+    f_y = str(f_y)
+    gamma = str(gamma)
+    T_dg = str(T_dg)
+    tension_yield_eqn = Math(inline=True)
+    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{l*t_p*f_y}{\gamma_{mo}}\\'))
+    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
+    tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
+    return tension_yield_eqn
 
 def tension_rupture_bolted_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
 
@@ -534,10 +570,43 @@ def tensile_capacity_prov(T_dg, T_dn, T_db =0.0):
         tension_capacity_eqn.append(NoEscape(r'\begin{aligned} T_d &= Min(T_{dg},T_{dn})\\'))
         tension_capacity_eqn.append(NoEscape(r'&= Min(' + T_dg + ',' + T_dn + r')\\'))
 
-
-
     tension_capacity_eqn.append(NoEscape(r'&='+ T_d + '\end{aligned}'))
     return tension_capacity_eqn
+
+
+def spacing (sp,s):
+    sp = max(15,s+5)
+    sp = str(sp)
+    s = str(s)
+    space_provided_eqn = Math(inline=True)
+    space_provided_eqn.append(NoEscape(r'\begin{aligned} sp &= Max(15,(s+5))\\'))
+    space_provided_eqn.append(NoEscape(r'&= Max(' + 15 + ','  +( s+5) + r')\\'))
+    space_provided_eqn.append(NoEscape(r'&=' + sp + '\end{aligned}'))
+    return space_provided_eqn
+
+def throat_thickness_req(t,t_t):
+    t_t <= .7*t
+    t_t >= 3
+    t = str(t)
+    t_t = str(t_t)
+    throat_thickness_eqn = Math(inline=True)
+    throat_thickness_eqn.append(NoEscape(r'\begin{aligned} [t_t& <= .7*t ]; [t_t& = >= 3]\\'))
+    throat_thickness_eqn.append(NoEscape(r'&='+ t_t+ '\end{aligned}'))
+    return throat_thickness_eqn
+
+def height_of_inner_flange_cover_plate(b_fp,B,t_w,r_r,sp):
+   # sp= max(15,s+5)
+    b_fp =str(b_fp)
+    B = str(B)
+    t_w =str(t_w)
+    r_r = str(r_r)
+    sp = str(sp)
+    #s = str(s)
+    ht_inner_flange_cover_plate_eqn =  Math(inline=True)
+    ht_inner_flange_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_fp &= \frac{B-t_w -2*r_r -4*sp}{2}\\'))
+    ht_inner_flange_cover_plate_eqn.append(NoEscape(r'&= \frac{'+B+'-'+t_w+'-2' +'*'+r_r+' -4' + '*' +sp +r'}{2}\\'))
+    ht_inner_flange_cover_plate_eqn.append(NoEscape(r'&= ' + b_fp+ r'\end{aligned}'))
+    return  ht_inner_flange_cover_plate_eqn
 
 
 def mom_axial_IR_prov(M,M_d,N,N_d,IR):
@@ -754,19 +823,55 @@ def prov_moment_load(moment_input,min_mc,app_moment_load):
     app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\end{aligned}'))
     return  app_moment_load_eqn
 
-def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn,multiple =1):
+def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn):
     h = str(h)
     t = str(t)
     n_r = str(n_r)
     d_o = str(d_o)
     f_u = str(fu)
     v_dn = str(v_dn)
-    multiple = str(multiple)
+    # multiple = str(multiple)
     shear_rup_eqn = Math(inline=True)
     shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
-    shear_rup_eqn.append(NoEscape(r'&='+multiple+ r'*('+h+'-('+n_r+'*'+d_o+'))*'+t+'*'+f_u+r'\\'))
+    shear_rup_eqn.append(NoEscape(r'&= 0.9 *('+h+'-('+n_r+'*'+d_o+'))*'+t+'*'+f_u+r'\\'))
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
     return shear_rup_eqn
+def shear_Rupture_prov_weld(h, t,  fu,v_dn,gamma_mo):  #weld
+    h = str(h)
+    t = str(t)
+    gamma_mo =  str(gamma_mo)
+    f_u = str(fu)
+    v_dn = str(v_dn)
+
+    shear_rup_eqn = Math(inline=True)
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
+    shear_rup_eqn.append(NoEscape(r'&=(0.9*'+h+'*'+t+'*'+f_u+'}{\sqrt{3}*' +gamma_mo+ r'}\\'))
+    shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
+    return shear_rup_eqn
+def shear_capacity_prov(V_dy, V_dn, V_db=0.0):
+
+ shear_capacity_eqn = Math(inline=True)
+ if  V_db !=0.0:
+     V_d = min(V_dy,V_dn,V_db)
+     V_d = str(V_d)
+     V_dy = str(V_dy)
+     V_dn = str(V_dn)
+     V_db = str(V_db)
+     shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn},V_{db})\\'))
+     shear_capacity_eqn.append(NoEscape(r'&= min('+V_dy+','+V_dn+','+V_db+r')\\'))
+ else:
+     V_d = min(V_dy, V_dn)
+     V_d = str(V_d)
+     V_dy = str(V_dy)
+     V_dn = str(V_dn)
+     shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn})\\'))
+     shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_dn + r')\\'))
+
+ shear_capacity_eqn.append(NoEscape(r'&='+V_d + '\end{aligned}'))
+ return shear_capacity_eqn
+
+
+
 def get_pass_fail(required, provided,relation='greater'):
     required = float(required)
     provided = float(provided)
@@ -831,6 +936,17 @@ def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,b
     member_rup_eqn.append(NoEscape(r'&= '+ member_rup + r'\end{aligned}'))
 
     return member_rup_eqn
+
+def flange_weld_stress(F_f,l_eff,F_ws):
+    F_f = str(F_f)
+    l_eff = str(l_eff)
+    F_ws = str(F_ws)
+    flange_weld_stress_eqn = Math(inline=True)
+    flange_weld_stress_eqn.append(NoEscape(r'\begin{aligned} Stress &= \frac{F_f*1000}{l_w}}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r' &= \frac{'+F_f+'*1000}{'+l_eff+ r'}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r'&= ' + F_ws+ r'\end{aligned}'))
+
+    return flange_weld_stress_eqn
 
 def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u = None, f_y = None ,gamma_m0 = None ,gamma_m1 = None):
     Tdb = str(Tdb)

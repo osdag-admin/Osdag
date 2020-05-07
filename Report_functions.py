@@ -185,10 +185,8 @@ def parameter_req_bolt_force(bolts_one_line,gauge,ymax,xmax,bolt_line,pitch,leng
 
     return parameter_req_bolt_force_eqn
 
-def moment_demand_req_bolt_force(bolts_one_line,bolt_line,shear_load,
-               web_moment,moment_demand,ecc):
-    bolts_one_line = str(bolts_one_line)
-    bolt_line = str(bolt_line)
+def moment_demand_req_bolt_force(shear_load, web_moment,moment_demand,ecc):
+
     ecc = str(ecc)
     web_moment = str(web_moment)
     moment_demand = str(moment_demand)

@@ -916,7 +916,7 @@ class Tension_bolted(Main):
     #     else:
     #         pass
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
 
         all_errors = []
         "check valid inputs and empty inputs in input dock"
@@ -2130,6 +2130,8 @@ class Tension_bolted(Main):
         #fname_no_ext = filename[0].split(".")[0]
         #print(fname_no_ext, "hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         fname_no_ext = popup_summary['filename']
+
+
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)
 

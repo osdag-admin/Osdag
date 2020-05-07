@@ -9,7 +9,7 @@ import numpy as np
 import logging
 
 
-class MomentConnection(Connection):
+class MomentConnection(Connection, IS800_2007):
     def __init__(self):
         super(MomentConnection, self).__init__()
 

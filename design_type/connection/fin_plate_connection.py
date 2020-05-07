@@ -329,7 +329,7 @@ class FinPlateConnection(ShearConnection):
 
         return out_list
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
         all_errors = []
         self.design_status = False
         flag = False
@@ -1140,6 +1140,7 @@ class FinPlateConnection(ShearConnection):
         # filename = os.path.join(str(folder), "images_html", "TexReport")
         #file_name = str(filename)
         fname_no_ext = popup_summary['filename']
+
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_3D_image)
 

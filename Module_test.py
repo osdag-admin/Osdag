@@ -3,6 +3,7 @@ import errno
 import yaml
 import sys
 import unittest
+is_travis = 'TRAVIS' in os.environ
 
 
 from design_type.connection.fin_plate_connection import FinPlateConnection
@@ -22,9 +23,9 @@ from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
 
-
-
-
+if not is_travis:
+    from cad.common_logic import CommonDesignLogic
+    from texlive .Design_wrapper import init_display
 
 
 all_modules = {'Base Plate':BasePlateConnection, 'Beam Coverplate  Weld Connection':BeamCoverPlateWeld,'Beam Coverplate Connection':BeamCoverPlate,
@@ -47,10 +48,8 @@ available_module dictionary is used in -
 Make sure to make the necessary changes in above functions/methods if you are changing the name of available_module.
 '''
 
-available_module = {'Fin Plate':FinPlateConnection,'Tension Members Bolted Design':Tension_bolted, 'Column Coverplate Weld Connection': ColumnCoverPlateWeld}
-
-
-
+available_module = {'Tension Members Bolted Design':Tension_bolted, 'Beam Coverplate  Weld Connection':BeamCoverPlateWeld,
+                    'Fin Plate':FinPlateConnection, 'Column Coverplate Weld Connection': ColumnCoverPlateWeld, 'Base Plate':BasePlateConnection}
 
 
 
@@ -111,7 +110,7 @@ class Modules:
 
         pdf_created = False
         main.set_osdaglogger(None)
-        error = main.func_for_validation(main,self,file_data)  # validating files and setting inputs (although we know files are valid).
+        error = main.func_for_validation(main,file_data)  # validating files and setting inputs (although we know files are valid).
 
         if error is None:  # if ran successfully and all input values are set without any error. Now create pdf
 
@@ -123,7 +122,7 @@ class Modules:
             We are actually not comparing pdf. This is just for testing purpose whether function
             is running fine and creating pdf or not.
 
-            I have made some changes in save_design function. Instead of asking for output file
+            Some changes are made in save_design function. Instead of asking for output file
             location from save_design function it'll ask from 'save_inputSummary' function inside
             ui_summary_popup.py file immediately after getting popup inputs and send it to
             save_design function using the same dictionary in which popup inputs are present
@@ -135,6 +134,20 @@ class Modules:
             duplicate = output_folder_path         # Making duplicate so that original path doesn't change.
             duplicate = duplicate + '/' + file_name  # giving each output file it's corresponding input file name.
             popup_summary['filename'] = duplicate    # adding this key in popup_summary dict.
+            popup_summary['does_design_exist'] = False
+            try:
+                display, start_display, add_menu, add_function_to_menu = init_display(backend_str="qt-pyqt5")
+                commLogicObj = CommonDesignLogic(display, ' ', main.module, main.mainmodule)
+                status = main.design_status
+                commLogicObj.call_3DModel(status, main)
+                fName = str('./ResourceFiles/images/3d.png')
+                file_extension = fName.split(".")[-1]
+                if file_extension == 'png':
+                    display.ExportToImage(fName)
+                popup_summary['does_design_exist'] = True
+            except:
+                print("Design is not ready.")
+
             main.save_design(main,popup_summary)  # calling the function.
             pdf_created = True   # if pdf created
 
@@ -156,8 +169,8 @@ class TestModules(unittest.TestCase):
 
         file_name = self.input[0]
         file_data = self.input[1]
-        file_class = available_module[file_data['Module']]               # check the class.
-        ans = self.module.run_test(self.module,file_class,file_name, file_data)
+        file_class = available_module[file_data['Module']]              # check the class.
+        ans = self.module.run_test(self.module, file_class,file_name, file_data)
         self.assertTrue(ans is self.output)
 
 

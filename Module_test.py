@@ -48,8 +48,8 @@ available_module dictionary is used in -
 Make sure to make the necessary changes in above functions/methods if you are changing the name of available_module.
 '''
 
-available_module = {'Tension Members Bolted Design':Tension_bolted, 'Beam Coverplate  Weld Connection':BeamCoverPlateWeld,
-                    'Fin Plate':FinPlateConnection, 'Column Coverplate Weld Connection': ColumnCoverPlateWeld, 'Base Plate':BasePlateConnection}
+available_module = {'Beam Coverplate  Weld Connection' : BeamCoverPlateWeld, 'Fin Plate' : FinPlateConnection,
+                    'Column Coverplate Weld Connection': ColumnCoverPlateWeld}
 
 
 

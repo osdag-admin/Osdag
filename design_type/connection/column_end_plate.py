@@ -118,6 +118,11 @@ class ColumnEndPlate(MomentConnection):
         else:
             existingvalue_key_endplatethk = ''
 
+        if KEY_DESIGN_PREFERENCE in existingvalues:
+            existingvalue_design_pref = existingvalues[KEY_DESIGN_PREFERENCE]
+        else:
+            existingvalue_design_pref = ''
+
         t16 = (KEY_MODULE, KEY_DISP_COLUMNENDPLATE, TYPE_MODULE, None, None)
         options_list.append(t16)
 
@@ -159,6 +164,12 @@ class ColumnEndPlate(MomentConnection):
 
         t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
         options_list.append(t12)
+
+        t14 = (None, DISP_TITLE_DESIGN_PREF, TYPE_TITLE, None, None)
+        options_list.append(t14)
+
+        t13 = (KEY_DESIGN_PREFERENCE, KEY_DISP_DESIGN_PREFERENCE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_design_pref, VALUES_DESIGN_PREFERENCE)
+        options_list.append(t13)
 
         t21 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, None)
         options_list.append(t21)
@@ -324,6 +335,7 @@ class ColumnEndPlate(MomentConnection):
 
         self.module = design_dictionary[KEY_MODULE]
         self.connection = design_dictionary[KEY_CONN]
+        self.design_pref = design_dictionary[KEY_DESIGN_PREFERENCE]
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_ENDPLATE_THICKNESS, None), material_grade=design_dictionary[KEY_MATERIAL])
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
@@ -459,163 +471,15 @@ class ColumnEndPlate(MomentConnection):
         else:
             logger.error("Either decrease the loads or increase member size")
 #############################################################################################
-        # self.section.plastic_moment_capacty(beta_b=beta_b, Z_p=self.Z_p,fy=self.section.fy)
-        # self.section.moment_d_deformation_criteria(fy=self.section.fy, Z_e=self.section.elast_sec_mod_z)
-        # self.section.moment_capacity = min(self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria)
-        # print("moment_capacity", self.section.moment_capacity)
-        #
-        # load_moment = max((0.5 * self.section.moment_capacity), self.load.moment * 1000000)  # N
-        # if load_moment > self.section.moment_capacity:
-        #     load_moment = self.section.moment_capacity
-        # else:
-        #     pass
-        # self.load.moment = load_moment  # N
-        # print("design_bending_strength", self.load.moment)
-        #
-        # self.moment_web = (Z_w * self.load.moment / (
-        #     self.section.plast_sec_mod_z))  # Nm todo add in ddcl # z_w of web & z_p  of section
-        # print('plast_sec_mod_z', self.section.plast_sec_mod_z)
-        # print("Z_W", Z_w)
-        # print("web moment", self.moment_web)
-        # self.moment_flange = ((self.load.moment) - self.moment_web)  # Nmm #Nmm todo add in ddcl
-        # print("moment_flange", self.moment_flange)
-        #
-        # if self.load.moment <= self.section.moment_capacity / 1000000:
-        #     self.factored_moment = self.load.moment
-        # else:
-        #     self.design_status = False
-        #     logger.warning(": moment capacity {} of section is less then applied loads, Please select larger section or decrease loads").format(self.section.moment_capacity / 1000000)
-        # if self.load.moment == 0:
-        #     self.load.moment = self.section.moment_capacity
-        # else:
-        #     pass
-        # print("self.load.moment", self.section.moment_capacity)
 
-        # if self.design_status == True:
-        #     print("Selecting bolt diameter")
-        #     self.get_bolt_diam(self)
-        # else:
-        #     logger.error(" : tension_yielding_capacity   is less "
-        #                  "than applied loads, Please select larger sections or decrease loads")
-
-    #################
-    # def get_bolt_diam(self):
-    #     for i in self.bolt.bolt_diameter:
-    #         self.bolt_checks(self.bolt.bolt_diameter[i])
-    #         if self.design_status:
-    #             self.bolt.bolt_diameter_provided = i
-    #             break
-    #
-    # def get_bolt_grade(self):
-    #     for i in self.bolt.bolt_grade:
-    #         self.bolt_checks(self.bolt.bolt_grade[i])
-    #         if self.design_status:
-    #             self.bolt.bolt_grade_provided = i
-    #             break
-
-
-    # def member_capacity(self):
-    #     gamma_m0 = 1.1
-    #     ### Check for axial load ######
-    #     self.axial_capacity = self.section.area * self.section.fy / gamma_m0
-    #     if self.load.axial_force <= self.axial_capacity:
-    #         self.factored_axial_load = self.load.axial_force
-    #     else:
-    #         self.design_status = False
-    #         logger.warning(": axial capacity {} of section is less then applied loads, Please select larger section or decrease loads").format(self.axial_capacity)
-    #     ###############
-    #
-    #     ###### Check for shear load  ######
-    #     self.shear_capacity = (self.section.depth * self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0)
-    #     if self.load.shear_force <= self.shear_capacity:
-    #         self.factored_shear_load = self.load.shear_force
-    #     else:
-    #         self.design_status = False
-    #         logger.warning(": shear capacity {} of section is less then applied loads, Please select larger section or decrease loads").format(self.shear_capacity)
-    #     #############
-    #
-    #     ###### Check for moment #######
-    #     if self.section.type == "Rolled":
-    #
-    #         self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
-    #                                                                        column_t_w=self.section.web_thickness,
-    #                                                                        column_d=self.section.depth,
-    #                                                                        column_b=self.section.flange_width,
-    #                                                                        column_fy=self.section.fy,
-    #                                                                        factored_axial_force=self.factored_axial_load,
-    #                                                                        column_area=self.section.area,
-    #                                                                        compression_element="External",
-    #                                                                        section="Rolled")
-    #         print("limitwidththkratio_flange", self.limitwidththkratio_flange)
-    #
-    #     elif self.section.type2 == "generally":
-    #         self.limitwidththkratio_web = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
-    #                                                                     column_t_w=self.section.web_thickness,
-    #                                                                     column_d=self.section.depth,
-    #                                                                     column_b=self.section.flange_width,
-    #                                                                     column_fy=self.section.fy,
-    #                                                                     factored_axial_force=self.factored_axial_load,
-    #                                                                     column_area=self.section.area,
-    #                                                                     compression_element="Web of an I-H",
-    #                                                                     section="generally")
-    #         print("limitwidththkratio_flange", self.limitwidththkratio_web)
-    #
-    #     else:
-    #         pass
-    #
-    #     if self.load.shear_force < (0.6 * self.shear_capacity):
-    #         self.Z_p = float((self.section.web_thickness * (self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4)  # mm3
-    #         self.Z_e = float((self.section.web_thickness * (self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 6)  # mm3
-    #
-    #     self.class_of_section = int(max(self.limitwidththkratio_flange, self.limitwidththkratio_web))
-    #     if self.class_of_section == 1 or self.class_of_section == 2:
-    #         Z_w = self.Z_p
-    #     elif self.class_of_section == 3:
-    #         Z_w = self.Z_e
-    #
-    #     if self.class_of_section == 1 or self.class_of_section == 2:
-    #         beta_b = 1
-    #     elif self.class_of_section == 3:
-    #         beta_b = self.Z_e / self.Z_p
-    #
-    #     self.section.plastic_moment_capacty(beta_b=beta_b, Z_p=self.Z_p,fy=self.section.fy)
-    #     self.section.moment_d_deformation_criteria(fy=self.section.fy, Z_e=self.section.elast_sec_mod_z)
-    #     self.section.moment_capacity = min(self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria)
-    #
-    #     if self.load.moment <= self.section.moment_capacity / 1000000:
-    #         self.factored_moment = self.load.moment
-    #     else:
-    #         self.design_status = False
-    #         logger.warning(": moment capacity {} of section is less then applied loads, Please select larger section or decrease loads").format(self.section.moment_capacity / 1000000)
-    #     if self.load.moment == 0:
-    #         self.load.moment = self.section.moment_capacity
-    #     else:
-    #         pass
-    #     print("self.load.moment", self.section.moment_capacity)
-        ##################
-
-
-    # def get_bolt_diam(self):
-    #     for i in self.bolt.bolt_diameter:
-    #         self.bolt_checks(self.bolt.bolt_diameter[i])
-    #         if self.design_status:
-    #             self.bolt.bolt_diameter_provided = i
-    #             break
-    #
-    # def get_bolt_grade(self):
-    #     for i in self.bolt.bolt_grade:
-    #         self.bolt_checks(self.bolt.bolt_grade[i])
-    #         if self.design_status:
-    #             self.bolt.bolt_grade_provided = i
-    #             break
+#############################################################################################
+    ## Function to get bolt diam ##
+############################################################################################
 
     def get_bolt_diam(self):
         self.lst1 = []
         self.lst2 = []
-        # self.lst2 = []
-        # for (x,y) in (self.bolt.bolt_diameter,self.bolt.bolt_grade):
-        # self.bolt_conn_plates_t_fu_fy = []
-        # self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+
         for x in self.bolt.bolt_diameter:
             self.pitch = IS800_2007.cl_10_2_2_min_spacing(x)
             self.end_dist = round_up(IS800_2007.cl_10_2_4_2_min_edge_end_dist(x,self.bolt.bolt_hole_type,self.bolt.edge_type),5)
@@ -703,19 +567,10 @@ class ColumnEndPlate(MomentConnection):
                 print("y_sqr",self.y_sqr)
 
             self.t_b = round((self.factored_axial_load / self.no_bolts) + (self.factored_moment * self.y_max) / self.y_sqr,2)
-            # self.t_b = 0
 
-            # self.bolt.calculate_bolt_capacity(bolt_diameter_provided=x,
-            #                                   # bolt_grade_provided=self.bolt.bolt_grade[y],
-            #                                   bolt_grade_provided=int(self.bolt.bolt_grade[-1]),
-            #                                   conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-            #                                   n_planes=1)
             self.bolt.calculate_bolt_tension_capacity(bolt_diameter_provided=x,
                                                       # bolt_grade_provided=self.bolt.bolt_grade[y]
                                                       bolt_grade_provided=(self.bolt.bolt_grade[-1]))
-
-            # self.v_sb = self.load.shear_force / (2 * self.n_bw)
-            self.v_sb = 0
 
             # if self.t_b > self.bolt.bolt_tension_capacity:
             #     self.design_status = False
@@ -732,23 +587,14 @@ class ColumnEndPlate(MomentConnection):
             #     logger.error("Force is not sufficient")
             #     logger.info("Increase bolt diam")
             #     return self.design_status
+
             print("T_b: ",self.t_b,"Bolt tension capacity: ",self.bolt.bolt_tension_capacity)
             if self.t_b < self.bolt.bolt_tension_capacity:
                 self.lst1.append(x)
                 self.lst2.append(self.no_bolts)
                 # self.lst2.append(y)
                 self.res   = dict(zip(self.lst1, self.lst2))
-                # key_min = min(res.keys(), key=(lambda k: res[k]))
-                # key_min = min(res, key=res.get)
-                # self.bolt_diam_provided = key_min
-                # # return self.bolt_diam_provided
-                # print("diam list",self.lst1)
-                # print("no of bolts list",self.lst2)
-                # print("dict",res)
-                # print("Bolt diam prov", self.bolt_diam_provided)
-                # print("Selecting bolt grade")
-                # self.get_bolt_grade(self)
-                # self.design_status = True
+
             else:
                 pass
                 # if self.t_b > self.bolt.bolt_tension_capacity:
@@ -758,34 +604,40 @@ class ColumnEndPlate(MomentConnection):
                 #     self.design_status = False
                 #     logger.error("shear capacity of member is less than applied shear")
         if len(self.lst1) != 0:
-            key_min = min(self.res, key=self.res.get)
-            self.bolt_diam_provided = key_min
-            # return self.bolt_diam_provided
-            print("diam list", self.lst1)
-            print("no of bolts list", self.lst2)
-            print("dict", self.res)
-            print("Bolt diam prov", self.bolt_diam_provided)
-            print("Selecting bolt grade")
-            # self.get_bolt_grade(self)
-            self.design_status = True
-            self.get_bolt_grade(self)
+            if self.design_pref == "Bolt Oriented":
+                key_min = min(self.res, key=self.res.get)
+                self.bolt_diam_provided = key_min
+                # return self.bolt_diam_provided
+                print("diam list", self.lst1)
+                print("no of bolts list", self.lst2)
+                print("dict", self.res)
+                print("Bolt diam prov", self.bolt_diam_provided)
+                print("Selecting bolt grade")
+                # self.get_bolt_grade(self)
+                self.design_status = True
+                self.get_bolt_grade(self)
+            else:
+                key_max = max(self.res, key=self.res.get)
+                self.bolt_diam_provided = key_max
+                # return self.bolt_diam_provided
+                print("diam list", self.lst1)
+                print("no of bolts list", self.lst2)
+                print("dict", self.res)
+                print("Bolt diam prov", self.bolt_diam_provided)
+                print("Selecting bolt grade")
+                # self.get_bolt_grade(self)
+                self.design_status = True
+                self.get_bolt_grade(self)
 
         else:
             self.design_status = False
             logger.error("tension capacity and moment capacity of member is less than applied axial force and momemt")
 
-        #     if self.design_status:
-        #         self.lst1.append(x)
-        #         self.lst2.append(self.no_bolts)
-        #         # self.lst2.append(y)
-        #         res = dict(zip(self.lst1, self.lst2))
-        # # key_min = min(res.keys(), key=(lambda k: res[k]))
-        #         key_min = min(res, key=res.get)
-        #         self.bolt_diam_provided = key_min
-        #         # return self.bolt_diam_provided
-        #
-        #         print("Bolt diam prov", self.bolt_diam_provided)
-        # self.bolt_grade_provided = min(self.lst2)
+ #############################################################################################################
+
+#############################################################################################################
+    ## Function to get Bolt grade ##
+###############################################################################################################
 
     def get_bolt_grade(self):
         self.lst3 = []
@@ -890,23 +742,6 @@ class ColumnEndPlate(MomentConnection):
                                                       bolt_grade_provided=x)
                                                       # bolt_grade_provided=12.9)
 
-        #     self.v_sb = self.load.shear_force / 2 * self.n_bw
-        #
-        #     if self.t_b > self.bolt.bolt_tension_capacity:
-        #         self.design_status = False
-        #         logger.error("Force is not sufficient")
-        #         logger.info("Increase bolt diam")
-        #
-        #     if self.v_sb > self.bolt.bolt_capacity:
-        #         self.design_status = False
-        #         logger.error("Force is not sufficient")
-        #         logger.info("Increase bolt diam")
-        #
-        #     if ((self.v_sb / self.bolt.bolt_capacity) ** 2 + (self.t_b / self.bolt.bolt_tension_capacity) ** 2) > 1.0:
-        #         self.design_status = False
-        #         logger.error("Force is not sufficient")
-        #         logger.info("Increase bolt diam")
-        #         return self.design_status
         #
         #     if self.design_status:
         #         self.lst3.append(x)
@@ -967,6 +802,11 @@ class ColumnEndPlate(MomentConnection):
 
         # bolt_grade_provided=12.9)
 
+########################################################################################################
+
+########################################################################################################
+    ## Function to get plate thickness ##
+#########################################################################################################
     def plate_details(self):
         if self.connection == 'Flush End Plate':
             self.plate_height = self.section.depth
@@ -1038,16 +878,6 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = False
             logger.error("Plate thickness provided is not satisfied")
 
-    # def hard_values(self):
-            # flange bolt
-            # self.load.moment = 20  # kN
-            # self.factored_axial_load = 300  # KN
-            # self.load.shear_force = 50  # kN
-            # self.flange_bolt.bolt_type = "Bearing Bolt"
-            # # self.flange_bolt.bolt_hole_type = bolt_hole_type
-            # # self.flange_bolt.edge_type = edge_type
-            # # self.flange_bolt.mu_f = float(mu_f)
-            # self.flange_bolt.connecting_plates_tk = None
 
     @staticmethod
     def grdval_customized():

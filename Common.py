@@ -1165,6 +1165,10 @@ KEY_PITCH_2_FLANGE = 'ColumnEndPlate.p2_flange'
 KEY_DISP_PITCH_2_FLANGE = 'Pitch2 along Flange'
 KEY_PITCH_2_WEB = 'ColumnEndPlate.p2_web'
 KEY_DISP_PITCH_2_WEB = 'Pitch2 along Web'
+DISP_TITLE_DESIGN_PREF = 'Design Preference'
+KEY_DESIGN_PREFERENCE = 'Design.Preference'
+KEY_DISP_DESIGN_PREFERENCE = 'Design Preference'
+VALUES_DESIGN_PREFERENCE = ["Plate Oriented", "Bolt Oriented"]
 
 
 DISP_TITLE_WELD = 'Weld'

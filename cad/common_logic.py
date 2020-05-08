@@ -14,6 +14,7 @@ from cad.items.filletweld import FilletWeld
 from cad.items.angle import Angle
 from cad.items.anchor_bolt import AnchorBolt_A, AnchorBolt_B, AnchorBolt_Endplate
 from cad.items.stiffener_plate import StiffenerPlate
+from cad.items.grout import Grout
 
 from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -708,7 +709,7 @@ class CommonDesignLogic(object):
                                    L11=BP.stiffener_plate_length - 50, L12=BP.stiffener_plate_height - 100)
 
         concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=BP.anchor_length_provided * 1.3)
-        grout = Plate(L=baseplate.L * 1.2, W=baseplate.W * 1.2, T=50)
+        grout = Grout(L=concrete.L, W=concrete.W, T=50)
 
         bolt_d = float(BP.anchor_dia_provided)
         bolt_r = bolt_d / 2  # Bolt radius (Shank part)
@@ -891,7 +892,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, weld, color='RED', update=True)
                     osdag_display_shape(self.display, nut_bolt, color='YELLOW', update=True)
                     osdag_display_shape(self.display, conc, color=GRAY, transparency=0.5, update=True)
-                    osdag_display_shape(self.display, grout, color=GRAY, update=True)
+                    osdag_display_shape(self.display, grout, color=GRAY, transparency=0.5, update=True)
 
                 elif self.connection == "Column":
                     osdag_display_shape(self.display, column, update=True)

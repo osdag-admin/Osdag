@@ -445,7 +445,7 @@ KEY_DISP_APPLIED_MOMENT_LOAD='Moment Load (kNm)'
 # capacity
 DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"
 KEY_MEMBER_CAPACITY = "section.memcapacity"
-KEY_DISP_MEMBER_CAPACITY = "Member Capacity"
+KEY_DISP_MEMBER_CAPACITY = "Member Capacity (kN)"
 KEY_MEMBER_AXIALCAPACITY='section.MomCapacity'
 KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity (kN)"
 KEY_MEMBER_SHEAR_CAPACITY='section.MomCapacity'
@@ -716,9 +716,8 @@ KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
 KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
 
-KEY_DISP_WELD_LEN_EFF_OUTSIDE = 'EffLength. Outer flange'
-KEY_DISP_WELD_LEN_EFF_INSIDE = 'EffLength. Inner flange'
-
+KEY_DISP_WELD_LEN_EFF_OUTSIDE = 'EffLength. Outer and Inner flange'
+KEY_DISP_CLEARANCE = "Clearance (mm)"
 KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
 KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
 DISP_EFF = "Effective length (mm)"
@@ -759,8 +758,8 @@ KEY_OUT_DISP_WEB_BOLT_CAPACITY ="Bolt Capacity (kN)"
 KEY_OUT_DISP_WEB_BOLT_SLIP= 'Slip Resistance'
 KEY_WEB_BOLT_GRP_CAPACITY = 'web_bolt.grp_bolt_capacity'
 KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'Web bolt grp bolt capacity (kN)'
-KEY_OUT_REQ_MOMENT_DEMAND_BOLT = "Moment Demand"
-KEY_OUT_REQ_PARA_BOLT = "Parameters required for bolt force"
+KEY_OUT_REQ_MOMENT_DEMAND_BOLT = "Moment Demand (kNm"
+KEY_OUT_REQ_PARA_BOLT = "Parameters required for bolt force (mm)"
 
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'

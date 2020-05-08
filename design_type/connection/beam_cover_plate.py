@@ -2328,8 +2328,7 @@ class BeamCoverPlate(MomentConnection):
         print("res_focce", res_force)
 
 
-        t1 = ('SubSection', 'Web Bolt Checks', '|p{4cm}|p{5cm}|p{6.5cm}|p{1.5cm}|')
-
+        t1 = ('SubSection', 'Web Bolt Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         if self.flange_bolt.bolt_type == TYP_BEARING:
             web_bolt_bearing_capacity_kn = round(self.web_bolt.bolt_bearing_capacity / 1000, 2)
@@ -2423,7 +2422,7 @@ class BeamCoverPlate(MomentConnection):
         t10 = (KEY_OUT_REQ_MOMENT_DEMAND_BOLT, '', moment_demand_req_bolt_force(shear_load=round(self.fact_shear_load / 1000, 2),
                                                                                 web_moment=round(self.moment_web / 1000000, 2),
                                                                                 ecc=self.web_plate.ecc,
-                                                                                moment_demand=round(self.web_plate.moment_demand / 1000000, 2)), '')
+                                                            moment_demand=round(self.web_plate.moment_demand / 1000000, 2)), '')
 
 
         self.report_check.append(t10)

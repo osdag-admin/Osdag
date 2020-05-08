@@ -1368,6 +1368,7 @@ class Plate(Material):
             self.edge_dist_provided = edge_dist
             self.end_dist_provided = end_dist
 
+
     # Function for block shear capacity calculation
     def blockshear(self, numrow, numcol, pitch, gauge, thk, end_dist, edge_dist, dia_hole, fy, fu):
         '''

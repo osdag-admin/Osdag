@@ -6,7 +6,25 @@ Created on 27-May-2015
 import numpy
 from cad.items.ModelUtils import getGpPt, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
 
+'''
 
+                        ^   a2 X
+                        |      | X
+                        |      |   X
+                        |      |     X
+                        |      |       X
+                        +      |         X
+                        h      |           X
+                        +      |             X
+                        |      |               X
+                        |      |                 X
+                        v   a1 +-------------------X a3
+
+
+                               <------- b --------->
+
+
+'''
 class FilletWeld(object):
 
     def __init__(self, b, h, L):
@@ -39,3 +57,30 @@ class FilletWeld(object):
         extrudeDir = self.L * (self.wDir)  # extrudeDir is a numpy array
         prism = makePrismFromFace(aFace, extrudeDir)
         return prism
+
+
+if __name__ == '__main__':
+    from OCC.Display.SimpleGui import init_display
+
+    display, start_display, add_menu, add_function_to_menu = init_display()
+    from OCC.gp import gp_Pnt
+
+    b = 10
+    h = 10
+    L = 50
+
+    origin = numpy.array([0., 0., 0.])
+    uDir = numpy.array([0., 0., 1.])
+    shaftDir = numpy.array([0., 1., 0.])
+
+    FWeld = FilletWeld(b, h, L)
+    _place = FWeld.place(origin, uDir, shaftDir)
+    point = FWeld.compute_params()
+    prism = FWeld.create_model()
+
+    Point = gp_Pnt(0.0, 0.0, 0.0)
+    display.DisplayMessage(Point, "Origin")
+
+    display.DisplayShape(prism, update=True)
+    display.DisableAntiAliasing()
+    start_display()

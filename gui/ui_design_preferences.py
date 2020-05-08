@@ -1602,6 +1602,7 @@ class DesignPreferences(QDialog):
                   KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
                   KEY_DP_DESIGN_METHOD: combo_design_method
                   }
+        print('design_pref_dict',d1)
         return d1
 
     def highlight_slipfactor_description(self):

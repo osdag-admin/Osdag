@@ -2,26 +2,14 @@ from design_type.connection.moment_connection import MomentConnection
 from design_report.reportGenerator_latex import CreateLatex
 
 from utils.common.component import *
-from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
 from Common import *
-from PyQt5.QtWidgets import QMessageBox
 from Common import *
 from Report_functions import *
-import os
-import shutil
+
 import logging
 from utils.common.load import Load
-import yaml
-import os
-import shutil
-import time
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-import pickle
-import pdfkit
-import configparser
-import cairosvg
-from io import StringIO
+
 
 class ColumnEndPlate(MomentConnection):
 
@@ -277,7 +265,7 @@ class ColumnEndPlate(MomentConnection):
 
         return out_list
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
 
         all_errors = []
         self.design_status = False

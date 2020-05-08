@@ -3,21 +3,19 @@ import time
 import math
 from Common import *
 import os
-import pdfkit
-import configparser
 # from utils.common import component
 from pylatex import Document, Section, Subsection
 from pylatex.utils import italic, bold
-import pdflatex
+#import pdflatex
 import sys
 import datetime
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
+#from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 
 
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic, NoEscape
-from pdflatex import PDFLaTeX
+#from pdflatex import PDFLaTeX
 import os
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
     MediumText, LineBreak, simple_page_number
@@ -199,7 +197,7 @@ def forces_in_flange(Au, B,T,A,D,Mu,Mw,Mf,Af,ff):
     forcesinflange_eqn.append(NoEscape(r' & = Mu-M_w\\'))
     forcesinflange_eqn.append(NoEscape(r'&= ' + Mu + '-' + Mw + r'\\'))
     forcesinflange_eqn.append(NoEscape(r'&=' + Mf + r'\\'))
-    forcesinflange_eqn.append(NoEscape(r' f_f& =flange~force  \\'))
+    forcesinflange_eqn.append(NoEscape(r' F_f& =flange~force  \\'))
     forcesinflange_eqn.append(NoEscape(r'& = \frac{M_f *1000}{D-T} + A_f \\'))
     forcesinflange_eqn.append(NoEscape(r'&= \frac{' + Mf + '}{' + D + '-' + T + '} +' + Af + r' \\'))
     forcesinflange_eqn.append(NoEscape(r'&=' + ff + r'\end{aligned}'))
@@ -332,6 +330,50 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
 
+def height_of_flange_cover_plate(B,sp,b_fp): #weld
+    B = str(B)
+    sp = str(sp)
+    b_fp = str (b_fp)
+    height_for_flange_cover_plate_eqn =Math(inline=True)
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= {B - 2*sp} \\'))
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'&= {' + B + ' - 2 * ' + sp + r'} \\'))
+    height_for_flange_cover_plate_eqn.append(NoEscape(r'&=' + b_fp + '\end{aligned}'))
+    return height_for_flange_cover_plate_eqn
+
+def inner_plate_height_weld(B,sp,t_w,r_1, b_ifp):#weld
+    B = str(B)
+    sp = str(sp)
+    t_w = str (t_w)
+    r_1 = str(r_1)
+    b_ifp = str(b_ifp)
+    inner_plate_height_weld_eqn =Math(inline=True)
+    inner_plate_height_weld_eqn.append(NoEscape(r'\begin{aligned} b_{ifp} &= \frac{B - 4*sp - t_w - 2*r_1}{2} \\'))
+    inner_plate_height_weld_eqn.append(NoEscape(r'&= \frac{'+B +'- 4*'+sp+'-' +t_w+ '- 2*'+r_1+r'} {2} \\'))
+    inner_plate_height_weld_eqn.append(NoEscape(r'&=' + b_ifp + '\end{aligned}'))
+    return inner_plate_height_weld_eqn
+
+
+def flange_plate_Length_req(l_w,s,g,l_fp): #weld
+    l_w = str(l_w)
+    s = str (s)
+    g = str (g)
+    l_fp = str(l_fp)
+    min_flange_plate_Length_eqn = Math(inline=True)
+    min_flange_plate_Length_eqn.append(NoEscape(r'\begin{aligned} l_{fp} & = [2*(l_{w} + 2*s) + g]\\'))
+    min_flange_plate_Length_eqn.append(NoEscape(r'&= [2*('+ l_w + '2*'+s+') +' + g+ r']\\'))
+    min_flange_plate_Length_eqn.append(NoEscape(r'&=' + l_fp + '\end{aligned}'))
+    return min_flange_plate_Length_eqn
+
+def flange_weld_stress(F_f,F_rl,F_ws):
+    F_rl = str(F_rl)
+    F_ws = str(F_ws)
+    F_f =str(F_f)
+    flange_weld_stress_eqn = Math(inline=True)
+    flange_weld_stress_eqn.append(NoEscape(r'\begin{aligned} Stress &= \frac{F_f*1000}{F_{rl}}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r' &= \frac{' + F_f + '*1000}{' + F_rl + r'}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r'&= ' + F_ws + r'\end{aligned}'))
+
+    return flange_weld_stress_eqn
 
 def tension_rupture_bolted_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
 
@@ -545,8 +587,6 @@ def prov_shear_load(shear_input,min_sc,app_shear_load):
     return app_shear_load_eqn
 
 
-
-
 def plastic_moment_capacty(beta_b, Z_p, f_y, gamma_m0 ,Pmc):  # same as #todo anjali
 
     beta_b = str(beta_b)
@@ -654,9 +694,9 @@ def member_rupture_prov(A_nc, A_go, F_u, F_y, L_c, w, b_s, t,gamma_m0,gamma_m1,b
     member_rup = str(member_rup)
     multiple = str(multiple)
     member_rup_eqn = Math(inline=True)
-    member_rup_eqn.append(NoEscape(r'\begin{aligned}\beta &= 1.4 - 0.076*\frac{w}{t}*\frac{f_{y}}{f_{u}}*\frac{b_s}{L_c}\\'))
+    member_rup_eqn.append(NoEscape(r'\begin{aligned}\beta &= 1.4 - 0.076*\frac{w}{t}*\frac{f_{y}}{0.9*f_{u}}*\frac{b_s}{L_c}\\'))
     member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9*f_{u}*\gamma_{m0}}{f_{y}*\gamma_{m1}} \geq 0.7 \\'))
-    member_rup_eqn.append(NoEscape(r'&= 1.4 - 0.076*\frac{'+ w +'}{'+ t + r'}*\frac{'+ fy +'}{'+ fu + r'}*\frac{'+ b_s +'}{' + L_c + r' }\\'))
+    member_rup_eqn.append(NoEscape(r'&= 1.4 - 0.076*\frac{'+ w +'}{'+ t + r'}*\frac{'+ fy +'}{0.9*'+ fu + r'}*\frac{'+ b_s +'}{' + L_c + r' }\\'))
     member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9* '+ fu + '*'+ gamma_m0 +'}{' +fy+'*'+gamma_m1 + r'} \geq 0.7 \\'))
     member_rup_eqn.append(NoEscape(r'&= '+ beta + r'\\'))
     member_rup_eqn.append(NoEscape(r'T_{dn} &= '+multiple+'*' r'(\frac{0.9*A_{nc}*f_{u}}{\gamma_{m1}} + \frac{\beta * A_{go} * f_{y}}{\gamma_{m0}})\\'))
@@ -706,7 +746,7 @@ def slenderness_prov(K, L, r, slender):
 
 def efficiency_req():
     efflimit_eqn = Math(inline=True)
-    efflimit_eqn.append(NoEscape(r'\begin{aligned} Efficiency &\leq 1 \end{aligned}'))
+    efflimit_eqn.append(NoEscape(r'\begin{aligned} Utilization Ratio &\leq 1 \end{aligned}'))
 
     return efflimit_eqn
 
@@ -715,7 +755,7 @@ def efficiency_prov(F, Td, eff):
     Td = str(round(Td/1000,2))
     eff = str(eff)
     eff_eqn = Math(inline=True)
-    eff_eqn.append(NoEscape(r'\begin{aligned} Efficiency &= \frac{F}{Td}&=\frac{'+F+'}{'+Td+r'}\\'))
+    eff_eqn.append(NoEscape(r'\begin{aligned} Utilization Ratio &= \frac{F}{Td}&=\frac{'+F+'}{'+Td+r'}\\'))
     eff_eqn.append(NoEscape(r'&= ' + eff + r'\end{aligned}'))
 
     return eff_eqn
@@ -828,8 +868,8 @@ def throat_req():
 def throat_prov(tw,f):
     tt = tw * f
     t_t= max(tt,3)
-    tw = str(tw)
-    f= str(f)
+    tw = str(round(tw,2))
+    f= str(round(f,2))
     tt = str(round(tt,2))
     t_t = str(round(t_t,2))
 

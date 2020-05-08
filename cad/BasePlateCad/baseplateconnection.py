@@ -14,7 +14,7 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 class BasePlateCad(object):
     def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
-                 concrete, gusset, stiffener):
+                 concrete, gusset, stiffener, grout):
 
         """
 
@@ -38,6 +38,7 @@ class BasePlateCad(object):
         self.concrete = concrete
         self.gusset = gusset
         self.stiffener = stiffener
+        self.grout = grout
 
         # self.alist = None #alist
         # self.columnModel = None
@@ -84,6 +85,7 @@ class BasePlateCad(object):
         self.createWeldGeometry()
         self.createConcreteGeometry()
         self.create_nut_bolt_array()
+        self.createGroutGeometry()
 
     def createColumnGeometry(self):
         """
@@ -233,12 +235,24 @@ class BasePlateCad(object):
 
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
 
+    def createGroutGeometry(self):
+        """
+        :return: Geometric Orientaion of grout
+        """
+        groutOriginL = numpy.array([-self.grout.W / 2, 0.0, -self.baseplate.T - self.grout.T / 2])
+        groutL_uDir = numpy.array([0.0, 0.0, 1.0])
+        groutL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.grout.place(groutOriginL, groutL_uDir, groutL_wDir)
+
+        self.groutModel = self.grout.create_model()
+
     def createConcreteGeometry(self):
         """
 
         :return: Geometric Orientation of concrete
         """
-        concreteOrigin = numpy.array([-self.concrete.W / 2, 0.0, -self.baseplate.T - self.concrete.T / 2])
+        concreteOrigin = numpy.array(
+            [-self.concrete.W / 2, 0.0, -self.baseplate.T - self.grout.T - self.concrete.T / 2])
         # concrete_uDir = numpy.array([1.0, 0.0, 0.0])
         # concrete_wDir = numpy.array([0.0, 0.0, 1.0])
         concrete_uDir = numpy.array([0.0, 0.0, 1.0])
@@ -288,6 +302,11 @@ class BasePlateCad(object):
 
         return plate
 
+    def get_grout_models(self):
+        grout = self.groutModel
+
+        return grout
+
     def get_concrete_models(self):
         conc = self.concreteModel
         return conc
@@ -311,8 +330,9 @@ class BasePlateCad(object):
         welds = self.get_welded_models()
         nut_bolt_array = self.get_nut_bolt_array_models()
         conc = self.get_concrete_models()
+        grt = self.get_grout_models()
 
-        CAD_list = [column, plate_connectors, welds, nut_bolt_array, conc] #, welds, nut_bolt_array]
+        CAD_list = [column, plate_connectors, welds, nut_bolt_array, conc, grt]  # , welds, nut_bolt_array]
         CAD = CAD_list[0]
 
         for model in CAD_list[1:]:
@@ -332,6 +352,7 @@ if __name__ == '__main__':
     from cad.items.anchor_bolt import *
     from cad.items.nut import Nut
     from cad.items.stiffener_plate import StiffenerPlate
+    from cad.items.concrete import Concrete
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
@@ -340,6 +361,7 @@ if __name__ == '__main__':
     # from cad.common_logic import CommonDesignLogic
 
     from OCC.gp import gp_Pnt
+    from OCC.Core.Graphic3d import Quantity_NOC_GRAY as GRAY
     from OCC.Display.SimpleGui import init_display
 
     display, start_display, add_menu, add_function_to_menu = init_display()
@@ -351,6 +373,7 @@ if __name__ == '__main__':
     weldSideWeb = FilletWeld(b=10, h=10, L=420)
     # concrete = Concrete(L= baseplate.W*1.5, W= baseplate.L*1.5, T= baseplate.T*10)
     concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=baseplate.T * 10)
+    grout = Concrete(L=baseplate.L + 200, W=baseplate.W + 200, T=50)
 
     gusset = StiffenerPlate(L=baseplate.W, W=200, T=14, L11=(baseplate.W - (column.B + 100)) / 2, L12=200 - 100,
                             R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
@@ -373,7 +396,7 @@ if __name__ == '__main__':
     nut_bolt_array = NutBoltArray(column, baseplate,  nut, bolt, numberOfBolts, nutSpace)
 
     basePlate = BasePlateCad(column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
-                             concrete, gusset, stiffener, type)
+                             concrete, gusset, stiffener, grout)
 
     basePlate.create_3DModel()
     prism = basePlate.get_models()
@@ -382,6 +405,7 @@ if __name__ == '__main__':
     weld = basePlate.get_welded_models()
     nut_bolt = basePlate.get_nut_bolt_array_models()
     conc = basePlate.get_concrete_models()
+    grt = basePlate.get_grout_models()
 
     Point = gp_Pnt(0.0, 0.0, 0.0)
     display.DisplayMessage(Point, "Origin")
@@ -394,12 +418,11 @@ if __name__ == '__main__':
     display.DisplayColoredShape(plate, color='BLUE', update=True)
     display.DisplayColoredShape(weld, color='RED', update=True)
     display.DisplayColoredShape(nut_bolt, color='YELLOW', update=True)
-    display.DisplayShape(conc, color='CYAN', transparency=0.5,  update=True)
+    display.DisplayShape(conc, color=GRAY, transparency=0.5, update=True)
+    display.DisplayShape(grt, colour=GRAY, update=True)
     display.DisableAntiAliasing()
     start_display()
     # display.ExportToImage("/home/rahul/Osdag_workspace/3DtestbasePlatw.png")
-
-
 
     # display = CommonDesignLogic.display
     # display.EraseAll()

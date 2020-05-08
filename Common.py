@@ -880,6 +880,12 @@ KEY_DP_WELD_FAB = 'DesignPreferences.Weld.Fab'
 
 KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
 KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
+KEY_DISP_GAMMA_M0 = "Governed by Yielding"
+KEY_DISP_GAMMA_M1 = "Governed by Ultimate Stress"
+KEY_DISP_GAMMA_MB = "Connection Bolts - Bearing Type"
+KEY_DISP_GAMMA_MF = "Connection Bolts - Friction Type"
+KEY_DISP_GAMMA_MW = "Connection Weld"
+
 
 
 KEY_DP_WELD_TYPE = 'Weld.Type'
@@ -1117,7 +1123,7 @@ KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
-KEY_OUT_LONG_JOINT = 'Long Joint Reduction'
+KEY_OUT_LONG_JOINT = 'Bolt Capacity post Long Joint (kN)'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
@@ -1174,7 +1180,7 @@ KEY_OUT_SPTNG_MIN_EDGE_DIST = 'Cleat.Sptng_leg.MinEdgeDist'
 KEY_OUT_SPTNG_MAX_EDGE_DIST = 'Cleat.Sptng_leg.MaxEdgeDist'
 
 
-KEY_OUT_DISP_PLATETHK_REP = 'Thickness (tp) (mm)'
+KEY_OUT_DISP_PLATETHK_REP = 'Thickness (mm)'
 KEY_OUT_PLATETHK = 'Plate.Thickness'
 KEY_OUT_DISP_PLATETHK = 'Thickness (mm)'
 KEY_OUT_PLATE_HEIGHT = 'Plate.Height'

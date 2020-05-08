@@ -37,7 +37,7 @@ def max_pitch(t):
 
     max_pitch_1 = 32*min(t)
     max_pitch_2 = 300
-    max_pitch = max(max_pitch_1,max_pitch_2)
+    max_pitch = min(max_pitch_1,max_pitch_2)
     t = str(min(t))
     max_pitch = str(max_pitch)
 
@@ -327,7 +327,7 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg):
     gamma = str(gamma)
     T_dg = str(T_dg)
     tension_yield_eqn = Math(inline=True)
-    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{l*t_p*f_y}{\gamma_{mo}}\\'))
+    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{Depth*t_p*f_y}{\gamma_{mo}}\\'))
     tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
@@ -676,7 +676,7 @@ def member_yield_prov(Ag, fy, gamma_m0, member_yield,multiple = 1):
     multiple = str(multiple)
     member_yield = str(member_yield)
     member_yield_eqn = Math(inline=True)
-    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{'+ multiple + r' * A_g ~ f_y}{\gamma_{m0}}\\'))
+    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg}~or~A_c&= \frac{'+ multiple + r' * A_g ~ f_y}{\gamma_{m0}}\\'))
     member_yield_eqn.append(NoEscape(r'&= \frac{'+ multiple + '*' + Ag + '*' + fy + '}{'+ gamma_m0 + r'}\\'))
     member_yield_eqn.append(NoEscape(r'&= ' + member_yield + r'\end{aligned}'))
     return member_yield_eqn
@@ -748,7 +748,7 @@ def slenderness_prov(K, L, r, slender):
 
 def efficiency_req():
     efflimit_eqn = Math(inline=True)
-    efflimit_eqn.append(NoEscape(r'\begin{aligned} Utilization Ratio &\leq 1 \end{aligned}'))
+    efflimit_eqn.append(NoEscape(r'\begin{aligned} Utilization~Ratio &\leq 1 \end{aligned}'))
 
     return efflimit_eqn
 
@@ -757,7 +757,7 @@ def efficiency_prov(F, Td, eff):
     Td = str(round(Td/1000,2))
     eff = str(eff)
     eff_eqn = Math(inline=True)
-    eff_eqn.append(NoEscape(r'\begin{aligned} Utilization Ratio &= \frac{F}{Td}&=\frac{'+F+'}{'+Td+r'}\\'))
+    eff_eqn.append(NoEscape(r'\begin{aligned} Utilization~Ratio &= \frac{F}{Td}&=\frac{'+F+'}{'+Td+r'}\\'))
     eff_eqn.append(NoEscape(r'&= ' + eff + r'\end{aligned}'))
 
     return eff_eqn
@@ -882,33 +882,19 @@ def throat_prov(tw,f):
 
     return throat_eqn
 
-# def eff_len_prov(l):
-#     l =str(l)
-#     eff_len_eqn = Math(inline=True)
-#     eff_len_eqn.append(NoEscape(r'\begin{aligned} l_w &='+l+ r' \end{aligned}'))
-#
-#     return eff_len_eqn
-#
-# def diameter_prov(d):
-#     d = str(d)
-#     diameter_eqn = Math(inline=True)
-#     diameter_eqn.append(NoEscape(r'\begin{aligned} d &=' + d + r' \end{aligned}'))
-#
-#     return diameter_eqn
-#
-# def diahole_prov(d0):
-#     d0 = str(d0)
-#     diahole_eqn = Math(inline=True)
-#     diahole_eqn.append(NoEscape(r'\begin{aligned} d &=' + d0 + r' \end{aligned}'))
-
-    return diahole_eqn
-
 def display_prov(v,t):
     v = str(v)
     display_eqn = Math(inline=True)
     display_eqn.append(NoEscape(r'\begin{aligned} '+t+' &=' + v + r' \end{aligned}'))
 
     return display_eqn
+
+def gamma(v,t):
+    v = str(v)
+    gamma = Math(inline=True)
+    gamma.append(NoEscape(r'\begin{aligned}\gamma_{' + t + '}&=' + v + r'\end{aligned}'))
+
+    return gamma
 
     # slender = (float(K) * float(L)) / float(r)
     #

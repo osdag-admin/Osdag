@@ -1837,63 +1837,77 @@ class Tension_bolted(Main):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
         if self.sec_profile in ["Channels", "Back to Back Channels"]:
             image = "Channel"
+            connecting_plates = [self.plate.thickness_provided, self.section_size_1.web_thickness]
         elif self.section_size_1.max_leg == self.section_size_1.min_leg:
             image = "Equal"
+            connecting_plates = [self.plate.thickness_provided, self.section_size_1.thickness]
         else:
             image = "Unequal"
+            connecting_plates = [self.plate.thickness_provided, self.section_size_1.thickness]
+
+        if self.bolt.bolt_type == TYP_BEARING:
+            variable = KEY_DISP_GAMMA_MB
+            value = gamma(self.bolt.gamma_mb,"mb")
+        else:
+            variable = KEY_DISP_GAMMA_MF
+            value = gamma(self.bolt.gamma_mf,"mf")
+
 
         if self.sec_profile in ["Channels", "Back to Back Channels"]:
             self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
                                       # Image shall be save with this name.png in resource files
                                       KEY_DISP_SECSIZE: (self.section_size_1.designation,self.sec_profile),
                                       KEY_DISP_MATERIAL: self.section_size_1.material,
-                                      KEY_DISP_FU: self.section_size_1.fu,
-                                      KEY_DISP_FY: self.section_size_1.fy,
-                                      'Mass': self.section_size_1.mass,
-                                      'Area(mm2) - A': self.section_size_1.area,
-                                      'D(mm)': self.section_size_1.depth,
-                                      'B(mm)': self.section_size_1.flange_width,
-                                      't(mm)': self.section_size_1.web_thickness,
-                                      'T(mm)': self.section_size_1.flange_thickness,
-                                      'FlangeSlope': self.section_size_1.flange_slope,
-                                      'R1(mm)': self.section_size_1.root_radius,
-                                      'R2(mm)': self.section_size_1.toe_radius,
+                                      KEY_DISP_FU: round(self.section_size_1.fu,2),
+                                      KEY_DISP_FY: round(self.section_size_1.fy,2),
+                                      'Mass': round(self.section_size_1.mass,2),
+                                      'Area(mm2) - A': round(self.section_size_1.area,2),
+                                      'D(mm)': round(self.section_size_1.depth,2),
+                                      'B(mm)': round(self.section_size_1.flange_width,2),
+                                      't(mm)': round(self.section_size_1.web_thickness,2),
+                                      'T(mm)': round(self.section_size_1.flange_thickness,2),
+                                      'FlangeSlope': round(self.section_size_1.flange_slope,2),
+                                      'R1(mm)': round(self.section_size_1.root_radius,2),
+                                      'R2(mm)':round(self.section_size_1.toe_radius,2),
                                       'Cy(mm)': round(self.section_size_1.Cy,2),
-                                      'Iz(mm4)': self.section_size_1.mom_inertia_z,
-                                      'Iy(mm4)': self.section_size_1.mom_inertia_y,
-                                      'rz(mm)': self.section_size_1.rad_of_gy_z,
-                                      'ry(mm)': self.section_size_1.rad_of_gy_y,
-                                      'Zz(mm3)': self.section_size_1.elast_sec_mod_z,
-                                      'Zy(mm3)': self.section_size_1.elast_sec_mod_y,
-                                      'Zpz(mm3)': self.section_size_1.plast_sec_mod_z,
-                                      'Zpy(mm3)': self.section_size_1.elast_sec_mod_y}
+                                      'Iz(mm4)': round(self.section_size_1.mom_inertia_z,2),
+                                      'Iy(mm4)': round(self.section_size_1.mom_inertia_y,2),
+                                      'rz(mm)': round(self.section_size_1.rad_of_gy_z,2),
+                                      'ry(mm)': round(self.section_size_1.rad_of_gy_y,2),
+                                      'Zz(mm3)': round(self.section_size_1.elast_sec_mod_z,2),
+                                      'Zy(mm3)': round(self.section_size_1.elast_sec_mod_y,2),
+                                      'Zpz(mm3)': round(self.section_size_1.plast_sec_mod_z,2),
+                                      'Zpy(mm3)': round(self.section_size_1.elast_sec_mod_y,2),
+                                      'r(mm3)': round(self.section_size_1.min_radius_gyration,2)}
         else:
             self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
                                       # Image shall be save with this name.png in resource files
-                                      KEY_DISP_SECSIZE: (self.section_size_1.designation,self.sec_profile),                                      KEY_DISP_MATERIAL: self.section_size_1.material,
-                                      KEY_DISP_FU: self.section_size_1.fu,
-                                      KEY_DISP_FY: self.section_size_1.fy,
-                                      'Mass': self.section_size_1.mass,
+                                      KEY_DISP_SECSIZE: (self.section_size_1.designation,self.sec_profile),
+                                      KEY_DISP_MATERIAL: self.section_size_1.material,
+                                      KEY_DISP_FU: round(self.section_size_1.fu,2),
+                                      KEY_DISP_FY: round(self.section_size_1.fy,2),
+                                      'Mass': round(self.section_size_1.mass,2),
                                       'Area(mm2) - A': round((self.section_size_1.area),2),
-                                      'A(mm)': self.section_size_1.max_leg,
-                                      'B(mm)': self.section_size_1.min_leg,
-                                      't(mm)': self.section_size_1.web_thickness,
-                                      'R1(mm)': self.section_size_1.root_radius,
-                                      'R2(mm)': self.section_size_1.toe_radius,
-                                      'Cy(mm)': self.section_size_1.Cy,
-                                      'Cz(mm)': self.section_size_1.Cz,
-                                      'Iz(mm4)': self.section_size_1.mom_inertia_z,
-                                      'Iy(mm4)': self.section_size_1.mom_inertia_y,
-                                      'Iu(mm4)': self.section_size_1.mom_inertia_u,
-                                      'Iv(mm4)': self.section_size_1.mom_inertia_v,
-                                      'rz(mm)': self.section_size_1.rad_of_gy_z,
+                                      'A(mm)': round(self.section_size_1.max_leg,2),
+                                      'B(mm)': round(self.section_size_1.min_leg,2),
+                                      't(mm)': round(self.section_size_1.thickness,2),
+                                      'R1(mm)': round(self.section_size_1.root_radius,2),
+                                      'R2(mm)': round(self.section_size_1.toe_radius,2),
+                                      'Cy(mm)': round(self.section_size_1.Cy,2),
+                                      'Cz(mm)': round(self.section_size_1.Cz,2),
+                                      'Iz(mm4)': round(self.section_size_1.mom_inertia_z,2),
+                                      'Iy(mm4)': round(self.section_size_1.mom_inertia_y,2),
+                                      'Iu(mm4)': round(self.section_size_1.mom_inertia_u,2),
+                                      'Iv(mm4)': round(self.section_size_1.mom_inertia_v,2),
+                                      'rz(mm)': round(self.section_size_1.rad_of_gy_z,2),
                                       'ry(mm)': round((self.section_size_1.rad_of_gy_y),2),
                                       'ru(mm)': round((self.section_size_1.rad_of_gy_u),2),
                                       'rv(mm)': round((self.section_size_1.rad_of_gy_v),2),
-                                      'Zz(mm3)': self.section_size_1.elast_sec_mod_z,
-                                      'Zy(mm3)': self.section_size_1.elast_sec_mod_y,
-                                      'Zpz(mm3)': self.section_size_1.plast_sec_mod_z,
-                                      'Zpy(mm3)': self.section_size_1.elast_sec_mod_y}
+                                      'Zz(mm3)': round(self.section_size_1.elast_sec_mod_z,2),
+                                      'Zy(mm3)': round(self.section_size_1.elast_sec_mod_y,2),
+                                      'Zpz(mm3)': round(self.section_size_1.plast_sec_mod_z,2),
+                                      'Zpy(mm3)': round(self.section_size_1.elast_sec_mod_y,2),
+                                      'r(mm3)': round(self.section_size_1.min_radius_gyration,2)}
 
 
         self.report_input = \
@@ -1915,7 +1929,11 @@ class Tension_bolted(Main):
              KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
              KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
-             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences,
+             "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
+             KEY_DISP_GAMMA_M0 : gamma(1.1,"m0"),
+             KEY_DISP_GAMMA_M1 : gamma(1.25,"m1"),
+             variable : value }
              # "Weld Details": "TITLE",
              # KEY_DISP_DP_WELD_TYPE: "Fillet",
              # KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
@@ -1924,7 +1942,7 @@ class Tension_bolted(Main):
 
 
         self.report_check = []
-        connecting_plates = [self.plate.thickness_provided, self.section_size_1.web_thickness]
+        # connecting_plates = [self.plate.thickness_provided, self.section_size_1.web_thickness]
         self.load.shear_force = 0.0
         member_yield_kn = round((self.section_size_1.tension_yielding_capacity/1000),2)
         member_rupture_kn = round((self.section_size_1.tension_rupture_capacity/1000),2)
@@ -1956,7 +1974,7 @@ class Tension_bolted(Main):
         self.report_check.append(t3)
         t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '',blockshear_prov(Tdb= member_blockshear_kn), '')
         self.report_check.append(t4)
-        t8 = (KEY_DISP_TENSION_CAPACITY, '', tensile_capacity_prov(member_yield_kn, member_rupture_kn, member_blockshear_kn),get_pass_fail(self.load.axial_force,self.section_size_1.tension_capacity, relation="lesser"))
+        t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(member_yield_kn, member_rupture_kn, member_blockshear_kn),get_pass_fail(self.load.axial_force,self.section_size_1.tension_capacity, relation="lesser"))
         self.report_check.append(t8)
         t5 = (KEY_DISP_SLENDER, slenderness_req(), slenderness_prov( 1, self.length,round(self.section_size_1.min_radius_gyration,2), self.section_size_1.slenderness), '')
         self.report_check.append(t5)
@@ -1974,7 +1992,7 @@ class Tension_bolted(Main):
 
 
 
-        t7 = ('SubSection', 'Bolt Checks', '|p{2.5cm}|p{5cm}|p{7.5cm}|p{1cm}|')
+        t7 = ('SubSection', 'Bolt Checks', '|p{2.5cm}|p{5.5cm}|p{7cm}|p{1cm}|')
 
         self.report_check.append(t7)
 
@@ -2004,7 +2022,7 @@ class Tension_bolted(Main):
         else:
 
             t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
-                  HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.bolt.fu,
+                  HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.bolt.bolt_fu,
                                           Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
                                           capacity=bolt_capacity_kn), '')
             self.report_check.append(t4)

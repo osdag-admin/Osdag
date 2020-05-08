@@ -1662,8 +1662,12 @@ class DesignPreferences(QDialog):
         '''
         @author: Umair
         '''
+        # designation = designation_table_material_grade[0]
+        # table = designation_table_material_grade[1]
+        # material_grade = designation_table_material_grade[2]
         tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
         if designation == 'Select Section':
+            self.flag = False
             self.ui.clear_tab("Column")
             return
 
@@ -1783,8 +1787,11 @@ class DesignPreferences(QDialog):
         '''
         @author: Umair
         '''
+        # designation = designation_material_grade[0]
+        # material_grade = designation_material_grade[1]
         tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
         if designation == 'Select Section':
+            self.flag = False
             self.ui.clear_tab("Beam")
             return
 

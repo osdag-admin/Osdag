@@ -422,13 +422,14 @@ class OsdagMainWindow(QMainWindow):
             sqlpath = Path('ResourceFiles/Database/test_database.sql')
             if sqlitepath.exists() and (
                     not sqlpath.exists() or sqlpath.stat().st_size == 0 or sqlpath.stat().st_mtime < sqlitepath.stat().st_mtime - 1):
-                sqlnewpath = Path(str(sqlpath) + '.new')
+                sqlnewpath = Path('ResourceFiles/Database/test_database_new.sql')
                 cmd = 'sqlite3 ' + str(sqlitepath) + ' .dump > ' + str(sqlnewpath)
                 error = os.system(cmd)
-                if error != 0:
-                    raise Exception('SQLite conversion to SQL error')
-                if sqlnewpath.stat().st_size == 0:
-                    raise Exception('SQLite conversion to SQL error')
+                # if error != 0:
+                #     raise Exception('SQLite conversion to SQL error')
+                # if sqlnewpath.stat().st_size == 0:
+                #     raise Exception('SQLite conversion to SQL error')
+                os.remove(sqlpath)
                 sqlnewpath.rename(sqlpath)
                 sqlitepath.touch()
                 print('DUMP updated')

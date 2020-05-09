@@ -85,50 +85,34 @@ import shutil
 from pathlib import Path
 
 ############################ Pre-Build Database Updation/Creation #################
-# sqlpath = Path('ResourceFiles/Database/test_database.sql')
-# sqlitepath = Path('ResourceFiles/Database/test_database.sqlite')
-# if sqlpath.exists():
-#     if not sqlitepath.exists():
-#         cmd = 'sqlite3 ' + str(sqlitepath) + ' < ' + str(sqlpath)
-#         os.system(cmd)
-#         sqlpath.touch()
-#         print('Database Created')
-#     elif sqlitepath.stat().st_size == 0 or sqlitepath.stat().st_mtime < sqlpath.stat().st_mtime - 1:
-#         try:
-#             # sqlitenewpath = Path('ResourceFiles/Database/test_database_new.sqlite')
-#             # shutil.copy(sqlitepath,sqlitenewpath)
-#             sqlitenewpath = Path(str(sqlitepath) + '.new')
-#             cmd = 'sqlite3 ' + str(sqlitenewpath) + ' < ' + str(sqlpath)
-#             error = os.system(cmd)
-#             # if error != 0:
-#             #     raise Exception('SQL to SQLite conversion error')
-#             # if sqlitenewpath.stat().st_size == 0:
-#             #     raise Exception('SQL to SQLite conversion error')
-#             # os.remove(sqlitepath)
-#             sqlitenewpath.rename(sqlitepath)
-#             sqlpath.touch()
-#             print('Database Updated')
-#         except Exception as e:
-#             sqlitenewpath.unlink()
-#             print('Error: ', e)
+sqlpath = Path('ResourceFiles/Database/test_database.sql')
+sqlitepath = Path('ResourceFiles/Database/test_database.sqlite')
 
-if not os.path.exists('ResourceFiles/Database/test_database.sqlite'):
-    cmd=f'sqlite3 ResourceFiles/Database/test_database.sqlite < ResourceFiles/Database/test_database.sql'
-    os.system(cmd)
-elif os.path.getmtime('ResourceFiles/Database/test_database.sql')>os.path.getmtime('ResourceFiles/Database/test_database.sqlite'):
-    try:
-        shutil.move('ResourceFiles/Database/test_database.sqlite','ResourceFiles/Database/temp/test_database.sqlite')
-        cmd=f'sqlite3 ResourceFiles/Database/test_database.sqlite < ResourceFiles/Database/test_database.sql'
-        error=os.system(cmd)
-        if error!=0:
-            raise Exception('SQL convertion to SQLite error')
-        os.remove('ResourceFiles/Database/temp/test_database.sqlite')
-        Path('ResourceFiles/Database/test_database.sql').touch()
-        print('Database Updated')
-    except Exception as e:
-        os.remove('ResourceFiles/Database/test_database.sqlite')
-        shutil.move('ResourceFiles/Database/temp/test_database.sqlite','ResourceFiles/Database/test_database.sqlite')
-        print('Error: ',e)
+if sqlpath.exists():
+    print(sqlitepath.stat().st_mtime, sqlpath.stat().st_mtime, sqlpath.stat().st_mtime - 1,sqlitepath.stat().st_size)
+    if not sqlitepath.exists():
+        cmd = 'sqlite3 ' + str(sqlitepath) + ' < ' + str(sqlpath)
+        os.system(cmd)
+        sqlpath.touch()
+        print('Database Created')
+
+    elif sqlitepath.stat().st_size == 0 or sqlitepath.stat().st_mtime < sqlpath.stat().st_mtime - 1:
+        try:
+            # sqlitenewpath = Path(str(sqlitepath) + '.new')
+            sqlitenewpath = Path('ResourceFiles/Database/test_database_new.sqlite')
+            cmd = 'sqlite3 ' + str(sqlitenewpath) + ' < ' + str(sqlpath)
+            error = os.system(cmd)
+            # if error != 0:
+            #     raise Exception('SQL to SQLite conversion error')
+            # if sqlitenewpath.stat().st_size == 0:
+            #     raise Exception('SQL to SQLite conversion error')
+            os.remove(sqlitepath)
+            sqlitenewpath.rename(sqlitepath)
+            sqlpath.touch()
+            print('Database Updated', sqlpath.stat().st_mtime, sqlitepath.stat().st_mtime)
+        except Exception as e:
+            sqlitenewpath.unlink()
+            print('Error: ', e)
 #########################################################################################
 
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize
@@ -433,45 +417,24 @@ class OsdagMainWindow(QMainWindow):
 ################################ UI Methods ###############################################
 
     def closeEvent(self, event):
-        # try:
-        #     sqlitepath = Path('ResourceFiles/Database/test_database.sqlite')
-        #     sqlpath = Path('ResourceFiles/Database/test_database.sql')
-        #     if sqlitepath.exists() and (not sqlpath.exists() or sqlpath.stat().st_size == 0 or sqlpath.stat().st_mtime < sqlitepath.stat().st_mtime - 1):
-        #         # sqlnewpath = Path('ResourceFiles/Database/test_database_new.sql')
-        #         sqlnewpath = Path(str(sqlpath) + '.new')
-        #         cmd = 'sqlite3 ' + str(sqlitepath) + ' .dump > ' + str(sqlnewpath)
-        #         os.system(cmd)
-        #         # if error != 0:
-        #         #     raise Exception('SQL to SQLite conversion error')
-        #         # if sqlitenewpath.stat().st_size == 0:
-        #         #     raise Exception('SQL to SQLite conversion error')
-        #         # os.remove(sqlpath)
-        #         sqlnewpath.rename(sqlpath)
-        #         sqlitepath.touch()
-        #         print('DUMP Updated')
-        # except Exception as e:
-        #     sqlnewpath.unlink()
-        #     print('Error: ', e)
-        #
-        # #         sqlnewpath = Path('ResourceFiles/Database/test_database_new.sqlite')
-        # #         shutil.copy(sqlitepath, sqlitenewpath)
-        # #         cmd = 'sqlite3 ' + str(sqlitepath) + ' .dump > ' + str(sqlnewpath)
-        # #         error = os.system(cmd)
-        # #         if error != 0:
-        # #             raise Exception('SQLite conversion to SQL error')
-        # #         if sqlnewpath.stat().st_size == 0:
-        # #             raise Exception('SQLite conversion to SQL error')
-        # #         sqlnewpath.rename(sqlpath)
-        # #         sqlitepath.touch()
-        # #         print('DUMP updated')
-        # # except Exception as e:
-        # #     sqlnewpath.unlink()
-        # #     print('Error: ', e)
-        if (not os.path.exists('ResourceFiles/Database/test_database.sql')) or os.path.getmtime('ResourceFiles/Database/test_database.sqlite')>os.path.getmtime('ResourceFiles/Database/test_database.sql'):
-            cmd='sqlite3 ResourceFiles/Database/test_database.sqlite .dump > ResourceFiles/Database/test_database.sql'
-            os.system(cmd)
-            Path('ResourceFiles/Database/test_database.sqlite').touch()
-            print('DUMP updated')
+        try:
+            sqlitepath = Path('ResourceFiles/Database/test_database.sqlite')
+            sqlpath = Path('ResourceFiles/Database/test_database.sql')
+            if sqlitepath.exists() and (
+                    not sqlpath.exists() or sqlpath.stat().st_size == 0 or sqlpath.stat().st_mtime < sqlitepath.stat().st_mtime - 1):
+                sqlnewpath = Path(str(sqlpath) + '.new')
+                cmd = 'sqlite3 ' + str(sqlitepath) + ' .dump > ' + str(sqlnewpath)
+                error = os.system(cmd)
+                if error != 0:
+                    raise Exception('SQLite conversion to SQL error')
+                if sqlnewpath.stat().st_size == 0:
+                    raise Exception('SQLite conversion to SQL error')
+                sqlnewpath.rename(sqlpath)
+                sqlitepath.touch()
+                print('DUMP updated')
+        except Exception as e:
+            sqlnewpath.unlink()
+            print('Error: ', e)
 
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()

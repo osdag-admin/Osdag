@@ -37,7 +37,7 @@ import openpyxl
 
 
 class Ui_Dialog(object):
-    def setupUi(self, DesignPreferences, main):
+    def setupUi(self, DesignPreferences, main, input_dictionary):
         DesignPreferences.setObjectName("DesignPreferences")
         DesignPreferences.resize(969, 624)
         self.gridLayout_5 = QtWidgets.QGridLayout(DesignPreferences)
@@ -495,7 +495,7 @@ class Ui_Dialog(object):
             if tab_type == TYPE_TAB_1:
                 tab = QtWidgets.QWidget()
                 tab.setObjectName(tab_name)
-                elements = tab_elements()
+                elements = tab_elements(main, input_dictionary)
                 _translate = QtCore.QCoreApplication.translate
                 i = 0
                 j = 6
@@ -535,6 +535,8 @@ class Ui_Dialog(object):
                         combo.setObjectName(element[0])
                         for item in element[3]:
                             combo.addItem(item)
+                        if input_dictionary:
+                            combo.setCurrentText(str(element[4]))
 
                     if type == TYPE_TITLE:
                         q = QtWidgets.QLabel(tab)
@@ -564,7 +566,8 @@ class Ui_Dialog(object):
                             r.setReadOnly(True)
                         if element[0] in [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY] and main.module_name(main) == KEY_DISP_BASE_PLATE:
                             r.setValidator(QDoubleValidator())
-
+                        if input_dictionary:
+                            r.setText(str(element[4]))
 
                     if type == TYPE_IMAGE:
                         im = QtWidgets.QLabel(tab)
@@ -628,10 +631,9 @@ class Ui_Dialog(object):
                 tab_index += 1
 
             elif tab_type == TYPE_TAB_2:
-
                 tab = QtWidgets.QWidget()
                 tab.setObjectName(tab_name)
-                elements = tab_elements()
+                elements = tab_elements(main, input_dictionary)
                 label_1 = QtWidgets.QLabel(tab)
                 font = QtGui.QFont()
                 font.setFamily("Arial")
@@ -676,11 +678,13 @@ class Ui_Dialog(object):
                         combo.setObjectName(element[0])
                         for item in element[3]:
                             combo.addItem(item)
-                        if element[0] == KEY_DP_BOLT_SLIP_FACTOR:
-                            combo.setCurrentIndex(4)
+                        # if element[0] == KEY_DP_BOLT_SLIP_FACTOR:
+                        #     combo.setCurrentIndex(4)
                         if element[0] == KEY_DP_DESIGN_METHOD:
                             combo.model().item(1).setEnabled(False)
                             combo.model().item(2).setEnabled(False)
+                        if input_dictionary:
+                            combo.setCurrentText(str(element[4]))
 
                     if type == TYPE_TITLE:
                         q = QtWidgets.QLabel(tab)
@@ -716,6 +720,8 @@ class Ui_Dialog(object):
                         if element[0] in [KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_WELD_MATERIAL_G_O]:
                             r.setValidator(dbl_validator)
                             r.setMaxLength(7)
+                        if input_dictionary:
+                            r.setText(str(element[4]))
 
                     if type == TYPE_IMAGE:
                         im = QtWidgets.QLabel(tab)
@@ -1430,11 +1436,11 @@ class Ui_Dialog(object):
 
 class DesignPreferences(QDialog):
 
-    def __init__(self, main, parent=None):
+    def __init__(self, main, input_dictionary, parent=None):
 
         QDialog.__init__(self, parent)
         self.ui = Ui_Dialog()
-        self.ui.setupUi(self, main)
+        self.ui.setupUi(self, main, input_dictionary)
         self.main_controller = parent
         #self.uiobj = self.main_controller.uiObj
         self.saved = None

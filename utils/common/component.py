@@ -17,9 +17,9 @@ import numpy as np
 from utils.common.common_calculation import *
 
 class Bolt(Material):
-
-    def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="",
-                 edge_type="", mu_f=0.0, corrosive_influences=True, bolt_tensioning=""):
+    #TODO: Bolt Need not inherit Material. Should Remove after unittests are in place.
+    def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="Standard",
+                 edge_type="a - Sheared or hand flame cut", mu_f=0.3, corrosive_influences=True, bolt_tensioning="Pretensioned"):
         super(Bolt, self).__init__(material_grade)
         if grade is not None:
             self.bolt_grade = list(np.float_(grade))

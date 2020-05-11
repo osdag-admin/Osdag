@@ -961,7 +961,7 @@ class Plate(Material):
                 #  This logic is in function get_web_plate_details
                 web_plate_h = False
         elif gauge == 0:
-            egde_dist = web_plate_h/2
+            edge_dist = web_plate_h/2
             if edge_dist >= max_edge_dist:
                 web_plate_h = False
 

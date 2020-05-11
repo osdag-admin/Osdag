@@ -586,7 +586,7 @@ class FinPlateConnection(ShearConnection):
             self.get_bolt_grade(self,bolt_capacity_req)
 
     def get_bolt_grade(self,bolt_capacity_req):
-        print(self.design_status, "Getting bolt grade")
+        # print(self.design_status, "Getting bolt grade")
         bolt_grade_previous = self.bolt.bolt_grade[-1]
 
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
@@ -616,7 +616,7 @@ class FinPlateConnection(ShearConnection):
 
     def get_fin_plate_details(self):
 
-        print(self.design_status,"getting fin plate details")
+        # print(self.design_status,"getting fin plate details")
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                 conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
@@ -879,9 +879,36 @@ class FinPlateConnection(ShearConnection):
 
     def get_design_status(self):
         if self.plate.design_status is True and self.weld.design_status is True:
-
             self.design_status = True
             logger.info("=== End Of Design ===")
+
+    def results_to_test(self, filename):
+        test_out_list = {KEY_OUT_DISP_D_PROVIDED:self.bolt.bolt_diameter_provided,
+                        KEY_OUT_DISP_GRD_PROVIDED:self.bolt.bolt_grade_provided,
+                        KEY_OUT_DISP_BOLT_SHEAR:self.bolt.bolt_shear_capacity,
+                        KEY_OUT_DISP_BOLT_BEARING:self.bolt.bolt_shear_capacity,
+                        KEY_OUT_DISP_BOLT_CAPACITY:self.bolt.bolt_capacity,
+                        KEY_OUT_DISP_BOLT_FORCE:self.plate.bolt_force,
+                        KEY_OUT_DISP_BOLT_LINE:self.plate.bolt_line,
+                        KEY_OUT_DISP_BOLTS_ONE_LINE:self.plate.bolts_one_line,
+                        KEY_OUT_DISP_PITCH:self.plate.pitch_provided,
+                        KEY_OUT_DISP_END_DIST:self.plate.end_dist_provided,
+                        KEY_OUT_DISP_GAUGE:self.plate.gauge_provided,
+                        KEY_OUT_DISP_EDGE_DIST:self.plate.edge_dist_provided,
+                        KEY_OUT_DISP_PLATETHK:self.plate.thickness_provided,
+                        KEY_OUT_DISP_PLATE_HEIGHT:self.plate.height,
+                        KEY_OUT_DISP_PLATE_LENGTH:self.plate.length,
+                        KEY_OUT_DISP_PLATE_SHEAR:self.plate.shear_yielding_capacity,
+                        KEY_OUT_DISP_PLATE_BLK_SHEAR:self.plate.block_shear_capacity,
+                        KEY_OUT_DISP_PLATE_MOM_DEMAND:self.plate.moment_demand,
+                        KEY_OUT_DISP_PLATE_MOM_CAPACITY:self.plate.moment_capacity,
+                        KEY_OUT_DISP_WELD_SIZE:self.weld.size,
+                        KEY_OUT_DISP_WELD_STRENGTH:self.weld.strength,
+                        KEY_OUT_DISP_WELD_STRESS:self.weld.stress}
+        f = open(filename, "w")
+        f.write(str(test_out_list))
+        f.close()
+        # return test_out_list
 
     # r'/ResourceFiles/images/ColumnsBeams".png'
     def save_design(self,popup_summary):

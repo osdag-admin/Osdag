@@ -1,14 +1,11 @@
 from design_type.connection.shear_connection import ShearConnection
-from design_type_command_prompt.connection.fin_plate_connection import FinPlateConnection
-from design_type_command_prompt.connection.column_cover_plate import ColumnCoverPlate
-from design_type_command_prompt.connection.end_plate_connection import EndPlateConnectionInput
-from design_type.connection.cleat_angle_connection import CleatAngleConnection
+from design_type.connection.fin_plate_connection import FinPlateConnection
 import yaml
 from utils.common.component import Bolt, Plate, Weld
 from Common import *
 import os
 
-path = r'.\ResourceFiles\Osi_Files'
+path = r'.\ResourceFiles\design_example'
 
 files = []
 # r=root, d=directories, f = files
@@ -24,10 +21,12 @@ for f in files:
 
     module = d['Module']
     if module == 'Fin Plate':
-        self = FinPlateConnection
-        self.set_osdaglogger()
-        self.set_input_values(self, d)
-        self.save_design(self, os.path.basename(f))
+        main = FinPlateConnection
+        main.set_osdaglogger(None)
+        main.set_input_values(main, d)
+        base = os.path.basename(f)
+        filename = str(os.path.splitext(base)[0])+".txt"
+        main.results_to_test(main, os.path.basename(filename))
     # elif module == 'Column Coverplate Connection':
     #     self = ColumnCoverPlate
     #     self.set_osdaglogger()

@@ -10,8 +10,6 @@ import time
 import math
 from Common import *
 import os
-import pdfkit
-import configparser
 from utils.common import component
 # from Connections.connection_calculations import ConnectionCalculations
 

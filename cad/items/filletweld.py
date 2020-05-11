@@ -60,22 +60,27 @@ class FilletWeld(object):
 
 
 if __name__ == '__main__':
-
     from OCC.Display.SimpleGui import init_display
+
     display, start_display, add_menu, add_function_to_menu = init_display()
+    from OCC.gp import gp_Pnt
 
     b = 10
     h = 10
     L = 50
 
-    origin = numpy.array([0.,0.,0.])
-    uDir = numpy.array([1.,0.,0.])
-    shaftDir = numpy.array([0.,0.,1.])
+    origin = numpy.array([0., 0., 0.])
+    uDir = numpy.array([0., 0., 1.])
+    shaftDir = numpy.array([0., 1., 0.])
 
     FWeld = FilletWeld(b, h, L)
     _place = FWeld.place(origin, uDir, shaftDir)
     point = FWeld.compute_params()
     prism = FWeld.create_model()
+
+    Point = gp_Pnt(0.0, 0.0, 0.0)
+    display.DisplayMessage(Point, "Origin")
+
     display.DisplayShape(prism, update=True)
     display.DisableAntiAliasing()
     start_display()

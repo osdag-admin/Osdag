@@ -1,35 +1,18 @@
 from design_type.connection.shear_connection import ShearConnection
 
 import time
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5 import QtCore, QtGui, QtWidgets
+
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from design_report.reportGenerator_latex import CreateLatex
 from utils.common.component import *
-from cad.common_logic import CommonDesignLogic
+#from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
-import yaml
-from design_report.reportGenerator import save_html
 from Report_functions import *
-import os
-import shutil
 import logging
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtGui import QTextCharFormat
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-import pickle
-import pdfkit
-import configparser
-import cairosvg
-from io import StringIO
+
 
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
@@ -87,11 +70,12 @@ class FinPlateConnection(ShearConnection):
         # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         # handler.setFormatter(formatter)
         # logger.addHandler(handler)
-        handler = OurLog(key)
-        # handler.setLevel(logging.DEBUG)
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        if key is not None:
+            handler = OurLog(key)
+            # handler.setLevel(logging.DEBUG)
+            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def module_name(self):
         return KEY_DISP_FINPLATE
@@ -345,7 +329,8 @@ class FinPlateConnection(ShearConnection):
 
         return out_list
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
+        all_errors = []
         self.design_status = False
         flag = False
         flag1 = False
@@ -383,9 +368,8 @@ class FinPlateConnection(ShearConnection):
                 lst1.append(row1)
             s_val = lst1[0][0]
             if p_val <= s_val:
-                QMessageBox.about(window, 'Information',
-                                  "Secondary beam depth is higher than clear depth of primary beam web "
-                                  "(No provision in Osdag till now)")
+                error = "Secondary beam depth is higher than clear depth of primary beam web " + "\n" + "(No provision in Osdag till now)"
+                all_errors.append(error)
             else:
                 flag1 = True
 
@@ -400,11 +384,10 @@ class FinPlateConnection(ShearConnection):
 
             s_beam_details = cursor2.fetchone()
             s_val = s_beam_details[0]
-            print(p_val,s_val)
+            #print(p_val,s_val)
             if p_val <= s_val:
-                QMessageBox.about(window, 'Information',
-                                  "Secondary beam width is higher than clear depth of primary column web "
-                                  "(No provision in Osdag till now)")
+                error = "Secondary beam width is higher than clear depth of primary column web " + "\n" + "(No provision in Osdag till now)"
+                all_errors.append(error)
             else:
                 flag1 = True
         else:
@@ -414,13 +397,13 @@ class FinPlateConnection(ShearConnection):
         supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_MATERIAL])
         available_plates = [i for i in selected_plate_thk if i >= supported_section.web_thickness]
         if not available_plates:
-            QMessageBox.about(window, 'Information',
-                              "Plate thickness should be greater than suppported section web thicknesss.")
+            error = "Plate thickness should be greater than suppported section web thicknesss."
+            all_errors.append(error)
         else:
             flag2=True
         if len(missing_fields_list) > 0:
-            QMessageBox.information(window, "Information",
-                                    generate_missing_fields_error_string(missing_fields_list))
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
             # flag = False
         else:
             flag = True
@@ -428,7 +411,31 @@ class FinPlateConnection(ShearConnection):
         if flag and flag1 and flag2:
             self.set_input_values(self, design_dictionary)
         else:
-            pass
+            return all_errors
+
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
 
     def warn_text(self):
 
@@ -518,6 +525,7 @@ class FinPlateConnection(ShearConnection):
         self.res_force = math.sqrt(self.load.shear_force ** 2 + self.load.axial_force ** 2) * 1000
 
         self.plate.thickness_provided = min(self.thickness_possible)
+        self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,thickness=self.plate.thickness_provided)
         bolts_required_previous = 2
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
@@ -636,6 +644,9 @@ class FinPlateConnection(ShearConnection):
     def get_plate_thickness(self):
         initial_plate_height = self.plate.height
         for self.plate.thickness_provided in self.thickness_possible:
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
+            print('plate_t_fy_fu', self.plate.thickness_provided,self.plate.fy,self.plate.fu)
             self.plate.height = initial_plate_height
             if self.connectivity in VALUES_CONN_1:
                 self.weld_connecting_plates = [self.supporting_section.flange_thickness, self.plate.thickness_provided]
@@ -813,6 +824,7 @@ class FinPlateConnection(ShearConnection):
                 fillet_size=self.weld.size, available_length=self.weld.length)
             self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
                                                 weld_fabrication=self.weld.fabrication,
+
                                                 t_weld=self.weld.size, weld_angle=90)
             Ip_weld = 2 * self.weld.eff_length ** 3 / 12
             y_max = self.weld.eff_length / 2
@@ -1118,21 +1130,22 @@ class FinPlateConnection(ShearConnection):
               get_pass_fail(self.weld.stress, self.weld.strength, relation="lesser"))
         self.report_check.append(t1)
 
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         # config = configparser.ConfigParser()
         # config.read_file(open(r'Osdag.config'))
         # desktop_path = config.get("desktop_path", "path1")
         # print("desk:", desktop_path)
-        print(sys.path[0])
+        #print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
 
-        file_type = "PDF (*.pdf)"
-        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        #file_type = "PDF (*.pdf)"
+        #filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
         # filename = os.path.join(str(folder), "images_html", "TexReport")
-        file_name = str(filename)
-        fname_no_ext = filename[0].split(".")[0]
+        #file_name = str(filename)
+        fname_no_ext = popup_summary['filename']
+
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_3D_image)
 

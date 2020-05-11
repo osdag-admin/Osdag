@@ -252,7 +252,7 @@ class Nut(Material):
 class Section(Material):
 
     def __init__(self, designation, material_grade=""):
-        super(Section, self).__init__(material_grade)
+
         self.designation = designation
         self.type = "Rolled"
         self.type2 = "generally"
@@ -276,20 +276,22 @@ class Section(Material):
         self.plast_sec_mod_z = 0.0
         self.plast_sec_mod_y = 0.0
         self.source = 0.0
+        max_thickness = max(self.flange_thickness,self.web_thickness)
+        super(Section, self).__init__(material_grade,max_thickness)
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
         self.block_shear_capacity = 0.0
+        self.tension_capacity_flange = 0.0
+
+        self.tension_yielding_capacity_web = 0.0  #
+        self.tension_rupture_capacity_web = 0.0
+        self.block_shear_capacity_web = 0.0
+        self.tension_capacity_web = 0.0
 
         # self.shear_yielding_capacity = 0.0
         # self.shear_rupture_capacity = 0.0
-
-        self.tension_capacity_flange = 0.0
         self.shear_capacity_flange = 0.0
-        self.tension_capacity_web = 0.0
         self.shear_capacity_web = 0.0
-        self.tension_yielding_capacity_web=0.0
-        self.tension_rupture_capacity_web=0.0
-        self.block_shear_capacity_web=0.0
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
@@ -761,7 +763,7 @@ class Weld(Material):
 
     def weld_size(self, plate_thickness, member_thickness, edge_type = "Square"):
 
-        max_weld_thickness = int(min(plate_thickness, member_thickness))
+        max_weld_thickness = (min(plate_thickness, member_thickness))
         if plate_thickness<=10:
             min_weld_thickness = 3
         elif plate_thickness>=10 and plate_thickness<=20:
@@ -790,6 +792,8 @@ class Weld(Material):
             pass
         self.size = weld_thickness
         self.reason = weld_reason
+        self.red = red
+        self.min_weld = min_weld_thickness
 
 class Plate(Material):
 

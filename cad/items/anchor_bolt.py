@@ -93,7 +93,7 @@ class AnchorBolt_A(object):
 
 class AnchorBolt_B(object):
 
-    def __init__(self, l, c, a, r, ex):
+    def __init__(self, l, r, ex, c=0, a=0):
         self.ex = ex
         self.l = l
         self.c = c
@@ -168,7 +168,7 @@ class AnchorBolt_B(object):
 
 class AnchorBolt_Endplate(object):
 
-    def __init__(self, l, c, a, r, ex):
+    def __init__(self, l, r, ex, c=0, a=0):
         self.ex = ex
         self.l = l
         self.c = c

@@ -22,6 +22,10 @@ from design_report.reportGenerator_latex import CreateLatex
 # from design_type.connection.fin_plate_connection import sa
 
 class Ui_Dialog1(object):
+
+    def __init__(self,design_exist):
+        self.design_exist = design_exist
+
     def setupUi(self, Dialog,main):
         Dialog.setObjectName("Dialog")
         Dialog.resize(539, 595)
@@ -164,7 +168,12 @@ class Ui_Dialog1(object):
         Dialog.setTabOrder(self.txt_additionalComments, self.buttonBox)
 
     def save_inputSummary(self,main):
-        input_summary = self.getPopUpInputs()
+        input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
+        file_type = "PDF (*.pdf)"
+        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        fname_no_ext = filename[0].split(".")[0]
+        input_summary['filename'] = fname_no_ext
+        input_summary['does_design_exist'] = self.design_exist
         main.save_design(main,input_summary)
 
 
@@ -225,4 +234,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())
-

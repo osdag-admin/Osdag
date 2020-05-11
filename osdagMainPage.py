@@ -89,7 +89,6 @@ sqlpath = Path('ResourceFiles/Database/test_database.sql')
 sqlitepath = Path('ResourceFiles/Database/test_database.sqlite')
 
 if sqlpath.exists():
-    print(sqlitepath.stat().st_mtime, sqlpath.stat().st_mtime, sqlpath.stat().st_mtime - 1,sqlitepath.stat().st_size)
     if not sqlitepath.exists():
         cmd = 'sqlite3 ' + str(sqlitepath) + ' < ' + str(sqlpath)
         os.system(cmd)
@@ -102,10 +101,11 @@ if sqlpath.exists():
             sqlitenewpath = Path('ResourceFiles/Database/test_database_new.sqlite')
             cmd = 'sqlite3 ' + str(sqlitenewpath) + ' < ' + str(sqlpath)
             error = os.system(cmd)
-            # if error != 0:
-            #     raise Exception('SQL to SQLite conversion error')
-            # if sqlitenewpath.stat().st_size == 0:
-            #     raise Exception('SQL to SQLite conversion error')
+            print(error)
+            if error != 0:
+                 raise Exception('SQL to SQLite conversion error 1')
+            if sqlitenewpath.stat().st_size == 0:
+                 raise Exception('SQL to SQLite conversion error 2')
             os.remove(sqlitepath)
             sqlitenewpath.rename(sqlitepath)
             sqlpath.touch()
@@ -425,10 +425,10 @@ class OsdagMainWindow(QMainWindow):
                 sqlnewpath = Path('ResourceFiles/Database/test_database_new.sql')
                 cmd = 'sqlite3 ' + str(sqlitepath) + ' .dump > ' + str(sqlnewpath)
                 error = os.system(cmd)
-                # if error != 0:
-                #     raise Exception('SQLite conversion to SQL error')
-                # if sqlnewpath.stat().st_size == 0:
-                #     raise Exception('SQLite conversion to SQL error')
+                if error != 0:
+                     raise Exception('SQLite conversion to SQL error 1')
+                if sqlnewpath.stat().st_size == 0:
+                     raise Exception('SQLite conversion to SQL error 2')
                 os.remove(sqlpath)
                 sqlnewpath.rename(sqlpath)
                 sqlitepath.touch()

@@ -351,7 +351,7 @@ class FinPlateConnection(ShearConnection):
             # elif option[2] == TYPE_MODULE:
             #     if design_dictionary[option[0]] == "Fin Plate":
 
-        if design_dictionary[KEY_CONN] == 'Beam-Beam':
+        if design_dictionary[KEY_CONN] == VALUES_CONN_2[0]:
             primary = design_dictionary[KEY_SUPTNGSEC]
             secondary = design_dictionary[KEY_SUPTDSEC]
             conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -373,7 +373,7 @@ class FinPlateConnection(ShearConnection):
             else:
                 flag1 = True
 
-        elif design_dictionary[KEY_CONN] == 'Column web-Beam web':
+        elif design_dictionary[KEY_CONN] == VALUES_CONN_1[1]:
             primary = design_dictionary[KEY_SUPTNGSEC]
             secondary = design_dictionary[KEY_SUPTDSEC]
             conn = sqlite3.connect(PATH_TO_DATABASE)

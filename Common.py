@@ -426,6 +426,21 @@ KEY_DISP_GRD_FOOTING = 'Grade*'
 VALUES_GRD_FOOTING = ['Select Grade', 'M10', 'M15', 'M20', 'M25', 'M30', 'M35', 'M40', 'M45', 'M50', 'M55']
 
 
+# Applied load
+KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load (kNm)'
+KEY_DISP_AXIAL_FORCE_CON= 'Axial Load Considered (kN)'
+
+# capacity
+KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member Ac (kN)"
+KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member Sc (kN)"
+KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member Mc (kNm)"
+KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity Pmc (kNm)'
+KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria Mdc (kNm)'
+
+
+
 KEY_OUT_ANCHOR_BOLT_SHEAR = 'Anchor Bolt.Shear'
 KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_ANCHOR_BOLT_BEARING = 'Anchor Bolt.Bearing'
@@ -455,19 +470,10 @@ KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity (kNm)"
 KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity (kNm)'
 KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
 
-KEY_OUT_ANCHOR_BOLT_SHEAR = 'Anchor Bolt.Shear'
-KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
-KEY_OUT_ANCHOR_BOLT_BEARING = 'Anchor Bolt.Bearing'
-KEY_OUT_DISP_ANCHOR_BOLT_BEARING = 'Bearing Capacity (kN)'
-KEY_OUT_ANCHOR_BOLT_CAPACITY = 'Anchor Bolt.Capacity'
-KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
-KEY_OUT_ANCHOR_BOLT_COMBINED = 'Anchor Bolt.Combined'
-KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity'
-
 KEY_OUT_BASEPLATE_THICKNNESS = 'Baseplate.Thickness'
-KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (tp)'
+KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (mm)'
 KEY_OUT_BASEPLATE_LENGTH = 'Baseplate.Length'
-KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (lp)'
+KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (mm)'
 KEY_OUT_BASEPLATE_WIDTH = 'Baseplate.Width'
 KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (wp)'
 
@@ -510,6 +516,7 @@ KEY_OUT_DISP_STIFFENER_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
 KEY_OUT_STIFFENER_PLATE_MOMENT = 'StiffenerPlate.Moment'
 KEY_OUT_DISP_STIFFENER_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 
+
 ###################################
 # Key for Storing Shear sub-key of Load
 KEY_SHEAR = 'Load.Shear'
@@ -529,7 +536,7 @@ DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
 
 DISP_TITLE_WELD = 'Weld'
 DISP_TITLE_WELD_CAPACITY = 'Weld Capacity'
-
+DISP_TITLE_END_CONNECTION = 'End Connection'
 
 DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
@@ -558,6 +565,8 @@ VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8',
 #################################
 # Key for storing Plate
 DISP_TITLE_PLATE = 'Plate'
+DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
+
 
 # Key for storing Thickness sub-key of Plate
 KEY_PLATETHK = 'Plate.Thickness'
@@ -1177,8 +1186,10 @@ KEY_OUT_PLATETHK = 'Plate.Thickness'
 KEY_OUT_DISP_PLATETHK = 'Thickness (mm)'
 KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_PLATE_HEIGHT = 'Height (mm)'
+KEY_OUT_DISP_PLATE_MIN_HEIGHT = 'Min.Height (mm)'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
+KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Length (mm)'
 KEY_OUT_PLATE_WIDTH = 'Plate.Width'
 KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 c = 'Width (mm)'
@@ -1236,6 +1247,9 @@ KEY_PITCH_2_FLANGE = 'ColumnEndPlate.p2_flange'
 KEY_DISP_PITCH_2_FLANGE = 'Pitch2 along Flange'
 KEY_PITCH_2_WEB = 'ColumnEndPlate.p2_web'
 KEY_DISP_PITCH_2_WEB = 'Pitch2 along Web'
+KEY_CONN_PREFERENCE = 'plate.design_method'
+KEY_DISP_CONN_PREFERENCE = 'Design Method'
+VALUES_CONN_PREFERENCE = ["Select","Plate Oriented", "Bolt Oriented"]
 
 
 DISP_TITLE_WELD = 'Weld'

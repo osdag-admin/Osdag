@@ -264,7 +264,7 @@ class Nut(Material):
 class Section(Material):
 
     def __init__(self, designation, material_grade=""):
-        super(Section, self).__init__(material_grade)
+
         self.designation = designation
         self.type = "Rolled"
         self.type2 = "generally"
@@ -288,7 +288,8 @@ class Section(Material):
         self.plast_sec_mod_z = 0.0
         self.plast_sec_mod_y = 0.0
         self.source = 0.0
-
+        max_thickness = max(self.flange_thickness,self.web_thickness)
+        super(Section, self).__init__(material_grade,max_thickness)
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
         self.block_shear_capacity = 0.0

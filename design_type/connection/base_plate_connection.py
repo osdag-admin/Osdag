@@ -182,7 +182,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.standard_plate_thk = []
         self.neglect_anchor_dia = []
         self.anchor_bolt = ''
-        self.anchor_dia_provided = 1
+        self.anchor_dia_provided = 'M8'
         self.anchor_length_min = 1
         self.anchor_length_max = 1
         self.anchor_length_provided = 1
@@ -298,6 +298,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         """
         Return a-list of tuple, used to create the Base Plate input dock U.I in Osdag design window.
         """
+
         self.module = KEY_DISP_BASE_PLATE
 
         options_list = []
@@ -515,46 +516,46 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t23)
 
         t24 = (KEY_OUT_GUSSET_PLATE_THICKNNESS, KEY_OUT_DISP_GUSSET_PLATE_THICKNESS, TYPE_TEXTBOX,
-               self.gusset_plate_thick if flag else '')
+               self.gusset_plate_thick if flag and self.gusset_along_flange == 'Yes' else '')
         out_list.append(t24)
 
         t25 = (KEY_OUT_GUSSET_PLATE_SHEAR_DEMAND, KEY_OUT_DISP_GUSSET_PLATE_SHEAR_DEMAND, TYPE_TEXTBOX,
-               self.shear_on_gusset if flag else '')
+               self.shear_on_gusset if flag and self.gusset_along_flange == 'Yes' else '')
         out_list.append(t25)
 
         t26 = (KEY_OUT_GUSSET_PLATE_SHEAR, KEY_OUT_DISP_GUSSET_PLATE_SHEAR, TYPE_TEXTBOX,
-               self.shear_capacity_gusset if flag else '')
+               self.shear_capacity_gusset if flag and self.gusset_along_flange == 'Yes' else '')
         out_list.append(t26)
 
         t27 = (KEY_OUT_GUSSET_PLATE_MOMENT_DEMAND, KEY_OUT_DISP_GUSSET_PLATE_MOMENT_DEMAND, TYPE_TEXTBOX,
-               self.moment_on_gusset if flag else '')
+               self.moment_on_gusset if flag and self.gusset_along_flange == 'Yes' else '')
         out_list.append(t27)
 
         t28 = (KEY_OUT_GUSSET_PLATE_MOMENT, KEY_OUT_DISP_GUSSET_PLATE_MOMENT, TYPE_TEXTBOX,
-               self.moment_capacity_gusset if flag else '')
+               self.moment_capacity_gusset if flag and self.gusset_along_flange == 'Yes' else '')
         out_list.append(t28)
 
         t29 = (None, DISP_TITLE_STIFFENER_PLATE, TYPE_TITLE, None)
         out_list.append(t29)
 
         t30 = (KEY_OUT_STIFFENER_PLATE_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_THICKNESS, TYPE_TEXTBOX,
-               self.stiffener_plate_thick if flag else '')
+               self.stiffener_plate_thick if flag and self.gusset_along_web == 'Yes' else '')
         out_list.append(t30)
 
         t31 = (KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND, TYPE_TEXTBOX,
-               self.shear_on_stiffener if flag else '')
+               self.shear_on_stiffener if flag and self.gusset_along_web == 'Yes' else '')
         out_list.append(t31)
 
         t32 = (KEY_OUT_STIFFENER_PLATE_SHEAR, KEY_OUT_DISP_STIFFENER_PLATE_SHEAR, TYPE_TEXTBOX,
-               self.shear_capacity_stiffener if flag else '')
+               self.shear_capacity_stiffener if flag and self.gusset_along_web == 'Yes' else '')
         out_list.append(t32)
 
         t33 = (KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_MOMENT_DEMAND, TYPE_TEXTBOX,
-               self.moment_on_stiffener if flag else '')
+               self.moment_on_stiffener if flag and self.gusset_along_web == 'Yes' else '')
         out_list.append(t33)
 
         t34 = (KEY_OUT_STIFFENER_PLATE_MOMENT, KEY_OUT_DISP_STIFFENER_PLATE_MOMENT, TYPE_TEXTBOX,
-               self.moment_capacity_stiffener if flag else '')
+               self.moment_capacity_stiffener if flag and self.gusset_along_web == 'Yes' else '')
         out_list.append(t34)
 
         t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None)
@@ -573,7 +574,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t21)
 
         t22 = (KEY_OUT_WELD_SIZE_STIFFENER, KEY_OUT_DISP_WELD_SIZE_STIFFENER, TYPE_TEXTBOX,
-               self.weld_size_stiffener if flag and self.weld_type != 'Butt Weld' else '')
+               self.weld_size_stiffener if flag and self.weld_type != 'Butt Weld' and self.gusset_along_flange == 'Yes' else '')
         out_list.append(t22)
 
         return out_list
@@ -970,6 +971,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         Returns: None
         """
         # attributes of input dock
+        self.mainmodule = "Moment Connection"
         self.connectivity = str(design_dictionary[KEY_CONN])
         self.end_condition = str(design_dictionary[KEY_END_CONDITION])
         self.column_section = str(design_dictionary[KEY_SUPTNGSEC])
@@ -1606,11 +1608,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.gusset_plate_thick = round_up(thk_req, 2, self.column_tf)  # mm
                 self.stiffener_plate_thick = self.gusset_plate_thick  # mm
 
+                # update the length pf the stiffener plate
+                self.stiffener_plate_length = self.stiffener_plate_length - self.gusset_plate_thick  # mm
+
                 # height of the gusset/stiffener plate
                 # the size of the landing is 100 mm along vertical dimension and 50 mm along horizontal dimension
                 # the assumed inclination of the gusset/stiffener plate is 45 degrees
-                self.stiffener_plate_height = self.stiffener_plate_length + 100  # mm
-                self.gusset_plate_height = max((self.gusset_outstand_length + 100), self.stiffener_plate_height)  # mm
+                self.stiffener_plate_height = self.stiffener_plate_length + 50  # mm
+                self.gusset_plate_height = max((self.gusset_outstand_length + 50), self.stiffener_plate_height)  # mm
 
                 # defining stresses for the connectivity types
                 if self.connectivity == 'Welded-Slab Base':
@@ -1762,7 +1767,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         print(self.weld_size_flange if self.weld_type != 'Butt Weld' else '')  # Size at Flange (mm)
         print(self.weld_size_web if self.weld_type != 'Butt Weld' else '')  # Size at Web (mm)
-        print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # Size at Gusset/Stiffener (mm)
+
+        if self.gusset_along_flange == 'Yes':
+            print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # Size at Gusset/Stiffener (mm)
 
         # this might not be required
         # print(self.weld_size if self.weld_type != 'Butt Weld' else '')  # Weld size (mm)

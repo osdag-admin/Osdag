@@ -288,6 +288,7 @@ class SeatedAngleConnection(ShearConnection):
         self.topangle_list = design_dictionary[KEY_TOPANGLE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        self.material_grade = design_dictionary[KEY_MATERIAL]
         # self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL], material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O], fabrication=design_dictionary[KEY_DP_WELD_FAB])
         # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
         print("input values are set. Doing preliminary member checks")
@@ -303,7 +304,7 @@ class SeatedAngleConnection(ShearConnection):
         self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
 
         if self.supported_section.shear_yielding_capacity > self.load.shear_force :
-            print("preliminary member check is satisfactory. Doing bolt checks")
+            print("preliminary member check is satisfactory. Checking available angle thickness")
             self.design_status = True
             self.select_angle_thickness(self)
         else:
@@ -327,8 +328,14 @@ class SeatedAngleConnection(ShearConnection):
                                                             self.supported_section.fy)
             # Distance from the end of bearing on cleat to root angle OR A TO B in Fig 5.31 in Subramanian's book
             b2 = max(b1 + self.plate.gap - seated.thickness - seated.root_radius, 0)
-
-            if seated.thickness * 2 <= self.supported_section.web_thickness:
+            # self.seated_angle.width = self.supported_section.flange_width
+            [self.plate.moment_demand, self.plate.moment_capacity] = \
+                self.check_moment_capacity(self.load.shear_force, seated.thickness,self.seated_angle.width,
+                                           b1,b2,self.material.fy)
+            area = self.seated_angle.width * seated.thickness
+            gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+            self.plate.shear_capacity = IS800_2007.cl_8_4_design_shear_strength(area, self.material.fy, gamma_m0)
+            if self.plate.moment_capacity < self.plate.moment_demand and self.plate.shear_capacity < self.load.shear_force:
                 self.seated_list.pop()
                 print("popped", designation)
             else:
@@ -337,18 +344,10 @@ class SeatedAngleConnection(ShearConnection):
                     print("added", designation, self.plate.angle_thickness)
 
         if self.plate.angle_thickness:
-            logger.info("Required Seated Angle thickness available. Doing preliminary member checks")
+            logger.info("Required Seated Angle thickness available. Getting angle leg size")
             self.member_capacity(self)
         else:
             logger.error("Increase Seated Angle thickness")
-
-        self.seated_angle.width = self.supported_section.flange_width
-
-
-
-
-
-        return self.seated_angle.thickness
 
     def check_moment_capacity(self, shear, thickness, width, b1, b2, fy):
         if b1<=b2:
@@ -356,7 +355,11 @@ class SeatedAngleConnection(ShearConnection):
         else:
             moment_at_root_angle = round(float(shear) * (b2 / b1) * (b2 / 2), 3)
 
-        moment_capacity = width * thickness **2 * fy/ 4
+        Z_p = width * thickness ** 2 / 4
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        plate_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(1.0, Z_p, fy, gamma_m0)
+
+        return moment_at_root_angle, plate_moment_capacity
 
 
 

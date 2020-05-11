@@ -14,7 +14,7 @@
 *.bak
 .project
 .pydevproject
-output/*
+Output_PDF/*
 venv/*
 Osdag_Workspace/*
 /Osdag.config

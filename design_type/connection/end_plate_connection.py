@@ -130,9 +130,9 @@ class EndPlateConnection(ShearConnection):
 
     def input_values(self, existingvalues={}):
 
-        '''
+        """
         Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
-        '''
+        """
 
         # @author: Amir, Umair
         self.module = KEY_DISP_ENDPLATE
@@ -433,16 +433,13 @@ class EndPlateConnection(ShearConnection):
                 logger.error(" : Select plate of higher thickness")
                 break
 
-
             for t in self.plate.thickness:
                 if t >= self.plate.thickness_check:
                     self.plate.thickness_check = t
                     break
 
-
             if self.plate.thickness_provided < self.plate.thickness_check:
                 design_status_plate = False
-
 
             # TO GET BOLT BEARING CAPACITY CORRESPONDING TO PLATE THICKNESS AND Fu AND Fy #
             self.bolt_conn_plates_t_fu_fy = []
@@ -518,12 +515,12 @@ class EndPlateConnection(ShearConnection):
                         end_dist = self.bolt.min_end_dist_round
                         if web_plate_h > ((bolt_rows-1)*pitch + 2*end_dist):
                             [pitch, end_dist, web_plate_h] = self.plate.get_gauge_edge_dist(web_plate_h,
-                                                bolt_rows ,self.bolt.min_end_dist_round, self.max_plate_height,
+                                                bolt_rows, self.bolt.min_end_dist_round, self.max_plate_height,
                                                 self.bolt.max_edge_dist_round)
 
                         self.plate.height = web_plate_h
                         self.plate.plate_moment = self.bolt.min_edge_dist_round * self.bolt.bolt_tension
-                        self.plate.plate_shear =self.load.shear_force*1000
+                        self.plate.plate_shear = self.load.shear_force*1000
 
                         [self.plate.plate_moment_capacity, self.plate.plate_shear_capacity, self.plate.plate_block_shear_capacity] = \
                             self.get_plate_capacity(self, self.plate.thickness_provided, self.plate.height, pitch,

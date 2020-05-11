@@ -194,7 +194,7 @@ def moment_demand_req_bolt_force(shear_load, web_moment,moment_demand,ecc):
     loads_req_bolt_force_eqn = Math(inline=True)
 
     loads_req_bolt_force_eqn.append(NoEscape(r'\begin{aligned}  M_d~~ &= (V_u * ecc + M_w)\\'))
-    loads_req_bolt_force_eqn.append(NoEscape(r' &= \frac{('+shear_load+' * 10^3'+ecc+' + '+web_moment+r'*10^6)}{10^6}\\'))
+    loads_req_bolt_force_eqn.append(NoEscape(r' &= \frac{('+shear_load+' * 10^3 *'+ecc+' + '+web_moment+r'*10^6)}{10^6}\\'))
     loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\end{aligned}'))
     return loads_req_bolt_force_eqn
 
@@ -286,8 +286,8 @@ def forces_in_flange(Au, B,T,A,D,Mu,Mw,Mf,Af,ff):
     forcesinflange_eqn.append(NoEscape(r'&= ' + Mu + '-' + Mw + r'\\'))
     forcesinflange_eqn.append(NoEscape(r'&=' + Mf + r'\\'))
     forcesinflange_eqn.append(NoEscape(r' F_f& =flange~force  \\'))
-    forcesinflange_eqn.append(NoEscape(r'& = \frac{M_f *1000}{D-T} + A_f \\'))
-    forcesinflange_eqn.append(NoEscape(r'&= \frac{' + Mf + '* 1000}{' + D + '-' + T + '} +' + Af + r' \\'))
+    forcesinflange_eqn.append(NoEscape(r'& = \frac{M_f *10^3}{D-T} + A_f \\'))
+    forcesinflange_eqn.append(NoEscape(r'&= \frac{' + Mf + '* 10^3}{' + D + '-' + T + '} +' + Af + r' \\'))
     forcesinflange_eqn.append(NoEscape(r'&=' + ff + r'\end{aligned}'))
     return forcesinflange_eqn
 
@@ -460,15 +460,16 @@ def height_of_flange_cover_plate(B,sp,b_fp): #weld
     height_for_flange_cover_plate_eqn.append(NoEscape(r'&=' + b_fp + '\end{aligned}'))
     return height_for_flange_cover_plate_eqn
 
-def height_of_web_cover_plate(D,sp,b_wp,T): #weld
+def height_of_web_cover_plate(D,sp,b_wp,T,R_1): #weld
     D = str(D)
     sp = str(sp)
     b_wp = str (b_wp)
+    R_1 = str(R_1)
     T= str(T)
     height_for_web_cover_plate_eqn =Math(inline=True)
 
-    height_for_web_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= {D-2*T - 2*sp} \\'))
-    height_for_web_cover_plate_eqn.append(NoEscape(r'&= {' + D + ' - 2 * ' +T+'- 2 *'+ sp + r'} \\'))
+    height_for_web_cover_plate_eqn.append(NoEscape(r'\begin{aligned} b_{fp} &= {D-2*T -(2 * R_1)- 2*sp} \\'))
+    height_for_web_cover_plate_eqn.append(NoEscape(r'&= {' + D + ' - 2 * ' +T+'- (2 *'+ R_1+')- 2 *'+ sp + r'} \\'))
 
     height_for_web_cover_plate_eqn.append(NoEscape(r'&=' + b_wp + '\end{aligned}'))
     return height_for_web_cover_plate_eqn
@@ -694,16 +695,16 @@ def weld_strength_req(V,A,M,Ip_w,y_max,x_max,l_w,R_w):
 
     return weld_stress_eqn
 
-
-def weld_strength_stress(V_u,A_w,M_w,Ip_w,y_max,x_max,l_eff,R_w):
-    T_wh = str(round(M_w * y_max/Ip_w,2))
-    T_wv = str(round(M_w * x_max/Ip_w,2))
-    V_wv = str(round(V_u /l_eff,2))
+#
+def weld_strength_stress(V_u,A_w,M_d,Ip_w,y_max,x_max,l_eff,R_w):
+    T_wh = str(round(M_d * y_max/Ip_w,2))
+    T_wv = str(round(M_d * x_max/Ip_w,2))
+    V_wv = str(round(V_u  /l_eff,2))
     A_wh = str(round(A_w/l_eff,2))
 
     V_u= str(V_u)
     A_w = str(A_w)
-    M_w= str(M_w)
+    M_d= str(M_d)
     Ip_w = str(Ip_w)
     y_max = str(y_max)
     x_max = str(x_max)
@@ -711,10 +712,14 @@ def weld_strength_stress(V_u,A_w,M_w,Ip_w,y_max,x_max,l_eff,R_w):
     R_w = str(R_w)
     weld_stress_eqn = Math(inline=True)
     weld_stress_eqn.append(NoEscape(r'\begin{aligned} R_w&=\sqrt{(T_{wh}+A_{wh})^2 + (T_{wv}+V_{wv})^2}\\'))
-    weld_stress_eqn.append(NoEscape(r'T_{wh}&=\frac{M_w*y_{max}}{I{pw}}=\frac{'+M_w+'*'+y_max+'}{'+Ip_w+r'}\\'))
-    weld_stress_eqn.append(NoEscape(r'T_{wv}&=\frac{M_w*x_{max}}{I{pw}}=\frac{'+M_w+'*'+x_max+'}{'+Ip_w+r'}\\'))
-    weld_stress_eqn.append(NoEscape(r'V_{wv}&=\frac{V_u}{l_{eff}}=\frac{'+V_u+'}{'+l_eff+r'}\\'))
-    weld_stress_eqn.append(NoEscape(r'A_{wh}&=\frac{A_u}{l_{eff}}=\frac{'+A_w+'}{'+l_eff+r'}\\'))
+    weld_stress_eqn.append(NoEscape(r'T_{wh}&=\frac{M_d*y_{max}}{I{pw}}\\'))
+    weld_stress_eqn.append(NoEscape(r'&=\frac{'+M_d+'*'+y_max+'}{'+Ip_w+r'}\\'))
+    weld_stress_eqn.append(NoEscape(r'T_{wv}&=\frac{M_d* x_{max}}{I{pw}}\\'))
+    weld_stress_eqn.append(NoEscape(r'&=\frac{'+M_d+'*'+x_max+'}{'+Ip_w+r'}\\'))
+    weld_stress_eqn.append(NoEscape(r'V_{wv}&=\frac{V_u}{l_{eff}}\\ '))
+    weld_stress_eqn.append(NoEscape(r'&=\frac{'+V_u+'}{'+l_eff+r'}\\'))
+    weld_stress_eqn.append(NoEscape(r'A_{wh}&=\frac{A_u}{l_{eff}}\\'))
+    weld_stress_eqn.append(NoEscape(r'&=\frac{'+A_w+'}{'+l_eff+r'}\\'))
     weld_stress_eqn.append(NoEscape(r'R_w&=\sqrt{('+T_wh+'+'+A_wh+r')^2 + ('+T_wv+'+'+V_wv+r')^2}\\'))
     weld_stress_eqn.append(NoEscape(r'&='+R_w+r'\end{aligned}'))
 
@@ -739,8 +744,8 @@ def axial_capacity(area,fy, gamma_m0,axial_capacity): #todo anjali
     gamma_m0=str(gamma_m0)
     axial_capacity = str(axial_capacity)
     axial_capacity_eqn = Math(inline=True)
-    axial_capacity_eqn.append(NoEscape(r'\begin{aligned} Ac &=\frac{A*f_y}{\gamma_{m0} *1000}\\'))
-    axial_capacity_eqn.append(NoEscape(r'&=\frac{'+area+'*'+fy+'}{'+ gamma_m0+r'* 1000}\\'))
+    axial_capacity_eqn.append(NoEscape(r'\begin{aligned} Ac &=\frac{A*f_y}{\gamma_{m0} *10^3}\\'))
+    axial_capacity_eqn.append(NoEscape(r'&=\frac{'+area+'*'+fy+'}{'+ gamma_m0+r'* 10^3}\\'))
     axial_capacity_eqn.append(NoEscape(r'&=' + axial_capacity + r'\end{aligned}'))
     return axial_capacity_eqn
 
@@ -771,8 +776,8 @@ def shear_capacity(h, t,f_y, gamma_m0,shear_capacity): # same as #todo anjali
     gamma_m0 = str(gamma_m0)
     shear_capacity = str(shear_capacity)
     shear_capacity_eqn = Math(inline=True)
-    shear_capacity_eqn.append(NoEscape(r'\begin{aligned} S_c &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo} *1000}\\'))
-    shear_capacity_eqn.append(NoEscape(r'&=\frac{' + h + r'*' + t + r'*' + f_y + r'}{\sqrt{3}*' + gamma_m0 + r' *1000}\\'))
+    shear_capacity_eqn.append(NoEscape(r'\begin{aligned} S_c &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo} *10^3}\\'))
+    shear_capacity_eqn.append(NoEscape(r'&=\frac{' + h + r'*' + t + r'*' + f_y + r'}{\sqrt{3}*' + gamma_m0 + r' *10^3}\\'))
     shear_capacity_eqn.append(NoEscape(r'&=' + shear_capacity + r'\end{aligned}'))
     return shear_capacity_eqn
 #
@@ -805,8 +810,8 @@ def plastic_moment_capacty(beta_b, Z_p, f_y, gamma_m0 ,Pmc):  # same as #todo an
     gamma_m0 =str(gamma_m0 )
     Pmc = str(Pmc)
     Pmc_eqn = Math(inline=True)
-    Pmc_eqn.append(NoEscape(r'\begin{aligned} Pmc &= \frac{\beta_b * Z_p *fy}{\gamma_{mo} * 1000000}\\'))
-    Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_b + r'*' +Z_p + r'*' + f_y + r'}{' + gamma_m0 + r' * 1000000}\\'))
+    Pmc_eqn.append(NoEscape(r'\begin{aligned} Pmc &= \frac{\beta_b * Z_p *fy}{\gamma_{mo} * 10^6}\\'))
+    Pmc_eqn.append(NoEscape(r'&=\frac{' + beta_b + r'*' +Z_p + r'*' + f_y + r'}{' + gamma_m0 + r' * 10^6}\\'))
     Pmc_eqn.append(NoEscape(r'&=' + Pmc + r'\end{aligned}'))
     return Pmc_eqn
 
@@ -815,8 +820,9 @@ def moment_d_deformation_criteria(fy,Z_e,Mdc):
     Z_e = str(Z_e)
     Mdc =str(Mdc)
     Mdc_eqn= Math(inline=True)
-    Mdc_eqn.append(NoEscape(r'\begin{aligned} Mdc &= \frac{1.5 *Z_e *fy}{1.1* 1000000}\\'))
-    Mdc_eqn.append(NoEscape(r'&= \frac{1.5 *'+Z_e + '*' +fy +r'}{1.1* 1000000}\\'))
+    Mdc_eqn.append(NoEscape(r'\begin{aligned} Mdc &= \frac{1.5 *Z_e *fy}{1.1* 10^6}\\'))
+    Mdc_eqn.append(NoEscape(r'&= \frac{1.5 *'+Z_e + '*' +fy +r'}{1.1* 10^6}\\'))
+
     Mdc_eqn.append(NoEscape(r'&= ' + Mdc+ r'\end{aligned}'))
     return  Mdc_eqn
 
@@ -968,8 +974,8 @@ def flange_weld_stress(F_f,l_eff,F_ws):
     l_eff = str(l_eff)
     F_ws = str(F_ws)
     flange_weld_stress_eqn = Math(inline=True)
-    flange_weld_stress_eqn.append(NoEscape(r'\begin{aligned} Stress &= \frac{F_f*1000}{l_{eff}}\\'))
-    flange_weld_stress_eqn.append(NoEscape(r' &= \frac{'+F_f+'*1000}{'+l_eff+ r'}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r'\begin{aligned} Stress &= \frac{F_f*10^3}{l_{eff}}\\'))
+    flange_weld_stress_eqn.append(NoEscape(r' &= \frac{'+F_f+'*10^3}{'+l_eff+ r'}\\'))
     flange_weld_stress_eqn.append(NoEscape(r'&= ' + F_ws+ r'\end{aligned}'))
 
     return flange_weld_stress_eqn
@@ -1169,7 +1175,7 @@ def eff_len_prov_out_in(l_eff, b_fp,b_ifp, t_w, l_w):
     t_w = str(t_w)
     eff_len_prov_out_in_eqn = Math(inline=True)
     eff_len_prov_out_in_eqn.append(NoEscape(r'\begin{aligned} l_{eff} &= (6*l_w) + b_{fp} + (2 * b_{ifp})- 6*t_w\\'))
-    eff_len_prov_out_in_eqn.append(NoEscape(r'&= (6*' + l_w + ') +' + b_fp + '+ 2*' +b_ifp + '- 2*' + t_w + r'\\'))
+    eff_len_prov_out_in_eqn.append(NoEscape(r'&= (6*' + l_w + ') +' + b_fp + '+ 2*' +b_ifp + '- 6*' + t_w + r'\\'))
     eff_len_prov_out_in_eqn.append(NoEscape(r'& = ' + l_eff + r'\end{aligned}'))
 
     return eff_len_prov_out_in_eqn

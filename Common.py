@@ -716,7 +716,7 @@ KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
 KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
 
-KEY_DISP_WELD_LEN_EFF_OUTSIDE = 'EffLength. Outer and Inner flange'
+KEY_DISP_WELD_LEN_EFF_OUTSIDE = 'EffLength. Outer+Inner flange'
 KEY_DISP_CLEARANCE = "Clearance (mm)"
 KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
 KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'

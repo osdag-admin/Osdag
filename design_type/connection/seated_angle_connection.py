@@ -62,8 +62,8 @@ class SeatedAngleConnection(ShearConnection):
     def __init__(self):
 
         super(SeatedAngleConnection, self).__init__()
-        self.seated_angle = Angle(designation=seated_angle_section, material=self.material)
-        self.top_angle = Angle(designation=top_angle_section, material=self.material)
+        # self.seated_angle = Angle(designation=seated_angle_section, material=self.material)
+        # self.top_angle = Angle(designation=top_angle_section, material=self.material)
 
         self.design_status = False
 
@@ -234,7 +234,7 @@ class SeatedAngleConnection(ShearConnection):
                 if design_dictionary[option[0]] == []:
                     missing_fields_list.append(option[1])
 
-        if design_dictionary[KEY_CONN] == 'Column web-Beam web':
+        if design_dictionary[KEY_CONN] == VALUES_CONN_1[1]:
             column = design_dictionary[KEY_SUPTNGSEC]
             beam = design_dictionary[KEY_SUPTDSEC]
             conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -268,7 +268,7 @@ class SeatedAngleConnection(ShearConnection):
         if flag and flag1:
             self.set_input_values(self, design_dictionary)
         else:
-             return all_errors
+            return all_errors
 
     def warn_text(self):
 
@@ -337,9 +337,8 @@ class SeatedAngleConnection(ShearConnection):
                 self.check_moment_capacity(self.load.shear_force, seated.thickness,self.seated_angle.width,
                                            b1,b2,self.material.fy)
             area = self.seated_angle.width * seated.thickness
-            gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
-            self.plate.shear_capacity = IS800_2007.cl_8_4_design_shear_strength(area, self.material.fy, gamma_m0)
-            if self.plate.moment_capacity < self.plate.moment_demand and self.plate.shear_capacity < self.load.shear_force:
+            self.plate.shear_capacity = IS800_2007.cl_8_4_design_shear_strength(area, self.material.fy)
+            if self.plate.moment_capacity < self.plate.moment_demand or self.plate.shear_capacity < self.load.shear_force:
                 self.seated_list.pop()
                 print("popped", designation)
             else:
@@ -349,26 +348,83 @@ class SeatedAngleConnection(ShearConnection):
 
         if self.plate.angle_thickness:
             logger.info("Required Seated Angle thickness available. Getting angle leg size")
-            self.member_capacity(self)
+            self.get_bolt_details(self)
         else:
             logger.error("Increase Seated Angle thickness")
 
+    @staticmethod
     def check_moment_capacity(self, shear, thickness, width, b1, b2, fy):
-        if b1<=b2:
+        if b1 <= b2:
             moment_at_root_angle = round(float(shear) * (b2 - b1 / 2), 3)
         else:
             moment_at_root_angle = round(float(shear) * (b2 / b1) * (b2 / 2), 3)
 
         Z_p = width * thickness ** 2 / 4
-        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        plate_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(1.0, Z_p, fy, gamma_m0)
+        Z_e = width * thickness ** 2 / 6
+        plate_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(Z_e, Z_p, fy, 'plastic')
 
         return moment_at_root_angle, plate_moment_capacity
 
+    def get_bolt_details(self):
+        print(self.design_status)
+        for self.plate.angle_thickness_provided in sorted(self.plate.angle_thickness):
+            # TO GET BOLT BEARING CAPACITY CORRESPONDING TO PLATE THICKNESS AND Fu AND Fy #
+            self.bolt_conn_plates_t_fu_fy = []
+            self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+            if self.connectivity == VALUES_CONN_1[1]:
+                self.bolt_conn_plates_t_fu_fy.append(
+                    (self.supporting_section.flange_thickness, self.supporting_section.fu, self.supporting_section.fy))
+            else:
+                self.bolt_conn_plates_t_fu_fy.append(
+                    (self.supporting_section.web_thickness, self.supporting_section.fu, self.supporting_section.fy))
+            bolts_required_previous = 2
+            bolt_diameter_previous = self.bolt.bolt_diameter[-1]
+            bolt_dia_possible =[]
+            count =0
+            for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
+                self.bolt.bolt_grade_provided = max(self.bolt.bolt_grade)
+                self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                        conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
+                self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                  bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                                  conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                                  n_planes=1)
+                if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
+                    bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+                    pass
+                else:
+                    bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
+                self.bolt.number = round_up(float(self.load.shear_force) / self.bolt.bolt_capacity, 1)
+                min_bolts_one_line = 2
+                if self.connectivity == VALUES_CONN_1[0]:
+                    self.seated_angle.width = (self.seated_angle.width - self.supporting_section.web_thickness-
+                                              self.supporting_section.root_radius)/2
+                    self.bolt.number = round_up(float(self.bolt.number)/2, 1)
+                    min_bolts_one_line = 1
 
-
+                [bolt_line, bolts_one_line, web_plate_h] = \
+                    self.plate.get_web_plate_l_bolts_one_line(self.seated_angle.width, self.seated_angle.width,
+                                                              self.bolt.number, self.bolt.min_end_dist_round,
+                                                              self.bolt.min_gauge_round, min_bolts_one_line)
+                if 2 >= bolt_line >= 1:
+                    bolt_dia_possible.append(self.bolt.bolt_diameter_provided)
+                    if self.plate.bolts_required > bolts_required_previous and count >= 1:
+                        self.bolt.bolt_diameter_provided = bolt_diameter_previous
+                        self.plate.bolts_required = bolts_required_previous
+                        self.plate.bolt_force = bolt_force_previous
+                        break
+                    bolts_required_previous = self.plate.bolts_required
+                    bolt_diameter_previous = self.bolt.bolt_diameter_provided
+                    bolt_force_previous = self.plate.bolt_force
+                    count += 1
+                else:
+                    continue
+            if bolt_dia_possible:
+                print("provided bolt diameter: ", self.bolt.bolt_diameter_provided)
+            else:
+                logger.error("Decrease bolt diameter")
 
 
 
@@ -480,6 +536,128 @@ class SeatedAngleConnection(ShearConnection):
         lst.append(t5)
 
         return lst
+
+    def output_values(self, flag):
+        '''
+        Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
+        '''
+
+        # @author: Umair
+        print(flag)
+
+        out_list = []
+
+        # TODO: Seated Angle properties: Start
+
+        t13 = (None, KEY_DISP_SEATED_ANGLE, TYPE_TITLE, None)
+        out_list.append(t13)
+
+        t14 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.output[0][3] if flag else '')
+        out_list.append(t14)
+
+        t15 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.output[0][4] if flag else '')
+        out_list.append(t15)
+
+        t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_WIDTH, TYPE_TEXTBOX, self.output[0][5] if flag else '')
+        out_list.append(t16)
+
+        t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities])
+        out_list.append(t22)
+
+        # TODO: Seated Angle Properties: End
+
+        # TODO: Top Angle properties: Start
+
+        t24 = (None, DISP_TITLE_WELD, TYPE_TITLE, None)
+        out_list.append(t24)
+
+        t25 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.output[0][23] if flag else '')
+        out_list.append(t25)
+
+        t26 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, self.output[0][25] if flag else '')
+        out_list.append(t26)
+
+        t27 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, self.output[0][24] if flag else '')
+        out_list.append(t27)
+
+        # TODO: Top Angle Properties: End
+
+        # TODO: 'Bolt Properties: Start'
+
+        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+        out_list.append(t1)
+
+        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.output[0][1] if flag else '')
+        out_list.append(t2)
+
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_PC_PROVIDED, TYPE_TEXTBOX, self.output[0][2] if flag else '')
+        out_list.append(t3)
+
+        t3_1 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, self.output[0][0] if flag else '')
+        out_list.append(t3_1)
+
+        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  self.output[0][7] if flag else '')
+        out_list.append(t4)
+        #
+        # bolt_bearing_capacity_disp = ''
+        # if flag is True:
+        #     if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
+        #         bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+        #         pass
+        #     else:
+        #         bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
+
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.output[0][8] if flag else '')
+        out_list.append(t5)
+
+        t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.output[0][6] if flag else '')
+        out_list.append(t6)
+
+        t21 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_SHEAR_FORCE, TYPE_TEXTBOX, self.output[0][10] if flag else '')
+        out_list.append(t21)
+
+        t23 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
+        out_list.append(t23)
+
+        # TODO: 'Bolt Properties: End'
+
+        return out_list
+
+    def spacing(self, flag):
+
+        spacing = []
+
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.output[0][13] if flag else '')
+        spacing.append(t9)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.output[0][15] if flag else '')
+        spacing.append(t10)
+
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.output[0][14] if flag else '')
+        spacing.append(t11)
+
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.output[0][16] if flag else '')
+        spacing.append(t12)
+
+        return spacing
+
+    def capacities(self, flag):
+
+        capacities = []
+
+        t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, self.output[0][20] if flag else '')
+        capacities.append(t17)
+
+        t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, self.output[0][21] if flag else '')
+        capacities.append(t18)
+
+        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND_SEP, TYPE_TEXTBOX, self.output[0][19] if flag else '')
+        capacities.append(t19)
+
+        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY_SEP, TYPE_TEXTBOX, self.output[0][22] if flag else '')
+        capacities.append(t20)
+
+        return capacities
 
     def to_get_d(my_d):
         print(my_d)

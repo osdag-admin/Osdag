@@ -1544,7 +1544,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.strength_unit_len_flange = self.load_axial_flange / self.total_eff_len_available  # N/mm
 
                         # improvised weld size at flange after adding the gusset plate
-                        self.strength_unit_len_flange = self.load_axial_flange / self.total_eff_len_gusset_available  # N/mm
+                        self.strength_unit_len_flange = self.load_axial_flange / self.total_eff_len_available  # N/mm
 
                         self.weld_size_flange = self.calc_weld_size_from_strength_per_unit_len(
                             self.strength_unit_len_flange,

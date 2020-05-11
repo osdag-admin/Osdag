@@ -501,7 +501,7 @@ class BeamCoverPlateWeld(MomentConnection):
 
             self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                            column_t_w=self.section.web_thickness,
-                                                                           column_d=self.section.depth,
+                                                                           D=self.section.depth,
                                                                            column_b=self.section.flange_width,
                                                                            column_fy=self.section.fy,
                                                                            factored_axial_force=self.factored_axial_load,
@@ -516,7 +516,7 @@ class BeamCoverPlateWeld(MomentConnection):
 
             self.limitwidththkratio_web = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                         column_t_w=self.section.web_thickness,
-                                                                        column_d=self.section.depth,
+                                                                        D=self.section.depth,
                                                                         column_b=self.section.flange_width,
                                                                         column_fy=self.section.fy,
                                                                         factored_axial_force=self.factored_axial_load,
@@ -1167,19 +1167,20 @@ class BeamCoverPlateWeld(MomentConnection):
     #     return round(axial_force_w)
 
     @staticmethod
-    def limiting_width_thk_ratio(column_f_t, column_t_w, column_d, column_b, column_fy, factored_axial_force,
+    def limiting_width_thk_ratio(column_f_t, column_t_w, D, column_b, column_fy, factored_axial_force,
                                  column_area, compression_element, section):
-
+        column_d = D - (2 *column_f_t)
         epsilon = float(math.sqrt(250 / column_fy))
         axial_force_w = int(
-            ((column_d - 2 * (column_f_t)) * column_t_w * factored_axial_force) / (column_area))  # N
+            ((D - 2 * (column_f_t)) * column_t_w * factored_axial_force) / (column_area))  # N
 
         des_comp_stress_web = column_fy
         des_comp_stress_section = column_fy
-        avg_axial_comp_stress = axial_force_w / ((column_d - 2 * column_f_t) * column_t_w)
+        avg_axial_comp_stress = axial_force_w / ((D - 2 * column_f_t) * column_t_w)
         r1 = avg_axial_comp_stress / des_comp_stress_web
         r2 = avg_axial_comp_stress / des_comp_stress_section
         a = column_b / column_f_t
+        # column_d = D - 2(column_f_t)
         # compression_element=["External","Internal","Web of an I-H" ,"box section" ]
         # section=["rolled","welded","compression due to bending","generally", "Axial compression" ]
         # section = "rolled"
@@ -1222,7 +1223,7 @@ class BeamCoverPlateWeld(MomentConnection):
                         class_of_section1 = "plastic"
                     elif column_d / column_t_w <= (max(105 * epsilon / (1 + r1)), (42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2 * r1)), column_d / column_t_w >= (
+                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2 * r2)), column_d / column_t_w >= (
                             42 * epsilon)):
                         class_of_section1 = "semi-compact"
                     # else:
@@ -1541,13 +1542,13 @@ class BeamCoverPlateWeld(MomentConnection):
 
         t1 = ('SubSection', 'Load Consideration', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
-        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, min_axial_capacity(axial_capacity=round(self.axial_capacity / 1000, 2),
-                                                               min_ac=round(self.min_axial_load / 1000, 2)),
+        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, display_prov(round(self.axial_capacity / 1000, 2), "Ac"),
+
               prov_axial_load(axial_input=self.load.axial_force,
-                              min_ac=round(self.min_axial_load / 1000, 2),
+                              min_ac=round(self.min_axial_load / 1000, 2),axial_capacity=round(self.axial_capacity / 1000, 2),
                               app_axial_load=round(self.factored_axial_load / 1000, 2)),
-              get_pass_fail(self.min_axial_load / 1000,
-                            self.factored_axial_load / 1000, relation='lesser'))
+              get_pass_fail(round(self.axial_capacity / 1000, 2),
+                            self.factored_axial_load / 1000, relation='geq'))
         self.report_check.append(t1)
         t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, min_shear_capacity(shear_capacity=round(self.shear_capacity1 / 1000, 2),
                                                               min_sc=round(self.shear_load1 / 1000, 2)),
@@ -1949,20 +1950,27 @@ class BeamCoverPlateWeld(MomentConnection):
                         round(self.web_plate.shear_capacity_web_plate / 1000, 2), relation="lesser"))
            self.report_check.append(t1)
 
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
-        config = configparser.ConfigParser()
-        config.read_file(open(r'Osdag.config'))
-        desktop_path = config.get("desktop_path", "path1")
-        print("desk:", desktop_path)
 
-        print(sys.path[0])
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
+
+        # config = configparser.ConfigParser()
+        # config.read_file(open(r'Osdag.config'))
+        # desktop_path = config.get("desktop_path", "path1")
+        # print("desk:", desktop_path)
+        #print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
 
+        #file_type = "PDF (*.pdf)"
+        #filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        # filename = os.path.join(str(folder), "images_html", "TexReport")
+        #file_name = str(filename)
         fname_no_ext = popup_summary['filename']
 
-        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_3D_image)
+
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_3D_image)
+
+
     ##############outside#######
     # if self.flange_weld.strength > self.flange_weld.stress:
     #     if self.available_long_flange_length > self.flange_plate.height:

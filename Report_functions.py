@@ -747,21 +747,27 @@ def axial_capacity(area,fy, gamma_m0,axial_capacity): #todo anjali
     axial_capacity_eqn.append(NoEscape(r'&=' + axial_capacity + r'\end{aligned}'))
     return axial_capacity_eqn
 
-def min_axial_capacity(axial_capacity,min_ac): #todo anjali
-    min_ac = str(min_ac)
-    axial_capacity = str(axial_capacity)
-    min_ac_eqn = Math(inline=True)
-    min_ac_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
-    min_ac_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
-    min_ac_eqn.append(NoEscape(r'&=' + min_ac + r'\end{aligned}'))
-    return min_ac_eqn
+# def min_axial_capacity(axial_capacity,min_ac): #todo anjali
+#     min_ac = str(min_ac)
+#     axial_capacity = str(axial_capacity)
+#     min_ac_eqn = Math(inline=True)
+#     min_ac_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
+#     min_ac_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
+#     min_ac_eqn.append(NoEscape(r'&=' + min_ac + r'\end{aligned}'))
+#     return min_ac_eqn
 
-def prov_axial_load(axial_input,min_ac,app_axial_load):
+def prov_axial_load(axial_input,min_ac,app_axial_load,axial_capacity):
     min_ac = str(min_ac)
     axial_input = str(axial_input)
     app_axial_load = str(app_axial_load)
+
+    axial_capacity = str(axial_capacity)
     prov_axial_load_eqn = Math(inline=True)
-    prov_axial_load_eqn.append(NoEscape(r'\begin{aligned} Au &= max(A,Ac_{min} )\\'))
+    prov_axial_load_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
+    prov_axial_load_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
+    prov_axial_load_eqn.append(NoEscape(r'&=' + min_ac + r'\\'))
+
+    prov_axial_load_eqn.append(NoEscape(r'Au~~ &= max(A,Ac_{min} )\\'))
     prov_axial_load_eqn.append(NoEscape(r'&= max( ' + axial_input + ',' + min_ac + r')\\'))
     prov_axial_load_eqn.append(NoEscape(r'&=' + app_axial_load + r'\end{aligned}'))
     return prov_axial_load_eqn

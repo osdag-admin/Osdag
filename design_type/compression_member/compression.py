@@ -1,6 +1,5 @@
 from main import Main
 from Common import *
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
 
 
 class Compression(Main):
@@ -215,7 +214,7 @@ class Compression(Main):
 
         return lst
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
 
         all_errors = []
         self.design_status = False

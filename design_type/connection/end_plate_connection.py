@@ -51,8 +51,6 @@ ASCII diagram
 
 
 from design_type.connection.shear_connection import ShearConnection
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5 import QtCore, QtGui, QtWidgets
 from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from utils.common.component import *
@@ -60,24 +58,9 @@ from utils.common.component import *
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
-import yaml
 from design_report.reportGenerator import save_html
-import os
-import shutil
 import logging
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtGui import QTextCharFormat
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
-import pickle
-import pdfkit
-import configparser
-import cairosvg
-from io import StringIO
+
 import time
 
 start_time = time.clock()
@@ -238,7 +221,7 @@ class EndPlateConnection(ShearConnection):
 
         return options_list
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
         all_errors = []
         self.design_status = False
         flag = False
@@ -689,7 +672,7 @@ class EndPlateConnection(ShearConnection):
         Z_e = pitch * p_th **2 /6
         plate_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(Z_e, Z_p, self.plate.fy, 'plastic')
         A_vg = p_h* p_th
-        plate_shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_vg, self.plate.fy)
+        plate_shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_vg, self.plate.fy,gamma_m0)
 
         A_vg = ((n_row-1)*pitch + end)*p_th
         A_vn = ((n_row-1)*pitch + end - (float(n_row)-0.5) * bolt_hole_dia) *p_th

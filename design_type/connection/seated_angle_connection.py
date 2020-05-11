@@ -50,11 +50,7 @@ from utils.common.material import *
 from utils.common.component import Bolt, Plate, Weld
 from Common import *
 from utils.common.load import Load
-import yaml
-import os
-import shutil
 import logging
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
 
 
 class SeatedAngleConnection(ShearConnection):
@@ -214,7 +210,7 @@ class SeatedAngleConnection(ShearConnection):
 
         return options_list
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
 
         all_errors = []
         self.design_status = False

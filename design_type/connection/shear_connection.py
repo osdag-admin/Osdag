@@ -123,6 +123,3 @@ class ShearConnection(Connection):
                          bolt_tensioning=design_dictionary[KEY_DP_BOLT_TYPE])
 
         self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None))
-
-
-

@@ -200,7 +200,7 @@ class GussetConnection(Connection):
     def module_name(self):
         return KEY_DISP_GUSSET
 
-    def input_values(self, existingvalues={}):
+    def input_values(self):
 
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
@@ -234,7 +234,7 @@ class GussetConnection(Connection):
         t6 = (None, DISP_TITLE_LOADS, TYPE_TITLE, None, None)
         options_list.append(t6)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_COMBOBOX_CUSTOMIZED, None, VALUES_AXIAL)
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, VALUES_AXIAL)
         options_list.append(t8)
 
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
@@ -282,6 +282,29 @@ class GussetConnection(Connection):
         lst.append(t2)
 
         return lst
+
+    def func_for_validation(self, design_dictionary):
+        all_errors = []
+        self.design_status = False
+        option_list = self.input_values(self)
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+                    all_errors.append('Please input '+option[1])
+            # Since all COMBO BOX have default value except material, we can check only for Material.
+            if option[0] == KEY_MATERIAL:
+                val = option[4]
+                if design_dictionary[option[0]] == val[0]:
+                    all_errors.append('Please input '+option[1])
+            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                if design_dictionary[option[0]] == []:
+                    all_errors.append('Please input '+option[1])
+
+        if all_errors == []:
+            self.set_input_values(self, design_dictionary)
+        else:
+            return all_errors
+
 
 
 class MainController(QMainWindow):

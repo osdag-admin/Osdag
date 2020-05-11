@@ -10,16 +10,9 @@ from utils.common.component import *
 from utils.common.material import *
 from Common import *
 from utils.common.load import Load
-import yaml
-from design_report.reportGenerator import  save_html
 from Report_functions import *
-import os
 import logging
 
-
-import configparser
-
-from io import StringIO
 
 #from ...gui.newnew import Ui_Form
 #newnew_object = Ui_Form()
@@ -336,7 +329,7 @@ class FinPlateConnection(ShearConnection):
 
         return out_list
 
-    def func_for_validation(self, window, design_dictionary):
+    def func_for_validation(self, design_dictionary):
         all_errors = []
         self.design_status = False
         flag = False
@@ -532,6 +525,7 @@ class FinPlateConnection(ShearConnection):
         self.res_force = math.sqrt(self.load.shear_force ** 2 + self.load.axial_force ** 2) * 1000
 
         self.plate.thickness_provided = min(self.thickness_possible)
+        self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,thickness=self.plate.thickness_provided)
         bolts_required_previous = 2
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
@@ -650,6 +644,9 @@ class FinPlateConnection(ShearConnection):
     def get_plate_thickness(self):
         initial_plate_height = self.plate.height
         for self.plate.thickness_provided in self.thickness_possible:
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
+            print('plate_t_fy_fu', self.plate.thickness_provided,self.plate.fy,self.plate.fu)
             self.plate.height = initial_plate_height
             if self.connectivity in VALUES_CONN_1:
                 self.weld_connecting_plates = [self.supporting_section.flange_thickness, self.plate.thickness_provided]
@@ -827,6 +824,7 @@ class FinPlateConnection(ShearConnection):
                 fillet_size=self.weld.size, available_length=self.weld.length)
             self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
                                                 weld_fabrication=self.weld.fabrication,
+
                                                 t_weld=self.weld.size, weld_angle=90)
             Ip_weld = 2 * self.weld.eff_length ** 3 / 12
             y_max = self.weld.eff_length / 2
@@ -1132,7 +1130,7 @@ class FinPlateConnection(ShearConnection):
               get_pass_fail(self.weld.stress, self.weld.strength, relation="lesser"))
         self.report_check.append(t1)
 
-        Disp_3D_image = "./ResourceFiles/images/3d.png"
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
 
         # config = configparser.ConfigParser()
         # config.read_file(open(r'Osdag.config'))
@@ -1147,6 +1145,7 @@ class FinPlateConnection(ShearConnection):
         # filename = os.path.join(str(folder), "images_html", "TexReport")
         #file_name = str(filename)
         fname_no_ext = popup_summary['filename']
+
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_3D_image)
 

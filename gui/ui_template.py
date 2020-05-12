@@ -177,6 +177,8 @@ class Ui_ModuleWindow(QMainWindow):
     def get_validator(self, validator):
         if validator == 'Int Validator':
             return QIntValidator()
+        elif validator == 'Double Validator':
+            return QDoubleValidator
         else:
             return None
 
@@ -1648,6 +1650,7 @@ class Ui_ModuleWindow(QMainWindow):
                     else:
                         val = main.get_values_for_design_pref(main, key_name, design_dictionary)
                         design_dictionary.update({key_name: val})
+
         self.design_inputs = design_dictionary
 
             # common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
@@ -1863,8 +1866,10 @@ class Ui_ModuleWindow(QMainWindow):
         if trigger_type == "Save":
             self.saveDesign_inputs()
         elif trigger_type == "Design_Pref":
+
             if self.prev_inputs != self.input_dock_inputs:
                 self.designPrefDialog = DesignPreferences(self, main, input_dictionary=self.input_dock_inputs)
+
                 if 'Select Section' in self.input_dock_inputs.values():
                     self.designPrefDialog.flag = False
                 else:
@@ -2345,69 +2350,69 @@ class Ui_ModuleWindow(QMainWindow):
         #     designation_bm = key_5.currentText()
         #     if key_5.currentIndex() != 0:
         #         self.designPrefDialog.beam_preferences(designation_bm, material_grade)
-        if module == KEY_DISP_COMPRESSION:
-            designation = self.design_inputs[KEY_SECSIZE]
-            if key_6.currentIndex() == 0:
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
-                if tab_Beam is not None:
-                    self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Beam, KEY_DISP_BEAMSEC)
-                self.designPrefDialog.beam_preferences(designation[0], material_grade)
-                designation_list = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
-                designation_list.setCurrentIndex(0)
-                designation_list.clear()
-                for item in designation:
-                    designation_list.addItem(item)
-                designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
-                    designation_list.currentText() if designation_list.currentText() else 'JB 150', material_grade))
-            elif key_6.currentIndex() == 1:
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
-                self.designPrefDialog.column_preferences(designation[0], table_1, material_grade)
-                if tab_Column is not None:
-                    self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Column, KEY_DISP_COLSEC)
-                designation_list = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
-                designation_list.setCurrentIndex(0)
-                designation_list.clear()
-                for item in designation:
-                    designation_list.addItem(item)
-                designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.column_preferences(
-                    designation_list.currentText() if designation_list.currentText() else 'HB 150', table_1, material_grade))
-            elif key_6.currentIndex() in [2, 4, 6]:
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
-                self.designPrefDialog.angle_preferences(designation[0], material_grade)
-                if tab_Angle is not None:
-                    self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Angle, DISP_TITLE_ANGLE)
-                designation_list = tab_Angle.findChild(QtWidgets.QWidget, KEY_SECSIZE)
-                designation_list.setCurrentIndex(0)
-                designation_list.clear()
-                for item in designation:
-                    designation_list.addItem(item)
-                designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.angle_preferences(
-                    designation_list.currentText() if designation_list.currentText() else '20 20 X 3', material_grade))
-                # self.designPrefDialog.ui.tabWidget.removeTab(
-                #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
-                # table_c = "Angles"
-            elif key_6.currentIndex() in [3, 5]:
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+        # if module == KEY_DISP_COMPRESSION:
+        #     designation = self.design_inputs[KEY_SECSIZE]
+        #     if key_6.currentIndex() == 0:
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
+        #         if tab_Beam is not None:
+        #             self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Beam, KEY_DISP_BEAMSEC)
+        #         self.designPrefDialog.beam_preferences(designation[0], material_grade)
+        #         designation_list = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+        #         designation_list.setCurrentIndex(0)
+        #         designation_list.clear()
+        #         for item in designation:
+        #             designation_list.addItem(item)
+        #         designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
+        #             designation_list.currentText() if designation_list.currentText() else 'JB 150', material_grade))
+        #     elif key_6.currentIndex() == 1:
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
+        #         self.designPrefDialog.column_preferences(designation[0], table_1, material_grade)
+        #         if tab_Column is not None:
+        #             self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Column, KEY_DISP_COLSEC)
+        #         designation_list = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
+        #         designation_list.setCurrentIndex(0)
+        #         designation_list.clear()
+        #         for item in designation:
+        #             designation_list.addItem(item)
+        #         designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.column_preferences(
+        #             designation_list.currentText() if designation_list.currentText() else 'HB 150', table_1, material_grade))
+        #     elif key_6.currentIndex() in [2, 4, 6]:
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
+        #         self.designPrefDialog.angle_preferences(designation[0], material_grade)
+        #         if tab_Angle is not None:
+        #             self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Angle, DISP_TITLE_ANGLE)
+        #         designation_list = tab_Angle.findChild(QtWidgets.QWidget, KEY_SECSIZE)
+        #         designation_list.setCurrentIndex(0)
+        #         designation_list.clear()
+        #         for item in designation:
+        #             designation_list.addItem(item)
+        #         designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.angle_preferences(
+        #             designation_list.currentText() if designation_list.currentText() else '20 20 X 3', material_grade))
+        #         # self.designPrefDialog.ui.tabWidget.removeTab(
+        #         #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+        #         # table_c = "Angles"
+        #     elif key_6.currentIndex() in [3, 5]:
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
                 # if tab_Channel is not None:
                 #     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Channel, "Channel")
                 # table_c = "Channels"
@@ -2461,7 +2466,9 @@ class Ui_ModuleWindow(QMainWindow):
         #     else:
         #         self.function_for_tab_population(tab_name)(parameters)
         #
+
         on_change_tab_list = main.tab_value_changed(main)
+
         for new_values in on_change_tab_list:
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
@@ -2472,6 +2479,19 @@ class Ui_ModuleWindow(QMainWindow):
                 elif isinstance(key, QtWidgets.QLineEdit):
                     self.connect_textbox_for_tab(key, tab, on_change_tab_list)
 
+        for fu_fy in main.list_for_fu_fy_validation(main):
+
+            material_key_name = fu_fy[0]
+            fu_key_name = fu_fy[1]
+            fy_key_name = fu_fy[2]
+            material_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, material_key_name)
+            fu_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, fu_key_name)
+            fy_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, fy_key_name)
+
+            for validation_key in [fu_key, fy_key]:
+                if validation_key.text() != "":
+                    self.designPrefDialog.fu_fy_validation_connect([fu_key, fy_key], validation_key, material_key)
+
         for edit in main.edit_tabs(main):
             (tab_name, input_dock_key_name, change_typ, f) = edit
             tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
@@ -2480,26 +2500,15 @@ class Ui_ModuleWindow(QMainWindow):
                 self.designPrefDialog.ui.tabWidget.setTabText(
                     self.designPrefDialog.ui.tabWidget.indexOf(tab), f(input_dock_key.currentText()))
             elif change_typ == TYPE_REMOVE_TAB:
-                if tab.objectName() != f(input_dock_key.currenttext()):
+
+                if tab.objectName() != f(input_dock_key.currentText()):
                     self.designPrefDialog.ui.tabWidget.removeTab(
                         self.designPrefDialog.ui.tabWidget.indexOf(tab))
-                    continue
-                if tab:
-                    self.designPrefDialog.ui.tabWidget.insertTab(0, tab, tab_name)
-
-        for fu_fy in main.list_for_fu_fy_validation(main):
-            material_key_name = fu_fy[0]
-            fu_key_name = fu_fy[1]
-            fy_key_name = fu_fy[2]
-            material_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, material_key_name)
-            fu_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, fu_key_name)
-            fy_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, fy_key_name)
-            for validation_key in [fu_key, fy_key]:
-                if validation_key.text() != "":
-                    self.designPrefDialog.fu_fy_validation_connect([fu_key, fy_key], validation_key, material_key)
+                # if tab:
+                #     self.designPrefDialog.ui.tabWidget.insertTab(0, tab, tab_name)
 
         for refresh in main.refresh_input_dock(main):
-            (tab_name, key_name, tab_key, master_key, value, database_arg) = refresh
+            (tab_name, key_name, key_type, tab_key, master_key, value, database_arg) = refresh
             tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
             if tab:
                 add_button = tab.findChild(QtWidgets.QWidget, "pushButton_Add_"+tab_name)
@@ -2509,7 +2518,7 @@ class Ui_ModuleWindow(QMainWindow):
                     val = self.dockWidgetContents.findChild(QtWidgets.QWidget, master_key).currentText()
                     if val not in value:
                         continue
-                self.refresh_section_connect(add_button, selected, key, tab_key, database_arg)
+                self.refresh_section_connect(add_button, selected, key, key_type, tab_key, database_arg)
 
 
         # if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,
@@ -2576,29 +2585,30 @@ class Ui_ModuleWindow(QMainWindow):
                 elif typ == TYPE_TEXTBOX:
                     k2.setText(str(val[k2_key_name]))
 
-    def refresh_section_connect(self, add_button, prev, key, tab_key, arg):
-        add_button.clicked.connect(lambda: self.refresh_section(prev, key, tab_key, arg))
+    def refresh_section_connect(self, add_button, prev, key, key_type, tab_key, arg):
+        add_button.clicked.connect(lambda: self.refresh_section(prev, key, key_type, tab_key, arg))
 
-    def refresh_section(self, prev, key, tab_key, arg):
+    def refresh_section(self, prev, key, key_type, tab_key, arg):
 
         current_list = connectdb(arg)
         text = self.designPrefDialog.findChild(QtWidgets.QWidget, tab_key).text()
         if text == "":
             return
-        key.clear()
-        for item in current_list:
-            key.addItem(item)
-        current_list_set = set(current_list)
-        red_list_set = set(red_list_function())
-        current_red_list = list(current_list_set.intersection(red_list_set))
-        for value in current_red_list:
-            indx = current_list.index(str(value))
-            key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-        text_index = key.findText(text, QtCore.Qt.MatchFixedString)
-        if text_index >= 0:
-            key.setCurrentIndex(text_index)
-        else:
-            key.setCurrentIndex(current_list.index(prev))
+        if key_type == TYPE_COMBOBOX:
+            key.clear()
+            for item in current_list:
+                key.addItem(item)
+            current_list_set = set(current_list)
+            red_list_set = set(red_list_function())
+            current_red_list = list(current_list_set.intersection(red_list_set))
+            for value in current_red_list:
+                indx = current_list.index(str(value))
+                key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            text_index = key.findText(text, QtCore.Qt.MatchFixedString)
+            if text_index >= 0:
+                key.setCurrentIndex(text_index)
+            else:
+                key.setCurrentIndex(current_list.index(prev))
 
     #
     # def function_for_tab_population(self, tab_name):

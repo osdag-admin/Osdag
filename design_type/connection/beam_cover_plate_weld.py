@@ -1605,7 +1605,7 @@ class BeamCoverPlateWeld(MomentConnection):
 
         add_buttons = []
 
-        t2 = (KEY_DISP_BEAMSEC, KEY_SECSIZE, KEY_SUPTDSEC_DESIGNATION, None, None, "Beams")
+        t2 = (KEY_DISP_BEAMSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SUPTDSEC_DESIGNATION, None, None, "Beams")
         add_buttons.append(t2)
 
         return add_buttons

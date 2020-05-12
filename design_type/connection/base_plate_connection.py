@@ -815,7 +815,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         add_buttons = []
 
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, KEY_SUPTNGSEC_DESIGNATION, None, None, "Columns")
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_DESIGNATION, None, None, "Columns")
         add_buttons.append(t1)
 
         return add_buttons

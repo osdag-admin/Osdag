@@ -1773,7 +1773,7 @@ class ColumnCoverPlateWeld(MomentConnection):
     def refresh_input_dock(self):
         add_buttons = []
 
-        t1 = (KEY_DISP_COLSEC, KEY_SECSIZE, KEY_SUPTNGSEC_DESIGNATION, None, None, "Columns")
+        t1 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SUPTNGSEC_DESIGNATION, None, None, "Columns")
         add_buttons.append(t1)
 
         return add_buttons

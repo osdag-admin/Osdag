@@ -946,13 +946,13 @@ class Connection(Main):
 
         add_buttons = []
 
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, KEY_SUPTNGSEC_DESIGNATION, KEY_CONN, VALUES_CONN_1, "Columns")
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_DESIGNATION, KEY_CONN, VALUES_CONN_1, "Columns")
         add_buttons.append(t1)
 
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, KEY_SUPTNGSEC_DESIGNATION, KEY_CONN, VALUES_CONN_2, "Beams")
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_DESIGNATION, KEY_CONN, VALUES_CONN_2, "Beams")
         add_buttons.append(t1)
 
-        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, KEY_SUPTDSEC_DESIGNATION, None, None, "Beams")
+        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTDSEC_DESIGNATION, None, None, "Beams")
         add_buttons.append(t2)
 
         return add_buttons

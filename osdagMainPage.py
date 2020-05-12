@@ -101,10 +101,10 @@ if sqlpath.exists():
             cmd = 'sqlite3 ' + str(sqlitenewpath) + ' < ' + str(sqlpath)
             error = os.system(cmd)
             print(error)
-            if error != 0:
-                 raise Exception('SQL to SQLite conversion error 1')
-            if sqlitenewpath.stat().st_size == 0:
-                 raise Exception('SQL to SQLite conversion error 2')
+            # if error != 0:
+            #      raise Exception('SQL to SQLite conversion error 1')
+            # if sqlitenewpath.stat().st_size == 0:
+            #      raise Exception('SQL to SQLite conversion error 2')
             os.remove(sqlitepath)
             sqlitenewpath.rename(sqlitepath)
             sqlpath.touch()
@@ -425,10 +425,10 @@ class OsdagMainWindow(QMainWindow):
                 sqlnewpath = Path('ResourceFiles/Database/Intg_osdag_new.sql')
                 cmd = 'sqlite3 ' + str(sqlitepath) + ' .dump | gawk -f ' + precisionscript + ' > ' + str(sqlnewpath)
                 error = os.system(cmd)
-                if error != 0:
-                     raise Exception('SQLite conversion to SQL error 1')
-                if sqlnewpath.stat().st_size == 0:
-                     raise Exception('SQLite conversion to SQL error 2')
+                # if error != 0:
+                #      raise Exception('SQLite conversion to SQL error 1')
+                # if sqlnewpath.stat().st_size == 0:
+                #      raise Exception('SQLite conversion to SQL error 2')
                 os.remove(sqlpath)
                 sqlnewpath.rename(sqlpath)
                 sqlitepath.touch()

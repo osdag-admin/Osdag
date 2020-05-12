@@ -440,96 +440,37 @@ class FinPlateConnection(ShearConnection):
 
         return information
 
-    def input_dictionary_design_pref(self):
 
-        design_input = []
-        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SUPTNGSEC_MATERIAL])
-        design_input.append(t1)
+    # def populate_tabs(self):
+    #
+    #     populate_tab_list = []
+    #
+    #     t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC, "Columns", KEY_MATERIAL], KEY_CONN, VALUES_CONN_1)
+    #     populate_tab_list.append(t1)
+    #
+    #     t2 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC, "Beams", KEY_MATERIAL], KEY_CONN, VALUES_CONN_2)
+    #     populate_tab_list.append(t2)
+    #
+    #     t3 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC, KEY_MATERIAL], None, None)
+    #     populate_tab_list.append(t3)
+    #
+    #     t4 = ("Connector", [KEY_SUPTDSEC, KEY_MATERIAL], None, None)
+    #     populate_tab_list.append(t4)
+    #
+    #     return populate_tab_list
 
-        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY])
-        design_input.append(t1)
-
-        t2 = (KEY_DISP_BEAMSEC, TYPE_COMBOBOX, [KEY_SUPTDSEC_MATERIAL])
-        design_input.append(t2)
-
-        t2 = (KEY_DISP_BEAMSEC, TYPE_TEXTBOX, [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY])
-        design_input.append(t2)
-
-        return design_input
-
-    def input_dictionary_without_design_pref(self):
-
-        design_input = []
-        t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL], 'Input Dock')
-        design_input.append(t1)
-
-        return design_input
-
-    def populate_tabs(self):
-
-        populate_tab_list = []
-
-        t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC, "Columns", KEY_MATERIAL], KEY_CONN, VALUES_CONN_1)
-        populate_tab_list.append(t1)
-
-        t2 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC, "Beams", KEY_MATERIAL], KEY_CONN, VALUES_CONN_2)
-        populate_tab_list.append(t2)
-
-        t3 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC, KEY_MATERIAL], None, None)
-        populate_tab_list.append(t3)
-
-        t4 = ("Connector", [KEY_SUPTDSEC, KEY_MATERIAL], None, None)
-        populate_tab_list.append(t4)
-
-        return populate_tab_list
-
-    def tab_value_changed(self):
-
-        change_tab = []
-
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC_MATERIAL, KEY_SUPTNGSEC_FU, TYPE_TEXTBOX, self.get_fu)
-        change_tab.append(t1)
-
-        t2 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC_MATERIAL, KEY_SUPTNGSEC_FY, TYPE_TEXTBOX, self.get_fy)
-        change_tab.append(t2)
-
-        t1 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC_MATERIAL, KEY_SUPTDSEC_FU, TYPE_TEXTBOX, self.get_fu)
-        change_tab.append(t1)
-
-        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC_MATERIAL, KEY_SUPTDSEC_FY, TYPE_TEXTBOX, self.get_fy)
-        change_tab.append(t2)
-
-        return change_tab
-
-    def get_fu(self):
-        return Material(self).fu
-
-    def get_fy(self):
-        return Material(self).fy
-
-    def edit_tabs(self):
-
-        edit_list = []
-
-        t1 = (KEY_DISP_COLSEC, KEY_CONN, TYPE_CHANGE_TAB_NAME, self.get_column_tab_name)
-        edit_list.append(t1)
-
-        t1 = (KEY_DISP_BEAMSEC, KEY_CONN, TYPE_CHANGE_TAB_NAME, self.get_beam_tab_name)
-        edit_list.append(t1)
-
-        return edit_list
-
-    def get_column_tab_name(self):
-        if self in VALUES_CONN_1:
-            return KEY_DISP_COLSEC
-        else:
-            return KEY_DISP_PRIBM
-
-    def get_beam_tab_name(self):
-        if self in VALUES_CONN_1:
-            return KEY_DISP_BEAMSEC
-        else:
-            return KEY_DISP_SECBM
+    # def get_fu_fy(self):
+    #     m = Material(self[0])
+    #     fu = m.fu
+    #     fy = m.fy
+    #     d = {KEY_SUPTNGSEC_FU: fu,
+    #          KEY_SUPTNGSEC_FY: fy,
+    #          KEY_SUPTDSEC_FU: fu,
+    #          KEY_SUPTDSEC_FY: fy,
+    #          KEY_PLATE_FU: fu,
+    #          KEY_PLATE_FY: fy}
+    #
+    #     return d
 
     def warn_text(self):
 

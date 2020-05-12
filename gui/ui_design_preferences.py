@@ -1436,13 +1436,14 @@ class Ui_Dialog(object):
 
 class DesignPreferences(QDialog):
 
-    def __init__(self, main, input_dictionary, parent=None):
+    def __init__(self, module_window, main, input_dictionary, parent=None):
 
         QDialog.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self, main, input_dictionary)
         self.main_controller = parent
         #self.uiobj = self.main_controller.uiObj
+        self.module_window = module_window
         self.saved = None
         self.flag = False
         self.sectionalprop = I_sectional_Properties()
@@ -1496,119 +1497,119 @@ class DesignPreferences(QDialog):
             else:
                 pass
 
-
-    def save_designPref_para(self, module):
-        """This routine is responsible for saving all design preferences selected by the user
-        """
-        '''
-        @author: Umair
-        '''
-        tab_Bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Bolt")
-        tab_Weld = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
-        tab_Detailing = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
-        tab_Design = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
-        tab_Connector = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
-
-        #
-        # key_boltHoleType = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_HOLE_TYPE)
-        # combo_boltHoleType = key_boltHoleType.currentText()
-        # key_boltFu = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O)
-        # line_boltFu = key_boltFu.text()
-        # key_slipfactor = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_SLIP_FACTOR)
-        # combo_slipfactor = key_slipfactor.currentText()
-
-        tab_Anchor_Bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
-
-        if module != KEY_DISP_BASE_PLATE:
-            key_boltTensioning = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_TYPE)
-            combo_boltTensioning = key_boltTensioning.currentText()
-            key_boltHoleType = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_HOLE_TYPE)
-            combo_boltHoleType = key_boltHoleType.currentText()
-            key_boltFu = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O)
-            line_boltFu = key_boltFu.text()
-            key_slipfactor = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_SLIP_FACTOR)
-            combo_slipfactor = key_slipfactor.currentText()
-            key_detailingGap = tab_Detailing.findChild(QtWidgets.QWidget, KEY_DP_DETAILING_GAP)
-            line_detailingGap = key_detailingGap.text()
-        elif module == KEY_DISP_BASE_PLATE:
-            key_boltDesignation = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_DESIGNATION)
-            line_boltDesignation = key_boltDesignation.text()
-            key_boltHoleType = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_HOLE_TYPE)
-            combo_boltHoleType = key_boltHoleType.currentText()
-            key_boltType = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_TYPE)
-            combo_boltType = key_boltType.text()
-            key_boltFu = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O)
-            line_boltFu = key_boltFu.text()
-            key_boltFriction = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_FRICTION)
-            line_boltFriction = key_boltFriction.text()
-
-        key_weldType = tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_FAB)
-        combo_weldType = key_weldType.currentText()
-        key_weldFu = tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O)
-        line_weldFu = key_weldFu.text()
-        key_detailingEdgeType = tab_Detailing.findChild(QtWidgets.QWidget, KEY_DP_DETAILING_EDGE_TYPE)
-        combo_detailingEdgeType = key_detailingEdgeType.currentText()
-
-        key_detailing_memebers = tab_Detailing.findChild(QtWidgets.QWidget, KEY_DP_DETAILING_CORROSIVE_INFLUENCES)
-        combo_detailing_memebers = key_detailing_memebers.currentText()
-        key_design_method = tab_Design.findChild(QtWidgets.QWidget, KEY_DP_DESIGN_METHOD)
-        combo_design_method = key_design_method.currentText()
-
-        key_design_baseplate = tab_Design.findChild(QtWidgets.QWidget, KEY_DP_DESIGN_BASE_PLATE)
-        if module not in [KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COMPRESSION]:
-            key_plate_material = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
-            combo_plate_material = key_plate_material.currentText()
-            key_plate_material_fu = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU)
-            line_plate_material_fu = key_plate_material_fu.text()
-            key_plate_material_fy = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY)
-            line_plate_material_fy = key_plate_material_fy.text()
-            d1 = {KEY_DP_BOLT_TYPE: combo_boltTensioning,
-                  KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
-                  KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
-                  KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
-                  KEY_DP_WELD_FAB: combo_weldType,
-                  KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
-                  KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
-                  KEY_DP_DETAILING_GAP: line_detailingGap,
-                  KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
-                  KEY_DP_DESIGN_METHOD: combo_design_method,
-                  KEY_PLATE_MATERIAL: combo_plate_material if combo_plate_material != "Custom" else
-                  "Custom " + str(line_plate_material_fu) + " " + str(line_plate_material_fy),
-                  }
-        elif module == KEY_DISP_BASE_PLATE:
-            if self.flag:
-                d1 = {KEY_DP_ANCHOR_BOLT_DESIGNATION: line_boltDesignation,
-                      KEY_DP_ANCHOR_BOLT_TYPE: combo_boltType,
-                      KEY_DP_ANCHOR_BOLT_HOLE_TYPE: combo_boltHoleType,
-                      KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: line_boltFu,
-                      KEY_DP_ANCHOR_BOLT_FRICTION: line_boltFriction,
-                      KEY_DP_WELD_FAB: combo_weldType,
-                      KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
-                      KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
-                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
-                      KEY_DP_DESIGN_METHOD: combo_design_method,
-                      KEY_DP_DESIGN_BASE_PLATE: key_design_baseplate.currentText()
-                      }
-            else:
-                d1 = {KEY_DP_WELD_FAB: combo_weldType,
-                      KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
-                      KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
-                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
-                      KEY_DP_DESIGN_METHOD: combo_design_method,
-                      KEY_DP_DESIGN_BASE_PLATE: key_design_baseplate.currentText()
-                      }
-        else:
-            d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
-                  KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
-                  KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
-                  KEY_DP_WELD_FAB: combo_weldType,
-                  KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
-                  KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
-                  KEY_DP_DETAILING_GAP: line_detailingGap,
-                  KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
-                  KEY_DP_DESIGN_METHOD: combo_design_method
-                  }
-        return d1
+    #
+    # def save_designPref_para(self, module):
+    #     """This routine is responsible for saving all design preferences selected by the user
+    #     """
+    #     '''
+    #     @author: Umair
+    #     '''
+    #     tab_Bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Bolt")
+    #     tab_Weld = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
+    #     tab_Detailing = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
+    #     tab_Design = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
+    #     tab_Connector = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
+    #
+    #     #
+    #     # key_boltHoleType = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_HOLE_TYPE)
+    #     # combo_boltHoleType = key_boltHoleType.currentText()
+    #     # key_boltFu = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O)
+    #     # line_boltFu = key_boltFu.text()
+    #     # key_slipfactor = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_SLIP_FACTOR)
+    #     # combo_slipfactor = key_slipfactor.currentText()
+    #
+    #     tab_Anchor_Bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
+    #
+    #     if module != KEY_DISP_BASE_PLATE:
+    #         key_boltTensioning = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_TYPE)
+    #         combo_boltTensioning = key_boltTensioning.currentText()
+    #         key_boltHoleType = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_HOLE_TYPE)
+    #         combo_boltHoleType = key_boltHoleType.currentText()
+    #         key_boltFu = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O)
+    #         line_boltFu = key_boltFu.text()
+    #         key_slipfactor = tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_SLIP_FACTOR)
+    #         combo_slipfactor = key_slipfactor.currentText()
+    #         key_detailingGap = tab_Detailing.findChild(QtWidgets.QWidget, KEY_DP_DETAILING_GAP)
+    #         line_detailingGap = key_detailingGap.text()
+    #     elif module == KEY_DISP_BASE_PLATE:
+    #         key_boltDesignation = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_DESIGNATION)
+    #         line_boltDesignation = key_boltDesignation.text()
+    #         key_boltHoleType = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_HOLE_TYPE)
+    #         combo_boltHoleType = key_boltHoleType.currentText()
+    #         key_boltType = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_TYPE)
+    #         combo_boltType = key_boltType.text()
+    #         key_boltFu = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O)
+    #         line_boltFu = key_boltFu.text()
+    #         key_boltFriction = tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_FRICTION)
+    #         line_boltFriction = key_boltFriction.text()
+    #
+    #     key_weldType = tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_FAB)
+    #     combo_weldType = key_weldType.currentText()
+    #     key_weldFu = tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O)
+    #     line_weldFu = key_weldFu.text()
+    #     key_detailingEdgeType = tab_Detailing.findChild(QtWidgets.QWidget, KEY_DP_DETAILING_EDGE_TYPE)
+    #     combo_detailingEdgeType = key_detailingEdgeType.currentText()
+    #
+    #     key_detailing_memebers = tab_Detailing.findChild(QtWidgets.QWidget, KEY_DP_DETAILING_CORROSIVE_INFLUENCES)
+    #     combo_detailing_memebers = key_detailing_memebers.currentText()
+    #     key_design_method = tab_Design.findChild(QtWidgets.QWidget, KEY_DP_DESIGN_METHOD)
+    #     combo_design_method = key_design_method.currentText()
+    #
+    #     key_design_baseplate = tab_Design.findChild(QtWidgets.QWidget, KEY_DP_DESIGN_BASE_PLATE)
+    #     if module not in [KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COMPRESSION]:
+    #         key_plate_material = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
+    #         combo_plate_material = key_plate_material.currentText()
+    #         key_plate_material_fu = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU)
+    #         line_plate_material_fu = key_plate_material_fu.text()
+    #         key_plate_material_fy = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY)
+    #         line_plate_material_fy = key_plate_material_fy.text()
+    #         d1 = {KEY_DP_BOLT_TYPE: combo_boltTensioning,
+    #               KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+    #               KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
+    #               KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
+    #               KEY_DP_WELD_FAB: combo_weldType,
+    #               KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+    #               KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+    #               KEY_DP_DETAILING_GAP: line_detailingGap,
+    #               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
+    #               KEY_DP_DESIGN_METHOD: combo_design_method,
+    #               KEY_PLATE_MATERIAL: combo_plate_material if combo_plate_material != "Custom" else
+    #               "Custom " + str(line_plate_material_fu) + " " + str(line_plate_material_fy),
+    #               }
+    #     elif module == KEY_DISP_BASE_PLATE:
+    #         if self.flag:
+    #             d1 = {KEY_DP_ANCHOR_BOLT_DESIGNATION: line_boltDesignation,
+    #                   KEY_DP_ANCHOR_BOLT_TYPE: combo_boltType,
+    #                   KEY_DP_ANCHOR_BOLT_HOLE_TYPE: combo_boltHoleType,
+    #                   KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: line_boltFu,
+    #                   KEY_DP_ANCHOR_BOLT_FRICTION: line_boltFriction,
+    #                   KEY_DP_WELD_FAB: combo_weldType,
+    #                   KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+    #                   KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+    #                   KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
+    #                   KEY_DP_DESIGN_METHOD: combo_design_method,
+    #                   KEY_DP_DESIGN_BASE_PLATE: key_design_baseplate.currentText()
+    #                   }
+    #         else:
+    #             d1 = {KEY_DP_WELD_FAB: combo_weldType,
+    #                   KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+    #                   KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+    #                   KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
+    #                   KEY_DP_DESIGN_METHOD: combo_design_method,
+    #                   KEY_DP_DESIGN_BASE_PLATE: key_design_baseplate.currentText()
+    #                   }
+    #     # else:
+    #     #     d1 = {KEY_DP_BOLT_HOLE_TYPE: combo_boltHoleType,
+    #     #           KEY_DP_BOLT_MATERIAL_G_O: line_boltFu,
+    #     #           KEY_DP_BOLT_SLIP_FACTOR: combo_slipfactor,
+    #     #           KEY_DP_WELD_FAB: combo_weldType,
+    #     #           KEY_DP_WELD_MATERIAL_G_O: line_weldFu,
+    #     #           KEY_DP_DETAILING_EDGE_TYPE: combo_detailingEdgeType,
+    #     #           KEY_DP_DETAILING_GAP: line_detailingGap,
+    #     #           KEY_DP_DETAILING_CORROSIVE_INFLUENCES: combo_detailing_memebers,
+    #     #           KEY_DP_DESIGN_METHOD: combo_design_method
+    #     #           }
+    #     return d1
 
     def highlight_slipfactor_description(self):
         """Highlight the description of currosponding slipfactor on selection of inputs
@@ -1664,476 +1665,373 @@ class DesignPreferences(QDialog):
     #     self.source = row[19]
     #
     #     conn.close()
-    def column_preferences(self, designation, table, material_grade):
-        '''
-        @author: Umair
-        '''
-        # designation = designation_table_material_grade[0]
-        # table = designation_table_material_grade[1]
-        # material_grade = designation_table_material_grade[2]
-        tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-        if designation == 'Select Section':
-            self.flag = False
-            self.ui.clear_tab("Column")
-            return
+    # def column_preferences(self, designation, table, material_grade):
+    #     '''
+    #     @author: Umair
+    #     '''
+    #     # designation = designation_table_material_grade[0]
+    #     # table = designation_table_material_grade[1]
+    #     # material_grade = designation_table_material_grade[2]
+    #     tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+    #     if designation == 'Select Section':
+    #         self.flag = False
+    #         self.ui.clear_tab("Column")
+    #         return
+    #
+    #     col_list = []
+    #     fu_fy_list = []
+    #     col_attributes = Section(designation, material_grade)
+    #     Section.connect_to_database_update_other_attributes(col_attributes, table, designation)
+    #     for ch in tab_Column.children():
+    #         if ch.objectName() == KEY_SUPTNGSEC_DESIGNATION:
+    #             ch.setText(designation)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_SOURCE:
+    #             ch.setText(col_attributes.source)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_MATERIAL:
+    #             if self.module == KEY_DISP_BASE_PLATE:
+    #                 ch.setText(material_grade)
+    #             else:
+    #                 indx = ch.findText(material_grade, QtCore.Qt.MatchFixedString)
+    #                 if indx >= 0:
+    #                     ch.setCurrentIndex(indx)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_FU:
+    #             if self.module == KEY_DISP_BASE_PLATE:
+    #                 ch.setText(str(col_attributes.fu))
+    #                 fu_fy_list.append(ch)
+    #             else:
+    #                 ch.setText(str(col_attributes.fu))
+    #                 ch.setEnabled(True if material_grade == 'Custom' else False)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_FY:
+    #             if self.module == KEY_DISP_BASE_PLATE:
+    #                 ch.setText(str(col_attributes.fy))
+    #                 fu_fy_list.append(ch)
+    #             else:
+    #                 ch.setText(str(col_attributes.fy))
+    #                 ch.setEnabled(True if material_grade == 'Custom' else False)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_DEPTH:
+    #             ch.setText(str(col_attributes.depth))
+    #             col_list.append(ch)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_W:
+    #             ch.setText(str(col_attributes.flange_width))
+    #             col_list.append(ch)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_T:
+    #             ch.setText(str(col_attributes.flange_thickness))
+    #             col_list.append(ch)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_WEB_T:
+    #             ch.setText(str(col_attributes.web_thickness))
+    #             col_list.append(ch)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_S:
+    #             ch.setText(str(col_attributes.flange_slope))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_ROOT_R:
+    #             ch.setText(str(col_attributes.root_radius))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_TOE_R:
+    #             ch.setText(str(col_attributes.toe_radius))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_MOD_OF_ELAST:
+    #             ch.setText("200")
+    #             ch.setDisabled(True)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_MOD_OF_RIGID:
+    #             ch.setText("76.9")
+    #             ch.setDisabled(True)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_POISSON_RATIO:
+    #             ch.setText("0.3")
+    #             ch.setDisabled(True)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_THERMAL_EXP:
+    #             ch.setText("12")
+    #             ch.setDisabled(True)
+    #         elif ch.objectName() == KEY_SUPTNGSEC_MASS:
+    #             ch.setText(str(col_attributes.mass))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_SEC_AREA:
+    #             ch.setText(str(col_attributes.area))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_MOA_LZ:
+    #             ch.setText(str(col_attributes.mom_inertia_z))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_MOA_LY:
+    #             ch.setText(str(col_attributes.mom_inertia_y))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_ROG_RZ:
+    #             ch.setText(str(col_attributes.rad_of_gy_z))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_ROG_RY:
+    #             ch.setText(str(col_attributes.rad_of_gy_y))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_EM_ZZ:
+    #             ch.setText(str(col_attributes.elast_sec_mod_z))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_EM_ZY:
+    #             ch.setText(str(col_attributes.elast_sec_mod_y))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_PM_ZPZ:
+    #             ch.setText(str(col_attributes.plast_sec_mod_z))
+    #         elif ch.objectName() == KEY_SUPTNGSEC_PM_ZPY:
+    #             ch.setText(str(col_attributes.plast_sec_mod_y))
+    #         elif ch.objectName() == 'pushButton_Add_Column':
+    #             ch.setEnabled(True)
+    #         else:
+    #             pass
+    #
+    #     for e in col_list:
+    #         if e.text() != "":
+    #             e.textChanged.connect(lambda: self.new_sectionalprop_Column(col_list))
+    #
+    #     for f in fu_fy_list:
+    #         if f.text() != "":
+    #             self.fu_fy_validation_connect(fu_fy_list, f)
+    #             # f.textChanged.connect(lambda: self.fu_fy_validation(fu_fy_list, f))
+    #
+    #     # def f():
+    #     #     found = False
+    #     #     material_key = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL)
+    #     #     for i in range(material_key.count()):
+    #     #         if material_key.itemText(i) == "Custom":
+    #     #             found = True
+    #     #         if i == material_key.count() - 1:
+    #     #             if found:
+    #     #                 material_key.setCurrentText("Custom")
+    #     #                 return
+    #     #             else:
+    #     #                 material_key.addItem("Custom")
+    #     #                 material_key.setCurrentText("Custom")
+    #     #                 return
+    #     # for m in material_list:
+    #     #     if m.text() != "":
+    #     #         m.textChanged.connect(f)
+    #
+    # def beam_preferences(self, designation, material_grade):
+    #     '''
+    #     @author: Umair
+    #     '''
+    #     # designation = designation_material_grade[0]
+    #     # material_grade = designation_material_grade[1]
+    #     tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+    #     if designation == 'Select Section':
+    #         self.flag = False
+    #         self.ui.clear_tab("Beam")
+    #         return
+    #
+    #     beam_attributes = Section(designation, material_grade)
+    #     Section.connect_to_database_update_other_attributes(beam_attributes, "Beams", designation)
+    #     beam_list = []
+    #     for ch in tab_Beam.children():
+    #         if ch.objectName() == KEY_SUPTDSEC_DESIGNATION:
+    #             ch.setText(designation)
+    #         elif ch.objectName() == KEY_SUPTDSEC_SOURCE:
+    #             ch.setText(beam_attributes.source)
+    #         elif ch.objectName() == KEY_SUPTDSEC_MATERIAL:
+    #             indx = ch.findText(material_grade, QtCore.Qt.MatchFixedString)
+    #             if indx >= 0:
+    #                 ch.setCurrentIndex(indx)
+    #         elif ch.objectName() == KEY_SUPTDSEC_FU:
+    #             ch.setText(str(beam_attributes.fu))
+    #             ch.setEnabled(True if material_grade == 'Custom' else False)
+    #         elif ch.objectName() == KEY_SUPTDSEC_FY:
+    #             ch.setText(str(beam_attributes.fy))
+    #             ch.setEnabled(True if material_grade == 'Custom' else False)
+    #         elif ch.objectName() == KEY_SUPTDSEC_DEPTH:
+    #             ch.setText(str(beam_attributes.depth))
+    #             beam_list.append(ch)
+    #         elif ch.objectName() == KEY_SUPTDSEC_FLANGE_W:
+    #             ch.setText(str(beam_attributes.flange_width))
+    #             beam_list.append(ch)
+    #         elif ch.objectName() == KEY_SUPTDSEC_FLANGE_T:
+    #             ch.setText(str(beam_attributes.flange_thickness))
+    #             beam_list.append(ch)
+    #         elif ch.objectName() == KEY_SUPTDSEC_WEB_T:
+    #             ch.setText(str(beam_attributes.web_thickness))
+    #             beam_list.append(ch)
+    #         elif ch.objectName() == KEY_SUPTDSEC_FLANGE_S:
+    #             ch.setText(str(beam_attributes.flange_slope))
+    #         elif ch.objectName() == KEY_SUPTDSEC_ROOT_R:
+    #             ch.setText(str(beam_attributes.root_radius))
+    #         elif ch.objectName() == KEY_SUPTDSEC_TOE_R:
+    #             ch.setText(str(beam_attributes.toe_radius))
+    #         elif ch.objectName() == KEY_SUPTDSEC_MOD_OF_ELAST:
+    #             ch.setText("200")
+    #             ch.setDisabled(True)
+    #         elif ch.objectName() == KEY_SUPTDSEC_MOD_OF_RIGID:
+    #             ch.setText("76.9")
+    #             ch.setDisabled(True)
+    #         elif ch.objectName() == KEY_SUPTDSEC_POISSON_RATIO:
+    #             ch.setText("0.3")
+    #             ch.setDisabled(True)
+    #         elif ch.objectName() == KEY_SUPTDSEC_THERMAL_EXP:
+    #             ch.setText("12")
+    #             ch.setDisabled(True)
+    #         elif ch.objectName() == KEY_SUPTDSEC_MASS:
+    #             ch.setText(str(beam_attributes.mass))
+    #         elif ch.objectName() == KEY_SUPTDSEC_SEC_AREA:
+    #             ch.setText(str(beam_attributes.area))
+    #         elif ch.objectName() == KEY_SUPTDSEC_MOA_LZ:
+    #             ch.setText(str(beam_attributes.mom_inertia_z))
+    #         elif ch.objectName() == KEY_SUPTDSEC_MOA_LY:
+    #             ch.setText(str(beam_attributes.mom_inertia_y))
+    #         elif ch.objectName() == KEY_SUPTDSEC_ROG_RZ:
+    #             ch.setText(str(beam_attributes.rad_of_gy_z))
+    #         elif ch.objectName() == KEY_SUPTDSEC_ROG_RY:
+    #             ch.setText(str(beam_attributes.rad_of_gy_y))
+    #         elif ch.objectName() == KEY_SUPTDSEC_EM_ZZ:
+    #             ch.setText(str(beam_attributes.elast_sec_mod_z))
+    #         elif ch.objectName() == KEY_SUPTDSEC_EM_ZY:
+    #             ch.setText(str(beam_attributes.elast_sec_mod_y))
+    #         elif ch.objectName() == KEY_SUPTDSEC_PM_ZPZ:
+    #             ch.setText(str(beam_attributes.plast_sec_mod_z))
+    #         elif ch.objectName() == KEY_SUPTDSEC_PM_ZPY:
+    #             ch.setText(str(beam_attributes.plast_sec_mod_y))
+    #         elif ch.objectName() == 'pushButton_Add_Beam':
+    #             ch.setEnabled(True)
+    #         else:
+    #             pass
+    #
+    #     for e in beam_list:
+    #         if e.text() != "":
+    #             e.textChanged.connect(lambda: self.new_sectionalprop_Beam(beam_list))
+    #
+    # def angle_preferences(self,designation,material_grade):
+    #     tab_Angle = self.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+    #
+    #     # if designation == 'Select Section':
+    #     #     self.ui.clear_tab("Angle")
+    #     #     return
+    #     ch=tab_Angle.findChild(QtWidgets.QWidget, KEY_ANGLE_DESIGNATION)
+    #     ch.setText(designation)
 
-        col_list = []
-        fu_fy_list = []
-        col_attributes = Section(designation, material_grade)
-        Section.connect_to_database_update_other_attributes(col_attributes, table, designation)
-        for ch in tab_Column.children():
-            if ch.objectName() == KEY_SUPTNGSEC_DESIGNATION:
-                ch.setText(designation)
-            elif ch.objectName() == KEY_SUPTNGSEC_SOURCE:
-                ch.setText(col_attributes.source)
-            elif ch.objectName() == KEY_SUPTNGSEC_MATERIAL:
-                if self.module == KEY_DISP_BASE_PLATE:
-                    ch.setText(material_grade)
-                else:
-                    indx = ch.findText(material_grade, QtCore.Qt.MatchFixedString)
-                    if indx >= 0:
-                        ch.setCurrentIndex(indx)
-            elif ch.objectName() == KEY_SUPTNGSEC_FU:
-                if self.module == KEY_DISP_BASE_PLATE:
-                    ch.setText(str(col_attributes.fu))
-                    fu_fy_list.append(ch)
-                else:
-                    ch.setText(str(col_attributes.fu))
-                    ch.setEnabled(True if material_grade == 'Custom' else False)
-            elif ch.objectName() == KEY_SUPTNGSEC_FY:
-                if self.module == KEY_DISP_BASE_PLATE:
-                    ch.setText(str(col_attributes.fy))
-                    fu_fy_list.append(ch)
-                else:
-                    ch.setText(str(col_attributes.fy))
-                    ch.setEnabled(True if material_grade == 'Custom' else False)
-            elif ch.objectName() == KEY_SUPTNGSEC_DEPTH:
-                ch.setText(str(col_attributes.depth))
-                col_list.append(ch)
-            elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_W:
-                ch.setText(str(col_attributes.flange_width))
-                col_list.append(ch)
-            elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_T:
-                ch.setText(str(col_attributes.flange_thickness))
-                col_list.append(ch)
-            elif ch.objectName() == KEY_SUPTNGSEC_WEB_T:
-                ch.setText(str(col_attributes.web_thickness))
-                col_list.append(ch)
-            elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_S:
-                ch.setText(str(col_attributes.flange_slope))
-            elif ch.objectName() == KEY_SUPTNGSEC_ROOT_R:
-                ch.setText(str(col_attributes.root_radius))
-            elif ch.objectName() == KEY_SUPTNGSEC_TOE_R:
-                ch.setText(str(col_attributes.toe_radius))
-            elif ch.objectName() == KEY_SUPTNGSEC_MOD_OF_ELAST:
-                ch.setText("200")
-                ch.setDisabled(True)
-            elif ch.objectName() == KEY_SUPTNGSEC_MOD_OF_RIGID:
-                ch.setText("76.9")
-                ch.setDisabled(True)
-            elif ch.objectName() == KEY_SUPTNGSEC_POISSON_RATIO:
-                ch.setText("0.3")
-                ch.setDisabled(True)
-            elif ch.objectName() == KEY_SUPTNGSEC_THERMAL_EXP:
-                ch.setText("12")
-                ch.setDisabled(True)
-            elif ch.objectName() == KEY_SUPTNGSEC_MASS:
-                ch.setText(str(col_attributes.mass))
-            elif ch.objectName() == KEY_SUPTNGSEC_SEC_AREA:
-                ch.setText(str(col_attributes.area))
-            elif ch.objectName() == KEY_SUPTNGSEC_MOA_LZ:
-                ch.setText(str(col_attributes.mom_inertia_z))
-            elif ch.objectName() == KEY_SUPTNGSEC_MOA_LY:
-                ch.setText(str(col_attributes.mom_inertia_y))
-            elif ch.objectName() == KEY_SUPTNGSEC_ROG_RZ:
-                ch.setText(str(col_attributes.rad_of_gy_z))
-            elif ch.objectName() == KEY_SUPTNGSEC_ROG_RY:
-                ch.setText(str(col_attributes.rad_of_gy_y))
-            elif ch.objectName() == KEY_SUPTNGSEC_EM_ZZ:
-                ch.setText(str(col_attributes.elast_sec_mod_z))
-            elif ch.objectName() == KEY_SUPTNGSEC_EM_ZY:
-                ch.setText(str(col_attributes.elast_sec_mod_y))
-            elif ch.objectName() == KEY_SUPTNGSEC_PM_ZPZ:
-                ch.setText(str(col_attributes.plast_sec_mod_z))
-            elif ch.objectName() == KEY_SUPTNGSEC_PM_ZPY:
-                ch.setText(str(col_attributes.plast_sec_mod_y))
-            elif ch.objectName() == 'pushButton_Add_Column':
-                ch.setEnabled(True)
-            else:
-                pass
+    def fu_fy_validation_connect(self, fu_fy_list, f, m):
+        f.textChanged.connect(lambda: self.fu_fy_validation(fu_fy_list, f, m))
 
-        for e in col_list:
-            if e.text() != "":
-                e.textChanged.connect(lambda: self.new_sectionalprop_Column(col_list))
-
-        for f in fu_fy_list:
-            if f.text() != "":
-                self.fu_fy_validation_connect(fu_fy_list, f)
-                # f.textChanged.connect(lambda: self.fu_fy_validation(fu_fy_list, f))
-
-        # def f():
-        #     found = False
-        #     material_key = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL)
-        #     for i in range(material_key.count()):
-        #         if material_key.itemText(i) == "Custom":
-        #             found = True
-        #         if i == material_key.count() - 1:
-        #             if found:
-        #                 material_key.setCurrentText("Custom")
-        #                 return
-        #             else:
-        #                 material_key.addItem("Custom")
-        #                 material_key.setCurrentText("Custom")
-        #                 return
-        # for m in material_list:
-        #     if m.text() != "":
-        #         m.textChanged.connect(f)
-
-    def beam_preferences(self, designation, material_grade):
-        '''
-        @author: Umair
-        '''
-        # designation = designation_material_grade[0]
-        # material_grade = designation_material_grade[1]
-        tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-        if designation == 'Select Section':
-            self.flag = False
-            self.ui.clear_tab("Beam")
-            return
-
-        beam_attributes = Section(designation, material_grade)
-        Section.connect_to_database_update_other_attributes(beam_attributes, "Beams", designation)
-        beam_list = []
-        for ch in tab_Beam.children():
-            if ch.objectName() == KEY_SUPTDSEC_DESIGNATION:
-                ch.setText(designation)
-            elif ch.objectName() == KEY_SUPTDSEC_SOURCE:
-                ch.setText(beam_attributes.source)
-            elif ch.objectName() == KEY_SUPTDSEC_MATERIAL:
-                indx = ch.findText(material_grade, QtCore.Qt.MatchFixedString)
-                if indx >= 0:
-                    ch.setCurrentIndex(indx)
-            elif ch.objectName() == KEY_SUPTDSEC_FU:
-                ch.setText(str(beam_attributes.fu))
-                ch.setEnabled(True if material_grade == 'Custom' else False)
-            elif ch.objectName() == KEY_SUPTDSEC_FY:
-                ch.setText(str(beam_attributes.fy))
-                ch.setEnabled(True if material_grade == 'Custom' else False)
-            elif ch.objectName() == KEY_SUPTDSEC_DEPTH:
-                ch.setText(str(beam_attributes.depth))
-                beam_list.append(ch)
-            elif ch.objectName() == KEY_SUPTDSEC_FLANGE_W:
-                ch.setText(str(beam_attributes.flange_width))
-                beam_list.append(ch)
-            elif ch.objectName() == KEY_SUPTDSEC_FLANGE_T:
-                ch.setText(str(beam_attributes.flange_thickness))
-                beam_list.append(ch)
-            elif ch.objectName() == KEY_SUPTDSEC_WEB_T:
-                ch.setText(str(beam_attributes.web_thickness))
-                beam_list.append(ch)
-            elif ch.objectName() == KEY_SUPTDSEC_FLANGE_S:
-                ch.setText(str(beam_attributes.flange_slope))
-            elif ch.objectName() == KEY_SUPTDSEC_ROOT_R:
-                ch.setText(str(beam_attributes.root_radius))
-            elif ch.objectName() == KEY_SUPTDSEC_TOE_R:
-                ch.setText(str(beam_attributes.toe_radius))
-            elif ch.objectName() == KEY_SUPTDSEC_MOD_OF_ELAST:
-                ch.setText("200")
-                ch.setDisabled(True)
-            elif ch.objectName() == KEY_SUPTDSEC_MOD_OF_RIGID:
-                ch.setText("76.9")
-                ch.setDisabled(True)
-            elif ch.objectName() == KEY_SUPTDSEC_POISSON_RATIO:
-                ch.setText("0.3")
-                ch.setDisabled(True)
-            elif ch.objectName() == KEY_SUPTDSEC_THERMAL_EXP:
-                ch.setText("12")
-                ch.setDisabled(True)
-            elif ch.objectName() == KEY_SUPTDSEC_MASS:
-                ch.setText(str(beam_attributes.mass))
-            elif ch.objectName() == KEY_SUPTDSEC_SEC_AREA:
-                ch.setText(str(beam_attributes.area))
-            elif ch.objectName() == KEY_SUPTDSEC_MOA_LZ:
-                ch.setText(str(beam_attributes.mom_inertia_z))
-            elif ch.objectName() == KEY_SUPTDSEC_MOA_LY:
-                ch.setText(str(beam_attributes.mom_inertia_y))
-            elif ch.objectName() == KEY_SUPTDSEC_ROG_RZ:
-                ch.setText(str(beam_attributes.rad_of_gy_z))
-            elif ch.objectName() == KEY_SUPTDSEC_ROG_RY:
-                ch.setText(str(beam_attributes.rad_of_gy_y))
-            elif ch.objectName() == KEY_SUPTDSEC_EM_ZZ:
-                ch.setText(str(beam_attributes.elast_sec_mod_z))
-            elif ch.objectName() == KEY_SUPTDSEC_EM_ZY:
-                ch.setText(str(beam_attributes.elast_sec_mod_y))
-            elif ch.objectName() == KEY_SUPTDSEC_PM_ZPZ:
-                ch.setText(str(beam_attributes.plast_sec_mod_z))
-            elif ch.objectName() == KEY_SUPTDSEC_PM_ZPY:
-                ch.setText(str(beam_attributes.plast_sec_mod_y))
-            elif ch.objectName() == 'pushButton_Add_Beam':
-                ch.setEnabled(True)
-            else:
-                pass
-
-        for e in beam_list:
-            if e.text() != "":
-                e.textChanged.connect(lambda: self.new_sectionalprop_Beam(beam_list))
-
-    def angle_preferences(self,designation,material_grade):
-        tab_Angle = self.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
-
-        # if designation == 'Select Section':
-        #     self.ui.clear_tab("Angle")
-        #     return
-        ch=tab_Angle.findChild(QtWidgets.QWidget, KEY_ANGLE_DESIGNATION)
-        ch.setText(designation)
-
-    def fu_fy_validation_connect(self, fu_fy_list, f):
-        f.textChanged.connect(lambda: self.fu_fy_validation(fu_fy_list, f))
-
-    def fu_fy_validation(self, fu_fy_list, textbox):
+    def fu_fy_validation(self, fu_fy_list, textbox, material_key):
         self.window_close_flag = False
         # self.rejected.disconnect()
         # self.rejected.connect(self.closeEvent_accept)
         print(fu_fy_list[0].text(), fu_fy_list[1].text())
         if "" not in [fu_fy_list[0].text(), fu_fy_list[1].text()]:
-            for f in fu_fy_list:
-                if f.objectName() in [KEY_SUPTNGSEC_FU, KEY_BASE_PLATE_FU]:
-                    fu = float(f.text())
-                elif f.objectName() in [KEY_SUPTNGSEC_FY, KEY_BASE_PLATE_FY]:
-                    fy = float(f.text())
-                else:
-                    pass
+            fu = float(fu_fy_list[0].text())
+            fy = float(fu_fy_list[1].text())
+            material = material_key.currentText()
+
         else:
             textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
             return
 
         if fu and fy:
-            if textbox.objectName() in [KEY_SUPTNGSEC_FU, KEY_BASE_PLATE_FU]:
-                if fu < 290 or fu > 649:
+            if 'Ultimate_Strength' in textbox.objectName():
+
+                if fu < 290 or fu > 639:
                     textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
                     self.window_close_flag = False
-
                     self.rejected.connect(self.closeEvent)
                     return
                 else:
-                    if 165 <= fy <= 249:
-                        if not (290 <= fu <= 409):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
 
-                            self.rejected.connect(self.closeEvent)
+                    fu_limits = self.get_limits_for_fu(str(material))
 
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-
-                            print("udhar")
-                            return
-
-                    elif 250 <= fy <= 299:
-                        if not (410 <= fu <= 439):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                    elif 300 <= fy <= 349:
-                        if not (440 <= fu <= 489):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                    elif 350 <= fy <= 409:
-                        if not (490 <= fu <= 539):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                    elif 410 <= fy <= 449:
-                        if not (540 <= fu <= 569):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                    elif 450 <= fy <= 549:
-                        if not (570 <= fu <= 649):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                    else:
+                    if fu_limits['lower'] <= fu <= fu_limits['upper']:
                         textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                        self.window_close_flag = False
-
+                        self.window_close_flag = True
                         self.rejected.connect(self.closeEvent)
                         return
-            if textbox.objectName() in [KEY_SUPTNGSEC_FY, KEY_BASE_PLATE_FY]:
-                if fy < 165 or fy > 549:
+                    else:
+                        textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
+                        self.window_close_flag = False
+                        self.rejected.connect(self.closeEvent)
+                        return
+
+            if 'Yield_Strength' in textbox.objectName():
+                if fy < 165 or fy > 499:
                     textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
                     self.window_close_flag = False
-
                     self.rejected.connect(self.closeEvent)
                     return
 
                 else:
-                    if 290 <= fu <= 409:
-                        if not (165 <= fy <= 249):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
 
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-
-                    elif 410 <= fu <= 439:
-                        if not (250 <= fy <= 299):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                    elif 440 <= fu <= 489:
-                        if not (300 <= fy <= 349):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                    elif 490 <= fu <= 539:
-                        if not (350 <= fy <= 409):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                    elif 540 <= fu <= 569:
-                        if not (410 <= fy <= 449):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                    elif 570 <= fu <= 649:
-                        if not (450 <= fy <= 549):
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
-                            self.window_close_flag = False
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                        else:
-                            textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                            self.window_close_flag = True
-
-                            self.rejected.connect(self.closeEvent)
-                            return
-                    else:
+                    fy_limits = self.get_limits_for_fy(str(material))
+                    if fy_limits['lower'] <= fy <= fy_limits['upper']:
                         textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: black;")
-                        self.window_close_flag = False
-
+                        self.window_close_flag = True
                         self.rejected.connect(self.closeEvent)
                         return
+                    else:
+                        textbox.setStyleSheet("border: 1 px; border-style: solid; border-color: red;")
+                        self.window_close_flag = False
+                        self.rejected.connect(self.closeEvent)
+                        return
+
+    def get_limits_for_fu(self, material_grade):
+
+        lower_fu = {'E 165 (Fe 290)': 290,
+                    'E 250 (Fe 410 W)A': 410,
+                    'E 250 (Fe 410 W)B': 410,
+                    'E 250 (Fe 410 W)C': 410,
+                    'E 300 (Fe 440)': 440,
+                    'E 350 (Fe 490)': 490,
+                    'E 410 (Fe 540)': 540,
+                    'E 450 (Fe 570)D': 570,
+                    'E 450 (Fe 590) E': 590}[material_grade]
+
+        upper_fu = {'E 165 (Fe 290)': 409,
+                    'E 250 (Fe 410 W)A': 439,
+                    'E 250 (Fe 410 W)B': 439,
+                    'E 250 (Fe 410 W)C': 439,
+                    'E 300 (Fe 440)': 489,
+                    'E 350 (Fe 490)': 539,
+                    'E 410 (Fe 540)': 569,
+                    'E 450 (Fe 570)D': 589,
+                    'E 450 (Fe 590) E': 639}[material_grade]
+
+        return {'lower': lower_fu, 'upper': upper_fu}
+
+    def get_limits_for_fy(self, material_grade):
+
+        lower_fy = {'E 165 (Fe 290)': 165,
+                    'E 250 (Fe 410 W)A': 230,
+                    'E 250 (Fe 410 W)B': 230,
+                    'E 250 (Fe 410 W)C': 230,
+                    'E 300 (Fe 440)': 280,
+                    'E 350 (Fe 490)': 320,
+                    'E 410 (Fe 540)': 380,
+                    'E 450 (Fe 570)D': 420,
+                    'E 450 (Fe 590) E': 420}[material_grade]
+
+        upper_fy = {'E 165 (Fe 290)': 249,
+                    'E 250 (Fe 410 W)A': 299,
+                    'E 250 (Fe 410 W)B': 299,
+                    'E 250 (Fe 410 W)C': 299,
+                    'E 300 (Fe 440)': 349,
+                    'E 350 (Fe 490)': 409,
+                    'E 410 (Fe 540)': 449,
+                    'E 450 (Fe 570)D': 499,
+                    'E 450 (Fe 590) E': 499}[material_grade]
+
+        return {'lower': lower_fy, 'upper': upper_fy}
 
     def anchor_bolt_designation(self, d):
         length = str(self.main.anchor_length_provided if self.main.design_button_status else 0)
         designation = str(d) + "X" + length + " IS5624 GALV"
         return (designation, length)
 
-    def anchor_bolt_preferences(self, d, typ):
-
-        change_list = []
-        tab_anchor_bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
-        # length = IS_5624_1993.table1(d)
-        # length = str(length[1])
-        # designation = str(d)+"X"+length+" IS5624 GALV"
-        designation = self.anchor_bolt_designation(d)[0]
-        # initial_designation = designation
-        for ch in tab_anchor_bolt.children():
-            if ch.objectName() == KEY_DP_ANCHOR_BOLT_DESIGNATION:
-                ch.setText(designation)
-                ch.setReadOnly(True)
-            elif ch.objectName() == KEY_DP_ANCHOR_BOLT_LENGTH:
-                ch.setText(str(self.main.anchor_length_provided) if self.main.design_button_status else '0')
-                change_list.append(ch)
-                # ch.setReadOnly(True)
-            elif ch.objectName() == KEY_DP_ANCHOR_BOLT_TYPE:
-                ch.setText(typ)
-                ch.setReadOnly(True)
-            elif ch.objectName() == KEY_DP_ANCHOR_BOLT_GALVANIZED:
-                change_list.append(ch)
-            elif ch.objectName() == KEY_DP_ANCHOR_BOLT_MATERIAL_G_O:
-                ch.setText(str(self.main.anchor_fu_fy[0]) if self.main.design_button_status else '0')
-
-        for c in change_list:
-            if isinstance(c, QtWidgets.QComboBox):
-                c.currentIndexChanged.connect(lambda: self.anchor_bolt_designation_change(change_list[0], change_list))
-            elif isinstance(c, QtWidgets.QLineEdit):
-                c.textChanged.connect(lambda: self.anchor_bolt_designation_change(c, change_list))
+    # def anchor_bolt_preferences(self, d, typ):
+    #
+    #     change_list = []
+    #     tab_anchor_bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
+    #     # length = IS_5624_1993.table1(d)
+    #     # length = str(length[1])
+    #     # designation = str(d)+"X"+length+" IS5624 GALV"
+    #     designation = self.anchor_bolt_designation(d)[0]
+    #     # initial_designation = designation
+    #     for ch in tab_anchor_bolt.children():
+    #         if ch.objectName() == KEY_DP_ANCHOR_BOLT_DESIGNATION:
+    #             ch.setText(designation)
+    #             ch.setReadOnly(True)
+    #         elif ch.objectName() == KEY_DP_ANCHOR_BOLT_LENGTH:
+    #             ch.setText(str(self.main.anchor_length_provided) if self.main.design_button_status else '0')
+    #             change_list.append(ch)
+    #             # ch.setReadOnly(True)
+    #         elif ch.objectName() == KEY_DP_ANCHOR_BOLT_TYPE:
+    #             ch.setText(typ)
+    #             ch.setReadOnly(True)
+    #         elif ch.objectName() == KEY_DP_ANCHOR_BOLT_GALVANIZED:
+    #             change_list.append(ch)
+    #         elif ch.objectName() == KEY_DP_ANCHOR_BOLT_MATERIAL_G_O:
+    #             ch.setText(str(self.main.anchor_fu_fy[0]) if self.main.design_button_status else '0')
+    #
+    #     for c in change_list:
+    #         if isinstance(c, QtWidgets.QComboBox):
+    #             c.currentIndexChanged.connect(lambda: self.anchor_bolt_designation_change(change_list[0], change_list))
+    #         elif isinstance(c, QtWidgets.QLineEdit):
+    #             c.textChanged.connect(lambda: self.anchor_bolt_designation_change(c, change_list))
 
     def anchor_bolt_designation_change(self, c, initial_des):
         des = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt").findChild(QtWidgets.QWidget,
@@ -2154,6 +2052,7 @@ class DesignPreferences(QDialog):
     def closeEvent(self, event):
         if self.window_close_flag:
             event.accept()
+            self.module_window.prev_inputs = self.module_window.input_dock_inputs
         else:
             QMessageBox.warning(self, "Error", "Select correct values for fu and fy!")
             event.ignore()

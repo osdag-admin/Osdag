@@ -224,7 +224,8 @@ class Connection(Main):
 
         ###################
     def tab_column_section(self, input_dictionary):
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SUPTNGSEC], input_dictionary[KEY_MATERIAL]]:
+        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SUPTNGSEC] if
+            KEY_SUPTNGSEC in input_dictionary.keys() else input_dictionary[KEY_SECSIZE], input_dictionary[KEY_MATERIAL]]:
             designation = ''
             material_grade = ''
             source = ''
@@ -253,10 +254,15 @@ class Connection(Main):
             plast_sec_mod_y = ''
 
         else:
-            designation = str(input_dictionary[KEY_SUPTNGSEC])
+            if KEY_SUPTNGSEC in input_dictionary.keys():
+                designation = str(input_dictionary[KEY_SUPTNGSEC])
+            else:
+                designation = str(input_dictionary[KEY_SECSIZE])
+
             material_grade = str(input_dictionary[KEY_MATERIAL])
             col_attributes = Section(designation, material_grade)
-            Section.connect_to_database_update_other_attributes(col_attributes, "Columns", designation)
+            Section.connect_to_database_update_other_attributes(
+                col_attributes, "Beams" if designation in connectdb("Beams", "popup") else "Columns", designation)
             source = str(col_attributes.source)
             fu = str(col_attributes.fu)
             fy = str(col_attributes.fy)
@@ -290,7 +296,6 @@ class Connection(Main):
         supporting_section.append(t2)
 
         material = connectdb("Material", call_type="popup")
-        material.append('Custom')
         t34 = (KEY_SUPTNGSEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         supporting_section.append(t34)
 
@@ -400,7 +405,8 @@ class Connection(Main):
 
     def tab_beam_section(self, input_dictionary):
 
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SUPTDSEC], input_dictionary[KEY_MATERIAL]]:
+        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SUPTDSEC] if
+            KEY_SUPTDSEC in input_dictionary.keys() else input_dictionary[KEY_SECSIZE], input_dictionary[KEY_MATERIAL]]:
             designation = ''
             material_grade = ''
             source = ''
@@ -429,7 +435,11 @@ class Connection(Main):
             plast_sec_mod_y = ''
 
         else:
-            designation = str(input_dictionary[KEY_SUPTDSEC])
+            if KEY_SUPTDSEC in input_dictionary.keys():
+                designation = str(input_dictionary[KEY_SUPTDSEC])
+            else:
+                designation = str(input_dictionary[KEY_SECSIZE])
+
             material_grade = str(input_dictionary[KEY_MATERIAL])
             col_attributes = Section(designation, material_grade)
             Section.connect_to_database_update_other_attributes(col_attributes, "Beams", designation)
@@ -467,7 +477,6 @@ class Connection(Main):
         supported_section.append(t2)
 
         material = connectdb("Material", call_type="popup")
-        material.append('Custom')
         t34 = (KEY_SUPTDSEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         supported_section.append(t34)
 
@@ -682,7 +691,6 @@ class Connection(Main):
         connector = []
 
         material = connectdb("Material", call_type="popup")
-        material.append('Custom')
         t1 = (KEY_PLATE_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         connector.append(t1)
 
@@ -721,71 +729,220 @@ class Connection(Main):
 
         return tabs
 
-        ###########################
+    def tab_value_changed(self):
 
-    # def bolt_values(self):
-    #
-    #     bolt = []
-    #
-    #     t1 = (KEY_DP_BOLT_TYPE, KEY_DISP_TYP, TYPE_COMBOBOX, ['Pretensioned', 'Non-pretensioned'])
-    #     bolt.append(t1)
-    #
-    #     t2 = (KEY_DP_BOLT_HOLE_TYPE, KEY_DISP_DP_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'])
-    #     bolt.append(t2)
-    #
-    #     t3 = (KEY_DP_BOLT_MATERIAL_G_O, KEY_DISP_DP_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, '410')
-    #     bolt.append(t3)
-    #
-    #     t4 = (None, None, TYPE_ENTER, None)
-    #     bolt.append(t4)
-    #
-    #     t5 = (None, KEY_DISP_DP_BOLT_DESIGN_PARA, TYPE_TITLE, None)
-    #     bolt.append(t5)
-    #
-    #     t6 = (KEY_DP_BOLT_SLIP_FACTOR, KEY_DISP_DP_BOLT_SLIP_FACTOR, TYPE_COMBOBOX, ['0.2', '0.5', '0.1', '0.25', '0.3',
-    #                                                                                  '0.33', '0.48', '0.52', '0.55'])
-    #     bolt.append(t6)
-    #
-    #     return bolt
-    #
-    # def weld_values(self):
-    #
-    #     weld = []
-    #
-    #
-    #     t1 = (KEY_DP_WELD_FAB, KEY_DISP_DP_WELD_FAB, TYPE_COMBOBOX, KEY_DP_WELD_FAB_VALUES)
-    #     weld.append(t1)
-    #
-    #     t2 = (KEY_DP_WELD_MATERIAL_G_O, KEY_DISP_DP_WELD_MATERIAL_G_O, TYPE_TEXTBOX, '410')
-    #     weld.append(t2)
-    #
-    #     return weld
-    #
-    # def detailing_values(self):
-    #     detailing = []
-    #
-    #     t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX, [
-    #         'a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'])
-    #     detailing.append(t1)
-    #
-    #     t2 = (KEY_DP_DETAILING_GAP, KEY_DISP_DP_DETAILING_GAP, TYPE_TEXTBOX, '10')
-    #     detailing.append(t2)
-    #
-    #     t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
-    #           ['No', 'Yes'])
-    #     detailing.append(t3)
-    #
-    #     return detailing
-    #
-    # def design_values(self):
-    #
-    #     design = []
-    #
-    #     t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX, ['Limit State Design',
-    #                                                 'Limit State (Capacity based) Design', 'Working Stress Design'])
-    #     design.append(t1)
-    #
-    #     return design
+        change_tab = []
+
+        t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC_MATERIAL], [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY], TYPE_TEXTBOX, self.get_fu_fy)
+        change_tab.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC_MATERIAL], [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY], TYPE_TEXTBOX, self.get_fu_fy)
+        change_tab.append(t2)
+
+        t3 = ("Connector", [KEY_PLATE_MATERIAL], [KEY_PLATE_FU, KEY_PLATE_FY], TYPE_TEXTBOX, self.get_fu_fy)
+        change_tab.append(t3)
+
+        t4 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC_DEPTH, KEY_SUPTNGSEC_FLANGE_W, KEY_SUPTNGSEC_FLANGE_T,
+                                KEY_SUPTNGSEC_WEB_T], [KEY_SUPTNGSEC_MASS, KEY_SUPTNGSEC_SEC_AREA, KEY_SUPTNGSEC_MOA_LZ,
+                                                       KEY_SUPTNGSEC_MOA_LY, KEY_SUPTNGSEC_ROG_RZ, KEY_SUPTNGSEC_ROG_RY,
+                                                       KEY_SUPTNGSEC_EM_ZZ, KEY_SUPTNGSEC_EM_ZY,
+                                                       KEY_SUPTNGSEC_PM_ZPZ, KEY_SUPTNGSEC_PM_ZPY], TYPE_TEXTBOX,
+              self.get_sec_properties)
+        change_tab.append(t4)
+
+        t5 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC_DEPTH, KEY_SUPTDSEC_FLANGE_W, KEY_SUPTDSEC_FLANGE_T,
+                                 KEY_SUPTDSEC_WEB_T], [KEY_SUPTDSEC_MASS, KEY_SUPTDSEC_SEC_AREA, KEY_SUPTDSEC_MOA_LZ,
+                                                       KEY_SUPTDSEC_MOA_LY, KEY_SUPTDSEC_ROG_RZ, KEY_SUPTDSEC_ROG_RY,
+                                                       KEY_SUPTDSEC_EM_ZZ, KEY_SUPTDSEC_EM_ZY,
+                                                       KEY_SUPTDSEC_PM_ZPZ, KEY_SUPTDSEC_PM_ZPY], TYPE_TEXTBOX,
+              self.get_sec_properties)
+        change_tab.append(t5)
+
+        return change_tab
+
+    def get_sec_properties(self):
+
+        if '' in self:
+            mass = ''
+            area = ''
+            moa_z = ''
+            moa_y = ''
+            rog_z = ''
+            rog_y = ''
+            em_z = ''
+            em_y = ''
+            pm_z = ''
+            pm_y = ''
+
+        else:
+            D = float(self[0])
+            B = float(self[1])
+            t_w = float(self[2])
+            t_f = float(self[3])
+
+            sec_prop = I_sectional_Properties()
+            mass = sec_prop.calc_Mass(D, B, t_w, t_f)
+            area = sec_prop.calc_Area(D, B, t_w, t_f)
+            moa_z = sec_prop.calc_MomentOfAreaZ(D, B, t_w, t_f)
+            moa_y = sec_prop.calc_MomentOfAreaY(D, B, t_w, t_f)
+            rog_z = sec_prop.calc_RogZ(D, B, t_w, t_f)
+            rog_y = sec_prop.calc_RogY(D, B, t_w, t_f)
+            em_z = sec_prop.calc_ElasticModulusZz(D, B, t_w, t_f)
+            em_y = sec_prop.calc_ElasticModulusZy(D, B, t_w, t_f)
+            pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
+            pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
+
+        d = {KEY_SUPTNGSEC_MASS: str(mass),
+             KEY_SUPTNGSEC_SEC_AREA: str(area),
+             KEY_SUPTNGSEC_MOA_LZ: str(moa_z),
+             KEY_SUPTNGSEC_MOA_LY: str(moa_y),
+             KEY_SUPTNGSEC_ROG_RZ: str(rog_z),
+             KEY_SUPTNGSEC_ROG_RY: str(rog_y),
+             KEY_SUPTNGSEC_EM_ZZ: str(em_z),
+             KEY_SUPTNGSEC_EM_ZY: str(em_y),
+             KEY_SUPTNGSEC_PM_ZPZ: str(pm_z),
+             KEY_SUPTNGSEC_PM_ZPY: str(pm_y),
+
+             KEY_SUPTDSEC_MASS: str(mass),
+             KEY_SUPTDSEC_SEC_AREA: str(area),
+             KEY_SUPTDSEC_MOA_LZ: str(moa_z),
+             KEY_SUPTDSEC_MOA_LY: str(moa_y),
+             KEY_SUPTDSEC_ROG_RZ: str(rog_z),
+             KEY_SUPTDSEC_ROG_RY: str(rog_y),
+             KEY_SUPTDSEC_EM_ZZ: str(em_z),
+             KEY_SUPTDSEC_EM_ZY: str(em_y),
+             KEY_SUPTDSEC_PM_ZPZ: str(pm_z),
+             KEY_SUPTDSEC_PM_ZPY: str(pm_y)
+            }
+
+        return d
+
+    def get_fu_fy(self):
+        m = Material(self[0])
+        fu = m.fu
+        fy = m.fy
+        d = {KEY_SUPTNGSEC_FU: fu,
+             KEY_SUPTNGSEC_FY: fy,
+             KEY_SUPTDSEC_FU: fu,
+             KEY_SUPTDSEC_FY: fy,
+             KEY_PLATE_FU: fu,
+             KEY_PLATE_FY: fy,
+             KEY_BASE_PLATE_FU: fu,
+             KEY_BASE_PLATE_FY: fy}
+
+        return d
+
+    def edit_tabs(self):
+
+        edit_list = []
+
+        t1 = (KEY_DISP_COLSEC, KEY_CONN, TYPE_CHANGE_TAB_NAME, self.get_column_tab_name)
+        edit_list.append(t1)
+
+        t1 = (KEY_DISP_BEAMSEC, KEY_CONN, TYPE_CHANGE_TAB_NAME, self.get_beam_tab_name)
+        edit_list.append(t1)
+
+        return edit_list
+
+    def get_column_tab_name(self):
+        if self in VALUES_CONN_1:
+            return KEY_DISP_COLSEC
+        else:
+            return KEY_DISP_PRIBM
+
+    def get_beam_tab_name(self):
+        if self in VALUES_CONN_1:
+            return KEY_DISP_BEAMSEC
+        else:
+            return KEY_DISP_SECBM
+
+    def list_for_fu_fy_validation(self):
+
+        fu_fy_list = []
+
+        t1 = (KEY_SUPTNGSEC_MATERIAL, KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY)
+        fu_fy_list.append(t1)
+
+        t2 = (KEY_SUPTDSEC_MATERIAL, KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY)
+        fu_fy_list.append(t2)
+
+        t3 = (KEY_PLATE_MATERIAL, KEY_PLATE_FU, KEY_PLATE_FY)
+        fu_fy_list.append(t3)
+
+        return fu_fy_list
+
+    def input_dictionary_design_pref(self):
+        design_input = []
+        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SUPTNGSEC_MATERIAL])
+        design_input.append(t1)
+
+        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY])
+        design_input.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, TYPE_COMBOBOX, [KEY_SUPTDSEC_MATERIAL])
+        design_input.append(t2)
+
+        t2 = (KEY_DISP_BEAMSEC, TYPE_TEXTBOX, [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY])
+        design_input.append(t2)
+
+        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        design_input.append(t3)
+
+        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
+        design_input.append(t3)
+
+        t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
+        design_input.append(t4)
+
+        t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
+        design_input.append(t4)
+
+        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        design_input.append(t5)
+
+        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        design_input.append(t5)
+
+        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
+        design_input.append(t6)
+
+        t7 = ("Connector", TYPE_COMBOBOX, [KEY_PLATE_MATERIAL])
+        design_input.append(t7)
+
+        return design_input
+
+    def input_dictionary_without_design_pref(self):
+        design_input = []
+        t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL], 'Input Dock')
+        design_input.append(t1)
+
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+                     KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
+                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_PLATE_MATERIAL], '')
+        design_input.append(t2)
+
+        return design_input
+
+
+    def get_values_for_design_pref(self, key, design_dictionary):
+
+        fu = Material(design_dictionary[KEY_MATERIAL]).fu
+
+        val = {KEY_DP_BOLT_TYPE: "Pretensioned",
+               KEY_DP_BOLT_HOLE_TYPE: "Standard",
+               KEY_DP_BOLT_MATERIAL_G_O: str(fu),
+               KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
+               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_MATERIAL_G_O: str(fu),
+               KEY_DP_DETAILING_EDGE_TYPE: "a - Sheared or hand flame cut",
+               KEY_DP_DETAILING_GAP: '10',
+               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
+               KEY_DP_DESIGN_METHOD: "Limit State Design",
+               KEY_PLATE_MATERIAL: str(design_dictionary[KEY_MATERIAL])
+               }[key]
+
+        return val
+
 
     def output_values(self, flag):
         return []

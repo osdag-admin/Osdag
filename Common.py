@@ -455,7 +455,7 @@ KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
 # Applied load
 KEY_DISP_APPLIED_SHEAR_LOAD ='Shear Load (kN)'
 KEY_DISP_APPLIED_AXIAL_FORCE='Axial Load (kN)'
-KEY_DISP_APPLIED_MOMENT_LOAD='Moment Load (kNm)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Moment Load (kN-m)'
 
 # capacity
 DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"
@@ -466,9 +466,9 @@ KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity (kN)"
 KEY_MEMBER_SHEAR_CAPACITY='section.MomCapacity'
 KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity (kN)"
 KEY_MEMBER_MOM_CAPACITY='section.MomCapacity'
-KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity (kNm)"
-KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity (kNm)'
-KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
+KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity (kN-m)"
+KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity (kN-m)'
+KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kN-m)'
 
 KEY_OUT_BASEPLATE_THICKNNESS = 'Baseplate.Thickness'
 KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (mm)'

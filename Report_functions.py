@@ -366,15 +366,17 @@ def min_plate_thk_req(t_w):
     min_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_w='+t_w+'\end{aligned}'))
     return min_plate_thk_eqn
 
-def shear_yield_prov(h,t, f_y, gamma, V_dg):
+def shear_yield_prov(h,t, f_y, gamma, V_dg,multiple=1):
     h = str(h)
     t = str(t)
     f_y = str(f_y)
     gamma = str(gamma)
     V_dg = str(V_dg)
+
+    multiple = str(multiple)
     shear_yield_eqn = Math(inline=True)
     shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{dg} &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo}}\\'))
-    shear_yield_eqn.append(NoEscape(r'&=\frac{'+h+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
+    shear_yield_eqn.append(NoEscape(r'&=\frac{'+multiple+'*'+h+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
     shear_yield_eqn.append(NoEscape(r'&=' + V_dg + '\end{aligned}'))
     return shear_yield_eqn
 
@@ -511,15 +513,16 @@ def flange_weld_stress(F_f,l_eff,F_ws):
 
     return flange_weld_stress_eqn
 
-def tension_yield_prov(l,t, f_y, gamma, T_dg):
+def tension_yield_prov(l,t, f_y, gamma, T_dg,multiple =1):
     l = str(l)
     t = str(t)
     f_y = str(f_y)
     gamma = str(gamma)
+    multiple = str(multiple)
     T_dg = str(T_dg)
     tension_yield_eqn = Math(inline=True)
     tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\'))
-    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
+    tension_yield_eqn.append(NoEscape(r'&=\frac{'+multiple+'*'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
     tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
     return tension_yield_eqn
 
@@ -538,15 +541,16 @@ def tension_rupture_bolted_prov(w_p, t_p, n_c, d_o, fu,gamma_m1,T_dn):
     Tensile_rup_eqnb.append(NoEscape(r'&=' + T_dn + '\end{aligned}'))
     return Tensile_rup_eqnb
 
-def tension_rupture_welded_prov(w_p, t_p, fu,gamma_m1,T_dn):
+def tension_rupture_welded_prov(w_p, t_p, fu,gamma_m1,T_dn,multiple =1):
     w_p = str(w_p)
     t_p = str(t_p)
     f_u = str(fu)
     T_dn = str(T_dn)
-    gamma_m1 = str(gamma_m1)
+    multiple = str(multiple)
+    T_dn = str(T_dn)
     Tensile_rup_eqnw = Math(inline=True)
     Tensile_rup_eqnw.append(NoEscape(r'\begin{aligned} T_{dn} &= \frac{0.9*A_{n}*f_u}{\gamma_{m1}}\\'))
-    Tensile_rup_eqnw.append(NoEscape(r'&=\frac{0.9*'+w_p+'*'+t_p+'*'+f_u+r'}{'+gamma_m1+r'}\\'))
+    Tensile_rup_eqnw.append(NoEscape(r'&=\frac{0.9*'+ multiple +'*'+w_p+'*'+t_p+'*'+f_u+r'}{'+gamma_m1+r'}\\'))
     Tensile_rup_eqnw.append(NoEscape(r'&=' + T_dn + '\end{aligned}'))
     return Tensile_rup_eqnw
 
@@ -742,32 +746,34 @@ def axial_capacity(area,fy, gamma_m0,axial_capacity): #todo anjali
     gamma_m0=str(gamma_m0)
     axial_capacity = str(axial_capacity)
     axial_capacity_eqn = Math(inline=True)
-    axial_capacity_eqn.append(NoEscape(r'\begin{aligned} Ac &=\frac{A*f_y}{\gamma_{m0} *10^3}\\'))
+    axial_capacity_eqn.append(NoEscape(r'\begin{aligned} A_c &=\frac{A*f_y}{\gamma_{m0} *10^3}\\'))
     axial_capacity_eqn.append(NoEscape(r'&=\frac{'+area+'*'+fy+'}{'+ gamma_m0+r'* 10^3}\\'))
     axial_capacity_eqn.append(NoEscape(r'&=' + axial_capacity + r'\end{aligned}'))
     return axial_capacity_eqn
 
-# def min_axial_capacity(axial_capacity,min_ac): #todo anjali
-#     min_ac = str(min_ac)
-#     axial_capacity = str(axial_capacity)
-#     min_ac_eqn = Math(inline=True)
-#     min_ac_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
-#     min_ac_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
-#     min_ac_eqn.append(NoEscape(r'&=' + min_ac + r'\end{aligned}'))
-#     return min_ac_eqn
+def min_max_axial_capacity(axial_capacity,min_ac): #todo anjali
+    min_ac = str(min_ac)
+    axial_capacity = str(axial_capacity)
+    min_ac_eqn = Math(inline=True)
+    min_ac_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
+    min_ac_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
+    min_ac_eqn.append(NoEscape(r'&=' + min_ac + r'\\'))
+    min_ac_eqn.append(NoEscape(r'Ac_{max} &= Ac \\'))
+    min_ac_eqn.append(NoEscape(r'&=' +axial_capacity+ r'\end{aligned}'))
+    return min_ac_eqn
 
-def prov_axial_load(axial_input,min_ac,app_axial_load,axial_capacity):
+def prov_axial_load(axial_input,min_ac,app_axial_load):
     min_ac = str(min_ac)
     axial_input = str(axial_input)
     app_axial_load = str(app_axial_load)
 
-    axial_capacity = str(axial_capacity)
+    # axial_capacity = str(axial_capacity)
     prov_axial_load_eqn = Math(inline=True)
-    prov_axial_load_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
-    prov_axial_load_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
-    prov_axial_load_eqn.append(NoEscape(r'&=' + min_ac + r'\\'))
+    # prov_axial_load_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
+    # prov_axial_load_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
+    # prov_axial_load_eqn.append(NoEscape(r'&=' + min_ac + r'\\'))
 
-    prov_axial_load_eqn.append(NoEscape(r'Au~~ &= max(A,Ac_{min} )\\'))
+    prov_axial_load_eqn.append(NoEscape(r'\begin{aligned} Au~~ &= max(A,Ac_{min} )\\'))
     prov_axial_load_eqn.append(NoEscape(r'&= max( ' + axial_input + ',' + min_ac + r')\\'))
     prov_axial_load_eqn.append(NoEscape(r'&=' + app_axial_load + r'\end{aligned}'))
     return prov_axial_load_eqn
@@ -786,21 +792,28 @@ def shear_capacity(h, t,f_y, gamma_m0,shear_capacity): # same as #todo anjali
     return shear_capacity_eqn
 #
 #
-def min_shear_capacity(shear_capacity,min_sc): #todo anjali
+def min_max_shear_capacity(shear_capacity,min_sc): #todo anjali
     min_sc = str(min_sc)
     shear_capacity = str(shear_capacity)
     min_sc_eqn = Math(inline=True)
     min_sc_eqn.append(NoEscape(r'\begin{aligned} Vc_{min} &= 0.6 * S_c\\'))
     min_sc_eqn.append(NoEscape(r'&= 0.6 *' + shear_capacity +r'\\'))
-    min_sc_eqn.append(NoEscape(r'&=' + min_sc + r'\end{aligned}'))
+    min_sc_eqn.append(NoEscape(r'&=' + min_sc + r'\\'))
+    min_sc_eqn.append(NoEscape(r'Vc_{max} &= Sc \\'))
+    min_sc_eqn.append(NoEscape(r'&=' +shear_capacity+ r'\end{aligned}'))
     return min_sc_eqn
 
 def prov_shear_load(shear_input,min_sc,app_shear_load):
     min_sc = str(min_sc)
     shear_input = str(shear_input)
     app_shear_load = str(app_shear_load)
+    # shear_capacity = str(shear_capacity)
     app_shear_load_eqn = Math(inline=True)
-    app_shear_load_eqn.append(NoEscape(r'\begin{aligned} Vu &= max(V,Vc_{min})\\'))
+    # app_shear_load_eqn.append(NoEscape(r'\begin{aligned} Vc_{min} &= 0.6 * S_c\\'))
+    # app_shear_load_eqn.append(NoEscape(r'&= 0.6 *' + shear_capacity + r'\\'))
+    # app_shear_load_eqn.append(NoEscape(r'&=' + min_sc + r'\\'))
+    # app_shear_load_eqn.append(NoEscape(r' Vu~~ &= max(V,Vc_{min})\\'))
+    app_shear_load_eqn.append(NoEscape(r'\begin{aligned} Vu~~ &= max(V,Vc_{min})\\'))
     app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',' + min_sc + r')\\'))
     app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r'\end{aligned}'))
     return app_shear_load_eqn
@@ -840,21 +853,25 @@ def moment_capacity (Pmc , Mdc, M_c):
     M_c_eqn.append(NoEscape(r'&=' + M_c + r'\end{aligned}'))
     return M_c_eqn
 
-def min_moment_capacity(moment_capacity,min_mc): #todo anjali
+def min_max_moment_capacity(moment_capacity,min_mc): #todo anjali
     min_mc = str(min_mc)
     moment_capacity = str(moment_capacity)
     min_mc_eqn = Math(inline=True)
     min_mc_eqn.append(NoEscape(r'\begin{aligned} Mc_{min} &= 0.5 * M_c\\'))
     min_mc_eqn.append(NoEscape(r'&= 0.5 *' + moment_capacity +r'\\'))
-    min_mc_eqn.append(NoEscape(r'&=' + min_mc + r'\end{aligned}'))
+    min_mc_eqn.append(NoEscape(r'&=' + min_mc + r'\\'))
+    min_mc_eqn.append(NoEscape(r' Mc_{max} &= Mc \\'))
+    min_mc_eqn.append(NoEscape(r'&=' +moment_capacity+ r'\end{aligned}'))
     return min_mc_eqn
 
 def prov_moment_load(moment_input,min_mc,app_moment_load):
     min_mc = str(min_mc)
     moment_input = str(moment_input)
     app_moment_load = str(app_moment_load)
+    # moment_capacity = str(moment_capacity)
     app_moment_load_eqn = Math(inline=True)
-    app_moment_load_eqn.append(NoEscape(r'\begin{aligned} Mu &= max(M,Mc_{min} )\\'))
+
+    app_moment_load_eqn.append(NoEscape(r' \begin{aligned}Mu &= max(M,Mc_{min} )\\'))
     app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r')\\'))
     app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\end{aligned}'))
     return  app_moment_load_eqn
@@ -872,16 +889,16 @@ def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn):
     shear_rup_eqn.append(NoEscape(r'&= 0.9 *('+h+'-('+n_r+'*'+d_o+'))*'+t+'*'+f_u+r'\\'))
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
     return shear_rup_eqn
-def shear_Rupture_prov_weld(h, t,  fu,v_dn,gamma_mo):  #weld
+def shear_Rupture_prov_weld(h, t,  fu,v_dn,gamma_m1):  #weld
     h = str(h)
     t = str(t)
-    gamma_mo =  str(gamma_mo)
+    gamma_m1 =  str(gamma_m1)
     f_u = str(fu)
     v_dn = str(v_dn)
 
     shear_rup_eqn = Math(inline=True)
-    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
-    shear_rup_eqn.append(NoEscape(r'&=(0.9*'+h+'*'+t+'*'+f_u+'}{\sqrt{3}*' +gamma_mo+ r'}\\'))
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{m1}}\\'))
+    shear_rup_eqn.append(NoEscape(r'&=\frac{0.9*'+h+'*'+t+'*'+f_u+'}{\sqrt{3}*' +gamma_m1+ r'}\\'))
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
     return shear_rup_eqn
 def shear_capacity_prov(V_dy, V_dn, V_db=0.0):
@@ -934,6 +951,19 @@ def get_pass_fail(required, provided,relation='greater'):
                 return 'Pass'
             else:
                 return 'Fail'
+
+def get_pass_fail2(min, provided, max):
+    min = float(min)
+    provided = float(provided)
+    max = float(max)
+    if provided == 0:
+        return 'N/A'
+    else:
+        if max >= provided and min <= provided:
+            return 'Pass'
+        else:
+            return 'Fail'
+        # elif relation == 'geq':
 
 def member_yield_prov(Ag, fy, gamma_m0, member_yield,multiple = 1):
     Ag = str(round(Ag,2))

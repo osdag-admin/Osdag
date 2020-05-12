@@ -64,6 +64,7 @@ from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
+from design_type.connection.base_plate_connection import BasePlateConnection
 
 from cad.cad3dconnection import cadconnection
 
@@ -89,7 +90,7 @@ class Ui_ModuleWindow(QMainWindow):
 
     def open_summary_popup(self, main):
         self.new_window = QtWidgets.QDialog()
-        self.new_ui = Ui_Dialog1()
+        self.new_ui = Ui_Dialog1(self.design_exist)
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
@@ -728,7 +729,10 @@ class Ui_ModuleWindow(QMainWindow):
                     continue
                 selected = key.currentText()
                 f = c_tup[1]
-                onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0]]
+                if updated_list != None:
+                    onchange_key_popup = [item for item in updated_list if item[1] == c_tup[0]]
+                else:
+                    onchange_key_popup = []
                 if onchange_key_popup != []:
                     # if c_tup[0] == KEY_SECSIZE:
                     options = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, onchange_key_popup[0][0]).currentText())
@@ -1736,6 +1740,8 @@ class Ui_ModuleWindow(QMainWindow):
             return ColumnEndPlate
         elif name == KEY_DISP_CLEATANGLE:
             return CleatAngleConnection
+        elif name == KEY_DISP_BASE_PLATE:
+            return BasePlateConnection
 # Function for getting inputs from a file
     '''
     @author: Umair
@@ -1874,6 +1880,7 @@ class Ui_ModuleWindow(QMainWindow):
             # DESIGN_FLAG = 'True'
 
             out_list = main.output_values(main, status)
+            print('outlist', out_list)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
@@ -1881,23 +1888,26 @@ class Ui_ModuleWindow(QMainWindow):
                     txt.setVisible(True if option[3] else False)
                     txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
                     txt_label.setVisible(True if option[3] else False)
+
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
             # if status is True and main.module == "Fin Plate":
             #     self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
             #                                                  main.module)
-            # if self.design_inputs[KEY_MODULE] == KEY_DISP_FINPLATE:
-            #     module_class = FinPlateConnection
-            # elif self.design_inputs[KEY_MODULE] == KEY_DISP_CLEATANGLE:
-            #     module_class = CleatAngleConnection
-            # elif self.design_inputs[KEY_MODULE] == KEY_DISP_BEAMCOVERPLATE:
-            #     module_class = BeamCoverPlate
-            # elif self.design_inputs[KEY_MODULE] == KEY_DISP_ENDPLATE:
-            #     module_class = EndPlateConnection
+
+            self.design_exist = False
+            if self.design_inputs[KEY_MODULE] == KEY_DISP_FINPLATE:
+                module_class = FinPlateConnection
+            elif self.design_inputs[KEY_MODULE] == KEY_DISP_CLEATANGLE:
+                module_class = CleatAngleConnection
+            elif self.design_inputs[KEY_MODULE] == KEY_DISP_BEAMCOVERPLATE:
+                module_class = BeamCoverPlate
+            elif self.design_inputs[KEY_MODULE] == KEY_DISP_ENDPLATE:
+                module_class = EndPlateConnection
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_CLEATANGLE,
-                    KEY_DISP_ENDPLATE]:
+                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
@@ -1916,6 +1926,7 @@ class Ui_ModuleWindow(QMainWindow):
                 file_extension = fName.split(".")[-1]
                 if file_extension == 'png':
                     self.display.ExportToImage(fName)
+                self.design_exist = True
 
             else:
                 self.btn3D.setEnabled(False)
@@ -2300,8 +2311,10 @@ class Ui_ModuleWindow(QMainWindow):
         table_2 = "Beams"
         material_grade = key_4.currentText()
         material = Material(material_grade)
+
         # if module != KEY_DISP_BASE_PLATE:
         #     tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
+
         # else:
         #     tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
         # tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))

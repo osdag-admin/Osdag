@@ -657,6 +657,7 @@ class Tension_welded(Main):
         t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, existingvalue_key_length, None)
         options_list.append(t5)
 
+
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
         options_list.append(t6)
 
@@ -722,6 +723,9 @@ class Tension_welded(Main):
                self.efficiency if flag else '')
         out_list.append(t7)
 
+        t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None)
+        out_list.append(t8)
+
         t8 = (None, DISP_TITLE_WELD_CAPACITY, TYPE_TITLE, None)
         out_list.append(t8)
 
@@ -741,16 +745,16 @@ class Tension_welded(Main):
         t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, self.weld.effective if flag else '')
         out_list.append(t13)
 
-        t18 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
+        t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None)
         out_list.append(t18)
 
         t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '')
         out_list.append(t19)
 
-        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
         out_list.append(t20)
 
-        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
+        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
         out_list.append(t21)
 
         return out_list
@@ -943,7 +947,8 @@ class Tension_welded(Main):
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
         self.loc = design_dictionary[KEY_LOCATION]
-        self.plate_thickness = [3,4,6,8,10,12,16,20,24,28,30,32,36,40]
+        self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
+
         # print(self.sizelist)
         self.length = float(design_dictionary[KEY_LENGTH])
         # print(self.bolt)
@@ -1221,9 +1226,9 @@ class Tension_welded(Main):
                 break
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels',"Star Angles"]:
-            max_tension_yield = 400*self.plate.fy*40/1.1
+            max_tension_yield = 400*self.plate.fy*80/1.1
         else:
-            max_tension_yield = 200*self.plate.fy*40/1.1
+            max_tension_yield = 200*self.plate.fy*80/1.1
 
         "Increasing sectionsize to suffice the plate requirement"
 
@@ -1233,10 +1238,9 @@ class Tension_welded(Main):
             self.select_weld(self, design_dictionary)
 
         else:
-            if tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
+            if tension_capacity < max_tension_yield and self.res_force < max_tension_yield:
                 self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
-            elif tension_capacity < max_tension_yield and design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', "Angles"]:
-                self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
+
             else:
                 self.design_status = False
                 logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness.")
@@ -1302,7 +1306,6 @@ class Tension_welded(Main):
 
         if self.weld.strength > self.weld.stress:
             self.design_status = True
-            logger.info(self.weld.reason)
             self.member_check(self, design_dictionary)
         else:
             self.design_status = False
@@ -1401,7 +1404,7 @@ class Tension_welded(Main):
             shear_lag = w
             L_c = (self.plate.length - max((2 * self.weld.size),15))
             A_go = self.section_size_1.min_leg * self.section_size_1.thickness
-            A_nc = (self.section_size_1.max_leg * self.section_size_1.thickness)
+            A_nc = ((self.section_size_1.max_leg- self.section_size_1.thickness) * self.section_size_1.thickness)
             t = self.section_size_1.thickness
 
         elif design_dictionary[KEY_LOCATION] == 'Short Leg':
@@ -1409,7 +1412,7 @@ class Tension_welded(Main):
             shear_lag = w
             L_c = (self.plate.length - max((2 * self.weld.size),15))
             A_go = self.section_size_1.max_leg * self.section_size_1.thickness
-            A_nc = (self.section_size_1.min_leg * self.section_size_1.thickness)
+            A_nc = ((self.section_size_1.min_leg - self.section_size_1.thickness) * self.section_size_1.thickness)
             t = self.section_size_1.thickness
 
         elif design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
@@ -1417,7 +1420,7 @@ class Tension_welded(Main):
             shear_lag = w
             L_c = (self.plate.length - max((2 * self.weld.size),15))
             A_go = self.section_size_1.flange_width * self.section_size_1.flange_thickness*2
-            A_nc = (self.section_size_1.depth * self.section_size_1.web_thickness)
+            A_nc = ((self.section_size_1.depth - 2*self.section_size_1.flange_thickness) * self.section_size_1.web_thickness)
             t = self.section_size_1.web_thickness
 
         self.section_size_1.tension_member_design_due_to_rupture_of_critical_section( A_nc = A_nc , A_go = A_go, F_u = self.section_size_1.fu, F_y = self.section_size_1.fy, L_c = L_c, w = w, b_s = shear_lag, t = t)
@@ -1454,7 +1457,7 @@ class Tension_welded(Main):
 
         if self.section_size_1.tension_capacity >= self.load.axial_force * 1000:
             self.design_status = True
-            logger.info("In case of reverse load, slenderness value should be less than 180.")
+
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
             self.get_plate_thickness(self,design_dictionary)
 
@@ -1540,14 +1543,21 @@ class Tension_welded(Main):
             elif (self.plate_tension_capacity < self.res_force) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
                 logger.error("Plate thickness is not sufficient.")
-                logger.error(": Design is not safe. \n ")
-                logger.debug(" :=========End Of design===========")
+
             else:
                 pass
         if self.plate_tension_capacity > self.res_force:
-            self.design_status = True
-            logger.info(": Overall welded tension member design is safe. \n")
-            logger.debug(" :=========End Of design===========")
+            if (2 * self.plate.length + 100) > self.length:
+                self.design_status = False
+                logger.info("Plate length exceeds the Member length")
+                logger.error(": Design is not safe. \n ")
+                logger.debug(" :=========End Of design===========")
+            else:
+                self.design_status = True
+                logger.info("In case of reverse load, slenderness value should be less than 180.")
+                logger.info(self.weld.reason)
+                logger.info(": Overall welded tension member design is safe. \n")
+                logger.debug(" :=========End Of design===========")
         else:
             self.design_status = False
             logger.error(": Design is not safe. \n ")
@@ -1812,6 +1822,7 @@ class Tension_welded(Main):
         rel_path = rel_path.replace("\\", "/")
 
         fname_no_ext = popup_summary['filename']
+
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)

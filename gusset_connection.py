@@ -6,6 +6,8 @@ from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 import sys
 from gui.ui_template import Ui_ModuleWindow
+from utils.common.component import Bolt
+from design_report.reportGenerator_latex import CreateLatex
 
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 
@@ -364,6 +366,53 @@ class GussetConnection(Connection):
 
         return connector
 
+    def set_input_values(self, design_dictionary):
+        self.section = design_dictionary[KEY_SECSIZE][0]
+        self.membercount = design_dictionary[KEY_MEMBER_COUNT]
+        self.load = design_dictionary[KEY_AXIAL]
+        self.bolt = Bolt(grade=[8.8], diameter=design_dictionary[KEY_D],
+                         bolt_type='Bearing Bolt',
+                         material_grade=design_dictionary[KEY_MATERIAL])
+        self.bolt_details = {
+            'diameter':self.bolt.bolt_diameter[0],
+            'grade': 8.8,
+            'number of bolts': 4}
+
+    def save_design(self,popup_summary):
+
+        self.report_input = \
+            {KEY_MODULE: self.module,
+             'Num of Members':self.membercount,
+             'Load': self.load,
+             KEY_DISP_D: str(self.bolt.bolt_diameter),
+             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_TYP: self.bolt.bolt_type}
+
+        self.report_check = []
+
+        t1 = ('SubSection', 'Bolt Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        if self.bolt.bolt_type == TYP_BEARING:
+            t1 = ('Bolt Shear Capacity', '', '50', '')
+            self.report_check.append(t1)
+            t2 = ('Bolt Bearing Capacity', '', '40', '')
+            self.report_check.append(t2)
+            t3 = ('Bolt capacity', '35','40','Pass')
+            self.report_check.append(t3)
+        else:
+
+            t4 = ('Bolt slip capacity', '60','70','Pass')
+            self.report_check.append(t4)
+
+
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
+        rel_path = str(sys.path[0])
+        rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
+                               rel_path, Disp_3D_image)
 
 class MainController(QMainWindow):
     closed = pyqtSignal()

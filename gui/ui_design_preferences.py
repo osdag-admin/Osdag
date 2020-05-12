@@ -520,7 +520,7 @@ class Ui_Dialog(object):
                         l.setFont(font)
                         l.setObjectName(element[0] + "_label")
                         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-                        l.setAlignment(QtCore.Qt.AlignCenter)
+                        l.setAlignment(QtCore.Qt.AlignLeft)
 
                     if type == TYPE_COMBOBOX:
                         combo = QtWidgets.QComboBox(tab)
@@ -663,7 +663,7 @@ class Ui_Dialog(object):
                         l.setFont(font)
                         l.setObjectName(element[0] + "_label")
                         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-                        l.setAlignment(QtCore.Qt.AlignCenter)
+                        l.setAlignment(QtCore.Qt.AlignLeft)
 
                     if type == TYPE_COMBOBOX:
                         combo = QtWidgets.QComboBox(tab)
@@ -1611,6 +1611,7 @@ class DesignPreferences(QDialog):
     #     #           }
     #     return d1
 
+
     def highlight_slipfactor_description(self):
         """Highlight the description of currosponding slipfactor on selection of inputs
         Note : This routine is not in use in current version
@@ -2000,7 +2001,7 @@ class DesignPreferences(QDialog):
     def anchor_bolt_designation(self, d):
         length = str(self.main.anchor_length_provided if self.main.design_button_status else 0)
         designation = str(d) + "X" + length + " IS5624 GALV"
-        return (designation, length)
+        return designation, length
 
     # def anchor_bolt_preferences(self, d, typ):
     #
@@ -2033,20 +2034,29 @@ class DesignPreferences(QDialog):
     #         elif isinstance(c, QtWidgets.QLineEdit):
     #             c.textChanged.connect(lambda: self.anchor_bolt_designation_change(c, change_list))
 
-    def anchor_bolt_designation_change(self, c, initial_des):
+    def anchor_bolt_designation_change(self, e, e_list):
         des = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt").findChild(QtWidgets.QWidget,
                                                                                       KEY_DP_ANCHOR_BOLT_DESIGNATION)
-        if isinstance(c, QtWidgets.QComboBox):
+        initial_des = des.text()
+        if isinstance(e, QtWidgets.QComboBox):
             des_list = initial_des.split(' ')
             new_des = des_list[0]+" "+des_list[1]
-            if c.currentText() == 'Yes':
-                des.setText(initial_des)
-            elif c.currentText() == 'No':
+            if e.currentText() == 'Yes':
+                des.setText(str(initial_des + " GALV"))
+            elif e.currentText() == 'No':
                 des.setText(new_des)
-        elif isinstance(c, QtWidgets.QLineEdit):
+        elif isinstance(e, QtWidgets.QLineEdit):
             des_list = initial_des.split('X')
             des_list_2 = des_list[1].split(' ')
-            new_des = str(des_list[0])+'X'+str(c.text())+' '+str(des_list_2[1])+' '+str(des_list_2[2])
+            if e.text() == "":
+                if e_list[0].currentText() == 'Yes':
+                    new_des = str(des_list[0])+'X '+str(des_list_2[1])+' '+str(des_list_2[2])
+                else:
+                    new_des = str(des_list[0]) + 'X ' + str(des_list_2[1])
+            elif e_list[0].currentText() == 'Yes':
+                new_des = str(des_list[0])+'X'+str(e.text())+' '+str(des_list_2[1])+' '+str(des_list_2[2])
+            else:
+                new_des = str(des_list[0]) + 'X' + str(e.text()) + ' ' + str(des_list_2[1])
             des.setText(new_des)
 
     def closeEvent(self, event):

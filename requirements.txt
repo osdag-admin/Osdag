@@ -1,7 +1,4 @@
-pdfkit
-pyyaml
-openpyxl
-Pygments
-XlsxWriter
-pylatex
 numpy
+pylatex
+pyyaml
+wheel

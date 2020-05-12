@@ -80,11 +80,39 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 7) Any further Levels will result in an error .
 '''
 
+import os
+import shutil
+from pathlib import Path
 
+############################ Pre-Build Database Updation/Creation #################
+sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
+sqlitepath = Path('ResourceFiles/Database/Intg_osdag.sqlite')
 
+if sqlpath.exists():
+    if not sqlitepath.exists():
+        cmd = 'sqlite3 ' + str(sqlitepath) + ' < ' + str(sqlpath)
+        os.system(cmd)
+        sqlpath.touch()
+        print('Database Created')
 
-
-
+    elif sqlitepath.stat().st_size == 0 or sqlitepath.stat().st_mtime < sqlpath.stat().st_mtime - 1:
+        try:
+            sqlitenewpath = Path('ResourceFiles/Database/Intg_osdag_new.sqlite')
+            cmd = 'sqlite3 ' + str(sqlitenewpath) + ' < ' + str(sqlpath)
+            error = os.system(cmd)
+            print(error)
+            if error != 0:
+                 raise Exception('SQL to SQLite conversion error 1')
+            if sqlitenewpath.stat().st_size == 0:
+                 raise Exception('SQL to SQLite conversion error 2')
+            os.remove(sqlitepath)
+            sqlitenewpath.rename(sqlitepath)
+            sqlpath.touch()
+            print('Database Updated', sqlpath.stat().st_mtime, sqlitepath.stat().st_mtime)
+        except Exception as e:
+            sqlitenewpath.unlink()
+            print('Error: ', e)
+#########################################################################################
 
 from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication, QWidget, QLabel, QGridLayout, QVBoxLayout, QTabWidget, QRadioButton, QButtonGroup, QSizePolicy
@@ -121,7 +149,6 @@ from design_type.compression_member.compression import Compression
 # from cad.cad_common import call_3DBeam
 
 import configparser
-import os
 import os.path
 import subprocess
 from gui.ui_template import Ui_ModuleWindow
@@ -387,6 +414,28 @@ class OsdagMainWindow(QMainWindow):
         self.showMaximized()
 
 ################################ UI Methods ###############################################
+
+    def closeEvent(self, event):
+        try:
+            sqlitepath = Path('ResourceFiles/Database/Intg_osdag.sqlite')
+            sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
+            precisionscript = 'ResourceFiles/Database/precision.awk'
+            if sqlitepath.exists() and (
+                    not sqlpath.exists() or sqlpath.stat().st_size == 0 or sqlpath.stat().st_mtime < sqlitepath.stat().st_mtime - 1):
+                sqlnewpath = Path('ResourceFiles/Database/Intg_osdag_new.sql')
+                cmd = 'sqlite3 ' + str(sqlitepath) + ' .dump | gawk -f ' + precisionscript + ' > ' + str(sqlnewpath)
+                error = os.system(cmd)
+                if error != 0:
+                     raise Exception('SQLite conversion to SQL error 1')
+                if sqlnewpath.stat().st_size == 0:
+                     raise Exception('SQLite conversion to SQL error 2')
+                os.remove(sqlpath)
+                sqlnewpath.rename(sqlpath)
+                sqlitepath.touch()
+                print('DUMP updated')
+        except Exception as e:
+            sqlnewpath.unlink()
+            print('Error: ', e)
 
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()

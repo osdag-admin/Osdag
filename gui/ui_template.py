@@ -1167,24 +1167,25 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(module, main))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(self, main, input_dictionary=self.input_dock_inputs)
-        add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
-        add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
 
-
-        if module in [KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_ENDPLATE, KEY_DISP_SEATED_ANGLE]:
-            column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
-            beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
-            add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
-            add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
-        elif module == KEY_DISP_COLUMNCOVERPLATE:
-            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
-        elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
-            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-            add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
-
-        else:
-            pass
+        # add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
+        # add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
+        #
+        #
+        # if module in [KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_ENDPLATE, KEY_DISP_SEATED_ANGLE]:
+        #     column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
+        #     beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
+        #     add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
+        #     add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
+        # elif module == KEY_DISP_COLUMNCOVERPLATE:
+        #     section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+        #     add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
+        # elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
+        #     section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+        #     add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
+        #
+        # else:
+        #     pass
 
         # self.designPrefDialog.rejected.connect(lambda: self.design_preferences('rejected'))
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
@@ -1719,6 +1720,7 @@ class Ui_ModuleWindow(QMainWindow):
             QMessageBox.warning(self, "Application",
                                 "Cannot write file %s:\n%s" % (fileName, str(e)))
             return
+
     def return_class(self,name):
         if name == KEY_DISP_FINPLATE:
             return FinPlateConnection
@@ -2005,92 +2007,92 @@ class Ui_ModuleWindow(QMainWindow):
                 scroll.setWidget(scrollcontent)
                 dialog.exec()
 
-    def refresh_sections(self, prev, section):
-
-        connectivity = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
-        supporting_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
-        supported_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
-        section_size = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
-
-        Columns = connectdb("Columns")
-        Beams = connectdb("Beams")
-        red_list_set = set(red_list_function())
-
-        if section == "Supporting":
-            supporting_section.clear()
-            if connectivity.currentText() in VALUES_CONN_1:
-                for item in Columns:
-                    supporting_section.addItem(item)
-                current_list_set = set(Columns)
-                current_red_list = list(current_list_set.intersection(red_list_set))
-                for value in current_red_list:
-                    indx = Columns.index(str(value))
-                    supporting_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-
-            elif connectivity.currentText() in VALUES_CONN_2:
-                for item in Beams:
-                    supporting_section.addItem(item)
-                current_list_set = set(Beams)
-                current_red_list = list(current_list_set.intersection(red_list_set))
-                for value in current_red_list:
-                    indx = Beams.index(str(value))
-                    supporting_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
-            text_index = supporting_section.findText(text, QtCore.Qt.MatchFixedString)
-            if text_index:
-                supporting_section.setCurrentIndex(text_index)
-            else:
-                supporting_section.setCurrentIndex(prev)
-
-        if section == "Supported":
-            supported_section.clear()
-
-            for item in Beams:
-                supported_section.addItem(item)
-            current_list_set = set(Beams)
-            current_red_list = list(current_list_set.intersection(red_list_set))
-            for value in current_red_list:
-                indx = Beams.index(str(value))
-                supported_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
-            text_index = supported_section.findText(text, QtCore.Qt.MatchFixedString)
-            if text_index:
-                supported_section.setCurrentIndex(text_index)
-            else:
-                supported_section.setCurrentIndex(prev)
-
-        if section == "Section_col":
-            section_size.clear()
-            for item in Columns:
-                section_size.addItem(item)
-            current_list_set = set(Columns)
-            current_red_list = list(current_list_set.intersection(red_list_set))
-            for value in current_red_list:
-                indx = Columns.index(str(value))
-                section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
-            text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
-            if text_index:
-                section_size.setCurrentIndex(text_index)
-            else:
-                section_size.setCurrentIndex(prev)
-
-        if section == "Section_bm":
-            section_size.clear()
-            for item in Beams:
-                section_size.addItem(item)
-            current_list_set = set(Beams)
-            current_red_list = list(current_list_set.intersection(red_list_set))
-            for value in current_red_list:
-                indx = Beams.index(str(value))
-                section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
-            text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
-            if text_index:
-                section_size.setCurrentIndex(text_index)
-            else:
-                section_size.setCurrentIndex(prev)
-
+    # def refresh_sections(self, prev, section):
+    #
+    #     connectivity = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
+    #     supporting_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
+    #     supported_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+    #     section_size = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
+    #
+    #     Columns = connectdb("Columns")
+    #     Beams = connectdb("Beams")
+    #     red_list_set = set(red_list_function())
+    #
+    #     if section == "Supporting":
+    #         supporting_section.clear()
+    #         if connectivity.currentText() in VALUES_CONN_1:
+    #             for item in Columns:
+    #                 supporting_section.addItem(item)
+    #             current_list_set = set(Columns)
+    #             current_red_list = list(current_list_set.intersection(red_list_set))
+    #             for value in current_red_list:
+    #                 indx = Columns.index(str(value))
+    #                 supporting_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+    #
+    #         elif connectivity.currentText() in VALUES_CONN_2:
+    #             for item in Beams:
+    #                 supporting_section.addItem(item)
+    #             current_list_set = set(Beams)
+    #             current_red_list = list(current_list_set.intersection(red_list_set))
+    #             for value in current_red_list:
+    #                 indx = Beams.index(str(value))
+    #                 supporting_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+    #         text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
+    #         text_index = supporting_section.findText(text, QtCore.Qt.MatchFixedString)
+    #         if text_index:
+    #             supporting_section.setCurrentIndex(text_index)
+    #         else:
+    #             supporting_section.setCurrentIndex(prev)
+    #
+    #     if section == "Supported":
+    #         supported_section.clear()
+    #
+    #         for item in Beams:
+    #             supported_section.addItem(item)
+    #         current_list_set = set(Beams)
+    #         current_red_list = list(current_list_set.intersection(red_list_set))
+    #         for value in current_red_list:
+    #             indx = Beams.index(str(value))
+    #             supported_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+    #         text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
+    #         text_index = supported_section.findText(text, QtCore.Qt.MatchFixedString)
+    #         if text_index:
+    #             supported_section.setCurrentIndex(text_index)
+    #         else:
+    #             supported_section.setCurrentIndex(prev)
+    #
+    #     if section == "Section_col":
+    #         section_size.clear()
+    #         for item in Columns:
+    #             section_size.addItem(item)
+    #         current_list_set = set(Columns)
+    #         current_red_list = list(current_list_set.intersection(red_list_set))
+    #         for value in current_red_list:
+    #             indx = Columns.index(str(value))
+    #             section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+    #         text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
+    #         text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
+    #         if text_index:
+    #             section_size.setCurrentIndex(text_index)
+    #         else:
+    #             section_size.setCurrentIndex(prev)
+    #
+    #     if section == "Section_bm":
+    #         section_size.clear()
+    #         for item in Beams:
+    #             section_size.addItem(item)
+    #         current_list_set = set(Beams)
+    #         current_red_list = list(current_list_set.intersection(red_list_set))
+    #         for value in current_red_list:
+    #             indx = Beams.index(str(value))
+    #             section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+    #         text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
+    #         text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
+    #         if text_index:
+    #             section_size.setCurrentIndex(text_index)
+    #         else:
+    #             section_size.setCurrentIndex(prev)
+    #
 
 
 
@@ -2496,6 +2498,20 @@ class Ui_ModuleWindow(QMainWindow):
                 if validation_key.text() != "":
                     self.designPrefDialog.fu_fy_validation_connect([fu_key, fy_key], validation_key, material_key)
 
+        for refresh in main.refresh_input_dock(main):
+            (tab_name, key_name, tab_key, master_key, value, database_arg) = refresh
+            tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+            if tab:
+                add_button = tab.findChild(QtWidgets.QWidget, "pushButton_Add_"+tab_name)
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
+                selected = key.currentText()
+                if master_key:
+                    val = self.dockWidgetContents.findChild(QtWidgets.QWidget, master_key).currentText()
+                    if val not in value:
+                        continue
+                self.refresh_section_connect(add_button, selected, key, tab_key, database_arg)
+
+
         # if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,
         #                  KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
         #
@@ -2559,6 +2575,31 @@ class Ui_ModuleWindow(QMainWindow):
                         k2.addItem(str(values))
                 elif typ == TYPE_TEXTBOX:
                     k2.setText(str(val[k2_key_name]))
+
+    def refresh_section_connect(self, add_button, prev, key, tab_key, arg):
+        add_button.clicked.connect(lambda: self.refresh_section(prev, key, tab_key, arg))
+
+    def refresh_section(self, prev, key, tab_key, arg):
+
+        current_list = connectdb(arg)
+        text = self.designPrefDialog.findChild(QtWidgets.QWidget, tab_key).text()
+        if text == "":
+            return
+        key.clear()
+        for item in current_list:
+            key.addItem(item)
+        current_list_set = set(current_list)
+        red_list_set = set(red_list_function())
+        current_red_list = list(current_list_set.intersection(red_list_set))
+        for value in current_red_list:
+            indx = current_list.index(str(value))
+            key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+        text_index = key.findText(text, QtCore.Qt.MatchFixedString)
+        if text_index >= 0:
+            key.setCurrentIndex(text_index)
+        else:
+            key.setCurrentIndex(current_list.index(prev))
+
     #
     # def function_for_tab_population(self, tab_name):
     #     if tab_name == KEY_DISP_COLSEC:

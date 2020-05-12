@@ -923,7 +923,6 @@ class Connection(Main):
 
         return design_input
 
-
     def get_values_for_design_pref(self, key, design_dictionary):
 
         fu = Material(design_dictionary[KEY_MATERIAL]).fu
@@ -943,10 +942,47 @@ class Connection(Main):
 
         return val
 
+    def refresh_input_dock(self):
+
+        add_buttons = []
+
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, KEY_SUPTNGSEC_DESIGNATION, KEY_CONN, VALUES_CONN_1, "Columns")
+        add_buttons.append(t1)
+
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, KEY_SUPTNGSEC_DESIGNATION, KEY_CONN, VALUES_CONN_2, "Beams")
+        add_buttons.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, KEY_SUPTDSEC_DESIGNATION, None, None, "Beams")
+        add_buttons.append(t2)
+
+        return add_buttons
 
     def output_values(self, flag):
         return []
 
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
 
 if __name__ == "__main__":
     connection = Connection()

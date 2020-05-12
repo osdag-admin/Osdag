@@ -782,9 +782,6 @@ class ColumnCoverPlate(MomentConnection):
             logger.error(" : tension_yielding_capacity   is less "
                          "than applied loads, Please select larger sections or decrease loads")
 
-    def module_name(self):
-        return KEY_DISP_COLUMNCOVERPLATE
-
     def select_bolt_dia(self):
         self.min_plate_height = self.section.flange_width
         self.max_plate_height = self.section.flange_width
@@ -2251,6 +2248,14 @@ class ColumnCoverPlate(MomentConnection):
 
         return design_input
 
+    def refresh_input_dock(self):
+
+        add_buttons = []
+
+        t1 = (KEY_DISP_COLSEC, KEY_SECSIZE, KEY_SUPTNGSEC_DESIGNATION, None, None, "Columns")
+        add_buttons.append(t1)
+
+        return add_buttons
 
     ################################ Design Report #####################################################################################
 

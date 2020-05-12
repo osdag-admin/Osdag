@@ -811,6 +811,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return val
 
+    def refresh_input_dock(self):
+
+        add_buttons = []
+
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, KEY_SUPTNGSEC_DESIGNATION, None, None, "Columns")
+        add_buttons.append(t1)
+
+        return add_buttons
+
     def edit_tabs(self):
         return []
 

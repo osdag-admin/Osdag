@@ -385,8 +385,6 @@ class BeamCoverPlateWeld(MomentConnection):
     def module_name(self):
 
         return KEY_DISP_BEAMCOVERPLATEWELD
-    def module_name(self):
-        return KEY_DISP_BEAMCOVERPLATEWELD
 
     def set_input_values(self, design_dictionary):
         super(BeamCoverPlateWeld, self).set_input_values(self, design_dictionary)
@@ -1602,6 +1600,15 @@ class BeamCoverPlateWeld(MomentConnection):
         design_input.append(t2)
 
         return design_input
+
+    def refresh_input_dock(self):
+
+        add_buttons = []
+
+        t2 = (KEY_DISP_BEAMSEC, KEY_SECSIZE, KEY_SUPTDSEC_DESIGNATION, None, None, "Beams")
+        add_buttons.append(t2)
+
+        return add_buttons
 
     # def flange_force(self,):
     #     axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (

@@ -514,9 +514,6 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         return KEY_DISP_COLUMNCOVERPLATEWELD
 
-    def module_name(self):
-        return KEY_DISP_COLUMNCOVERPLATEWELD
-
     def set_input_values(self, design_dictionary):
         super(ColumnCoverPlateWeld, self).set_input_values(self, design_dictionary)
         # self.module = design_dictionary[KEY_MODULE]
@@ -1772,6 +1769,14 @@ class ColumnCoverPlateWeld(MomentConnection):
         design_input.append(t2)
 
         return design_input
+
+    def refresh_input_dock(self):
+        add_buttons = []
+
+        t1 = (KEY_DISP_COLSEC, KEY_SECSIZE, KEY_SUPTNGSEC_DESIGNATION, None, None, "Columns")
+        add_buttons.append(t1)
+
+        return add_buttons
 
 
         # def flange_force(self,):

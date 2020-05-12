@@ -561,11 +561,6 @@ class Ui_Dialog(object):
                                           KEY_SUPTNGSEC_WEB_T, KEY_SUPTDSEC_DEPTH, KEY_SUPTDSEC_FLANGE_W,
                                           KEY_SUPTDSEC_FLANGE_T, KEY_SUPTDSEC_WEB_T]:
                             r.setValidator(QDoubleValidator())
-                        if element[0] in [KEY_SUPTNGSEC_DESIGNATION,
-                                          KEY_SUPTNGSEC_MATERIAL] and main.module_name(main) == KEY_DISP_BASE_PLATE:
-                            r.setReadOnly(True)
-                        if element[0] in [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY] and main.module_name(main) == KEY_DISP_BASE_PLATE:
-                            r.setValidator(QDoubleValidator())
                         if input_dictionary:
                             r.setText(str(element[4]))
 
@@ -1184,8 +1179,6 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
         module = main.module_name(main)
 
-
-
         if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD,
                           KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,
                           KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
@@ -1198,16 +1191,19 @@ class Ui_Dialog(object):
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
-        if module == KEY_DISP_COLUMNCOVERPLATE and module == KEY_DISP_COLUMNCOVERPLATEWELD:
+
+        if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD:
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
             pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
-        if module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
+
+        if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD:
             pushButton_Clear_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+
         if module == KEY_DISP_COMPRESSION:
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
@@ -1217,6 +1213,12 @@ class Ui_Dialog(object):
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+
+        if module == KEY_DISP_BASE_PLATE:
+            pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
+            pushButton_Add_Column.clicked.connect(self.add_tab_column)
 
     def clear_tab(self, tab_name):
         '''
@@ -1998,10 +2000,10 @@ class DesignPreferences(QDialog):
 
         return {'lower': lower_fy, 'upper': upper_fy}
 
-    def anchor_bolt_designation(self, d):
-        length = str(self.main.anchor_length_provided if self.main.design_button_status else 0)
-        designation = str(d) + "X" + length + " IS5624 GALV"
-        return designation, length
+    # def anchor_bolt_designation(self, d):
+    #     length = str(self.main.anchor_length_provided if self.main.design_button_status else 0)
+    #     designation = str(d) + "X" + length + " IS5624 GALV"
+    #     return designation, length
 
     # def anchor_bolt_preferences(self, d, typ):
     #
@@ -2034,30 +2036,30 @@ class DesignPreferences(QDialog):
     #         elif isinstance(c, QtWidgets.QLineEdit):
     #             c.textChanged.connect(lambda: self.anchor_bolt_designation_change(c, change_list))
 
-    def anchor_bolt_designation_change(self, e, e_list):
-        des = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt").findChild(QtWidgets.QWidget,
-                                                                                      KEY_DP_ANCHOR_BOLT_DESIGNATION)
-        initial_des = des.text()
-        if isinstance(e, QtWidgets.QComboBox):
-            des_list = initial_des.split(' ')
-            new_des = des_list[0]+" "+des_list[1]
-            if e.currentText() == 'Yes':
-                des.setText(str(initial_des + " GALV"))
-            elif e.currentText() == 'No':
-                des.setText(new_des)
-        elif isinstance(e, QtWidgets.QLineEdit):
-            des_list = initial_des.split('X')
-            des_list_2 = des_list[1].split(' ')
-            if e.text() == "":
-                if e_list[0].currentText() == 'Yes':
-                    new_des = str(des_list[0])+'X '+str(des_list_2[1])+' '+str(des_list_2[2])
-                else:
-                    new_des = str(des_list[0]) + 'X ' + str(des_list_2[1])
-            elif e_list[0].currentText() == 'Yes':
-                new_des = str(des_list[0])+'X'+str(e.text())+' '+str(des_list_2[1])+' '+str(des_list_2[2])
-            else:
-                new_des = str(des_list[0]) + 'X' + str(e.text()) + ' ' + str(des_list_2[1])
-            des.setText(new_des)
+    # def anchor_bolt_designation_change(self, e, e_list):
+    #     des = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt").findChild(QtWidgets.QWidget,
+    #                                                                                   KEY_DP_ANCHOR_BOLT_DESIGNATION)
+    #     initial_des = des.text()
+    #     if isinstance(e, QtWidgets.QComboBox):
+    #         des_list = initial_des.split(' ')
+    #         new_des = des_list[0]+" "+des_list[1]
+    #         if e.currentText() == 'Yes':
+    #             des.setText(str(initial_des + " GALV"))
+    #         elif e.currentText() == 'No':
+    #             des.setText(new_des)
+    #     elif isinstance(e, QtWidgets.QLineEdit):
+    #         des_list = initial_des.split('X')
+    #         des_list_2 = des_list[1].split(' ')
+    #         if e.text() == "":
+    #             if e_list[0].currentText() == 'Yes':
+    #                 new_des = str(des_list[0])+'X '+str(des_list_2[1])+' '+str(des_list_2[2])
+    #             else:
+    #                 new_des = str(des_list[0]) + 'X ' + str(des_list_2[1])
+    #         elif e_list[0].currentText() == 'Yes':
+    #             new_des = str(des_list[0])+'X'+str(e.text())+' '+str(des_list_2[1])+' '+str(des_list_2[2])
+    #         else:
+    #             new_des = str(des_list[0]) + 'X' + str(e.text()) + ' ' + str(des_list_2[1])
+    #         des.setText(new_des)
 
     def closeEvent(self, event):
         if self.window_close_flag:
@@ -2067,99 +2069,99 @@ class DesignPreferences(QDialog):
             QMessageBox.warning(self, "Error", "Select correct values for fu and fy!")
             event.ignore()
 
-    def new_sectionalprop_Column(self, col_list):
-        '''
-        @author: Umair
-        '''
-
-        for e in col_list:
-            if e.text() != "":
-                if e.objectName() == KEY_SUPTNGSEC_DEPTH:
-                    D = float(e.text())
-                elif e.objectName() == KEY_SUPTNGSEC_FLANGE_W:
-                    B = float(e.text())
-                elif e.objectName() == KEY_SUPTNGSEC_FLANGE_T:
-                    t_w = float(e.text())
-                elif e.objectName() == KEY_SUPTNGSEC_WEB_T:
-                    t_f = float(e.text())
-                else:
-                    pass
-            else:
-                return
-        if col_list:
-            tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-            for c in tab_Column.children():
-                if c.objectName() == KEY_SUPTNGSEC_MASS:
-                    c.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTNGSEC_SEC_AREA:
-                    c.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTNGSEC_MOA_LZ:
-                    c.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTNGSEC_MOA_LY:
-                    c.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTNGSEC_ROG_RZ:
-                    c.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTNGSEC_ROG_RY:
-                    c.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTNGSEC_EM_ZZ:
-                    c.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTNGSEC_EM_ZY:
-                    c.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTNGSEC_PM_ZPZ:
-                    c.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTNGSEC_PM_ZPY:
-                    c.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
-                elif c.objectName() == 'pushButton_Add_Column':
-                    c.setEnabled(True)
-                else:
-                    pass
-
-    def new_sectionalprop_Beam(self, beam_list):
-        '''
-        @author: Umair
-        '''
-
-        for e in beam_list:
-            if e.text() != "":
-                if e.objectName() == KEY_SUPTDSEC_DEPTH:
-                    D = float(e.text())
-                elif e.objectName() == KEY_SUPTDSEC_FLANGE_W:
-                    B = float(e.text())
-                elif e.objectName() == KEY_SUPTDSEC_FLANGE_T:
-                    t_w = float(e.text())
-                elif e.objectName() == KEY_SUPTDSEC_WEB_T:
-                    t_f = float(e.text())
-                else:
-                    pass
-            else:
-                return
-        if beam_list:
-            tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-            for c in tab_Beam.children():
-                if c.objectName() == KEY_SUPTDSEC_MASS:
-                    c.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTDSEC_SEC_AREA:
-                    c.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTDSEC_MOA_LZ:
-                    c.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTDSEC_MOA_LY:
-                    c.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTDSEC_ROG_RZ:
-                    c.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTDSEC_ROG_RY:
-                    c.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTDSEC_EM_ZZ:
-                    c.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTDSEC_EM_ZY:
-                    c.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTDSEC_PM_ZPZ:
-                    c.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
-                elif c.objectName() == KEY_SUPTDSEC_PM_ZPY:
-                    c.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
-                elif c.objectName() == 'pushButton_Add_Beam':
-                    c.setEnabled(True)
-                else:
-                    pass
+    # def new_sectionalprop_Column(self, col_list):
+    #     '''
+    #     @author: Umair
+    #     '''
+    #
+    #     for e in col_list:
+    #         if e.text() != "":
+    #             if e.objectName() == KEY_SUPTNGSEC_DEPTH:
+    #                 D = float(e.text())
+    #             elif e.objectName() == KEY_SUPTNGSEC_FLANGE_W:
+    #                 B = float(e.text())
+    #             elif e.objectName() == KEY_SUPTNGSEC_FLANGE_T:
+    #                 t_w = float(e.text())
+    #             elif e.objectName() == KEY_SUPTNGSEC_WEB_T:
+    #                 t_f = float(e.text())
+    #             else:
+    #                 pass
+    #         else:
+    #             return
+    #     if col_list:
+    #         tab_Column = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+    #         for c in tab_Column.children():
+    #             if c.objectName() == KEY_SUPTNGSEC_MASS:
+    #                 c.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTNGSEC_SEC_AREA:
+    #                 c.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTNGSEC_MOA_LZ:
+    #                 c.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTNGSEC_MOA_LY:
+    #                 c.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTNGSEC_ROG_RZ:
+    #                 c.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTNGSEC_ROG_RY:
+    #                 c.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTNGSEC_EM_ZZ:
+    #                 c.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTNGSEC_EM_ZY:
+    #                 c.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTNGSEC_PM_ZPZ:
+    #                 c.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTNGSEC_PM_ZPY:
+    #                 c.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
+    #             elif c.objectName() == 'pushButton_Add_Column':
+    #                 c.setEnabled(True)
+    #             else:
+    #                 pass
+    #
+    # def new_sectionalprop_Beam(self, beam_list):
+    #     '''
+    #     @author: Umair
+    #     '''
+    #
+    #     for e in beam_list:
+    #         if e.text() != "":
+    #             if e.objectName() == KEY_SUPTDSEC_DEPTH:
+    #                 D = float(e.text())
+    #             elif e.objectName() == KEY_SUPTDSEC_FLANGE_W:
+    #                 B = float(e.text())
+    #             elif e.objectName() == KEY_SUPTDSEC_FLANGE_T:
+    #                 t_w = float(e.text())
+    #             elif e.objectName() == KEY_SUPTDSEC_WEB_T:
+    #                 t_f = float(e.text())
+    #             else:
+    #                 pass
+    #         else:
+    #             return
+    #     if beam_list:
+    #         tab_Beam = self.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+    #         for c in tab_Beam.children():
+    #             if c.objectName() == KEY_SUPTDSEC_MASS:
+    #                 c.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTDSEC_SEC_AREA:
+    #                 c.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTDSEC_MOA_LZ:
+    #                 c.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTDSEC_MOA_LY:
+    #                 c.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTDSEC_ROG_RZ:
+    #                 c.setText(str(self.sectionalprop.calc_RogZ(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTDSEC_ROG_RY:
+    #                 c.setText(str(self.sectionalprop.calc_RogY(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTDSEC_EM_ZZ:
+    #                 c.setText(str(self.sectionalprop.calc_ElasticModulusZz(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTDSEC_EM_ZY:
+    #                 c.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTDSEC_PM_ZPZ:
+    #                 c.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
+    #             elif c.objectName() == KEY_SUPTDSEC_PM_ZPY:
+    #                 c.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
+    #             elif c.objectName() == 'pushButton_Add_Beam':
+    #                 c.setEnabled(True)
+    #             else:
+    #                 pass
 
     def download_Database_Column(self):
         file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))

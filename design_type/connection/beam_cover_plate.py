@@ -501,6 +501,15 @@ class BeamCoverPlate(MomentConnection):
 
         return design_input
 
+    def refresh_input_dock(self):
+
+        add_buttons = []
+
+        t2 = (KEY_DISP_BEAMSEC, KEY_SECSIZE, KEY_SUPTDSEC_DESIGNATION, None, None, "Beams")
+        add_buttons.append(t2)
+
+        return add_buttons
+
     def func_for_validation(self, design_dictionary):\
 
         all_errors = []
@@ -898,10 +907,6 @@ class BeamCoverPlate(MomentConnection):
         else:
             logger.error(" : tension_yielding_capacity   is less "
                          "than applied loads, Please select larger sections or decrease loads")
-
-    def module_name(self):
-        return KEY_DISP_BEAMCOVERPLATE
-
 
     def select_bolt_dia(self):
         self.min_plate_height = self.section.flange_width

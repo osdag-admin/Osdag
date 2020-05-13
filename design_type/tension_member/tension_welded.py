@@ -739,22 +739,22 @@ class Tension_welded(Main):
         t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, round(self.weld.stress,2) if flag else '')
         out_list.append(t11)
 
-        t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, self.weld.length if flag else '')
+        t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, round(self.weld.length,0) if flag else '')
         out_list.append(t5)
 
-        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, self.weld.effective if flag else '')
+        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, round(self.weld.effective,2) if flag else '')
         out_list.append(t13)
 
         t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '')
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, round(self.plate.thickness_provided,0) if flag else '')
         out_list.append(t19)
 
-        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, round(self.plate.height,0) if flag else '')
         out_list.append(t20)
 
-        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
+        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, round(self.plate.length,0) if flag else '')
         out_list.append(t21)
 
         return out_list
@@ -873,6 +873,8 @@ class Tension_welded(Main):
         self.design_status = False
 
         flag = False
+        flag1 = False
+        flag2 = False
         option_list = self.input_values(self)
         missing_fields_list = []
         for option in option_list:
@@ -884,16 +886,34 @@ class Tension_welded(Main):
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
 
+            if option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH:
+                # val = option[4]
+                # print(design_dictionary[option[0]], "jhvhj")
+                if float(design_dictionary[option[0]]) <= 0.0:
+                    error = "Value can't be equal or less than zero"
+                    all_errors.append(error)
+                else:
+                    flag1 = True
+
+            if option[2] == TYPE_TEXTBOX and option[0] == KEY_AXIAL:
+
+                if float(design_dictionary[option[0]]) <= 0.0:
+                    error = "Value can't be equal or less than zero"
+                    all_errors.append(error)
+                else:
+                    flag2 = True
+
         if len(missing_fields_list) > 0:
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
             all_errors.append(error)
             # flag = False
         else:
             flag = True
-
-        if flag:
+        print(all_errors, "ysdgh")
+        print(flag, flag1, flag2)
+        if flag and flag1 and flag2:
             self.set_input_values(self, design_dictionary)
-            print(design_dictionary)
+            # print(design_dictionary)
         else:
             return all_errors
 
@@ -1755,14 +1775,14 @@ class Tension_welded(Main):
 
         self.clearance =  max((4 * self.weld.size),30)
         if self.sec_profile in ["Channels", 'Back to Back Channels']:
-            t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
+            t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                   tension_yield_prov(l = self.section_size_1.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), '')
             t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_welded_prov(self.section_size_1.depth, self.plate.thickness_provided,self.plate.fu, gamma_m1,plate_rupture_kn), '')
 
         elif self.sec_profile in ["Angles", 'Back to Back Angles']:
             if self.loc == "Long Leg":
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT, '',
+                t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '',
                       gusset_ht_prov(self.section_size_1.max_leg, self.clearance, self.plate.height, 1), "")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
@@ -1772,7 +1792,7 @@ class Tension_welded(Main):
                                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
             else:
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht_prov(self.section_size_1.min_leg, self.clearance,self.plate.height,1),"")
+                t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(self.section_size_1.min_leg, self.clearance,self.plate.height,1),"")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=self.section_size_1.min_leg, t=self.plate.thickness_provided,
                                          f_y=self.plate.fy,
@@ -1783,7 +1803,7 @@ class Tension_welded(Main):
 
         else:
             if self.loc == "Long Leg":
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht_prov(2*self.section_size_1.max_leg, self.clearance,self.plate.height,1),"")
+                t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(2*self.section_size_1.max_leg, self.clearance,self.plate.height,1),"")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=2*self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
                                          gamma=gamma_m0, T_dg=plate_yield_kn), '')
@@ -1792,7 +1812,7 @@ class Tension_welded(Main):
                                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
             else:
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT, '',
+                t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '',
                       gusset_ht_prov(2*self.section_size_1.min_leg, self.clearance, self.plate.height, 1), "")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=2*self.section_size_1.min_leg, t=self.plate.thickness_provided,
@@ -1803,7 +1823,7 @@ class Tension_welded(Main):
                                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
         self.report_check.append(t3)
-        t4 = (KEY_OUT_DISP_PLATE_LENGTH, '',
+        t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, '',
               gusset_lt_w_prov(self.flange_weld, self.clearance,self.plate.length), "")
         self.report_check.append(t4)
 

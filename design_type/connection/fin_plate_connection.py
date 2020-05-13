@@ -351,7 +351,7 @@ class FinPlateConnection(ShearConnection):
             # elif option[2] == TYPE_MODULE:
             #     if design_dictionary[option[0]] == "Fin Plate":
 
-        if design_dictionary[KEY_CONN] == 'Beam-Beam':
+        if design_dictionary[KEY_CONN] == VALUES_CONN_2[0]:
             primary = design_dictionary[KEY_SUPTNGSEC]
             secondary = design_dictionary[KEY_SUPTDSEC]
             conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -373,7 +373,7 @@ class FinPlateConnection(ShearConnection):
             else:
                 flag1 = True
 
-        elif design_dictionary[KEY_CONN] == 'Column web-Beam web':
+        elif design_dictionary[KEY_CONN] == VALUES_CONN_1[1]:
             primary = design_dictionary[KEY_SUPTNGSEC]
             secondary = design_dictionary[KEY_SUPTDSEC]
             conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -525,6 +525,7 @@ class FinPlateConnection(ShearConnection):
         self.res_force = math.sqrt(self.load.shear_force ** 2 + self.load.axial_force ** 2) * 1000
 
         self.plate.thickness_provided = min(self.thickness_possible)
+        self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,thickness=self.plate.thickness_provided)
         bolts_required_previous = 2
         bolt_diameter_previous = self.bolt.bolt_diameter[-1]
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
@@ -585,7 +586,7 @@ class FinPlateConnection(ShearConnection):
             self.get_bolt_grade(self,bolt_capacity_req)
 
     def get_bolt_grade(self,bolt_capacity_req):
-        print(self.design_status, "Getting bolt grade")
+        # print(self.design_status, "Getting bolt grade")
         bolt_grade_previous = self.bolt.bolt_grade[-1]
 
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
@@ -615,7 +616,7 @@ class FinPlateConnection(ShearConnection):
 
     def get_fin_plate_details(self):
 
-        print(self.design_status,"getting fin plate details")
+        # print(self.design_status,"getting fin plate details")
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                 conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
@@ -643,6 +644,9 @@ class FinPlateConnection(ShearConnection):
     def get_plate_thickness(self):
         initial_plate_height = self.plate.height
         for self.plate.thickness_provided in self.thickness_possible:
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
+            print('plate_t_fy_fu', self.plate.thickness_provided,self.plate.fy,self.plate.fu)
             self.plate.height = initial_plate_height
             if self.connectivity in VALUES_CONN_1:
                 self.weld_connecting_plates = [self.supporting_section.flange_thickness, self.plate.thickness_provided]
@@ -820,6 +824,7 @@ class FinPlateConnection(ShearConnection):
                 fillet_size=self.weld.size, available_length=self.weld.length)
             self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
                                                 weld_fabrication=self.weld.fabrication,
+
                                                 t_weld=self.weld.size, weld_angle=90)
             Ip_weld = 2 * self.weld.eff_length ** 3 / 12
             y_max = self.weld.eff_length / 2
@@ -874,9 +879,36 @@ class FinPlateConnection(ShearConnection):
 
     def get_design_status(self):
         if self.plate.design_status is True and self.weld.design_status is True:
-
             self.design_status = True
             logger.info("=== End Of Design ===")
+
+    def results_to_test(self, filename):
+        test_out_list = {KEY_OUT_DISP_D_PROVIDED:self.bolt.bolt_diameter_provided,
+                        KEY_OUT_DISP_GRD_PROVIDED:self.bolt.bolt_grade_provided,
+                        KEY_OUT_DISP_BOLT_SHEAR:self.bolt.bolt_shear_capacity,
+                        KEY_OUT_DISP_BOLT_BEARING:self.bolt.bolt_shear_capacity,
+                        KEY_OUT_DISP_BOLT_CAPACITY:self.bolt.bolt_capacity,
+                        KEY_OUT_DISP_BOLT_FORCE:self.plate.bolt_force,
+                        KEY_OUT_DISP_BOLT_LINE:self.plate.bolt_line,
+                        KEY_OUT_DISP_BOLTS_ONE_LINE:self.plate.bolts_one_line,
+                        KEY_OUT_DISP_PITCH:self.plate.pitch_provided,
+                        KEY_OUT_DISP_END_DIST:self.plate.end_dist_provided,
+                        KEY_OUT_DISP_GAUGE:self.plate.gauge_provided,
+                        KEY_OUT_DISP_EDGE_DIST:self.plate.edge_dist_provided,
+                        KEY_OUT_DISP_PLATETHK:self.plate.thickness_provided,
+                        KEY_OUT_DISP_PLATE_HEIGHT:self.plate.height,
+                        KEY_OUT_DISP_PLATE_LENGTH:self.plate.length,
+                        KEY_OUT_DISP_PLATE_SHEAR:self.plate.shear_yielding_capacity,
+                        KEY_OUT_DISP_PLATE_BLK_SHEAR:self.plate.block_shear_capacity,
+                        KEY_OUT_DISP_PLATE_MOM_DEMAND:self.plate.moment_demand,
+                        KEY_OUT_DISP_PLATE_MOM_CAPACITY:self.plate.moment_capacity,
+                        KEY_OUT_DISP_WELD_SIZE:self.weld.size,
+                        KEY_OUT_DISP_WELD_STRENGTH:self.weld.strength,
+                        KEY_OUT_DISP_WELD_STRESS:self.weld.stress}
+        f = open(filename, "w")
+        f.write(str(test_out_list))
+        f.close()
+        # return test_out_list
 
     # r'/ResourceFiles/images/ColumnsBeams".png'
     def save_design(self,popup_summary):

@@ -580,37 +580,49 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         return out_list
 
     def major_minor(self):
-        if self in ['Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']:
+
+        conn = self[0]
+        if conn in ['Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']:
             return True
         else:
             return False
 
     def label_end_condition(self):
-        if self in ['Gusseted Base Plate', 'Hollow Section']:
+
+        conn = self[0]
+        if conn in ['Gusseted Base Plate', 'Hollow Section']:
             return 'Fixed'
         else:
             return 'Pinned'
 
     def out_weld(self):
-        if self == 'Butt Weld':
+
+        conn = self[0]
+        if conn == 'Butt Weld':
             return True
         else:
             return False
 
     def out_anchor_tension(self):
-        if self != 'Gusseted Base Plate':
+
+        conn = self[0]
+        if conn != 'Gusseted Base Plate':
             return True
         else:
             return False
 
     def out_detail_projection(self):
-        if self != 'Welded-Slab Base':
+
+        conn = self[0]
+        if conn != 'Welded-Slab Base':
             return True
         else:
             return False
 
     def out_anchor_combined(self):
-        if self != 'Welded-Slab Base':
+
+        conn = self[0]
+        if conn != 'Welded-Slab Base':
             return True
         else:
             return False
@@ -619,13 +631,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         lst = []
 
-        t1 = (KEY_CONN, KEY_MOMENT_MAJOR, TYPE_TEXTBOX, self.major_minor)
+        t1 = ([KEY_CONN], KEY_MOMENT_MAJOR, TYPE_TEXTBOX, self.major_minor)
         lst.append(t1)
 
-        t2 = (KEY_CONN, KEY_MOMENT_MINOR, TYPE_TEXTBOX, self.major_minor)
+        t2 = ([KEY_CONN], KEY_MOMENT_MINOR, TYPE_TEXTBOX, self.major_minor)
         lst.append(t2)
 
-        t3 = (KEY_CONN, KEY_END_CONDITION, TYPE_NOTE, self.label_end_condition)
+        t3 = ([KEY_CONN], KEY_END_CONDITION, TYPE_NOTE, self.label_end_condition)
         lst.append(t3)
 
         # t4 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE, TYPE_OUT_DOCK, self.out_weld)
@@ -634,40 +646,40 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # t5 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE, TYPE_OUT_LABEL, self.out_weld)
         # lst.append(t5)
 
-        t12 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_FLANGE, TYPE_OUT_DOCK, self.out_weld)
+        t12 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_FLANGE, TYPE_OUT_DOCK, self.out_weld)
         lst.append(t12)
 
-        t13 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_FLANGE, TYPE_OUT_LABEL, self.out_weld)
+        t13 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_FLANGE, TYPE_OUT_LABEL, self.out_weld)
         lst.append(t13)
 
-        t14 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_WEB, TYPE_OUT_DOCK, self.out_weld)
+        t14 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_WEB, TYPE_OUT_DOCK, self.out_weld)
         lst.append(t14)
 
-        t15 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_WEB, TYPE_OUT_LABEL, self.out_weld)
+        t15 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_WEB, TYPE_OUT_LABEL, self.out_weld)
         lst.append(t15)
 
-        t16 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_STIFFENER, TYPE_OUT_DOCK, self.out_weld)
+        t16 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_STIFFENER, TYPE_OUT_DOCK, self.out_weld)
         lst.append(t16)
 
-        t17 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_STIFFENER, TYPE_OUT_LABEL, self.out_weld)
+        t17 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_STIFFENER, TYPE_OUT_LABEL, self.out_weld)
         lst.append(t17)
 
-        t6 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_TENSION, TYPE_OUT_DOCK, self.out_anchor_tension)
+        t6 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_TENSION, TYPE_OUT_DOCK, self.out_anchor_tension)
         lst.append(t6)
 
-        t7 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_TENSION, TYPE_OUT_LABEL, self.out_anchor_tension)
+        t7 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_TENSION, TYPE_OUT_LABEL, self.out_anchor_tension)
         lst.append(t7)
 
-        t8 = (KEY_CONN, KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_DOCK, self.out_detail_projection)
+        t8 = ([KEY_CONN], KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_DOCK, self.out_detail_projection)
         lst.append(t8)
 
-        t9 = (KEY_CONN, KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_LABEL, self.out_detail_projection)
+        t9 = ([KEY_CONN], KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_LABEL, self.out_detail_projection)
         lst.append(t9)
 
-        t10 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_DOCK, self.out_anchor_combined)
+        t10 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_DOCK, self.out_anchor_combined)
         lst.append(t10)
 
-        t11 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_LABEL, self.out_anchor_combined)
+        t11 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_LABEL, self.out_anchor_combined)
         lst.append(t11)
 
         return lst

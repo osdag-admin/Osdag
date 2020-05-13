@@ -833,46 +833,52 @@ class EndPlateConnection(ShearConnection):
 
     def fn_conn_suptngsec_lbl(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return KEY_DISP_COLSEC
-        elif self in VALUES_CONN_2:
+        elif conn in VALUES_CONN_2:
             return KEY_DISP_PRIBM
         else:
             return ''
 
     def fn_conn_suptdsec_lbl(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return KEY_DISP_BEAMSEC
-        elif self in VALUES_CONN_2:
+        elif conn in VALUES_CONN_2:
             return KEY_DISP_SECBM
         else:
             return ''
 
     def fn_conn_suptngsec(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return VALUES_COLSEC
-        elif self in VALUES_CONN_2:
+        elif conn in VALUES_CONN_2:
             return VALUES_PRIBM
         else:
             return []
 
     def fn_conn_suptdsec(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return VALUES_BEAMSEC
-        elif self in VALUES_CONN_2:
+        elif conn in VALUES_CONN_2:
             return VALUES_SECBM
         else:
             return []
 
     def fn_conn_image(self):
-        if self == VALUES_CONN[0]:
+
+        conn = self[0]
+        if conn == VALUES_CONN[0]:
             return './ResourceFiles/images/fin_cf_bw.png'
-        elif self == VALUES_CONN[1]:
+        elif conn == VALUES_CONN[1]:
             return './ResourceFiles/images/fin_cw_bw.png'
-        elif self in VALUES_CONN_2:
+        elif conn in VALUES_CONN_2:
             return './ResourceFiles/images/fin_beam_beam.png'
         else:
             return ''
@@ -881,19 +887,19 @@ class EndPlateConnection(ShearConnection):
 
         lst = []
 
-        t1 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_LABEL, self.fn_conn_suptngsec_lbl)
+        t1 = ([KEY_CONN], KEY_SUPTNGSEC, TYPE_LABEL, self.fn_conn_suptngsec_lbl)
         lst.append(t1)
 
-        t2 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_COMBOBOX, self.fn_conn_suptngsec)
+        t2 = ([KEY_CONN], KEY_SUPTNGSEC, TYPE_COMBOBOX, self.fn_conn_suptngsec)
         lst.append(t2)
 
-        t3 = (KEY_CONN, KEY_SUPTDSEC, TYPE_LABEL, self.fn_conn_suptdsec_lbl)
+        t3 = ([KEY_CONN], KEY_SUPTDSEC, TYPE_LABEL, self.fn_conn_suptdsec_lbl)
         lst.append(t3)
 
-        t4 = (KEY_CONN, KEY_SUPTDSEC, TYPE_COMBOBOX, self.fn_conn_suptdsec)
+        t4 = ([KEY_CONN], KEY_SUPTDSEC, TYPE_COMBOBOX, self.fn_conn_suptdsec)
         lst.append(t4)
 
-        t5 = (KEY_CONN, KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        t5 = ([KEY_CONN], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t5)
 
         return lst

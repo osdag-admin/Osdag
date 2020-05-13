@@ -140,24 +140,27 @@ class Compression(Main):
         return options_list
 
     def fn_profile_section(self):
-        if self == 'Beams':
+
+        profile = self[0]
+        if profile == 'Beams':
             return connectdb("Beams", call_type="popup")
-        elif self == 'Columns':
+        elif profile == 'Columns':
             return connectdb("Columns", call_type="popup")
-        elif self in ['Angles', 'Back to Back Angles', 'Star Angles']:
+        elif profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
             return connectdb("Angles", call_type="popup")
-        elif self in ['Channels', 'Back to Back Channels']:
+        elif profile in ['Channels', 'Back to Back Channels']:
             return connectdb("Channels", call_type="popup")
 
     def fn_end1_end2(self):
 
-        if self == 'Fixed':
+        end1 = self[0]
+        if end1 == 'Fixed':
             return VALUES_END2
-        elif self == 'Free':
+        elif end1 == 'Free':
             return ['Fixed']
-        elif self == 'Hinged':
+        elif end1 == 'Hinged':
             return ['Fixed', 'Hinged', 'Roller']
-        elif self == 'Roller':
+        elif end1 == 'Roller':
             return ['Fixed', 'Hinged']
 
     def fn_end1_image(self):
@@ -171,47 +174,50 @@ class Compression(Main):
         elif self == 'Roller':
             return "./ResourceFiles/images/4.RRFR.PNG"
 
-    def fn_end2_image(self, end1):
+    def fn_end2_image(self):
+
+        end1 = self[0]
+        end2 = self[1]
 
         if end1 == 'Fixed':
-            if self == 'Fixed':
+            if end2 == 'Fixed':
                 return "./ResourceFiles/images/6.RRRR.PNG"
-            elif self == 'Free':
+            elif end2 == 'Free':
                 return "./ResourceFiles/images/1.RRFF_rotated.PNG"
-            elif self == 'Hinged':
+            elif end2 == 'Hinged':
                 return "./ResourceFiles/images/5.RRRF_rotated.PNG"
-            elif self == 'Roller':
+            elif end2 == 'Roller':
                 return "./ResourceFiles/images/4.RRFR_rotated.PNG"
         elif end1 == 'Free':
             return "./ResourceFiles/images/1.RRFF.PNG"
         elif end1 == 'Hinged':
-            if self == 'Fixed':
+            if end2 == 'Fixed':
                 return "./ResourceFiles/images/5.RRRF.PNG"
-            elif self == 'Hinged':
+            elif end2 == 'Hinged':
                 return "./ResourceFiles/images/3.RFRF.PNG"
-            elif self == 'Roller':
+            elif end2 == 'Roller':
                 return "./ResourceFiles/images/2.FRFR_rotated.PNG"
         elif end1 == 'Roller':
-            if self == 'Fixed':
+            if end2 == 'Fixed':
                 return "./ResourceFiles/images/4.RRFR.PNG"
-            elif self == 'Hinged':
+            elif end2 == 'Hinged':
                 return "./ResourceFiles/images/2.FRFR.PNG"
 
     def input_value_changed(self):
 
         lst = []
 
-        t1 = (KEY_SEC_PROFILE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
+        t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t1)
 
-        t2 = (KEY_END1, KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
+        t2 = ([KEY_END1], KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
         lst.append(t2)
 
-        t3 = (KEY_END1, KEY_IMAGE, TYPE_IMAGE, self.fn_end1_image)
+        t3 = ([KEY_END1, KEY_END2], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
         lst.append(t3)
 
-        t4 = (KEY_END2, KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
-        lst.append(t4)
+        # t4 = (KEY_END2, KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
+        # lst.append(t4)
 
         return lst
 

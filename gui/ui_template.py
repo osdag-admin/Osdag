@@ -174,7 +174,18 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             pass
 
+    def get_validator(self, validator):
+        if validator == 'Int Validator':
+            return QIntValidator()
+        elif validator == 'Double Validator':
+            return QDoubleValidator
+        else:
+            return None
+
     def setupUi(self, MainWindow, main,folder):
+        self.design_inputs = {}
+        self.prev_inputs = {}
+        self.input_dock_inputs = {}
         self.folder = folder
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -542,10 +553,10 @@ class Ui_ModuleWindow(QMainWindow):
             type = option[2]
             if type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_IMAGE_COMPRESSION]:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
-                if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
-                    l.setGeometry(QtCore.QRect(16, 10 + i, 120, 25))
-                else:
-                    l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
+                # if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
+                #     l.setGeometry(QtCore.QRect(16, 10 + i, 120, 25))
+                # else:
+                l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -555,7 +566,6 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                 l.setFixedSize(l.size())
                 in_layout2.addWidget(l, j, 1, 1, 1)
-                print(j, 'label')
 
             if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)
@@ -582,11 +592,14 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
-                if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
-                    r.setGeometry(QtCore.QRect(160, 10 + i, 150, 27))
-                    r.setDisabled(True)
-                else:
-                    r.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
+                # if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
+                #     r.setGeometry(QtCore.QRect(160, 10 + i, 150, 27))
+                #     r.setDisabled(True)
+                # else:
+                r.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
+                r.setEnabled(True if option[5] else False)
+                if option[6] != 'No Validator':
+                    r.setValidator(self.get_validator(option[6]))
                 r.setFixedSize(r.size())
                 in_layout2.addWidget(r, j, 2, 1, 1)
 
@@ -623,7 +636,6 @@ class Ui_ModuleWindow(QMainWindow):
                 i = i + 30
                 im.setFixedSize(im.size())
                 in_layout2.addWidget(im, j, 2, 1, 1)
-                print(j, 'image')
 
             if type == TYPE_IMAGE_COMPRESSION:
                 imc = QtWidgets.QLabel(self.dockWidgetContents)
@@ -636,10 +648,10 @@ class Ui_ModuleWindow(QMainWindow):
                 imc.setFixedSize(imc.size())
                 in_layout2.addWidget(imc, j, 2, 1, 1)
 
-            if option[0] in [KEY_AXIAL, KEY_SHEAR]:
-                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
-                onlyInt = QIntValidator()
-                key.setValidator(onlyInt)
+            # if option[0] in [KEY_AXIAL, KEY_SHEAR]:
+            #     key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+            #     onlyInt = QIntValidator()
+            #     key.setValidator(onlyInt)
 
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents)
@@ -655,12 +667,13 @@ class Ui_ModuleWindow(QMainWindow):
 
             i = i + 30
             j = j + 1
+        in_layout2.setRowStretch(j+1, 10)
         in_scroll.setWidget(in_scrollcontent)
 
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
-            if option[0] in [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]:
+            if option[0] in RED_LIST:
                 red_list_set = set(red_list_function())
                 current_list_set = set(option[4])
                 current_red_list = list(current_list_set.intersection(red_list_set))
@@ -683,13 +696,17 @@ class Ui_ModuleWindow(QMainWindow):
                 print('updatedlist',updated_list)
                 if updated_list != None:
                     onchange_key_popup = [item for item in updated_list if item[1] == t[0]]
+                    arg_list = []
                     if onchange_key_popup != []:
-                        data[t[0] + "_customized"] = t[1](self.dockWidgetContents.findChild(QtWidgets.QWidget,
-                                                                                            onchange_key_popup[0][0]).currentText())
+                        for change_key in onchange_key_popup[0][0]:
+                            arg_list.append(
+                                self.dockWidgetContents.findChild(QtWidgets.QWidget, change_key).currentText())
+                        data[t[0] + "_customized"] = t[1](arg_list)
                     else:
                         data[t[0] + "_customized"] = t[1]()
                 else:
                     data[t[0] + "_customized"] = t[1]()
+            print('pppppppppppppp')
             try:
                 d.get(new_list[0][0]).activated.connect(lambda: popup(d.get(new_list[0][0]), new_list))
                 d.get(new_list[1][0]).activated.connect(lambda: popup(d.get(new_list[1][0]), new_list))
@@ -724,19 +741,22 @@ class Ui_ModuleWindow(QMainWindow):
                     onchange_key_popup = []
                 if onchange_key_popup != []:
                     # if c_tup[0] == KEY_SECSIZE:
-                    options = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, onchange_key_popup[0][0]).currentText())
+                    arg_list = []
+                    for change_key in onchange_key_popup[0][0]:
+                        arg_list.append(
+                            self.dockWidgetContents.findChild(QtWidgets.QWidget, change_key).currentText())
+                    options = f(arg_list)
                     existing_options = data[c_tup[0] + "_customized"]
                     if selected == "Customized":
+                        print('op', 'ex', options, existing_options)
                         data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                         if data[c_tup[0] + "_customized"] == []:
-                            data[c_tup[0] + "_customized"] = f(self.dockWidgetContents.findChild(QtWidgets.QWidget, onchange_key_popup[0][0]).currentText())
+                            data[c_tup[0] + "_customized"] = f(arg_list)
                             key.setCurrentIndex(0)
                     else:
-                        data[c_tup[0] + "_customized"] = f(self.dockWidgetContents.findChild(QtWidgets.QWidget,
-                                                                                             onchange_key_popup[0][0]).currentText())
+                        data[c_tup[0] + "_customized"] = f(arg_list)
 
-                        input = f(self.dockWidgetContents.findChild(QtWidgets.QWidget,
-                            onchange_key_popup[0][0]).currentText())
+                        input = f(arg_list)
                         # input.remove('Select Section')
                         data[c_tup[0] + "_customized"] = input
 
@@ -757,13 +777,14 @@ class Ui_ModuleWindow(QMainWindow):
     # Change in Ui based on Connectivity selection
     ##############################################
 
-
+        print('ffffffffffffffffff')
         if updated_list is None:
             pass
         else:
             for t in updated_list:
-                key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                self.on_change_connect(key_changed, updated_list, data)
+                for key_name in t[0]:
+                    key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
+                    self.on_change_connect(key_changed, updated_list, data)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
         self.btn_Reset.setGeometry(QtCore.QRect(30, 600, 100, 30))
@@ -819,7 +840,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.dockWidgetContents_out.setObjectName("dockWidgetContents_out")
 
         out_widget = QtWidgets.QWidget(self.dockWidgetContents_out)
-        out_widget.setGeometry(QtCore.QRect(0, 0, 320, 622))
+        out_widget.setGeometry(QtCore.QRect(0, 0, 325, 600))
         out_layout1 = QtWidgets.QVBoxLayout(out_widget)
         out_scroll = QScrollArea(out_widget)
         out_layout1.addWidget(out_scroll)
@@ -827,6 +848,7 @@ class Ui_ModuleWindow(QMainWindow):
         out_scrollcontent = QtWidgets.QWidget(out_scroll)
         out_layout2 = QtWidgets.QGridLayout(out_scrollcontent)
         out_scrollcontent.setLayout(out_layout2)
+        out_scroll.horizontalScrollBar().hide()
         out_list = main.output_values(main, False)
         _translate = QtCore.QCoreApplication.translate
 
@@ -845,14 +867,16 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 l.setFont(font)
                 l.setObjectName(option[0] + "_label")
+                l.setFixedSize(l.size())
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                 out_layout2.addWidget(l, j, 1, 1, 1)
-                if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
-                    l.setVisible(False)
+                l.setVisible(True if option[4] else False)
+                # if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
+                #     l.setVisible(False)
 
             if output_type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents_out)
-                r.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                r.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
@@ -860,20 +884,23 @@ class Ui_ModuleWindow(QMainWindow):
                 r.setFont(font)
                 r.setObjectName(option[0])
                 r.setReadOnly(True)
+                r.setFixedSize(r.size())
                 out_layout2.addWidget(r, j, 2, 1, 1)
-                if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
-                    r.setVisible(False)
+                r.setVisible(True if option[4] else False)
+                # if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
+                #     r.setVisible(False)
 
             if output_type == TYPE_OUT_BUTTON:
                 v = option[3]
                 b = QtWidgets.QPushButton(self.dockWidgetContents_out)
-                b.setGeometry(QtCore.QRect(150, 10 + i, 160, 27))
+                b.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
                 font.setWeight(50)
                 b.setFont(font)
                 b.setObjectName(option[0])
+                b.setFixedSize(b.size())
                 b.setText(v[0])
                 b.setDisabled(True)
                 button_list.append(option)
@@ -886,12 +913,14 @@ class Ui_ModuleWindow(QMainWindow):
                 font = QtGui.QFont()
                 q.setFont(font)
                 q.setObjectName("_title")
+                q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
                 out_layout2.addWidget(q, j, 1, 2, 2)
                 j = j + 1
             i = i + 30
             j = j + 1
+        out_layout2.setRowStretch(j+1, 10)
         out_scroll.setWidget(out_scrollcontent)
 
         # common_button = QtWidgets.QPushButton()
@@ -1145,29 +1174,30 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionDesign_Preferences.setFont(font)
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
-        self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(module))
+        self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(module, main))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
-        self.designPrefDialog = DesignPreferences(main)
-        add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
-        add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
+        self.designPrefDialog = DesignPreferences(self, main, input_dictionary=self.input_dock_inputs)
 
+        # add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
+        # add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
+        #
+        #
+        # if module in [KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_ENDPLATE, KEY_DISP_SEATED_ANGLE]:
+        #     column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
+        #     beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
+        #     add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
+        #     add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
+        # elif module == KEY_DISP_COLUMNCOVERPLATE:
+        #     section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+        #     add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
+        # elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
+        #     section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
+        #     add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
+        #
+        # else:
+        #     pass
 
-        if module in [KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_ENDPLATE, KEY_DISP_SEATED_ANGLE]:
-            column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
-            beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
-            add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
-            add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
-        elif module == KEY_DISP_COLUMNCOVERPLATE:
-            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
-        elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
-            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-            add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
-
-        else:
-            pass
-
-        self.designPrefDialog.rejected.connect(self.design_preferences)
+        # self.designPrefDialog.rejected.connect(lambda: self.design_preferences('rejected'))
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
         self.actionfinPlate_quit.setObjectName("actionfinPlate_quit")
         self.actio_load_input = QtWidgets.QAction(MainWindow)
@@ -1398,7 +1428,7 @@ class Ui_ModuleWindow(QMainWindow):
         """
         for tup in new:
             (object_name, k2_key, typ, f) = tup
-            if object_name != k1.objectName():
+            if k1.objectName() not in object_name:
                 continue
             if typ in [TYPE_LABEL, TYPE_OUT_LABEL]:
                 k2_key = k2_key + "_label"
@@ -1410,23 +1440,30 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
 
-            if object_name != KEY_END2:
-                val = f(k1.currentText())
-            else:
-                key_end1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_END1)
-                val = f(k1.currentText(), key_end1.currentText())
+
+            arg_list = []
+            for ob_name in object_name:
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, ob_name)
+                arg_list.append(key.currentText())
+
+            val = f(arg_list)
+            # if object_name != KEY_END2:
+            #     val = f(k1.currentText())
+            # else:
+            #     key_end1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_END1)
+            #     val = f(k1.currentText(), key_end1.currentText())
 
             # if object_name not in [KEY_SEC_PROFILE, KEY_WELD_TYPE, KEY_CONN]:
             #     k2.clear()
-            if object_name == KEY_SEC_PROFILE:
-                k2.setCurrentIndex(0)
+            # if object_name == KEY_SEC_PROFILE:
+            #     k2.setCurrentIndex(0)
 
             if typ == TYPE_COMBOBOX:
                 k2.clear()
                 for values in val:
                     k2.addItem(values)
                     k2.setCurrentIndex(0)
-                if k2_key in [KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_SECSIZE]:
+                if k2_key in RED_LIST:
                     red_list_set = set(red_list_function())
                     current_list_set = set(val)
                     current_red_list = list(current_list_set.intersection(red_list_set))
@@ -1434,6 +1471,7 @@ class Ui_ModuleWindow(QMainWindow):
                         indx = val.index(str(value))
                         k2.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
             elif typ == TYPE_COMBOBOX_CUSTOMIZED:
+                k2.setCurrentIndex(0)
                 data[k2_key + "_customized"] = val
             elif typ == TYPE_LABEL:
                 k2.setText(val)
@@ -1506,8 +1544,9 @@ class Ui_ModuleWindow(QMainWindow):
     @author: Umair
     '''
 
-    def design_fn(self, op_list, data_list):
+    def design_fn(self, op_list, data_list, main):
         design_dictionary = {}
+        self.input_dock_inputs = {}
         for op in op_list:
             widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
             if op[2] == TYPE_COMBOBOX:
@@ -1530,116 +1569,147 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 d1 = {}
             design_dictionary.update(d1)
-
+            self.input_dock_inputs.update(d1)
 
         if self.designPrefDialog.flag:
+            print('flag true')
 
-            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,
-                              KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,
-                              KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
-                tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-                key_material_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL).currentText()
-                if key_material_column == "Custom":
-                    material_fu_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
-                    material_fy_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
-                    material_column = "Custom" + " " + str(material_fu_column) + " " + str(material_fy_column)
-                else:
-                    material_column = key_material_column
-                tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-                key_material_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_MATERIAL).currentText()
-                if key_material_beam == "Custom":
-                    material_fu_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FU).text()
-                    material_fy_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FY).text()
-                    material_beam = "Custom" + " " + str(material_fu_beam) + " " + str(material_fy_beam)
-                else:
-                    material_beam = key_material_beam
-                d2 = {KEY_SUPTNGSEC_MATERIAL: material_column, KEY_SUPTDSEC_MATERIAL: material_beam}
-                design_dictionary.update(d2)
-            elif module == KEY_DISP_COMPRESSION:
-                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
-                section = key.currentText()
-                if section == 'Beams':
-                    tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-                    material_fu_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FU).text()
-                    material_fy_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FY).text()
-                    material_beam = str(material_fu_beam) + "," + str(material_fy_beam)
-                    d2 = {KEY_SUPTDSEC_MATERIAL: material_beam}
-                    design_dictionary.update(d2)
+            for des_pref in main.input_dictionary_design_pref(main):
+                tab_name = des_pref[0]
+                input_type = des_pref[1]
+                input_list = des_pref[2]
+                tab = self.designPrefDialog.findChild(QtWidgets.QWidget, tab_name)
+                for key_name in input_list:
+                    key = tab.findChild(QtWidgets.QWidget, key_name)
+                    if input_type == TYPE_TEXTBOX:
+                        val = key.text()
+                        design_dictionary.update({key_name: val})
+                    elif input_type == TYPE_COMBOBOX:
+                        val = key.currentText()
+                        design_dictionary.update({key_name: val})
 
-                elif section == 'Columns':
-                    tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-                    material_fu_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
-                    material_fy_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
-                    material_column = str(material_fu_column) + "," + str(material_fy_column)
-                    d2 = {KEY_SUPTNGSEC_MATERIAL: material_column}
-                    design_dictionary.update(d2)
 
-                elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
-                    pass
-            elif module == KEY_DISP_BASE_PLATE:
-                tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-                typ = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_TYPE).currentText()
-                source = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_SOURCE).text()
-                material = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL).text()
-                material_fu = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
-                material_fy = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
-                tab_Base_Plate = self.designPrefDialog.findChild(QtWidgets.QWidget, "Base Plate")
-                bp_material = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_MATERIAL).text()
-                bp_material_fu = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FU).text()
-                bp_material_fy = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FY).text()
-                anchor_dia = data_list[KEY_DIA_ANCHOR + "_customized"]
 
-                d2 = {KEY_SUPTNGSEC_TYPE: typ, KEY_SUPTNGSEC_SOURCE: source, KEY_SUPTNGSEC_MATERIAL: material,
-                      KEY_SUPTNGSEC_FU: material_fu, KEY_SUPTNGSEC_FY: material_fy,
-                      KEY_BASE_PLATE_MATERIAL: bp_material,
-                      KEY_BASE_PLATE_FU: bp_material_fu, KEY_BASE_PLATE_FY: bp_material_fy,
-                      KEY_DP_ANCHOR_BOLT_LENGTH: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0])[1],
-                      }
-                design_dictionary.update(d2)
+            # if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,
+            #                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,
+            #                   KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
+            #     tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+            #     key_material_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL).currentText()
+            #     if key_material_column == "Custom":
+            #         material_fu_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
+            #         material_fy_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
+            #         material_column = "Custom" + " " + str(material_fu_column) + " " + str(material_fy_column)
+            #     else:
+            #         material_column = key_material_column
+            #     tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+            #     key_material_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_MATERIAL).currentText()
+            #     if key_material_beam == "Custom":
+            #         material_fu_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FU).text()
+            #         material_fy_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FY).text()
+            #         material_beam = "Custom" + " " + str(material_fu_beam) + " " + str(material_fy_beam)
+            #     else:
+            #         material_beam = key_material_beam
+            #     d2 = {KEY_SUPTNGSEC_MATERIAL: material_column, KEY_SUPTDSEC_MATERIAL: material_beam}
+            #     design_dictionary.update(d2)
+            # elif module == KEY_DISP_COMPRESSION:
+            #     key = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+            #     section = key.currentText()
+            #     if section == 'Beams':
+            #         tab_Beam = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+            #         material_fu_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FU).text()
+            #         material_fy_beam = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_FY).text()
+            #         material_beam = str(material_fu_beam) + "," + str(material_fy_beam)
+            #         d2 = {KEY_SUPTDSEC_MATERIAL: material_beam}
+            #         design_dictionary.update(d2)
+            #
+            #     elif section == 'Columns':
+            #         tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+            #         material_fu_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
+            #         material_fy_column = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
+            #         material_column = str(material_fu_column) + "," + str(material_fy_column)
+            #         d2 = {KEY_SUPTNGSEC_MATERIAL: material_column}
+            #         design_dictionary.update(d2)
+            #
+            #     elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
+            #         pass
+            # elif module == KEY_DISP_BASE_PLATE:
+            #     tab_Column = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+            #     typ = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_TYPE).currentText()
+            #     source = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_SOURCE).text()
+            #     material = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL).text()
+            #     material_fu = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FU).text()
+            #     material_fy = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_FY).text()
+            #     tab_Base_Plate = self.designPrefDialog.findChild(QtWidgets.QWidget, "Base Plate")
+            #     bp_material = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_MATERIAL).text()
+            #     bp_material_fu = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FU).text()
+            #     bp_material_fy = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FY).text()
+            #     anchor_dia = data_list[KEY_DIA_ANCHOR + "_customized"]
+            #
+            #     d2 = {KEY_SUPTNGSEC_TYPE: typ, KEY_SUPTNGSEC_SOURCE: source, KEY_SUPTNGSEC_MATERIAL: material,
+            #           KEY_SUPTNGSEC_FU: material_fu, KEY_SUPTNGSEC_FY: material_fy,
+            #           KEY_BASE_PLATE_MATERIAL: bp_material,
+            #           KEY_BASE_PLATE_FU: bp_material_fu, KEY_BASE_PLATE_FY: bp_material_fy,
+            #           KEY_DP_ANCHOR_BOLT_LENGTH: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0])[1],
+            #           }
+            #     design_dictionary.update(d2)
 
         else:
-            common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
+            print('flag false')
 
-            if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION,
-                              KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
-                d2 = {KEY_SUPTNGSEC_MATERIAL: common_material, KEY_SUPTDSEC_MATERIAL: common_material}
-                design_dictionary.update(d2)
-            elif module == KEY_DISP_COMPRESSION:
-                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
-                section = key.currentText()
-                if section == 'Beams':
-                    d2 = {KEY_SUPTDSEC_MATERIAL: common_material}
-                    design_dictionary.update(d2)
-                elif section == 'Columns':
-                    d2 = {KEY_SUPTNGSEC_MATERIAL: common_material}
-                    design_dictionary.update(d2)
-                elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
-                    pass
-            elif module == KEY_DISP_BASE_PLATE:
-                des = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentText()
-                anchor_dia = data_list[KEY_DIA_ANCHOR + "_customized"]
-                anchor_typ = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_TYP_ANCHOR).currentText()
-                if des == 'Select Section':
-                    des = connectdb("Columns", "popup")[0]
-                col_attributes = Section(des, common_material)
-                Section.connect_to_database_update_other_attributes(col_attributes, "Columns", des)
-                d2 = {KEY_SUPTNGSEC_TYPE: "Rolled", KEY_SUPTNGSEC_SOURCE: str(col_attributes.source),
-                      KEY_SUPTNGSEC_MATERIAL: common_material,
-                      KEY_SUPTNGSEC_FU: str(col_attributes.fu), KEY_SUPTNGSEC_FY: str(col_attributes.fy),
-                      KEY_BASE_PLATE_MATERIAL: common_material,
-                      KEY_BASE_PLATE_FU: str(col_attributes.fu), KEY_BASE_PLATE_FY: str(col_attributes.fy),
-                      KEY_DP_ANCHOR_BOLT_DESIGNATION: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0])[0],
-                      KEY_DP_ANCHOR_BOLT_TYPE: anchor_typ,
-                      KEY_DP_ANCHOR_BOLT_LENGTH: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0])[1],
-                      KEY_DP_ANCHOR_BOLT_HOLE_TYPE: 'Standard',
-                      KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(col_attributes.fu),
-                      KEY_DP_ANCHOR_BOLT_FRICTION: str(0.30)
-                      }
+            for without_des_pref in main.input_dictionary_without_design_pref(main):
+                input_dock_key = without_des_pref[0]
+                input_list = without_des_pref[1]
+                input_source = without_des_pref[2]
+                for key_name in input_list:
+                    if input_source == 'Input Dock':
+                        design_dictionary.update({key_name: design_dictionary[input_dock_key]})
+                    else:
+                        val = main.get_values_for_design_pref(main, key_name, design_dictionary)
+                        design_dictionary.update({key_name: val})
 
-                design_dictionary.update(d2)
-
-        design_dictionary.update(self.designPrefDialog.save_designPref_para(module))
         self.design_inputs = design_dictionary
+
+            # common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()
+            #
+            # if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_COMPRESSION,
+            #                   KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
+            #     d2 = {KEY_SUPTNGSEC_MATERIAL: common_material, KEY_SUPTDSEC_MATERIAL: common_material}
+            #     design_dictionary.update(d2)
+            # elif module == KEY_DISP_COMPRESSION:
+            #     key = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+            #     section = key.currentText()
+            #     if section == 'Beams':
+            #         d2 = {KEY_SUPTDSEC_MATERIAL: common_material}
+            #         design_dictionary.update(d2)
+            #     elif section == 'Columns':
+            #         d2 = {KEY_SUPTNGSEC_MATERIAL: common_material}
+            #         design_dictionary.update(d2)
+            #     elif section in ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']:
+            #         pass
+            # elif module == KEY_DISP_BASE_PLATE:
+            #     des = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentText()
+            #     anchor_dia = data_list[KEY_DIA_ANCHOR + "_customized"]
+            #     anchor_typ = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_TYP_ANCHOR).currentText()
+            #     if des == 'Select Section':
+            #         des = connectdb("Columns", "popup")[0]
+            #     col_attributes = Section(des, common_material)
+            #     Section.connect_to_database_update_other_attributes(col_attributes, "Columns", des)
+            #     d2 = {KEY_SUPTNGSEC_TYPE: "Rolled", KEY_SUPTNGSEC_SOURCE: str(col_attributes.source),
+            #           KEY_SUPTNGSEC_MATERIAL: common_material,
+            #           KEY_SUPTNGSEC_FU: str(col_attributes.fu), KEY_SUPTNGSEC_FY: str(col_attributes.fy),
+            #           KEY_BASE_PLATE_MATERIAL: common_material,
+            #           KEY_BASE_PLATE_FU: str(col_attributes.fu), KEY_BASE_PLATE_FY: str(col_attributes.fy),
+            #           KEY_DP_ANCHOR_BOLT_DESIGNATION: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0])[0],
+            #           KEY_DP_ANCHOR_BOLT_TYPE: anchor_typ,
+            #           KEY_DP_ANCHOR_BOLT_LENGTH: self.designPrefDialog.anchor_bolt_designation(anchor_dia[0])[1],
+            #           KEY_DP_ANCHOR_BOLT_HOLE_TYPE: 'Standard',
+            #           KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(col_attributes.fu),
+            #           KEY_DP_ANCHOR_BOLT_FRICTION: str(0.30)
+            #           }
+            #
+            #     design_dictionary.update(d2)
+
+        # design_dictionary.update(self.designPrefDialog.save_designPref_para(module))
 
     # def pass_d(self, main, design_dictionary):
     #     """
@@ -1669,6 +1739,7 @@ class Ui_ModuleWindow(QMainWindow):
             QMessageBox.warning(self, "Application",
                                 "Cannot write file %s:\n%s" % (fileName, str(e)))
             return
+
     def return_class(self,name):
         if name == KEY_DISP_FINPLATE:
             return FinPlateConnection
@@ -1806,12 +1877,20 @@ class Ui_ModuleWindow(QMainWindow):
         # @author: Amir
 
         option_list = main.input_values(self)
-        self.design_fn(option_list, data)
+        self.design_fn(option_list, data, main)
 
         if trigger_type == "Save":
             self.saveDesign_inputs()
         elif trigger_type == "Design_Pref":
-            pass
+
+            if self.prev_inputs != self.input_dock_inputs:
+                self.designPrefDialog = DesignPreferences(self, main, input_dictionary=self.input_dock_inputs)
+
+                if 'Select Section' in self.input_dock_inputs.values():
+                    self.designPrefDialog.flag = False
+                else:
+                    self.designPrefDialog.flag = True
+
         else:
             main.design_button_status = True
             error = main.func_for_validation(main, self.design_inputs)
@@ -1839,6 +1918,7 @@ class Ui_ModuleWindow(QMainWindow):
             # if status is True and main.module == "Fin Plate":
             #     self.commLogicObj = cadconnection.commonfile(cadconnection, main.mainmodule, self.display, self.folder,
             #                                                  main.module)
+
             self.design_exist = False
             if self.design_inputs[KEY_MODULE] == KEY_DISP_FINPLATE:
                 module_class = FinPlateConnection
@@ -1948,92 +2028,92 @@ class Ui_ModuleWindow(QMainWindow):
                 scroll.setWidget(scrollcontent)
                 dialog.exec()
 
-    def refresh_sections(self, prev, section):
-
-        connectivity = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
-        supporting_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
-        supported_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
-        section_size = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
-
-        Columns = connectdb("Columns")
-        Beams = connectdb("Beams")
-        red_list_set = set(red_list_function())
-
-        if section == "Supporting":
-            supporting_section.clear()
-            if connectivity.currentText() in VALUES_CONN_1:
-                for item in Columns:
-                    supporting_section.addItem(item)
-                current_list_set = set(Columns)
-                current_red_list = list(current_list_set.intersection(red_list_set))
-                for value in current_red_list:
-                    indx = Columns.index(str(value))
-                    supporting_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-
-            elif connectivity.currentText() in VALUES_CONN_2:
-                for item in Beams:
-                    supporting_section.addItem(item)
-                current_list_set = set(Beams)
-                current_red_list = list(current_list_set.intersection(red_list_set))
-                for value in current_red_list:
-                    indx = Beams.index(str(value))
-                    supporting_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
-            text_index = supporting_section.findText(text, QtCore.Qt.MatchFixedString)
-            if text_index:
-                supporting_section.setCurrentIndex(text_index)
-            else:
-                supporting_section.setCurrentIndex(prev)
-
-        if section == "Supported":
-            supported_section.clear()
-
-            for item in Beams:
-                supported_section.addItem(item)
-            current_list_set = set(Beams)
-            current_red_list = list(current_list_set.intersection(red_list_set))
-            for value in current_red_list:
-                indx = Beams.index(str(value))
-                supported_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
-            text_index = supported_section.findText(text, QtCore.Qt.MatchFixedString)
-            if text_index:
-                supported_section.setCurrentIndex(text_index)
-            else:
-                supported_section.setCurrentIndex(prev)
-
-        if section == "Section_col":
-            section_size.clear()
-            for item in Columns:
-                section_size.addItem(item)
-            current_list_set = set(Columns)
-            current_red_list = list(current_list_set.intersection(red_list_set))
-            for value in current_red_list:
-                indx = Columns.index(str(value))
-                section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
-            text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
-            if text_index:
-                section_size.setCurrentIndex(text_index)
-            else:
-                section_size.setCurrentIndex(prev)
-
-        if section == "Section_bm":
-            section_size.clear()
-            for item in Beams:
-                section_size.addItem(item)
-            current_list_set = set(Beams)
-            current_red_list = list(current_list_set.intersection(red_list_set))
-            for value in current_red_list:
-                indx = Beams.index(str(value))
-                section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
-            text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
-            text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
-            if text_index:
-                section_size.setCurrentIndex(text_index)
-            else:
-                section_size.setCurrentIndex(prev)
-
+    # def refresh_sections(self, prev, section):
+    #
+    #     connectivity = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
+    #     supporting_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
+    #     supported_section = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+    #     section_size = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
+    #
+    #     Columns = connectdb("Columns")
+    #     Beams = connectdb("Beams")
+    #     red_list_set = set(red_list_function())
+    #
+    #     if section == "Supporting":
+    #         supporting_section.clear()
+    #         if connectivity.currentText() in VALUES_CONN_1:
+    #             for item in Columns:
+    #                 supporting_section.addItem(item)
+    #             current_list_set = set(Columns)
+    #             current_red_list = list(current_list_set.intersection(red_list_set))
+    #             for value in current_red_list:
+    #                 indx = Columns.index(str(value))
+    #                 supporting_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+    #
+    #         elif connectivity.currentText() in VALUES_CONN_2:
+    #             for item in Beams:
+    #                 supporting_section.addItem(item)
+    #             current_list_set = set(Beams)
+    #             current_red_list = list(current_list_set.intersection(red_list_set))
+    #             for value in current_red_list:
+    #                 indx = Beams.index(str(value))
+    #                 supporting_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+    #         text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
+    #         text_index = supporting_section.findText(text, QtCore.Qt.MatchFixedString)
+    #         if text_index:
+    #             supporting_section.setCurrentIndex(text_index)
+    #         else:
+    #             supporting_section.setCurrentIndex(prev)
+    #
+    #     if section == "Supported":
+    #         supported_section.clear()
+    #
+    #         for item in Beams:
+    #             supported_section.addItem(item)
+    #         current_list_set = set(Beams)
+    #         current_red_list = list(current_list_set.intersection(red_list_set))
+    #         for value in current_red_list:
+    #             indx = Beams.index(str(value))
+    #             supported_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+    #         text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
+    #         text_index = supported_section.findText(text, QtCore.Qt.MatchFixedString)
+    #         if text_index:
+    #             supported_section.setCurrentIndex(text_index)
+    #         else:
+    #             supported_section.setCurrentIndex(prev)
+    #
+    #     if section == "Section_col":
+    #         section_size.clear()
+    #         for item in Columns:
+    #             section_size.addItem(item)
+    #         current_list_set = set(Columns)
+    #         current_red_list = list(current_list_set.intersection(red_list_set))
+    #         for value in current_red_list:
+    #             indx = Columns.index(str(value))
+    #             section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+    #         text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_DESIGNATION).text()
+    #         text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
+    #         if text_index:
+    #             section_size.setCurrentIndex(text_index)
+    #         else:
+    #             section_size.setCurrentIndex(prev)
+    #
+    #     if section == "Section_bm":
+    #         section_size.clear()
+    #         for item in Beams:
+    #             section_size.addItem(item)
+    #         current_list_set = set(Beams)
+    #         current_red_list = list(current_list_set.intersection(red_list_set))
+    #         for value in current_red_list:
+    #             indx = Beams.index(str(value))
+    #             section_size.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+    #         text = self.designPrefDialog.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_DESIGNATION).text()
+    #         text_index = section_size.findText(text, QtCore.Qt.MatchFixedString)
+    #         if text_index:
+    #             section_size.setCurrentIndex(text_index)
+    #         else:
+    #             section_size.setCurrentIndex(prev)
+    #
 
 
 
@@ -2224,130 +2304,186 @@ class Ui_ModuleWindow(QMainWindow):
     def design_preferences(self):
         self.designPrefDialog.exec()
 
-# Function for getting input for design preferences from input dock
+    # Function for getting input for design preferences from input dock
     '''
     @author: Umair
     '''
 
-    def combined_design_prefer(self, module):
-        self.designPrefDialog.flag = True
-        key_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
-        key_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
-        key_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
-        key_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
-        key_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
-        key_6 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+    def combined_design_prefer(self, module, main):
 
-        tab_Column = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-        tab_Beam = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-        tab_Angle = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+        on_change_tab_list = main.tab_value_changed(main)
 
-        tab_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Bolt")
-        tab_Weld = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
-        tab_Detailing = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
-        tab_Design = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
-        tab_Connector = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
-        tab_Anchor_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
-        tab_Base_Plate = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Base Plate")
+        for new_values in on_change_tab_list:
+            (tab_name, key_list, key_to_change, key_type, f) = new_values
+            tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+            for key_name in key_list:
+                key = tab.findChild(QtWidgets.QWidget, key_name)
+                if isinstance(key, QtWidgets.QComboBox):
+                    self.connect_combobox_for_tab(key, tab, on_change_tab_list)
+                elif isinstance(key, QtWidgets.QLineEdit):
+                    self.connect_textbox_for_tab(key, tab, on_change_tab_list)
 
-        table_1 = "Columns"
-        table_2 = "Beams"
-        material_grade = key_4.currentText()
-        material = Material(material_grade)
+        for fu_fy in main.list_for_fu_fy_validation(main):
 
-        if module != KEY_DISP_BASE_PLATE:
-            tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
+            material_key_name = fu_fy[0]
+            fu_key_name = fu_fy[1]
+            fy_key_name = fu_fy[2]
+            material_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, material_key_name)
+            fu_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, fu_key_name)
+            fy_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, fy_key_name)
+
+            for validation_key in [fu_key, fy_key]:
+                if validation_key.text() != "":
+                    self.designPrefDialog.fu_fy_validation_connect([fu_key, fy_key], validation_key, material_key)
+
+        for edit in main.edit_tabs(main):
+            (tab_name, input_dock_key_name, change_typ, f) = edit
+            tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+            input_dock_key = self.dockWidgetContents.findChild(QtWidgets.QWidget, input_dock_key_name)
+            if change_typ == TYPE_CHANGE_TAB_NAME:
+                self.designPrefDialog.ui.tabWidget.setTabText(
+                    self.designPrefDialog.ui.tabWidget.indexOf(tab), f(input_dock_key.currentText()))
+            elif change_typ == TYPE_REMOVE_TAB:
+
+                if tab.objectName() != f(input_dock_key.currentText()):
+                    self.designPrefDialog.ui.tabWidget.removeTab(
+                        self.designPrefDialog.ui.tabWidget.indexOf(tab))
+                # if tab:
+                #     self.designPrefDialog.ui.tabWidget.insertTab(0, tab, tab_name)
+
+        for refresh in main.refresh_input_dock(main):
+            (tab_name, key_name, key_type, tab_key, master_key, value, database_arg) = refresh
+            tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+            if tab:
+                add_button = tab.findChild(QtWidgets.QWidget, "pushButton_Add_"+tab_name)
+                key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
+                selected = key.currentText()
+                if master_key:
+                    val = self.dockWidgetContents.findChild(QtWidgets.QWidget, master_key).currentText()
+                    if val not in value:
+                        continue
+                self.refresh_section_connect(add_button, selected, key, key_type, tab_key, database_arg)
+
+
+        #
+        # key_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
+        # key_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
+        # key_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+        # key_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
+        # key_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
+        # key_6 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
+        #
+        # tab_Column = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+        # tab_Beam = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
+        # tab_Angle = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+        #
+        # tab_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Bolt")
+        # tab_Weld = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
+        # tab_Detailing = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
+        # tab_Design = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
+        # tab_Connector = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
+        # tab_Anchor_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
+        # tab_Base_Plate = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Base Plate")
+        #
+        # table_1 = "Columns"
+        # table_2 = "Beams"
+        # material_grade = key_4.currentText()
+        # material = Material(material_grade)
+
+        # if module != KEY_DISP_BASE_PLATE:
+        #     tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
+
         # else:
         #     tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
-        tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
+        # tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
 
-        if module not in [KEY_DISP_BASE_PLATE,KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
+        # if module not in [KEY_DISP_BASE_PLATE,KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
+        #
+        #     material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
+        #     material_connector.setCurrentText(str(material_grade))
+        #
+        #     def f(material_g):
+        #         m = Material(material_g)
+        #         tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(m.fu))
+        #         tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(m.fy))
+        #
+        #     material_connector.currentIndexChanged.connect(lambda: f(material_connector.currentText()))
+        #     tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(material.fu))
+        #     tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(material.fy))
+        # else:
+        #     pass
 
-            material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
-            material_connector.setCurrentText(str(material_grade))
-
-            def f(material_g):
-                m = Material(material_g)
-                tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(m.fu))
-                tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(m.fy))
-
-            material_connector.currentIndexChanged.connect(lambda: f(material_connector.currentText()))
-            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(material.fu))
-            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(material.fy))
-        else:
-            pass
-
-        if module == KEY_DISP_COLUMNCOVERPLATE:
-            designation_col = key_5.currentText()
-            if key_5.currentIndex() != 0:
-                self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
-        elif module == KEY_DISP_BEAMCOVERPLATE:
-            designation_bm = key_5.currentText()
-            if key_5.currentIndex() != 0:
-                self.designPrefDialog.beam_preferences(designation_bm, material_grade)
-        elif module == KEY_DISP_COMPRESSION:
-            designation = self.design_inputs[KEY_SECSIZE]
-            if key_6.currentIndex() == 0:
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
-                if tab_Beam is not None:
-                    self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Beam, KEY_DISP_BEAMSEC)
-                self.designPrefDialog.beam_preferences(designation[0], material_grade)
-                designation_list = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
-                designation_list.setCurrentIndex(0)
-                designation_list.clear()
-                for item in designation:
-                    designation_list.addItem(item)
-                designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
-                    designation_list.currentText() if designation_list.currentText() else 'JB 150', material_grade))
-            elif key_6.currentIndex() == 1:
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
-                self.designPrefDialog.column_preferences(designation[0], table_1, material_grade)
-                if tab_Column is not None:
-                    self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Column, KEY_DISP_COLSEC)
-                designation_list = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
-                designation_list.setCurrentIndex(0)
-                designation_list.clear()
-                for item in designation:
-                    designation_list.addItem(item)
-                designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.column_preferences(
-                    designation_list.currentText() if designation_list.currentText() else 'HB 150', table_1, material_grade))
-            elif key_6.currentIndex() in [2, 4, 6]:
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
-                self.designPrefDialog.angle_preferences(designation[0], material_grade)
-                if tab_Angle is not None:
-                    self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Angle, DISP_TITLE_ANGLE)
-                designation_list = tab_Angle.findChild(QtWidgets.QWidget, KEY_SECSIZE)
-                designation_list.setCurrentIndex(0)
-                designation_list.clear()
-                for item in designation:
-                    designation_list.addItem(item)
-                designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.angle_preferences(
-                    designation_list.currentText() if designation_list.currentText() else '20 20 X 3', material_grade))
-                # self.designPrefDialog.ui.tabWidget.removeTab(
-                #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
-                # table_c = "Angles"
-            elif key_6.currentIndex() in [3, 5]:
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
-                self.designPrefDialog.ui.tabWidget.removeTab(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+        # if module == KEY_DISP_COLUMNCOVERPLATE:
+        #     designation_col = key_5.currentText()
+        #     if key_5.currentIndex() != 0:
+        #         self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
+        # elif module == KEY_DISP_BEAMCOVERPLATE:
+        #     designation_bm = key_5.currentText()
+        #     if key_5.currentIndex() != 0:
+        #         self.designPrefDialog.beam_preferences(designation_bm, material_grade)
+        # if module == KEY_DISP_COMPRESSION:
+        #     designation = self.design_inputs[KEY_SECSIZE]
+        #     if key_6.currentIndex() == 0:
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
+        #         if tab_Beam is not None:
+        #             self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Beam, KEY_DISP_BEAMSEC)
+        #         self.designPrefDialog.beam_preferences(designation[0], material_grade)
+        #         designation_list = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
+        #         designation_list.setCurrentIndex(0)
+        #         designation_list.clear()
+        #         for item in designation:
+        #             designation_list.addItem(item)
+        #         designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
+        #             designation_list.currentText() if designation_list.currentText() else 'JB 150', material_grade))
+        #     elif key_6.currentIndex() == 1:
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
+        #         self.designPrefDialog.column_preferences(designation[0], table_1, material_grade)
+        #         if tab_Column is not None:
+        #             self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Column, KEY_DISP_COLSEC)
+        #         designation_list = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
+        #         designation_list.setCurrentIndex(0)
+        #         designation_list.clear()
+        #         for item in designation:
+        #             designation_list.addItem(item)
+        #         designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.column_preferences(
+        #             designation_list.currentText() if designation_list.currentText() else 'HB 150', table_1, material_grade))
+        #     elif key_6.currentIndex() in [2, 4, 6]:
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Channel))
+        #         self.designPrefDialog.angle_preferences(designation[0], material_grade)
+        #         if tab_Angle is not None:
+        #             self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Angle, DISP_TITLE_ANGLE)
+        #         designation_list = tab_Angle.findChild(QtWidgets.QWidget, KEY_SECSIZE)
+        #         designation_list.setCurrentIndex(0)
+        #         designation_list.clear()
+        #         for item in designation:
+        #             designation_list.addItem(item)
+        #         designation_list.currentIndexChanged.connect(lambda: self.designPrefDialog.angle_preferences(
+        #             designation_list.currentText() if designation_list.currentText() else '20 20 X 3', material_grade))
+        #         # self.designPrefDialog.ui.tabWidget.removeTab(
+        #         #     self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+        #         # table_c = "Angles"
+        #     elif key_6.currentIndex() in [3, 5]:
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Column))
+        #         self.designPrefDialog.ui.tabWidget.removeTab(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Angle))
                 # if tab_Channel is not None:
                 #     self.designPrefDialog.ui.tabWidget.insertTab(0, tab_Channel, "Channel")
                 # table_c = "Channels"
@@ -2363,56 +2499,140 @@ class Ui_ModuleWindow(QMainWindow):
             #     print(designation_col[0])
             # self.designPrefDialog.column_preferences(designation_col[0], table_c, material_grade)
 
-        elif module == KEY_DISP_BASE_PLATE:
+        # elif module == KEY_DISP_BASE_PLATE:
+        #
+        #     bp_list = []
+        #     anchor_dia = self.design_inputs[KEY_DIA_ANCHOR][0]
+        #     anchor_typ = self.design_inputs[KEY_TYP_ANCHOR]
+        #     designation_col = key_2.currentText()
+        #     self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
+        #     self.designPrefDialog.anchor_bolt_preferences(anchor_dia, anchor_typ)
+        #     bp_material = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_MATERIAL)
+        #     bp_material.setText(str(material_grade))
+        #     bp_material.setReadOnly(True)
+        #     bp_fu = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FU)
+        #     bp_list.append(bp_fu)
+        #     bp_fu.setText(str(material.fu))
+        #     bp_fy = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FY)
+        #     bp_list.append(bp_fy)
+        #     bp_fy.setText(str(material.fy))
+        #
+        #     for bp in bp_list:
+        #         if bp.text() != "":
+        #             self.designPrefDialog.fu_fy_validation_connect(bp_list, bp)
 
-            bp_list = []
-            anchor_dia = self.design_inputs[KEY_DIA_ANCHOR][0]
-            anchor_typ = self.design_inputs[KEY_TYP_ANCHOR]
-            designation_col = key_2.currentText()
-            self.designPrefDialog.column_preferences(designation_col, table_1, material_grade)
-            self.designPrefDialog.anchor_bolt_preferences(anchor_dia, anchor_typ)
-            bp_material = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_MATERIAL)
-            bp_material.setText(str(material_grade))
-            bp_material.setReadOnly(True)
-            bp_fu = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FU)
-            bp_list.append(bp_fu)
-            bp_fu.setText(str(material.fu))
-            bp_fy = tab_Base_Plate.findChild(QtWidgets.QWidget, KEY_BASE_PLATE_FY)
-            bp_list.append(bp_fy)
-            bp_fy.setText(str(material.fy))
+        # for pop_tab in main.populate_tabs(main):
+        #     (tab_name, para, key_name, values) = pop_tab
+        #     parameters = []
+        #     for p in para:
+        #         p_key = self.dockWidgetContents.findChild(QtWidgets.QWidget, p)
+        #         if p_key:
+        #             parameters.append(self.design_inputs[p])
+        #         else:
+        #             parameters.append(p)
+        #     if key_name:
+        #         val = self.design_inputs[key_name]
+        #         if val in values:
+        #             self.function_for_tab_population(tab_name)(parameters)
+        #     else:
+        #         self.function_for_tab_population(tab_name)(parameters)
+        #
 
-            for bp in bp_list:
-                if bp.text() != "":
-                    self.designPrefDialog.fu_fy_validation_connect(bp_list, bp)
+        # if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,
+        #                  KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
+        #
+        #     conn = key_1.currentText()
+        #
+        #     if conn in VALUES_CONN_1:
+        #         self.designPrefDialog.column_preferences(key_2.currentText(), table_1, material_grade)
+        #         self.designPrefDialog.beam_preferences(key_3.currentText(), material_grade)
+        #         column_material = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL)
+        #         column_material.currentIndexChanged.connect(lambda: self.designPrefDialog.column_preferences(
+        #             key_2.currentText(), table_1, column_material.currentText()))
+        #         beam_material = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_MATERIAL)
+        #         beam_material.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
+        #             key_3.currentText(), beam_material.currentText()))
+        #
+        #     elif conn in VALUES_CONN_2:
+        #         self.designPrefDialog.ui.tabWidget.setTabText(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Column), KEY_DISP_PRIBM)
+        #         self.designPrefDialog.ui.tabWidget.setTabText(
+        #             self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam), KEY_DISP_SECBM)
+        #         self.designPrefDialog.column_preferences(key_2.currentText(), table_2, material_grade)
+        #         self.designPrefDialog.beam_preferences(key_3.currentText(), material_grade)
+        #         column_material = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL)
+        #         column_material.currentIndexChanged.connect(lambda: self.designPrefDialog.column_preferences(
+        #             key_2.currentText(), table_2, column_material.currentText()))
+        #         beam_material = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_MATERIAL)
+        #         beam_material.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
+        #             key_3.currentText(), beam_material.currentText()))
 
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BEAMCOVERPLATE,
-                          KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
+    def connect_textbox_for_tab(self, key, tab, new):
+        key.textChanged.connect(lambda: self.tab_change(key, tab, new))
 
-            conn = key_1.currentText()
+    def connect_combobox_for_tab(self, key, tab, new):
+        key.currentIndexChanged.connect(lambda: self.tab_change(key, tab, new))
 
-            if conn in VALUES_CONN_1:
-                self.designPrefDialog.column_preferences(key_2.currentText(), table_1, material_grade)
-                self.designPrefDialog.beam_preferences(key_3.currentText(), material_grade)
-                column_material = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL)
-                column_material.currentIndexChanged.connect(lambda: self.designPrefDialog.column_preferences(
-                    key_2.currentText(), table_1, column_material.currentText()))
-                beam_material = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_MATERIAL)
-                beam_material.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
-                    key_3.currentText(), beam_material.currentText()))
+    def tab_change(self, key, tab, new):
 
-            elif conn in VALUES_CONN_2:
-                self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Column), KEY_DISP_PRIBM)
-                self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab_Beam), KEY_DISP_SECBM)
-                self.designPrefDialog.column_preferences(key_2.currentText(), table_2, material_grade)
-                self.designPrefDialog.beam_preferences(key_3.currentText(), material_grade)
-                column_material = tab_Column.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC_MATERIAL)
-                column_material.currentIndexChanged.connect(lambda: self.designPrefDialog.column_preferences(
-                    key_2.currentText(), table_2, column_material.currentText()))
-                beam_material = tab_Beam.findChild(QtWidgets.QWidget, KEY_SUPTDSEC_MATERIAL)
-                beam_material.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
-                    key_3.currentText(), beam_material.currentText()))
+        for tup in new:
+            (tab_name, key_list, k2_key_list, typ, f) = tup
+            if tab_name != tab.objectName() or key.objectName() not in key_list:
+                continue
+            arg_list = []
+            for key_name in key_list:
+                # if object_name != key.objectName():
+                #     continue
+                key = tab.findChild(QtWidgets.QWidget, key_name)
+                if isinstance(key, QtWidgets.QComboBox):
+                    arg_list.append(key.currentText())
+                elif isinstance(key, QtWidgets.QLineEdit):
+                    arg_list.append(key.text())
+
+            arg_list.append(self.input_dock_inputs)
+
+            val = f(arg_list)
+
+            for k2_key_name in k2_key_list:
+                k2 = tab.findChild(QtWidgets.QWidget, k2_key_name)
+                if typ == TYPE_COMBOBOX:
+                    k2.clear()
+                    for values in val[k2_key_name]:
+                        k2.addItem(str(values))
+                elif typ == TYPE_TEXTBOX:
+                    k2.setText(str(val[k2_key_name]))
+
+    def refresh_section_connect(self, add_button, prev, key, key_type, tab_key, arg):
+        add_button.clicked.connect(lambda: self.refresh_section(prev, key, key_type, tab_key, arg))
+
+    def refresh_section(self, prev, key, key_type, tab_key, arg):
+
+        current_list = connectdb(arg)
+        text = self.designPrefDialog.findChild(QtWidgets.QWidget, tab_key).text()
+        if text == "":
+            return
+        if key_type == TYPE_COMBOBOX:
+            key.clear()
+            for item in current_list:
+                key.addItem(item)
+            current_list_set = set(current_list)
+            red_list_set = set(red_list_function())
+            current_red_list = list(current_list_set.intersection(red_list_set))
+            for value in current_red_list:
+                indx = current_list.index(str(value))
+                key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            text_index = key.findText(text, QtCore.Qt.MatchFixedString)
+            if text_index >= 0:
+                key.setCurrentIndex(text_index)
+            else:
+                key.setCurrentIndex(current_list.index(prev))
+
+    #
+    # def function_for_tab_population(self, tab_name):
+    #     if tab_name == KEY_DISP_COLSEC:
+    #         return self.designPrefDialog.column_preferences
+    #     elif tab_name == KEY_DISP_BEAMSEC:
+    #         return self.designPrefDialog.beam_preferences
 
 
     def create_design_report(self):

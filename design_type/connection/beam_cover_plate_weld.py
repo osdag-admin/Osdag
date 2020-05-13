@@ -1803,11 +1803,11 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                              2),1), '')
             self.report_check.append(t1)
             gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+
             t1 = (KEY_DISP_TENSIONRUPTURECAP_FLANGE, '', tension_rupture_welded_prov(w_p=self.section.flange_width,
                                                                                  t_p=self.section.flange_thickness,
                                                                                  fu=self.section.fu, gamma_m1=gamma_m1,
-                                                                                 T_dn=round(self.section.tension_rupture_capacity / 1000,
-                                                                                     2),multiple =1), '')
+                                                    T_dn=round((self.section.tension_rupture_capacity / 1000),2),multiple =1), '')
 
             self.report_check.append(t1)
             t1 = (KEY_DISP_FLANGE_TEN_CAPACITY, display_prov(round(self.flange_force / 1000, 2), "f_f") ,

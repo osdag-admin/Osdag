@@ -14,6 +14,7 @@ from cad.items.filletweld import FilletWeld
 from cad.items.angle import Angle
 from cad.items.anchor_bolt import AnchorBolt_A, AnchorBolt_B, AnchorBolt_Endplate
 from cad.items.stiffener_plate import StiffenerPlate
+from cad.items.grout import Grout
 
 from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -80,6 +81,7 @@ from Common import *
 import OCC.Core.V3d
 from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
 from OCC.Core.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
+from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
 
 # from Connections.Shear.Finplate.drawing_2D import FinCommonData
 # from Connections.Shear.Endplate.drawing_2D import EndCommonData
@@ -130,6 +132,7 @@ class CommonDesignLogic(object):
 
         self.connectivityObj = None
         self.folder = folder
+        print(self.folder,'fhbdfbffhdbshhhhhhhhhhh')
 
     # ============================= FinCalculation ===========================================
     # def call_calculation(self):  # Done
@@ -700,28 +703,42 @@ class CommonDesignLogic(object):
         weldSideWeb = FilletWeld(b=float(BP.weld_size_web), h=float(BP.weld_size_web),
                                  L=column.D - 2 * (column.t + column.R1))
 
-        concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=baseplate.T * 10)
-
         gusset = StiffenerPlate(L=BP.gusset_plate_length, W=BP.gusset_plate_height, T=BP.gusset_plate_thick,
                                 L11=(BP.gusset_plate_length - (column.B + 100)) / 2, L12=BP.gusset_plate_height - 100,
                                 R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
         stiffener = StiffenerPlate(L=BP.stiffener_plate_length, W=BP.stiffener_plate_height, T=BP.stiffener_plate_thick,
                                    L11=BP.stiffener_plate_length - 50, L12=BP.stiffener_plate_height - 100)
 
-        ex_length = (50 + 24 + baseplate.T)  # nut.T = 24
-        bolt = AnchorBolt_A(l=float(BP.anchor_length_provided), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
-                            ex=ex_length)
-        # bolt = AnchorBolt_B(l= float(BP.anchor_length_provided),  r= float(BP.anchor_dia_provided) / 2, ex=ex_length)
-        # bolt = AnchorBolt_Endplate(l= float(BP.anchor_length_provided), r= float(BP.anchor_dia_provided) / 2, ex=ex_length)
-        nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
+        concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=BP.anchor_length_provided * 1.3)
+        grout = Grout(L=concrete.L, W=concrete.W, T=50)
+
+        bolt_d = float(BP.anchor_dia_provided)
+        bolt_r = bolt_d / 2  # Bolt radius (Shank part)
+        bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
+        # bolt_T = self.boltHeadThick_Calculation(bolt_d)      # Bolt head thickness
+        nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
+        nut_HT = nut_T
+
+        ex_length = (50 + 24 + baseplate.T + grout.T)  # nut.T = 24
+        if BP.dp_anchor_type == 'IS 5624-Type A':
+            bolt = AnchorBolt_A(l=float(BP.anchor_length_provided), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
+                                ex=ex_length)
+        elif BP.dp_anchor_type == 'IS 5624-Type B':
+            bolt = AnchorBolt_B(l=float(BP.anchor_length_provided), r=float(BP.anchor_dia_provided) / 2, ex=ex_length)
+        elif BP.dp_anchor_type == 'End Plate Type':
+            bolt = AnchorBolt_Endplate(l=float(BP.anchor_length_provided), r=float(BP.anchor_dia_provided) / 2,
+                                       ex=ex_length)
+
+        nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)
         numberOfBolts = 4
         nutSpace = bolt.c + baseplate.T
         bolthight = nut.T + 50
 
+
         nut_bolt_array = bpNutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
 
         basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang,
-                                 weldSideWeb, concrete, gusset, stiffener)
+                                 weldSideWeb, concrete, gusset, stiffener, grout)
         basePlate.create_3DModel()
 
         return basePlate
@@ -868,13 +885,15 @@ class CommonDesignLogic(object):
                 weld = self.BPObj.get_welded_models()
                 nut_bolt = self.BPObj.get_nut_bolt_array_models()
                 conc = self.BPObj.get_concrete_models()
+                grout = self.BPObj.get_grout_models()
 
                 if self.component == "Model":  # Todo: change this into key
                     osdag_display_shape(self.display, column, update=True)
                     osdag_display_shape(self.display, plate, color='Blue', update=True)
                     osdag_display_shape(self.display, weld, color='RED', update=True)
                     osdag_display_shape(self.display, nut_bolt, color='YELLOW', update=True)
-                    osdag_display_shape(self.display, conc, color='CYAN', transparency=0.5, update=True)
+                    osdag_display_shape(self.display, conc, color=GRAY, transparency=0.5, update=True)
+                    osdag_display_shape(self.display, grout, color=GRAY, transparency=0.5, update=True)
 
                 elif self.connection == "Column":
                     osdag_display_shape(self.display, column, update=True)

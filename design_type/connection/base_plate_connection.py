@@ -129,7 +129,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.footing_grade = 0.0
 
-        self.weld_type = 'Butt Weld'
+        if self.connectivity == 'Welded-Slab Base':
+            self.weld_type = self.weld_type
+        else:
+            self.weld_type = 'Butt Weld'
 
         # attributes for design preferences
         self.dp_column_designation = ""  # dp for column
@@ -207,12 +210,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.length_available_total = 0.0
         self.effective_length_flange = 0.0
-        self.total_eff_len_gusset_available = 0.0
+        self.total_eff_len_available = 0.0
         self.effective_length_web = 0.0
         self.load_axial_flange = 0.0
         self.load_axial_web = 0.0
-        self.strength_unit_len_flange = 0.0
-        self.strength_unit_len_web = 0.0
+        self.strength_unit_len = 0.0
         self.weld_size = 0.0
         self.weld_size_flange = 0.0
         self.weld_size_web = 0.0
@@ -220,6 +222,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gusset_along_web = 'No'
         self.gusset_plate_length = 0.0
         self.stiffener_plate_length = 0.0
+        self.total_eff_len_gusset_available = 0.0
         self.gusset_outstand_length = 0.0
         self.stiffener_outstand_length = 0.0
         self.gusset_fy = self.dp_column_fy
@@ -1087,7 +1090,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchor_grade = i
             break
 
-        # TODO: self.anchor_fu should be passed to - DP anchor fu from here
         self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade)  # returns a list with strength values - [bolt_fu, bolt_fy]
 
         # TODO add condition for number of anchor bolts depending on col depth and force
@@ -1117,6 +1119,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
         # minimum required dimensions of the base plate [as per the detailing criteria]
+        # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
         if self.connectivity == 'Welded-Slab Base' or 'Gusseted Base Plate':
             self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
             self.bp_width_min = round_up(self.column_bf + 1.5 * self.edge_distance + 1.5 * self.edge_distance, 5)  # mm
@@ -1145,6 +1148,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.min_area_req = self.load_axial / self.bearing_strength_concrete  # mm^2
 
             # calculate projection by the 'Effective Area Method' [Reference: Clause 7.4.1.1, IS 800:2007]
+            # the calculated projection is added by half times the hole dia on each side to avoid stress concentration near holes
             if self.dp_column_type == 'Rolled' or 'Welded':
                 print('proioooooooooooo')
 
@@ -1450,131 +1454,142 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             logger.info(": [Anchor Bolt] Reference: IS 5624:1993, Table 1.")
 
     def design_weld(self):
-        """ design weld for the base plate
+        """ design weld for the base plate and stiffeners
 
         Args:
 
         Returns:
         """
-        # design the weld connecting the column to the base plate
+        # design the weld connecting the column and the stiffeners to the base plate
+
+        self.weld_fu = min(self.dp_weld_fu_overwrite, self.dp_column_fu)
 
         # design of fillet weld
         if self.weld_type == 'Fillet Weld':
 
-            weld_fu = min(self.dp_weld_fu_overwrite, self.dp_column_fu)
+            if self.connectivity == 'Welded-Slab Base':
 
-            if self.dp_column_type == 'Rolled' or 'Welded':
+                if self.dp_column_type == 'Rolled' or 'Welded':
 
-                # defining the maximum limit of weld size that can be provided, which is equal to/less than the flange/web thickness
-                weld_size_flange_max = round_down(self.column_tf, 2)  # mm
-                weld_size_web_max = round_down(self.column_tw, 2)  # mm
+                    # defining the maximum limit of weld size that can be provided, which is equal to/less than the flange/web thickness
+                    self.weld_size_flange_max = round_down(self.column_tf, 2)  # mm
+                    self.weld_size_web_max = round_down(self.column_tw, 2)  # mm
 
-                # available length for welding along the flange and web of the column, without the stiffeners
-                length_available_flange = 2 * (
-                            self.column_bf + (self.column_bf - self.column_tw - (2 * self.column_r1)))  # mm
-                length_available_web = 2 * (self.column_D - (2 * self.column_tf) - (2 * self.column_r1))  # mm
+                    # available length for welding along the flange and web of the column, without the stiffeners
+                    length_available_flange = 2 * (self.column_bf + (self.column_bf - self.column_tw - (2 * self.column_r1)))  # mm
+                    length_available_web = 2 * (self.column_D - (2 * self.column_tf) - (2 * self.column_r1))  # mm
 
-                # total available length for welding along the perimeter of the column (flange + web)
-                # self.length_available_total = length_available_flange + length_available_web
+                    # TODO: check end returns reduction
+                    # Note: The effective length of weld is calculated by assuming 1% reduction in length at each end return. Since, the
+                    # total number of end returns are 12, a total of 12% reduction (8% at flange and 4% at web) is incorporated into the
+                    # respective 'effective' lengths.
+                    self.effective_length_flange = length_available_flange - (0.08 * length_available_flange)  # mm
+                    self.effective_length_web = length_available_web - (0.04 * length_available_web)  # mm
 
-                # Note: The effective length of weld is calculated by assuming 1% reduction in length at each end return. Since, the
-                # total number of end returns are 12, a total of 12% reduction (8% at flange and 4% at web) is incorporated into the
-                # respective 'effective' lengths.
-                self.effective_length_flange = length_available_flange - (0.08 * length_available_flange)  # mm
-                self.effective_length_web = length_available_web - (0.04 * length_available_web)  # mm
+                    self.strength_unit_len = self.load_axial / (self.effective_length_flange + self.effective_length_web)  # N/mm
+                    self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
+                                                                                    [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                    [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
 
-                if self.connectivity == 'Welded-Slab Base' or 'Gusseted Base Plate':
-
-                    if self.connectivity == 'Welded-Slab Base':
-                        self.load_axial_flange = self.dp_column_fy * (
-                                    self.column_bf * self.column_tf)  # N, load carried by each flange
-                        self.load_axial_web = self.load_axial - (
-                                    2 * self.load_axial_flange)  # N, load carried by the web
-
-                        # strength of weld per unit length
-                        self.strength_unit_len_flange = self.load_axial_flange / (
-                                    self.effective_length_flange / 2)  # N/mm, at each flange
-                        self.strength_unit_len_web = self.load_axial_web / self.effective_length_web  # N/mm, at web
-
-                    else:
-                        self.load_axial_flange = self.load_moment_major / (
-                                    self.column_D - self.column_tf)  # N, tension in each flange due to moment
-                        self.load_axial_web = 0  # N, load carried is assumed to be zero due to perfect bearing between the column and the base plate
-
-                        # strength of weld per unit length
-                        self.strength_unit_len_flange = self.load_axial_flange / (
-                                    self.effective_length_flange / 2)  # N/mm
-
-                    # calculate weld size required at the flange and the web
-                    self.weld_size_flange = self.calc_weld_size_from_strength_per_unit_len(
-                        self.strength_unit_len_flange,
-                        [self.dp_weld_fu_overwrite, self.dp_column_fu],
-                        [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
-
-                    if self.connectivity == 'Welded-Slab Base':
-                        self.weld_size_web = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len_web,
-                                                                                            [self.dp_weld_fu_overwrite,
-                                                                                             self.dp_column_fu],
-                                                                                            [self.plate_thk,
-                                                                                             self.column_tw],
-                                                                                            self.dp_weld_fab)  # mm
-                    else:
-                        self.weld_size_web = self.weld_size_flange
-
-                    # providing the size of the weld at the flange at-least equal to that at the web
-                    # self.weld_size_flange = max(self.weld_size_flange, self.weld_size_web)
+                    self.weld_size_flange = self.weld_size  # mm
+                    self.weld_size_web = self.weld_size  # mm
 
                     # check against maximum allowed size
-                    # checking if gusset plates are required for providing extra length of weld
-                    if self.weld_size_flange > weld_size_flange_max:
-                        self.gusset_along_flange = 'Yes'
+                    # checking if stiffener plates are required for providing extra length of weld
 
-                        # length available on the gusset plate for welding, assuming 6 mm weld connecting the gusset to the column flange
-                        len_gusset_available = self.bp_width_provided + (
-                                    self.bp_width_provided - self.column_bf - 2 * 6)  # mm
-                        eff_len_gusset_available = len_gusset_available - (
-                                    0.04 * len_gusset_available)  # mm, effective length assuming 4% reduction
+                    if self.weld_size_web > self.weld_size_web_max:
+                        # Case 1: Adding stiffeners along the flanges of the column on either sides (total four in number)
+                        self.stiffener_along_flange = 'Yes'
 
-                        # for each column connected to the gusset plate
-                        self.total_eff_len_gusset_available = (
-                                                                          self.effective_length_flange / 2) + eff_len_gusset_available  # mm
+                        # length available on each stiffener plate for (fillet) welding on either sides
+                        len_stiffener_available_flange = ((self.bp_width_provided - self.column_bf) / 2) * 2  # mm
+                        # effective length assuming 2% reduction to incorporate end returns
+                        eff_len_stiffener_available_flange = len_stiffener_available_flange - (0.02 * len_stiffener_available_flange)  # mm
 
-                        # improvised weld size at flange after adding the gusset plate
-                        self.strength_unit_len_flange = self.load_axial_flange / self.total_eff_len_gusset_available  # N/mm
+                        # total effective len available including four stiffeners
+                        self.total_eff_len_available = self.effective_length_flange + self.effective_length_web + \
+                                                       (4 * eff_len_stiffener_available_flange)  # mm
 
-                        self.weld_size_flange = self.calc_weld_size_from_strength_per_unit_len(
-                            self.strength_unit_len_flange,
-                            [self.dp_weld_fu_overwrite, self.dp_column_fu],
-                            [self.plate_thk, self.column_tf], self.dp_weld_fab)
+                        # relative strength of weld per unit weld length and weld size including stiffeners along the flange
+                        self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
+                        self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
+                                                                                               [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                               [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
 
-                    if self.weld_size_web > weld_size_web_max:
-                        self.gusset_along_web = 'Yes'
+                        self.weld_size_web = self.weld_size  # mm
 
-                        self.weld_size_web = self.weld_size_flange
+                    # Second itreation: checking the maximum weld size limit (at web)
+                    if self.weld_size_web > self.weld_size_web_max:
+                        # Case 2: Adding stiffeners along web of the column (total two in number)
+                        self.stiffener_along_web = 'Yes'
 
-                    # defining conditions for providing gusset/stiffener plates for each connectivity
-                    if self.connectivity == 'Welded-Slab Base':
-                        if self.gusset_along_flange or self.gusset_along_web == 'Yes':
-                            self.gusset_along_flange = 'Yes'
-                            self.gusset_along_web = 'Yes'
+                        len_stiffener_available_web = ((self.bp_length_provided - self.column_D) / 2) * 2  # mm  (each)
+                        # effective length assuming 2% reduction to incorporate end returns
+                        eff_len_stiffener_available_web = len_stiffener_available_web - (0.02 * len_stiffener_available_web)  # mm
+
+                        # TODO: deduce notch size
+                        # total effective len available including four stiffeners along flange and two along the web
+                        self.total_eff_len_available = self.total_eff_len_available + (2 * eff_len_stiffener_available_web)  # mm
+
+                        # relative strength of weld per unit weld length and weld size, including stiffeners along the flange and the web
+                        self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
+                        self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
+                                                                                               [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                               [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
+
+                        self.weld_size_web = self.weld_size  # mm
+
+                        # Third iteration: checking the maximum weld size limit (at web)
+                        if self.weld_size_web > self.weld_size_web_max:
+                            # Case 3: Adding stiffeners across the web of the column, between the depth (total two in number)
+                            self.stiffener_across_web = 'Yes'
+
+                            len_required = (self.load_axial * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_size_web_max * self.weld_fu)  # mm
+                            # Adding 16% of the total length to incorporate end returs (16 ends in this case)
+                            len_required = len_required + (0.16 * len_required)  # mm
+
+                            len_stiffener_req_across_web = len_required - self.total_eff_len_available
+
+                            if len_stiffener_req_across_web < ((self.bp_width_provided / 2) - (self.column_tw / 2) - self.edge_distance):
+                                len_stiffener_req_across_web = max(len_stiffener_req_across_web, eff_len_stiffener_available_flange,
+                                                                   eff_len_stiffener_available_web)  # mm
+                                self.total_eff_len_available = self.total_eff_len_available + (2 * len_stiffener_req_across_web)  # mm
+
+                                # relative strength of weld per unit weld length and weld size, including stiffeners along the flange, web and across web
+                                self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
+                                self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
+                                                                                                [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                                [self.plate_thk, self.column_tf],
+                                                                                                self.dp_weld_fab)  # mm
+
+                                self.weld_size_web = self.weld_size  # mm
+
+                                if self.weld_size_web > self.weld_size_web_max:
+                                    self.weld_size_web = self.weld_size_web_max
+                            else:
+                                self.design_status = False
+                                # TODO: add log messages
+
+                            # TODO: add log messages
                         else:
                             pass
-                    else:
-                        self.gusset_along_flange = 'Yes'
-                        self.gusset_along_web = 'Yes'
 
-                elif self.connectivity == "Hollow Section":
-                    # TODO: add calculations for hollow sections
-                    self.weld_size = 0
+                    self.weld_size_flange = self.weld_size  # mm
+                    self.weld_size_stiffener = self.weld_size  # mm
 
-                else:
+                else:  # TODO: add checks for other type(s) of column section here (Example: built-up, star shaped etc.)
                     pass
 
-            else:  # TODO: add checks for other type(s) of column section here (Example: built-up, star shaped etc.)
+            elif self.connectivity == 'Hollow Section':  # TODO: add calculations for hollow sections
                 pass
 
         # design of butt/groove weld
         else:
+
+            if self.connectivity == 'Gusseted Base Plate':
+                self.stiffener_along_flange = 'Yes'
+                self.stiffener_along_web = 'Yes'
+
             self.weld_size_flange = self.column_tf  # mm
             self.weld_size_web = self.column_tw  # mm
 
@@ -1777,3 +1792,5 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # col properties
         print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)
         # print(self.w)
+
+        print("Here {}".format(self.dp_anchor_fu_overwrite))

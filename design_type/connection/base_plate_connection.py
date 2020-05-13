@@ -1464,6 +1464,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.weld_fu = min(self.dp_weld_fu_overwrite, self.dp_column_fu)
 
+        # length of the stiffener plate available in case of stiffener requirement
+        self.stiffener_plt_len_along_flange = (self.bp_width_provided - self.column_bf) / 2  # mm (each, along the flange)
+        self.stiffener_plt_len_along_web = (self.bp_length_provided - self.column_D) / 2  # mm (each, along the web)
+        self.stiffener_plt_len_across_web = max(self.stiffener_plt_len_along_flange, self.stiffener_plt_len_along_web)  # mm (each, across the web)
+
         # design of fillet weld
         if self.weld_type == 'Fillet Weld':
 
@@ -1494,21 +1499,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.weld_size_flange = self.weld_size  # mm
                     self.weld_size_web = self.weld_size  # mm
 
-                    # check against maximum allowed size
+                    # check against maximum allowed weld size at web
                     # checking if stiffener plates are required for providing extra length of weld
-
                     if self.weld_size_web > self.weld_size_web_max:
                         # Case 1: Adding stiffeners along the flanges of the column on either sides (total four in number)
                         self.stiffener_along_flange = 'Yes'
 
                         # length available on each stiffener plate for (fillet) welding on either sides
-                        len_stiffener_available_flange = ((self.bp_width_provided - self.column_bf) / 2) * 2  # mm
                         # effective length assuming 2% reduction to incorporate end returns
-                        eff_len_stiffener_available_flange = len_stiffener_available_flange - (0.02 * len_stiffener_available_flange)  # mm
-
+                        self.eff_stiffener_plt_len_along_flange = (self.stiffener_plt_len_along_flange * 2) - \
+                                                                  (0.02 * self.stiffener_plt_len_along_flange)  # mm
                         # total effective len available including four stiffeners
                         self.total_eff_len_available = self.effective_length_flange + self.effective_length_web + \
-                                                       (4 * eff_len_stiffener_available_flange)  # mm
+                                                       (4 * self.eff_stiffener_plt_len_along_flange)  # mm
 
                         # relative strength of weld per unit weld length and weld size including stiffeners along the flange
                         self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
@@ -1518,18 +1521,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                         self.weld_size_web = self.weld_size  # mm
 
-                    # Second itreation: checking the maximum weld size limit (at web)
+                    # Second iteration: checking the maximum weld size limit (at web)
                     if self.weld_size_web > self.weld_size_web_max:
                         # Case 2: Adding stiffeners along web of the column (total two in number)
                         self.stiffener_along_web = 'Yes'
 
-                        len_stiffener_available_web = ((self.bp_length_provided - self.column_D) / 2) * 2  # mm  (each)
-                        # effective length assuming 2% reduction to incorporate end returns
-                        eff_len_stiffener_available_web = len_stiffener_available_web - (0.02 * len_stiffener_available_web)  # mm
+                        self.eff_stiffener_plt_len_along_web = (self.stiffener_plt_len_along_web * 2) - (0.02 * self.stiffener_plt_len_along_web)  # mm
 
                         # TODO: deduce notch size
                         # total effective len available including four stiffeners along flange and two along the web
-                        self.total_eff_len_available = self.total_eff_len_available + (2 * eff_len_stiffener_available_web)  # mm
+                        self.total_eff_len_available = self.total_eff_len_available + (2 * self.eff_stiffener_plt_len_along_web)  # mm
 
                         # relative strength of weld per unit weld length and weld size, including stiffeners along the flange and the web
                         self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
@@ -1545,17 +1546,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             self.stiffener_across_web = 'Yes'
 
                             len_required = (self.load_axial * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_size_web_max * self.weld_fu)  # mm
-                            # Adding 16% of the total length to incorporate end returs (16 ends in this case)
+                            # Adding 16% of the total length to incorporate end returns (total 16 end returns in this case)
                             len_required = len_required + (0.16 * len_required)  # mm
 
-                            len_stiffener_req_across_web = len_required - self.total_eff_len_available
+                            len_stiffener_req_across_web = len_required - self.total_eff_len_available  # mm
+                            len_stiffener_available_across_web = 4 * (((self.bp_width_provided / 2) - (self.column_tw / 2) - self.edge_distance))  # mm
 
-                            if len_stiffener_req_across_web < ((self.bp_width_provided / 2) - (self.column_tw / 2) - self.edge_distance):
-                                len_stiffener_req_across_web = max(len_stiffener_req_across_web, eff_len_stiffener_available_flange,
-                                                                   eff_len_stiffener_available_web)  # mm
-                                self.total_eff_len_available = self.total_eff_len_available + (2 * len_stiffener_req_across_web)  # mm
+                            if len_stiffener_req_across_web < len_stiffener_available_across_web:
 
-                                # relative strength of weld per unit weld length and weld size, including stiffeners along the flange, web and across web
+                                self.stiffener_plt_len_across_web = max(self.stiffener_plt_len_across_web, len_stiffener_req_across_web)  # mm
+                                self.total_eff_len_available = self.total_eff_len_available + (4 * self.stiffener_plt_len_across_web)  # mm
+
+                                # relative strength of weld per unit weld length,
+                                # and, weld size, including stiffeners along the flange, web and across the web
                                 self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
                                 self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
                                                                                                 [self.dp_weld_fu_overwrite, self.dp_column_fu],
@@ -1594,7 +1597,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.weld_size_web = self.column_tw  # mm
 
     def design_stiffeners(self):
-        """ design the gusset and the stiffener plate
+        """ design and detail the stiffener plates
 
         Args:
 
@@ -1602,35 +1605,29 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         """
         if self.connectivity == 'Welded-Slab Base' or 'Gusseted Base Plate':
 
-            if self.gusset_along_flange == 'Yes':
+            # define material parameters
+            self.stiffener_fy = self.dp_column_fy  # MPa
+            self.epsilon = math.sqrt(250 / self.stiffener_fy)
 
-                # layout of the gusset and the stiffener plate
-                self.gusset_plate_length = self.bp_width_provided  # mm (each), gusset plate is along the flange of the column
-                self.stiffener_plate_length = (self.bp_length_provided - self.column_D) / 2  # mm (each), stiffener plate is across the flange of the column
+            if self.stiffener_along_flange == 'Yes':
 
-                self.gusset_outstand_length = (self.gusset_plate_length - self.column_bf) / 2  # mm
-                self.stiffener_outstand_length = self.stiffener_plate_length  # mm
+                # self.gusset_outstand_length = (self.gusset_plate_length - self.column_bf) / 2  # mm
+                # self.stiffener_outstand_length = self.stiffener_plate_length  # mm
 
-                self.gusset_fy = self.dp_column_fy  # MPa
-                self.stiffener_fy = self.dp_column_fy  # MPa
-                self.epsilon = math.sqrt(250 / self.gusset_fy)
+                # thickness of the stiffener plate as per Table 2 of IS 800:2007 [b/t_f <= 13.6 * epsilon]
+                thk_req_stiffener_along_flange = (self.stiffener_plt_len_along_flange) / (13.6 * self.epsilon)  # mm
+                thk_req_stiffener_along_web = (self.stiffener_plt_len_along_web) / (13.6 * self.epsilon)  # mm
 
-                # thickness of the gusset/stiffener plate as per Table 2 of IS 800:2007 [b/t_f <= 13.6 * epsilon]
-                # considering the maximum outstanding length to calculate the thickness of the gusset/stiffener
-                thk_req = (max(self.gusset_outstand_length, self.stiffener_outstand_length)) / (13.6 * self.epsilon)  # mm
+                # stiffener plate should be at-least equal to the flange thickness along the flange and web thickness along the web
+                self.stiffener_plt_thick_along_flange = round_up(thk_req_stiffener_along_flange, 2, self.column_tf)  # mm
+                self.stiffener_plt_thick_along_web = round_up(thk_req_stiffener_along_web, 2, self.column_tw)  # mm
 
-                # gusset/stiffener plate should be at-least equal to the flange thickness
-                self.gusset_plate_thick = round_up(thk_req, 2, self.column_tf)  # mm
-                self.stiffener_plate_thick = self.gusset_plate_thick  # mm
+                # height of the stiffener plate
+                # the size of the landing is 100 mm along its vertical side and 50 mm along its horizontal side
+                # the assumed inclination of the stiffener plate is 45 degrees
+                self.stiffener_plt_height_along_flange = self.stiffener_plt_len_along_flange + 50  # mm
+                self.stiffener_plt_height_along_web = self.stiffener_plt_len_along_web + 50  # mm
 
-                # update the length pf the stiffener plate
-                self.stiffener_plate_length = self.stiffener_plate_length - self.gusset_plate_thick  # mm
-
-                # height of the gusset/stiffener plate
-                # the size of the landing is 100 mm along vertical dimension and 50 mm along horizontal dimension
-                # the assumed inclination of the gusset/stiffener plate is 45 degrees
-                self.stiffener_plate_height = self.stiffener_plate_length + 50  # mm
-                self.gusset_plate_height = max((self.gusset_outstand_length + 50), self.stiffener_plate_height)  # mm
 
                 # defining stresses for the connectivity types
                 if self.connectivity == 'Welded-Slab Base':

@@ -3,7 +3,7 @@ Created on 07-Jun-2015
 
 @author: deepa
 '''
-import numpy
+import numpy as np
 from cad.items.bolt import Bolt
 from cad.items.nut import Nut
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
@@ -40,12 +40,12 @@ class NutBoltArray():
     def initialise_nut_bolts(self):
         b = self.bolt
         n = self.nut
-        for i in range(self.row * self.col):
+        for i in np.arange(self.row * self.col):
             bolt_len_required = float(b.T + self.gap)
             b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
-        for i in range(self.row * self.col):
+        for i in np.arange(self.row * self.col):
             bolt_len_required = float(b.T + self.gap)
             b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.bolts1.append(Bolt(b.R, b.T, b.H, b.r))
@@ -65,8 +65,8 @@ class NutBoltArray():
 
     def calculate_positions(self):
         self.positions = []
-        for rw in range(self.row):
-            for col in range(self.col):
+        for rw in np.arange(self.row):
+            for col in np.arange(self.col):
                 pos = self.origin 
                 pos = pos + (self.edge) * self.gauge_dir
                 pos = pos + col * self.gauge * self.gauge_dir
@@ -75,8 +75,8 @@ class NutBoltArray():
                 
                 self.positions.append(pos)
         self.positions1 = []        
-        for rw in range(self.row):
-            for col in range(self.col):
+        for rw in np.arange(self.row):
+            for col in np.arange(self.col):
                 pos = self.origin1 
                 pos = pos - (self.edge) * self.gauge_dir
                 pos = pos - col * self.gauge * self.gauge_dir

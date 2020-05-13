@@ -9,6 +9,7 @@
 **/.idea/
 *~
 .vscode
+*.sqlite
 *.html
 *.log
 *.bak

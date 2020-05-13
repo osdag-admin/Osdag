@@ -1780,10 +1780,10 @@ class Ui_ModuleWindow(QMainWindow):
             module = uiObj[KEY_MODULE]
 
             # module_class = self.return_class(module)
-            print('loading inputs',uiObj, op_list, data, new)
+            # print('loading inputs',uiObj, op_list, data, new)
             selected_module = main.module_name(main)
             if selected_module == module:
-                print(uiObj, op_list, data, new)
+                # print(uiObj, op_list, data, new)
                 self.setDictToUserInputs(uiObj, op_list, data, new)
             else:
                 QMessageBox.information(self, "Information",
@@ -1903,7 +1903,7 @@ class Ui_ModuleWindow(QMainWindow):
             # DESIGN_FLAG = 'True'
 
             out_list = main.output_values(main, status)
-            print('outlist', out_list)
+            # print('outlist', out_list)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])

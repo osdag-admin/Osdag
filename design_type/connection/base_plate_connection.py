@@ -1054,7 +1054,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print('mera 0')
         self.design_weld(self)
         print('mera 1')
-        self.design_gusset_plate(self)
+        self.design_stiffeners(self)
         print('mera 2')
 
     def bp_analyses_parameters(self):
@@ -1593,7 +1593,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.weld_size_flange = self.column_tf  # mm
             self.weld_size_web = self.column_tw  # mm
 
-    def design_gusset_plate(self):
+    def design_stiffeners(self):
         """ design the gusset and the stiffener plate
 
         Args:

@@ -718,7 +718,7 @@ class EndPlateConnection(ShearConnection):
             l_j = pitch * (bolts_one_line - 1)
             beta_lj = IS800_2007.cl_10_3_3_1_bolt_long_joint(self.bolt.bolt_diameter_provided, l_j)
             print("beta_lj", beta_lj)
-            [bolt_shear, bolt_tension, bolt_tension_prying, bolts_n]=\
+            [self.bolt.bolt_shear, self.bolt.bolt_tension, self.bolt.bolt_tension_prying, bolts_n]=\
                 self.get_bolt_IR(self, self.bolt.bolt_capacity, self.bolt.bolt_tension_capacity,
                              bolts_one_line * 2, beta_lj)
 
@@ -738,23 +738,23 @@ class EndPlateConnection(ShearConnection):
 
     def get_bolt_IR(self,bolt_shear_capacity,bolt_tension_capacity,no_bolt, beta_lj = 1.0):
         while True:
-            self.bolt_shear = self.load.shear_force * 1000 / no_bolt  # N
-            print("bolt_shear", self.bolt_shear)
-            self.bolt_tension = self.load.axial_force * 1000 / no_bolt  # N
-            print("bolt_tension", self.bolt_tension)
+            self.bolt.bolt_shear = self.load.shear_force * 1000 / no_bolt  # N
+            print("bolt_shear", self.bolt.bolt_shear)
+            self.bolt.bolt_tension = self.load.axial_force * 1000 / no_bolt  # N
+            print("bolt_tension", self.bolt.bolt_tension)
             # TODO: check available effective width per pair of bolts (b_e)
-            self.bolt_tension_prying = IS800_2007.cl_10_4_7_bolt_prying_force( self.bolt_tension, self.bolt.min_end_dist_round,
+            self.bolt.bolt_tension_prying = IS800_2007.cl_10_4_7_bolt_prying_force(self.bolt.bolt_tension, self.bolt.min_end_dist_round,
                                         0.7*self.bolt.fu, self.bolt.min_pitch_round, self.plate.thickness_provided,
                                         self.plate.fy, self.bolt.min_end_dist_round, self.bolt.bolt_tensioning)
-            print("bolt_tension_prying", self.bolt_tension_prying)
-            comb_bolt_ir = ( self.bolt_shear / (bolt_shear_capacity*beta_lj)) ** 2 + \
-                           (( self.bolt_tension + self.bolt_tension_prying)/bolt_tension_capacity) ** 2
+            print("bolt_tension_prying", self.bolt.bolt_tension_prying)
+            comb_bolt_ir = ( self.bolt.bolt_shear / (bolt_shear_capacity*beta_lj)) ** 2 + \
+                           (( self.bolt.bolt_tension + self.bolt.bolt_tension_prying)/bolt_tension_capacity) ** 2
             print(comb_bolt_ir)
             if comb_bolt_ir > 1:
                 no_bolt += 2
             else:
                 break
-        return self.bolt_shear, self.bolt_tension, self.bolt_tension_prying, no_bolt
+        return self.bolt.bolt_shear, self.bolt.bolt_tension, self.bolt.bolt_tension_prying, no_bolt
 
     def get_plate_capacity(self, p_th, p_h, p_h_max, pitch, edge, end, n_row, bolt_hole_dia):
         # plate_moment = min_edge_dist * bolt_tension

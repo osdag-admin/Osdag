@@ -1,5 +1,8 @@
 from design_type.connection.shear_connection import ShearConnection
 from design_type.connection.fin_plate_connection import FinPlateConnection
+from design_type.tension_member.tension_bolted import Tension_bolted
+from design_type.tension_member.tension_welded import Tension_welded
+
 import yaml
 from utils.common.component import Bolt, Plate, Weld
 from Common import *
@@ -26,6 +29,20 @@ for f in files:
         main.set_input_values(main, d)
         base = os.path.basename(f)
         filename = str(os.path.splitext(base)[0])+".txt"
+        main.results_to_test(main, os.path.basename(filename))
+    elif module == 'Tension Members Bolted Design':
+        main = Tension_bolted
+        main.set_osdaglogger(None)
+        main.set_input_values(main, d)
+        base = os.path.basename(f)
+        filename = str(os.path.splitext(base)[0]) + ".txt"
+        main.results_to_test(main, os.path.basename(filename))
+    elif module == 'Tension Members Welded Design':
+        main = Tension_welded
+        main.set_osdaglogger(None)
+        main.set_input_values(main, d)
+        base = os.path.basename(f)
+        filename = str(os.path.splitext(base)[0]) + ".txt"
         main.results_to_test(main, os.path.basename(filename))
     # elif module == 'Column Coverplate Connection':
     #     self = ColumnCoverPlate

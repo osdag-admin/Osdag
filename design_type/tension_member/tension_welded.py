@@ -739,22 +739,22 @@ class Tension_welded(Main):
         t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, round(self.weld.stress,2) if flag else '')
         out_list.append(t11)
 
-        t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, round(self.weld.length,0) if flag else '')
-        out_list.append(t5)
+        # t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, round(self.weld.length,0) if flag else '')
+        # out_list.append(t5)
 
-        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, round(self.weld.effective,2) if flag else '')
+        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, int(round(self.weld.length,0)) if flag else '')
         out_list.append(t13)
 
         t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, round(self.plate.thickness_provided,0) if flag else '')
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, int(round(self.plate.thickness_provided,0)) if flag else '')
         out_list.append(t19)
 
-        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, round(self.plate.height,0) if flag else '')
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, int(round(self.plate.height,0)) if flag else '')
         out_list.append(t20)
 
-        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, round(self.plate.length,0) if flag else '')
+        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, int(round(self.plate.length,0)) if flag else '')
         out_list.append(t21)
 
         return out_list
@@ -1570,6 +1570,7 @@ class Tension_welded(Main):
             if (2 * self.plate.length + 100) > self.length:
                 self.design_status = False
                 logger.info("Plate length exceeds the Member length")
+                logger.info("Try higher diameter of bolt to get a safe design")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
             else:
@@ -1582,6 +1583,23 @@ class Tension_welded(Main):
             self.design_status = False
             logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
+
+    def results_to_test(self, filename):
+        test_out_list = {KEY_DISP_DESIGNATION:self.section_size_1.designation,
+                         KEY_DISP_TENSION_YIELDCAPACITY:self.section_size_1.tension_yielding_capacity,
+                         KEY_DISP_TENSION_RUPTURECAPACITY: self.section_size_1.tension_rupture_capacity,
+                         KEY_DISP_TENSION_BLOCKSHEARCAPACITY:self.section_size_1.block_shear_capacity_axial,
+                         KEY_DISP_SLENDER:self.section_size_1.slenderness,
+                         KEY_DISP_EFFICIENCY:self.efficiency,
+                         KEY_OUT_DISP_WELD_SIZE: self.weld.size,
+                         KEY_OUT_DISP_WELD_STRENGTH: self.weld.strength,
+                         KEY_OUT_DISP_WELD_STRESS: self.weld.stress,
+                        KEY_OUT_DISP_PLATETHK:self.plate.thickness_provided,
+                        KEY_OUT_DISP_PLATE_HEIGHT:self.plate.height,
+                        KEY_OUT_DISP_PLATE_LENGTH:self.plate.length}
+        f = open(filename, "w")
+        f.write(str(test_out_list))
+        f.close()
 
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
@@ -1654,10 +1672,11 @@ class Tension_welded(Main):
             {KEY_MODULE: self.module,
              KEY_DISP_AXIAL: self.load.axial_force,
              KEY_DISP_LENGTH: self.length,
-             "Section": "TITLE",
-             "Section Details":self.report_supporting,
+             # "Section": "TITLE",
+             "Selected Section Details": self.report_supporting,
              # "Supported Section Details": "TITLE",
              # "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+             KEY_DISP_SECSIZE: str(self.sizelist),
              "Weld Details": "TITLE",
              KEY_DISP_DP_WELD_TYPE: "Fillet",
              KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
@@ -1708,8 +1727,10 @@ class Tension_welded(Main):
         else:
             pass
 
+        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
+        self.report_check.append(t1)
 
-        t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{5cm}|p{7.5cm}|p{1cm}|')
+        t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
         self.report_check.append(t1)
         t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(self.section_size_1.area,self.section_size_1.fy,gamma_m0,member_yield_kn,multiple), '')
         self.report_check.append(t2)
@@ -1717,13 +1738,20 @@ class Tension_welded(Main):
         self.report_check.append(t3)
         # t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '',blockshear_prov(Tdb= member_blockshear_kn), '')
         # self.report_check.append(t4)
-        t8 = (KEY_DISP_TENSION_CAPACITY, '', tensile_capacity_prov(member_yield_kn, member_rupture_kn),get_pass_fail(self.load.axial_force,self.section_size_1.tension_capacity, relation="lesser"))
+        t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(member_yield_kn, member_rupture_kn),get_pass_fail(self.load.axial_force,self.section_size_1.tension_capacity, relation="lesser"))
         self.report_check.append(t8)
         t5 = (KEY_DISP_SLENDER, slenderness_req(), slenderness_prov( 1, self.length,round(self.section_size_1.min_radius_gyration,2), self.section_size_1.slenderness), '')
         self.report_check.append(t5)
         t6 = (KEY_DISP_EFFICIENCY, efficiency_req(),
               efficiency_prov(self.load.axial_force, self.section_size_1.tension_capacity, self.efficiency), '')
         self.report_check.append(t6)
+        t1 = (KEY_DISP_AXIAL_FORCE_CON,
+              axial_capacity_req(axial_capacity=round((self.section_size_1.tension_yielding_capacity / 1000), 2),
+                                 min_ac=round(((0.3 * self.section_size_1.tension_yielding_capacity) / 1000), 2)),
+              display_prov(round((self.res_force / 1000), 2), "A"),
+              min_prov_max(round(((0.3 * self.section_size_1.tension_yielding_capacity) / 1000), 2),
+                           self.res_force / 1000, round((self.section_size_1.tension_yielding_capacity / 1000), 2)))
+        self.report_check.append(t1)
 
         t7 = ('SubSection', 'Weld Checks', '|p{3cm}|p{7cm}|p{5cm}|p{1cm}|')
         self.report_check.append(t7)
@@ -1827,6 +1855,9 @@ class Tension_welded(Main):
               gusset_lt_w_prov(self.flange_weld, self.clearance,self.plate.length), "")
         self.report_check.append(t4)
 
+        t5 = (KEY_OUT_DISP_PLATETHK_REP, '', display_prov(self.plate.thickness_provided, "t_p"), "")
+        self.report_check.append(t5)
+
         self.report_check.append(t2)
         self.report_check.append(t1)
 
@@ -1834,8 +1865,8 @@ class Tension_welded(Main):
         self.report_check.append(t4)
 
         t8 = (
-        KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
-        get_pass_fail(self.load.axial_force, self.plate_tension_capacity, relation="lesser"))
+        KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
+        get_pass_fail(round((self.res_force/1000),2), self.plate_tension_capacity, relation="lesser"))
         self.report_check.append(t8)
 
         Disp_3D_image = "/ResourceFiles/images/3d.png"

@@ -27,8 +27,8 @@ DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
 DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-Length(mm): '2000'
-Load.Axial: '400'
+Length(mm): '10000'
+Load.Axial: '200'
 Member.Material: E 250 (Fe 410 W)A
 Member.Profile: Star Angles
 Module: Tension Members Bolted Design

@@ -1,5 +1,4 @@
 Bolt.Diameter:
-- '12'
 - '16'
 - '20'
 - '24'
@@ -16,7 +15,7 @@ Bolt.Grade:
 - '9.8'
 - '10.9'
 - '12.9'
-Bolt.Type: Bearing Bolt
+Bolt.Type: Friction Grip Bolt
 Conn_Location: Long Leg
 DesignPreferences.Bolt.Bolt_Hole_Type: Standard
 DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
@@ -27,10 +26,10 @@ DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
 DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-Length(mm): '2000'
-Load.Axial: '400'
+Length(mm): '5000'
+Load.Axial: '500'
 Member.Material: E 250 (Fe 410 W)A
-Member.Profile: Back to Back Angles
+Member.Profile: Angles
 Module: Tension Members Bolted Design
 Section Size:
 - 20 20 X 3

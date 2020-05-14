@@ -1128,7 +1128,7 @@ class Tension_bolted(Main):
         "Loop checking each member from sizelist based on yield capacity"
 
         for selectedsize in self.sizelist:
-            print('selectedsize',selectedsize)
+            print('selectedsize',self.sizelist)
             self.section_size = self.select_section(self,design_dictionary,selectedsize)
             bolt_diameter_min= min(self.bolt.bolt_diameter)
 
@@ -1734,7 +1734,8 @@ class Tension_bolted(Main):
             self.plate.bolts_one_line = 2 * self.plate.bolts_one_line
             self.plate.bolts_required = self.plate.bolt_line * self.plate.bolts_one_line
         else:
-            pass
+            self.plate.bolts_required = self.plate.bolt_line * self.plate.bolts_one_line
+
 
         for self.plate.thickness_provided in self.thickness_possible:
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
@@ -1813,6 +1814,7 @@ class Tension_bolted(Main):
             if (2 * self.plate.length + 100) > self.length:
                 self.design_status = False
                 logger.info("Plate length exceeds the Member length")
+                logger.info("Try higher diameter of bolt to get a safe design")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
             else:
@@ -1832,6 +1834,32 @@ class Tension_bolted(Main):
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
                 print(self.design_status)
+
+    def results_to_test(self, filename):
+        test_out_list = {KEY_DISP_DESIGNATION:self.section_size_1.designation,
+                         KEY_DISP_TENSION_YIELDCAPACITY:self.section_size_1.tension_yielding_capacity,
+                         KEY_DISP_TENSION_RUPTURECAPACITY: self.section_size_1.tension_rupture_capacity,
+                         KEY_DISP_TENSION_BLOCKSHEARCAPACITY:self.section_size_1.block_shear_capacity_axial,
+                         KEY_DISP_SLENDER:self.section_size_1.slenderness,
+                         KEY_DISP_EFFICIENCY:self.efficiency,
+                        KEY_OUT_DISP_D_PROVIDED:self.bolt.bolt_diameter_provided,
+                        KEY_OUT_DISP_GRD_PROVIDED:self.bolt.bolt_grade_provided,
+                        KEY_OUT_DISP_BOLT_SHEAR:self.bolt.bolt_shear_capacity,
+                        KEY_OUT_DISP_BOLT_BEARING:self.bolt.bolt_shear_capacity,
+                        KEY_OUT_DISP_BOLT_CAPACITY:self.bolt.bolt_capacity,
+                        KEY_OUT_DISP_BOLT_FORCE:self.plate.bolt_force,
+                        KEY_OUT_DISP_BOLT_LINE:self.plate.bolt_line,
+                        KEY_OUT_DISP_BOLTS_ONE_LINE:self.plate.bolts_one_line,
+                        KEY_OUT_DISP_PITCH:self.plate.pitch_provided,
+                        KEY_OUT_DISP_END_DIST:self.plate.end_dist_provided,
+                        KEY_OUT_DISP_GAUGE:self.plate.gauge_provided,
+                        KEY_OUT_DISP_EDGE_DIST:self.plate.edge_dist_provided,
+                        KEY_OUT_DISP_PLATETHK:self.plate.thickness_provided,
+                        KEY_OUT_DISP_PLATE_HEIGHT:self.plate.height,
+                        KEY_OUT_DISP_PLATE_LENGTH:self.plate.length}
+        f = open(filename, "w")
+        f.write(str(test_out_list))
+        f.close()
 
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
@@ -1915,17 +1943,18 @@ class Tension_bolted(Main):
              KEY_DISP_AXIAL: self.load.axial_force,
              KEY_DISP_LENGTH: self.length,
              # "Section": "TITLE",
-             # "Section Details":self.report_supporting,
+             "Selected Section Details":self.report_supporting,
              # "Supported Section Details": "TITLE",
              # "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+             KEY_DISP_SECSIZE : str(self.sizelist),
              "Bolt Details": "TITLE",
+
              KEY_DISP_D: str(self.bolt.bolt_diameter),
              KEY_DISP_GRD: str(self.bolt.bolt_grade),
              KEY_DISP_TYP: self.bolt.bolt_type,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
              KEY_DISP_DP_BOLT_FU: round(self.bolt.bolt_fu,2),
              KEY_DISP_DP_BOLT_FY: round(self.bolt.bolt_fy,2),
-             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
              KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
              KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
@@ -1963,9 +1992,10 @@ class Tension_bolted(Main):
         else:
             multiple =1
 
+        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
+        self.report_check.append(t1)
 
-
-        t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{5cm}|p{7.5cm}|p{1cm}|')
+        t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
 
         self.report_check.append(t1)
         t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(self.section_size_1.area,self.section_size_1.fy,gamma_m0,member_yield_kn,multiple), '')
@@ -1983,7 +2013,7 @@ class Tension_bolted(Main):
         self.report_check.append(t6)
         t1 = (KEY_DISP_AXIAL_FORCE_CON, axial_capacity_req(axial_capacity=round((self.section_size_1.tension_yielding_capacity/1000), 2),
                                                                min_ac=round(((0.3*self.section_size_1.tension_yielding_capacity) / 1000), 2)),
-              display_prov(round((self.res_force/1000),2),"A_c"),min_prov_max(round(((0.3*self.section_size_1.tension_yielding_capacity) / 1000), 2),self.res_force/1000,round((self.section_size_1.tension_yielding_capacity/1000), 2)))
+              display_prov(round((self.res_force/1000),2),"A"),min_prov_max(round(((0.3*self.section_size_1.tension_yielding_capacity) / 1000), 2),self.res_force/1000,round((self.section_size_1.tension_yielding_capacity/1000), 2)))
         self.report_check.append(t1)
 
 
@@ -2004,10 +2034,13 @@ class Tension_bolted(Main):
         t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area, "A_{nb}"," Ref~IS~1367-3~(2002)"), '')
         self.report_check.append(t8)
 
-        t8 = (KEY_DISP_KB, " ", kb_prov(self.plate.end_dist_provided,self.plate.pitch_provided,self.bolt.dia_hole,self.bolt.bolt_fu, self.bolt.fu_considered), '')
-        self.report_check.append(t8)
+
 
         if self.bolt.bolt_type == TYP_BEARING:
+            t8 = (KEY_DISP_KB, " ", kb_prov(self.plate.end_dist_provided, self.plate.pitch_provided, self.bolt.dia_hole,
+                                            self.bolt.bolt_fu, self.bolt.fu_considered), '')
+            self.report_check.append(t8)
+
             bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, self.planes, self.bolt.bolt_net_area,
                                                                self.bolt.gamma_mb, bolt_shear_capacity_kn), '')
@@ -2024,7 +2057,7 @@ class Tension_bolted(Main):
         else:
 
             t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
-                  HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.bolt.bolt_fu,
+                  HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=self.planes, K_h=kh_disp, fub=self.bolt.bolt_fu,
                                           Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
                                           capacity=bolt_capacity_kn), '')
             self.report_check.append(t4)
@@ -2146,7 +2179,7 @@ class Tension_bolted(Main):
         t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '', blockshear_prov(Tdb=plate_blockshear_kn), '')
         self.report_check.append(t4)
 
-        t8 = (KEY_DISP_TENSION_CAPACITY, round((self.res_force/1000),2), tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
+        t8 = (KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
         get_pass_fail(round((self.res_force/1000),2), self.plate_tension_capacity, relation="lesser"))
         self.report_check.append(t8)
 

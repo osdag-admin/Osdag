@@ -46,6 +46,7 @@ from .ui_design_preferences import Ui_Dialog
 from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 from .ui_design_preferences import DesignPreferences
+from .ui_OsdagSectionModeller import Ui_OsdagSectionModeller
 from design_type.connection.shear_connection import ShearConnection
 from cad.common_logic import CommonDesignLogic
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
@@ -1151,6 +1152,11 @@ class Ui_ModuleWindow(QMainWindow):
         add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
         add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
 
+        self.actionOsdagSectionModeller=QtWidgets.QAction(MainWindow)
+        self.actionOsdagSectionModeller.setFont(font)
+        self.actionOsdagSectionModeller.setObjectName("actionOsdagSectionModeller")
+        self.actionOsdagSectionModeller.triggered.connect(self.osdag_section_modeller)
+        self.OsdagSectionModeller=Ui_OsdagSectionModeller()
 
         if module in [KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_ENDPLATE, KEY_DISP_SEATED_ANGLE]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
@@ -1190,6 +1196,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.menuEdit.addAction(self.actionCopy)
         self.menuEdit.addAction(self.actionPaste)
         self.menuEdit.addAction(self.actionDesign_Preferences)
+        self.menuEdit.addAction(self.actionOsdagSectionModeller)
         self.menuView.addAction(self.actionEnlarge_font_size)
         self.menuView.addSeparator()
         self.menuHelp.addAction(self.actionSample_Tutorials)
@@ -2199,6 +2206,8 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionFAQ.setText(_translate("MainWindow", "FAQ"))
         self.actionDesign_Preferences.setText(_translate("MainWindow", "Design Preferences"))
         self.actionDesign_Preferences.setShortcut(_translate("MainWindow", "Alt+P"))
+        self.actionOsdagSectionModeller.setText(_translate("MainWindow", "Section Modeller"))
+        self.actionOsdagSectionModeller.setShortcut(_translate("MainWindow", "Alt+S"))
         self.actionfinPlate_quit.setText(_translate("MainWindow", "Quit"))
         self.actionfinPlate_quit.setShortcut(_translate("MainWindow", "Shift+Q"))
         self.actio_load_input.setText(_translate("MainWindow", "Load input"))
@@ -2224,6 +2233,12 @@ class Ui_ModuleWindow(QMainWindow):
     def design_preferences(self):
         self.designPrefDialog.exec()
 
+# Function for showing Osdag Section Modeller popup
+
+    def osdag_section_modeller(self):
+        dialog=QDialog()
+        self.OsdagSectionModeller.setupUi(dialog)
+        dialog.exec()
 # Function for getting input for design preferences from input dock
     '''
     @author: Umair

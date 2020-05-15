@@ -699,7 +699,7 @@ class Ui_OsdagSectionModeller(object):
         else:
                 self.SectionParameters=Ui_SectionParameters()
                 dialog=QtWidgets.QDialog()
-                self.SectionParameters.setupUi(dialog)
+                self.SectionParameters.setupUi(dialog,index_type,index_template)
                 dialog.exec()
 
         self.disable_usability(False)

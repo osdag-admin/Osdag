@@ -23,6 +23,7 @@ TYPE_NOTE = 'Note'
 TYPE_ENABLE_DISABLE = 'Enable/Disable'
 TYPE_CHANGE_TAB_NAME = 'Change tab_name'
 TYPE_REMOVE_TAB = 'Remove tab'
+TYPE_SECTION = 'Popup_Section'
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 DESIGN_FLAG = 'False'
 VALUE_NOT_APPLICABLE = 'N/A'

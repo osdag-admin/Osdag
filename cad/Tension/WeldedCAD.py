@@ -40,8 +40,8 @@ class TensionCAD(object):
 
     def createMemberGeometry(self):
         member1OriginL = numpy.array([0.0, 0.0, 0.0])
-        member1_uDir = numpy.array([0.0, -1.0, 0.0])
-        member1_wDir = numpy.array([1.0, 0.0, 0.0])
+        member1_uDir = numpy.array([1.0, 0.0, 0.0])
+        member1_wDir = numpy.array([0.0, -1.0, 0.0])
         self.member1.place(member1OriginL, member1_uDir, member1_wDir)
 
         self.member1_Model = self.member1.create_model()
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     plate_L = 100
     plate_H = plate_h + 2 * (math.tan(30) * plate_L)
     cut = 2 * (math.tan(30) * plate_L)
-    plate = StiffenerPlate(L=plate_H, W=plate_L, T=5, R11=plate_L, R12=cut, R21=plate_L, R22=cut, )
+    plate = StiffenerPlate(L=plate_L, W=plate_H, T=5, R11=plate_L, R12=cut, R21=plate_L, R22=cut, )
     inline_weld = FilletWeld(b=0, h=0, L=0)
     opline_weld = FilletWeld(b=0, h=0, L=0)
     member_data = 'Channel'

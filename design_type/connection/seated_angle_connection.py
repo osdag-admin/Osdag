@@ -353,6 +353,7 @@ class SeatedAngleConnection(ShearConnection):
                                                             self.supported_section.fy)
             # Distance from the end of bearing on cleat to root angle OR A TO B in Fig 5.31 in Subramanian's book
             b2 = max(b1 + self.plate.gap - seated.thickness - seated.root_radius, 0)
+            self.seated_angle.leg_a_length = b1 + self.plate.gap
             # self.seated_angle.width = self.supported_section.flange_width
             [self.plate.moment_demand, self.plate.moment_capacity] = \
                 self.check_moment_capacity(self, self.load.shear_force, seated.thickness, self.seated_angle.width,
@@ -578,10 +579,10 @@ class SeatedAngleConnection(ShearConnection):
         t14 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self. plate.thickness_provided if flag else '')
         out_list.append(t14)
 
-        t15 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self. plate.thickness_provided if flag else '')
+        t15 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_CLEAT_SPTNGLEG, TYPE_TEXTBOX, self.seated_angle.leg_a_length if flag else '')
         out_list.append(t15)
 
-        t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_WIDTH, TYPE_TEXTBOX, self. plate.thickness_provided if flag else '')
+        t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_WIDTH, TYPE_TEXTBOX, self.seated_angle.width if flag else '')
         out_list.append(t16)
 
         t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities])
@@ -613,11 +614,11 @@ class SeatedAngleConnection(ShearConnection):
         t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '')
         out_list.append(t2)
 
-        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_PC_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '')
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_PC_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '')
         out_list.append(t3)
 
-        # t3_1 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, self.output[0][0] if flag else '')
-        # out_list.append(t3_1)
+        t3_1 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, self.plate.bolts_required if flag else '')
+        out_list.append(t3_1)
         #
         # t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  self.output[0][7] if flag else '')
         # out_list.append(t4)
@@ -668,17 +669,17 @@ class SeatedAngleConnection(ShearConnection):
 
         capacities = []
 
-        # t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, self.output[0][20] if flag else '')
-        # capacities.append(t17)
-        #
+        t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, self.plate.shear_capacity if flag else '')
+        capacities.append(t17)
+
         # t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, self.output[0][21] if flag else '')
         # capacities.append(t18)
         #
-        # t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND_SEP, TYPE_TEXTBOX, self.output[0][19] if flag else '')
-        # capacities.append(t19)
-        #
-        # t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY_SEP, TYPE_TEXTBOX, self.output[0][22] if flag else '')
-        # capacities.append(t20)
+        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND_SEP, TYPE_TEXTBOX, self.plate.moment_demand if flag else '')
+        capacities.append(t19)
+
+        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY_SEP, TYPE_TEXTBOX, self.plate.moment_capacity if flag else '')
+        capacities.append(t20)
 
         return capacities
 

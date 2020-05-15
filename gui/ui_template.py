@@ -1156,8 +1156,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionOsdagSectionModeller.setFont(font)
         self.actionOsdagSectionModeller.setObjectName("actionOsdagSectionModeller")
         self.actionOsdagSectionModeller.triggered.connect(self.osdag_section_modeller)
-        dialog=QDialog()
-        self.OsdagSectionModeller=Ui_OsdagSectionModeller(dialog)
 
         if module in [KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_ENDPLATE, KEY_DISP_SEATED_ANGLE]:
             column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
@@ -2237,7 +2235,10 @@ class Ui_ModuleWindow(QMainWindow):
 # Function for showing Osdag Section Modeller popup
 
     def osdag_section_modeller(self):
-        self.OsdagSectionModeller.setupUi()
+        self.OsdagSectionModeller=Ui_OsdagSectionModeller()
+        dialog=QtWidgets.QDialog()
+        self.OsdagSectionModeller.setupUi(dialog)
+        dialog.exec()
         
 # Function for getting input for design preferences from input dock
     '''

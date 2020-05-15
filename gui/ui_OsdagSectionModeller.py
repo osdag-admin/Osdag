@@ -8,23 +8,22 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from gui.ui_section_parameters import Ui_SectionParameters
 
 class Ui_OsdagSectionModeller(object):
-    def __init__(self,Dialog):
-        self.ModellerDialog=Dialog
-    def setupUi(self):
-        self.ModellerDialog.setObjectName("Dialog")
-        self.ModellerDialog.resize(901, 790)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Maximum)
+    def setupUi(self,Dialog):
+        Dialog.setObjectName("Dialog")
+        Dialog.resize(901, 790)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.ModellerDialog.sizePolicy().hasHeightForWidth())
-        self.ModellerDialog.setSizePolicy(sizePolicy)
-        self.ModellerDialog.setMinimumSize(QtCore.QSize(901, 0))
-        self.ModellerDialog.setMaximumSize(QtCore.QSize(901, 825))
-        self.ModellerDialog.setSizeGripEnabled(False)
-        self.ModellerDialog.setModal(True)
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.ModellerDialog)
+        sizePolicy.setHeightForWidth(Dialog.sizePolicy().hasHeightForWidth())
+        Dialog.setSizePolicy(sizePolicy)
+        Dialog.setMinimumSize(QtCore.QSize(901, 0))
+        Dialog.setMaximumSize(QtCore.QSize(901, 825))
+        Dialog.setSizeGripEnabled(False)
+        Dialog.setModal(True)
+        self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setContentsMargins(11, 11, 11, 11)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -32,7 +31,7 @@ class Ui_OsdagSectionModeller(object):
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.design_section = QtWidgets.QFrame(self.ModellerDialog)
+        self.design_section = QtWidgets.QFrame(Dialog)
         self.design_section.setStyleSheet("QFrame{\n"
 "background:#ffffff;\n"
 "}")
@@ -65,7 +64,7 @@ class Ui_OsdagSectionModeller(object):
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
         self.verticalLayout_17.addWidget(self.label)
-        spacerItem = QtWidgets.QSpacerItem(75, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
+        spacerItem = QtWidgets.QSpacerItem(75, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout_17.addItem(spacerItem)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setContentsMargins(11, 11, 11, 11)
@@ -93,7 +92,7 @@ class Ui_OsdagSectionModeller(object):
         self.section_type_combobox.addItem("")
         self.horizontalLayout_2.addWidget(self.section_type_combobox)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed) 
         self.verticalLayout_2.addItem(spacerItem1)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -137,10 +136,10 @@ class Ui_OsdagSectionModeller(object):
         self.verticalLayout_3.addWidget(self.section_designation_lineEdit)
         self.verticalLayout_2.addLayout(self.verticalLayout_3)
         self.verticalLayout_17.addLayout(self.verticalLayout_2)
-        spacerItem3 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout_17.addItem(spacerItem3)
         self.horizontalLayout.addWidget(self.design_section)
-        self.occ = QtWidgets.QFrame(self.ModellerDialog)
+        self.occ = QtWidgets.QFrame(Dialog)
         font = QtGui.QFont()
         font.setPointSize(9)
         self.occ.setFont(font)
@@ -156,7 +155,7 @@ class Ui_OsdagSectionModeller(object):
         self.horizontalLayout.setStretch(0, 1)
         self.horizontalLayout.setStretch(1, 1)
         self.verticalLayout.addLayout(self.horizontalLayout)
-        self.section_properties = QtWidgets.QFrame(self.ModellerDialog)
+        self.section_properties = QtWidgets.QFrame(Dialog)
         self.section_properties.setStyleSheet("QFrame{\n"
 "background:#ffffff;\n"
 "}")
@@ -184,7 +183,7 @@ class Ui_OsdagSectionModeller(object):
         self.label_5.setAlignment(QtCore.Qt.AlignCenter)
         self.label_5.setObjectName("label_5")
         self.verticalLayout_16.addWidget(self.label_5)
-        spacerItem4 = QtWidgets.QSpacerItem(20, 12, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
+        spacerItem4 = QtWidgets.QSpacerItem(20, 12, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding) 
         self.verticalLayout_16.addItem(spacerItem4)
         self.horizontalLayout_15 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_15.setContentsMargins(11, 11, 11, 11)
@@ -593,7 +592,7 @@ class Ui_OsdagSectionModeller(object):
         self.HLayout_Buttons.setObjectName("HLayout_Buttons")
         spacerItem13 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.HLayout_Buttons.addItem(spacerItem13)
-        self.saveBtn = QtWidgets.QPushButton(self.ModellerDialog)
+        self.saveBtn = QtWidgets.QPushButton(Dialog)
         font = QtGui.QFont()
         font.setPointSize(12)
         self.saveBtn.setFont(font)
@@ -601,7 +600,7 @@ class Ui_OsdagSectionModeller(object):
         self.HLayout_Buttons.addWidget(self.saveBtn)
         spacerItem14 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.HLayout_Buttons.addItem(spacerItem14)
-        self.exportBtn = QtWidgets.QPushButton(self.ModellerDialog)
+        self.exportBtn = QtWidgets.QPushButton(Dialog)
         font = QtGui.QFont()
         font.setPointSize(12)
         self.exportBtn.setFont(font)
@@ -611,15 +610,14 @@ class Ui_OsdagSectionModeller(object):
         self.HLayout_Buttons.addItem(spacerItem15)
         self.verticalLayout.addLayout(self.HLayout_Buttons)
 
-        self.retranslateUi()
-        QtCore.QMetaObject.connectSlotsByName(self.ModellerDialog)
+        self.retranslateUi(Dialog)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
         self.section_type_combobox.currentIndexChanged.connect(self.type_change)
         self.section_template_combobox.currentIndexChanged.connect(self.template_change)
         self.section_designation_lineEdit.setValidator(QtGui.QRegExpValidator(
             QtCore.QRegExp("[a-zA-Z0-9@_]*"), self.section_designation_lineEdit
         ))
         self.disable_usability(True)
-        self.ModellerDialog.exec()
 
     def disable_usability(self,toggle):
             self.section_properties.setDisabled(toggle)
@@ -628,9 +626,8 @@ class Ui_OsdagSectionModeller(object):
 
     def type_change(self):
         index_type=self.section_type_combobox.currentIndex()
-        if(index_type==0):
-                self.disable_usability(True)
-        elif(index_type in [1,4,5]):
+        self.disable_usability(True)
+        if(index_type in [1,4,5]):
                 self.Centroid_box.hide()
                 self.MI_label_3.hide()
                 self.MI_text_3.hide()
@@ -687,9 +684,11 @@ class Ui_OsdagSectionModeller(object):
                 ],
                 5:['I & Channel on One Flange','I & Channel on Both Flange'],
         }[index_type]
+        self.section_template_combobox.blockSignals(True)
         self.section_template_combobox.clear()
         self.section_template_combobox.addItem('-------Select Template-------')
         self.section_template_combobox.addItems(templates)
+        self.section_template_combobox.blockSignals(False)
 
     def template_change(self):
         index_type=self.section_type_combobox.currentIndex()
@@ -697,6 +696,12 @@ class Ui_OsdagSectionModeller(object):
         if(index_template==0):
                 self.disable_usability(True)
                 return
+        else:
+                self.SectionParameters=Ui_SectionParameters()
+                dialog=QtWidgets.QDialog()
+                self.SectionParameters.setupUi(dialog)
+                dialog.exec()
+
         self.disable_usability(False)
         if(index_type==2):
                 if(index_template==1):
@@ -705,9 +710,9 @@ class Ui_OsdagSectionModeller(object):
                                 self.Centroid_box.show()
 
 
-    def retranslateUi(self):
+    def retranslateUi(self,Dialog):
         _translate = QtCore.QCoreApplication.translate
-        self.ModellerDialog.setWindowTitle(_translate("Dialog", "Osdag Section Modeller"))
+        Dialog.setWindowTitle(_translate("Dialog", "Osdag Section Modeller"))
         self.label.setText(_translate("Dialog", "Design Section"))
         self.label_2.setText(_translate("Dialog", "Section Type:"))
         self.section_type_combobox.setItemText(0, _translate("Dialog", "---------Select Type---------"))
@@ -734,7 +739,7 @@ class Ui_OsdagSectionModeller(object):
         self.MI_label_1.setText(_translate("Dialog", "Izz:"))
         self.MI_label_2.setText(_translate("Dialog", "Iyy:"))
         self.MI_label_3.setText(_translate("Dialog", "Ixy:"))
-        self.MI_label_4.setText(_translate("Dialog", "α:"))
+        self.MI_label_4.setText(_translate("Dialog", "𝛼:"))
         self.MI_label_5.setText(_translate("Dialog", "Iu:"))
         self.MI_label_6.setText(_translate("Dialog", "Iv:"))
         self.label_11.setText(_translate("Dialog", "Plastic Section Moduli:"))

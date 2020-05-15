@@ -213,6 +213,46 @@ class FinPlateConnection(ShearConnection):
 
         return spacing
 
+    def spacing_capacities(self, status):
+
+        spacing_cap = []
+
+        t99 = (None, 'Section', TYPE_SECTION, './ResourceFiles/images/Osdag.png')
+        spacing_cap.append(t99)
+
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
+        spacing_cap.append(t9)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if status else '')
+        spacing_cap.append(t10)
+
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
+        spacing_cap.append(t11)
+
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
+        spacing_cap.append(t12)
+
+        t99 = (None, 'Section2', TYPE_SECTION, './ResourceFiles/images/Osdag.png')
+        spacing_cap.append(t99)
+
+        t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX,
+               round(self.plate.shear_yielding_capacity, 2) if status else '')
+        spacing_cap.append(t17)
+
+        t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX,
+               round(self.plate.block_shear_capacity, 2) if status else '')
+        spacing_cap.append(t18)
+
+        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
+               round(self.plate.moment_demand / 1000000, 2) if status else '')
+        spacing_cap.append(t19)
+
+        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
+               round(self.plate.moment_capacity / 1000000, 2) if status else '')
+        spacing_cap.append(t20)
+
+        return spacing_cap
+
     def capacities(self, status):
 
         capacities = []
@@ -276,8 +316,11 @@ class FinPlateConnection(ShearConnection):
         t8 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if flag else '', True)
         out_list.append(t8)
 
-        # t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
-        # out_list.append(t21)
+        t21 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
+        out_list.append(t21)
+
+        t21 = ('sample_key', 'Sample Button', TYPE_OUT_BUTTON, ['Spacing_Capacity Details', self.spacing_capacities], True)
+        out_list.append(t21)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if flag else '', True)
         out_list.append(t9)

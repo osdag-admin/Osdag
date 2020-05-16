@@ -131,3 +131,27 @@ class BeamEndPlate(MomentConnection):
         t6 = (KEY_ENDPLATE_THICKNESS, self.endplate_thick_customized)
         list1.append(t6)
         return list1
+
+    def tab_list(self):
+
+        tabs = []
+
+        t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
+        tabs.append(t2)
+
+        t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t3)
+
+        t4 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t4)
+
+        t5 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t5)
+
+        t6 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t6)
+
+        t7 = ("Connector", TYPE_TAB_2, self.connector_values)
+        tabs.append(t7)
+
+        return tabs

@@ -157,55 +157,90 @@ class SeatedAngleConnection(ShearConnection):
             existingvalue_key_topangle = ''
 
 
-        t16 = (KEY_MODULE, KEY_DISP_SEATED_ANGLE, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_SEATED_ANGLE, TYPE_MODULE, None, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN_1)
+        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN_1, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC)
+        t4 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC, True, 'No Validator')
         options_list.append(t4)
 
-        t5 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC)
+        t5 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC, True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
+        t6 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
+        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None, True, 'No Validator')
         options_list.append(t8)
 
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
+        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t9)
 
+<<<<<<< HEAD
         t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D)
+=======
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D, True, 'No Validator')
+>>>>>>> umair
         options_list.append(t10)
 
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
+        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
 
+<<<<<<< HEAD
         t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
+=======
+        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD, True, 'No Validator')
+>>>>>>> umair
         options_list.append(t12)
 
-        t13 = (None,DISP_TITLE_ANGLE, TYPE_TITLE, None, None)
+        t13 = (None,DISP_TITLE_ANGLE, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t13)
 
-        t14 = (KEY_SEATEDANGLE, KEY_DISP_SEATEDANGLE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_seatedangle, VALUES_ANGLESEC)
+        t14 = (KEY_SEATEDANGLE, KEY_DISP_SEATEDANGLE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_seatedangle, VALUES_ANGLESEC, True, 'No Validator')
         options_list.append(t14)
 
-        t15 = (KEY_TOPANGLE, KEY_DISP_TOPANGLE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_topangle, VALUES_ANGLESEC)
+        t15 = (KEY_TOPANGLE, KEY_DISP_TOPANGLE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_topangle, VALUES_ANGLESEC, True, 'No Validator')
         options_list.append(t15)
 
         return options_list
+
+    def tab_list(self):
+
+        tabs = []
+
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
+        tabs.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
+        tabs.append(t2)
+
+        t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t3)
+
+        t4 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t4)
+
+        t5 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t5)
+
+        t6 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t6)
+
+        t7 = ("Connector", TYPE_TAB_2, self.connector_values)
+        tabs.append(t7)
+
+        return tabs
 
     def func_for_validation(self, design_dictionary):
         all_errors = []
@@ -251,10 +286,17 @@ class SeatedAngleConnection(ShearConnection):
             flag1 = True
 
         if len(missing_fields_list) > 0:
+<<<<<<< HEAD
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
             all_errors.append(error)
             # QMessageBox.information(window, "Information",
             #                         generate_missing_fields_error_string(missing_fields_list))
+=======
+            # QMessageBox.information(window, "Information",
+            #                         generate_missing_fields_error_string(missing_fields_list))
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
+>>>>>>> umair
             # flag = False
         else:
             flag = True
@@ -486,9 +528,9 @@ class SeatedAngleConnection(ShearConnection):
         list1 = []
         t1 = (KEY_GRD, self.grdval_customized)
         list1.append(t1)
-        t2 = (KEY_SEATEDANGLE, SeatedAngleConnection.seated_angle_customized)
+        t2 = (KEY_SEATEDANGLE, self.seated_angle_customized)
         list1.append(t2)
-        t3 = (KEY_TOPANGLE, SeatedAngleConnection.top_angle_customized)
+        t3 = (KEY_TOPANGLE, self.top_angle_customized)
         list1.append(t3)
         t4 = (KEY_D, self.diam_bolt_customized)
         list1.append(t4)
@@ -496,7 +538,8 @@ class SeatedAngleConnection(ShearConnection):
 
     def fn_conn_suptngsec_lbl(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return KEY_DISP_COLSEC
         # elif self in VALUES_CONN_2:
         #     return KEY_DISP_PRIBM
@@ -505,7 +548,8 @@ class SeatedAngleConnection(ShearConnection):
 
     def fn_conn_suptdsec_lbl(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return KEY_DISP_BEAMSEC
         # elif self in VALUES_CONN_2:
         #     return KEY_DISP_SECBM
@@ -514,7 +558,8 @@ class SeatedAngleConnection(ShearConnection):
 
     def fn_conn_suptngsec(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return VALUES_COLSEC
         # elif self in VALUES_CONN_2:
         #     return VALUES_PRIBM
@@ -523,7 +568,8 @@ class SeatedAngleConnection(ShearConnection):
 
     def fn_conn_suptdsec(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return VALUES_BEAMSEC
         # elif self in VALUES_CONN_2:
         #     return VALUES_SECBM
@@ -531,9 +577,11 @@ class SeatedAngleConnection(ShearConnection):
             return []
 
     def fn_conn_image(self):
-        if self == VALUES_CONN[0]:
+
+        conn = self[0]
+        if conn == VALUES_CONN[0]:
             return './ResourceFiles/images/fin_cf_bw.png'
-        elif self == VALUES_CONN[1]:
+        elif conn == VALUES_CONN[1]:
             return './ResourceFiles/images/fin_cw_bw.png'
         # elif self in VALUES_CONN_2:
         #     return './ResourceFiles/images/fin_beam_beam.png'
@@ -544,19 +592,19 @@ class SeatedAngleConnection(ShearConnection):
 
         lst = []
 
-        t1 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_LABEL, self.fn_conn_suptngsec_lbl)
+        t1 = ([KEY_CONN], KEY_SUPTNGSEC, TYPE_LABEL, self.fn_conn_suptngsec_lbl)
         lst.append(t1)
 
-        t2 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_COMBOBOX,self.fn_conn_suptngsec)
+        t2 = ([KEY_CONN], KEY_SUPTNGSEC, TYPE_COMBOBOX,self.fn_conn_suptngsec)
         lst.append(t2)
 
-        t3 = (KEY_CONN, KEY_SUPTDSEC, TYPE_LABEL, self.fn_conn_suptdsec_lbl)
+        t3 = ([KEY_CONN], KEY_SUPTDSEC, TYPE_LABEL, self.fn_conn_suptdsec_lbl)
         lst.append(t3)
 
-        t4 = (KEY_CONN, KEY_SUPTDSEC, TYPE_COMBOBOX, self.fn_conn_suptdsec)
+        t4 = ([KEY_CONN], KEY_SUPTDSEC, TYPE_COMBOBOX, self.fn_conn_suptdsec)
         lst.append(t4)
 
-        t5 = (KEY_CONN, KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        t5 = ([KEY_CONN], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t5)
 
         return lst
@@ -573,9 +621,10 @@ class SeatedAngleConnection(ShearConnection):
 
         # TODO: Seated Angle properties: Start
 
-        t13 = (None, KEY_DISP_SEATED_ANGLE, TYPE_TITLE, None)
+        t13 = (None, KEY_DISP_SEATED_ANGLE, TYPE_TITLE, None, True)
         out_list.append(t13)
 
+<<<<<<< HEAD
         t14 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self. plate.thickness_provided if flag else '')
         out_list.append(t14)
 
@@ -583,15 +632,25 @@ class SeatedAngleConnection(ShearConnection):
         out_list.append(t15)
 
         t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_WIDTH, TYPE_TEXTBOX, self.seated_angle.width if flag else '')
+=======
+        t14 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.output[0][3] if flag else '', True)
+        out_list.append(t14)
+
+        t15 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_HEIGHT, TYPE_TEXTBOX, self.output[0][4] if flag else '', True)
+        out_list.append(t15)
+
+        t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_WIDTH, TYPE_TEXTBOX, self.output[0][5] if flag else '', True)
+>>>>>>> umair
         out_list.append(t16)
 
-        t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities])
+        t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities], True)
         out_list.append(t22)
 
         # TODO: Seated Angle Properties: End
 
         # TODO: Top Angle properties: Start
 
+<<<<<<< HEAD
         # t24 = (None, DISP_TITLE_WELD, TYPE_TITLE, None)
         # out_list.append(t24)
         #
@@ -603,14 +662,28 @@ class SeatedAngleConnection(ShearConnection):
         #
         # t27 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, self.output[0][24] if flag else '')
         # out_list.append(t27)
+=======
+        t24 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
+        out_list.append(t24)
+
+        t25 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.output[0][23] if flag else '', True)
+        out_list.append(t25)
+
+        t26 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, self.output[0][25] if flag else '', True)
+        out_list.append(t26)
+
+        t27 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, self.output[0][24] if flag else '', True)
+        out_list.append(t27)
+>>>>>>> umair
 
         # TODO: Top Angle Properties: End
 
         # TODO: 'Bolt Properties: Start'
 
-        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
 
+<<<<<<< HEAD
         t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '')
         out_list.append(t2)
 
@@ -642,6 +715,39 @@ class SeatedAngleConnection(ShearConnection):
         #
         # t23 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
         # out_list.append(t23)
+=======
+        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.output[0][1] if flag else '', True)
+        out_list.append(t2)
+
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_PC_PROVIDED, TYPE_TEXTBOX, self.output[0][2] if flag else '', True)
+        out_list.append(t3)
+
+        t3_1 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, self.output[0][0] if flag else '', True)
+        out_list.append(t3_1)
+
+        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  self.output[0][7] if flag else '', True)
+        out_list.append(t4)
+        #
+        # bolt_bearing_capacity_disp = ''
+        # if flag is True:
+        #     if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
+        #         bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+        #         pass
+        #     else:
+        #         bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
+
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.output[0][8] if flag else '', True)
+        out_list.append(t5)
+
+        t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.output[0][6] if flag else '', True)
+        out_list.append(t6)
+
+        t21 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_SHEAR_FORCE, TYPE_TEXTBOX, self.output[0][10] if flag else '', True)
+        out_list.append(t21)
+
+        t23 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
+        out_list.append(t23)
+>>>>>>> umair
 
         # TODO: 'Bolt Properties: End'
 

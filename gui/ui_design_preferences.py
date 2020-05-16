@@ -505,15 +505,10 @@ class Ui_Dialog(object):
                     # value = option[4]
                     if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
                         l = QtWidgets.QLabel(tab)
-                        if lable in [KEY_DISP_SUPTNGSEC_THERMAL_EXP]:
-                            l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 28))
-                            i = i + 10
-                        else:
-                            l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
+                        l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
                         font = QtGui.QFont()
                         font.setPointSize(9)
-                        if lable in [KEY_DISP_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_TYPE,
-                                     KEY_DISP_SUPTNGSEC_SOURCE]:
+                        if lable in [KEY_DISP_SUPTNGSEC_DESIGNATION, 'Type', 'Source']:
                             font.setWeight(75)
                         else:
                             font.setWeight(50)
@@ -557,9 +552,7 @@ class Ui_Dialog(object):
                         font.setWeight(50)
                         r.setFont(font)
                         r.setObjectName(element[0])
-                        if element[0] in [KEY_SUPTNGSEC_DEPTH, KEY_SUPTNGSEC_FLANGE_W, KEY_SUPTNGSEC_FLANGE_T,
-                                          KEY_SUPTNGSEC_WEB_T, KEY_SUPTDSEC_DEPTH, KEY_SUPTDSEC_FLANGE_W,
-                                          KEY_SUPTDSEC_FLANGE_T, KEY_SUPTDSEC_WEB_T]:
+                        if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4']:
                             r.setValidator(QDoubleValidator())
                         if input_dictionary:
                             r.setText(str(element[4]))
@@ -1258,50 +1251,50 @@ class Ui_Dialog(object):
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
                 if ch.objectName() == KEY_SUPTNGSEC_DESIGNATION:
                     Designation_c = ch.text()
-                elif ch.objectName() == KEY_SUPTNGSEC_SOURCE:
+                elif ch.objectName() == 'Label_21':
                     Source_c = ch.text()
-                elif ch.objectName() == KEY_SUPTNGSEC_DEPTH:
+                elif ch.objectName() == 'Label_1':
                     D_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_W:
+                elif ch.objectName() == 'Label_2':
                     B_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_T:
+                elif ch.objectName() == 'Label_3':
                     T_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_WEB_T:
+                elif ch.objectName() == 'Label_4':
                     tw_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_FLANGE_S:
+                elif ch.objectName() == 'Label_5':
                     FlangeSlope_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_ROOT_R:
+                elif ch.objectName() == 'Label_6':
                     R1_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_TOE_R:
+                elif ch.objectName() == 'Label_7':
                     R2_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_MASS:
+                elif ch.objectName() == 'Label_11':
                     Mass_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_SEC_AREA:
+                elif ch.objectName() == 'Label_12':
                     Area_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_MOA_LZ:
+                elif ch.objectName() == 'Label_13':
                     Iz_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_MOA_LY:
+                elif ch.objectName() == 'Label_14':
                     Iy_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_ROG_RZ:
+                elif ch.objectName() == 'Label_15':
                     rz_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_ROG_RY:
+                elif ch.objectName() == 'Label_16':
                     ry_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_EM_ZZ:
+                elif ch.objectName() == 'Label_17':
                     Zz_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_EM_ZY:
+                elif ch.objectName() == 'Label_18':
                     Zy_c = float(ch.text())
-                elif ch.objectName() == KEY_SUPTNGSEC_PM_ZPZ:
+                elif ch.objectName() == 'Label_19':
                     if ch.text() == "":
                         ch.setText("0")
                     Zpz_c = ch.text()
-                elif ch.objectName() == KEY_SUPTNGSEC_PM_ZPY:
+                elif ch.objectName() == 'Label_20':
                     if ch.text() == "":
                         ch.setText("0")
                     Zpy_c = ch.text()
                 else:
                     pass
             elif isinstance(ch, QtWidgets.QComboBox):
-                if ch.objectName() == KEY_SUPTNGSEC_TYPE:
+                if ch.objectName() == 'Label_8':
                     Type = ch.currentText()
 
         if ch == tab_Column.children()[len(tab_Column.children())-1]:
@@ -1355,50 +1348,50 @@ class Ui_Dialog(object):
 
                 if ch.objectName() == KEY_SUPTDSEC_DESIGNATION:
                     Designation_b = ch.text()
-                elif ch.objectName() == KEY_SUPTDSEC_SOURCE:
+                elif ch.objectName() == 'Label_21':
                     Source_b = ch.text()
-                elif ch.objectName() == KEY_SUPTDSEC_DEPTH:
+                elif ch.objectName() == 'Label_1':
                     D_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_FLANGE_W:
+                elif ch.objectName() == 'Label_2':
                     B_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_FLANGE_T:
+                elif ch.objectName() == 'Label_3':
                     T_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_WEB_T:
+                elif ch.objectName() == 'Label_4':
                     tw_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_FLANGE_S:
+                elif ch.objectName() == 'Label_5':
                     FlangeSlope_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_ROOT_R:
+                elif ch.objectName() == 'Label_6':
                     R1_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_TOE_R:
+                elif ch.objectName() == 'Label_7':
                     R2_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_MASS:
+                elif ch.objectName() == 'Label_11':
                     Mass_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_SEC_AREA:
+                elif ch.objectName() == 'Label_12':
                     Area_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_MOA_LZ:
+                elif ch.objectName() == 'Label_13':
                     Iz_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_MOA_LY:
+                elif ch.objectName() == 'Label_14':
                     Iy_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_ROG_RZ:
+                elif ch.objectName() == 'Label_15':
                     rz_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_ROG_RY:
+                elif ch.objectName() == 'Label_16':
                     ry_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_EM_ZZ:
+                elif ch.objectName() == 'Label_17':
                     Zz_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_EM_ZY:
+                elif ch.objectName() == 'Label_18':
                     Zy_b = float(ch.text())
-                elif ch.objectName() == KEY_SUPTDSEC_PM_ZPZ:
+                elif ch.objectName() == 'Label_19':
                     if ch.text() == "":
                         ch.setText("0")
                     Zpz_b = ch.text()
-                elif ch.objectName() == KEY_SUPTDSEC_PM_ZPY:
+                elif ch.objectName() == 'Label_20':
                     if ch.text() == "":
                         ch.setText("0")
                     Zpy_b = ch.text()
                 else:
                     pass
             elif isinstance(ch, QtWidgets.QComboBox):
-                if ch.objectName() == KEY_SUPTDSEC_TYPE:
+                if ch.objectName() == 'Label_8':
                     Type = ch.currentText()
 
         if ch == tab_Beam.children()[len(tab_Beam.children())-1]:

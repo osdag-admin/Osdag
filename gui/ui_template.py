@@ -706,7 +706,6 @@ class Ui_ModuleWindow(QMainWindow):
                         data[t[0] + "_customized"] = t[1]()
                 else:
                     data[t[0] + "_customized"] = t[1]()
-            print('pppppppppppppp')
             try:
                 d.get(new_list[0][0]).activated.connect(lambda: popup(d.get(new_list[0][0]), new_list))
                 d.get(new_list[1][0]).activated.connect(lambda: popup(d.get(new_list[1][0]), new_list))
@@ -777,7 +776,6 @@ class Ui_ModuleWindow(QMainWindow):
     # Change in Ui based on Connectivity selection
     ##############################################
 
-        print('ffffffffffffffffff')
         if updated_list is None:
             pass
         else:
@@ -972,7 +970,6 @@ class Ui_ModuleWindow(QMainWindow):
 
         # for button in self.dockWidgetContents_out.children():
         #     if button.objectName() == KEY
-
         self.outputDock.setWidget(self.dockWidgetContents_out)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
 
@@ -2082,11 +2079,8 @@ class Ui_ModuleWindow(QMainWindow):
                         if section != 0:
                             outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
                             outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
-
                             hl1 = QtWidgets.QFrame()
                             hl1.setFrameShape(QtWidgets.QFrame.HLine)
-                            hl2 = QtWidgets.QFrame()
-                            hl2.setFrameShape(QtWidgets.QFrame.HLine)
                             j += 1
                             outer_grid_layout.addWidget(hl1, j, 1, 1, 2)
 
@@ -2426,7 +2420,6 @@ class Ui_ModuleWindow(QMainWindow):
     def combined_design_prefer(self, module, main):
 
         on_change_tab_list = main.tab_value_changed(main)
-
         for new_values in on_change_tab_list:
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)

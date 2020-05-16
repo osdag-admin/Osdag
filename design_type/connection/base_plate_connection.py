@@ -743,10 +743,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def input_dictionary_design_pref(self):
 
         design_input = []
-        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SUPTNGSEC_TYPE, KEY_SUPTNGSEC_MATERIAL])
+        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, ['Label_8', KEY_SUPTNGSEC_MATERIAL])
         design_input.append(t1)
 
-        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY, KEY_SUPTNGSEC_SOURCE])
+        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY, 'Label_21'])
         design_input.append(t1)
 
         t2 = ("Base Plate", TYPE_COMBOBOX, [KEY_BASE_PLATE_MATERIAL])
@@ -786,7 +786,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t2 = (KEY_TYP_ANCHOR, [KEY_DP_ANCHOR_BOLT_TYPE], 'Input Dock')
         design_input.append(t2)
 
-        t3 = (None, [KEY_SUPTNGSEC_TYPE, KEY_SUPTNGSEC_SOURCE, KEY_SUPTNGSEC_FU, KEY_BASE_PLATE_FU,
+        t3 = (None, ['Label_8', 'Label_21', KEY_SUPTNGSEC_FU, KEY_BASE_PLATE_FU,
                      KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_SUPTNGSEC_FY, KEY_BASE_PLATE_FY,
                      KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_HOLE_TYPE,
                      KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE,
@@ -801,8 +801,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         length = str(self.anchor_length_provided if self.design_button_status else 0)
         fu = Material(design_dictionary[KEY_MATERIAL]).fu
 
-        val = {KEY_SUPTNGSEC_TYPE: "Rolled",
-               KEY_SUPTNGSEC_SOURCE: str(section.source),
+        val = {'Label_8': "Rolled",
+               'Label_21': str(section.source),
                KEY_SUPTNGSEC_FU: str(section.fu),
                KEY_BASE_PLATE_FU: str(section.fu),
                KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(section.fu),
@@ -1182,8 +1182,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # attributes of design preferences
         self.dp_column_designation = str(design_dictionary[KEY_SUPTNGSEC])
-        self.dp_column_type = str(design_dictionary[KEY_SUPTNGSEC_TYPE])
-        self.dp_column_source = str(design_dictionary[KEY_SUPTNGSEC_SOURCE])
+        self.dp_column_type = str(design_dictionary['Label_8'])
+        self.dp_column_source = str(design_dictionary['Label_21'])
         self.dp_column_material = str(design_dictionary[KEY_SUPTNGSEC_MATERIAL])
         self.dp_column_fu = float(design_dictionary[KEY_SUPTNGSEC_FU])
         self.dp_column_fy = float(design_dictionary[KEY_SUPTNGSEC_FY])

@@ -428,12 +428,9 @@ class BeamCoverPlate(MomentConnection):
         t3 = ("Connector", [KEY_PLATE_MATERIAL], [KEY_PLATE_FU, KEY_PLATE_FY], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t3)
 
-        t5 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC_DEPTH, KEY_SUPTDSEC_FLANGE_W, KEY_SUPTDSEC_FLANGE_T,
-                                 KEY_SUPTDSEC_WEB_T], [KEY_SUPTDSEC_MASS, KEY_SUPTDSEC_SEC_AREA, KEY_SUPTDSEC_MOA_LZ,
-                                                       KEY_SUPTDSEC_MOA_LY, KEY_SUPTDSEC_ROG_RZ, KEY_SUPTDSEC_ROG_RY,
-                                                       KEY_SUPTDSEC_EM_ZZ, KEY_SUPTDSEC_EM_ZY,
-                                                       KEY_SUPTDSEC_PM_ZPZ, KEY_SUPTDSEC_PM_ZPY], TYPE_TEXTBOX,
-              self.get_sec_properties)
+        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_sec_properties)
         change_tab.append(t5)
 
         return change_tab

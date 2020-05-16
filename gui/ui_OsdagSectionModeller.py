@@ -613,18 +613,24 @@ class Ui_OsdagSectionModeller(object):
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
         self.section_type_combobox.currentIndexChanged.connect(self.type_change)
-        self.section_template_combobox.currentIndexChanged.connect(self.template_change)
+        self.section_template_combobox.activated[int].connect(self.template_change)
         self.section_designation_lineEdit.setValidator(QtGui.QRegExpValidator(
             QtCore.QRegExp("[a-zA-Z0-9@_]*"), self.section_designation_lineEdit
         ))
         self.disable_usability(True)
 
     def disable_usability(self,toggle):
+            '''
+            Method to Disable/Enable Section Properties and Buttons
+            '''
             self.section_properties.setDisabled(toggle)
             self.saveBtn.setDisabled(toggle)
             self.exportBtn.setDisabled(toggle)
 
     def type_change(self):
+        '''
+        Method to handle Section Type change
+        '''
         index_type=self.section_type_combobox.currentIndex()
         self.disable_usability(True)
         if(index_type in [1,4,5]):
@@ -689,25 +695,34 @@ class Ui_OsdagSectionModeller(object):
         self.section_template_combobox.addItem('-------Select Template-------')
         self.section_template_combobox.addItems(templates)
         self.section_template_combobox.blockSignals(False)
+        self.section_template_combobox.setProperty("lastitem", None)
 
-    def template_change(self):
+    def template_change(self,new_index):
+        '''
+        Method to handle Section Template change
+        '''
+        last_index=self.section_template_combobox.property("lastitem")
         index_type=self.section_type_combobox.currentIndex()
         index_template=self.section_template_combobox.currentIndex()
         if(index_template==0):
                 self.disable_usability(True)
                 return
         else:
-                self.SectionParameters=Ui_SectionParameters()
-                dialog=QtWidgets.QDialog()
-                self.SectionParameters.setupUi(dialog,index_type,index_template)
-                dialog.exec()
-
-        self.disable_usability(False)
+                self.SectionParameters=Ui_SectionParameters(index_type,index_template)
+                if(last_index==new_index and self.Parameters!={}):
+                        for child in self.Parameters:
+                                self.SectionParameters.textBoxVisible[child]=self.Parameters[child]
+                                exec('self.SectionParameters.'+child+'.setText('+repr(self.Parameters[child])+')')
+                self.SectionParameters.exec()
+                self.Parameters=self.SectionParameters.textBoxVisible
+                if(self.Parameters!={}):
+                        self.disable_usability(False)
         if(index_type==2):
                 if(index_template==1):
                                 self.Centroid_box.hide()                        
                 elif(index_template==2):
                                 self.Centroid_box.show()
+        self.section_template_combobox.setProperty("lastitem",new_index)
 
 
     def retranslateUi(self,Dialog):

@@ -953,7 +953,7 @@ class Compression(Main):
         t1 = (KEY_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_DESIGNATION, TYPE_TEXTBOX, None, designation)
         supporting_section.append(t1)
 
-        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
+        t2 = (None, 'Mechanical Properties', TYPE_TITLE, None, None)
         supporting_section.append(t2)
 
         material = connectdb("Material", call_type="popup")
@@ -966,34 +966,34 @@ class Compression(Main):
         t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None, fy)
         supporting_section.append(t4)
 
-        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
+        t5 = (None, 'Dimensions', TYPE_TITLE, None, None)
         supporting_section.append(t5)
 
-        t6 = (KEY_SUPTNGSEC_DEPTH, KEY_DISP_SUPTNGSEC_DEPTH, TYPE_TEXTBOX, None, depth)
+        t6 = ('Label_1', 'Depth, D (mm)*', TYPE_TEXTBOX, None, depth)
         supporting_section.append(t6)
 
-        t7 = (KEY_SUPTNGSEC_FLANGE_W, KEY_DISP_SUPTNGSEC_FLANGE_W, TYPE_TEXTBOX, None, flange_width)
+        t7 = ('Label_2', 'Flange width, B (mm)*', TYPE_TEXTBOX, None, flange_width)
         supporting_section.append(t7)
 
-        t8 = (KEY_SUPTNGSEC_FLANGE_T, KEY_DISP_SUPTNGSEC_FLANGE_T, TYPE_TEXTBOX, None, flange_thickness)
+        t8 = ('Label_3', 'Flange thickness, T (mm)*', TYPE_TEXTBOX, None, flange_thickness)
         supporting_section.append(t8)
 
-        t9 = (KEY_SUPTNGSEC_WEB_T, KEY_DISP_SUPTNGSEC_WEB_T, TYPE_TEXTBOX, None, web_thickness)
+        t9 = ('Label_4', 'Web thickness, t (mm)*', TYPE_TEXTBOX, None, web_thickness)
         supporting_section.append(t9)
 
-        t10 = (KEY_SUPTNGSEC_FLANGE_S, KEY_DISP_SUPTNGSEC_FLANGE_S, TYPE_TEXTBOX, None, flange_slope)
+        t10 = ('Label_5', 'Flange Slope, a (deg.)*', TYPE_TEXTBOX, None, flange_slope)
         supporting_section.append(t10)
 
-        t11 = (KEY_SUPTNGSEC_ROOT_R, KEY_DISP_SUPTNGSEC_ROOT_R, TYPE_TEXTBOX, None, root_radius)
+        t11 = ('Label_6', 'Root radius, R1 (mm)*', TYPE_TEXTBOX, None, root_radius)
         supporting_section.append(t11)
 
-        t12 = (KEY_SUPTNGSEC_TOE_R, KEY_DISP_SUPTNGSEC_TOE_R, TYPE_TEXTBOX, None, toe_radius)
+        t12 = ('Label_7', 'Toe radius, R2 (mm)*', TYPE_TEXTBOX, None, toe_radius)
         supporting_section.append(t12)
 
         t13 = (None, None, TYPE_BREAK, None, None)
         supporting_section.append(t13)
 
-        t14 = (KEY_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        t14 = ('Label_8', 'Type', TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
         supporting_section.append(t14)
 
         t18 = (None, None, TYPE_ENTER, None, None)
@@ -1002,49 +1002,49 @@ class Compression(Main):
         t18 = (None, None, TYPE_ENTER, None, None)
         supporting_section.append(t18)
 
-        t15 = (KEY_SUPTNGSEC_MOD_OF_ELAST, KEY_SUPTNGSEC_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        t15 = ('Label_9', 'Modulus of elasticity, E (GPa)', TYPE_TEXTBOX, None, m_o_e)
         supporting_section.append(t15)
 
-        t16 = (KEY_SUPTNGSEC_MOD_OF_RIGID, KEY_SUPTNGSEC_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        t16 = ('Label_10', 'Modulus of rifidity, G (GPa)', TYPE_TEXTBOX, None, m_o_r)
         supporting_section.append(t16)
 
-        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        t17 = (None, 'Sectional Properties', TYPE_TITLE, None, None)
         supporting_section.append(t17)
 
-        t18 = (KEY_SUPTNGSEC_MASS, KEY_DISP_SUPTNGSEC_MASS, TYPE_TEXTBOX, None, mass)
+        t18 = ('Label_11', 'Mass, M (Kg/m)', TYPE_TEXTBOX, None, mass)
         supporting_section.append(t18)
 
-        t19 = (KEY_SUPTNGSEC_SEC_AREA, KEY_DISP_SUPTNGSEC_SEC_AREA, TYPE_TEXTBOX, None, area)
+        t19 = ('Label_12', 'Sectional area, a (mm<sup>2</sup>)', TYPE_TEXTBOX, None, area)
         supporting_section.append(t19)
 
-        t20 = (KEY_SUPTNGSEC_MOA_LZ, KEY_DISP_SUPTNGSEC_MOA_LZ, TYPE_TEXTBOX, None, mom_inertia_z)
+        t20 = ('Label_13', '2nd Moment of area, l<sub>z</sub> (cm<sup>4</sup>)', TYPE_TEXTBOX, None, mom_inertia_z)
         supporting_section.append(t20)
 
-        t21 = (KEY_SUPTNGSEC_MOA_LY, KEY_DISP_SUPTNGSEC_MOA_LY, TYPE_TEXTBOX, None, mom_inertia_y)
+        t21 = ('Label_14', '2nd Moment of area, l<sub>y</sub> (cm<sup>4</sup>)', TYPE_TEXTBOX, None, mom_inertia_y)
         supporting_section.append(t21)
 
-        t22 = (KEY_SUPTNGSEC_ROG_RZ, KEY_DISP_SUPTNGSEC_ROG_RZ, TYPE_TEXTBOX, None, rad_of_gy_z)
+        t22 = ('Label_15', 'Radius of gyration, r<sub>z</sub> (cm)', TYPE_TEXTBOX, None, rad_of_gy_z)
         supporting_section.append(t22)
 
-        t23 = (KEY_SUPTNGSEC_ROG_RY, KEY_DISP_SUPTNGSEC_ROG_RY, TYPE_TEXTBOX, None, rad_of_gy_y)
+        t23 = ('Label_16', 'Radius of gyration, r<sub>y</sub> (cm)', TYPE_TEXTBOX, None, rad_of_gy_y)
         supporting_section.append(t23)
 
-        t24 = (KEY_SUPTNGSEC_EM_ZZ, KEY_DISP_SUPTNGSEC_EM_ZZ, TYPE_TEXTBOX, None, elast_sec_mod_z)
+        t24 = ('Label_17', 'Elastic modulus, Z<sub>z</sub> (cm<sup>3</sup>)', TYPE_TEXTBOX, None, elast_sec_mod_z)
         supporting_section.append(t24)
 
-        t25 = (KEY_SUPTNGSEC_EM_ZY, KEY_DISP_SUPTNGSEC_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
+        t25 = ('Label_18', 'Elastic modulus, Z<sub>y</sub> (cm<sup>3</sup>)', TYPE_TEXTBOX, None, elast_sec_mod_y)
         supporting_section.append(t25)
 
-        t26 = (KEY_SUPTNGSEC_PM_ZPZ, KEY_DISP_SUPTNGSEC_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
+        t26 = ('Label_19', 'Plastic modulus, Z<sub>pz</sub> (cm<sup>3</sup>)', TYPE_TEXTBOX, None, plast_sec_mod_z)
         supporting_section.append(t26)
 
-        t27 = (KEY_SUPTNGSEC_PM_ZPY, KEY_DISP_SUPTNGSEC_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
+        t27 = ('Label_20', 'Plastic modulus, Z<sub>py</sub> (cm<sup>3</sup>)', TYPE_TEXTBOX, None, plast_sec_mod_y)
         supporting_section.append(t27)
 
         t28 = (None, None, TYPE_BREAK, None, None)
         supporting_section.append(t28)
 
-        t29 = (KEY_SUPTNGSEC_SOURCE, KEY_DISP_SUPTNGSEC_SOURCE, TYPE_TEXTBOX, None, source)
+        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
         supporting_section.append(t29)
 
         t30 = (None, None, TYPE_ENTER, None, None)
@@ -1053,10 +1053,10 @@ class Compression(Main):
         t30 = (None, None, TYPE_ENTER, None, None)
         supporting_section.append(t30)
 
-        t31 = (KEY_SUPTNGSEC_POISSON_RATIO, KEY_DISP_SUPTNGSEC_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        t31 = ('Label_22', 'Poissons ratio, v', TYPE_TEXTBOX, None, p_r)
         supporting_section.append(t31)
 
-        t32 = (KEY_SUPTNGSEC_THERMAL_EXP, KEY_DISP_SUPTNGSEC_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        t32 = ('Label_23', 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)', TYPE_TEXTBOX, None, t_e)
         supporting_section.append(t32)
 
         t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, None)
@@ -1128,10 +1128,11 @@ class Compression(Main):
 
         supported_section = []
 
+
         t1 = (KEY_SUPTDSEC_DESIGNATION, KEY_DISP_SUPTDSEC_DESIGNATION, TYPE_TEXTBOX, None, designation)
         supported_section.append(t1)
 
-        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
+        t2 = (None, 'Mechanical Properties', TYPE_TITLE, None, None)
         supported_section.append(t2)
 
         material = connectdb("Material", call_type="popup")
@@ -1144,34 +1145,34 @@ class Compression(Main):
         t4 = (KEY_SUPTDSEC_FY, KEY_DISP_SUPTDSEC_FY, TYPE_TEXTBOX, None, fy)
         supported_section.append(t4)
 
-        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
+        t5 = (None, 'Dimensions', TYPE_TITLE, None, None)
         supported_section.append(t5)
 
-        t6 = (KEY_SUPTDSEC_DEPTH, KEY_DISP_SUPTDSEC_DEPTH, TYPE_TEXTBOX, None, depth)
+        t6 = ('Label_1', 'Depth, D (mm)*', TYPE_TEXTBOX, None, depth)
         supported_section.append(t6)
 
-        t7 = (KEY_SUPTDSEC_FLANGE_W, KEY_DISP_SUPTDSEC_FLANGE_W, TYPE_TEXTBOX, None, flange_width)
+        t7 = ('Label_2', 'Flange width, B (mm)*', TYPE_TEXTBOX, None, flange_width)
         supported_section.append(t7)
 
-        t8 = (KEY_SUPTDSEC_FLANGE_T, KEY_DISP_SUPTDSEC_FLANGE_T, TYPE_TEXTBOX, None, flange_thickness)
+        t8 = ('Label_3', 'Flange thickness, T (mm)*', TYPE_TEXTBOX, None, flange_thickness)
         supported_section.append(t8)
 
-        t9 = (KEY_SUPTDSEC_WEB_T, KEY_DISP_SUPTDSEC_WEB_T, TYPE_TEXTBOX, None, web_thickness)
+        t9 = ('Label_4', 'Web thickness, t (mm)*', TYPE_TEXTBOX, None, web_thickness)
         supported_section.append(t9)
 
-        t10 = (KEY_SUPTDSEC_FLANGE_S, KEY_DISP_SUPTDSEC_FLANGE_S, TYPE_TEXTBOX, None, flange_slope)
+        t10 = ('Label_5', 'Flange Slope, a (deg.)*', TYPE_TEXTBOX, None, flange_slope)
         supported_section.append(t10)
 
-        t11 = (KEY_SUPTDSEC_ROOT_R, KEY_DISP_SUPTDSEC_ROOT_R, TYPE_TEXTBOX, None, root_radius)
+        t11 = ('Label_6', 'Root radius, R1 (mm)*', TYPE_TEXTBOX, None, root_radius)
         supported_section.append(t11)
 
-        t12 = (KEY_SUPTDSEC_TOE_R, KEY_DISP_SUPTDSEC_TOE_R, TYPE_TEXTBOX, None, toe_radius)
+        t12 = ('Label_7', 'Toe radius, R2 (mm)*', TYPE_TEXTBOX, None, toe_radius)
         supported_section.append(t12)
 
         t13 = (None, None, TYPE_BREAK, None, None)
         supported_section.append(t13)
 
-        t14 = (KEY_SUPTDSEC_TYPE, KEY_DISP_SUPTDSEC_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        t14 = ('Label_8', 'Type', TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
         supported_section.append(t14)
 
         t18 = (None, None, TYPE_ENTER, None, None)
@@ -1180,49 +1181,49 @@ class Compression(Main):
         t18 = (None, None, TYPE_ENTER, None, None)
         supported_section.append(t18)
 
-        t15 = (KEY_SUPTDSEC_MOD_OF_ELAST, KEY_SUPTDSEC_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        t15 = ('Label_9', 'Modulus of elasticity, E (GPa)', TYPE_TEXTBOX, None, m_o_e)
         supported_section.append(t15)
 
-        t16 = (KEY_SUPTDSEC_MOD_OF_RIGID, KEY_SUPTDSEC_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        t16 = ('Label_10', 'Modulus of rifidity, G (GPa)', TYPE_TEXTBOX, None, m_o_r)
         supported_section.append(t16)
 
-        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        t17 = (None, 'Sectional Properties', TYPE_TITLE, None, None)
         supported_section.append(t17)
 
-        t18 = (KEY_SUPTDSEC_MASS, KEY_DISP_SUPTDSEC_MASS, TYPE_TEXTBOX, None, mass)
+        t18 = ('Label_11', 'Mass, M (Kg/m)', TYPE_TEXTBOX, None, mass)
         supported_section.append(t18)
 
-        t19 = (KEY_SUPTDSEC_SEC_AREA, KEY_DISP_SUPTDSEC_SEC_AREA, TYPE_TEXTBOX, None, area)
+        t19 = ('Label_12', 'Sectional area, a (mm<sup>2</sup>)', TYPE_TEXTBOX, None, area)
         supported_section.append(t19)
 
-        t20 = (KEY_SUPTDSEC_MOA_LZ, KEY_DISP_SUPTDSEC_MOA_LZ, TYPE_TEXTBOX, None, mom_inertia_z)
+        t20 = ('Label_13', '2nd Moment of area, l<sub>z</sub> (cm<sup>4</sup>)', TYPE_TEXTBOX, None, mom_inertia_z)
         supported_section.append(t20)
 
-        t21 = (KEY_SUPTDSEC_MOA_LY, KEY_DISP_SUPTDSEC_MOA_LY, TYPE_TEXTBOX, None, mom_inertia_y)
+        t21 = ('Label_14', '2nd Moment of area, l<sub>y</sub> (cm<sup>4</sup>)', TYPE_TEXTBOX, None, mom_inertia_y)
         supported_section.append(t21)
 
-        t22 = (KEY_SUPTDSEC_ROG_RZ, KEY_DISP_SUPTDSEC_ROG_RZ, TYPE_TEXTBOX, None, rad_of_gy_z)
+        t22 = ('Label_15', 'Radius of gyration, r<sub>z</sub> (cm)', TYPE_TEXTBOX, None, rad_of_gy_z)
         supported_section.append(t22)
 
-        t23 = (KEY_SUPTDSEC_ROG_RY, KEY_DISP_SUPTDSEC_ROG_RY, TYPE_TEXTBOX, None, rad_of_gy_y)
+        t23 = ('Label_16', 'Radius of gyration, r<sub>y</sub> (cm)', TYPE_TEXTBOX, None, rad_of_gy_y)
         supported_section.append(t23)
 
-        t24 = (KEY_SUPTDSEC_EM_ZZ, KEY_DISP_SUPTDSEC_EM_ZZ, TYPE_TEXTBOX, None, elast_sec_mod_z)
+        t24 = ('Label_17', 'Elastic modulus, Z<sub>z</sub> (cm<sup>3</sup>)', TYPE_TEXTBOX, None, elast_sec_mod_z)
         supported_section.append(t24)
 
-        t25 = (KEY_SUPTDSEC_EM_ZY, KEY_DISP_SUPTDSEC_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
+        t25 = ('Label_18', 'Elastic modulus, Z<sub>y</sub> (cm<sup>3</sup>)', TYPE_TEXTBOX, None, elast_sec_mod_y)
         supported_section.append(t25)
 
-        t26 = (KEY_SUPTDSEC_PM_ZPZ, KEY_DISP_SUPTDSEC_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
+        t26 = ('Label_19', 'Plastic modulus, Z<sub>pz</sub> (cm<sup>3</sup>)', TYPE_TEXTBOX, None, plast_sec_mod_z)
         supported_section.append(t26)
 
-        t27 = (KEY_SUPTDSEC_PM_ZPY, KEY_DISP_SUPTDSEC_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
+        t27 = ('Label_20', 'Plastic modulus, Z<sub>py</sub> (cm<sup>3</sup>)', TYPE_TEXTBOX, None, plast_sec_mod_y)
         supported_section.append(t27)
 
         t28 = (None, None, TYPE_BREAK, None, None)
         supported_section.append(t28)
 
-        t29 = (KEY_SUPTDSEC_SOURCE, KEY_DISP_SUPTDSEC_SOURCE, TYPE_TEXTBOX, None, source)
+        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
         supported_section.append(t29)
 
         t30 = (None, None, TYPE_ENTER, None, None)
@@ -1231,10 +1232,10 @@ class Compression(Main):
         t30 = (None, None, TYPE_ENTER, None, None)
         supported_section.append(t30)
 
-        t31 = (KEY_SUPTDSEC_POISSON_RATIO, KEY_DISP_SUPTDSEC_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        t31 = ('Label_22', 'Poissons ratio, v', TYPE_TEXTBOX, None, p_r)
         supported_section.append(t31)
 
-        t32 = (KEY_SUPTDSEC_THERMAL_EXP, KEY_DISP_SUPTDSEC_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        t32 = ('Label_23', 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)', TYPE_TEXTBOX, None, t_e)
         supported_section.append(t32)
 
         t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, None)
@@ -1395,20 +1396,14 @@ class Compression(Main):
         t3 = ("Connector", [KEY_PLATE_MATERIAL], [KEY_PLATE_FU, KEY_PLATE_FY], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t3)
 
-        t4 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC_DEPTH, KEY_SUPTNGSEC_FLANGE_W, KEY_SUPTNGSEC_FLANGE_T,
-                                KEY_SUPTNGSEC_WEB_T], [KEY_SUPTNGSEC_MASS, KEY_SUPTNGSEC_SEC_AREA, KEY_SUPTNGSEC_MOA_LZ,
-                                                       KEY_SUPTNGSEC_MOA_LY, KEY_SUPTNGSEC_ROG_RZ, KEY_SUPTNGSEC_ROG_RY,
-                                                       KEY_SUPTNGSEC_EM_ZZ, KEY_SUPTNGSEC_EM_ZY,
-                                                       KEY_SUPTNGSEC_PM_ZPZ, KEY_SUPTNGSEC_PM_ZPY], TYPE_TEXTBOX,
-              self.get_sec_properties)
+        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_sec_properties)
         change_tab.append(t4)
 
-        t5 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC_DEPTH, KEY_SUPTDSEC_FLANGE_W, KEY_SUPTDSEC_FLANGE_T,
-                                 KEY_SUPTDSEC_WEB_T], [KEY_SUPTDSEC_MASS, KEY_SUPTDSEC_SEC_AREA, KEY_SUPTDSEC_MOA_LZ,
-                                                       KEY_SUPTDSEC_MOA_LY, KEY_SUPTDSEC_ROG_RZ, KEY_SUPTDSEC_ROG_RY,
-                                                       KEY_SUPTDSEC_EM_ZZ, KEY_SUPTDSEC_EM_ZY,
-                                                       KEY_SUPTDSEC_PM_ZPZ, KEY_SUPTDSEC_PM_ZPY], TYPE_TEXTBOX,
-              self.get_sec_properties)
+        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_sec_properties)
         change_tab.append(t5)
 
         return change_tab
@@ -1445,27 +1440,17 @@ class Compression(Main):
             pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
             pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
 
-        d = {KEY_SUPTNGSEC_MASS: str(mass),
-             KEY_SUPTNGSEC_SEC_AREA: str(area),
-             KEY_SUPTNGSEC_MOA_LZ: str(moa_z),
-             KEY_SUPTNGSEC_MOA_LY: str(moa_y),
-             KEY_SUPTNGSEC_ROG_RZ: str(rog_z),
-             KEY_SUPTNGSEC_ROG_RY: str(rog_y),
-             KEY_SUPTNGSEC_EM_ZZ: str(em_z),
-             KEY_SUPTNGSEC_EM_ZY: str(em_y),
-             KEY_SUPTNGSEC_PM_ZPZ: str(pm_z),
-             KEY_SUPTNGSEC_PM_ZPY: str(pm_y),
+        d = {'Label_11': str(mass),
+             'Label_12': str(area),
+             'Label_13': str(moa_z),
+             'Label_14': str(moa_y),
+             'Label_15': str(rog_z),
+             'Label_16': str(rog_y),
+             'Label_17': str(em_z),
+             'Label_18': str(em_y),
+             'Label_19': str(pm_z),
+             'Label_20': str(pm_y),
 
-             KEY_SUPTDSEC_MASS: str(mass),
-             KEY_SUPTDSEC_SEC_AREA: str(area),
-             KEY_SUPTDSEC_MOA_LZ: str(moa_z),
-             KEY_SUPTDSEC_MOA_LY: str(moa_y),
-             KEY_SUPTDSEC_ROG_RZ: str(rog_z),
-             KEY_SUPTDSEC_ROG_RY: str(rog_y),
-             KEY_SUPTDSEC_EM_ZZ: str(em_z),
-             KEY_SUPTDSEC_EM_ZY: str(em_y),
-             KEY_SUPTDSEC_PM_ZPZ: str(pm_z),
-             KEY_SUPTDSEC_PM_ZPY: str(pm_y)
             }
 
         return d

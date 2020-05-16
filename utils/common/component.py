@@ -1080,7 +1080,7 @@ class Plate(Material):
                                                 , min_edge_dist, min_gauge, min_bolts_one_line,min_bolt_line)
 
         print("boltdetails0", bolt_line, bolts_one_line, web_plate_h)
-
+        count = 0
 
         if bolts_one_line < min_bolts_one_line:
             self.design_status = False
@@ -1172,6 +1172,24 @@ class Plate(Material):
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,
                                                       bolt_dia)
+                convergence= bolt_capacity_red - vres
+
+                if convergence < 0:
+                    if count ==0:
+                        initial_convergence = convergence
+                        count = count +1
+                    else:
+                        if initial_convergence < convergence:
+                            initial_convergence = convergence
+                        else:
+                            break
+                else:
+                    pass
+
+
+
+
+
                 print("vres, vred", vres, bolt_capacity_red)
 
 

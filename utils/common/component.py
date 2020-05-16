@@ -804,13 +804,15 @@ class Weld(Material):
         self.min_weld = min_weld_thickness
 
 class Plate(Material):
-
     def __init__(self, thickness=[], height=0.0,Innerheight=0.0, length=0.0,Innerlength=0.0, gap=0.0, material_grade=""):
         super(Plate, self).__init__(material_grade=material_grade)
         self.design_status = False
         self.reason = ""
-        self.thickness = list(np.float_(thickness))
-        self.thickness.sort(key=float)
+        if thickness:
+            self.thickness = list(np.float_(thickness))
+            self.thickness.sort(key=float)
+        else:
+            self.thickness = 0.0
         self.thickness_provided = 0.0
         self.height = height
         self.length = length
@@ -1492,7 +1494,7 @@ class Plate(Material):
 
 class Angle(Section):
 
-    def __init__(self, designation, material_grade ):
+    def __init__(self, designation, material_grade):
         # super(Angle, self).__init__(material_grade)
         super(Angle, self).__init__(designation, material_grade)
 

@@ -819,6 +819,7 @@ class Plate(Material):
         else:
             self.thickness = 0.0
         self.thickness_provided = 0.0
+        super(Plate, self).__init__(material_grade, self.thickness_provided)
         self.height = height
         self.length = length
         self.gap = float(gap)

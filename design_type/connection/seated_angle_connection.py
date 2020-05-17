@@ -42,8 +42,6 @@ ASCII diagram
 
 """
 
-
-
 from design_type.connection.shear_connection import ShearConnection
 from utils.common.component import *
 from utils.common.material import *
@@ -683,5 +681,5 @@ class SeatedAngleConnection(ShearConnection):
 
         return capacities
 
-    def to_get_d(my_d):
-        print(my_d)
+    # def to_get_d(my_d):
+    #     print(my_d)

@@ -950,8 +950,17 @@ class Compression(Main):
             plast_sec_mod_y = str(col_attributes.plast_sec_mod_y)
 
         supporting_section = []
+
+        if input_dictionary:
+            designation_list = input_dictionary[KEY_SECSIZE]
+        else:
+            designation_list = []
+
         t1 = (KEY_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_DESIGNATION, TYPE_TEXTBOX, None, designation)
         supporting_section.append(t1)
+
+        t0 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, designation_list, designation)
+        supporting_section.append(t0)
 
         t2 = (None, 'Mechanical Properties', TYPE_TITLE, None, None)
         supporting_section.append(t2)
@@ -1128,9 +1137,16 @@ class Compression(Main):
 
         supported_section = []
 
+        if input_dictionary:
+            designation_list = input_dictionary[KEY_SECSIZE]
+        else:
+            designation_list = []
 
         t1 = (KEY_SUPTDSEC_DESIGNATION, KEY_DISP_SUPTDSEC_DESIGNATION, TYPE_TEXTBOX, None, designation)
         supported_section.append(t1)
+
+        t0 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, designation_list, designation)
+        supported_section.append(t0)
 
         t2 = (None, 'Mechanical Properties', TYPE_TITLE, None, None)
         supported_section.append(t2)
@@ -1406,6 +1422,18 @@ class Compression(Main):
                'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_sec_properties)
         change_tab.append(t5)
 
+        t6 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC, KEY_SUPTNGSEC_MATERIAL],
+              [KEY_SUPTNGSEC_DESIGNATION, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5', 'Label_6', 'Label_7',
+               'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20', 'Label_21'], TYPE_TEXTBOX, self.get_new_section_properties)
+        change_tab.append(t6)
+
+        t7 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC, KEY_SUPTDSEC_MATERIAL],
+              [KEY_SUPTDSEC_DESIGNATION, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5', 'Label_6', 'Label_7',
+               'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20', 'Label_21'], TYPE_TEXTBOX, self.get_new_section_properties)
+        change_tab.append(t7)
+
         return change_tab
 
     def get_sec_properties(self):
@@ -1449,8 +1477,7 @@ class Compression(Main):
              'Label_17': str(em_z),
              'Label_18': str(em_y),
              'Label_19': str(pm_z),
-             'Label_20': str(pm_y),
-
+             'Label_20': str(pm_y)
             }
 
         return d
@@ -1467,6 +1494,61 @@ class Compression(Main):
              KEY_PLATE_FY: fy,
              KEY_BASE_PLATE_FU: fu,
              KEY_BASE_PLATE_FY: fy}
+
+        return d
+
+    def get_new_section_properties(self):
+
+        designation = self[0]
+        material_grade = self[1]
+        if designation in connectdb("Beams", call_type="popup"):
+            table = "Beams"
+        else:
+            table = "Columns"
+        col_attributes = Section(designation, material_grade)
+        Section.connect_to_database_update_other_attributes(
+            col_attributes, table, designation)
+        source = str(col_attributes.source)
+        depth = str(col_attributes.depth)
+        flange_width = str(col_attributes.flange_width)
+        flange_thickness = str(col_attributes.flange_thickness)
+        web_thickness = str(col_attributes.web_thickness)
+        flange_slope = str(col_attributes.flange_slope)
+        root_radius = str(col_attributes.root_radius)
+        toe_radius = str(col_attributes.toe_radius)
+        mass = str(col_attributes.mass)
+        area = str(col_attributes.area)
+        mom_inertia_z = str(col_attributes.mom_inertia_z)
+        mom_inertia_y = str(col_attributes.mom_inertia_y)
+        rad_of_gy_z = str(col_attributes.rad_of_gy_z)
+        rad_of_gy_y = str(col_attributes.rad_of_gy_y)
+        elast_sec_mod_z = str(col_attributes.elast_sec_mod_z)
+        elast_sec_mod_y = str(col_attributes.elast_sec_mod_y)
+        plast_sec_mod_z = str(col_attributes.plast_sec_mod_z)
+        plast_sec_mod_y = str(col_attributes.plast_sec_mod_y)
+
+        d = {
+            KEY_SUPTNGSEC_DESIGNATION: str(designation),
+            KEY_SUPTDSEC_DESIGNATION: str(designation),
+            'Label_1': str(depth),
+            'Label_2': str(flange_width),
+            'Label_3': str(flange_thickness),
+            'Label_4': str(web_thickness),
+            'Label_5': str(flange_slope),
+            'Label_6': str(root_radius),
+            'Label_7': str(toe_radius),
+            'Label_11': str(mass),
+            'Label_12': str(area),
+            'Label_13': str(mom_inertia_z),
+            'Label_14': str(mom_inertia_y),
+            'Label_15': str(rad_of_gy_z),
+            'Label_16': str(rad_of_gy_y),
+            'Label_17': str(elast_sec_mod_z),
+            'Label_18': str(elast_sec_mod_y),
+            'Label_19': str(plast_sec_mod_z),
+            'Label_20': str(plast_sec_mod_y),
+            'Label_21': str(source)
+            }
 
         return d
 

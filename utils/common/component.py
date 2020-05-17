@@ -261,6 +261,8 @@ class Section(Material):
         self.mass = 0.0
         self.area = 0.0
         self.depth = 0.0
+        # web_height for for rolled section without notches (considered as default)
+        self.web_height = self.depth
         self.flange_width = 0.0
         self.web_thickness = 0.0
         self.flange_thickness = 0.0
@@ -635,6 +637,7 @@ class Beam(Section):
     def __init__(self, designation, material_grade):
         super(Beam, self).__init__(designation, material_grade)
         self.connect_to_database_update_other_attributes("Beams", designation)
+
 
     def min_plate_height(self):
         return 0.6 * self.depth

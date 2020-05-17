@@ -337,7 +337,8 @@ class Section(Material):
         self.plast_sec_mod_z = row[17]
         print(row[17], "plast_sec_mod_z")
         if self.plast_sec_mod_z is None:  # Todo: add in database
-            self.plast_sec_mod_z = self.elast_sec_mod_z
+            self.plast_sec_mod_z = I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)
             print(self.plast_sec_mod_z,"plast_sec_mod_z")
         else:
             self.plast_sec_mod_z = row[17] *1000
@@ -345,7 +346,8 @@ class Section(Material):
         self.plast_sec_mod_y = row[18]
         print(row[18], "plast_sec_mod_z")
         if self.plast_sec_mod_y is None:  # Todo: add in database
-            self.plast_sec_mod_y = self.elast_sec_mod_y
+            self.plast_sec_mod_y = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)
             print(self.plast_sec_mod_y, "plast_sec_mod_y")
         else:
             self.plast_sec_mod_y = row[17] * 1000
@@ -851,6 +853,7 @@ class Plate(Material):
         self.tension_capacity_web_plate = 0.0
         self.tension_capacity_flange_plate = 0.0
         self.block_shear_capacity_shear = 0.0
+        self.block_shear_capacity_axial = 0.0
         self.moment_capacity = 0.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
@@ -1130,7 +1133,9 @@ class Plate(Material):
                 # Length of plate is increased for calculated bolts in one line.
                 # This increases spacing which decreases resultant force
                 print(4, web_plate_h, web_plate_h_max)
-                if web_plate_h + 10 <= web_plate_h_max and shear_ecc is True and gauge!=0:
+                [gauge, edge_dist, web_plate_h_recalc] = self.get_gauge_edge_dist(web_plate_h+10, bolts_one_line, min_edge_dist,
+                                                                           max_spacing, max_edge_dist)
+                if web_plate_h_recalc <= web_plate_h_max and shear_ecc is True and gauge!=0:
                 # gauge is recalculated only if there is shear ecc or else increase in bolt is the only option
                     web_plate_h += 10
                     print("boltdetails2", bolt_line, bolts_one_line, web_plate_h)

@@ -1196,17 +1196,27 @@ KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity (kN)'
 KEY_OUT_PLATE_YIELD = 'Plate.Yield'
 KEY_OUT_DISP_PLATE_YIELD = 'Yield Capacity'
 KEY_OUT_PLATE_RUPTURE = 'Plate.Rupture'
-KEY_OUT_DISP_PLATE_RUPTURE = 'Rupture Capacity'
+KEY_OUT_DISP_PLATE_RUPTURE = 'Rupture Capacity (kN)'
 
 KEY_OUT_PLATE_BLK_SHEAR = 'Plate.BlockShear'
 KEY_OUT_DISP_PLATE_BLK_SHEAR = 'Block Shear Capacity (kN)'
 KEY_OUT_PLATE_MOM_DEMAND = 'Plate.MomDemand'
-
 KEY_OUT_DISP_PLATE_MOM_DEMAND = 'Moment Demand (kN-m)'
 KEY_OUT_DISP_PLATE_MOM_DEMAND_SEP = 'Moment Demand per Bolt (kN-m)'
 KEY_OUT_PLATE_MOM_CAPACITY = 'Plate.MomCapacity'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kN-m)'
 KEY_OUT_DISP_PLATE_MOM_CAPACITY_SEP = 'Moment Capacity per Bolt (kN-m)'
+
+
+KEY_OUT_PLATE_TENSION = 'Plate.TensionYield'
+
+KEY_OUT_DISP_PLATE_TENSION = 'Tension yielding Capacity (kN)'
+
+KEY_OUT_PLATE_TENSION_RUP = 'Plate.TensionRupture'
+KEY_OUT_DISP_PLATE_TENSION_RUP = 'Tension Rupture Capacity (kN)'
+
+KEY_OUT_PLATE_BLK_SHEAR_AXIAL = 'Plate.BlockShearAxial'
+KEY_OUT_DISP_PLATE_BLK_SHEAR_AXIAL = 'Axial Block Shear Capacity (kN)'
 
 KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'

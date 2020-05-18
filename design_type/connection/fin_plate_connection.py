@@ -549,6 +549,7 @@ class FinPlateConnection(ShearConnection):
         self.plate.design_status_2 = False
         self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],fabrication = design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
+        self.warn_text(self)
         self.member_capacity(self)
 
         # if self.design_status:
@@ -711,13 +712,17 @@ class FinPlateConnection(ShearConnection):
                 self.section_shear_checks(self)
                 self.plate_shear_checks(self)
                 self.design_weld(self, available_welds)
-                while self.plate.height+10 <= self.max_plate_height and (self.supported_section.design_status == False or
-                            self.plate.design_status_2 == False or self.weld.design_status == False):
-                    self.section_shear_checks(self)
-                    self.plate_shear_checks(self)
-                    self.design_weld(self, available_welds)
-                    self.plate.height+=10
-                    self.plate.edge_dist_provided += 5
+                while self.supported_section.design_status == False or self.plate.design_status_2 == False or \
+                        self.weld.design_status == False:
+                    if self.plate.moment_capacity > self.plate.moment_demand and self.plate.height+10 <= self.max_plate_height:
+                        self.plate.height += 10
+                        self.plate.edge_dist_provided += 5
+                        self.section_shear_checks(self)
+                        self.plate_shear_checks(self)
+                        self.design_weld(self, available_welds)
+                    else:
+                        break
+
 
             else:
                 logger.error(": For given members and %2.2f mm thick plate, weld sizes should be of range "
@@ -725,12 +730,12 @@ class FinPlateConnection(ShearConnection):
                              % self.weld_size_max)
                 logger.info(": Cannot design weld with available welds ")
 
-            if self.supported_section.design_status is False:
+            if self.plate.moment_capacity < self.plate.moment_demand:
                 break
+
             if self.supported_section.design_status is True and self.plate.design_status is True and self.weld.design_status is True:
                 self.recalculating_bolt_values(self)
                 break
-
 
         if self.load.shear_force*1000 > self.plate.shear_capacity:
             self.design_status = False
@@ -964,7 +969,9 @@ class FinPlateConnection(ShearConnection):
         print(self.weld.strength)
         self.weld.get_weld_stress(weld_axial=force_l, weld_shear=force_w, weld_twist=force_t, Ip_weld=Ip_weld, y_max=y_max,
                                                     x_max=x_max, l_weld=2*self.weld.eff_length)
-        t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
+        K_unit_weld = 0.7
+        t_weld_req = self.weld.size * self.weld.stress / self.weld.strength / 0.7
+
         updated_weld_list = list([x for x in available_welds if (t_weld_req <= x)])
         if not updated_weld_list:
             self.weld.design_status = False
@@ -1005,29 +1012,63 @@ class FinPlateConnection(ShearConnection):
             logger.info("=== End Of Design ===")
 
     def results_to_test(self):
-        test_out_list = {KEY_OUT_DISP_D_PROVIDED:self.bolt.bolt_diameter_provided,
-                        KEY_OUT_DISP_GRD_PROVIDED:self.bolt.bolt_grade_provided,
-                        KEY_OUT_DISP_BOLT_SHEAR:self.bolt.bolt_shear_capacity,
-                        KEY_OUT_DISP_BOLT_BEARING:self.bolt.bolt_shear_capacity,
-                        KEY_OUT_DISP_BOLT_CAPACITY:self.bolt.bolt_capacity,
-                        KEY_OUT_DISP_BOLT_FORCE:self.plate.bolt_force,
-                        KEY_OUT_DISP_BOLT_LINE:self.plate.bolt_line,
-                        KEY_OUT_DISP_BOLTS_ONE_LINE:self.plate.bolts_one_line,
-                        KEY_OUT_DISP_PITCH:self.plate.pitch_provided,
-                        KEY_OUT_DISP_END_DIST:self.plate.end_dist_provided,
-                        KEY_OUT_DISP_GAUGE:self.plate.gauge_provided,
-                        KEY_OUT_DISP_EDGE_DIST:self.plate.edge_dist_provided,
-                        KEY_OUT_DISP_PLATETHK:self.plate.thickness_provided,
-                        KEY_OUT_DISP_PLATE_HEIGHT:self.plate.height,
-                        KEY_OUT_DISP_PLATE_LENGTH:self.plate.length,
-                        KEY_OUT_DISP_PLATE_SHEAR:self.plate.shear_yielding_capacity,
-                        KEY_OUT_DISP_PLATE_BLK_SHEAR:self.plate.block_shear_capacity,
-                        KEY_OUT_DISP_PLATE_MOM_DEMAND:self.plate.moment_demand,
-                        KEY_OUT_DISP_PLATE_MOM_CAPACITY:self.plate.moment_capacity,
-                        KEY_OUT_DISP_WELD_SIZE:self.weld.size,
-                        KEY_OUT_DISP_WELD_STRENGTH:self.weld.strength,
-                        KEY_OUT_DISP_WELD_STRESS:self.weld.stress}
-        return test_out_list
+        test_in_list = {KEY_MODULE: self.module,
+                        KEY_MAIN_MODULE: self.mainmodule,
+                        KEY_CONN: self.connectivity,
+                        KEY_MATERIAL: self.plate.material,
+                        KEY_SHEAR: self.load.shear_force,
+                        KEY_AXIAL:self.load.axial_force,
+                        KEY_SUPTNGSEC_DESIGNATION:self.supporting_section.designation,
+                        KEY_SUPTNGSEC_MATERIAL:self.supporting_section.material,
+                        KEY_SUPTNGSEC_FU:self.supporting_section.fu,
+                        KEY_SUPTNGSEC_FY:self.supporting_section.fy,
+                        KEY_SUPTDSEC_DESIGNATION:self.supported_section.designation,
+                        KEY_SUPTDSEC_FU: self.supported_section.fu,
+                        KEY_SUPTDSEC_FY: self.supported_section.fy,
+                        KEY_D: self.bolt.bolt_diameter,
+                        KEY_GRD: self.bolt.bolt_grade,
+                        KEY_TYP: self.bolt.bolt_type,
+                        KEY_DP_BOLT_TYPE:self.bolt.bolt_type,
+                        KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+                        KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+                        KEY_PLATETHK: self.plate.thickness,
+                        KEY_PLATE_MATERIAL: self.plate.material,
+                        KEY_PLATE_FU: self.plate.fu,
+                        KEY_PLATE_FY: self.plate.fy,
+                        KEY_DP_WELD_TYPE: 'Fillet',
+                        KEY_DP_WELD_FAB: self.weld.fabrication,
+                        KEY_DP_WELD_MATERIAL_G_O: self.weld.fu,
+                        KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+                        KEY_DP_DETAILING_GAP: self.plate.gap,
+                        KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+
+        test_out_list = {KEY_OUT_D_PROVIDED:self.bolt.bolt_diameter_provided,
+                        KEY_OUT_GRD_PROVIDED:self.bolt.bolt_grade_provided,
+                        KEY_OUT_BOLT_SHEAR:self.bolt.bolt_shear_capacity,
+                        KEY_OUT_BOLT_BEARING:self.bolt.bolt_bearing_capacity,
+                        KEY_OUT_BOLT_CAPACITY:self.bolt.bolt_capacity,
+                        KEY_OUT_BOLT_FORCE:self.plate.bolt_force,
+                        KEY_OUT_BOLT_LINE:self.plate.bolt_line,
+                        KEY_OUT_BOLTS_ONE_LINE:self.plate.bolts_one_line,
+                        KEY_OUT_PITCH:self.plate.pitch_provided,
+                        KEY_OUT_END_DIST:self.plate.end_dist_provided,
+                        KEY_OUT_GAUGE:self.plate.gauge_provided,
+                        KEY_OUT_EDGE_DIST:self.plate.edge_dist_provided,
+                        KEY_OUT_PLATETHK:self.plate.thickness_provided,
+                        KEY_OUT_PLATE_HEIGHT:self.plate.height,
+                        KEY_OUT_PLATE_LENGTH:self.plate.length,
+                        KEY_OUT_PLATE_SHEAR:self.plate.shear_yielding_capacity,
+                        KEY_OUT_PLATE_RUPTURE: self.plate.shear_rupture_capacity,
+                        KEY_OUT_PLATE_BLK_SHEAR:self.plate.block_shear_capacity_shear,
+                        KEY_OUT_PLATE_TENSION: self.plate.tension_yielding_capacity,
+                        KEY_OUT_PLATE_TENSION_RUP: self.plate.tension_rupture_capacity,
+                        KEY_OUT_PLATE_BLK_SHEAR_AXIAL: self.plate.block_shear_capacity_axial,
+                        KEY_OUT_PLATE_MOM_DEMAND:self.plate.moment_demand,
+                        KEY_OUT_PLATE_MOM_CAPACITY:self.plate.moment_capacity,
+                        KEY_OUT_WELD_SIZE:self.weld.size,
+                        KEY_OUT_WELD_STRENGTH:self.weld.strength,
+                        KEY_OUT_WELD_STRESS:self.weld.stress}
+        return test_in_list, test_out_list
 
     # r'/ResourceFiles/images/ColumnsBeams".png'
     def save_design(self,popup_summary):

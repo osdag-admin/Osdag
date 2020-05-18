@@ -1246,7 +1246,7 @@ class Plate(Material):
 
 
     def get_flange_plate_details(self, bolt_dia, flange_plate_h_min, flange_plate_h_max, bolt_capacity, min_edge_dist, min_gauge, max_spacing, max_edge_dist,web_thickness, root_radius,
-                              shear_load=0.0, axial_load=0.0, gap=0.0,  bolt_line_limit=math.inf):
+                              shear_load=0.0, axial_load=0.0, gap=0.0,  bolt_line_limit=math.inf,joint =None):
     #todo anjali
         """
 
@@ -1366,9 +1366,15 @@ class Plate(Material):
             else:
                 pitch = min_gauge
 
-            bolt_capacity_red = self.get_bolt_red(bolts_one_line,
-                                                  gauge, bolt_line,pitch,bolt_capacity,
-                                                  bolt_dia)
+            if joint == None:
+
+                bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+                                                      gauge, bolt_line, pitch, bolt_capacity,
+                                                      bolt_dia)
+            else:
+                bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+                                                      gauge, bolt_line, pitch, bolt_capacity,
+                                                      bolt_dia, end_dist, gap)
 
 
             if vres > bolt_capacity_red:

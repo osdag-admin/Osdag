@@ -83,9 +83,9 @@ pDir      |      |       | End distance  |
 
         self.pitch = plateObj.pitch_provided
         self.gauge = plateObj.gauge_provided
-        self.edge = plateObj.edge_dist_provided
+        self.edge = plateObj.end_dist_provided
         self.plateedge = plateObj.end_dist_provided + plateObj.gap
-        self.end = plateObj.end_dist_provided
+        self.end = plateObj.edge_dist_provided
         self.row = plateObj.bolts_one_line
         self.col = plateObj.bolt_line
 

@@ -1,5 +1,10 @@
 Bolt.Diameter:
 - '12'
+- '16'
+- '20'
+- '24'
+- '30'
+- '36'
 Bolt.Grade:
 - '3.6'
 - '4.6'
@@ -24,7 +29,7 @@ DesignPreferences.Detailing.Gap: '10'
 DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
 Load.Axial: '300'
-Load.Shear: '200'
+Load.Shear: '400'
 Member.Material: E 250 (Fe 410 W)A
 Member.Supported_Section: NPB 600x220x122.4
 Member.Supported_Section.Material: E 250 (Fe 410 W)A

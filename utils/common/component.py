@@ -253,6 +253,7 @@ class Section(Material):
 
     def __init__(self, designation, material_grade=""):
 
+        self.design_status = True
         self.designation = designation
         self.type = "Rolled"
         self.type2 = "generally"
@@ -282,7 +283,13 @@ class Section(Material):
         super(Section, self).__init__(material_grade,max_thickness)
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
+        self.shear_yielding_capacity = 0.0
+        self.shear_rupture_capacity = 0.0
+        self.block_shear_capacity_shear = 0.0
+        self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity = 0.0
+        self.shear_capacity = 0.0
+        self.tension_capacity = 0.0
         self.tension_capacity_flange = 0.0
 
         self.tension_yielding_capacity_web = 0.0  #
@@ -306,6 +313,7 @@ class Section(Material):
         self.slenderness = 0.0
         self.min_radius_gyration = 0.0
         self.beta =0.0
+        self.IR = 1.0
         # self.min_rad_gyration_bbchannel = 0.0
 
         # self.member_yield_eqn =0.0
@@ -338,7 +346,7 @@ class Section(Material):
         print(row[17], "plast_sec_mod_z")
         if self.plast_sec_mod_z is None:  # Todo: add in database
             self.plast_sec_mod_z = I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,
-                                                                                   self.web_thickness,self.flange_thickness)
+                                                                                   self.web_thickness,self.flange_thickness)*1000
             print(self.plast_sec_mod_z,"plast_sec_mod_z")
         else:
             self.plast_sec_mod_z = row[17] *1000
@@ -347,7 +355,7 @@ class Section(Material):
         print(row[18], "plast_sec_mod_z")
         if self.plast_sec_mod_y is None:  # Todo: add in database
             self.plast_sec_mod_y = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
-                                                                                   self.web_thickness,self.flange_thickness)
+                                                                                   self.web_thickness,self.flange_thickness)*1000
             print(self.plast_sec_mod_y, "plast_sec_mod_y")
         else:
             self.plast_sec_mod_y = row[17] * 1000
@@ -716,6 +724,7 @@ class Weld(Material):
         self.type = type
         self.size = 0.0
         self.length = 0.0
+        self.eff_length = 0.0
         self.Innerlength = 0.0
         self.effective = 0.0
         self.height =0.0
@@ -856,6 +865,7 @@ class Plate(Material):
         self.block_shear_capacity_shear = 0.0
         self.block_shear_capacity_axial = 0.0
         self.moment_capacity = 0.0
+        self.IR = 1.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
         # self.block_shear_capacity_disp = round(self.block_shear_capacity/1000, 2)

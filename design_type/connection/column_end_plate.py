@@ -159,8 +159,8 @@ class ColumnEndPlate(MomentConnection):
         t22 = (KEY_ENDPLATE_THICKNESS, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_endplatethk, VALUES_ENDPLATE_THICKNESS)
         options_list.append(t22)
 
-        t13 = (KEY_CONN_PREFERENCE, KEY_DISP_CONN_PREFERENCE, TYPE_COMBOBOX, existingvalue_design_pref, VALUES_CONN_PREFERENCE)
-        options_list.append(t13)
+        # t13 = (KEY_CONN_PREFERENCE, KEY_DISP_CONN_PREFERENCE, TYPE_COMBOBOX, existingvalue_design_pref, VALUES_CONN_PREFERENCE)
+        # options_list.append(t13)
 
         return options_list
 
@@ -216,9 +216,6 @@ class ColumnEndPlate(MomentConnection):
         t3 = (KEY_GRD, KEY_DISP_GRD, TYPE_TEXTBOX,self.bolt_grade_provided if flag else '')
         out_list.append(t3)
 
-        t20 = (None, DISP_TITLE_BOLT_CAPACITIES, TYPE_TITLE, None)
-        out_list.append(t20)
-
         t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
               round(self.bolt.bolt_shear_capacity / 1000, 2) if flag else '')
         out_list.append(t4)
@@ -238,12 +235,27 @@ class ColumnEndPlate(MomentConnection):
               round(self.bolt.bolt_capacity / 1000, 2) if flag else '')
         out_list.append(t6)
 
-        t6 = (KEY_OUT_BOLT_TENSION_CAPACITY, KEY_OUT_DISP_BOLT_TENSION_CAPACITY, TYPE_TEXTBOX,
+        t7 = (KEY_OUT_BOLT_TENSION_CAPACITY, KEY_OUT_DISP_BOLT_TENSION_CAPACITY, TYPE_TEXTBOX,
               round(self.bolt.bolt_tension_capacity / 1000, 2) if flag else '')
-        out_list.append(t6)
+        out_list.append(t7)
 
-        t21 = (KEY_BOLT_DETAILS, KEY_DISP_BOLT_DETAILS, TYPE_OUT_BUTTON, ['Bolt detailing', self.detailing])
-        out_list.append(t21)
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '')
+        out_list.append(t9)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.end_dist if flag else '')
+        out_list.append(t10)
+
+        t8 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '')
+        out_list.append(t8)
+
+        t9 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf + 4 if flag else '')
+        out_list.append(t9)
+
+        t11 = (KEY_OUT_NO_BOLTS, KEY_OUT_DISP_NO_BOLTS, TYPE_TEXTBOX, self.no_bolts if flag else '')
+        out_list.append(t11)
+
+        # t21 = (KEY_BOLT_DETAILS, KEY_DISP_BOLT_DETAILS, TYPE_OUT_BUTTON, ['Bolt detailing', self.detailing])
+        # out_list.append(t21)
 
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None)
         out_list.append(t13)
@@ -344,7 +356,7 @@ class ColumnEndPlate(MomentConnection):
 
         self.module = design_dictionary[KEY_MODULE]
         self.connection = design_dictionary[KEY_CONN]
-        self.design_pref = design_dictionary[KEY_CONN_PREFERENCE]
+        # self.design_pref = design_dictionary[KEY_CONN_PREFERENCE]
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_ENDPLATE_THICKNESS, None), material_grade=design_dictionary[KEY_MATERIAL])
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
@@ -376,7 +388,7 @@ class ColumnEndPlate(MomentConnection):
 
         else:
             self.design_status = False
-            logger.error("The axial force {} acting is higher than axial capacity {} of member").format(self.load.axial_force,self.axial_capacity)
+            logger.error(":The axial force {} acting is higher than axial capacity {} of member").format(self.load.axial_force,self.axial_capacity)
             logger.info("Increase member size or decrease axial load")
         # self.load.axial_force = self.factored_axial_load  # N
         print("factored_axial_load", self.factored_axial_load)
@@ -395,7 +407,7 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = True
         else:
             self.design_status = False
-            logger.error("The shear force {} acting is higher than axial capacity {} of member").format(self.load.shear_force,self.shear_capacity)
+            logger.error(":The shear force {} acting is higher than axial capacity {} of member").format(self.load.shear_force,self.shear_capacity)
             logger.info("Increase member size or decrease shear load")
         print("factored_shear_load", self.factored_shear_load)
 ###############################################################
@@ -469,7 +481,7 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = True
         else:
             self.design_status = False
-            logger.error("The moment {} acting is higher than moment capacity {} of member").format(self.load.moment, self.moment_capacity)
+            logger.error(":The moment {} acting is higher than moment capacity {} of member").format(self.load.moment, self.moment_capacity)
             logger.info("Increase member size or decrease shear load")
         print("factored_moment", self.factored_moment)
 
@@ -485,7 +497,7 @@ class ColumnEndPlate(MomentConnection):
     ## Function to get bolt diam ##
 ############################################################################################
 
-    def get_bolt_diam(self):
+    def get_bolt_diam(self, previous_size = None):
         self.lst1 = []
         self.lst2 = []
 
@@ -518,6 +530,7 @@ class ColumnEndPlate(MomentConnection):
             else:
                 self.p_2_web = (self.section.depth - (2 * self.section.flange_thickness) - (2 * self.end_dist) - ((self.n_bw - 3) * self.pitch))/2
             print("p_2_web",self.p_2_web)
+
         ######### pitch 2 along flange  ################
             if self.n_bf % 2 == 0:
                 self.p_2_flange = (self.section.flange_width/2) - (self.section.web_thickness/2) - (2 * self.end_dist) - (self.n_bf * self.pitch)
@@ -694,50 +707,89 @@ class ColumnEndPlate(MomentConnection):
 
             print("T_b: ",self.t_b,"Bolt tension capacity: ",self.bolt.bolt_tension_capacity)
             if self.t_b < self.bolt.bolt_tension_capacity:
-                self.lst1.append(x)
-                self.lst2.append(self.no_bolts)
-                # self.lst2.append(y)
-                self.res   = dict(zip(self.lst1, self.lst2))
+                # self.lst1.append(x)
+                # self.lst2.append(self.no_bolts)
+                if previous_size is None:
+                    self.lst1.append(x)
+                    self.lst2.append(self.no_bolts)
+                    print("List1, List2",self.lst1,self.lst2)
+                else:
+                    # self.prev_dia = (previous_size)
+                    if previous_size != x and previous_size > x:
+                        self.lst1.append(x)
+                        self.lst2.append(self.no_bolts)
+                        print("after prev size, lst1, lst2",self.lst1,self.lst2)
+                        print("excluded diam",previous_size)
+                        print(self.lst1)
+                        # self.lst1.pop(self.prev_dia)
+                    else:
+                        pass
 
+                # if previous_size in self.lst1:
+                # self.lst1.pop(previous_size)
+
+                # self.lst2.append(y)
+                # self.lst1.append(x)
+                # self.lst2.append(self.no_bolts)
+                self.res = dict(zip(self.lst1, self.lst2))
             else:
                 pass
+
                 # if self.t_b > self.bolt.bolt_tension_capacity:
                 #     self.design_status = False
                 #     logger.error("tension capacity and moment capacity of member is less than applied axial force and momemt")
                 # elif self.v_sb > self.bolt.bolt_capacity:
                 #     self.design_status = False
                 #     logger.error("shear capacity of member is less than applied shear")
+
         if len(self.lst1) != 0:
-            if self.design_pref == "Bolt Oriented":
-                print (self.design_pref)
-                key_min = min(self.res, key=self.res.get)
-                self.bolt_diam_provided = key_min
-                # return self.bolt_diam_provided
-                print("diam list", self.lst1)
-                print("no of bolts list", self.lst2)
-                print("dict", self.res)
-                print("Bolt diam prov", self.bolt_diam_provided)
-                print("Selecting bolt grade")
-                # self.get_bolt_grade(self)
-                self.design_status = True
-                self.get_bolt_grade(self)
-            else:
-                key_max = max(self.res, key=self.res.get)
-                print (self.design_pref)
-                self.bolt_diam_provided = key_max
-                # return self.bolt_diam_provided
-                print("diam list", self.lst1)
-                print("no of bolts list", self.lst2)
-                print("dict", self.res)
-                print("Bolt diam prov", self.bolt_diam_provided)
-                print("Selecting bolt grade")
-                # self.get_bolt_grade(self)
-                self.design_status = True
-                self.get_bolt_grade(self)
+            # if self.design_pref == "Bolt Oriented":
+            # print (self.design_pref)
+            # if previous_size is None:
+            #     pass
+            # else:
+            #     for a in self.lst1:
+            #         if (previous_size) == 36.0:
+            #             print("prev size",previous_size)
+            #             self.lst1 = self.lst1[1:a]
+            #         else:
+            #             pass
+
+                # self.prev_dia = (previous_size)
+                # if self.prev_dia in self.lst1:
+                #     print("excluded diam",self.prev_dia)
+                #     print(self.lst1)
+                #     self.lst1.pop(self.prev_dia)
+                # else:
+                #     pass
+            key_min = min(self.res, key=self.res.get)
+            self.bolt_diam_provided = key_min
+            # return self.bolt_diam_provided
+            print("diam list", self.lst1)
+            print("no of bolts list", self.lst2)
+            print("dict", self.res)
+            print("Bolt diam prov", self.bolt_diam_provided)
+            print("Selecting bolt grade")
+            # self.get_bolt_grade(self)
+            self.design_status = True
+            self.get_bolt_grade(self)
+            # else:
+            #     key_max = max(self.res, key=self.res.get)
+            #     print (self.design_pref)
+            #     self.bolt_diam_provided = key_max
+            #     # return self.bolt_diam_provided
+            #     print("diam list", self.lst1)
+            #     print("no of bolts list", self.lst2)
+            #     print("dict", self.res)
+            #     print("Bolt diam prov", self.bolt_diam_provided)
+            #     print("Selecting bolt grade")
+            #     # self.get_bolt_grade(self)
+            #     self.design_status = True
+            #     self.get_bolt_grade(self)
 
         else:
             self.design_status = False
-            logger.error("tension capacity and moment capacity of member is less than applied axial force and momemt")
+            logger.error("failed in bolt diam selection")
 
  #############################################################################################################
 
@@ -756,8 +808,10 @@ class ColumnEndPlate(MomentConnection):
             ########## no of bolts along each side of web and flange  ##################
             self.n_bw = int(math.floor(
                 ((self.section.depth - (2 * self.section.flange_thickness + (2 * self.end_dist))) / self.pitch) + 1))
+            # print("n_bw",self.n_bw)
             self.n_bf = int(math.ceil((((self.section.flange_width / 2) - (
                         (self.section.web_thickness / 2) + (2 * self.end_dist))) / self.pitch) - 2))
+            # print("n_bf",self.n_bf)
 
             if self.n_bf < 0:
                 self.n_bf = 0
@@ -780,7 +834,7 @@ class ColumnEndPlate(MomentConnection):
             else:
                 self.p_2_web = self.section.depth - (2 * self.section.flange_thickness) - (2 * self.end_dist) - (
                             (self.n_bw - 3) * self.pitch)
-            print("p_2_web",self.p_2_web)
+            # print("p_2_web",self.p_2_web)
 
             ######### pitch 2 along flange  ################
             if self.n_bf % 2 == 0:
@@ -789,7 +843,7 @@ class ColumnEndPlate(MomentConnection):
             else:
                 self.p_2_flange = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (
                             2 * self.end_dist) - ((self.n_bf - 1) * self.pitch)
-            print("p_2_flange",self.p_2_flange)
+            # print("p_2_flange",self.p_2_flange)
 
             # self.x = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - self.end_dist - (self.n_bf * self.pitch)
 
@@ -798,7 +852,7 @@ class ColumnEndPlate(MomentConnection):
                 self.y_max = self.section.depth - 3 / 2 * self.section.flange_thickness - self.end_dist
             else:
                 self.y_max = self.section.depth - self.section.flange_thickness / 2 + self.end_dist
-            print("y_max", self.y_max)
+            # print("y_max", self.y_max)
 
             if self.connection == 'Flush End Plate':
                 if self.n_bw % 2 == 0:
@@ -808,23 +862,23 @@ class ColumnEndPlate(MomentConnection):
                         self.y_sqr = self.y_sqr1 + self.y_sqr2
                     else:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
-                        print("y_sqr1", self.y_sqr1)
+                        # print("y_sqr1", self.y_sqr1)
 
                         for i in range(1, int(self.n_bw / 2)):
                             self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + i * self.pitch) ** 2
-                        print("y_sqr2", self.y_sqr2)
+                        # print("y_sqr2", self.y_sqr2)
 
                         self.y_sqr3 = (self.section.flange_thickness / 2 + self.end_dist + (
                                     (self.n_bw / 2) - 1) * self.pitch + self.p_2_web) ** 2
-                        print("y_sqr3", self.y_sqr3)
+                        # print("y_sqr3", self.y_sqr3)
 
                         for i in range(1, int(self.n_bw / 2)):
                             self.y_sqr4 = (self.section.flange_thickness / 2 + self.end_dist + (
                                         (self.n_bw / 2) - 1) * self.pitch + self.p_2_web + i * self.pitch) ** 2
-                        print("y_sqr4", self.y_sqr4)
+                        # print("y_sqr4", self.y_sqr4)
 
                         self.y_sqr = self.y_sqr1 + self.y_sqr2 + self.y_sqr3 + self.y_sqr4
-                    print("y_sqr", self.y_sqr)
+                    # print("y_sqr", self.y_sqr)
                 else:
                     if self.n_bw == 3:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
@@ -832,27 +886,27 @@ class ColumnEndPlate(MomentConnection):
                         self.y_sqr = self.y_sqr1 + self.y_sqr2
                     else:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
-                        print("y_sqr1", self.y_sqr1)
+                        # print("y_sqr1", self.y_sqr1)
 
                         for i in range(1, int(self.n_bw / 2 - 0.5)):
                             self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + i * self.pitch) ** 2
-                        print("y_sqr2", self.y_sqr2)
+                        # print("y_sqr2", self.y_sqr2)
 
                         self.y_sqr3 = (self.section.flange_thickness / 2 + self.end_dist + (
                                     (self.n_bw / 2) - 1.5) * self.pitch + self.p_2_web) ** 2
-                        print("y_sqr3", self.y_sqr3)
+                        # print("y_sqr3", self.y_sqr3)
 
                         self.y_sqr4 = (self.section.flange_thickness / 2 + self.end_dist + (
                                     (self.n_bw / 2) - 1.5) * self.pitch + 2 * self.p_2_web) ** 2
-                        print("y_sqr4", self.y_sqr4)
+                        # print("y_sqr4", self.y_sqr4)
 
                         for i in range(1, int(self.n_bw / 2 - 0.5)):
                             self.y_sqr5 = (self.section.flange_thickness / 2 + self.end_dist + (
                                         (self.n_bw / 2) - 1.5) * self.pitch + 2 * self.p_2_web + i * self.pitch) ** 2
-                        print("y_sqr5", self.y_sqr5)
+                        # print("y_sqr5", self.y_sqr5)
 
                         self.y_sqr = self.y_sqr1 + self.y_sqr2 + self.y_sqr3 + self.y_sqr4 + self.y_sqr5
-                    print("y_sqr", self.y_sqr)
+                    # print("y_sqr", self.y_sqr)
             else:
                 if self.n_bw % 2 == 0:
                     if self.n_bw == 2:
@@ -861,26 +915,26 @@ class ColumnEndPlate(MomentConnection):
                         self.y_sqr = self.y_sqr1 + self.y_sqr2
                     else:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
-                        print("y_sqr1", self.y_sqr1)
+                        # print("y_sqr1", self.y_sqr1)
 
                         for i in range(1, int(self.n_bw / 2)):
                             self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + i * self.pitch) ** 2
-                        print("y_sqr2", self.y_sqr2)
+                        # print("y_sqr2", self.y_sqr2)
 
                         self.y_sqr3 = (self.section.flange_thickness / 2 + self.end_dist + (
                                 (self.n_bw / 2) - 1) * self.pitch + self.p_2_web) ** 2
-                        print("y_sqr3", self.y_sqr3)
+                        # print("y_sqr3", self.y_sqr3)
 
                         for i in range(1, int(self.n_bw / 2)):
                             self.y_sqr4 = (self.section.flange_thickness / 2 + self.end_dist + (
                                     (self.n_bw / 2) - 1) * self.pitch + self.p_2_web + i * self.pitch) ** 2
-                        print("y_sqr4", self.y_sqr4)
+                        # print("y_sqr4", self.y_sqr4)
 
                         self.y_sqr5 = (1.5 * self.section.flange_thickness + 3 * self.end_dist + (
                                     self.n_bw - 2) * self.pitch + self.p_2_web) ** 2
 
                         self.y_sqr = self.y_sqr1 + self.y_sqr2 + self.y_sqr3 + self.y_sqr4 + self.y_sqr5
-                    print("y_sqr", self.y_sqr)
+                    # print("y_sqr", self.y_sqr)
                 else:
                     if self.n_bw == 3:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
@@ -888,24 +942,24 @@ class ColumnEndPlate(MomentConnection):
                         self.y_sqr = self.y_sqr1 + self.y_sqr2
                     else:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
-                        print("y_sqr1", self.y_sqr1)
+                        # print("y_sqr1", self.y_sqr1)
 
                         for i in range(1, int(self.n_bw / 2 - 0.5)):
                             self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + i * self.pitch) ** 2
-                        print("y_sqr2", self.y_sqr2)
+                        # print("y_sqr2", self.y_sqr2)
 
                         self.y_sqr3 = (self.section.flange_thickness / 2 + self.end_dist + (
                                 (self.n_bw / 2) - 1.5) * self.pitch + self.p_2_web) ** 2
-                        print("y_sqr3", self.y_sqr3)
+                        # print("y_sqr3", self.y_sqr3)
 
                         self.y_sqr4 = (self.section.flange_thickness / 2 + self.end_dist + (
                                 (self.n_bw / 2) - 1.5) * self.pitch + 2 * self.p_2_web) ** 2
-                        print("y_sqr4", self.y_sqr4)
+                        # print("y_sqr4", self.y_sqr4)
 
                         for i in range(1, int(self.n_bw / 2 - 0.5)):
                             self.y_sqr5 = (self.section.flange_thickness / 2 + self.end_dist + (
                                     (self.n_bw / 2) - 1.5) * self.pitch + 2 * self.p_2_web + i * self.pitch) ** 2
-                        print("y_sqr5", self.y_sqr5)
+                        # print("y_sqr5", self.y_sqr5)
 
                         self.y_sqr6 = (1.5 * self.section.flange_thickness + 3 * self.end_dist + (
                                     self.n_bw - 3) * self.pitch + 2 * self.p_2_web) ** 2
@@ -947,7 +1001,7 @@ class ColumnEndPlate(MomentConnection):
 
         else:
             self.design_status = False
-            logger.error("tension capacity and moment capacity of member is less than applied axial force and momemt")
+            logger.error("failed in bolt grade selection")
 
 
     # def bolt_capacities(self):
@@ -1023,6 +1077,7 @@ class ColumnEndPlate(MomentConnection):
             print("m_dp: ",self.m_dp)
             if self.m_dp > self.m_ep:
                 self.lst_pl.append(x)
+                print("plate list",self.lst_pl)
             else:
                 pass
                 # self.design_status = False
@@ -1036,6 +1091,7 @@ class ColumnEndPlate(MomentConnection):
             self.bolt_conn_plates_t_fu_fy = []
             self.bolt_conn_plates_t_fu_fy.append((x, self.plate.fu, self.plate.fy))
             self.bolt_conn_plates_t_fu_fy.append((x, self.plate.fu, self.plate.fy))
+            self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt_diam_provided,conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt_diam_provided,
                                               bolt_grade_provided=self.bolt_grade_provided,
                                               # bolt_grade_provided=12.9,
@@ -1043,8 +1099,13 @@ class ColumnEndPlate(MomentConnection):
                                               n_planes=1)
             # self.bolt.calculate_bolt_tension_capacity(bolt_diameter_provided=self.bolt_diam_provided,
             #                                           bolt_grade_provided=self.bolt_grade_provided)
-            self.v_sb = self.factored_shear_load / (2 * self.n_bw)
+            if self.connection == 'Flush End Plate':
+                self.v_sb = self.factored_shear_load / (2 * self.n_bw)
+            else:
+                self.v_sb = self.factored_shear_load / ((2 * self.n_bw) + 4)
+
             print("V_sb: ", self.v_sb, "Bolt capacity: ", self.bolt.bolt_capacity)
+
             if self.v_sb < self.bolt.bolt_capacity:
                 self.lst_4.append(x)
             else:
@@ -1059,8 +1120,11 @@ class ColumnEndPlate(MomentConnection):
             # self.plate_details(self)
 
         else:
-            self.design_status = False
-            logger.error("Plate thickness provided is not satisfied")
+            previous_diam = (self.bolt_diam_provided)
+            print(type(self.bolt_diam_provided))
+            self.get_bolt_diam(self,previous_diam)
+            # self.design_status = False
+            # logger.error("Plate thickness provided is not satisfied")
 
 
     @staticmethod

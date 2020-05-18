@@ -507,7 +507,7 @@ if __name__ == '__main__':
 
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    member_data = 'B2BChannel'  # 'Star Angle'  # 'B2BAngle'  # 'Channel'  # 'Angle'  #  or 'Angle' 'Channel' or
+    member_data = 'Star Angle'  # 'B2BAngle'  #'Angle'  #'Channel'  #'B2BChannel'  #     or 'Angle' 'Channel' or
 
     weld_size = 6
     s = max(15, weld_size)

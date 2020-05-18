@@ -60,7 +60,7 @@ class TensionAngleCAD(object):
 
     def createMemberGeometry(self):
 
-        if self.member_data == 'B2BAngle' or self.member_data == 'Angle':
+        if self.member_data == 'Angle':
             member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
             member1_uDir = numpy.array([0.0, -1.0, 0.0])
             member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -69,6 +69,13 @@ class TensionAngleCAD(object):
             self.member1_Model = self.member1.create_model()
 
         elif self.member_data == 'B2BAngle':
+            member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
+            member1_uDir = numpy.array([0.0, -1.0, 0.0])
+            member1_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+
+            self.member1_Model = self.member1.create_model()
+
             member2OriginL = numpy.array([self.member.L - self.plate_intercept, self.plate.T, self.member.A / 2])
             member2_uDir = numpy.array([0.0, 1.0, 0.0])
             member2_wDir = numpy.array([-1.0, 0.0, 0.0])
@@ -150,6 +157,49 @@ class TensionAngleCAD(object):
 
         self.weldVR11_Model = self.weldVR11.create_model()
 
+        if self.member_data == 'B2BAngle':
+            weldHL21OriginL = numpy.array([0.0, self.plate.T, self.member.A / 2])
+            weldHL21_uDir = numpy.array([0.0, 0.0, 1.0])
+            weldHL21_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.weldHL21.place(weldHL21OriginL, weldHL21_uDir, weldHL21_wDir)
+
+            self.weldHL21_Model = self.weldHL21.create_model()
+
+            weldHL22OriginL = numpy.array([- self.plate_intercept, self.plate.T, -self.member.A / 2])
+            weldHL22_uDir = numpy.array([0.0, 0.0, -1.0])
+            weldHL22_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.weldHL22.place(weldHL22OriginL, weldHL22_uDir, weldHL22_wDir)
+
+            self.weldHL22_Model = self.weldHL22.create_model()
+
+            weldHR21OriginL = numpy.array([- self.plate_intercept + self.member.L, self.plate.T, self.member.A / 2])
+            weldHR21_uDir = numpy.array([0.0, 0.0, 1.0])
+            weldHR21_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.weldHR21.place(weldHR21OriginL, weldHR21_uDir, weldHR21_wDir)
+
+            self.weldHR21_Model = self.weldHR21.create_model()
+
+            weldHR22OriginL = numpy.array([-2 * self.plate_intercept + self.member.L, self.plate.T, -self.member.A / 2])
+            weldHR22_uDir = numpy.array([0.0, 0.0, -1.0])
+            weldHR22_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.weldHR22.place(weldHR22OriginL, weldHR22_uDir, weldHR22_wDir)
+
+            self.weldHR22_Model = self.weldHR22.create_model()
+
+            weldVL21OriginL = numpy.array([-self.plate_intercept, self.plate.T, self.member.A / 2])
+            weldVL21_uDir = numpy.array([-1.0, 0.0, 0.0])
+            weldVL21_wDir = numpy.array([0.0, 0.0, -1.0])
+            self.weldVL21.place(weldVL21OriginL, weldVL21_uDir, weldVL21_wDir)
+
+            self.weldVL21_Model = self.weldVL21.create_model()
+
+            weldVR21OriginL = numpy.array([-self.plate_intercept + self.member.L, self.plate.T, -self.member.A / 2])
+            weldVR21_uDir = numpy.array([1.0, 0.0, 0.0])
+            weldVR21_wDir = numpy.array([0.0, 0.0, 1.0])
+            self.weldVR21.place(weldVR21OriginL, weldVR21_uDir, weldVR21_wDir)
+
+            self.weldVR21_Model = self.weldVR21.create_model()
+
     def get_members_models(self):
 
         if self.member_data == 'Angle':
@@ -165,8 +215,14 @@ class TensionAngleCAD(object):
         return plate
 
     def get_welded_models(self):
-        welded_sec = [self.weldHL11_Model, self.weldHL12_Model, self.weldHR11_Model, self.weldHR12_Model,
-                      self.weldVL11_Model, self.weldVR11_Model]
+
+        if self.member_data == 'Angle':
+            welded_sec = [self.weldHL11_Model, self.weldHL12_Model, self.weldHR11_Model, self.weldHR12_Model,
+                          self.weldVL11_Model, self.weldVR11_Model]
+        else:
+            welded_sec = [self.weldHL11_Model, self.weldHL12_Model, self.weldHR11_Model, self.weldHR12_Model,
+                          self.weldVL11_Model, self.weldVR11_Model, self.weldHL21_Model, self.weldHL22_Model,
+                          self.weldHR21_Model, self.weldHR22_Model, self.weldVL21_Model, self.weldVR21_Model]
         welds = welded_sec[0]
         for comp in welded_sec[1:]:
             welds = BRepAlgoAPI_Fuse(comp, welds).Shape()
@@ -276,7 +332,7 @@ if __name__ == '__main__':
 
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    member_data = 'Channel'  # 'Angle'  # 'Star Angle' #'B2BChannel' #B2BAngle or 'Angle' 'Channel' or
+    member_data = 'B2BAngle'  # 'Channel'  # 'Angle'  # 'Star Angle' #'B2BChannel' # or 'Angle' 'Channel' or
 
     weld_size = 6
     s = max(15, weld_size)

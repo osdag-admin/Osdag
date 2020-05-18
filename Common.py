@@ -368,13 +368,13 @@ VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
 
 KEY_IMAGE = 'Image'
 
-KEY_LENGTH = 'Length(mm)'
+KEY_LENGTH = 'Member.Length'
 KEY_DISP_LENGTH = 'Length(mm) *'
 
 ###################################
 # Key for Storing Supporting_Section sub-key of Member
 
-KEY_SUPTNGSEC = 'Member.Supporting_Section'
+KEY_SUPTNGSEC = 'Member.Supporting_Section.Designation'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 VALUES_COLSEC = connectdb("Columns")
@@ -386,7 +386,7 @@ VALUES_PRIBM = connectdb("Beams")
 ###################################
 # Key for Storing Supported_Section sub-key of Member
 
-KEY_SUPTDSEC = 'Member.Supported_Section'
+KEY_SUPTDSEC = 'Member.Supported_Section.Designation'
 KEY_DISP_SUPTDSEC = 'Supported Section'
 KEY_DISP_BEAMSEC = 'Beam Section *'
 VALUES_BEAMSEC = connectdb("Beams")
@@ -587,17 +587,10 @@ VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '
 
 
 
-KEY_LOCATION = 'Conn_Location'
-KEY_DISP_LOCATION = 'Conn_Location *'
-VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg','Web']
 VALUES_LOCATION_1 = ['Long Leg', 'Short Leg']
 VALUES_LOCATION_2 = ["Web"]
 
 
-KEY_IMAGE = 'Image'
-
-KEY_LENGTH = 'Length(mm)'
-KEY_DISP_LENGTH = 'Length (mm) *'
 
 KEY_SLENDER = "Member.Slenderness"
 KEY_DISP_SLENDER = 'Slenderness'
@@ -871,16 +864,16 @@ KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficien
 KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction coefficient between <br>concrete and anchor bolt'
 
 
-KEY_DP_BOLT_TYPE = 'DesignPreferences.Bolt.Type'
+KEY_DP_BOLT_TYPE = 'Bolt.TensionType'
 KEY_DISP_DP_BOLT_TYPE = 'Bolt type'
-KEY_DP_BOLT_HOLE_TYPE = 'DesignPreferences.Bolt.Bolt_Hole_Type'
+KEY_DP_BOLT_HOLE_TYPE = 'Bolt.Bolt_Hole_Type'
 KEY_DISP_DP_BOLT_HOLE_TYPE = 'Bolt hole type'
-KEY_DP_BOLT_MATERIAL_G_O = 'DesignPreferences.Bolt.Material_Grade_OverWrite'
+KEY_DP_BOLT_MATERIAL_G_O = 'Bolt.Material_Grade_OverWrite'
 KEY_DISP_DP_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
-KEY_DP_BOLT_SLIP_FACTOR = 'DesignPreferences.Bolt.Slip_Factor'
+KEY_DP_BOLT_SLIP_FACTOR = 'Bolt.Slip_Factor'
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
-KEY_DP_WELD_FAB = 'DesignPreferences.Weld.Fab'
+KEY_DP_WELD_FAB = 'Weld.Fab'
 
 KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
 KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
@@ -893,15 +886,15 @@ KEY_DP_WELD_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
 
 KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
-KEY_DP_WELD_MATERIAL_G_O = 'DesignPreferences.Weld.Material_Grade_OverWrite'
+KEY_DP_WELD_MATERIAL_G_O = 'Weld.Material_Grade_OverWrite'
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
-KEY_DP_DETAILING_EDGE_TYPE = 'DesignPreferences.Detailing.Edge_type'
+KEY_DP_DETAILING_EDGE_TYPE = 'Detailing.Edge_type'
 KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Type of edges'
-KEY_DP_DETAILING_GAP = 'DesignPreferences.Detailing.Gap'
+KEY_DP_DETAILING_GAP = 'Detailing.Gap'
 KEY_DISP_DP_DETAILING_GAP = 'Gap between beam and <br>support (mm)'
-KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'DesignPreferences.Detailing.Corrosive_Influences'
+KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'Detailing.Corrosive_Influences'
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the members exposed to <br>corrosive influences'
-KEY_DP_DESIGN_METHOD = 'DesignPreferences.Design.Design_Method'
+KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
 KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate'
@@ -1401,7 +1394,7 @@ KEY_DISP_SECTYPE = 'Section Type*'
 VALUES_SECTYPE = ['Select Type','Beams','Columns','Angles','Back to Back Angles','Star Angles','Channels','Back to back Channels']
 
 
-KEY_SECSIZE = 'Section Size'
+KEY_SECSIZE = 'Member.Designation'
 KEY_DISP_SECSIZE = 'Section Size*'
 
 KEY_LENMEM = 'Length of Member'

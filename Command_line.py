@@ -1,3 +1,4 @@
+
 from pathlib import Path
 import os
 import errno
@@ -68,7 +69,11 @@ all_modules = {'Base Plate':BasePlateConnection, 'Beam Coverplate  Weld Connecti
     'Tension Members Bolted Design':Tension_bolted, 'Tension Members Welded Design':Tension_welded, 'Compression Member':Compression,
     }
 
-available_module = {'Fin Plate' : FinPlateConnection}
+available_module = {'Beam Coverplate  Weld Connection':BeamCoverPlateWeld,'Beam Coverplate Connection':BeamCoverPlate,
+    'Cleat Angle':CleatAngleConnection, 'Column Coverplate Weld Connection':ColumnCoverPlateWeld, 'Column Coverplate Connection':ColumnCoverPlate,
+    'Column Endplate Connection':ColumnEndPlate, 'End Plate':EndPlateConnection, 'Fin Plate':FinPlateConnection,'Seated Angle': SeatedAngleConnection,
+    'Tension Members Bolted Design':Tension_bolted, 'Tension Members Welded Design':Tension_welded, 'Compression Member':Compression,
+    }
 
 
 def make_sure_path_exists(path):      # Works on all OS.
@@ -122,14 +127,12 @@ def create_files():
             main.set_osdaglogger(None)
             main.set_input_values(main, data)
 
-            output_dict = main.results_to_test(main)
-
-            path = os.path.join(output_file_path, file_name)
-
-            with open(path, "w") as content:
-                content.write(str(output_dict))
-
-
+            # output_dict = main.results_to_test(main)
+            #
+            # path = os.path.join(output_file_path, file_name)
+            #
+            # with open(path, "w") as content:
+            #     content.write(str(output_dict))
 
 #Block print
 def blockPrint():
@@ -139,7 +142,6 @@ def blockPrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
-
 if __name__ == '__main__':
 
     blockPrint()
@@ -147,3 +149,71 @@ if __name__ == '__main__':
     precompute_data()
 
     create_files()
+
+#writer = pd.ExcelWriter(workbook_name, engine='openpyxl')
+# writer.book = wb
+# test_in_list, test_out_list = main.results_to_test(main)
+#
+# # df = pd.DataFrame.from_records(list(test_out_list.items()), columns=['Check', 'Value'])
+#
+# input_keys = list(test_in_list.keys())
+# input_values = list(map(str, list(test_in_list.values())))
+# output_keys = list(test_out_list.keys())
+# output_values = list(map(str, list(test_out_list.values())))
+#
+#         while len(input_keys) != len(output_keys):
+#             if len(input_keys) < len(output_keys):
+#                 for i in range(0,len(output_keys)-len(input_keys)):
+#                     input_keys.append('')
+#                     input_values.append('')
+#             else:
+#                 for i in range(0,len(output_keys)-len(input_keys)):
+#                     output_keys.append('')
+#                     output_values.append('')
+#
+#         sheet_name_as_list = [sheet_name]
+#         for i in range(0, len(input_keys)):
+#             sheet_name_as_list.append('')
+#
+#         for row in zip(sheet_name_as_list,input_keys,input_values,output_keys,output_values):
+#             wb.active.append(row)
+#
+#         # df.to_excel(writer, sheet_name=sheet_name, index=False)
+#         writer.save()
+#         writer.close()
+#
+#     elif module == KEY_DISP_TENSION_BOLTED:
+#         print('filenAME', f)
+#         main = Tension_bolted
+#         main.set_osdaglogger(None)
+#         main.set_input_values(main, d)
+#
+#     elif module == KEY_DISP_TENSION_WELDED:
+#         print('filenAME', f)
+#         main = Tension_welded
+#         main.set_osdaglogger(None)
+#         main.set_input_values(main, d)
+#
+#     elif module == KEY_DISP_COLUMNCOVERPLATE:
+#         print('filenAME', f)
+#         main = ColumnCoverPlate
+#         main.set_osdaglogger(None)
+#         main.set_input_values(main, d)
+#
+#     elif module == KEY_DISP_COLUMNCOVERPLATEWELD:
+#         print('filenAME', f)
+#         main = ColumnCoverPlateWeld
+#         main.set_osdaglogger(None)
+#         main.set_input_values(main, d)
+#
+#     elif module == KEY_DISP_BEAMCOVERPLATE:
+#         print('filenAME', f)
+#         main = BeamCoverPlate
+#         main.set_osdaglogger(None)
+#         main.set_input_values(main, d)
+#
+#     elif module == KEY_DISP_BEAMCOVERPLATEWELD:
+#         print('filenAME', f)
+#         main = BeamCoverPlateWeld
+#         main.set_osdaglogger(None)
+#         main.set_input_values(main, d)

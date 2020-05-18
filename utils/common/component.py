@@ -1067,6 +1067,7 @@ class Plate(Material):
         length_avail = max(((bolts_one_line - 1) * gauge),((bolts_line - 1) * pitch))
         if length_avail > 15 * bolt_dia:
             beta_lj = 1.075 - length_avail / (200 * bolt_dia)
+            print('long joint case')
             bolt_capacity_red = beta_lj * bolt_capacity
         else:
             bolt_capacity_red = bolt_capacity

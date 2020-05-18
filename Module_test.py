@@ -80,9 +80,11 @@ available_module dictionary is used in -
 Make sure to make the necessary changes in above functions/methods if you are changing the name of available_module.
 '''
 
-available_module = {'Beam Coverplate  Weld Connection' : BeamCoverPlateWeld, 'Fin Plate' : FinPlateConnection,
-                    'Column Coverplate Weld Connection': ColumnCoverPlateWeld}
-
+# available_module = {'Beam Coverplate  Weld Connection':BeamCoverPlateWeld,'Beam Coverplate Connection':BeamCoverPlate,
+#                     'Column Coverplate Weld Connection':ColumnCoverPlateWeld, 'Column Coverplate Connection':ColumnCoverPlate,
+#                     'Fin Plate':FinPlateConnection, 'Tension Members Bolted Design':Tension_bolted,
+#                     'Tension Members Welded Design':Tension_welded}
+available_module = {'Column Coverplate Connection':ColumnCoverPlate}
 
 
 #predefined pop-up summary.

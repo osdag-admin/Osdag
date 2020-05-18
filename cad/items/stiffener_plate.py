@@ -2,7 +2,6 @@
 Created on 16-May-2019
 
 @author: Anand Swaroop
-@author: Anand Swaroop
 '''
 import numpy
 from cad.items.ModelUtils import *

@@ -205,7 +205,7 @@ def forces_in_flange(Au, B,T,A,D,Mu,Mw,Mf,Af,ff):
 
 def min_plate_ht_req(beam_depth,min_plate_ht):
     beam_depth = str(beam_depth)
-    min_plate_ht = str(min_plate_ht)
+    min_plate_ht = str(round(min_plate_ht,2))
     min_plate_ht_eqn = Math(inline=True)
     min_plate_ht_eqn.append(NoEscape(r'\begin{aligned}0.6 * d_b&= 0.6 * '+ beam_depth + r'='+min_plate_ht+r'\end{aligned}'))
     return min_plate_ht_eqn
@@ -443,7 +443,7 @@ def IR_req(IR):
 
 def min_weld_size_req(conn_plates_weld,min_weld_size):
     t1 = str(conn_plates_weld[0])
-    t2 = str(conn_plates_weld[0])
+    t2 = str(conn_plates_weld[1])
     tmax = str(max(conn_plates_weld))
     weld_min = str(min_weld_size)
 

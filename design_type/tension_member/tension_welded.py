@@ -80,25 +80,24 @@ class Tension_welded(Main):
     def fn_profile_section(self):
 
         "Function to populate combobox based on the section type selected"
-
-
-        if self == 'Beams':
+        conn = self[0]
+        if conn == 'Beams':
             return connectdb("Beams", call_type="popup")
-        elif self == 'Columns':
+        elif conn == 'Columns':
             return connectdb("Columns", call_type= "popup")
-        elif self in ['Angles', 'Back to Back Angles', 'Star Angles']:
+        elif conn in ['Angles', 'Back to Back Angles', 'Star Angles']:
             return connectdb("Angles", call_type= "popup")
-        elif self in ['Channels', 'Back to Back Channels']:
+        elif conn in ['Channels', 'Back to Back Channels']:
             return connectdb("Channels", call_type= "popup")
 
     def input_value_changed(self):
 
         lst = []
 
-        t1 = (KEY_SEC_PROFILE, KEY_LOCATION, TYPE_COMBOBOX, self.fn_conn_type)
+        t1 = ([KEY_SEC_PROFILE], KEY_LOCATION, TYPE_COMBOBOX, self.fn_conn_type)
         lst.append(t1)
 
-        t2 = (KEY_SEC_PROFILE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
+        t2 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t2)
 
         return lst
@@ -106,26 +105,26 @@ class Tension_welded(Main):
     def fn_conn_type(self):
         "Function to populate section size based on the type of section "
 
-        if self in ['Angles', 'Back to Back Angles', 'Star Angles']:
-            b = VALUES_LOCATION_1
-        elif self in ["Channels", "Back to Back Channels"]:
-            b = VALUES_LOCATION_2
-        return b
+        profile = self[0]
+        if profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
+            return VALUES_LOCATION_1
+        elif profile in ["Channels", "Back to Back Channels"]:
+            return VALUES_LOCATION_2
 
     def tab_list(self):
 
         "Function to create design preference"
 
         tabs = []
-
-        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
-        tabs.append(t1)
-
-        t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
-        tabs.append(t2)
-
-        t3 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_angle_section)
-        tabs.append(t3)
+        #
+        # t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
+        # tabs.append(t1)
+        #
+        # t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
+        # tabs.append(t2)
+        #
+        # t3 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_angle_section)
+        # tabs.append(t3)
 
         t4 = ("Bolt", TYPE_TAB_2, self.bolt_values)
         tabs.append(t4)
@@ -501,94 +500,169 @@ class Tension_welded(Main):
 
         return angle_section
 
-    @staticmethod
-    def bolt_values():
+    def bolt_values(self, input_dictionary):
 
         "In design preference, it shows other properties of bolt used "
 
+        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_MATERIAL]]:
+            material_g_o = ''
+        else:
+            material_g_o = Material(input_dictionary[KEY_MATERIAL]).fu
+
         bolt = []
 
-        t1 = (KEY_DP_BOLT_TYPE, KEY_DISP_TYP, TYPE_COMBOBOX, ['Pretensioned', 'Non-pretensioned'])
+        t1 = (KEY_DP_BOLT_TYPE, KEY_DISP_TYP, TYPE_COMBOBOX, ['Pretensioned', 'Non-pretensioned'], 'Pretensioned')
         bolt.append(t1)
 
-        t2 = (KEY_DP_BOLT_HOLE_TYPE, KEY_DISP_DP_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'])
+        t2 = (KEY_DP_BOLT_HOLE_TYPE, KEY_DISP_DP_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'], 'Standard')
         bolt.append(t2)
 
-        t3 = (KEY_DP_BOLT_MATERIAL_G_O, KEY_DISP_DP_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, '410')
+        t3 = (KEY_DP_BOLT_MATERIAL_G_O, KEY_DISP_DP_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None, material_g_o)
         bolt.append(t3)
 
-        t4 = (None, None, TYPE_ENTER, None)
+        t4 = (None, None, TYPE_ENTER, None, None)
         bolt.append(t4)
 
-        t5 = (None, KEY_DISP_DP_BOLT_DESIGN_PARA, TYPE_TITLE, None)
+        t5 = (None, KEY_DISP_DP_BOLT_DESIGN_PARA, TYPE_TITLE, None, None)
         bolt.append(t5)
 
-        t6 = (KEY_DP_BOLT_SLIP_FACTOR, KEY_DISP_DP_BOLT_SLIP_FACTOR, TYPE_COMBOBOX, ['0.2', '0.5', '0.1', '0.25', '0.3',
-                                                                                     '0.33', '0.48', '0.52', '0.55'])
+        t6 = (KEY_DP_BOLT_SLIP_FACTOR, KEY_DISP_DP_BOLT_SLIP_FACTOR, TYPE_COMBOBOX,
+              ['0.2', '0.5', '0.1', '0.25', '0.3', '0.33', '0.48', '0.52', '0.55'], '0.3')
         bolt.append(t6)
 
-        t7 = (None, None, TYPE_ENTER, None)
+        t7 = (None, None, TYPE_ENTER, None, None)
         bolt.append(t7)
 
         t8 = (None, "NOTE : If slip is permitted under the design load, design the bolt as"
-                    "<br>a bearing bolt and select corresponding bolt grade.", TYPE_NOTE, None)
+                    "<br>a bearing bolt and select corresponding bolt grade.", TYPE_NOTE, None, None)
         bolt.append(t8)
 
-        t9 = ["textBrowser", "", TYPE_TEXT_BROWSER, BOLT_DESCRIPTION]
+        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, BOLT_DESCRIPTION, None)
         bolt.append(t9)
 
         return bolt
 
-    @staticmethod
-    def weld_values():
+    def weld_values(self, input_dictionary):
 
         "In design preference, it shows other properties of weld used "
 
+        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_MATERIAL]]:
+            material_g_o = ''
+        else:
+            material_g_o = Material(input_dictionary[KEY_MATERIAL]).fu
 
         weld = []
 
-        t1 = (KEY_DP_WELD_FAB, KEY_DISP_DP_WELD_FAB, TYPE_COMBOBOX, KEY_DP_WELD_FAB_VALUES)
+        t1 = (KEY_DP_WELD_FAB, KEY_DISP_DP_WELD_FAB, TYPE_COMBOBOX, KEY_DP_WELD_FAB_VALUES, KEY_DP_WELD_FAB_SHOP)
         weld.append(t1)
 
-        t2 = (KEY_DP_WELD_MATERIAL_G_O, KEY_DISP_DP_WELD_MATERIAL_G_O, TYPE_TEXTBOX, '410')
+        t2 = (KEY_DP_WELD_MATERIAL_G_O, KEY_DISP_DP_WELD_MATERIAL_G_O, TYPE_TEXTBOX, None, material_g_o)
         weld.append(t2)
 
-        t3 = ["textBrowser", "", TYPE_TEXT_BROWSER, WELD_DESCRIPTION]
+        t3 = ("textBrowser", "", TYPE_TEXT_BROWSER, WELD_DESCRIPTION, None)
         weld.append(t3)
 
         return weld
 
-    @staticmethod
-    def detailing_values():
+    def detailing_values(self, input_dictionary):
         detailing = []
 
-        t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX, [
-            'a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'])
+        t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX,
+              ['a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'],
+              'a - Sheared or hand flame cut')
         detailing.append(t1)
 
-        t2 = (KEY_DP_DETAILING_GAP, KEY_DISP_DP_DETAILING_GAP, TYPE_TEXTBOX, '10')
+        t2 = (KEY_DP_DETAILING_GAP, KEY_DISP_DP_DETAILING_GAP, TYPE_TEXTBOX, None, '10')
         detailing.append(t2)
 
         t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
-              ['No', 'Yes'])
+              ['No', 'Yes'], 'No')
         detailing.append(t3)
 
-        t4 = ["textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION]
+        t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION, None)
         detailing.append(t4)
 
         return detailing
 
-    @staticmethod
-    def design_values():
+    def design_values(self, input_dictionary):
 
         design = []
 
-        t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX, ['Limit State Design',
-                                                                               'Limit State (Capacity based) Design',
-                                                                               'Working Stress Design'])
+        t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX,
+              ['Limit State Design', 'Limit State (Capacity based) Design', 'Working Stress Design'],
+              'Limit State Design')
         design.append(t1)
 
         return design
+
+    def tab_value_changed(self):
+        return []
+
+    def edit_tabs(self):
+        return []
+
+    def list_for_fu_fy_validation(self):
+        return []
+
+    def refresh_input_dock(self):
+        return []
+
+    def input_dictionary_design_pref(self):
+
+        design_input = []
+
+        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        design_input.append(t3)
+
+        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
+        design_input.append(t3)
+
+        t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
+        design_input.append(t4)
+
+        t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
+        design_input.append(t4)
+
+        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        design_input.append(t5)
+
+        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        design_input.append(t5)
+
+        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
+        design_input.append(t6)
+
+        return design_input
+
+    def input_dictionary_without_design_pref(self):
+
+        design_input = []
+
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+                     KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
+                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD], '')
+        design_input.append(t2)
+
+        return design_input
+
+    def get_values_for_design_pref(self, key, design_dictionary):
+
+        fu = Material(design_dictionary[KEY_MATERIAL]).fu
+
+        val = {KEY_DP_BOLT_TYPE: "Pretensioned",
+               KEY_DP_BOLT_HOLE_TYPE: "Standard",
+               KEY_DP_BOLT_MATERIAL_G_O: str(fu),
+               KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
+               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_MATERIAL_G_O: str(fu),
+               KEY_DP_DETAILING_EDGE_TYPE: "a - Sheared or hand flame cut",
+               KEY_DP_DETAILING_GAP: '10',
+               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
+               KEY_DP_DESIGN_METHOD: "Limit State Design",
+               KEY_PLATE_MATERIAL: str(design_dictionary[KEY_MATERIAL])
+               }[key]
+
+        return val
 
     def input_values(self, existingvalues={}):
 
@@ -632,36 +706,34 @@ class Tension_welded(Main):
         else:
             existingvalue_key_axial = ''
 
-
-        t16 = (KEY_MODULE, KEY_DISP_TENSION_WELDED, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_TENSION_WELDED, TYPE_MODULE, None, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, existingvalue_key_sec_profile, VALUES_SEC_PROFILE_2)
+        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, existingvalue_key_sec_profile, VALUES_SEC_PROFILE_2, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/fin_cf_bw.png")
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/fin_cf_bw.png", True, 'No Validator')
         options_list.append(t15)
 
-        t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, existingvalue_key_location, VALUES_LOCATION_1)
+        t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, existingvalue_key_location, VALUES_LOCATION_1, True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_sec_size, ['All','Customized'])
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_sec_size, ['All','Customized'], True, 'No Validator')
         options_list.append(t4)
 
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, existingvalue_key_length, None)
+        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, existingvalue_key_length, None, True, 'No Validator')
         options_list.append(t5)
 
-
-        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
+        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
+        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None, True, 'No Validator')
         options_list.append(t7)
 
         return options_list
@@ -693,68 +765,67 @@ class Tension_welded(Main):
 
         out_list = []
 
-        t1 = (None, DISP_TITLE_TENSION_SECTION, TYPE_TITLE, None)
+        t1 = (None, DISP_TITLE_TENSION_SECTION, TYPE_TITLE, None, True)
         out_list.append(t1)
 
         t2 = (KEY_DESIGNATION, KEY_DISP_DESIGNATION, TYPE_TEXTBOX,
-              self.section_size_1.designation if flag else '')
+              self.section_size_1.designation if flag else '', True)
         out_list.append(t2)
 
-        t3 = (KEY_TENSION_YIELDCAPACITY, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX, round((self.section_size_1.tension_yielding_capacity/1000),2) if flag else '')
+        t3 = (KEY_TENSION_YIELDCAPACITY, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX, round((self.section_size_1.tension_yielding_capacity/1000),2) if flag else '', True)
         out_list.append(t3)
 
         t4 = (KEY_TENSION_RUPTURECAPACITY, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
-              round((self.section_size_1.tension_rupture_capacity/1000),2) if flag else '')
+              round((self.section_size_1.tension_rupture_capacity/1000),2) if flag else '', True)
         out_list.append(t4)
 
         t5 = (KEY_TENSION_BLOCKSHEARCAPACITY, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
-              round((self.section_size_1.block_shear_capacity_axial/1000),2) if flag else '')
+              round((self.section_size_1.block_shear_capacity_axial/1000),2) if flag else '', True)
         out_list.append(t5)
 
         t6 = (KEY_TENSION_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
-              round((self.section_size_1.tension_capacity/1000),2) if flag else '')
+              round((self.section_size_1.tension_capacity/1000),2) if flag else '', True)
         out_list.append(t6)
 
         t6 = (KEY_SLENDER, KEY_DISP_SLENDER, TYPE_TEXTBOX,
-              self.section_size_1.slenderness if flag else '')
+              self.section_size_1.slenderness if flag else '', True)
         out_list.append(t6)
 
         t7 = (KEY_EFFICIENCY, KEY_DISP_EFFICIENCY, TYPE_TEXTBOX,
-               self.efficiency if flag else '')
+               self.efficiency if flag else '', True)
         out_list.append(t7)
 
-        t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None)
+        t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None, True)
         out_list.append(t8)
 
-        t8 = (None, DISP_TITLE_WELD_CAPACITY, TYPE_TITLE, None)
+        t8 = (None, DISP_TITLE_WELD_CAPACITY, TYPE_TITLE, None, True)
         out_list.append(t8)
 
-        t9 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.weld.size if flag else '')
+        t9 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.weld.size if flag else '', True)
         out_list.append(t9)
 
-        t10 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, round(self.weld.strength,2) if flag else '')
-
+        t10 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, round(self.weld.strength,2) if flag else '', True)
         out_list.append(t10)
 
-        t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, round(self.weld.stress,2) if flag else '')
+        t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, round(self.weld.stress,2) if flag else '', True)
         out_list.append(t11)
 
-        t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, self.weld.length if flag else '')
+        t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, self.weld.length if flag else '', True)
         out_list.append(t5)
 
-        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, self.weld.effective if flag else '')
+        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, self.weld.effective if flag else '', True)
         out_list.append(t13)
 
-        t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None)
+        t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '')
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '', True)
         out_list.append(t19)
 
-        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '')
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '', True)
         out_list.append(t20)
 
-        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '')
+        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '', True)
         out_list.append(t21)
 
         return out_list

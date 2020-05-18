@@ -1058,7 +1058,8 @@ class Plate(Material):
         self.vres =vres
         return vres
 
-    def get_bolt_red(self, bolts_one_line, gauge, bolts_line, pitch, bolt_capacity, bolt_dia):
+    def get_bolt_red(self, bolts_one_line , gauge ,bolts_line ,
+                     pitch, bolt_capacity, bolt_dia,end_dist=0.0,gap=0.0):
         """
 
         :param bolts_one_line: bolts in one line
@@ -1067,17 +1068,26 @@ class Plate(Material):
         :param bolt_dia: diameter of bolt
         :return: reduced bolt capacity if long joint condition is met
         """
-        length_avail = max(((bolts_one_line - 1) * gauge),((bolts_line - 1) * pitch))
-        if length_avail > 15 * bolt_dia:
-            beta_lj = 1.075 - length_avail / (200 * bolt_dia)
-            bolt_capacity_red = beta_lj * bolt_capacity
+        if end_dist == 0.0:
+            length_avail = max(((bolts_one_line - 1) * gauge),((bolts_line - 1) * pitch))
+            if length_avail > 15 * bolt_dia:
+                beta_lj = 1.075 - length_avail / (200 * bolt_dia)
+                bolt_capacity_red = beta_lj * bolt_capacity
+            else:
+                bolt_capacity_red = bolt_capacity
         else:
-            bolt_capacity_red = bolt_capacity
+            length_avail =  2 * ((bolts_line * pitch) + end_dist) + gap
+            if length_avail > 15 * bolt_dia:
+                beta_lj = 1.075 - length_avail / (200 * bolt_dia)
+                bolt_capacity_red = beta_lj * bolt_capacity
+            else:
+                bolt_capacity_red = bolt_capacity
+
         return bolt_capacity_red
 
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge,
                               max_spacing, max_edge_dist, shear_load=0.0, axial_load=0.0, web_moment =0.0, gap=0.0,
-                              shear_ecc=False, bolt_line_limit=math.inf, min_bolts_one_line=2, min_bolt_line=1):
+                              shear_ecc=False, bolt_line_limit=math.inf, min_bolts_one_line=2, min_bolt_line=1,joint =None):
 
 
         """
@@ -1098,6 +1108,7 @@ class Plate(Material):
         """
 
         # initialising values to start the loop
+        length =0.0
         resultant_force = math.sqrt(shear_load ** 2 + axial_load ** 2)
         print(resultant_force, "daa")
         print(bolt_capacity, "222")
@@ -1197,10 +1208,20 @@ class Plate(Material):
                     moment_demand = 0.0
                     vres = resultant_force / (bolt_line * bolts_one_line)
 
+            if joint == None:
+
+                bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+                                              gauge, bolt_line, pitch, bolt_capacity,
+                                              bolt_dia)
+            else:
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,
-                                                      bolt_dia)
-                print("vres, vred", vres, bolt_capacity_red)
+                                                      bolt_dia,end_dist,gap)
+
+            # bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+            #                                           gauge, bolt_line, pitch, bolt_capacity,
+            #                                           bolt_dia)
+            print("vres, vred", vres, bolt_capacity_red)
 
 
 

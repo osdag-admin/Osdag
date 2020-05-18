@@ -460,7 +460,7 @@ KEY_DISP_APPLIED_MOMENT_LOAD='Moment Load (kN-m)'
 # capacity
 DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"
 KEY_MEMBER_CAPACITY = "section.memcapacity"
-KEY_DISP_MEMBER_CAPACITY = "Member Capacity (kN)"
+KEY_DISP_MEMBER_CAPACITY = "Member Capacity"
 KEY_MEMBER_AXIALCAPACITY='section.MomCapacity'
 KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity (kN)"
 KEY_MEMBER_SHEAR_CAPACITY='section.MomCapacity'
@@ -615,7 +615,7 @@ KEY_FLANGEPLATE_PREFERENCES = 'Flange_Plate.Preferences'
 KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
 VALUES_FLANGEPLATE_PREFERENCES = ['Cover plate location', 'Outside','Outside + Inside']
 
-KEY_FLANGEPLATE_THICKNESS = 'flange_plate.thickness_provided'
+KEY_FLANGEPLATE_THICKNESS = 'flange_pt.thickness_provided'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm)*'
 VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 
@@ -628,6 +628,7 @@ KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length (mm)'
 
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
+KEY_DISP_AREA_CHECK ="Plate Area check (mm^2)"
 
 
 KEY_INNERPLATE= "flange_plate.Inner_plate_details"

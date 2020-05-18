@@ -203,8 +203,48 @@ class TensionChannelCAD(TensionAngleCAD):
 
             self.member2_Model = self.member2.create_model()
 
-    def crearteWeldGeometry(self):
-        pass
+    def createWeldGeometry(self):
+        weldHL11OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.D / 2])
+        weldHL11_uDir = numpy.array([0.0, 0.0, 1.0])
+        weldHL11_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.weldHL11.place(weldHL11OriginL, weldHL11_uDir, weldHL11_wDir)
+
+        self.weldHL11_Model = self.weldHL11.create_model()
+
+        weldHL12OriginL = numpy.array([0.0, 0.0, -self.member.D / 2])
+        weldHL12_uDir = numpy.array([0.0, 0.0, -1.0])
+        weldHL12_wDir = numpy.array([-1.0, 0.0, 0.0])
+        self.weldHL12.place(weldHL12OriginL, weldHL12_uDir, weldHL12_wDir)
+
+        self.weldHL12_Model = self.weldHL12.create_model()
+
+        weldHR11OriginL = numpy.array([-2 * self.plate_intercept + self.member.L, 0.0, self.member.D / 2])
+        weldHR11_uDir = numpy.array([0.0, 0.0, 1.0])
+        weldHR11_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.weldHR11.place(weldHR11OriginL, weldHR11_uDir, weldHR11_wDir)
+
+        self.weldHR11_Model = self.weldHR11.create_model()
+
+        weldHR12OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, -self.member.D / 2])
+        weldHR12_uDir = numpy.array([0.0, 0.0, -1.0])
+        weldHR12_wDir = numpy.array([-1.0, 0.0, 0.0])
+        self.weldHR12.place(weldHR12OriginL, weldHR12_uDir, weldHR12_wDir)
+
+        self.weldHR12_Model = self.weldHR12.create_model()
+
+        weldVL11OriginL = numpy.array([-self.plate_intercept, 0.0, -self.member.D / 2])
+        weldVL11_uDir = numpy.array([-1.0, 0.0, 0.0])
+        weldVL11_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.weldVL11.place(weldVL11OriginL, weldVL11_uDir, weldVL11_wDir)
+
+        self.weldVL11_Model = self.weldVL11.create_model()
+
+        weldVR11OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.member.D / 2])
+        weldVR11_uDir = numpy.array([1.0, 0.0, 0.0])
+        weldVR11_wDir = numpy.array([0.0, 0.0, -1.0])
+        self.weldVR11.place(weldVR11OriginL, weldVR11_uDir, weldVR11_wDir)
+
+        self.weldVR11_Model = self.weldVR11.create_model()
 
     def get_members_models(self):
 
@@ -236,7 +276,7 @@ if __name__ == '__main__':
 
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    member_data = 'Angle'  # 'Star Angle' #'Channel' #'B2BChannel' #B2BAngle or 'Angle' 'Channel' or
+    member_data = 'Channel'  # 'Angle'  # 'Star Angle' #'B2BChannel' #B2BAngle or 'Angle' 'Channel' or
 
     weld_size = 6
     s = max(15, weld_size)

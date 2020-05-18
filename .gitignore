@@ -15,18 +15,9 @@
 *.bak
 .project
 .pydevproject
-<<<<<<< HEAD
-=======
-Output_PDF/*
->>>>>>> 20cd099a42cf82842b99557b6c77f2d8c1063845
 venv/*
 Osdag_Workspace/*
 /Osdag.config
 /backup
-<<<<<<< HEAD
 OUTPUT_FILES/Output_PDF/
 ResourceFiles/images/3d.png
-=======
-
-
->>>>>>> 20cd099a42cf82842b99557b6c77f2d8c1063845

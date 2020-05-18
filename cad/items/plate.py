@@ -84,3 +84,24 @@ v dir                                    |   |                          |
     #     prism = makePrismFromFace(aFace, extrudeDir)
     #
     #     return extrudeDir
+
+if __name__ == '__main__':
+
+    from OCC.Display.SimpleGui import init_display
+    display, start_display, add_menu, add_function_to_menu = init_display()
+
+    L = 10
+    T = 2
+    W = 8
+
+    origin = numpy.array([0.,0.,0.])
+    uDir = numpy.array([1.,0.,0.])
+    wDir = numpy.array([0.,0.,1.])
+
+    plate = Plate(L, W, T)
+    _place = plate.place(origin, uDir, wDir)
+    point = plate.compute_params()
+    prism = plate.create_model()
+    display.DisplayShape(prism, update=True)
+    display.DisableAntiAliasing()
+    start_display()

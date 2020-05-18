@@ -10,6 +10,7 @@
 *~
 .vscode
 *.sqlite
+**/*.sqlite
 *.html
 *.log
 *.bak

@@ -952,6 +952,25 @@ def kb_prov(e,p,d,fub,fu):
         kb_eqn.append(NoEscape(r'& = ' + kb_2 + r'\end{aligned}'))
     return kb_eqn
 
+def depth_req(e, g, row, sec =None):
+    d = 2*e + (row-1)*g
+    depth = d
+    depth = str(depth)
+    e = str(e)
+    g = str(g)
+    row = str(row)
+
+    depth_eqn = Math(inline=True)
+    if sec == "C":
+        depth_eqn.append(NoEscape(r'\begin{aligned} depth & = 2 * e + (r_l -1) * g \\'))
+        depth_eqn.append(NoEscape(r'& = 2 * '+e+'+('+row+'-1)*'+g+r' \\'))
+        depth_eqn.append(NoEscape(r'& = ' + depth + r'\end{aligned}'))
+    else:
+        depth_eqn.append(NoEscape(r'\begin{aligned} depth & = 2 * e + (r_l -1) * g\\'))
+        depth_eqn.append(NoEscape(r'& = 2 * ' + e + '+(' + row + '-1)*' + g +  r'\\'))
+        depth_eqn.append(NoEscape(r'& = ' + depth + r'\end{aligned}'))
+    return depth_eqn
+
     # slender = (float(K) * float(L)) / float(r)
     #
     # self.slenderness = round(slender, 2)

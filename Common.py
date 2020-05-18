@@ -287,6 +287,7 @@ DISP_MAX_PITCH = 'Max. Pitch (mm)'
 DISP_MIN_GAUGE = 'Min. Gauge (mm)'
 DISP_MAX_GAUGE = 'Max. Gauge (mm)'
 DISP_MIN_EDGE = 'Min. Edge Distance (mm)'
+KEY_SPACING = "Spacing Check"
 DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
 DISP_MIN_END = 'Min. End Distance (mm)'
 DISP_MAX_END = 'Max. End Distance (mm)'
@@ -1096,6 +1097,11 @@ KEY_DISP_ANGLE_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <
 KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
+KEY_OUT_DISP_D_MIN= 'Min.Diameter (mm)'
+
+
+
+
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'

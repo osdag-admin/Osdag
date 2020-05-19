@@ -3,8 +3,39 @@ import errno
 import yaml
 import sys
 import unittest
+from pathlib import Path
+import ast
 is_travis = 'TRAVIS' in os.environ
 
+############################ Pre-Build Database Updation/Creation #################
+sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
+sqlitepath = Path('ResourceFiles/Database/Intg_osdag.sqlite')
+
+if sqlpath.exists():
+    if not sqlitepath.exists():
+        cmd = 'sqlite3 ' + str(sqlitepath) + ' < ' + str(sqlpath)
+        os.system(cmd)
+        sqlpath.touch()
+        print('Database Created')
+
+    elif sqlitepath.stat().st_size == 0 or sqlitepath.stat().st_mtime < sqlpath.stat().st_mtime - 1:
+        try:
+            sqlitenewpath = Path('ResourceFiles/Database/Intg_osdag_new.sqlite')
+            cmd = 'sqlite3 ' + str(sqlitenewpath) + ' < ' + str(sqlpath)
+            error = os.system(cmd)
+            print(error)
+            # if error != 0:
+            #      raise Exception('SQL to SQLite conversion error 1')
+            # if sqlitenewpath.stat().st_size == 0:
+            #      raise Exception('SQL to SQLite conversion error 2')
+            os.remove(sqlitepath)
+            sqlitenewpath.rename(sqlitepath)
+            sqlpath.touch()
+            print('Database Updated', sqlpath.stat().st_mtime, sqlitepath.stat().st_mtime)
+        except Exception as e:
+            sqlitenewpath.unlink()
+            print('Error: ', e)
+#########################################################################################
 
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
@@ -28,6 +59,7 @@ if not is_travis:
     from texlive .Design_wrapper import init_display
 
 
+
 all_modules = {'Base Plate':BasePlateConnection, 'Beam Coverplate  Weld Connection':BeamCoverPlateWeld,'Beam Coverplate Connection':BeamCoverPlate,
     'Cleat Angle':CleatAngleConnection, 'Column Coverplate Weld Connection':ColumnCoverPlateWeld, 'Column Coverplate Connection':ColumnCoverPlate,
     'Column Endplate Connection':ColumnEndPlate, 'End Plate':EndPlateConnection, 'Fin Plate':FinPlateConnection,'Seated Angle': SeatedAngleConnection,
@@ -48,23 +80,16 @@ available_module dictionary is used in -
 Make sure to make the necessary changes in above functions/methods if you are changing the name of available_module.
 '''
 
-available_module = {'Beam Coverplate  Weld Connection' : BeamCoverPlateWeld, 'Fin Plate' : FinPlateConnection,
-                    'Column Coverplate Weld Connection': ColumnCoverPlateWeld}
+# available_module = {'Beam Coverplate  Weld Connection':BeamCoverPlateWeld,'Beam Coverplate Connection':BeamCoverPlate,
+#                     'Column Coverplate Weld Connection':ColumnCoverPlateWeld, 'Column Coverplate Connection':ColumnCoverPlate,
+#                     'Fin Plate':FinPlateConnection, 'Tension Members Bolted Design':Tension_bolted,
+#                     'Tension Members Welded Design':Tension_welded}
+available_module = {'Column Coverplate Connection':ColumnCoverPlate}
 
-
-
-Output_folder_name = 'Output_PDF'
 
 #predefined pop-up summary.
 popup_summary = {'ProfileSummary': {'CompanyName': 'LoremIpsum', 'CompanyLogo': '', 'Group/TeamName': 'LoremIpsum', 'Designer': 'LoremIpsum'},
                 'ProjectTitle': 'Fossee', 'Subtitle': '', 'JobNumber': '123', 'AdditionalComments': 'No comments', 'Client': 'LoremIpsum'}
-
-
-input_file_path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'design_example')   # input folder path
-
-output_folder_path = os.path.join(os.path.dirname(__file__), Output_folder_name)               # output folder path
-
-
 
 
 
@@ -76,7 +101,15 @@ def make_sure_path_exists(path):      # Works on all OS.
         if exception.errno != errno.EEXIST:
             raise
 
-make_sure_path_exists(output_folder_path)   #make sure output folder exists if not then create.
+
+
+input_file_path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'design_example')   # input folder path
+
+output_file_path = os.path.join(os.path.dirname(__file__), 'OUTPUT_FILES', 'Output_PDF')               # output folder path
+
+
+
+make_sure_path_exists(output_file_path)   #make sure output folder exists if not then create.
 
 
 
@@ -130,28 +163,61 @@ class Modules:
 
 
             '''
+            file_name = file_name.split(".")[0]
 
-            duplicate = output_folder_path         # Making duplicate so that original path doesn't change.
-            duplicate = duplicate + '/' + file_name  # giving each output file it's corresponding input file name.
-            popup_summary['filename'] = duplicate    # adding this key in popup_summary dict.
+            path =  os.path.join(output_file_path, file_name)
+
+            popup_summary['filename'] = path    # adding this key in popup_summary dict.
+
             popup_summary['does_design_exist'] = False
+
             try:
+
                 display, start_display, add_menu, add_function_to_menu = init_display(backend_str="qt-pyqt5")
+
                 commLogicObj = CommonDesignLogic(display, ' ', main.module, main.mainmodule)
+
                 status = main.design_status
+
                 commLogicObj.call_3DModel(status, main)
+
                 fName = str('./ResourceFiles/images/3d.png')
+
                 file_extension = fName.split(".")[-1]
+
                 if file_extension == 'png':
+
                     display.ExportToImage(fName)
+
                 popup_summary['does_design_exist'] = True
+
             except:
+
                 print("Design is not ready.")
 
             main.save_design(main,popup_summary)  # calling the function.
+
             pdf_created = True   # if pdf created
 
-        return pdf_created
+            is_dict_same = True
+            '''
+            path = os.path.join(os.path.dirname(__file__), 'OUTPUT_FILES', 'Command_line_output', file_name + ".txt")
+
+            if os.path.isfile(path):
+
+                with open(path,"r") as file_content:
+
+                    content = file_content.read()
+
+                content = ast.literal_eval(content)   # convert dictionary string to dictionary
+
+                output_dict = main.results_to_test(main)
+
+                if output_dict != content:
+
+                    is_dict_same = False    # if dictionary is not equal.
+            '''
+        return (pdf_created & is_dict_same)
 
 
 
@@ -208,7 +274,7 @@ if __name__ == '__main__':
     precompute_data()    # precompute all data.
 
 
-    log_file = "test_log_file.txt"   # log file in which test results will be written.
+    log_file = "test_log_file.log"   # log file in which test results will be written.
 
 
     with open(log_file, 'w') as TEST_LOG_FILE:

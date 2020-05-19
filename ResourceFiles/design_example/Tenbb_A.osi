@@ -18,6 +18,7 @@ Bolt.Grade:
 - '12.9'
 Bolt.Type: Bearing Bolt
 Conn_Location: Long Leg
+<<<<<<< HEAD:ResourceFiles/design_example/Tenbb_A.osi
 DesignPreferences.Bolt.Bolt_Hole_Type: Standard
 DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
 DesignPreferences.Bolt.Slip_Factor: '0.3'
@@ -29,10 +30,23 @@ DesignPreferences.Weld.Fab: Shop Weld
 DesignPreferences.Weld.Material_Grade_OverWrite: '410'
 Length(mm): '5000'
 Load.Axial: '500'
+=======
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Material_Grade_OverWrite: '410'
+Bolt.Slip_Factor: '0.3'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: a - Sheared or hand flame cut
+Detailing.Gap: '10'
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'
+Member.Length: '2000'
+Load.Axial: '400'
+>>>>>>> e760e8f14a604c814a44be3983d33d24080f9354:ResourceFiles/design_example/Tension_Angle bear.osi
 Member.Material: E 250 (Fe 410 W)A
 Member.Profile: Angles
 Module: Tension Members Bolted Design
-Section Size:
+Member.Designation:
 - 20 20 X 3
 - 20 20 X 4
 - 25 25 x 3

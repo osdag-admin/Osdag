@@ -1068,6 +1068,13 @@ class Plate(Material):
         if length_avail > 15 * bolt_dia:
             beta_lj = 1.075 - length_avail / (200 * bolt_dia)
             print('long joint case')
+            if beta_lj >1:
+                beta_lj =1
+            elif beta_lj<0.75:
+                beta_lj = 0.75
+            else:
+                beta_lj = beta_lj
+
             bolt_capacity_red = beta_lj * bolt_capacity
         else:
             bolt_capacity_red = bolt_capacity
@@ -1159,6 +1166,7 @@ class Plate(Material):
                     print("boltdetails2", bolt_line, bolts_one_line, web_plate_h)
                 # If height cannot be increased number of bolts is increased by 1 and loop is repeated
                 else:
+                    bolts_required = bolt_line * bolts_one_line
                     bolts_required += 1
                     print(5, web_plate_h_max, web_plate_h_min, bolts_required,
                                                             min_edge_dist, min_gauge)

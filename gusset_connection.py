@@ -6,6 +6,8 @@ from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 import sys
 from gui.ui_template import Ui_ModuleWindow
+from utils.common.component import Bolt
+from design_report.reportGenerator_latex import CreateLatex
 
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 
@@ -134,6 +136,21 @@ KEY_PLATETHK = 'Plate.Thickness'
 VALUES_PLATETHK = ['All', 'Customized']
 VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 
+# Keys for design_pref
+KEY_SUPTNGSEC_DESIGNATION = 'Supporting_Section.Designation'
+KEY_DISP_SUPTNGSEC_DESIGNATION = 'Designation'
+KEY_DISP_MECH_PROP = 'Mechanical Properties'
+KEY_SUPTNGSEC_FU = 'Supporting_Section.Ultimate_Strength'
+KEY_DISP_SUPTNGSEC_FU = 'Ultimate strength, fu (MPa)'
+KEY_SUPTNGSEC_FY = 'Supporting_Section.Yield_Strength'
+KEY_DISP_SUPTNGSEC_FY = 'Yield Strength , fy (MPa)'
+KEY_PLATE_MATERIAL = 'Plate.Material'
+KEY_PLATE_FU = 'Plate.Ultimate_Strength'
+KEY_DISP_PLATE_FU = 'Ultimate strength, fu (MPa)'
+KEY_PLATE_FY = 'Plate.Yield_Strength'
+KEY_DISP_PLATE_FY = 'Yield Strength , fy (MPa)'
+
+
 TYPE_COMBOBOX = 'ComboBox'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
@@ -146,6 +163,8 @@ TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
 TYPE_TEXT_BROWSER = 'TextBrowser'
 TYPE_NOTE = 'Note'
+TYPE_TAB_1 = "TYPE_TAB_1"
+TYPE_TAB_2 = "TYPE_TAB_2"
 
 
 class OurLog(logging.Handler):
@@ -305,15 +324,105 @@ class GussetConnection(Connection):
         else:
             return all_errors
 
+    def tab_list(self):
+        tabs = []
 
+        t1 = ("Column", TYPE_TAB_1, self.tab_column_section)
+        tabs.append(t1)
+
+        t7 = ("Connector", TYPE_TAB_2, self.connector_values)
+        tabs.append(t7)
+
+        return tabs
+
+    @staticmethod
+    def tab_column_section():
+        supporting_section = []
+        t1 = (KEY_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_DESIGNATION, TYPE_TEXTBOX, None)
+        supporting_section.append(t1)
+
+        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None)
+        supporting_section.append(t2)
+
+        t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
+        supporting_section.append(t3)
+
+        return supporting_section
+
+    @staticmethod
+    def connector_values():
+        connector = []
+
+        material = connectdb("Material", call_type="popup")
+        material.append('Custom')
+        t1 = (KEY_PLATE_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material)
+        connector.append(t1)
+
+        t2 = (KEY_PLATE_FU, KEY_DISP_PLATE_FU, TYPE_TEXTBOX, None)
+        connector.append(t2)
+
+        t3 = (KEY_PLATE_FY, KEY_DISP_PLATE_FY, TYPE_TEXTBOX, None)
+        connector.append(t3)
+
+        return connector
+
+    def set_input_values(self, design_dictionary):
+        self.section = design_dictionary[KEY_SECSIZE][0]
+        self.membercount = design_dictionary[KEY_MEMBER_COUNT]
+        self.load = design_dictionary[KEY_AXIAL]
+        self.bolt = Bolt(grade=[8.8], diameter=design_dictionary[KEY_D],
+                         bolt_type='Bearing Bolt',
+                         material_grade=design_dictionary[KEY_MATERIAL])
+        self.bolt_details = {
+            'diameter':self.bolt.bolt_diameter[0],
+            'grade': 8.8,
+            'number of bolts': 4}
+
+    def save_design(self,popup_summary):
+
+        self.report_input = \
+            {KEY_MODULE: self.module,
+             'Num of Members':self.membercount,
+             'Load': self.load,
+             KEY_DISP_D: str(self.bolt.bolt_diameter),
+             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_TYP: self.bolt.bolt_type}
+
+        self.report_check = []
+
+        t1 = ('SubSection', 'Bolt Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        if self.bolt.bolt_type == TYP_BEARING:
+            t1 = ('Bolt Shear Capacity', '', '50', '')
+            self.report_check.append(t1)
+            t2 = ('Bolt Bearing Capacity', '', '40', '')
+            self.report_check.append(t2)
+            t3 = ('Bolt capacity', '35','40','Pass')
+            self.report_check.append(t3)
+        else:
+
+            t4 = ('Bolt slip capacity', '60','70','Pass')
+            self.report_check.append(t4)
+
+
+        Disp_3D_image = "/ResourceFiles/images/3d.png"
+        rel_path = str(sys.path[0])
+        rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
+                               rel_path, Disp_3D_image)
 
 class MainController(QMainWindow):
     closed = pyqtSignal()
+
     def __init__(self, Ui_ModuleWindow, main):
         super(MainController,self).__init__()
         QMainWindow.__init__(self)
         self.ui = Ui_ModuleWindow()
         self.ui.setupUi(self, main, '')
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

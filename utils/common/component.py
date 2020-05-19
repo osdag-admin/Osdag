@@ -17,9 +17,9 @@ import numpy as np
 from utils.common.common_calculation import *
 
 class Bolt(Material):
-
-    def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="",
-                 edge_type="", mu_f=0.0, corrosive_influences=True, bolt_tensioning=""):
+    #TODO: Bolt Need not inherit Material. Should Remove after unittests are in place.
+    def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="Standard",
+                 edge_type="a - Sheared or hand flame cut", mu_f=0.3, corrosive_influences=True, bolt_tensioning="Pretensioned"):
         super(Bolt, self).__init__(material_grade)
         if grade is not None:
             self.bolt_grade = list(np.float_(grade))
@@ -265,6 +265,7 @@ class Section(Material):
 
     def __init__(self, designation, material_grade=""):
 
+        self.design_status = True
         self.designation = designation
         self.type = "Rolled"
         self.type2 = "generally"
@@ -273,6 +274,8 @@ class Section(Material):
         self.mass = 0.0
         self.area = 0.0
         self.depth = 0.0
+        # web_height for for rolled section without notches (considered as default)
+        self.web_height = self.depth
         self.flange_width = 0.0
         self.web_thickness = 0.0
         self.flange_thickness = 0.0
@@ -292,7 +295,13 @@ class Section(Material):
         super(Section, self).__init__(material_grade,max_thickness)
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
+        self.shear_yielding_capacity = 0.0
+        self.shear_rupture_capacity = 0.0
+        self.block_shear_capacity_shear = 0.0
+        self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity = 0.0
+        self.shear_capacity = 0.0
+        self.tension_capacity = 0.0
         self.tension_capacity_flange = 0.0
 
         self.tension_yielding_capacity_web = 0.0  #
@@ -316,6 +325,7 @@ class Section(Material):
         self.slenderness = 0.0
         self.min_radius_gyration = 0.0
         self.beta =0.0
+        self.IR = 1.0
         # self.min_rad_gyration_bbchannel = 0.0
 
         # self.member_yield_eqn =0.0
@@ -347,7 +357,8 @@ class Section(Material):
         self.plast_sec_mod_z = row[17]
         print(row[17], "plast_sec_mod_z")
         if self.plast_sec_mod_z is None:  # Todo: add in database
-            self.plast_sec_mod_z = self.elast_sec_mod_z
+            self.plast_sec_mod_z = I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)*1000
             print(self.plast_sec_mod_z,"plast_sec_mod_z")
         else:
             self.plast_sec_mod_z = row[17] *1000
@@ -355,7 +366,8 @@ class Section(Material):
         self.plast_sec_mod_y = row[18]
         print(row[18], "plast_sec_mod_z")
         if self.plast_sec_mod_y is None:  # Todo: add in database
-            self.plast_sec_mod_y = self.elast_sec_mod_y
+            self.plast_sec_mod_y = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)*1000
             print(self.plast_sec_mod_y, "plast_sec_mod_y")
         else:
             self.plast_sec_mod_y = row[17] * 1000
@@ -648,6 +660,7 @@ class Beam(Section):
         super(Beam, self).__init__(designation, material_grade)
         self.connect_to_database_update_other_attributes("Beams", designation)
 
+
     def min_plate_height(self):
         return 0.6 * self.depth
 
@@ -723,6 +736,7 @@ class Weld(Material):
         self.type = type
         self.size = 0.0
         self.length = 0.0
+        self.eff_length = 0.0
         self.Innerlength = 0.0
         self.effective = 0.0
         self.height =0.0
@@ -759,6 +773,14 @@ class Weld(Material):
         weld_strength = round(f_wd * self.throat_tk,2)
         self.strength = weld_strength
 
+    def get_weld_strength_lj(self, connecting_fu, weld_fabrication, t_weld, weld_angle, lenght):
+        f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
+        self.throat_tk = \
+            round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
+                (t_weld, weld_angle),2)
+        print ("throat_tk",self.throat_tk)
+        weld_strength = round(f_wd * self.throat_tk,2)
+        self.strength = weld_strength
 
     def get_weld_stress(self,weld_shear, weld_axial, l_weld, weld_twist=0.0, Ip_weld=None, y_max=0.0, x_max=0.0):
         if weld_twist != 0.0:
@@ -808,14 +830,17 @@ class Weld(Material):
         self.min_weld = min_weld_thickness
 
 class Plate(Material):
-
     def __init__(self, thickness=[], height=0.0,Innerheight=0.0, length=0.0,Innerlength=0.0, gap=0.0, material_grade=""):
         super(Plate, self).__init__(material_grade=material_grade)
         self.design_status = False
         self.reason = ""
-        self.thickness = list(np.float_(thickness))
-        self.thickness.sort(key=float)
+        if thickness:
+            self.thickness = list(np.float_(thickness))
+            self.thickness.sort(key=float)
+        else:
+            self.thickness = 0.0
         self.thickness_provided = 0.0
+        super(Plate, self).__init__(material_grade, self.thickness_provided)
         self.height = height
         self.length = length
         self.gap = float(gap)
@@ -850,7 +875,9 @@ class Plate(Material):
         self.tension_capacity_web_plate = 0.0
         self.tension_capacity_flange_plate = 0.0
         self.block_shear_capacity_shear = 0.0
+        self.block_shear_capacity_axial = 0.0
         self.moment_capacity = 0.0
+        self.IR = 1.0
 
         self.ymax = 0.0
         self.xmax = 0.0
@@ -978,7 +1005,7 @@ class Plate(Material):
                 #  This logic is in function get_web_plate_details
                 web_plate_h = False
         elif gauge == 0:
-            egde_dist = web_plate_h/2
+            edge_dist = web_plate_h/2
             if edge_dist >= max_edge_dist:
                 web_plate_h = False
 
@@ -1164,7 +1191,9 @@ class Plate(Material):
                 # Length of plate is increased for calculated bolts in one line.
                 # This increases spacing which decreases resultant force
                 print(4, web_plate_h, web_plate_h_max)
-                if web_plate_h + 10 <= web_plate_h_max and shear_ecc is True and gauge!=0:
+                [gauge, edge_dist, web_plate_h_recalc] = self.get_gauge_edge_dist(web_plate_h+10, bolts_one_line, min_edge_dist,
+                                                                           max_spacing, max_edge_dist)
+                if web_plate_h_recalc <= web_plate_h_max and shear_ecc is True and gauge!=0:
                 # gauge is recalculated only if there is shear ecc or else increase in bolt is the only option
                     web_plate_h += 10
                     print("boltdetails2", bolt_line, bolts_one_line, web_plate_h)
@@ -1548,7 +1577,7 @@ class Plate(Material):
 
 class Angle(Section):
 
-    def __init__(self, designation, material_grade ):
+    def __init__(self, designation, material_grade):
         # super(Angle, self).__init__(material_grade)
         super(Angle, self).__init__(designation, material_grade)
 

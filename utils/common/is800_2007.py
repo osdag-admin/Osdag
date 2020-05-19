@@ -40,7 +40,35 @@ class IS800_2007(object):
     # ==========================================================================
     """    SECTION  6     DESIGN OF TENSION MEMBERS   """
 
+    # ------------------------------------------------------------
+    #   6.2 Design Strength Due to Yielding of Gross Section
     # -------------------------------------------------------------
+
+    @staticmethod
+    def cl_6_2_tension_yielding_strength(A_g, f_y):
+        """Calcualte the tension rupture capacity of plate as per clause 6.3.1
+        :param A_g: gross area of cross section
+        :param f_y: yield stress of the material
+        :return: design strength in tension yielding
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        T_dg = A_g * f_y / gamma_m0
+        return T_dg
+    # ------------------------------------------------------------
+    #   6.3 Design Strength Due to Rupture of Critical Section
+    # -------------------------------------------------------------
+
+    # cl.6.3.1 Plates
+    @staticmethod
+    def cl_6_3_1_tension_rupture_strength(A_n,f_u):
+        """Calcualte the tension rupture capacity of plate as per clause 6.3.1
+        :param A_n: net effective area of member
+        :param f_u: ultimate stress of the material
+        :return: design strength in tension rupture
+        """
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_dn = 0.9*A_n*f_u/gamma_m1
+        return T_dn
     #   6.4 Design Strength Due to Block Shear
     # -------------------------------------------------------------
 
@@ -500,9 +528,7 @@ self
 
     # cl. 10.4.3 Slip Resistance
     @staticmethod
-
     def cl_10_4_3_bolt_slip_resistance(f_ub, A_nb, n_e, mu_f, bolt_hole_type='Standard', slip_resistance='ultimate_load'):
-
         # TODO : Ensure default slip_resistance = 'service_load' or 'ultimate_load'
         """Calculate design shear strength of friction grip bolt as governed by slip
         Args:

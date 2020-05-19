@@ -9,12 +9,13 @@
 **/.idea/
 *~
 .vscode
+*.sqlite
 *.html
 *.log
 *.bak
 .project
 .pydevproject
-output/*
+Output_PDF/*
 venv/*
 Osdag_Workspace/*
 /Osdag.config

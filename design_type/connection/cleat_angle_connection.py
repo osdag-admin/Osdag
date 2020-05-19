@@ -67,49 +67,49 @@ class CleatAngleConnection(ShearConnection):
         else:
             existingvalue_key_cleatsec = ''
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN)
+        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC)
+        t4 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC, True, 'No Validator')
         options_list.append(t4)
 
-        t5 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC)
+        t5 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC, True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
+        t6 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
+        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        t8 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None, True, 'No Validator')
         options_list.append(t8)
 
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
+        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t9)
 
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D)
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D, True, 'No Validator')
         options_list.append(t10)
 
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
+        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
+        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)
 
-        t13 = (None, DISP_TITLE_CLEAT, TYPE_TITLE, None, None)
+        t13 = (None, DISP_TITLE_CLEAT, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t13)
 
-        t15 = (KEY_CLEATSEC, KEY_DISP_CLEATSEC, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_cleatsec, VALUES_ANGLESEC)
+        t15 = (KEY_CLEATSEC, KEY_DISP_CLEATSEC, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_cleatsec, VALUES_ANGLESEC, True, 'No Validator')
         options_list.append(t15)
 
-        t16 = (KEY_MODULE, KEY_DISP_CLEATANGLE, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_CLEATANGLE, TYPE_MODULE, None, None, True, 'No Validator')
         options_list.append(t16)
 
         return options_list
@@ -120,11 +120,6 @@ class CleatAngleConnection(ShearConnection):
         return a
 
     @staticmethod
-    def grdval_customized():
-        b = VALUES_GRD_CUSTOMIZED
-        return b
-
-    @staticmethod
     def diam_bolt_customized():
         c = connectdb1()
         if "36" in c: c.remove("36")
@@ -133,56 +128,62 @@ class CleatAngleConnection(ShearConnection):
     def customized_input(self):
 
         list1 = []
-        t1 = (KEY_GRD, CleatAngleConnection.grdval_customized)
+        t1 = (KEY_GRD, self.grdval_customized)
         list1.append(t1)
-        t2 = (KEY_CLEATSEC, CleatAngleConnection.cleatsec_customized)
+        t2 = (KEY_CLEATSEC, self.cleatsec_customized)
         list1.append(t2)
-        t3 = (KEY_D, CleatAngleConnection.diam_bolt_customized)
+        t3 = (KEY_D, self.diam_bolt_customized)
         list1.append(t3)
         return list1
 
     def fn_conn_suptngsec_lbl(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return KEY_DISP_COLSEC
-        elif self in VALUES_CONN_2:
+        elif conn in VALUES_CONN_2:
             return KEY_DISP_PRIBM
         else:
             return ''
 
     def fn_conn_suptdsec_lbl(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return KEY_DISP_BEAMSEC
-        elif self in VALUES_CONN_2:
+        elif conn in VALUES_CONN_2:
             return KEY_DISP_SECBM
         else:
             return ''
 
     def fn_conn_suptngsec(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return VALUES_COLSEC
-        elif self in VALUES_CONN_2:
+        elif conn in VALUES_CONN_2:
             return VALUES_PRIBM
         else:
             return []
 
     def fn_conn_suptdsec(self):
 
-        if self in VALUES_CONN_1:
+        conn = self[0]
+        if conn in VALUES_CONN_1:
             return VALUES_BEAMSEC
-        elif self in VALUES_CONN_2:
+        elif conn in VALUES_CONN_2:
             return VALUES_SECBM
         else:
             return []
 
     def fn_conn_image(self):
-        if self == VALUES_CONN[0]:
+
+        conn = self[0]
+        if conn == VALUES_CONN[0]:
             return './ResourceFiles/images/fin_cf_bw.png'
-        elif self == VALUES_CONN[1]:
+        elif conn == VALUES_CONN[1]:
             return './ResourceFiles/images/fin_cw_bw.png'
-        elif self in VALUES_CONN_2:
+        elif conn in VALUES_CONN_2:
             return './ResourceFiles/images/fin_beam_beam.png'
         else:
             return ''
@@ -191,19 +192,19 @@ class CleatAngleConnection(ShearConnection):
 
         lst = []
 
-        t1 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_LABEL, self.fn_conn_suptngsec_lbl)
+        t1 = ([KEY_CONN], KEY_SUPTNGSEC, TYPE_LABEL, self.fn_conn_suptngsec_lbl)
         lst.append(t1)
 
-        t2 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_COMBOBOX, self.fn_conn_suptngsec)
+        t2 = ([KEY_CONN], KEY_SUPTNGSEC, TYPE_COMBOBOX, self.fn_conn_suptngsec)
         lst.append(t2)
 
-        t3 = (KEY_CONN, KEY_SUPTDSEC, TYPE_LABEL, self.fn_conn_suptdsec_lbl)
+        t3 = ([KEY_CONN], KEY_SUPTDSEC, TYPE_LABEL, self.fn_conn_suptdsec_lbl)
         lst.append(t3)
 
-        t4 = (KEY_CONN, KEY_SUPTDSEC, TYPE_COMBOBOX, self.fn_conn_suptdsec)
+        t4 = ([KEY_CONN], KEY_SUPTDSEC, TYPE_COMBOBOX, self.fn_conn_suptdsec)
         lst.append(t4)
 
-        t5 = (KEY_CONN, KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        t5 = ([KEY_CONN], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t5)
 
         return lst
@@ -253,20 +254,20 @@ class CleatAngleConnection(ShearConnection):
 
         out_list = []
 
-        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None)
+        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
 
-        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '')
+        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '', True)
         out_list.append(t2)
 
-        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '')
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '', True)
 
         out_list.append(t3)
 
-        t4 = (None, DISP_OUT_TITLE_SPTDLEG, TYPE_TITLE, None)
+        t4 = (None, DISP_OUT_TITLE_SPTDLEG, TYPE_TITLE, None, True)
         out_list.append(t4)
 
-        t5 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag else '')
+        t5 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag else '', True)
         out_list.append(t5)
         bolt_bearing_capacity_disp = ''
         if flag is True:
@@ -275,29 +276,29 @@ class CleatAngleConnection(ShearConnection):
             else:
                 bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
-        t6 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '')
+        t6 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t6)
 
-        t7 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '')
+        t7 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '', True)
         out_list.append(t7)
 
-        t8 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_FORCE, TYPE_TEXTBOX, round(self.sptd_leg.bolt_force / 1000, 2) if flag else '')
+        t8 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_FORCE, TYPE_TEXTBOX, round(self.sptd_leg.bolt_force / 1000, 2) if flag else '', True)
         out_list.append(t8)
 
-        t9 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.sptd_leg.bolt_line if flag else '')
+        t9 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.sptd_leg.bolt_line if flag else '', True)
         out_list.append(t9)
 
-        t10 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.sptd_leg.bolts_one_line if flag else '')
+        t10 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.sptd_leg.bolts_one_line if flag else '', True)
         out_list.append(t10)
 
-        t11 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
+        t11 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
         out_list.append(t11)
 
-        t12 = (None, DISP_OUT_TITLE_SPTNGLEG, TYPE_TITLE, None)
+        t12 = (None, DISP_OUT_TITLE_SPTNGLEG, TYPE_TITLE, None, True)
         out_list.append(t12)
 
         t13 = (KEY_OUT_SPTNG_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
-              round(self.sptng_bolt.bolt_shear_capacity / 1000, 2) if flag else '')
+              round(self.sptng_bolt.bolt_shear_capacity / 1000, 2) if flag else '', True)
         out_list.append(t13)
 
         bolt_bearing_capacity_disp = ''
@@ -307,53 +308,79 @@ class CleatAngleConnection(ShearConnection):
             else:
                 bolt_bearing_capacity_disp = self.sptng_bolt.bolt_bearing_capacity
 
-        t14 = (KEY_OUT_SPTNG_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '')
+        t14 = (KEY_OUT_SPTNG_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t14)
 
         t15 = (KEY_OUT_SPTNG_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX,
-              round(self.sptng_bolt.bolt_capacity / 1000, 2) if flag else '')
+              round(self.sptng_bolt.bolt_capacity / 1000, 2) if flag else '', True)
         out_list.append(t15)
 
         t16 = (KEY_OUT_SPTNG_BOLT_FORCE, KEY_OUT_DISP_BOLT_FORCE, TYPE_TEXTBOX,
-              round(self.sptng_leg.bolt_force / 1000, 2) if flag else '')
+              round(self.sptng_leg.bolt_force / 1000, 2) if flag else '', True)
         out_list.append(t16)
 
-        t17 = (KEY_OUT_SPTNG_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.sptng_leg.bolt_line if flag else '')
+        t17 = (KEY_OUT_SPTNG_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.sptng_leg.bolt_line if flag else '', True)
         out_list.append(t17)
 
         t18 = (
-        KEY_OUT_SPTNG_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.sptng_leg.bolts_one_line if flag else '')
+        KEY_OUT_SPTNG_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.sptng_leg.bolts_one_line if flag else '', True)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_SPTNG_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.sptng_spacing])
+        t19 = (KEY_OUT_SPTNG_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.sptng_spacing], True)
         out_list.append(t19)
 
-        t20 = (None, DISP_OUT_TITLE_CLEAT, TYPE_TITLE, None)
+        t20 = (None, DISP_OUT_TITLE_CLEAT, TYPE_TITLE, None, True)
         out_list.append(t20)
 
-        t15 = (KEY_OUT_CLEAT_HEIGHT, KEY_OUT_DISP_CLEAT_HEIGHT, TYPE_TEXTBOX, self.sptd_leg.height if flag else '')
+        t15 = (KEY_OUT_CLEAT_HEIGHT, KEY_OUT_DISP_CLEAT_HEIGHT, TYPE_TEXTBOX, self.sptd_leg.height if flag else '', True)
         out_list.append(t15)
 
-        t16 = (KEY_OUT_CLEAT_SPTDLEG, KEY_OUT_DISP_CLEAT_SPTDLEG, TYPE_TEXTBOX, self.cleat.leg_a_length if flag else '')
+        t16 = (KEY_OUT_CLEAT_SPTDLEG, KEY_OUT_DISP_CLEAT_SPTDLEG, TYPE_TEXTBOX, self.cleat.leg_a_length if flag else '', True)
         out_list.append(t16)
 
-        t16 = (KEY_OUT_CLEAT_SPTNGLEG, KEY_OUT_DISP_CLEAT_SPTNGLEG, TYPE_TEXTBOX, self.cleat.leg_b_length if flag else '')
+        t16 = (KEY_OUT_CLEAT_SPTNGLEG, KEY_OUT_DISP_CLEAT_SPTNGLEG, TYPE_TEXTBOX, self.cleat.leg_b_length if flag else '', True)
         out_list.append(t16)
 
-        t17 = (KEY_OUT_CLEAT_SHEAR, KEY_OUT_DISP_CLEAT_SPTNGLEG, TYPE_TEXTBOX, round(self.sptd_leg.shear_yielding_capacity,2) if flag else '')
+        t17 = (KEY_OUT_CLEAT_SHEAR, KEY_OUT_DISP_CLEAT_SPTNGLEG, TYPE_TEXTBOX, round(self.sptd_leg.shear_yielding_capacity,2) if flag else '', True)
         out_list.append(t17)
 
-        t18 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_BLK_SHEAR, TYPE_TEXTBOX, round(self.sptd_leg.block_shear_capacity,2) if flag else '')
+        t18 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_BLK_SHEAR, TYPE_TEXTBOX, round(self.sptd_leg.block_shear_capacity,2) if flag else '', True)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_MOM_DEMAND, TYPE_TEXTBOX, round(self.sptd_leg.moment_demand/1000000,2) if flag else '')
+        t19 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_MOM_DEMAND, TYPE_TEXTBOX, round(self.sptd_leg.moment_demand/1000000,2) if flag else '', True)
         out_list.append(t19)
 
-        t20 = (KEY_OUT_CLEAT_MOM_CAPACITY, KEY_DISP_MOM_CAPACITY, TYPE_TEXTBOX, round(self.sptd_leg.moment_capacity,2) if flag else '')
+        t20 = (KEY_OUT_CLEAT_MOM_CAPACITY, KEY_DISP_MOM_CAPACITY, TYPE_TEXTBOX, round(self.sptd_leg.moment_capacity,2) if flag else '', True)
         out_list.append(t20)
 
         return out_list
 
+    def tab_list(self):
+
+        tabs = []
+
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
+        tabs.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
+        tabs.append(t2)
+
+        t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t3)
+
+        t4 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t4)
+
+        t5 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t5)
+
+        t6 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t6)
+
+        t7 = ("Connector", TYPE_TAB_2, self.connector_values)
+        tabs.append(t7)
+
+        return tabs
     def set_osdaglogger(key):
 
         """

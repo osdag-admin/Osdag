@@ -281,3 +281,22 @@ class IS_5624_1993(object):
                                anchor_details.get('max_len'), anchor_details.get('avg_len')]
 
         return anchor_details_list
+
+
+class AISC(object):
+    # TODO: This formula based on AISC guidelines, check if this should be included
+    @staticmethod
+    def cl_j_4_2_b_shear_rupture(A_vn, fu):
+        '''
+        Args:
+            A_vn (float) Net area under shear
+            beam_fu (float) Ultimate stress of beam material
+        Returns:
+            Capacity of beam web in shear rupture
+        Note:
+            Reference:
+            J4.2(b) Speciﬁcation for Structural Steel Buildings, June 22, 2010, AISC
+        '''
+        R_n = (0.75 * fu * A_vn)
+        shear_rupture_capacity = round(R_n, 2)
+        return shear_rupture_capacity

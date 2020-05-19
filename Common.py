@@ -291,6 +291,7 @@ DISP_MAX_PITCH = 'Max. Pitch (mm)'
 DISP_MIN_GAUGE = 'Min. Gauge (mm)'
 DISP_MAX_GAUGE = 'Max. Gauge (mm)'
 DISP_MIN_EDGE = 'Min. Edge Distance (mm)'
+KEY_SPACING = "Spacing Check"
 DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
 DISP_MIN_END = 'Min. End Distance (mm)'
 DISP_MAX_END = 'Max. End Distance (mm)'
@@ -877,6 +878,12 @@ KEY_DP_WELD_FAB = 'Weld.Fab'
 
 KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
 KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
+KEY_DISP_GAMMA_M0 = "Governed by Yielding"
+KEY_DISP_GAMMA_M1 = "Governed by Ultimate Stress"
+KEY_DISP_GAMMA_MB = "Connection Bolts - Bearing Type"
+KEY_DISP_GAMMA_MF = "Connection Bolts - Friction Type"
+KEY_DISP_GAMMA_MW = "Connection Weld"
+
 
 
 KEY_DP_WELD_TYPE = 'Weld.Type'
@@ -1087,6 +1094,11 @@ KEY_DISP_ANGLE_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <
 KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
+KEY_OUT_DISP_D_MIN= 'Min.Diameter (mm)'
+
+
+
+
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
@@ -1095,6 +1107,9 @@ KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
+KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
+KEY_DISP_KB = 'Kb'
+
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
@@ -1114,7 +1129,7 @@ KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
-KEY_OUT_LONG_JOINT = 'Long Joint Reduction'
+KEY_OUT_LONG_JOINT = 'Bolt Capacity post Long Joint (kN)'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
@@ -1171,7 +1186,7 @@ KEY_OUT_SPTNG_MIN_EDGE_DIST = 'Cleat.Sptng_leg.MinEdgeDist'
 KEY_OUT_SPTNG_MAX_EDGE_DIST = 'Cleat.Sptng_leg.MaxEdgeDist'
 
 
-KEY_OUT_DISP_PLATETHK_REP = 'Thickness (tp) (mm)'
+KEY_OUT_DISP_PLATETHK_REP = 'Thickness (mm)'
 KEY_OUT_PLATETHK = 'Plate.Thickness'
 KEY_OUT_DISP_PLATETHK = 'Thickness (mm)'
 KEY_OUT_PLATE_HEIGHT = 'Plate.Height'

@@ -1,4 +1,5 @@
 
+
 from pathlib import Path
 import os
 import errno
@@ -142,6 +143,34 @@ def blockPrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
+# <<<<<<< HEAD
+#     module = d['Module']
+#     if module == 'Fin Plate':
+#         main = FinPlateConnection
+#         main.set_osdaglogger(None)
+#         main.set_input_values(main, d)
+#         base = os.path.basename(f)
+#         filename = str(os.path.splitext(base)[0])+".txt"
+#         main.results_to_test(main, os.path.basename(filename))
+#     elif module == 'Tension Members Bolted Design':
+#         main = Tension_bolted
+#         main.set_osdaglogger(None)
+#         main.set_input_values(main, d)
+#         base = os.path.basename(f)
+#         filename = str(os.path.splitext(base)[0]) + ".txt"
+#         main.results_to_test(main, os.path.basename(filename))
+#     elif module == 'Tension Members Welded Design':
+#         main = Tension_welded
+#         main.set_osdaglogger(None)
+#         main.set_input_values(main, d)
+#         base = os.path.basename(f)
+#         filename = str(os.path.splitext(base)[0]) + ".txt"
+#         main.results_to_test(main, os.path.basename(filename))
+#     # elif module == 'Column Coverplate Connection':
+#     #     self = ColumnCoverPlate
+#     #     self.set_osdaglogger()
+#     #     self.set_input_values(self, d)
+# =======
 if __name__ == '__main__':
 
     blockPrint()

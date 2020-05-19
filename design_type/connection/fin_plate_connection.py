@@ -672,8 +672,9 @@ class FinPlateConnection(ShearConnection):
         # print(self.design_status, "Getting bolt grade")
         # bolt_grade_previous = self.bolt.bolt_grade[-1]
         bolt_previous = self.bolt
+        count = 0
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
-            count = 1
+
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                     conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
@@ -1023,6 +1024,7 @@ class FinPlateConnection(ShearConnection):
                         KEY_SUPTNGSEC_FU:self.supporting_section.fu,
                         KEY_SUPTNGSEC_FY:self.supporting_section.fy,
                         KEY_SUPTDSEC_DESIGNATION:self.supported_section.designation,
+                        KEY_SUPTDSEC_MATERIAL: self.supported_section.material,
                         KEY_SUPTDSEC_FU: self.supported_section.fu,
                         KEY_SUPTDSEC_FY: self.supported_section.fy,
                         KEY_D: self.bolt.bolt_diameter,

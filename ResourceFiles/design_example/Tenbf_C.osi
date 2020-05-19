@@ -1,0 +1,109 @@
+Bolt.Diameter:
+- '12'
+- '16'
+- '20'
+- '24'
+- '30'
+- '36'
+Bolt.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Bolt.Type: Friction Grip Bolt
+Conn_Location: Web
+<<<<<<< HEAD:ResourceFiles/design_example/Tenbf_C.osi
+DesignPreferences.Bolt.Bolt_Hole_Type: Standard
+DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
+DesignPreferences.Bolt.Slip_Factor: '0.3'
+DesignPreferences.Design.Design_Method: Limit State Design
+DesignPreferences.Detailing.Corrosive_Influences: 'No'
+DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
+DesignPreferences.Detailing.Gap: '10'
+DesignPreferences.Weld.Fab: Shop Weld
+DesignPreferences.Weld.Material_Grade_OverWrite: '410'
+Length(mm): '10000'
+Load.Axial: '750'
+=======
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Material_Grade_OverWrite: '410'
+Bolt.Slip_Factor: '0.3'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: a - Sheared or hand flame cut
+Detailing.Gap: '10'
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'
+Member.Length: '1000'
+Load.Axial: '100'
+>>>>>>> e760e8f14a604c814a44be3983d33d24080f9354:ResourceFiles/design_example/Tension_JC125 fric.osi
+Member.Material: E 250 (Fe 410 W)A
+Member.Profile: Channels
+Module: Tension Members Bolted Design
+Member.Designation:
+- JC 100
+- JC 125
+- JC 150
+- JC 175
+- JC 200
+- LC 100
+- LC 125
+- LC 150
+- LC 175
+- LC 200
+- LC 225
+- LC 250
+- LC 300
+- LC 350
+- LC 400
+- LC 75
+- LC(P )150
+- LC(P) 125
+- LC(P) 200
+- LC(P) 300
+- MC 100
+- MC 125
+- MC 125*
+- MC 150
+- MC 150*
+- MC 175
+- 'MC 175* '
+- MC 200
+- MC 200*
+- MC 225
+- MC 225*
+- MC 250
+- MC 250*
+- MC 250*
+- MC 300
+- MC 300*
+- MC 300*
+- MC 350
+- MC 400
+- 'MC 75                     '
+- MCP 100
+- MCP 125
+- MCP 125*
+- MCP 150
+- MCP 150*
+- MCP 175
+- MCP 175*
+- MCP 200
+- MCP 200*
+- MCP 225
+- MCP 225*
+- MCP 250
+- MCP 250*
+- MCP 250*
+- MCP 300
+- MCP 300*
+- MCP 300*
+- MCP 350
+- MCP 400
+- MCP 75

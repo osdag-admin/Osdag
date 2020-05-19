@@ -1,5 +1,4 @@
 Bolt.Diameter:
-- '12'
 - '16'
 - '20'
 - '24'
@@ -18,6 +17,19 @@ Bolt.Grade:
 - '12.9'
 Bolt.Type: Friction Grip Bolt
 Conn_Location: Long Leg
+<<<<<<< HEAD:ResourceFiles/design_example/Tenbf_A.osi
+DesignPreferences.Bolt.Bolt_Hole_Type: Standard
+DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
+DesignPreferences.Bolt.Slip_Factor: '0.3'
+DesignPreferences.Design.Design_Method: Limit State Design
+DesignPreferences.Detailing.Corrosive_Influences: 'No'
+DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
+DesignPreferences.Detailing.Gap: '10'
+DesignPreferences.Weld.Fab: Shop Weld
+DesignPreferences.Weld.Material_Grade_OverWrite: '410'
+Length(mm): '5000'
+Load.Axial: '500'
+=======
 Bolt.Bolt_Hole_Type: Standard
 Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
@@ -29,8 +41,9 @@ Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '410'
 Member.Length: '2000'
 Load.Axial: '400'
+>>>>>>> e760e8f14a604c814a44be3983d33d24080f9354:ResourceFiles/design_example/Tension_Angle fric.osi
 Member.Material: E 250 (Fe 410 W)A
-Member.Profile: Back to Back Angles
+Member.Profile: Angles
 Module: Tension Members Bolted Design
 Member.Designation:
 - 20 20 X 3

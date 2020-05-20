@@ -179,13 +179,13 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         '''
         Save Section Parameters for further use
         '''
-        for child in self.findChildren(QtWidgets.QLineEdit):
-            if(child.isVisible()):
-                if(child.text()==''):
+        for label,box in zip(self.findChildren(QtWidgets.QLabel),self.findChildren(QtWidgets.QLineEdit)):
+            if(box.isVisible() and label.isVisible()):
+                if(box.text()==''):
                     self.textBoxVisible={}
                     self.close()
                     return
-                self.textBoxVisible[child.objectName()]=child.text()
+                self.textBoxVisible[box.objectName()]=[label.text().strip()[:-1],box.text()]
         self.close()
     
     def update_parameters(self,index_type,index_template):

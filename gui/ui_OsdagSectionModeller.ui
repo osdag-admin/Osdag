@@ -500,7 +500,7 @@ color:#ffffff;
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
             <item>
-             <widget class="QLabel" name="label_6">
+             <widget class="QLabel" name="Area_2">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>
@@ -530,7 +530,7 @@ color:#ffffff;
              </spacer>
             </item>
             <item>
-             <widget class="QLineEdit" name="Area">
+             <widget class="QLineEdit" name="Area_text">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>
@@ -556,7 +556,7 @@ color:#ffffff;
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="QLabel" name="label_9">
+             <widget class="QLabel" name="RG">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>
@@ -593,7 +593,7 @@ color:#ffffff;
                  <number>5</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="label_12">
+                 <widget class="QLabel" name="RG_label_1">
                   <property name="font">
                    <font>
                     <pointsize>9</pointsize>
@@ -605,7 +605,7 @@ color:#ffffff;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_13">
+                 <widget class="QLabel" name="RG_label_2">
                   <property name="font">
                    <font>
                     <pointsize>9</pointsize>
@@ -624,7 +624,7 @@ color:#ffffff;
                  <number>5</number>
                 </property>
                 <item>
-                 <widget class="QLineEdit" name="RG1">
+                 <widget class="QLineEdit" name="RG_text_1">
                   <property name="font">
                    <font>
                     <pointsize>9</pointsize>
@@ -639,7 +639,7 @@ color:#ffffff;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="RG2">
+                 <widget class="QLineEdit" name="RG_text_2">
                   <property name="font">
                    <font>
                     <pointsize>9</pointsize>
@@ -669,7 +669,7 @@ color:#ffffff;
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
             <item>
-             <widget class="QLabel" name="label_10">
+             <widget class="QLabel" name="ESM">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>
@@ -706,7 +706,7 @@ color:#ffffff;
                  <number>5</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="label_14">
+                 <widget class="QLabel" name="ESM_label_1">
                   <property name="font">
                    <font>
                     <pointsize>9</pointsize>
@@ -718,7 +718,7 @@ color:#ffffff;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_15">
+                 <widget class="QLabel" name="ESM_label_2">
                   <property name="font">
                    <font>
                     <pointsize>9</pointsize>
@@ -737,7 +737,7 @@ color:#ffffff;
                  <number>5</number>
                 </property>
                 <item>
-                 <widget class="QLineEdit" name="ESM1">
+                 <widget class="QLineEdit" name="ESM_text_1">
                   <property name="font">
                    <font>
                     <pointsize>9</pointsize>
@@ -752,7 +752,7 @@ color:#ffffff;
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="ESM2">
+                 <widget class="QLineEdit" name="ESM_text_2">
                   <property name="font">
                    <font>
                     <pointsize>9</pointsize>
@@ -803,7 +803,7 @@ color:#ffffff;
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_10">
                <item>
-                <widget class="QLabel" name="label_8">
+                <widget class="QLabel" name="C">
                  <property name="font">
                   <font>
                    <pointsize>9</pointsize>
@@ -843,7 +843,7 @@ color:#ffffff;
                     <number>5</number>
                    </property>
                    <item>
-                    <widget class="QLabel" name="label_16">
+                    <widget class="QLabel" name="C_label_1">
                      <property name="font">
                       <font>
                        <pointsize>9</pointsize>
@@ -855,7 +855,7 @@ color:#ffffff;
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_17">
+                    <widget class="QLabel" name="C_label_2">
                      <property name="font">
                       <font>
                        <pointsize>9</pointsize>
@@ -874,7 +874,7 @@ color:#ffffff;
                     <number>5</number>
                    </property>
                    <item>
-                    <widget class="QLineEdit" name="C1">
+                    <widget class="QLineEdit" name="C_text_1">
                      <property name="font">
                       <font>
                        <pointsize>9</pointsize>
@@ -889,7 +889,7 @@ color:#ffffff;
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLineEdit" name="C2">
+                    <widget class="QLineEdit" name="C_text_2">
                      <property name="font">
                       <font>
                        <pointsize>9</pointsize>
@@ -936,7 +936,7 @@ color:#ffffff;
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_14">
             <item>
-             <widget class="QLabel" name="label_7">
+             <widget class="QLabel" name="MI">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>
@@ -1151,7 +1151,7 @@ color:#ffffff;
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
             <item>
-             <widget class="QLabel" name="label_11">
+             <widget class="QLabel" name="PSM">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>

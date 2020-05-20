@@ -398,14 +398,14 @@ class BeamCoverPlate(MomentConnection):
 
         tabs = []
 
-        t1 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
+        t1 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_section)
         tabs.append(t1)
+
+        t6 = ("Connector", TYPE_TAB_2, self.connector_values)
+        tabs.append(t6)
 
         t2 = ("Bolt", TYPE_TAB_2, self.bolt_values)
         tabs.append(t2)
-
-        t3 = ("Weld", TYPE_TAB_2, self.weld_values)
-        tabs.append(t3)
 
         t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
         tabs.append(t4)
@@ -413,8 +413,6 @@ class BeamCoverPlate(MomentConnection):
         t5 = ("Design", TYPE_TAB_2, self.design_values)
         tabs.append(t5)
 
-        t6 = ("Connector", TYPE_TAB_2, self.connector_values)
-        tabs.append(t6)
 
         return tabs
 

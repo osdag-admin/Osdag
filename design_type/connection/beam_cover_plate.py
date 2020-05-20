@@ -854,7 +854,7 @@ class BeamCoverPlate(MomentConnection):
                     # self.moment_web = (Z_w * self.load_moment / (
                     #     self.section.plast_sec_mod_z))  # Nm todo add in ddcl # z_w of web & z_p  of section
                     # self.moment_flange = ((self.load_moment) - self.moment_web)
-                    self.sectioncheck(self)
+                    self.initial_pt_thk(self)
 
         # #############################################################
         # else :
@@ -1313,10 +1313,10 @@ class BeamCoverPlate(MomentConnection):
 
         if self.preference == "Outside":
             #  Block shear strength for outside flange plate
+            design_status_block_shear = False
             available_flange_thickness = list([x for x in self.flange_plate.thickness if (self.flange_plate.thickness_provided <= x)])
-
             for self.flange_plate.thickness_provided in available_flange_thickness:
-                design_status_block_shear = False
+
                 edge_dist = self.flange_plate.edge_dist_provided
                 end_dist = self.flange_plate.end_dist_provided
                 gauge = self.flange_plate.gauge_provided
@@ -1347,7 +1347,7 @@ class BeamCoverPlate(MomentConnection):
                              self.flange_plate.bolts_one_line / 2 - 0.5) * self.flange_bolt.dia_hole)) + (
                              self.flange_plate.edge_dist_provided + self.section.root_radius + self.section.web_thickness / 2)) \
                              * self.flange_plate.thickness_provided
-#
+    #
 
                     self.flange_plate.block_shear_capacity = self.block_shear_strength_plate(A_vg=Avg, A_vn=Avn,
                                                                                              A_tg=Atg,
@@ -1393,11 +1393,10 @@ class BeamCoverPlate(MomentConnection):
             # capacity Check for flange_outsite_plate =min(block, yielding, rupture)
             #  Block shear strength for outside + inside flange plate
             # OUTSIDE-inside
-            available_flange_thickness = list(
-                [x for x in self.flange_plate.thickness if ((self.flange_plate.thickness_provided) <= x)])
-
+            design_status_block_shear = False
+            available_flange_thickness = list([x for x in self.flange_plate.thickness if ((self.flange_plate.thickness_provided) <= x)])
             for self.flange_plate.thickness_provided in available_flange_thickness:
-                design_status_block_shear = False
+
                 edge_dist = self.flange_plate.edge_dist_provided
                 end_dist = self.flange_plate.end_dist_provided
                 gauge = self.flange_plate.gauge_provided
@@ -1585,11 +1584,9 @@ class BeamCoverPlate(MomentConnection):
                                                     A_v=A_v_web, fy=self.web_plate.fy)
         self.web_plate.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
                                                     A_vn=A_vn_web, fu=self.web_plate.fu)
-
+        design_status_block_shear = False
         available_web_thickness = list([x for x in self.web_plate.thickness if ((self.web_plate.thickness_provided) <= x)])
-
         for self.web_plate.thickness_provided in available_web_thickness:
-            design_status_block_shear = False
             edge_dist = self.web_plate.edge_dist_provided
             end_dist = self.web_plate.end_dist_provided
             gauge = self.web_plate.gauge_provided
@@ -1662,11 +1659,9 @@ class BeamCoverPlate(MomentConnection):
             A_v=A_v_web, fy=self.web_plate.fy)
         self.web_plate.shear_rupture_capacity = self.shear_rupture_(
             A_vn=A_vn_web, fu=self.web_plate.fu)
-
+        design_status_block_shear = False
         available_web_thickness = list([x for x in self.web_plate.thickness if ((self.web_plate.thickness_provided) <= x)])
-
         for self.web_plate.thickness_provided in available_web_thickness:  #
-            design_status_block_shear = False
             edge_dist = self.web_plate.edge_dist_provided
             end_dist = self.web_plate.end_dist_provided
             gauge = self.web_plate.gauge_provided
@@ -1980,8 +1975,7 @@ class BeamCoverPlate(MomentConnection):
                         class_of_section1 = "plastic"
                     elif column_d / column_t_w <= (max(105 * epsilon / (1 + r1)), (42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2 * r2)), column_d / column_t_w >= (
-                            42 * epsilon)):
+                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2 * r2)), (42 * epsilon)):
                         class_of_section1 = "semi-compact"
                     # else:
                     #     print('fail')
@@ -1992,7 +1986,7 @@ class BeamCoverPlate(MomentConnection):
                     elif column_d / column_t_w <= max((105 * epsilon / (1 + (r1 * 1.5))), (
                             42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2 * r1)), (
+                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2 * r2)), (
                             42 * epsilon)):
                         class_of_section1 = "semi-compact"
 
@@ -2025,7 +2019,7 @@ class BeamCoverPlate(MomentConnection):
         for y in list_of_pt_tk:
             if preference != None:
                 if preference == "Outside":
-                    outerwidth = width
+                    self.outerwidth = width
                     self.flange_plate_crs_sec_area = y * width
                     if self.flange_plate_crs_sec_area >= self.flange_crs_sec_area * 1.05:
                         thickness = y
@@ -2036,16 +2030,16 @@ class BeamCoverPlate(MomentConnection):
                         self.design_status = False
 
                 elif preference == "Outside + Inside":
-                    outerwidth = width
-                    innerwidth = (width - t_w - (2 * r_1)) / 2
-                    if innerwidth < 50:
+                    self.outerwidth = width
+                    self.innerwidth = (width - t_w - (2 * r_1)) / 2
+                    if self.innerwidth < 50:
                         # logger.error(":Inner Plate not possible")
                         self.design_status = False
                         thickness = 0
                     else:
                         self.design_status = True
-                        flange_plate_crs_sec_area = (outerwidth + (2*innerwidth)) * y
-                        if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                        flange_plate_crs_sec_area = (self.outerwidth + (2*self.innerwidth)) * y
+                        if self.flange_plate_crs_sec_area >= self.flange_crs_sec_area * 1.05:
                             thickness = y
                             self.design_status = True
                             break

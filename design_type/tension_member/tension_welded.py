@@ -2010,6 +2010,8 @@ class Tension_welded(Main):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)
+
+
 #     def save_design(self,ui,popup_summary):
 #
 #

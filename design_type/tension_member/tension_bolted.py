@@ -965,7 +965,7 @@ class Tension_bolted(Main):
         t8 = (None, DISP_TITLE_BOLT_CAPACITY, TYPE_TITLE, None, True)
         out_list.append(t8)
 
-        t9 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '', True)
+        t9 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, int(self.bolt.bolt_diameter_provided) if flag else '', True)
         out_list.append(t9)
 
         t10 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '', True)
@@ -1011,7 +1011,42 @@ class Tension_bolted(Main):
         out_list.append(t20)
 
         t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, int(round(self.plate.length,0)) if flag else '', True)
+        out_list.append(t21)
 
+        t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
+               (round(self.plate_tension_capacity/1000, 2)) if flag else '', True)
+
+        out_list.append(t21)
+
+        # if KEY_SEC_PROFILE in ['Back to Back Angles', 'Star Angles','Back to Back Channels']:
+
+        t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, self.inter_status)
+        out_list.append(t18)
+
+        t21 = (KEY_OUT_CONNECTION, KEY_OUT_DISP_CONNECTION, TYPE_TEXTBOX,
+               int(round(self.inter_conn, 0)) if flag else '', self.inter_status)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_INTER_SPACING, KEY_OUT_INTER_DISP_SPACING, TYPE_TEXTBOX,
+               (round(self.inter_memb_length, 2)) if flag else '', self.inter_status)
+        out_list.append(t21)
+
+        t9 = (KEY_OUT_INTER_D_PROVIDED, KEY_OUT_DISP_INTER_D_PROVIDED, TYPE_TEXTBOX, int(self.bolt.bolt_diameter_provided) if flag else '',self.inter_status)
+        out_list.append(t9)
+
+        t10 = (KEY_OUT_INTER_GRD_PROVIDED, KEY_OUT_DISP_INTER_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '',self.inter_status)
+        out_list.append(t10)
+
+        t15 = (KEY_OUT_INTER_BOLT_LINE, KEY_OUT_DISP_INTER_BOLT_LINE, TYPE_TEXTBOX, self.inter_bolt_line if flag else '', self.inter_status)
+        out_list.append(t15)
+
+        t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, KEY_OUT_INTER_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.inter_bolt_one_line if flag else '',self.inter_status)
+        out_list.append(t16)
+
+        t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_INTER_DISP_PLATE_HEIGHT, TYPE_TEXTBOX,int(round(self.inter_plate_height, 0)) if flag else '', self.inter_status)
+        out_list.append(t20)
+
+        t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_INTER_DISP_PLATE_LENGTH, TYPE_TEXTBOX,int(round(self.inter_plate_length, 0)) if flag else '',self.inter_status)
         out_list.append(t21)
 
         return out_list
@@ -1257,7 +1292,7 @@ class Tension_bolted(Main):
         self.max_limit_status_1 = False
         self.max_limit_status_2 = False
         self.bolt_design_status = False
-
+        self.inter_status = False
 
 
         print("input values are set. Doing preliminary member checks")
@@ -2178,7 +2213,9 @@ class Tension_bolted(Main):
             else:
                 self.plate_design_status = True
                 self.design_status = True
-                logger.info("In case of reverse load, slenderness value should be less than 180.")
+                self.intermittent_bolt(self, design_dictionary)
+                logger.info("In case of reverse load, slenderness value shall be less than 180.")
+                logger.info("In case of reverse load, spacing of intermittent connection shall be less than 600.")
                 logger.info(": Overall bolted tension member design is safe. \n")
                 logger.debug(" :=========End Of design===========")
         else:
@@ -2193,6 +2230,60 @@ class Tension_bolted(Main):
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
                 print(self.design_status)
+
+    def intermittent_bolt(self, design_dictionary):
+
+        self.inter_length = self.length - 2 * (self.plate.end_dist_provided + (self.plate.bolt_line -1)*self.plate.pitch_provided)
+        if design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
+            # print (Angle)
+            self.inter_memb = Angle(designation=self.section_size_1.designation, material_grade=design_dictionary[KEY_MATERIAL])
+            min_gyration = min(self.inter_memb.rad_of_gy_u, self.inter_memb.rad_of_gy_v)
+
+
+        elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Channels']:
+            self.inter_memb = Channel(designation=self.section_size_1.designation,
+                                    material_grade=design_dictionary[KEY_MATERIAL])
+            min_gyration = self.inter_memb.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+                                                        subkey=design_dictionary[KEY_LOCATION],
+                                                        mom_inertia_y=self.inter_memb.mom_inertia_y,
+                                                        mom_inertia_z=self.inter_memb.mom_inertia_z,
+                                                        rad_y=self.inter_memb.rad_of_gy_y,
+                                                        rad_z=self.inter_memb.rad_of_gy_z,
+                                                        area=self.inter_memb.area, Cg_1=self.inter_memb.Cy,
+                                                        Cg_2=0.0, thickness=0.0)
+
+        # print (self.inter_memb.min_radius_gyration,"hgvsdfsdff")
+        if design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles','Back to Back Channels']:
+            self.inter_memb_length = 400 * min_gyration
+
+            if self.inter_length > 1000:
+                if self.inter_memb_length > 1000:
+                    ratio = round_up(self.inter_length/1000,1)
+                else:
+                    ratio = round_up(self.inter_length/self.inter_memb_length,1)
+
+            self.inter_memb_length = self.inter_length/ratio
+            self.inter_conn = ratio - 1
+            self.inter_bolt_one_line = self.plate.bolts_one_line
+            self.inter_bolt_line = 1
+            self.inter_plate_length = 2 * self.plate.end_dist_provided
+            if self.loc == "Long Leg":
+                self.inter_plate_height = self.section_size_1.max_leg
+            elif self.loc == "Short Leg":
+                self.inter_plate_height = self.section_size_1.min_leg
+            else:
+                self.inter_plate_height = self.section_size_1.depth
+            self.inter_status = True
+        else:
+            self.inter_conn = 0.0
+            self.inter_bolt_one_line = 0.0
+            self.inter_bolt_line = 0.0
+            self.inter_plate_length = 0.0
+            self.inter_plate_height = 0.0
+            self.inter_memb_length = 0.0
+            self.inter_status = False
+
+
 
     def results_to_test(self, filename):
         test_out_list = {KEY_DISP_DESIGNATION:self.section_size_1.designation,
@@ -2441,7 +2532,7 @@ class Tension_bolted(Main):
             self.report_check.append(t6)
             t1 = (KEY_DISP_AXIAL_FORCE_CON, axial_capacity_req(axial_capacity=round((section_size.tension_yielding_capacity/1000), 2),
                                                                    min_ac=round(((0.3*section_size.tension_yielding_capacity) / 1000), 2)),
-                  display_prov(round((self.res_force/1000),2),"A"),min_prov_max(round(((0.3*section_size.tension_yielding_capacity) / 1000), 2),self.res_force/1000,round((section_size.tension_yielding_capacity/1000), 2)))
+                  display_prov(round((self.res_force/1000),2),"A"),min_prov_max(round(((0.3*section_size.tension_yielding_capacity) / 1000), 2),round(self.res_force/1000,2),round((section_size.tension_yielding_capacity/1000), 2)))
             self.report_check.append(t1)
         else:
             # t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
@@ -2613,7 +2704,7 @@ class Tension_bolted(Main):
             self.report_check.append(t3)
             t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, self.length,
                   gusset_lt_b_prov(self.plate.bolt_line, self.plate.pitch_provided,self.plate.end_dist_provided,self.plate.length)
-                  , get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="greater"))
+                  , get_pass_fail(self.length, self.plate.length, relation="greater"))
             self.report_check.append(t4)
             t5 = (KEY_OUT_DISP_PLATETHK_REP, '',display_prov(self.plate.thickness_provided,"t_p"), "")
             self.report_check.append(t5)

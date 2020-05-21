@@ -1151,7 +1151,7 @@ KEY_OUT_DISP_INTER_BOLT_LINE = 'Bolt Lines (nos)'
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
 KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
 KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
-KEY_OUT_INTER_DISP_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
+KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
 
 
 KEY_OUT_SPACING = 'spacing'
@@ -1214,22 +1214,23 @@ KEY_OUT_DISP_PLATE_HEIGHT = 'Height (mm)'
 KEY_OUT_DISP_PLATE_MIN_HEIGHT = 'Min.Height (mm)'
 
 KEY_OUT_INTER_PLATE_HEIGHT = 'Plate.InterHeight'
-KEY_OUT_INTER_DISP_PLATE_HEIGHT = 'Height (mm)'
+KEY_OUT_DISP_INTER_PLATE_HEIGHT = 'Height (mm)'
 
 
 KEY_OUT_INTER_PLATE_LENGTH = 'Plate.InterLength'
-KEY_OUT_INTER_DISP_PLATE_LENGTH = 'Length (mm)'
+KEY_OUT_DISP_INTER_PLATE_LENGTH = 'Length (mm)'
 
 
-KEY_OUT_CONNECTION = 'Intermittent.Connection'
-KEY_OUT_DISP_CONNECTION = 'Connection (nos)'
+KEY_OUT_INTERCONNECTION = 'Intermittent.Connection'
+KEY_OUT_DISP_INTERCONNECTION = 'Connection (nos)'
 
-KEY_OUT_INTER_SPACING = 'Intermittent.Spacing'
-KEY_OUT_INTER_DISP_SPACING = 'Spacing (mm)'
+KEY_OUT_INTERSPACING = 'Intermittent.Spacing'
+KEY_OUT_DISP_INTERSPACING = 'Spacing (mm)'
 
 
 KEY_OUT_PLATE_CAPACITY = 'Plate.Capacity'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
+KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
 KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Length (mm)'
 KEY_OUT_PLATE_WIDTH = 'Plate.Width'
 KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'

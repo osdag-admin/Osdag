@@ -256,11 +256,11 @@ def forces_in_web(Au,T,A,t,D,Zw,Mu,Z,Mw,Aw):
     forcesinweb_eqn.append(NoEscape(r'\begin{aligned}A_w &= Axial~ force~ in~ web  \\'))
     forcesinweb_eqn.append(NoEscape(r'  &= \frac{(D- 2*T)*t* Au }{A} \\'))
     forcesinweb_eqn.append(NoEscape(r'&= \frac{(' + D + '- 2*' + T + ')*' + t + '*' + Au + ' }{' + A + r'} \\'))
-    forcesinweb_eqn.append(NoEscape(r'&=' + Aw + r'\\'))
+    forcesinweb_eqn.append(NoEscape(r'&=' + Aw + r'~ kN\\'))
     forcesinweb_eqn.append(NoEscape( r'M_w &= Moment ~in ~web  \\'))
     forcesinweb_eqn.append(NoEscape(r' &= \frac{Z_w * Mu}{Z} \\'))
     forcesinweb_eqn.append(NoEscape(r'&= \frac{' + Zw + ' * ' + Mu + '}{' + Z + r'} \\'))
-    forcesinweb_eqn.append(NoEscape(r'&=' + Mw + r'\end{aligned}'))
+    forcesinweb_eqn.append(NoEscape(r'&=' + Mw + r'~{kNm}\end{aligned}'))
     return forcesinweb_eqn
 
 def forces_in_flange(Au, B,T,A,D,Mu,Mw,Mf,Af,ff):
@@ -278,15 +278,15 @@ def forces_in_flange(Au, B,T,A,D,Mu,Mw,Mf,Af,ff):
     forcesinflange_eqn.append(NoEscape(r'\begin{aligned} A_f&= Axial~force~ in ~flange  \\'))
     forcesinflange_eqn.append(NoEscape(r'&= \frac{Au * B *T}{A} \\'))
     forcesinflange_eqn.append(NoEscape(r'&= \frac{' + Au + ' * ' + B + '*' + T + '}{' + A + r'} \\'))
-    forcesinflange_eqn.append(NoEscape(r'&=' + Af + r'\\'))
+    forcesinflange_eqn.append(NoEscape(r'&=' + Af + r'~ kN\\'))
     forcesinflange_eqn.append(NoEscape(r'M_f& =Moment~ in~ flange \\'))
     forcesinflange_eqn.append(NoEscape(r' & = Mu-M_w\\'))
     forcesinflange_eqn.append(NoEscape(r'&= ' + Mu + '-' + Mw + r'\\'))
-    forcesinflange_eqn.append(NoEscape(r'&=' + Mf + r'\\'))
+    forcesinflange_eqn.append(NoEscape(r'&=' + Mf + r'~{kNm}\\'))
     forcesinflange_eqn.append(NoEscape(r' F_f& =flange~force  \\'))
     forcesinflange_eqn.append(NoEscape(r'& = \frac{M_f *10^3}{D-T} + A_f \\'))
     forcesinflange_eqn.append(NoEscape(r'&= \frac{' + Mf + '* 10^3}{' + D + '-' + T + '} +' + Af + r' \\'))
-    forcesinflange_eqn.append(NoEscape(r'&=' + ff + r'\end{aligned}'))
+    forcesinflange_eqn.append(NoEscape(r'&=' + ff + r'~kN \end{aligned}'))
     return forcesinflange_eqn
 
 def min_plate_ht_req(beam_depth,min_plate_ht):

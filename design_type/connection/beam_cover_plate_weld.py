@@ -1599,6 +1599,8 @@ class BeamCoverPlateWeld(MomentConnection):
              KEY_DISP_DP_WELD_TYPE: "Fillet",
              KEY_DISP_DP_WELD_FAB: self.flange_weld.fabrication,
              KEY_DISP_DP_WELD_MATERIAL_G_O: self.flange_weld.fu,
+             KEY_WEBPLATE_THICKNESS:str(self.plate_thick_customized()),
+             KEY_FLANGEPLATE_THICKNESS:str(self.plate_thick_customized()),
              "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
              KEY_DISP_GAMMA_M0: gamma(1.1, "m0"),
              KEY_DISP_GAMMA_M1: gamma(1.25, "m1"),

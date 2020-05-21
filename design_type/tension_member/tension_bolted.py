@@ -2461,11 +2461,11 @@ class Tension_bolted(Main):
                 value = gamma(self.bolt.gamma_mf,"mf")
         else:
             if self.bolt.bolt_type == TYP_BEARING:
-                variable = ""
-                value = ""
+                variable = KEY_DISP_GAMMA_MF
+                value = gamma(1.25,"mf")
             else:
-                variable = ""
-                value = ""
+                variable = KEY_DISP_GAMMA_MF
+                value = gamma(1.25, "mf")
 
         if self.member_design_status == True:
             member_yield_kn = round((section_size.tension_yielding_capacity / 1000), 2)

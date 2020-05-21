@@ -863,52 +863,29 @@ class BeamCoverPlate(MomentConnection):
         #     logger.error(" : Design is not safe. \n ")
         #     logger.debug(" :=========End Of design===========")
 
+
     def initial_pt_thk(self):
         ############################### WEB MENBER CAPACITY CHECK ############################
         ###### # capacity Check for web in axial = min(block, yielding, rupture)
         self.initial_pt_thk_status = False
-        # self.axial_force_w = ((self.section.depth - (2 * self.section.flange_thickness)) * self.section.web_thickness * self.factored_axial_load) / (
-        #                          self.section.area)  # N
+        self.initial_pt_thk_status_web =False
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
+        self.section.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(A_v=A_v_web,fy=self.section.fy)
 
-        self.section.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
-            A_v=A_v_web,
-            fy=self.section.fy)
+        if self.section.tension_yielding_capacity_web> self.axial_force_w:
 
-        if self.section.tension_yielding_capacity_web > self.axial_force_w:
-
-            ################################# FLANGE MEMBER CAPACITY CHECK##############################
-            # self.axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (self.section.area)  # N
-            # self.flange_force = (((self.moment_flange) / (self.section.depth - self.section.flange_thickness)) + (self.axial_force_f))
-
+        ################################# FLANGE MEMBER CAPACITY CHECK##############################
             A_v_flange = self.section.flange_thickness * self.section.flange_width
-            self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
-                A_v=A_v_flange,
-                fy=self.flange_plate.fy)
+            self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(A_v=A_v_flange,fy=self.flange_plate.fy)
             if self.section.tension_yielding_capacity > self.flange_force:
-                # if len(self.web_plate.thickness) >= 2:
-                #     self.max_thick_w = max(self.web_plate.thickness)
-                # else:
-                #     self.max_thick_w = self.web_plate.thickness[0]
-
-                self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if
-                                                     i >= (self.section.web_thickness / 2)]
-
-                # if len(self.flange_plate.thickness) >= 2:
-                #     self.max_thick_f = max(self.flange_plate.thickness)
-                # else:
-                #     self.max_thick_f = self.flange_plate.thickness[0]
-
+                self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if i >= (self.section.web_thickness / 2)]
                 if self.preference == "Outside":
-                    self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if
-                                                            i >= self.section.flange_thickness]
+                    self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if i >= self.section.flange_thickness]
                 else:
-                    self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if
-                                                            i >= (self.section.flange_thickness / 2)]
-
-                if len(self.flange_plate_thickness_possible) == 0 or len(self.web_plate_thickness_possible) == 0:
-                    logger.error(" : Flange and web Plate thickness should be greater than section  thicknesss.")
-                    self.initial_pt_thk_status = False
+                    self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if i >= (self.section.flange_thickness / 2)]
+                if len(self.flange_plate_thickness_possible) == 0:
+                    logger.error(" : Flange Plate thickness should be greater than section thicknesss.")
+                    self.initial_pt_thk_status =False
                 else:
                     self.flange_plate.thickness_provided = self.min_thick_based_on_area(self,
                                                                                         tk=self.section.flange_thickness,
@@ -918,35 +895,123 @@ class BeamCoverPlate(MomentConnection):
                                                                                         r_1=self.section.root_radius,
                                                                                         D=self.section.depth,
                                                                                         preference=self.preference)
+                    if self.preference =="Outside":
+                        if self.outerwidth < 50:
+                            logger.error(" : Outer Height of flange plate should be greater 50 mm.")
+                            logger.info(" : Select the wider section.")
+                            self.initial_pt_thk_status = False
+                            self.design_status = False
+                        else:
+                            if self.flange_plate.thickness_provided != 0:
+                                if self.flange_plate_crs_sec_area < (self.flange_crs_sec_area  * 1.05):
+                                    logger.error(" : Area of flange plate should be greater than 1.05 times area of flange.")
+                                    logger.info(" : Increase the thickness of the plate.")
+                                    self.initial_pt_thk_status = False
+                                else:
+                                    self.initial_pt_thk_status = True
+                                    pass
+                            else:
+                                logger.error(" : Provided flange plate thickness is not sufficient.")
+                                logger.error(" : Area of flange plate should be greater than 1.05 times area of flange.")
+                                logger.info(" : Increase the thickness of the plate.")
+                                self.initial_pt_thk_status = False
+                                self.design_status = False
+
+                    else:
+                        if self.outerwidth < 50 or self.innerwidth < 50:
+                            logger.error(" : Height of flange plate should be greater 50 mm.")
+                            logger.info(" : Increase the thickness of the flane plate.")
+                            self.initial_pt_thk_status = False
+                            self.design_status =False
+
+                        else:
+                            if self.flange_plate.thickness_provided != 0:
+                                if self.flange_plate_crs_sec_area < (self.flange_crs_sec_area * 1.05):
+                                    logger.error(" : Area of flange plates should be greater than 1.05 times area of flange.")
+                                    logger.info(" : Increase the thickness of the flange plate.")
+                                    self.initial_pt_thk_status = False
+                                else:
+                                    self.initial_pt_thk_status =True
+                            else:
+                                logger.error(" : Provided flange plate thickness is not sufficient.")
+                                logger.error(" : Area of flange plate should be greater than 1.05 times area of flange.")
+                                logger.info(" : Increase the thickness of the plate.")
+                                self.initial_pt_thk_status = False
+                                self.design_status = False
+
+                self.initial_pt_thk_status_web = False
+                if  len(self.web_plate_thickness_possible) == 0:
+                    logger.error(" : Web Plate thickness should be greater than section  thicknesss.")
+                    self.initial_pt_thk_status_web = False
+                else:
                     self.web_plate.thickness_provided = self.min_thick_based_on_area(self,
                                                                                      tk=self.section.flange_thickness,
                                                                                      width=self.section.flange_width,
                                                                                      list_of_pt_tk=self.web_plate_thickness_possible,
                                                                                      t_w=self.section.web_thickness,
-                                                                                     r_1=self.section.root_radius,
-                                                                                     D=self.section.depth, )
-                    # self.flange_plate_crs_sec_area= round(self.flange_plate_crs_sec_area)
-                    # self.web_crs_area = round(self.web_crs_area)
-                    # self.web_plate_crs_sec_area = round(self.web_plate_crs_sec_area)
-                    if self.web_plate.thickness_provided == 0 or self.flange_plate.thickness_provided == 0:
-                        self.initial_pt_thk_status = False
+                                                                                     r_1=self.section.root_radius, D=self.section.depth, )
+
+                    if self.web_plate.thickness_provided != 0:
+                        if self.web_plate_crs_sec_area < (self.web_crs_area * 1.05):
+                            logger.error(" : Area of web plate should be greater than 1.05 times area of web.")
+                            logger.info(" : Increase the thickness of the web plate.")
+                            self.initial_pt_thk_status_web = False
+                        else:
+                            self.initial_pt_thk_status_web = True
+                    else:
+                        logger.error(" : Provided web plate thickness is not sufficient.")
+                        logger.error(" : Area of web plate should be greater than 1.05 times area of web.")
+                        logger.info(" : Increase the thickness of the plate.")
+                        self.initial_pt_thk_status_web = False
+                        self.design_status = False
+
+
+                if len(self.flange_plate_thickness_possible) == 0:
+                    if len(self.flange_plate.thickness) >= 2:
+                        self.max_thick_f = max(self.flange_plate.thickness)
+                    else:
+                        self.max_thick_f = self.flange_plate.thickness[0]
+                else:
+                    if self.flange_plate.thickness_provided ==0:
+                        if len(self.flange_plate.thickness) >= 2:
+                            self.max_thick_f = max(self.flange_plate.thickness)
+                        else:
+                            self.max_thick_f = self.flange_plate.thickness[0]
+                    else:
+                        self.max_thick_f = self.flange_plate.thickness_provided
+
+                if len(self.web_plate_thickness_possible) == 0:
+                    if len(self.web_plate.thickness) >= 2:
+                        self.max_thick_w = max(self.web_plate.thickness)
+                    else:
+                        self.max_thick_w = self.web_plate.thickness[0]
+                else:
+                    if self.web_plate.thickness_provided == 0:
+                        if len(self.web_plate.thickness) >= 2:
+                            self.max_thick_w = max(self.web_plate.thickness)
+                        else:
+                            self.max_thick_w = self.web_plate.thickness[0]
+                    else:
+                        self.max_thick_w = self.web_plate.thickness_provided
+
+                    if self.initial_pt_thk_status == True and self.initial_pt_thk_status_web == True:
+                        self.design_status = True
+                        self.select_bolt_dia(self)
+                    else:
+                        self.initial_pt_thk_status = False and self.initial_pt_thk_status_web == False
+                        self.design_status = False
                         logger.warning(" : Plate is not possible")
                         logger.error(" : Design is not safe. \n ")
                         logger.debug(" : =========End Of design===========")
-                    else:
-                        self.initial_pt_thk_status = True
-                        self.select_bolt_dia(self)
+
             else:
                 self.initial_pt_thk_status = False
-                logger.warning(
-                    " : Tension_yielding_capacity  of flange is less than applied loads, Please select larger sections or decrease loads")
+                logger.warning(" : Tension_yielding_capacity  of flange is less than applied loads, Please select larger sections or decrease loads")
                 logger.error(" : Design is not safe. \n ")
                 logger.debug(" : =========End Of design===========")
-
         else:
-            self.initial_pt_thk_status = False
-            logger.warning(
-                " : Tension_yielding_capacity of web  is less than applied loads, Please select larger sections or decrease loads")
+            self.initial_pt_thk_status_web = False
+            logger.warning(" : Tension_yielding_capacity of web  is less than applied loads, Please select larger sections or decrease loads")
             logger.error(" : Design is not safe. \n ")
             logger.debug(" : =========End Of design===========")
 

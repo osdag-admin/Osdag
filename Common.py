@@ -620,21 +620,21 @@ VALUES_FLANGEPLATE_THICKNESS = ['All', 'Customized']
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
 KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness (mm)'
 
-KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
+KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Height (mm)'
 KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height (mm)'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length (mm)'
 
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
-KEY_DISP_AREA_CHECK ="Plate Area check (mm^2)"
+KEY_DISP_AREA_CHECK ="Plate Area check (mm2)"
 
 
 KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 KEY_DISP_INNERFLANGESPLICEPLATE = "Inner Plate Detials"
 DISP_TITLE_INNERFLANGESPLICEPLATE = 'Inner Flange splice plate'
-KEY_INNERFLANGE_PLATE_HEIGHT = 'flange_plate.InnerHeight'
+KEY_INNERFLANGE_PLATE_HEIGHT = 'Flange_Plate.InnerHeight (mm)'
 KEY_DISP_INNERFLANGE_PLATE_HEIGHT = 'Height (mm)'
-KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
+KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength (mm)'
 KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length (mm)'
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
@@ -775,8 +775,8 @@ DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 KEY_WEBPLATE_THICKNESS = 'Web_Plate.thickness_provided'
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)*'
 VALUES_WEBPLATE_THICKNESS = ['All', 'Customized']
-VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30','32','36','40',]
-# '25','28','32','36','40','45','50','56','63','80'
+VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30','32','36','40',
+ '25','28','32','36','40','45','50','56','63','80']
 
 KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'

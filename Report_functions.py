@@ -375,7 +375,7 @@ def shear_yield_prov(h,t, f_y, gamma, V_dg,multiple=1):
 
     multiple = str(multiple)
     shear_yield_eqn = Math(inline=True)
-    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{dg} &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo}}\\'))
+    shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{dy} &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo}}\\'))
     shear_yield_eqn.append(NoEscape(r'&=\frac{'+multiple+'*'+h+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
     shear_yield_eqn.append(NoEscape(r'&=' + V_dg + '\end{aligned}'))
     return shear_yield_eqn
@@ -1275,6 +1275,28 @@ def plate_area_req(crs_area, flange_web_area):
     plate_crs_sec_area_eqn.append(NoEscape(r' &= ' + flange_web_area  + r'\end{aligned}'))
     return plate_crs_sec_area_eqn
 
+def width_pt_chk(B,t,r_1,pref):
+    if pref == "Outside":
+        outerwidth = round(B  - (2 * 20) ,2)
+        outerwidth = str(outerwidth)
+    else:
+        innerwidth = round((B -t - (2*r_1)-(4*20))/2 ,2)
+        innerwidth = str(innerwidth)
+
+    B = str(B)
+    t = str(t)
+    r_1 = str(r_1)
+    Innerwidth_pt_chk_eqn = Math(inline=True)
+    if pref == "Outside":
+        Innerwidth_pt_chk_eqn.append(NoEscape(r'\begin{aligned} outer.b &= B-(2*20)\\'))
+        Innerwidth_pt_chk_eqn.append(NoEscape(r'&=' + B + r'-(2*20)\\'))
+        Innerwidth_pt_chk_eqn.append(NoEscape(r'&= ' + outerwidth +r'\end{aligned}'))
+    else:
+        Innerwidth_pt_chk_eqn.append(NoEscape(r'\begin{aligned} inner.b &= \frac{B-t-(2*r_1)-(4 * 20)}{2}\\'))
+        Innerwidth_pt_chk_eqn.append(NoEscape(r'&=\frac{'+B+'-'+t+'-(2*'+r_1+r')-(4 * 20)}{2}\\'))
+        Innerwidth_pt_chk_eqn.append(NoEscape(r'&= ' + innerwidth + r'\end{aligned}'))
+    return Innerwidth_pt_chk_eqn
+
 def flange_plate_area_prov(B,pref,y,outerwidth,fp_area,t,r_1,innerwidth =None):
     outerwidth = str(outerwidth)
     B = str(B)
@@ -1285,16 +1307,16 @@ def flange_plate_area_prov(B,pref,y,outerwidth,fp_area,t,r_1,innerwidth =None):
     y = str(y)
     flangeplate_crs_sec_area_eqn = Math(inline=True)
     if pref == "Outside":
-        flangeplate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} outer.B &= B - (2 * 20)\\'))
+        flangeplate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} outer.b &= B - (2 * 20)\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= '+B+r' - (2 * 20)\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= ' + outerwidth + r' \\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r' pt.area &= '+y+' * '+outerwidth+r'\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= '+fp_area+r'\end{aligned}'))
     else:
-        flangeplate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} outer.B&= B-(2*20)\\'))
+        flangeplate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} outer.b &= B-(2*20)\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&='+B+ r'-(2*20)\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= ' + outerwidth + r' \\'))
-        flangeplate_crs_sec_area_eqn.append(NoEscape(r'inner.B &= \frac{B-t-(2*r_1)-(4 * 20)}{2}\\'))
+        flangeplate_crs_sec_area_eqn.append(NoEscape(r'inner.b &= \frac{B-t-(2*r_1)-(4 * 20)}{2}\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&=\frac{'+B+'-'+t+'-(2*'+r_1+r')-(4 * 20)}{2}\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= ' + innerwidth + r' \\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r' pt.area &=('+outerwidth+'+(2*'+innerwidth+'))*'+y+r'\\'))

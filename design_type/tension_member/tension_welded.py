@@ -672,6 +672,7 @@ class Tension_welded(Main):
 
         # @author: Amir, Umair
         self.module = KEY_DISP_TENSION_WELDED
+        self.mainmodule = 'Member'
         self.connection = "Welded"
 
         options_list = []

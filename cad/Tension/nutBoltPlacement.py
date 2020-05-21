@@ -38,6 +38,11 @@ class NutBoltArray():
 
         self.models = []
 
+        if plateObj.sec_profile == 'Channels' or plateObj.sec_profile == 'Back to Back Channels':
+            self.member_thickness = plateObj.section_size_1.flange_thickness
+        else:
+            self.member_thickness = plateObj.section_size_1.thickness
+
     def initialiseNutBolts(self):
         '''
         Initializing the Nut Bolt
@@ -46,19 +51,18 @@ class NutBoltArray():
         n = self.nut
         for i in range(self.row * self.col):
             bolt_len_required = float(b.T + self.gap)
-            b.H = bolt_len_required + (bolt_len_required) % 20
+            b.H = bolt_len_required + (bolt_len_required) % 5
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
 
     def initBoltPlaceParams(self, plateObj):
 
-        self.pitch = 45
-        self.gauge = 0
-        self.edge = 38
-        # self.plateedge =
-        self.end = 35
-        self.row = 1
-        self.col = 6
+        self.pitch = plateObj.plate.pitch_provided
+        self.gauge = plateObj.plate.gauge_provided
+        self.edge = plateObj.plate.edge_dist_provided
+        self.end = plateObj.plate.end_dist_provided
+        self.row = plateObj.plate.bolts_one_line
+        self.col = plateObj.plate.bolt_line
 
     def calculatePositions(self):
         """
@@ -68,9 +72,10 @@ class NutBoltArray():
         for rw in range(self.row):
             for col in range(self.col):
                 pos = self.origin
-                pos = pos + self.end * self.gaugeDir
+                pos = pos + self.member_thickness * self.gaugeDir
+                pos = pos + self.edge * self.gaugeDir
                 pos = pos + col * self.pitch * self.pitchDir
-                pos = pos + self.edge * self.pitchDir
+                pos = pos + self.end * self.pitchDir
                 pos = pos + rw * self.gauge * self.gaugeDir
 
                 self.positions.append(pos)

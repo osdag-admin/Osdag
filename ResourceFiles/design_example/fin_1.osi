@@ -1,10 +1,6 @@
+Bolt.Bolt_Hole_Type: Standard
 Bolt.Diameter:
 - '12'
-- '16'
-- '20'
-- '24'
-- '30'
-- '36'
 Bolt.Grade:
 - '3.6'
 - '4.6'
@@ -16,27 +12,24 @@ Bolt.Grade:
 - '9.8'
 - '10.9'
 - '12.9'
+Bolt.Material_Grade_OverWrite: '410'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pretensioned
 Bolt.Type: Bearing Bolt
 Connectivity: Column flange-Beam web
-DesignPreferences.Bolt.Bolt_Hole_Type: Standard
-DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
-DesignPreferences.Bolt.Slip_Factor: '0.3'
-DesignPreferences.Bolt.Type: Pretensioned
-DesignPreferences.Design.Design_Method: Limit State Design
-DesignPreferences.Detailing.Corrosive_Influences: 'No'
-DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
-DesignPreferences.Detailing.Gap: '10'
-DesignPreferences.Weld.Fab: Shop Weld
-DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-Load.Axial: '300'
-Load.Shear: '150'
-Member.Material: E 250 (Fe 410 W)B
-Member.Supported_Section: UB 406 x 178 x 74
-Member.Supported_Section.Material: E 410 (Fe 540)
-Member.Supporting_Section: PBP 300X222.9
-Member.Supporting_Section.Material: E 300 (Fe 440)
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: a - Sheared or hand flame cut
+Detailing.Gap: '10'
+Load.Axial: '60'
+Load.Shear: '90'
+Member.Material: E 250 (Fe 410 W)A
+Member.Supported_Section.Designation: MB 300
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section.Designation: UC 305 x 305 x 118
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
 Module: Fin Plate
-Plate.Material: E 250 (Fe 410 W)B
+Plate.Material: E 250 (Fe 410 W)A
 Plate.Thickness:
 - '3'
 - '4'
@@ -49,3 +42,10 @@ Plate.Thickness:
 - '16'
 - '18'
 - '20'
+- '22'
+- '24'
+- '26'
+- '28'
+- '30'
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'

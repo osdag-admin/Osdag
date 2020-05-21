@@ -395,6 +395,7 @@ def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn,multiple =1):
     return shear_rup_eqn
 
 
+
 # def shear_Rupture_prov_weld(h, t,  fu,v_dn,gamma_mo):  #weld
 #     h = str(h)
 #     t = str(t)
@@ -446,6 +447,17 @@ def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn,multiple =1):
 #     return shear_rup_eqn
 
 
+def tension_yield_prov(l,t, f_y, gamma, T_dg):
+    l = str(l)
+    t = str(t)
+    f_y = str(f_y)
+    gamma = str(gamma)
+    T_dg = str(T_dg)
+    tension_yield_eqn = Math(inline=True)
+    tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{Depth*t_p*f_y}{\gamma_{mo}}\\'))
+    tension_yield_eqn.append(NoEscape(r'&=\frac{'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
+    tension_yield_eqn.append(NoEscape(r'&=' + T_dg + '\end{aligned}'))
+    return tension_yield_eqn
 
 
 def height_of_flange_cover_plate(B,sp,b_fp): #weld
@@ -762,6 +774,16 @@ def min_max_axial_capacity(axial_capacity,min_ac): #todo anjali
     min_ac_eqn.append(NoEscape(r'&=' +axial_capacity+ r'\end{aligned}'))
     return min_ac_eqn
 
+def axial_capacity_req(axial_capacity,min_ac):
+    min_ac = str(min_ac)
+    axial_capacity = str(axial_capacity)
+    ac_req_eqn = Math(inline=True)
+    ac_req_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
+    ac_req_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
+    ac_req_eqn.append(NoEscape(r'&=' + min_ac + r'\\'))
+    ac_req_eqn.append(NoEscape(r'Ac_{max} &=' +axial_capacity +r'\end{aligned}'))
+    return ac_req_eqn
+
 def prov_axial_load(axial_input,min_ac,app_axial_load):
     min_ac = str(min_ac)
     axial_input = str(axial_input)
@@ -953,6 +975,7 @@ def get_pass_fail(required, provided,relation='greater'):
             else:
                 return 'Fail'
 
+
 def get_pass_fail2(min, provided, max):
     min = float(min)
     provided = float(provided)
@@ -966,6 +989,20 @@ def get_pass_fail2(min, provided, max):
             return 'Fail'
         # elif relation == 'geq':
 
+def min_prov_max(min, provided,max):
+    min = float(min)
+    provided = float(provided)
+    max = float(max)
+    if provided==0:
+        return 'N/A'
+    else:
+        if max >= provided and min<=provided:
+            return 'Pass'
+        else:
+            return 'Fail'
+
+
+
 def member_yield_prov(Ag, fy, gamma_m0, member_yield,multiple = 1):
     Ag = str(round(Ag,2))
     fy = str(fy)
@@ -973,7 +1010,7 @@ def member_yield_prov(Ag, fy, gamma_m0, member_yield,multiple = 1):
     multiple = str(multiple)
     member_yield = str(member_yield)
     member_yield_eqn = Math(inline=True)
-    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg} &= \frac{'+ multiple + r' * A_g ~ f_y}{\gamma_{m0}}\\'))
+    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg}~or~A_c&= \frac{'+ multiple + r' * A_g ~ f_y}{\gamma_{m0}}\\'))
     member_yield_eqn.append(NoEscape(r'&= \frac{'+ multiple + '*' + Ag + '*' + fy + '}{'+ gamma_m0 + r'}\\'))
     member_yield_eqn.append(NoEscape(r'&= ' + member_yield + r'\end{aligned}'))
     return member_yield_eqn
@@ -1056,7 +1093,7 @@ def slenderness_prov(K, L, r, slender):
 
 def efficiency_req():
     efflimit_eqn = Math(inline=True)
-    efflimit_eqn.append(NoEscape(r'\begin{aligned} Utilization Ratio &\leq 1 \end{aligned}'))
+    efflimit_eqn.append(NoEscape(r'\begin{aligned} Utilization~Ratio &\leq 1 \end{aligned}'))
 
     return efflimit_eqn
 
@@ -1065,7 +1102,7 @@ def efficiency_prov(F, Td, eff):
     Td = str(round(Td/1000,2))
     eff = str(eff)
     eff_eqn = Math(inline=True)
-    eff_eqn.append(NoEscape(r'\begin{aligned} Utilization Ratio &= \frac{F}{Td}&=\frac{'+F+'}{'+Td+r'}\\'))
+    eff_eqn.append(NoEscape(r'\begin{aligned} Utilization~Ratio &= \frac{F}{Td}&=\frac{'+F+'}{'+Td+r'}\\'))
     eff_eqn.append(NoEscape(r'&= ' + eff + r'\end{aligned}'))
 
     return eff_eqn
@@ -1190,6 +1227,7 @@ def throat_prov(tw,f):
 
     return throat_eqn
 
+
 def eff_len_prov(l_eff, b_fp, t_w, l_w):
     l_eff = str(l_eff)
     l_w = str(l_w)
@@ -1302,12 +1340,75 @@ def web_plate_area_prov(D, y, webwidth, wp_area, T, r_1):
 
     return diahole_eqn
 
-def display_prov(v,t):
+
+def display_prov(v,t, ref = None):
+
     v = str(v)
     display_eqn = Math(inline=True)
-    display_eqn.append(NoEscape(r'\begin{aligned} '+t+' &=' + v + r' \end{aligned}'))
-
+    if ref != None:
+        display_eqn.append(NoEscape(r'\begin{aligned} '+t+' &=' + v + '~('+ref+r')\end{aligned}'))
+    else:
+        display_eqn.append(NoEscape(r'\begin{aligned} ' + t + ' &=' + v + r'\end{aligned}'))
     return display_eqn
+
+def gamma(v,t):
+    v = str(v)
+    gamma = Math(inline=True)
+    gamma.append(NoEscape(r'\begin{aligned}\gamma_{' + t + '}&=' + v + r'\end{aligned}'))
+
+    return gamma
+
+def kb_prov(e,p,d,fub,fu):
+    kb1 = round((e / (3.0 * d)),2)
+    kb2 = round((p / (3.0 * d)-0.25),2)
+    kb3 = round(( fub / fu),2)
+    kb4 = 1.0
+    kb_1 = min(kb1,kb2,kb3,kb4)
+    kb_2 = min(kb1,kb3,kb4)
+    pitch = p
+    e = str(e)
+    p = str(p)
+    d = str(d)
+    fub = str(fub)
+    fu = str(fu)
+    kb1 = str(kb1)
+    kb2 = str(kb2)
+    kb3 = str(kb3)
+    kb4 = str(kb4)
+    kb_1 = str(kb_1)
+    kb_2 = str(kb_2)
+    kb_eqn = Math(inline=True)
+    if pitch != 0 :
+        kb_eqn.append(NoEscape(r'\begin{aligned} k_b & = min(\frac{e}{3*d_0},\frac{p}{3*d_0}-0.25,\frac{f_{ub}}{f_u},1.0)\\' ))
+        kb_eqn.append(NoEscape(r'& = min(\frac{'+e+'}{3*'+d+r'},\frac{'+p+'}{3*'+d+r'}-0.25,\frac{'+fub+'}{'+fu+r'},1.0)\\'))
+        kb_eqn.append(NoEscape(r'& = min('+kb1+','+kb2+','+kb3+','+kb4+r')\\'))
+        kb_eqn.append(NoEscape(r'& = '+kb_1+r'\end{aligned}'))
+
+    else:
+        kb_eqn.append(NoEscape(r'\begin{aligned} k_b & = min(\frac{e}{3*d_0},\frac{f_{ub}}{f_u},1.0)\\'))
+        kb_eqn.append(NoEscape(r'& = min(\frac{' + e + '}{3*' + d + r'},\frac{' + fub + '}{' + fu + r'},1.0)\\'))
+        kb_eqn.append(NoEscape(r'& = min(' + kb1 + ',' + kb3 + ',' + kb4 + r')\\'))
+        kb_eqn.append(NoEscape(r'& = ' + kb_2 + r'\end{aligned}'))
+    return kb_eqn
+
+def depth_req(e, g, row, sec =None):
+    d = 2*e + (row-1)*g
+    depth = d
+    depth = str(depth)
+    e = str(e)
+    g = str(g)
+    row = str(row)
+
+    depth_eqn = Math(inline=True)
+    if sec == "C":
+        depth_eqn.append(NoEscape(r'\begin{aligned} depth & = 2 * e + (r_l -1) * g \\'))
+        depth_eqn.append(NoEscape(r'& = 2 * '+e+'+('+row+'-1)*'+g+r' \\'))
+        depth_eqn.append(NoEscape(r'& = ' + depth + r'\end{aligned}'))
+    else:
+        depth_eqn.append(NoEscape(r'\begin{aligned} depth & = 2 * e + (r_l -1) * g\\'))
+        depth_eqn.append(NoEscape(r'& = 2 * ' + e + '+(' + row + '-1)*' + g +  r'\\'))
+        depth_eqn.append(NoEscape(r'& = ' + depth + r'\end{aligned}'))
+    return depth_eqn
 
     # slender = (float(K) * float(L)) / float(r)
     #

@@ -311,8 +311,14 @@ class Section(Material):
 
         # self.shear_yielding_capacity = 0.0
         # self.shear_rupture_capacity = 0.0
+
+        self.tension_capacity_flange = 0.0
         self.shear_capacity_flange = 0.0
+        self.tension_capacity_web = 0.0
         self.shear_capacity_web = 0.0
+        self.tension_yielding_capacity_web=0.0
+        self.tension_rupture_capacity_web=0.0
+        self.block_shear_capacity_web=0.0
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
@@ -1095,6 +1101,7 @@ class Plate(Material):
         :param bolt_dia: diameter of bolt
         :return: reduced bolt capacity if long joint condition is met
         """
+
         if end_dist == 0.0:
             length_avail = max(((bolts_one_line - 1) * gauge),((bolts_line - 1) * pitch))
             if length_avail > 15 * bolt_dia:
@@ -1159,7 +1166,7 @@ class Plate(Material):
                                                 , min_edge_dist, min_gauge, min_bolts_one_line,min_bolt_line)
 
         print("boltdetails0", bolt_line, bolts_one_line, web_plate_h)
-
+        count = 0
 
         if bolts_one_line < min_bolts_one_line:
             self.design_status = False
@@ -1251,6 +1258,7 @@ class Plate(Material):
                     moment_demand = 0.0
                     vres = resultant_force / (bolt_line * bolts_one_line)
 
+
                 if joint == None:
 
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
@@ -1268,6 +1276,7 @@ class Plate(Material):
                         count = count + 1
                     else:
                         if initial_convergence <= convergence:
+
                             initial_convergence = convergence
                         else:
                             break
@@ -1278,6 +1287,7 @@ class Plate(Material):
             #                                           gauge, bolt_line, pitch, bolt_capacity,
             #                                           bolt_dia)
             print("vres, vred", vres, bolt_capacity_red)
+
 
 
 

@@ -549,6 +549,7 @@ class FinPlateConnection(ShearConnection):
         self.plate.design_status_2 = False
         self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],fabrication = design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
+        self.warn_text(self)
         self.member_capacity(self)
 
         # if self.design_status:
@@ -575,13 +576,13 @@ class FinPlateConnection(ShearConnection):
         print(self.supported_section.shear_yielding_capacity, self.load.shear_force,
               self.supported_section.tension_yielding_capacity, self.load.axial_force)
 
-        if self.supported_section.shear_yielding_capacity > self.load.shear_force and \
-                self.supported_section.tension_yielding_capacity > self.load.axial_force:
+        if self.supported_section.shear_yielding_capacity/1000 > self.load.shear_force and \
+                self.supported_section.tension_yielding_capacity/1000 > self.load.axial_force:
 
-            if self.load.shear_force <= min(0.15 * self.supported_section.shear_yielding_capacity, 40.0):
+            if self.load.shear_force <= min(round(0.15 * self.supported_section.shear_yielding_capacity/1000,0), 40.0):
                 logger.warning(" : User input for shear force is very less compared to section capacity. "
                                "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
-                self.load.shear_force = min(0.15 * self.supported_section.shear_yielding_capacity, 40.0)
+                self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity/1000,0), 40.0)
 
             print("preliminary member check is satisfactory. Checking available plate Thickness")
             self.thickness_possible = [i for i in self.plate.thickness if i >= self.supported_section.web_thickness]
@@ -671,8 +672,9 @@ class FinPlateConnection(ShearConnection):
         # print(self.design_status, "Getting bolt grade")
         # bolt_grade_previous = self.bolt.bolt_grade[-1]
         bolt_previous = self.bolt
+        count = 0
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
-            count = 1
+
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                     conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
@@ -708,30 +710,20 @@ class FinPlateConnection(ShearConnection):
                 self.weld_connecting_plates = [self.supporting_section.web_thickness, self.plate.thickness_provided]
             [available_welds,self.weld_size_min,self.weld_size_max] = self.get_available_welds(self,self.weld_connecting_plates)
             if available_welds:
-                while self.plate.height+10 <= self.max_plate_height:
-                    self.section_shear_checks(self)
-                    self.plate_shear_checks(self)
-                    self.design_weld(self, available_welds)
-                    if self.supported_section.design_status == False or \
-                            self.plate.design_status_2 == False or self.weld.design_status == False:
-                        self.plate.height+=10
+                self.section_shear_checks(self)
+                self.plate_shear_checks(self)
+                self.design_weld(self, available_welds)
+                while self.supported_section.design_status == False or self.plate.design_status_2 == False or \
+                        self.weld.design_status == False:
+                    if self.plate.moment_capacity > self.plate.moment_demand and self.plate.height+10 <= self.max_plate_height:
+                        self.plate.height += 10
                         self.plate.edge_dist_provided += 5
-                        # [self.plate.gauge_provided, self.plate.edge_dist_provided, self.plate.height] =\
-                        #     self.plate.get_gauge_edge_dist(web_plate_h=self.plate.height,bolts_one_line=self.plate.bolts_one_line,
-                        #                                edge_dist=self.plate.edge_dist_provided,max_spacing=self.bolt.max_spacing,
-                        #                                max_edge_dist=self.bolt.max_edge_dist)
-                        # ecc = (self.plate.pitch_provided * max((self.plate.bolt_line - 1.5), 0)) + self.plate.end_dist_provided + self.plate.gap
-                        # self.plate.bolt_force = self.plate.get_vres(bolts_one_line=self.plate.bolts_one_line,pitch=self.plate.pitch_provided,
-                        #                     gauge=self.plate.gauge_provided,bolt_line=self.plate.bolt_line, shear_load=self.load.shear_force*1000,
-                        #                     axial_load=self.load.axial_force, ecc = ecc)
-                        # self.plate.bolt_capacity_red = self.plate.get_bolt_red(bolts_one_line=self.plate.bolts_one_line,gauge=self.plate.gauge_provided,
-                        #                         bolts_line=self.plate.bolt_line,pitch=self.plate.pitch_provided,
-                        #                         bolt_capacity=self.bolt.bolt_capacity,bolt_dia=self.bolt.bolt_diameter_provided)
-                        # if self.plate.bolt_capacity_red < self.plate.bolt_force:
-                        #     self.plate.height =initial_plate_height
-                        #     break
+                        self.section_shear_checks(self)
+                        self.plate_shear_checks(self)
+                        self.design_weld(self, available_welds)
                     else:
                         break
+
 
             else:
                 logger.error(": For given members and %2.2f mm thick plate, weld sizes should be of range "
@@ -739,31 +731,31 @@ class FinPlateConnection(ShearConnection):
                              % self.weld_size_max)
                 logger.info(": Cannot design weld with available welds ")
 
-            if self.supported_section.design_status is False:
+            if self.plate.moment_capacity < self.plate.moment_demand:
                 break
+
             if self.supported_section.design_status is True and self.plate.design_status is True and self.weld.design_status is True:
                 self.recalculating_bolt_values(self)
                 break
-
 
         if self.load.shear_force*1000 > self.plate.shear_capacity:
             self.design_status = False
             logger.error(":shear capacity of the plate is less than the applied shear force, %2.2f kN [cl. 6.4.1]"
                          % self.load.shear_force)
-            logger.warning(":Shear capacity of plate is %2.2f kN" % self.plate.shear_capacity/1000)
+            logger.warning(":Shear capacity of plate is {} kN" .format(round(self.plate.shear_capacity/1000,2)))
             logger.info(": Increase the plate thickness or material grade")
 
         if self.load.axial_force*1000 > self.plate.shear_capacity:
             self.design_status = False
             logger.error(":tensile capacity of the plate is less than the applied axial force, %2.2f kN [cl. 6.4.1]"
                          % self.load.axial_force)
-            logger.warning(":tensile capacity of plate is %2.2f kN" % self.plate.tension_capacity/1000)
+            logger.warning(":tensile capacity of plate is {} kN" .format(round(self.plate.tension_capacity/1000,2)))
             logger.info(": Increase the plate thickness or material grade")
 
         if self.plate.moment_capacity < self.plate.moment_demand:
             self.design_status = False
-            logger.error(": Plate moment capacity is less than the moment demand, %2.2f kNm [cl. 8.2.1.2]"
-                         % self.plate.moment_demand)
+            logger.error(": Plate moment capacity is less than the moment demand, {} kNm [cl. 8.2.1.2]"
+                         .format(round(self.plate.moment_demand/1000000,2)))
             # print(self.plate.moment_capacity / 1000000)
             logger.warning(":Moment capacity of plate is %2.2f kN-m" % self.plate.moment_capacity)
             logger.info(": Increase the plate thickness or material grade")
@@ -773,7 +765,7 @@ class FinPlateConnection(ShearConnection):
             self.design_status = False
             logger.error(":shear capacity of the Beam is less than the applied shear force, %2.2f kN [cl. 6.4.1]"
                          % self.load.shear_force)
-            logger.warning(":Shear capacity of Beam is %2.2f kN" % self.supported_section.shear_capacity/1000)
+            logger.warning(":Shear capacity of Beam is {} kN".format(round(self.supported_section.shear_capacity/1000,2)))
             logger.info(": Choose a Beam of higher size or provide higher bolt diameter(if available) "
                         "So that rupture/block shear capacity increases")
 
@@ -781,7 +773,7 @@ class FinPlateConnection(ShearConnection):
             self.design_status = False
             logger.error(":tensile capacity of the Beam is less than the applied axial force, %2.2f kN [cl. 6.4.1]"
                          % self.load.axial_force)
-            logger.warning(":tensile capacity of Beam is %2.2f kN" % self.supported_section.tension_capacity/1000)
+            logger.warning(":tensile capacity of Beam is {} kN" .format(round(self.supported_section.tension_capacity/1000,2)))
             logger.info(": Choose a Beam of higher size or material grade")
             logger.info(": Lesser number of bolts per line increases the rupture capacity")
 
@@ -789,7 +781,7 @@ class FinPlateConnection(ShearConnection):
             self.design_status = False
             logger.error(": Beam moment capacity is less than the moment demand, %2.2f kNm [cl. 8.2.1.2]"
                          % self.plate.moment_demand)
-            logger.warning(":Moment capacity of plate is %2.2f kN-m" % self.supported_section.moment_capacity)
+            logger.warning(":Moment capacity of plate is {} kN-m" .format(round(self.supported_section.moment_capacity/1000000,2)))
             logger.info(": Increase the plate thickness or material grade")
             logger.info(": Arranging bolts in one line will reduce moment induced")
 
@@ -797,7 +789,7 @@ class FinPlateConnection(ShearConnection):
             t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
             self.weld.design_status = False
             logger.error(": Weld thickness is not sufficient [cl. 10.5.7, IS 800:2007]")
-            logger.warning(": Minimum weld thickness required is %2.2f mm " % t_weld_req)
+            logger.warning(": Minimum weld thickness required is {} mm " .format(round(t_weld_req,2)))
             logger.info(": Should increase length of weld/fin plate")
         else:
             self.weld.design_status = True
@@ -831,7 +823,7 @@ class FinPlateConnection(ShearConnection):
         if self.supported_section.shear_capacity < self.load.shear_force * 1000:
             self.supported_section.design_status = False
             logger.warning(
-                'shear capacity of section is guiding plate height, trying with length %2.2f mm' % self.plate.height)
+                'shear capacity of section is guiding plate height, trying with length {} mm' .format(self.plate.height))
         else:
             self.supported_section.design_status = True
 
@@ -855,7 +847,7 @@ class FinPlateConnection(ShearConnection):
         if self.supported_section.tension_capacity < self.load.axial_force * 1000:
             self.supported_section.design_status = False
             logger.warning(
-                'tension capacity of section is guiding plate height, trying with length %2.2f mm' % self.plate.height)
+                'tension capacity of section is guiding plate height, trying with length {} mm' .format(self.plate.height))
         else:
             self.supported_section.design_status = True
 
@@ -903,7 +895,7 @@ class FinPlateConnection(ShearConnection):
         if self.plate.shear_capacity < self.load.shear_force*1000:
             self.plate.design_status_2 = False
             logger.warning(
-                'shear capacity of section is guiding plate height, trying with length %2.2f mm' % self.plate.height)
+                'shear capacity of section is guiding plate height, trying with length {} mm' .format(self.plate.height))
         else:
             self.plate.design_status_2 = True
         A_g = self.plate.height * self.plate.thickness_provided
@@ -927,7 +919,7 @@ class FinPlateConnection(ShearConnection):
         if self.plate.tension_capacity < self.load.axial_force*1000:
             self.plate.design_status_2 = False
             logger.warning(
-                'tension capacity of plate is guiding plate height, trying with length %2.2f mm' % self.plate.height)
+                'tension capacity of plate is guiding plate height, trying with length {} mm' .format(self.plate.height))
         else:
             self.plate.design_status_2 = True
 
@@ -978,12 +970,14 @@ class FinPlateConnection(ShearConnection):
         print(self.weld.strength)
         self.weld.get_weld_stress(weld_axial=force_l, weld_shear=force_w, weld_twist=force_t, Ip_weld=Ip_weld, y_max=y_max,
                                                     x_max=x_max, l_weld=2*self.weld.eff_length)
-        t_weld_req = self.weld.size * self.weld.stress / self.weld.strength
+        K_unit_weld = 0.7
+        t_weld_req = self.weld.size * self.weld.stress / self.weld.strength / 0.7
+
         updated_weld_list = list([x for x in available_welds if (t_weld_req <= x)])
         if not updated_weld_list:
             self.weld.design_status = False
             logger.warning(
-                'weld stress is guiding plate height, trying with length %2.2f mm' % self.plate.height)
+                'weld stress is guiding plate height, trying with length {} mm' .format(self.plate.height))
         else:
             self.weld.size = updated_weld_list[0]
             self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
@@ -1018,33 +1012,65 @@ class FinPlateConnection(ShearConnection):
             self.design_status = True
             logger.info("=== End Of Design ===")
 
-    def results_to_test(self, filename):
-        test_out_list = {KEY_OUT_DISP_D_PROVIDED:self.bolt.bolt_diameter_provided,
-                        KEY_OUT_DISP_GRD_PROVIDED:self.bolt.bolt_grade_provided,
-                        KEY_OUT_DISP_BOLT_SHEAR:self.bolt.bolt_shear_capacity,
-                        KEY_OUT_DISP_BOLT_BEARING:self.bolt.bolt_shear_capacity,
-                        KEY_OUT_DISP_BOLT_CAPACITY:self.bolt.bolt_capacity,
-                        KEY_OUT_DISP_BOLT_FORCE:self.plate.bolt_force,
-                        KEY_OUT_DISP_BOLT_LINE:self.plate.bolt_line,
-                        KEY_OUT_DISP_BOLTS_ONE_LINE:self.plate.bolts_one_line,
-                        KEY_OUT_DISP_PITCH:self.plate.pitch_provided,
-                        KEY_OUT_DISP_END_DIST:self.plate.end_dist_provided,
-                        KEY_OUT_DISP_GAUGE:self.plate.gauge_provided,
-                        KEY_OUT_DISP_EDGE_DIST:self.plate.edge_dist_provided,
-                        KEY_OUT_DISP_PLATETHK:self.plate.thickness_provided,
-                        KEY_OUT_DISP_PLATE_HEIGHT:self.plate.height,
-                        KEY_OUT_DISP_PLATE_LENGTH:self.plate.length,
-                        KEY_OUT_DISP_PLATE_SHEAR:self.plate.shear_yielding_capacity,
-                        KEY_OUT_DISP_PLATE_BLK_SHEAR:self.plate.block_shear_capacity,
-                        KEY_OUT_DISP_PLATE_MOM_DEMAND:self.plate.moment_demand,
-                        KEY_OUT_DISP_PLATE_MOM_CAPACITY:self.plate.moment_capacity,
-                        KEY_OUT_DISP_WELD_SIZE:self.weld.size,
-                        KEY_OUT_DISP_WELD_STRENGTH:self.weld.strength,
-                        KEY_OUT_DISP_WELD_STRESS:self.weld.stress}
-        f = open(filename, "w")
-        f.write(str(test_out_list))
-        f.close()
-        # return test_out_list
+    def results_to_test(self):
+        test_in_list = {KEY_MODULE: self.module,
+                        KEY_MAIN_MODULE: self.mainmodule,
+                        KEY_CONN: self.connectivity,
+                        KEY_MATERIAL: self.plate.material,
+                        KEY_SHEAR: self.load.shear_force,
+                        KEY_AXIAL:self.load.axial_force,
+                        KEY_SUPTNGSEC_DESIGNATION:self.supporting_section.designation,
+                        KEY_SUPTNGSEC_MATERIAL:self.supporting_section.material,
+                        KEY_SUPTNGSEC_FU:self.supporting_section.fu,
+                        KEY_SUPTNGSEC_FY:self.supporting_section.fy,
+                        KEY_SUPTDSEC_DESIGNATION:self.supported_section.designation,
+                        KEY_SUPTDSEC_MATERIAL: self.supported_section.material,
+                        KEY_SUPTDSEC_FU: self.supported_section.fu,
+                        KEY_SUPTDSEC_FY: self.supported_section.fy,
+                        KEY_D: self.bolt.bolt_diameter,
+                        KEY_GRD: self.bolt.bolt_grade,
+                        KEY_TYP: self.bolt.bolt_type,
+                        KEY_DP_BOLT_TYPE:self.bolt.bolt_type,
+                        KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+                        KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+                        KEY_PLATETHK: self.plate.thickness,
+                        KEY_PLATE_MATERIAL: self.plate.material,
+                        KEY_PLATE_FU: self.plate.fu,
+                        KEY_PLATE_FY: self.plate.fy,
+                        KEY_DP_WELD_TYPE: 'Fillet',
+                        KEY_DP_WELD_FAB: self.weld.fabrication,
+                        KEY_DP_WELD_MATERIAL_G_O: self.weld.fu,
+                        KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+                        KEY_DP_DETAILING_GAP: self.plate.gap,
+                        KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+
+        test_out_list = {KEY_OUT_D_PROVIDED:self.bolt.bolt_diameter_provided,
+                        KEY_OUT_GRD_PROVIDED:self.bolt.bolt_grade_provided,
+                        KEY_OUT_BOLT_SHEAR:self.bolt.bolt_shear_capacity,
+                        KEY_OUT_BOLT_BEARING:self.bolt.bolt_bearing_capacity,
+                        KEY_OUT_BOLT_CAPACITY:self.bolt.bolt_capacity,
+                        KEY_OUT_BOLT_FORCE:self.plate.bolt_force,
+                        KEY_OUT_BOLT_LINE:self.plate.bolt_line,
+                        KEY_OUT_BOLTS_ONE_LINE:self.plate.bolts_one_line,
+                        KEY_OUT_PITCH:self.plate.pitch_provided,
+                        KEY_OUT_END_DIST:self.plate.end_dist_provided,
+                        KEY_OUT_GAUGE:self.plate.gauge_provided,
+                        KEY_OUT_EDGE_DIST:self.plate.edge_dist_provided,
+                        KEY_OUT_PLATETHK:self.plate.thickness_provided,
+                        KEY_OUT_PLATE_HEIGHT:self.plate.height,
+                        KEY_OUT_PLATE_LENGTH:self.plate.length,
+                        KEY_OUT_PLATE_SHEAR:self.plate.shear_yielding_capacity,
+                        KEY_OUT_PLATE_RUPTURE: self.plate.shear_rupture_capacity,
+                        KEY_OUT_PLATE_BLK_SHEAR:self.plate.block_shear_capacity_shear,
+                        KEY_OUT_PLATE_TENSION: self.plate.tension_yielding_capacity,
+                        KEY_OUT_PLATE_TENSION_RUP: self.plate.tension_rupture_capacity,
+                        KEY_OUT_PLATE_BLK_SHEAR_AXIAL: self.plate.block_shear_capacity_axial,
+                        KEY_OUT_PLATE_MOM_DEMAND:self.plate.moment_demand,
+                        KEY_OUT_PLATE_MOM_CAPACITY:self.plate.moment_capacity,
+                        KEY_OUT_WELD_SIZE:self.weld.size,
+                        KEY_OUT_WELD_STRENGTH:self.weld.strength,
+                        KEY_OUT_WELD_STRESS:self.weld.stress}
+        return test_in_list, test_out_list
 
     # r'/ResourceFiles/images/ColumnsBeams".png'
     def save_design(self,popup_summary):
@@ -1128,8 +1154,7 @@ class FinPlateConnection(ShearConnection):
         self.report_check = []
         connecting_plates = [self.plate.thickness_provided,self.supported_section.web_thickness]
 
-        bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity/1000,2)
-        bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+
         bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
         kb_disp= round(self.bolt.kb,2)
         kh_disp = round(self.bolt.kh, 2)
@@ -1143,6 +1168,8 @@ class FinPlateConnection(ShearConnection):
         t1 = (KEY_DISP_GRD, '', self.bolt.bolt_grade_provided, '')
         self.report_check.append(t1)
         if self.bolt.bolt_type == TYP_BEARING:
+            bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
+            bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu,1,self.bolt.bolt_net_area,
                                                                self.bolt.gamma_mb,bolt_shear_capacity_kn), '')
             self.report_check.append(t1)
@@ -1296,13 +1323,14 @@ class FinPlateConnection(ShearConnection):
             Ip_weld = round(2 * self.weld.eff_length ** 3 / 12,2)
             weld_conn_plates_fu = [self.supporting_section.fu, self.plate.fu]
             gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.weld.fabrication]
-            t1 = (DISP_WELD_STRENGTH, weld_strength_req(V=self.load.shear_force*1000,A=self.load.axial_force*1000,
-                                                        M=self.plate.moment_demand,Ip_w=Ip_weld,
-                                                        y_max= self.weld.eff_length/2,x_max=0.0,l_w=2*self.weld.eff_length,
-                                                        R_w=self.weld.stress),
-                  weld_strength_prov(weld_conn_plates_fu, gamma_mw, self.weld.throat_tk,self.weld.strength),
-                  get_pass_fail(self.weld.stress, self.weld.strength, relation="lesser"))
-            self.report_check.append(t1)
+            if Ip_weld != 0.0:
+                t1 = (DISP_WELD_STRENGTH, weld_strength_req(V=self.load.shear_force*1000,A=self.load.axial_force*1000,
+                                                            M=self.plate.moment_demand,Ip_w=Ip_weld,
+                                                            y_max= self.weld.eff_length/2,x_max=0.0,l_w=2*self.weld.eff_length,
+                                                            R_w=self.weld.stress),
+                      weld_strength_prov(weld_conn_plates_fu, gamma_mw, self.weld.throat_tk,self.weld.strength),
+                      get_pass_fail(self.weld.stress, self.weld.strength, relation="lesser"))
+                self.report_check.append(t1)
 
         Disp_3D_image = "/ResourceFiles/images/3d.png"
 

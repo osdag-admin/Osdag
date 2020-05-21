@@ -1,19 +1,19 @@
 Conn_Location: Web
-DesignPreferences.Bolt.Bolt_Hole_Type: Standard
-DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
-DesignPreferences.Bolt.Slip_Factor: '0.3'
-DesignPreferences.Design.Design_Method: Limit State Design
-DesignPreferences.Detailing.Corrosive_Influences: 'No'
-DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
-DesignPreferences.Detailing.Gap: '10'
-DesignPreferences.Weld.Fab: Shop Weld
-DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-Length(mm): '12000'
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Material_Grade_OverWrite: '410'
+Bolt.Slip_Factor: '0.3'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: a - Sheared or hand flame cut
+Detailing.Gap: '10'
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'
+Member.Length: '12000'
 Load.Axial: '1000'
 Member.Material: E 250 (Fe 410 W)A
 Member.Profile: Channels
 Module: Tension Members Welded Design
-Section Size:
+Member.Designation:
 - JC 100
 - JC 125
 - JC 150

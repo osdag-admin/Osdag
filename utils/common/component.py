@@ -253,6 +253,7 @@ class Section(Material):
 
     def __init__(self, designation, material_grade=""):
 
+        self.design_status = True
         self.designation = designation
         self.type = "Rolled"
         self.type2 = "generally"
@@ -282,7 +283,13 @@ class Section(Material):
         super(Section, self).__init__(material_grade,max_thickness)
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
+        self.shear_yielding_capacity = 0.0
+        self.shear_rupture_capacity = 0.0
+        self.block_shear_capacity_shear = 0.0
+        self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity = 0.0
+        self.shear_capacity = 0.0
+        self.tension_capacity = 0.0
         self.tension_capacity_flange = 0.0
 
         self.tension_yielding_capacity_web = 0.0  #
@@ -292,8 +299,14 @@ class Section(Material):
 
         # self.shear_yielding_capacity = 0.0
         # self.shear_rupture_capacity = 0.0
+
+        self.tension_capacity_flange = 0.0
         self.shear_capacity_flange = 0.0
+        self.tension_capacity_web = 0.0
         self.shear_capacity_web = 0.0
+        self.tension_yielding_capacity_web=0.0
+        self.tension_rupture_capacity_web=0.0
+        self.block_shear_capacity_web=0.0
 
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity_shear = 0.0
@@ -306,6 +319,7 @@ class Section(Material):
         self.slenderness = 0.0
         self.min_radius_gyration = 0.0
         self.beta =0.0
+        self.IR = 1.0
         # self.min_rad_gyration_bbchannel = 0.0
 
         # self.member_yield_eqn =0.0
@@ -338,7 +352,7 @@ class Section(Material):
         print(row[17], "plast_sec_mod_z")
         if self.plast_sec_mod_z is None:  # Todo: add in database
             self.plast_sec_mod_z = I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,
-                                                                                   self.web_thickness,self.flange_thickness)
+                                                                                   self.web_thickness,self.flange_thickness)*1000
             print(self.plast_sec_mod_z,"plast_sec_mod_z")
         else:
             self.plast_sec_mod_z = row[17] *1000
@@ -347,7 +361,7 @@ class Section(Material):
         print(row[18], "plast_sec_mod_z")
         if self.plast_sec_mod_y is None:  # Todo: add in database
             self.plast_sec_mod_y = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
-                                                                                   self.web_thickness,self.flange_thickness)
+                                                                                   self.web_thickness,self.flange_thickness)*1000
             print(self.plast_sec_mod_y, "plast_sec_mod_y")
         else:
             self.plast_sec_mod_y = row[17] * 1000
@@ -716,6 +730,7 @@ class Weld(Material):
         self.type = type
         self.size = 0.0
         self.length = 0.0
+        self.eff_length = 0.0
         self.Innerlength = 0.0
         self.effective = 0.0
         self.height =0.0
@@ -856,6 +871,7 @@ class Plate(Material):
         self.block_shear_capacity_shear = 0.0
         self.block_shear_capacity_axial = 0.0
         self.moment_capacity = 0.0
+        self.IR = 1.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
         # self.block_shear_capacity_disp = round(self.block_shear_capacity/1000, 2)
@@ -1051,6 +1067,7 @@ class Plate(Material):
         length_avail = max(((bolts_one_line - 1) * gauge),((bolts_line - 1) * pitch))
         if length_avail > 15 * bolt_dia:
             beta_lj = 1.075 - length_avail / (200 * bolt_dia)
+            print('long joint case')
             bolt_capacity_red = beta_lj * bolt_capacity
         else:
             bolt_capacity_red = bolt_capacity
@@ -1089,7 +1106,7 @@ class Plate(Material):
                                                 , min_edge_dist, min_gauge, min_bolts_one_line,min_bolt_line)
 
         print("boltdetails0", bolt_line, bolts_one_line, web_plate_h)
-
+        count = 0
 
         if bolts_one_line < min_bolts_one_line:
             self.design_status = False
@@ -1183,6 +1200,24 @@ class Plate(Material):
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,
                                                       bolt_dia)
+                convergence= bolt_capacity_red - vres
+
+                if convergence < 0:
+                    if count ==0:
+                        initial_convergence = convergence
+                        count = count +1
+                    else:
+                        if initial_convergence < convergence:
+                            initial_convergence = convergence
+                        else:
+                            break
+                else:
+                    pass
+
+
+
+
+
                 print("vres, vred", vres, bolt_capacity_red)
 
 

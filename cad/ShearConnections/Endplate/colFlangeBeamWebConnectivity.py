@@ -10,7 +10,7 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 
 class ColFlangeBeamWeb(object):
-
+    
     def __init__(self, column, beam, Fweld, plate, nut_bolt_array):
         self.column = column
         self.beam = beam
@@ -32,7 +32,7 @@ class ColFlangeBeamWeb(object):
         self.create_plate_geometry()
         self.create_fillet_weld_geometry()
         self.create_nut_bolt_array()
-
+        
         # Call for create_model
         self.columnModel = self.column.create_model()
         self.beamModel = self.beam.create_model()
@@ -40,47 +40,45 @@ class ColFlangeBeamWeb(object):
         self.weldModelLeft = self.weldLeft.create_model()
         self.weldModelRight = self.weldRight.create_model()
         self.nutboltArrayModels = self.nut_bolt_array.create_model()
-
+        
     def create_column_geometry(self):
         column_origin = numpy.array([0, 0, 0])
         column_u_dir = numpy.array([0, 1.0, 0])
         wDir1 = numpy.array([0.0, 0, 1.0])
         self.column.place(column_origin, column_u_dir, wDir1)
-
+        
     def create_beam_geometry(self):
-        beam_origin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + (
-                    self.column.length / 2 * self.column.wDir) + (self.plate.T * (-self.column.vDir))
+        
+        beam_origin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + (self.column.length / 2 * self.column.wDir) + (self.plate.T * (-self.column.vDir))
         uDir = numpy.array([0.0, 1.0, 0])
         wDir = numpy.array([1.0, 0.0, 0.0])
         self.beam.place(beam_origin, uDir, wDir)
-
+        
     def create_butt_weld(self):
         pass
         # plateThickness = 10
         # uDir3 = numpy.array([0, 1.0, 0])
         # wDir3 = numpy.array([1.0, 0, 0.0])
         # origin3 = (self.column.sec_origin +
-        #            self.column.t/2.0 * self.column.uDir +
+        #            self.column.t/2.0 * self.column.uDir + 
         #            self.column.length/2.0 * self.column.wDir +
         #            self.beam.t/2.0 * (-self.beam.uDir)+
         #            self.weld.W/2.0 * (-self.beam.uDir))
         # #origin3 = numpy.array([0, 0, 500]) + t/2.0 *wDir3 + plateThickness/2.0 * (-self.beam.uDir)
         # self.weld.place(origin3, uDir3, wDir3)
-
+        
     def create_plate_geometry(self):
-        plate_origin = self.beam.sec_origin + (self.plate.W / 2) * (-self.beam.uDir) + (self.plate.T / 2) * (
-            -self.beam.wDir) + (self.beam.D / 2 - self.beam.T - self.beam.R1 - 5 - self.plate.L / 2) * (self.beam.vDir)
+        plate_origin = self.beam.sec_origin + (self.plate.W / 2) * (-self.beam.uDir) + (self.plate.T / 2) * (-self.beam.wDir) + (self.beam.D / 2 - self.beam.T - self.beam.R1 - 5 - self.plate.L / 2) * (self.beam.vDir)
         uDir = numpy.array([1.0, 0.0, 0.0])
         wDir = numpy.array([0.0, 1.0, 0.0])
         self.plate.place(plate_origin, uDir, wDir)
-
+                
     def create_fillet_weld_geometry(self):
         uDir = numpy.array([1.0, 0.0, 0.0])
         wDir = numpy.array([0.0, 0.0, -1.0])
-        fillet_weld1_origin = (self.plate.sec_origin + (self.plate.T / 2.0 * self.plate.uDir) + (
-                    self.plate.W / 2 - self.beam.t / 2) * self.plate.wDir - self.plate.L / 2 * self.plate.vDir)
+        fillet_weld1_origin = (self.plate.sec_origin + (self.plate.T / 2.0 * self.plate.uDir) + (self.plate.W / 2 - self.beam.t / 2) * self.plate.wDir - self.plate.L / 2 * self.plate.vDir)
         self.weldLeft.place(fillet_weld1_origin, uDir, wDir)
-
+         
         uDir1 = numpy.array([0.0, 1.0, 0.0])
         wDir1 = numpy.array([0.0, 0.0, -1.0])
         fillet_weld2_origin = (fillet_weld1_origin + self.beam.t * self.plate.wDir)
@@ -101,19 +99,19 @@ class ColFlangeBeamWeb(object):
         pitch_dir = -self.plate.vDir
         bolt_dir = self.plate.uDir
         self.nut_bolt_array.place(nut_bolt_array_origin, nut_bolt_array_origin1, gauge_dir, pitch_dir, -bolt_dir)
-
+    
     def get_models(self):
         '''Returning 3D models
         '''
         return [self.columnModel, self.plateModel, self.weldModelLeft, self.weldModelRight,
                 self.beamModel] + self.nut_bolt_array.get_models()
-
+             
     def get_nutboltmodels(self):
         return self.nut_bolt_array.get_models()
-
+    
     def get_beamModel(self):
         return self.beamModel
-
+    
     # def get_column_model(self):
     #     final_column = self.columnModel
     #     print"printing nutBoltarray from endplate/colFlamgeBeamWebConnectivity",self.nut_bolt_array

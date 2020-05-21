@@ -811,22 +811,31 @@ class Tension_welded(Main):
         t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, round(self.weld.stress,2) if flag else '', True)
         out_list.append(t11)
 
-        t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, self.weld.length if flag else '', True)
-        out_list.append(t5)
+# <<<<<<< HEAD
+#         # t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, round(self.weld.length,0) if flag else '')
+#         # out_list.append(t5)
+#
+#         t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, int(round(self.weld.length,0)) if flag else '')
+# =======
+#         t5 = (KEY_OUT_WELD_LENGTH, KEY_OUT_DISP_WELD_LENGTH, TYPE_TEXTBOX, self.weld.length if flag else '', True)
+#         out_list.append(t5)
 
-        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, self.weld.effective if flag else '', True)
+        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, int(round(self.weld.length,0)) if flag else '', True)
+
         out_list.append(t13)
 
         t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '', True)
+
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, int(round(self.plate.thickness_provided,0)) if flag else '', True)
         out_list.append(t19)
 
-        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, self.plate.height if flag else '', True)
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, int(round(self.plate.height,0)) if flag else '', True)
         out_list.append(t20)
 
-        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, self.plate.length if flag else '', True)
+        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX,int(round(self.plate.length,0)) if flag else '', True)
+
         out_list.append(t21)
 
         return out_list
@@ -945,6 +954,8 @@ class Tension_welded(Main):
         self.design_status = False
 
         flag = False
+        flag1 = False
+        flag2 = False
         option_list = self.input_values(self)
         missing_fields_list = []
         for option in option_list:
@@ -956,16 +967,34 @@ class Tension_welded(Main):
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
 
+            if option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH:
+                # val = option[4]
+                # print(design_dictionary[option[0]], "jhvhj")
+                if float(design_dictionary[option[0]]) <= 0.0:
+                    error = "Value can't be equal or less than zero"
+                    all_errors.append(error)
+                else:
+                    flag1 = True
+
+            if option[2] == TYPE_TEXTBOX and option[0] == KEY_AXIAL:
+
+                if float(design_dictionary[option[0]]) <= 0.0:
+                    error = "Value can't be equal or less than zero"
+                    all_errors.append(error)
+                else:
+                    flag2 = True
+
         if len(missing_fields_list) > 0:
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
             all_errors.append(error)
             # flag = False
         else:
             flag = True
-
-        if flag:
+        print(all_errors, "ysdgh")
+        print(flag, flag1, flag2)
+        if flag and flag1 and flag2:
             self.set_input_values(self, design_dictionary)
-            print(design_dictionary)
+            # print(design_dictionary)
         else:
             return all_errors
 
@@ -1336,7 +1365,7 @@ class Tension_welded(Main):
         self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu,self.weld.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.res_force))
 
         self.weld_plate_length(self, design_dictionary)
-        self.weld.get_weld_stress(weld_shear=0,weld_axial=self.res_force, l_weld=self.weld.effective)
+        self.weld.get_weld_stress(weld_shear=0,weld_axial=self.res_force, l_weld=self.weld.length)
         # print(self.plate.length, self.weld.throat, "xfsf")
         if self.plate.length > (150 * self.weld.throat) and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             logger.info(" To avoid Long Joint Limit, weld is provided only on the flanges.")
@@ -1346,7 +1375,7 @@ class Tension_welded(Main):
                                    weld_fabrication=self.weld.fabrication, t_weld=self.weld.size,
                                    force=(self.res_force))
             self.weld_plate_length(self, design_dictionary,"web_weld")
-            self.weld.get_weld_stress(weld_shear=0,weld_axial=self.res_force, l_weld=self.weld.effective)
+            self.weld.get_weld_stress(weld_shear=0,weld_axial=self.res_force, l_weld=self.weld.length)
 
         # "Check for long joint"
         # if self.plate.length > (150 * self.weld.throat):
@@ -1622,6 +1651,7 @@ class Tension_welded(Main):
             if (2 * self.plate.length + 100) > self.length:
                 self.design_status = False
                 logger.info("Plate length exceeds the Member length")
+                logger.info("Try higher diameter of bolt to get a safe design")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
             else:
@@ -1635,6 +1665,23 @@ class Tension_welded(Main):
             logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
 
+    def results_to_test(self, filename):
+        test_out_list = {KEY_DISP_DESIGNATION:self.section_size_1.designation,
+                         KEY_DISP_TENSION_YIELDCAPACITY:self.section_size_1.tension_yielding_capacity,
+                         KEY_DISP_TENSION_RUPTURECAPACITY: self.section_size_1.tension_rupture_capacity,
+                         KEY_DISP_TENSION_BLOCKSHEARCAPACITY:self.section_size_1.block_shear_capacity_axial,
+                         KEY_DISP_SLENDER:self.section_size_1.slenderness,
+                         KEY_DISP_EFFICIENCY:self.efficiency,
+                         KEY_OUT_DISP_WELD_SIZE: self.weld.size,
+                         KEY_OUT_DISP_WELD_STRENGTH: self.weld.strength,
+                         KEY_OUT_DISP_WELD_STRESS: self.weld.stress,
+                        KEY_OUT_DISP_PLATETHK:self.plate.thickness_provided,
+                        KEY_OUT_DISP_PLATE_HEIGHT:self.plate.height,
+                        KEY_OUT_DISP_PLATE_LENGTH:self.plate.length}
+        f = open(filename, "w")
+        f.write(str(test_out_list))
+        f.close()
+
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
         if self.sec_profile in ["Channels", "Back to Back Channels"]:
@@ -1643,73 +1690,83 @@ class Tension_welded(Main):
             image = "Equal"
         else:
             image = "Unequal"
+        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.weld.fabrication]
 
         if self.sec_profile in ["Channels", "Back to Back Channels"]:
             self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
                                       # Image shall be save with this name.png in resource files
-                                      KEY_DISP_SECSIZE: (self.section_size_1.designation,self.sec_profile),
+                                      KEY_DISP_SECSIZE: (self.section_size_1.designation, self.sec_profile),
                                       KEY_DISP_MATERIAL: self.section_size_1.material,
-                                      KEY_DISP_FU: self.section_size_1.fu,
-                                      KEY_DISP_FY: self.section_size_1.fy,
-                                      'Mass': self.section_size_1.mass,
-                                      'Area(mm2) - A': self.section_size_1.area,
-                                      'D(mm)': self.section_size_1.depth,
-                                      'B(mm)': self.section_size_1.flange_width,
-                                      't(mm)': self.section_size_1.web_thickness,
-                                      'T(mm)': self.section_size_1.flange_thickness,
-                                      'FlangeSlope': self.section_size_1.flange_slope,
-                                      'R1(mm)': self.section_size_1.root_radius,
-                                      'R2(mm)': self.section_size_1.toe_radius,
-                                      'Cy(mm)': self.section_size_1.Cy,
-                                      'Iz(mm4)': self.section_size_1.mom_inertia_z,
-                                      'Iy(mm4)': self.section_size_1.mom_inertia_y,
-                                      'rz(mm)': self.section_size_1.rad_of_gy_z,
-                                      'ry(mm)': self.section_size_1.rad_of_gy_y,
-                                      'Zz(mm3)': self.section_size_1.elast_sec_mod_z,
-                                      'Zy(mm3)': self.section_size_1.elast_sec_mod_y,
-                                      'Zpz(mm3)': self.section_size_1.plast_sec_mod_z,
-                                      'Zpy(mm3)': self.section_size_1.elast_sec_mod_y}
+                                      KEY_DISP_FU: round(self.section_size_1.fu, 2),
+                                      KEY_DISP_FY: round(self.section_size_1.fy, 2),
+                                      'Mass': round(self.section_size_1.mass, 2),
+                                      'Area(mm2) - A': round(self.section_size_1.area, 2),
+                                      'D(mm)': round(self.section_size_1.depth, 2),
+                                      'B(mm)': round(self.section_size_1.flange_width, 2),
+                                      't(mm)': round(self.section_size_1.web_thickness, 2),
+                                      'T(mm)': round(self.section_size_1.flange_thickness, 2),
+                                      'FlangeSlope': round(self.section_size_1.flange_slope, 2),
+                                      'R1(mm)': round(self.section_size_1.root_radius, 2),
+                                      'R2(mm)': round(self.section_size_1.toe_radius, 2),
+                                      'Cy(mm)': round(self.section_size_1.Cy, 2),
+                                      'Iz(mm4)': round(self.section_size_1.mom_inertia_z, 2),
+                                      'Iy(mm4)': round(self.section_size_1.mom_inertia_y, 2),
+                                      'rz(mm)': round(self.section_size_1.rad_of_gy_z, 2),
+                                      'ry(mm)': round(self.section_size_1.rad_of_gy_y, 2),
+                                      'Zz(mm3)': round(self.section_size_1.elast_sec_mod_z, 2),
+                                      'Zy(mm3)': round(self.section_size_1.elast_sec_mod_y, 2),
+                                      'Zpz(mm3)': round(self.section_size_1.plast_sec_mod_z, 2),
+                                      'Zpy(mm3)': round(self.section_size_1.elast_sec_mod_y, 2),
+                                      'r(mm3)': round(self.section_size_1.min_radius_gyration, 2)}
         else:
             self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
                                       # Image shall be save with this name.png in resource files
-                                      KEY_DISP_SECSIZE: (self.section_size_1.designation,self.sec_profile),                                      KEY_DISP_MATERIAL: self.section_size_1.material,
-                                      KEY_DISP_FU: self.section_size_1.fu,
-                                      KEY_DISP_FY: self.section_size_1.fy,
-                                      'Mass': self.section_size_1.mass,
-                                      'Area(mm2) - A': round((self.section_size_1.area),2),
-                                      'A(mm)': self.section_size_1.max_leg,
-                                      'B(mm)': self.section_size_1.min_leg,
-                                      't(mm)': self.section_size_1.thickness,
-                                      'R1(mm)': self.section_size_1.root_radius,
-                                      'R2(mm)': self.section_size_1.toe_radius,
-                                      'Cy(mm)': round(self.section_size_1.Cy,2),
-                                      'Cz(mm)': self.section_size_1.Cz,
-                                      'Iz(mm4)': self.section_size_1.mom_inertia_z,
-                                      'Iy(mm4)': self.section_size_1.mom_inertia_y,
-                                      'Iu(mm4)': self.section_size_1.mom_inertia_u,
-                                      'Iv(mm4)': self.section_size_1.mom_inertia_v,
-                                      'rz(mm)': round(self.section_size_1.rad_of_gy_z,2),
-                                      'ry(mm)': round((self.section_size_1.rad_of_gy_y),2),
-                                      'ru(mm)': round((self.section_size_1.rad_of_gy_u),2),
-                                      'rv(mm)': round((self.section_size_1.rad_of_gy_v),2),
-                                      'Zz(mm3)': self.section_size_1.elast_sec_mod_z,
-                                      'Zy(mm3)': self.section_size_1.elast_sec_mod_y,
-                                      'Zpz(mm3)': self.section_size_1.plast_sec_mod_z,
-                                      'Zpy(mm3)': self.section_size_1.elast_sec_mod_y}
+                                      KEY_DISP_SECSIZE: (self.section_size_1.designation, self.sec_profile),
+                                      KEY_DISP_MATERIAL: self.section_size_1.material,
+                                      KEY_DISP_FU: round(self.section_size_1.fu, 2),
+                                      KEY_DISP_FY: round(self.section_size_1.fy, 2),
+                                      'Mass': round(self.section_size_1.mass, 2),
+                                      'Area(mm2) - A': round((self.section_size_1.area), 2),
+                                      'A(mm)': round(self.section_size_1.max_leg, 2),
+                                      'B(mm)': round(self.section_size_1.min_leg, 2),
+                                      't(mm)': round(self.section_size_1.thickness, 2),
+                                      'R1(mm)': round(self.section_size_1.root_radius, 2),
+                                      'R2(mm)': round(self.section_size_1.toe_radius, 2),
+                                      'Cy(mm)': round(self.section_size_1.Cy, 2),
+                                      'Cz(mm)': round(self.section_size_1.Cz, 2),
+                                      'Iz(mm4)': round(self.section_size_1.mom_inertia_z, 2),
+                                      'Iy(mm4)': round(self.section_size_1.mom_inertia_y, 2),
+                                      'Iu(mm4)': round(self.section_size_1.mom_inertia_u, 2),
+                                      'Iv(mm4)': round(self.section_size_1.mom_inertia_v, 2),
+                                      'rz(mm)': round(self.section_size_1.rad_of_gy_z, 2),
+                                      'ry(mm)': round((self.section_size_1.rad_of_gy_y), 2),
+                                      'ru(mm)': round((self.section_size_1.rad_of_gy_u), 2),
+                                      'rv(mm)': round((self.section_size_1.rad_of_gy_v), 2),
+                                      'Zz(mm3)': round(self.section_size_1.elast_sec_mod_z, 2),
+                                      'Zy(mm3)': round(self.section_size_1.elast_sec_mod_y, 2),
+                                      'Zpz(mm3)': round(self.section_size_1.plast_sec_mod_z, 2),
+                                      'Zpy(mm3)': round(self.section_size_1.elast_sec_mod_y, 2),
+                                      'r(mm3)': round(self.section_size_1.min_radius_gyration, 2)}
 
 
         self.report_input = \
             {KEY_MODULE: self.module,
              KEY_DISP_AXIAL: self.load.axial_force,
              KEY_DISP_LENGTH: self.length,
-             "Section": "TITLE",
-             "Section Details":self.report_supporting,
+             # "Section": "TITLE",
+             "Selected Section Details": self.report_supporting,
              # "Supported Section Details": "TITLE",
              # "Beam Details": r'/ResourceFiles/images/ColumnsBeams".png',
+             KEY_DISP_SECSIZE: str(self.sizelist),
              "Weld Details": "TITLE",
              KEY_DISP_DP_WELD_TYPE: "Fillet",
              KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
-             KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
+             KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu,
+             "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
+             KEY_DISP_GAMMA_M0: gamma(1.1, "m0"),
+             KEY_DISP_GAMMA_M1: gamma(1.25, "m1"),
+             KEY_DISP_GAMMA_MW: gamma(gamma_mw, "mw")}
+
 
 
 
@@ -1751,22 +1808,29 @@ class Tension_welded(Main):
         else:
             pass
 
+        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
+        self.report_check.append(t1)
 
-        t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{5cm}|p{7.5cm}|p{1cm}|')
+        t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
         self.report_check.append(t1)
         t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(self.section_size_1.area,self.section_size_1.fy,gamma_m0,member_yield_kn,multiple), '')
         self.report_check.append(t2)
         t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',member_rupture_prov(self.A_nc,self.A_go,self.section_size_1.fu, self.section_size_1.fy, self.L_c,self.w,self.b_s, self.t,gamma_m0,gamma_m1,self.section_size_1.beta,member_rupture_kn,multiple), '')
         self.report_check.append(t3)
-        # t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '',blockshear_prov(Tdb= member_blockshear_kn), '')
-        # self.report_check.append(t4)
-        t8 = (KEY_DISP_TENSION_CAPACITY, '', tensile_capacity_prov(member_yield_kn, member_rupture_kn),get_pass_fail(self.load.axial_force,self.section_size_1.tension_capacity, relation="lesser"))
+        t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(member_yield_kn, member_rupture_kn),get_pass_fail(self.load.axial_force,self.section_size_1.tension_capacity, relation="lesser"))
         self.report_check.append(t8)
         t5 = (KEY_DISP_SLENDER, slenderness_req(), slenderness_prov( 1, self.length,round(self.section_size_1.min_radius_gyration,2), self.section_size_1.slenderness), '')
         self.report_check.append(t5)
         t6 = (KEY_DISP_EFFICIENCY, efficiency_req(),
               efficiency_prov(self.load.axial_force, self.section_size_1.tension_capacity, self.efficiency), '')
         self.report_check.append(t6)
+        t1 = (KEY_DISP_AXIAL_FORCE_CON,
+              axial_capacity_req(axial_capacity=round((self.section_size_1.tension_yielding_capacity / 1000), 2),
+                                 min_ac=round(((0.3 * self.section_size_1.tension_yielding_capacity) / 1000), 2)),
+              display_prov(round((self.res_force / 1000), 2), "A"),
+              min_prov_max(round(((0.3 * self.section_size_1.tension_yielding_capacity) / 1000), 2),
+                           self.res_force / 1000, round((self.section_size_1.tension_yielding_capacity / 1000), 2)))
+        self.report_check.append(t1)
 
         t7 = ('SubSection', 'Weld Checks', '|p{3cm}|p{7cm}|p{5cm}|p{1cm}|')
         self.report_check.append(t7)
@@ -1791,7 +1855,7 @@ class Tension_welded(Main):
 
         Ip_weld = 0.0
         weld_conn_plates_fu = [self.section_size_1.fu, self.plate.fu]
-        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.weld.fabrication]
+
         # t1 = (DISP_WELD_STRENGTH, weld_strength_req(V=0.0, A=self.res_force,
         #                                             M=0.0, Ip_w=0.0,
         #                                             y_max=0.0, x_max=0.0,
@@ -1818,14 +1882,14 @@ class Tension_welded(Main):
 
         self.clearance =  max((4 * self.weld.size),30)
         if self.sec_profile in ["Channels", 'Back to Back Channels']:
-            t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
+            t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                   tension_yield_prov(l = self.section_size_1.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), '')
             t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_welded_prov(self.section_size_1.depth, self.plate.thickness_provided,self.plate.fu, gamma_m1,plate_rupture_kn), '')
 
         elif self.sec_profile in ["Angles", 'Back to Back Angles']:
             if self.loc == "Long Leg":
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT, '',
+                t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '',
                       gusset_ht_prov(self.section_size_1.max_leg, self.clearance, self.plate.height, 1), "")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
@@ -1835,7 +1899,7 @@ class Tension_welded(Main):
                                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
             else:
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht_prov(self.section_size_1.min_leg, self.clearance,self.plate.height,1),"")
+                t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(self.section_size_1.min_leg, self.clearance,self.plate.height,1),"")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=self.section_size_1.min_leg, t=self.plate.thickness_provided,
                                          f_y=self.plate.fy,
@@ -1846,7 +1910,7 @@ class Tension_welded(Main):
 
         else:
             if self.loc == "Long Leg":
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT,'',gusset_ht_prov(2*self.section_size_1.max_leg, self.clearance,self.plate.height,1),"")
+                t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(2*self.section_size_1.max_leg, self.clearance,self.plate.height,1),"")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=2*self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
                                          gamma=gamma_m0, T_dg=plate_yield_kn), '')
@@ -1855,7 +1919,7 @@ class Tension_welded(Main):
                                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
             else:
-                t3 = (KEY_OUT_DISP_PLATE_HEIGHT, '',
+                t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '',
                       gusset_ht_prov(2*self.section_size_1.min_leg, self.clearance, self.plate.height, 1), "")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l=2*self.section_size_1.min_leg, t=self.plate.thickness_provided,
@@ -1866,9 +1930,12 @@ class Tension_welded(Main):
                                                   self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
         self.report_check.append(t3)
-        t4 = (KEY_OUT_DISP_PLATE_LENGTH, '',
+        t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, '',
               gusset_lt_w_prov(self.flange_weld, self.clearance,self.plate.length), "")
         self.report_check.append(t4)
+
+        t5 = (KEY_OUT_DISP_PLATETHK_REP, '', display_prov(self.plate.thickness_provided, "t_p"), "")
+        self.report_check.append(t5)
 
         self.report_check.append(t2)
         self.report_check.append(t1)
@@ -1877,8 +1944,8 @@ class Tension_welded(Main):
         self.report_check.append(t4)
 
         t8 = (
-        KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
-        get_pass_fail(self.load.axial_force, self.plate_tension_capacity, relation="lesser"))
+        KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
+        get_pass_fail(round((self.res_force/1000),2), self.plate_tension_capacity, relation="lesser"))
         self.report_check.append(t8)
 
         Disp_3D_image = "/ResourceFiles/images/3d.png"

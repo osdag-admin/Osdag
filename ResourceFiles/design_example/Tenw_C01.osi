@@ -4,8 +4,8 @@ Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
-DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
-etailing.Gap: '10'
+Detailing.Edge_type: a - Sheared or hand flame cut
+Detailing.Gap: '10'
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '410'
 Member.Length: '2500'

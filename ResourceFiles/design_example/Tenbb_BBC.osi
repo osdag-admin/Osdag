@@ -18,19 +18,6 @@ Bolt.Grade:
 - '12.9'
 Bolt.Type: Bearing Bolt
 Conn_Location: Web
-<<<<<<< HEAD:ResourceFiles/design_example/Tenbb_BBC.osi
-DesignPreferences.Bolt.Bolt_Hole_Type: Standard
-DesignPreferences.Bolt.Material_Grade_OverWrite: '410'
-DesignPreferences.Bolt.Slip_Factor: '0.3'
-DesignPreferences.Design.Design_Method: Limit State Design
-DesignPreferences.Detailing.Corrosive_Influences: 'No'
-DesignPreferences.Detailing.Edge_type: a - Sheared or hand flame cut
-DesignPreferences.Detailing.Gap: '10'
-DesignPreferences.Weld.Fab: Shop Weld
-DesignPreferences.Weld.Material_Grade_OverWrite: '410'
-Length(mm): '10000'
-Load.Axial: '2000'
-=======
 Bolt.Bolt_Hole_Type: Standard
 Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
@@ -40,9 +27,8 @@ Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '410'
-Member.Length: '4000'
-Load.Axial: '600'
->>>>>>> e760e8f14a604c814a44be3983d33d24080f9354:ResourceFiles/design_example/Tension_BB C bear.osi
+Member.Length: '10000'
+Load.Axial: '2000'
 Member.Material: E 250 (Fe 410 W)A
 Member.Profile: Back to Back Channels
 Module: Tension Members Bolted Design

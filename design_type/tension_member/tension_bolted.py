@@ -1,12 +1,9 @@
-from design_type.connection.shear_connection import ShearConnection
-from utils.common.component import Bolt, Plate, Weld
 # from gui.ui_summary_popup import Ui_Dialog
 from design_report.reportGenerator_latex import CreateLatex
 
 from utils.common.component import *
 # from cad.common_logic import CommonDesignLogic
 from utils.common.material import *
-from Common import *
 from Report_functions import *
 from utils.common.load import Load
 
@@ -14,17 +11,199 @@ from utils.common.load import Load
 import logging
 
 
-from main import Main
+from design_type.main import Main
+from design_type.member import Member
 
 
 
-class Tension_bolted(Main):
+class Tension_bolted(Member):
 
     def __init__(self):
         super(Tension_bolted, self).__init__()
-
-
         self.design_status = False
+
+    ###############################################
+    # Design Preference Functions Start
+    ###############################################
+
+    def tab_list(self):
+        """
+
+        :return: This function returns the list of tuples. Each tuple will create a tab in design preferences, in the
+        order they are appended. Format of the Tuple is:
+        [Tab Title, Type of Tab, function for tab content)
+        Tab Title : Text which is displayed as Title of Tab,
+        Type of Tab: There are Three types of tab layouts.
+            Type_TAB_1: This have "Add", "Clear", "Download xlsx file" "Import xlsx file"
+            TYPE_TAB_2: This contains a Text box for side note.
+            TYPE_TAB_3: This is plain layout
+        function for tab content: All the values like labels, input widgets can be passed as list of tuples,
+        which will be displayed in chosen tab layout
+
+        """
+        tabs = []
+
+        t1 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_angle_section)
+        tabs.append(t1)
+
+        t2 = (DISP_TITLE_CHANNEL, TYPE_TAB_1, self.tab_channel_section)
+        tabs.append(t2)
+
+        t6 = ("Connector", TYPE_TAB_2, self.plate_connector_values)
+        tabs.append(t6)
+
+        t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t3)
+
+        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t4)
+
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t5)
+
+        return tabs
+
+    def tab_value_changed(self):
+        """
+
+        :return: This function is used to update the values of the keys in design preferences,
+         which are dependent on other inputs.
+         It returns list of tuple which contains, tab name, keys whose values will be changed,
+         function to change the values and arguments for the function.
+
+         [Tab Name, [Argument list], [list of keys to be updated], input widget type of keys, change_function]
+
+         Here Argument list should have only one element.
+         Changing of this element,(either changing index or text depending on widget type),
+         will update the list of keys (this can be more than one).
+
+         """
+        change_tab = []
+
+        t1 = (DISP_TITLE_ANGLE, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_section)
+        change_tab.append(t1)
+
+        t2 = (DISP_TITLE_CHANNEL, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_section)
+        change_tab.append(t2)
+
+        t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
+                                                      KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
+        change_tab.append(t3)
+
+        t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_3'],
+              ['Label_7','Label_8','Label_9', 'Label_10','Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
+               'Label_16', 'Label_17', 'Label_18','Label_19', 'Label_20','Label_21', 'Label_22'],
+              TYPE_TEXTBOX, self.get_Angle_sec_properties)
+        change_tab.append(t5)
+
+        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+              [KEY_SECSIZE_SELECTED, KEY_SEC_FY,KEY_SEC_FU,'Label_1', 'Label_3', 'Label_4', 'Label_5','Label_7','Label_8','Label_9',
+               'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX, self.get_new_angle_section_properties)
+        change_tab.append(t6)
+
+        t5 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13'],
+              ['Label_9', 'Label_10','Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
+               'Label_19', 'Label_20', 'Label_21', 'Label_22'], TYPE_TEXTBOX, self.get_Channel_sec_properties)
+        change_tab.append(t5)
+
+        t6 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+              [KEY_SECSIZE_SELECTED, KEY_SEC_FY,KEY_SEC_FU,'Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14','Label_4', 'Label_5',
+               'Label_9', 'Label_10','Label_11', 'Label_12', 'Label_15', 'Label_16','Label_17',
+               'Label_19', 'Label_20','Label_21',
+               'Label_22', 'Label_23'], TYPE_TEXTBOX, self.get_new_channel_section_properties)
+        change_tab.append(t6)
+
+        return change_tab
+
+    def input_dictionary_design_pref(self):
+        """
+
+        :return: This function is used to choose values of design preferences to be saved to design dictionary.
+
+         It returns list of tuple which contains, tab name, input widget type of keys, keys whose values to be saved,
+
+         [(Tab Name, input widget type of keys, [List of keys to be saved])]
+
+         """
+        design_input = []
+
+        t2 = (DISP_TITLE_ANGLE, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
+        design_input.append(t2)
+
+        t2 = (DISP_TITLE_CHANNEL, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
+        design_input.append(t2)
+
+        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        design_input.append(t3)
+
+        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
+        design_input.append(t3)
+
+        # t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
+        # design_input.append(t4)
+        #
+        # t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
+        # design_input.append(t4)
+        #
+        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        design_input.append(t5)
+
+        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_CORROSIVE_INFLUENCES,KEY_DP_DETAILING_EDGE_TYPE])
+        design_input.append(t5)
+
+        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
+        design_input.append(t6)
+
+        t7 = ("Connector", TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
+        design_input.append(t7)
+        #
+        return design_input
+
+    def input_dictionary_without_design_pref(self):
+        """
+
+        :return: Returns list of tuples which have the design preference keys to be stored if user does not open
+        design preference (since deisgn preference values are saved on click of 'save' this function is necessary'
+
+        ([Key need to get default values, list of design prefernce values, source of key])
+
+        TODO: list of design preference values are sufficient in this function
+         since whole of input dock design dictionary is being passed anyway in ui template
+        """
+        design_input = []
+        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
+        design_input.append(t1)
+
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
+                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
+        design_input.append(t2)
+
+        return design_input
+
+    def refresh_input_dock(self):
+        """
+
+         :return: This function returns list of tuples which has keys that needs to be updated,
+          on changing Keys in design preference (ex: adding a new section to database should reflect in input dock)
+
+          [(Tab Name,  Input Dock Key, Input Dock Key type, design preference key, Master key, Value, Database Table Name)]
+         """
+
+        add_buttons = []
+
+        t2 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE_SELECTED, None, None, "Angles")
+        add_buttons.append(t2)
+
+        t2 = (DISP_TITLE_CHANNEL, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE_SELECTED, None, None, "Channels")
+        add_buttons.append(t2)
+
+        return add_buttons
+
+    ####################################
+    # Design Preference Functions End
+    ####################################
 
     def set_osdaglogger(key):
 
@@ -43,7 +222,6 @@ class Tension_bolted(Main):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
-
 
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
@@ -117,320 +295,6 @@ class Tension_bolted(Main):
         elif conn in ["Channels", "Back to Back Channels"]:
             return VALUES_LOCATION_2
 
-    def tab_list(self):
-
-        "Function to create design preference"
-
-        tabs = []
-
-        # t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
-        # tabs.append(t1)
-        #
-        # t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
-        # tabs.append(t2)
-
-        # t3 = (DISP_TITLE_ANGLE, TYPE_TAB_1, self.tab_angle_section)
-        # tabs.append(t3)
-
-        t4 = ("Bolt", TYPE_TAB_2, self.bolt_values)
-        tabs.append(t4)
-
-        t5 = ("Weld", TYPE_TAB_2, self.weld_values)
-        tabs.append(t5)
-
-        t6 = ("Detailing", TYPE_TAB_2, self.detailing_values)
-        tabs.append(t6)
-
-        t7 = ("Design", TYPE_TAB_2, self.design_values)
-        tabs.append(t7)
-
-        return tabs
-
-
-
-    @staticmethod
-    def tab_angle_section():
-
-        "In design preference, it shows other properties of section used "
-
-        angle_section = []
-
-        t34 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, [])
-        angle_section.append(t34)
-
-        t1 = (KEY_SUPTDSEC_DESIGNATION, KEY_DISP_SUPTDSEC_DESIGNATION, TYPE_TEXTBOX, None)
-        angle_section.append(t1)
-
-        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None)
-        angle_section.append(t2)
-
-        t3 = (KEY_SUPTDSEC_FU, KEY_DISP_SUPTDSEC_FU, TYPE_TEXTBOX, None)
-        angle_section.append(t3)
-
-        t4 = (KEY_SUPTDSEC_FY, KEY_DISP_SUPTDSEC_FY, TYPE_TEXTBOX, None)
-        angle_section.append(t4)
-
-        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None)
-        angle_section.append(t5)
-
-        t6 = (KEY_SUPTDSEC_DEPTH, KEY_DISP_SUPTDSEC_DEPTH, TYPE_TEXTBOX, None)
-        angle_section.append(t6)
-
-        t7 = (KEY_SUPTDSEC_FLANGE_W, KEY_DISP_SUPTDSEC_FLANGE_W, TYPE_TEXTBOX, None)
-        angle_section.append(t7)
-
-        t8 = (KEY_SUPTDSEC_FLANGE_T, KEY_DISP_SUPTDSEC_FLANGE_T, TYPE_TEXTBOX, None)
-        angle_section.append(t8)
-
-        t9 = (KEY_SUPTDSEC_WEB_T, KEY_DISP_SUPTDSEC_WEB_T, TYPE_TEXTBOX, None)
-        angle_section.append(t9)
-
-        t10 = (KEY_SUPTDSEC_FLANGE_S, KEY_DISP_SUPTDSEC_FLANGE_S, TYPE_TEXTBOX, None)
-        angle_section.append(t10)
-
-        t11 = (KEY_SUPTDSEC_ROOT_R, KEY_DISP_SUPTDSEC_ROOT_R, TYPE_TEXTBOX, None)
-        angle_section.append(t11)
-
-        t12 = (KEY_SUPTDSEC_TOE_R, KEY_DISP_SUPTDSEC_TOE_R, TYPE_TEXTBOX, None)
-        angle_section.append(t12)
-
-        t13 = (None, None, TYPE_BREAK, None)
-        angle_section.append(t13)
-
-        t35 = (None, None, TYPE_ENTER, None)
-        angle_section.append(t35)
-
-        t14 = (KEY_SUPTDSEC_TYPE, KEY_DISP_SUPTDSEC_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'])
-        angle_section.append(t14)
-
-        t18 = (None, None, TYPE_ENTER, None)
-        angle_section.append(t18)
-
-        t15 = (KEY_SUPTDSEC_MOD_OF_ELAST, KEY_SUPTDSEC_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None)
-        angle_section.append(t15)
-
-        t16 = (KEY_SUPTDSEC_MOD_OF_RIGID, KEY_SUPTDSEC_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None)
-        angle_section.append(t16)
-
-        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None)
-        angle_section.append(t17)
-
-        t18 = (KEY_SUPTDSEC_MASS, KEY_DISP_SUPTDSEC_MASS, TYPE_TEXTBOX, None)
-        angle_section.append(t18)
-
-        t19 = (KEY_SUPTDSEC_SEC_AREA, KEY_DISP_SUPTDSEC_SEC_AREA, TYPE_TEXTBOX, None)
-        angle_section.append(t19)
-
-        t20 = (KEY_SUPTDSEC_MOA_LZ, KEY_DISP_SUPTDSEC_MOA_LZ, TYPE_TEXTBOX, None)
-        angle_section.append(t20)
-
-        t21 = (KEY_SUPTDSEC_MOA_LY, KEY_DISP_SUPTDSEC_MOA_LY, TYPE_TEXTBOX, None)
-        angle_section.append(t21)
-
-        t22 = (KEY_SUPTDSEC_ROG_RZ, KEY_DISP_SUPTDSEC_ROG_RZ, TYPE_TEXTBOX, None)
-        angle_section.append(t22)
-
-        t23 = (KEY_SUPTDSEC_ROG_RY, KEY_DISP_SUPTDSEC_ROG_RY, TYPE_TEXTBOX, None)
-        angle_section.append(t23)
-
-        t24 = (KEY_SUPTDSEC_EM_ZZ, KEY_DISP_SUPTDSEC_EM_ZZ, TYPE_TEXTBOX, None)
-        angle_section.append(t24)
-
-        t25 = (KEY_SUPTDSEC_EM_ZY, KEY_DISP_SUPTDSEC_EM_ZY, TYPE_TEXTBOX, None)
-        angle_section.append(t25)
-
-        t26 = (KEY_SUPTDSEC_PM_ZPZ, KEY_DISP_SUPTDSEC_PM_ZPZ, TYPE_TEXTBOX, None)
-        angle_section.append(t26)
-
-        t27 = (KEY_SUPTDSEC_PM_ZPY, KEY_DISP_SUPTDSEC_PM_ZPY, TYPE_TEXTBOX, None)
-        angle_section.append(t27)
-
-        t28 = (None, None, TYPE_BREAK, None)
-        angle_section.append(t28)
-
-        t36 = (None, None, TYPE_ENTER, None)
-        angle_section.append(t36)
-
-        t29 = (KEY_SUPTDSEC_SOURCE, KEY_DISP_SUPTDSEC_SOURCE, TYPE_TEXTBOX, None)
-        angle_section.append(t29)
-
-        t30 = (None, None, TYPE_ENTER, None)
-        angle_section.append(t30)
-
-        t31 = (KEY_SUPTDSEC_POISSON_RATIO, KEY_DISP_SUPTDSEC_POISSON_RATIO, TYPE_TEXTBOX, None)
-        angle_section.append(t31)
-
-        t32 = (KEY_SUPTDSEC_THERMAL_EXP, KEY_DISP_SUPTDSEC_THERMAL_EXP, TYPE_TEXTBOX, None)
-        angle_section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
-        angle_section.append(t33)
-
-        return angle_section
-
-    def bolt_values(self, input_dictionary):
-
-        "In design preference, it shows other properties of bolt used "
-
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_MATERIAL]]:
-            material_g_o = ''
-        else:
-            material_g_o = Material(input_dictionary[KEY_MATERIAL]).fu
-
-        bolt = []
-
-        t1 = (KEY_DP_BOLT_TYPE, KEY_DISP_TYP, TYPE_COMBOBOX, ['Pretensioned', 'Non-pretensioned'], 'Pretensioned')
-        bolt.append(t1)
-
-        t2 = (KEY_DP_BOLT_HOLE_TYPE, KEY_DISP_DP_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'], 'Standard')
-        bolt.append(t2)
-
-        t3 = (KEY_DP_BOLT_MATERIAL_G_O, KEY_DISP_DP_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None, material_g_o)
-        bolt.append(t3)
-
-        t4 = (None, None, TYPE_ENTER, None, None)
-        bolt.append(t4)
-
-        t5 = (None, KEY_DISP_DP_BOLT_DESIGN_PARA, TYPE_TITLE, None, None)
-        bolt.append(t5)
-
-        t6 = (KEY_DP_BOLT_SLIP_FACTOR, KEY_DISP_DP_BOLT_SLIP_FACTOR, TYPE_COMBOBOX,
-              ['0.2', '0.5', '0.1', '0.25', '0.3', '0.33', '0.48', '0.52', '0.55'], '0.3')
-        bolt.append(t6)
-
-        t7 = (None, None, TYPE_ENTER, None, None)
-        bolt.append(t7)
-
-        t8 = (None, "NOTE : If slip is permitted under the design load, design the bolt as"
-                    "<br>a bearing bolt and select corresponding bolt grade.", TYPE_NOTE, None, None)
-        bolt.append(t8)
-
-        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, BOLT_DESCRIPTION, None)
-        bolt.append(t9)
-
-        return bolt
-
-    def weld_values(self, input_dictionary):
-
-        "In design preference, it shows other properties of weld used "
-
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_MATERIAL]]:
-            material_g_o = ''
-        else:
-            material_g_o = Material(input_dictionary[KEY_MATERIAL]).fu
-
-        weld = []
-
-        t1 = (KEY_DP_WELD_FAB, KEY_DISP_DP_WELD_FAB, TYPE_COMBOBOX, KEY_DP_WELD_FAB_VALUES, KEY_DP_WELD_FAB_SHOP)
-        weld.append(t1)
-
-        t2 = (KEY_DP_WELD_MATERIAL_G_O, KEY_DISP_DP_WELD_MATERIAL_G_O, TYPE_TEXTBOX, None, material_g_o)
-        weld.append(t2)
-
-        t3 = ("textBrowser", "", TYPE_TEXT_BROWSER, WELD_DESCRIPTION, None)
-        weld.append(t3)
-
-        return weld
-
-    def detailing_values(self, input_dictionary):
-        detailing = []
-
-        t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX,
-              ['a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'],
-              'a - Sheared or hand flame cut')
-        detailing.append(t1)
-
-        t2 = (KEY_DP_DETAILING_GAP, KEY_DISP_DP_DETAILING_GAP, TYPE_TEXTBOX, None, '10')
-        detailing.append(t2)
-
-        t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
-              ['No', 'Yes'], 'No')
-        detailing.append(t3)
-
-        t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION, None)
-        detailing.append(t4)
-
-        return detailing
-
-    def design_values(self, input_dictionary):
-
-        design = []
-
-        t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX,
-              ['Limit State Design', 'Limit State (Capacity based) Design', 'Working Stress Design'],
-              'Limit State Design')
-        design.append(t1)
-
-        return design
-
-    def tab_value_changed(self):
-        return []
-
-    def edit_tabs(self):
-        return []
-
-    def list_for_fu_fy_validation(self):
-        return []
-
-    def refresh_input_dock(self):
-        return []
-
-    def input_dictionary_design_pref(self):
-
-        design_input = []
-
-        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
-        design_input.append(t3)
-
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
-        design_input.append(t3)
-
-        t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
-        design_input.append(t4)
-
-        t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
-        design_input.append(t4)
-
-        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
-        design_input.append(t5)
-
-        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
-        design_input.append(t5)
-
-        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
-        design_input.append(t6)
-
-        return design_input
-
-    def input_dictionary_without_design_pref(self):
-
-        design_input = []
-
-        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
-                     KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
-                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD], '')
-        design_input.append(t2)
-
-        return design_input
-
-    def get_values_for_design_pref(self, key, design_dictionary):
-
-        fu = Material(design_dictionary[KEY_MATERIAL]).fu
-
-        val = {KEY_DP_BOLT_TYPE: "Pretensioned",
-               KEY_DP_BOLT_HOLE_TYPE: "Standard",
-               KEY_DP_BOLT_MATERIAL_G_O: str(fu),
-               KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
-               KEY_DP_WELD_MATERIAL_G_O: str(fu),
-               KEY_DP_DETAILING_EDGE_TYPE: "a - Sheared or hand flame cut",
-               KEY_DP_DETAILING_GAP: '10',
-               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
-               KEY_DP_DESIGN_METHOD: "Limit State Design",
-               KEY_PLATE_MATERIAL: str(design_dictionary[KEY_MATERIAL])
-               }[key]
-
-        return val
 
     def input_values(self, existingvalues={}):
 
@@ -878,12 +742,11 @@ class Tension_bolted(Main):
         self.K = 1
 
         self.plate = Plate(thickness=self.plate_thickness,
-                           material_grade=design_dictionary[KEY_MATERIAL])
+                           material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
 
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
                          bolt_type=design_dictionary[KEY_TYP],
                          bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
-                         material_grade=design_dictionary[KEY_MATERIAL],
                          edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
                          mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
@@ -905,9 +768,9 @@ class Tension_bolted(Main):
         "selecting components class based on the section passed "
 
         if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Back to Back Angles', 'Star Angles']:
-            self.section_size = Angle(designation=selectedsize, material_grade=design_dictionary[KEY_MATERIAL])
+            self.section_size = Angle(designation=selectedsize, material_grade=design_dictionary[KEY_SEC_MATERIAL])
         elif design_dictionary[KEY_SEC_PROFILE] in ['Channels', 'Back to Back Channels']:
-            self.section_size = Channel(designation=selectedsize, material_grade=design_dictionary[KEY_MATERIAL])
+            self.section_size = Channel(designation=selectedsize, material_grade=design_dictionary[KEY_SEC_MATERIAL])
         else:
             pass
 
@@ -919,10 +782,10 @@ class Tension_bolted(Main):
         sec_area = {}
         for section in sizelist:
             if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Back to Back Angles', 'Star Angles']:
-                self.section = Angle(designation=section, material_grade=design_dictionary[KEY_MATERIAL])
+                self.section = Angle(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
                 sec_area[self.section.designation] = self.section.area
             elif design_dictionary[KEY_SEC_PROFILE] in ['Channels', 'Back to Back Channels']:
-                self.section = Channel(designation=section, material_grade=design_dictionary[KEY_MATERIAL])
+                self.section = Channel(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
                 sec_area[self.section.designation] = self.section.area
         print(sec_area)
         self.max = max(sec_area, key=sec_area.get)
@@ -936,7 +799,7 @@ class Tension_bolted(Main):
 
         if design_dictionary[KEY_SEC_PROFILE] == 'Angles':
             # print (Angle)
-            self.section_size_max = Angle(designation = max_section, material_grade=design_dictionary[KEY_MATERIAL])
+            self.section_size_max = Angle(designation = max_section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
             self.section_size_max.tension_member_yielding(A_g = (self.section_size_max.area) , F_y = self.section_size_max.fy)
             self.max_member_force = self.section_size_max.tension_yielding_capacity
             self.section_size_max.min_rad_gyration_calc(key = design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],mom_inertia_y = 0.0 ,mom_inertia_z = 0.0 ,rad_y = self.section_size_max.rad_of_gy_y , rad_z = self.section_size_max.rad_of_gy_z, rad_u =self.section_size_max.rad_of_gy_u, rad_v=self.section_size_max.rad_of_gy_v, area = self.section_size_max.area,Cg_1= 0.0,Cg_2= 0.0,thickness=0.0)
@@ -946,7 +809,7 @@ class Tension_bolted(Main):
 
 
         elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
-            self.section_size_max = Angle(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+            self.section_size_max = Angle(designation=max_section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
             self.section_size_max.tension_member_yielding(A_g=(self.section_size_max.area),
                                                           F_y=self.section_size_max.fy)
             self.max_member_force = self.section_size_max.tension_yielding_capacity * 2
@@ -963,7 +826,7 @@ class Tension_bolted(Main):
 
 
         elif design_dictionary[KEY_SEC_PROFILE] == 'Channels':
-            self.section_size_max = Channel(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+            self.section_size_max = Channel(designation=max_section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
             self.section_size_max.tension_member_yielding(A_g = (self.section_size_max.area) , F_y = self.section_size_max.fy)
             self.max_member_force = self.section_size_max.tension_yielding_capacity
             self.section_size_max.min_rad_gyration_calc(key = design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],mom_inertia_y = self.section_size_max.mom_inertia_y,mom_inertia_z = self.section_size_max.mom_inertia_z,rad_y = self.section_size_max.rad_of_gy_y , rad_z = self.section_size_max.rad_of_gy_z,area = self.section_size_max.area,Cg_1 = self.section_size_max.Cy, Cg_2=0.0,thickness=0.0)
@@ -973,7 +836,7 @@ class Tension_bolted(Main):
 
 
         elif design_dictionary[KEY_SEC_PROFILE] ==  'Back to Back Channels':
-            self.section_size_max = Channel(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+            self.section_size_max = Channel(designation=max_section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
             self.section_size_max.tension_member_yielding(A_g = (self.section_size_max.area) , F_y = self.section_size_max.fy)
             self.max_member_force  = 2 * self.section_size_max.tension_yielding_capacity
             self.section_size_max.min_rad_gyration_calc(key = design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],mom_inertia_y = self.section_size_max.mom_inertia_y,mom_inertia_z = self.section_size_max.mom_inertia_z,rad_y = self.section_size_max.rad_of_gy_y , rad_z = self.section_size_max.rad_of_gy_z,area = self.section_size_max.area,Cg_1 = self.section_size_max.Cy, Cg_2=0.0,thickness=0.0)

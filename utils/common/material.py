@@ -14,7 +14,7 @@ class Material(object):
         self.fy_40 = 0.0
         self.fu = 0.0
         self.fy = 0.0
-        if material_grade not in ["Select Section", "Custom"] and "Custom" not in material_grade:
+        if material_grade not in ["Select Material", "Custom"] and "Custom" not in material_grade:
             self.connect_to_database_to_get_fy_fu(grade=material_grade, thickness=thickness)
             self.material=material_grade
         if material_grade.split(" ")[0] == "Custom":
@@ -41,13 +41,15 @@ class Material(object):
         self.fy_20 = row[1]
         self.fy_20_40 = row[2]
         self.fy_40 = row[3]
-        if thickness <= 20:
-            self.fy = self.fy_20
-        elif 20 < thickness <=40:
-            self.fy = self.fy_20_40
+        if thickness != '':
+            if thickness <= 20:
+                self.fy = self.fy_20
+            elif 20 < thickness <=40:
+                self.fy = self.fy_20_40
+            else:
+                self.fy = self.fy_40
         else:
-            self.fy = self.fy_40
-        # self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
+            self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
         self.fu = row[4]
         conn.close()
 

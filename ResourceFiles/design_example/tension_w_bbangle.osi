@@ -1,31 +1,11 @@
-Bolt.Bolt_Hole_Type: Standard
-Bolt.Diameter:
-- '16'
-- '20'
-- '24'
-- '30'
-- '36'
-Bolt.Grade:
-- '3.6'
-- '4.6'
-- '4.8'
-- '5.6'
-- '5.8'
-- '6.8'
-- '8.8'
-- '9.8'
-- '10.9'
-- '12.9'
-Bolt.Material_Grade_OverWrite: '410'
-Bolt.Slip_Factor: '0.3'
-Bolt.TensionType: Pretensioned
-Bolt.Type: Friction Grip Bolt
 Conn_Location: Long Leg
+Connector.Material: E 300 (Fe 440)
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
-Load.Axial: '1000'
+Load.Axial: '500'
+Material: E 450 (Fe 570)D
 Member.Designation:
 - 20 20 X 3
 - 20 20 X 4
@@ -104,12 +84,6 @@ Member.Designation:
 - 130 130 X 10
 - 130 130 X 12
 - 130 130 X 16
-- 150 150 X 10
-- 150 150 X 12
-- 150 150 X 15
-- 150 150 X 16
-- 150 150 X 18
-- 150 150 X 20
 - 150 150 X 10
 - 150 150 X 12
 - 150 150 X 15
@@ -251,9 +225,9 @@ Member.Designation:
 - 200 150 X 16
 - 200 150 X 18
 - 200 150 X 20
-Member.Length: '7500'
-Member.Material: E 250 (Fe 410 W)A
+Member.Length: '1000'
+Member.Material: E 450 (Fe 570)D
 Member.Profile: Back to Back Angles
-Module: Tension Members Bolted Design
+Module: Tension Members Welded Design
 Weld.Fab: Shop Weld
-Weld.Material_Grade_OverWrite: '410'
+Weld.Material_Grade_OverWrite: '570'

@@ -1,157 +1,374 @@
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column
-from utils.common.load import Load
 from utils.common.component import Section,I_sectional_Properties, Material
-from main import Main
+from design_type.main import Main
 from Common import *
 
 
 class Connection(Main):
 
-    def bolt_values(self, input_dictionary):
+    ########################################
+    # Design Preference Functions Start
+    ########################################
 
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_MATERIAL]]:
-            material_g_o = ''
-        else:
-            material_g_o = Material(input_dictionary[KEY_MATERIAL]).fu
+    def tab_supporting_section(self, input_dictionary):
 
-        bolt = []
+        "In design preference, it shows other properties of section used "
 
-        t1 = (KEY_DP_BOLT_TYPE, KEY_DISP_TYP, TYPE_COMBOBOX, ['Pretensioned', 'Non-pretensioned'], 'Pretensioned')
-        bolt.append(t1)
-
-        t2 = (KEY_DP_BOLT_HOLE_TYPE, KEY_DISP_DP_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'], 'Standard')
-        bolt.append(t2)
-
-        t3 = (KEY_DP_BOLT_MATERIAL_G_O, KEY_DISP_DP_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None, material_g_o)
-        bolt.append(t3)
-
-        t4 = (None, None, TYPE_ENTER, None, None)
-        bolt.append(t4)
-
-        t5 = (None, KEY_DISP_DP_BOLT_DESIGN_PARA, TYPE_TITLE, None, None)
-        bolt.append(t5)
-
-        t6 = (KEY_DP_BOLT_SLIP_FACTOR, KEY_DISP_DP_BOLT_SLIP_FACTOR, TYPE_COMBOBOX,
-              ['0.2', '0.5', '0.1', '0.25', '0.3', '0.33', '0.48', '0.52', '0.55'], '0.3')
-        bolt.append(t6)
-
-        t7 = (None, None, TYPE_ENTER, None, None)
-        bolt.append(t7)
-
-        t8 = (None, "NOTE : If slip is permitted under the design load, design the bolt as"
-                    "<br>a bearing bolt and select corresponding bolt grade.", TYPE_NOTE, None, None)
-        bolt.append(t8)
-
-        t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, BOLT_DESCRIPTION, None)
-        bolt.append(t9)
-
-        return bolt
-
-    def weld_values(self, input_dictionary):
-
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_MATERIAL]]:
-            material_g_o = ''
-        else:
-            material_g_o = Material(input_dictionary[KEY_MATERIAL]).fu
-
-        weld = []
-
-        t1 = (KEY_DP_WELD_FAB, KEY_DISP_DP_WELD_FAB, TYPE_COMBOBOX, KEY_DP_WELD_FAB_VALUES, KEY_DP_WELD_FAB_SHOP)
-        weld.append(t1)
-
-        t2 = (KEY_DP_WELD_MATERIAL_G_O, KEY_DISP_DP_WELD_MATERIAL_G_O, TYPE_TEXTBOX, None, material_g_o)
-        weld.append(t2)
-
-        t3 = ("textBrowser", "", TYPE_TEXT_BROWSER, WELD_DESCRIPTION, None)
-        weld.append(t3)
-
-        return weld
-
-    def detailing_values(self, input_dictionary):
-
-        detailing = []
-
-        t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX,
-              ['a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'],
-              'a - Sheared or hand flame cut')
-        detailing.append(t1)
-
-        t2 = (KEY_DP_DETAILING_GAP, KEY_DISP_DP_DETAILING_GAP, TYPE_TEXTBOX, None, '10')
-        detailing.append(t2)
-
-        t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
-              ['No', 'Yes'], 'No')
-        detailing.append(t3)
-
-        t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION, None)
-        detailing.append(t4)
-
-        return detailing
-
-    def design_values(self, input_dictionary):
-
-        design = []
-
-        t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX,
-              ['Limit State Design', 'Limit State (Capacity based) Design', 'Working Stress Design'],
-              'Limit State Design')
-        design.append(t1)
-
-        return design
-
-    def connector_values(self, input_dictionary):
-
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_MATERIAL]]:
-            material_grade = 'Custom'
+        if not input_dictionary or input_dictionary[KEY_SUPTNGSEC] == 'Select Section' or input_dictionary[
+            KEY_MATERIAL] == 'Select Material':
+            designation = ''
+            material_grade = ''
+            source = ''
             fu = ''
             fy = ''
-        else:
-            material_grade = input_dictionary[KEY_MATERIAL]
-            material_attributes = Material(material_grade)
-            fu = material_attributes.fu
-            fy = material_attributes.fy
+            depth = ''
+            flange_width = ''
+            flange_thickness = ''
+            web_thickness = ''
+            flange_slope = ''
+            root_radius = ''
+            toe_radius = ''
+            m_o_e = "200"
+            m_o_r = "76.9"
+            p_r = "0.3"
+            t_e = "12"
+            mass = ''
+            area = ''
+            mom_inertia_z = ''
+            mom_inertia_y = ''
+            rad_of_gy_z = ''
+            rad_of_gy_y = ''
+            elast_sec_mod_z = ''
+            elast_sec_mod_y = ''
+            plast_sec_mod_z = ''
+            plast_sec_mod_y = ''
 
-        connector = []
+        else:
+            designation = str(input_dictionary[KEY_SUPTNGSEC])
+            material_grade = str(input_dictionary[KEY_MATERIAL])
+            I_sec_attributes = Section(designation, material_grade)
+            table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
+            Section.connect_to_database_update_other_attributes(I_sec_attributes, table, designation,material_grade)
+            source = str(I_sec_attributes.source)
+            fu = str(I_sec_attributes.fu)
+            fy = str(I_sec_attributes.fy)
+            depth = str(I_sec_attributes.depth)
+            flange_width = str(I_sec_attributes.flange_width)
+            flange_thickness = str(I_sec_attributes.flange_thickness)
+            web_thickness = str(I_sec_attributes.web_thickness)
+            flange_slope = str(I_sec_attributes.flange_slope)
+            root_radius = str(I_sec_attributes.root_radius)
+            toe_radius = str(I_sec_attributes.toe_radius)
+            m_o_e = "200"
+            m_o_r = "76.9"
+            p_r = "0.3"
+            t_e = "12"
+            mass = str(I_sec_attributes.mass)
+            area = str(I_sec_attributes.area)
+            mom_inertia_z = str(I_sec_attributes.mom_inertia_z)
+            mom_inertia_y = str(I_sec_attributes.mom_inertia_y)
+            rad_of_gy_z = str(I_sec_attributes.rad_of_gy_z)
+            rad_of_gy_y = str(I_sec_attributes.rad_of_gy_y)
+            elast_sec_mod_z = str(I_sec_attributes.elast_sec_mod_z)
+            elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
+            plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
+            plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
+
+        supporting_section = []
+        t1 = (KEY_SUPTNGSEC, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
+        supporting_section.append(t1)
+
+        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
+        supporting_section.append(t2)
 
         material = connectdb("Material", call_type="popup")
-        t1 = (KEY_PLATE_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
-        connector.append(t1)
+        t34 = (KEY_SUPTNGSEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
+        supporting_section.append(t34)
 
-        t2 = (KEY_PLATE_FU, KEY_DISP_PLATE_FU, TYPE_TEXTBOX, None, fu)
-        connector.append(t2)
+        t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_FU, TYPE_TEXTBOX, None, fu)
+        supporting_section.append(t3)
 
-        t3 = (KEY_PLATE_FY, KEY_DISP_PLATE_FY, TYPE_TEXTBOX, None, fy)
-        connector.append(t3)
+        t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
+        supporting_section.append(t4)
 
-        return connector
+        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
+        supporting_section.append(t5)
 
+        t6 = ('Label_1', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, depth)
+        supporting_section.append(t6)
 
-    def tab_value_changed(self):
+        t7 = ('Label_2', KEY_DISP_FLANGE_W, TYPE_TEXTBOX, None, flange_width)
+        supporting_section.append(t7)
 
-        change_tab = []
+        t8 = ('Label_3', KEY_DISP_FLANGE_T, TYPE_TEXTBOX, None, flange_thickness)
+        supporting_section.append(t8)
 
-        t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC_MATERIAL], [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY], TYPE_TEXTBOX, self.get_fu_fy)
-        change_tab.append(t1)
+        t9 = ('Label_4', KEY_DISP_WEB_T, TYPE_TEXTBOX, None, web_thickness)
+        supporting_section.append(t9)
 
-        t2 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC_MATERIAL], [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY], TYPE_TEXTBOX, self.get_fu_fy)
-        change_tab.append(t2)
+        t10 = ('Label_5', KEY_DISP_FLANGE_S, TYPE_TEXTBOX, None, flange_slope)
+        supporting_section.append(t10)
 
-        t3 = ("Connector", [KEY_PLATE_MATERIAL], [KEY_PLATE_FU, KEY_PLATE_FY], TYPE_TEXTBOX, self.get_fu_fy)
-        change_tab.append(t3)
+        t11 = ('Label_6', KEY_DISP_ROOT_R, TYPE_TEXTBOX, None, root_radius)
+        supporting_section.append(t11)
 
-        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
-              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_sec_properties)
-        change_tab.append(t4)
+        t12 = ('Label_7', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
+        supporting_section.append(t12)
 
-        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
-              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_sec_properties)
-        change_tab.append(t5)
+        t13 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t13)
 
-        return change_tab
+        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        supporting_section.append(t14)
 
-    def get_sec_properties(self):
+        t18 = (None, None, TYPE_ENTER, None, None)
+        supporting_section.append(t18)
+
+        t18 = (None, None, TYPE_ENTER, None, None)
+        supporting_section.append(t18)
+
+        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        supporting_section.append(t15)
+
+        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        supporting_section.append(t16)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        supporting_section.append(t17)
+
+        t18 = ('Label_11', KEY_DISP_MASS, TYPE_TEXTBOX, None, mass)
+        supporting_section.append(t18)
+
+        t19 = ('Label_12', KEY_DISP_AREA, TYPE_TEXTBOX, None, area)
+        supporting_section.append(t19)
+
+        t20 = ('Label_13', KEY_DISP_MOA_IZ, TYPE_TEXTBOX, None, mom_inertia_z)
+        supporting_section.append(t20)
+
+        t21 = ('Label_14', KEY_DISP_MOA_IY, TYPE_TEXTBOX, None, mom_inertia_y)
+        supporting_section.append(t21)
+
+        t22 = ('Label_15', KEY_DISP_ROG_RZ, TYPE_TEXTBOX, None, rad_of_gy_z)
+        supporting_section.append(t22)
+
+        t23 = ('Label_16', KEY_DISP_ROG_RY, TYPE_TEXTBOX, None, rad_of_gy_y)
+        supporting_section.append(t23)
+
+        t24 = ('Label_17', KEY_DISP_EM_ZZ, TYPE_TEXTBOX, None, elast_sec_mod_z)
+        supporting_section.append(t24)
+
+        t25 = ('Label_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
+        supporting_section.append(t25)
+
+        t26 = ('Label_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
+        supporting_section.append(t26)
+
+        t27 = ('Label_20', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
+        supporting_section.append(t27)
+
+        t28 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t28)
+
+        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
+        supporting_section.append(t29)
+
+        t30 = (None, None, TYPE_ENTER, None, None)
+        supporting_section.append(t30)
+
+        t30 = (None, None, TYPE_ENTER, None, None)
+        supporting_section.append(t30)
+
+        t31 = ('Label_22', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        supporting_section.append(t31)
+
+        t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        supporting_section.append(t32)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, None)
+        supporting_section.append(t33)
+
+        return supporting_section
+
+    def tab_supported_section(self, input_dictionary):
+
+        "In design preference, it shows other properties of section used "
+
+        if not input_dictionary or input_dictionary[KEY_SUPTDSEC] == 'Select Section' or input_dictionary[
+            KEY_MATERIAL] == 'Select Material':
+            designation = ''
+            material_grade = ''
+            source = ''
+            fu = ''
+            fy = ''
+            depth = ''
+            flange_width = ''
+            flange_thickness = ''
+            web_thickness = ''
+            flange_slope = ''
+            root_radius = ''
+            toe_radius = ''
+            m_o_e = "200"
+            m_o_r = "76.9"
+            p_r = "0.3"
+            t_e = "12"
+            mass = ''
+            area = ''
+            mom_inertia_z = ''
+            mom_inertia_y = ''
+            rad_of_gy_z = ''
+            rad_of_gy_y = ''
+            elast_sec_mod_z = ''
+            elast_sec_mod_y = ''
+            plast_sec_mod_z = ''
+            plast_sec_mod_y = ''
+
+        else:
+            designation = str(input_dictionary[KEY_SUPTDSEC])
+            material_grade = str(input_dictionary[KEY_MATERIAL])
+            I_sec_attributes = Section(designation)
+            table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
+
+            I_sec_attributes.connect_to_database_update_other_attributes(table, designation,material_grade)
+            source = str(I_sec_attributes.source)
+            fu = str(I_sec_attributes.fu)
+            fy = str(I_sec_attributes.fy)
+            depth = str(I_sec_attributes.depth)
+            flange_width = str(I_sec_attributes.flange_width)
+            flange_thickness = str(I_sec_attributes.flange_thickness)
+            web_thickness = str(I_sec_attributes.web_thickness)
+            flange_slope = str(I_sec_attributes.flange_slope)
+            root_radius = str(I_sec_attributes.root_radius)
+            toe_radius = str(I_sec_attributes.toe_radius)
+            m_o_e = "200"
+            m_o_r = "76.9"
+            p_r = "0.3"
+            t_e = "12"
+            mass = str(I_sec_attributes.mass)
+            area = str(I_sec_attributes.area)
+            mom_inertia_z = str(I_sec_attributes.mom_inertia_z)
+            mom_inertia_y = str(I_sec_attributes.mom_inertia_y)
+            rad_of_gy_z = str(I_sec_attributes.rad_of_gy_z)
+            rad_of_gy_y = str(I_sec_attributes.rad_of_gy_y)
+            elast_sec_mod_z = str(I_sec_attributes.elast_sec_mod_z)
+            elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
+            plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
+            plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
+
+        supporting_section = []
+        t1 = (KEY_SUPTDSEC, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
+        supporting_section.append(t1)
+
+        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
+        supporting_section.append(t2)
+
+        material = connectdb("Material", call_type="popup")
+        t34 = (KEY_SUPTDSEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
+        supporting_section.append(t34)
+
+        t3 = (KEY_SUPTDSEC_FU, KEY_DISP_FU, TYPE_TEXTBOX, None, fu)
+        supporting_section.append(t3)
+
+        t4 = (KEY_SUPTDSEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
+        supporting_section.append(t4)
+
+        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
+        supporting_section.append(t5)
+
+        t6 = ('Label_1', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, depth)
+        supporting_section.append(t6)
+
+        t7 = ('Label_2', KEY_DISP_FLANGE_W, TYPE_TEXTBOX, None, flange_width)
+        supporting_section.append(t7)
+
+        t8 = ('Label_3', KEY_DISP_FLANGE_T, TYPE_TEXTBOX, None, flange_thickness)
+        supporting_section.append(t8)
+
+        t9 = ('Label_4', KEY_DISP_WEB_T, TYPE_TEXTBOX, None, web_thickness)
+        supporting_section.append(t9)
+
+        t10 = ('Label_5', KEY_DISP_FLANGE_S, TYPE_TEXTBOX, None, flange_slope)
+        supporting_section.append(t10)
+
+        t11 = ('Label_6', KEY_DISP_ROOT_R, TYPE_TEXTBOX, None, root_radius)
+        supporting_section.append(t11)
+
+        t12 = ('Label_7', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
+        supporting_section.append(t12)
+
+        t13 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t13)
+
+        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        supporting_section.append(t14)
+
+        t18 = (None, None, TYPE_ENTER, None, None)
+        supporting_section.append(t18)
+
+        t18 = (None, None, TYPE_ENTER, None, None)
+        supporting_section.append(t18)
+
+        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        supporting_section.append(t15)
+
+        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        supporting_section.append(t16)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        supporting_section.append(t17)
+
+        t18 = ('Label_11', KEY_DISP_MASS, TYPE_TEXTBOX, None, mass)
+        supporting_section.append(t18)
+
+        t19 = ('Label_12', KEY_DISP_AREA, TYPE_TEXTBOX, None, area)
+        supporting_section.append(t19)
+
+        t20 = ('Label_13', KEY_DISP_MOA_IZ, TYPE_TEXTBOX, None, mom_inertia_z)
+        supporting_section.append(t20)
+
+        t21 = ('Label_14', KEY_DISP_MOA_IY, TYPE_TEXTBOX, None, mom_inertia_y)
+        supporting_section.append(t21)
+
+        t22 = ('Label_15', KEY_DISP_ROG_RZ, TYPE_TEXTBOX, None, rad_of_gy_z)
+        supporting_section.append(t22)
+
+        t23 = ('Label_16', KEY_DISP_ROG_RY, TYPE_TEXTBOX, None, rad_of_gy_y)
+        supporting_section.append(t23)
+
+        t24 = ('Label_17', KEY_DISP_EM_ZZ, TYPE_TEXTBOX, None, elast_sec_mod_z)
+        supporting_section.append(t24)
+
+        t25 = ('Label_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
+        supporting_section.append(t25)
+
+        t26 = ('Label_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
+        supporting_section.append(t26)
+
+        t27 = ('Label_20', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
+        supporting_section.append(t27)
+
+        t28 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t28)
+
+        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
+        supporting_section.append(t29)
+
+        t30 = (None, None, TYPE_ENTER, None, None)
+        supporting_section.append(t30)
+
+        t30 = (None, None, TYPE_ENTER, None, None)
+        supporting_section.append(t30)
+
+        t31 = ('Label_22', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        supporting_section.append(t31)
+
+        t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        supporting_section.append(t32)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, None)
+        supporting_section.append(t33)
+
+        return supporting_section
+
+    def get_I_sec_properties(self):
 
         if '' in self:
             mass = ''
@@ -197,16 +414,28 @@ class Connection(Main):
 
         return d
 
+
     def get_fu_fy(self):
-        m = Material(self[0])
-        fu = m.fu
-        fy = m.fy
-        d = {KEY_SUPTNGSEC_FU: fu,
-             KEY_SUPTNGSEC_FY: fy,
-             KEY_SUPTDSEC_FU: fu,
-             KEY_SUPTDSEC_FY: fy,
-             KEY_PLATE_FU: fu,
-             KEY_PLATE_FY: fy,
+        material_grade = self[0]
+        fu_conn = ''
+        fy_20 = ''
+        fy_20_40 = ''
+        fy_40 = ''
+        fu = ''
+        fy = ''
+        if material_grade != "Select Material":
+            m_conn = Material(material_grade)
+            fu_conn = m_conn.fu
+            fy_20 = m_conn.fy_20
+            fy_20_40 = m_conn.fy_20_40
+            fy_40 = m_conn.fy_40
+        else:
+            pass
+
+        d = {KEY_CONNECTOR_FU: fu_conn,
+             KEY_CONNECTOR_FY_20: fy_20,
+             KEY_CONNECTOR_FY_20_40: fy_20_40,
+             KEY_CONNECTOR_FY_40: fy_40,
              KEY_BASE_PLATE_FU: fu,
              KEY_BASE_PLATE_FY: fy}
 
@@ -246,66 +475,18 @@ class Connection(Main):
         t2 = (KEY_SUPTDSEC_MATERIAL, KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY)
         fu_fy_list.append(t2)
 
-        t3 = (KEY_PLATE_MATERIAL, KEY_PLATE_FU, KEY_PLATE_FY)
+        t3 = (KEY_CONNECTOR_MATERIAL, KEY_CONNECTOR_FU, KEY_CONNECTOR_FY)
         fu_fy_list.append(t3)
 
         return fu_fy_list
 
-    def input_dictionary_design_pref(self):
-        design_input = []
-        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SUPTNGSEC_MATERIAL])
-        design_input.append(t1)
-
-        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY])
-        design_input.append(t1)
-
-        t2 = (KEY_DISP_BEAMSEC, TYPE_COMBOBOX, [KEY_SUPTDSEC_MATERIAL])
-        design_input.append(t2)
-
-        t2 = (KEY_DISP_BEAMSEC, TYPE_TEXTBOX, [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY])
-        design_input.append(t2)
-
-        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
-        design_input.append(t3)
-
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
-        design_input.append(t3)
-
-        t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
-        design_input.append(t4)
-
-        t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
-        design_input.append(t4)
-
-        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
-        design_input.append(t5)
-
-        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
-        design_input.append(t5)
-
-        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
-        design_input.append(t6)
-
-        t7 = ("Connector", TYPE_COMBOBOX, [KEY_PLATE_MATERIAL])
-        design_input.append(t7)
-
-        return design_input
-
-    def input_dictionary_without_design_pref(self):
-        design_input = []
-        t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL], 'Input Dock')
-        design_input.append(t1)
-
-        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
-                     KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
-                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_PLATE_MATERIAL], '')
-        design_input.append(t2)
-
-        return design_input
 
     def get_values_for_design_pref(self, key, design_dictionary):
 
-        fu = Material(design_dictionary[KEY_MATERIAL]).fu
+        if design_dictionary[KEY_MATERIAL] != 'Select Material':
+            fu = Material(design_dictionary[KEY_MATERIAL],41).fu
+        else:
+            fu = ''
 
         val = {KEY_DP_BOLT_TYPE: "Pretensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
@@ -317,7 +498,7 @@ class Connection(Main):
                KEY_DP_DETAILING_GAP: '10',
                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
                KEY_DP_DESIGN_METHOD: "Limit State Design",
-               KEY_PLATE_MATERIAL: str(design_dictionary[KEY_MATERIAL])
+               KEY_CONNECTOR_MATERIAL: str(design_dictionary[KEY_MATERIAL])
                }[key]
 
         return val
@@ -326,19 +507,21 @@ class Connection(Main):
 
         add_buttons = []
 
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_DESIGNATION, KEY_CONN, VALUES_CONN_1, "Columns")
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_1, "Columns")
         add_buttons.append(t1)
 
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_DESIGNATION, KEY_CONN, VALUES_CONN_2, "Beams")
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_2, "Beams")
         add_buttons.append(t1)
 
-        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTDSEC_DESIGNATION, None, None, "Beams")
+        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTDSEC, None, None, "Beams")
         add_buttons.append(t2)
 
         return add_buttons
 
-    def output_values(self, flag):
-        return []
+    ########################################
+    # Design Preference Functions End
+    ########################################
+
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """

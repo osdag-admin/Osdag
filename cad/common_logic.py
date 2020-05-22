@@ -15,6 +15,9 @@ from cad.items.angle import Angle
 from cad.items.anchor_bolt import AnchorBolt_A, AnchorBolt_B, AnchorBolt_Endplate
 from cad.items.stiffener_plate import StiffenerPlate
 from cad.items.grout import Grout
+from cad.items.angle import Angle
+from cad.items.channel import Channel
+from cad.items.Gasset_plate import GassetPlate
 
 from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -33,6 +36,10 @@ from cad.ShearConnections.EndPlate.nutBoltPlacement import NutBoltArray as endNu
 
 from cad.BasePlateCad.baseplateconnection import BasePlateCad
 from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
+
+from cad.Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
+from cad.Tension.BoltedCAD import TensionAngleBoltCAD, TensionChannelBoltCAD
+from cad.Tension.nutBoltPlacement import NutBoltArray as TNutBoltArray
 
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.cleat_angle_connection import CleatAngleConnection
@@ -734,7 +741,6 @@ class CommonDesignLogic(object):
         nutSpace = bolt.c + baseplate.T
         bolthight = nut.T + 50
 
-
         nut_bolt_array = bpNutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
 
         basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang,
@@ -743,6 +749,79 @@ class CommonDesignLogic(object):
 
         return basePlate
 
+    def createTensionCAD(self):
+        """
+        :return: The calculated values/parameters to create 3D CAD model of individual components.
+        """
+        T = self.module_class
+
+        # Types of connections =  #'Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels'
+        if self.connection == KEY_DISP_TENSION_BOLTED:
+            bolt_d = float(T.bolt.bolt_diameter_provided)  # Bolt diameter (shank part), entered by user
+            bolt_r = bolt_d / 2  # Bolt radius (Shank part)
+            bolt_T = self.boltHeadThick_Calculation(bolt_d)  # Bolt head thickness
+            bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
+            bolt_Ht = self.boltLength_Calculation(bolt_d)  # Bolt head height
+
+            bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component directory
+            nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
+            nut_Ht = nut_T
+            nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)  # Call to create Nut from Component directory
+
+            plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
+                                T=float(T.plate.thickness_provided), degree=30)
+
+            if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
+                member = Channel(B=float(T.section_size_1.flange_width), T=float(T.section_size_1.flange_thickness),
+                                 D=float(T.section_size_1.depth), t=float(T.section_size_1.web_thickness),
+                                 R1=float(T.section_size_1.root_radius), R2=float(T.section_size_1.toe_radius),
+                                 L=float(T.length))
+                if T.sec_profile == 'Channel':
+                    nut_space = member.t + plate.T + nut.T  # member.T + plate.T + nut.T
+                else:
+                    nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
+                nut_bolt_array = TNutBoltArray(T, nut, bolt, nut_space)
+                tensionCAD = TensionChannelBoltCAD(T, member, plate, nut_bolt_array)
+
+            else:
+                member = Angle(L=float(T.length), A=float(T.section_size_1.max_leg), B=float(T.section_size_1.min_leg),
+                               T=float(T.section_size_1.thickness), R1=float(T.section_size_1.root_radius),
+                               R2=float(T.section_size_1.toe_radius))
+                if T.sec_profile == 'Back to Back Angles':
+                    nut_space = 2 * member.T + plate.T + nut.T
+                else:
+                    nut_space = member.T + plate.T + nut.T
+                nut_bolt_array = TNutBoltArray(T, nut, bolt, nut_space)
+                tensionCAD = TensionAngleBoltCAD(T, member, plate, nut_bolt_array)
+
+        else:
+            plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
+                                T=float(T.plate.thickness_provided), degree=30)
+            s = max(15, float(T.weld.size))
+            plate_intercept = plate.L - s - 50
+            if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
+                member = Channel(B=float(T.section_size_1.flange_width), T=float(T.section_size_1.flange_thickness),
+                                 D=float(T.section_size_1.depth), t=float(T.section_size_1.web_thickness),
+                                 R1=float(T.section_size_1.root_radius), R2=float(T.section_size_1.toe_radius),
+                                 L=float(T.length))
+                inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
+                opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.D))
+
+                tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld, opline_weld)
+
+            else:
+                member = Angle(L=float(T.length), A=float(T.section_size_1.max_leg), B=float(T.section_size_1.min_leg),
+                               T=float(T.section_size_1.thickness), R1=float(T.section_size_1.root_radius),
+                               R2=float(T.section_size_1.toe_radius))
+                inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
+                opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
+
+                tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld, opline_weld)
+
+        tensionCAD.create_3DModel()
+
+        return tensionCAD
+
     def display_3DModel(self, component, bgcolor):
 
         self.component = component
@@ -750,8 +829,6 @@ class CommonDesignLogic(object):
         self.display.EraseAll()
         self.display.View_Iso()
         self.display.FitAll()
-
-
 
         self.display.DisableAntiAliasing()
 
@@ -903,6 +980,41 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, weld, color='RED', update=True)
                     osdag_display_shape(self.display, nut_bolt, color='YELLOW', update=True)
 
+        else:
+            if self.connection == KEY_DISP_TENSION_BOLTED:
+                self.T = self.module_class()
+                self.TObj = self.createTensionCAD()
+
+                member = self.TObj.get_members_models()
+                plate = self.TObj.get_plates_models()
+                nutbolt = self.TObj.get_nut_bolt_array_models()
+                if self.component == "Model":  # Todo: change this into key
+                    osdag_display_shape(self.display, member, update=True)
+                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
+                    osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
+
+                # elif self.component == "end bolt":
+                #     pass
+                # elif self.component == "intermediate bolt":
+                #     pass
+
+            elif self.connection == KEY_DISP_TENSION_WELDED:
+                self.T = self.module_class()
+                self.TObj = self.createTensionCAD()
+
+                member = self.TObj.get_members_models()
+                plate = self.TObj.get_plates_models()
+                welds = self.TObj.get_welded_models()
+                if self.component == "Model":  # Todo: change this into key
+                    osdag_display_shape(self.display, member, update=True)
+                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
+                    osdag_display_shape(self.display, welds, color='RED', update=True)
+
+                # elif self.component == "end bolt":
+                #     pass
+                # elif self.component == "intermediate bolt":
+                #     pass
+
     def call_3DModel(self, flag, module_class):  # Done
 
         self.module_class = module_class
@@ -956,6 +1068,18 @@ class CommonDesignLogic(object):
 
                 else:
                     self.display.EraseAll()
+
+        else:
+            if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
+
+                if flag is True:
+                    self.TObj = self.createTensionCAD()
+
+                    self.display_3DModel("Model", "gradient_bg")
+
+                else:
+                    self.display.EraseAll()
+
     # def call_saveOutputs(self):  # Done
     #     return self.call_calculation(self.uiObj)
     #

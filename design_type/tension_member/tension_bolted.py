@@ -805,6 +805,7 @@ class Tension_bolted(Main):
 
         # @author: Amir, Umair
         self.module = KEY_DISP_TENSION_BOLTED
+        self.mainmodule = 'Member'
 
         options_list = []
 

@@ -703,7 +703,9 @@ self
             Effective throat thickness of fillet weld for stress calculation in mm (float)
         Note:
             Reference:
+
             IS 800:2007,  cl 10.5.3.2
+
         """
         table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
         fusion_face_angle = int(round(fusion_face_angle))
@@ -729,11 +731,49 @@ self
         return throat
 
     @staticmethod
+    def cl_10_5_3_2_fillet_weld_effective_throat_thickness_constant( fusion_face_angle=90):
+
+        """Calculate effective throat thickness of fillet weld for stress calculation
+
+        Args:
+            fusion_face_angle - Angle between fusion faces in degrees (int)
+
+        Returns:
+            Effective throat thickness of fillet weld constant
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.3.2zzz
+
+        """
+        table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
+        fusion_face_angle = int(round(fusion_face_angle))
+        if 60 <= fusion_face_angle <= 90:
+            K = table_22['60-90']
+        elif 91 <= fusion_face_angle <= 100:
+            K = table_22['91-100']
+        elif 101 <= fusion_face_angle <= 106:
+            K = table_22['101-106']
+        elif 107 <= fusion_face_angle <= 113:
+            K = table_22['107-113']
+        elif 114 <= fusion_face_angle <= 120:
+            K = table_22['114-120']
+        else:
+            K = "NOT DEFINED"
+        try:
+            K = float(K)
+        except ValueError:
+            return
+
+        return K
+
+
+    @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):
 
         """Calculate effective length of fillet weld from available length to weld in practice
         Args:
-            fillet_size - Size of fillet weld in mm (float)
+            #fillet_size - Size of fillet weld in mm (float)
             available_length - Available length in mm to weld the plates in practice (float)
         Returns:
             Effective length of fillet weld in mm (float)
@@ -787,6 +827,7 @@ self
         elif beta_lw <= 0.6:
             beta_lw = 0.6
         return beta_lw
+
 
     # -------------------------------------------------------------
     #   10.6 Design of Connections

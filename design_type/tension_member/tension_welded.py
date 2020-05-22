@@ -1938,7 +1938,6 @@ class Tension_welded(Main):
 
 
 
-
         self.report_check = []
         # connecting_plates = [self.plate.thickness_provided, self.section_size_1.web_thickness]
         self.load.shear_force = 0.0

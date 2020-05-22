@@ -2267,6 +2267,7 @@ class Tension_bolted(Main):
 
             self.plate.tension_blockshear_area_input(A_vg = A_vg, A_vn = A_vn, A_tg = A_tg, A_tn = A_tn, f_u = self.plate.fu, f_y = self.plate.fy)
             self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
+            print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
 
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
                 max_tension_yield = 400 * self.plate.fy * 80 / 1.1
@@ -2285,7 +2286,7 @@ class Tension_bolted(Main):
                 pass
 
         if self.plate_tension_capacity > self.res_force:
-            print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
+            # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
             if (2 * self.plate.length + 100) > self.length:
                 self.design_status = False
                 logger.info("Plate length exceeds the Member length")
@@ -2301,6 +2302,7 @@ class Tension_bolted(Main):
                 logger.info(": Overall bolted tension member design is safe. \n")
                 logger.debug(" :=========End Of design===========")
         else:
+            print(self.plate_tension_capacity, "hsdvdhsd")
             if self.plate_tension_capacity < max_tension_yield and self.res_force < max_tension_yield:
                 print(self.section_size_1.designation, "hsdvdhsd")
                 self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
@@ -2329,16 +2331,14 @@ class Tension_bolted(Main):
 
 
         # print (self.inter_memb.min_radius_gyration,"hgvsdfsdff")
-        if design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles','Back to Back Channels']:
+        if design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles','Back to Back Channels'] and self.inter_length > 1000:
             self.inter_memb_length = 400 * min_gyration
 
-            if self.inter_length > 1000:
-                if self.inter_memb_length > 1000:
-                    ratio = round_up(self.inter_length/1000,1)
-                else:
-                    ratio = round_up(self.inter_length/self.inter_memb_length,1)
-
-            self.inter_memb_length = self.inter_length/ratio
+            if self.inter_memb_length > 1000:
+                ratio = round_up(self.inter_length/1000,1)
+            else:
+                ratio = round_up(self.inter_length/self.inter_memb_length,1)
+            self.inter_memb_length = self.inter_length / ratio
             self.inter_conn = ratio - 1
             self.inter_bolt_one_line = self.plate.bolts_one_line
             self.inter_bolt_line = 1
@@ -2497,15 +2497,15 @@ class Tension_bolted(Main):
                                       'R1(mm)': round(section_size.root_radius,2),
                                       'R2(mm)':round(section_size.toe_radius,2),
                                       'Cy(mm)': round(section_size.Cy,2),
-                                      'Iz(mm4)': round(section_size.mom_inertia_z,2),
+                                      'Ix(mm4)': round(section_size.mom_inertia_z,2),
                                       'Iy(mm4)': round(section_size.mom_inertia_y,2),
-                                      'rz(mm)': round(section_size.rad_of_gy_z,2),
+                                      'rx(mm)': round(section_size.rad_of_gy_z,2),
                                       'ry(mm)': round(section_size.rad_of_gy_y,2),
-                                      'Zz(mm3)': round(section_size.elast_sec_mod_z,2),
+                                      'Zx(mm3)': round(section_size.elast_sec_mod_z,2),
                                       'Zy(mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'Zpz(mm3)': round(section_size.plast_sec_mod_z,2),
+                                      'Zpx(mm3)': round(section_size.plast_sec_mod_z,2),
                                       'Zpy(mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'r(mm3)': round(gyration,2)}
+                                      'r(mm)': round(gyration,2)}
             thickness = section_size.web_thickness
             text = "C"
         else:
@@ -2523,20 +2523,20 @@ class Tension_bolted(Main):
                                       'R1(mm)': round(section_size.root_radius,2),
                                       'R2(mm)': round(section_size.toe_radius,2),
                                       'Cy(mm)': round(section_size.Cy,2),
-                                      'Cz(mm)': round(section_size.Cz,2),
-                                      'Iz(mm4)': round(section_size.mom_inertia_z,2),
+                                      'Cx(mm)': round(section_size.Cz,2),
+                                      'Ix(mm4)': round(section_size.mom_inertia_z,2),
                                       'Iy(mm4)': round(section_size.mom_inertia_y,2),
                                       'Iu(mm4)': round(section_size.mom_inertia_u,2),
                                       'Iv(mm4)': round(section_size.mom_inertia_v,2),
-                                      'rz(mm)': round(section_size.rad_of_gy_z,2),
+                                      'rx(mm)': round(section_size.rad_of_gy_z,2),
                                       'ry(mm)': round((section_size.rad_of_gy_y),2),
                                       'ru(mm)': round((section_size.rad_of_gy_u),2),
                                       'rv(mm)': round((section_size.rad_of_gy_v),2),
-                                      'Zz(mm3)': round(section_size.elast_sec_mod_z,2),
+                                      'Zx(mm3)': round(section_size.elast_sec_mod_z,2),
                                       'Zy(mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'Zpz(mm3)': round(section_size.plast_sec_mod_z,2),
+                                      'Zpx(mm3)': round(section_size.plast_sec_mod_z,2),
                                       'Zpy(mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'r(mm3)': round(gyration,2)}
+                                      'r(mm)': round(gyration,2)}
             thickness = section_size.thickness
             text = "A"
 
@@ -2847,7 +2847,7 @@ class Tension_bolted(Main):
             self.report_check.append(t4)
 
             t8 = (KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
-            get_pass_fail(round((self.res_force/1000),2), self.plate_tension_capacity, relation="lesser"))
+            get_pass_fail(round((self.res_force/1000),2), round(self.plate_tension_capacity/1000,2), relation="lesser"))
             self.report_check.append(t8)
         else:
             pass

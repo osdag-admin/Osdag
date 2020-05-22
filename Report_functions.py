@@ -672,7 +672,7 @@ def get_pass_fail(required, provided,relation='greater'):
             else:
                 return 'Fail'
         else:
-            if required <= provided:
+            if required < provided:
                 return 'Pass'
             else:
                 return 'Fail'

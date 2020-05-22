@@ -311,15 +311,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             existingvalue_key_conn = ''
 
-        if KEY_SUPTNGSEC in existingvalues:  # this might not be required
-            existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
+        if KEY_SECSIZE in existingvalues:  # this might not be required
+            existingvalue_key_suptngsec = existingvalues[KEY_SECSIZE]
         else:
             existingvalue_key_suptngsec = ''
 
-        if KEY_SUPTDSEC in existingvalues:
-            existingvalue_key_suptdsec = existingvalues[KEY_SUPTDSEC]
-        else:
-            existingvalue_key_suptdsec = ''
 
         if KEY_MATERIAL in existingvalues:
             existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
@@ -371,7 +367,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t5 = (KEY_END_CONDITION, KEY_DISP_END_CONDITION, TYPE_NOTE, existingvalue_key_conn, 'Pinned', True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec,
+        t6 = (KEY_SECSIZE, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec,
               connectdb("Columns"), True, 'No Validator')  # this might not be required
         options_list.append(t6)
 
@@ -746,10 +742,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def input_dictionary_design_pref(self):
 
         design_input = []
-        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, ['Label_8', KEY_SUPTNGSEC_MATERIAL])
+        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, ['Label_8', KEY_SEC_MATERIAL])
         design_input.append(t1)
 
-        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY, 'Label_21'])
+        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SEC_FU, KEY_SEC_FU, 'Label_21'])
         design_input.append(t1)
 
         t2 = ("Base Plate", TYPE_COMBOBOX, [KEY_BASE_PLATE_MATERIAL])
@@ -783,14 +779,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def input_dictionary_without_design_pref(self):
 
         design_input = []
-        t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_BASE_PLATE_MATERIAL], 'Input Dock')
+        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL, KEY_BASE_PLATE_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
         t2 = (KEY_TYP_ANCHOR, [KEY_DP_ANCHOR_BOLT_TYPE], 'Input Dock')
         design_input.append(t2)
 
-        t3 = (None, ['Label_8', 'Label_21', KEY_SUPTNGSEC_FU, KEY_BASE_PLATE_FU,
-                     KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_SUPTNGSEC_FY, KEY_BASE_PLATE_FY,
+        t3 = (None, ['Label_8', 'Label_21', KEY_SEC_FU, KEY_BASE_PLATE_FU,
+                     KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_SEC_FY, KEY_BASE_PLATE_FY,
                      KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_HOLE_TYPE,
                      KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE], '')
@@ -800,16 +796,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def get_values_for_design_pref(self, key, design_dictionary):
 
-        section = Section(design_dictionary[KEY_SUPTNGSEC], design_dictionary[KEY_MATERIAL])
+        section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
         length = str(self.anchor_length_provided if self.design_button_status else 0)
         fu = Material(design_dictionary[KEY_MATERIAL]).fu
 
         val = {'Label_8': "Rolled",
                'Label_21': str(section.source),
-               KEY_SUPTNGSEC_FU: str(section.fu),
+               KEY_SEC_FU: str(section.fu),
                KEY_BASE_PLATE_FU: str(section.fu),
                KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(section.fu),
-               KEY_SUPTNGSEC_FY: str(section.fy),
+               KEY_SEC_FY: str(section.fy),
                KEY_BASE_PLATE_FY: str(section.fy),
                KEY_DP_ANCHOR_BOLT_DESIGNATION:
                    str(str(design_dictionary[KEY_DIA_ANCHOR][0]) + "X" + length + " IS5624 GALV"),
@@ -830,7 +826,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         add_buttons = []
 
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_DESIGNATION, None, None, "Columns")
+        t1 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
         add_buttons.append(t1)
 
         return add_buttons
@@ -842,8 +838,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         change_tab = []
 
-        t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC_MATERIAL], [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY], TYPE_TEXTBOX,
-              self.get_fu_fy)
+        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX,
+              self.get_fu_fy_I_section)
         change_tab.append(t1)
 
         t2 = ("Base Plate", [KEY_BASE_PLATE_MATERIAL], [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY], TYPE_TEXTBOX,
@@ -882,7 +878,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         fu_fy_list = []
 
-        t1 = (KEY_SUPTNGSEC_MATERIAL, KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY)
+        t1 = (KEY_SEC_MATERIAL, KEY_SEC_FU, KEY_SEC_FY)
         fu_fy_list.append(t1)
 
         t2 = (KEY_BASE_PLATE_MATERIAL, KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY)
@@ -896,7 +892,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         tabs = []
 
-        t0 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
+        t0 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
         tabs.append(t0)
 
         t5 = ("Base Plate", TYPE_TAB_2, self.tab_bp)
@@ -922,7 +918,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def anchor_bolt_values(self, input_dictionary):
 
         self.input_dictionary = input_dictionary
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SUPTNGSEC], input_dictionary[KEY_MATERIAL]]:
+        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SECSIZE], input_dictionary[KEY_MATERIAL]]:
             length = ''
             designation = ''
             anchor_type = ''
@@ -1016,130 +1012,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         design.append(t2)
 
         return design
-    #
-    # @staticmethod
-    # def tab_column_section():
-    #     supporting_section = []
-    #     t1 = (KEY_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_DESIGNATION, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t1)
-    #
-    #     t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None)
-    #     supporting_section.append(t2)
-    #
-    #     # material = connectdb("Material", call_type="popup")
-    #     # material.append('Custom')
-    #     t34 = (KEY_SUPTNGSEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t34)
-    #
-    #     # t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t3)
-    #
-    #     # t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t4)
-    #
-    #     t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None)
-    #     supporting_section.append(t5)
-    #
-    #     t6 = (KEY_SUPTNGSEC_DEPTH, KEY_DISP_SUPTNGSEC_DEPTH, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t6)
-    #
-    #     t7 = (KEY_SUPTNGSEC_FLANGE_W, KEY_DISP_SUPTNGSEC_FLANGE_W, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t7)
-    #
-    #     t8 = (KEY_SUPTNGSEC_FLANGE_T, KEY_DISP_SUPTNGSEC_FLANGE_T, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t8)
-    #
-    #     t9 = (KEY_SUPTNGSEC_WEB_T, KEY_DISP_SUPTNGSEC_WEB_T, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t9)
-    #
-    #     t10 = (KEY_SUPTNGSEC_FLANGE_S, KEY_DISP_SUPTNGSEC_FLANGE_S, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t10)
-    #
-    #     t11 = (KEY_SUPTNGSEC_ROOT_R, KEY_DISP_SUPTNGSEC_ROOT_R, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t11)
-    #
-    #     t12 = (KEY_SUPTNGSEC_TOE_R, KEY_DISP_SUPTNGSEC_TOE_R, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t12)
-    #
-    #     t13 = (None, None, TYPE_BREAK, None)
-    #     supporting_section.append(t13)
-    #
-    #     t14 = (KEY_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'])
-    #     supporting_section.append(t14)
-    #
-    #     # t18 = (None, None, TYPE_ENTER, None)
-    #     # supporting_section.append(t18)
-    #
-    #     t18 = (None, None, TYPE_ENTER, None)
-    #     supporting_section.append(t18)
-    #
-    #     t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t3)
-    #
-    #     # t15 = (KEY_SUPTNGSEC_MOD_OF_ELAST, KEY_SUPTNGSEC_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t15)
-    #     #
-    #     # t16 = (KEY_SUPTNGSEC_MOD_OF_RIGID, KEY_SUPTNGSEC_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t16)
-    #
-    #     t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None)
-    #     supporting_section.append(t17)
-    #
-    #     t18 = (KEY_SUPTNGSEC_MASS, KEY_DISP_SUPTNGSEC_MASS, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t18)
-    #
-    #     t19 = (KEY_SUPTNGSEC_SEC_AREA, KEY_DISP_SUPTNGSEC_SEC_AREA, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t19)
-    #
-    #     t20 = (KEY_SUPTNGSEC_MOA_LZ, KEY_DISP_SUPTNGSEC_MOA_LZ, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t20)
-    #
-    #     t21 = (KEY_SUPTNGSEC_MOA_LY, KEY_DISP_SUPTNGSEC_MOA_LY, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t21)
-    #
-    #     t22 = (KEY_SUPTNGSEC_ROG_RZ, KEY_DISP_SUPTNGSEC_ROG_RZ, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t22)
-    #
-    #     t23 = (KEY_SUPTNGSEC_ROG_RY, KEY_DISP_SUPTNGSEC_ROG_RY, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t23)
-    #
-    #     t24 = (KEY_SUPTNGSEC_EM_ZZ, KEY_DISP_SUPTNGSEC_EM_ZZ, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t24)
-    #
-    #     t25 = (KEY_SUPTNGSEC_EM_ZY, KEY_DISP_SUPTNGSEC_EM_ZY, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t25)
-    #
-    #     t26 = (KEY_SUPTNGSEC_PM_ZPZ, KEY_DISP_SUPTNGSEC_PM_ZPZ, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t26)
-    #
-    #     t27 = (KEY_SUPTNGSEC_PM_ZPY, KEY_DISP_SUPTNGSEC_PM_ZPY, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t27)
-    #
-    #     t28 = (None, None, TYPE_BREAK, None)
-    #     supporting_section.append(t28)
-    #
-    #     t29 = (KEY_SUPTNGSEC_SOURCE, KEY_DISP_SUPTNGSEC_SOURCE, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t29)
-    #
-    #     # t30 = (None, None, TYPE_ENTER, None)
-    #     # supporting_section.append(t30)
-    #
-    #     t30 = (None, None, TYPE_ENTER, None)
-    #     supporting_section.append(t30)
-    #
-    #     t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t4)
-    #
-    #     # t31 = (KEY_SUPTNGSEC_POISSON_RATIO, KEY_DISP_SUPTNGSEC_POISSON_RATIO, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t31)
-    #     #
-    #     # t32 = (KEY_SUPTNGSEC_THERMAL_EXP, KEY_DISP_SUPTNGSEC_THERMAL_EXP, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t32)
-    #
-    #     t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
-    #     supporting_section.append(t33)
-    #
-    #     return supporting_section
+
 
     # def dia_to_len(self, d):
     #
@@ -1160,7 +1033,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.mainmodule = "Moment Connection"
         self.connectivity = str(design_dictionary[KEY_CONN])
         self.end_condition = str(design_dictionary[KEY_END_CONDITION])
-        self.column_section = str(design_dictionary[KEY_SUPTNGSEC])
+        self.column_section = str(design_dictionary[KEY_SECSIZE])
         self.material = str(design_dictionary[KEY_MATERIAL])
 
         self.load_axial = float(design_dictionary[KEY_AXIAL])
@@ -1184,12 +1057,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_type = str(design_dictionary[KEY_WELD_TYPE])
 
         # attributes of design preferences
-        self.dp_column_designation = str(design_dictionary[KEY_SUPTNGSEC])
+        self.dp_column_designation = str(design_dictionary[KEY_SECSIZE])
         self.dp_column_type = str(design_dictionary['Label_8'])
         self.dp_column_source = str(design_dictionary['Label_21'])
-        self.dp_column_material = str(design_dictionary[KEY_SUPTNGSEC_MATERIAL])
-        self.dp_column_fu = float(design_dictionary[KEY_SUPTNGSEC_FU])
-        self.dp_column_fy = float(design_dictionary[KEY_SUPTNGSEC_FY])
+        self.dp_column_material = str(design_dictionary[KEY_SEC_MATERIAL])
+        self.dp_column_fu = float(design_dictionary[KEY_SEC_FU])
+        self.dp_column_fy = float(design_dictionary[KEY_SEC_FY])
 
         self.dp_bp_material = str(design_dictionary[KEY_BASE_PLATE_MATERIAL])
         self.dp_bp_fu = float(design_dictionary[KEY_BASE_PLATE_FU])

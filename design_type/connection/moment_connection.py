@@ -202,7 +202,7 @@ class MomentConnection(Connection, IS800_2007):
 
     def get_fu_fy_I_section(self):
         material_grade = self[0]
-        designation = self[1].KEY_SECSIZE
+        designation = self[1][KEY_SECSIZE]
 
         fu = ''
         fy = ''

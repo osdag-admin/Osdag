@@ -1101,20 +1101,18 @@ class Plate(Material):
         :param bolt_dia: diameter of bolt
         :return: reduced bolt capacity if long joint condition is met
         """
-
-        if end_dist == 0.0:
-            length_avail = max(((bolts_one_line - 1) * gauge),((bolts_line - 1) * pitch))
-            if length_avail > 15 * bolt_dia:
-                beta_lj = 1.075 - length_avail / (200 * bolt_dia)
-                if beta_lj > 1:
-                    beta_lj = 1
-                elif beta_lj < 0.75:
-                    beta_lj = 0.75
-                else:
-                    beta_lj = beta_lj
-                bolt_capacity_red = beta_lj * bolt_capacity
+        length_avail = max(((bolts_one_line - 1) * gauge),((bolts_line - 1) * pitch))
+        if length_avail > 15 * bolt_dia:
+            beta_lj = 1.075 - length_avail / (200 * bolt_dia)
+            print('long joint case')
+            if beta_lj >1:
+                beta_lj =1
+            elif beta_lj<0.75:
+                beta_lj = 0.75
             else:
-                bolt_capacity_red = bolt_capacity
+                beta_lj = beta_lj
+
+            bolt_capacity_red = beta_lj * bolt_capacity
         else:
             length_avail =  2 * ((bolts_line * pitch) + end_dist) + gap
             if length_avail > 15 * bolt_dia:

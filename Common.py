@@ -571,6 +571,9 @@ VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8',
 # Key for storing Plate
 DISP_TITLE_PLATE = 'Plate'
 DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
+DISP_TITLE_INTERMITTENT = 'Intermittent Connection'
+DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
+
 
 
 # Key for storing Thickness sub-key of Plate
@@ -1103,12 +1106,20 @@ KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
 KEY_OUT_DISP_D_MIN= 'Min.Diameter (mm)'
+KEY_OUT_INTER_D_PROVIDED = 'Bolt.InterDiameter'
+KEY_OUT_DISP_INTER_D_PROVIDED = 'Diameter (mm)'
 
 
 
 
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
+KEY_OUT_INTER_GRD_PROVIDED = 'Bolt.InterGrade'
+KEY_OUT_DISP_INTER_GRD_PROVIDED = 'Grade'
+
+
+
+
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
 KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
 KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
@@ -1135,13 +1146,22 @@ KEY_OUT_BOLT_PRYING_FORCE = 'Bolt.PryingForce'
 KEY_OUT_DISP_BOLT_PRYING_FORCE = 'Bolt Prying Force (kN)'
 KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
-KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 KEY_OUT_LONG_JOINT = 'Bolt Capacity post Long Joint (kN)'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
+KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
+KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
+KEY_OUT_DISP_INTER_BOLT_LINE = 'Bolt Lines (nos)'
+
+
+
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
-KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line (nos)'
+KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
+KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
+KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
+
+
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
@@ -1200,6 +1220,23 @@ KEY_OUT_DISP_PLATETHK = 'Thickness (mm)'
 KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_PLATE_HEIGHT = 'Height (mm)'
 KEY_OUT_DISP_PLATE_MIN_HEIGHT = 'Min.Height (mm)'
+
+KEY_OUT_INTER_PLATE_HEIGHT = 'Plate.InterHeight'
+KEY_OUT_DISP_INTER_PLATE_HEIGHT = 'Height (mm)'
+
+
+KEY_OUT_INTER_PLATE_LENGTH = 'Plate.InterLength'
+KEY_OUT_DISP_INTER_PLATE_LENGTH = 'Length (mm)'
+
+
+KEY_OUT_INTERCONNECTION = 'Intermittent.Connection'
+KEY_OUT_DISP_INTERCONNECTION = 'Connection (nos)'
+
+KEY_OUT_INTERSPACING = 'Intermittent.Spacing'
+KEY_OUT_DISP_INTERSPACING = 'Spacing (mm)'
+
+
+KEY_OUT_PLATE_CAPACITY = 'Plate.Capacity'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
 KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Length (mm)'

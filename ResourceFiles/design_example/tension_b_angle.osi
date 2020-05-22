@@ -24,6 +24,8 @@ Bolt.Type: Bearing Bolt
 Conn_Location: Long Leg
 Connector.Material: E 450 (Fe 590) E
 Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
 Load.Axial: '50'
 Material: E 250 (Fe 410 W)B

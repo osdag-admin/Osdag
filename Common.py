@@ -403,7 +403,7 @@ KEY_DISP_IR = 'Interaction Ratio'
 DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
 DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
 DISP_THROAT = 'Throat Thickness (mm)'
-DISP_EFF = 'Effective Length (mm)'
+
 DISP_WELD_STRENGTH = 'Weld Strength (kN/mm)'
 KEY_DISP_FY_20 = 'Yield Strength , fy (MPa) (<20mm)'
 KEY_DISP_FY_20_40 = 'Yield Strength , fy (MPa) (20-40mm)'
@@ -484,8 +484,10 @@ KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
 KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity'
 KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
 
+
 DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"
 KEY_DISP_MEMBER_CAPACITY = "Member Capacity"
+
 
 KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (wp)'
 KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (mm)'
@@ -565,12 +567,16 @@ KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
 
 KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
 
+
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 
 
 
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
 KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Type of edges'
+
+DISP_TITLE_INTERMITTENT = 'Intermittent Connection'
+
 
 KEY_DISP_DP_DETAILING_GAP = 'Gap between beam and <br>support (mm)'
 
@@ -659,14 +665,21 @@ KEY_OUT_STIFFENER_PLATE_MOMENT = 'StiffenerPlate.Moment'
 KEY_PLATE_MIN_HEIGHT = 'Plate.MinHeight'
 KEY_PLATE_MAX_HEIGHT = 'Plate.MaxHeight'
 KEY_SLENDER = "Member.Slenderness"
+
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
 KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
+
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
+
 KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 
 KEY_INNERFLANGE_PLATE_HEIGHT = 'flange_plate.InnerHeight'
 KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
+
+KEY_DISP_AREA_CHECK ="Plate Area check (mm2)"
+
+
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
 
 KEY_FLANGE_PITCH = 'Flange_plate.pitch_provided'
@@ -718,6 +731,7 @@ KEY_BOLT_DETAILS ="Bolt.Details"
 
 DISP_TITLE_BOLT_CAPACITIES = 'Bolt Capacities'
 KEY_BOLT_CAPACITIES = 'Bolt.Capacities'
+DISP_THROAT_THICKNESS = "Throat Thickness"
 
 KEY_DISP_BOLT_DETAILS = "Bolt Details"
 KEY_FLANGE_BOLT_LINE = 'Flange_plate.Bolt_Line'
@@ -748,9 +762,12 @@ KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
 KEY_DISP_FLANGE_WELD_LENGTH ='Flange Weld Length'
 KEY_FLANGE_WELD_LENGTH_EFF = 'Flange_Weld.EffLength'
+
+KEY_DISP_WELD_LEN_EFF_OUTSIDE = 'EffLength. Outer+Inner flange'
+KEY_DISP_CLEARANCE = "Clearance (mm)"
 KEY_FLANGE_WELD_HEIGHT ='flange_Weld.height'
 KEY_DISP_FLANGE_WELD_HEIGHT = 'Flange Weld Height'
-
+DISP_EFF = "Effective length (mm)"
 KEY_INNERFLANGE_WELD_LENGTH = 'Flange_Weld.InnerLength'
 KEY_DISP_INNERFLANGE_WELD_LENGTH ='Length (mm)'
 KEY_INNERFLANGE_WELD_LENGTH_EFF = 'Flange_Weld.InnerEffLength'
@@ -788,6 +805,8 @@ KEY_OUT_DISP_WEB_BOLT_CAPACITY ="Bolt Capacity (kN)"
 KEY_OUT_DISP_WEB_BOLT_SLIP= 'Slip Resistance'
 KEY_WEB_BOLT_GRP_CAPACITY = 'web_bolt.grp_bolt_capacity'
 KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'Web bolt grp bolt capacity (kN)'
+KEY_OUT_REQ_MOMENT_DEMAND_BOLT = "Moment Demand (kNm"
+KEY_OUT_REQ_PARA_BOLT = "Parameters required for bolt force (mm)"
 
 
 DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
@@ -795,7 +814,9 @@ DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)*'
 
-VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30','32','36','40']
+VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30','32','36','40',
+ '25','28','32','36','40','45','50','56','63','80']
+
 
 KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
@@ -887,12 +908,20 @@ KEY_BOLT_STATUS = 'Bolt.DesignStatus'
 KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
 KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
 KEY_OUT_DISP_D_MIN= 'Min.Diameter (mm)'
+KEY_OUT_INTER_D_PROVIDED = 'Bolt.InterDiameter'
+KEY_OUT_DISP_INTER_D_PROVIDED = 'Diameter (mm)'
 
 
 
 
 KEY_OUT_GRD_PROVIDED = 'Bolt.Grade_Provided'
 KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
+KEY_OUT_INTER_GRD_PROVIDED = 'Bolt.InterGrade'
+KEY_OUT_DISP_INTER_GRD_PROVIDED = 'Grade'
+
+
+
+
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
 KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
 KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
@@ -919,13 +948,22 @@ KEY_OUT_BOLT_PRYING_FORCE = 'Bolt.PryingForce'
 KEY_OUT_DISP_BOLT_PRYING_FORCE = 'Bolt Prying Force (kN)'
 KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
-KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 KEY_OUT_LONG_JOINT = 'Bolt Capacity post Long Joint (kN)'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
+KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
+KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
+KEY_OUT_DISP_INTER_BOLT_LINE = 'Bolt Lines (nos)'
+
+
+
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
-KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Line (nos)'
+KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
+KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
+KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
+
+
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_PITCH = 'Bolt.Pitch'
@@ -984,6 +1022,23 @@ KEY_OUT_DISP_PLATETHK = 'Thickness (mm)'
 KEY_OUT_PLATE_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_PLATE_HEIGHT = 'Height (mm)'
 KEY_OUT_DISP_PLATE_MIN_HEIGHT = 'Min.Height (mm)'
+
+KEY_OUT_INTER_PLATE_HEIGHT = 'Plate.InterHeight'
+KEY_OUT_DISP_INTER_PLATE_HEIGHT = 'Height (mm)'
+
+
+KEY_OUT_INTER_PLATE_LENGTH = 'Plate.InterLength'
+KEY_OUT_DISP_INTER_PLATE_LENGTH = 'Length (mm)'
+
+
+KEY_OUT_INTERCONNECTION = 'Intermittent.Connection'
+KEY_OUT_DISP_INTERCONNECTION = 'Connection (nos)'
+
+KEY_OUT_INTERSPACING = 'Intermittent.Spacing'
+KEY_OUT_DISP_INTERSPACING = 'Spacing (mm)'
+
+
+KEY_OUT_PLATE_CAPACITY = 'Plate.Capacity'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
 KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Length (mm)'

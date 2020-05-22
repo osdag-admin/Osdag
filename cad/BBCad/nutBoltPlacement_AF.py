@@ -100,7 +100,7 @@ class NutBoltArray_AF():
         """
         self.positions_AF = []
         # self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.gauge_AF / 2) * self.gaugeDirAF
-        self.boltOrigin_AF = self.originAF + self.edge_gauge_AF * self.pitchDirAF + ((self.plateAbvFlangeL - self.gauge_AF)/2 - ((self.col_AF/2-1)*self.gauge)) * self.gaugeDirAF
+        self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + ((self.plateAbvFlangeL - self.gauge_AF)/2 - ((self.col_AF/2-1)*self.gauge)) * self.gaugeDirAF
 
         for rw_AF in range(self.row_AF):
             for cl_AF in range(self.col_AF):

@@ -176,7 +176,7 @@ class Tension_bolted(Member):
         design_input.append(t1)
 
         t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
-                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
+                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP, KEY_DP_DETAILING_EDGE_TYPE,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
 
@@ -304,6 +304,7 @@ class Tension_bolted(Member):
 
         # @author: Amir, Umair
         self.module = KEY_DISP_TENSION_BOLTED
+        self.mainmodule = 'Member'
 
         options_list = []
 
@@ -464,7 +465,7 @@ class Tension_bolted(Member):
         t8 = (None, DISP_TITLE_BOLT_CAPACITY, TYPE_TITLE, None, True)
         out_list.append(t8)
 
-        t9 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '', True)
+        t9 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, int(self.bolt.bolt_diameter_provided) if flag else '', True)
         out_list.append(t9)
 
         t10 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '', True)
@@ -510,7 +511,42 @@ class Tension_bolted(Member):
         out_list.append(t20)
 
         t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, int(round(self.plate.length,0)) if flag else '', True)
+        out_list.append(t21)
 
+        t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
+               (round(self.plate_tension_capacity/1000, 2)) if flag else '', True)
+
+        out_list.append(t21)
+
+        # if KEY_SEC_PROFILE in ['Back to Back Angles', 'Star Angles','Back to Back Channels']:
+
+        t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, True)
+        out_list.append(t18)
+
+        t21 = (KEY_OUT_INTERCONNECTION, KEY_OUT_DISP_INTERCONNECTION, TYPE_TEXTBOX,
+               int(round(self.inter_conn, 0)) if flag else '', True)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_INTERSPACING, KEY_OUT_DISP_INTERSPACING, TYPE_TEXTBOX,
+               (round(self.inter_memb_length, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t9 = (KEY_OUT_INTER_D_PROVIDED, KEY_OUT_DISP_INTER_D_PROVIDED, TYPE_TEXTBOX, int(self.inter_dia) if flag else '',True)
+        out_list.append(t9)
+
+        t10 = (KEY_OUT_INTER_GRD_PROVIDED, KEY_OUT_DISP_INTER_GRD_PROVIDED, TYPE_TEXTBOX, self.inter_grade if flag else '',True)
+        out_list.append(t10)
+
+        t15 = (KEY_OUT_INTER_BOLT_LINE, KEY_OUT_DISP_INTER_BOLT_LINE, TYPE_TEXTBOX, self.inter_bolt_line if flag else '', True)
+        out_list.append(t15)
+
+        t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, KEY_OUT_DISP_INTER_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.inter_bolt_one_line if flag else '',True)
+        out_list.append(t16)
+
+        t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,int(round(self.inter_plate_height, 0)) if flag else '', True)
+        out_list.append(t20)
+
+        t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX,int(round(self.inter_plate_length, 0)) if flag else '',True)
         out_list.append(t21)
 
         return out_list
@@ -630,6 +666,8 @@ class Tension_bolted(Member):
         flag = False
         flag1 = False
         flag2 = False
+        # self.include_status = True
+
         option_list = self.input_values(self)
         missing_fields_list = []
 
@@ -668,6 +706,9 @@ class Tension_bolted(Member):
                     all_errors.append(error)
                 else:
                     flag2 = True
+
+            # if option[0]== KEY_SEC_PROFILE and option[4] in ["Angles","Channels"]:
+            #     self.include_status = False
 
         if len(missing_fields_list) > 0:
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
@@ -733,6 +774,9 @@ class Tension_bolted(Member):
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
         self.loc = design_dictionary[KEY_LOCATION]
+        self.main_material = design_dictionary[KEY_MATERIAL]
+        self.material = design_dictionary[KEY_SEC_MATERIAL]
+
         self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
         # print(self.sizelist)
         self.length = float(design_dictionary[KEY_LENGTH])
@@ -752,9 +796,11 @@ class Tension_bolted(Member):
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
 
         self.member_design_status = False
-        self.max_limit_status = False
+        self.max_limit_status_1 = False
+        self.max_limit_status_2 = False
         self.bolt_design_status = False
-
+        self.plate_design_status = False
+        # self.inter_status = False
 
 
         print("input values are set. Doing preliminary member checks")
@@ -780,71 +826,254 @@ class Tension_bolted(Member):
 
         "selecting components class based on the section passed "
         sec_area = {}
+        sec_gyr = {}
         for section in sizelist:
-            if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Back to Back Angles', 'Star Angles']:
+            if design_dictionary[KEY_SEC_PROFILE] in ['Angles']:
                 self.section = Angle(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-                sec_area[self.section.designation] = self.section.area
-            elif design_dictionary[KEY_SEC_PROFILE] in ['Channels', 'Back to Back Channels']:
+                self.section.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+                                                            subkey=design_dictionary[KEY_LOCATION], mom_inertia_y=0.0,
+                                                            mom_inertia_z=0.0, rad_y=self.section.rad_of_gy_y,
+                                                            rad_z=self.section.rad_of_gy_z,
+                                                            rad_u=self.section.rad_of_gy_u,
+                                                            rad_v=self.section.rad_of_gy_v,
+                                                            area=self.section.area, Cg_1=0.0, Cg_2=0.0,
+                                                            thickness=0.0)
+                sec_gyr[self.section.designation] = self.section.min_radius_gyration
+
+            elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
+                self.section = Angle(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
+                self.section.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],
+                                                        mom_inertia_y=self.section.mom_inertia_y,
+                                                        mom_inertia_z=self.section.mom_inertia_z,
+                                                        rad_y=self.section.rad_of_gy_y,
+                                                        rad_z=self.section.rad_of_gy_z, rad_u =self.section.rad_of_gy_u, rad_v=self.section.rad_of_gy_v,
+                                                        area=self.section.area, Cg_1=self.section.Cy,Cg_2=self.section.Cz,
+                                                        thickness=0.0)
+                sec_gyr[self.section.designation] = self.section.min_radius_gyration
+
+            else:
                 self.section = Channel(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-                sec_area[self.section.designation] = self.section.area
-        print(sec_area)
-        self.max = max(sec_area, key=sec_area.get)
+                self.section.min_rad_gyration_calc(key = design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],mom_inertia_y = self.section.mom_inertia_y,mom_inertia_z = self.section.mom_inertia_z,rad_y = self.section.rad_of_gy_y , rad_z = self.section.rad_of_gy_z,area = self.section.area,Cg_1 = self.section.Cy, Cg_2=0.0,thickness=0.0)
+                sec_gyr[self.section.designation] = self.section.min_radius_gyration
 
+            sec_area[self.section.designation] = self.section.area
+            
+        print(sec_gyr)
+        self.max_area = max(sec_area, key=sec_area.get)
+        self.max_gyr = max(sec_gyr, key=sec_gyr.get)
 
-        return self.max
+        return self.max_area,self.max_gyr
 
-    def max_force_length(self, design_dictionary, max_section):
+    # def max_force(self, design_dictionary, max_section):
+    #
+    #     "calculated max force and length based on the maximum section size avaialble for diff section type"
+    #
+    #     if design_dictionary[KEY_SEC_PROFILE] == 'Angles':
+    #         # print (Angle)
+    #         self.section_size_maxarea = Angle(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+    #         self.section_size_maxarea.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+    #                                                     subkey=design_dictionary[KEY_LOCATION], mom_inertia_y=0.0,
+    #                                                     mom_inertia_z=0.0, rad_y=self.section_size_maxarea.rad_of_gy_y,
+    #                                                     rad_z=self.section_size_maxarea.rad_of_gy_z,
+    #                                                     rad_u=self.section_size_maxarea.rad_of_gy_u,
+    #                                                     rad_v=self.section_size_maxarea.rad_of_gy_v,
+    #                                                     area=self.section_size_maxarea.area, Cg_1=0.0, Cg_2=0.0,
+    #                                                     thickness=0.0)
+    #         self.section_size_maxarea.tension_member_yielding(A_g=(self.section_size_maxarea.area),
+    #                                                           F_y=self.section_size_maxarea.fy)
+    #         self.max_member_force = self.section_size_maxarea.tension_yielding_capacity
+    #         self.section_size_maxarea.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+    #                                                                r=self.section_size_maxarea.min_radius_gyration)
+    #
+    #     elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
+    #         self.section_size_maxarea = Angle(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+    #         self.section_size_maxarea.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+    #                                                     subkey=design_dictionary[KEY_LOCATION],
+    #                                                     mom_inertia_y=self.section_size_maxarea.mom_inertia_y,
+    #                                                     mom_inertia_z=self.section_size_maxarea.mom_inertia_z,
+    #                                                     rad_y=self.section_size_maxarea.rad_of_gy_y,
+    #                                                     rad_z=self.section_size_maxarea.rad_of_gy_z,
+    #                                                     rad_u=self.section_size_maxarea.rad_of_gy_u,
+    #                                                     rad_v=self.section_size_maxarea.rad_of_gy_v,
+    #                                                     area=self.section_size_maxarea.area, Cg_1=self.section_size_maxarea.Cy,
+    #                                                     Cg_2=self.section_size_maxarea.Cz,
+    #                                                     thickness=0.0)
+    #         self.section_size_maxarea.tension_member_yielding(A_g=(self.section_size_maxarea.area),
+    #                                                           F_y=self.section_size_maxarea.fy)
+    #         self.max_member_force = self.section_size_maxarea.tension_yielding_capacity * 2
+    #         self.section_size_maxarea.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+    #                                                                r=self.section_size_maxarea.min_radius_gyration)
+    #
+    #
+    #     elif design_dictionary[KEY_SEC_PROFILE] == 'Back to Back Channels':
+    #         self.section_size_maxarea = Channel(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+    #         self.section_size_maxarea.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+    #                                                     subkey=design_dictionary[KEY_LOCATION],
+    #                                                     mom_inertia_y=self.section_size_maxarea.mom_inertia_y,
+    #                                                     mom_inertia_z=self.section_size_maxarea.mom_inertia_z,
+    #                                                     rad_y=self.section_size_maxarea.rad_of_gy_y,
+    #                                                     rad_z=self.section_size_maxarea.rad_of_gy_z,
+    #                                                     area=self.section_size_maxarea.area, Cg_1=self.section_size_maxarea.Cy,
+    #                                                     Cg_2=0.0, thickness=0.0)
+    #         self.section_size_maxarea.tension_member_yielding(A_g=(self.section_size_maxarea.area),
+    #                                                           F_y=self.section_size_maxarea.fy)
+    #         self.max_member_force = self.section_size_maxarea.tension_yielding_capacity * 2
+    #         self.section_size_maxarea.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+    #                                                                r=self.section_size_maxarea.min_radius_gyration)
+    #     else:
+    #         self.section_size_maxarea = Channel(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+    #
+    #         self.section_size_maxarea.tension_member_yielding(A_g=(self.section_size_maxarea.area),
+    #                                                           F_y=self.section_size_maxarea.fy)
+    #         self.max_member_force = self.section_size_maxarea.tension_yielding_capacity
+    #         self.section_size_maxarea = Channel(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+    #         self.section_size_maxarea.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+    #                                                         subkey=design_dictionary[KEY_LOCATION],
+    #                                                         mom_inertia_y=self.section_size_maxarea.mom_inertia_y,
+    #                                                         mom_inertia_z=self.section_size_maxarea.mom_inertia_z,
+    #                                                         rad_y=self.section_size_maxarea.rad_of_gy_y,
+    #                                                         rad_z=self.section_size_maxarea.rad_of_gy_z,
+    #                                                         area=self.section_size_maxarea.area,
+    #                                                         Cg_1=self.section_size_maxarea.Cy,
+    #                                                         Cg_2=0.0, thickness=0.0)
+    #         self.section_size_maxarea.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+    #                                                                r=self.section_size_maxarea.min_radius_gyration)
+    #
+    #     return self.max_member_force
+    #
+    # def max_length(self, design_dictionary, max_section):
+    #
+    #     "calculated max force and length based on the maximum section size avaialble for diff section type"
+    #
+    #     if design_dictionary[KEY_SEC_PROFILE] == 'Angles':
+    #         # print (Angle)
+    #         self.section_size_max = Angle(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+    #         self.section_size_max.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+    #                                                     subkey=design_dictionary[KEY_LOCATION], mom_inertia_y=0.0,
+    #                                                     mom_inertia_z=0.0, rad_y=self.section_size_max.rad_of_gy_y,
+    #                                                     rad_z=self.section_size_max.rad_of_gy_z,
+    #                                                     rad_u=self.section_size_max.rad_of_gy_u,
+    #                                                     rad_v=self.section_size_max.rad_of_gy_v,
+    #                                                     area=self.section_size_max.area, Cg_1=0.0, Cg_2=0.0,
+    #                                                     thickness=0.0)
+    #         self.max_memb_length = 400 * self.section_size_max.min_radius_gyration
+    #         self.section_size_max.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+    #                                                            r=self.section_size_max.min_radius_gyration)
+    #
+    #
+    #     elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
+    #         self.section_size_max = Angle(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+    #         self.section_size_max.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+    #                                                     subkey=design_dictionary[KEY_LOCATION],
+    #                                                     mom_inertia_y=self.section_size_max.mom_inertia_y,
+    #                                                     mom_inertia_z=self.section_size_max.mom_inertia_z,
+    #                                                     rad_y=self.section_size_max.rad_of_gy_y,
+    #                                                     rad_z=self.section_size_max.rad_of_gy_z,
+    #                                                     rad_u=self.section_size_max.rad_of_gy_u,
+    #                                                     rad_v=self.section_size_max.rad_of_gy_v,
+    #                                                     area=self.section_size_max.area, Cg_1=self.section_size_max.Cy,
+    #                                                     Cg_2=self.section_size_max.Cz,
+    #                                                     thickness=0.0)
+    #         self.max_memb_length = 400 * self.section_size_max.min_radius_gyration
+    #         self.section_size_max.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+    #                                                            r=self.section_size_max.min_radius_gyration)
+    #
+    #
+    #     elif design_dictionary[KEY_SEC_PROFILE] in ['Channels','Back to Back Channels']:
+    #         self.section_size_max = Channel(designation=max_section, material_grade=design_dictionary[KEY_MATERIAL])
+    #         self.section_size_max.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+    #                                                     subkey=design_dictionary[KEY_LOCATION],
+    #                                                     mom_inertia_y=self.section_size_max.mom_inertia_y,
+    #                                                     mom_inertia_z=self.section_size_max.mom_inertia_z,
+    #                                                     rad_y=self.section_size_max.rad_of_gy_y,
+    #                                                     rad_z=self.section_size_max.rad_of_gy_z,
+    #                                                     area=self.section_size_max.area, Cg_1=self.section_size_max.Cy,
+    #                                                     Cg_2=0.0, thickness=0.0)
+    #         self.max_memb_length = 400 * self.section_size_max.min_radius_gyration
+    #         self.section_size_max.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+    #                                                            r=self.section_size_max.min_radius_gyration)
+    #
+    #
+    #     return self.max_memb_length
+
+    def max_force_length(self,section):
 
         "calculated max force and length based on the maximum section size avaialble for diff section type"
 
-        if design_dictionary[KEY_SEC_PROFILE] == 'Angles':
+        if self.sec_profile == 'Angles':
             # print (Angle)
-            self.section_size_max = Angle(designation = max_section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-            self.section_size_max.tension_member_yielding(A_g = (self.section_size_max.area) , F_y = self.section_size_max.fy)
-            self.max_member_force = self.section_size_max.tension_yielding_capacity
-            self.section_size_max.min_rad_gyration_calc(key = design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],mom_inertia_y = 0.0 ,mom_inertia_z = 0.0 ,rad_y = self.section_size_max.rad_of_gy_y , rad_z = self.section_size_max.rad_of_gy_z, rad_u =self.section_size_max.rad_of_gy_u, rad_v=self.section_size_max.rad_of_gy_v, area = self.section_size_max.area,Cg_1= 0.0,Cg_2= 0.0,thickness=0.0)
-            self.max_length = 400 * self.section_size_max.min_radius_gyration
-            self.section_size_max.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
-                                                           r=self.section_size_max.min_radius_gyration)
 
-
-        elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
-            self.section_size_max = Angle(designation=max_section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
+            self.section_size_max = Angle(designation=section, material_grade=self.material)
             self.section_size_max.tension_member_yielding(A_g=(self.section_size_max.area),
                                                           F_y=self.section_size_max.fy)
-            self.max_member_force = self.section_size_max.tension_yielding_capacity * 2
-            self.section_size_max.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],
+            self.max_member_force = self.section_size_max.tension_yielding_capacity
+            self.section_size_max.min_rad_gyration_calc(key=self.sec_profile,
+                                                        subkey=self.loc, mom_inertia_y=0.0,
+                                                        mom_inertia_z=0.0, rad_y=self.section_size_max.rad_of_gy_y,
+                                                        rad_z=self.section_size_max.rad_of_gy_z,
+                                                        rad_u=self.section_size_max.rad_of_gy_u,
+                                                        rad_v=self.section_size_max.rad_of_gy_v,
+                                                        area=self.section_size_max.area, Cg_1=0.0, Cg_2=0.0,
+                                                        thickness=0.0)
+            self.max_length = 400 * self.section_size_max.min_radius_gyration
+
+
+        elif self.sec_profile in ['Back to Back Angles', 'Star Angles']:
+            self.section_size_max = Angle(designation=section, material_grade=self.material)
+            self.section_size_max.tension_member_yielding(A_g=(2*self.section_size_max.area),
+                                                          F_y=self.section_size_max.fy)
+            # self.max_member_force = self.section_size_max.tension_yielding_capacity * 2
+            self.section_size_max.min_rad_gyration_calc(key=self.sec_profile,
+                                                        subkey=self.loc,
                                                         mom_inertia_y=self.section_size_max.mom_inertia_y,
                                                         mom_inertia_z=self.section_size_max.mom_inertia_z,
                                                         rad_y=self.section_size_max.rad_of_gy_y,
-                                                        rad_z=self.section_size_max.rad_of_gy_z, rad_u =self.section_size_max.rad_of_gy_u, rad_v=self.section_size_max.rad_of_gy_v,
-                                                        area=self.section_size_max.area, Cg_1=self.section_size_max.Cy,Cg_2=self.section_size_max.Cz,
+                                                        rad_z=self.section_size_max.rad_of_gy_z,
+                                                        rad_u=self.section_size_max.rad_of_gy_u,
+                                                        rad_v=self.section_size_max.rad_of_gy_v,
+                                                        area=self.section_size_max.area, Cg_1=self.section_size_max.Cy,
+                                                        Cg_2=self.section_size_max.Cz,
                                                         thickness=0.0)
             self.max_length = 400 * self.section_size_max.min_radius_gyration
-            self.section_size_max.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
-                                                               r=self.section_size_max.min_radius_gyration)
 
 
-        elif design_dictionary[KEY_SEC_PROFILE] == 'Channels':
-            self.section_size_max = Channel(designation=max_section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-            self.section_size_max.tension_member_yielding(A_g = (self.section_size_max.area) , F_y = self.section_size_max.fy)
+
+
+        elif self.sec_profile == 'Channels':
+            self.section_size_max = Channel(designation=section, material_grade=self.material)
+            self.section_size_max.tension_member_yielding(A_g=(self.section_size_max.area),
+                                                          F_y=self.section_size_max.fy)
+
             self.max_member_force = self.section_size_max.tension_yielding_capacity
-            self.section_size_max.min_rad_gyration_calc(key = design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],mom_inertia_y = self.section_size_max.mom_inertia_y,mom_inertia_z = self.section_size_max.mom_inertia_z,rad_y = self.section_size_max.rad_of_gy_y , rad_z = self.section_size_max.rad_of_gy_z,area = self.section_size_max.area,Cg_1 = self.section_size_max.Cy, Cg_2=0.0,thickness=0.0)
+            self.section_size_max.min_rad_gyration_calc(key=self.sec_profile,
+                                                        subkey=self.loc,
+                                                        mom_inertia_y=self.section_size_max.mom_inertia_y,
+                                                        mom_inertia_z=self.section_size_max.mom_inertia_z,
+                                                        rad_y=self.section_size_max.rad_of_gy_y,
+                                                        rad_z=self.section_size_max.rad_of_gy_z,
+                                                        area=self.section_size_max.area, Cg_1=self.section_size_max.Cy,
+                                                        Cg_2=0.0, thickness=0.0)
             self.max_length = 400 * self.section_size_max.min_radius_gyration
-            self.section_size_max.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
-                                                               r=self.section_size_max.min_radius_gyration)
 
 
-        elif design_dictionary[KEY_SEC_PROFILE] ==  'Back to Back Channels':
-            self.section_size_max = Channel(designation=max_section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-            self.section_size_max.tension_member_yielding(A_g = (self.section_size_max.area) , F_y = self.section_size_max.fy)
-            self.max_member_force  = 2 * self.section_size_max.tension_yielding_capacity
-            self.section_size_max.min_rad_gyration_calc(key = design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],mom_inertia_y = self.section_size_max.mom_inertia_y,mom_inertia_z = self.section_size_max.mom_inertia_z,rad_y = self.section_size_max.rad_of_gy_y , rad_z = self.section_size_max.rad_of_gy_z,area = self.section_size_max.area,Cg_1 = self.section_size_max.Cy, Cg_2=0.0,thickness=0.0)
+        elif self.sec_profile == 'Back to Back Channels':
+            self.section_size_max = Channel(designation=section, material_grade=self.material)
+            self.section_size_max.tension_member_yielding(A_g=(2*self.section_size_max.area),
+                                                          F_y=self.section_size_max.fy)
+            # self.max_member_force = 2 * self.section_size_max.tension_yielding_capacity
+            self.section_size_max.min_rad_gyration_calc(key=self.sec_profile,
+                                                        subkey=self.loc,
+                                                        mom_inertia_y=self.section_size_max.mom_inertia_y,
+                                                        mom_inertia_z=self.section_size_max.mom_inertia_z,
+                                                        rad_y=self.section_size_max.rad_of_gy_y,
+                                                        rad_z=self.section_size_max.rad_of_gy_z,
+                                                        area=self.section_size_max.area, Cg_1=self.section_size_max.Cy,
+                                                        Cg_2=0.0, thickness=0.0)
             self.max_length = 400 * self.section_size_max.min_radius_gyration
-            self.section_size_max.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
-                                                               r=self.section_size_max.min_radius_gyration)
+        self.section_size_max.design_check_for_slenderness(K=self.K, L=self.length,
+                                                       r=self.section_size_max.min_radius_gyration)
 
-        return self.max_member_force,self.max_length
+        return self.section_size_max.tension_yielding_capacity, self.max_length, self.section_size_max.slenderness,self.section_size_max.min_radius_gyration
 
 
     def initial_member_capacity(self,design_dictionary,previous_size = None):
@@ -853,11 +1082,12 @@ class Tension_bolted(Member):
 
         min_yield = 0
         
-        max = self.max_section(self,design_dictionary,self.sizelist)
-        print(max,"hgsvfsg")
+        self.max_section(self,design_dictionary,self.sizelist)
+        # print(area,gyr,"hgsvfsg")
         # self.max_size = self.select_section(self, design_dictionary, max)
 
-        [max_force,length] = self.max_force_length(self, design_dictionary, max)
+        [self.force1, self.len1, self.slen1, self.gyr1]= self.max_force_length(self,  self.max_area)
+        [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self,  self.max_gyr)
 
         "Loop checking each member from sizelist based on yield capacity"
 
@@ -1014,8 +1244,8 @@ class Tension_bolted(Member):
 
                     "condition to limit loop based on max force derived from max available size."
 
-                elif (self.load.axial_force*1000 > max_force) :
-                    self.max_limit_status = True
+                elif (self.load.axial_force*1000 > self.force1) :
+                    self.max_limit_status_1 = True
                     # self.design_status = False
                     logger.error(" : Tension force exceeds tension capacity for maximum available member size.")
                     # logger.error(": Design is not safe. \n ")
@@ -1024,8 +1254,8 @@ class Tension_bolted(Member):
 
                     "condition to limit loop based on max length derived from max available size"
 
-                elif self.length > length:
-                    self.max_limit_status = True
+                elif self.length > self.len2:
+                    self.max_limit_status_2 = True
                     # self.design_status = False
                     logger.error(" : Length exceeds maximum allowable length for maximum available member size .")
                     # logger.error(": Design is not safe. \n ")
@@ -1035,7 +1265,7 @@ class Tension_bolted(Member):
                 else:
                     pass
 
-        if self.member_design_status == False and self.max_limit_status !=True:
+        if self.member_design_status == False and self.max_limit_status_1!=True and self.max_limit_status_2!=True:
             logger.error(" : Member depth can't accomodate minimum avaialble bolt diameter.")
             logger.error(" : Reduce the bolt size or increase the member size")
             # logger.error(": Design is not safe. \n ")
@@ -1046,7 +1276,7 @@ class Tension_bolted(Member):
             self.design_status = True
             self.select_bolt_dia(self, design_dictionary)
         else:
-            print(self.member_design_status,"hxfv")
+            # print(self.member_design_status,"hxfv")
             self.design_status = False
             logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
@@ -1441,7 +1671,6 @@ class Tension_bolted(Member):
 
         "Calculate plate thickness based on the tension capacity fron the available list of plate thickness"
 
-        self.plate_design_status = False
         self.plate_last = self.plate.thickness[-1]
 
         "recalculating block shear capacity of the bolt based on the change in pitch while block shear check in member design"
@@ -1544,6 +1773,7 @@ class Tension_bolted(Member):
 
             self.plate.tension_blockshear_area_input(A_vg = A_vg, A_vn = A_vn, A_tg = A_tg, A_tn = A_tn, f_u = self.plate.fu, f_y = self.plate.fy)
             self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
+            print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
 
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
                 max_tension_yield = 400 * self.plate.fy * 80 / 1.1
@@ -1562,20 +1792,23 @@ class Tension_bolted(Member):
                 pass
 
         if self.plate_tension_capacity > self.res_force:
-            print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
+            # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
             if (2 * self.plate.length + 100) > self.length:
                 self.design_status = False
                 logger.info("Plate length exceeds the Member length")
-                logger.info("Try higher diameter of bolt to get a safe design")
+                logger.info("Try higher diameter of bolt to get a safe design or member length is not sufficient")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
             else:
                 self.plate_design_status = True
                 self.design_status = True
-                logger.info("In case of reverse load, slenderness value should be less than 180.")
+                self.intermittent_bolt(self, design_dictionary)
+                logger.info("In case of reverse load, slenderness value shall be less than 180.")
+                logger.info("In case of reverse load, spacing of intermittent connection shall be less than 600.")
                 logger.info(": Overall bolted tension member design is safe. \n")
                 logger.debug(" :=========End Of design===========")
         else:
+            print(self.plate_tension_capacity, "hsdvdhsd")
             if self.plate_tension_capacity < max_tension_yield and self.res_force < max_tension_yield:
                 print(self.section_size_1.designation, "hsdvdhsd")
                 self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
@@ -1587,6 +1820,55 @@ class Tension_bolted(Member):
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
                 print(self.design_status)
+
+    def intermittent_bolt(self, design_dictionary):
+
+        self.inter_length = self.length - 2 * (self.plate.end_dist_provided + (self.plate.bolt_line -1)*self.plate.pitch_provided)
+        if design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
+            # print (Angle)
+            self.inter_memb = Angle(designation=self.section_size_1.designation, material_grade=design_dictionary[KEY_SEC_MATERIAL])
+            min_gyration = min(self.inter_memb.rad_of_gy_u, self.inter_memb.rad_of_gy_v)
+
+
+        elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Channels']:
+            self.inter_memb = Channel(designation=self.section_size_1.designation,
+                                    material_grade=design_dictionary[KEY_SEC_MATERIAL])
+            min_gyration = min(self.inter_memb.rad_of_gy_y, self.inter_memb.rad_of_gy_z)
+
+
+        # print (self.inter_memb.min_radius_gyration,"hgvsdfsdff")
+        if design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles','Back to Back Channels'] and self.inter_length > 1000:
+            self.inter_memb_length = 400 * min_gyration
+
+            if self.inter_memb_length > 1000:
+                ratio = round_up(self.inter_length/1000,1)
+            else:
+                ratio = round_up(self.inter_length/self.inter_memb_length,1)
+            self.inter_memb_length = self.inter_length / ratio
+            self.inter_conn = ratio - 1
+            self.inter_bolt_one_line = self.plate.bolts_one_line
+            self.inter_bolt_line = 1
+            self.inter_plate_length = 2 * self.plate.end_dist_provided
+            if self.loc == "Long Leg":
+                self.inter_plate_height = self.section_size_1.max_leg
+            elif self.loc == "Short Leg":
+                self.inter_plate_height = self.section_size_1.min_leg
+            else:
+                self.inter_plate_height = self.section_size_1.depth
+            self.inter_dia = self.bolt.bolt_diameter_provided
+            self.inter_grade = self.bolt.bolt_grade_provided
+
+        else:
+            self.inter_conn = 0.0
+            self.inter_bolt_one_line = 0.0
+            self.inter_bolt_line = 0.0
+            self.inter_plate_length = 0.0
+            self.inter_plate_height = 0.0
+            self.inter_memb_length = 0.0
+            self.inter_dia = 0.0
+            self.inter_grade =0.0
+
+
 
     def results_to_test(self, filename):
         test_out_list = {KEY_DISP_DESIGNATION:self.section_size_1.designation,
@@ -1608,8 +1890,8 @@ class Tension_bolted(Member):
                         KEY_OUT_DISP_GAUGE:self.plate.gauge_provided,
                         KEY_OUT_DISP_EDGE_DIST:self.plate.edge_dist_provided,
                         KEY_OUT_DISP_PLATETHK:self.plate.thickness_provided,
-                        KEY_OUT_DISP_PLATE_HEIGHT:self.plate.height,
-                        KEY_OUT_DISP_PLATE_LENGTH:self.plate.length}
+                        KEY_OUT_DISP_PLATE_MIN_HEIGHT:self.plate.height,
+                        KEY_OUT_DISP_PLATE_MIN_LENGTH:self.plate.length}
         f = open(filename, "w")
         f.write(str(test_out_list))
         f.close()
@@ -1620,7 +1902,17 @@ class Tension_bolted(Member):
             section_size = self.section_size_1
             depth_max = self.max_plate_height
         else:
-            section_size = self.section_size_max
+            if self.max_limit_status_2 == True:
+                if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
+                    section_size = Angle(designation=self.max_gyr, material_grade=self.material)
+                else:
+                    section_size = Channel(designation=self.max_gyr, material_grade=self.material)
+            else:
+                if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
+                    section_size = Angle(designation=self.max_area, material_grade=self.material)
+                else:
+                    section_size = Channel(designation=self.max_area, material_grade=self.material)
+
             depth_max = self.max_depth
         
         # if self.member_design_status == True:
@@ -1628,15 +1920,15 @@ class Tension_bolted(Member):
             image = "Channel"
             connecting_plates = [self.plate.thickness_provided, section_size.web_thickness]
             min_gauge = self.pitch_round
-            row_limit = "Row~Limit~(r_l) = 2"
-            row = 2.0
+            row_limit = "Row Limit (rl) = 2"
+            row = 2
             depth =  2 * self.edge_dist_min_round + self.pitch_round
         elif section_size.max_leg == section_size.min_leg:
             image = "Equal"
             connecting_plates = [self.plate.thickness_provided, section_size.thickness]
             min_gauge = 0.0
-            row_limit = "Row~Limit~(r_l) = 1"
-            row = 1.0
+            row_limit = "Row Limit (rl) = 1"
+            row = 1
             # if self.loc == "Long Leg":
             depth = 2 * self.edge_dist_min_round
 
@@ -1644,8 +1936,8 @@ class Tension_bolted(Member):
             image = "Unequal"
             connecting_plates = [self.plate.thickness_provided, section_size.thickness]
             min_gauge = 0.0
-            row_limit = "Row~Limit~(r_l) = 1"
-            row = 1.0
+            row_limit = "Row Limit (rl) = 1"
+            row = 1
             # if self.loc == "Long Leg":
             depth = 2 * self.edge_dist_min_round
 
@@ -1666,13 +1958,32 @@ class Tension_bolted(Member):
         #         min_gauge = 0.0
         #         row_limit = "Row Limit = 1"
 
-
-        if self.bolt.bolt_type == TYP_BEARING:
-            variable = KEY_DISP_GAMMA_MB
-            value = gamma(self.bolt.gamma_mb,"mb")
+        if self.member_design_status == True:
+            if self.bolt.bolt_type == TYP_BEARING:
+                variable = KEY_DISP_GAMMA_MB
+                value = gamma(self.bolt.gamma_mb,"mb")
+            else:
+                variable = KEY_DISP_GAMMA_MF
+                value = gamma(self.bolt.gamma_mf,"mf")
         else:
-            variable = KEY_DISP_GAMMA_MF
-            value = gamma(self.bolt.gamma_mf,"mf")
+            if self.bolt.bolt_type == TYP_BEARING:
+                variable = KEY_DISP_GAMMA_MF
+                value = gamma(1.25,"mf")
+            else:
+                variable = KEY_DISP_GAMMA_MF
+                value = gamma(1.25, "mf")
+
+        if self.member_design_status == True:
+            member_yield_kn = round((section_size.tension_yielding_capacity / 1000), 2)
+            slenderness = section_size.slenderness
+            gyration = section_size.min_radius_gyration
+        else:
+            if self.max_limit_status_2 == True:
+                [member_yield_kn, l, slenderness, gyration] = self.max_force_length(self, self.max_gyr)
+                member_yield_kn = round(member_yield_kn / 1000,2)
+            else:
+                [member_yield_kn, l, slenderness, gyration] = self.max_force_length(self, self.max_area)
+                member_yield_kn = round(member_yield_kn / 1000,2)
 
         # if self.member_design_status == True:
         if self.sec_profile in ["Channels", "Back to Back Channels"]:
@@ -1692,15 +2003,15 @@ class Tension_bolted(Member):
                                       'R1(mm)': round(section_size.root_radius,2),
                                       'R2(mm)':round(section_size.toe_radius,2),
                                       'Cy(mm)': round(section_size.Cy,2),
-                                      'Iz(mm4)': round(section_size.mom_inertia_z,2),
+                                      'Ix(mm4)': round(section_size.mom_inertia_z,2),
                                       'Iy(mm4)': round(section_size.mom_inertia_y,2),
-                                      'rz(mm)': round(section_size.rad_of_gy_z,2),
+                                      'rx(mm)': round(section_size.rad_of_gy_z,2),
                                       'ry(mm)': round(section_size.rad_of_gy_y,2),
-                                      'Zz(mm3)': round(section_size.elast_sec_mod_z,2),
+                                      'Zx(mm3)': round(section_size.elast_sec_mod_z,2),
                                       'Zy(mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'Zpz(mm3)': round(section_size.plast_sec_mod_z,2),
+                                      'Zpx(mm3)': round(section_size.plast_sec_mod_z,2),
                                       'Zpy(mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'r(mm3)': round(section_size.min_radius_gyration,2)}
+                                      'r(mm)': round(gyration,2)}
             thickness = section_size.web_thickness
             text = "C"
         else:
@@ -1718,20 +2029,20 @@ class Tension_bolted(Member):
                                       'R1(mm)': round(section_size.root_radius,2),
                                       'R2(mm)': round(section_size.toe_radius,2),
                                       'Cy(mm)': round(section_size.Cy,2),
-                                      'Cz(mm)': round(section_size.Cz,2),
-                                      'Iz(mm4)': round(section_size.mom_inertia_z,2),
+                                      'Cx(mm)': round(section_size.Cz,2),
+                                      'Ix(mm4)': round(section_size.mom_inertia_z,2),
                                       'Iy(mm4)': round(section_size.mom_inertia_y,2),
                                       'Iu(mm4)': round(section_size.mom_inertia_u,2),
                                       'Iv(mm4)': round(section_size.mom_inertia_v,2),
-                                      'rz(mm)': round(section_size.rad_of_gy_z,2),
+                                      'rx(mm)': round(section_size.rad_of_gy_z,2),
                                       'ry(mm)': round((section_size.rad_of_gy_y),2),
                                       'ru(mm)': round((section_size.rad_of_gy_u),2),
                                       'rv(mm)': round((section_size.rad_of_gy_v),2),
-                                      'Zz(mm3)': round(section_size.elast_sec_mod_z,2),
+                                      'Zx(mm3)': round(section_size.elast_sec_mod_z,2),
                                       'Zy(mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'Zpz(mm3)': round(section_size.plast_sec_mod_z,2),
+                                      'Zpx(mm3)': round(section_size.plast_sec_mod_z,2),
                                       'Zpy(mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'r(mm3)': round(section_size.min_radius_gyration,2)}
+                                      'r(mm)': round(gyration,2)}
             thickness = section_size.thickness
             text = "A"
 
@@ -1751,8 +2062,8 @@ class Tension_bolted(Member):
              KEY_DISP_GRD: str(self.bolt.bolt_grade),
              KEY_DISP_TYP: self.bolt.bolt_type,
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-             KEY_DISP_DP_BOLT_FU: round(self.bolt.bolt_fu,2),
-             KEY_DISP_DP_BOLT_FY: round(self.bolt.bolt_fy,2),
+             # KEY_DISP_DP_BOLT_FU: round(self.bolt.bolt_fu,2),
+             # KEY_DISP_DP_BOLT_FY: round(self.bolt.bolt_fy,2),
              KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
              KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
@@ -1767,10 +2078,7 @@ class Tension_bolted(Member):
         self.report_check = []
         # connecting_plates = [self.plate.thickness_provided, section_size.web_thickness]
         self.load.shear_force = 0.0
-        if self.member_design_status == True:
-            member_yield_kn = round((section_size.tension_yielding_capacity/1000),2)
-        else:
-            member_yield_kn = round((self.max_member_force / 1000), 2)
+
 
         if self.member_design_status == True and self.bolt_design_status ==True:
             member_rupture_kn = round((section_size.tension_rupture_capacity/1000),2)
@@ -1796,17 +2104,43 @@ class Tension_bolted(Member):
 
         t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
         self.report_check.append(t1)
-        t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{5cm}|p{1cm}|')
-        self.report_check.append(t1)
-        t6 = ( KEY_OUT_DISP_D_MIN, "", display_prov(self.bolt_diameter_min, "d"),'')
-        self.report_check.append(t6)
-        t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
-        self.report_check.append(t2)
-        t3 = (DISP_MIN_EDGE, min_edge_end(self.d_0_min, self.bolt.edge_type),
-              self.edge_dist_min_round,"")
-        self.report_check.append(t3)
-        t3 = (KEY_SPACING, depth_req(self.edge_dist_min_round,self.pitch_round,row,text),depth_max, get_pass_fail(depth, depth_max, relation="lesser"))
-        self.report_check.append(t3)
+
+        if self.member_design_status == True:
+            t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{3cm}|')
+            self.report_check.append(t1)
+            t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt.bolt_diameter_provided), "d"), '')
+            self.report_check.append(t6)
+            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.bolt.d_0), "d_0"), '')
+            self.report_check.append(t8)
+            # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
+            # self.report_check.append(t2)
+            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided), self.bolt.min_gauge_round, row_limit)
+            self.report_check.append(t2)
+            t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+                  self.bolt.min_edge_dist_round, "")
+            self.report_check.append(t3)
+            t3 = (
+            KEY_SPACING, depth_req(self.bolt.min_edge_dist_round, self.bolt.min_pitch_round, row, text), depth_max,
+            get_pass_fail(depth, depth_max, relation="lesser"))
+            self.report_check.append(t3)
+
+        else:
+            t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{3cm}|')
+            self.report_check.append(t1)
+            t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt_diameter_min), "d"), '')
+            self.report_check.append(t6)
+            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.d_0_min), "d_0"), '')
+            self.report_check.append(t8)
+            # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
+            # self.report_check.append(t2)
+            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min), min_gauge, row_limit)
+            self.report_check.append(t2)
+            t3 = (DISP_MIN_EDGE, min_edge_end(self.d_0_min, self.bolt.edge_type),
+                  self.edge_dist_min_round, "")
+            self.report_check.append(t3)
+            t3 = (KEY_SPACING, depth_req(self.edge_dist_min_round, self.pitch_round, row, text), depth_max,
+                  get_pass_fail(depth, depth_max, relation="lesser"))
+            self.report_check.append(t3)
 
         if self.member_design_status == True and self.bolt_design_status == True:
             t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
@@ -1820,14 +2154,14 @@ class Tension_bolted(Member):
             self.report_check.append(t4)
             t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(member_yield_kn, member_rupture_kn, member_blockshear_kn),get_pass_fail(self.load.axial_force,section_size.tension_capacity, relation="lesser"))
             self.report_check.append(t8)
-            t5 = (KEY_DISP_SLENDER, slenderness_req(), slenderness_prov( 1, self.length,round(section_size.min_radius_gyration,2), section_size.slenderness), '')
+            t5 = (KEY_DISP_SLENDER, slenderness_req(), slenderness_prov( 1, self.length,round(gyration,2), slenderness), get_pass_fail(400,slenderness, relation="greater"))
             self.report_check.append(t5)
             t6 = (KEY_DISP_EFFICIENCY, efficiency_req(),
                   efficiency_prov(self.load.axial_force, section_size.tension_capacity, self.efficiency), '')
             self.report_check.append(t6)
             t1 = (KEY_DISP_AXIAL_FORCE_CON, axial_capacity_req(axial_capacity=round((section_size.tension_yielding_capacity/1000), 2),
                                                                    min_ac=round(((0.3*section_size.tension_yielding_capacity) / 1000), 2)),
-                  display_prov(round((self.res_force/1000),2),"A"),min_prov_max(round(((0.3*section_size.tension_yielding_capacity) / 1000), 2),self.res_force/1000,round((section_size.tension_yielding_capacity/1000), 2)))
+                  display_prov(round((self.res_force/1000),2),"A"),min_prov_max(round(((0.3*section_size.tension_yielding_capacity) / 1000), 2),round(self.res_force/1000,2),round((section_size.tension_yielding_capacity/1000), 2)))
             self.report_check.append(t1)
         else:
             # t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
@@ -1840,8 +2174,8 @@ class Tension_bolted(Member):
             self.report_check.append(t2)
 
             t5 = (KEY_DISP_SLENDER, slenderness_req(),
-                  slenderness_prov(1, self.length, round(section_size.min_radius_gyration, 2),
-                                   section_size.slenderness), '')
+                  slenderness_prov(1, self.length, round(gyration, 2),
+                                  slenderness), get_pass_fail(400,slenderness, relation="greater"))
             self.report_check.append(t5)
 
 
@@ -1851,14 +2185,21 @@ class Tension_bolted(Member):
 
             self.report_check.append(t7)
 
-            t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt.bolt_diameter_provided,"d"), '')
+            t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(int(self.bolt.bolt_diameter_provided),"d"), '')
             self.report_check.append(t6)
+
+            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.bolt.d_0), "d_0"), '')
+            self.report_check.append(t8)
 
             t8 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Grade Optimisation", self.bolt.bolt_grade_provided, '')
             self.report_check.append(t8)
 
-            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt.d_0,"d_0"), '')
+            t8 = (KEY_DISP_DP_BOLT_FU, "", display_prov(round(self.bolt.bolt_fu,2), "f_{ub}"), '')
             self.report_check.append(t8)
+
+            t8 = (KEY_DISP_DP_BOLT_FY, "", display_prov(round(self.bolt.bolt_fy, 2), "f_{yb}"), '')
+            self.report_check.append(t8)
+
 
             t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area, "A_{nb}"," Ref~IS~1367-3~(2002)"), '')
             self.report_check.append(t8)
@@ -1949,14 +2290,14 @@ class Tension_bolted(Member):
 
             self.clearance = 30.0
             if self.sec_profile in ["Channels", 'Back to Back Channels']:
-                t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,self.plate.height,1),"")
+                t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT,'',gusset_ht_prov(self.section_size_1.depth, self.clearance,int(self.plate.height),1),"")
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                       tension_yield_prov(l = self.section_size_1.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), '')
                 t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '', tension_rupture_bolted_prov(self.section_size_1.depth, self.plate.thickness_provided,self.plate.bolts_one_line, self.bolt.dia_hole,self.plate.fu, gamma_m1,plate_rupture_kn), '')
 
             elif self.sec_profile in ["Angles", 'Back to Back Angles']:
                 if self.loc == "Long Leg":
-                    t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,self.plate.height, 1), "")
+                    t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,int(self.plate.height), 1), "")
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                           tension_yield_prov(l=self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
                                              gamma=gamma_m0, T_dg =plate_yield_kn), '')
@@ -1966,7 +2307,7 @@ class Tension_bolted(Member):
                                                plate_rupture_kn), '')
 
                 else:
-                    t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.min_leg, self.clearance, self.plate.height,1), "")
+                    t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.min_leg, self.clearance,int(self.plate.height),1), "")
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                           tension_yield_prov(l=self.section_size_1.min_leg, t=self.plate.thickness_provided,
                                              f_y=self.plate.fy,
@@ -1977,7 +2318,7 @@ class Tension_bolted(Member):
                                                plate_rupture_kn), '')
             else:
                 if self.loc == "Long Leg":
-                    t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,self.plate.height, 2), "")
+                    t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,int(self.plate.height), 2), "")
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                           tension_yield_prov(l=2*self.section_size_1.max_leg, t=self.plate.thickness_provided, f_y=self.plate.fy,
                                              gamma=gamma_m0, T_dg=plate_yield_kn), '')
@@ -1986,7 +2327,7 @@ class Tension_bolted(Member):
                                                self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
                                                plate_rupture_kn), '')
                 else:
-                    t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,self.plate.height, 2)
+                    t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '', gusset_ht_prov(self.section_size_1.max_leg, self.clearance,int(self.plate.height), 2)
                           , "")
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
                           tension_yield_prov(l=2*self.section_size_1.min_leg, t=self.plate.thickness_provided,
@@ -1998,8 +2339,8 @@ class Tension_bolted(Member):
                                                plate_rupture_kn), '')
             self.report_check.append(t3)
             t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, self.length,
-                  gusset_lt_b_prov(self.plate.bolt_line, self.plate.pitch_provided,self.plate.end_dist_provided,self.plate.length)
-                  , get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="lesser"))
+                  gusset_lt_b_prov(self.plate.bolt_line, self.plate.pitch_provided,self.plate.end_dist_provided,int(self.plate.length))
+                  , get_pass_fail(self.length, self.plate.length, relation="greater"))
             self.report_check.append(t4)
             t5 = (KEY_OUT_DISP_PLATETHK_REP, '',display_prov(self.plate.thickness_provided,"t_p"), "")
             self.report_check.append(t5)
@@ -2012,16 +2353,38 @@ class Tension_bolted(Member):
             self.report_check.append(t4)
 
             t8 = (KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
-            get_pass_fail(round((self.res_force/1000),2), self.plate_tension_capacity, relation="lesser"))
+            get_pass_fail(round((self.res_force/1000),2), round(self.plate_tension_capacity/1000,2), relation="lesser"))
             self.report_check.append(t8)
         else:
             pass
 
+        if self.plate_design_status == True and self.sec_profile not in ["Angles", "Channels"]:
 
+            t7 = ('SubSection', 'Intermittent Connection', '|p{2.5cm}|p{5cm}|p{7.5cm}|p{1cm}|')
+            self.report_check.append(t7)
 
+            t5 = (KEY_OUT_DISP_INTERCONNECTION, " ", self.inter_conn, "")
+            self.report_check.append(t5)
 
+            t5 = (KEY_OUT_DISP_INTERSPACING, 1000 , round(self.inter_memb_length,2),  get_pass_fail(1000, self.inter_memb_length, relation="geq"))
+            self.report_check.append(t5)
 
+            t6 = (KEY_OUT_DISP_D_PROVIDED, "", int(self.bolt.bolt_diameter_provided),'')
+            self.report_check.append(t6)
 
+            t8 = (KEY_OUT_DISP_GRD_PROVIDED, "", self.bolt.bolt_grade_provided, '')
+            self.report_check.append(t8)
+
+            t6 = (DISP_NUM_OF_COLUMNS, '',self.inter_bolt_line, '')
+            self.report_check.append(t6)
+            t7 = (DISP_NUM_OF_ROWS, '', self.inter_bolt_one_line, '')
+            self.report_check.append(t7)
+
+            t3 = (KEY_OUT_DISP_PLATE_MIN_HEIGHT, '',int(self.inter_plate_height), "")
+            self.report_check.append(t3)
+
+            t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, "",int(self.inter_plate_length),"")
+            self.report_check.append(t4)
         # t1 = ('SubSection', 'Plate Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         # self.report_check.append(t1)
         #

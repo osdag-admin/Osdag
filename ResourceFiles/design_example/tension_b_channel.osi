@@ -24,6 +24,8 @@ Bolt.Type: Bearing Bolt
 Conn_Location: Web
 Connector.Material: E 410 (Fe 540)
 Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
 Load.Axial: '200'
 Material: E 450 (Fe 590) E
@@ -88,13 +90,6 @@ Member.Designation:
 - MCP 350
 - MCP 400
 - MCP 75
-- tensionbolted
-- tensionbolted2
-- beamtensioned3
-- tension4
-- tensionbolted5
-- tensionbolted6
-- tensionbolted7
 Member.Length: '1000'
 Member.Material: E 410 (Fe 540)
 Member.Profile: Channels

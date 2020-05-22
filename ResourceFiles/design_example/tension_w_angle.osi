@@ -1,8 +1,6 @@
 Conn_Location: Long Leg
 Connector.Material: E 450 (Fe 570)D
 Design.Design_Method: Limit State Design
-Detailing.Corrosive_Influences: 'No'
-Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
 Load.Axial: '500'
 Material: E 450 (Fe 570)D

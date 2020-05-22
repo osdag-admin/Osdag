@@ -1,8 +1,6 @@
 Conn_Location: Web
 Connector.Material: E 450 (Fe 570)D
 Design.Design_Method: Limit State Design
-Detailing.Corrosive_Influences: 'No'
-Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
 Load.Axial: '800'
 Material: E 450 (Fe 570)D
@@ -67,7 +65,6 @@ Member.Designation:
 - MCP 350
 - MCP 400
 - MCP 75
-- ten_weld
 Member.Length: '7000'
 Member.Material: E 450 (Fe 570)D
 Member.Profile: Back to Back Channels

@@ -65,13 +65,15 @@ from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.connection.base_plate_connection import BasePlateConnection
+from design_type.tension_member.tension_bolted import Tension_bolted
+from design_type.tension_member.tension_welded import Tension_welded
 
 from cad.cad3dconnection import cadconnection
 
 
 class Ui_ModuleWindow(QMainWindow):
-
     closed = pyqtSignal()
+
     def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
         """
         Function to connect the customized_popup with the ui_template file
@@ -1784,6 +1786,10 @@ class Ui_ModuleWindow(QMainWindow):
             return CleatAngleConnection
         elif name == KEY_DISP_BASE_PLATE:
             return BasePlateConnection
+        elif name == KEY_DISP_TENSION_BOLTED:
+            return Tension_bolted
+        elif name == KEY_DISP_TENSION_WELDED:
+            return Tension_welded
 # Function for getting inputs from a file
     '''
     @author: Umair
@@ -1951,7 +1957,8 @@ class Ui_ModuleWindow(QMainWindow):
                 module_class = EndPlateConnection
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_CLEATANGLE,
-                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE]:
+                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED,
+                                                  KEY_DISP_TENSION_WELDED]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)

@@ -508,7 +508,7 @@ class Ui_Dialog(object):
                         l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
                         font = QtGui.QFont()
                         font.setPointSize(9)
-                        if lable in [KEY_DISP_SUPTNGSEC_DESIGNATION, 'Type', 'Source']:
+                        if lable in [KEY_DISP_DESIGNATION, 'Type', 'Source']:
                             font.setWeight(75)
                         else:
                             font.setWeight(50)
@@ -1172,9 +1172,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
         module = main.module_name(main)
 
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD,
-                          KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,
-                          KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE,KEY_DISP_COLUMNENDPLATE]:
+        if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE]:
 
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
@@ -1184,14 +1182,34 @@ class Ui_Dialog(object):
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+            pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CLEAT)
+            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+            pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CLEAT)
+            pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
 
-        if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD:
+        if module in [KEY_DISP_SEATED_ANGLE]:
+
+            pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
+            pushButton_Add_Column.clicked.connect(self.add_tab_column)
+            pushButton_Clear_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+            pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
+            pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+            pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_SEATED_ANGLE)
+            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+            pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_SEATED_ANGLE)
+            pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+
+        if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD or module == KEY_DISP_COLUMNENDPLATE:
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
             pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
 
-        if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD:
+
+        if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD or module == KEY_DISP_BEAMENDPLATE:
             pushButton_Clear_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
@@ -1212,6 +1230,16 @@ class Ui_Dialog(object):
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
             pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
+
+        if module == KEY_DISP_TENSION_BOLTED or module == KEY_DISP_TENSION_WELDED:
+            pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_ANGLE)
+            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+            pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_ANGLE)
+            pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+            pushButton_Clear_Channel = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CHANNEL)
+            pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab("Channel"))
+            pushButton_Add_Channel = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
+            pushButton_Add_Channel.clicked.connect(self.add_tab_channel)
 
     def clear_tab(self, tab_name):
         '''
@@ -1249,7 +1277,7 @@ class Ui_Dialog(object):
                 add_col.setDisabled(True)
                 break
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
-                if ch.objectName() == KEY_SUPTNGSEC_DESIGNATION:
+                if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC:
                     Designation_c = ch.text()
                 elif ch.objectName() == 'Label_21':
                     Source_c = ch.text()
@@ -1346,7 +1374,7 @@ class Ui_Dialog(object):
 
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
 
-                if ch.objectName() == KEY_SUPTDSEC_DESIGNATION:
+                if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTDSEC:
                     Designation_b = ch.text()
                 elif ch.objectName() == 'Label_21':
                     Source_b = ch.text()
@@ -1415,6 +1443,204 @@ class Ui_Dialog(object):
             else:
                 QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
 
+    def add_tab_angle(self):
+        '''
+        @author: Umair
+        '''
+        tab_Angle = self.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+        tab_name = DISP_TITLE_ANGLE
+        if tab_Angle == None:
+            tab_Angle = self.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_CLEAT)
+            tab_name  = DISP_TITLE_CLEAT
+        if tab_Angle == None:
+            tab_Angle = self.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_SEATED_ANGLE)
+            tab_name  = KEY_DISP_SEATED_ANGLE
+        if tab_Angle == None:
+            tab_Angle = self.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_TOPANGLE)
+            tab_name = KEY_DISP_TOPANGLE
+        # tab_cleat_angle = self.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_CLEAT)
+        for ch in tab_Angle.children():
+            if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                add_bm = tab_Angle.findChild(QtWidgets.QWidget, 'pushButton_Add_'+tab_name)
+                add_bm.setDisabled(True)
+                break
+
+            elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
+
+                if ch.objectName() == KEY_SECSIZE_SELECTED or ch.objectName() == KEY_ANGLE_SELECTED:
+                    Designation_a = ch.text()
+                elif ch.objectName() == 'Label_23':
+                    Source = ch.text()
+                elif ch.objectName() == 'Label_1':
+                    AXB = ch.text()
+                elif ch.objectName() == 'Label_3':
+                    t = float(ch.text())
+                elif ch.objectName() == 'Label_4':
+                    R1 = float(ch.text())
+                elif ch.objectName() == 'Label_5':
+                    R2 = float(ch.text())
+                elif ch.objectName() == 'Label_7':
+                    Cz = float(ch.text())
+                elif ch.objectName() == 'Label_8':
+                    Cy = float(ch.text())
+                elif ch.objectName() == 'Label_9':
+                    Mass = float(ch.text())
+                elif ch.objectName() == 'Label_10':
+                    Area = float(ch.text())
+                elif ch.objectName() == 'Label_11':
+                    I_z = float(ch.text())
+                elif ch.objectName() == 'Label_12':
+                    I_y = float(ch.text())
+                elif ch.objectName() == 'Label_13':
+                    I_u_max = float(ch.text())
+                elif ch.objectName() == 'Label_14':
+                    I_v_min = float(ch.text())
+                elif ch.objectName() == 'Label_15':
+                    rz = float(ch.text())
+                elif ch.objectName() == 'Label_16':
+                    ry = float(ch.text())
+                elif ch.objectName() == 'Label_17':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    ru_max = float(ch.text())
+                elif ch.objectName() == 'Label_18':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    rv_min = ch.text()
+                elif ch.objectName() == 'Label_19':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zz = ch.text()
+                elif ch.objectName() == 'Label_20':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zy = ch.text()
+                elif ch.objectName() == 'Label_21':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zpz = ch.text()
+                elif ch.objectName() == 'Label_22':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zpy = ch.text()
+
+                else:
+                    pass
+            elif isinstance(ch, QtWidgets.QComboBox):
+                if ch.objectName() == 'Label_6':
+                    Type = ch.currentText()
+
+        if ch == tab_Angle.children()[len(tab_Angle.children())-1]:
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+
+            c = conn.cursor()
+
+            c.execute("SELECT count(*) FROM Angles WHERE Designation = ?", (Designation_a,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Angles (Designation,Mass,Area,AXB,t,R1,R2,Cz,Cy,Iz,Iy,Iumax,Ivmin,rz,ry,
+                rumax,rvmin,Zz,Zy,Zpz,Zpy,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (Designation_a, Mass, Area,
+                           AXB, t, R1, R2, Cz,Cy,I_z,I_y,I_u_max,
+                           I_v_min, rz, ry, ru_max, rv_min,zz,zy,zpz,zpy,Source,Type))
+                conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+
+    def add_tab_channel(self):
+        '''
+        @author: Umair
+        '''
+        tab_Channel = self.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_CHANNEL)
+        for ch in tab_Channel.children():
+            if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                add_bm = tab_Channel.findChild(QtWidgets.QWidget, 'pushButton_Add_'+DISP_TITLE_ANGLE)
+                add_bm.setDisabled(True)
+                break
+
+            elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
+
+                if ch.objectName() == KEY_SECSIZE_SELECTED:
+                    Designation_c = ch.text()
+                elif ch.objectName() == 'Label_23':
+                    Source = ch.text()
+                elif ch.objectName() == 'Label_1':
+                    B = float(ch.text())
+                elif ch.objectName() == 'Label_2':
+                    T = float(ch.text())
+                elif ch.objectName() == 'Label_3':
+                    D = float(ch.text())
+                elif ch.objectName() == 'Label_13':
+                    t_w = float(ch.text())
+                elif ch.objectName() == 'Label_14':
+                    Flange_Slope = float(ch.text())
+                elif ch.objectName() == 'Label_4':
+                    R1 = float(ch.text())
+                elif ch.objectName() == 'Label_5':
+                    R2 = float(ch.text())
+                elif ch.objectName() == 'Label_9':
+                    Mass = float(ch.text())
+                elif ch.objectName() == 'Label_10':
+                    Area = float(ch.text())
+                elif ch.objectName() == 'Label_17':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    cy = float(ch.text())
+                elif ch.objectName() == 'Label_11':
+                    I_z = float(ch.text())
+                elif ch.objectName() == 'Label_12':
+                    I_y = float(ch.text())
+                elif ch.objectName() == 'Label_15':
+                    rz = float(ch.text())
+                elif ch.objectName() == 'Label_16':
+                    ry = float(ch.text())
+
+                elif ch.objectName() == 'Label_19':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zz = ch.text()
+                elif ch.objectName() == 'Label_20':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zy = ch.text()
+                elif ch.objectName() == 'Label_21':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zpz = ch.text()
+                elif ch.objectName() == 'Label_22':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zpy = ch.text()
+
+                else:
+                    pass
+            elif isinstance(ch, QtWidgets.QComboBox):
+                if ch.objectName() == 'Label_6':
+                    Type = ch.currentText()
+
+        if ch == tab_Channel.children()[len(tab_Channel.children())-1]:
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+
+            c = conn.cursor()
+            c.execute("SELECT count(*) FROM Channels WHERE Designation = ?", (Designation_c,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Channels (Designation,Mass, Area,D,B,tw,T,FlangeSlope, R1, R2,Cy,Iz,Iy,
+                 rz, ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (Designation_c, Mass, Area,D,B,t_w,T,
+                           Flange_Slope, R1, R2,cy,I_z,I_y, rz, ry,zz,zy,zpz,zpy,Source,Type))
+                conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+
     def retranslateUi(self, DesignPreferences):
         _translate = QtCore.QCoreApplication.translate
         DesignPreferences.setWindowTitle(_translate("DesignPreferences", "Design preferences"))
@@ -1459,38 +1685,52 @@ class DesignPreferences(QDialog):
         tab_Detailing = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
         tab_Design = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
 
-        for children in tab_Bolt.children():
-            if children.objectName() == KEY_DP_BOLT_TYPE:
-                children.setCurrentIndex(0)
-            elif children.objectName() == KEY_DP_BOLT_HOLE_TYPE:
-                children.setCurrentIndex(0)
-            elif children.objectName() == KEY_DP_BOLT_MATERIAL_G_O:
-                children.setText('410')
-            elif children.objectName() == KEY_DP_BOLT_SLIP_FACTOR:
-                children.setCurrentIndex(4)
-            else:
-                pass
-        for children in tab_Weld.children():
-            if children.objectName() == KEY_DP_WELD_FAB:
-                children.setCurrentIndex(0)
-            elif children.objectName() == KEY_DP_WELD_MATERIAL_G_O:
-                children.setText('410')
-            else:
-                pass
-        for children in tab_Detailing.children():
-            if children.objectName() == KEY_DP_DETAILING_EDGE_TYPE:
-                children.setCurrentIndex(0)
-            elif children.objectName() == KEY_DP_DETAILING_GAP:
-                children.setText('10')
-            elif children.objectName() == KEY_DP_DETAILING_CORROSIVE_INFLUENCES:
-                children.setCurrentIndex(0)
-            else:
-                pass
-        for children in tab_Design.children():
-            if children.objectName() == KEY_DP_DESIGN_METHOD:
-                children.setCurrentIndex(0)
-            else:
-                pass
+        try:
+            for children in tab_Bolt.children():
+                if children.objectName() == KEY_DP_BOLT_TYPE:
+                    children.setCurrentIndex(0)
+                elif children.objectName() == KEY_DP_BOLT_HOLE_TYPE:
+                    children.setCurrentIndex(0)
+                elif children.objectName() == KEY_DP_BOLT_MATERIAL_G_O:
+                    children.setText('410')
+                elif children.objectName() == KEY_DP_BOLT_SLIP_FACTOR:
+                    children.setCurrentIndex(4)
+                else:
+                    pass
+        except:
+            pass
+
+        try:
+            for children in tab_Weld.children():
+                if children.objectName() == KEY_DP_WELD_FAB:
+                    children.setCurrentIndex(0)
+                elif children.objectName() == KEY_DP_WELD_MATERIAL_G_O:
+                    children.setText('410')
+                else:
+                    pass
+        except:
+            pass
+
+        try:
+            for children in tab_Detailing.children():
+                if children.objectName() == KEY_DP_DETAILING_EDGE_TYPE:
+                    children.setCurrentIndex(0)
+                elif children.objectName() == KEY_DP_DETAILING_GAP:
+                    children.setText('10')
+                elif children.objectName() == KEY_DP_DETAILING_CORROSIVE_INFLUENCES:
+                    children.setCurrentIndex(0)
+                else:
+                    pass
+        except:
+            pass
+        try:
+            for children in tab_Design.children():
+                if children.objectName() == KEY_DP_DESIGN_METHOD:
+                    children.setCurrentIndex(0)
+                else:
+                    pass
+        except:
+            pass
 
     #
     # def save_designPref_para(self, module):

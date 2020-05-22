@@ -1,39 +1,9 @@
-Bolt.Diameter:
-- '12'
-- '16'
-- '20'
-- '24'
-- '30'
-- '36'
-Bolt.Grade:
-- '3.6'
-- '4.6'
-- '4.8'
-- '5.6'
-- '5.8'
-- '6.8'
-- '8.8'
-- '9.8'
-- '10.9'
-- '12.9'
-Bolt.Type: Friction Grip Bolt
 Conn_Location: Web
-
-Bolt.Bolt_Hole_Type: Standard
-Bolt.Material_Grade_OverWrite: '410'
-Bolt.Slip_Factor: '0.3'
+Connector.Material: E 450 (Fe 570)D
 Design.Design_Method: Limit State Design
-Detailing.Corrosive_Influences: 'No'
-Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
-Weld.Fab: Shop Weld
-Weld.Material_Grade_OverWrite: '410'
-Member.Length: '10000'
-Load.Axial: '2000'
-
-Member.Material: E 250 (Fe 410 W)A
-Member.Profile: Back to Back Channels
-Module: Tension Members Bolted Design
+Load.Axial: '800'
+Material: E 450 (Fe 570)D
 Member.Designation:
 - JC 100
 - JC 125
@@ -95,3 +65,9 @@ Member.Designation:
 - MCP 350
 - MCP 400
 - MCP 75
+Member.Length: '7000'
+Member.Material: E 450 (Fe 570)D
+Member.Profile: Back to Back Channels
+Module: Tension Members Welded Design
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '570'

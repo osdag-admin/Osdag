@@ -58,6 +58,136 @@ class SeatedAngleConnection(ShearConnection):
         super(SeatedAngleConnection, self).__init__()
         self.design_status = False
 
+    ###############################################
+    # Design Preference Functions Start
+    ###############################################
+    def tab_list(self):
+        """
+
+        :return: This function returns the list of tuples. Each tuple will create a tab in design preferences, in the
+        order they are appended. Format of the Tuple is:
+        [Tab Title, Type of Tab, function for tab content)
+        Tab Title : Text which is displayed as Title of Tab,
+        Type of Tab: There are Three types of tab layouts.
+            Type_TAB_1: This have "Add", "Clear", "Download xlsx file" "Import xlsx file"
+            TYPE_TAB_2: This contains a Text box for side note.
+            TYPE_TAB_3: This is plain layout
+        function for tab content: All the values like labels, input widgets can be passed as list of tuples,
+        which will be displayed in chosen tab layout
+
+        """
+
+        tabs = []
+
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_supporting_section)
+        tabs.append(t1)
+
+        t1 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_supported_section)
+        tabs.append(t1)
+
+        t6 = (KEY_DISP_SEATED_ANGLE, TYPE_TAB_1, self.tab_angle_section)
+        tabs.append(t6)
+
+        t2 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t2)
+
+        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t4)
+
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t5)
+
+        return tabs
+
+    def tab_value_changed(self):
+        change_tab = []
+
+        t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC_MATERIAL], [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY],
+              TYPE_TEXTBOX, self.get_fu_fy_I_section_suptng)
+        change_tab.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC_MATERIAL], [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY],
+              TYPE_TEXTBOX, self.get_fu_fy_I_section_suptd)
+        change_tab.append(t2)
+
+        t5 = (KEY_DISP_SEATED_ANGLE, ['Label_1', 'Label_3'],
+              ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14',
+               'Label_15',
+               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22'],
+              TYPE_TEXTBOX, self.get_Angle_sec_properties)
+        change_tab.append(t5)
+
+        t6 = (KEY_DISP_SEATED_ANGLE, [KEY_ANGLE_LIST, KEY_CONNECTOR_MATERIAL],
+              [KEY_ANGLE_SELECTED, KEY_CONNECTOR_FY, KEY_CONNECTOR_FU, 'Label_1', 'Label_3', 'Label_4', 'Label_5',
+               'Label_7',
+               'Label_8', 'Label_9',
+               'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
+               'Label_18',
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX,
+              self.get_new_angle_section_properties)
+        change_tab.append(t6)
+
+        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t4)
+
+        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t5)
+
+        return change_tab
+
+    def input_dictionary_design_pref(self):
+        design_input = []
+        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SUPTNGSEC_MATERIAL])
+        design_input.append(t1)
+
+        # t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY])
+        # design_input.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, TYPE_COMBOBOX, [KEY_SUPTDSEC_MATERIAL])
+        design_input.append(t2)
+
+        # t2 = (KEY_DISP_BEAMSEC, TYPE_TEXTBOX, [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY])
+        # design_input.append(t2)
+        t2 = (KEY_DISP_SEATED_ANGLE, TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
+        design_input.append(t2)
+
+        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        design_input.append(t3)
+
+        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
+        design_input.append(t3)
+
+        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        design_input.append(t5)
+
+        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        design_input.append(t5)
+
+        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
+        design_input.append(t6)
+
+        return design_input
+
+    def input_dictionary_without_design_pref(self):
+        design_input = []
+        t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL], 'Input Dock')
+        design_input.append(t1)
+
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
+                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
+        design_input.append(t2)
+
+        return design_input
+
+    ####################################
+    # Design Preference Functions End
+    ####################################
+
     def set_osdaglogger(key):
 
         """
@@ -144,8 +274,8 @@ class SeatedAngleConnection(ShearConnection):
         # else:
         #     existingvalue_key_cleatsec = ''
 
-        if KEY_SEATEDANGLE in existingvalues:
-            existingvalue_key_seatedangle = existingvalues[KEY_SEATEDANGLE]
+        if KEY_ANGLE_LIST in existingvalues:
+            existingvalue_key_seatedangle = existingvalues[KEY_ANGLE_LIST]
         else:
             existingvalue_key_seatedangle = ''
 
@@ -197,7 +327,7 @@ class SeatedAngleConnection(ShearConnection):
         t13 = (None,DISP_TITLE_ANGLE, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t13)
 
-        t14 = (KEY_SEATEDANGLE, KEY_DISP_SEATEDANGLE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_seatedangle, VALUES_ANGLESEC, True, 'No Validator')
+        t14 = (KEY_ANGLE_LIST, KEY_DISP_SEATEDANGLE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_seatedangle, VALUES_ANGLESEC, True, 'No Validator')
         options_list.append(t14)
 
         t15 = (KEY_TOPANGLE, KEY_DISP_TOPANGLE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_topangle, VALUES_ANGLESEC, True, 'No Validator')
@@ -205,32 +335,6 @@ class SeatedAngleConnection(ShearConnection):
 
         return options_list
 
-    def tab_list(self):
-
-        tabs = []
-
-        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
-        tabs.append(t1)
-
-        t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
-        tabs.append(t2)
-
-        t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
-        tabs.append(t3)
-
-        t4 = ("Weld", TYPE_TAB_2, self.weld_values)
-        tabs.append(t4)
-
-        t5 = ("Detailing", TYPE_TAB_2, self.detailing_values)
-        tabs.append(t5)
-
-        t6 = ("Design", TYPE_TAB_2, self.design_values)
-        tabs.append(t6)
-
-        t7 = ("Connector", TYPE_TAB_2, self.connector_values)
-        tabs.append(t7)
-
-        return tabs
 
     def func_for_validation(self, design_dictionary):
         all_errors = []
@@ -331,14 +435,15 @@ class SeatedAngleConnection(ShearConnection):
 
     def set_input_values(self, design_dictionary):
         super(SeatedAngleConnection,self).set_input_values(self, design_dictionary)
-        self.seated_angle = Angle(designation= design_dictionary[KEY_SEATEDANGLE][0], material_grade=design_dictionary[KEY_MATERIAL])
-        self.top_angle = Angle(designation= design_dictionary[KEY_SEATEDANGLE][0], material_grade=design_dictionary[KEY_MATERIAL])
+        self.seated_angle = Angle(designation= design_dictionary[KEY_ANGLE_LIST][0], material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
+        self.top_angle = Angle(designation= design_dictionary[KEY_ANGLE_LIST][0], material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
         self.module = design_dictionary[KEY_MODULE]
-        self.seated_list = design_dictionary[KEY_SEATEDANGLE]
+        self.seated_list = design_dictionary[KEY_ANGLE_LIST]
         self.topangle_list = design_dictionary[KEY_TOPANGLE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-                           material_grade=design_dictionary[KEY_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+                           material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.material_grade = design_dictionary[KEY_MATERIAL]
+        self.material_grade_connector = design_dictionary[KEY_CONNECTOR_MATERIAL]
         # self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL], material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O], fabrication=design_dictionary[KEY_DP_WELD_FAB])
         # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
         print("input values are set. Doing preliminary member checks")
@@ -368,7 +473,7 @@ class SeatedAngleConnection(ShearConnection):
         self.seated_angle.width = self.supported_section.flange_width
 
         for designation in self.seated_list:
-            seated = Angle(designation=designation, material_grade=self.material_grade)
+            seated = Angle(designation=designation, material_grade=self.material_grade_connector)
             # length of bearing required at the root line of beam (b) = R*gamma_m0/t_w*f_yw
             # Rearranged equation from cl. 8.7.4
             b1 = IS800_2007.cl_8_7_1_3_stiff_bearing_length(self.load.shear_force,
@@ -511,7 +616,7 @@ class SeatedAngleConnection(ShearConnection):
         list1 = []
         t1 = (KEY_GRD, self.grdval_customized)
         list1.append(t1)
-        t2 = (KEY_SEATEDANGLE, self.seated_angle_customized)
+        t2 = (KEY_ANGLE_LIST, self.seated_angle_customized)
         list1.append(t2)
         t3 = (KEY_TOPANGLE, self.top_angle_customized)
         list1.append(t3)

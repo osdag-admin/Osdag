@@ -1,3 +1,4 @@
+Bolt.Bolt_Hole_Type: Standard
 Bolt.Diameter:
 - '12'
 - '16'
@@ -16,22 +17,18 @@ Bolt.Grade:
 - '9.8'
 - '10.9'
 - '12.9'
-Bolt.Type: Bearing Bolt
-Conn_Location: Long Leg
-Bolt.Bolt_Hole_Type: Standard
 Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pretensioned
+Bolt.Type: Bearing Bolt
+Conn_Location: Long Leg
+Connector.Material: E 450 (Fe 590) E
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
-Weld.Fab: Shop Weld
-Weld.Material_Grade_OverWrite: '410'
-Member.Length: '2000'
-Load.Axial: '400'
-Member.Material: E 250 (Fe 410 W)A
-Member.Profile: Star Angles
-Module: Tension Members Bolted Design
+Load.Axial: '50'
+Material: E 250 (Fe 410 W)B
 Member.Designation:
 - 20 20 X 3
 - 20 20 X 4
@@ -110,12 +107,6 @@ Member.Designation:
 - 130 130 X 10
 - 130 130 X 12
 - 130 130 X 16
-- 150 150 X 10
-- 150 150 X 12
-- 150 150 X 15
-- 150 150 X 16
-- 150 150 X 18
-- 150 150 X 20
 - 150 150 X 10
 - 150 150 X 12
 - 150 150 X 15
@@ -257,3 +248,7 @@ Member.Designation:
 - 200 150 X 16
 - 200 150 X 18
 - 200 150 X 20
+Member.Length: '1000'
+Member.Material: E 410 (Fe 540)
+Member.Profile: Angles
+Module: Tension Members Bolted Design

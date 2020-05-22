@@ -16,11 +16,12 @@ import math
 import numpy as np
 from utils.common.common_calculation import *
 
-class Bolt(Material):
-    #TODO: Bolt Need not inherit Material. Should Remove after unittests are in place.
-    def __init__(self, grade=None, diameter=None, bolt_type="", material_grade="", bolt_hole_type="Standard",
+
+class Bolt:
+
+    def __init__(self, grade=None, diameter=None, bolt_type="", bolt_hole_type="Standard",
                  edge_type="a - Sheared or hand flame cut", mu_f=0.3, corrosive_influences=True, bolt_tensioning="Pretensioned"):
-        super(Bolt, self).__init__(material_grade)
+
         if grade is not None:
             self.bolt_grade = list(np.float_(grade))
             self.bolt_grade.sort(key=float)
@@ -222,7 +223,6 @@ class Bolt(Material):
                 f_ub=self.bolt_fu, f_yb=self.bolt_fy, A_sb=self.bolt_shank_area, A_n=self.bolt_net_area)
 
 
-
     def calculate_bolt_spacing_limits(self, bolt_diameter_provided, conn_plates_t_fu_fy):
 
         self.connecting_plates_tk = [i[0] for i in conn_plates_t_fu_fy]
@@ -235,7 +235,7 @@ class Bolt(Material):
                                                                             self.edge_type),2)
         self.min_end_dist = self.min_edge_dist
         self.max_spacing = round(IS800_2007.cl_10_2_3_1_max_spacing(self.connecting_plates_tk),2)
-        self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(self.connecting_plates_tk, self.fy,
+        self.max_edge_dist = round(IS800_2007.cl_10_2_4_3_max_edge_dist(conn_plates_t_fu_fy,
                                                                         self.corrosive_influences),2)
 
         self.max_end_dist = self.max_edge_dist
@@ -255,6 +255,7 @@ class Nut(Material):
         self.diameter = diameter
         super(Nut, self).__init__(material_grade)
 
+
     def __repr__(self):
         repr = "Nut\n"
         repr += "Diameter: {}\n".format(self.diameter)
@@ -264,6 +265,7 @@ class Nut(Material):
 class Section(Material):
 
     def __init__(self, designation, material_grade=""):
+
 
         self.design_status = True
         self.designation = designation
@@ -291,8 +293,7 @@ class Section(Material):
         self.plast_sec_mod_z = 0.0
         self.plast_sec_mod_y = 0.0
         self.source = 0.0
-        max_thickness = max(self.flange_thickness,self.web_thickness)
-        super(Section, self).__init__(material_grade,max_thickness)
+
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
         self.shear_yielding_capacity = 0.0
@@ -339,7 +340,7 @@ class Section(Material):
         # self.member_block_eqn = 0.0
 
 
-    def connect_to_database_update_other_attributes(self, table, designation):
+    def connect_to_database_update_other_attributes(self, table, designation,material_grade = ""):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
         cur = conn.cursor()
@@ -351,6 +352,8 @@ class Section(Material):
         self.flange_width = row[5]
         self.web_thickness = row[6]
         self.flange_thickness = row[7]
+        max_thickness = max(self.flange_thickness,self.web_thickness)
+        super(Section, self).__init__(material_grade,max_thickness)
         self.flange_slope = row[8]
         self.root_radius = row[9]
         self.toe_radius = row[10]
@@ -659,12 +662,11 @@ class Section(Material):
         repr += "shear_capacity_web: {}\n".format(self.shear_capacity_web)
         return repr
 
-
 class Beam(Section):
 
     def __init__(self, designation, material_grade):
         super(Beam, self).__init__(designation, material_grade)
-        self.connect_to_database_update_other_attributes("Beams", designation)
+        self.connect_to_database_update_other_attributes("Beams", designation,material_grade)
 
 
     def min_plate_height(self):
@@ -681,7 +683,7 @@ class Column(Section):
 
     def __init__(self, designation, material_grade):
         super(Column, self).__init__(designation, material_grade)
-        self.connect_to_database_update_other_attributes("Columns", designation)
+        self.connect_to_database_update_other_attributes("Columns", designation,material_grade)
 
     def min_plate_height(self):
         return 0.6 * self.depth
@@ -694,22 +696,25 @@ class Column(Section):
 class Channel(Section):
 
     def __init__(self, designation, material_grade):
-        super(Channel, self).__init__(designation, material_grade)
-        self.connect_to_database_update_other_attributes(designation)
+        super(Channel, self).__init__(material_grade)
+        self.connect_to_database_update_other_attributes_channels(designation, material_grade)
         # self.length =0.0
 
-    def connect_to_database_update_other_attributes(self, designation):
+    def connect_to_database_update_other_attributes_channels(self, designation, material_grade):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT * FROM Channels WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
         row = cur.fetchone()
+        self.designation = designation
         self.mass = row[2]
         self.area = row[3] *100
         self.depth = row[4]
         self.flange_width = row[5]
         self.web_thickness = row[6]
         self.flange_thickness = row[7]
+        max_thickness = max(self.web_thickness,self.flange_thickness)
+        super(Section, self).__init__(material_grade,max_thickness)
         self.flange_slope = row[8]
         self.root_radius = row[9]
         self.toe_radius = row[10]
@@ -720,9 +725,18 @@ class Channel(Section):
         self.rad_of_gy_y = row[15] * 10
         self.elast_sec_mod_z = row[16] * 1000
         self.elast_sec_mod_y = row[17] * 1000
-        # self.plast_sec_mod_z = row[18] * 1000
-        # self.plast_sec_mod_y = row[19] * 1000
+        try:
+            self.plast_sec_mod_z = row[18] * 1000
+            self.plast_sec_mod_y = row[19] * 1000
+        except:
+            self.plast_sec_mod_z = self.elast_sec_mod_z
+            self.plast_sec_mod_y = self.elast_sec_mod_y
         self.source = row[20]
+
+        if row[21] is None:
+            self.Type = 'Rolled'
+        else:
+            self.Type = row[21]
 
         conn.close()
 
@@ -735,11 +749,12 @@ class Channel(Section):
         return clear_depth
 
 
-class Weld(Material):
+class Weld:
 
-    def __init__(self, material_grade="", material_g_o="",type="fillet", fabrication=KEY_DP_WELD_FAB_SHOP):
+    def __init__(self, material_g_o="",type="fillet", fabrication=KEY_DP_WELD_FAB_SHOP):
         self.design_status = True
         self.type = type
+
         self.size = 0.0
         self.length = 0.0
         self.eff_length = 0.0
@@ -771,6 +786,7 @@ class Weld(Material):
         return repr
 
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
+        connecting_fu.append(self.fu)
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         self.throat_tk = \
             round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
@@ -1280,14 +1296,7 @@ class Plate(Material):
                             break
                 else:
                     pass
-
-            # bolt_capacity_red = self.get_bolt_red(bolts_one_line,
-            #                                           gauge, bolt_line, pitch, bolt_capacity,
-            #                                           bolt_dia)
-            print("vres, vred", vres, bolt_capacity_red)
-
-
-
+                print("vres, vred", vres, bolt_capacity_red)
 
             if vres > bolt_capacity_red:
                 self.design_status = False
@@ -1578,9 +1587,6 @@ class Plate(Material):
     def get_moment_cacacity(self, fy, plate_tk, plate_len):
         self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6
 
-
-
-
     def __repr__(self):
         repr = "Plate\n"
         repr += "Thickness Provided: {}\n".format(self.thickness_provided)
@@ -1613,18 +1619,14 @@ class Plate(Material):
 class Angle(Section):
 
     def __init__(self, designation, material_grade):
-        # super(Angle, self).__init__(material_grade)
-        super(Angle, self).__init__(designation, material_grade)
+        super(Angle, self).__init__(material_grade)
 
         self.designation = designation
-
         self.leg_a_length = 0.0
         self.leg_b_length = 0.0
         self.thickness = 0.0
         self.gap = 0.0
-
-
-        self.connect_to_database_update_other_attributes_angles(designation)
+        self.connect_to_database_update_other_attributes_angles(designation,material_grade)
 
         # self.length = 0.0
 
@@ -1634,7 +1636,7 @@ class Angle(Section):
         repr += "rad: {}\n".format(self.rad_of_gy_z)
         return repr
 
-    def connect_to_database_update_other_attributes_angles(self, designation):
+    def connect_to_database_update_other_attributes_angles(self, designation,material_grade):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         # db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
         db_query =  "SELECT * FROM Angles WHERE Designation = ?"
@@ -1644,13 +1646,14 @@ class Angle(Section):
 
         self.mass = row[2]
         self.area = row[3] * 100
-        axb = row[4]
-        axb = axb.lower()
-        self.leg_a_length = float(axb.split("x")[0])
-        self.leg_b_length = float(axb.split("x")[1])
+        self.axb = row[4]
+        self.axb = self.axb.lower()
+        self.leg_a_length = float(self.axb.split("x")[0])
+        self.leg_b_length = float(self.axb.split("x")[1])
         self.max_leg = max(self.leg_a_length,self.leg_b_length)
         self.min_leg = min(self.leg_a_length, self.leg_b_length)
         self.thickness = row[5]
+        super(Section, self).__init__(material_grade,self.thickness)
         self.root_radius = row[6]
         self.toe_radius = row[7]
         if self.leg_a_length != self.leg_b_length:
@@ -1673,6 +1676,11 @@ class Angle(Section):
         self.plast_sec_mod_z = row[21] * 1000
         self.plast_sec_mod_y = row[22] * 1000
         self.source = row[23]
+        if row[24] is None:
+            self.Type = 'Rolled'
+        else:
+            self.Type = row[24]
+
 
         conn.close()
 
@@ -1729,3 +1737,117 @@ class I_sectional_Properties(object):
         self.z_p = ((((D-2*t_f)*t_w**2)/8 + (B*t_f*B)/4)/((D-2*t_f)*t_w/2 + (B*t_f)))
         self.Z_py = 2 * (self.A / 2 * self.z_p)
         return round(self.Z_py,1)
+
+class Single_Angle_Properties(object):
+
+    def calc_Mass(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_Area(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_Cz(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_Cy(self,axb,t):
+        a = 0.0
+        return a
+
+
+
+    def calc_MomentOfAreaZ(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_MomentOfAreaY(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_MomentOfAreaU(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_MomentOfAreaV(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_RogZ(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_RogY(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_RogU(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_RogV(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_ElasticModulusZz(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_ElasticModulusZy(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_PlasticModulusZpz(self,axb,t):
+        a = 0.0
+        return a
+
+    def calc_PlasticModulusZpy(self,axb,t):
+        a = 0.0
+        return a
+
+class Single_Channel_Properties(object):
+
+    def calc_Mass(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_Area(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_C_y(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_MomentOfAreaZ(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_MomentOfAreaY(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_RogZ(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_RogY(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_ElasticModulusZz(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_ElasticModulusZy(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_PlasticModulusZpz(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_PlasticModulusZpy(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a

@@ -257,6 +257,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.eff_stiffener_plt_len_along_web = 0.0
 
         self.stiffener_plt_thick_btwn_D = 0.0
+        self.stiffener_plt_len_btwn_D = 0.0
+        self.stiffener_plt_height_btwn_D = 0.0
 
         self.shear_on_gusset = 0.0
         self.moment_on_gusset = 0.0
@@ -1790,11 +1792,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # design of the stiffener plate between the column depth to support the outstanding stiffeners, when there are 6 anchor bolts required
             # the governing ratio is D/t_g < 29.30 (Table 2, IS 800:2007)
             if self.anchor_nos_provided == 6:
-                self.stiffener_plt_thick_btwn_D = (self.column_D - (2 * self.column_tf)) / 29.30  # mm
-                self.stiffener_plt_thick_btwn_D = round_up(self.stiffener_plt_thick_btwn_D, 2, self.column_tf)
+                self.stiffener_plt_thick_btwn_D = (self.column_D - (2 * self.column_tf)) / 29.30
+                self.stiffener_plt_thick_btwn_D = round_up(self.stiffener_plt_thick_btwn_D, 2, self.column_tf)  # mm
 
-                if self.ststiffener_plt_thick_btwn_D < self.stiffener_plt_thick_along_flange:
+                if self.stiffener_plt_thick_btwn_D < self.stiffener_plt_thick_along_flange:
                     self.stiffener_plt_thick_btwn_D = self.stiffener_plt_thick_along_flange
+
+                self.stiffener_plt_len_btwn_D = self.column_D - (2 * self.column_tf)  # mm
+                self.stiffener_plt_height_btwn_D = self.stiffener_plt_height_along_web - 10  # mm
 
             else:
                 pass

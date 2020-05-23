@@ -898,17 +898,18 @@ def prov_moment_load(moment_input,min_mc,app_moment_load):
     app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\end{aligned}'))
     return  app_moment_load_eqn
 
-def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn):
+def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn,gamma_m1):
     h = str(h)
     t = str(t)
     n_r = str(n_r)
     d_o = str(d_o)
     f_u = str(fu)
     v_dn = str(v_dn)
+    gamma_m1 = str(gamma_m1)
     # multiple = str(multiple)
     shear_rup_eqn = Math(inline=True)
-    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\'))
-    shear_rup_eqn.append(NoEscape(r'&= 0.9 *('+h+'-('+n_r+'*'+d_o+'))*'+t+'*'+f_u+r'\\'))
+    shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{m1}}\\'))
+    shear_rup_eqn.append(NoEscape(r'&= \frac{0.9 *('+h+'-('+n_r+'*'+d_o+'))*'+t+'*'+f_u+ '}{\sqrt{3}*'+gamma_m1+ r'}\\'))
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
     return shear_rup_eqn
 def shear_Rupture_prov_weld(h, t,  fu,v_dn,gamma_m1,multiple =1):  #weld

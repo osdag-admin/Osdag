@@ -801,7 +801,7 @@ class ColumnCoverPlate(MomentConnection):
         if self.section.type == "Rolled":
             self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                            column_t_w=self.section.web_thickness,
-                                                                           D=self.section.depth,
+                                                                           column_d=self.section.depth,
                                                                            column_b=self.section.flange_width,
                                                                            column_fy=self.section.fy,
                                                                            factored_axial_force=self.factored_axial_load,
@@ -814,7 +814,7 @@ class ColumnCoverPlate(MomentConnection):
         if self.section.type2 == "generally":
             self.limitwidththkratio_web = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                         column_t_w=self.section.web_thickness,
-                                                                        D=self.section.depth,
+                                                                        column_d=self.section.depth,
                                                                         column_b=self.section.flange_width,
                                                                         column_fy=self.section.fy,
                                                                         factored_axial_force=self.factored_axial_load,
@@ -2310,14 +2310,14 @@ class ColumnCoverPlate(MomentConnection):
     def min_thick_based_on_area(self, tk, width, list_of_pt_tk, t_w, r_1, D,
                                 preference=None):  # area of flange plate should be greater than 1.05 times area of flange
         # 20 is the maximum spacing either side of the plate
-        flange_crs_sec_area = tk * width
+        self.flange_crs_sec_area = tk * width
         self.design_status = True
         for y in list_of_pt_tk:
             if preference != None:
                 if preference == "Outside":
-                    outerwidth = width
-                    flange_plate_crs_sec_area = y * width
-                    if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                    self.outerwidth = width
+                    self.flange_plate_crs_sec_area = y * width
+                    if self.flange_plate_crs_sec_area >= self.flange_crs_sec_area * 1.05:
                         thickness = y
                         self.design_status = True
                         break
@@ -2326,16 +2326,16 @@ class ColumnCoverPlate(MomentConnection):
                         self.design_status = False
 
                 elif preference == "Outside + Inside":
-                    outerwidth = width
-                    innerwidth = (width - t_w - (2 * r_1)) / 2
-                    if innerwidth < 50:
+                    self.outerwidth = width
+                    self.innerwidth = (width - t_w - (2 * r_1)) / 2
+                    if self.innerwidth < 50:
                         # logger.error(":Inner Plate not possible")
                         self.design_status = False
                         thickness = 0
                     else:
                         self.design_status = True
-                        flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y
-                        if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                        self.flange_plate_crs_sec_area = (self.outerwidth + (2 * self.innerwidth)) * y
+                        if self.flange_plate_crs_sec_area >= self.flange_crs_sec_area * 1.05:
                             thickness = y
                             self.design_status = True
                             break
@@ -2345,9 +2345,9 @@ class ColumnCoverPlate(MomentConnection):
 
             else:
                 webwidth = D - (2 * tk) - (2 * r_1)
-                web_crs_area = t_w * webwidth
-                web_plate_crs_sec_area = 2 * webwidth * y
-                if web_plate_crs_sec_area >= web_crs_area * 1.05:
+                self.web_crs_area = t_w * webwidth
+                self.web_plate_crs_sec_area = 2 * webwidth * y
+                if self.web_plate_crs_sec_area >=self.web_crs_area * 1.05:
                     thickness = y
                     self.design_status = True
                     break
@@ -3150,7 +3150,7 @@ class ColumnCoverPlate(MomentConnection):
                                                                                 self.web_plate.thickness_provided,
                                                                                 self.web_plate.bolts_one_line,
                                                                                 self.web_bolt.dia_hole,
-                                                                                self.web_bolt.fu, gamma_m1,
+                                                                                self.web_bolt.bolt_fu, gamma_m1,
                                                                                 round(
                                                                                     self.web_plate.tension_rupture_capacity / 1000,
                                                                                     2)), '')

@@ -1272,30 +1272,29 @@ class Plate(Material):
                     moment_demand = 0.0
                     vres = resultant_force / (bolt_line * bolts_one_line)
 
-
                 if joint == None:
 
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                   gauge, bolt_line, pitch, bolt_capacity,
                                                   bolt_dia)
+                    convergence = bolt_capacity_red - vres
+
+                    if convergence < 0:
+                        if count == 0:
+                            initial_convergence = convergence
+                            count = count + 1
+                        else:
+                            if initial_convergence <= convergence:
+                                initial_convergence = convergence
+                            else:
+                                break
+                    else:
+                        pass
                 else:
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                           gauge, bolt_line, pitch, bolt_capacity,
                                                           bolt_dia,end_dist,gap)
-                convergence = bolt_capacity_red - vres
 
-                if convergence < 0:
-                    if count == 0:
-                        initial_convergence = convergence
-                        count = count + 1
-                    else:
-                        if initial_convergence <= convergence:
-
-                            initial_convergence = convergence
-                        else:
-                            break
-                else:
-                    pass
                 print("vres, vred", vres, bolt_capacity_red)
 
             if vres > bolt_capacity_red:

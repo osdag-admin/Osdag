@@ -11,7 +11,7 @@ from utils.common.component import Bolt, Plate, Weld
 from Common import *
 import os
 import xlsxwriter
-import pandas as pd
+# import pandas as pd
 from openpyxl import load_workbook, Workbook
 
 path = r'.\ResourceFiles\design_example'
@@ -50,11 +50,11 @@ for f in files:
             print('creatingnew')
             wb = Workbook()
         # wb.create_sheet('test2')
-        # wb.save('test.xls')
 
 
-        writer = pd.ExcelWriter(workbook_name, engine='openpyxl')
-        writer.book = wb
+
+        # writer = ExcelWriter(workbook_name, engine='openpyxl')
+        # writer.book = wb
         test_in_list, test_out_list = main.results_to_test(main)
 
         # df = pd.DataFrame.from_records(list(test_out_list.items()), columns=['Check', 'Value'])
@@ -82,8 +82,10 @@ for f in files:
             wb.active.append(row)
 
         # df.to_excel(writer, sheet_name=sheet_name, index=False)
-        writer.save()
-        writer.close()
+        wb.save(workbook_name)
+        wb.close()
+        # writer.save()
+        # writer.close()
     #
     # elif module == KEY_DISP_TENSION_BOLTED:
     #     print('filenAME', f)

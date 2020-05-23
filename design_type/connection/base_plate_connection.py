@@ -129,7 +129,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.footing_grade = 0.0
 
-        self.weld_type = 'Butt Weld'
+        if self.connectivity == 'Welded-Slab Base':
+            self.weld_type = self.weld_type
+        else:
+            self.weld_type = 'Butt Weld'
 
         # attributes for design preferences
         self.dp_column_designation = ""  # dp for column
@@ -207,12 +210,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.length_available_total = 0.0
         self.effective_length_flange = 0.0
-        self.total_eff_len_gusset_available = 0.0
+        self.total_eff_len_available = 0.0
         self.effective_length_web = 0.0
         self.load_axial_flange = 0.0
         self.load_axial_web = 0.0
-        self.strength_unit_len_flange = 0.0
-        self.strength_unit_len_web = 0.0
+        self.strength_unit_len = 0.0
         self.weld_size = 0.0
         self.weld_size_flange = 0.0
         self.weld_size_web = 0.0
@@ -220,6 +222,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gusset_along_web = 'No'
         self.gusset_plate_length = 0.0
         self.stiffener_plate_length = 0.0
+        self.total_eff_len_gusset_available = 0.0
         self.gusset_outstand_length = 0.0
         self.stiffener_outstand_length = 0.0
         self.gusset_fy = self.dp_column_fy
@@ -308,15 +311,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             existingvalue_key_conn = ''
 
-        if KEY_SUPTNGSEC in existingvalues:  # this might not be required
-            existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
+        if KEY_SECSIZE in existingvalues:  # this might not be required
+            existingvalue_key_suptngsec = existingvalues[KEY_SECSIZE]
         else:
             existingvalue_key_suptngsec = ''
 
-        if KEY_SUPTDSEC in existingvalues:
-            existingvalue_key_suptdsec = existingvalues[KEY_SUPTDSEC]
-        else:
-            existingvalue_key_suptdsec = ''
 
         if KEY_MATERIAL in existingvalues:
             existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
@@ -368,7 +367,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t5 = (KEY_END_CONDITION, KEY_DISP_END_CONDITION, TYPE_NOTE, existingvalue_key_conn, 'Pinned', True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec,
+        t6 = (KEY_SECSIZE, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec,
               connectdb("Columns"), True, 'No Validator')  # this might not be required
         options_list.append(t6)
 
@@ -767,10 +766,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def input_dictionary_design_pref(self):
 
         design_input = []
-        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, ['Label_8', KEY_SUPTNGSEC_MATERIAL])
+        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, ['Label_8', KEY_SEC_MATERIAL])
         design_input.append(t1)
 
-        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY, 'Label_21'])
+        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SEC_FU, KEY_SEC_FY, 'Label_21'])
         design_input.append(t1)
 
         t2 = ("Base Plate", TYPE_COMBOBOX, [KEY_BASE_PLATE_MATERIAL])
@@ -804,14 +803,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def input_dictionary_without_design_pref(self):
 
         design_input = []
-        t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_BASE_PLATE_MATERIAL], 'Input Dock')
+        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL, KEY_BASE_PLATE_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
         t2 = (KEY_TYP_ANCHOR, [KEY_DP_ANCHOR_BOLT_TYPE], 'Input Dock')
         design_input.append(t2)
 
-        t3 = (None, ['Label_8', 'Label_21', KEY_SUPTNGSEC_FU, KEY_BASE_PLATE_FU,
-                     KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_SUPTNGSEC_FY, KEY_BASE_PLATE_FY,
+        t3 = (None, ['Label_8', 'Label_21', KEY_SEC_FU, KEY_BASE_PLATE_FU,
+                     KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_SEC_FY, KEY_BASE_PLATE_FY,
                      KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_HOLE_TYPE,
                      KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE], '')
@@ -821,16 +820,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def get_values_for_design_pref(self, key, design_dictionary):
 
-        section = Section(design_dictionary[KEY_SUPTNGSEC], design_dictionary[KEY_MATERIAL])
+        section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
         length = str(self.anchor_length_provided if self.design_button_status else 0)
         fu = Material(design_dictionary[KEY_MATERIAL]).fu
 
         val = {'Label_8': "Rolled",
                'Label_21': str(section.source),
-               KEY_SUPTNGSEC_FU: str(section.fu),
+               KEY_SEC_FU: str(section.fu),
                KEY_BASE_PLATE_FU: str(section.fu),
                KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(section.fu),
-               KEY_SUPTNGSEC_FY: str(section.fy),
+               KEY_SEC_FY: str(section.fy),
                KEY_BASE_PLATE_FY: str(section.fy),
                KEY_DP_ANCHOR_BOLT_DESIGNATION:
                    str(str(design_dictionary[KEY_DIA_ANCHOR][0]) + "X" + length + " IS5624 GALV"),
@@ -851,7 +850,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         add_buttons = []
 
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_DESIGNATION, None, None, "Columns")
+        t1 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
         add_buttons.append(t1)
 
         return add_buttons
@@ -863,8 +862,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         change_tab = []
 
-        t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC_MATERIAL], [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY], TYPE_TEXTBOX,
-              self.get_fu_fy)
+        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX,
+              self.get_fu_fy_I_section)
         change_tab.append(t1)
 
         t2 = ("Base Plate", [KEY_BASE_PLATE_MATERIAL], [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY], TYPE_TEXTBOX,
@@ -903,7 +902,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         fu_fy_list = []
 
-        t1 = (KEY_SUPTNGSEC_MATERIAL, KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY)
+        t1 = (KEY_SEC_MATERIAL, KEY_SEC_FU, KEY_SEC_FY)
         fu_fy_list.append(t1)
 
         t2 = (KEY_BASE_PLATE_MATERIAL, KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY)
@@ -917,7 +916,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         tabs = []
 
-        t0 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
+        t0 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
         tabs.append(t0)
 
         t5 = ("Base Plate", TYPE_TAB_2, self.tab_bp)
@@ -943,7 +942,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def anchor_bolt_values(self, input_dictionary):
 
         self.input_dictionary = input_dictionary
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SUPTNGSEC], input_dictionary[KEY_MATERIAL]]:
+        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SECSIZE], input_dictionary[KEY_MATERIAL]]:
             length = ''
             designation = ''
             anchor_type = ''
@@ -1037,130 +1036,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         design.append(t2)
 
         return design
-    #
-    # @staticmethod
-    # def tab_column_section():
-    #     supporting_section = []
-    #     t1 = (KEY_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_DESIGNATION, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t1)
-    #
-    #     t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None)
-    #     supporting_section.append(t2)
-    #
-    #     # material = connectdb("Material", call_type="popup")
-    #     # material.append('Custom')
-    #     t34 = (KEY_SUPTNGSEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t34)
-    #
-    #     # t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t3)
-    #
-    #     # t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t4)
-    #
-    #     t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None)
-    #     supporting_section.append(t5)
-    #
-    #     t6 = (KEY_SUPTNGSEC_DEPTH, KEY_DISP_SUPTNGSEC_DEPTH, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t6)
-    #
-    #     t7 = (KEY_SUPTNGSEC_FLANGE_W, KEY_DISP_SUPTNGSEC_FLANGE_W, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t7)
-    #
-    #     t8 = (KEY_SUPTNGSEC_FLANGE_T, KEY_DISP_SUPTNGSEC_FLANGE_T, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t8)
-    #
-    #     t9 = (KEY_SUPTNGSEC_WEB_T, KEY_DISP_SUPTNGSEC_WEB_T, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t9)
-    #
-    #     t10 = (KEY_SUPTNGSEC_FLANGE_S, KEY_DISP_SUPTNGSEC_FLANGE_S, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t10)
-    #
-    #     t11 = (KEY_SUPTNGSEC_ROOT_R, KEY_DISP_SUPTNGSEC_ROOT_R, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t11)
-    #
-    #     t12 = (KEY_SUPTNGSEC_TOE_R, KEY_DISP_SUPTNGSEC_TOE_R, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t12)
-    #
-    #     t13 = (None, None, TYPE_BREAK, None)
-    #     supporting_section.append(t13)
-    #
-    #     t14 = (KEY_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'])
-    #     supporting_section.append(t14)
-    #
-    #     # t18 = (None, None, TYPE_ENTER, None)
-    #     # supporting_section.append(t18)
-    #
-    #     t18 = (None, None, TYPE_ENTER, None)
-    #     supporting_section.append(t18)
-    #
-    #     t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t3)
-    #
-    #     # t15 = (KEY_SUPTNGSEC_MOD_OF_ELAST, KEY_SUPTNGSEC_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t15)
-    #     #
-    #     # t16 = (KEY_SUPTNGSEC_MOD_OF_RIGID, KEY_SUPTNGSEC_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t16)
-    #
-    #     t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None)
-    #     supporting_section.append(t17)
-    #
-    #     t18 = (KEY_SUPTNGSEC_MASS, KEY_DISP_SUPTNGSEC_MASS, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t18)
-    #
-    #     t19 = (KEY_SUPTNGSEC_SEC_AREA, KEY_DISP_SUPTNGSEC_SEC_AREA, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t19)
-    #
-    #     t20 = (KEY_SUPTNGSEC_MOA_LZ, KEY_DISP_SUPTNGSEC_MOA_LZ, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t20)
-    #
-    #     t21 = (KEY_SUPTNGSEC_MOA_LY, KEY_DISP_SUPTNGSEC_MOA_LY, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t21)
-    #
-    #     t22 = (KEY_SUPTNGSEC_ROG_RZ, KEY_DISP_SUPTNGSEC_ROG_RZ, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t22)
-    #
-    #     t23 = (KEY_SUPTNGSEC_ROG_RY, KEY_DISP_SUPTNGSEC_ROG_RY, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t23)
-    #
-    #     t24 = (KEY_SUPTNGSEC_EM_ZZ, KEY_DISP_SUPTNGSEC_EM_ZZ, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t24)
-    #
-    #     t25 = (KEY_SUPTNGSEC_EM_ZY, KEY_DISP_SUPTNGSEC_EM_ZY, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t25)
-    #
-    #     t26 = (KEY_SUPTNGSEC_PM_ZPZ, KEY_DISP_SUPTNGSEC_PM_ZPZ, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t26)
-    #
-    #     t27 = (KEY_SUPTNGSEC_PM_ZPY, KEY_DISP_SUPTNGSEC_PM_ZPY, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t27)
-    #
-    #     t28 = (None, None, TYPE_BREAK, None)
-    #     supporting_section.append(t28)
-    #
-    #     t29 = (KEY_SUPTNGSEC_SOURCE, KEY_DISP_SUPTNGSEC_SOURCE, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t29)
-    #
-    #     # t30 = (None, None, TYPE_ENTER, None)
-    #     # supporting_section.append(t30)
-    #
-    #     t30 = (None, None, TYPE_ENTER, None)
-    #     supporting_section.append(t30)
-    #
-    #     t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None)
-    #     supporting_section.append(t4)
-    #
-    #     # t31 = (KEY_SUPTNGSEC_POISSON_RATIO, KEY_DISP_SUPTNGSEC_POISSON_RATIO, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t31)
-    #     #
-    #     # t32 = (KEY_SUPTNGSEC_THERMAL_EXP, KEY_DISP_SUPTNGSEC_THERMAL_EXP, TYPE_TEXTBOX, None)
-    #     # supporting_section.append(t32)
-    #
-    #     t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
-    #     supporting_section.append(t33)
-    #
-    #     return supporting_section
+
 
     # def dia_to_len(self, d):
     #
@@ -1181,7 +1057,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.mainmodule = "Moment Connection"
         self.connectivity = str(design_dictionary[KEY_CONN])
         self.end_condition = str(design_dictionary[KEY_END_CONDITION])
-        self.column_section = str(design_dictionary[KEY_SUPTNGSEC])
+        self.column_section = str(design_dictionary[KEY_SECSIZE])
         self.material = str(design_dictionary[KEY_MATERIAL])
 
         self.load_axial = float(design_dictionary[KEY_AXIAL])
@@ -1205,12 +1081,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_type = str(design_dictionary[KEY_WELD_TYPE])
 
         # attributes of design preferences
-        self.dp_column_designation = str(design_dictionary[KEY_SUPTNGSEC])
+        self.dp_column_designation = str(design_dictionary[KEY_SECSIZE])
         self.dp_column_type = str(design_dictionary['Label_8'])
         self.dp_column_source = str(design_dictionary['Label_21'])
-        self.dp_column_material = str(design_dictionary[KEY_SUPTNGSEC_MATERIAL])
-        self.dp_column_fu = float(design_dictionary[KEY_SUPTNGSEC_FU])
-        self.dp_column_fy = float(design_dictionary[KEY_SUPTNGSEC_FY])
+        self.dp_column_material = str(design_dictionary[KEY_SEC_MATERIAL])
+        self.dp_column_fu = float(design_dictionary[KEY_SEC_FU])
+        self.dp_column_fy = float(design_dictionary[KEY_SEC_FY])
 
         self.dp_bp_material = str(design_dictionary[KEY_BASE_PLATE_MATERIAL])
         self.dp_bp_fu = float(design_dictionary[KEY_BASE_PLATE_FU])
@@ -1248,7 +1124,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gamma_m1 = self.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]  # gamma_m1 = 1.25
         self.gamma_mb = self.cl_5_4_1_Table_5["gamma_mb"][self.dp_weld_fab]  # gamma_mb = 1.25
         self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"][self.dp_weld_fab]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
-
         self.safe = True
 
         self.bp_analyses_parameters(self)
@@ -1290,7 +1165,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchor_grade = i
             break
 
-        # TODO: self.anchor_fu should be passed to - DP anchor fu from here
         self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade)  # returns a list with strength values - [bolt_fu, bolt_fy]
 
         # TODO add condition for number of anchor bolts depending on col depth and force
@@ -1320,6 +1194,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
         # minimum required dimensions of the base plate [as per the detailing criteria]
+        # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
         if self.connectivity == 'Welded-Slab Base' or 'Gusseted Base Plate':
             self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
             self.bp_width_min = round_up(self.column_bf + 1.5 * self.edge_distance + 1.5 * self.edge_distance, 5)  # mm
@@ -1348,6 +1223,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.min_area_req = self.load_axial / self.bearing_strength_concrete  # mm^2
 
             # calculate projection by the 'Effective Area Method' [Reference: Clause 7.4.1.1, IS 800:2007]
+            # the calculated projection is added by half times the hole dia on each side to avoid stress concentration near holes
             if self.dp_column_type == 'Rolled' or 'Welded':
                 print('proioooooooooooo')
 
@@ -1653,131 +1529,142 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             logger.info(": [Anchor Bolt] Reference: IS 5624:1993, Table 1.")
 
     def design_weld(self):
-        """ design weld for the base plate
+        """ design weld for the base plate and stiffeners
 
         Args:
 
         Returns:
         """
-        # design the weld connecting the column to the base plate
+        # design the weld connecting the column and the stiffeners to the base plate
+
+        self.weld_fu = min(self.dp_weld_fu_overwrite, self.dp_column_fu)
 
         # design of fillet weld
         if self.weld_type == 'Fillet Weld':
 
-            weld_fu = min(self.dp_weld_fu_overwrite, self.dp_column_fu)
+            if self.connectivity == 'Welded-Slab Base':
 
-            if self.dp_column_type == 'Rolled' or 'Welded':
+                if self.dp_column_type == 'Rolled' or 'Welded':
 
-                # defining the maximum limit of weld size that can be provided, which is equal to/less than the flange/web thickness
-                weld_size_flange_max = round_down(self.column_tf, 2)  # mm
-                weld_size_web_max = round_down(self.column_tw, 2)  # mm
+                    # defining the maximum limit of weld size that can be provided, which is equal to/less than the flange/web thickness
+                    self.weld_size_flange_max = round_down(self.column_tf, 2)  # mm
+                    self.weld_size_web_max = round_down(self.column_tw, 2)  # mm
 
-                # available length for welding along the flange and web of the column, without the stiffeners
-                length_available_flange = 2 * (
-                            self.column_bf + (self.column_bf - self.column_tw - (2 * self.column_r1)))  # mm
-                length_available_web = 2 * (self.column_D - (2 * self.column_tf) - (2 * self.column_r1))  # mm
+                    # available length for welding along the flange and web of the column, without the stiffeners
+                    length_available_flange = 2 * (self.column_bf + (self.column_bf - self.column_tw - (2 * self.column_r1)))  # mm
+                    length_available_web = 2 * (self.column_D - (2 * self.column_tf) - (2 * self.column_r1))  # mm
 
-                # total available length for welding along the perimeter of the column (flange + web)
-                # self.length_available_total = length_available_flange + length_available_web
+                    # TODO: check end returns reduction
+                    # Note: The effective length of weld is calculated by assuming 1% reduction in length at each end return. Since, the
+                    # total number of end returns are 12, a total of 12% reduction (8% at flange and 4% at web) is incorporated into the
+                    # respective 'effective' lengths.
+                    self.effective_length_flange = length_available_flange - (0.08 * length_available_flange)  # mm
+                    self.effective_length_web = length_available_web - (0.04 * length_available_web)  # mm
 
-                # Note: The effective length of weld is calculated by assuming 1% reduction in length at each end return. Since, the
-                # total number of end returns are 12, a total of 12% reduction (8% at flange and 4% at web) is incorporated into the
-                # respective 'effective' lengths.
-                self.effective_length_flange = length_available_flange - (0.08 * length_available_flange)  # mm
-                self.effective_length_web = length_available_web - (0.04 * length_available_web)  # mm
+                    self.strength_unit_len = self.load_axial / (self.effective_length_flange + self.effective_length_web)  # N/mm
+                    self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
+                                                                                    [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                    [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
 
-                if self.connectivity == 'Welded-Slab Base' or 'Gusseted Base Plate':
-
-                    if self.connectivity == 'Welded-Slab Base':
-                        self.load_axial_flange = self.dp_column_fy * (
-                                    self.column_bf * self.column_tf)  # N, load carried by each flange
-                        self.load_axial_web = self.load_axial - (
-                                    2 * self.load_axial_flange)  # N, load carried by the web
-
-                        # strength of weld per unit length
-                        self.strength_unit_len_flange = self.load_axial_flange / (
-                                    self.effective_length_flange / 2)  # N/mm, at each flange
-                        self.strength_unit_len_web = self.load_axial_web / self.effective_length_web  # N/mm, at web
-
-                    else:
-                        self.load_axial_flange = self.load_moment_major / (
-                                    self.column_D - self.column_tf)  # N, tension in each flange due to moment
-                        self.load_axial_web = 0  # N, load carried is assumed to be zero due to perfect bearing between the column and the base plate
-
-                        # strength of weld per unit length
-                        self.strength_unit_len_flange = self.load_axial_flange / (
-                                    self.effective_length_flange / 2)  # N/mm
-
-                    # calculate weld size required at the flange and the web
-                    self.weld_size_flange = self.calc_weld_size_from_strength_per_unit_len(
-                        self.strength_unit_len_flange,
-                        [self.dp_weld_fu_overwrite, self.dp_column_fu],
-                        [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
-
-                    if self.connectivity == 'Welded-Slab Base':
-                        self.weld_size_web = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len_web,
-                                                                                            [self.dp_weld_fu_overwrite,
-                                                                                             self.dp_column_fu],
-                                                                                            [self.plate_thk,
-                                                                                             self.column_tw],
-                                                                                            self.dp_weld_fab)  # mm
-                    else:
-                        self.weld_size_web = self.weld_size_flange
-
-                    # providing the size of the weld at the flange at-least equal to that at the web
-                    # self.weld_size_flange = max(self.weld_size_flange, self.weld_size_web)
+                    self.weld_size_flange = self.weld_size  # mm
+                    self.weld_size_web = self.weld_size  # mm
 
                     # check against maximum allowed size
-                    # checking if gusset plates are required for providing extra length of weld
-                    if self.weld_size_flange > weld_size_flange_max:
-                        self.gusset_along_flange = 'Yes'
+                    # checking if stiffener plates are required for providing extra length of weld
 
-                        # length available on the gusset plate for welding, assuming 6 mm weld connecting the gusset to the column flange
-                        len_gusset_available = self.bp_width_provided + (
-                                    self.bp_width_provided - self.column_bf - 2 * 6)  # mm
-                        eff_len_gusset_available = len_gusset_available - (
-                                    0.04 * len_gusset_available)  # mm, effective length assuming 4% reduction
+                    if self.weld_size_web > self.weld_size_web_max:
+                        # Case 1: Adding stiffeners along the flanges of the column on either sides (total four in number)
+                        self.stiffener_along_flange = 'Yes'
 
-                        # for each column connected to the gusset plate
-                        self.total_eff_len_gusset_available = (
-                                                                          self.effective_length_flange / 2) + eff_len_gusset_available  # mm
+                        # length available on each stiffener plate for (fillet) welding on either sides
+                        len_stiffener_available_flange = ((self.bp_width_provided - self.column_bf) / 2) * 2  # mm
+                        # effective length assuming 2% reduction to incorporate end returns
+                        eff_len_stiffener_available_flange = len_stiffener_available_flange - (0.02 * len_stiffener_available_flange)  # mm
 
-                        # improvised weld size at flange after adding the gusset plate
-                        self.strength_unit_len_flange = self.load_axial_flange / self.total_eff_len_gusset_available  # N/mm
+                        # total effective len available including four stiffeners
+                        self.total_eff_len_available = self.effective_length_flange + self.effective_length_web + \
+                                                       (4 * eff_len_stiffener_available_flange)  # mm
 
-                        self.weld_size_flange = self.calc_weld_size_from_strength_per_unit_len(
-                            self.strength_unit_len_flange,
-                            [self.dp_weld_fu_overwrite, self.dp_column_fu],
-                            [self.plate_thk, self.column_tf], self.dp_weld_fab)
+                        # relative strength of weld per unit weld length and weld size including stiffeners along the flange
+                        self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
+                        self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
+                                                                                               [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                               [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
 
-                    if self.weld_size_web > weld_size_web_max:
-                        self.gusset_along_web = 'Yes'
+                        self.weld_size_web = self.weld_size  # mm
 
-                        self.weld_size_web = self.weld_size_flange
+                    # Second itreation: checking the maximum weld size limit (at web)
+                    if self.weld_size_web > self.weld_size_web_max:
+                        # Case 2: Adding stiffeners along web of the column (total two in number)
+                        self.stiffener_along_web = 'Yes'
 
-                    # defining conditions for providing gusset/stiffener plates for each connectivity
-                    if self.connectivity == 'Welded-Slab Base':
-                        if self.gusset_along_flange or self.gusset_along_web == 'Yes':
-                            self.gusset_along_flange = 'Yes'
-                            self.gusset_along_web = 'Yes'
+                        len_stiffener_available_web = ((self.bp_length_provided - self.column_D) / 2) * 2  # mm  (each)
+                        # effective length assuming 2% reduction to incorporate end returns
+                        eff_len_stiffener_available_web = len_stiffener_available_web - (0.02 * len_stiffener_available_web)  # mm
+
+                        # TODO: deduce notch size
+                        # total effective len available including four stiffeners along flange and two along the web
+                        self.total_eff_len_available = self.total_eff_len_available + (2 * eff_len_stiffener_available_web)  # mm
+
+                        # relative strength of weld per unit weld length and weld size, including stiffeners along the flange and the web
+                        self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
+                        self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
+                                                                                               [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                               [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
+
+                        self.weld_size_web = self.weld_size  # mm
+
+                        # Third iteration: checking the maximum weld size limit (at web)
+                        if self.weld_size_web > self.weld_size_web_max:
+                            # Case 3: Adding stiffeners across the web of the column, between the depth (total two in number)
+                            self.stiffener_across_web = 'Yes'
+
+                            len_required = (self.load_axial * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_size_web_max * self.weld_fu)  # mm
+                            # Adding 16% of the total length to incorporate end returs (16 ends in this case)
+                            len_required = len_required + (0.16 * len_required)  # mm
+
+                            len_stiffener_req_across_web = len_required - self.total_eff_len_available
+
+                            if len_stiffener_req_across_web < ((self.bp_width_provided / 2) - (self.column_tw / 2) - self.edge_distance):
+                                len_stiffener_req_across_web = max(len_stiffener_req_across_web, eff_len_stiffener_available_flange,
+                                                                   eff_len_stiffener_available_web)  # mm
+                                self.total_eff_len_available = self.total_eff_len_available + (2 * len_stiffener_req_across_web)  # mm
+
+                                # relative strength of weld per unit weld length and weld size, including stiffeners along the flange, web and across web
+                                self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
+                                self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
+                                                                                                [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                                [self.plate_thk, self.column_tf],
+                                                                                                self.dp_weld_fab)  # mm
+
+                                self.weld_size_web = self.weld_size  # mm
+
+                                if self.weld_size_web > self.weld_size_web_max:
+                                    self.weld_size_web = self.weld_size_web_max
+                            else:
+                                self.design_status = False
+                                # TODO: add log messages
+
+                            # TODO: add log messages
                         else:
                             pass
-                    else:
-                        self.gusset_along_flange = 'Yes'
-                        self.gusset_along_web = 'Yes'
 
-                elif self.connectivity == "Hollow Section":
-                    # TODO: add calculations for hollow sections
-                    self.weld_size = 0
+                    self.weld_size_flange = self.weld_size  # mm
+                    self.weld_size_stiffener = self.weld_size  # mm
 
-                else:
+                else:  # TODO: add checks for other type(s) of column section here (Example: built-up, star shaped etc.)
                     pass
 
-            else:  # TODO: add checks for other type(s) of column section here (Example: built-up, star shaped etc.)
+            elif self.connectivity == 'Hollow Section':  # TODO: add calculations for hollow sections
                 pass
 
         # design of butt/groove weld
         else:
+
+            if self.connectivity == 'Gusseted Base Plate':
+                self.stiffener_along_flange = 'Yes'
+                self.stiffener_along_web = 'Yes'
+
             self.weld_size_flange = self.column_tf  # mm
             self.weld_size_web = self.column_tw  # mm
 
@@ -1980,3 +1867,5 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # col properties
         print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)
         # print(self.w)
+
+        print("Here {}".format(self.dp_anchor_fu_overwrite))

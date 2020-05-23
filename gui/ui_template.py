@@ -65,13 +65,15 @@ from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.connection.base_plate_connection import BasePlateConnection
+from design_type.tension_member.tension_bolted import Tension_bolted
+from design_type.tension_member.tension_welded import Tension_welded
 
 from cad.cad3dconnection import cadconnection
 
 
 class Ui_ModuleWindow(QMainWindow):
-
     closed = pyqtSignal()
+
     def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
         """
         Function to connect the customized_popup with the ui_template file
@@ -782,7 +784,7 @@ class Ui_ModuleWindow(QMainWindow):
                 else:
                     options = f()
                     existing_options = data[c_tup[0] + "_customized"]
-                    print('options, existing options', options,existing_options)
+                    # print('options, existing options', options,existing_options)
                     if selected == "Customized":
                        data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                        if data[c_tup[0] + "_customized"] == []:
@@ -1492,6 +1494,7 @@ class Ui_ModuleWindow(QMainWindow):
                     k2.setCurrentIndex(0)
                 if k2_key in RED_LIST:
                     red_list_set = set(red_list_function())
+                    red_list_set = set(red_list_function())
                     current_list_set = set(val)
                     current_red_list = list(current_list_set.intersection(red_list_set))
                     for value in current_red_list:
@@ -1601,13 +1604,37 @@ class Ui_ModuleWindow(QMainWindow):
         if self.designPrefDialog.flag:
             print('flag true')
 
-            for des_pref in main.input_dictionary_design_pref(main):
+            des_pref_input_list = main.input_dictionary_design_pref(main)
+            edit_tabs_list = main.edit_tabs(main)
+            edit_tabs_remove = list(filter(lambda x: x[2] == TYPE_REMOVE_TAB,edit_tabs_list))
+            remove_tab_name = [x[0] for x in edit_tabs_remove]
+            # remove_tabs = list(filter(lambda x: x[0] in remove_tab_name, des_pref_input_list))
+            #
+            # remove_func_name = edit_tabs_remove[3]
+            result = None
+            for edit in main.edit_tabs(main):
+                (tab_name, input_dock_key_name, change_typ, f) = edit
+                remove_tabs = list(filter(lambda x: x[0] in remove_tab_name,des_pref_input_list))
+
+                input_dock_key = self.dockWidgetContents.findChild(QtWidgets.QWidget, input_dock_key_name)
+                result = list(filter(lambda get_tab:
+                                     self.designPrefDialog.findChild(QtWidgets.QWidget, get_tab[0]).objectName() !=
+                                     f(input_dock_key.currentText()), remove_tabs))
+
+            if result is not None:
+                des_pref_input_list_updated = [i for i in des_pref_input_list if i not in result]
+                print('updated input tablist',des_pref_input_list_updated)
+            else:
+                des_pref_input_list_updated = des_pref_input_list
+
+            for des_pref in des_pref_input_list_updated:
                 tab_name = des_pref[0]
                 input_type = des_pref[1]
                 input_list = des_pref[2]
                 tab = self.designPrefDialog.findChild(QtWidgets.QWidget, tab_name)
                 for key_name in input_list:
                     key = tab.findChild(QtWidgets.QWidget, key_name)
+                    print('key_name',key_name)
                     if input_type == TYPE_TEXTBOX:
                         val = key.text()
                         design_dictionary.update({key_name: val})
@@ -1790,6 +1817,10 @@ class Ui_ModuleWindow(QMainWindow):
             return CleatAngleConnection
         elif name == KEY_DISP_BASE_PLATE:
             return BasePlateConnection
+        elif name == KEY_DISP_TENSION_BOLTED:
+            return Tension_bolted
+        elif name == KEY_DISP_TENSION_WELDED:
+            return Tension_welded
 # Function for getting inputs from a file
     '''
     @author: Umair
@@ -1935,9 +1966,9 @@ class Ui_ModuleWindow(QMainWindow):
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
-                    txt.setVisible(True if option[3] else False)
+                    # txt.setVisible(True if option[3] else False)
                     txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
-                    txt_label.setVisible(True if option[3] else False)
+                    # txt_label.setVisible(True if option[3] else False)
 
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
@@ -1957,7 +1988,8 @@ class Ui_ModuleWindow(QMainWindow):
                 module_class = EndPlateConnection
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_CLEATANGLE,
-                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE]:
+                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED,
+                                                  KEY_DISP_TENSION_WELDED]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
@@ -2463,24 +2495,26 @@ class Ui_ModuleWindow(QMainWindow):
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
             for key_name in key_list:
+                print('key_name',key_name)
                 key = tab.findChild(QtWidgets.QWidget, key_name)
+                print('key1',key)
                 if isinstance(key, QtWidgets.QComboBox):
                     self.connect_combobox_for_tab(key, tab, on_change_tab_list)
                 elif isinstance(key, QtWidgets.QLineEdit):
                     self.connect_textbox_for_tab(key, tab, on_change_tab_list)
 
-        for fu_fy in main.list_for_fu_fy_validation(main):
-
-            material_key_name = fu_fy[0]
-            fu_key_name = fu_fy[1]
-            fy_key_name = fu_fy[2]
-            material_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, material_key_name)
-            fu_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, fu_key_name)
-            fy_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, fy_key_name)
-
-            for validation_key in [fu_key, fy_key]:
-                if validation_key.text() != "":
-                    self.designPrefDialog.fu_fy_validation_connect([fu_key, fy_key], validation_key, material_key)
+        # for fu_fy in main.list_for_fu_fy_validation(main):
+        #
+        #     material_key_name = fu_fy[0]
+        #     fu_key_name = fu_fy[1]
+        #     fy_key_name = fu_fy[2]
+        #     material_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, material_key_name)
+        #     fu_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, fu_key_name)
+        #     fy_key = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, fy_key_name)
+        #
+        #     for validation_key in [fu_key, fy_key]:
+        #         if validation_key.text() != "":
+        #             self.designPrefDialog.fu_fy_validation_connect([fu_key, fy_key], validation_key, material_key)
 
         for edit in main.edit_tabs(main):
             (tab_name, input_dock_key_name, change_typ, f) = edit
@@ -2729,6 +2763,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         for tup in new:
             (tab_name, key_list, k2_key_list, typ, f) = tup
+            print('tabname',tab_name, tab.objectName(),key)
             if tab_name != tab.objectName() or key.objectName() not in key_list:
                 continue
             arg_list = []
@@ -2742,7 +2777,13 @@ class Ui_ModuleWindow(QMainWindow):
                     arg_list.append(key.text())
 
             arg_list.append(self.input_dock_inputs)
-
+            try:
+                tab1 = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+                key1 = tab.findChild(QtWidgets.QWidget, KEY_SECSIZE_SELECTED)
+                value1 = key1.text()
+                arg_list.append({KEY_SECSIZE_SELECTED: value1})
+            except:
+                pass
             val = f(arg_list)
 
             for k2_key_name in k2_key_list:
@@ -2752,6 +2793,7 @@ class Ui_ModuleWindow(QMainWindow):
                     for values in val[k2_key_name]:
                         k2.addItem(str(values))
                 elif typ == TYPE_TEXTBOX:
+                    print('k2keyname',k2_key_name)
                     k2.setText(str(val[k2_key_name]))
 
     def refresh_section_connect(self, add_button, prev, key, key_type, tab_key, arg):

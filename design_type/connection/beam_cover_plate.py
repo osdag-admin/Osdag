@@ -1250,7 +1250,7 @@ class BeamCoverPlate(MomentConnection):
             bolt_capacity_reduced_flange = self.flange_plate.get_bolt_red(self.flange_plate.bolts_one_line,
                                                                           self.flange_plate.gauge_provided,self.web_plate.bolt_line,self.web_plate.pitch_provided,
                                                                           self.flange_bolt.bolt_capacity,
-                                                                          self.bolt.bolt_diameter_provided,)
+                                                                          self.bolt.bolt_diameter_provided)
             bolt_capacity_reduced_web = self.web_plate.get_bolt_red(self.web_plate.bolts_one_line,
                                                                     self.web_plate.gauge_provided,self.web_plate.bolt_line,self.web_plate.pitch_provided,
                                                                     self.web_bolt.bolt_capacity,
@@ -2909,7 +2909,7 @@ class BeamCoverPlate(MomentConnection):
                                                                         self.web_plate.thickness_provided,
                                                                         self.web_plate.bolts_one_line,
                                                                         self.web_bolt.dia_hole,
-                                                                        self.web_bolt.fu, gamma_m1,
+                                                                        self.web_bolt.bolt_fu, gamma_m1,
                                                                         round(self.web_plate.tension_rupture_capacity / 1000,2)), '')
 
         self.report_check.append(t1)

@@ -801,7 +801,7 @@ class ColumnCoverPlate(MomentConnection):
         if self.section.type == "Rolled":
             self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                            column_t_w=self.section.web_thickness,
-                                                                           D=self.section.depth,
+                                                                           column_d=self.section.depth,
                                                                            column_b=self.section.flange_width,
                                                                            column_fy=self.section.fy,
                                                                            factored_axial_force=self.factored_axial_load,
@@ -814,7 +814,7 @@ class ColumnCoverPlate(MomentConnection):
         if self.section.type2 == "generally":
             self.limitwidththkratio_web = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                         column_t_w=self.section.web_thickness,
-                                                                        D=self.section.depth,
+                                                                        column_d=self.section.depth,
                                                                         column_b=self.section.flange_width,
                                                                         column_fy=self.section.fy,
                                                                         factored_axial_force=self.factored_axial_load,

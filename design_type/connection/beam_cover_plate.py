@@ -2185,71 +2185,47 @@ class BeamCoverPlate(MomentConnection):
 
         return thickness
 
-    def get_3d_components(self):
-        components = []
 
-        t1 = ('Model', self.call_3DModel)
-        components.append(t1)
+    def call_3DModel(self,ui,bgcolor):
+        # Call to calculate/create the BB Cover Plate Bolted CAD model
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.createBBCoverPlateBoltedCAD()
+        #     self.ui.btn3D.setChecked(Qt.Checked)
+        if ui.btn3D.isChecked():
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxFinplate.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
 
-        t2 = ('Beam', self.call_3DBeam)
-        components.append(t2)
+        # Call to display the BB Cover Plate Bolted CAD model
+        #     ui.Commondisplay_3DModel("Model", bgcolor)  # "gradient_bg")
+        ui.commLogicObj.display_3DModel("Model",bgcolor)
 
-        t4 = ('Cover Plate', self.call_3DPlate)
-        components.append(t4)
+        # else:
+        #     self.display.EraseAll()
 
-        return components
+    def call_3DBeam(self, ui, bgcolor):
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
+        if ui.chkBxBeam.isChecked():
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+        # self.display_3DModel("Beam", bgcolor)
+        ui.commLogicObj.display_3DModel("Beam",bgcolor)
 
-    def call_3DPlate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Cover Plate':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+
+    def call_3DConnector(self, ui, bgcolor):
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.ui.chkBx_extndPlate.setChecked(Qt.Checked)
+        if ui.chkBxFinplate.isChecked():
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+        # self.display_3DModel("Connector", bgcolor)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
-
-
-    # def call_3DModel(self,ui,bgcolor):
-    #     # Call to calculate/create the BB Cover Plate Bolted CAD model
-    #     # status = self.resultObj['Bolt']['status']
-    #     # if status is True:
-    #     #     self.createBBCoverPlateBoltedCAD()
-    #     #     self.ui.btn3D.setChecked(Qt.Checked)
-    #     if ui.btn3D.isChecked():
-    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
-    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
-    #         ui.mytabWidget.setCurrentIndex(0)
-    #
-    #     # Call to display the BB Cover Plate Bolted CAD model
-    #     #     ui.Commondisplay_3DModel("Model", bgcolor)  # "gradient_bg")
-    #     ui.commLogicObj.display_3DModel("Model",bgcolor)
-    #
-    #     # else:
-    #     #     self.display.EraseAll()
-    #
-    # def call_3DBeam(self, ui, bgcolor):
-    #     # status = self.resultObj['Bolt']['status']
-    #     # if status is True:
-    #     #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
-    #     if ui.chkBxBeam.isChecked():
-    #         ui.btn3D.setChecked(Qt.Unchecked)
-    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
-    #         ui.mytabWidget.setCurrentIndex(0)
-    #     # self.display_3DModel("Beam", bgcolor)
-    #     ui.commLogicObj.display_3DModel("Beam",bgcolor)
-    #
-    #
-    # def call_3DConnector(self, ui, bgcolor):
-    #     # status = self.resultObj['Bolt']['status']
-    #     # if status is True:
-    #     #     self.ui.chkBx_extndPlate.setChecked(Qt.Checked)
-    #     if ui.chkBxFinplate.isChecked():
-    #         ui.btn3D.setChecked(Qt.Unchecked)
-    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
-    #         ui.mytabWidget.setCurrentIndex(0)
-    #     # self.display_3DModel("Connector", bgcolor)
-    #     ui.commLogicObj.display_3DModel("Connector", bgcolor)
 
     ################################ Design Report #####################################################################################
 

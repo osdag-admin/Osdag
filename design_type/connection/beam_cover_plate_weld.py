@@ -1575,92 +1575,48 @@ class BeamCoverPlateWeld(MomentConnection):
                                       weld_twist=  self.weld_twist, Ip_weld=self.Ip_weld, y_max=self.y_max , x_max= self.x_max ,
                                       l_weld=self.l_req_weblength)
 
-    # def call_3DModel(self,ui,bgcolor):
-    #     # Call to calculate/create the BB Cover Plate Bolted CAD model
-    #     # status = self.resultObj['Bolt']['status']
-    #     # if status is True:
-    #     #     self.createBBCoverPlateBoltedCAD()
-    #     #     self.ui.btn3D.setChecked(Qt.Checked)
-    #     if ui.btn3D.isChecked():
-    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
-    #         ui.chkBxFinplate.setChecked(Qt.Unchecked)
-    #         ui.mytabWidget.setCurrentIndex(0)
-    #
-    #     # Call to display the BB Cover Plate Bolted CAD model
-    #     #     ui.Commondisplay_3DModel("Model", bgcolor)  # "gradient_bg")
-    #     ui.commLogicObj.display_3DModel("Model",bgcolor)
-    #
-    #     # else:
-    #     #     self.display.EraseAll()
-    #
-    # def call_3DBeam(self, ui, bgcolor):
-    #     # status = self.resultObj['Bolt']['status']
-    #     # if status is True:
-    #     #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
-    #     if ui.chkBxBeam.isChecked():
-    #         ui.btn3D.setChecked(Qt.Unchecked)
-    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
-    #         ui.mytabWidget.setCurrentIndex(0)
-    #     # self.display_3DModel("Beam", bgcolor)
-    #     ui.commLogicObj.display_3DModel("Beam",bgcolor)
-    #
-    #
-    # def call_3DConnector(self, ui, bgcolor):
-    #     # status = self.resultObj['Bolt']['status']
-    #     # if status is True:
-    #     #     self.ui.chkBx_extndPlate.setChecked(Qt.Checked)
-    #     if ui.chkBxFinplate.isChecked():
-    #         ui.btn3D.setChecked(Qt.Unchecked)
-    #         ui.chkBxBeam.setChecked(Qt.Unchecked)
-    #         ui.mytabWidget.setCurrentIndex(0)
-    #     # self.display_3DModel("Connector", bgcolor)
-    #     ui.commLogicObj.display_3DModel("Connector", bgcolor)
+    def call_3DModel(self,ui,bgcolor):
+        # Call to calculate/create the BB Cover Plate Bolted CAD model
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.createBBCoverPlateBoltedCAD()
+        #     self.ui.btn3D.setChecked(Qt.Checked)
+        if ui.btn3D.isChecked():
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.chkBxFinplate.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
 
-    def get_3d_components(self):
-        components = []
+        # Call to display the BB Cover Plate Bolted CAD model
+        #     ui.Commondisplay_3DModel("Model", bgcolor)  # "gradient_bg")
+        ui.commLogicObj.display_3DModel("Model",bgcolor)
 
-        t1 = ('Model', self.call_3DModel)
-        components.append(t1)
+        # else:
+        #     self.display.EraseAll()
 
-        t2 = ('Beam', self.call_3DBeam)
-        components.append(t2)
+    def call_3DBeam(self, ui, bgcolor):
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
+        if ui.chkBxBeam.isChecked():
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+        # self.display_3DModel("Beam", bgcolor)
+        ui.commLogicObj.display_3DModel("Beam",bgcolor)
 
-        t4 = ('Cover Plate', self.call_3DPlate)
-        components.append(t4)
 
-        return components
-
-    def call_3DPlate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Cover Plate':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+    def call_3DConnector(self, ui, bgcolor):
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.ui.chkBx_extndPlate.setChecked(Qt.Checked)
+        if ui.chkBxFinplate.isChecked():
+            ui.btn3D.setChecked(Qt.Unchecked)
+            ui.chkBxBeam.setChecked(Qt.Unchecked)
+            ui.mytabWidget.setCurrentIndex(0)
+        # self.display_3DModel("Connector", bgcolor)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
 
-    # def flange_force(self,):
-    #     axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
-    #         self.section.area)
-    #     moment_web = (Z_w / ( self.section.plast_sec_mod_z )) * self.load.moment #  KNm todo add in ddcl # z_w of web & z_p  of section
-    #
-    #     self.moment_flange = ((self.load.moment * 1000000) - moment_web) / 1000000
-    #     flange_force = (((self.moment_flange * 1000000) / (self.section.depth - self.section.flange_thickness)) + (
-    #         axial_force_f))
 
-
-# self.weld_connecting_plates = [self.section.flange_thickness,self.flange_plate.thickness_provided]
-# t1 = (DISP_MIN_WELD_SIZE_FLANGE,# for display
-#       min_weld_size_req(conn_plates_weld = self.weld_connecting_plates,min_weld_size= self.min_flange_platethk ), # Required
-#     self.flange_weld.size, #provided
-#      get_pass_fail(self.min_flange_platethk,  self.flange_weld.size, relation="leq")) # relation
-#         self.report_check.append(t1)
-# t2 = (DISP_MIN_WELD_SIZE,min_weld_size_req(conn_plates_weld=self.weld_connecting_plates,
-#                                                    min_weld_size=self.min_flange_platethk ) ,
-#               self.flange_weld.size ,
-#               get_pass_fail(self.min_flange_platethk,  self.flange_weld.size, relation="leq") )
-# self.report_check.append(t2)
 
     ################################ Design Report #####################################################################################
 

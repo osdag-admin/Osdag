@@ -29,10 +29,10 @@ from cad.ShearConnections.CleatAngle.colFlangeBeamWebConnectivity import ColFlan
 from cad.ShearConnections.CleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
 from cad.ShearConnections.CleatAngle.nutBoltPlacement import NutBoltArray as cleatNutBoltArray
 
-# from cad.ShearConnections.EndPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as EndBeamWebBeamWeb
-# from cad.ShearConnections.EndPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as EndColFlangeBeamWeb
-# from cad.ShearConnections.EndPlate.colWebBeamWebConnectivity import ColWebBeamWeb as EndColWebBeamWeb
-# from cad.ShearConnections.EndPlate.nutBoltPlacement import NutBoltArray as endNutBoltArray
+from cad.ShearConnections.EndPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as EndBeamWebBeamWeb
+from cad.ShearConnections.EndPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as EndColFlangeBeamWeb
+from cad.ShearConnections.EndPlate.colWebBeamWebConnectivity import ColWebBeamWeb as EndColWebBeamWeb
+from cad.ShearConnections.EndPlate.nutBoltPlacement import NutBoltArray as endNutBoltArray
 
 from cad.BasePlateCad.baseplateconnection import BasePlateCad
 from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
@@ -1042,7 +1042,6 @@ class CommonDesignLogic(object):
 
                 else:
                     self.connectivityObj = self.create3DBeamWebBeamWeb()
-
                 self.display_3DModel("Model","gradient_bg")
             else:
                 self.display.EraseAll()
@@ -1178,7 +1177,8 @@ class CommonDesignLogic(object):
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component
         '''
-        # TODO: changed for saving 3dmodels for different modules
+        # TODO: changed for saving 3dmodels for different modules, add conditions for "connector",
+        #  "cleatAngle", "seatedAngle" etc..
         if self.mainmodule == "Shear Connection":
             Obj = self.connectivityObj
         elif self.mainmodule == "Moment Connection":

@@ -1172,7 +1172,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
         module = main.module_name(main)
 
-        if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE]:
+        if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE]:
 
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
@@ -1182,25 +1182,16 @@ class Ui_Dialog(object):
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
-            pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CLEAT)
-            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
-            pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CLEAT)
-            pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
-
-        if module in [KEY_DISP_SEATED_ANGLE]:
-
-            pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
-            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
-            pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
-            pushButton_Add_Column.clicked.connect(self.add_tab_column)
-            pushButton_Clear_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
-            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
-            pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
-            pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
-            pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_SEATED_ANGLE)
-            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
-            pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_SEATED_ANGLE)
-            pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+            if module== KEY_DISP_CLEATANGLE:
+                pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CLEAT)
+                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+                pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CLEAT)
+                pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+            if module == KEY_DISP_SEATED_ANGLE:
+                pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_SEATED_ANGLE)
+                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+                pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_SEATED_ANGLE)
+                pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
 
         if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD or module == KEY_DISP_COLUMNENDPLATE:
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)

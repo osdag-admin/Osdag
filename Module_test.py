@@ -87,7 +87,8 @@ Make sure to make the necessary changes in above functions/methods if you are ch
 from Common import *
 available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDED:Tension_welded,
                     KEY_DISP_TENSION_BOLTED:Tension_bolted,KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
-                    KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld}
+                    KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
+                    KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate}
 
 
 #predefined pop-up summary.

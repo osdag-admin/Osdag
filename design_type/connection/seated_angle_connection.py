@@ -821,5 +821,32 @@ class SeatedAngleConnection(ShearConnection):
 
         return capacities
 
+    def get_3d_components(self):
+        components = []
+
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t2 = ('Beam', self.call_3DBeam)
+        components.append(t2)
+
+        t3 = ('Column', self.call_3DColumn)
+        components.append(t3)
+
+        t4 = ('Seated Angle', self.call_3DPlate)
+        components.append(t4)
+
+        return components
+
+    def call_3DPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Seated Angle':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("SeatAngle", bgcolor)
+
     # def to_get_d(my_d):
     #     print(my_d)

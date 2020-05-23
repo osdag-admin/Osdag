@@ -1116,7 +1116,7 @@ class Plate(Material):
             else:
                 bolt_capacity_red = bolt_capacity
         else:
-            length_avail =  2 * ((bolts_line * pitch) + end_dist) + gap
+            length_avail = max((2 * ((bolts_line * pitch) + end_dist) + gap), ((bolts_one_line - 1) * gauge))
             if length_avail > 15 * bolt_dia:
                 beta_lj = 1.075 - length_avail / (200 * bolt_dia)
                 if beta_lj > 1:
@@ -1200,9 +1200,16 @@ class Plate(Material):
                 moment_demand = 0.0
                 vres = resultant_force / (bolt_line * bolts_one_line)
 
-            bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+
+            if joint == None:
+
+                bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,
                                                       bolt_dia)
+            else:
+                bolt_capacity_red = self.get_bolt_red(bolts_one_line,
+                                                      gauge, bolt_line, pitch, bolt_capacity,
+                                                      bolt_dia, end_dist, gap)
 
             while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
 

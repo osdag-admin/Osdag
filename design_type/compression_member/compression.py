@@ -1,4 +1,4 @@
-from main import Main
+from design_type.main import Main
 from Common import *
 from utils.common.component import Section,I_sectional_Properties, Material
 
@@ -1109,7 +1109,7 @@ class Compression(Main):
             designation = str(input_dictionary[KEY_SECSIZE][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
             col_attributes = Section(designation, material_grade)
-            Section.connect_to_database_update_other_attributes(col_attributes, "Beams", designation)
+            Section.connect_to_database_update_other_attributes(col_attributes, "Beams", designation,material_grade)
             source = str(col_attributes.source)
             fu = str(col_attributes.fu)
             fy = str(col_attributes.fy)
@@ -1507,7 +1507,7 @@ class Compression(Main):
             table = "Columns"
         col_attributes = Section(designation, material_grade)
         Section.connect_to_database_update_other_attributes(
-            col_attributes, table, designation)
+            col_attributes, table, designation,material_grade)
         source = str(col_attributes.source)
         depth = str(col_attributes.depth)
         flange_width = str(col_attributes.flange_width)

@@ -338,7 +338,7 @@ self
 
     # cl. 10.2.4.3  Maximum Edge Distance
     @staticmethod
-    def cl_10_2_4_3_max_edge_dist(plate_thicknesses, f_y, corrosive_influences=False):
+    def cl_10_2_4_3_max_edge_dist(conn_plates_t_fu_fy, corrosive_influences=False):
         """Calculate maximum end and edge distance
         Args:
              plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
@@ -351,12 +351,21 @@ self
             IS 800:2007, cl. 10.2.4.3
         """
         # TODO : Differentiate outer plates and connected plates.
-        t = min(plate_thicknesses)
-        epsilon = math.sqrt(250 / f_y)
+        t_epsilon_prev = conn_plates_t_fu_fy[0][0] * math.sqrt(250 / float(conn_plates_t_fu_fy[0][2]))
+        thk_considered = conn_plates_t_fu_fy[0][0]
+        for i in conn_plates_t_fu_fy:
+            t = i[0]
+            f_y = i[2]
+            epsilon = math.sqrt(250 / f_y)
+            if t * epsilon <= t_epsilon_prev:
+                t_epsilon_considered = t * epsilon
+                t_considered = t
+
+         # epsilon = math.sqrt(250 / f_y)
         if corrosive_influences is True:
-            return 40.0 + 4 * t
+            return 40.0 + 4 * t_considered
         else:
-            return 12 * t * epsilon
+            return 12 * t_epsilon_considered
 
     # -------------------------------------------------------------
     #   10.3 Bearing Type Bolts

@@ -84,7 +84,11 @@ Make sure to make the necessary changes in above functions/methods if you are ch
 #                     'Column Coverplate Weld Connection':ColumnCoverPlateWeld, 'Column Coverplate Connection':ColumnCoverPlate,
 #                     'Fin Plate':FinPlateConnection, 'Tension Members Bolted Design':Tension_bolted,
 #                     'Tension Members Welded Design':Tension_welded}
-available_module = {'Column Coverplate Connection':ColumnCoverPlate}
+from Common import *
+available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDED:Tension_welded,
+                    KEY_DISP_TENSION_BOLTED:Tension_bolted,KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
+                    KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
+                    KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate}
 
 
 #predefined pop-up summary.

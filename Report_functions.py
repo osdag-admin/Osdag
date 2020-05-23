@@ -955,7 +955,7 @@ def get_pass_fail(required, provided,relation='greater'):
         return 'N/A'
     else:
         if relation == 'greater':
-            if required >= provided:
+            if required > provided:
                 return 'Pass'
             else:
                 return 'Fail'
@@ -970,7 +970,7 @@ def get_pass_fail(required, provided,relation='greater'):
             else:
                 return 'Fail'
         else:
-            if required <= provided:
+            if required < provided:
                 return 'Pass'
             else:
                 return 'Fail'
@@ -1555,7 +1555,7 @@ def depth_req(e, g, row, sec =None):
 
     depth_eqn = Math(inline=True)
     if sec == "C":
-        depth_eqn.append(NoEscape(r'\begin{aligned} depth & = 2 * e + (r_l -1) * g \\'))
+        depth_eqn.append(NoEscape(r'\begin{aligned} depth & = 2 * e + (rl -1) * g \\'))
         depth_eqn.append(NoEscape(r'& = 2 * '+e+'+('+row+'-1)*'+g+r' \\'))
         depth_eqn.append(NoEscape(r'& = ' + depth + r'\end{aligned}'))
     else:

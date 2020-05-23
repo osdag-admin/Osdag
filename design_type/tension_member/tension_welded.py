@@ -293,10 +293,6 @@ class Tension_welded(Member):
             return VALUES_LOCATION_2
 
 
-    def get_3d_components(self):
-        components = []
-        return components
-
     def input_values(self, existingvalues={}):
 
         '''

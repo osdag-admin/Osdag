@@ -1607,6 +1607,30 @@ class BeamCoverPlateWeld(MomentConnection):
 
         return add_buttons
 
+    def get_3d_components(self):
+        components = []
+
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t2 = ('Beam', self.call_3DBeam)
+        components.append(t2)
+
+        t4 = ('Cover Plate', self.call_3DPlate)
+        components.append(t4)
+
+        return components
+
+    def call_3DPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Cover Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Connector", bgcolor)
+
     # def flange_force(self,):
     #     axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
     #         self.section.area)

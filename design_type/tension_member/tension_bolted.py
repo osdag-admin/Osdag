@@ -1850,9 +1850,15 @@ class Tension_bolted(Member):
             self.inter_bolt_line = 1
             self.inter_plate_length = 2 * self.plate.end_dist_provided
             if self.loc == "Long Leg":
-                self.inter_plate_height = self.section_size_1.max_leg
+                if self.sec_profile == "Star Angles":
+                    self.inter_plate_height = 2 * self.section_size_1.max_leg
+                else:
+                    self.inter_plate_height = self.section_size_1.max_leg
             elif self.loc == "Short Leg":
-                self.inter_plate_height = self.section_size_1.min_leg
+                if self.sec_profile == "Star Angles":
+                    self.inter_plate_height = 2 * self.section_size_1.max_leg
+                else:
+                    self.inter_plate_height = self.section_size_1.max_leg
             else:
                 self.inter_plate_height = self.section_size_1.depth
             self.inter_dia = self.bolt.bolt_diameter_provided

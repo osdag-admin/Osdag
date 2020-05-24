@@ -965,11 +965,14 @@ class Plate(Material):
         if possible_bolt > 0:
             bolt_one_side = int(possible_bolt/gauge  +1)
             max_bolts_one_line = 2*bolt_one_side
+            print("max bolt one line",max_bolts_one_line)
 
 
             if max_bolts_one_line >= 2:
+                print("bolts_required",bolts_required)
                 bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
                 bolts_one_line = max(int(math.ceil(float(bolts_required) / float(bolt_line))),2)
+                print("bbbb1", bolt_line, bolts_one_line)
                 if bolts_one_line % 2 == 1:
                     bolts_one_line = bolts_one_line-1
                     bolt_line =bolt_line  +1
@@ -977,7 +980,7 @@ class Plate(Material):
                     pass
 
                 height =flange_plate_h_max
-                # (
+                print("bbbb",bolt_line, bolts_one_line, height)
                 #     self.get_flange_plate_h_req(self.bolts_one_line, gauge, edge_dist, web_thickness, root_radius))
                 return bolt_line, bolts_one_line, height
             # if max_bolts_one_line >= 2:
@@ -1120,18 +1123,20 @@ class Plate(Material):
         :param bolt_dia: diameter of bolt
         :return: reduced bolt capacity if long joint condition is met
         """
-        length_avail = max(((bolts_one_line - 1) * gauge),((bolts_line - 1) * pitch))
-        if length_avail > 15 * bolt_dia:
-            beta_lj = 1.075 - length_avail / (200 * bolt_dia)
-            print('long joint case')
-            if beta_lj >1:
-                beta_lj =1
-            elif beta_lj<0.75:
-                beta_lj = 0.75
+        if end_dist==0.0 and gap==0.0:
+            length_avail = max(((bolts_one_line - 1) * gauge),((bolts_line - 1) * pitch))
+            if length_avail > 15 * bolt_dia:
+                beta_lj = 1.075 - length_avail / (200 * bolt_dia)
+                print('long joint case')
+                if beta_lj >1:
+                    beta_lj =1
+                elif beta_lj<0.75:
+                    beta_lj = 0.75
+                else:
+                    beta_lj = beta_lj
+                bolt_capacity_red = beta_lj * bolt_capacity
             else:
-                beta_lj = beta_lj
-
-            bolt_capacity_red = beta_lj * bolt_capacity
+                bolt_capacity_red = bolt_capacity
         else:
             length_avail = max((2 * ((bolts_line * pitch) + end_dist) + gap), ((bolts_one_line - 1) * gauge))
             if length_avail > 15 * bolt_dia:
@@ -1417,7 +1422,7 @@ class Plate(Material):
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                           gauge, bolt_line, pitch, bolt_capacity,
                                                           bolt_dia, end_dist, gap)
-
+                print("boltforce", vres, bolt_capacity_red)
                 # convergence = bolt_capacity_red - vres
                 #
                 # if convergence < 0:

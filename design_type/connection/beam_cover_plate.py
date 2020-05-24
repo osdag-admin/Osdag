@@ -1284,8 +1284,8 @@ class BeamCoverPlate(MomentConnection):
             self.web_plate.bolt_force = bolt_force_previous_2
 
         if bolt_design_status_1 is True and bolt_design_status_2 is True  :
-            self.flange_plate.spacing_status =False
-            self.web_plate.spacing_status = False
+            self.flange_plate.spacing_status =True
+            self.web_plate.spacing_status = True
             self.design_status = True
             self.select_bolt_dia_status = True
             self.get_bolt_grade(self)
@@ -2290,7 +2290,10 @@ class BeamCoverPlate(MomentConnection):
                             self.design_status = False
 
             else:
-                self.webclearance = max (self.section.root_radius, fp_thk) +10
+                if self.section.depth > 600.00:
+                    self.webclearance = max (self.section.root_radius, fp_thk) +25
+                else:
+                    self.webclearance = max(self.section.root_radius, fp_thk) + 10
                 self.webwidth = D - (2 * tk) - (2 * self.webclearance )
                 self.web_crs_area = t_w * self.webwidth
                 self.Wp = self.web_crs_area * 1.05
@@ -2390,9 +2393,6 @@ class BeamCoverPlate(MomentConnection):
              KEY_DISP_D: str(self.bolt.bolt_diameter),
              KEY_DISP_GRD: str(self.bolt.bolt_grade),
              KEY_DISP_TYP: self.bolt.bolt_type,
-
-             KEY_BOLT_FU:  self.flange_bolt.bolt_fu,
-             KEY_BOLT_FY: round(self.flange_bolt.bolt_fy,2),
 
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
              KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
@@ -2631,7 +2631,6 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t3)
 
 
-
             t1 = ('SubSection', 'Flange Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{5cm}|p{1cm}|')
             self.report_check.append(t1)
             self.bolt_diameter_min = min(self.bolt.bolt_diameter)
@@ -2665,7 +2664,10 @@ class BeamCoverPlate(MomentConnection):
 
             t8 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Grade Optimisation", self.bolt.bolt_grade_provided, '')
             self.report_check.append(t8)
-
+            t8 =(KEY_BOLT_FU,'' , self.flange_bolt.bolt_fu,'' )
+            self.report_check.append(t8)
+            t8 =(KEY_BOLT_FY ,'' ,round(self.flange_bolt.bolt_fy, 2),'' )
+            self.report_check.append(t8)
             t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.flange_bolt.dia_hole, "d_0"), '')
             self.report_check.append(t8)
 

@@ -1257,7 +1257,16 @@ KEY_DISP_PITCH_2_WEB = 'Pitch2 along Web'
 KEY_CONN_PREFERENCE = 'plate.design_method'
 KEY_DISP_CONN_PREFERENCE = 'Design Method'
 VALUES_CONN_PREFERENCE = ["Select","Plate Oriented", "Bolt Oriented"]
-
+KEY_OUT_STIFFENER_HEIGHT = 'Stiffener.height'
+KEY_OUT_DISP_STIFFENER_HEIGHT = 'Stiffener Height'
+KEY_OUT_STIFFENER_WIDTH = 'Stiffener.width'
+KEY_OUT_DISP_STIFFENER_WIDTH = 'Stiffener Width'
+KEY_OUT_STIFFENER_THICKNESS = 'Stiffener.thickness'
+KEY_OUT_DISP_STIFFENER_THICKNESS = 'Stiffener Thickness'
+KEY_OUT_WELD_TYPE = 'Stiffener.weld'
+KEY_OUT_DISP_WELD_TYPE = 'Weld Type'
+KEY_OUT_STIFFENER_DETAILS = 'Stiffener.details'
+KEY_OUT_DISP_STIFFENER_DETAILS = 'Stiffener Details'
 
 DISP_TITLE_WELD = 'Weld'
 KEY_OUT_WELD_SIZE = 'Weld.Size'

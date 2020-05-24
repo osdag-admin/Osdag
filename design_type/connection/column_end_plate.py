@@ -203,6 +203,24 @@ class ColumnEndPlate(MomentConnection):
 
         return detailing
 
+    def stiffener_details(self, flag):
+        stiff_details = []
+
+        if 2*self.end_dist < 50 and self.h_s < 100:
+            pass
+        elif 2*self.end_dist >= 50 and self.h_s >= 100:
+            t1 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.t_s if flag else '', True)
+            stiff_details.append(t1)
+            t2 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
+            stiff_details.append(t2)
+            t3 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
+            stiff_details.append(t3)
+            t4 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
+            stiff_details.append(t4)
+            return stiff_details
+        else:
+            pass
+
     def output_values(self, flag):
 
         out_list = []
@@ -269,8 +287,26 @@ class ColumnEndPlate(MomentConnection):
         t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate_width if flag else '', True)
         out_list.append(t16)
 
-        t17 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, self.m_dp if flag else '', True)
+        t17 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.m_dp/1000000,2) if flag else '', True)
         out_list.append(t17)
+
+        # if 2*self.end_dist < 50 and self.h_s < 100:
+        #     pass
+        # elif 2*self.end_dist >= 50 and self.h_s >= 100:
+        t33 = (None, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, True)
+        out_list.append(t33)
+
+        t21 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.stiff_ht if flag else '', True)
+        out_list.append(t21)
+        t22 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
+        out_list.append(t22)
+        t23 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
+        out_list.append(t23)
+        t24 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
+        out_list.append(t24)
+
+        # t22 = (KEY_OUT_STIFFENER_DETAILS,KEY_OUT_DISP_STIFFENER_DETAILS,TYPE_OUT_BUTTON, ['Stiffener Details',self.stiffener_details], True)
+        # out_list.append(t22)
 
         return out_list
 
@@ -411,7 +447,7 @@ class ColumnEndPlate(MomentConnection):
 
         else:
             self.design_status = False
-            logger.error(":The axial force {} acting is higher than axial capacity {} of member").format(self.load.axial_force,self.axial_capacity)
+            logger.error(":The axial force {} acting is higher than axial capacity {} of member".format(self.load.axial_force,self.axial_capacity))
             logger.info("Increase member size or decrease axial load")
         # self.load.axial_force = self.factored_axial_load  # N
         print("factored_axial_load", self.factored_axial_load)
@@ -430,7 +466,7 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = True
         else:
             self.design_status = False
-            logger.error(":The shear force {} acting is higher than axial capacity {} of member").format(self.load.shear_force,self.shear_capacity)
+            logger.error(":The shear force {} acting is higher than axial capacity {} of member".format(self.load.shear_force,self.shear_capacity))
             logger.info("Increase member size or decrease shear load")
         print("factored_shear_load", self.factored_shear_load)
 ###############################################################
@@ -504,7 +540,7 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = True
         else:
             self.design_status = False
-            logger.error(":The moment {} acting is higher than moment capacity {} of member").format(self.load.moment, self.moment_capacity)
+            logger.error(":The moment {} acting is higher than moment capacity {} of member".format(self.load.moment, self.moment_capacity))
             logger.info("Increase member size or decrease shear load")
         print("factored_moment", self.factored_moment)
 
@@ -1072,7 +1108,7 @@ class ColumnEndPlate(MomentConnection):
         if self.connection == 'Flush End Plate':
             self.plate_height = self.section.depth
         else:
-            self.plate_height = self.section.depth + 4 * self.end_dist
+            self.plate_height = self.section.depth + 4 * self.pitch
         self.plate_width = self.section.flange_width
         self.y_2 = self.y_max - self.end_dist
         self.t_b2 = self.factored_axial_load / self.no_bolts + self.factored_moment * self.y_2 / self.y_sqr
@@ -1139,7 +1175,20 @@ class ColumnEndPlate(MomentConnection):
             # return self.bolt_diam_provided
             print("Plate thickness prov", self.plate_thickness_provided)
             # self.get_bolt_grade(self)
-            self.design_status = True
+            if self.connection == 'Flush End Plate':
+                self.stiff_ht = 0.0
+                self.stiff_wt = 0.0
+                self.t_s = 0.0
+                self.weld_type = "None"
+            else:
+                # if 2 * self.end_dist >= 50:
+                self.stiffener_details(self)
+                # else:
+                #     self.stiff_ht = 0.0
+                #     self.stiff_wt = 0.0
+                #     self.t_s = 0.0
+                #     self.weld_type = "None"
+            # self.design_status = True
             # self.plate_details(self)
 
         else:
@@ -1149,6 +1198,82 @@ class ColumnEndPlate(MomentConnection):
             # self.design_status = False
             # logger.error("Plate thickness provided is not satisfied")
 
+##########################################################################################
+             ####   Stiffener details   ####
+##########################################################################################
+    def stiffener_details(self):
+        gamma_m0 = 1.1
+        gamma_mw = 1.25
+        k = 0.7
+
+        self.m_s = self.t_b * self.end_dist
+
+        self.n = 10
+
+        self.a = 196
+        self.b = -25 * self.n
+        self.c = self.n ** 2
+        self.d = (self.t_b * self.end_dist * 4 * gamma_m0)/self.plate.fy
+
+        coeff = [self.a,self.b,self.c,self.d]
+
+        self.t_s = np.roots(coeff)
+        self.t_s = math.ceil(np.amax(self.t_s))
+
+        self.h_s = 14 * self.t_s
+
+        flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.flange_thickness, self.t_s)
+        flange_weld_throat_size = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=flange_weld_size_min, fusion_face_angle=90)
+        flange_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(self.section.flange_thickness,
+                                                                                  self.t_s)
+
+        self.weld_length_avail = 2 * self.h_s - 2 * self.n
+
+        self.weld_force_shear = (self.factored_shear_load/1000)/(2 * flange_weld_throat_size * self.weld_length_avail)
+
+        self.weld_force_moment = (self.factored_moment/1000)/((self.weld_length_avail ** 3 * flange_weld_throat_size)/6)
+
+        # capacity_unit_flange is the capacity of weld of unit throat thickness
+        capacity_unit_flange = (k * self.section.fu) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
+
+        self.resultant = math.sqrt(self.weld_force_shear ** 2 + self.weld_force_moment ** 2)
+
+        self.weld_size = self.resultant/capacity_unit_flange
+
+
+        if 2*self.end_dist < 50:
+            self.stiff_ht = 0.0
+            self.stiff_wt = 0.0
+            self.t_s = 0.0
+            self.weld_type = "None"
+            print("< 50 loop")
+        else:
+            if self.h_s < 100:
+                self.h_s = 100
+            else:
+                self.h_s = self.h_s
+
+            if self.weld_size <= 16:
+                self.weld_size_prov = self.weld_size
+                self.weld_type = "FILLET"
+                self.t_s = self.t_s
+                self.stiff_wt = 2 * self.end_dist
+                self.stiff_ht = self.h_s
+                print(">50, fillet loop")
+            else:
+                self.t_s = self.t_s
+                self.stiff_wt = 2 * self.end_dist
+                self.stiff_ht = self.h_s
+                self.weld_type = "GROOVE"
+                print(">50, groove loop")
+
+        if self.design_status:
+            logger.info(": Overall Column end plate connection design is safe \n")
+            logger.debug(" :=========End Of design===========")
+        else:
+            logger.error(": Design is not safe \n ")
+            logger.debug(" :=========End Of design===========")
 
     @staticmethod
     def grdval_customized():

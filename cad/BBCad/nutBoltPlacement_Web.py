@@ -59,8 +59,8 @@ class NutBoltArray_Web():
         b_W = self.bolt
         n_W = self.nut
         for k in range(self.numOfboltsW):
-            bolt_length_required = float(b_W.T + self.nutSpaceW)
-            b_W.H = 1.5 * bolt_length_required
+            bolt_length_required = float(n_W.H + self.nutSpaceW)
+            b_W.H = bolt_length_required +10
             self.bolts_W.append(Bolt(b_W.R, b_W.T, b_W.H, b_W.r))
             self.nuts_W.append(Nut(n_W.R, n_W.T, n_W.H, n_W.r1))
 

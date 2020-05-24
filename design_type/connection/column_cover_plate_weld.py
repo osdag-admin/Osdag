@@ -12,6 +12,166 @@ import logging
 
 class ColumnCoverPlateWeld(MomentConnection):
 
+    ###############################################
+    # Design Preference Functions Start
+    ###############################################
+    def tab_list(self):
+        """
+
+        :return: This function returns the list of tuples. Each tuple will create a tab in design preferences, in the
+        order they are appended. Format of the Tuple is:
+        [Tab Title, Type of Tab, function for tab content)
+        Tab Title : Text which is displayed as Title of Tab,
+        Type of Tab: There are Three types of tab layouts.
+            Type_TAB_1: This have "Add", "Clear", "Download xlsx file" "Import xlsx file"
+            TYPE_TAB_2: This contains a Text box for side note.
+            TYPE_TAB_3: This is plain layout
+        function for tab content: All the values like labels, input widgets can be passed as list of tuples,
+        which will be displayed in chosen tab layout
+
+        """
+        tabs = []
+
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
+        tabs.append(t1)
+
+        t6 = ("Connector", TYPE_TAB_2, self.plate_connector_values)
+        tabs.append(t6)
+
+        t2 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t2)
+
+        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t4)
+
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t5)
+
+        return tabs
+
+    def tab_value_changed(self):
+        """
+
+        :return: This function is used to update the values of the keys in design preferences,
+         which are dependent on other inputs.
+         It returns list of tuple which contains, tab name, keys whose values will be changed,
+         function to change the values and arguments for the function.
+
+         [Tab Name, [Argument list], [list of keys to be updated], input widget type of keys, change_function]
+
+         Here Argument list should have only one element.
+         Changing of this element,(either changing index or text depending on widget type),
+         will update the list of keys (this can be more than one).
+
+         """
+        change_tab = []
+
+        t2 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
+        change_tab.append(t2)
+
+        t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
+                                                      KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
+        change_tab.append(t3)
+
+        t5 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t5)
+
+        return change_tab
+
+    def edit_tabs(self):
+        """ This function is required if the tab name changes based on connectivity or profile or any other key.
+                Not required for this module but empty list should be passed"""
+        return []
+
+    # def list_for_fu_fy_validation(self):
+    #     """ This function is no longer required"""
+    #     fu_fy_list = []
+    #
+    #     t2 = (KEY_SEC_MATERIAL, KEY_SEC_FU, KEY_SEC_FY)
+    #     fu_fy_list.append(t2)
+    #
+    #     t3 = (KEY_CONNECTOR_MATERIAL, KEY_CONNECTOR_FU, KEY_CONNECTOR_FY)
+    #     fu_fy_list.append(t3)
+    #
+    #     return fu_fy_list
+
+    def input_dictionary_design_pref(self):
+        """
+
+        :return: This function is used to choose values of design preferences to be saved to design dictionary.
+
+         It returns list of tuple which contains, tab name, input widget type of keys, keys whose values to be saved,
+
+         [(Tab Name, input widget type of keys, [List of keys to be saved])]
+
+         """
+        design_input = []
+
+        t2 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
+        design_input.append(t2)
+
+        t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
+        design_input.append(t4)
+
+        t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
+        design_input.append(t4)
+
+        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        design_input.append(t5)
+
+        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
+        design_input.append(t6)
+
+        t7 = ("Connector", TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
+        design_input.append(t7)
+
+        return design_input
+
+    def input_dictionary_without_design_pref(self):
+        """
+
+        :return: This function is used to choose values of design preferences to be saved to
+        design dictionary if design preference is never opened by user. It sets are design preference values to default.
+        If any design preference value needs to be set to input dock value, tuple shall be written as:
+
+        (Key of input dock, [List of Keys from design preference], 'Input Dock')
+
+        If the values needs to be set to default,
+
+        (None, [List of Design Preference Keys], '')
+
+         """
+        design_input = []
+        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
+        design_input.append(t1)
+
+        t2 = (None, [KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_GAP,
+                     KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
+        design_input.append(t2)
+
+        return design_input
+
+    def refresh_input_dock(self):
+        """
+
+        :return: This function returns list of tuples which has keys that needs to be updated,
+         on changing Keys in design preference (ex: adding a new section to database should reflect in input dock)
+
+         [(Tab Name,  Input Dock Key, Input Dock Key type, design preference key, Master key, Value, Database Table Name)]
+        """
+        add_buttons = []
+
+        t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
+        add_buttons.append(t2)
+
+        return add_buttons
+
+    ####################################
+    # Design Preference Functions End
+    ####################################
+
     def __init__(self):
         super(ColumnCoverPlateWeld, self).__init__()
         self.design_status = False
@@ -105,36 +265,35 @@ class ColumnCoverPlateWeld(MomentConnection):
         else:
             existingvalue_key_wplate_thk = ''
 
-        t16 = (KEY_MODULE, KEY_DISP_COLUMNCOVERPLATEWELD, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_COLUMNCOVERPLATEWELD, TYPE_MODULE, None, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t1)
 
-
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Columns"))
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Columns"), True, 'No Validator')
         options_list.append(t4)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, True, 'No Validator')
         options_list.append(t15)
 
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
         t19 = (
             KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, existingvalue_key_weld_type,
-            VALUES_WELD_TYPE)
+            VALUES_WELD_TYPE, True, 'No Validator')
         options_list.append(t19)
 
-        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
+        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t6)
 
-        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX,existingvalues_key_moment,None)
+        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX,existingvalues_key_moment,None, True, 'No Validator')
         options_list.append(t17)
 
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None, True, 'No Validator')
         options_list.append(t8)
 
         # t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
@@ -149,19 +308,19 @@ class ColumnCoverPlateWeld(MomentConnection):
         # t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD)
         # options_list.append(t12)
 
-        t18 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, None)
+        t18 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t18)
 
-        t19 = (KEY_FLANGEPLATE_PREFERENCES, KEY_DISP_FLANGESPLATE_PREFERENCES, TYPE_COMBOBOX, existingvalue_key_fplate_pref, VALUES_FLANGEPLATE_PREFERENCES)
+        t19 = (KEY_FLANGEPLATE_PREFERENCES, KEY_DISP_FLANGESPLATE_PREFERENCES, TYPE_COMBOBOX, existingvalue_key_fplate_pref, VALUES_FLANGEPLATE_PREFERENCES, True, 'No Validator')
         options_list.append(t19)
 
-        t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_fplate_thk, VALUES_FLANGEPLATE_THICKNESS)
+        t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_fplate_thk, VALUES_FLANGEPLATE_THICKNESS, True, 'No Validator')
         options_list.append(t20)
 
-        t21 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None, None)
+        t21 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t21)
 
-        t22 = (KEY_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_wplate_thk, VALUES_WEBPLATE_THICKNESS)
+        t22 = (KEY_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_wplate_thk, VALUES_WEBPLATE_THICKNESS, True, 'No Validator')
         options_list.append(t22)
 
         return options_list
@@ -321,29 +480,29 @@ class ColumnCoverPlateWeld(MomentConnection):
     def output_values(self, flag):
 
         out_list = []
-        t1 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None)
+        t1 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None, True)
         out_list.append(t1)
 
         t5 = (KEY_WEB_PLATE_HEIGHT, KEY_DISP_WEB_PLATE_HEIGHT, TYPE_TEXTBOX,
-              self.web_plate.height if flag else '')
+              self.web_plate.height if flag else '', True)
         out_list.append(t5)
 
         t6 = (KEY_WEB_PLATE_LENGTH, KEY_DISP_WEB_PLATE_LENGTH, TYPE_TEXTBOX,
-              self.web_plate.length if flag else '')
+              self.web_plate.length if flag else '', True)
         out_list.append(t6)
 
         t7 = (KEY_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_TEXTBOX,
-              self.web_plate.thickness_provided if flag else '')
+              self.web_plate.thickness_provided if flag else '', True)
         out_list.append(t7)
 
         # t21 = (KEY_WEB_SPACING, KEY_DISP_WEB_SPACING, TYPE_OUT_BUTTON, ['Web Spacing Details', self.webspacing])
         # out_list.append(t21)
 
-        t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON, ['Web Capacity', self.webcapacity])
+        t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON, ['Web Capacity', self.webcapacity], True)
         out_list.append(t21)
 
         t21 = (
-            KEY_WEB_WELD_DETAILS, KEY_DISP_WEB_WELD_DETAILS, TYPE_OUT_BUTTON, ['Web Plate Weld', self.web_weld_details])
+            KEY_WEB_WELD_DETAILS, KEY_DISP_WEB_WELD_DETAILS, TYPE_OUT_BUTTON, ['Web Plate Weld', self.web_weld_details], True)
         out_list.append(t21)
         #
         #
@@ -372,27 +531,27 @@ class ColumnCoverPlateWeld(MomentConnection):
         #         KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity])
         #     out_list.append(t21)
         # else:
-        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None)
+        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, True)
         out_list.append(t17)
 
         t18 = (KEY_FLANGE_PLATE_HEIGHT, KEY_DISP_FLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-               self.flange_plate.height if flag else '')
+               self.flange_plate.height if flag else '', True)
         out_list.append(t18)
 
         t19 = (
             KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-            self.flange_plate.length if flag else '')
+            self.flange_plate.length if flag else '', True)
         out_list.append(t19)
 
         t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_plate.thickness_provided if flag else '')
+               self.flange_plate.thickness_provided if flag else '', True)
         out_list.append(t20)
         # t21 = (
         # KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing])
         # out_list.append(t21)
 
         t21 = (
-            KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity])
+            KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
         out_list.append(t21)
 
         # t13 = (None, DISP_WEB_TITLE_WELD , TYPE_TITLE, None)
@@ -400,27 +559,27 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         t21 = (
             KEY_FLANGE_WELD_DETAILS, KEY_DISP_FLANGE_WELD_DETAILS, TYPE_OUT_BUTTON,
-            ['Flange Plate Weld', self.flange_weld_details])
+            ['Flange Plate Weld', self.flange_weld_details], True)
         out_list.append(t21)
 
-        t17 = (None, DISP_TITLE_INNERFLANGESPLICEPLATE, TYPE_TITLE, None)
+        t17 = (None, DISP_TITLE_INNERFLANGESPLICEPLATE, TYPE_TITLE, None, True)
         out_list.append(t17)
 
         t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-               self.flange_plate.Innerheight if flag else '')
+               self.flange_plate.Innerheight if flag else '', True)
         out_list.append(t18)
 
         t19 = (
             KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-            self.flange_plate.Innerlength if flag else '')
+            self.flange_plate.Innerlength if flag else '', True)
         out_list.append(t19)
 
         t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_plate.thickness_provided if flag else '')
+               self.flange_plate.thickness_provided if flag else '', True)
         out_list.append(t20)
 
         t21 = (KEY_INNERFLANGE_WELD_DETAILS, KEY_DISP_INNERFLANGE_WELD_DETAILS, TYPE_OUT_BUTTON,
-               ['Inner plate Weld', self.Innerflange_weld_details])
+               ['Inner plate Weld', self.Innerflange_weld_details], True)
         out_list.append(t21)
 
         return out_list
@@ -515,9 +674,6 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         return KEY_DISP_COLUMNCOVERPLATEWELD
 
-    def module_name(self):
-        return KEY_DISP_COLUMNCOVERPLATEWELD
-
     def set_input_values(self, design_dictionary):
         super(ColumnCoverPlateWeld, self).set_input_values(self, design_dictionary)
         # self.module = design_dictionary[KEY_MODULE]
@@ -529,8 +685,8 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.preference = design_dictionary[KEY_FLANGEPLATE_PREFERENCES]
 
         self.section = Column(designation=design_dictionary[KEY_SECSIZE],
-                            material_grade=design_dictionary[KEY_MATERIAL])
-        print("anjali", design_dictionary[KEY_DP_DETAILING_EDGE_TYPE])
+                            material_grade=design_dictionary[KEY_SEC_MATERIAL])
+        # print("anjali", design_dictionary[KEY_DP_DETAILING_EDGE_TYPE])
         # self.web_bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
         #                      bolt_type=design_dictionary[KEY_TYP], material_grade=design_dictionary[KEY_MATERIAL],
         #                      bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
@@ -552,23 +708,21 @@ class ColumnCoverPlateWeld(MomentConnection):
         #                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
         #                         mu_f=design_dictionary[KEY_DP_BOLT_SLIP_FACTOR],
         #                         corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
-        self.flange_weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],
-                                material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+        self.flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                                 fabrication=design_dictionary[KEY_DP_WELD_FAB])
-        self.web_weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],
-                             material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+        self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                              fabrication=design_dictionary[KEY_DP_WELD_FAB])
 
         # self.web_weld =
 
         self.flange_plate = Plate(thickness=design_dictionary.get(KEY_FLANGEPLATE_THICKNESS, None),
-                                  material_grade=design_dictionary[KEY_MATERIAL],
+                                  material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
                                   gap=design_dictionary[KEY_DP_DETAILING_GAP])
         # self.plate = Plate(thickness=design_dictionary.get(KEY_FLANGEPLATE_THICKNESS, None),
         #                           material_grade=design_dictionary[KEY_MATERIAL],
         #                           gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.web_plate = Plate(thickness=design_dictionary.get(KEY_WEBPLATE_THICKNESS, None),
-                               material_grade=design_dictionary[KEY_MATERIAL],
+                               material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
                                gap=design_dictionary[KEY_DP_DETAILING_GAP])
         # print("input values are set. Doing preliminary member checks")
         #
@@ -622,47 +776,45 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.design_status = True
 
     def member_capacity(self):
-
+        self.member_capacity_status = False
         if self.section.type == "Rolled":
             length = self.section.depth
         else:
             length = self.section.depth - (
                     2 * self.section.flange_thickness)  # -(2*self.supported_section.root_radius)
-        #     else:
-        #         length = self.supported_section.depth - 50.0  # TODO: Subtract notch height for column-column connection
-
         gamma_m0 = 1.1
-        # Axial Capacity
-        self.axial_capacity = (self.section.area * self.section.fy) / gamma_m0  # N
+        ############################# Axial Capacity N ############################
+        self.axial_capacity = round((self.section.area * self.section.fy) / gamma_m0, 2)  # N
         self.min_axial_load = 0.3 * self.axial_capacity
-        self.factored_axial_load = max(self.load.axial_force * 1000, self.min_axial_load)  # N
-        if self.factored_axial_load > self.axial_capacity:
-            self.factored_axial_load = self.axial_capacity
-        else:
-            pass
-        # self.load.axial_force = self.factored_axial_load #N
+        self.factored_axial_load = round(max(self.load.axial_force * 1000, self.min_axial_load), 2)  # N
         print("self.factored_axial_load", self.factored_axial_load)
 
-        # Shear Capacity  # N
-        self.shear_capacity1 = ((self.section.depth - (
-                2 * self.section.flange_thickness)) * self.section.web_thickness * self.section.fy) / (
-                                       math.sqrt(
-                                           3) * gamma_m0)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
+        ############################# Shear Capacity  # N############################
+        self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
+                                      self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0),
+                                     2)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
         self.shear_load1 = 0.6 * self.shear_capacity1  # N
-        self.fact_shear_load = max(self.shear_load1, self.load.shear_force * 1000)  # N
-        if self.fact_shear_load > self.shear_capacity1:
-            self.fact_shear_load = self.shear_capacity1
-        else:
-            pass
-        # self.load.shear_force = self.fact_shear_load  #N
+        self.fact_shear_load = round(max(self.shear_load1, self.load.shear_force * 1000), 2)  # N
         print('shear_force', self.load.shear_force)
 
+        # ###########################################################
+        # if self.factored_axial_load > self.axial_capacity:
+        #     logger.warning(' : Factored axial load is exceeding axial capacity  %2.2f KN' % self.axial_capacity)
+        #     self.member_capacity = False
+        # else:
+        #     if self.fact_shear_load > self.shear_capacity1:
+        #         logger.warning(' : Factored shear load is exceeding shear capacity  %2.2f KN' % self.shear_capacity1)
+        #         self.member_capacity = False
+        #     else:
+        #         self.member_capacity = True
+        # #############################################################
+
         self.Z_p = round(((self.section.web_thickness * (
-                self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4), )  # mm3
+                self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4), 2)  # mm3
         self.Z_e = round(((self.section.web_thickness * (
                 self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 6), 2)  # mm3
+        # if self.member_capacity == True:
         if self.section.type == "Rolled":
-
             self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                            column_t_w=self.section.web_thickness,
                                                                            column_d=self.section.depth,
@@ -672,12 +824,10 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                                            column_area=self.section.area,
                                                                            compression_element="External",
                                                                            section="Rolled")
-            print("limitwidththkratio_flange", self.limitwidththkratio_flange)
         else:
             pass
 
         if self.section.type2 == "generally":
-
             self.limitwidththkratio_web = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                         column_t_w=self.section.web_thickness,
                                                                         column_d=self.section.depth,
@@ -700,83 +850,109 @@ class ColumnCoverPlateWeld(MomentConnection):
             self.beta_b = 1
         elif self.class_of_section == 3:
             self.beta_b = self.Z_e / self.Z_p
-
+        ############################ moment_capacty ############################
         self.section.plastic_moment_capacty(beta_b=self.beta_b, Z_p=self.Z_p,
-                                            fy=self.section.fy)  # N # for section #todo add in ddcl
+                                            fy=self.section.fy)  # N # for section
         self.section.moment_d_deformation_criteria(fy=self.section.fy, Z_e=self.section.elast_sec_mod_z)
-        # todo add in ddcl
         self.Pmc = self.section.plastic_moment_capactiy
         self.Mdc = self.section.moment_d_def_criteria
-        self.section.moment_capacity = min(self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria)
-        print("moment_capacity", self.section.moment_capacity)
+        self.section.moment_capacity = round(
+            min(self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria), 2)
         self.load_moment_min = 0.5 * self.section.moment_capacity
-        self.load_moment = max(self.load_moment_min, self.load.moment * 1000000)  # N
-        if self.load_moment > self.section.moment_capacity:
-            self.load_moment = self.section.moment_capacity
-        else:
-            pass
-        # self.load.moment = load_moment # N
-        print("design_bending_strength", self.load.moment)
-
-        print("self.load_moment", self.load_moment)
-        print("self.load_moment_min", self.load_moment_min)
-
-        self.moment_web = (Z_w * self.load_moment / (
-            self.section.plast_sec_mod_z))  # Nm todo add in ddcl # z_w of web & z_p  of section
-        print('plast_sec_mod_z', self.section.plast_sec_mod_z)
-        print("Z_W", Z_w)
-        print("web moment", self.moment_web)
-        self.moment_flange = ((self.load_moment) - self.moment_web)  # Nmm #Nmm todo add in ddcl
-        print("moment_flange", self.moment_flange)
-
-        ###WEB MENBER CAPACITY CHECK
-
-        ###### # capacity Check for web in axial = min(block, yielding, rupture)
+        self.load_moment = round(max(self.load_moment_min, self.load.moment * 1000000), 2)  # N
+        self.moment_web = round((Z_w * self.load_moment / (self.section.plast_sec_mod_z)),
+                                2)  # Nm todo add in ddcl # z_w of web & z_p  of section
+        self.moment_flange = round(((self.load_moment) - self.moment_web), 2)
         self.axial_force_w = ((self.section.depth - (
                 2 * self.section.flange_thickness)) * self.section.web_thickness * self.factored_axial_load) / (
                                  self.section.area)  # N
+        self.axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
+            self.section.area)  # N
+        self.flange_force = (((self.moment_flange) / (self.section.depth - self.section.flange_thickness)) + (
+            self.axial_force_f))
 
-        # A_vn_web = ( self.section.depth - 2 * self.section.flange_thickness - self.web_plate.bolts_one_line * self.web_bolt.dia_hole) * self.section.web_thickness
+        # if self.load_moment > self.section.moment_capacity:
+        #     self.member_capacity = False
+        #     logger.warning(' : Moment load is exceeding moment capacity  %2.2f KN-m' % self.section.moment_capacity)
+        #     logger.error(" : Design is not safe. \n ")
+        #     logger.debug(" :=========End Of design===========")
+        # else:
+        #     self.member_capacity = True
+        #     self.moment_web = (Z_w * self.load_moment / (
+        #         self.section.plast_sec_mod_z))  # Nm todo add in ddcl # z_w of web & z_p  of section
+        #     self.moment_flange = ((self.load_moment) - self.moment_web)
+        #     self.sectioncheck(self)
+
+        if len(self.flange_plate.thickness) >= 2:
+            self.max_thick_f = max(self.flange_plate.thickness)
+        else:
+            self.max_thick_f = self.flange_plate.thickness[0]
+        if len(self.web_plate.thickness) >= 2:
+            self.max_thick_w = max(self.web_plate.thickness)
+        else:
+            self.max_thick_w = self.web_plate.thickness[0]
+        ###########################################################
+        if self.factored_axial_load > self.axial_capacity:
+            logger.warning(' : Factored axial load is exceeding axial capacity  %2.2f KN' % self.axial_capacity)
+            logger.error(" : Design is not safe. \n ")
+            logger.debug(" :=========End Of design===========")
+            self.member_capacity_status = False
+        else:
+            if self.fact_shear_load > self.shear_capacity1:
+                logger.warning(' : Factored shear load is exceeding shear capacity  %2.2f KN' % self.shear_capacity1)
+                logger.error(" : Design is not safe. \n ")
+                logger.debug(" :=========End Of design===========")
+                self.member_capacity_status = False
+            else:
+                if self.load_moment > self.section.moment_capacity:
+                    self.member_capacity_status = False
+                    logger.warning(
+                        ' : Moment load is exceeding moment capacity  %2.2f KN-m' % self.section.moment_capacity)
+                    logger.error(" : Design is not safe. \n ")
+                    logger.debug(" :=========End Of design===========")
+                else:
+                    self.member_capacity_status = True
+
+                    # self.moment_web = (Z_w * self.load_moment / (
+                    #     self.section.plast_sec_mod_z))  # Nm todo add in ddcl # z_w of web & z_p  of section
+                    # self.moment_flange = ((self.load_moment) - self.moment_web)
+                    self.initial_pt_thk(self)
+
+        # #############################################################
+        # else :
+        #     self.member_capacity = False
+        #     logger.error(" : Load applied is greater than member capacity. \n ")
+        #     logger.error(" : Design is not safe. \n ")
+        #     logger.debug(" :=========End Of design===========")
+
+    def initial_pt_thk(self):
+        ############################### WEB MENBER CAPACITY CHECK ############################
+        ###### # capacity Check for web in axial = min(block, yielding, rupture)
+        self.initial_pt_thk_status = False
+        self.initial_pt_thk_status_web = False
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
         self.section.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
             A_v=A_v_web, fy=self.section.fy)
 
-        print("tension_yielding_capacity_web", self.section.tension_yielding_capacity_web)
-
         if self.section.tension_yielding_capacity_web > self.axial_force_w:
 
-            # self.section.tension_yielding_capacity = self.section.tension_yielding_capacity_web
-
-            ### FLANGE MEMBER CAPACITY CHECK
-            self.axial_force_f = self.factored_axial_load * self.section.flange_width * self.section.flange_thickness / (
-                self.section.area)  # N
-            self.flange_force = (
-                    ((self.moment_flange) / (self.section.depth - self.section.flange_thickness)) + (
-                self.axial_force_f))
-
+            ################################# FLANGE MEMBER CAPACITY CHECK##############################
             A_v_flange = self.section.flange_thickness * self.section.flange_width
-
             self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
-                A_v=A_v_flange,
-                fy=self.flange_plate.fy)
-            print("tension_yielding_capacity_flange", self.section.tension_yielding_capacity)
-
+                A_v=A_v_flange, fy=self.flange_plate.fy)
             if self.section.tension_yielding_capacity > self.flange_force:
-
                 self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if
                                                      i >= (self.section.web_thickness / 2)]
-
                 if self.preference == "Outside":
                     self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if
                                                             i >= self.section.flange_thickness]
                 else:
                     self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if
                                                             i >= (self.section.flange_thickness / 2)]
-
-                if len(self.flange_plate_thickness_possible) == 0 or self.web_plate_thickness_possible == 0:
-                    logger.error(":aaaaWeb Plate thickness should be greater than section  thicknesss.")
+                if len(self.flange_plate_thickness_possible) == 0:
+                    logger.error(" : Flange Plate thickness should be greater than section thicknesss.")
+                    self.initial_pt_thk_status = False
                 else:
-
                     self.flange_plate.thickness_provided = self.min_thick_based_on_area(self,
                                                                                         tk=self.section.flange_thickness,
                                                                                         width=self.section.flange_width,
@@ -785,6 +961,59 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                                                         r_1=self.section.root_radius,
                                                                                         D=self.section.depth,
                                                                                         preference=self.preference)
+                    if self.preference == "Outside":
+                        if self.outerwidth < 50:
+                            logger.error(" : Outer Height of flange plate should be greater 50 mm.")
+                            logger.info(" : Select the wider section.")
+                            self.initial_pt_thk_status = False
+                            self.design_status = False
+                        else:
+                            if self.flange_plate.thickness_provided != 0:
+                                if self.flange_plate_crs_sec_area < (self.flange_crs_sec_area * 1.05):
+                                    logger.error(
+                                        " : Area of flange plate should be greater than 1.05 times area of flange.")
+                                    logger.info(" : Increase the thickness of the plate.")
+                                    self.initial_pt_thk_status = False
+                                else:
+                                    self.initial_pt_thk_status = True
+                                    pass
+                            else:
+                                logger.error(" : Provided flange plate thickness is not sufficient.")
+                                logger.error(
+                                    " : Area of flange plate should be greater than 1.05 times area of flange.")
+                                logger.info(" : Increase the thickness of the plate.")
+                                self.initial_pt_thk_status = False
+                                self.design_status = False
+
+                    else:
+                        if self.outerwidth < 50 or self.innerwidth < 50:
+                            logger.error(" : Height of flange plate should be greater 50 mm.")
+                            logger.info(" : Increase the thickness of the flane plate.")
+                            self.initial_pt_thk_status = False
+                            self.design_status = False
+
+                        else:
+                            if self.flange_plate.thickness_provided != 0:
+                                if self.flange_plate_crs_sec_area < (self.flange_crs_sec_area * 1.05):
+                                    logger.error(
+                                        " : Area of flange plates should be greater than 1.05 times area of flange.")
+                                    logger.info(" : Increase the thickness of the flange plate.")
+                                    self.initial_pt_thk_status = False
+                                else:
+                                    self.initial_pt_thk_status = True
+                            else:
+                                logger.error(" : Provided flange plate thickness is not sufficient.")
+                                logger.error(
+                                    " : Area of flange plate should be greater than 1.05 times area of flange.")
+                                logger.info(" : Increase the thickness of the plate.")
+                                self.initial_pt_thk_status = False
+                                self.design_status = False
+
+                self.initial_pt_thk_status_web = False
+                if len(self.web_plate_thickness_possible) == 0:
+                    logger.error(" : Web Plate thickness should be greater than section  thicknesss.")
+                    self.initial_pt_thk_status_web = False
+                else:
                     self.web_plate.thickness_provided = self.min_thick_based_on_area(self,
                                                                                      tk=self.section.flange_thickness,
                                                                                      width=self.section.flange_width,
@@ -793,28 +1022,70 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                                                      r_1=self.section.root_radius,
                                                                                      D=self.section.depth, )
 
-                    if self.web_plate.thickness_provided == 0 or self.flange_plate.thickness_provided == 0:
-                        self.design_status = False
-                        logger.error("flange plate is not possible")
+                    if self.web_plate.thickness_provided != 0:
+                        if self.web_plate_crs_sec_area < (self.web_crs_area * 1.05):
+                            logger.error(" : Area of web plate should be greater than 1.05 times area of web.")
+                            logger.info(" : Increase the thickness of the web plate.")
+                            self.initial_pt_thk_status_web = False
+                        else:
+                            self.initial_pt_thk_status_web = True
                     else:
+                        logger.error(" : Provided web plate thickness is not sufficient.")
+                        logger.error(" : Area of web plate should be greater than 1.05 times area of web.")
+                        logger.info(" : Increase the thickness of the plate.")
+                        self.initial_pt_thk_status_web = False
+                        self.design_status = False
+
+                if len(self.flange_plate_thickness_possible) == 0:
+                    if len(self.flange_plate.thickness) >= 2:
+                        self.max_thick_f = max(self.flange_plate.thickness)
+                    else:
+                        self.max_thick_f = self.flange_plate.thickness[0]
+                else:
+                    if self.flange_plate.thickness_provided == 0:
+                        if len(self.flange_plate.thickness) >= 2:
+                            self.max_thick_f = max(self.flange_plate.thickness)
+                        else:
+                            self.max_thick_f = self.flange_plate.thickness[0]
+                    else:
+                        self.max_thick_f = self.flange_plate.thickness_provided
+
+                if len(self.web_plate_thickness_possible) == 0:
+                    if len(self.web_plate.thickness) >= 2:
+                        self.max_thick_w = max(self.web_plate.thickness)
+                    else:
+                        self.max_thick_w = self.web_plate.thickness[0]
+                else:
+                    if self.web_plate.thickness_provided == 0:
+                        if len(self.web_plate.thickness) >= 2:
+                            self.max_thick_w = max(self.web_plate.thickness)
+                        else:
+                            self.max_thick_w = self.web_plate.thickness[0]
+                    else:
+                        self.max_thick_w = self.web_plate.thickness_provided
+
+                    if self.initial_pt_thk_status == True and self.initial_pt_thk_status_web == True:
                         self.design_status = True
+                        self.web_plate_weld(self)
+                    else:
+                        self.initial_pt_thk_status = False and self.initial_pt_thk_status_web == False
+                        self.design_status = False
+                        logger.warning(" : Plate is not possible")
+                        logger.error(" : Design is not safe. \n ")
+                        logger.debug(" : =========End Of design===========")
+
             else:
-                self.design_status = False
-                logger.error(
-                    " : tension_yielding_capacity  of flange is less than applied loads, Please select larger sections or decrease loads"
-                    )
-                print(" BBB failed in flange member checks. Select larger sections or decrease loads")
+                self.initial_pt_thk_status = False
+                logger.warning(
+                    " : Tension_yielding_capacity  of flange is less than applied loads, Please select larger sections or decrease loads")
+                logger.error(" : Design is not safe. \n ")
+                logger.debug(" : =========End Of design===========")
         else:
-            self.design_status = False
-            logger.error(
-                " : tension_yielding_capacity of web  is less than applied loads, Please select larger sections or decrease loads")
-            print("BBB failed in web member checks. Select larger sections or decrease loads")
-        if self.design_status == True:
-            print("Selecting bolt diameter")
-            self.web_plate_weld(self)
-        else:
-            logger.error(" : tension_yielding_capacity   is less "
-                         "than applied loads, Please select larger sections or decrease loads")
+            self.initial_pt_thk_status_web = False
+            logger.warning(
+                " : Tension_yielding_capacity of web  is less than applied loads, Please select larger sections or decrease loads")
+            logger.error(" : Design is not safe. \n ")
+            logger.debug(" : =========End Of design===========")
 
     def web_plate_weld(self):
         self.min_web_platethk = min(self.web_plate.thickness_provided, self.section.web_thickness)
@@ -1551,7 +1822,7 @@ class ColumnCoverPlateWeld(MomentConnection):
     def min_thick_based_on_area(self, tk, width, list_of_pt_tk, t_w, r_1, D,
                                 preference=None):  # area of flange plate should be greater than 1.05 times area of flange
         # 20 is the maximum spacing either side of the plate
-        flange_crs_sec_area = tk * width
+        self.flange_crs_sec_area = tk * width
         self.design_status = True
         for y in list_of_pt_tk:
             if y > 40:
@@ -1562,9 +1833,9 @@ class ColumnCoverPlateWeld(MomentConnection):
                 pass
             if preference != None:
                 if preference == "Outside":
-                    outerwidth = width - (2 * 20)
-                    flange_plate_crs_sec_area = y * outerwidth
-                    if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                    self.outerwidth = width - (2 * 20)
+                    self.flange_plate_crs_sec_area = y * self.outerwidth
+                    if self.flange_plate_crs_sec_area >= self.flange_crs_sec_area * 1.05:
                         thickness = y
                         self.design_status = True
                         break
@@ -1572,15 +1843,15 @@ class ColumnCoverPlateWeld(MomentConnection):
                         thickness = 0
                         self.design_status = False
                 elif preference == "Outside + Inside":
-                    outerwidth = width - (2 * 20)
-                    innerwidth = (width - t_w - (2 * r_1) - (4 * 20)) / 2
-                    if innerwidth < 50:
+                    self.outerwidth = width - (2 * 20)
+                    self.innerwidth = (width - t_w - (2 * r_1) - (4 * 20)) / 2
+                    if self.innerwidth < 50:
                         thickness = 0
                         self.design_status = False
                     else:
                         self.design_status = True
-                        flange_plate_crs_sec_area = (outerwidth + (2 * innerwidth)) * y
-                        if flange_plate_crs_sec_area >= flange_crs_sec_area * 1.05:
+                        self.flange_plate_crs_sec_area = (self.outerwidth + (2 * self.innerwidth)) * y
+                        if self.flange_plate_crs_sec_area >= self.flange_crs_sec_area * 1.05:
                             thickness = y
                             self.design_status = True
                             break
@@ -1591,9 +1862,9 @@ class ColumnCoverPlateWeld(MomentConnection):
 
             else:
                 webwidth = D - (2 * tk) - (2 * r_1) - (2 * 20)
-                web_crs_area = t_w * webwidth
-                web_plate_crs_sec_area = (2 * webwidth) * y
-                if web_plate_crs_sec_area >= web_crs_area * 1.05:
+                self.web_crs_area = t_w * webwidth
+                self.web_plate_crs_sec_area = (2 * webwidth) * y
+                if self.web_plate_crs_sec_area >= self.web_crs_area * 1.05:
                     thickness = y
                     self.design_status = True
                     break
@@ -1668,32 +1939,6 @@ class ColumnCoverPlateWeld(MomentConnection):
             ui.mytabWidget.setCurrentIndex(0)
         # self.display_3DModel("Connector", bgcolor)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
-
-    def tab_list(self):
-
-        tabs = []
-
-        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
-        tabs.append(t1)
-
-        t2 = ("Bolt", TYPE_TAB_2, self.bolt_values)
-        tabs.append(t2)
-
-        t3 = ("Weld", TYPE_TAB_2, self.weld_values)
-        tabs.append(t3)
-
-        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
-        tabs.append(t4)
-
-        t5 = ("Design", TYPE_TAB_2, self.design_values)
-        tabs.append(t5)
-
-        t6 = ("Connector", TYPE_TAB_2, self.connector_values)
-        tabs.append(t6)
-
-        return tabs
-
-
 
 
         # def flange_force(self,):

@@ -1,0 +1,51 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '20'
+Bolt.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Bolt.Material_Grade_OverWrite: '410'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pretensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Column flange-Beam web
+Connector.Material: E 165 (Fe 290)
+Connector.Plate.Thickness_List:
+- '3'
+- '4'
+- '5'
+- '6'
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '24'
+- '26'
+- '28'
+- '30'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: a - Sheared or hand flame cut
+Detailing.Gap: '10'
+Load.Axial: '50'
+Load.Shear: '50'
+Material: E 250 (Fe 410 W)A
+Member.Supported_Section.Designation: MB 300
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section.Designation: UC 305 x 305 x 97
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
+Module: Fin Plate
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'

@@ -381,33 +381,6 @@ class FinPlateConnection(ShearConnection):
 
         return capacities
 
-    def get_3d_components(self):
-        components = []
-
-        t1 = ('Model', self.call_3DModel)
-        components.append(t1)
-
-        t2 = ('Beam', self.call_3DBeam)
-        components.append(t2)
-
-        t3 = ('Column', self.call_3DColumn)
-        components.append(t3)
-
-        t4 = ('Fin Plate', self.call_3DPlate)
-        components.append(t4)
-
-        return components
-
-    def call_3DPlate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Fin Plate':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Plate", bgcolor)
-
     def output_values(self, flag):
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
@@ -943,10 +916,10 @@ class FinPlateConnection(ShearConnection):
             self.supported_section.design_status = True
 
         self.supported_section.tension_rupture_capacity = IS800_2007.cl_6_3_1_tension_rupture_strength(A_vn, self.plate.fu)
-        A_vg = ((n_row - 1) * pitch) * web_thick
-        A_vn = ((n_row - 1) * pitch + end - (float(n_row) - 1.0) * bolt_hole_dia) * web_thick
-        A_tg = 2 * ((n_col - 1) * gauge + edge) * web_thick
-        A_tn = 2 * ((n_col - 1) * gauge + edge - (float(n_col) - 0.5) * bolt_hole_dia) * web_thick
+        A_tg = ((n_row - 1) * pitch) * web_thick
+        A_tn = ((n_row - 1) * pitch + end - (float(n_row) - 1.0) * bolt_hole_dia) * web_thick
+        A_vg = 2 * ((n_col - 1) * gauge + edge) * web_thick
+        A_vn = 2 * ((n_col - 1) * gauge + edge - (float(n_col) - 0.5) * bolt_hole_dia) * web_thick
 
         self.supported_section.block_shear_capacity_axial = IS800_2007.cl_6_4_1_block_shear_strength(A_vg,
                                                                                                      A_vn,
@@ -1134,11 +1107,11 @@ class FinPlateConnection(ShearConnection):
                         KEY_MATERIAL: self.plate.material,
                         KEY_SHEAR: self.load.shear_force,
                         KEY_AXIAL:self.load.axial_force,
-                        KEY_SUPTNGSEC_DESIGNATION:self.supporting_section.designation,
+                        KEY_SUPTNGSEC:self.supporting_section.designation,
                         KEY_SUPTNGSEC_MATERIAL:self.supporting_section.material,
                         KEY_SUPTNGSEC_FU:self.supporting_section.fu,
                         KEY_SUPTNGSEC_FY:self.supporting_section.fy,
-                        KEY_SUPTDSEC_DESIGNATION:self.supported_section.designation,
+                        KEY_SUPTDSEC:self.supported_section.designation,
                         KEY_SUPTDSEC_MATERIAL: self.supported_section.material,
                         KEY_SUPTDSEC_FU: self.supported_section.fu,
                         KEY_SUPTDSEC_FY: self.supported_section.fy,
@@ -1149,9 +1122,11 @@ class FinPlateConnection(ShearConnection):
                         KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
                         KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
                         KEY_PLATETHK: self.plate.thickness,
-                        KEY_PLATE_MATERIAL: self.plate.material,
-                        KEY_PLATE_FU: self.plate.fu,
-                        KEY_PLATE_FY: self.plate.fy,
+                        KEY_CONNECTOR_MATERIAL: self.plate.material,
+                        KEY_CONNECTOR_FU: self.plate.fu,
+                        KEY_CONNECTOR_FY_20: self.plate.fy_20,
+                        KEY_CONNECTOR_FY_20_40: self.plate.fy_20_40,
+                        KEY_CONNECTOR_FY_40: self.plate.fy_40,
                         KEY_DP_WELD_TYPE: 'Fillet',
                         KEY_DP_WELD_FAB: self.weld.fabrication,
                         KEY_DP_WELD_MATERIAL_G_O: self.weld.fu,
@@ -1182,6 +1157,13 @@ class FinPlateConnection(ShearConnection):
                         KEY_OUT_PLATE_BLK_SHEAR_AXIAL: self.plate.block_shear_capacity_axial,
                         KEY_OUT_PLATE_MOM_DEMAND:self.plate.moment_demand,
                         KEY_OUT_PLATE_MOM_CAPACITY:self.plate.moment_capacity,
+                         KEY_SHEAR_YIELDCAPACITY: self.supported_section.shear_yielding_capacity,
+                         KEY_SHEAR_RUPTURECAPACITY: self.supported_section.shear_rupture_capacity,
+                         KEY_SHEAR_BLOCKSHEARCAPACITY: self.supported_section.block_shear_capacity_shear,
+                         KEY_TENSION_YIELDCAPACITY: self.supported_section.tension_yielding_capacity,
+                         KEY_TENSION_RUPTURECAPACITY: self.supported_section.tension_rupture_capacity,
+                         KEY_TENSION_BLOCKSHEARCAPACITY: self.supported_section.block_shear_capacity_axial,
+                         KEY_MEMBER_MOM_CAPACITY: self.supported_section.moment_capacity,
                         KEY_OUT_WELD_SIZE:self.weld.size,
                         KEY_OUT_WELD_STRENGTH:self.weld.strength,
                         KEY_OUT_WELD_STRESS:self.weld.stress}

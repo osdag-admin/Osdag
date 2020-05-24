@@ -720,6 +720,12 @@ KEY_DISP_TENSION_RUPTURECAPACITY = 'Tension Rupture Capacity (kN)'
 KEY_TENSION_BLOCKSHEARCAPACITY = "Member.tension_blockshear"
 KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear Capacity (kN)'
 
+KEY_SHEAR_YIELDCAPACITY = "Member.shear_yielding"
+KEY_SHEAR_RUPTURECAPACITY = "Member.shear_rupture"
+KEY_SHEAR_BLOCKSHEARCAPACITY = "Member.shear_blockshear"
+
+
+
 KEY_TENSION_CAPACITY = "Member.tension_capacity"
 KEY_DISP_TENSION_CAPACITY = "Tension Capacity (kN)"
 

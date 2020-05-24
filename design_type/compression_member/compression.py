@@ -1590,10 +1590,6 @@ class Compression(Main):
         add_buttons = []
 
         return add_buttons
-
-    def get_3d_components(self):
-        components = []
-        return components
     #
     # @staticmethod
     # def bolt_values():

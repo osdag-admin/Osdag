@@ -284,7 +284,6 @@ class SeatedAngleConnection(ShearConnection):
         else:
             existingvalue_key_topangle = ''
 
-
         t16 = (KEY_MODULE, KEY_DISP_SEATED_ANGLE, TYPE_MODULE, None, None, True, 'No Validator')
         options_list.append(t16)
 
@@ -321,7 +320,7 @@ class SeatedAngleConnection(ShearConnection):
         t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD, True, 'No Validator')
+        t12 = (KEY_GRD, KEY_DISP_PC, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)
 
         t13 = (None,DISP_TITLE_ANGLE, TYPE_TITLE, None, None, True, 'No Validator')
@@ -473,123 +472,496 @@ class SeatedAngleConnection(ShearConnection):
         self.seated_angle.width = self.supported_section.flange_width
 
         for designation in self.seated_list:
-            seated = Angle(designation=designation, material_grade=self.material_grade_connector)
-            # length of bearing required at the root line of beam (b) = R*gamma_m0/t_w*f_yw
-            # Rearranged equation from cl. 8.7.4
-            b1 = IS800_2007.cl_8_7_1_3_stiff_bearing_length(self.load.shear_force,
-                                                            self.supported_section.web_thickness,
-                                                            self.supported_section.flange_thickness,
-                                                            self.supported_section.root_radius,
-                                                            self.supported_section.fy)
-            # Distance from the end of bearing on cleat to root angle OR A TO B in Fig 5.31 in Subramanian's book
-            b2 = max(b1 + self.plate.gap - seated.thickness - seated.root_radius, 0)
-            self.seated_angle.leg_a_length = b1 + self.plate.gap
-            # self.seated_angle.width = self.supported_section.flange_width
-            [self.plate.moment_demand, self.plate.moment_capacity] = \
-                self.check_moment_capacity(self, self.load.shear_force, seated.thickness, self.seated_angle.width,
-                                           b1, b2, self.material.fy)
-            area = self.seated_angle.width * seated.thickness
-            self.plate.shear_capacity = IS800_2007.cl_8_4_design_shear_strength(area, self.material.fy)
-            if self.plate.moment_capacity < self.plate.moment_demand or self.plate.shear_capacity < self.load.shear_force:
-                self.seated_list.pop()
-                print("popped", designation)
-            else:
-                if seated.thickness not in self. plate.thickness:
-                    self. plate.thickness.append(seated.thickness)
-                    print("added", designation, self. plate.thickness)
+            print(self.seated_list)
+            print(designation)
+            self.seated = Angle(designation=designation, material_grade=self.material_grade)
+            self.check_capacity(self, self.seated)
+            self.seated_angle.leg_a_length_min = self.b1 + self.plate.gap
 
-        if self. plate.thickness:
+            if self.plate.moment_capacity > self.plate.moment_demand and \
+                    self.plate.shear_capacity > self.load.shear_force and \
+                    self.seated.leg_a_length > self.seated_angle.leg_a_length_min:
+                if self.seated.thickness not in self.plate.thickness:
+                    self.plate.thickness.append(self.seated.thickness)
+                print("added", designation, self. plate.thickness)
+            else:
+                self.seated_list = [x for x in self.seated_list if x != designation]
+                print("popped", designation)
+
+        if self.plate.thickness:
             logger.info("Required Seated Angle thickness available. Getting angle leg size")
             self.get_bolt_details(self)
         else:
+            self.design_status = False
             logger.error("Increase Seated Angle thickness")
 
-    def check_moment_capacity(self, shear, thickness, width, b1, b2, fy):
-        if b1 <= b2:
-            moment_at_root_angle = round(float(shear) * (b2 - b1 / 2), 3)
+    def check_capacity(self, seated):
+        self.b1 = IS800_2007.cl_8_7_1_3_stiff_bearing_length(self.load.shear_force,
+                                                        self.supported_section.web_thickness,
+                                                        self.supported_section.flange_thickness,
+                                                        self.supported_section.root_radius,
+                                                        self.supported_section.fy)
+        # Distance from the end of bearing on seated angle horizontal leg to root angle OR A TO B in Fig 5.31 in Prof N. Subramanian's book
+        self.b2 = max(self.b1 + self.plate.gap - seated.thickness - seated.root_radius,
+                      self.supported_section.flange_thickness + self.supported_section.root_radius)
+
+        if self.b1 <= self.b2:
+            self.plate.moment_demand = round(float(self.load.shear_force) * (self.b2 - self.b1 / 2) / 1E3, 3)
         else:
-            moment_at_root_angle = round(float(shear) * (b2 / b1) * (b2 / 2), 3)
+            self.plate.moment_demand = round(float(self.load.shear_force) * (self.b2 / self.b1) * (self.b2 / 2) / 1E3, 3)
 
-        Z_p = width * thickness ** 2 / 4
-        Z_e = width * thickness ** 2 / 6
-        plate_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(Z_e, Z_p, fy, 'plastic')
+        Z_p = self.seated_angle.width * seated.thickness ** 2 / 4
+        Z_e = self.seated_angle.width * seated.thickness ** 2 / 6
+        self.plate.moment_capacity = round(float(IS800_2007.cl_8_2_1_2_design_moment_strength(Z_e, Z_p, seated.fy, 'plastic'))/ 1E6, 3)
 
-        return moment_at_root_angle, plate_moment_capacity
+        area = self.seated_angle.width * seated.thickness
+        self.plate.shear_capacity = round(float(IS800_2007.cl_8_4_design_shear_strength(area, seated.fy)) / 1E3, 3)
+
+        # return moment_at_root_angle, plate_moment_capacity, self.plate.shear_capacity, b1
 
     def get_bolt_details(self):
         print(self.design_status)
-        for self. plate.thickness_provided in sorted(self. plate.thickness):
+        self.output = []
+        trial = 0
+        [min_bolts_one_line, n] = self.get_seated_width_min_max(self)
+
+        for self.plate.thickness_provided in sorted(self.plate.thickness):
+            self.plate.connect_to_database_to_get_fy_fu(self.plate.material, self.plate.thickness_provided)
             # TO GET BOLT BEARING CAPACITY CORRESPONDING TO PLATE THICKNESS AND Fu AND Fy #
-            self.bolt_conn_plates_t_fu_fy = []
-            self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
-            if self.connectivity == VALUES_CONN_1[1]:
-                self.bolt_conn_plates_t_fu_fy.append(
-                    (self.supporting_section.flange_thickness, self.supporting_section.fu, self.supporting_section.fy))
-            else:
-                self.bolt_conn_plates_t_fu_fy.append(
-                    (self.supporting_section.web_thickness, self.supporting_section.fu, self.supporting_section.fy))
+            self.get_plate_thk_bolt_bearing(self)
             bolts_required_previous = 2
             bolt_diameter_previous = self.bolt.bolt_diameter[-1]
-            bolt_dia_possible =[]
-            count =0
-            min_bolts_one_line = 2
-            n = 1
+            self.bolt_dia_possible = []
+            count = 0
+
             for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
-                self.bolt.bolt_grade_provided = max(self.bolt.bolt_grade)
-                self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                        conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
-                self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                  bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                                  conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy, n_planes=1)
-                if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
-                    bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-                    pass
-                else:
-                    bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
+                self.bolt.bolt_PC_provided = self.bolt.bolt_grade[-1]
 
-                self.bolt.number = round_up(float(self.load.shear_force) / self.bolt.bolt_capacity, 1)
+                self.bolt_placement_check(self)
+                self.bolt_dia_check(self)
+                if self.bolt.design_status is False:
+                    print("Sufficient space is not available for bolt diameter: ", self.bolt.bolt_diameter_provided)
+                    continue
 
+                self.get_bolt_capacity(self)
+
+                self.bolt.number = round_up(float(self.load.shear_force * 1000) / self.bolt.bolt_capacity, 1)
                 if self.connectivity == VALUES_CONN_1[0]:
-                    self.seated_angle.width = (self.seated_angle.width - self.supporting_section.web_thickness-
-                                              self.supporting_section.root_radius)/2
-                    self.bolt.number = round_up(float(self.bolt.number)/2, 1)
-                    min_bolts_one_line = 1
-                    n = 2
+                    self.bolt.number = round_up(float(self.bolt.number) / n, 1)
 
                 [bolt_line, bolts_one_line, web_plate_h] = \
-                    self.plate.get_web_plate_l_bolts_one_line(self.seated_angle.width, self.seated_angle.width,
-                                                              self.bolt.number, self.bolt.min_end_dist_round,
+                    self.plate.get_web_plate_l_bolts_one_line(self.seated_angle.width_max, self.seated_angle.width_min,
+                                                              self.bolt.number, self.bolt.min_edge_dist_round,
                                                               self.bolt.min_gauge_round, min_bolts_one_line)
-                self.plate.bolts_required = bolts_one_line*bolt_line*n
+                self.bolt.bolt_row = bolt_line
+                self.bolt.bolt_col = bolts_one_line * n
+                if self.connectivity == VALUES_CONN_1[0]:
+                    self.seated_angle.width = round_up(web_plate_h * 2 + self.supporting_section.web_thickness + \
+                                              self.supporting_section.root_radius * 2, 1)
+                else:
+                    self.seated_angle.width = web_plate_h
+                self.bolt.bolts_required = bolts_one_line*bolt_line*n
+
                 if 2 >= bolt_line >= 1:
-                    bolt_dia_possible.append(self.bolt.bolt_diameter_provided)
-                    if self.plate.bolts_required > bolts_required_previous and count >= 1:
+                    self.bolt.bolt_force = self.load.shear_force / self.bolt.bolts_required
+                    self.bolt_dia_possible.append(self.bolt.bolt_diameter_provided)
+                    if self.bolt.bolts_required > bolts_required_previous and count >= 1:
                         self.bolt.bolt_diameter_provided = bolt_diameter_previous
-                        self.plate.bolts_required = bolts_required_previous
-                        self.plate.bolt_force = bolt_force_previous
+                        self.bolt.bolts_required = bolts_required_previous
+                        self.bolt.bolt_row = bolt_row_prev
+                        self.bolt.bolt_col = bolt_col_prev
+                        # self.bolt.bolt_force = bolt_force_previous
                         break
-                    bolts_required_previous = self.plate.bolts_required
+                    bolts_required_previous = self.bolt.bolts_required
                     bolt_diameter_previous = self.bolt.bolt_diameter_provided
-                    bolt_force_previous = self.plate.bolt_force
+                    # TODO: set bolt row and column prev value
+                    bolt_row_prev = self.bolt.bolt_row
+                    bolt_col_prev = self.bolt.bolt_col
+                    # bolt_force_previous = self.bolt.bolt_force
                     count += 1
                 else:
+                    self.bolt.bolt_force = self.load.shear_force / self.bolt.number
                     continue
-            if bolt_dia_possible:
-                print("bolt diameter: ", bolt_dia_possible)
+            if self.bolt_dia_possible:
+                print("bolt diameter: ", self.bolt_dia_possible)
                 print("provided bolt diameter: ", self.bolt.bolt_diameter_provided)
+                self.check_leg_size(self, bolt_line)
+
+                if self.plate.design_status is True:
+                    trial += 1
+
+                    ##### O U T P U T   D I C T I O N A R Y   F O R M A T #####
+                    row = [int(self.bolt.bolt_diameter_provided),           # 0-Bolt Diameter
+                           self.bolt.bolt_PC_provided,                      # 1-Bolt Grade
+                           self.seated_angle.designation,                   # 2-Seated Angle designation
+                           int(self.plate.thickness_provided),              # 3-Seated Angle Thickness
+                           self.seated_angle.leg_a_length,                  # 4-Seated angle leg size
+                           self.bolt.bolt_row,                              # 5-Bolt rows on seated angle vertical leg
+                           self.bolt.bolt_col,                              # 6-Bolt columns on seat angle vertical leg
+                           self.seated_angle.width,                         # 7-Length of the seated angle
+                           self.bolt.bolts_required,                        # 8-Total no of bolts
+                           self.bolt.min_gauge_round,                       # 9-Gauge distance
+                           self.bolt.min_edge_dist_round,                   # 10-Edge Distance
+                           self.bolt.min_pitch_round,                       # 11-Pitch
+                           self.bolt.min_end_dist_round,                    # 12-End Distance
+                           self.bolt.bolt_force,                            # 13-Bolt Force
+
+                           'INSERT_HERE',  # XX- EMPTY
+                           trial]
+                    self.output.append(row)
+                    print("********* Trial {} ends here *************".format(trial))
+                else:
+                    continue
             else:
-                logger.error("Decrease bolt diameter")
+                continue
 
+        if self.bolt_dia_possible and self.plate.design_status is True:
+            print("No of effective trials: ", trial)
+            print(self.output)
+            self.select_optimum(self)
 
+            self.top_angle_section(self)
+            logger.info("=== End Of Design ===")
+        else:
+            self.design_status = False
+            # logger.error("Decrease bolt diameter")
+            logger.error("Sufficient space not available to arrange bolts, " +
+                         "either decrease bolt diameter or increase angle leg size.")
 
+    def select_optimum(self):
+        """This function sorts the list of available options and selects the combination with least leg size"""
+        self.output.sort(key=lambda x: (x[4], x[3], x[5]))
+        self.bolt.bolt_diameter_provided = self.output[0][0]
+        self.bolt.bolt_PC_provided = self.output[0][1]
+        self.seated_angle.designation = self.output[0][2]
+        self.plate.thickness_provided = self.output[0][3]
+        self.seated_angle.leg_a_length = self.output[0][4]
+        self.bolt.bolt_row = self.output[0][5]
+        self.bolt.bolt_col = self.output[0][6]
+        self.seated_angle.width = self.output[0][7]
+        self.bolt.bolts_required = self.output[0][8]
+        self.bolt.min_gauge_round = self.output[0][9]
+        self.bolt.min_edge_dist_round = self.output[0][10]
+        self.bolt.min_pitch_round = self.output[0][11]
+        self.bolt.min_end_dist_round = self.output[0][12]
+        self.bolt.bolt_force = self.output[0][13]
 
+        self.set_final_values(self)
 
+    def set_final_values(self):
+        # self.seated_angle = Angle(designation=self.seated_angle.designation, material_grade=self.material_grade)
+        self.seated = Angle(designation=self.seated_angle.designation, material_grade=self.material_grade)
+        self.seated_angle_bolt_details(self)
+        if self.connectivity == VALUES_CONN_1[0]:
+            self.bolt.gauge = self.bolt.min_gauge_round
+            self.bolt.sa_length = self.seated_angle.width
+        else:
+            self.bolt.gauge = self.bolt.seated_angle_gauge_column
+        self.plate.thickness_provided = self.seated.thickness
+        self.get_plate_thk_bolt_bearing(self)
+        self.bolt.bolt_force = self.load.shear_force / self.bolt.bolts_required
+        self.bolt_PC(self)
+        self.get_bolt_capacity(self)
+        self.check_capacity(self, self.seated)
 
+    def bolt_PC(self):
+        bolt_PC_previous = self.bolt.bolt_grade[-1]
+        for self.bolt.bolt_PC_provided in reversed(self.bolt.bolt_grade):
+            count = 1
+            self.bolt_placement_check(self)
+            self.get_bolt_capacity(self)
 
+            if self.bolt.bolt_capacity < self.bolt.bolt_force * 1000 and count >= 1:
+                self.bolt.bolt_PC_provided = bolt_PC_previous
+                break
+            bolt_PC_previous = self.bolt.bolt_PC_provided
+            count += 1
 
+    def get_seated_width_min_max(self):
+        """This function sets the max and min limits of seated angle length"""
+        if self.connectivity == VALUES_CONN_1[0]:
+            if self.supporting_section.flange_width > self.supported_section.flange_width:
+                self.seated_angle.width_min = (self.supported_section.flange_width -
+                                    self.supporting_section.web_thickness -2 * self.supporting_section.root_radius) / 2
+                self.seated_angle.width_max = (self.supporting_section.flange_width -
+                                    self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
+            else:
+                self.seated_angle.width_min = (self.supporting_section.flange_width -
+                                    self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
+                self.seated_angle.width_max = self.seated_angle.width_min + 20
+                # self.seated_angle.width_min = (self.supporting_section.flange_width -
+                #                   self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
+                # self.seated_angle.width_max = (self.supported_section.flange_width -
+                #                   self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
+            min_bolts_one_line = 1
+            n = 2
+        else:
+            self.seated_angle.width_min = self.supported_section.flange_width
+            self.seated_angle.width_max = (self.supporting_section.depth -
+                                2 * self.supporting_section.flange_thickness - 2 * self.supporting_section.root_radius)
+            min_bolts_one_line = 2
+            n = 1
 
+        return min_bolts_one_line, n
 
+    def get_plate_thk_bolt_bearing(self):
+        """This function sets the thickness and material propert combination of connected elements"""
+        # TO GET BOLT BEARING CAPACITY CORRESPONDING TO PLATE THICKNESS AND Fu AND Fy #
+        self.bolt_conn_plates_t_fu_fy = []
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.seated.fu, self.seated.fy))
+        if self.connectivity == VALUES_CONN_1[1]:
+            self.bolt_conn_plates_t_fu_fy.append(
+                (self.supporting_section.flange_thickness, self.supporting_section.fu, self.supporting_section.fy))
+        else:
+            self.bolt_conn_plates_t_fu_fy.append(
+                (self.supporting_section.web_thickness, self.supporting_section.fu, self.supporting_section.fy))
 
+    def bolt_placement_check(self):
+        """This function calculates minimum bolt spacing limits"""
+        self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+        self.bolt.min_end_dist_round = round_up(IS800_2007.cl_10_2_4_2_min_edge_end_dist(
+            self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type, 'machine_flame_cut'), 5)
+
+    def get_bolt_capacity(self):
+        """This function calculates minimum bolt capacities"""
+        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                          bolt_grade_provided=self.bolt.bolt_PC_provided,
+                                          conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy, n_planes=1, seatedangle= True)
+        if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
+            self.bolt.bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+            pass
+        else:
+            self.bolt.bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
+
+        self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity/1000, 1)
+        self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity/1000, 1)
+
+    def bolt_dia_check(self):
+        """This function checks if the selected bolt diameter can be placed within the available flange width"""
+        self.beam_space_min = (self.supported_section.flange_width -
+                          self.supported_section.web_thickness - 2 * self.supported_section.root_radius) / 2
+        self.col_space_min = (self.supporting_section.flange_width -
+                          self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
+        if self.connectivity == VALUES_CONN_1[0]:
+            if self.beam_space_min >= 2*self.bolt.min_end_dist_round and self.col_space_min >= 2*self.bolt.min_end_dist_round:
+                self.bolt.design_status = True
+            else:
+                self.bolt.design_status = False
+        else:
+            if self.beam_space_min >= 2 * self.bolt.min_end_dist_round:
+                self.bolt.design_status = True
+            else:
+                self.bolt.design_status = False
+
+    def check_leg_size(self, bolt_line):
+        min_leg_length = 2 * self.bolt.min_end_dist_round + (bolt_line - 1) * self.bolt.min_pitch_round
+        # min_leg_length = max(2*self.bolt.min_end_dist_round + (bolts_one_line - 1) * self.bolt.min_pitch_round, self.seated_angle.leg_a_length_min)
+        print(min_leg_length)
+        self.seated_list_same_thickness = self.seated_angle.get_available_seated_list(self.seated_list, max_leg_length=math.inf,
+                                                         min_leg_length=min_leg_length, position="inner",
+                                                         t_min=self.plate.thickness_provided)
+        for self.seated_angle.designation in self.seated_list_same_thickness:
+            print(self.seated_list)
+            print("updated thickness:", self.seated_list_same_thickness)
+            # seated = Angle(designation=designation, material_grade=self.material_grade)
+            [leg_a_length, leg_b_length, t, r_r] = get_leg_lengths(self.seated_angle.designation)
+            if (leg_a_length - t - r_r) >= min_leg_length:
+                self.seated_angle.leg_a_length = leg_a_length
+                self.plate.design_status = True
+                break
+            else:
+                self.plate.design_status = False
+
+        if self.seated_list_same_thickness is []:
+            self.plate.design_status = False
+
+    def top_angle_section(self):
+        """Identify appropriate top angle size based on beam depth.
+        Note:
+            Assumptions:
+                Calculating top angle dimensions based on thumb rules:
+                    top_angle_side = beam_depth/4
+                    top_angle_thickness = top_angle_side/10 with a minimum of 6mm
+                Select the nearest available equal angle as the top angle.
+                Equal angles satisfying both these thumb rules are selected for this function from steel tables
+        """
+        # minimum length of leg of top angle is twice edge distance + angle thickness + root_radius.
+        # as the side length is rounded up in the next step, ignoring angle thickness while calculating
+        # minimum length of side
+
+        for top in self.topangle_list:
+            print(self.topangle_list)
+            print(top)
+            topclip = Angle(designation=top, material_grade=self.material_grade)
+            top_angle_side_minimum = 2 * self.bolt.min_end_dist_round + topclip.root_radius + topclip.thickness
+            top_angle_side = max(float(self.supported_section.depth) / 4, top_angle_side_minimum, 50)
+            top_angle_thickness_min = max(round_up(float(topclip.leg_a_length) / 10, 1), 6)
+            print(topclip.thickness, top_angle_thickness_min)
+            if topclip.leg_a_length >= top_angle_side and topclip.thickness >= top_angle_thickness_min:
+                self.top_angle = Angle(designation=top, material_grade=self.material_grade)
+                self.top_angle.design_status = True
+                break
+            else:
+                self.top_angle.design_status = False
+
+        if self.top_angle.design_status is False:
+            for top in self.topangle_list:
+                print(self.topangle_list)
+                print(top)
+                topclip = Angle(designation=top, material_grade=self.material_grade)
+                top_angle_side_minimum = 2 * self.bolt.min_end_dist_round + topclip.root_radius + topclip.thickness
+                top_angle_side = max(top_angle_side_minimum, 50)
+                top_angle_thickness_min = max(round_up(float(topclip.leg_a_length) / 10, 1), 6)
+                if topclip.leg_a_length >= top_angle_side and topclip.thickness >= top_angle_thickness_min:
+                    self.top_angle = Angle(designation=top, material_grade=self.material_grade)
+                    self.top_angle.design_status = True
+                    break
+                else:
+                    self.top_angle.design_status = False
+
+        if self.top_angle.design_status is False:
+            for top in self.topangle_list:
+                print(self.topangle_list)
+                print(top)
+                topclip = Angle(designation=top, material_grade=self.material_grade)
+                top_angle_side_minimum = 2 * self.bolt.min_end_dist_round + topclip.root_radius + topclip.thickness
+                top_angle_side = max(top_angle_side_minimum, 50)
+                top_angle_thickness_min = 6
+                if topclip.leg_a_length >= top_angle_side and topclip.thickness >= top_angle_thickness_min:
+                    self.top_angle = Angle(designation=top, material_grade=self.material_grade)
+                    self.top_angle.design_status = True
+                    break
+                else:
+                    self.top_angle.design_status = False
+
+        top_angle_thickness_min = max(round_up(float(topclip.leg_a_length) / 10, 1), 6)
+        if self.top_angle.design_status is True:
+            self.top_angle_bolt_details(self)
+            print("provided top angle", self.top_angle.designation)
+            logger.info(": Based on thumb rules, a minimum top angle leg size of {} mm and a thickness of {} mm "
+                        "is required to provide stability to {} ".format(top_angle_side, top_angle_thickness_min,
+                                                                         self.supported_section.designation))
+            self.design_status = True
+        else:
+            logger.error(": Sufficient leg length is not available for Top Angle. ")
+            self.design_status = False
+
+    def top_angle_bolt_details(self):
+        if self.connectivity == VALUES_CONN_1[0]:
+            self.top_angle.width = max(min(self.supported_section.flange_width + 20, self.supporting_section.flange_width + 20),
+
+                                       round_up((self.supporting_section.web_thickness+self.supporting_section.root_radius * 2 +
+                                       self.bolt.min_end_dist_round * 2 + self.bolt.min_edge_dist_round * 2), 1),
+
+                                       round_up((self.supported_section.web_thickness + self.supported_section.root_radius * 2 +
+                                       self.bolt.min_end_dist_round * 2 + self.bolt.min_edge_dist_round * 2), 1) )
+
+            if self.top_angle.width < self.supporting_section.flange_width:
+                self.bolt.top_angle_gauge_column = round_up((self.top_angle.width -
+                            self.supporting_section.root_radius * 2 + self.supporting_section.web_thickness) / 2 +
+                            self.supporting_section.root_radius * 2 + self.supporting_section.web_thickness, 1)
+                self.bolt.top_angle_edge_column = round((self.top_angle.width - self.bolt.top_angle_gauge_column) / 2, 1)
+                # self.top_angle.width = self.bolt.top_angle_gauge_column + 2 * self.bolt.top_angle_edge_column
+            else:
+                self.bolt.top_angle_gauge_column = round_up((self.supporting_section.flange_width -
+                            self.supporting_section.root_radius * 2 + self.supporting_section.web_thickness) / 2 +
+                            self.supporting_section.root_radius * 2 + self.supporting_section.web_thickness, 1)
+                self.bolt.top_angle_edge_column = round((self.top_angle.width - self.bolt.top_angle_gauge_column) / 2, 1)
+                # self.top_angle.width = self.bolt.top_angle_gauge_column + 2 * self.bolt.top_angle_edge_column
+
+            if self.top_angle.width < self.supported_section.flange_width:
+                # self.bolt.top_angle_gauge_beam = round_up((self.top_angle.width - self.bolt.min_edge_dist_round * 2), 1)
+                self.bolt.top_angle_gauge_beam = round_up((self.top_angle.width -
+                            self.supported_section.root_radius * 2 + self.supported_section.web_thickness) / 2 +
+                            self.supported_section.root_radius * 2 + self.supported_section.web_thickness, 1)
+                self.bolt.top_angle_edge_beam = round((self.top_angle.width - self.bolt.top_angle_gauge_beam) / 2, 1)
+
+            else:
+                self.bolt.top_angle_gauge_beam = round_up((self.supported_section.flange_width -
+                            self.supported_section.root_radius * 2 + self.supported_section.web_thickness) / 2 +
+                            self.supported_section.root_radius * 2 + self.supported_section.web_thickness, 1)
+                self.bolt.top_angle_edge_beam = round((self.top_angle.width - self.bolt.top_angle_gauge_beam) / 2, 1)
+
+        else:
+            self.top_angle.width = max(round_up(self.supported_section.flange_width + 20, 1),
+
+                                       round_up((self.supported_section.web_thickness + self.supported_section.root_radius * 2 +
+                                                self.bolt.min_end_dist_round * 2 + self.bolt.min_edge_dist_round * 2), 1) )
+
+            self.bolt.top_angle_gauge_beam = round_up((self.supported_section.flange_width -
+                            self.supported_section.root_radius * 2 + self.supported_section.web_thickness) / 2 +
+                            self.supported_section.root_radius * 2 + self.supported_section.web_thickness, 1)
+            self.bolt.top_angle_edge_beam = round((self.top_angle.width - self.bolt.top_angle_gauge_beam) / 2, 1)
+            self.bolt.top_angle_gauge_column = self.bolt.top_angle_gauge_beam
+            self.bolt.top_angle_edge_column = round((self.top_angle.width - self.bolt.top_angle_gauge_column) / 2, 1)
+
+        self.bolt.top_angle_end = round_up((self.top_angle.leg_a_length - self.top_angle.thickness - self.top_angle.root_radius) / 2, 1)
+
+    def seated_angle_bolt_details(self):
+        if self.connectivity == VALUES_CONN_1[0]:
+            # self.seated_angle.width = max(min(self.supported_section.flange_width, self.supporting_section.flange_width),
+            #
+            #                            round_up((self.supporting_section.web_thickness+self.supporting_section.root_radius * 2 +
+            #                            self.bolt.min_end_dist_round * 2 + self.bolt.min_edge_dist_round * 2), 1),
+            #
+            #                            round_up((self.supported_section.web_thickness + self.supported_section.root_radius * 2 +
+            #                            self.bolt.min_end_dist_round * 2 + self.bolt.min_edge_dist_round * 2), 1) )
+            # TODO: Recalculate bolt row and column to minimize seated angle width
+            self.recalculate_bolt_row_col(self)
+            if self.seated_angle.width < self.supporting_section.flange_width:
+                # print("seated angle width: ", self.seated_angle.width)
+                self.bolt.seated_angle_gauge_column = round_up((self.seated_angle.width - self.bolt.min_edge_dist_round * 2 -
+                                                                (self.bolt.bolt_col - 2) * self.bolt.min_gauge_round), 1)
+
+            else:
+                self.bolt.seated_angle_gauge_column = round_up((self.supporting_section.flange_width -
+                                                                self.bolt.min_end_dist_round * 2 -
+                                                                (self.bolt.bolt_col - 2) * self.bolt.min_gauge_round), 1)
+
+            self.bolt.seated_angle_gauge_beam = round_up((self.supported_section.flange_width -
+                                    self.supported_section.root_radius * 2 + self.supported_section.web_thickness)/2 +
+                                    self.supported_section.root_radius * 2 + self.supported_section.web_thickness, 1)
+            self.bolt.seated_angle_edge_beam = round((self.seated_angle.width - self.bolt.seated_angle_gauge_beam) / 2, 1)
+            self.bolt.seated_angle_end_column = round_up((self.seated.leg_a_length - self.seated.thickness -
+                                                          self.seated.root_radius - self.bolt.min_end_dist_round -
+                                                          self.bolt.min_pitch_round * (self.bolt.bolt_row - 1)), 1)
+            self.bolt.seated_angle_edge_column = round((self.seated_angle.width - self.bolt.seated_angle_gauge_column -
+                                                          (self.bolt.bolt_col - 2) * self.bolt.min_gauge_round) / 2, 1)
+
+        else:
+            self.seated_angle.width = max(self.supported_section.flange_width + 20,
+
+                   round_up((self.supported_section.web_thickness + self.supported_section.root_radius * 2 +
+                            self.bolt.min_end_dist_round * 2 + (self.bolt.bolt_col - 1) * self.bolt.min_gauge_round), 1) )
+
+            self.bolt.seated_angle_gauge_beam = round_up((self.supported_section.flange_width -
+                                    self.supported_section.root_radius * 2 + self.supported_section.web_thickness)/2 +
+                                    self.supported_section.root_radius * 2 + self.supported_section.web_thickness, 1)
+            self.bolt.seated_angle_edge_beam = round((self.seated_angle.width - self.bolt.seated_angle_gauge_beam) / 2, 1)
+            self.bolt.seated_angle_gauge_column = round_up((self.seated_angle.width - self.bolt.min_edge_dist_round * 2)/
+                                                            (self.bolt.bolt_col - 1), 1)
+            self.bolt.seated_angle_end_column = round_up((self.seated.leg_a_length - self.seated.thickness -
+                                                          self.seated.root_radius - self.bolt.min_end_dist_round -
+                                                          self.bolt.min_pitch_round * (self.bolt.bolt_row - 1)), 1)
+            self.bolt.seated_angle_edge_column = round((self.seated_angle.width - (self.bolt.bolt_col - 1) *
+                                                           self.bolt.seated_angle_gauge_column) / 2, 1)
+        self.bolt.seated_angle_end_beam = round_up((self.seated.leg_a_length - self.seated.thickness - self.seated.root_radius) / 2, 1)
+
+    def recalculate_bolt_row_col(self):
+        """This Function recalculates bolt row and columns to reduce seated angle width"""
+        if self.bolt.bolt_col/2 >= 2 and self.bolt.bolt_row == 1 and self.seated_angle.width > self.supported_section.flange_width:
+            if (self.seated.leg_a_length - self.seated.thickness - self.seated.root_radius -
+                                                    2 * self.bolt.min_end_dist_round) / self.bolt.min_pitch_round >= 1:
+                self.bolt.bolt_col = 2 * round_up(self.bolt.bolt_col/4, 1)
+                self.bolt.bolt_row = self.bolt.bolt_row * 2
+                self.bolt.bolts_required = self.bolt.bolt_col * self.bolt.bolt_row
+                self.seated_angle.width = max(round_up(self.supported_section.flange_width + 20, 1),
+                            round_up((self.supporting_section.web_thickness + self.supporting_section.root_radius * 2 +
+                                self.bolt.min_end_dist_round * 2 + (self.bolt.bolt_col - 2) * self.bolt.min_gauge_round
+                                + self.bolt.min_edge_dist_round * 2), 1))
+        else:
+            self.seated_angle.width = max(round_up(self.supported_section.flange_width + 20, 1), self.seated_angle.width)
 
     @staticmethod
     def seated_angle_customized():
@@ -698,53 +1070,16 @@ class SeatedAngleConnection(ShearConnection):
         return lst
 
     def output_values(self, flag):
-        '''
-        Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
-        '''
+        """
+        Function to return a list of tuples to be displayed as the UI.(Output Dock)
+        """
 
         # @author: Umair
         print(flag)
 
         out_list = []
-
-        # TODO: Seated Angle properties: Start
-
-        t13 = (None, KEY_DISP_SEATED_ANGLE, TYPE_TITLE, None, True)
-        out_list.append(t13)
-
-        t14 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, self. plate.thickness_provided if flag else '', True)
-        out_list.append(t14)
-
-        t15 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_CLEAT_SPTNGLEG, TYPE_TEXTBOX, self.seated_angle.leg_a_length if flag else '', True)
-        out_list.append(t15)
-
-        t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_WIDTH, TYPE_TEXTBOX, self.seated_angle.width if flag else '', True)
-
-        out_list.append(t16)
-
-        t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities], True)
-        out_list.append(t22)
-
-        # TODO: Seated Angle Properties: End
-
-        # TODO: Top Angle properties: Start
-
-        # t24 = (None, DISP_TITLE_WELD, TYPE_TITLE, None)
-        # out_list.append(t24)
-        #
-        # t25 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.output[0][23] if flag else '')
-        # out_list.append(t25)
-        #
-        # t26 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, self.output[0][25] if flag else '')
-        # out_list.append(t26)
-        #
-        # t27 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, self.output[0][24] if flag else '')
-        # out_list.append(t27)
-
-
-        # TODO: Top Angle Properties: End
-
-        # TODO: 'Bolt Properties: Start'
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""
+        """      Bolt Properties: Start        """
 
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
@@ -752,71 +1087,193 @@ class SeatedAngleConnection(ShearConnection):
         t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '', True)
         out_list.append(t2)
 
-        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_PC_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '', True)
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_PC_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_PC_provided if flag else '', True)
         out_list.append(t3)
 
-        t3_1 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, self.plate.bolts_required if flag else '', True)
+        t3_1 = (KEY_OUT_TOT_NO_BOLTS, KEY_OUT_DISP_TOT_NO_BOLTS, TYPE_TEXTBOX, self.bolt.bolts_required if flag else '', True)
         out_list.append(t3_1)
-        #
-        # t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  self.output[0][7] if flag else '')
-        # out_list.append(t4)
-        # #
-        # # bolt_bearing_capacity_disp = ''
-        # # if flag is True:
-        # #     if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
-        # #         bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-        # #         pass
-        # #     else:
-        # #         bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
-        #
-        # t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.output[0][8] if flag else '')
-        # out_list.append(t5)
-        #
-        # t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.output[0][6] if flag else '')
-        # out_list.append(t6)
-        #
-        # t21 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_SHEAR_FORCE, TYPE_TEXTBOX, self.output[0][10] if flag else '')
-        # out_list.append(t21)
-        #
-        # t23 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing])
-        # out_list.append(t23)
 
-        # TODO: 'Bolt Properties: End'
+        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX, self.bolt.bolt_shear_capacity_disp if flag else '', True)
+        out_list.append(t4)
+        #
+        # bolt_bearing_capacity_disp = ''
+        # if flag is True:
+        #     if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
+        #         bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+        #         pass
+        #     else:
+        #         bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
+
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.bolt.bolt_bearing_capacity_disp if flag else '', True)
+        out_list.append(t5)
+
+        t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.bolt.bolt_capacity_disp if flag else '', True)
+        out_list.append(t6)
+
+        t21 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_SHEAR_FORCE, TYPE_TEXTBOX, round(self.bolt.bolt_force, 2) if flag else '', True)
+        out_list.append(t21)
+
+        """      Bolt Properties: End        """
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""
+        """     Seated Angle Properties: Start     """
+
+        t13 = (None, KEY_DISP_SEATED_ANGLE, TYPE_TITLE, None, True)
+        out_list.append(t13)
+
+        t13_1 = (KEY_OUT_SEATED_ANGLE_DESIGNATION, KEY_OUT_DISP_ANGLE_DESIGNATION, TYPE_TEXTBOX, self.seated_angle.designation if flag else '', True)
+        out_list.append(t13_1)
+
+        t14 = (KEY_OUT_SEATED_ANGLE_THICKNESS, KEY_OUT_DISP_SEATED_ANGLE_THICKNESS, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '', True)
+        out_list.append(t14)
+
+        t15 = (KEY_OUT_SEATED_ANGLE_LEGLENGTH, KEY_OUT_DISP_SEATED_ANGLE_LEGLENGTH, TYPE_TEXTBOX, self.seated_angle.leg_a_length if flag else '', True)
+        out_list.append(t15)
+
+        t16 = (KEY_OUT_SEATED_ANGLE_WIDTH, KEY_OUT_DISP_ANGLE_WIDTH, TYPE_TEXTBOX, self.seated_angle.width if flag else '', True)
+        out_list.append(t16)
+
+        t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities], True)
+        out_list.append(t22)
+
+        t22_1 = (KEY_OUT_SEATED_ANGLE_BOLT_COL, KEY_OUT_DISP_SEATED_ANGLE_BOLT_COL, TYPE_OUT_BUTTON, ['on Column', self.seated_spacing_col], True)
+        out_list.append(t22_1)
+
+        t22_2 = (KEY_OUT_SEATED_ANGLE_BOLT_BEAM, KEY_OUT_DISP_SEATED_ANGLE_BOLT_BEAM, TYPE_OUT_BUTTON, ['on Beam', self.seated_spacing_beam], True)
+        out_list.append(t22_2)
+
+        """     Seated Angle Properties: End     """
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""
+        """     Top Angle Properties: Start     """
+
+        t24 = (None, KEY_DISP_TOP_ANGLE, TYPE_TITLE, None, True)
+        out_list.append(t24)
+
+        t25 = (KEY_OUT_TOP_ANGLE_DESIGNATION, KEY_OUT_DISP_ANGLE_DESIGNATION, TYPE_TEXTBOX, self.top_angle.designation if flag else '', True)
+        out_list.append(t25)
+
+        t25_1 = (KEY_OUT_TOP_ANGLE_WIDTH, KEY_OUT_DISP_ANGLE_WIDTH, TYPE_TEXTBOX, self.top_angle.width if flag else '', True)
+        out_list.append(t25_1)
+
+        t26 = (KEY_OUT_TOP_ANGLE_BOLT_COL, KEY_OUT_DISP_TOP_ANGLE_BOLT_COL, TYPE_OUT_BUTTON, ['on Column', self.top_spacing_col], True)
+        out_list.append(t26)
+
+        t27 = (KEY_OUT_TOP_ANGLE_BOLT_BEAM, KEY_OUT_DISP_TOP_ANGLE_BOLT_BEAM, TYPE_OUT_BUTTON, ['on Beam', self.top_spacing_beam], True)
+        out_list.append(t27)
+
+        """     Top Angle Properties: End     """
+        """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
         return out_list
 
-    def spacing(self, flag):
+    def top_spacing_col(self, flag):
 
-        spacing = []
+        top_spacing_col = []
 
-        # t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.output[0][13] if flag else '')
-        # spacing.append(t9)
-        #
-        # t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.output[0][15] if flag else '')
-        # spacing.append(t10)
-        #
-        # t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.output[0][14] if flag else '')
-        # spacing.append(t11)
-        #
-        # t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.output[0][16] if flag else '')
-        # spacing.append(t12)
+        t9 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, 1 if flag else '')
+        top_spacing_col.append(t9)
 
-        return spacing
+        t9_1 = (KEY_OUT_COL_PROVIDED, KEY_OUT_DISP_COL_PROVIDED, TYPE_TEXTBOX, 2 if flag else '')
+        top_spacing_col.append(t9_1)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.bolt.top_angle_end if flag else '')
+        top_spacing_col.append(t10)
+
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.bolt.top_angle_gauge_column if flag else '')
+        top_spacing_col.append(t11)
+
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.bolt.top_angle_edge_column if flag else '')
+        top_spacing_col.append(t12)
+
+        return top_spacing_col
+
+    def top_spacing_beam(self, flag):
+
+        top_spacing_beam = []
+
+        t9 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, 1 if flag else '')
+        top_spacing_beam.append(t9)
+
+        t9_1 = (KEY_OUT_COL_PROVIDED, KEY_OUT_DISP_COL_PROVIDED, TYPE_TEXTBOX, 2 if flag else '')
+        top_spacing_beam.append(t9_1)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.bolt.top_angle_end if flag else '')
+        top_spacing_beam.append(t10)
+
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.bolt.top_angle_gauge_beam if flag else '')
+        top_spacing_beam.append(t11)
+
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.bolt.top_angle_edge_beam if flag else '')
+        top_spacing_beam.append(t12)
+
+        return top_spacing_beam
+
+    def seated_spacing_col(self, flag):
+
+        seated_spacing_col = []
+
+        t9 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_row if flag else '')
+        seated_spacing_col.append(t9)
+
+        t9_1 = (KEY_OUT_COL_PROVIDED, KEY_OUT_DISP_COL_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_col if flag else '')
+        seated_spacing_col.append(t9_1)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.bolt.seated_angle_end_column if flag else '')
+        seated_spacing_col.append(t10)
+
+        if self.bolt.bolt_row > 1:
+            t10_1 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.bolt.min_pitch_round if flag else '')
+            seated_spacing_col.append(t10_1)
+
+        if self.bolt.bolt_col > 2 and self.connectivity == VALUES_CONN_1[0]:
+            t11 = (KEY_OUT_GAUGE_CENTRAL, KEY_OUT_DISP_GAUGE_CENTRAL, TYPE_TEXTBOX, self.bolt.seated_angle_gauge_column if flag else '')
+            seated_spacing_col.append(t11)
+
+            t11_1 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.bolt.min_gauge_round if flag else '')
+            seated_spacing_col.append(t11_1)
+        else:
+            t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.bolt.seated_angle_gauge_column if flag else '')
+            seated_spacing_col.append(t11)
+
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.bolt.seated_angle_edge_column if flag else '')
+        seated_spacing_col.append(t12)
+
+        return seated_spacing_col
+
+    def seated_spacing_beam(self, flag):
+
+        seated_spacing_beam = []
+
+        t9 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, 1 if flag else '')
+        seated_spacing_beam.append(t9)
+
+        t9_1 = (KEY_OUT_COL_PROVIDED, KEY_OUT_DISP_COL_PROVIDED, TYPE_TEXTBOX, 2 if flag else '')
+        seated_spacing_beam.append(t9_1)
+
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.bolt.seated_angle_end_beam if flag else '')
+        seated_spacing_beam.append(t10)
+
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.bolt.seated_angle_gauge_beam if flag else '')
+        seated_spacing_beam.append(t11)
+
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.bolt.seated_angle_edge_beam if flag else '')
+        seated_spacing_beam.append(t12)
+
+        return seated_spacing_beam
 
     def capacities(self, flag):
 
         capacities = []
 
+        t18 = (KEY_OUT_PLATE_SHEAR_DEMAND, KEY_OUT_DISP_PLATE_SHEAR_DEMAND, TYPE_TEXTBOX, self.load.shear_force if flag else '')
+        capacities.append(t18)
+
         t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, self.plate.shear_capacity if flag else '')
         capacities.append(t17)
 
-        # t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, self.output[0][21] if flag else '')
-        # capacities.append(t18)
-        #
-        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND_SEP, TYPE_TEXTBOX, self.plate.moment_demand if flag else '')
+        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, self.plate.moment_demand if flag else '')
         capacities.append(t19)
 
-        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY_SEP, TYPE_TEXTBOX, self.plate.moment_capacity if flag else '')
+        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, self.plate.moment_capacity if flag else '')
         capacities.append(t20)
 
         return capacities

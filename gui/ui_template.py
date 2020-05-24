@@ -1808,8 +1808,10 @@ class Ui_ModuleWindow(QMainWindow):
             return FinPlateConnection
         elif name == KEY_DISP_ENDPLATE:
             return EndPlateConnection
-        elif name==KEY_DISP_CLEATANGLE:
+        elif name == KEY_DISP_CLEATANGLE:
             return CleatAngleConnection
+        elif name == KEY_DISP_SEATED_ANGLE:
+            return SeatedAngleConnection
         elif name == KEY_DISP_COLUMNCOVERPLATE:
             return ColumnCoverPlate
         # elif name == KEY_DISP_COLUMNCOVERPLATEWELD:
@@ -1822,8 +1824,6 @@ class Ui_ModuleWindow(QMainWindow):
             return BeamEndPlate
         elif name == KEY_DISP_COLUMNENDPLATE:
             return ColumnEndPlate
-        elif name == KEY_DISP_CLEATANGLE:
-            return CleatAngleConnection
         elif name == KEY_DISP_BASE_PLATE:
             return BasePlateConnection
         elif name == KEY_DISP_TENSION_BOLTED:
@@ -1997,8 +1997,8 @@ class Ui_ModuleWindow(QMainWindow):
                 module_class = EndPlateConnection
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_CLEATANGLE,
-                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED,
-                                                  KEY_DISP_TENSION_WELDED]:
+                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
+                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
@@ -2303,8 +2303,6 @@ class Ui_ModuleWindow(QMainWindow):
     #             section_size.setCurrentIndex(prev)
     #
 
-
-
 # Function for warning about structure
 
     # def warning_function(self, main, design_dictionary):
@@ -2357,9 +2355,6 @@ class Ui_ModuleWindow(QMainWindow):
             key3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
             key2.currentIndexChanged.connect(lambda: self.primary_secondary_beam_comparison(key, key2, key3))
             key3.currentIndexChanged.connect(lambda: self.primary_secondary_beam_comparison(key, key2, key3))
-
-
-
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate

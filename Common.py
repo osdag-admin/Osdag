@@ -276,6 +276,7 @@ KEY_MOMENT = 'Load.Moment'
 KEY_D = 'Bolt.Diameter'
 KEY_TYP = 'Bolt.Type'
 KEY_GRD = 'Bolt.Grade'
+
 KEY_DP_BOLT_MATERIAL_G_O = 'Bolt.Material_Grade_OverWrite'
 KEY_DP_BOLT_HOLE_TYPE = 'Bolt.Bolt_Hole_Type'
 KEY_DP_BOLT_TYPE = 'Bolt.TensionType'
@@ -424,6 +425,8 @@ KEY_DISP_SECBM = 'Secondary beam *'
 DISP_TITLE_FSL = 'Factored load'
 KEY_DISP_MOMENT = 'Moment(kNm)*'
 
+KEY_DISP_TOP_ANGLE = 'Top Angle'
+
 KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
 DISP_TITLE_BOLT = 'Bolt'
 DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
@@ -452,7 +455,7 @@ DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
 
 KEY_DISP_D = 'Diameter (mm)*'
-KEY_DISP_SHEAR = 'Shear(kN)*'
+KEY_DISP_SHEAR = 'Shear (kN)*'
 KEY_DISP_AXIAL = 'Axial (kN) *'
 DISP_TITLE_PLATE = 'Plate'
 
@@ -545,8 +548,11 @@ KEY_DISP_DP_BOLT_TYPE = 'Bolt type'
 
 KEY_DISP_DP_BOLT_HOLE_TYPE = 'Bolt hole type'
 
+# KEY_PC = 'Bolt.PC'
+KEY_DISP_PC = 'Property Class *'
 KEY_DISP_DP_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
+
 
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 
@@ -931,6 +937,10 @@ KEY_OUT_DISP_INTER_GRD_PROVIDED = 'Grade'
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
 KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
 KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
+KEY_OUT_COL_PROVIDED = 'Bolt.Cols'
+KEY_OUT_DISP_COL_PROVIDED = 'Columns of Bolts'
+KEY_OUT_TOT_NO_BOLTS = 'Bolt.number'
+KEY_OUT_DISP_TOT_NO_BOLTS = 'Number of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
@@ -985,6 +995,8 @@ KEY_OUT_END_DIST = 'Bolt.EndDist'
 KEY_OUT_DISP_END_DIST = 'End Distance (mm)'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
 KEY_OUT_DISP_GAUGE = 'Gauge (mm)'
+KEY_OUT_GAUGE_CENTRAL = 'Bolt.GaugeCentral'
+KEY_OUT_DISP_GAUGE_CENTRAL = 'Central Gauge (mm)'
 
 KEY_OUT_MIN_GAUGE = 'Bolt.MinGauge'
 KEY_OUT_MAX_SPACING = 'Bolt.MaxGauge'
@@ -1051,8 +1063,32 @@ KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Length (mm)'
 KEY_OUT_PLATE_WIDTH = 'Plate.Width'
 KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 c = 'Width (mm)'
-KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 
+KEY_OUT_SEATED_ANGLE_DESIGNATION = "SeatedAngle.Designation"
+KEY_OUT_DISP_ANGLE_DESIGNATION = "Designation"
+KEY_OUT_SEATED_ANGLE_THICKNESS = "SeatedAngle.Thickness"
+KEY_OUT_DISP_SEATED_ANGLE_THICKNESS = "Leg Thickness (mm)"
+KEY_OUT_SEATED_ANGLE_LEGLENGTH = "SeatedAngle.LegLength"
+KEY_OUT_DISP_SEATED_ANGLE_LEGLENGTH = "Leg Length (mm)"
+KEY_OUT_SEATED_ANGLE_WIDTH = "SeatedAngle.Width"
+KEY_OUT_DISP_ANGLE_WIDTH = "Width (mm)"
+KEY_OUT_SEATED_ANGLE_BOLT_COL = "SeatedAngle.Bolt_Spacing_col"
+KEY_OUT_DISP_SEATED_ANGLE_BOLT_COL = "Bolt Spacing Details"
+KEY_OUT_SEATED_ANGLE_BOLT_BEAM = "SeatedAngle.Bolt_Spacing_beam"
+KEY_OUT_DISP_SEATED_ANGLE_BOLT_BEAM = "Bolt Spacing Details"
+
+KEY_OUT_TOP_ANGLE_DESIGNATION = "TopAngle.Designation"
+# KEY_OUT_DISP_TOP_ANGLE_DESIGNATION = "Designation"
+KEY_OUT_TOP_ANGLE_WIDTH = "TopAngle.Width"
+# KEY_OUT_DISP_TOP_ANGLE_WIDTH = "Width (mm)"
+KEY_OUT_TOP_ANGLE_BOLT_COL = "TopAngle.Bolt_Spacing_col"
+KEY_OUT_DISP_TOP_ANGLE_BOLT_COL = "Bolt Spacing Details"
+KEY_OUT_TOP_ANGLE_BOLT_BEAM = "TopAngle.Bolt_Spacing_beam"
+KEY_OUT_DISP_TOP_ANGLE_BOLT_BEAM = "Bolt Spacing Details"
+
+KEY_OUT_PLATE_SHEAR_DEMAND = 'Plate.ShearDemand'
+KEY_OUT_DISP_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity (kN)'
 KEY_OUT_PLATE_YIELD = 'Plate.Yield'
 KEY_OUT_DISP_PLATE_YIELD = 'Yield Capacity'

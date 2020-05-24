@@ -136,5 +136,3 @@ class BeamWebBeamWeb(object):
     
     def get_beamModel(self):
         return self.beamModel
-
-

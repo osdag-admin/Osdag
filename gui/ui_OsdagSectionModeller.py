@@ -11,6 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from gui.ui_section_parameters import Ui_SectionParameters
 from gui.ui_SectionModeller_SummaryPopUp import Ui_Dialog1 as SummaryDialog
 from SectionModeller_Latex import CreateLatex
+from Common import *
 import sys
 
 class Ui_OsdagSectionModeller(object):
@@ -768,16 +769,33 @@ class Ui_OsdagSectionModeller(object):
                 return
         else:
                 self.SectionParameters=Ui_SectionParameters(index_type,index_template)
+                if(index_type in [1,4,5]):
+                        self.SectionParameters.parameterText_1.clear()
+                        self.SectionParameters.parameterText_1.addItems(connectdb('Columns'))
+                        if(index_type==5):
+                                self.SectionParameters.parameterText_2.clear()
+                                self.SectionParameters.parameterText_2.addItems(connectdb('Channels'))
+                elif(index_type==2):
+                        self.SectionParameters.parameterText_1.clear()
+                        self.SectionParameters.parameterText_1.addItems(connectdb('Channels'))
+                elif(index_type==3):
+                        self.SectionParameters.parameterText_1.clear()
+                        self.SectionParameters.parameterText_1.addItems(connectdb('Angles'))
+        
+
                 if(last_index==new_index and self.Parameters!={}):
                         for child in self.Parameters:
                                 self.SectionParameters.textBoxVisible[child]=self.Parameters[child]
-                                exec('self.SectionParameters.'+child+'.setText('+repr(self.Parameters[child][1])+')')
+                                if(child=='parameterText_1' or child=='parameterText_2'):
+                                        exec('self.SectionParameters.'+child+'.setCurrentText('+repr(self.Parameters[child][1])+')')
+                                else:
+                                        exec('self.SectionParameters.'+child+'.setText('+repr(self.Parameters[child][1])+')')
                 self.SectionParameters.exec()
                 self.Parameters=self.SectionParameters.textBoxVisible
-                if(self.Parameters!={}):
-                        self.disable_usability(False)
-                else:
+                if(self.Parameters=={}):
                         self.disable_usability(True)
+                else:
+                        self.disable_usability(False)
         if(index_type==2):
                 if(index_template==1):
                                 self.Centroid_box.hide()                        
@@ -793,8 +811,8 @@ class Ui_OsdagSectionModeller(object):
         self.label_2.setText(_translate("Dialog", "Section Type:"))
         self.section_type_combobox.setItemText(0, _translate("Dialog", "---------Select Type---------"))
         self.section_type_combobox.setItemText(1, _translate("Dialog", "I-Section"))
-        self.section_type_combobox.setItemText(2, _translate("Dialog", "Angle Section"))
-        self.section_type_combobox.setItemText(3, _translate("Dialog", "Channel Section"))
+        self.section_type_combobox.setItemText(2, _translate("Dialog", "Channel Section"))
+        self.section_type_combobox.setItemText(3, _translate("Dialog", "Angle Section"))
         self.section_type_combobox.setItemText(4, _translate("Dialog", "Built-Up Section"))
         self.section_type_combobox.setItemText(5, _translate("Dialog", "Compound Section"))
         self.label_3.setText(_translate("Dialog", "Section Template:"))

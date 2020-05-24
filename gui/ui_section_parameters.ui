@@ -255,14 +255,14 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="okBtn">
+      <widget class="QPushButton" name="saveBtn">
        <property name="font">
         <font>
          <pointsize>10</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>OK</string>
+        <string>Save</string>
        </property>
       </widget>
      </item>

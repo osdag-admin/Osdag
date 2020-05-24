@@ -1450,11 +1450,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.combined_capacity_anchor = 0
 
             else:
-                v_sb = self.load_shear * 10 ** -3 / self.anchor_nos_provided  # kN
-                v_db = self.anchor_capacity  # kN
-                t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
-                t_db = self.tension_capacity_anchor  # kN
-                self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(v_sb, v_db, t_b, t_db)
+                self.v_sb = self.load_shear * 10 ** -3 / self.anchor_nos_provided  # kN
+                self.v_db = self.anchor_capacity  # kN
+                self.t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
+                self.t_db = self.tension_capacity_anchor  # kN
+                self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db)
                 self.combined_capacity_anchor = round(self.combined_capacity_anchor, 3)
 
                 if self.combined_capacity_anchor > 1.0:

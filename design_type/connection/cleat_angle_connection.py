@@ -493,6 +493,7 @@ class CleatAngleConnection(ShearConnection):
             if cleat.thickness*2 <= self.supported_section.web_thickness:
                 self.cleat_list.pop()
                 print("popped", designation)
+                print(self.cleat_list)
             else:
                 if cleat.thickness not in self.sptd_leg.thickness:
                     self.sptd_leg.thickness.append(cleat.thickness)

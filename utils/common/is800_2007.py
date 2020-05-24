@@ -178,7 +178,7 @@ class IS800_2007(object):
         bearing_length = round((float(shear_force) * 1000) * gamma_m0 / web_thickness / fy, 3)
         b1_req = bearing_length - (flange_thickness + root_radius)
         k = flange_thickness + root_radius
-        b1 = min(b1_req, k)
+        b1 = max(b1_req, k)
         return b1
 
     # ==========================================================================

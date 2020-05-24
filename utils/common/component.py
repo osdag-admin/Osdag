@@ -114,7 +114,7 @@ class Bolt(Material):
 
         return repr
 
-    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy,n_planes):
+    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes, seatedangle = False):
         """
 
         :param bolt_type: bearing or friction grip bolt
@@ -149,9 +149,14 @@ class Bolt(Material):
         if self.bolt_type == "Bearing Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
-            self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
-                f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
-                e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
+            if seatedangle:
+                self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
+                    f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
+                    e=self.min_end_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
+            else:
+                self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
+                    f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
+                    e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
             self.fu_considered = fu_considered
             self.thk_considered = thk_considered
@@ -276,8 +281,7 @@ class Section(Material):
         self.plast_sec_mod_z = 0.0
         self.plast_sec_mod_y = 0.0
         self.source = 0.0
-        max_thickness = max(self.flange_thickness,self.web_thickness)
-        super(Section, self).__init__(material_grade,max_thickness)
+
         self.tension_yielding_capacity = 0.0
         self.tension_rupture_capacity = 0.0
         self.block_shear_capacity = 0.0
@@ -635,6 +639,8 @@ class Beam(Section):
     def __init__(self, designation, material_grade):
         super(Beam, self).__init__(designation, material_grade)
         self.connect_to_database_update_other_attributes("Beams", designation)
+        max_thickness = max(self.flange_thickness, self.web_thickness)
+        super(Section, self).__init__(material_grade, max_thickness)
 
     def min_plate_height(self):
         return 0.6 * self.depth
@@ -651,6 +657,8 @@ class Column(Section):
     def __init__(self, designation, material_grade):
         super(Column, self).__init__(designation, material_grade)
         self.connect_to_database_update_other_attributes("Columns", designation)
+        max_thickness = max(self.flange_thickness, self.web_thickness)
+        super(Section, self).__init__(material_grade, max_thickness)
 
     def min_plate_height(self):
         return 0.6 * self.depth
@@ -1462,8 +1470,6 @@ class Plate(Material):
         self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6
 
 
-
-
     def __repr__(self):
         repr = "Plate\n"
         repr += "Thickness Provided: {}\n".format(self.thickness_provided)
@@ -1504,10 +1510,13 @@ class Angle(Section):
         self.leg_a_length = 0.0
         self.leg_b_length = 0.0
         self.thickness = 0.0
+        # max_thickness = max(self.flange_thickness, self.web_thickness)
+
         self.gap = 0.0
 
 
         self.connect_to_database_update_other_attributes_angles(designation)
+        super(Section, self).__init__(material_grade, self.thickness)
 
         # self.length = 0.0
 
@@ -1558,6 +1567,26 @@ class Angle(Section):
         self.source = row[23]
 
         conn.close()
+
+    def get_available_seated_list(self, input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer", t_min = 0.0):
+        available_angles = []
+        for designation in input_angle_list:
+            leg_a_length, leg_b_length, t, r_r = get_leg_lengths(designation)
+            if position == "inner":
+                min_leg_length_outer = min_leg_length + t + r_r
+                max_leg_length_outer = max_leg_length + t + r_r
+            else:
+                min_leg_length_outer = min_leg_length
+                max_leg_length_outer = max_leg_length
+
+            if operator.le(max(leg_a_length, leg_b_length), max_leg_length_outer) and operator.ge(
+                    min(leg_a_length, leg_b_length), min_leg_length_outer) and leg_a_length == leg_b_length\
+                    and operator.eq(t, t_min):
+                # print("appended", designation)
+                available_angles.append(designation)
+            else:
+                print("popped", designation)
+        return available_angles
 
 
 class I_sectional_Properties(object):

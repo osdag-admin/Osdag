@@ -559,6 +559,8 @@ VALUES_TYP_2 = ['Bearing Bolt']
 # Key for storing Grade sub-key of Bolt
 KEY_GRD = 'Bolt.Grade'
 KEY_DISP_GRD = 'Grade *'
+# KEY_PC = 'Bolt.PC'
+KEY_DISP_PC = 'Property Class *'
 VALUES_GRD = ['All', 'Customized']
 VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
 
@@ -1095,6 +1097,10 @@ KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
 KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
 KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
+KEY_OUT_COL_PROVIDED = 'Bolt.Cols'
+KEY_OUT_DISP_COL_PROVIDED = 'Columns of Bolts'
+KEY_OUT_TOT_NO_BOLTS = 'Bolt.number'
+KEY_OUT_DISP_TOT_NO_BOLTS = 'Number of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
@@ -1137,6 +1143,8 @@ KEY_OUT_END_DIST = 'Bolt.EndDist'
 KEY_OUT_DISP_END_DIST = 'End Distance (mm)'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
 KEY_OUT_DISP_GAUGE = 'Gauge (mm)'
+KEY_OUT_GAUGE_CENTRAL = 'Bolt.GaugeCentral'
+KEY_OUT_DISP_GAUGE_CENTRAL = 'Central Gauge (mm)'
 
 KEY_OUT_MIN_GAUGE = 'Bolt.MinGauge'
 KEY_OUT_MAX_SPACING = 'Bolt.MaxGauge'
@@ -1186,8 +1194,32 @@ KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Length (mm)'
 KEY_OUT_PLATE_WIDTH = 'Plate.Width'
 KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 c = 'Width (mm)'
-KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 
+KEY_OUT_SEATED_ANGLE_DESIGNATION = "SeatedAngle.Designation"
+KEY_OUT_DISP_ANGLE_DESIGNATION = "Designation"
+KEY_OUT_SEATED_ANGLE_THICKNESS = "SeatedAngle.Thickness"
+KEY_OUT_DISP_SEATED_ANGLE_THICKNESS = "Leg Thickness (mm)"
+KEY_OUT_SEATED_ANGLE_LEGLENGTH = "SeatedAngle.LegLength"
+KEY_OUT_DISP_SEATED_ANGLE_LEGLENGTH = "Leg Length (mm)"
+KEY_OUT_SEATED_ANGLE_WIDTH = "SeatedAngle.Width"
+KEY_OUT_DISP_ANGLE_WIDTH = "Width (mm)"
+KEY_OUT_SEATED_ANGLE_BOLT_COL = "SeatedAngle.Bolt_Spacing_col"
+KEY_OUT_DISP_SEATED_ANGLE_BOLT_COL = "Bolt Spacing Details"
+KEY_OUT_SEATED_ANGLE_BOLT_BEAM = "SeatedAngle.Bolt_Spacing_beam"
+KEY_OUT_DISP_SEATED_ANGLE_BOLT_BEAM = "Bolt Spacing Details"
+
+KEY_OUT_TOP_ANGLE_DESIGNATION = "TopAngle.Designation"
+# KEY_OUT_DISP_TOP_ANGLE_DESIGNATION = "Designation"
+KEY_OUT_TOP_ANGLE_WIDTH = "TopAngle.Width"
+# KEY_OUT_DISP_TOP_ANGLE_WIDTH = "Width (mm)"
+KEY_OUT_TOP_ANGLE_BOLT_COL = "TopAngle.Bolt_Spacing_col"
+KEY_OUT_DISP_TOP_ANGLE_BOLT_COL = "Bolt Spacing Details"
+KEY_OUT_TOP_ANGLE_BOLT_BEAM = "TopAngle.Bolt_Spacing_beam"
+KEY_OUT_DISP_TOP_ANGLE_BOLT_BEAM = "Bolt Spacing Details"
+
+KEY_OUT_PLATE_SHEAR_DEMAND = 'Plate.ShearDemand'
+KEY_OUT_DISP_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity (kN)'
 KEY_OUT_PLATE_YIELD = 'Plate.Yield'
 KEY_OUT_DISP_PLATE_YIELD = 'Yield Capacity'

@@ -1274,6 +1274,7 @@ class Ui_ModuleWindow(QMainWindow):
         Returns:
 
         """
+<<<<<<< HEAD
 
         if main.design_status:
 
@@ -1293,6 +1294,27 @@ class Ui_ModuleWindow(QMainWindow):
 
     def save3DcadImages(self, main):
 
+=======
+
+        if main.design_status:
+
+            files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+                                                      files_types)
+            fName = str(fileName)
+            file_extension = fName.split(".")[-1]
+
+            if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
+                self.display.ExportToImage(fName)
+                QMessageBox.about(self, 'Information', "File saved")
+        else:
+            # self.actionSave_current_image.setEnabled(False)
+            QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
+
+
+    def save3DcadImages(self, main):
+
+>>>>>>> 4150550d245c273fcdda77a312303b0ebc7d36a9
         if main.design_status:
             if self.fuse_model is None:
                 self.fuse_model = CommonDesignLogic.create2Dcad(self.commLogicObj)

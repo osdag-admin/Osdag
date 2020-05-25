@@ -428,7 +428,7 @@ class Tension_welded(Member):
         t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None, True)
         out_list.append(t8)
 
-        t8 = (None, DISP_TITLE_WELD_CAPACITY, TYPE_TITLE, None, True)
+        t8 = (None, DISP_TITLE_WELD_DETAILS, TYPE_TITLE, None, True)
         out_list.append(t8)
 
         t9 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.weld.size if flag else '', True)
@@ -475,6 +475,9 @@ class Tension_welded(Member):
         t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, True)
         out_list.append(t18)
 
+        t8 = (None, DISP_TITLE_CONN_DETAILS , TYPE_TITLE, None, True)
+        out_list.append(t8)
+
         t21 = (KEY_OUT_INTERCONNECTION, KEY_OUT_DISP_INTERCONNECTION, TYPE_TEXTBOX,
                int(round(self.inter_conn, 0)) if flag else '', True)
         out_list.append(t21)
@@ -483,6 +486,14 @@ class Tension_welded(Member):
                (round(self.inter_memb_length, 2)) if flag else '', True)
         out_list.append(t21)
 
+        t8 = (None, DISP_TITLE_WELD_DETAILS, TYPE_TITLE, None, True)
+        out_list.append(t8)
+
+        t9 = (KEY_OUT_INTER_WELD_SIZE, KEY_OUT_DISP_INTER_WELD_SIZE, TYPE_TEXTBOX, self.inter_weld_size if flag else '', True)
+        out_list.append(t9)
+
+        t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, True)
+        out_list.append(t18)
 
         t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,
                int(round(self.inter_plate_height, 0)) if flag else '', True)
@@ -1201,11 +1212,13 @@ class Tension_welded(Member):
 
         elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[
             KEY_LOCATION] == "Long Leg":
+
             if web == None:
                 self.web_weld = 2 * (self.section_size_1.max_leg - 2 * self.weld.size)
             else:
                 self.web_weld = 0.0
-            self.flange_weld = round_up(((self.weld.effective - self.web_weld ) / 4), 1, 50)
+            length_weld = self.section_size_1.angle_weld_length(self.weld.strength,self.web_weld,self.res_force,self.section_size_1.Cy,self.section_size_1.max_leg )
+            self.flange_weld = round_up((length_weld), 1, 50)
             self.weld.length = (self.web_weld + 4 * self.flange_weld)
 
         elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[
@@ -1214,7 +1227,8 @@ class Tension_welded(Member):
                 self.web_weld = 2 * (self.section_size_1.min_leg - 2 * self.weld.size)
             else:
                 self.web_weld = 0.0
-            self.flange_weld = round_up(((self.weld.effective - self.web_weld ) / 4), 1, 50)
+            length_weld = self.section_size_1.angle_weld_length(self.weld.strength,self.web_weld,self.res_force,self.section_size_1.Cz,self.section_size_1.min_leg )
+            self.flange_weld = round_up((length_weld), 1, 50)
             self.weld.length = (self.web_weld + 4 * self.flange_weld)
 
         elif design_dictionary[KEY_SEC_PROFILE] == "Angles" and design_dictionary[KEY_LOCATION] == "Long Leg":
@@ -1222,7 +1236,8 @@ class Tension_welded(Member):
                 self.web_weld = (self.section_size_1.max_leg - 2 * self.weld.size)
             else:
                 self.web_weld = 0.0
-            self.flange_weld = round_up(((self.weld.effective - self.web_weld ) / 2), 1, 50)
+            length_weld = self.section_size_1.angle_weld_length(self.weld.strength,self.web_weld,self.res_force,self.section_size_1.Cz,self.section_size_1.min_leg )
+            self.flange_weld = round_up((length_weld), 1, 50)
             self.weld.length = (self.web_weld + 2 * self.flange_weld)
 
         else:
@@ -1230,7 +1245,8 @@ class Tension_welded(Member):
                 self.web_weld = (self.section_size_1.min_leg - 2 * self.weld.size)
             else:
                 self.web_weld = 0.0
-            self.flange_weld = round_up(((self.weld.effective - self.web_weld ) / 2), 1, 50)
+            length_weld = self.section_size_1.angle_weld_length(self.weld.strength,self.web_weld,self.res_force,self.section_size_1.Cz,self.section_size_1.min_leg )
+            self.flange_weld = round_up((length_weld), 1, 50)
             self.weld.length = (self.web_weld + 2 * self.flange_weld)
 
 
@@ -1412,22 +1428,26 @@ class Tension_welded(Member):
                 ratio = round_up(self.inter_length / self.inter_memb_length, 1)
             self.inter_memb_length = self.inter_length / ratio
             self.inter_conn = ratio - 1
-            self.inter_plate_length = min(50, 4*self.weld.size)
+            self.inter_plate_length = max(50, 4*self.weld.size)
             if self.loc == "Long Leg":
-                self.inter_plate_height = self.section_size_1.max_leg
+                if self.sec_profile == "Star Angles":
+                    self.inter_plate_height = 2 * self.section_size_1.max_leg
+                else:
+                    self.inter_plate_height = self.section_size_1.max_leg
             elif self.loc == "Short Leg":
-                self.inter_plate_height = self.section_size_1.min_leg
+                if self.sec_profile == "Star Angles":
+                    self.inter_plate_height = 2 * self.section_size_1.max_leg
+                else:
+                    self.inter_plate_height = self.section_size_1.max_leg
             else:
                 self.inter_plate_height = self.section_size_1.depth
+            self.inter_weld_size = self.weld.size
         else:
             self.inter_conn = 0.0
-            self.inter_bolt_one_line = 0.0
-            self.inter_bolt_line = 0.0
             self.inter_plate_length = 0.0
             self.inter_plate_height = 0.0
             self.inter_memb_length = 0.0
-            self.inter_dia = 0.0
-            self.inter_grade = 0.0
+            self.inter_weld_size = 0.0
 
 
     def results_to_test(self, filename):

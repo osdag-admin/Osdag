@@ -462,7 +462,7 @@ class Tension_bolted(Member):
         t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None, True)
         out_list.append(t8)
 
-        t8 = (None, DISP_TITLE_BOLT_CAPACITY, TYPE_TITLE, None, True)
+        t8 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
         out_list.append(t8)
 
         t9 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, int(self.bolt.bolt_diameter_provided) if flag else '', True)
@@ -503,7 +503,6 @@ class Tension_bolted(Member):
         t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-
         t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,int(round(self.plate.thickness_provided,0)) if flag else '', True)
         out_list.append(t19)
 
@@ -523,6 +522,9 @@ class Tension_bolted(Member):
         t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, True)
         out_list.append(t18)
 
+        t8 = (None, DISP_TITLE_CONN_DETAILS, TYPE_TITLE, None, True)
+        out_list.append(t8)
+
         t21 = (KEY_OUT_INTERCONNECTION, KEY_OUT_DISP_INTERCONNECTION, TYPE_TEXTBOX,
                int(round(self.inter_conn, 0)) if flag else '', True)
         out_list.append(t21)
@@ -530,6 +532,9 @@ class Tension_bolted(Member):
         t21 = (KEY_OUT_INTERSPACING, KEY_OUT_DISP_INTERSPACING, TYPE_TEXTBOX,
                (round(self.inter_memb_length, 2)) if flag else '', True)
         out_list.append(t21)
+
+        t18 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
+        out_list.append(t18)
 
         t9 = (KEY_OUT_INTER_D_PROVIDED, KEY_OUT_DISP_INTER_D_PROVIDED, TYPE_TEXTBOX, int(self.inter_dia) if flag else '',True)
         out_list.append(t9)
@@ -542,6 +547,9 @@ class Tension_bolted(Member):
 
         t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, KEY_OUT_DISP_INTER_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.inter_bolt_one_line if flag else '',True)
         out_list.append(t16)
+
+        t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, True)
+        out_list.append(t18)
 
         t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,int(round(self.inter_plate_height, 0)) if flag else '', True)
         out_list.append(t20)
@@ -1587,8 +1595,20 @@ class Tension_bolted(Member):
                 if self.plate.pitch_provided <= self.bolt.max_spacing_round and length_avail <= (15 * self.bolt.bolt_diameter_provided):
                     self.plate.pitch_provided = self.plate.pitch_provided + 5
                 else:
-                    self.plate.bolt_line = self.plate.bolt_line + 1
-                    self.plate.pitch_provided = initial_pitch
+                    # self.plate.bolt_line = self.plate.bolt_line + 1
+                    # self.plate.pitch_provided = initial_pitch
+                    while capacity == False:
+                        self.plate.bolt_line = self.plate.bolt_line + 1
+                        self.plate.pitch_provided = initial_pitch
+                        self.plate.bolt_capacity_red = self.plate.get_bolt_red(self.plate.bolts_one_line,
+                                                                               self.plate.gauge_provided,
+                                                                               self.plate.bolt_line,
+                                                                               self.plate.pitch_provided,
+                                                                               self.bolt.bolt_capacity,
+                                                                               self.bolt.bolt_diameter_provided)
+                        if self.plate.bolt_force < self.plate.bolt_capacity_red:
+                            capacity = True
+                            break
 
 
         if design_dictionary[KEY_LOCATION] == 'Long Leg':
@@ -2158,9 +2178,9 @@ class Tension_bolted(Member):
             self.report_check.append(t3)
             t4 = (KEY_DISP_TENSION_BLOCKSHEARCAPACITY, '',blockshear_prov(Tdb= member_blockshear_kn), '')
             self.report_check.append(t4)
-            t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(member_yield_kn, member_rupture_kn, member_blockshear_kn),get_pass_fail(self.load.axial_force,section_size.tension_capacity, relation="lesser"))
+            t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, tensile_capacity_prov(member_yield_kn, member_rupture_kn, member_blockshear_kn),get_pass_fail(self.load.axial_force,section_size.tension_capacity, relation="leq"))
             self.report_check.append(t8)
-            t5 = (KEY_DISP_SLENDER, slenderness_req(), slenderness_prov( 1, self.length,round(gyration,2), slenderness), get_pass_fail(400,slenderness, relation="greater"))
+            t5 = (KEY_DISP_SLENDER, slenderness_req(), slenderness_prov( 1, self.length,round(gyration,2), slenderness), get_pass_fail(400,slenderness, relation="geq"))
             self.report_check.append(t5)
             t6 = (KEY_DISP_EFFICIENCY, efficiency_req(),
                   efficiency_prov(self.load.axial_force, section_size.tension_capacity, self.efficiency), '')
@@ -2176,12 +2196,12 @@ class Tension_bolted(Member):
             self.report_check.append(t1)
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, self.load.axial_force,
                   member_yield_prov(section_size.area, section_size.fy, gamma_m0, member_yield_kn,
-                                    multiple), get_pass_fail(self.load.axial_force, member_yield_kn, relation="lesser"))
+                                    multiple), get_pass_fail(self.load.axial_force, member_yield_kn, relation="leq"))
             self.report_check.append(t2)
 
             t5 = (KEY_DISP_SLENDER, slenderness_req(),
                   slenderness_prov(1, self.length, round(gyration, 2),
-                                  slenderness), get_pass_fail(400,slenderness, relation="greater"))
+                                  slenderness), get_pass_fail(400,slenderness, relation="geq"))
             self.report_check.append(t5)
 
 
@@ -2248,42 +2268,42 @@ class Tension_bolted(Member):
             self.report_check.append(t7)
             t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
                   self.plate.pitch_provided,
-                  get_pass_fail(self.bolt.min_pitch, self.plate.pitch_provided, relation='lesser'))
+                  get_pass_fail(self.bolt.min_pitch, self.plate.pitch_provided, relation='leq'))
             self.report_check.append(t1)
             t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
                   self.plate.pitch_provided,
-                  get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided, relation='greater'))
+                  get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided, relation='geq'))
             self.report_check.append(t1)
             t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
                   self.plate.gauge_provided,
-                  get_pass_fail(self.bolt.min_gauge, self.plate.gauge_provided, relation="lesser"))
+                  get_pass_fail(self.bolt.min_gauge, self.plate.gauge_provided, relation="leq"))
             self.report_check.append(t2)
             t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
                   self.plate.gauge_provided,
-                  get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided, relation="greater"))
+                  get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided, relation="geq"))
             self.report_check.append(t2)
             t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
                   self.plate.end_dist_provided,
-                  get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided, relation='lesser'))
+                  get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided, relation='leq'))
             self.report_check.append(t3)
             t4 = (DISP_MAX_END, max_edge_end(self.plate.fy, self.plate.thickness_provided),
                   self.plate.end_dist_provided,
-                  get_pass_fail(self.bolt.max_end_dist, self.plate.end_dist_provided, relation='greater'))
+                  get_pass_fail(self.bolt.max_end_dist, self.plate.end_dist_provided, relation='geq'))
             self.report_check.append(t4)
             t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
                   self.plate.edge_dist_provided,
-                  get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided, relation='lesser'))
+                  get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided, relation='leq'))
             self.report_check.append(t3)
             t4 = (DISP_MAX_EDGE, max_edge_end(self.plate.fy, self.plate.thickness_provided),
                   self.plate.edge_dist_provided,
-                  get_pass_fail(self.bolt.max_edge_dist, self.plate.edge_dist_provided, relation="greater"))
+                  get_pass_fail(self.bolt.max_edge_dist, self.plate.edge_dist_provided, relation="geq"))
             self.report_check.append(t4)
             t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),long_joint_bolted_prov(self.plate.bolt_line,self.plate.bolts_one_line,self.plate.pitch_provided,self.plate.gauge_provided,self.bolt.bolt_diameter_provided,bolt_capacity_kn,bolt_capacity_red_kn), "")
             self.report_check.append(t10)
 
 
             t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn, bolt_capacity_red_kn,
-                  get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="lesser"))
+                  get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="leq"))
             self.report_check.append(t5)
 
         else:
@@ -2346,7 +2366,7 @@ class Tension_bolted(Member):
             self.report_check.append(t3)
             t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, self.length,
                   gusset_lt_b_prov(self.plate.bolt_line, self.plate.pitch_provided,self.plate.end_dist_provided,int(self.plate.length))
-                  , get_pass_fail(self.length, self.plate.length, relation="greater"))
+                  , get_pass_fail(self.length, self.plate.length, relation="geq"))
             self.report_check.append(t4)
             t5 = (KEY_OUT_DISP_PLATETHK_REP, '',display_prov(self.plate.thickness_provided,"t_p"), "")
             self.report_check.append(t5)
@@ -2359,7 +2379,7 @@ class Tension_bolted(Member):
             self.report_check.append(t4)
 
             t8 = (KEY_DISP_TENSION_CAPACITY, display_prov(round((self.res_force/1000),2),"A"), tensile_capacity_prov(plate_yield_kn, plate_rupture_kn, plate_blockshear_kn),
-            get_pass_fail(round((self.res_force/1000),2), round(self.plate_tension_capacity/1000,2), relation="lesser"))
+            get_pass_fail(round((self.res_force/1000),2), round(self.plate_tension_capacity/1000,2), relation="leq"))
             self.report_check.append(t8)
         else:
             pass

@@ -1696,6 +1696,16 @@ class Angle(Section):
 
         conn.close()
 
+    def angle_weld_length(self, weld_strength, depth_weld, force, C, depth):
+
+        "Function to calculate weld length for angles based on the force transfer pattern"
+
+        f2 = weld_strength * depth_weld
+        f3 = force * (1 - C / depth) - f2 / 2
+        l3 = f3 / weld_strength
+
+        return l3
+
 
 class I_sectional_Properties(object):
 

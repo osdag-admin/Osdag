@@ -11,7 +11,6 @@ import sqlite3
 
 from utils.common.component import *
 from utils.common.component import *
-
 import logging
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.column_cover_plate import ColumnCoverPlate
@@ -20,13 +19,14 @@ class OurLog(logging.Handler):
 
     def __init__(self, key):
         logging.Handler.__init__(self)
+
         self.key = key
         # self.key.setText("<h1>Welcome to Osdag</h1>")
 
     def handle(self, record):
         msg = self.format(record)
         if record.levelname == 'WARNING':
-            msg = "<span style='color: yellow;'>"+ msg +"</span>"
+            msg = "<span style='color: blue;'>"+ msg +"</span>"
         elif record.levelname == 'ERROR':
             msg = "<span style='color: red;'>"+ msg +"</span>"
         elif record.levelname == 'INFO':
@@ -1153,6 +1153,29 @@ KEY_DISP_PITCH_2_WEB = 'Pitch2 along Web'
 KEY_CONN_PREFERENCE = 'plate.design_method'
 KEY_DISP_CONN_PREFERENCE = 'Design Method'
 VALUES_CONN_PREFERENCE = ["Select","Plate Oriented", "Bolt Oriented"]
+KEY_OUT_STIFFENER_HEIGHT = 'Stiffener.height'
+KEY_OUT_DISP_STIFFENER_HEIGHT = 'Stiffener Height'
+KEY_OUT_STIFFENER_WIDTH = 'Stiffener.width'
+KEY_OUT_DISP_STIFFENER_WIDTH = 'Stiffener Width'
+KEY_OUT_STIFFENER_THICKNESS = 'Stiffener.thickness'
+KEY_OUT_DISP_STIFFENER_THICKNESS = 'Stiffener Thickness'
+KEY_OUT_WELD_TYPE = 'Stiffener.weld'
+KEY_OUT_DISP_WELD_TYPE = 'Weld Type'
+KEY_OUT_STIFFENER_DETAILS = 'Stiffener.details'
+KEY_OUT_DISP_STIFFENER_DETAILS = 'Stiffener Details'
+
+DISP_TITLE_WELD = 'Weld'
+KEY_OUT_WELD_SIZE = 'Weld.Size'
+KEY_OUT_DISP_WELD_SIZE = 'Size (mm)'
+KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
+KEY_OUT_WELD_STRESS = 'Weld.Stress'
+KEY_OUT_DISP_WELD_STRESS = 'Stress (N/mm)'
+KEY_OUT_WELD_LENGTH = 'Weld.Length'
+KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
+KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
+KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
+
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"

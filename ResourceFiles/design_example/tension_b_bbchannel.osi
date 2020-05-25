@@ -1,0 +1,96 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '12'
+- '16'
+- '20'
+- '24'
+- '30'
+- '36'
+Bolt.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Bolt.Material_Grade_OverWrite: '410'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pretensioned
+Bolt.Type: Bearing Bolt
+Conn_Location: Web
+Connector.Material: E 250 (Fe 410 W)B
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: a - Sheared or hand flame cut
+Detailing.Gap: '10'
+Load.Axial: '1000'
+Material: E 250 (Fe 410 W)B
+Member.Designation:
+- JC 100
+- JC 125
+- JC 150
+- JC 175
+- JC 200
+- LC 100
+- LC 125
+- LC 150
+- LC 175
+- LC 200
+- LC 225
+- LC 250
+- LC 300
+- LC 350
+- LC 400
+- LC 75
+- LC(P )150
+- LC(P) 125
+- LC(P) 200
+- LC(P) 300
+- MC 100
+- MC 125
+- MC 125*
+- MC 150
+- MC 150*
+- MC 175
+- 'MC 175* '
+- MC 200
+- MC 200*
+- MC 225
+- MC 225*
+- MC 250
+- MC 250*
+- MC 250*
+- MC 300
+- MC 300*
+- MC 300*
+- MC 350
+- MC 400
+- 'MC 75                     '
+- MCP 100
+- MCP 125
+- MCP 125*
+- MCP 150
+- MCP 150*
+- MCP 175
+- MCP 175*
+- MCP 200
+- MCP 200*
+- MCP 225
+- MCP 225*
+- MCP 250
+- MCP 250*
+- MCP 250*
+- MCP 300
+- MCP 300*
+- MCP 300*
+- MCP 350
+- MCP 400
+- MCP 75
+Member.Length: '5000'
+Member.Material: E 250 (Fe 410 W)B
+Member.Profile: Back to Back Channels
+Module: Tension Members Bolted Design

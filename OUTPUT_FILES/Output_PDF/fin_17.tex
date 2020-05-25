@@ -1,0 +1,364 @@
+\documentclass{article}%
+\usepackage[T1]{fontenc}%
+\usepackage[utf8]{inputenc}%
+\usepackage{lmodern}%
+\usepackage{textcomp}%
+\usepackage{lastpage}%
+\usepackage{parskip}%
+\usepackage[top=1.2in,bottom=1in,left=0.6in,right=0.6in,headsep=0.8in]{geometry}%
+\usepackage{amsmath}%
+\usepackage{graphicx}%
+\usepackage{needspace}%
+\usepackage{color}%
+\usepackage{longtable}%
+\usepackage{multirow}%
+\usepackage[table]{xcolor}%
+\usepackage{fancyhdr}%
+\usepackage{tabularx}%
+%
+\definecolor{OsdagGreen}{HTML}{D5DF93}%
+\fancypagestyle{header}{ 
+\renewcommand{\headrulewidth}{0pt}%
+\renewcommand{\footrulewidth}{0pt}%
+\fancyhead{ 
+}%
+\fancyfoot{ 
+}%
+\fancyhead[C]{ 
+\begin{tabularx}{\textwidth}{|l|p{6cm}|l|X|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Company Name&LoremIpsum&Project Title&Fossee\\%
+\hline%
+\rowcolor{OsdagGreen}%
+Group/Team Name&LoremIpsum&Subtitle&\\%
+\hline%
+\rowcolor{OsdagGreen}%
+Designer&LoremIpsum&Job Number&123\\%
+\hline%
+\rowcolor{OsdagGreen}%
+Date&18 /05 /2020&Client&LoremIpsum\\%
+\hline%
+\end{tabularx}
+}%
+\fancyfoot[R]{ 
+Page \thepage\ of \pageref{LastPage}
+}
+}%
+%
+\begin{document}%
+\normalsize%
+\pagestyle{header}%
+\section{Input Parameters}%
+\label{sec:InputParameters}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|}%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Module}&\multicolumn{2}{|c|}{Fin Plate}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{MainModule}&\multicolumn{2}{|c|}{Shear Connection}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Connectivity}&\multicolumn{2}{|c|}{Column flange{-}Beam web}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Shear(kN)*}&\multicolumn{2}{|c|}{200.0}\\%
+\hline%
+\hline%
+\multicolumn{5}{|c|}{\textbf{Supporting Section}}\\%
+\hline%
+\hline%
+\multirow{13}{*}{\includegraphics[width=5cm,height=5cm]{C:/Users/nitin/Pictures/Saved Pictures/Osdag3/ResourceFiles/images/ISection.png}}&\multicolumn{2}{|c|}{Supporting Section}&\multicolumn{2}{|c|}{PBP 360X133}\\%
+\cline{2%
+-%
+5}%
+&\multicolumn{2}{|c|}{Material *}&\multicolumn{2}{|c|}{E 250 (Fe 410 W)A}\\%
+\cline{2%
+-%
+5}%
+&\multicolumn{2}{|c|}{Ultimate strength, fu (MPa)}&\multicolumn{2}{|c|}{410}\\%
+\cline{2%
+-%
+5}%
+&\multicolumn{2}{|c|}{Yield Strength , fy (MPa)}&\multicolumn{2}{|c|}{250}\\%
+\cline{2%
+-%
+5}%
+&Mass&132.96&Iz(cm4)&379830000.0\\%
+\cline{2%
+-%
+5}%
+&Area(cm2) {-} A&16940.0&Iy(cm4)&136783600.0\\%
+\cline{2%
+-%
+5}%
+&D(mm)&352.0&rz(cm)&149.8\\%
+\cline{2%
+-%
+5}%
+&B(mm)&373.8&ry(cm)&89.9\\%
+\cline{2%
+-%
+5}%
+&t(mm)&15.6&Zz(cm3)&2158120.0\\%
+\cline{2%
+-%
+5}%
+&T(mm)&15.7&Zy(cm3)&731850.0\\%
+\cline{2%
+-%
+5}%
+&FlangeSlope&90&Zpz(cm3)&2405610.0\\%
+\cline{2%
+-%
+5}%
+&R1(mm)&1.52&Zpy(cm3)&731850.0\\%
+\cline{2%
+-%
+5}%
+&R2(mm)&0.0&&\\%
+\cline{2%
+-%
+5}%
+\hline%
+\multicolumn{5}{|c|}{\textbf{Supported Section}}\\%
+\hline%
+\hline%
+\multirow{13}{*}{\includegraphics[width=5cm,height=5cm]{C:/Users/nitin/Pictures/Saved Pictures/Osdag3/ResourceFiles/images/ISection.png}}&\multicolumn{2}{|c|}{Supported Section}&\multicolumn{2}{|c|}{MB 350}\\%
+\cline{2%
+-%
+5}%
+&\multicolumn{2}{|c|}{Material *}&\multicolumn{2}{|c|}{E 250 (Fe 410 W)A}\\%
+\cline{2%
+-%
+5}%
+&\multicolumn{2}{|c|}{Ultimate strength, fu (MPa)}&\multicolumn{2}{|c|}{410}\\%
+\cline{2%
+-%
+5}%
+&\multicolumn{2}{|c|}{Yield Strength , fy (MPa)}&\multicolumn{2}{|c|}{250}\\%
+\cline{2%
+-%
+5}%
+&Mass&52.3&Iz(cm4)&136150000.0\\%
+\cline{2%
+-%
+5}%
+&Area(cm2) {-} A&6660.0&Iy(cm4)&5180000.0\\%
+\cline{2%
+-%
+5}%
+&D(mm)&350.0&rz(cm)&143.0\\%
+\cline{2%
+-%
+5}%
+&B(mm)&140.0&ry(cm)&28.0\\%
+\cline{2%
+-%
+5}%
+&t(mm)&8.1&Zz(cm3)&778000.0\\%
+\cline{2%
+-%
+5}%
+&T(mm)&14.2&Zy(cm3)&74000.0\\%
+\cline{2%
+-%
+5}%
+&FlangeSlope&98&Zpz(cm3)&888400.0\\%
+\cline{2%
+-%
+5}%
+&R1(mm)&14.0&Zpy(cm3)&74000.0\\%
+\cline{2%
+-%
+5}%
+&R2(mm)&7.0&&\\%
+\cline{2%
+-%
+5}%
+\hline%
+\multicolumn{5}{|c|}{\textbf{Bolt Details}}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Diameter (mm)*}&\multicolumn{2}{|c|}{{[}12.0, 16.0, 20.0{]}}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Grade *}&\multicolumn{2}{|c|}{{[}3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9{]}}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Type *}&\multicolumn{2}{|c|}{Bearing Bolt}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Bolt hole type}&\multicolumn{2}{|c|}{Standard}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Slip factor (µ\_f)}&\multicolumn{2}{|c|}{0.3}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Type of edges}&\multicolumn{2}{|c|}{a {-} Sheared or hand flame cut}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Gap between beam and <br>support (mm)}&\multicolumn{2}{|c|}{10.0}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Are the members exposed to <br>corrosive influences}&\multicolumn{2}{|c|}{False}\\%
+\hline%
+\hline%
+\multicolumn{5}{|c|}{\textbf{Plate Details}}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Thickness(mm)*}&\multicolumn{2}{|c|}{{[}3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0{]}}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Material *}&\multicolumn{2}{|c|}{E 250 (Fe 410 W)A}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Ultimate strength, fu (MPa)}&\multicolumn{2}{|c|}{410}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Yield Strength , fy (MPa)}&\multicolumn{2}{|c|}{250}\\%
+\hline%
+\hline%
+\multicolumn{5}{|c|}{\textbf{Weld Details}}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Weld Type}&\multicolumn{2}{|c|}{Fillet}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Type of weld fabrication}&\multicolumn{2}{|c|}{Shop Weld}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Material grade overwrite (MPa) Fu}&\multicolumn{2}{|c|}{410.0}\\%
+\hline%
+\end{longtable}
+
+%
+\Needspace{10\baselineskip}%
+\newpage%
+\section{Design Checks}%
+\label{sec:DesignChecks}%
+\subsection{Bolt Design Checks}%
+\label{subsec:BoltDesignChecks}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Diameter (mm)*&&16.0&\\%
+\hline%
+Grade *&&6.8&\\%
+\hline%
+Shear Capacity (kN)&&$\begin{aligned}V_{dsb} &= \frac{f_ub ~n_n~ A_{nb}}{\sqrt{3} ~\gamma_{mb}}\\ &= \frac{600.0*1*157}{\sqrt{3}~*~1.25}\\ &= 43.51\end{aligned}$&\\%
+\hline%
+Bearing Capacity (kN)&&$\begin{aligned}V_{dpb} &= \frac{2.5~ k_b~ d~ t~ f_u}{\gamma_{mb}}\\ &= \frac{2.5~*0.49*16.0*8.1*410}{1.25}\\ &=52.07\end{aligned}$&\\%
+\hline%
+Capacity (kN)&&$\begin{aligned}V_{db} &= min~ (V_{dsb}, V_{dpb})\\ &= min~ (43.51,52.07)\\ &=43.51\end{aligned}$&\\%
+\hline%
+No of Bolts&$\begin{aligned}R_{u} &= \sqrt{V_u^2+A_u^2}\\ n_{trial} &= R_u/ V_{bolt}\\ R_{u} &= \frac{\sqrt{200.0^2+80.0^2}}{43.51}\\ &=5\end{aligned}$&8&\\%
+\hline%
+No of Columns&&2&\\%
+\hline%
+No of Rows&&4&\\%
+\hline%
+Min. Pitch (mm)&$\begin{aligned}p/g_{min}&= 2.5 ~ d&\\ =&2.5*16.0&=40.0\end{aligned}$&40&Pass\\%
+\hline%
+Max. Pitch (mm)&$\begin{aligned}p/g_{max} &=\min(32~t,~300~mm)&\\ &=\min(32 *~8.1,~ 300 ~mm)\\&=300\end{aligned}$&40&Pass\\%
+\hline%
+Min. Gauge (mm)&$\begin{aligned}p/g_{min}&= 2.5 ~ d&\\ =&2.5*16.0&=40.0\end{aligned}$&60&Pass\\%
+\hline%
+Max. Gauge (mm)&$\begin{aligned}p/g_{max} &=\min(32~t,~300~mm)&\\ &=\min(32 *~8.1,~ 300 ~mm)\\&=300\end{aligned}$&60&Pass\\%
+\hline%
+Min. End Distance (mm)&$\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\ &=1.7*18.0=30.6 \end{aligned}$&35&Pass\\%
+\hline%
+Max. End Distance (mm)&$\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\ \varepsilon &= \sqrt{\frac{250}{f_y}}\\ e/e`_{max}&=12 ~*10.0*\sqrt{\frac{250}{250}}\\ &=120.0\\ \end{aligned}$&35&Pass\\%
+\hline%
+Min. Edge Distance (mm)&$\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\ &=1.7*18.0=30.6 \end{aligned}$&35&Pass\\%
+\hline%
+Max. Edge Distance (mm)&$\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\ \varepsilon &= \sqrt{\frac{250}{f_y}}\\ e/e`_{max}&=12 ~*10.0*\sqrt{\frac{250}{250}}\\ &=120.0\\ \end{aligned}$&35&Pass\\%
+\hline%
+Capacity (kN)&50.88&52.07&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Plate Design Checks}%
+\label{subsec:PlateDesignChecks}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Min. Plate Height (mm)&$\begin{aligned}0.6 * d_b&= 0.6 * 350.0=210.0\end{aligned}$&250&Pass\\%
+\hline%
+Max. Plate Height (mm)&$\begin{aligned} &d_b - 2 (t_{bf} + r_{b1} + gap)\\ &=350.0- 2* (14.2+14.0+ 10)\\ &=293.6\end{aligned}$&250&Pass\\%
+\hline%
+Min. Plate Length (mm)&$\begin{aligned} &2*e_{min} + (n~c-1) * p_{min})\\ &=2*30.6+(2-1) * 40.0\\ &=111.2\end{aligned}$&120.0&Pass\\%
+\hline%
+Min.Plate Thickness (mm)&$\begin{aligned} t_w=8.1\end{aligned}$&10.0&Pass\\%
+\hline%
+Shear yielding Capacity (V\_dy) (kN)&&$\begin{aligned} V_{dg} &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo}}\\ &=\frac{250*10.0*250}{\sqrt{3}*1.1}\\ &=328.04\end{aligned}$&\\%
+\hline%
+Shear Rupture Capacity (V\_dn) (kN)&&$\begin{aligned} V_{dn} &= \frac{0.75*A_{vn}*f_u}{\sqrt{3}*\gamma_{mo}}\\ &=1*(250-(4*18.0))*10.0*410\\ &=547.35\end{aligned}$&\\%
+\hline%
+Block Shear Capacity in Shear (V\_db) (kN)&&423.81&\\%
+\hline%
+Shear Capacity (V\_d) (kN)&200.0&$\begin{aligned} V_d &= Min(V_{dy},V_{dn},V_{db})\\ &= Min(328.04,547.35,423.81)\\ &=328.04\end{aligned}$&Pass\\%
+\hline%
+Tension Yielding Capacity (kN)&&$\begin{aligned} T_{dg} &= \frac{l*t_p*f_y}{\gamma_{mo}}\\ &=\frac{250*10.0*250}{1.1}\\ &=568.18\end{aligned}$&\\%
+\hline%
+Tension Rupture Capacity (kN)&&$\begin{aligned} T_{dn} &= \frac{0.9*A_{n}*f_u}{\gamma_{m1}}\\ &=\frac{0.9*(250-4*18.0)*10.0*410}{1.25}\\ &=631.73\end{aligned}$&\\%
+\hline%
+Block Shear Capacity in Tension (T\_db) (kN)&&519.58&\\%
+\hline%
+Tension Capacity (kN)&80.0&$\begin{aligned} T_d &= Min(T_{dg},T_{dn},T_{db})\\ &= Min(568.18,631.73,519.58)\\ &=519.58\end{aligned}$&Pass\\%
+\hline%
+Moment Capacity (kN{-}m)&13.0&35.51&Pass\\%
+\hline%
+Interaction Ratio&$\begin{aligned} \leq1\end{aligned}$&$\begin{aligned} \frac{13.0}{35.51}+\frac{80.0}{519.58}=0.52\end{aligned}$&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Weld Checks}%
+\label{subsec:WeldChecks}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{7.0cm}|p{3.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Min Weld Size (mm)&$\begin{aligned} &Thickness~of~Thicker~part\\ \noindent &=max(15.7,10.0)\\ &=15.7\\ &IS800:2007~cl.10.5.2.3~Table 21,\\  &t_{w_{min}}=5\end{aligned}$&10&Pass\\%
+\hline%
+Max Weld Size (mm)&$\begin{aligned} & Thickness~of~Thinner~part\\ &=Min(15.7,10.0)=10.0\\ &t_{w_{max}} =10.0\end{aligned}$&10&Pass\\%
+\hline%
+Weld Strength (kN/mm)&$\begin{aligned} R_w&=\sqrt{(T_{wh}+A_{wh})^2 + (T_{wv}+V_{wv})^2}\\ T_{wh}&=\frac{M*y_{max}}{I{pw}}=\frac{13000000.0*120.0}{2304000.0}\\ T_{wv}&=\frac{M*x_{max}}{I{pw}}=\frac{13000000.0*0.0}{2304000.0}\\ V_{wv}&=\frac{V}{l_w}=\frac{200000.0}{480}\\ A_{wh}&=\frac{A}{l_w}=\frac{80000.0}{480}\\ R_w&=\sqrt{(677.08+166.67)^2 + (0.0+416.67)^2}\\ &=1106.38\end{aligned}$&$\begin{aligned} f_w &=\frac{t_t*f_u}{\sqrt{3}*\gamma_{mw}}\\ &=\frac{7.0*410}{\sqrt{3}*1.25}\\ &=1325.6\end{aligned}$&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\Needspace{10\baselineskip}%
+\newpage%
+\section{3D View}%
+\label{sec:3DView}%
+
+
+\begin{figure}[h!]%
+\centering%
+\includegraphics[width=\linewidth]{C:/Users/nitin/Pictures/Saved Pictures/Osdag3/ResourceFiles/images/3d.png}%
+\caption{3D View}%
+\end{figure}
+
+%
+\end{document}

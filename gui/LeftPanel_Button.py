@@ -43,25 +43,10 @@ class Ui_LPButton(object):
         self.LP_Button.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
         self.LP_Button.setToolTip("")
         self.LP_Button.setAutoFillBackground(False)
-        self.LP_Button.setStyleSheet("QPushButton::hover\n"
-"{\n"
-"   background-color: #d97f7f;\n"
-"   color:#000000 ;\n"
-"   \n"
-"}\n"
-"\n"
-"QPushButton\n"
-"{\n"
-"background-color: #925a5b;\n"
-"color:#ffffff;\n"
-"\n"
-"}\n"
-"\n"
-"")
+        
         self.LP_Button.setAutoDefault(True)
         self.LP_Button.setDefault(False)
         self.LP_Button.setFlat(False)
         self.LP_Button.setObjectName("LP_Button")
         self.gridLayout.addWidget(self.LP_Button, 0, 0, 1, 1)
         QtCore.QMetaObject.connectSlotsByName(Form)
-

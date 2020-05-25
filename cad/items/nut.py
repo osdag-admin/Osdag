@@ -84,3 +84,26 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         result_shape = BRepAlgoAPI_Cut(prism, innerCyl).Shape()
 
         return result_shape
+
+
+if __name__ == '__main__':
+
+    from OCC.Display.SimpleGui import init_display
+    display, start_display, add_menu, add_function_to_menu = init_display()
+
+    R = 10
+    T = 8
+    H = 10
+    innerR1 = 5
+
+    origin = numpy.array([0.,0.,0.])
+    uDir = numpy.array([1.,0.,0.])
+    wDir = numpy.array([0.,0.,1.])
+
+    nut = Nut(R, T, H, innerR1)
+    _place = nut.place(origin, uDir, wDir)
+    point = nut.compute_params()
+    prism = nut.create_model()
+    display.DisplayShape(prism, update=True)
+    display.DisableAntiAliasing()
+    start_display()

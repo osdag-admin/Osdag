@@ -45,18 +45,22 @@ class Ui_Dialog(object):
         self.gridLayout_2 = QtWidgets.QGridLayout()
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.btn_defaults = QtWidgets.QPushButton(DesignPreferences)
+        self.btn_defaults.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         font = QtGui.QFont()
         font.setFamily("Arial")
         self.btn_defaults.setFont(font)
         self.btn_defaults.setObjectName("btn_defaults")
         self.gridLayout_2.addWidget(self.btn_defaults, 0, 1, 1, 1)
         self.btn_save = QtWidgets.QPushButton(DesignPreferences)
+
         font = QtGui.QFont()
         font.setFamily("Arial")
         self.btn_save.setFont(font)
         self.btn_save.setObjectName("btn_save")
         self.gridLayout_2.addWidget(self.btn_save, 0, 2, 1, 1)
         self.btn_close = QtWidgets.QPushButton(DesignPreferences)
+
+        self.btn_close.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         font = QtGui.QFont()
         font.setFamily("Arial")
         self.btn_close.setFont(font)
@@ -488,6 +492,7 @@ class Ui_Dialog(object):
 # START
 
         tab_index = 0
+
         for tab_details in main.tab_list(main):
             tab_name = tab_details[0]
             tab_elements = tab_details[2]
@@ -499,16 +504,18 @@ class Ui_Dialog(object):
                 _translate = QtCore.QCoreApplication.translate
                 i = 0
                 j = 6
+                labels = []
+                combo_text = []
                 for element in elements:
                     lable = element[1]
                     type = element[2]
                     # value = option[4]
                     if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
                         l = QtWidgets.QLabel(tab)
-                        l.setGeometry(QtCore.QRect(3 + j, 10 + i, 165, 22))
+                        l.move(3 + j, 10 + i)
                         font = QtGui.QFont()
                         font.setPointSize(9)
-                        if lable in [KEY_DISP_SUPTNGSEC_DESIGNATION, 'Type', 'Source']:
+                        if lable in [KEY_DISP_DESIGNATION, 'Type', 'Source']:
                             font.setWeight(75)
                         else:
                             font.setWeight(50)
@@ -516,10 +523,11 @@ class Ui_Dialog(object):
                         l.setObjectName(element[0] + "_label")
                         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                         l.setAlignment(QtCore.Qt.AlignLeft)
-
+                        l.resize(l.sizeHint().width(), l.sizeHint().height())
+                        labels.append((l, l.sizeHint().width()+3+j))
                     if type == TYPE_COMBOBOX:
                         combo = QtWidgets.QComboBox(tab)
-                        combo.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
+                        combo.setGeometry(QtCore.QRect(l.sizeHint().width() + 10 + j, 10 + i, 130, 22))
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         font.setBold(False)
@@ -532,7 +540,9 @@ class Ui_Dialog(object):
                             combo.addItem(item)
                         if input_dictionary:
                             combo.setCurrentText(str(element[4]))
-
+                        width = combo.minimumSizeHint().width()
+                        combo.view().setMinimumWidth(width)
+                        combo_text.append((combo,l.sizeHint().width() + 10 + j,10+i))
                     if type == TYPE_TITLE:
                         q = QtWidgets.QLabel(tab)
                         q.setGeometry(QtCore.QRect(j, 10 + i, 155, 35))
@@ -542,10 +552,11 @@ class Ui_Dialog(object):
                         q.setObjectName("_title")
                         q.setText(_translate("MainWindow",
                                              "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
+                        q.resize(q.sizeHint().width(), q.sizeHint().height())
 
                     if type == TYPE_TEXTBOX:
                         r = QtWidgets.QLineEdit(tab)
-                        r.setGeometry(QtCore.QRect(170 + j, 10 + i, 130, 22))
+                        r.setGeometry(QtCore.QRect(QtCore.QRect(l.sizeHint().width() + 10 + j, 10 + i, 130, 22)))
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         font.setBold(False)
@@ -556,7 +567,7 @@ class Ui_Dialog(object):
                             r.setValidator(QDoubleValidator())
                         if input_dictionary:
                             r.setText(str(element[4]))
-
+                        combo_text.append((r,l.sizeHint().width() + 10 + j,10+i))
                     if type == TYPE_IMAGE:
                         im = QtWidgets.QLabel(tab)
                         im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
@@ -565,60 +576,91 @@ class Ui_Dialog(object):
                         image = QPixmap("./ResourceFiles/images/ColumnsBeams.png")
                         im.setPixmap(image)
                         i = i + 300
+                        im.resize(im.sizeHint().width(), im.sizeHint().height())
 
                     if type == TYPE_BREAK:
-                        j = j + 310
+                        ki = -1
+                        for item,size in labels:
+                            item.resize(size,item.sizeHint().height())
+                            ki = max(ki,size)
+                        labels =[]
+
+                        for item in combo_text:
+                            x,y = item[1], item[2]
+                            item[0].move(ki+10,y)
+                        combo_text = []
+
+                        j = j + 400
                         i = -30
 
                     if type == TYPE_ENTER:
                         pass
 
                     i = i + 30
+
                 pushButton_Add = QtWidgets.QPushButton(tab)
                 pushButton_Add.setObjectName(str("pushButton_Add_" + tab_name))
-                pushButton_Add.setGeometry(QtCore.QRect(6, 500, 160, 27))
+                pushButton_Add.setGeometry(QtCore.QRect(6, i + 30, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(9)
                 font.setBold(False)
                 font.setWeight(50)
                 pushButton_Add.setFont(font)
                 pushButton_Add.setText("Add")
+                pushButton_Add.resize(pushButton_Add.sizeHint().width() + 10, pushButton_Add.sizeHint().height() + 7)
 
                 pushButton_Clear = QtWidgets.QPushButton(tab)
                 pushButton_Clear.setObjectName(str("pushButton_Clear_" + tab_name))
-                pushButton_Clear.setGeometry(QtCore.QRect(180, 500, 160, 27))
+                pushButton_Clear.setGeometry(QtCore.QRect(180, i + 30, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(9)
                 font.setBold(False)
                 font.setWeight(50)
                 pushButton_Clear.setFont(font)
                 pushButton_Clear.setText("Clear")
+                pushButton_Clear.resize(pushButton_Clear.sizeHint().width() + 10, pushButton_Clear.sizeHint().height() + 7)
 
                 pushButton_Import = QtWidgets.QPushButton(tab)
                 pushButton_Import.setObjectName(str("pushButton_Import_" + tab_name))
-                pushButton_Import.setGeometry(QtCore.QRect(770, 500, 160, 27))
+                pushButton_Import.setGeometry(QtCore.QRect(770, i + 30, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(9)
                 font.setBold(False)
                 font.setWeight(50)
                 pushButton_Import.setFont(font)
                 pushButton_Import.setText("Import xlsx file")
+                pushButton_Import.resize(pushButton_Import.sizeHint().width() + 10, pushButton_Import.sizeHint().height() + 7)
 
                 pushButton_Download = QtWidgets.QPushButton(tab)
                 pushButton_Download.setObjectName(str("pushButton_Download_" + tab_name))
-                pushButton_Download.setGeometry(QtCore.QRect(600, 500, 160, 27))
+                pushButton_Download.setGeometry(QtCore.QRect(600, i + 30, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(9)
                 font.setBold(False)
                 font.setWeight(50)
                 pushButton_Download.setFont(font)
                 pushButton_Download.setText("Download xlsx file")
+                pushButton_Download.resize(pushButton_Download.sizeHint().width() + 10, pushButton_Download.sizeHint().height() + 7)
+
+
+                if combo_text and labels:
+                    ki = -1
+                    for item,size in labels:
+                        item.resize(size,item.sizeHint().height())
+                        ki = max(ki,size)
+
+                    for item in combo_text:
+                        x,y = item[1], item[2]
+                        item[0].move(ki+10,y)
 
                 self.tabWidget.addTab(tab, "")
                 self.tabWidget.setTabText(tab_index, tab_name)
                 tab_index += 1
 
+
             elif tab_type == TYPE_TAB_2:
+                labels = []
+                combo_text = []
                 tab = QtWidgets.QWidget()
                 tab.setObjectName(tab_name)
                 elements = tab_elements(main, input_dictionary)
@@ -652,10 +694,11 @@ class Ui_Dialog(object):
                         l.setObjectName(element[0] + "_label")
                         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                         l.setAlignment(QtCore.Qt.AlignLeft)
-
+                        l.resize(l.sizeHint().width(), l.sizeHint().width())
+                        labels.append((l, l.sizeHint().width()+3+j))
                     if type == TYPE_COMBOBOX:
                         combo = QtWidgets.QComboBox(tab)
-                        combo.setGeometry(QtCore.QRect(170 + j, 10 + i, 270, 22))
+                        combo.setGeometry(QtCore.QRect(l.sizeHint().width() + 10 + j, 10 + i, 270, 22))
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         font.setBold(False)
@@ -673,7 +716,9 @@ class Ui_Dialog(object):
                             combo.model().item(2).setEnabled(False)
                         if input_dictionary:
                             combo.setCurrentText(str(element[4]))
-
+                        width = combo.minimumSizeHint().width()
+                        combo.view().setMinimumWidth(width)
+                        combo_text.append((combo,l.sizeHint().width() + 10 + j,10+i))
                     if type == TYPE_TITLE:
                         q = QtWidgets.QLabel(tab)
                         q.setGeometry(QtCore.QRect(j, 10 + i, 155, 35))
@@ -685,17 +730,17 @@ class Ui_Dialog(object):
                                              "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
                     if type == TYPE_NOTE:
                         q = QtWidgets.QLabel(tab)
-                        q.setGeometry(QtCore.QRect(j, 10 + i, 355, 35))
+                        q.setGeometry(QtCore.QRect(j, 55 + i, 355, 35))
                         font = QtGui.QFont()
                         font.setPointSize(10)
                         q.setFont(font)
                         q.setObjectName("_title")
                         q.setText(_translate("MainWindow",
                                              "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
-
+                        q.resize(q.sizeHint().width(),q.sizeHint().height())
                     if type == TYPE_TEXTBOX:
                         r = QtWidgets.QLineEdit(tab)
-                        r.setGeometry(QtCore.QRect(170 + j, 10 + i, 270, 22))
+                        r.setGeometry(QtCore.QRect(l.sizeHint().width() + 10 + j, 10 + i, 270, 22))
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         font.setBold(False)
@@ -710,7 +755,7 @@ class Ui_Dialog(object):
                             r.setMaxLength(7)
                         if input_dictionary:
                             r.setText(str(element[4]))
-
+                        combo_text.append((r,l.sizeHint().width() + 10 + j,10+i))
                     if type == TYPE_IMAGE:
                         im = QtWidgets.QLabel(tab)
                         im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
@@ -718,10 +763,23 @@ class Ui_Dialog(object):
                         im.setScaledContents(True)
                         image = QPixmap("./ResourceFiles/images/Columns_Beams.png")
                         im.setPixmap(image)
+                        im.resize(im.sizeHint().width(),im.sizeHint().height())
                         i = i + 300
 
                     if type == TYPE_BREAK:
-                        j = j + 310
+
+                        ki = -1
+                        for item,size in labels:
+                            item.resize(size,item.sizeHint().height())
+                            ki = max(ki,size)
+                        labels =[]
+
+                        for item in combo_text:
+                            x,y = item[1], item[2]
+                            item[0].move(ki+10,y)
+                        combo_text = []
+
+                        j = j + 400
                         i = -30
 
                     if type == TYPE_ENTER:
@@ -734,19 +792,31 @@ class Ui_Dialog(object):
                         font.setWeight(75)
                         label_3.setFont(font)
                         label_3.setObjectName("label_3")
-                        label_3.setGeometry(QtCore.QRect(460, 10, 130, 22))
+                        label_3.setGeometry(QtCore.QRect(550, 10, 130, 22))
                         label_3.setText("Description")
                         textBrowser = QtWidgets.QTextBrowser(tab)
                         textBrowser.setMinimumSize(QtCore.QSize(210, 320))
                         textBrowser.setObjectName(element[0])
-                        textBrowser.setGeometry(QtCore.QRect(460, 40, 480, 450))
+                        textBrowser.setGeometry(QtCore.QRect(550, 40, 480, 450))
                         textBrowser.setHtml(_translate("DesignPreferences", element[3]))
                         textBrowser.horizontalScrollBar().setVisible(False)
 
                     i = i + 30
+
+                if combo_text and labels:
+                    ki = -1
+                    for item,size in labels:
+                        item.resize(size,item.sizeHint().height())
+                        ki = max(ki,size)
+
+                    for item in combo_text:
+                        x,y = item[1], item[2]
+                        item[0].move(ki+10,y)
+
                 self.tabWidget.addTab(tab, "")
                 self.tabWidget.setTabText(tab_index, tab_name)
                 tab_index += 1
+        DesignPreferences.resize(1170,700)
 
 # END
 
@@ -1172,9 +1242,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
         module = main.module_name(main)
 
-        if module not in [KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_BEAMCOVERPLATE,KEY_DISP_BEAMCOVERPLATEWELD,
-                          KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COMPRESSION, KEY_DISP_TENSION_BOLTED,
-                          KEY_DISP_TENSION_WELDED, KEY_DISP_BASE_PLATE]:
+        if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE]:
 
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
@@ -1184,14 +1252,25 @@ class Ui_Dialog(object):
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+            if module== KEY_DISP_CLEATANGLE:
+                pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CLEAT)
+                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+                pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CLEAT)
+                pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+            if module == KEY_DISP_SEATED_ANGLE:
+                pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_SEATED_ANGLE)
+                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+                pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_SEATED_ANGLE)
+                pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
 
-        if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD:
+        if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD or module == KEY_DISP_COLUMNENDPLATE:
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
             pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
 
-        if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD:
+
+        if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD or module == KEY_DISP_BEAMENDPLATE:
             pushButton_Clear_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
             pushButton_Add_Beam = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
@@ -1212,6 +1291,16 @@ class Ui_Dialog(object):
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
             pushButton_Add_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
+
+        if module == KEY_DISP_TENSION_BOLTED or module == KEY_DISP_TENSION_WELDED:
+            pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_ANGLE)
+            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+            pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_ANGLE)
+            pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+            pushButton_Clear_Channel = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CHANNEL)
+            pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab("Channel"))
+            pushButton_Add_Channel = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
+            pushButton_Add_Channel.clicked.connect(self.add_tab_channel)
 
     def clear_tab(self, tab_name):
         '''
@@ -1249,7 +1338,7 @@ class Ui_Dialog(object):
                 add_col.setDisabled(True)
                 break
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
-                if ch.objectName() == KEY_SUPTNGSEC_DESIGNATION:
+                if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC:
                     Designation_c = ch.text()
                 elif ch.objectName() == 'Label_21':
                     Source_c = ch.text()
@@ -1346,7 +1435,7 @@ class Ui_Dialog(object):
 
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
 
-                if ch.objectName() == KEY_SUPTDSEC_DESIGNATION:
+                if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTDSEC:
                     Designation_b = ch.text()
                 elif ch.objectName() == 'Label_21':
                     Source_b = ch.text()
@@ -1415,6 +1504,204 @@ class Ui_Dialog(object):
             else:
                 QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
 
+    def add_tab_angle(self):
+        '''
+        @author: Umair
+        '''
+        tab_Angle = self.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+        tab_name = DISP_TITLE_ANGLE
+        if tab_Angle == None:
+            tab_Angle = self.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_CLEAT)
+            tab_name  = DISP_TITLE_CLEAT
+        if tab_Angle == None:
+            tab_Angle = self.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_SEATED_ANGLE)
+            tab_name  = KEY_DISP_SEATED_ANGLE
+        if tab_Angle == None:
+            tab_Angle = self.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_TOPANGLE)
+            tab_name = KEY_DISP_TOPANGLE
+        # tab_cleat_angle = self.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_CLEAT)
+        for ch in tab_Angle.children():
+            if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                add_bm = tab_Angle.findChild(QtWidgets.QWidget, 'pushButton_Add_'+tab_name)
+                add_bm.setDisabled(True)
+                break
+
+            elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
+
+                if ch.objectName() == KEY_SECSIZE_SELECTED or ch.objectName() == KEY_ANGLE_SELECTED:
+                    Designation_a = ch.text()
+                elif ch.objectName() == 'Label_23':
+                    Source = ch.text()
+                elif ch.objectName() == 'Label_1':
+                    AXB = ch.text()
+                elif ch.objectName() == 'Label_3':
+                    t = float(ch.text())
+                elif ch.objectName() == 'Label_4':
+                    R1 = float(ch.text())
+                elif ch.objectName() == 'Label_5':
+                    R2 = float(ch.text())
+                elif ch.objectName() == 'Label_7':
+                    Cz = float(ch.text())
+                elif ch.objectName() == 'Label_8':
+                    Cy = float(ch.text())
+                elif ch.objectName() == 'Label_9':
+                    Mass = float(ch.text())
+                elif ch.objectName() == 'Label_10':
+                    Area = float(ch.text())
+                elif ch.objectName() == 'Label_11':
+                    I_z = float(ch.text())
+                elif ch.objectName() == 'Label_12':
+                    I_y = float(ch.text())
+                elif ch.objectName() == 'Label_13':
+                    I_u_max = float(ch.text())
+                elif ch.objectName() == 'Label_14':
+                    I_v_min = float(ch.text())
+                elif ch.objectName() == 'Label_15':
+                    rz = float(ch.text())
+                elif ch.objectName() == 'Label_16':
+                    ry = float(ch.text())
+                elif ch.objectName() == 'Label_17':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    ru_max = float(ch.text())
+                elif ch.objectName() == 'Label_18':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    rv_min = ch.text()
+                elif ch.objectName() == 'Label_19':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zz = ch.text()
+                elif ch.objectName() == 'Label_20':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zy = ch.text()
+                elif ch.objectName() == 'Label_21':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zpz = ch.text()
+                elif ch.objectName() == 'Label_22':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zpy = ch.text()
+
+                else:
+                    pass
+            elif isinstance(ch, QtWidgets.QComboBox):
+                if ch.objectName() == 'Label_6':
+                    Type = ch.currentText()
+
+        if ch == tab_Angle.children()[len(tab_Angle.children())-1]:
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+
+            c = conn.cursor()
+
+            c.execute("SELECT count(*) FROM Angles WHERE Designation = ?", (Designation_a,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Angles (Designation,Mass,Area,AXB,t,R1,R2,Cz,Cy,Iz,Iy,Iumax,Ivmin,rz,ry,
+                rumax,rvmin,Zz,Zy,Zpz,Zpy,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (Designation_a, Mass, Area,
+                           AXB, t, R1, R2, Cz,Cy,I_z,I_y,I_u_max,
+                           I_v_min, rz, ry, ru_max, rv_min,zz,zy,zpz,zpy,Source,Type))
+                conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+
+    def add_tab_channel(self):
+        '''
+        @author: Umair
+        '''
+        tab_Channel = self.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_CHANNEL)
+        for ch in tab_Channel.children():
+            if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                add_bm = tab_Channel.findChild(QtWidgets.QWidget, 'pushButton_Add_'+DISP_TITLE_ANGLE)
+                add_bm.setDisabled(True)
+                break
+
+            elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
+
+                if ch.objectName() == KEY_SECSIZE_SELECTED:
+                    Designation_c = ch.text()
+                elif ch.objectName() == 'Label_23':
+                    Source = ch.text()
+                elif ch.objectName() == 'Label_1':
+                    B = float(ch.text())
+                elif ch.objectName() == 'Label_2':
+                    T = float(ch.text())
+                elif ch.objectName() == 'Label_3':
+                    D = float(ch.text())
+                elif ch.objectName() == 'Label_13':
+                    t_w = float(ch.text())
+                elif ch.objectName() == 'Label_14':
+                    Flange_Slope = float(ch.text())
+                elif ch.objectName() == 'Label_4':
+                    R1 = float(ch.text())
+                elif ch.objectName() == 'Label_5':
+                    R2 = float(ch.text())
+                elif ch.objectName() == 'Label_9':
+                    Mass = float(ch.text())
+                elif ch.objectName() == 'Label_10':
+                    Area = float(ch.text())
+                elif ch.objectName() == 'Label_17':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    cy = float(ch.text())
+                elif ch.objectName() == 'Label_11':
+                    I_z = float(ch.text())
+                elif ch.objectName() == 'Label_12':
+                    I_y = float(ch.text())
+                elif ch.objectName() == 'Label_15':
+                    rz = float(ch.text())
+                elif ch.objectName() == 'Label_16':
+                    ry = float(ch.text())
+
+                elif ch.objectName() == 'Label_19':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zz = ch.text()
+                elif ch.objectName() == 'Label_20':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zy = ch.text()
+                elif ch.objectName() == 'Label_21':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zpz = ch.text()
+                elif ch.objectName() == 'Label_22':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    zpy = ch.text()
+
+                else:
+                    pass
+            elif isinstance(ch, QtWidgets.QComboBox):
+                if ch.objectName() == 'Label_6':
+                    Type = ch.currentText()
+
+        if ch == tab_Channel.children()[len(tab_Channel.children())-1]:
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+
+            c = conn.cursor()
+            c.execute("SELECT count(*) FROM Channels WHERE Designation = ?", (Designation_c,))
+            data = c.fetchone()[0]
+            if data == 0:
+                c.execute('''INSERT INTO Channels (Designation,Mass, Area,D,B,tw,T,FlangeSlope, R1, R2,Cy,Iz,Iy,
+                 rz, ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                          (Designation_c, Mass, Area,D,B,t_w,T,
+                           Flange_Slope, R1, R2,cy,I_z,I_y, rz, ry,zz,zy,zpz,zpy,Source,Type))
+                conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+
     def retranslateUi(self, DesignPreferences):
         _translate = QtCore.QCoreApplication.translate
         DesignPreferences.setWindowTitle(_translate("DesignPreferences", "Design preferences"))
@@ -1459,38 +1746,52 @@ class DesignPreferences(QDialog):
         tab_Detailing = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
         tab_Design = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
 
-        for children in tab_Bolt.children():
-            if children.objectName() == KEY_DP_BOLT_TYPE:
-                children.setCurrentIndex(0)
-            elif children.objectName() == KEY_DP_BOLT_HOLE_TYPE:
-                children.setCurrentIndex(0)
-            elif children.objectName() == KEY_DP_BOLT_MATERIAL_G_O:
-                children.setText('410')
-            elif children.objectName() == KEY_DP_BOLT_SLIP_FACTOR:
-                children.setCurrentIndex(4)
-            else:
-                pass
-        for children in tab_Weld.children():
-            if children.objectName() == KEY_DP_WELD_FAB:
-                children.setCurrentIndex(0)
-            elif children.objectName() == KEY_DP_WELD_MATERIAL_G_O:
-                children.setText('410')
-            else:
-                pass
-        for children in tab_Detailing.children():
-            if children.objectName() == KEY_DP_DETAILING_EDGE_TYPE:
-                children.setCurrentIndex(0)
-            elif children.objectName() == KEY_DP_DETAILING_GAP:
-                children.setText('10')
-            elif children.objectName() == KEY_DP_DETAILING_CORROSIVE_INFLUENCES:
-                children.setCurrentIndex(0)
-            else:
-                pass
-        for children in tab_Design.children():
-            if children.objectName() == KEY_DP_DESIGN_METHOD:
-                children.setCurrentIndex(0)
-            else:
-                pass
+        try:
+            for children in tab_Bolt.children():
+                if children.objectName() == KEY_DP_BOLT_TYPE:
+                    children.setCurrentIndex(0)
+                elif children.objectName() == KEY_DP_BOLT_HOLE_TYPE:
+                    children.setCurrentIndex(0)
+                elif children.objectName() == KEY_DP_BOLT_MATERIAL_G_O:
+                    children.setText('410')
+                elif children.objectName() == KEY_DP_BOLT_SLIP_FACTOR:
+                    children.setCurrentIndex(4)
+                else:
+                    pass
+        except:
+            pass
+
+        try:
+            for children in tab_Weld.children():
+                if children.objectName() == KEY_DP_WELD_FAB:
+                    children.setCurrentIndex(0)
+                elif children.objectName() == KEY_DP_WELD_MATERIAL_G_O:
+                    children.setText('410')
+                else:
+                    pass
+        except:
+            pass
+
+        try:
+            for children in tab_Detailing.children():
+                if children.objectName() == KEY_DP_DETAILING_EDGE_TYPE:
+                    children.setCurrentIndex(0)
+                elif children.objectName() == KEY_DP_DETAILING_GAP:
+                    children.setText('10')
+                elif children.objectName() == KEY_DP_DETAILING_CORROSIVE_INFLUENCES:
+                    children.setCurrentIndex(0)
+                else:
+                    pass
+        except:
+            pass
+        try:
+            for children in tab_Design.children():
+                if children.objectName() == KEY_DP_DESIGN_METHOD:
+                    children.setCurrentIndex(0)
+                else:
+                    pass
+        except:
+            pass
 
     #
     # def save_designPref_para(self, module):
@@ -2274,4 +2575,3 @@ if __name__ == "__main__":
     ui.setupUi(DesignPreferences)
     DesignPreferences.exec()
     sys.exit(app.exec_())
-

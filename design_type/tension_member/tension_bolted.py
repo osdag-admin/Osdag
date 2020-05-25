@@ -201,6 +201,9 @@ class Tension_bolted(Member):
 
         return add_buttons
 
+    def get_3d_components(self):
+        components = []
+        return components
     ####################################
     # Design Preference Functions End
     ####################################

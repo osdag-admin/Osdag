@@ -28,7 +28,7 @@ def make_vertex(*args):
 
 
 def make_n_sided(edges, continuity=GeomAbs_C0):
-    n_sided = BRepFill_Filling()  # TODO Checck optional NbIter=6)
+    n_sided = BRepFill_Filling()
     for edg in edges:
         n_sided.Add(edg, continuity)
     n_sided.Build()
@@ -49,7 +49,7 @@ def make_wire(*args):
 
 
 def points_to_bspline(pnts):
-    pts = TColgp_Array1OfPnt(0, len(pnts) - 1)
+    pts = TColgp_Array1OfPnt(0, len(pnts)-1)
     for n, i in enumerate(pnts):
         pts.SetValue(n, i)
     crv = GeomAPI_PointsToBSpline(pts)
@@ -58,6 +58,7 @@ def points_to_bspline(pnts):
 
 def makeWireFromEdges(edges):
     wire = None
+    
     for edge in edges:
         if wire:
             wire = make_wire(wire, edge)
@@ -81,20 +82,15 @@ def getGpDir(direction):
 def makeEdgesFromPoints(points):
     edges = []
     num = len(points)
-
     for i in range(num - 1):
         edge = make_edge(getGpPt(points[i]), getGpPt(points[i + 1]))
         edges.append(edge)
-    # print(points,"points")
+    
     cycleEdge = make_edge(getGpPt(points[num - 1]), getGpPt(points[0]))
     edges.append(cycleEdge)
-
-
-
+    
     return edges
 
 
-def makePrismFromFace(aFace, eDir):
-
-    return BRepPrimAPI_MakePrism(aFace, gp_Vec(gp_Pnt(0., 0., 0.), gp_Pnt(eDir[0], eDir[1], eDir[2]))).Shape()
-
+def makePrismFromFace(aface, edir):
+    return BRepPrimAPI_MakePrism(aface, gp_Vec(gp_Pnt(0., 0., 0.), gp_Pnt(edir[0], edir[1], edir[2]))).Shape()

@@ -11,7 +11,6 @@ import sqlite3
 
 from utils.common.component import *
 from utils.common.component import *
-
 import logging
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.column_cover_plate import ColumnCoverPlate
@@ -20,13 +19,14 @@ class OurLog(logging.Handler):
 
     def __init__(self, key):
         logging.Handler.__init__(self)
+
         self.key = key
         # self.key.setText("<h1>Welcome to Osdag</h1>")
 
     def handle(self, record):
         msg = self.format(record)
         if record.levelname == 'WARNING':
-            msg = "<span style='color: yellow;'>"+ msg +"</span>"
+            msg = "<span style='color: blue;'>"+ msg +"</span>"
         elif record.levelname == 'ERROR':
             msg = "<span style='color: red;'>"+ msg +"</span>"
         elif record.levelname == 'INFO':
@@ -276,6 +276,7 @@ KEY_MOMENT = 'Load.Moment'
 KEY_D = 'Bolt.Diameter'
 KEY_TYP = 'Bolt.Type'
 KEY_GRD = 'Bolt.Grade'
+
 KEY_DP_BOLT_MATERIAL_G_O = 'Bolt.Material_Grade_OverWrite'
 KEY_DP_BOLT_HOLE_TYPE = 'Bolt.Bolt_Hole_Type'
 KEY_DP_BOLT_TYPE = 'Bolt.TensionType'
@@ -424,6 +425,8 @@ KEY_DISP_SECBM = 'Secondary beam *'
 DISP_TITLE_FSL = 'Factored load'
 KEY_DISP_MOMENT = 'Moment(kNm)*'
 
+KEY_DISP_TOP_ANGLE = 'Top Angle'
+
 KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
 DISP_TITLE_BOLT = 'Bolt'
 DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
@@ -454,7 +457,7 @@ DISP_TITLE_SECTION = 'SECTION'
 DISP_TITLE_TENSION_SECTION = 'Section Capacity'
 
 KEY_DISP_D = 'Diameter (mm)*'
-KEY_DISP_SHEAR = 'Shear(kN)*'
+KEY_DISP_SHEAR = 'Shear (kN)*'
 KEY_DISP_AXIAL = 'Axial (kN) *'
 DISP_TITLE_PLATE = 'Plate'
 
@@ -547,8 +550,11 @@ KEY_DISP_DP_BOLT_TYPE = 'Bolt type'
 
 KEY_DISP_DP_BOLT_HOLE_TYPE = 'Bolt hole type'
 
+# KEY_PC = 'Bolt.PC'
+KEY_DISP_PC = 'Property Class *'
 KEY_DISP_DP_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
 KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
+
 
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 
@@ -721,6 +727,12 @@ KEY_TENSION_RUPTURECAPACITY = "Member.tension_rupture"
 KEY_DISP_TENSION_RUPTURECAPACITY = 'Tension Rupture Capacity (kN)'
 KEY_TENSION_BLOCKSHEARCAPACITY = "Member.tension_blockshear"
 KEY_DISP_TENSION_BLOCKSHEARCAPACITY = 'Block Shear Capacity (kN)'
+
+KEY_SHEAR_YIELDCAPACITY = "Member.shear_yielding"
+KEY_SHEAR_RUPTURECAPACITY = "Member.shear_rupture"
+KEY_SHEAR_BLOCKSHEARCAPACITY = "Member.shear_blockshear"
+
+
 
 KEY_TENSION_CAPACITY = "Member.tension_capacity"
 KEY_DISP_TENSION_CAPACITY = "Tension Capacity (kN)"
@@ -927,6 +939,10 @@ KEY_OUT_DISP_INTER_GRD_PROVIDED = 'Grade'
 KEY_OUT_DISP_PC_PROVIDED = 'Property Class'
 KEY_OUT_ROW_PROVIDED = 'Bolt.Rows'
 KEY_OUT_DISP_ROW_PROVIDED = 'Rows of Bolts'
+KEY_OUT_COL_PROVIDED = 'Bolt.Cols'
+KEY_OUT_DISP_COL_PROVIDED = 'Columns of Bolts'
+KEY_OUT_TOT_NO_BOLTS = 'Bolt.number'
+KEY_OUT_DISP_TOT_NO_BOLTS = 'Number of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
@@ -981,6 +997,8 @@ KEY_OUT_END_DIST = 'Bolt.EndDist'
 KEY_OUT_DISP_END_DIST = 'End Distance (mm)'
 KEY_OUT_GAUGE = 'Bolt.Gauge'
 KEY_OUT_DISP_GAUGE = 'Gauge (mm)'
+KEY_OUT_GAUGE_CENTRAL = 'Bolt.GaugeCentral'
+KEY_OUT_DISP_GAUGE_CENTRAL = 'Central Gauge (mm)'
 
 KEY_OUT_MIN_GAUGE = 'Bolt.MinGauge'
 KEY_OUT_MAX_SPACING = 'Bolt.MaxGauge'
@@ -1047,8 +1065,32 @@ KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Length (mm)'
 KEY_OUT_PLATE_WIDTH = 'Plate.Width'
 KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 c = 'Width (mm)'
-KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 
+KEY_OUT_SEATED_ANGLE_DESIGNATION = "SeatedAngle.Designation"
+KEY_OUT_DISP_ANGLE_DESIGNATION = "Designation"
+KEY_OUT_SEATED_ANGLE_THICKNESS = "SeatedAngle.Thickness"
+KEY_OUT_DISP_SEATED_ANGLE_THICKNESS = "Leg Thickness (mm)"
+KEY_OUT_SEATED_ANGLE_LEGLENGTH = "SeatedAngle.LegLength"
+KEY_OUT_DISP_SEATED_ANGLE_LEGLENGTH = "Leg Length (mm)"
+KEY_OUT_SEATED_ANGLE_WIDTH = "SeatedAngle.Width"
+KEY_OUT_DISP_ANGLE_WIDTH = "Width (mm)"
+KEY_OUT_SEATED_ANGLE_BOLT_COL = "SeatedAngle.Bolt_Spacing_col"
+KEY_OUT_DISP_SEATED_ANGLE_BOLT_COL = "Bolt Spacing Details"
+KEY_OUT_SEATED_ANGLE_BOLT_BEAM = "SeatedAngle.Bolt_Spacing_beam"
+KEY_OUT_DISP_SEATED_ANGLE_BOLT_BEAM = "Bolt Spacing Details"
+
+KEY_OUT_TOP_ANGLE_DESIGNATION = "TopAngle.Designation"
+# KEY_OUT_DISP_TOP_ANGLE_DESIGNATION = "Designation"
+KEY_OUT_TOP_ANGLE_WIDTH = "TopAngle.Width"
+# KEY_OUT_DISP_TOP_ANGLE_WIDTH = "Width (mm)"
+KEY_OUT_TOP_ANGLE_BOLT_COL = "TopAngle.Bolt_Spacing_col"
+KEY_OUT_DISP_TOP_ANGLE_BOLT_COL = "Bolt Spacing Details"
+KEY_OUT_TOP_ANGLE_BOLT_BEAM = "TopAngle.Bolt_Spacing_beam"
+KEY_OUT_DISP_TOP_ANGLE_BOLT_BEAM = "Bolt Spacing Details"
+
+KEY_OUT_PLATE_SHEAR_DEMAND = 'Plate.ShearDemand'
+KEY_OUT_DISP_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_PLATE_SHEAR = 'Plate.Shear'
 KEY_OUT_DISP_PLATE_SHEAR = 'Shear yielding Capacity (kN)'
 KEY_OUT_PLATE_YIELD = 'Plate.Yield'
 KEY_OUT_DISP_PLATE_YIELD = 'Yield Capacity'
@@ -1113,6 +1155,29 @@ KEY_DISP_PITCH_2_WEB = 'Pitch2 along Web'
 KEY_CONN_PREFERENCE = 'plate.design_method'
 KEY_DISP_CONN_PREFERENCE = 'Design Method'
 VALUES_CONN_PREFERENCE = ["Select","Plate Oriented", "Bolt Oriented"]
+KEY_OUT_STIFFENER_HEIGHT = 'Stiffener.height'
+KEY_OUT_DISP_STIFFENER_HEIGHT = 'Stiffener Height'
+KEY_OUT_STIFFENER_WIDTH = 'Stiffener.width'
+KEY_OUT_DISP_STIFFENER_WIDTH = 'Stiffener Width'
+KEY_OUT_STIFFENER_THICKNESS = 'Stiffener.thickness'
+KEY_OUT_DISP_STIFFENER_THICKNESS = 'Stiffener Thickness'
+KEY_OUT_WELD_TYPE = 'Stiffener.weld'
+KEY_OUT_DISP_WELD_TYPE = 'Weld Type'
+KEY_OUT_STIFFENER_DETAILS = 'Stiffener.details'
+KEY_OUT_DISP_STIFFENER_DETAILS = 'Stiffener Details'
+
+DISP_TITLE_WELD = 'Weld'
+KEY_OUT_WELD_SIZE = 'Weld.Size'
+KEY_OUT_DISP_WELD_SIZE = 'Size (mm)'
+KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
+KEY_OUT_WELD_STRESS = 'Weld.Stress'
+KEY_OUT_DISP_WELD_STRESS = 'Stress (N/mm)'
+KEY_OUT_WELD_LENGTH = 'Weld.Length'
+KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
+KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
+KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
+
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"

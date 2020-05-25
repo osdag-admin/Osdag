@@ -21,5 +21,6 @@ Osdag_Workspace/*
 /Osdag.config
 /backup
 Output_PDF/*
+OUTPUT_FILES/Output_PDF/*
 ResourceFiles/images/3d.png
 *.xlsx

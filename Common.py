@@ -11,7 +11,6 @@ import sqlite3
 
 from utils.common.component import *
 from utils.common.component import *
-
 import logging
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.column_cover_plate import ColumnCoverPlate
@@ -20,13 +19,14 @@ class OurLog(logging.Handler):
 
     def __init__(self, key):
         logging.Handler.__init__(self)
+
         self.key = key
         # self.key.setText("<h1>Welcome to Osdag</h1>")
 
     def handle(self, record):
         msg = self.format(record)
         if record.levelname == 'WARNING':
-            msg = "<span style='color: yellow;'>"+ msg +"</span>"
+            msg = "<span style='color: blue;'>"+ msg +"</span>"
         elif record.levelname == 'ERROR':
             msg = "<span style='color: red;'>"+ msg +"</span>"
         elif record.levelname == 'INFO':

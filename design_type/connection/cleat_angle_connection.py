@@ -186,7 +186,7 @@ class CleatAngleConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, True, 'No Validator')
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, None, './ResourceFiles/images/fin_cf_bw.png', True, 'No Validator')
         options_list.append(t3)
 
         t4 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC, True, 'No Validator')
@@ -792,7 +792,7 @@ class CleatAngleConnection(ShearConnection):
         self.sptng_bolt_conn_plates_t_fu_fy = []
         if self.connectivity in VALUES_CONN_1:
             self.sptng_bolt_conn_plates_t_fu_fy.append((self.sptd_leg.thickness_provided, self.sptd_leg.fu, self.sptd_leg.fy))
-            self.sptd_bolt_conn_plates_t_fu_fy.append((self.supporting_section.flange_thickness, self.supporting_section.fu, self.supporting_section.fy))
+            self.sptng_bolt_conn_plates_t_fu_fy.append((self.supporting_section.flange_thickness, self.supporting_section.fu, self.supporting_section.fy))
         else:
             self.sptng_bolt_conn_plates_t_fu_fy.append((self.sptd_leg.thickness_provided, self.sptd_leg.fu, self.sptd_leg.fy))
             self.sptd_bolt_conn_plates_t_fu_fy.append((self.supporting_section.web_thickness, self.supporting_section.fu, self.supporting_section.fy))

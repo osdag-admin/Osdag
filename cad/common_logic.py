@@ -144,7 +144,6 @@ class CommonDesignLogic(object):
 
         self.connectivityObj = None
         self.folder = folder
-        print(self.folder,'fhbdfbffhdbshhhhhhhhhhh')
 
     # ============================= FinCalculation ===========================================
     # def call_calculation(self):  # Done
@@ -378,7 +377,7 @@ class CommonDesignLogic(object):
         if self.connection == KEY_DISP_CLEATANGLE:
             # A = CleatAngleConnection()
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
-                          R1=A.cleat.r1, R2=A.cleat.r2)
+                          R1=A.cleat.root_radius, R2=A.cleat.toe_radius)
 
         elif self.connection == KEY_DISP_SEATED_ANGLE:
             angle = Angle(L=A.seated_angle.width, A=A.seated.leg_a_length, B=A.seated.leg_b_length,

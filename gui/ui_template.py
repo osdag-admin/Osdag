@@ -716,7 +716,6 @@ class Ui_ModuleWindow(QMainWindow):
             for t in new_list:
                 Combobox_key = t[0]
                 d[Combobox_key] = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                print('updatedlist',updated_list)
                 if updated_list != None:
                     onchange_key_popup = [item for item in updated_list if item[1] == t[0]]
                     arg_list = []
@@ -770,7 +769,6 @@ class Ui_ModuleWindow(QMainWindow):
                     options = f(arg_list)
                     existing_options = data[c_tup[0] + "_customized"]
                     if selected == "Customized":
-                        print('op', 'ex', options, existing_options)
                         data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                         if data[c_tup[0] + "_customized"] == []:
                             data[c_tup[0] + "_customized"] = f(arg_list)
@@ -787,7 +785,6 @@ class Ui_ModuleWindow(QMainWindow):
                 else:
                     options = f()
                     existing_options = data[c_tup[0] + "_customized"]
-                    # print('options, existing options', options,existing_options)
                     if selected == "Customized":
                        data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                        if data[c_tup[0] + "_customized"] == []:
@@ -1632,7 +1629,6 @@ class Ui_ModuleWindow(QMainWindow):
 
             if result is not None:
                 des_pref_input_list_updated = [i for i in des_pref_input_list if i not in result]
-                print('updated input tablist',des_pref_input_list_updated)
             else:
                 des_pref_input_list_updated = des_pref_input_list
 
@@ -1643,7 +1639,6 @@ class Ui_ModuleWindow(QMainWindow):
                 tab = self.designPrefDialog.findChild(QtWidgets.QWidget, tab_name)
                 for key_name in input_list:
                     key = tab.findChild(QtWidgets.QWidget, key_name)
-                    print('key_name',key_name)
                     if input_type == TYPE_TEXTBOX:
                         val = key.text()
                         design_dictionary.update({key_name: val})
@@ -2499,9 +2494,7 @@ class Ui_ModuleWindow(QMainWindow):
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
             for key_name in key_list:
-                print('key_name',key_name)
                 key = tab.findChild(QtWidgets.QWidget, key_name)
-                print('key1',key)
                 if isinstance(key, QtWidgets.QComboBox):
                     self.connect_combobox_for_tab(key, tab, on_change_tab_list)
                 elif isinstance(key, QtWidgets.QLineEdit):
@@ -2767,7 +2760,6 @@ class Ui_ModuleWindow(QMainWindow):
 
         for tup in new:
             (tab_name, key_list, k2_key_list, typ, f) = tup
-            print('tabname',tab_name, tab.objectName(),key)
             if tab_name != tab.objectName() or key.objectName() not in key_list:
                 continue
             arg_list = []
@@ -2797,7 +2789,6 @@ class Ui_ModuleWindow(QMainWindow):
                     for values in val[k2_key_name]:
                         k2.addItem(str(values))
                 elif typ == TYPE_TEXTBOX:
-                    print('k2keyname',k2_key_name)
                     k2.setText(str(val[k2_key_name]))
 
     def refresh_section_connect(self, add_button, prev, key, key_type, tab_key, arg):

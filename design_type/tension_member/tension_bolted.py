@@ -201,6 +201,9 @@ class Tension_bolted(Member):
 
         return add_buttons
 
+    def get_3d_components(self):
+        components = []
+        return components
     ####################################
     # Design Preference Functions End
     ####################################
@@ -1539,6 +1542,8 @@ class Tension_bolted(Member):
         "If failed in block shear either increased pitch or increase bolt line "
 
         block_shear_check = False
+        capacity = False
+
         while block_shear_check == False:
             if design_dictionary[KEY_SEC_PROFILE] == "Channels" and design_dictionary[KEY_LOCATION] == "Web":
                 member_Ag = self.section_size_1.area

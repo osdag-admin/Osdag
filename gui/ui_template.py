@@ -189,6 +189,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.prev_inputs = {}
         self.input_dock_inputs = {}
         self.folder = folder
+        main.design_status = False
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
         icon = QtGui.QIcon()
@@ -239,6 +240,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btnTop.setIcon(icon3)
         self.btnTop.setIconSize(QtCore.QSize(22, 22))
         self.btnTop.setObjectName("btnTop")
+        self.btnTop.setEnabled(False)
         self.btnFront = QtWidgets.QToolButton(self.frame)
         self.btnFront.setGeometry(QtCore.QRect(100, 0, 28, 28))
         self.btnFront.setFocusPolicy(QtCore.Qt.TabFocus)
@@ -247,6 +249,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btnFront.setIcon(icon4)
         self.btnFront.setIconSize(QtCore.QSize(22, 22))
         self.btnFront.setObjectName("btnFront")
+        self.btnFront.setEnabled(False)
         self.btnSide = QtWidgets.QToolButton(self.frame)
         self.btnSide.setGeometry(QtCore.QRect(130, 0, 28, 28))
         self.btnSide.setFocusPolicy(QtCore.Qt.TabFocus)
@@ -255,49 +258,67 @@ class Ui_ModuleWindow(QMainWindow):
         self.btnSide.setIcon(icon5)
         self.btnSide.setIconSize(QtCore.QSize(22, 22))
         self.btnSide.setObjectName("btnSide")
-        self.btn3D = QtWidgets.QCheckBox(self.frame)
-        self.btn3D.setGeometry(QtCore.QRect(230, 0, 90, 28))
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setItalic(False)
-        font.setUnderline(False)
-        font.setWeight(75)
-        font.setStrikeOut(False)
-        self.btn3D.setFont(font)
-        self.btn3D.setFocusPolicy(QtCore.Qt.TabFocus)
-        self.btn3D.setObjectName("btn3D")
-        self.chkBxBeam = QtWidgets.QCheckBox(self.frame)
-        self.chkBxBeam.setGeometry(QtCore.QRect(325, 0, 90, 29))
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.chkBxBeam.setFont(font)
-        self.chkBxBeam.setFocusPolicy(QtCore.Qt.TabFocus)
-        self.chkBxBeam.setObjectName("chkBxBeam")
-        self.chkBxCol = QtWidgets.QCheckBox(self.frame)
-        self.chkBxCol.setGeometry(QtCore.QRect(420, 0, 101, 29))
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.chkBxCol.setFont(font)
-        self.chkBxCol.setFocusPolicy(QtCore.Qt.TabFocus)
-        self.chkBxCol.setObjectName("chkBxCol")
-        self.chkBxFinplate = QtWidgets.QCheckBox(self.frame)
-        self.chkBxFinplate.setGeometry(QtCore.QRect(530, 0, 101, 29))
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.chkBxFinplate.setFont(font)
-        self.chkBxFinplate.setFocusPolicy(QtCore.Qt.TabFocus)
-        self.chkBxFinplate.setObjectName("chkBxFinplate")
+        self.btnSide.setEnabled(False)
+        # self.btn3D = QtWidgets.QCheckBox(self.frame)
+        # self.btn3D.setGeometry(QtCore.QRect(230, 0, 90, 28))
+        # font = QtGui.QFont()
+        # font.setFamily("Arial")
+        # font.setPointSize(11)
+        # font.setBold(True)
+        # font.setItalic(False)
+        # font.setUnderline(False)
+        # font.setWeight(75)
+        # font.setStrikeOut(False)
+        # self.btn3D.setFont(font)
+        # self.btn3D.setFocusPolicy(QtCore.Qt.TabFocus)
+        # self.btn3D.setObjectName("btn3D")
+        # self.chkBxBeam = QtWidgets.QCheckBox(self.frame)
+        # self.chkBxBeam.setGeometry(QtCore.QRect(325, 0, 90, 29))
+        # font = QtGui.QFont()
+        # font.setFamily("Arial")
+        # font.setPointSize(11)
+        # font.setBold(True)
+        # font.setWeight(75)
+        # self.chkBxBeam.setFont(font)
+        # self.chkBxBeam.setFocusPolicy(QtCore.Qt.TabFocus)
+        # self.chkBxBeam.setObjectName("chkBxBeam")
+        # self.chkBxCol = QtWidgets.QCheckBox(self.frame)
+        # self.chkBxCol.setGeometry(QtCore.QRect(420, 0, 101, 29))
+        # font = QtGui.QFont()
+        # font.setFamily("Arial")
+        # font.setPointSize(11)
+        # font.setBold(True)
+        # font.setWeight(75)
+        # self.chkBxCol.setFont(font)
+        # self.chkBxCol.setFocusPolicy(QtCore.Qt.TabFocus)
+        # self.chkBxCol.setObjectName("chkBxCol")
+        # self.chkBxFinplate = QtWidgets.QCheckBox(self.frame)
+        # self.chkBxFinplate.setGeometry(QtCore.QRect(530, 0, 101, 29))
+        # font = QtGui.QFont()
+        # font.setFamily("Arial")
+        # font.setPointSize(11)
+        # font.setBold(True)
+        # font.setWeight(75)
+        # self.chkBxFinplate.setFont(font)
+        # self.chkBxFinplate.setFocusPolicy(QtCore.Qt.TabFocus)
+        # self.chkBxFinplate.setObjectName("chkBxFinplate")
+        i = 0
+        for component in main.get_3d_components(main):
+            checkBox = QtWidgets.QCheckBox(self.frame)
+            checkBox.setGeometry(QtCore.QRect(230 + i, 0, 110, 29))
+            font = QtGui.QFont()
+            font.setFamily("Arial")
+            font.setPointSize(11)
+            font.setBold(True)
+            font.setWeight(75)
+            checkBox.setFont(font)
+            checkBox.setFocusPolicy(QtCore.Qt.TabFocus)
+            checkBox.setObjectName(component[0])
+            checkBox.setText(component[0])
+            checkBox.setDisabled(True)
+            function_name = component[1]
+            self.chkbox_connect(main, checkBox, function_name)
+            i += 111
 
         self.verticalLayout_2.addWidget(self.frame)
         self.splitter = QtWidgets.QSplitter(self.centralwidget)
@@ -528,10 +549,10 @@ class Ui_ModuleWindow(QMainWindow):
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Link, brush)
-        self.btn3D.setEnabled(False)
-        self.chkBxBeam.setEnabled(False)
-        self.chkBxCol.setEnabled(False)
-        self.chkBxFinplate.setEnabled(False)
+        # self.btn3D.setEnabled(False)
+        # self.chkBxBeam.setEnabled(False)
+        # self.chkBxCol.setEnabled(False)
+        # self.chkBxFinplate.setEnabled(False)
 
         in_widget = QtWidgets.QWidget(self.dockWidgetContents)
         in_widget.setGeometry(QtCore.QRect(0, 0, 325, 600))
@@ -695,7 +716,6 @@ class Ui_ModuleWindow(QMainWindow):
             for t in new_list:
                 Combobox_key = t[0]
                 d[Combobox_key] = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-                print('updatedlist',updated_list)
                 if updated_list != None:
                     onchange_key_popup = [item for item in updated_list if item[1] == t[0]]
                     arg_list = []
@@ -749,7 +769,6 @@ class Ui_ModuleWindow(QMainWindow):
                     options = f(arg_list)
                     existing_options = data[c_tup[0] + "_customized"]
                     if selected == "Customized":
-                        print('op', 'ex', options, existing_options)
                         data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                         if data[c_tup[0] + "_customized"] == []:
                             data[c_tup[0] + "_customized"] = f(arg_list)
@@ -766,7 +785,6 @@ class Ui_ModuleWindow(QMainWindow):
                 else:
                     options = f()
                     existing_options = data[c_tup[0] + "_customized"]
-                    # print('options, existing options', options,existing_options)
                     if selected == "Customized":
                        data[c_tup[0] + "_customized"] = self.open_customized_popup(options, existing_options)
                        if data[c_tup[0] + "_customized"] == []:
@@ -1112,44 +1130,61 @@ class Ui_ModuleWindow(QMainWindow):
         font.setFamily("DejaVu Sans")
         self.actionSave_Front_View.setFont(font)
         self.actionSave_Front_View.setObjectName("actionSave_Front_View")
+        self.actionSave_Front_View.setEnabled(False)
         self.actionSave_Top_View = QtWidgets.QAction(MainWindow)
         font = QtGui.QFont()
         font.setFamily("DejaVu Sans")
         self.actionSave_Top_View.setFont(font)
         self.actionSave_Top_View.setObjectName("actionSave_Top_View")
+        self.actionSave_Top_View.setEnabled(False)
         self.actionSave_Side_View = QtWidgets.QAction(MainWindow)
         font = QtGui.QFont()
         font.setFamily("DejaVu Sans")
         self.actionSave_Side_View.setFont(font)
         self.actionSave_Side_View.setObjectName("actionSave_Side_View")
+        self.actionSave_Side_View.setEnabled(False)
         self.actionChange_bg_color = QtWidgets.QAction(MainWindow)
         font = QtGui.QFont()
         font.setFamily("Verdana")
         self.actionChange_bg_color.setFont(font)
         self.actionChange_bg_color.setObjectName("actionChange_bg_color")
-        self.actionShow_beam = QtWidgets.QAction(MainWindow)
-        font = QtGui.QFont()
-        font.setFamily("DejaVu Sans")
-        font.setItalic(False)
-        self.actionShow_beam.setFont(font)
-        self.actionShow_beam.setObjectName("actionShow_beam")
-        self.actionShow_column = QtWidgets.QAction(MainWindow)
-        font = QtGui.QFont()
-        font.setFamily("DejaVu Sans")
-        self.actionShow_column.setFont(font)
-        self.actionShow_column.setObjectName("actionShow_column")
-        self.actionShow_finplate = QtWidgets.QAction(MainWindow)
-        font = QtGui.QFont()
-        font.setFamily("DejaVu Sans")
-        self.actionShow_finplate.setFont(font)
-        self.actionShow_finplate.setObjectName("actionShow_finplate")
+        # self.actionShow_beam = QtWidgets.QAction(MainWindow)
+        # font = QtGui.QFont()
+        # font.setFamily("DejaVu Sans")
+        # font.setItalic(False)
+        # self.actionShow_beam.setFont(font)
+        # self.actionShow_beam.setObjectName("actionShow_beam")
+        # self.actionShow_column = QtWidgets.QAction(MainWindow)
+        # font = QtGui.QFont()
+        # font.setFamily("DejaVu Sans")
+        # self.actionShow_column.setFont(font)
+        # self.actionShow_column.setObjectName("actionShow_column")
+        # self.actionShow_finplate = QtWidgets.QAction(MainWindow)
+        # font = QtGui.QFont()
+        # font.setFamily("DejaVu Sans")
+        # self.actionShow_finplate.setFont(font)
+        # self.actionShow_finplate.setObjectName("actionShow_finplate")
+
+        self.menugraphics_component_list = []
+        for component in main.get_3d_components(main):
+            actionShow_component = QtWidgets.QAction(MainWindow)
+            font = QtGui.QFont()
+            font.setFamily("DejaVu Sans")
+            font.setItalic(False)
+            actionShow_component.setFont(font)
+            actionShow_component.setObjectName(component[0])
+            actionShow_component.setText(component[0])
+            actionShow_component.setEnabled(False)
+            self.action_connect(main, actionShow_component, component[1])
+            self.menugraphics_component_list.append(actionShow_component)
+
         self.actionChange_background = QtWidgets.QAction(MainWindow)
         font = QtGui.QFont()
         font.setFamily("DejaVu Sans")
         self.actionChange_background.setFont(font)
         self.actionChange_background.setObjectName("actionChange_background")
-        self.actionShow_all = QtWidgets.QAction(MainWindow)
-        self.actionShow_all.setObjectName("actionShow_all")
+        # self.actionShow_all = QtWidgets.QAction(MainWindow)
+        # self.actionShow_all.setObjectName("actionShow_all")
         self.actionDesign_examples = QtWidgets.QAction(MainWindow)
         self.actionDesign_examples.setObjectName("actionDesign_examples")
         self.actionSample_Problems = QtWidgets.QAction(MainWindow)
@@ -1231,10 +1266,12 @@ class Ui_ModuleWindow(QMainWindow):
         self.menuGraphics.addAction(self.actionPan)
         self.menuGraphics.addAction(self.actionRotate_3D_model)
         self.menuGraphics.addSeparator()
-        self.menuGraphics.addAction(self.actionShow_beam)
-        self.menuGraphics.addAction(self.actionShow_column)
-        self.menuGraphics.addAction(self.actionShow_finplate)
-        self.menuGraphics.addAction(self.actionShow_all)
+        # self.menuGraphics.addAction(self.actionShow_beam)
+        # self.menuGraphics.addAction(self.actionShow_column)
+        # self.menuGraphics.addAction(self.actionShow_finplate)
+        # self.menuGraphics.addAction(self.actionShow_all)
+        for action in self.menugraphics_component_list:
+            self.menuGraphics.addAction(action)
         self.menuGraphics.addSeparator()
         self.menuGraphics.addAction(self.actionChange_background)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -1255,16 +1292,16 @@ class Ui_ModuleWindow(QMainWindow):
         # self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list))
         # self.btn_Reset.clicked.connect(lambda: self.reset_popup(new_list, data))
         # self.btn_Design.clicked.connect(self.osdag_header)
-        self.actionShow_beam.triggered.connect(lambda: main.call_3DBeam(self,"gradient_bg"))
-        self.actionShow_column.triggered.connect(lambda: main.call_3DColumn(self,"gradient_bg"))
-        self.actionShow_finplate.triggered.connect(lambda: main.call_3DFinplate(self,"gradient_bg"))
-        self.actionShow_all.triggered.connect(lambda: main.call_3DModel(self,"gradient_bg"))
+        # self.actionShow_beam.triggered.connect(lambda: main.call_3DBeam(self,"gradient_bg"))
+        # self.actionShow_column.triggered.connect(lambda: main.call_3DColumn(self,"gradient_bg"))
+        # self.actionShow_finplate.triggered.connect(lambda: main.call_3DFinplate(self,"gradient_bg"))
+        # self.actionShow_all.triggered.connect(lambda: main.call_3DModel(self,"gradient_bg"))
         self.actionChange_background.triggered.connect(lambda: main.showColorDialog(self))
-        self.actionSave_3D_model.triggered.connect(self.save3DcadImages)
-        self.btn3D.clicked.connect(lambda: main.call_3DModel(main,self,"gradient_bg"))
-        self.chkBxBeam.clicked.connect(lambda: main.call_3DBeam(main, self,"gradient_bg"))
-        self.chkBxCol.clicked.connect(lambda: main.call_3DColumn(main,self,"gradient_bg"))
-        self.chkBxFinplate.clicked.connect(lambda: main.call_3DFinplate(main, self,"gradient_bg"))
+        self.actionSave_3D_model.triggered.connect(lambda: self.save3DcadImages(main))
+        # self.btn3D.clicked.connect(lambda: main.call_3DModel(main,self,"gradient_bg"))
+        # self.chkBxBeam.clicked.connect(lambda: main.call_3DBeam(main, self,"gradient_bg"))
+        # self.chkBxCol.clicked.connect(lambda: main.call_3DColumn(main,self,"gradient_bg"))
+        # self.chkBxFinplate.clicked.connect(lambda: main.call_3DFinplate(main, self,"gradient_bg"))
         self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
 
@@ -1327,32 +1364,32 @@ class Ui_ModuleWindow(QMainWindow):
 
         return display, start_display
 
-    # def save_cadImages(self,main):
-    #     """Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)
-    #
-    #     Returns:
-    #
-    #     """
-    #
-    #     if main.design_status is True:
-    #
-    #         files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
-    #         fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
-    #                                                   files_types)
-    #         fName = str(fileName)
-    #         file_extension = fName.split(".")[-1]
-    #
-    #         if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
-    #             self.display.ExportToImage(fName)
-    #             QMessageBox.about(self, 'Information', "File saved")
-    #     else:
-    #         self.actionSave_current_image.setEnabled(False)
-    #         QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
+    def save_cadImages(self,main):
+        """Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)
+
+        Returns:
+
+        """
+
+        if main.design_status:
+
+            files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+                                                      files_types)
+            fName = str(fileName)
+            file_extension = fName.split(".")[-1]
+
+            if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
+                self.display.ExportToImage(fName)
+                QMessageBox.about(self, 'Information', "File saved")
+        else:
+            # self.actionSave_current_image.setEnabled(False)
+            QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
 
 
-    def save3DcadImages(self):
-        status = True
-        if status is True:
+    def save3DcadImages(self, main):
+
+        if main.design_status:
             if self.fuse_model is None:
                 self.fuse_model = CommonDesignLogic.create2Dcad(self.commLogicObj)
             shape = self.fuse_model
@@ -1400,7 +1437,7 @@ class Ui_ModuleWindow(QMainWindow):
 
                 QMessageBox.about(self, 'Information', "File saved")
         else:
-            self.actionSave_3D_model.setEnabled(False)
+            # self.actionSave_3D_model.setEnabled(False)
             QMessageBox.about(self,'Information', 'Design Unsafe: 3D Model cannot be saved')
 
     # def generate_3D_Cad_image(self,main):
@@ -1529,14 +1566,14 @@ class Ui_ModuleWindow(QMainWindow):
 
         self.display.EraseAll()
 
-        self.btn3D.setEnabled(False)
-        self.chkBxBeam.setEnabled(False)
-        self.chkBxCol.setEnabled(False)
-        self.chkBxFinplate.setEnabled(False)
-        self.btn3D.setChecked(Qt.Unchecked)
-        self.chkBxBeam.setChecked(Qt.Unchecked)
-        self.chkBxCol.setChecked(Qt.Unchecked)
-        self.chkBxFinplate.setChecked(Qt.Unchecked)
+        # self.btn3D.setEnabled(False)
+        # self.chkBxBeam.setEnabled(False)
+        # self.chkBxCol.setEnabled(False)
+        # self.chkBxFinplate.setEnabled(False)
+        # self.btn3D.setChecked(Qt.Unchecked)
+        # self.chkBxBeam.setChecked(Qt.Unchecked)
+        # self.chkBxCol.setChecked(Qt.Unchecked)
+        # self.chkBxFinplate.setChecked(Qt.Unchecked)
 
 # Function for Design Button
     '''
@@ -1592,7 +1629,6 @@ class Ui_ModuleWindow(QMainWindow):
 
             if result is not None:
                 des_pref_input_list_updated = [i for i in des_pref_input_list if i not in result]
-                print('updated input tablist',des_pref_input_list_updated)
             else:
                 des_pref_input_list_updated = des_pref_input_list
 
@@ -1603,7 +1639,6 @@ class Ui_ModuleWindow(QMainWindow):
                 tab = self.designPrefDialog.findChild(QtWidgets.QWidget, tab_name)
                 for key_name in input_list:
                     key = tab.findChild(QtWidgets.QWidget, key_name)
-                    print('key_name',key_name)
                     if input_type == TYPE_TEXTBOX:
                         val = key.text()
                         design_dictionary.update({key_name: val})
@@ -1768,8 +1803,10 @@ class Ui_ModuleWindow(QMainWindow):
             return FinPlateConnection
         elif name == KEY_DISP_ENDPLATE:
             return EndPlateConnection
-        elif name==KEY_DISP_CLEATANGLE:
+        elif name == KEY_DISP_CLEATANGLE:
             return CleatAngleConnection
+        elif name == KEY_DISP_SEATED_ANGLE:
+            return SeatedAngleConnection
         elif name == KEY_DISP_COLUMNCOVERPLATE:
             return ColumnCoverPlate
         # elif name == KEY_DISP_COLUMNCOVERPLATEWELD:
@@ -1782,8 +1819,6 @@ class Ui_ModuleWindow(QMainWindow):
             return BeamEndPlate
         elif name == KEY_DISP_COLUMNENDPLATE:
             return ColumnEndPlate
-        elif name == KEY_DISP_CLEATANGLE:
-            return CleatAngleConnection
         elif name == KEY_DISP_BASE_PLATE:
             return BasePlateConnection
         elif name == KEY_DISP_TENSION_BOLTED:
@@ -1957,21 +1992,25 @@ class Ui_ModuleWindow(QMainWindow):
                 module_class = EndPlateConnection
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_CLEATANGLE,
-                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED,
-                                                  KEY_DISP_TENSION_WELDED]:
+                                                  KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
+                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
                 self.commLogicObj.call_3DModel(status, module_class)
                 # self.callFin2D_Drawing("All")
-                self.btn3D.setEnabled(True)
-                self.chkBxBeam.setEnabled(True)
-                self.chkBxCol.setEnabled(True)
-                self.chkBxFinplate.setEnabled(True)
-                self.actionShow_all.setEnabled(True)
-                self.actionShow_beam.setEnabled(True)
-                self.actionShow_column.setEnabled(True)
-                self.actionShow_finplate.setEnabled(True)
+                # self.btn3D.setEnabled(True)
+                # self.chkBxBeam.setEnabled(True)
+                # self.chkBxCol.setEnabled(True)
+                # self.chkBxFinplate.setEnabled(True)
+                # self.actionShow_all.setEnabled(True)
+                # self.actionShow_beam.setEnabled(True)
+                # self.actionShow_column.setEnabled(True)
+                # self.actionShow_finplate.setEnabled(True)
+                for chkbox in main.get_3d_components(main):
+                    self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(True)
+                for action in self.menugraphics_component_list:
+                    action.setEnabled(True)
                 # image = main.generate_3D_Cad_image(main, self, self.folder)
                 fName = str('./ResourceFiles/images/3d.png')
                 file_extension = fName.split(".")[-1]
@@ -1980,14 +2019,18 @@ class Ui_ModuleWindow(QMainWindow):
                 self.design_exist = True
 
             else:
-                self.btn3D.setEnabled(False)
-                self.chkBxBeam.setEnabled(False)
-                self.chkBxCol.setEnabled(False)
-                self.chkBxFinplate.setEnabled(False)
-                self.actionShow_all.setEnabled(False)
-                self.actionShow_beam.setEnabled(False)
-                self.actionShow_column.setEnabled(False)
-                self.actionShow_finplate.setEnabled(False)
+                # self.btn3D.setEnabled(False)
+                # self.chkBxBeam.setEnabled(False)
+                # self.chkBxCol.setEnabled(False)
+                # self.chkBxFinplate.setEnabled(False)
+                # self.actionShow_all.setEnabled(False)
+                # self.actionShow_beam.setEnabled(False)
+                # self.actionShow_column.setEnabled(False)
+                # self.actionShow_finplate.setEnabled(False)
+                for chkbox in main.get_3d_components(main):
+                    self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(False)
+                for action in self.menugraphics_component_list:
+                    action.setEnabled(False)
 
     def show_error_msg(self, error):
         QMessageBox.about(self,'information',error[0])  # show only first error message.
@@ -2255,8 +2298,6 @@ class Ui_ModuleWindow(QMainWindow):
     #             section_size.setCurrentIndex(prev)
     #
 
-
-
 # Function for warning about structure
 
     # def warning_function(self, main, design_dictionary):
@@ -2310,9 +2351,6 @@ class Ui_ModuleWindow(QMainWindow):
             key2.currentIndexChanged.connect(lambda: self.primary_secondary_beam_comparison(key, key2, key3))
             key3.currentIndexChanged.connect(lambda: self.primary_secondary_beam_comparison(key, key2, key3))
 
-
-
-
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.btnInput.setToolTip(_translate("MainWindow", "Left Dock"))
@@ -2325,14 +2363,14 @@ class Ui_ModuleWindow(QMainWindow):
         self.btnFront.setText(_translate("MainWindow", "..."))
         self.btnSide.setToolTip(_translate("MainWindow", "Side View"))
         self.btnSide.setText(_translate("MainWindow", "..."))
-        self.btn3D.setToolTip(_translate("MainWindow", "3D Model"))
-        self.btn3D.setText(_translate("MainWindow", "Model"))
-        self.chkBxBeam.setToolTip(_translate("MainWindow", "Beam only"))
-        self.chkBxBeam.setText(_translate("MainWindow", "Beam"))
-        self.chkBxCol.setToolTip(_translate("MainWindow", "Column only"))
-        self.chkBxCol.setText(_translate("MainWindow", "Column"))
-        self.chkBxFinplate.setToolTip(_translate("MainWindow", "Finplate only"))
-        self.chkBxFinplate.setText(_translate("MainWindow", "Fin Plate"))
+        # self.btn3D.setToolTip(_translate("MainWindow", "3D Model"))
+        # self.btn3D.setText(_translate("MainWindow", "Model"))
+        # self.chkBxBeam.setToolTip(_translate("MainWindow", "Beam only"))
+        # self.chkBxBeam.setText(_translate("MainWindow", "Beam"))
+        # self.chkBxCol.setToolTip(_translate("MainWindow", "Column only"))
+        # self.chkBxCol.setText(_translate("MainWindow", "Column"))
+        # self.chkBxFinplate.setToolTip(_translate("MainWindow", "Finplate only"))
+        # self.chkBxFinplate.setText(_translate("MainWindow", "Fin Plate"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuEdit.setTitle(_translate("MainWindow", "Edit"))
         self.menuView.setTitle(_translate("MainWindow", "View"))
@@ -2401,15 +2439,15 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionSave_Side_View.setText(_translate("MainWindow", "Save side view"))
         self.actionSave_Side_View.setShortcut(_translate("MainWindow", "Alt+Shift+S"))
         self.actionChange_bg_color.setText(_translate("MainWindow", "Change bg color"))
-        self.actionShow_beam.setText(_translate("MainWindow", "Show beam"))
-        self.actionShow_beam.setShortcut(_translate("MainWindow", "Alt+Shift+B"))
-        self.actionShow_column.setText(_translate("MainWindow", "Show column"))
-        self.actionShow_column.setShortcut(_translate("MainWindow", "Alt+Shift+C"))
-        self.actionShow_finplate.setText(_translate("MainWindow", "Show finplate"))
-        self.actionShow_finplate.setShortcut(_translate("MainWindow", "Alt+Shift+A"))
+        # self.actionShow_beam.setText(_translate("MainWindow", "Show beam"))
+        # self.actionShow_beam.setShortcut(_translate("MainWindow", "Alt+Shift+B"))
+        # self.actionShow_column.setText(_translate("MainWindow", "Show column"))
+        # self.actionShow_column.setShortcut(_translate("MainWindow", "Alt+Shift+C"))
+        # self.actionShow_finplate.setText(_translate("MainWindow", "Show finplate"))
+        # self.actionShow_finplate.setShortcut(_translate("MainWindow", "Alt+Shift+A"))
         self.actionChange_background.setText(_translate("MainWindow", "Change background"))
-        self.actionShow_all.setText(_translate("MainWindow", "Show all"))
-        self.actionShow_all.setShortcut(_translate("MainWindow", "Alt+Shift+M"))
+        # self.actionShow_all.setText(_translate("MainWindow", "Show all"))
+        # self.actionShow_all.setShortcut(_translate("MainWindow", "Alt+Shift+M"))
         self.actionDesign_examples.setText(_translate("MainWindow", "Design Examples"))
         self.actionSample_Problems.setText(_translate("MainWindow", "Sample Problems"))
         self.actionSample_Tutorials.setText(_translate("MainWindow", "Video Tutorials"))
@@ -2456,9 +2494,7 @@ class Ui_ModuleWindow(QMainWindow):
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
             for key_name in key_list:
-                print('key_name',key_name)
                 key = tab.findChild(QtWidgets.QWidget, key_name)
-                print('key1',key)
                 if isinstance(key, QtWidgets.QComboBox):
                     self.connect_combobox_for_tab(key, tab, on_change_tab_list)
                 elif isinstance(key, QtWidgets.QLineEdit):
@@ -2708,6 +2744,12 @@ class Ui_ModuleWindow(QMainWindow):
         #         beam_material.currentIndexChanged.connect(lambda: self.designPrefDialog.beam_preferences(
         #             key_3.currentText(), beam_material.currentText()))
 
+    def chkbox_connect(self, main, chkbox, f):
+        chkbox.clicked.connect(lambda: f(main, self, "gradient_bg"))
+
+    def action_connect(self, main, action, f):
+        action.triggered.connect(lambda: f(main, self, "gradient_bg"))
+
     def connect_textbox_for_tab(self, key, tab, new):
         key.textChanged.connect(lambda: self.tab_change(key, tab, new))
 
@@ -2718,7 +2760,6 @@ class Ui_ModuleWindow(QMainWindow):
 
         for tup in new:
             (tab_name, key_list, k2_key_list, typ, f) = tup
-            print('tabname',tab_name, tab.objectName(),key)
             if tab_name != tab.objectName() or key.objectName() not in key_list:
                 continue
             arg_list = []
@@ -2748,7 +2789,6 @@ class Ui_ModuleWindow(QMainWindow):
                     for values in val[k2_key_name]:
                         k2.addItem(str(values))
                 elif typ == TYPE_TEXTBOX:
-                    print('k2keyname',k2_key_name)
                     k2.setText(str(val[k2_key_name]))
 
     def refresh_section_connect(self, add_button, prev, key, key_type, tab_key, arg):

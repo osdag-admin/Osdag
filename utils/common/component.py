@@ -127,7 +127,7 @@ class Bolt:
 
         return repr
 
-    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy,n_planes):
+    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes, seatedangle = False):
         """
 
         :param bolt_type: bearing or friction grip bolt
@@ -162,9 +162,14 @@ class Bolt:
         if self.bolt_type == "Bearing Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
-            self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
-                f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
-                e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
+            if seatedangle:
+                self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
+                    f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
+                    e=self.min_end_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
+            else:
+                self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
+                    f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
+                    e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
             self.fu_considered = fu_considered
             self.thk_considered = thk_considered
@@ -364,20 +369,16 @@ class Section(Material):
         self.elast_sec_mod_z = row[15] *1000
         self.elast_sec_mod_y = row[16] *1000
         self.plast_sec_mod_z = row[17]
-        print(row[17], "plast_sec_mod_z")
         if self.plast_sec_mod_z is None:  # Todo: add in database
             self.plast_sec_mod_z = I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,
                                                                                    self.web_thickness,self.flange_thickness)*1000
-            print(self.plast_sec_mod_z,"plast_sec_mod_z")
         else:
             self.plast_sec_mod_z = row[17] *1000
 
         self.plast_sec_mod_y = row[18]
-        print(row[18], "plast_sec_mod_z")
         if self.plast_sec_mod_y is None:  # Todo: add in database
             self.plast_sec_mod_y = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
                                                                                    self.web_thickness,self.flange_thickness)*1000
-            print(self.plast_sec_mod_y, "plast_sec_mod_y")
         else:
             self.plast_sec_mod_y = row[17] * 1000
 
@@ -397,7 +398,6 @@ class Section(Material):
 
         A_v = length * thickness
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        print(length, thickness, fy, gamma_m0)
         # V_p = (0.6 * A_v * fy) / (math.sqrt(3) * gamma_m0 * 1000)  # kN
         V_p = (A_v * fy) / (math.sqrt(3) * gamma_m0 * 1000)  # kN
 
@@ -472,7 +472,6 @@ class Section(Material):
             self.beta = 1.4
         else:
             self.beta = float(1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
-        # print(beta)
 
         if self.beta <= (F_u * gamma_m0 / F_y * gamma_m1) and self.beta >= 0.7:
             self.beta = self.beta
@@ -666,8 +665,8 @@ class Beam(Section):
 
     def __init__(self, designation, material_grade):
         super(Beam, self).__init__(designation, material_grade)
-        self.connect_to_database_update_other_attributes("Beams", designation,material_grade)
 
+        self.connect_to_database_update_other_attributes("Beams", designation,material_grade)
 
     def min_plate_height(self):
         return 0.6 * self.depth
@@ -683,7 +682,9 @@ class Column(Section):
 
     def __init__(self, designation, material_grade):
         super(Column, self).__init__(designation, material_grade)
+
         self.connect_to_database_update_other_attributes("Columns", designation,material_grade)
+
 
     def min_plate_height(self):
         return 0.6 * self.depth
@@ -791,7 +792,7 @@ class Weld:
         self.throat_tk = \
             round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
                 (t_weld, weld_angle),2)
-        print ("throat_tk",self.throat_tk)
+
         weld_strength = round(f_wd * self.throat_tk,2)
         self.strength = weld_strength
 
@@ -800,7 +801,7 @@ class Weld:
         self.throat_tk = \
             round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
                 (t_weld, weld_angle),2)
-        print ("throat_tk",self.throat_tk)
+
         weld_strength = round(f_wd * self.throat_tk,2)
         self.strength = weld_strength
 
@@ -933,15 +934,13 @@ class Plate(Material):
     def get_spacing_adjusted(self, gauge_pitch, edge_end, max_spacing):
         while gauge_pitch > max_spacing:
             edge_end += 5
-            gauge_pitch -= 5
+            gauge_pitch -= 10
         return gauge_pitch, edge_end
 
 
     def get_web_plate_l_bolts_one_line(self, web_plate_h_max, web_plate_h_min,bolts_required,edge_dist, gauge,min_bolts_one_line=2,min_bolt_line=1):
-        print('maxh',web_plate_h_max)
-        print(web_plate_h_max,edge_dist,gauge)
+
         max_bolts_one_line = int(((web_plate_h_max - (2 * edge_dist)) / gauge) + 1)
-        print("max_bolts_one_line", max_bolts_one_line)
         if max_bolts_one_line >= min_bolts_one_line:
             bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), min_bolt_line)
             bolts_one_line = max(int(math.ceil(float(bolts_required) / float(bolt_line))),min_bolts_one_line)
@@ -955,8 +954,7 @@ class Plate(Material):
 
 
     def get_flange_plate_l_bolts_one_line(self, flange_plate_h_max, flange_plate_h_min, bolts_required, edge_dist, gauge,web_thickness,root_radius):# todo anjalinew
-        print('maxh', flange_plate_h_max)
-        print(flange_plate_h_max, edge_dist, gauge)
+
         # max_bolts_one_line = int(((flange_plate_h_max - (2 * edge_dist)) / gauge) + 1)
         # print("max_bolts_one_line", max_bolts_one_line)
         possible_bolt = (flange_plate_h_max/2 - web_thickness/2 - 2 *edge_dist)-root_radius
@@ -1011,12 +1009,7 @@ class Plate(Material):
         if bolts_one_line > 1:
             gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
 
-            # print(gauge)
-
         web_plate_h = gauge * (bolts_one_line - 1) + edge_dist * 2
-        print(web_plate_h, "web_plate_h web")
-
-        # print("gauge", gauge,web_plate_h,edge_dist,max_spacing, max_edge_dist)
 
         if gauge > max_spacing:
             gauge, edge_dist = self.get_spacing_adjusted(gauge, edge_dist, max_spacing)
@@ -1030,8 +1023,6 @@ class Plate(Material):
             edge_dist = web_plate_h/2
             if edge_dist >= max_edge_dist:
                 web_plate_h = False
-
-        print("web", gauge, edge_dist, web_plate_h)
         return gauge, edge_dist, web_plate_h
 
 
@@ -1045,7 +1036,6 @@ class Plate(Material):
         :param max_end_dist_round: maximum end distance
         :return: pitch, end distance, height of plate (false if applicable)
         """
-        print("red",flange_plate_h,web_thickness,edge_dist,bolts_one_line)
         if bolts_one_line > 2:
             """
             gauge is the distance between bolts along bolt line on either side of the web thickness
@@ -1055,7 +1045,6 @@ class Plate(Material):
             gauge = 0.0
         # multiplier=5)
         # web_plate_h = gauge*(bolts_one_line - 1) + edge_dist*2
-        print("gauge", gauge,edge_dist,max_spacing, max_edge_dist)
         if gauge > max_spacing:
             gauge, edge_dist = self.get_spacing_adjusted(gauge, edge_dist, max_spacing)
             if edge_dist >= max_edge_dist:
@@ -1089,7 +1078,6 @@ class Plate(Material):
         sigma_r_sq = r_sq
         vbv = shear_load / (bolts_one_line * bolt_line)
         moment_demand = round((shear_load * ecc + web_moment), 3)
-        print(moment_demand, ymax, sigma_r_sq)
         tmh = moment_demand * ymax / sigma_r_sq
         tmv = moment_demand * xmax / sigma_r_sq
         abh = axial_load / (bolts_one_line * bolt_line)
@@ -1171,15 +1159,10 @@ class Plate(Material):
         length =0.0
         count =0.0
         resultant_force = math.sqrt(shear_load ** 2 + axial_load ** 2)
-        print(resultant_force, "daa")
-        print(bolt_capacity, "222")
         bolts_required = max(int(math.ceil(resultant_force / bolt_capacity)), min_bolt_line*min_bolts_one_line)
-        print (bolts_required)
         [bolt_line, bolts_one_line, web_plate_h] = \
             self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required
                                                 , min_edge_dist, min_gauge, min_bolts_one_line,min_bolt_line)
-
-        print("boltdetails0", bolt_line, bolts_one_line, web_plate_h)
         count = 0
 
         if bolts_one_line < min_bolts_one_line:
@@ -1192,9 +1175,7 @@ class Plate(Material):
             self.design_status = False
             self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
         else:
-            print("boltdetails", bolt_line, bolts_one_line,web_plate_h)
             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,min_edge_dist,max_spacing, max_edge_dist)
-            print("boltdetails", bolt_line, bolts_one_line,web_plate_h)
             if bolt_line == 1:
                 pitch = 0.0
             else:
@@ -1205,9 +1186,6 @@ class Plate(Material):
                 # If check for shear eccentricity is true, resultant force in bolt is calculated
                 ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
                 moment_demand = shear_load * ecc + web_moment
-
-                print(2, bolts_one_line, pitch,
-                      gauge, bolt_line, shear_load, axial_load, ecc, web_plate_h)
                 vres = self.get_vres(bolts_one_line, pitch,
                                      gauge, bolt_line, shear_load, axial_load, ecc,web_moment)
             else:
@@ -1219,29 +1197,20 @@ class Plate(Material):
                                                       bolt_dia)
 
             while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
-
-                print(3, vres, bolt_capacity_red)
-
-                # Length of plate is increased for calculated bolts in one line.
-                # This increases spacing which decreases resultant force
-                print(4, web_plate_h, web_plate_h_max)
+                print("entered web plate details loop for bolt force:",vres,"bolt capaity reduced:", bolt_capacity_red)
                 [gauge, edge_dist, web_plate_h_recalc] = self.get_gauge_edge_dist(web_plate_h+10, bolts_one_line, min_edge_dist,
                                                                            max_spacing, max_edge_dist)
                 if web_plate_h_recalc <= web_plate_h_max and shear_ecc is True and gauge!=0:
                 # gauge is recalculated only if there is shear ecc or else increase in bolt is the only option
                     web_plate_h += 10
-                    print("boltdetails2", bolt_line, bolts_one_line, web_plate_h)
+
                 # If height cannot be increased number of bolts is increased by 1 and loop is repeated
                 else:
                     bolts_required = bolt_line * bolts_one_line
                     bolts_required += 1
-                    print(5, web_plate_h_max, web_plate_h_min, bolts_required,
-                                                            min_edge_dist, min_gauge)
                     [bolt_line, bolts_one_line, web_plate_h] = \
                         self.get_web_plate_l_bolts_one_line(web_plate_h_max, web_plate_h_min, bolts_required,
                                                             min_edge_dist, min_gauge, min_bolts_one_line)
-
-                print(6, bolts_required, bolt_line, bolts_one_line, web_plate_h)
                 [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,min_edge_dist, max_spacing, max_edge_dist)
 
                 while web_plate_h is False:
@@ -1252,7 +1221,6 @@ class Plate(Material):
                     [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,
                                                                                min_edge_dist, max_spacing,
                                                                                max_edge_dist)
-                    print("g,e,h ", gauge, edge_dist, web_plate_h)
 
                 if bolt_line == 1:
                     pitch = 0.0
@@ -1263,11 +1231,8 @@ class Plate(Material):
                     # If check for shear eccentricity is true, resultant force in bolt is calculated
                     ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
                     moment_demand = shear_load * ecc + web_moment
-
-                    print(2, bolts_one_line, pitch,
-                          gauge, bolt_line, shear_load, axial_load, ecc, web_plate_h)
                     vres = self.get_vres(bolts_one_line, pitch,
-                                         gauge, bolt_line, shear_load, axial_load, ecc,web_moment )
+                                         gauge, bolt_line, shear_load, axial_load, ecc,web_moment)
                 else:
                     moment_demand = 0.0
                     vres = resultant_force / (bolt_line * bolts_one_line)
@@ -1285,26 +1250,13 @@ class Plate(Material):
                                                           gauge, bolt_line, pitch, bolt_capacity,
                                                           bolt_dia,end_dist,gap)
 
-                # convergence = bolt_capacity_red - vres
-                #
-                # if convergence < 0:
-                #     if count == 0:
-                #         initial_convergence = convergence
-                #         count = count + 1
-                #     else:
-                #         if initial_convergence <= convergence:
-                #             initial_convergence = convergence
-                #         else:
-                #             break
-                # else:
-                #     pass
-
-                print("vres, vred", vres, bolt_capacity_red)
 
             if vres > bolt_capacity_red:
                 self.design_status = False
                 self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection"
             else:
+                print("passed the web plate details loop for bolt force:", vres, "bolt capaity reduced:",
+                      bolt_capacity_red, "no. of bolts:", bolt_line*bolts_one_line, "height", web_plate_h)
                 self.design_status = True
 
             self.length = gap + end_dist * 2 + pitch * (bolt_line - 1)
@@ -1599,6 +1551,7 @@ class Plate(Material):
     def get_moment_cacacity(self, fy, plate_tk, plate_len):
         self.moment_capacity = 1.2 * (fy / 1.1) * (plate_tk * plate_len ** 2) / 6
 
+
     def __repr__(self):
         repr = "Plate\n"
         repr += "Thickness Provided: {}\n".format(self.thickness_provided)
@@ -1637,7 +1590,10 @@ class Angle(Section):
         self.leg_a_length = 0.0
         self.leg_b_length = 0.0
         self.thickness = 0.0
+        # max_thickness = max(self.flange_thickness, self.web_thickness)
+
         self.gap = 0.0
+
         self.connect_to_database_update_other_attributes_angles(designation,material_grade)
 
         # self.length = 0.0
@@ -1696,6 +1652,7 @@ class Angle(Section):
 
         conn.close()
 
+
     def angle_weld_length(self, weld_strength, depth_weld, force, C, depth):
 
         "Function to calculate weld length for angles based on the force transfer pattern"
@@ -1705,6 +1662,27 @@ class Angle(Section):
         l3 = f3 / weld_strength
 
         return l3
+
+    def get_available_seated_list(self, input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer", t_min = 0.0):
+        available_angles = []
+        for designation in input_angle_list:
+            leg_a_length, leg_b_length, t, r_r = get_leg_lengths(designation)
+            if position == "inner":
+                min_leg_length_outer = min_leg_length + t + r_r
+                max_leg_length_outer = max_leg_length + t + r_r
+            else:
+                min_leg_length_outer = min_leg_length
+                max_leg_length_outer = max_leg_length
+
+            if operator.le(max(leg_a_length, leg_b_length), max_leg_length_outer) and operator.ge(
+                    min(leg_a_length, leg_b_length), min_leg_length_outer) and leg_a_length == leg_b_length\
+                    and operator.eq(t, t_min):
+                # print("appended", designation)
+                available_angles.append(designation)
+            else:
+                print("popped", designation)
+        return available_angles
+
 
 
 class I_sectional_Properties(object):

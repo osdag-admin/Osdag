@@ -970,14 +970,14 @@ class Plate(Material):
 
             if max_bolts_one_line >= 2:
                 print("bolts_required",bolts_required)
-                bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))), 1)
-                bolts_one_line = max(int(math.ceil(float(bolts_required) / float(bolt_line))),2)
+                bolt_line = max(int(math.ceil((float(bolts_required) / float(max_bolts_one_line)))),1)
+                bolts_one_line = min(round_up(int(math.ceil(float(bolts_required) / float(bolt_line))),2,2),max_bolts_one_line)
                 print("bbbb1", bolt_line, bolts_one_line)
-                if bolts_one_line % 2 == 1:
-                    bolts_one_line = bolts_one_line-1
-                    bolt_line =bolt_line  +1
-                else:
-                    pass
+                # if bolts_one_line % 2 == 1:
+                #     bolts_one_line = bolts_one_line-1
+                #     bolt_line =bolt_line  +1
+                # else:
+                #     pass
 
                 height =flange_plate_h_max
                 print("bbbb",bolt_line, bolts_one_line, height)
@@ -1057,8 +1057,12 @@ class Plate(Material):
             gauge is the distance between bolts along bolt line on either side of the web thickness
             """
             gauge = (int((flange_plate_h/2 - web_thickness/2 - (2 * edge_dist)-root_radius) / (bolts_one_line/2 - 1))) #
+            edge_dist =  (flange_plate_h/2 - web_thickness/2 - root_radius - ((bolts_one_line/2 - 1)*gauge))/2
         else:
-            gauge = 0.0
+            gauge = 0.
+            edge_dist = (flange_plate_h / 2 - web_thickness / 2 - root_radius - ((bolts_one_line / 2 - 1) * gauge)) / 2
+
+
         # multiplier=5)
         # web_plate_h = gauge*(bolts_one_line - 1) + edge_dist*2
         print("gauge", gauge,edge_dist,max_spacing, max_edge_dist)
@@ -1114,7 +1118,7 @@ class Plate(Material):
         return vres
 
     def get_bolt_red(self, bolts_one_line , gauge ,bolts_line ,
-                     pitch, bolt_capacity, bolt_dia,end_dist=0.0,gap=0.0):
+                     pitch, bolt_capacity, bolt_dia,end_dist=0.0,gap=0.0,edge_dist =0.0,root_radius =0.0,web_thickness =0.0):
         """
 
         :param bolts_one_line: bolts in one line
@@ -1138,7 +1142,11 @@ class Plate(Material):
             else:
                 bolt_capacity_red = bolt_capacity
         else:
-            length_avail = max((2 * ((bolts_line * pitch) + end_dist) + gap), ((bolts_one_line - 1) * gauge))
+            if web_thickness == 0.0:
+                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2*gap)), ((bolts_one_line - 1) * gauge))
+            else:
+                midgauge = 2 * (edge_dist + root_radius) + web_thickness
+                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2*gap)), (((bolts_one_line/2 - 1) * gauge) + midgauge))
             if length_avail > 15 * bolt_dia:
                 beta_lj = 1.075 - length_avail / (200 * bolt_dia)
                 if beta_lj > 1:
@@ -1374,7 +1382,7 @@ class Plate(Material):
             [gauge, edge_dist, flange_plate_h] = \
                 self.get_gauge_edge_dist_flange(flange_plate_h, bolts_one_line, min_edge_dist, max_spacing,
                                                 max_edge_dist, web_thickness,root_radius)
-            print("boltdetails", bolt_line, bolts_one_line,flange_plate_h)
+            print("boltdetails2", bolt_line, bolts_one_line,flange_plate_h)
             if bolt_line == 1:
                 pitch = 0.0
             else:
@@ -1390,7 +1398,7 @@ class Plate(Material):
             else:
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,
-                                                      bolt_dia, end_dist, gap)
+                                                      bolt_dia, end_dist, gap,edge_dist,root_radius,web_thickness)
 
             # while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
                 # [gauge, edge_dist, flange_plate_h] = \
@@ -1421,7 +1429,7 @@ class Plate(Material):
                 else:
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                           gauge, bolt_line, pitch, bolt_capacity,
-                                                          bolt_dia, end_dist, gap)
+                                                          bolt_dia, end_dist, gap,edge_dist,root_radius,web_thickness)
                 print("boltforce", vres, bolt_capacity_red)
                 # convergence = bolt_capacity_red - vres
                 #

@@ -1631,7 +1631,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                   KEY_DISP_FU: self.section.fu,
                                   KEY_DISP_FY: self.section.fy,
                                   'Mass': self.section.mass,
-                                  'Area(mm2) - A': round(self.section.area,2),
+                                  'Area(mm2) - A': round(self.section.area, 2),
                                   'D(mm)': self.section.depth,
                                   'B(mm)': self.section.flange_width,
                                   't(mm)': self.section.web_thickness,
@@ -1639,14 +1639,15 @@ class BeamCoverPlateWeld(MomentConnection):
                                   'FlangeSlope': self.section.flange_slope,
                                   'R1(mm)': self.section.root_radius,
                                   'R2(mm)': self.section.toe_radius,
-                                  'Iz(mm4)': self.section.mom_inertia_z,
-                                  'Iy(mm4)': self.section.mom_inertia_y,
-                                  'rz(mm)': self.section.rad_of_gy_z,
-                                  'ry(mm)': round(self.section.rad_of_gy_y,2),
-                                  'Zz(mm3)': self.section.elast_sec_mod_z,
-                                  'Zy(mm3)': self.section.elast_sec_mod_y,
-                                  'Zpz(mm3)': self.section.plast_sec_mod_z,
-                                  'Zpy(mm3)': self.section.elast_sec_mod_y}
+                                  'Iz(mm4)': round(self.section.mom_inertia_z, 2),
+                                  'Iy(mm4)': round(self.section.mom_inertia_y, 2),
+                                  'rz(mm)': round(self.section.rad_of_gy_z, 2),
+                                  'ry(mm)': round(self.section.rad_of_gy_y, 2),
+                                  'Zz(mm3)': round(self.section.elast_sec_mod_z, 2),
+                                  'Zy(mm3)': round(self.section.elast_sec_mod_y, 2),
+                                  'Zpz(mm3)': round(self.section.plast_sec_mod_z, 2),
+                                  'Zpy(mm3)': round(self.section.elast_sec_mod_y, 2)}
+
         self.report_input = \
             {KEY_MODULE: self.module,
 
@@ -1786,19 +1787,19 @@ class BeamCoverPlateWeld(MomentConnection):
                 t1 = (KEY_FLANGE_PLATE_HEIGHT , 'Outer.b >= 50',
                       width_pt_chk( B=self.section.flange_width,
                                         t=self.section.web_thickness, r_1=self.section.root_radius,pref= "Outside"),
-                      get_pass_fail(50, self.outerwidth, relation="leq"))
+                      get_pass_fail(50, round(self.outerwidth,2), relation="leq"))
                 self.report_check.append(t1)
             else:
                 t1 = (KEY_FLANGE_PLATE_HEIGHT , 'Outer.b >= 50',
                       width_pt_chk(B=self.section.flange_width,
                                    t=self.section.web_thickness, r_1=self.section.root_radius, pref="Outside"),
-                      get_pass_fail(50, self.outerwidth, relation="leq"))
+                      get_pass_fail(50, round(self.outerwidth,2), relation="leq"))
                 self.report_check.append(t1)
 
                 t1 = (KEY_INNERFLANGE_PLATE_HEIGHT, 'Inner.b >= 50' ,
                       width_pt_chk(B=self.section.flange_width,
                       t=self.section.web_thickness, r_1=self.section.root_radius, pref= "Outside +Inside"),
-                     get_pass_fail(50, self.innerwidth, relation="leq"))
+                     get_pass_fail(50, round(self.innerwidth,2), relation="leq"))
                 self.report_check.append(t1)
 
 

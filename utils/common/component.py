@@ -127,7 +127,7 @@ class Bolt:
 
         return repr
 
-    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes, seatedangle = False):
+    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes, seatedangle_e = 0.0):
         """
 
         :param bolt_type: bearing or friction grip bolt
@@ -162,10 +162,10 @@ class Bolt:
         if self.bolt_type == "Bearing Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
-            if seatedangle:
+            if seatedangle_e > 0.0:
                 self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                     f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
-                    e=self.min_end_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
+                    e=seatedangle_e, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             else:
                 self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                     f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,

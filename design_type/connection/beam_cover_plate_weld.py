@@ -1646,8 +1646,8 @@ class BeamCoverPlateWeld(MomentConnection):
 
 
     def save_design(self, popup_summary):
-        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.flange_weld.fabrication]
-        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
+        self.gamma_mw_flange = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.flange_weld.fabrication]
+        self.gamma_mw_web = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
                                   KEY_DISP_BEAMSEC: self.section.designation,
                                   KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
@@ -1693,7 +1693,7 @@ class BeamCoverPlateWeld(MomentConnection):
              "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
              KEY_DISP_GAMMA_M0: gamma(1.1, "m0"),
              KEY_DISP_GAMMA_M1: gamma(1.25, "m1"),
-             KEY_DISP_GAMMA_MW: gamma(gamma_mw, "mw")}
+             KEY_DISP_GAMMA_MW: gamma(self.gamma_mw_flange, "mw")}
 
 
         self.report_check = []
@@ -1701,7 +1701,7 @@ class BeamCoverPlateWeld(MomentConnection):
         flange_weld_conn_plates_fu = [self.section.fu, self.flange_plate.fu]
         self.flange_weld_connecting_plates = [self.section.flange_thickness, self.flange_plate.thickness_provided]
         self.flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.flange_thickness,self.flange_plate.thickness_provided)
-        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.flange_weld.fabrication]
+        self.gamma_mw_flange = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.flange_weld.fabrication]
         if self.member_capacity_status ==True and self.initial_pt_thk_status== True:
             self.thick_f = self.flange_plate.thickness_provided
             self.thick_w =self.web_plate.thickness_provided
@@ -1879,14 +1879,14 @@ class BeamCoverPlateWeld(MomentConnection):
                 if self.preference == "Outside":
                     t1 = (DISP_EFF,' ',eff_len_prov(l_w=self.flange_weld.length,b_fp= self.flange_plate.height,t_w=self.flange_weld.size, l_eff =self.l_req_flangelength), "")
                     self.report_check.append(t1)
-                    t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,flange_weld_stress(F_f=round(self.flange_force/1000,2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress,2)),weld_strength_prov(conn_plates_weld_fu =  flange_weld_conn_plates_fu,gamma_mw =gamma_mw ,t_t =self.flange_weld.throat_tk,f_w =self.flange_weld.strength),get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
+                    t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,flange_weld_stress(F_f=round(self.flange_force/1000,2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress,2)),weld_strength_prov(conn_plates_weld_fu =  flange_weld_conn_plates_fu,gamma_mw =self.gamma_mw_flange ,t_t =self.flange_weld.throat_tk,f_w =self.flange_weld.strength),get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
                     self.report_check.append(t2)
                     # Outside +Inside#
                 else:
                     #Outside
                     t1 = (KEY_DISP_WELD_LEN_EFF_OUTSIDE ,'', eff_len_prov_out_in(l_w=self.flange_weld.length,b_fp=self.flange_plate.height,b_ifp=self.flange_plate.Innerheight,t_w=self.flange_weld.size, l_eff=self.l_req_flangelength), "")
                     self.report_check.append(t1)
-                    t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,flange_weld_stress(F_f=round(self.flange_force / 1000, 2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress, 2)),weld_strength_prov(conn_plates_weld_fu=flange_weld_conn_plates_fu, gamma_mw=gamma_mw,t_t=self.flange_weld.throat_tk,f_w=self.flange_weld.strength),get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
+                    t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,flange_weld_stress(F_f=round(self.flange_force / 1000, 2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress, 2)),weld_strength_prov(conn_plates_weld_fu=flange_weld_conn_plates_fu, gamma_mw=self.gamma_mw_flange,t_t=self.flange_weld.throat_tk,f_w=self.flange_weld.strength),get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
                     self.report_check.append(t2)
 
                 if  self.preference == "Outside":
@@ -1922,8 +1922,8 @@ class BeamCoverPlateWeld(MomentConnection):
 #######################################################Web design###########################################################
                 self.web_weld_connecting_plates = [self.section.web_thickness, self.web_plate.thickness_provided]
                 self.web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.web_thickness,self.web_plate.thickness_provided)
-                web_weld_conn_plates_fu = [self.section.fu, self.web_plate.fu]
-                Gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
+                self.web_weld_conn_plates_fu = [self.section.fu, self.web_plate.fu]
+                self.gamma_mw_web = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
             if self.initial_pt_thk_status == True:
                 t1 = ('SubSection', 'Web Weld  Design Check ', '|p{3.5cm}|p{6cm}|p{6cm}|p{1.5cm}|')
                 self.report_check.append(t1)
@@ -1946,7 +1946,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                         x_max=round(self.x_max,2),
                                                                         l_eff=self.l_req_weblength,
                                                                         R_w=round(self.web_weld.stress,2)),
-                    weld_strength_prov(conn_plates_weld_fu =  web_weld_conn_plates_fu,gamma_mw =Gamma_mw ,t_t =self.web_weld.throat_tk,f_w =self.web_weld.strength),get_pass_fail(self.web_weld.stress, self.web_weld.strength, relation="lesser"))
+                    weld_strength_prov(conn_plates_weld_fu =  self.web_weld_conn_plates_fu,gamma_mw =self.gamma_mw_web ,t_t =self.web_weld.throat_tk,f_w =self.web_weld.strength),get_pass_fail(self.web_weld.stress, self.web_weld.strength, relation="lesser"))
                 self.report_check.append(t2)
 
                 t1 = ('SubSection', 'Web Plate Check', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')

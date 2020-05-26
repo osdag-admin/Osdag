@@ -1126,15 +1126,20 @@ class Plate(Material):
                     beta_lj = 0.75
                 else:
                     beta_lj = beta_lj
-                bolt_capacity_red = beta_lj * bolt_capacity
+                bolt_capacity_red = round(beta_lj,2) * bolt_capacity
             else:
                 bolt_capacity_red = bolt_capacity
         else:
             if web_thickness == 0.0:
-                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2*gap)), ((bolts_one_line - 1) * gauge))
+                length_avail = max((2 * (((bolts_line-1) * pitch) + end_dist) + (2*gap)), ((bolts_one_line - 1) * gauge))
+                print("welong",length_avail)
+                print("bolt_capacity", bolt_capacity)
+
             else:
                 midgauge = 2 * (edge_dist + root_radius) + web_thickness
-                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2*gap)), (((bolts_one_line/2 - 1) * gauge) + midgauge))
+                length_avail = max((2 * (((bolts_line-1) * pitch) + end_dist) + (2*gap)), (((bolts_one_line/2 - 1) * gauge) + midgauge))
+                print("flangelong", length_avail)
+                print("bolt_capacity", bolt_capacity)
             if length_avail > 15 * bolt_dia:
                 beta_lj = 1.075 - length_avail / (200 * bolt_dia)
                 if beta_lj > 1:
@@ -1143,7 +1148,8 @@ class Plate(Material):
                     beta_lj = 0.75
                 else:
                     beta_lj = beta_lj
-                bolt_capacity_red = beta_lj * bolt_capacity
+                bolt_capacity_red = round(beta_lj,2) * bolt_capacity
+                print('beta',round(beta_lj, 2))
             else:
                 bolt_capacity_red = bolt_capacity
 

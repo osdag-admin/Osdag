@@ -2291,9 +2291,9 @@ class BeamCoverPlate(MomentConnection):
 
             else:
                 if self.section.depth > 600.00:
-                    self.webclearance = max (self.section.root_radius, fp_thk) +25
+                    self.webclearance = (max (self.section.root_radius, fp_thk)) +25
                 else:
-                    self.webclearance = max(self.section.root_radius, fp_thk) + 10
+                    self.webclearance = (max(self.section.root_radius, fp_thk)) + 10
                 self.webwidth = D - (2 * tk) - (2 * self.webclearance )
                 self.web_crs_area = t_w * self.webwidth
                 self.Wp = self.web_crs_area * 1.05
@@ -2795,11 +2795,13 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t4)
 
             t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
-                   long_joint_bolted_prov(self.flange_plate.bolt_line, self.flange_plate.bolts_one_line,
+                   long_joint_bolted_beam(self.flange_plate.bolt_line, self.flange_plate.bolts_one_line,
                                           self.flange_plate.pitch_provided,
                                           self.flange_plate.gauge_provided, self.bolt.bolt_diameter_provided,
                                           flange_bolt_capacity_kn,
-                                          flange_bolt_capacity_red_kn,'half',self.flange_plate.end_dist_provided,self.flange_plate.gap), "")
+                                          flange_bolt_capacity_red_kn,'flange',self.flange_plate.end_dist_provided,
+                                          self.flange_plate.gap,self.flange_plate.edge_dist_provided,
+                                          self.section.web_thickness,self.section.root_radius), "")
             self.report_check.append(t10)
 
             t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
@@ -2922,11 +2924,13 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t10)
 
             t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
-                   long_joint_bolted_prov(self.web_plate.bolt_line, self.web_plate.bolts_one_line,
+                   long_joint_bolted_beam(self.web_plate.bolt_line, self.web_plate.bolts_one_line,
                                           self.web_plate.pitch_provided,
                                           self.web_plate.gauge_provided, self.bolt.bolt_diameter_provided,
                                           web_bolt_capacity_kn,
-                                          web_bolt_capacity_red_kn,'half',self.web_plate.end_dist_provided,self.flange_plate.gap), "")
+                                          web_bolt_capacity_red_kn,'web',self.web_plate.end_dist_provided,
+                                          self.flange_plate.gap,self.web_plate.edge_dist_provided,
+                                          self.section.web_thickness,self.section.root_radius), "")
             self.report_check.append(t10)
 
             t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.web_plate.bolt_force / 1000, 2), web_bolt_capacity_red_kn,

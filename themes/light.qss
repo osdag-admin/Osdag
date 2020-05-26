@@ -556,6 +556,11 @@ QFrame#frame{
  
  }
  
+ QDockWidget{
+ 
+ background: white;
+ 
+ }
  QScrollArea{
  background: white;
  }

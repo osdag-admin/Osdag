@@ -432,6 +432,8 @@ DISP_TITLE_BOLT = 'Bolt'
 DISP_TITLE_BOLT_CAPACITY = 'Bolt Capacity'
 
 DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate '
+DISP_TITLE_FLANGESPLICEPLATE_OUTER = 'Outer plate '
+DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner plate '
 KEY_DISP_SLENDER = 'Slenderness'
 KEY_DISP_PLATETHK = 'Thickness(mm)*'
 DISP_TITLE_TENSION = 'Tension Capacity'
@@ -748,14 +750,14 @@ KEY_BOLT_DETAILS ="Bolt.Details"
 DISP_TITLE_BOLT_CAPACITIES = 'Bolt Capacities'
 KEY_BOLT_CAPACITIES = 'Bolt.Capacities'
 DISP_THROAT_THICKNESS = "Throat Thickness"
-
+DISP_TITLE_BOLT_CAPACITY_FLANGE= 'Flange Bolt Capacity'
 KEY_DISP_BOLT_DETAILS = "Bolt Details"
 KEY_FLANGE_BOLT_LINE = 'Flange_plate.Bolt_Line'
-KEY_FLANGE_DISP_BOLT_LINE = 'Bolt Lines in flange'
+KEY_FLANGE_DISP_BOLT_LINE = 'Bolt Lines '
 KEY_FLANGE_BOLTS_ONE_LINE = 'Flange_plate.Bolt_OneLine'
-KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in flange'
+KEY_FLANGE_DISP_BOLTS_ONE_LINE = 'Bolts in one Line '
 KEY_FLANGE_BOLTS_REQ = "Flange_plate.Bolt_required"
-KEY_FLANGE_DISP_BOLTS_REQ = "Flange Bolt Required"
+KEY_FLANGE_DISP_BOLTS_REQ = "Bolt Required"
 KEY_FLANGE_NUM_BOLTS_REQ = "Flange_plate.Bolt_required"
 
 
@@ -838,8 +840,8 @@ KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
 KEY_DISP_WEB_PLATE_LENGTH ='Length (mm)'
-
-
+DISP_TITLE_BOLT_CAPACITY_WEB = 'Web Bolt Capacity'
+KEY_BOLT_CAPACITIES_WEB = 'Web Bolt.Capacities'
 
 KEY_WEB_SPACING ="Web_plate.spacing"
 KEY_DISP_WEB_SPACING = 'Spacing (mm)'
@@ -877,11 +879,11 @@ KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Web Moment Demand (kNm)'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
 KEY_WEB_DISP_PLATE_MOM_CAPACITY = 'Moment Capacity (kNm)'
 KEY_WEB_BOLT_LINE = 'Web_plate.Bolt_Line'
-KEY_WEB_DISP_BOLT_LINE = 'Bolt Lines in web'
+KEY_WEB_DISP_BOLT_LINE = 'Bolt Lines'
 KEY_WEB_BOLTS_REQ = "Web_plate.Bolt_required"
-KEY_WEB_DISP_BOLTS_REQ = "Web Bolt Required"
+KEY_WEB_DISP_BOLTS_REQ = "Bolt Required"
 KEY_WEB_BOLTS_ONE_LINE = 'Web_plate.Bolt_OneLine'
-KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in one Line in web'
+KEY_WEB_DISP_BOLTS_ONE_LINE = 'Bolts in one Line'
 
 KEY_WEB_WELD_DETAILS = "Web detail"
 KEY_DISP_WEB_WELD_DETAILS = "Weld Details"

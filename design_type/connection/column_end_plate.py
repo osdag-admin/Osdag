@@ -470,22 +470,76 @@ class ColumnEndPlate(MomentConnection):
         # if 2*self.end_dist < 50 and self.h_s < 100:
         #     pass
         # elif 2*self.end_dist >= 50 and self.h_s >= 100:
-        t33 = (None, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, True)
+
+        # if flag is True:
+        #     if self.connection == "Extended Both Ways":
+        #         t33 = (None, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, True)
+        #         out_list.append(t33)
+        #
+        #         t21 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.stiff_ht if flag else '', True)
+        #         out_list.append(t21)
+        #         t22 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
+        #         out_list.append(t22)
+        #         t23 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
+        #         out_list.append(t23)
+        #         t24 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
+        #         out_list.append(t24)
+        #     else:
+        #         t33 = (None, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, False)
+        #         out_list.append(t33)
+        #         t21 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX, self.stiff_ht if flag else '',False)
+        #         out_list.append(t21)
+        #         t22 = (KEY_OUT_STIFFENER_WIDTH, KEY_OUT_DISP_STIFFENER_WIDTH, TYPE_TEXTBOX, self.stiff_wt if flag else '',False)
+        #         out_list.append(t22)
+        #         t23 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX, self.t_s if flag else '',False)
+        #         out_list.append(t23)
+        #         t24 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, self.weld_type if flag else '', False)
+        #         out_list.append(t24)
+        #         pass
+
+        t33 = (KEY_OUT_STIFFENER_TITLE, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, True)
         out_list.append(t33)
-
-        t21 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.stiff_ht if flag else '', True)
+        t21 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX, self.stiff_ht if flag else '', True)
         out_list.append(t21)
-        t22 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
+        t22 = (KEY_OUT_STIFFENER_WIDTH, KEY_OUT_DISP_STIFFENER_WIDTH, TYPE_TEXTBOX, self.stiff_wt if flag else '', True)
         out_list.append(t22)
-        t23 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
+        t23 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX, self.t_s if flag else '', True)
         out_list.append(t23)
-        t24 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
+        t24 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, self.weld_type if flag else '', True)
         out_list.append(t24)
-
         # t22 = (KEY_OUT_STIFFENER_DETAILS,KEY_OUT_DISP_STIFFENER_DETAILS,TYPE_OUT_BUTTON, ['Stiffener Details',self.stiffener_details], True)
         # out_list.append(t22)
 
         return out_list
+
+    def input_value_changed(self):
+        lst = []
+        # t6 = ([KEY_CONN], KEY_OUT_STIFFENER_TITLE, TYPE_LABEL, self.out_stiffener)
+        # lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_HEIGHT, TYPE_OUT_DOCK, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_WIDTH, TYPE_OUT_DOCK, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_THICKNESS, TYPE_OUT_DOCK, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_WELD_TYPE, TYPE_OUT_DOCK, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_HEIGHT, TYPE_OUT_LABEL, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_WIDTH, TYPE_OUT_LABEL, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_THICKNESS, TYPE_OUT_LABEL, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_WELD_TYPE, TYPE_OUT_LABEL, self.out_stiffener)
+        lst.append(t6)
+        return lst
+
+    def out_stiffener(self):
+        conn_type = self[0]
+        if conn_type != 'Extended Both Ways':
+            return True
+        else:
+            return False
 
     def func_for_validation(self, design_dictionary):
 

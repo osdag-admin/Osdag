@@ -1,0 +1,43 @@
+Connector.Flange_Plate.Preferences: Outside + Inside
+Connector.Flange_Plate.Thickness_list:
+- '6'
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '24'
+- '25'
+- '26'
+- '28'
+- '28'
+- '30'
+- '32'
+- '32'
+- '36'
+- '36'
+- '40'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '80'
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Web_Plate.Thickness_List:
+- '6'
+Design.Design_Method: Limit State Design
+Detailing.Gap: '10'
+Load.Axial: '1500'
+Load.Moment: '9'
+Load.Shear: '180'
+Material: E 250 (Fe 410 W)A
+Member.Designation: WPB 240x240x47.4
+Member.Material: E 250 (Fe 410 W)A
+Module: Beam Coverplate Weld Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'
+Weld.Type: Fillet Weld

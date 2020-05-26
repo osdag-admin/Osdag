@@ -1,0 +1,564 @@
+\documentclass{article}%
+\usepackage[T1]{fontenc}%
+\usepackage[utf8]{inputenc}%
+\usepackage{lmodern}%
+\usepackage{textcomp}%
+\usepackage{lastpage}%
+\usepackage{parskip}%
+\usepackage[top=1.2in,bottom=1in,left=0.6in,right=0.6in,headsep=0.8in]{geometry}%
+\usepackage{amsmath}%
+\usepackage{graphicx}%
+\usepackage{needspace}%
+\usepackage{color}%
+\usepackage{longtable}%
+\usepackage{multirow}%
+\usepackage[table]{xcolor}%
+\usepackage{fancyhdr}%
+\usepackage{tabularx}%
+%
+\definecolor{OsdagGreen}{HTML}{D5DF93}%
+\fancypagestyle{header}{ 
+\renewcommand{\headrulewidth}{0pt}%
+\renewcommand{\footrulewidth}{0pt}%
+\fancyhead{ 
+}%
+\fancyfoot{ 
+}%
+\fancyhead[C]{ 
+\begin{tabularx}{\textwidth}{|l|p{6cm}|l|X|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Company Name&LoremIpsum&Project Title&Fossee\\%
+\hline%
+\rowcolor{OsdagGreen}%
+Group/Team Name&LoremIpsum&Subtitle&\\%
+\hline%
+\rowcolor{OsdagGreen}%
+Designer&LoremIpsum&Job Number&123\\%
+\hline%
+\rowcolor{OsdagGreen}%
+Date&26 /05 /2020&Client&LoremIpsum\\%
+\hline%
+\end{tabularx}
+}%
+\fancyfoot[R]{ 
+Page \thepage\ of \pageref{LastPage}
+}
+}%
+%
+\begin{document}%
+\normalsize%
+\pagestyle{header}%
+\section{Input Parameters}%
+\label{sec:InputParameters}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|}%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Module}&\multicolumn{2}{|c|}{Beam Coverplate Connection}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{MainModule}&\multicolumn{2}{|c|}{Moment Connection}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Moment(kNm)*}&\multicolumn{2}{|c|}{1.0}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Shear (kN)*}&\multicolumn{2}{|c|}{89.0}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Axial (kN) *}&\multicolumn{2}{|c|}{32.0}\\%
+\hline%
+\hline%
+\multicolumn{5}{|c|}{\textbf{Section}}\\%
+\hline%
+\hline%
+\multirow{12}{*}{\includegraphics[width=5cm,height=5cm]{E:/office _anjali/columnspliceanjali/Osdag3/ResourceFiles/images/ISection.png}}&\multicolumn{2}{|c|}{Beam Section *}&\multicolumn{2}{|c|}{WPB 200x200x101}\\%
+\cline{2%
+-%
+5}%
+&\multicolumn{2}{|c|}{Preferences}&\multicolumn{2}{|c|}{Outside + Inside}\\%
+\cline{2%
+-%
+5}%
+&\multicolumn{2}{|c|}{Material *}&\multicolumn{2}{|c|}{E 250 (Fe 410 W)A}\\%
+\cline{2%
+-%
+5}%
+&\multicolumn{2}{|c|}{Ultimate strength, fu (MPa)}&\multicolumn{2}{|c|}{410}\\%
+\cline{2%
+-%
+5}%
+&Yield Strength , fy (MPa)&240&R1(mm)&1.8\\%
+\cline{2%
+-%
+5}%
+&Mass&100.99&R2(mm)&0.0\\%
+\cline{2%
+-%
+5}%
+&Area(mm2) {-} A&12870.0&Iz(mm4)&114686000.0\\%
+\cline{2%
+-%
+5}%
+&D(mm)&229.0&Iy(mm4)&36645800.0\\%
+\cline{2%
+-%
+5}%
+&B(mm)&210.0&rz(mm)&94.4\\%
+\cline{2%
+-%
+5}%
+&t(mm)&14.5&ry(mm)&53.4\\%
+\cline{2%
+-%
+5}%
+&T(mm)&23.7&Zz(mm3)&1001620.0\\%
+\cline{2%
+-%
+5}%
+&FlangeSlope&90&Zy(mm3)&349010.0\\%
+\cline{2%
+-%
+5}%
+\hline%
+\multicolumn{5}{|c|}{\textbf{Bolt Details}}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Diameter (mm)*}&\multicolumn{2}{|c|}{{[}12.0{]}}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Grade *}&\multicolumn{2}{|c|}{{[}9.8{]}}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Type *}&\multicolumn{2}{|c|}{Bearing Bolt}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Bolt hole type}&\multicolumn{2}{|c|}{Standard}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Slip factor (µ\_f)}&\multicolumn{2}{|c|}{0.3}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Type of edges}&\multicolumn{2}{|c|}{a {-} Sheared or hand flame cut}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Gap between beam and <br>support (mm)}&\multicolumn{2}{|c|}{10.0}\\%
+\hline%
+\hline%
+\multicolumn{3}{|c|}{Are the members exposed to <br>corrosive influences}&\multicolumn{2}{|c|}{False}\\%
+\hline%
+\end{longtable}
+
+%
+\Needspace{10\baselineskip}%
+\newpage%
+\section{Design Checks}%
+\label{sec:DesignChecks}%
+\subsection{Member Capacity}%
+\label{subsec:MemberCapacity}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Axial Capacity Member Ac (kN)&&$\begin{aligned} A_c &=\frac{A*f_y}{\gamma_{m0} *10^3}\\ &=\frac{12870.0*240}{1.1* 10^3}\\ &=2808.0\end{aligned}$&\\%
+\hline%
+Shear Capacity Member Sc (kN)&&$\begin{aligned} S_c &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo} *10^3}\\ &=\frac{181.6*14.5*240}{\sqrt{3}*1.1 *10^3}\\ &=331.7\end{aligned}$&\\%
+\hline%
+Plastic Moment Capacity Pmc (kNm)&&$\begin{aligned} Pmc &= \frac{\beta_b * Z_p *fy}{\gamma_{mo} * 10^6}\\ &=\frac{1*119547.28*240}{1.1 * 10^6}\\ &=26.08\end{aligned}$&\\%
+\hline%
+Moment Deformation Criteria Mdc (kNm)&&$\begin{aligned} Mdc &= \frac{1.5 *Z_e *fy}{1.1* 10^6}\\ &= \frac{1.5 *1001620.0*240}{1.1* 10^6}\\ &= 327.8\end{aligned}$&\\%
+\hline%
+Moment Capacity Member Mc (kNm)&&$\begin{aligned} M_c &= min(Pmc,Mdc)\\ &=min(26.08,327.8)\\ &=26.08\end{aligned}$&\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Load Consideration}%
+\label{subsec:LoadConsideration}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{3.5cm}|p{6.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Applied Axial Load Au (kN)&$\begin{aligned} Ac_{min} &= 0.3 * A_c\\ &= 0.3 *2808.0\\ &=842.4\\ Ac_{max} &= Ac \\ &=2808.0\end{aligned}$&$\begin{aligned} A_u &=842.4\end{aligned}$&Pass\\%
+\hline%
+Applied Shear Load Vu (kN)&$\begin{aligned} Vc_{min} &= 0.6 * S_c\\ &= 0.6 *331.7\\ &=199.02\\ Vc_{max} &= Sc \\ &=331.7\end{aligned}$&$\begin{aligned} V_u &=199.02\end{aligned}$&Pass\\%
+\hline%
+Applied Moment Load Mu (kNm)&$\begin{aligned} Mc_{min} &= 0.5 * M_c\\ &= 0.5 *26.08\\ &=13.04\\  Mc_{max} &= Mc \\ &=26.08\end{aligned}$&$\begin{aligned} M_u &=13.04\end{aligned}$&Pass\\%
+\hline%
+Forces Carried by Web&&$\begin{aligned}A_w &= Axial~ force~ in~ web  \\   &= \frac{(D- 2*T)*t* Au }{A} \\ &= \frac{(229.0- 2*23.7)*14.5*842.4 }{12870.0} \\ &=172.35~ kN\\ M_w &= Moment ~in ~web  \\  &= \frac{Z_w * Mu}{Z} \\ &= \frac{119547.28 * 13.04}{1165460.0} \\ &=1.34~{kNm}\end{aligned}$&\\%
+\hline%
+Forces Carried by Flange&&$\begin{aligned} A_f&= Axial~force~ in ~flange  \\ &= \frac{Au * B *T}{A} \\ &= \frac{842.4 * 210.0*23.7}{12870.0} \\ &=325.77~ kN\\ M_f& =Moment~ in~ flange \\  & = Mu-M_w\\ &= 13.04-1.34\\ &=11.7~{kNm}\\  F_f& =flange~force  \\ & = \frac{M_f *10^3}{D-T} + A_f \\ &= \frac{11.7* 10^3}{229.0-23.7} +325.77 \\ &=382.78~kN \end{aligned}$&\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Initial Member Check}%
+\label{subsec:InitialMemberCheck}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{3cm}|p{4.5cm}|p{6.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Flange Tension Yielding Capacity (kN)&$\begin{aligned} F_f &=382.78\end{aligned}$&$\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\ &=\frac{1*210.0*23.7*240}{1.1}\\ &=1131.14\end{aligned}$&Pass\\%
+\hline%
+Web Tension Yielding Capacity (kN)&$\begin{aligned} A_w &=172.35\end{aligned}$&$\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\ &=\frac{1*181.6*14.5*240}{1.1}\\ &=598\end{aligned}$&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Initial flange plate height check}%
+\label{subsec:Initialflangeplateheightcheck}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4.5cm}|p{2.5cm}|p{7cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+flange\_plate.Height&Outer.b >= 50&$\begin{aligned} Outer.b &=210.0\end{aligned}$&Pass\\%
+\hline%
+flange\_plate.InnerHeight&Inner.b >= 50&$\begin{aligned} inner.b &= \frac{B-t-(2*r_1)}{2}\\ &=\frac{210.0-14.5-(2*1.8)}{2}\\ &= 95.95\end{aligned}$&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Flange plate thickness}%
+\label{subsec:Flangeplatethickness}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Thickness (mm)*&$\begin{aligned} T &=11.85\end{aligned}$&$\begin{aligned} t_f &=25.0\end{aligned}$&Pass\\%
+\hline%
+Plate Area check (mm2)&$\begin{aligned} &pt.area >= \\&connected~member~area * 1.05\\  &= 5225.85\end{aligned}$&$\begin{aligned} outer.b &= B\\ &= 210.0 \\ inner.b &= \frac{B-t-(2*r_1)}{2}\\ &=\frac{210.0-14.5-(2*1.8)}{2}\\ &= 95.95 \\  pt.area &=(210.0+(2*95.95))*25.0\\ &= 10047.5\end{aligned}$&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Web plate thickness}%
+\label{subsec:Webplatethickness}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Thickness (mm)*&$\begin{aligned} t &=7.25\end{aligned}$&$\begin{aligned} t_w &=20.0\end{aligned}$&Pass\\%
+\hline%
+Plate Area check (mm2)&$\begin{aligned} &pt.area >= \\&connected~member~area * 1.05\\  &= 1699.11\end{aligned}$&$\begin{aligned} web~b &= D-(2*T)-(2*r_1)\\ &=229.0-(2*23.7)-(2*1.8)\\ &= 111.6 \\  pt.area &= 20.0*2* 111.6\\ &= 4464.0\end{aligned}$&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Web Spacing Checks}%
+\label{subsec:WebSpacingChecks}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{2.5cm}|p{7.5cm}|p{5cm}|p{1cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Min.Diameter (mm)&&$\begin{aligned} d &=12.0\end{aligned}$&\\%
+\hline%
+Min. Gauge (mm)&$\begin{aligned}p/g_{min}&= 2.5 ~ d&\\ =&2.5*12.0&=30.0\end{aligned}$&$\begin{aligned} g &=30~(Row~Limit~(r_l) = 2)\end{aligned}$&\\%
+\hline%
+Min. Edge Distance (mm)&$\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\ &=1.7*13.0=22.1 \end{aligned}$&25&\\%
+\hline%
+Spacing Check&$\begin{aligned} depth & = 2 * e + (r_l -1) * g\\ & = 2 * 25+(2.0-1)*30\\ & = 80.0\end{aligned}$&111.6&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Flange Spacing Checks}%
+\label{subsec:FlangeSpacingChecks}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{2.5cm}|p{7.5cm}|p{5cm}|p{1cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Min.Diameter (mm)&&$\begin{aligned} d &=12.0\end{aligned}$&\\%
+\hline%
+Min. Gauge (mm)&$\begin{aligned}p/g_{min}&= 2.5 ~ d&\\ =&2.5*12.0&=30.0\end{aligned}$&$\begin{aligned} g &=0.0~(Row~Limit~(r_l) = 1)\end{aligned}$&\\%
+\hline%
+Min. Edge Distance (mm)&$\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\ &=1.7*13.0=22.1 \end{aligned}$&25&\\%
+\hline%
+Spacing Check&$\begin{aligned} depth & = 2 * e + (r_l -1) * g\\ & = 2 * 25+(1.0-1)*30\\ & = 50.0\end{aligned}$&95.95&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Flange Bolt Checks}%
+\label{subsec:FlangeBoltChecks}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Diameter (mm)&Bolt Quantity Optimisation&$\begin{aligned} d &=12.0\end{aligned}$&\\%
+\hline%
+Grade&Bolt Grade Optimisation&9.8&\\%
+\hline%
+Bolt.fu&&900.0&\\%
+\hline%
+Bolt.fy&&720.0&\\%
+\hline%
+Hole Diameter (mm)& &$\begin{aligned} d_0 &=13.0\end{aligned}$&\\%
+\hline%
+Shear Capacity (kN)&&$\begin{aligned}V_{dsb} &= \frac{f_{ub} ~n_n~ A_{nb}}{\sqrt{3} ~\gamma_{mb}}\\ &= \frac{900.0*2*84.3}{\sqrt{3}~*~1.25}\\ &= 70.09\end{aligned}$&\\%
+\hline%
+Bearing Capacity (kN)&&$\begin{aligned}V_{dpb} &= \frac{2.5~ k_b~ d~ t~ f_u}{\gamma_{mb}}\\ &= \frac{2.5~*0.52*12.0*23.7*410}{1.25}\\ &=121.27\end{aligned}$&\\%
+\hline%
+Bolt Capacity (kN)&&$\begin{aligned}V_{db} &= min~ (V_{dsb}, V_{dpb})\\ &= min~ (70.09,121.27)\\ &=70.09\end{aligned}$&\\%
+\hline%
+No of Bolts&$\begin{aligned}R_{u} &= \sqrt{V_u^2+A_u^2}\\ n_{trial} &= R_u/ V_{bolt}\\ R_{u} &= \frac{\sqrt{0.0^2+382.78^2}}{70.09}\\ &=12\end{aligned}$&16&\\%
+\hline%
+No of Columns&&$\begin{aligned} n_c &=4\end{aligned}$&\\%
+\hline%
+No of Rows&&$\begin{aligned} n_r &=4\end{aligned}$&\\%
+\hline%
+Min. Pitch (mm)&$\begin{aligned}p/g_{min}&= 2.5 ~ d&\\ =&2.5*12.0&=30.0\end{aligned}$&30&Pass\\%
+\hline%
+Max. Pitch (mm)&$\begin{aligned}p/g_{max} &=\min(32~t,~300~mm)&\\ &=\min(32 *~23.7,~ 300 ~mm)\\&=300\end{aligned}$&30&Pass\\%
+\hline%
+Min. Gauge (mm)&$\begin{aligned}p/g_{min}&= 2.5 ~ d&\\ =&2.5*12.0&=30.0\end{aligned}$&45&Pass\\%
+\hline%
+Max. Gauge (mm)&$\begin{aligned}p/g_{max} &=\min(32~t,~300~mm)&\\ &=\min(32 *~23.7,~ 300 ~mm)\\&=300\end{aligned}$&45&Pass\\%
+\hline%
+Min. End Distance (mm)&$\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\ &=1.7*13.0=22.1 \end{aligned}$&25&Pass\\%
+\hline%
+Max. End Distance (mm)&$\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\ \varepsilon &= \sqrt{\frac{250}{f_y}}\\ e/e`_{max}&=12 ~*25.0*\sqrt{\frac{250}{250}}\\ &=300.0\\ \end{aligned}$&25&Pass\\%
+\hline%
+Min. Edge Distance (mm)&$\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\ &=1.7*13.0=22.1 \end{aligned}$&25.475&Pass\\%
+\hline%
+Max. Edge Distance (mm)&$\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\ \varepsilon &= \sqrt{\frac{250}{f_y}}\\ e/e`_{max}&=12 ~*25.0*\sqrt{\frac{250}{250}}\\ &=300.0\\ \end{aligned}$&25.475&Pass\\%
+\hline%
+Bolt Capacity post Long Joint (kN)&$\begin{aligned} &if~l\geq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\ & if~l < 15 * d~then~V_{rd} = V_{db} \\ & where,\\ & l = ((nc~or~nr) - 1) * (p~or~g) \\ & \beta_{ij} = 1.075 - l/(200 * d) \\ & but~0.75\leq\beta_{ij}\leq1.0 \end{aligned}$&$\begin{aligned} l~&= ((nc~or~nr) - 1) * (p~or~g) \\  lc&= 2*((\frac{4}{2} - 1) * 30+25)+ 10.0\\&=120.0\\  lr&= 2*((\frac{4}{2} - 1) * 45+25.475\\& +1.8)+ 14.5=159.04999999999998\\  l~&= 159.04999999999998\\ & 15 * d = 15 * 12.0 = 180.0 \\ & since,~l < 15 * d~ \\& then~V_{rd} = V_{db} \\ & V_{rd} = 70.09 \end{aligned}$&\\%
+\hline%
+Capacity (kN)&47.85&70.09&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Web Bolt Checks}%
+\label{subsec:WebBoltChecks}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Shear Capacity (kN)&&$\begin{aligned}V_{dsb} &= \frac{f_{ub} ~n_n~ A_{nb}}{\sqrt{3} ~\gamma_{mb}}\\ &= \frac{900.0*2*84.3}{\sqrt{3}~*~1.25}\\ &= 70.09\end{aligned}$&\\%
+\hline%
+Bearing Capacity (kN)&&$\begin{aligned}V_{dpb} &= \frac{2.5~ k_b~ d~ t~ f_u}{\gamma_{mb}}\\ &= \frac{2.5~*0.52*12.0*14.5*410}{1.25}\\ &=74.19\end{aligned}$&\\%
+\hline%
+Bolt Capacity (kN)&&$\begin{aligned}V_{db} &= min~ (V_{dsb}, V_{dpb})\\ &= min~ (70.09,74.19)\\ &=70.09\end{aligned}$&\\%
+\hline%
+No of Bolts&$\begin{aligned}R_{u} &= \sqrt{V_u^2+A_u^2}\\ n_{trial} &= R_u/ V_{bolt}\\ R_{u} &= \frac{\sqrt{199.02^2+172.35^2}}{70.09}\\ &=8\end{aligned}$&30&\\%
+\hline%
+No of Columns&&$\begin{aligned} n_c &=10\end{aligned}$&\\%
+\hline%
+No of Rows&&$\begin{aligned} n_r &=3\end{aligned}$&\\%
+\hline%
+Min. Pitch (mm)&$\begin{aligned}p/g_{min}&= 2.5 ~ d&\\ =&2.5*12.0&=30.0\end{aligned}$&30&Pass\\%
+\hline%
+Max. Pitch (mm)&$\begin{aligned}p/g_{max} &=\min(32~t,~300~mm)&\\ &=\min(32 *~14.5,~ 300 ~mm)\\&=300\end{aligned}$&30&Pass\\%
+\hline%
+Min. Gauge (mm)&$\begin{aligned}p/g_{min}&= 2.5 ~ d&\\ =&2.5*12.0&=30.0\end{aligned}$&45&Pass\\%
+\hline%
+Max. Gauge (mm)&$\begin{aligned}p/g_{max} &=\min(32~t,~300~mm)&\\ &=\min(32 *~14.5,~ 300 ~mm)\\&=300\end{aligned}$&45&Pass\\%
+\hline%
+Min. End Distance (mm)&$\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\ &=1.7*13.0=22.1 \end{aligned}$&25&Pass\\%
+\hline%
+Max. End Distance (mm)&$\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\ \varepsilon &= \sqrt{\frac{250}{f_y}}\\ e/e`_{max}&=12 ~*20.0*\sqrt{\frac{250}{250}}\\ &=240.0\\ \end{aligned}$&25&Pass\\%
+\hline%
+Min. Edge Distance (mm)&$\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\ &=1.7*13.0=22.1 \end{aligned}$&25&Pass\\%
+\hline%
+Max. Edge Distance (mm)&$\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\ \varepsilon &= \sqrt{\frac{250}{f_y}}\\ e/e`_{max}&=12 ~*20.0*\sqrt{\frac{250}{250}}\\ &=240.0\\ \end{aligned}$&25&Pass\\%
+\hline%
+Parameters required for bolt force (mm)&&$\begin{aligned} l_n~~~ &= length~available \\  l_n~~~ &= (n_r - 1) * g\\  &= (3 - 1) *45\\  & =90\\  y_{max} &= l_n / 2\\  &= 90 / 2 \\  & =45.0\\ x_{max} &= p * (\frac{n_c}{2} - 1) / 2 \\  &= 30 * (\frac{10}{2} + - 1) / 2 \\  & =60.0\end{aligned}$&\\%
+\hline%
+Moment Demand (kNm&&$\begin{aligned}  M_d &= (V_u * ecc + M_w)\\  &= \frac{(199.02 * 10^3 *135.0 + 1.34*10^6)}{10^6}\\  & =28.21\end{aligned}$&\\%
+\hline%
+Bolt.Force&&$\begin{aligned} vbv~~ &= V_u / (n_r * n_c)\\  &= \frac{199.02}{ (3*10)}\\  & =13.27\\ tmh~ &= \frac{M_d * y_{max} }{ \Sigma r_i^2} \\  &= \frac{28.21 *45.0}{47.25}\\  & =26.86\\  tmv ~&= \frac{M_d * x_{max}}{\Sigma r_i^2}\\ &= \frac{28.21 * 60.0}{47.25}\\  & =35.82\\  abh~ & = \frac{A_u }{(n_r * n_c)}\\   & =\frac{172.35}{ (3 *10)}\\  & =11.49\\  vres &=\sqrt{(vbv +tmv) ^ 2 + (tmh+abh) ^ 2}\\   &= \sqrt{(13.27 +35.82) ^2 + (26.86+11.49) ^ 2}\\  & =62.29\end{aligned}$&\\%
+\hline%
+Bolt Capacity post Long Joint (kN)&$\begin{aligned} &if~l\geq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\ & if~l < 15 * d~then~V_{rd} = V_{db} \\ & where,\\ & l = ((nc~or~nr) - 1) * (p~or~g) \\ & \beta_{ij} = 1.075 - l/(200 * d) \\ & but~0.75\leq\beta_{ij}\leq1.0 \end{aligned}$&$\begin{aligned} l&= ((nc~or~nr) - 1) * (p~or~g) \\  lc&= 2*((\frac{10}{2} - 1) * 30+25)+ 10.0\\&=300.0\\  lr&= (3 - 1) * 45=90\\  l&= 300.0\\ & 15 * d = 15 * 12.0 = 180.0 \\ &since,~l \geq 15 * d~ \\&then~V_{rd} = \beta_{ij} * V_{db} \\ \beta_{ij} &= 1.075 - 300.0/(200*12.0) \\&=0.95\\ V_{rd} &= 0.95 * 70.09=66.58 \end{aligned}$&\\%
+\hline%
+Capacity (kN)&62.29&66.58&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Inner and Outer flange plate Checks}%
+\label{subsec:InnerandOuterflangeplateChecks}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Min. Plate Height (mm)&$\begin{aligned}min~flange~plate~ht &= beam~width\\ &=210.0\end{aligned}$&210.0&Pass\\%
+\hline%
+Min. Plate Length (mm)&$\begin{aligned} & 2[2*e_{min} + ({\frac{bolt~lines}{2}}-1) * p_{min})]\\ & +\frac{gap}{2}]\\ &=2*[(2*22.1 + (\frac{4}{2}-1) * 30.0\\ &= + \frac{10.0}{2}]\\ &=158.4\end{aligned}$&170.0&Pass\\%
+\hline%
+Min. Inner Plate Height (mm)&$\begin{aligned}&= \frac{B -t- (2*R1)}{2}\\ &=\frac{210.0 -14.5 - 2*1.8}{2}\\ &=95.95\end{aligned}$&95.95&Pass\\%
+\hline%
+Max. Inner Plate Height (mm)&$\begin{aligned}&= \frac{B -t- (2*R1)}{2}\\ &=\frac{210.0 -14.5 - 2*1.8}{2}\\ &=95.95\end{aligned}$&95.95&Pass\\%
+\hline%
+Min. Inner Plate Length (mm)&$\begin{aligned} & 2[2*e_{min} + ({\frac{bolt~lines}{2}}-1) * p_{min})]\\ & +\frac{gap}{2}]\\ &=2*[(2*22.1 + (\frac{4}{2}-1) * 30.0\\ &= + \frac{10.0}{2}]\\ &=158.4\end{aligned}$&170.0&Pass\\%
+\hline%
+Min.Plate Thickness (mm)&$\begin{aligned} t_w=11.85\end{aligned}$&25.0&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Member Checks}%
+\label{subsec:MemberChecks}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Flange Tension Yielding Capacity (kN)&&$\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\ &=\frac{1*210.0*23.7*240}{1.1}\\ &=1131.14\end{aligned}$&\\%
+\hline%
+Flange Tension Rupture Capacity (kN)&&$\begin{aligned} T_{dn} &= \frac{0.9*A_{n}*f_u}{\gamma_{m1}}\\ &=\frac{0.9*(210.0-4*13.0)*23.7*410}{1.25}\\ &=1105.41\end{aligned}$&\\%
+\hline%
+Flange Block Shear Capacity (kN)&&$\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\ T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\ T_{db} &= min(T_{db1}, T_{db2})= 1046.0\end{aligned}$&\\%
+\hline%
+Flange Tension Capacity (kN)&$\begin{aligned} f_f &=382.78\end{aligned}$&$\begin{aligned} T_d &= min(T_{dg},T_{dn},T_{db})\\ &= min(1131.14,1105.41,1046.0)\\ &=1046.0\end{aligned}$&Pass\\%
+\hline%
+Web Tension Yielding Capacity (kN)&&$\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\ &=\frac{1*181.6*14.5*240}{1.1}\\ &=598.45\end{aligned}$&\\%
+\hline%
+Web Tension Rupture Capacity (kN)&&$\begin{aligned} T_{dn} &= \frac{0.9*A_{n}*f_u}{\gamma_{m1}}\\ &=\frac{0.9*(181.6-3*13.0)*14.5*410}{1.25}\\ &=610.39\end{aligned}$&\\%
+\hline%
+Web Block Shear Capacity (kN)&&$\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\ T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\ T_{db} &= min(T_{db1}, T_{db2})= 932.72\end{aligned}$&\\%
+\hline%
+Web Tension Capacity (kN)&$\begin{aligned} A_w &=172.35\end{aligned}$&$\begin{aligned} T_d &= min(T_{dg},T_{dn},T_{db})\\ &= min(598.45,610.39,932.72)\\ &=598.45\end{aligned}$&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Flange Plate Capacity Checks in axial{-}Outside/Inside }%
+\label{subsec:FlangePlateCapacityChecksinaxial{-}Outside/Inside}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Tension Yielding Capacity (kN)&&$\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\ &=\frac{1*401.9*25.0*250}{1.1}\\ &=2283.52\end{aligned}$&\\%
+\hline%
+Tension Rupture Capacity (kN)&&$\begin{aligned} T_{dn} &= \frac{0.9*A_{n}*f_u}{\gamma_{m1}}\\ &=\frac{0.9*(401.9-4*13.0)*25.0*410}{1.25}\\ &=2582.26\end{aligned}$&\\%
+\hline%
+Block Shear Capacity (kN)&&$\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\ T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\ T_{db} &= min(T_{db1}, T_{db2})= 2309.59\end{aligned}$&\\%
+\hline%
+Plate Tension Capacity (kN)&$\begin{aligned} f_f &=382.78\end{aligned}$&$\begin{aligned} T_d &= min(T_{dg},T_{dn},T_{db})\\ &= min(2283.52,2582.26,2309.59)\\ &=2283.52\end{aligned}$&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Web Plate Capacity Checks in Axial}%
+\label{subsec:WebPlateCapacityChecksinAxial}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Tension Yielding Capacity (kN)&&$\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\ &=\frac{1*140*20.0*250}{1.1}\\ &=734.81\end{aligned}$&\\%
+\hline%
+Tension Rupture Capacity (kN)&&$\begin{aligned} T_{dn} &= \frac{0.9*A_{n}*f_u}{\gamma_{m1}}\\ &=\frac{0.9*(140-3*13.0)*20.0*900.0}{1.25}\\ &=1192.61\end{aligned}$&\\%
+\hline%
+Block Shear Capacity (kN)&&$\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\ T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\ T_{db} &= min(T_{db1}, T_{db2})= 2573.02\end{aligned}$&\\%
+\hline%
+Plate Tension Capacity (kN)&$\begin{aligned} A_w &=172.35\end{aligned}$&$\begin{aligned} T_d &= min(T_{dg},T_{dn},T_{db})\\ &= min(1272.73,1192.61,2573.02)\\ &=1192.61\end{aligned}$&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\newpage%
+\subsection{Web Plate Capacity Checks in Shear}%
+\label{subsec:WebPlateCapacityChecksinShear}%
+\renewcommand{\arraystretch}{1.2}%
+\begin{longtable}{|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|}%
+\hline%
+\rowcolor{OsdagGreen}%
+Check&Required&Provided&Remarks\\%
+\hline%
+\endhead%
+\hline%
+Shear yielding Capacity (V\_dy) (kN)&&$\begin{aligned} V_{dy} &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo}}\\ &=\frac{1*140*20.0*250}{\sqrt{3}*1.1}\\ &=734.81\end{aligned}$&\\%
+\hline%
+Shear Rupture Capacity (V\_dn) (kN)&&$\begin{aligned} V_{dn} &= \frac{0.9*A_{vn}*f_u}{\sqrt{3}*\gamma_{m1}}\\ &= \frac{0.9 *(140-(5.0*13.0))*20.0*410}{\sqrt{3}*1.25}\\ &=688.55\end{aligned}$&\\%
+\hline%
+Block Shear Capacity in Shear (V\_db) (kN)&&$\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\ T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\ T_{db} &= min(T_{db1}, T_{db2})= 1880.61\end{aligned}$&\\%
+\hline%
+Plate Shear Capacity (kN)&$\begin{aligned} V_u &=199.02\end{aligned}$&$\begin{aligned} V_d &= min(V_{dy},V_{dn},V_{db})\\ &= min(734.81,688.55,2573.02)\\ &=688.55\end{aligned}$&Pass\\%
+\hline%
+\end{longtable}
+
+%
+\Needspace{10\baselineskip}%
+\newpage%
+\section{3D View}%
+\label{sec:3DView}%
+
+
+\begin{figure}[h!]%
+\centering%
+\includegraphics[width=\linewidth]{E:/office _anjali/columnspliceanjali/Osdag3/ResourceFiles/images/3d.png}%
+\caption{3D View}%
+\end{figure}
+
+%
+\end{document}

@@ -6,11 +6,8 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
 from cad.items.notch import Notch
 
 
-class ISection(object):
-    '''
-
-
-    '''
+class TISection(object):
+   
 
     def __init__(self, B, T, D, t, R1, R2, d, b, alpha, length, notchObj):
         self.B = B
@@ -112,10 +109,10 @@ if __name__ == '__main__':
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])
 
-    ISec = ISection(B, T, D, t, R1, R2, d, b, alpha, length, notchObj)
-    _place = ISec.place(origin, uDir, shaftDir)
-    point = ISec.compute_params()
-    prism = ISec.create_model()
+    TISec = TISection(B, T, D, t, R1, R2, d, b, alpha, length, notchObj)
+    _place = TISec.place(origin, uDir, shaftDir)
+    point = TISec.compute_params()
+    prism = TISec.create_model()
     display.DisplayShape(prism, update=True)
     display.DisableAntiAliasing()
     start_display()

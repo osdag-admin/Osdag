@@ -255,6 +255,8 @@ class Tension_bolted(Member):
         c_lst.append(t2)
         t3 = (KEY_D, self.diam_bolt_customized)
         c_lst.append(t3)
+        t4= (KEY_IMAGE, self.fn_conn_image)
+        c_lst.append(t3)
         # t4 = (KEY_PLATETHK, self.plate_thick_customized)
         # c_lst.append(t4)
         # t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
@@ -287,6 +289,9 @@ class Tension_bolted(Member):
         t2 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t2)
 
+        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, None , self.fn_conn_image)
+        lst.append(t3)
+
         return lst
 
     def fn_conn_type(self):
@@ -298,6 +303,20 @@ class Tension_bolted(Member):
         elif conn in ["Channels", "Back to Back Channels"]:
             return VALUES_LOCATION_2
 
+    def fn_conn_image(self):
+
+        "Function to populate section size based on the type of section "
+        img = self[0]
+        if img =="Angles":
+            return VALUES_IMG_TENSIONBOLTED[0]
+        elif img =="Back to Back Angles":
+            return VALUES_IMG_TENSIONBOLTED[1]
+        elif img =="Star Angles":
+            return VALUES_IMG_TENSIONBOLTED[2]
+        elif img =="Channels":
+            return VALUES_IMG_TENSIONBOLTED[3]
+        else:
+            return VALUES_IMG_TENSIONBOLTED[4]
 
     def input_values(self, existingvalues={}):
 
@@ -370,7 +389,7 @@ class Tension_bolted(Member):
         t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, existingvalue_key_sec_profile, VALUES_SEC_PROFILE_2, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/fin_cf_bw.png", True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_TENSIONBOLTED[0], True, 'No Validator')
         options_list.append(t15)
 
         t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, existingvalue_key_location, VALUES_LOCATION_1, True, 'No Validator')
@@ -481,6 +500,7 @@ class Tension_bolted(Member):
         if flag is True:
             if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
                 bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+
                 pass
             else:
                 bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity

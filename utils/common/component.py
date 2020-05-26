@@ -1095,30 +1095,37 @@ class Plate(Material):
         self.vres =vres
         return vres
 
-    def get_bolt_red(self, bolts_one_line , gauge ,bolts_line ,
-                     pitch, bolt_capacity, bolt_dia,end_dist=0.0,gap=0.0):
+    def get_bolt_red(self, bolts_one_line, gauge, bolts_line,
+                     pitch, bolt_capacity, bolt_dia, end_dist=0.0, gap=0.0, edge_dist=0.0, root_radius=0.0,
+                     web_thickness=0.0):
         """
-
         :param bolts_one_line: bolts in one line
         :param gauge: gauge
         :param bolt_capacity: capacity of bolt
         :param bolt_dia: diameter of bolt
         :return: reduced bolt capacity if long joint condition is met
         """
-        length_avail = max(((bolts_one_line - 1) * gauge),((bolts_line - 1) * pitch))
-        if length_avail > 15 * bolt_dia:
-            beta_lj = 1.075 - length_avail / (200 * bolt_dia)
-            print('long joint case')
-            if beta_lj >1:
-                beta_lj =1
-            elif beta_lj<0.75:
-                beta_lj = 0.75
+        if end_dist == 0.0 and gap == 0.0:
+            length_avail = max(((bolts_one_line - 1) * gauge), ((bolts_line - 1) * pitch))
+            if length_avail > 15 * bolt_dia:
+                beta_lj = 1.075 - length_avail / (200 * bolt_dia)
+                print('long joint case')
+                if beta_lj > 1:
+                    beta_lj = 1
+                elif beta_lj < 0.75:
+                    beta_lj = 0.75
+                else:
+                    beta_lj = beta_lj
+                bolt_capacity_red = beta_lj * bolt_capacity
             else:
-                beta_lj = beta_lj
-
-            bolt_capacity_red = beta_lj * bolt_capacity
+                bolt_capacity_red = bolt_capacity
         else:
-            length_avail =  2 * ((bolts_line * pitch) + end_dist) + gap
+            if web_thickness == 0.0:
+                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2 * gap)), ((bolts_one_line - 1) * gauge))
+            else:
+                midgauge = 2 * (edge_dist + root_radius) + web_thickness
+                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2 * gap)),
+                                   (((bolts_one_line / 2 - 1) * gauge) + midgauge))
             if length_avail > 15 * bolt_dia:
                 beta_lj = 1.075 - length_avail / (200 * bolt_dia)
                 if beta_lj > 1:

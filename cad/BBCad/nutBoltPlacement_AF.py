@@ -58,11 +58,13 @@ class NutBoltArray_AF():
         '''
         b_AF = self.bolt
         n_AF = self.nut
+
         for i in range(self.numOfboltsF):
-            bolt_length_required = float( b_AF.T +self.nutSpaceF)#todo: anjali
+            bolt_length_required = float(n_AF.H + self.nutSpaceF)#todo: anjali
+            print(bolt_length_required, "len")
            #  bolt_length_required = float(b_AF.T  + self.nutSpaceF)
             # bolt_length_required = 100
-            b_AF.H = 1.5 * bolt_length_required
+            b_AF.H =  bolt_length_required + 10
             self.bolts_AF.append(Bolt(b_AF.R, b_AF.T, b_AF.H, b_AF.r))
             print("bolt", b_AF.R, b_AF.T, b_AF.H, b_AF.r)
             self.nuts_AF.append(Nut(n_AF.R, n_AF.T, n_AF.H, n_AF.r1))

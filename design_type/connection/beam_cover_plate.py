@@ -1123,6 +1123,13 @@ class BeamCoverPlate(MomentConnection):
                     logger.error(" : Web Plate thickness should be greater than section  thicknesss.")
                     self.initial_pt_thk_status_web = False
                 else:
+                    # self.web_plate.thickness_provided = self.min_thick_based_on_area(self,
+                    #                                                                  tk=self.section.flange_thickness,
+                    #                                                                  width=self.section.flange_width,
+                    #                                                                  list_of_pt_tk=self.web_plate_thickness_possible,
+                    #                                                                  t_w=self.section.web_thickness,
+                    #                                                                  r_1=self.section.root_radius, D=self.section.depth, )
+
                     self.web_plate.thickness_provided = self.min_thick_based_on_area(self,
                                                                                      tk=self.section.flange_thickness,
                                                                                      width=self.section.flange_width,
@@ -1270,12 +1277,11 @@ class BeamCoverPlate(MomentConnection):
                                                     web_thickness =self.section.web_thickness,
                                                     root_radius= self.section.root_radius,joint = "half")
 
-
-
             self.min_web_plate_height = self.section.min_plate_height()
             if self.preference == "Outside":
                 self.max_web_plate_height = self.section.max_plate_height()
             else:
+
                 self.max_web_plate_height = self.section.depth - 2 * self.section.flange_thickness - (2 * self.webclearance)
 
             self.axial_force_w = ((self.section.depth - (2 * self.section.flange_thickness)) *
@@ -1470,6 +1476,7 @@ class BeamCoverPlate(MomentConnection):
                                              , shear_load=self.fact_shear_load, axial_load=self.axial_force_w,web_moment = self.moment_web,
 
                                              gap=(self.web_plate.gap/2), shear_ecc=True,joint = "half")
+
 
         # possible_inner_plate = self.section.flange_width / 2 - self.section.web_thickness / 2 - self.section.root_radius
         # self.flange_plate.edge_dist_provided = (possible_inner_plate- (self.flange_plate.gauge_provided *
@@ -2354,6 +2361,7 @@ class BeamCoverPlate(MomentConnection):
                             self.design_status = False
 
             else:
+
                 if self.section.depth > 600.00:
                     self.webclearance = (max (self.section.root_radius, fp_thk)) +25
                 else:
@@ -2362,7 +2370,7 @@ class BeamCoverPlate(MomentConnection):
                 self.web_crs_area = t_w * self.webwidth
                 self.Wp = self.web_crs_area * 1.05
                 self.web_plate_crs_sec_area = 2 * self.webwidth * y
-                if self.web_plate_crs_sec_area  >= self.web_crs_area * 1.05:
+                if self.web_plate_crs_sec_area >= self.web_crs_area * 1.05:
                     thickness = y
                     self.design_status = True
                     break

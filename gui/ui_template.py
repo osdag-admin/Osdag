@@ -205,7 +205,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.frame.setMaximumSize(QtCore.QSize(16777215, 28))
         self.frame.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
+        self.frame.setObjectName("frame_")
 
         self.btnInput = QtWidgets.QToolButton(self.frame)
         self.btnInput.setGeometry(QtCore.QRect(0, 0, 28, 28))
@@ -220,9 +220,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.btnOutput = QtWidgets.QToolButton(self.frame)
         self.btnOutput.setGeometry(QtCore.QRect(30, 0, 28, 28))
         self.btnOutput.setFocusPolicy(QtCore.Qt.TabFocus)
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(440, 412, 111, 51))
-        self.pushButton.setObjectName("pushButton")
+        #self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        #self.pushButton.setGeometry(QtCore.QRect(440, 412, 111, 51))
+        #self.pushButton.setObjectName("pushButton")
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(":/newPrefix/images/output.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btnOutput.setIcon(icon2)
@@ -390,10 +390,11 @@ class Ui_ModuleWindow(QMainWindow):
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.inputDock.sizePolicy().hasHeightForWidth())
-        self.inputDock.setSizePolicy(sizePolicy)
+        #self.inputDock.setSizePolicy(sizePolicy)
         #self.inputDock.setMinimumSize(QtCore.QSize(320, 710))
-        self.inputDock.setMaximumSize(QtCore.QSize(310, 710))
-        self.inputDock.setBaseSize(QtCore.QSize(310, 710))
+        #self.inputDock.setMaximumSize(QtCore.QSize(310, 710))
+        #self.inputDock.setBaseSize(QtCore.QSize(310, 710))
+        #self.inputDock.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(11)
@@ -426,7 +427,7 @@ class Ui_ModuleWindow(QMainWindow):
         # self.chkBxFinplate.setEnabled(False)
 
         in_widget = QtWidgets.QWidget(self.dockWidgetContents)
-        in_widget.setGeometry(QtCore.QRect(0, 0, 325, 600))
+        #sin_widget.setGeometry(QtCore.QRect(0, 0, 325, 600))
         in_layout1 = QtWidgets.QVBoxLayout(in_widget)
         in_scroll = QScrollArea(in_widget)
         in_layout1.addWidget(in_scroll)
@@ -481,10 +482,16 @@ class Ui_ModuleWindow(QMainWindow):
                     combo.addItem(item)
                 #combo.setFixedSize(combo.size())
                 width = combo.minimumSizeHint().width()
-                combo.view().setMinimumWidth(width)
+
                 #combo.AdjustToContents
                 in_layout2.addWidget(combo, j, 2, 1, 1)
-                maxi_width_right = max(maxi_width_right, width)
+
+                if lable == 'Material *':
+
+                    #combo.setFixedSize(combo.sizeHint().width()+10,combo.sizeHint().height())
+                    maxi_width_right = max(maxi_width_right, combo.sizeHint().width())
+                else:
+                    combo.view().setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Maximum))
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
@@ -504,7 +511,7 @@ class Ui_ModuleWindow(QMainWindow):
                     r.setValidator(self.get_validator(option[6]))
                 #r.setFixedSize(r.size())
                 in_layout2.addWidget(r, j, 2, 1, 1)
-                maxi_width_right = max(maxi_width_right, 120)
+                #maxi_width_right = max(maxi_width_right, 120)
 
             if type == TYPE_MODULE:
                 _translate = QtCore.QCoreApplication.translate
@@ -560,11 +567,13 @@ class Ui_ModuleWindow(QMainWindow):
                 q = QtWidgets.QLabel(self.dockWidgetContents)
                 #q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
                 font = QtGui.QFont()
+                font.setPointSize(10)
+                font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
-                q.resize(q.sizeHint().width(), q.sizeHint().height())
+                q.setFixedSize(q.sizeHint().width(), q.sizeHint().height())
                 in_layout2.addWidget(q, j, 1, 2, 2)
                 j = j + 1
 
@@ -572,10 +581,14 @@ class Ui_ModuleWindow(QMainWindow):
             j = j + 1
         in_layout2.setRowStretch(j+1, 10)
         in_scroll.setWidget(in_scrollcontent)
+
         maxi_width = maxi_width_left + maxi_width_right
+
+        in_scrollcontent.setMinimumSize(maxi_width,in_scrollcontent.sizeHint().height())
         maxi_width += 82
-        self.inputDock.setMinimumSize(QtCore.QSize(maxi_width, 710))
-        in_widget.setGeometry(QtCore.QRect(0, 0, maxi_width, 600))
+        maxi_width = max(maxi_width, 350)    # In case there is no widget
+        self.inputDock.setMinimumSize(maxi_width, 710)
+        in_widget.setGeometry(0, 0, maxi_width, 650)
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
@@ -688,7 +701,7 @@ class Ui_ModuleWindow(QMainWindow):
                     self.on_change_connect(key_changed, updated_list, data)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 600, 100, 35))
+        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -698,7 +711,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Reset.setObjectName("btn_Reset")
 
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 600, 100, 35))
+        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -819,12 +832,14 @@ class Ui_ModuleWindow(QMainWindow):
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
                 #q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
                 font = QtGui.QFont()
+                font.setPointSize(10)
+                font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")
                 #q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
-                q.resize(q.sizeHint().width(), q.sizeHint().height())
+                q.setFixedSize(q.sizeHint().width(), q.sizeHint().height())
                 out_layout2.addWidget(q, j, 1, 2, 2)
                 j = j + 1
             i = i + 30
@@ -832,14 +847,12 @@ class Ui_ModuleWindow(QMainWindow):
         out_layout2.setRowStretch(j+1, 10)
         out_scroll.setWidget(out_scrollcontent)
         maxi_width = maxi_width_left + maxi_width_right
+
         maxi_width += 80    # +80 coz of whitespaces
-        if len(out_list) == 0:
-            self.outputDock.setMinimumSize(350, 710)
-            out_widget.setGeometry(0,0,350, 600)
-            maxi_width = 350
-        else:
-            self.outputDock.setMinimumSize(maxi_width, 710)
-            out_widget.setGeometry(0,0,maxi_width, 600)
+        maxi_width = max(maxi_width, 350) # in case no widget
+
+        self.outputDock.setMinimumSize(maxi_width, 710)
+        out_widget.setGeometry(0,0,maxi_width, 650)
         # common_button = QtWidgets.QPushButton()
         # d = {
         #     'Button_1': common_button,
@@ -1274,7 +1287,6 @@ class Ui_ModuleWindow(QMainWindow):
         Returns:
 
         """
-<<<<<<< HEAD
 
         if main.design_status:
 
@@ -1294,27 +1306,6 @@ class Ui_ModuleWindow(QMainWindow):
 
     def save3DcadImages(self, main):
 
-=======
-
-        if main.design_status:
-
-            files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
-            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
-                                                      files_types)
-            fName = str(fileName)
-            file_extension = fName.split(".")[-1]
-
-            if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
-                self.display.ExportToImage(fName)
-                QMessageBox.about(self, 'Information', "File saved")
-        else:
-            # self.actionSave_current_image.setEnabled(False)
-            QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
-
-
-    def save3DcadImages(self, main):
-
->>>>>>> 4150550d245c273fcdda77a312303b0ebc7d36a9
         if main.design_status:
             if self.fuse_model is None:
                 self.fuse_model = CommonDesignLogic.create2Dcad(self.commLogicObj)
@@ -2310,7 +2301,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.menuGraphics.setTitle(_translate("MainWindow", "Graphics"))
         self.inputDock.setWindowTitle(_translate("MainWindow", "Input dock"))
-        self.pushButton.setText(_translate("MainWindow", "PushButton"))
+        #self.pushButton.setText(_translate("MainWindow", "PushButton"))
         self.btn_Reset.setToolTip(_translate("MainWindow", "Alt+R"))
         self.btn_Reset.setText(_translate("MainWindow", "Reset"))
         self.btn_Reset.setShortcut(_translate("MainWindow", "Alt+R"))

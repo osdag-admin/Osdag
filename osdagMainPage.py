@@ -393,7 +393,11 @@ class OsdagMainWindow(QMainWindow):
         items = list(self.ui.verticalLayout.itemAt(i) for i in range(self.ui.verticalLayout.count()))
         for item in range(len(items)):
             if item == index-1:
-                items[item].widget().ui.LP_Button.setStyleSheet("background-color:dodgerblue;")
+                items[item].widget().ui.LP_Button.setStyleSheet('''
+
+                background-color: qradialgradient(cx: 0.5, cy: 0.5, radius: 2, fx: 0.5, fy: 1, stop: 0 rgba(130, 36, 38,190), stop: 0.2 rgb(171, 39, 42), stop: 0.4 rgba(255,30,30,32));
+
+                ''')
             else:
                 items[item].widget().ui.LP_Button.setStyleSheet(";")
 
@@ -787,7 +791,7 @@ class OsdagMainWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    path = os.path.join(os.path.dirname(__file__), 'themes', 'darkstyle.qss')
+    path = os.path.join(os.path.dirname(__file__), 'themes', 'light.qss')
     file = open(path,'r')
     file = file.read()
     app.setStyleSheet(file)

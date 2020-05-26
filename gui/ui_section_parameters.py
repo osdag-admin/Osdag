@@ -77,7 +77,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.parameterText_1 = QtWidgets.QComboBox(self)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.parameterText_1.sizePolicy().hasHeightForWidth())
@@ -88,7 +88,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         self.parameterText_1.setObjectName("parameterText_1")
         self.verticalLayout_2.addWidget(self.parameterText_1)
         self.parameterText_2 = QtWidgets.QComboBox(self)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.parameterText_2.sizePolicy().hasHeightForWidth())
@@ -233,7 +233,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             cursor = conn.execute("SELECT FlangeSlope FROM "+table+" where Designation="+repr(self.parameterText_1.currentText()))
             data = cursor.fetchall()[0][0]
             if(float(self.parameterText_3.text())<=float(data)):
-                QtWidgets.QMessageBox.critical(self,'Save Error','Increase the Spacing(s) > '+str(data))
+                QtWidgets.QMessageBox.critical(self,'Save Error','Increase the Spacing(s), to be > '+str(data))
                 self.textBoxVisible={}
                 return
         elif(index_type==3):
@@ -246,20 +246,48 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                     self.textBoxVisible={}
                     return
                 elif(float(self.parameterText_3.text())!=float(self.parameterText_4.text()) or float(self.parameterText_4.text())!=float(self.parameterText_7.text())):
-                    QtWidgets.QMessageBox.critical(self,'Save Error','The condition (s=s*=t) is not satisfied.')
+                    QtWidgets.QMessageBox.critical(self,'Save Error','The following condition is not satisfied:\n\tS=S*=T')
                     self.textBoxVisible={}
                     return
             elif(index_template==1):
                 if(float(self.parameterText_3.text())!=float(self.parameterText_4.text()) or float(self.parameterText_4.text())!=float(self.parameterText_7.text())):
-                    QtWidgets.QMessageBox.critical(self,'Save Error','The condition (s=s*=t) is not satisfied.')
+                    QtWidgets.QMessageBox.critical(self,'Save Error','The following condition is not satisfied:\n\tS=S*=T')
                     self.textBoxVisible={}
                     return
             else:
                 if(float(self.parameterText_3.text())!=float(self.parameterText_7.text())):
-                    QtWidgets.QMessageBox.critical(self,'Save Error','The condition (s=t) is not satisfied.')
+                    QtWidgets.QMessageBox.critical(self,'Save Error','The following condition is not satisfied:\n\tS=T')
                     self.textBoxVisible={}
                     return
-        
+        elif(index_type==4):
+            if(index_template==1):
+                if(float(self.parameterText_6.text())>float(self.parameterText_3.text())/2):
+                    QtWidgets.QMessageBox.critical(self,'Save Error','The following condition is not satisfied:\n\tL <= S/2 ')
+                    self.textBoxVisible={}
+                    return
+            elif(index_template==2):
+                conn = sqlite3.connect(PATH_TO_DATABASE)
+                cursor = conn.execute("SELECT D FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
+                d = float(cursor.fetchall()[0][0])
+                if(float(self.parameterText_3.text())<=d/2):
+                    QtWidgets.QMessageBox.critical(self,'Save Error','Increase Spacing(s), to be > '+str(d/2))
+                    self.textBoxVisible={}
+                    return
+            elif(index_template==3):
+                if(float(self.parameterText_3.text())!=float(self.parameterText_4.text())):
+                    QtWidgets.QMessageBox.critical(self,'Save Error','The following condition is not satisfied:\n\tS = S*')
+                    self.textBoxVisible={}
+                    return
+        elif(index_type==5):
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            cursor = conn.execute("SELECT B FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
+            b = float(cursor.fetchall()[0][0])
+            cursor = conn.execute("SELECT D FROM Channels where Designation="+repr(self.parameterText_2.currentText()))
+            d = float(cursor.fetchall()[0][0])
+            if(b!=d):
+                QtWidgets.QMessageBox.critical(self,'Save Error','Choose different Section type for I-Section/Channel to satisfy:\n\tB(I-Section)=D(Channel Section)')
+                self.textBoxVisible={}
+                return
 
         self.close()
     
@@ -367,9 +395,10 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.parameterText_6.hide()
             self.parameterLabel_7.hide()
             self.parameterText_7.hide()
+            self.parameterLabel_3.hide()
+            self.parameterText_3.hide()
             self.parameterLabel_1.setText('I-Section Type:')
             self.parameterLabel_2.setText('Channel Section Type:')
-            self.parameterLabel_3.setText('Spacing between Channel and I-Section:')
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate

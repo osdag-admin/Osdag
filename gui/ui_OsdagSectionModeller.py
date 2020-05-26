@@ -747,7 +747,7 @@ class Ui_OsdagSectionModeller(object):
                         u'\ua585'+' I-Section from Plates',
                         'Built up SHS/RHS',
                 ],
-                5:['I & Channel on One Flange','I & Channel on Both Flange'],
+                5:['I & Channel on One Flange'],
         }[index_type]
         self.section_template_combobox.blockSignals(True)
         self.section_template_combobox.clear()

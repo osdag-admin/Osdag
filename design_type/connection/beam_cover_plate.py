@@ -587,35 +587,85 @@ class BeamCoverPlate(MomentConnection):
                self.flange_plate.height if flag else '', True)
         out_list.append(t18)
 
-        t19 = (
-            KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-            self.flange_plate.length if flag else '', True)
+        t19 = ( KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
+            self.plate_out_len if flag else '', True)
         out_list.append(t19)
 
         t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_plate.thickness_provided if flag else '', True)
+               self.flange_out_plate_tk if flag else '', True)
         out_list.append(t20)
-        t21 = (
-        KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing], True)
+        t21 = (KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing], True)
         out_list.append(t21)
 
-        t21 = (
-            KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
+        t21 = (KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
         out_list.append(t21)
+
 
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, True)
         out_list.append(t17)
         t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-               self.flange_plate.Innerheight if flag else '',True)
+               self.flange_plate.Innerheight if flag else '', True)
         out_list.append(t18)
 
         t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-               self.flange_plate.Innerlength if flag else '',True)
+             self.plate_in_len if flag else '', True)
         out_list.append(t19)
-
+        # if flag is True:
         t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_plate.thickness_provided if flag else '',True)
+               self.flange_in_plate_tk if flag else '', True)
         out_list.append(t20)
+
+                # pass
+            # else:
+            #     t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, False)
+            #     out_list.append(t17)
+            #     t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
+            #            self.flange_plate.Innerheight if flag else '', False)
+            #     out_list.append(t18)
+
+        #         t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
+        #                self.flange_plate.Innerlength if flag else '', False)
+        #         out_list.append(t19)
+        #
+        #         t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
+        #                self.flange_plate.thickness_provided if flag else '', False)
+        #         out_list.append(t20)
+        #
+        # t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, False)
+        # out_list.append(t17)
+        # t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
+        #        self.flange_plate.Innerheight if flag else '', False)
+        # out_list.append(t18)
+        #
+        # t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
+        #        self.flange_plate.Innerlength if flag else '', False)
+        # out_list.append(t19)
+        #
+        # t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
+        #        self.flange_plate.thickness_provided if flag else '', False)
+        # out_list.append(t20)
+
+
+
+
+
+
+
+
+
+        # t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, True)
+        # out_list.append(t17)
+        # t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
+        #        self.flange_plate.Innerheight if flag else '',True)
+        # out_list.append(t18)
+        #
+        # t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
+        #        self.flange_plate.Innerlength if flag else '',True)
+        # out_list.append(t19)
+        #
+        # t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
+        #        self.flange_plate.thickness_provided if flag else '',True)
+        # out_list.append(t20)
 
 
         return out_list
@@ -1977,6 +2027,20 @@ class BeamCoverPlate(MomentConnection):
         self.min_plate_length = (((self.flange_plate.bolt_line / 2 - 1) * self.flange_bolt.min_pitch) +
                                  (2*self.flange_bolt.min_end_dist) + (self.flange_plate.gap/2))
         print("self.min_plate_length",self.min_plate_length)
+        if self.preference =="Outside":
+            self.flange_out_plate_tk = self.flange_plate.thickness_provided
+            self.flange_in_plate_tk =0.0
+        else :
+            self.flange_in_plate_tk = self.flange_plate.thickness_provided
+            self.flange_out_plate_tk = self.flange_plate.thickness_provided
+
+
+        if self.preference =="Outside":
+            self.plate_out_len = self.flange_plate.length
+            self.plate_in_len = 0.0
+        else:
+            self.plate_out_len = self.flange_plate.length
+            self.plate_in_len = self.flange_plate.Innerlength
 
         # print("anjali", self.anjali)
         print(self.section)

@@ -349,8 +349,8 @@ class BeamCoverPlateWeld(MomentConnection):
 
     def web_weld_details(self,flag):
         web_weld_details = []
-        t15 = (KEY_WEB_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,(self.l_req_weblength) if flag else '')
-        web_weld_details.append(t15)
+        # t15 = (KEY_WEB_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,(self.l_req_weblength) if flag else '')
+        # web_weld_details.append(t15)
         t14 = (KEY_WEB_WELD_SIZE, KEY_WEB_DISP_WELD_SIZE, TYPE_TEXTBOX, self.web_weld.size if flag else '')
         web_weld_details.append(t14)
 
@@ -365,9 +365,9 @@ class BeamCoverPlateWeld(MomentConnection):
 
     def flange_weld_details(self, flag):
         flange_weld_details = []
-        t15 = (KEY_FLANGE_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,
-              (self.l_req_flangelength) if flag else '')
-        flange_weld_details.append(t15)
+        # t15 = (KEY_FLANGE_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,
+        #       (self.l_req_flangelength) if flag else '')
+        # flange_weld_details.append(t15)
 
         # t15 = (KEY_FLANGE_WELD_HEIGHT, KEY_DISP_FLANGE_WELD_HEIGHT, TYPE_TEXTBOX,
         #        (self.flange_weld.height) if flag else '')
@@ -391,9 +391,9 @@ class BeamCoverPlateWeld(MomentConnection):
         # t15 = (KEY_INNERFLANGE_WELD_LENGTH, KEY_DISP_INNERFLANGE_WELD_LENGTH, TYPE_TEXTBOX,
         #       ( self.flange_weld.Innerlength ) if flag else '')
         # Innerflange_weld_details.append(t15)
-        t15 = (KEY_FLANGE_WELD_LENGTH, KEY_DISP_WELD_LEN_EFF_OUTSIDE, TYPE_TEXTBOX,
-               (self.l_req_flangelength) if flag else '')
-        Innerflange_weld_details.append(t15)
+        # t15 = (KEY_FLANGE_WELD_LENGTH, KEY_DISP_WELD_LEN_EFF_OUTSIDE, TYPE_TEXTBOX,
+        #        (self.l_req_flangelength) if flag else '')
+        # Innerflange_weld_details.append(t15)
 
         # t15 = (KEY_INNERFLANGE_WELD_HEIGHT, KEY_DISP_INNERFLANGE_WELD_HEIGHT, TYPE_TEXTBOX,
         #        (self.flange_weld.Innerheight) if flag else '')
@@ -456,8 +456,9 @@ class BeamCoverPlateWeld(MomentConnection):
 
         t21 = (KEY_WEB_WELD_DETAILS, KEY_DISP_WEB_WELD_DETAILS, TYPE_OUT_BUTTON, ['Web Plate Weld', self.web_weld_details], True)
         out_list.append(t21)
-
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, True)
+        out_list.append(t17)
+        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_OUTER, TYPE_TITLE, None, True)
 
         out_list.append(t17)
 
@@ -484,7 +485,7 @@ class BeamCoverPlateWeld(MomentConnection):
         KEY_FLANGE_WELD_DETAILS, KEY_DISP_FLANGE_WELD_DETAILS, TYPE_OUT_BUTTON, ['Flange Plate Weld', self.flange_weld_details], True)
         out_list.append(t21)
 
-        t17 = (None, DISP_TITLE_INNERFLANGESPLICEPLATE, TYPE_TITLE, None, True)
+        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, True)
 
         out_list.append(t17)
 
@@ -505,6 +506,13 @@ class BeamCoverPlateWeld(MomentConnection):
         t21 = (KEY_INNERFLANGE_WELD_DETAILS, KEY_DISP_INNERFLANGE_WELD_DETAILS, TYPE_OUT_BUTTON,
                ['Inner plate Weld', self.Innerflange_weld_details], True)
         out_list.append(t21)
+
+        # t17 = (None, DISP_EFF, TYPE_TITLE, None, True)
+        # out_list.append(t17)
+        #
+        # t15 = (KEY_FLANGE_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,
+        #        (self.l_req_flangelength) if flag else '', True)
+        # out_list.append(t15)
 
         return out_list
 

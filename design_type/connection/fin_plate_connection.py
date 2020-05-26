@@ -12,6 +12,7 @@ from Common import *
 from utils.common.load import Load
 from Report_functions import *
 import logging
+import logging
 
 class FinPlateConnection(ShearConnection):
 
@@ -22,6 +23,121 @@ class FinPlateConnection(ShearConnection):
         self.res_force = 0.0
         self.weld_connecting_plates=[]
         self.design_status = False
+
+    ###############################################
+    # Design Preference Functions Start
+    ###############################################
+    def tab_list(self):
+        tabs = []
+
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_supporting_section)
+        tabs.append(t1)
+
+        t1 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_supported_section)
+        tabs.append(t1)
+
+        t6 = ("Connector", TYPE_TAB_2, self.plate_connector_values)
+        tabs.append(t6)
+
+        t2 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t2)
+
+        t2 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t2)
+
+        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t4)
+
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t5)
+
+        return tabs
+
+    def tab_value_changed(self):
+
+        change_tab = []
+
+        t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC_MATERIAL], [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY], TYPE_TEXTBOX,
+        self.get_fu_fy_I_section_suptng)
+        change_tab.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC_MATERIAL], [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY], TYPE_TEXTBOX,
+        self.get_fu_fy_I_section_suptd)
+        change_tab.append(t2)
+
+        t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
+                                                      KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
+
+        change_tab.append(t3)
+
+        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t4)
+
+        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t5)
+
+        return change_tab
+
+    def input_dictionary_design_pref(self):
+        design_input = []
+        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SUPTNGSEC_MATERIAL])
+        design_input.append(t1)
+
+        # t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY])
+        # design_input.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, TYPE_COMBOBOX, [KEY_SUPTDSEC_MATERIAL])
+        design_input.append(t2)
+
+        # t2 = (KEY_DISP_BEAMSEC, TYPE_TEXTBOX, [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY])
+        # design_input.append(t2)
+
+        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        design_input.append(t3)
+
+        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
+        design_input.append(t3)
+
+        t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
+        design_input.append(t4)
+
+        t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
+        design_input.append(t4)
+
+        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        design_input.append(t5)
+
+        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        design_input.append(t5)
+
+        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
+        design_input.append(t6)
+
+        t7 = ("Connector", TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
+        design_input.append(t7)
+
+        return design_input
+
+    def input_dictionary_without_design_pref(self):
+        design_input = []
+        t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL], 'Input Dock')
+        design_input.append(t1)
+
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+                     KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
+                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
+        design_input.append(t2)
+
+        return design_input
+
+
+    ####################################
+    # Design Preference Functions End
+    ####################################
 
     def set_osdaglogger(key):
 
@@ -71,7 +187,6 @@ class FinPlateConnection(ShearConnection):
 
         # @author: Amir, Umair
         self.module = KEY_DISP_FINPLATE
-        print('Het I am existing values', existingvalues)
 
         options_list = []
 
@@ -266,6 +381,33 @@ class FinPlateConnection(ShearConnection):
 
         return capacities
 
+    def get_3d_components(self):
+        components = []
+
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t2 = ('Beam', self.call_3DBeam)
+        components.append(t2)
+
+        t3 = ('Column', self.call_3DColumn)
+        components.append(t3)
+
+        t4 = ('Fin Plate', self.call_3DPlate)
+        components.append(t4)
+
+        return components
+
+    def call_3DPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Fin Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Plate", bgcolor)
+
     def output_values(self, flag):
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
@@ -345,33 +487,6 @@ class FinPlateConnection(ShearConnection):
         out_list.append(t16)
 
         return out_list
-
-    def tab_list(self):
-
-        tabs = []
-
-        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
-        tabs.append(t1)
-
-        t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
-        tabs.append(t2)
-
-        t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
-        tabs.append(t3)
-
-        t4 = ("Weld", TYPE_TAB_2, self.weld_values)
-        tabs.append(t4)
-
-        t5 = ("Detailing", TYPE_TAB_2, self.detailing_values)
-        tabs.append(t5)
-
-        t6 = ("Design", TYPE_TAB_2, self.design_values)
-        tabs.append(t6)
-
-        t7 = ("Connector", TYPE_TAB_2, self.connector_values)
-        tabs.append(t7)
-
-        return tabs
 
     def func_for_validation(self, design_dictionary):
         all_errors = []
@@ -482,37 +597,6 @@ class FinPlateConnection(ShearConnection):
         return information
 
 
-    # def populate_tabs(self):
-    #
-    #     populate_tab_list = []
-    #
-    #     t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC, "Columns", KEY_MATERIAL], KEY_CONN, VALUES_CONN_1)
-    #     populate_tab_list.append(t1)
-    #
-    #     t2 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC, "Beams", KEY_MATERIAL], KEY_CONN, VALUES_CONN_2)
-    #     populate_tab_list.append(t2)
-    #
-    #     t3 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC, KEY_MATERIAL], None, None)
-    #     populate_tab_list.append(t3)
-    #
-    #     t4 = ("Connector", [KEY_SUPTDSEC, KEY_MATERIAL], None, None)
-    #     populate_tab_list.append(t4)
-    #
-    #     return populate_tab_list
-
-    # def get_fu_fy(self):
-    #     m = Material(self[0])
-    #     fu = m.fu
-    #     fy = m.fy
-    #     d = {KEY_SUPTNGSEC_FU: fu,
-    #          KEY_SUPTNGSEC_FY: fy,
-    #          KEY_SUPTDSEC_FU: fu,
-    #          KEY_SUPTDSEC_FY: fy,
-    #          KEY_PLATE_FU: fu,
-    #          KEY_PLATE_FY: fy}
-    #
-    #     return d
-
     def warn_text(self):
 
         """
@@ -530,8 +614,6 @@ class FinPlateConnection(ShearConnection):
 
     def set_input_values(self, design_dictionary):
 
-        print(design_dictionary)
-
         if design_dictionary[KEY_SUPTNGSEC_MATERIAL] == "Custom":
             design_dictionary[KEY_SUPTNGSEC_MATERIAL] = "Custom" + " " + str(design_dictionary[KEY_SUPTNGSEC_FU]) + " " \
                                                         + str(design_dictionary[KEY_SUPTNGSEC_FY])
@@ -545,9 +627,9 @@ class FinPlateConnection(ShearConnection):
         self.module = design_dictionary[KEY_MODULE]
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-                           material_grade=design_dictionary[KEY_PLATE_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+                           material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.plate.design_status_2 = False
-        self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL],material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],fabrication = design_dictionary[KEY_DP_WELD_FAB])
+        self.weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],fabrication = design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
         self.warn_text(self)
         self.member_capacity(self)
@@ -601,7 +683,6 @@ class FinPlateConnection(ShearConnection):
                                     self.supported_section.tension_yielding_capacity))
             print("failed in preliminary member checks. Select larger sections or decrease loads")
 
-
     def select_bolt_dia(self):
         self.min_plate_height = self.supported_section.min_plate_height()
         self.max_plate_height = self.supported_section.max_plate_height(self.connectivity, 50.0)
@@ -611,7 +692,7 @@ class FinPlateConnection(ShearConnection):
         self.plate.thickness_provided = min(self.thickness_possible)
         self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,thickness=self.plate.thickness_provided)
         bolts_required_previous = 2
-        bolt_diameter_previous = self.bolt.bolt_diameter[-1]
+
         self.bolt.bolt_grade_provided = self.bolt.bolt_grade[-1]
         count = 0
 
@@ -620,8 +701,9 @@ class FinPlateConnection(ShearConnection):
         self.bolt_conn_plates_t_fu_fy.append((self.supported_section.web_thickness, self.supported_section.fu, self.supported_section.fy))
 
         bolt_force_previous = 0.0
-        bolt_previous = self.bolt
-        plate_previous = self.plate
+        bolt_dia_previous = self.bolt.bolt_diameter[-1]
+        plate_height_previous = self.min_plate_height
+        long_joint_factor_previous = 1.0
 
         for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
@@ -631,7 +713,7 @@ class FinPlateConnection(ShearConnection):
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
                                               conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
                                               n_planes=1)
-
+            print("getting web plate details for dia:", self.bolt.bolt_diameter_provided, self.bolt.bolt_grade_provided, self.bolt.bolt_capacity)
             self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
                                              web_plate_h_min=self.min_plate_height,
                                              web_plate_h_max=self.max_plate_height,
@@ -643,61 +725,75 @@ class FinPlateConnection(ShearConnection):
                                              shear_load=self.load.shear_force * 1000,
                                              axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
                                              shear_ecc=True, bolt_line_limit=2)
+            self.long_joint_factor = self.plate.bolt_capacity_red/self.bolt.bolt_capacity
 
-            # self.plate.bolts_required = max(int(math.ceil(self.res_force / self.bolt.bolt_capacity)), 2)
-            # [bolt_line, bolts_one_line, web_plate_h] = \
-            #     self.plate.get_web_plate_l_bolts_one_line(self.max_plate_height, self.min_plate_height, self.plate.bolts_required,
-            #                                         self.bolt.min_edge_dist_round, self.bolt.min_gauge_round)
-            # self.plate.bolts_required = bolt_line * bolts_one_line
-            print(1, self.plate.bolt_force, self.bolt.bolt_capacity, self.bolt.bolt_diameter_provided, self.plate.bolts_required, self.plate.bolts_one_line)
             if self.plate.design_status is True:
                 if self.plate.bolts_required > bolts_required_previous and count >= 1:
-                    self.bolt = bolt_previous
-                    self.plate = plate_previous
+                    self.bolt.bolt_diameter_provided = bolt_dia_previous
+                    self.plate.bolt_force = bolt_force_previous
+                    self.plate.height = plate_height_previous
+                    self.long_joint_factor = long_joint_factor_previous
                     break
-                plate_previous = self.plate
-                bolt_previous = self.bolt
+                bolt_force_previous = self.plate.bolt_force
+                bolt_dia_previous = self.bolt.bolt_diameter_provided
+                plate_height_previous = self.plate.height
+                long_joint_factor_previous = self.plate.bolt_capacity_red/self.bolt.bolt_capacity
+                bolts_required_previous = self.plate.bolts_required
                 count += 1
             else:
                 pass
-        bolt_capacity_req = self.bolt.bolt_capacity
+        # bolt_capacity_req = self.bolt.bolt_capacity
 
         if self.plate.design_status is False:
             self.design_status = False
             logger.error(self.plate.reason)
         else:
-            self.get_bolt_grade(self,bolt_capacity_req)
+            self.get_bolt_grade(self)
 
-    def get_bolt_grade(self,bolt_capacity_req):
+    def get_bolt_grade(self):
         # print(self.design_status, "Getting bolt grade")
-        # bolt_grade_previous = self.bolt.bolt_grade[-1]
-        bolt_previous = self.bolt
+        bolt_grade_previous = self.bolt.bolt_grade[-1]
+        # bolt_previous = self.bolt
         count = 0
         for self.bolt.bolt_grade_provided in reversed(self.bolt.bolt_grade):
-
-            self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
                                               conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
                                               n_planes=1)
 
-            print(self.bolt.bolt_grade_provided, self.bolt.bolt_capacity, self.plate.bolt_force)
+            print("for grade :", self.bolt.bolt_grade_provided, "capacity is:",self.bolt.bolt_capacity,"force is:", self.plate.bolt_force)
 
-            bolt_capacity_reduced = self.plate.get_bolt_red(self.plate.bolts_one_line,
-                                                            self.plate.gauge_provided, self.plate.bolt_line, self.plate.pitch_provided,self.bolt.bolt_capacity,
-                                                            self.bolt.bolt_diameter_provided)
+            bolt_capacity_reduced = self.long_joint_factor*self.bolt.bolt_shear_capacity
             if bolt_capacity_reduced < self.plate.bolt_force and count >= 1:
-                self.bolt = bolt_previous
+                self.bolt.bolt_grade_provided = bolt_grade_previous
                 break
-            bolt_previous = self.bolt
+            bolt_grade_previous = self.bolt.bolt_grade_provided
             count += 1
 
         self.bolt.design_status = True
         self.get_fin_plate_details(self)
 
     def get_fin_plate_details(self):
+        self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+
+        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                          bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                          conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                          n_planes=1)
+        print("recalculating web plate details")
+        self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                         web_plate_h_min=self.plate.height,
+                                         web_plate_h_max=self.max_plate_height,
+                                         bolt_capacity=self.bolt.bolt_capacity,
+                                         min_edge_dist=self.bolt.min_edge_dist_round,
+                                         min_gauge=self.bolt.min_gauge_round,
+                                         max_spacing=self.bolt.max_spacing_round,
+                                         max_edge_dist=self.bolt.max_edge_dist_round,
+                                         shear_load=self.load.shear_force * 1000,
+                                         axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
+                                         shear_ecc=True, bolt_line_limit=2)
         initial_plate_height = self.plate.height
         for self.plate.thickness_provided in self.thickness_possible:
             self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
@@ -828,10 +924,10 @@ class FinPlateConnection(ShearConnection):
             self.supported_section.design_status = True
 
         self.supported_section.tension_rupture_capacity = IS800_2007.cl_6_3_1_tension_rupture_strength(A_vn, self.plate.fu)
-        A_vg = ((n_row - 1) * pitch) * web_thick
-        A_vn = ((n_row - 1) * pitch + end - (float(n_row) - 1.0) * bolt_hole_dia) * web_thick
-        A_tg = 2 * ((n_col - 1) * gauge + edge) * web_thick
-        A_tn = 2 * ((n_col - 1) * gauge + edge - (float(n_col) - 0.5) * bolt_hole_dia) * web_thick
+        A_tg = ((n_row - 1) * pitch) * web_thick
+        A_tn = ((n_row - 1) * pitch + end - (float(n_row) - 1.0) * bolt_hole_dia) * web_thick
+        A_vg = 2 * ((n_col - 1) * gauge + edge) * web_thick
+        A_vn = 2 * ((n_col - 1) * gauge + edge - (float(n_col) - 0.5) * bolt_hole_dia) * web_thick
 
         self.supported_section.block_shear_capacity_axial = IS800_2007.cl_6_4_1_block_shear_strength(A_vg,
                                                                                                      A_vn,
@@ -1019,11 +1115,11 @@ class FinPlateConnection(ShearConnection):
                         KEY_MATERIAL: self.plate.material,
                         KEY_SHEAR: self.load.shear_force,
                         KEY_AXIAL:self.load.axial_force,
-                        KEY_SUPTNGSEC_DESIGNATION:self.supporting_section.designation,
+                        KEY_SUPTNGSEC:self.supporting_section.designation,
                         KEY_SUPTNGSEC_MATERIAL:self.supporting_section.material,
                         KEY_SUPTNGSEC_FU:self.supporting_section.fu,
                         KEY_SUPTNGSEC_FY:self.supporting_section.fy,
-                        KEY_SUPTDSEC_DESIGNATION:self.supported_section.designation,
+                        KEY_SUPTDSEC:self.supported_section.designation,
                         KEY_SUPTDSEC_MATERIAL: self.supported_section.material,
                         KEY_SUPTDSEC_FU: self.supported_section.fu,
                         KEY_SUPTDSEC_FY: self.supported_section.fy,
@@ -1034,9 +1130,11 @@ class FinPlateConnection(ShearConnection):
                         KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
                         KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
                         KEY_PLATETHK: self.plate.thickness,
-                        KEY_PLATE_MATERIAL: self.plate.material,
-                        KEY_PLATE_FU: self.plate.fu,
-                        KEY_PLATE_FY: self.plate.fy,
+                        KEY_CONNECTOR_MATERIAL: self.plate.material,
+                        KEY_CONNECTOR_FU: self.plate.fu,
+                        KEY_CONNECTOR_FY_20: self.plate.fy_20,
+                        KEY_CONNECTOR_FY_20_40: self.plate.fy_20_40,
+                        KEY_CONNECTOR_FY_40: self.plate.fy_40,
                         KEY_DP_WELD_TYPE: 'Fillet',
                         KEY_DP_WELD_FAB: self.weld.fabrication,
                         KEY_DP_WELD_MATERIAL_G_O: self.weld.fu,
@@ -1067,6 +1165,13 @@ class FinPlateConnection(ShearConnection):
                         KEY_OUT_PLATE_BLK_SHEAR_AXIAL: self.plate.block_shear_capacity_axial,
                         KEY_OUT_PLATE_MOM_DEMAND:self.plate.moment_demand,
                         KEY_OUT_PLATE_MOM_CAPACITY:self.plate.moment_capacity,
+                         KEY_SHEAR_YIELDCAPACITY: self.supported_section.shear_yielding_capacity,
+                         KEY_SHEAR_RUPTURECAPACITY: self.supported_section.shear_rupture_capacity,
+                         KEY_SHEAR_BLOCKSHEARCAPACITY: self.supported_section.block_shear_capacity_shear,
+                         KEY_TENSION_YIELDCAPACITY: self.supported_section.tension_yielding_capacity,
+                         KEY_TENSION_RUPTURECAPACITY: self.supported_section.tension_rupture_capacity,
+                         KEY_TENSION_BLOCKSHEARCAPACITY: self.supported_section.block_shear_capacity_axial,
+                         KEY_MEMBER_MOM_CAPACITY: self.supported_section.moment_capacity,
                         KEY_OUT_WELD_SIZE:self.weld.size,
                         KEY_OUT_WELD_STRENGTH:self.weld.strength,
                         KEY_OUT_WELD_STRESS:self.weld.stress}

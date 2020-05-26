@@ -15,6 +15,119 @@ class CleatAngleConnection(ShearConnection):
         self.sptng_leg_length = 0.0
         self.design_status = False
 
+    ###############################################
+    # Design Preference Functions Start
+    ###############################################
+    def tab_list(self):
+        tabs = []
+
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_supporting_section)
+        tabs.append(t1)
+
+        t1 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_supported_section)
+        tabs.append(t1)
+
+        t6 = (DISP_TITLE_CLEAT, TYPE_TAB_1, self.tab_angle_section)
+        tabs.append(t6)
+
+        t2 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t2)
+
+        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t4)
+
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t5)
+
+        return tabs
+
+    def tab_value_changed(self):
+        change_tab = []
+
+        t1 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC_MATERIAL], [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY],
+              TYPE_TEXTBOX, self.get_fu_fy_I_section_suptng)
+        change_tab.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC_MATERIAL], [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY],
+              TYPE_TEXTBOX, self.get_fu_fy_I_section_suptd)
+        change_tab.append(t2)
+
+        t5 = (DISP_TITLE_CLEAT, ['Label_1', 'Label_3'],
+              ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
+               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22'],
+              TYPE_TEXTBOX, self.get_Angle_sec_properties)
+        change_tab.append(t5)
+
+        t6 = (DISP_TITLE_CLEAT, [KEY_ANGLE_LIST, KEY_CONNECTOR_MATERIAL],
+              [KEY_ANGLE_SELECTED, KEY_CONNECTOR_FY, KEY_CONNECTOR_FU, 'Label_1', 'Label_3', 'Label_4', 'Label_5', 'Label_7',
+               'Label_8', 'Label_9',
+               'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
+               'Label_18',
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX,
+              self.get_new_angle_section_properties)
+        change_tab.append(t6)
+
+        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t4)
+
+        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t5)
+
+        return change_tab
+
+    def input_dictionary_design_pref(self):
+        design_input = []
+        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SUPTNGSEC_MATERIAL])
+        design_input.append(t1)
+
+        # t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SUPTNGSEC_FU, KEY_SUPTNGSEC_FY])
+        # design_input.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, TYPE_COMBOBOX, [KEY_SUPTDSEC_MATERIAL])
+        design_input.append(t2)
+
+        # t2 = (KEY_DISP_BEAMSEC, TYPE_TEXTBOX, [KEY_SUPTDSEC_FU, KEY_SUPTDSEC_FY])
+        # design_input.append(t2)
+        t2 = (DISP_TITLE_CLEAT, TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
+        design_input.append(t2)
+
+        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        design_input.append(t3)
+
+        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
+        design_input.append(t3)
+
+        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        design_input.append(t5)
+
+        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        design_input.append(t5)
+
+        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
+        design_input.append(t6)
+
+        return design_input
+
+    def input_dictionary_without_design_pref(self):
+        design_input = []
+        t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL], 'Input Dock')
+        design_input.append(t1)
+
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
+                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
+        design_input.append(t2)
+
+        return design_input
+
+    ####################################
+    # Design Preference Functions End
+    ####################################
+
     def input_values(self, existingvalues={}):
 
         self.module = KEY_DISP_CLEATANGLE
@@ -62,8 +175,8 @@ class CleatAngleConnection(ShearConnection):
         else:
             existingvalue_key_grd = ''
 
-        if KEY_CLEATSEC in existingvalues:
-            existingvalue_key_cleatsec = existingvalues[KEY_CLEATSEC]
+        if KEY_ANGLE_LIST in existingvalues:
+            existingvalue_key_cleatsec = existingvalues[KEY_ANGLE_LIST]
         else:
             existingvalue_key_cleatsec = ''
 
@@ -73,7 +186,7 @@ class CleatAngleConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, True, 'No Validator')
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, None, './ResourceFiles/images/fin_cf_bw.png', True, 'No Validator')
         options_list.append(t3)
 
         t4 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC, True, 'No Validator')
@@ -106,7 +219,7 @@ class CleatAngleConnection(ShearConnection):
         t13 = (None, DISP_TITLE_CLEAT, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t13)
 
-        t15 = (KEY_CLEATSEC, KEY_DISP_CLEATSEC, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_cleatsec, VALUES_ANGLESEC, True, 'No Validator')
+        t15 = (KEY_ANGLE_LIST, KEY_DISP_CLEATSEC, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_cleatsec, VALUES_ANGLESEC, True, 'No Validator')
         options_list.append(t15)
 
         t16 = (KEY_MODULE, KEY_DISP_CLEATANGLE, TYPE_MODULE, None, None, True, 'No Validator')
@@ -130,7 +243,7 @@ class CleatAngleConnection(ShearConnection):
         list1 = []
         t1 = (KEY_GRD, self.grdval_customized)
         list1.append(t1)
-        t2 = (KEY_CLEATSEC, self.cleatsec_customized)
+        t2 = (KEY_ANGLE_LIST, self.cleatsec_customized)
         list1.append(t2)
         t3 = (KEY_D, self.diam_bolt_customized)
         list1.append(t3)
@@ -245,6 +358,33 @@ class CleatAngleConnection(ShearConnection):
 
         return sptng_spacing
 
+    def get_3d_components(self):
+        components = []
+
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t2 = ('Beam', self.call_3DBeam)
+        components.append(t2)
+
+        t3 = ('Column', self.call_3DColumn)
+        components.append(t3)
+
+        t4 = ('Cleat Angle', self.call_3DCleat)
+        components.append(t4)
+
+        return components
+
+    def call_3DCleat(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Cleat Angle':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("cleatAngle", bgcolor)
+
     def output_values(self, flag):
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
@@ -355,32 +495,7 @@ class CleatAngleConnection(ShearConnection):
 
         return out_list
 
-    def tab_list(self):
 
-        tabs = []
-
-        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
-        tabs.append(t1)
-
-        t2 = (KEY_DISP_BEAMSEC, TYPE_TAB_1, self.tab_beam_section)
-        tabs.append(t2)
-
-        t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
-        tabs.append(t3)
-
-        t4 = ("Weld", TYPE_TAB_2, self.weld_values)
-        tabs.append(t4)
-
-        t5 = ("Detailing", TYPE_TAB_2, self.detailing_values)
-        tabs.append(t5)
-
-        t6 = ("Design", TYPE_TAB_2, self.design_values)
-        tabs.append(t6)
-
-        t7 = ("Connector", TYPE_TAB_2, self.connector_values)
-        tabs.append(t7)
-
-        return tabs
     def set_osdaglogger(key):
 
         """
@@ -498,11 +613,11 @@ class CleatAngleConnection(ShearConnection):
 
         super(CleatAngleConnection,self).set_input_values(self, design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
-        self.cleat_list = design_dictionary[KEY_CLEATSEC]
-        self.material_grade = design_dictionary[KEY_MATERIAL]
+        self.cleat_list = design_dictionary[KEY_ANGLE_LIST]
+        self.cleat_material_grade = design_dictionary[KEY_CONNECTOR_MATERIAL]
         print(self.cleat_list)
 
-        self.sptd_leg = Plate(material_grade=design_dictionary[KEY_MATERIAL],gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        self.sptd_leg = Plate(material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],gap=design_dictionary[KEY_DP_DETAILING_GAP])
         # self.sptng_leg = self.sptd_leg
 
 
@@ -516,10 +631,11 @@ class CleatAngleConnection(ShearConnection):
 
         min_thickness = self.supported_section.web_thickness / 2
         for designation in self.cleat_list:
-            cleat = Angle(designation=designation,material_grade=self.material_grade)
+            cleat = Angle(designation=designation,material_grade=self.cleat_material_grade)
             if cleat.thickness*2 <= self.supported_section.web_thickness:
                 self.cleat_list.pop()
                 print("popped", designation)
+                print(self.cleat_list)
             else:
                 if cleat.thickness not in self.sptd_leg.thickness:
                     self.sptd_leg.thickness.append(cleat.thickness)
@@ -676,7 +792,7 @@ class CleatAngleConnection(ShearConnection):
         self.sptng_bolt_conn_plates_t_fu_fy = []
         if self.connectivity in VALUES_CONN_1:
             self.sptng_bolt_conn_plates_t_fu_fy.append((self.sptd_leg.thickness_provided, self.sptd_leg.fu, self.sptd_leg.fy))
-            self.sptd_bolt_conn_plates_t_fu_fy.append((self.supporting_section.flange_thickness, self.supporting_section.fu, self.supporting_section.fy))
+            self.sptng_bolt_conn_plates_t_fu_fy.append((self.supporting_section.flange_thickness, self.supporting_section.fu, self.supporting_section.fy))
         else:
             self.sptng_bolt_conn_plates_t_fu_fy.append((self.sptd_leg.thickness_provided, self.sptd_leg.fu, self.sptd_leg.fy))
             self.sptd_bolt_conn_plates_t_fu_fy.append((self.supporting_section.web_thickness, self.supporting_section.fu, self.supporting_section.fy))
@@ -724,14 +840,14 @@ class CleatAngleConnection(ShearConnection):
         self.max_plate_height = self.supported_section.max_plate_height()
         for self.cleat_angle_selected in self.cleat_list:
 
-            self.cleat = Angle(designation=self.cleat_angle_selected, material_grade=self.material_grade)
+            self.cleat = Angle(designation=self.cleat_angle_selected, material_grade=self.cleat_material_grade)
 
 
 
 
 
         designation_angle = self.cleat_list[0]
-        self.cleat = Angle(designation=designation_angle, material_grade=self.material_grade)
+        self.cleat = Angle(designation=designation_angle, material_grade=self.cleat_material_grade)
         self.for_3D_view(self)
 
     def for_3D_view(self):

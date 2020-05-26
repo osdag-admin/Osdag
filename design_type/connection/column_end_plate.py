@@ -17,6 +17,183 @@ class ColumnEndPlate(MomentConnection):
         super(ColumnEndPlate, self).__init__()
         self.design_status = False
 
+    ###############################################
+    # Design Preference Functions Start
+    ###############################################
+    def tab_list(self):
+        """
+
+        :return: This function returns the list of tuples. Each tuple will create a tab in design preferences, in the
+        order they are appended. Format of the Tuple is:
+        [Tab Title, Type of Tab, function for tab content)
+        Tab Title : Text which is displayed as Title of Tab,
+        Type of Tab: There are Three types of tab layouts.
+            Type_TAB_1: This have "Add", "Clear", "Download xlsx file" "Import xlsx file"
+            TYPE_TAB_2: This contains a Text box for side note.
+            TYPE_TAB_3: This is plain layout
+        function for tab content: All the values like labels, input widgets can be passed as list of tuples,
+        which will be displayed in chosen tab layout
+
+        """
+        tabs = []
+
+        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
+        tabs.append(t1)
+
+        t6 = ("Connector", TYPE_TAB_2, self.plate_connector_values)
+        tabs.append(t6)
+
+        t2 = ("Bolt", TYPE_TAB_2, self.bolt_values)
+        tabs.append(t2)
+
+        t2 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t2)
+
+        t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
+        tabs.append(t4)
+
+        t5 = ("Design", TYPE_TAB_2, self.design_values)
+        tabs.append(t5)
+
+        return tabs
+
+    def tab_value_changed(self):
+        """
+
+        :return: This function is used to update the values of the keys in design preferences,
+         which are dependent on other inputs.
+         It returns list of tuple which contains, tab name, keys whose values will be changed,
+         function to change the values and arguments for the function.
+
+         [Tab Name, [Argument list], [list of keys to be updated], input widget type of keys, change_function]
+
+         Here Argument list should have only one element.
+         Changing of this element,(either changing index or text depending on widget type),
+         will update the list of keys (this can be more than one).
+
+         """
+        change_tab = []
+
+        t2 = (
+        KEY_DISP_COLSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
+        change_tab.append(t2)
+
+        t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
+                                                      KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
+        change_tab.append(t3)
+
+        t5 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t5)
+
+        return change_tab
+
+    def edit_tabs(self):
+        """ This function is required if the tab name changes based on connectivity or profile or any other key.
+                Not required for this module but empty list should be passed"""
+        return []
+
+    # def list_for_fu_fy_validation(self):
+    #     """ This function is no longer required"""
+    #     fu_fy_list = []
+    #
+    #     t2 = (KEY_SEC_MATERIAL, KEY_SEC_FU, KEY_SEC_FY)
+    #     fu_fy_list.append(t2)
+    #
+    #     t3 = (KEY_CONNECTOR_MATERIAL, KEY_CONNECTOR_FU, KEY_CONNECTOR_FY)
+    #     fu_fy_list.append(t3)
+    #
+    #     return fu_fy_list
+
+    def input_dictionary_design_pref(self):
+        """
+
+        :return: This function is used to choose values of design preferences to be saved to design dictionary.
+
+         It returns list of tuple which contains, tab name, input widget type of keys, keys whose values to be saved,
+
+         [(Tab Name, input widget type of keys, [List of keys to be saved])]
+
+         """
+        design_input = []
+
+        t2 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
+        design_input.append(t2)
+
+        # t2 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SEC_FU, KEY_SEC_FY])
+        # design_input.append(t2)
+
+        t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
+        design_input.append(t3)
+
+        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
+        design_input.append(t3)
+
+        t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
+        design_input.append(t4)
+
+        t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
+        design_input.append(t4)
+
+        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        design_input.append(t5)
+
+        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        design_input.append(t5)
+
+        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD])
+        design_input.append(t6)
+
+        t7 = ("Connector", TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
+        design_input.append(t7)
+
+        return design_input
+
+    def input_dictionary_without_design_pref(self):
+        """
+
+        :return: This function is used to choose values of design preferences to be saved to
+        design dictionary if design preference is never opened by user. It sets are design preference values to default.
+        If any design preference value needs to be set to input dock value, tuple shall be written as:
+
+        (Key of input dock, [List of Keys from design preference], 'Input Dock')
+
+        If the values needs to be set to default,
+
+        (None, [List of Design Preference Keys], '')
+
+         """
+        design_input = []
+        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
+        design_input.append(t1)
+
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
+                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
+        design_input.append(t2)
+
+        return design_input
+
+    def refresh_input_dock(self):
+        """
+
+        :return: This function returns list of tuples which has keys that needs to be updated,
+         on changing Keys in design preference (ex: adding a new section to database should reflect in input dock)
+
+         [(Tab Name,  Input Dock Key, Input Dock Key type, design preference key, Master key, Value, Database Table Name)]
+        """
+        add_buttons = []
+
+        t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
+        add_buttons.append(t2)
+
+        return add_buttons
+
+    ####################################
+    # Design Preference Functions End
+    ####################################
+
     def set_osdaglogger(key):
 
         """
@@ -101,8 +278,8 @@ class ColumnEndPlate(MomentConnection):
         else:
             existingvalue_key_grd = ''
 
-        if KEY_ENDPLATE_THICKNESS in existingvalues:
-            existingvalue_key_endplatethk = existingvalues[KEY_ENDPLATE_THICKNESS]
+        if KEY_PLATETHK in existingvalues:
+            existingvalue_key_endplatethk = existingvalues[KEY_PLATETHK]
         else:
             existingvalue_key_endplatethk = ''
 
@@ -156,7 +333,7 @@ class ColumnEndPlate(MomentConnection):
         t21 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, None, True, 'No Validator')
         options_list.append(t21)
 
-        t22 = (KEY_ENDPLATE_THICKNESS, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_endplatethk, VALUES_ENDPLATE_THICKNESS, True, 'No Validator')
+        t22 = (KEY_PLATETHK, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_endplatethk, VALUES_ENDPLATE_THICKNESS, True, 'No Validator')
         options_list.append(t22)
 
         # t13 = (KEY_CONN_PREFERENCE, KEY_DISP_CONN_PREFERENCE, TYPE_COMBOBOX, existingvalue_design_pref, VALUES_CONN_PREFERENCE)
@@ -202,6 +379,24 @@ class ColumnEndPlate(MomentConnection):
         detailing.append(t10)
 
         return detailing
+
+    def stiffener_details(self, flag):
+        stiff_details = []
+
+        if 2*self.end_dist < 50 and self.h_s < 100:
+            pass
+        elif 2*self.end_dist >= 50 and self.h_s >= 100:
+            t1 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.t_s if flag else '', True)
+            stiff_details.append(t1)
+            t2 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
+            stiff_details.append(t2)
+            t3 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
+            stiff_details.append(t3)
+            t4 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
+            stiff_details.append(t4)
+            return stiff_details
+        else:
+            pass
 
     def output_values(self, flag):
 
@@ -269,34 +464,29 @@ class ColumnEndPlate(MomentConnection):
         t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate_width if flag else '', True)
         out_list.append(t16)
 
-        t17 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, self.m_dp if flag else '', True)
+        t17 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.m_dp/1000000,2) if flag else '', True)
         out_list.append(t17)
+
+        # if 2*self.end_dist < 50 and self.h_s < 100:
+        #     pass
+        # elif 2*self.end_dist >= 50 and self.h_s >= 100:
+        t33 = (None, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, True)
+        out_list.append(t33)
+
+        t21 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.stiff_ht if flag else '', True)
+        out_list.append(t21)
+        t22 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
+        out_list.append(t22)
+        t23 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
+        out_list.append(t23)
+        t24 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
+        out_list.append(t24)
+
+        # t22 = (KEY_OUT_STIFFENER_DETAILS,KEY_OUT_DISP_STIFFENER_DETAILS,TYPE_OUT_BUTTON, ['Stiffener Details',self.stiffener_details], True)
+        # out_list.append(t22)
 
         return out_list
 
-    def tab_list(self):
-
-        tabs = []
-
-        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
-        tabs.append(t1)
-
-        t3 = ("Bolt", TYPE_TAB_2, self.bolt_values)
-        tabs.append(t3)
-
-        t4 = ("Weld", TYPE_TAB_2, self.weld_values)
-        tabs.append(t4)
-
-        t5 = ("Detailing", TYPE_TAB_2, self.detailing_values)
-        tabs.append(t5)
-
-        t6 = ("Design", TYPE_TAB_2, self.design_values)
-        tabs.append(t6)
-
-        t7 = ("Connector", TYPE_TAB_2, self.connector_values)
-        tabs.append(t7)
-
-        return tabs
     def func_for_validation(self, design_dictionary):
 
         all_errors = []
@@ -373,7 +563,7 @@ class ColumnEndPlate(MomentConnection):
         super(ColumnEndPlate, self).set_input_values(self, design_dictionary)
 
         self.section = Column(designation=design_dictionary[KEY_SECSIZE],
-                              material_grade=design_dictionary[KEY_MATERIAL])
+                              material_grade=design_dictionary[KEY_SEC_MATERIAL])
 
         self.start_time = time.time()
 
@@ -381,9 +571,9 @@ class ColumnEndPlate(MomentConnection):
         self.connection = design_dictionary[KEY_CONN]
         # self.design_pref = design_dictionary[KEY_CONN_PREFERENCE]
 
-        self.plate = Plate(thickness=design_dictionary.get(KEY_ENDPLATE_THICKNESS, None), material_grade=design_dictionary[KEY_MATERIAL])
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None), material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
-                         bolt_type=design_dictionary[KEY_TYP], material_grade=design_dictionary[KEY_MATERIAL],
+                         bolt_type=design_dictionary[KEY_TYP],
                          bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
                          edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
                          mu_f=design_dictionary[KEY_DP_BOLT_SLIP_FACTOR],
@@ -411,7 +601,7 @@ class ColumnEndPlate(MomentConnection):
 
         else:
             self.design_status = False
-            logger.error(":The axial force {} acting is higher than axial capacity {} of member").format(self.load.axial_force,self.axial_capacity)
+            logger.error(":The axial force {} acting is higher than axial capacity {} of member".format(self.load.axial_force,self.axial_capacity))
             logger.info("Increase member size or decrease axial load")
         # self.load.axial_force = self.factored_axial_load  # N
         print("factored_axial_load", self.factored_axial_load)
@@ -430,7 +620,7 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = True
         else:
             self.design_status = False
-            logger.error(":The shear force {} acting is higher than axial capacity {} of member").format(self.load.shear_force,self.shear_capacity)
+            logger.error(":The shear force {} acting is higher than axial capacity {} of member".format(self.load.shear_force,self.shear_capacity))
             logger.info("Increase member size or decrease shear load")
         print("factored_shear_load", self.factored_shear_load)
 ###############################################################
@@ -504,7 +694,7 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = True
         else:
             self.design_status = False
-            logger.error(":The moment {} acting is higher than moment capacity {} of member").format(self.load.moment, self.moment_capacity)
+            logger.error(":The moment {} acting is higher than moment capacity {} of member".format(self.load.moment, self.moment_capacity))
             logger.info("Increase member size or decrease shear load")
         print("factored_moment", self.factored_moment)
 
@@ -1072,7 +1262,7 @@ class ColumnEndPlate(MomentConnection):
         if self.connection == 'Flush End Plate':
             self.plate_height = self.section.depth
         else:
-            self.plate_height = self.section.depth + 4 * self.end_dist
+            self.plate_height = self.section.depth + 4 * self.pitch
         self.plate_width = self.section.flange_width
         self.y_2 = self.y_max - self.end_dist
         self.t_b2 = self.factored_axial_load / self.no_bolts + self.factored_moment * self.y_2 / self.y_sqr
@@ -1139,7 +1329,20 @@ class ColumnEndPlate(MomentConnection):
             # return self.bolt_diam_provided
             print("Plate thickness prov", self.plate_thickness_provided)
             # self.get_bolt_grade(self)
-            self.design_status = True
+            if self.connection == 'Flush End Plate':
+                self.stiff_ht = 0.0
+                self.stiff_wt = 0.0
+                self.t_s = 0.0
+                self.weld_type = "None"
+            else:
+                # if 2 * self.end_dist >= 50:
+                self.stiffener_details(self)
+                # else:
+                #     self.stiff_ht = 0.0
+                #     self.stiff_wt = 0.0
+                #     self.t_s = 0.0
+                #     self.weld_type = "None"
+            # self.design_status = True
             # self.plate_details(self)
 
         else:
@@ -1149,6 +1352,82 @@ class ColumnEndPlate(MomentConnection):
             # self.design_status = False
             # logger.error("Plate thickness provided is not satisfied")
 
+##########################################################################################
+             ####   Stiffener details   ####
+##########################################################################################
+    def stiffener_details(self):
+        gamma_m0 = 1.1
+        gamma_mw = 1.25
+        k = 0.7
+
+        self.m_s = self.t_b * self.end_dist
+
+        self.n = 10
+
+        self.a = 196
+        self.b = -25 * self.n
+        self.c = self.n ** 2
+        self.d = (self.t_b * self.end_dist * 4 * gamma_m0)/self.plate.fy
+
+        coeff = [self.a,self.b,self.c,self.d]
+
+        self.t_s = np.roots(coeff)
+        self.t_s = math.ceil(np.amax(self.t_s))
+
+        self.h_s = 14 * self.t_s
+
+        flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.flange_thickness, self.t_s)
+        flange_weld_throat_size = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=flange_weld_size_min, fusion_face_angle=90)
+        flange_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(self.section.flange_thickness,
+                                                                                  self.t_s)
+
+        self.weld_length_avail = 2 * self.h_s - 2 * self.n
+
+        self.weld_force_shear = (self.factored_shear_load/1000)/(2 * flange_weld_throat_size * self.weld_length_avail)
+
+        self.weld_force_moment = (self.factored_moment/1000)/((self.weld_length_avail ** 3 * flange_weld_throat_size)/6)
+
+        # capacity_unit_flange is the capacity of weld of unit throat thickness
+        capacity_unit_flange = (k * self.section.fu) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
+
+        self.resultant = math.sqrt(self.weld_force_shear ** 2 + self.weld_force_moment ** 2)
+
+        self.weld_size = self.resultant/capacity_unit_flange
+
+
+        if 2*self.end_dist < 50:
+            self.stiff_ht = 0.0
+            self.stiff_wt = 0.0
+            self.t_s = 0.0
+            self.weld_type = "None"
+            print("< 50 loop")
+        else:
+            if self.h_s < 100:
+                self.h_s = 100
+            else:
+                self.h_s = self.h_s
+
+            if self.weld_size <= 16:
+                self.weld_size_prov = self.weld_size
+                self.weld_type = "FILLET"
+                self.t_s = self.t_s
+                self.stiff_wt = 2 * self.end_dist
+                self.stiff_ht = self.h_s
+                print(">50, fillet loop")
+            else:
+                self.t_s = self.t_s
+                self.stiff_wt = 2 * self.end_dist
+                self.stiff_ht = self.h_s
+                self.weld_type = "GROOVE"
+                print(">50, groove loop")
+
+        if self.design_status:
+            logger.info(": Overall Column end plate connection design is safe \n")
+            logger.debug(" :=========End Of design===========")
+        else:
+            logger.error(": Design is not safe \n ")
+            logger.debug(" :=========End Of design===========")
 
     @staticmethod
     def grdval_customized():
@@ -1275,6 +1554,6 @@ class ColumnEndPlate(MomentConnection):
         list1.append(t1)
         t3 = (KEY_D, self.diam_bolt_customized)
         list1.append(t3)
-        t6 = (KEY_ENDPLATE_THICKNESS, self.endplate_thick_customized)
+        t6 = (KEY_PLATETHK, self.endplate_thick_customized)
         list1.append(t6)
         return list1

@@ -302,8 +302,8 @@ class CommonDesignLogic(object):
                              width=(A.supporting_section.flange_width / 2.0 - (
                                      A.supporting_section.web_thickness / 2.0 + gap)) + gap,
                              length=A.supported_section.flange_width)
-            print(notch_R1,notch_height,(A.supporting_section.flange_width / 2.0 -
-                                         (A.supporting_section.web_thickness / 2.0 + gap)) + gap, A.supported_section.flange_width)
+            # print(notch_R1,notch_height,(A.supporting_section.flange_width / 2.0 -
+            #                              (A.supporting_section.web_thickness / 2.0 + gap)) + gap, A.supported_section.flange_width)
 
         elif self.connection == KEY_DISP_ENDPLATE:
             notchObj = Notch(R1=notch_R1, height=notch_height,
@@ -434,9 +434,9 @@ class CommonDesignLogic(object):
                              width=(A.supporting_section.flange_width / 2.0 - (
                                      A.supporting_section.web_thickness / 2.0 + gap)) + gap,
                              length=A.supported_section.flange_width)
-            print(notch_R1, notch_height, (A.supporting_section.flange_width / 2.0 -
-                                           (A.supporting_section.web_thickness / 2.0 + gap)) + gap,
-                  A.supported_section.flange_width)
+            # print(notch_R1, notch_height, (A.supporting_section.flange_width / 2.0 -
+            #                                (A.supporting_section.web_thickness / 2.0 + gap)) + gap,
+            #       A.supported_section.flange_width)
         elif self.connection == KEY_DISP_SEATED_ANGLE:
             gap = A.plate.gap
             seatangle = Angle(L=A.seated_angle.width, A=A.seated.leg_a_length, B=A.seated.leg_b_length,     #TODO:Check leg b length
@@ -539,9 +539,9 @@ class CommonDesignLogic(object):
                              width=(A.supporting_section.flange_width / 2.0 - (
                                      A.supporting_section.web_thickness / 2.0 + gap)) + gap,
                              length=A.supported_section.flange_width)
-            print(notch_R1, notch_height, (A.supporting_section.flange_width / 2.0 -
-                                           (A.supporting_section.web_thickness / 2.0 + gap)) + gap,
-                  A.supported_section.flange_width)
+            # print(notch_R1, notch_height, (A.supporting_section.flange_width / 2.0 -
+            #                                (A.supporting_section.web_thickness / 2.0 + gap)) + gap,
+            #       A.supported_section.flange_width)
 
         elif self.connection == KEY_DISP_SEATED_ANGLE:
             gap = A.plate.gap

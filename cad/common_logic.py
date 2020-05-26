@@ -601,11 +601,11 @@ class CommonDesignLogic(object):
         colflangeconn.create_3dmodel()
         return colflangeconn
 
-    def createBBCoverPlateBoltedCAD(self):
+    def createBBCoverPlateCAD(self):
         '''
         :return: The calculated values/parameters to create 3D CAD model of individual components.
         '''
-        B= BeamCoverPlate()
+        B = BeamCoverPlate()
         # beam_data = self.fetchBeamPara()  # Fetches the beam dimensions
 
         beam_tw = float(B.section.web_thickness)
@@ -685,6 +685,9 @@ class CommonDesignLogic(object):
         bbCoverPlateBolted.create_3DModel()
 
         return bbCoverPlateBolted
+
+    def createCCCoverPlateCAD(self):
+        pass
 
     def createBasePlateCAD(self):
         """
@@ -814,7 +817,10 @@ class CommonDesignLogic(object):
                                T=float(T.section_size_1.thickness), R1=float(T.section_size_1.root_radius),
                                R2=float(T.section_size_1.toe_radius))
                 inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
-                opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
+                if T.loc == 'Long Leg':
+                    opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.A))
+                else:  # 'Short Leg'
+                    opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
 
                 tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld, opline_weld)
 
@@ -923,7 +929,7 @@ class CommonDesignLogic(object):
                 #     pass
                 #
                 # self.loc = A.connectivity
-                self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()  # CPBoltedObj is an object which gets all the calculated values of CAD models
+                self.CPBoltedObj = self.createBBCoverPlateCAD()  # CPBoltedObj is an object which gets all the calculated values of CAD models
                 if self.component == "Beam":
                     # Displays both beams
                     osdag_display_shape(self.display, self.CPBoltedObj.get_beamsModel(), update=True)
@@ -1052,7 +1058,7 @@ class CommonDesignLogic(object):
             if self.connection == KEY_DISP_BEAMCOVERPLATE:
                 if flag is True:
 
-                    self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()
+                    self.CPBoltedObj = self.createBBCoverPlateCAD()
 
                     self.display_3DModel("Model", "gradient_bg")
 

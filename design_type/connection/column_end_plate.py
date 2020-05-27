@@ -1557,3 +1557,4 @@ class ColumnEndPlate(MomentConnection):
         t6 = (KEY_PLATETHK, self.endplate_thick_customized)
         list1.append(t6)
         return list1
+

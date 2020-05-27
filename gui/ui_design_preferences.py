@@ -39,7 +39,7 @@ import openpyxl
 class Ui_Dialog(object):
     def setupUi(self, DesignPreferences, main, input_dictionary):
         DesignPreferences.setObjectName("DesignPreferences")
-        DesignPreferences.resize(969, 624)
+        #DesignPreferences.resize(1170,870)
         self.gridLayout_5 = QtWidgets.QGridLayout(DesignPreferences)
         self.gridLayout_5.setObjectName("gridLayout_5")
         self.gridLayout_2 = QtWidgets.QGridLayout()
@@ -492,7 +492,8 @@ class Ui_Dialog(object):
 # START
 
         tab_index = 0
-
+        dialog_height = 500
+        buttons = []
         for tab_details in main.tab_list(main):
             tab_name = tab_details[0]
             tab_elements = tab_details[2]
@@ -540,6 +541,7 @@ class Ui_Dialog(object):
                             combo.addItem(item)
                         if input_dictionary:
                             combo.setCurrentText(str(element[4]))
+                        combo.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
                         width = combo.minimumSizeHint().width()
                         combo.view().setMinimumWidth(width)
                         combo_text.append((combo,l.sizeHint().width() + 10 + j,10+i))
@@ -589,7 +591,7 @@ class Ui_Dialog(object):
                             x,y = item[1], item[2]
                             item[0].move(ki+10,y)
                         combo_text = []
-
+                        dialog_height = max(dialog_height, i)
                         j = j + 400
                         i = -30
 
@@ -600,48 +602,51 @@ class Ui_Dialog(object):
 
                 pushButton_Add = QtWidgets.QPushButton(tab)
                 pushButton_Add.setObjectName(str("pushButton_Add_" + tab_name))
-                pushButton_Add.setGeometry(QtCore.QRect(6, i + 30, 160, 27))
+                pushButton_Add.setGeometry(QtCore.QRect(200, i + 70, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(9)
                 font.setBold(False)
                 font.setWeight(50)
                 pushButton_Add.setFont(font)
                 pushButton_Add.setText("Add")
-                pushButton_Add.resize(pushButton_Add.sizeHint().width() + 10, pushButton_Add.sizeHint().height() + 7)
+                buttons.append((pushButton_Add,200,i+70))
+                #pushButton_Add.resize(pushButton_Add.sizeHint().width() + 10, pushButton_Add.sizeHint().height() + 7)
 
                 pushButton_Clear = QtWidgets.QPushButton(tab)
                 pushButton_Clear.setObjectName(str("pushButton_Clear_" + tab_name))
-                pushButton_Clear.setGeometry(QtCore.QRect(180, i + 30, 160, 27))
+                pushButton_Clear.setGeometry(QtCore.QRect(400, i + 70, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(9)
                 font.setBold(False)
                 font.setWeight(50)
                 pushButton_Clear.setFont(font)
                 pushButton_Clear.setText("Clear")
-                pushButton_Clear.resize(pushButton_Clear.sizeHint().width() + 10, pushButton_Clear.sizeHint().height() + 7)
+                buttons.append((pushButton_Clear,400,i+70))
+                #pushButton_Clear.resize(pushButton_Clear.sizeHint().width() + 10, pushButton_Clear.sizeHint().height() + 7)
 
                 pushButton_Import = QtWidgets.QPushButton(tab)
                 pushButton_Import.setObjectName(str("pushButton_Import_" + tab_name))
-                pushButton_Import.setGeometry(QtCore.QRect(770, i + 30, 160, 27))
+                pushButton_Import.setGeometry(QtCore.QRect(600, i + 70, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(9)
                 font.setBold(False)
                 font.setWeight(50)
                 pushButton_Import.setFont(font)
                 pushButton_Import.setText("Import xlsx file")
-                pushButton_Import.resize(pushButton_Import.sizeHint().width() + 10, pushButton_Import.sizeHint().height() + 7)
+                buttons.append((pushButton_Import,600,i+70))
+                #pushButton_Import.resize(pushButton_Import.sizeHint().width() + 10, pushButton_Import.sizeHint().height() + 7)
 
                 pushButton_Download = QtWidgets.QPushButton(tab)
                 pushButton_Download.setObjectName(str("pushButton_Download_" + tab_name))
-                pushButton_Download.setGeometry(QtCore.QRect(600, i + 30, 160, 27))
+                pushButton_Download.setGeometry(QtCore.QRect(800, i + 70, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(9)
                 font.setBold(False)
                 font.setWeight(50)
                 pushButton_Download.setFont(font)
                 pushButton_Download.setText("Download xlsx file")
-                pushButton_Download.resize(pushButton_Download.sizeHint().width() + 10, pushButton_Download.sizeHint().height() + 7)
-
+                buttons.append((pushButton_Download,800,i+70))
+                #pushButton_Download.resize(pushButton_Download.sizeHint().width() + 10, pushButton_Download.sizeHint().height() + 7)
 
                 if combo_text and labels:
                     ki = -1
@@ -656,8 +661,7 @@ class Ui_Dialog(object):
                 self.tabWidget.addTab(tab, "")
                 self.tabWidget.setTabText(tab_index, tab_name)
                 tab_index += 1
-
-
+                #dialog_height = max(i+70, dialog_height)
             elif tab_type == TYPE_TAB_2:
                 labels = []
                 combo_text = []
@@ -716,6 +720,7 @@ class Ui_Dialog(object):
                             combo.model().item(2).setEnabled(False)
                         if input_dictionary:
                             combo.setCurrentText(str(element[4]))
+                        combo.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
                         width = combo.minimumSizeHint().width()
                         combo.view().setMinimumWidth(width)
                         combo_text.append((combo,l.sizeHint().width() + 10 + j,10+i))
@@ -792,12 +797,12 @@ class Ui_Dialog(object):
                         font.setWeight(75)
                         label_3.setFont(font)
                         label_3.setObjectName("label_3")
-                        label_3.setGeometry(QtCore.QRect(550, 10, 130, 22))
+                        label_3.setGeometry(QtCore.QRect(650, 10, 130, 22))
                         label_3.setText("Description")
                         textBrowser = QtWidgets.QTextBrowser(tab)
                         textBrowser.setMinimumSize(QtCore.QSize(210, 320))
                         textBrowser.setObjectName(element[0])
-                        textBrowser.setGeometry(QtCore.QRect(550, 40, 480, 450))
+                        textBrowser.setGeometry(QtCore.QRect(650, 40, 480, 450))
                         textBrowser.setHtml(_translate("DesignPreferences", element[3]))
                         textBrowser.horizontalScrollBar().setVisible(False)
 
@@ -816,7 +821,10 @@ class Ui_Dialog(object):
                 self.tabWidget.addTab(tab, "")
                 self.tabWidget.setTabText(tab_index, tab_name)
                 tab_index += 1
-        DesignPreferences.resize(1170,700)
+        dialog_height += 170   # 70 for buttons and 100 for whitespaces
+        DesignPreferences.resize(1170,dialog_height)
+        for item in buttons:
+            item[0].move(item[1],dialog_height-150)
 
 # END
 

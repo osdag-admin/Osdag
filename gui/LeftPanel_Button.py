@@ -43,7 +43,7 @@ class Ui_LPButton(object):
         self.LP_Button.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
         self.LP_Button.setToolTip("")
         self.LP_Button.setAutoFillBackground(False)
-        
+
         self.LP_Button.setAutoDefault(True)
         self.LP_Button.setDefault(False)
         self.LP_Button.setFlat(False)

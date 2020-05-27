@@ -158,8 +158,6 @@ class NutBoltArray():
                     pos = pos + rw * self.pitch * self.pitchDir
                     self.positions.append(pos)
 
-        print("self.positions", self.positions)
-
     def calculatebPositions(self):       
         self.bpositions = []
         for rw in  range(self.brow):

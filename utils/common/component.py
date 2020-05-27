@@ -127,7 +127,7 @@ class Bolt:
 
         return repr
 
-    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes, seatedangle = False):
+    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes, seatedangle_e = 0.0):
         """
 
         :param bolt_type: bearing or friction grip bolt
@@ -162,10 +162,10 @@ class Bolt:
         if self.bolt_type == "Bearing Bolt":
             self.bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, A_sb=self.bolt_shank_area, n_n=n_planes, n_s=0)
-            if seatedangle:
+            if seatedangle_e > 0.0:
                 self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                     f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
-                    e=self.min_end_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
+                    e=seatedangle_e, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
             else:
                 self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                     f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
@@ -1108,7 +1108,6 @@ class Plate(Material):
     def get_bolt_red(self, bolts_one_line , gauge ,bolts_line ,
                      pitch, bolt_capacity, bolt_dia,end_dist=0.0,gap=0.0,edge_dist =0.0,root_radius =0.0,web_thickness =0.0):
         """
-
         :param bolts_one_line: bolts in one line
         :param gauge: gauge
         :param bolt_capacity: capacity of bolt
@@ -1131,15 +1130,11 @@ class Plate(Material):
                 bolt_capacity_red = bolt_capacity
         else:
             if web_thickness == 0.0:
-                length_avail = max((2 * (((bolts_line-1) * pitch) + end_dist) + (2*gap)), ((bolts_one_line - 1) * gauge))
-                print("welong",length_avail)
-                print("bolt_capacity", bolt_capacity)
-
+                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2 * gap)), ((bolts_one_line - 1) * gauge))
             else:
                 midgauge = 2 * (edge_dist + root_radius) + web_thickness
-                length_avail = max((2 * (((bolts_line-1) * pitch) + end_dist) + (2*gap)), (((bolts_one_line/2 - 1) * gauge) + midgauge))
-                print("flangelong", length_avail)
-                print("bolt_capacity", bolt_capacity)
+                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2 * gap)),
+                                   (((bolts_one_line / 2 - 1) * gauge) + midgauge))
             if length_avail > 15 * bolt_dia:
                 beta_lj = 1.075 - length_avail / (200 * bolt_dia)
                 if beta_lj > 1:
@@ -1349,7 +1344,6 @@ class Plate(Material):
             moment_demand = 0.0
             vres = res_force / (bolt_line*bolts_one_line)
             if joint == None:
-
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,
                                                       bolt_dia)
@@ -1380,7 +1374,6 @@ class Plate(Material):
                     pitch = min_gauge
                 vres = res_force / (bolt_line * bolts_one_line)
                 if joint == None:
-
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                           gauge, bolt_line, pitch, bolt_capacity,
                                                           bolt_dia)
@@ -1644,6 +1637,17 @@ class Angle(Section):
 
         conn.close()
 
+
+    def angle_weld_length(self, weld_strength, depth_weld, force, C, depth):
+
+        "Function to calculate weld length for angles based on the force transfer pattern"
+
+        f2 = weld_strength * depth_weld
+        f3 = force * (1 - C / depth) - f2 / 2
+        l3 = f3 / weld_strength
+
+        return l3
+
     def get_available_seated_list(self, input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer", t_min = 0.0):
         available_angles = []
         for designation in input_angle_list:
@@ -1663,6 +1667,7 @@ class Angle(Section):
             else:
                 print("popped", designation)
         return available_angles
+
 
 
 class I_sectional_Properties(object):

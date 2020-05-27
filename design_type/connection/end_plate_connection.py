@@ -202,7 +202,7 @@ class EndPlateConnection(ShearConnection):
     def module_name(self):
         return KEY_DISP_ENDPLATE
 
-    def input_values(self, existingvalues={}):
+    def input_values(self):
 
         """
         Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
@@ -212,102 +212,52 @@ class EndPlateConnection(ShearConnection):
         self.module = KEY_DISP_ENDPLATE
         options_list = []
 
-        if KEY_CONN in existingvalues:
-            existingvalue_key_conn = existingvalues[KEY_CONN]
-        else:
-            existingvalue_key_conn = ''
-
-        if KEY_SUPTNGSEC in existingvalues:
-            existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
-        else:
-            existingvalue_key_suptngsec = ''
-
-        if KEY_SUPTDSEC in existingvalues:
-            existingvalue_key_suptdsec = existingvalues[KEY_SUPTDSEC]
-        else:
-            existingvalue_key_suptdsec = ''
-
-        if KEY_MATERIAL in existingvalues:
-            existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
-        else:
-            existingvalue_key_mtrl = ''
-
-        if KEY_SHEAR in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_SHEAR]
-        else:
-            existingvalue_key_versh = ''
-
-        if KEY_AXIAL in existingvalues:
-            existingvalue_key_axial = existingvalues[KEY_AXIAL]
-        else:
-            existingvalue_key_axial = ''
-
-        if KEY_D in existingvalues:
-            existingvalue_key_d = existingvalues[KEY_D]
-        else:
-            existingvalue_key_d = ''
-
-        if KEY_TYP in existingvalues:
-            existingvalue_key_typ = existingvalues[KEY_TYP]
-        else:
-            existingvalue_key_typ = ''
-
-        if KEY_GRD in existingvalues:
-            existingvalue_key_grd = existingvalues[KEY_GRD]
-        else:
-            existingvalue_key_grd = ''
-
-        if KEY_PLATETHK in existingvalues:
-            existingvalue_key_platethk = existingvalues[KEY_PLATETHK]
-        else:
-            existingvalue_key_platethk = ''
-
-        t16 = (KEY_MODULE, KEY_DISP_ENDPLATE, TYPE_MODULE, None, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_ENDPLATE, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None, True, 'No Validator')
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN, True, 'No Validator')
+        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, True, 'No Validator')
         options_list.append(t15)
 
-        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC, True, 'No Validator')
+        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, VALUES_COLSEC, True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC, True, 'No Validator')
+        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, VALUES_BEAMSEC, True, 'No Validator')
         options_list.append(t4)
 
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
+        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None, True, 'No Validator')
+        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None, True, 'No Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None, True, 'No Validator')
+        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t9)
 
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D, True, 'No Validator')
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
         options_list.append(t10)
 
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP, True, 'No Validator')
+        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_GRD, KEY_DISP_PC, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD, True, 'No Validator')
+        t12 = (KEY_GRD, KEY_DISP_PC, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)
 
-        t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None, True, 'No Validator')
+        t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t13)
 
-        t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_platethk, VALUES_PLATETHK, True, 'No Validator')
+        t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'No Validator')
         options_list.append(t14)
 
         return options_list
@@ -324,7 +274,7 @@ class EndPlateConnection(ShearConnection):
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-                val = option[4]
+                val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
@@ -443,7 +393,7 @@ class EndPlateConnection(ShearConnection):
             else:
                 length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)
         else:
-            self.supported_section.notch_ht = round_up(self.supporting_section.flange_thickness*2, 5)
+            self.supported_section.notch_ht = round_up(self.supporting_section.flange_thickness + self.supporting_section.root_radius + 5, 5)
             # length = self.supported_section.depth - self.supported_section.notch_ht
             if self.supported_section.type == "Rolled":
                 length = self.supported_section.depth - self.supported_section.notch_ht
@@ -452,9 +402,12 @@ class EndPlateConnection(ShearConnection):
 
             # length = self.supported_section.depth - round_up((2*self.supporting_section.flange_thickness),5)  # TODO: Subtract notch height for beam-beam connection
 
-        self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
-        self.supported_section.tension_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
-
+        # self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
+        self.supported_section.shear_yielding_capacity = round(IS800_2007.cl_8_4_design_shear_strength(
+            length*self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
+        # self.supported_section.tension_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
+        self.supported_section.tension_yielding_capacity = round(IS800_2007.cl_6_2_tension_yielding_strength(
+            length*self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
         if self.load.shear_force <= min(0.15 * self.supported_section.shear_yielding_capacity, 40.0):
             logger.warning(" : User input for shear force is very less compared to section capacity. "
                 "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
@@ -585,15 +538,26 @@ class EndPlateConnection(ShearConnection):
                         if self.bolt.bolt_type == "Bearing Bolt":
                             bolt_bearing_capacity_disp = self.get_bolt_bearing_updated(self, end_dist, pitch, bolt_rows)
 
+                        [available_welds, weld_size_min, weld_size_max] = self.get_available_welds(self, self.connecting_plates_tk)
+                        if self.connectivity == VALUES_CONN_1[0] and available_welds and\
+                                (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius) > \
+                                (self.supported_section.web_thickness / 2 + min(available_welds)):
+                              self.bolt_dist_to_weld = (self.supporting_section.web_thickness / 2 +
+                                                        self.supporting_section.root_radius +
+                                                        self.bolt.min_edge_dist_round -
+                                                        (self.supported_section.web_thickness / 2 + min(available_welds)))
+                        else:
+                            self.bolt_dist_to_weld = self.bolt.min_edge_dist_round
+
                         self.plate.height = web_plate_h
-                        self.plate.plate_moment = self.bolt.min_edge_dist_round * self.bolt.bolt_tension
+                        self.plate.plate_moment = self.bolt_dist_to_weld * self.bolt.bolt_tension
                         self.plate.plate_shear = self.load.shear_force*1000
 
                         [self.plate.plate_moment_capacity, self.plate.plate_shear_capacity,
                          self.plate.plate_block_shear_capacity] = \
                             self.get_plate_capacity(self, self.plate.thickness_provided, self.plate.height,
                                                     self.max_plate_height, pitch,
-                                                    self.bolt.min_edge_dist_round, end_dist,
+                                                    self.bolt_dist_to_weld, end_dist,
                                                     bolt_rows, self.bolt.dia_hole)
                         # print("plate_moment:", self.plate.plate_moment)
                         # print("plate_shear:", self.plate.plate_shear)
@@ -605,12 +569,10 @@ class EndPlateConnection(ShearConnection):
                             design_status_plate = False
                             [bolt_rows, pitch, end_dist, design_status_plate] = self.plate_check(self, bolt_rows,
                                                                                 pitch, end_dist, design_status_plate)
-
                         else:
                             design_status_plate = True
 
                         if design_status_bolt is True and design_status_plate is True:
-                            self.weld.design_status = False
                             [available_welds, weld_size_min, weld_size_max] = self.get_available_welds(self,
                                                                                         self.connecting_plates_tk)
                             print(available_welds)
@@ -626,8 +588,8 @@ class EndPlateConnection(ShearConnection):
                             # #     logger.info(": Cannot design weld with available welds ")
 
                             if self.weld.design_status is True:
-                                plate_width = round_up(self.weld.size +
-                                    self.bolt.min_edge_dist_round * 4 + self.supported_section.web_thickness, 2)
+                                plate_width = round_up(self.weld.size * 2 + self.bolt_dist_to_weld * 2 +
+                                    self.bolt.min_edge_dist_round * 2 + self.supported_section.web_thickness, 2)
                                 self.plate_width_check(self, plate_width)
 
                             if self.plate.height >= web_plate_h:
@@ -637,17 +599,25 @@ class EndPlateConnection(ShearConnection):
                                                                                                 self.bolt.max_spacing_round,
                                                                                                 self.bolt.max_edge_dist_round)
 
+                            if self.connectivity == VALUES_CONN_1[0] and min(available_welds) < self.weld.size and \
+                                    (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius) > \
+                                    (self.supported_section.web_thickness / 2 + self.weld.size):
+                                self.bolt_dist_to_weld = (self.supporting_section.web_thickness / 2 +
+                                                          self.supporting_section.root_radius +
+                                                          self.bolt.min_edge_dist_round -
+                                                          (self.supported_section.web_thickness / 2 + self.weld.size))
+                            self.plate.plate_moment = self.bolt_dist_to_weld * self.bolt.bolt_tension
                             [self.plate.plate_moment_capacity, self.plate.plate_shear_capacity,
                              self.plate.plate_block_shear_capacity] = \
                                 self.get_plate_capacity(self, self.plate.thickness_provided, self.plate.height,
                                                         self.max_plate_height, pitch,
-                                                        self.bolt.min_edge_dist_round, end_dist,
+                                                        self.bolt_dist_to_weld, end_dist,
                                                         bolt_rows, self.bolt.dia_hole)
 
                             if self.plate.design_status is True:
                                 count += 1
                                 gauge = round_up(self.weld.size * 2 +
-                                    self.bolt.min_edge_dist_round * 2 + self.supported_section.web_thickness, 2)
+                                    self.bolt_dist_to_weld * 2 + self.supported_section.web_thickness, 2)
 
                                 # TRIAL FUNCTION #
                                 # total_cost = self.plate.height*plate_width*self.plate.thickness_provided*plate_cost + \
@@ -789,9 +759,9 @@ class EndPlateConnection(ShearConnection):
                  self.plate.plate_block_shear_capacity] = \
                     self.get_plate_capacity(self, self.plate.thickness_provided, self.plate.height,
                                             self.max_plate_height, pitch,
-                                            self.bolt.min_edge_dist_round, end_dist,
+                                            self.bolt_dist_to_weld, end_dist,
                                             bolt_rows, self.bolt.dia_hole)
-                self.plate.plate_moment = self.bolt.min_edge_dist_round * self.bolt.bolt_tension
+                self.plate.plate_moment = self.bolt_dist_to_weld * self.bolt.bolt_tension
                 # self.plate.plate_shear = self.load.shear_force * 1000
                 if self.plate.plate_moment > self.plate.plate_moment_capacity or \
                         self.plate.plate_shear > self.plate.plate_shear_capacity:
@@ -892,6 +862,7 @@ class EndPlateConnection(ShearConnection):
         return available_welds,weld_size_min,weld_size_max
 
     def design_weld(self,available_welds):
+        self.weld.design_status = False
         self.weld.size = available_welds[0]
         while self.plate.height <= self.max_plate_height:
             self.weld.length = self.plate.height

@@ -176,7 +176,7 @@ class FinPlateConnection(ShearConnection):
     def module_name(self):
         return KEY_DISP_FINPLATE
 
-    def input_values(self, existingvalues={}):
+    def input_values(self):
 
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
@@ -190,102 +190,52 @@ class FinPlateConnection(ShearConnection):
 
         options_list = []
 
-        if KEY_CONN in existingvalues:
-            existingvalue_key_conn = existingvalues[KEY_CONN]
-        else:
-            existingvalue_key_conn = ''
-
-        if KEY_SUPTNGSEC in existingvalues:
-           existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
-        else:
-            existingvalue_key_suptngsec = ''
-
-        if KEY_SUPTDSEC in existingvalues:
-            existingvalue_key_suptdsec = existingvalues[KEY_SUPTDSEC]
-        else:
-            existingvalue_key_suptdsec = ''
-
-        if KEY_MATERIAL in existingvalues:
-            existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
-        else:
-            existingvalue_key_mtrl = ''
-
-        if KEY_SHEAR in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_SHEAR]
-        else:
-            existingvalue_key_versh = ''
-
-        if KEY_AXIAL in existingvalues:
-            existingvalue_key_axial = existingvalues[KEY_AXIAL]
-        else:
-            existingvalue_key_axial = ''
-
-        if KEY_D in existingvalues:
-            existingvalue_key_d = existingvalues[KEY_D]
-        else:
-            existingvalue_key_d = ''
-
-        if KEY_TYP in existingvalues:
-            existingvalue_key_typ = existingvalues[KEY_TYP]
-        else:
-            existingvalue_key_typ = ''
-
-        if KEY_GRD in existingvalues:
-            existingvalue_key_grd = existingvalues[KEY_GRD]
-        else:
-            existingvalue_key_grd = ''
-
-        if KEY_PLATETHK in existingvalues:
-            existingvalue_key_platethk = existingvalues[KEY_PLATETHK]
-        else:
-            existingvalue_key_platethk = ''
-
-        t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_FINPLATE, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None, True, 'No Validator')
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN, True, 'No Validator')
+        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/fin_cf_bw.png", True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, "./ResourceFiles/images/fin_cf_bw.png", True, 'No Validator')
         options_list.append(t15)
 
-        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, connectdb("Columns"), True, 'No Validator')
+        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, connectdb("Columns"), True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, connectdb("Beams"), True, 'No Validator')
+        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, connectdb("Beams"), True, 'No Validator')
         options_list.append(t4)
 
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
+        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None, True, 'Int Validator')
+        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None, True, 'Int Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t8)
 
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None, True, 'No Validator')
+        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t9)
 
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D, True, 'No Validator')
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
         options_list.append(t10)
 
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP, True, 'No Validator')
+        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD, True, 'No Validator')
+        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)
 
-        t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None, True, 'No Validator')
+        t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t13)
 
-        t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_platethk, VALUES_PLATETHK, True, 'No Validator')
+        t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'No Validator')
         options_list.append(t14)
 
         return options_list
@@ -352,6 +302,9 @@ class FinPlateConnection(ShearConnection):
 
         capacities = []
 
+        t99 = (None, 'Shear Capacities', TYPE_SECTION, './ResourceFiles/images/Osdag.png')
+        capacities.append(t99)
+
         t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity/1000,2) if status else '')
         capacities.append(t17)
 
@@ -360,6 +313,9 @@ class FinPlateConnection(ShearConnection):
 
         t17 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity_shear/1000,2) if status else '')
         capacities.append(t17)
+
+        t99 = (None, 'Tension Capacites', TYPE_SECTION, './ResourceFiles/images/Osdag.png')
+        capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
                round(self.plate.tension_yielding_capacity/1000, 2) if status else '')
@@ -372,6 +328,9 @@ class FinPlateConnection(ShearConnection):
         t17 = (KEY_OUT_PLATE_BLK_SHEAR_AXIAL, KEY_OUT_DISP_PLATE_BLK_SHEAR_AXIAL, TYPE_TEXTBOX,
                round(self.plate.block_shear_capacity_axial/1000, 2) if status else '')
         capacities.append(t17)
+
+        t99 = (None, 'Moment Capacites', TYPE_SECTION, '')
+        capacities.append(t99)
 
         t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if status else '')
         capacities.append(t19)
@@ -427,16 +386,14 @@ class FinPlateConnection(ShearConnection):
 
         out_list.append(t3)
 
-        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag else '', True)
+        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
+              round(self.bolt.bolt_shear_capacity / 1000, 2) if flag else '', True)
         out_list.append(t4)
 
         bolt_bearing_capacity_disp = ''
         if flag is True:
             if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
                 bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-                pass
-            else:
-                bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
         t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)
@@ -501,7 +458,7 @@ class FinPlateConnection(ShearConnection):
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-                val = option[4]
+                val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:

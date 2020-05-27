@@ -360,7 +360,7 @@ VALUES_SECTYPE = ['Select Type','Beams','Columns','Angles','Back to Back Angles'
 VALUES_CONNLOC_BOLT = ['Bolted','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
-
+VALUES_IMG_TENSIONBOLTED = ["ResourceFiles/images/bA.png","ResourceFiles/images/bBBA.png","ResourceFiles/images/bSA.png","ResourceFiles/images/bC.png","ResourceFiles/images/bBBC.png"]
 
 VALUES_BEAMSEC = connectdb("Beams")
 VALUES_SECBM = connectdb("Beams")
@@ -444,6 +444,9 @@ KEY_DISP_INNERFLANGESPLATE_THICKNESS = 'Thickness (mm)'
 DISP_TITLE_WELD = 'Weld'
 DISP_TITLE_WELD_CAPACITY = 'Weld Capacity'
 DISP_TITLE_END_CONNECTION = 'End Connection'
+DISP_TITLE_WELD_DETAILS = 'Weld Details'
+DISP_TITLE_CONN_DETAILS = 'Connection Details'
+
 
 KEY_DISP_FLANGE_CAPACITY= 'Capacity'
 KEY_DISP_FLANGE_PLATE_GAUGE ="Gauge"
@@ -454,7 +457,7 @@ KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
 
 KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity (kN)"
 DISP_TITLE_SECTION = 'SECTION'
-DISP_TITLE_TENSION_SECTION = 'Section Capacity'
+DISP_TITLE_TENSION_SECTION = 'Section Details'
 
 KEY_DISP_D = 'Diameter (mm)*'
 KEY_DISP_SHEAR = 'Shear (kN)*'
@@ -521,7 +524,7 @@ KEY_OUT_DISP_GUSSET_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
 KEY_OUT_DISP_GUSSET_PLATE_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_DISP_GUSSET_PLATE_THICKNESS = 'Thickness (mm)'
 KEY_OUT_DISP_GUSSET_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
-DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
+DISP_TITLE_GUSSET_PLATE = 'Gusset Plate Details'
 KEY_DISP_FLANGE_PLATE_LENGTH ='Length (mm)'
 KEY_DISP_FLANGE_PLATE_HEIGHT = 'Height (mm)'
 KEY_DISP_INNERFLANGESPLICEPLATE = "Inner Plate Detials"
@@ -584,7 +587,8 @@ KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
 KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Type of edges'
 
 DISP_TITLE_INTERMITTENT = 'Intermittent Connection'
-
+DISP_TITLE_BOLTD = 'Bolt Details'
+DISP_TITLE_PLATED = 'Plate Details'
 
 KEY_DISP_DP_DETAILING_GAP = 'Gap between beam and <br>support (mm)'
 
@@ -1121,7 +1125,11 @@ KEY_OUT_PLATE_CAPACITIES = 'capacities'
 KEY_OUT_DISP_PLATE_CAPACITIES = 'Capacity'
 
 KEY_OUT_WELD_SIZE = 'Weld.Size'
-KEY_OUT_DISP_WELD_SIZE = 'Size(mm)'
+KEY_OUT_DISP_WELD_SIZE = 'Size (mm)'
+
+KEY_OUT_INTER_WELD_SIZE = 'InterWeld.Size'
+KEY_OUT_DISP_INTER_WELD_SIZE = 'Size (mm)'
+
 KEY_OUT_WELD_SIZE_FLANGE = 'Weld.Size_flange'
 KEY_OUT_DISP_WELD_SIZE_FLANGE = 'Size at Flange (mm)'
 KEY_OUT_WELD_SIZE_WEB = 'Weld.Size_web'
@@ -1129,9 +1137,9 @@ KEY_OUT_DISP_WELD_SIZE_WEB = 'Size at Web (mm)'
 KEY_OUT_WELD_SIZE_STIFFENER = 'Weld.Size_stiffener'
 KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Gusset/Stiffener (mm)'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
-KEY_OUT_DISP_WELD_STRENGTH = 'Strength(N/mm)'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
-KEY_OUT_DISP_WELD_STRESS = 'Stress(N/mm)'
+KEY_OUT_DISP_WELD_STRESS = 'Stress (N/mm)'
 KEY_OUT_WELD_LENGTH = 'Weld.Length'
 KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
 KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
@@ -1201,7 +1209,7 @@ KEY_OUT_CLEAT_MOM_CAPACITY = 'Cleat.MomCapacity'
 
 
 
-KEY_DISP_SEC_PROFILE = 'Section Profile'
+KEY_DISP_SEC_PROFILE = 'Section Profile*'
 VALUES_SEC_PROFILE = ['Beams', 'Columns', 'Angles', 'Channels', 'Back to Back Angles', 'Back to Back Channels', 'Star Angles']
 VALUES_SEC_PROFILE_2 = ['Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels']
 

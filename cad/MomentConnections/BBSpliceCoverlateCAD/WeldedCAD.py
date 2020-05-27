@@ -91,28 +91,28 @@ class BBSpliceCoverPlateWeldedCAD(object):
         :return:  CAD model of each of the followings. Debugging each command below would give give clear picture
         '''
 
-        self.createColumnGeometry()
+        self.createbeamGeometry()
         self.createPlateGeometry()
         self.createWeldedGeometry()
 
-    def createColumnGeometry(self):
+    def createbeamGeometry(self):
         """
 
         :return: Geometric Orientation of this component
         """
-        column1Origin = numpy.array([self.gap / 2, 0.0, 0.0])
-        column1_uDir = numpy.array([0.0, 1.0, 0.0])
-        column1_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.beam1.place(column1Origin, column1_uDir, column1_wDir)
+        beam1Origin = numpy.array([self.gap / 2, 0.0, 0.0])
+        beam1_uDir = numpy.array([0.0, 1.0, 0.0])
+        beam1_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.beam1.place(beam1Origin, beam1_uDir, beam1_wDir)
 
-        self.column1Model = self.beam1.create_model()
+        self.beam1Model = self.beam1.create_model()
 
-        column2Origin = numpy.array([-self.gap / 2, 0.0, 0.0])
-        column2_uDir = numpy.array([0.0, 1.0, 0.0])
-        column2_wDir = numpy.array([-1.0, 0.0, 0.0])
-        self.beam2.place(column2Origin, column2_uDir, column2_wDir)
+        beam2Origin = numpy.array([-self.gap / 2, 0.0, 0.0])
+        beam2_uDir = numpy.array([0.0, 1.0, 0.0])
+        beam2_wDir = numpy.array([-1.0, 0.0, 0.0])
+        self.beam2.place(beam2Origin, beam2_uDir, beam2_wDir)
 
-        self.column2Model = self.beam2.create_model()
+        self.beam2Model = self.beam2.create_model()
 
     def createPlateGeometry(self):
 
@@ -469,14 +469,14 @@ class BBSpliceCoverPlateWeldedCAD(object):
 
         self.weldCutPlateModel = self.weldCutPlate.create_model()
 
-    def get_column_models(self):
+    def get_beam_models(self):
         """
 
-        :return: CAD mode for the columns
+        :return: CAD mode for the beams
         """
-        columns = BRepAlgoAPI_Fuse(self.column1Model, self.column2Model).Shape()
+        beams = BRepAlgoAPI_Fuse(self.beam1Model, self.beam2Model).Shape()
 
-        return columns
+        return beams
 
     def get_plate_models(self):
         """
@@ -526,10 +526,10 @@ class BBSpliceCoverPlateWeldedCAD(object):
         # return self.webPlateWeldW22Model
 
     def get_models(self):
-        columns = self.get_column_models()
+        beams = self.get_beam_models()
         plate_conectors = self.get_plate_models()
 
-        CAD = BRepAlgoAPI_Fuse(columns, plate_conectors).Shape()
+        CAD = BRepAlgoAPI_Fuse(beams, plate_conectors).Shape()
 
         return CAD
 
@@ -545,7 +545,7 @@ if __name__ == '__main__':
 
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    column = ISection(B=250, T=13.5, D=450, t=9.8, R1=15, R2=75, alpha=94, length=1000, notchObj=None)
+    beam = ISection(B=250, T=13.5, D=450, t=9.8, R1=15, R2=75, alpha=94, length=1000, notchObj=None)
     flangePlate = Plate(L=550, W=210, T=14)
     innerFlangePlate = Plate(L=550, W=80, T=14)
     webPlate = Plate(L=365, W=170, T=8)
@@ -560,12 +560,12 @@ if __name__ == '__main__':
     webPlateWeldL = FilletWeld(h=5, b=5, L=webPlate.L)
     webPlateWeldW = FilletWeld(h=5, b=5, L=webPlate.W)
 
-    BBSpliceCoverPlateCAD = BBSpliceCoverPlateWeldedCAD(column, flangePlate, innerFlangePlate, webPlate, gap,
+    BBSpliceCoverPlateCAD = BBSpliceCoverPlateWeldedCAD(beam, flangePlate, innerFlangePlate, webPlate, gap,
                                                         flangePlateWeldL, flangePlateWeldW, innerflangePlateWeldL,
                                                         innerflangePlateWeldW, webPlateWeldL, webPlateWeldW)
 
     BBSpliceCoverPlateCAD.create_3DModel()
-    column = BBSpliceCoverPlateCAD.get_column_models()
+    beam = BBSpliceCoverPlateCAD.get_beam_models()
     plates = BBSpliceCoverPlateCAD.get_plate_models()
     welds = BBSpliceCoverPlateCAD.get_welded_modules()
 
@@ -573,7 +573,7 @@ if __name__ == '__main__':
     display.DisplayMessage(Point, "Origin")
 
     # display.View.Rotate(45, 90, 45)
-    display.DisplayShape(column, update=True)
+    display.DisplayShape(beam, update=True)
     display.DisplayShape(plates, color='BLUE', update=True)
     display.DisplayShape(welds, color='RED', update=True)
 

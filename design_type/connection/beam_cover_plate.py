@@ -1180,7 +1180,7 @@ class BeamCoverPlate(MomentConnection):
                     else:
                         self.initial_pt_thk_status = False and self.initial_pt_thk_status_web == False
                         self.design_status = False
-                        logger.warning(" : Plate is not possible")
+                        # logger.warning(" : Plate is not possible")
                         logger.error(" : Design is not safe. \n ")
                         logger.debug(" : =========End Of design===========")
 
@@ -2406,9 +2406,9 @@ class BeamCoverPlate(MomentConnection):
                     self.webplatewidth = round(D - (2 * tk) - (2 * self.webclearance),2)
                     if self.webplatewidth < self.min_web_plate_height:
                         logger.error(" : Inner plate is not possible")
-                        logger.warning(" : web plate height {} is less than min depth of the plate {}".format(self.webplatewidth,
+                        logger.warning(" : Web plate height {} mm is less than min depth of the plate {} mm".format(self.webplatewidth,
                                                                                                               self.min_web_plate_height))
-                        logger.warning("Try for outside plate")
+                        logger.warning(" : Change the preference to outside plate")
                         thickness = 0
                         self.design_status = False
                     else:

@@ -482,11 +482,11 @@ class BeamCoverPlate(MomentConnection):
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
 
-        t2 = (KEY_D, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
+        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
               self.bolt.bolt_diameter_provided if flag else '', True)
         out_list.append(t2)
 
-        t3 = (KEY_GRD, KEY_DISP_GRD, TYPE_TEXTBOX,
+        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_GRD, TYPE_TEXTBOX,
               self.bolt.bolt_grade_provided if flag else '', True)
         out_list.append(t3)
 
@@ -746,7 +746,7 @@ class BeamCoverPlate(MomentConnection):
         self.web_axial_check_status = False
         self.web_plate_axial_check_status = False
         self.web_shear_plate_check_status = False
-
+        self.warn_text(self)
         self.member_capacity(self)
         #self.hard_values(self)
     def hard_values(self):
@@ -934,43 +934,22 @@ class BeamCoverPlate(MomentConnection):
         self.flange_force = (((self.moment_flange) / (self.section.depth - self.section.flange_thickness)) + (
             self.axial_force_f))
 
-        # if self.load_moment > self.section.moment_capacity:
-        #     self.member_capacity = False
-        #     logger.warning(' : Moment load is exceeding moment capacity  %2.2f KN-m' % self.section.moment_capacity)
-        #     logger.error(" : Design is not safe. \n ")
-        #     logger.debug(" :=========End Of design===========")
-        # else:
-        #     self.member_capacity = True
-        #     self.moment_web = (Z_w * self.load_moment / (
-        #         self.section.plast_sec_mod_z))  # Nm todo add in ddcl # z_w of web & z_p  of section
-        #     self.moment_flange = ((self.load_moment) - self.moment_web)
-        #     self.sectioncheck(self)
-
-        # if len(self.flange_plate.thickness) >= 2:
-        #     self.max_thick_f = max(self.flange_plate.thickness)
-        # else:
-        #     self.max_thick_f = self.flange_plate.thickness[0]
-        # if len(self.web_plate.thickness) >= 2:
-        #     self.max_thick_w = max(self.web_plate.thickness)
-        # else:
-        #     self.max_thick_w = self.web_plate.thickness[0]
         ###########################################################
         if self.factored_axial_load > self.axial_capacity:
-            logger.warning(' : Factored axial load is exceeding axial capacity  %2.2f KN' % self.axial_capacity)
+            logger.warning(' : Factored axial load is exceeding axial capacity  %2.2f KN' % round(self.axial_capacity,2))
             logger.error(" : Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
             self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity1:
-                logger.warning(' : Factored shear load is exceeding shear capacity  %2.2f KN' % self.shear_capacity1)
+                logger.warning(' : Factored shear load is exceeding shear capacity  %2.2f KN' % round(self.shear_capacity1,2))
                 logger.error(" : Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
                 self.member_capacity_status = False
             else:
                 if self.load_moment > self.section.moment_capacity:
                     self.member_capacity_status = False
-                    logger.warning(
-                        ' : Moment load is exceeding moment capacity  %2.2f KN-m' % self.section.moment_capacity)
+                    logger.warning(' : Moment load is exceeding moment capacity  %2.2f KN-m' % round(self.section.moment_capacity),2)
                     logger.error(" : Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
                 else:

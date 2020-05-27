@@ -1973,7 +1973,7 @@ class Ui_ModuleWindow(QMainWindow):
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
                     # txt.setVisible(True if option[3] else False)
-                    txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
+                    # txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
                     # txt_label.setVisible(True if option[3] else False)
 
                 elif option[2] == TYPE_OUT_BUTTON:

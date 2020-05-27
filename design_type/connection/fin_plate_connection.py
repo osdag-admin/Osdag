@@ -352,6 +352,9 @@ class FinPlateConnection(ShearConnection):
 
         capacities = []
 
+        t99 = (None, 'Shear Capacities', TYPE_SECTION, './ResourceFiles/images/Osdag.png')
+        capacities.append(t99)
+
         t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity/1000,2) if status else '')
         capacities.append(t17)
 
@@ -360,6 +363,9 @@ class FinPlateConnection(ShearConnection):
 
         t17 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity_shear/1000,2) if status else '')
         capacities.append(t17)
+
+        t99 = (None, 'Tension Capacites', TYPE_SECTION, './ResourceFiles/images/Osdag.png')
+        capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
                round(self.plate.tension_yielding_capacity/1000, 2) if status else '')
@@ -372,6 +378,9 @@ class FinPlateConnection(ShearConnection):
         t17 = (KEY_OUT_PLATE_BLK_SHEAR_AXIAL, KEY_OUT_DISP_PLATE_BLK_SHEAR_AXIAL, TYPE_TEXTBOX,
                round(self.plate.block_shear_capacity_axial/1000, 2) if status else '')
         capacities.append(t17)
+
+        t99 = (None, 'Moment Capacites', TYPE_SECTION, '')
+        capacities.append(t99)
 
         t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if status else '')
         capacities.append(t19)
@@ -427,16 +436,14 @@ class FinPlateConnection(ShearConnection):
 
         out_list.append(t3)
 
-        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag else '', True)
+        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
+              round(self.bolt.bolt_shear_capacity / 1000, 2) if flag else '', True)
         out_list.append(t4)
 
         bolt_bearing_capacity_disp = ''
         if flag is True:
             if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
                 bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-                pass
-            else:
-                bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
         t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)

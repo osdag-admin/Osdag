@@ -95,7 +95,7 @@ if __name__ == '__main__':
     display, start_display, add_menu, add_function_to_menu = init_display()
 
     R = 8
-    H = 20
+    H = 10
     T = 5
     r = 3
 

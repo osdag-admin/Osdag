@@ -720,22 +720,30 @@ class CommonDesignLogic(object):
 
         elif self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
             B = self.module_class()
-            beam = ISection(B=250, T=13.5, D=450, t=9.8, R1=15, R2=75, alpha=94, length=1000, notchObj=None)
-            flangePlate = Plate(L=550, W=210, T=14)
-            innerFlangePlate = Plate(L=550, W=80, T=14)
-            webPlate = Plate(L=365, W=170, T=8)
-            gap = 10
+            beamLenght = (max(float(B.flange_plate.length), float(B.web_plate.length)) + 600) / 2
+            beam = ISection(B=float(B.section.flange_width), T=float(B.section.flange_thickness),
+                            D=float(B.section.depth), t=float(B.section.web_thickness), R1=float(B.section.root_radius),
+                            R2=float(B.section.toe_radius), alpha=float(B.section.flange_slope), length=beamLenght,
+                            notchObj=None)
+            flangePlate = Plate(L=float(B.flange_plate.length), W=float(B.flange_plate.height),
+                                T=float(B.flange_plate.thickness_provided))
+            innerFlangePlate = Plate(L=float(B.flange_plate.Innerlength), W=float(B.flange_plate.Innerheight),
+                                     T=float(B.flange_plate.thickness_provided))
+            webPlate = Plate(L=float(B.web_plate.length), W=float(B.web_plate.height),
+                             T=float(B.web_plate.thickness_provided))
 
-            flangePlateWeldL = FilletWeld(h=5, b=5, L=flangePlate.L)
-            flangePlateWeldW = FilletWeld(h=5, b=5, L=flangePlate.W)
+            flangePlateWeldL = FilletWeld(h=float(B.flange_weld.size), b=float(B.flange_weld.size), L=flangePlate.L)
+            flangePlateWeldW = FilletWeld(h=float(B.flange_weld.size), b=float(B.flange_weld.size), L=flangePlate.W)
 
-            innerflangePlateWeldL = FilletWeld(h=5, b=5, L=innerFlangePlate.L)
-            innerflangePlateWeldW = FilletWeld(h=5, b=5, L=innerFlangePlate.W)
+            innerflangePlateWeldL = FilletWeld(h=float(B.flange_weld.size), b=float(B.flange_weld.size),
+                                               L=innerFlangePlate.L)
+            innerflangePlateWeldW = FilletWeld(h=float(B.flange_weld.size), b=float(B.flange_weld.size),
+                                               L=innerFlangePlate.W)
 
-            webPlateWeldL = FilletWeld(h=5, b=5, L=webPlate.L)
-            webPlateWeldW = FilletWeld(h=5, b=5, L=webPlate.W)
+            webPlateWeldL = FilletWeld(h=float(B.web_weld.size), b=float(B.web_weld.size), L=webPlate.L)
+            webPlateWeldW = FilletWeld(h=float(B.web_weld.size), b=float(B.web_weld.size), L=webPlate.W)
 
-            bbCoverPlate = BBSpliceCoverPlateWeldedCAD(beam, flangePlate, innerFlangePlate, webPlate, gap,
+            bbCoverPlate = BBSpliceCoverPlateWeldedCAD(B, beam, flangePlate, innerFlangePlate, webPlate,
                                                        flangePlateWeldL, flangePlateWeldW,
                                                        innerflangePlateWeldL,
                                                        innerflangePlateWeldW, webPlateWeldL, webPlateWeldW)

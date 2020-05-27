@@ -10,14 +10,14 @@ import copy
 
 
 class BBSpliceCoverPlateWeldedCAD(object):
-    def __init__(self, beam, flangePlate, innerFlangePlate, webPlate, gap, flangePlateWeldL, flangePlateWeldW,
+    def __init__(self, B, beam, flangePlate, innerFlangePlate, webPlate, flangePlateWeldL, flangePlateWeldW,
                  innerflangePlateWeldL, innerflangePlateWeldW, webPlateWeldL, webPlateWeldW):
 
+        self.B = B
         self.beam = beam
         self.flangePlate = flangePlate
         self.innerFlangePlate = innerFlangePlate
         self.webPlate = webPlate
-        self.gap = gap
         self.flangePlateWeldL = flangePlateWeldL
         self.flangePlateWeldW = flangePlateWeldW
         self.webPlateWeldL = webPlateWeldL
@@ -25,8 +25,9 @@ class BBSpliceCoverPlateWeldedCAD(object):
         self.innerflangePlateWeldL = innerflangePlateWeldL
         self.innerflangePlateWeldW = innerflangePlateWeldW
 
-        self.flangespace = 15
-        self.webspace = 15
+        self.gap = float(self.B.flange_plate.gap)
+        self.flangespace = float(self.B.flangespace)
+        self.webspace = float(self.B.webspace)
 
         self.beam1 = copy.deepcopy(self.beam)
         self.beam2 = copy.deepcopy(self.beam)
@@ -148,38 +149,39 @@ class BBSpliceCoverPlateWeldedCAD(object):
 
         # Todo: Add an if statement for inner plates
         # Inner Plates
-        innerFlangePlatespacing = self.flangespace + self.beam.t / 2 + self.beam.R1
-        innerFlangePlate1Origin = numpy.array(
-            [0.0, innerFlangePlatespacing, (self.beam.D - self.innerFlangePlate.T) / 2 - self.beam.T])
-        innerFlangePlate1_uDir = numpy.array([0.0, 0.0, 1.0])
-        innerFlangePlate1_wDir = numpy.array([0.0, 1.0, 0.0])
-        self.innerFlangePlate1.place(innerFlangePlate1Origin, innerFlangePlate1_uDir, innerFlangePlate1_wDir)
+        if self.B.preference != 'Outside':
+            innerFlangePlatespacing = self.flangespace + self.beam.t / 2 + self.beam.R1
+            innerFlangePlate1Origin = numpy.array(
+                [0.0, innerFlangePlatespacing, (self.beam.D - self.innerFlangePlate.T) / 2 - self.beam.T])
+            innerFlangePlate1_uDir = numpy.array([0.0, 0.0, 1.0])
+            innerFlangePlate1_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.innerFlangePlate1.place(innerFlangePlate1Origin, innerFlangePlate1_uDir, innerFlangePlate1_wDir)
 
-        self.innerFlangePlate1Model = self.innerFlangePlate1.create_model()
+            self.innerFlangePlate1Model = self.innerFlangePlate1.create_model()
 
-        innerFlangePlate2Origin = numpy.array(
-            [0.0, innerFlangePlatespacing, -(self.beam.D - self.innerFlangePlate.T) / 2 + self.beam.T])
-        innerFlangePlate2_uDir = numpy.array([0.0, 0.0, 1.0])
-        innerFlangePlate2_wDir = numpy.array([0.0, 1.0, 0.0])
-        self.innerFlangePlate2.place(innerFlangePlate2Origin, innerFlangePlate2_uDir, innerFlangePlate2_wDir)
+            innerFlangePlate2Origin = numpy.array(
+                [0.0, innerFlangePlatespacing, -(self.beam.D - self.innerFlangePlate.T) / 2 + self.beam.T])
+            innerFlangePlate2_uDir = numpy.array([0.0, 0.0, 1.0])
+            innerFlangePlate2_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.innerFlangePlate2.place(innerFlangePlate2Origin, innerFlangePlate2_uDir, innerFlangePlate2_wDir)
 
-        self.innerFlangePlate2Model = self.innerFlangePlate2.create_model()
+            self.innerFlangePlate2Model = self.innerFlangePlate2.create_model()
 
-        innerFlangePlate3Origin = numpy.array(
-            [0.0, -innerFlangePlatespacing, -(self.beam.D - self.innerFlangePlate.T) / 2 + self.beam.T])
-        innerFlangePlate3_uDir = numpy.array([0.0, 0.0, 1.0])
-        innerFlangePlate3_wDir = numpy.array([0.0, -1.0, 0.0])
-        self.innerFlangePlate3.place(innerFlangePlate3Origin, innerFlangePlate3_uDir, innerFlangePlate3_wDir)
+            innerFlangePlate3Origin = numpy.array(
+                [0.0, -innerFlangePlatespacing, -(self.beam.D - self.innerFlangePlate.T) / 2 + self.beam.T])
+            innerFlangePlate3_uDir = numpy.array([0.0, 0.0, 1.0])
+            innerFlangePlate3_wDir = numpy.array([0.0, -1.0, 0.0])
+            self.innerFlangePlate3.place(innerFlangePlate3Origin, innerFlangePlate3_uDir, innerFlangePlate3_wDir)
 
-        self.innerFlangePlate3Model = self.innerFlangePlate3.create_model()
+            self.innerFlangePlate3Model = self.innerFlangePlate3.create_model()
 
-        innerFlangePlate4Origin = numpy.array(
-            [0.0, -innerFlangePlatespacing, (self.beam.D - self.innerFlangePlate.T) / 2 - self.beam.T])
-        innerFlangePlate4_uDir = numpy.array([0.0, 0.0, 1.0])
-        innerFlangePlate4_wDir = numpy.array([0.0, -1.0, 0.0])
-        self.innerFlangePlate4.place(innerFlangePlate4Origin, innerFlangePlate4_uDir, innerFlangePlate4_wDir)
+            innerFlangePlate4Origin = numpy.array(
+                [0.0, -innerFlangePlatespacing, (self.beam.D - self.innerFlangePlate.T) / 2 - self.beam.T])
+            innerFlangePlate4_uDir = numpy.array([0.0, 0.0, 1.0])
+            innerFlangePlate4_wDir = numpy.array([0.0, -1.0, 0.0])
+            self.innerFlangePlate4.place(innerFlangePlate4Origin, innerFlangePlate4_uDir, innerFlangePlate4_wDir)
 
-        self.innerFlangePlate4Model = self.innerFlangePlate4.create_model()
+            self.innerFlangePlate4Model = self.innerFlangePlate4.create_model()
 
     def createWeldedGeometry(self):
 
@@ -304,162 +306,163 @@ class BBSpliceCoverPlateWeldedCAD(object):
         self.webPlateWeldW22Model = self.webPlateWeldW22.create_model()
 
         # Todo: Add if statement for inner plate condition
-        # innerplate1 (right top)
-        innerFlangePlatespacing = self.flangespace + self.beam.t / 2 + self.beam.R1
-        innerflangePlateWeldL11Origin = numpy.array(
-            [self.innerFlangePlate.L / 2, innerFlangePlatespacing + self.innerFlangePlate.W,
-             (self.beam.D) / 2 - self.beam.T])
-        innerflangePlateWeldL11_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerflangePlateWeldL11_wDir = numpy.array([-1.0, 0.0, 0.0])
-        self.innerflangePlateWeldL11.place(innerflangePlateWeldL11Origin, innerflangePlateWeldL11_uDir,
-                                           innerflangePlateWeldL11_wDir)
+        if self.B.preference != 'Outside':
+            # innerplate1 (right top)
+            innerFlangePlatespacing = self.flangespace + self.beam.t / 2 + self.beam.R1
+            innerflangePlateWeldL11Origin = numpy.array(
+                [self.innerFlangePlate.L / 2, innerFlangePlatespacing + self.innerFlangePlate.W,
+                 (self.beam.D) / 2 - self.beam.T])
+            innerflangePlateWeldL11_uDir = numpy.array([0.0, 1.0, 0.0])
+            innerflangePlateWeldL11_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.innerflangePlateWeldL11.place(innerflangePlateWeldL11Origin, innerflangePlateWeldL11_uDir,
+                                               innerflangePlateWeldL11_wDir)
 
-        self.innerflangePlateWeldL11Model = self.innerflangePlateWeldL11.create_model()
+            self.innerflangePlateWeldL11Model = self.innerflangePlateWeldL11.create_model()
 
-        innerflangePlateWeldL12Origin = numpy.array(
-            [-self.innerFlangePlate.L / 2, innerFlangePlatespacing, (self.beam.D) / 2 - self.beam.T])
-        innerflangePlateWeldL12_uDir = numpy.array([0.0, -1.0, 0.0])
-        innerflangePlateWeldL12_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.innerflangePlateWeldL12.place(innerflangePlateWeldL12Origin, innerflangePlateWeldL12_uDir,
-                                           innerflangePlateWeldL12_wDir)
+            innerflangePlateWeldL12Origin = numpy.array(
+                [-self.innerFlangePlate.L / 2, innerFlangePlatespacing, (self.beam.D) / 2 - self.beam.T])
+            innerflangePlateWeldL12_uDir = numpy.array([0.0, -1.0, 0.0])
+            innerflangePlateWeldL12_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.innerflangePlateWeldL12.place(innerflangePlateWeldL12Origin, innerflangePlateWeldL12_uDir,
+                                               innerflangePlateWeldL12_wDir)
 
-        self.innerflangePlateWeldL12Model = self.innerflangePlateWeldL12.create_model()
+            self.innerflangePlateWeldL12Model = self.innerflangePlateWeldL12.create_model()
 
-        innerflangePlateWeldW11Origin = numpy.array(
-            [self.innerFlangePlate.L / 2, innerFlangePlatespacing + self.innerFlangePlate.W,
-             (self.beam.D) / 2 - self.beam.T])
-        innerflangePlateWeldW11_uDir = numpy.array([0.0, 0.0, -1.0])
-        innerflangePlateWeldW11_wDir = numpy.array([0.0, -1.0, 0.0])
-        self.innerflangePlateWeldW11.place(innerflangePlateWeldW11Origin, innerflangePlateWeldW11_uDir,
-                                           innerflangePlateWeldW11_wDir)
+            innerflangePlateWeldW11Origin = numpy.array(
+                [self.innerFlangePlate.L / 2, innerFlangePlatespacing + self.innerFlangePlate.W,
+                 (self.beam.D) / 2 - self.beam.T])
+            innerflangePlateWeldW11_uDir = numpy.array([0.0, 0.0, -1.0])
+            innerflangePlateWeldW11_wDir = numpy.array([0.0, -1.0, 0.0])
+            self.innerflangePlateWeldW11.place(innerflangePlateWeldW11Origin, innerflangePlateWeldW11_uDir,
+                                               innerflangePlateWeldW11_wDir)
 
-        self.innerflangePlateWeldW11Model = self.innerflangePlateWeldW11.create_model()
+            self.innerflangePlateWeldW11Model = self.innerflangePlateWeldW11.create_model()
 
-        innerflangePlateWeldW12Origin = numpy.array(
-            [-self.innerFlangePlate.L / 2, innerFlangePlatespacing, (self.beam.D) / 2 - self.beam.T])
-        innerflangePlateWeldW12_uDir = numpy.array([0.0, 0.0, -1.0])
-        innerflangePlateWeldW12_wDir = numpy.array([0.0, 1.0, 0.0])
-        self.innerflangePlateWeldW12.place(innerflangePlateWeldW12Origin, innerflangePlateWeldW12_uDir,
-                                           innerflangePlateWeldW12_wDir)
+            innerflangePlateWeldW12Origin = numpy.array(
+                [-self.innerFlangePlate.L / 2, innerFlangePlatespacing, (self.beam.D) / 2 - self.beam.T])
+            innerflangePlateWeldW12_uDir = numpy.array([0.0, 0.0, -1.0])
+            innerflangePlateWeldW12_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.innerflangePlateWeldW12.place(innerflangePlateWeldW12Origin, innerflangePlateWeldW12_uDir,
+                                               innerflangePlateWeldW12_wDir)
 
-        self.innerflangePlateWeldW12Model = self.innerflangePlateWeldW12.create_model()
+            self.innerflangePlateWeldW12Model = self.innerflangePlateWeldW12.create_model()
 
-        # innerplate2 (top left)
-        innerflangePlateWeldL21Origin = numpy.array(
-            [self.innerFlangePlate.L / 2, -innerFlangePlatespacing, (self.beam.D) / 2 - self.beam.T])
-        innerflangePlateWeldL21_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerflangePlateWeldL21_wDir = numpy.array([-1.0, 0.0, 0.0])
-        self.innerflangePlateWeldL21.place(innerflangePlateWeldL21Origin, innerflangePlateWeldL21_uDir,
-                                           innerflangePlateWeldL21_wDir)
+            # innerplate2 (top left)
+            innerflangePlateWeldL21Origin = numpy.array(
+                [self.innerFlangePlate.L / 2, -innerFlangePlatespacing, (self.beam.D) / 2 - self.beam.T])
+            innerflangePlateWeldL21_uDir = numpy.array([0.0, 1.0, 0.0])
+            innerflangePlateWeldL21_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.innerflangePlateWeldL21.place(innerflangePlateWeldL21Origin, innerflangePlateWeldL21_uDir,
+                                               innerflangePlateWeldL21_wDir)
 
-        self.innerflangePlateWeldL21Model = self.innerflangePlateWeldL21.create_model()
+            self.innerflangePlateWeldL21Model = self.innerflangePlateWeldL21.create_model()
 
-        innerflangePlateWeldL22Origin = numpy.array(
-            [-self.innerFlangePlate.L / 2, -innerFlangePlatespacing - self.innerFlangePlate.W,
-             (self.beam.D) / 2 - self.beam.T])
-        innerflangePlateWeldL22_uDir = numpy.array([0.0, -1.0, 0.0])
-        innerflangePlateWeldL22_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.innerflangePlateWeldL22.place(innerflangePlateWeldL22Origin, innerflangePlateWeldL22_uDir,
-                                           innerflangePlateWeldL22_wDir)
+            innerflangePlateWeldL22Origin = numpy.array(
+                [-self.innerFlangePlate.L / 2, -innerFlangePlatespacing - self.innerFlangePlate.W,
+                 (self.beam.D) / 2 - self.beam.T])
+            innerflangePlateWeldL22_uDir = numpy.array([0.0, -1.0, 0.0])
+            innerflangePlateWeldL22_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.innerflangePlateWeldL22.place(innerflangePlateWeldL22Origin, innerflangePlateWeldL22_uDir,
+                                               innerflangePlateWeldL22_wDir)
 
-        self.innerflangePlateWeldL22Model = self.innerflangePlateWeldL22.create_model()
+            self.innerflangePlateWeldL22Model = self.innerflangePlateWeldL22.create_model()
 
-        innerflangePlateWeldW21Origin = numpy.array(
-            [self.innerFlangePlate.L / 2, - innerFlangePlatespacing, (self.beam.D) / 2 - self.beam.T])
-        innerflangePlateWeldW21_uDir = numpy.array([0.0, 0.0, -1.0])
-        innerflangePlateWeldW21_wDir = numpy.array([0.0, -1.0, 0.0])
-        self.innerflangePlateWeldW21.place(innerflangePlateWeldW21Origin, innerflangePlateWeldW21_uDir,
-                                           innerflangePlateWeldW21_wDir)
+            innerflangePlateWeldW21Origin = numpy.array(
+                [self.innerFlangePlate.L / 2, - innerFlangePlatespacing, (self.beam.D) / 2 - self.beam.T])
+            innerflangePlateWeldW21_uDir = numpy.array([0.0, 0.0, -1.0])
+            innerflangePlateWeldW21_wDir = numpy.array([0.0, -1.0, 0.0])
+            self.innerflangePlateWeldW21.place(innerflangePlateWeldW21Origin, innerflangePlateWeldW21_uDir,
+                                               innerflangePlateWeldW21_wDir)
 
-        self.innerflangePlateWeldW21Model = self.innerflangePlateWeldW21.create_model()
+            self.innerflangePlateWeldW21Model = self.innerflangePlateWeldW21.create_model()
 
-        innerflangePlateWeldW22Origin = numpy.array(
-            [-self.innerFlangePlate.L / 2, -innerFlangePlatespacing - self.innerFlangePlate.W,
-             (self.beam.D) / 2 - self.beam.T])
-        innerflangePlateWeldW22_uDir = numpy.array([0.0, 0.0, -1.0])
-        innerflangePlateWeldW22_wDir = numpy.array([0.0, 1.0, 0.0])
-        self.innerflangePlateWeldW22.place(innerflangePlateWeldW22Origin, innerflangePlateWeldW22_uDir,
-                                           innerflangePlateWeldW22_wDir)
+            innerflangePlateWeldW22Origin = numpy.array(
+                [-self.innerFlangePlate.L / 2, -innerFlangePlatespacing - self.innerFlangePlate.W,
+                 (self.beam.D) / 2 - self.beam.T])
+            innerflangePlateWeldW22_uDir = numpy.array([0.0, 0.0, -1.0])
+            innerflangePlateWeldW22_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.innerflangePlateWeldW22.place(innerflangePlateWeldW22Origin, innerflangePlateWeldW22_uDir,
+                                               innerflangePlateWeldW22_wDir)
 
-        self.innerflangePlateWeldW22Model = self.innerflangePlateWeldW22.create_model()
+            self.innerflangePlateWeldW22Model = self.innerflangePlateWeldW22.create_model()
 
-        # innerplate3 (Right bottom)
-        innerflangePlateWeldL31Origin = numpy.array(
-            [-self.innerFlangePlate.L / 2, innerFlangePlatespacing + self.innerFlangePlate.W,
-             -(self.beam.D) / 2 + self.beam.T])
-        innerflangePlateWeldL31_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerflangePlateWeldL31_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.innerflangePlateWeldL31.place(innerflangePlateWeldL31Origin, innerflangePlateWeldL31_uDir,
-                                           innerflangePlateWeldL31_wDir)
+            # innerplate3 (Right bottom)
+            innerflangePlateWeldL31Origin = numpy.array(
+                [-self.innerFlangePlate.L / 2, innerFlangePlatespacing + self.innerFlangePlate.W,
+                 -(self.beam.D) / 2 + self.beam.T])
+            innerflangePlateWeldL31_uDir = numpy.array([0.0, 1.0, 0.0])
+            innerflangePlateWeldL31_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.innerflangePlateWeldL31.place(innerflangePlateWeldL31Origin, innerflangePlateWeldL31_uDir,
+                                               innerflangePlateWeldL31_wDir)
 
-        self.innerflangePlateWeldL31Model = self.innerflangePlateWeldL31.create_model()
+            self.innerflangePlateWeldL31Model = self.innerflangePlateWeldL31.create_model()
 
-        innerflangePlateWeldL32Origin = numpy.array(
-            [self.innerFlangePlate.L / 2, innerFlangePlatespacing, -(self.beam.D) / 2 + self.beam.T])
-        innerflangePlateWeldL32_uDir = numpy.array([0.0, -1.0, 0.0])
-        innerflangePlateWeldL32_wDir = numpy.array([-1.0, 0.0, 0.0])
-        self.innerflangePlateWeldL32.place(innerflangePlateWeldL32Origin, innerflangePlateWeldL32_uDir,
-                                           innerflangePlateWeldL32_wDir)
+            innerflangePlateWeldL32Origin = numpy.array(
+                [self.innerFlangePlate.L / 2, innerFlangePlatespacing, -(self.beam.D) / 2 + self.beam.T])
+            innerflangePlateWeldL32_uDir = numpy.array([0.0, -1.0, 0.0])
+            innerflangePlateWeldL32_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.innerflangePlateWeldL32.place(innerflangePlateWeldL32Origin, innerflangePlateWeldL32_uDir,
+                                               innerflangePlateWeldL32_wDir)
 
-        self.innerflangePlateWeldL32Model = self.innerflangePlateWeldL32.create_model()
+            self.innerflangePlateWeldL32Model = self.innerflangePlateWeldL32.create_model()
 
-        innerflangePlateWeldW31Origin = numpy.array(
-            [self.innerFlangePlate.L / 2, innerFlangePlatespacing, -(self.beam.D) / 2 + self.beam.T])
-        innerflangePlateWeldW31_uDir = numpy.array([0.0, 0.0, 1.0])
-        innerflangePlateWeldW31_wDir = numpy.array([0.0, 1.0, 0.0])
-        self.innerflangePlateWeldW31.place(innerflangePlateWeldW31Origin, innerflangePlateWeldW31_uDir,
-                                           innerflangePlateWeldW31_wDir)
+            innerflangePlateWeldW31Origin = numpy.array(
+                [self.innerFlangePlate.L / 2, innerFlangePlatespacing, -(self.beam.D) / 2 + self.beam.T])
+            innerflangePlateWeldW31_uDir = numpy.array([0.0, 0.0, 1.0])
+            innerflangePlateWeldW31_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.innerflangePlateWeldW31.place(innerflangePlateWeldW31Origin, innerflangePlateWeldW31_uDir,
+                                               innerflangePlateWeldW31_wDir)
 
-        self.innerflangePlateWeldW31Model = self.innerflangePlateWeldW31.create_model()
+            self.innerflangePlateWeldW31Model = self.innerflangePlateWeldW31.create_model()
 
-        innerflangePlateWeldW32Origin = numpy.array(
-            [-self.innerFlangePlate.L / 2, innerFlangePlatespacing + self.innerFlangePlate.W,
-             -(self.beam.D) / 2 + self.beam.T])
-        innerflangePlateWeldW32_uDir = numpy.array([0.0, 0.0, 1.0])
-        innerflangePlateWeldW32_wDir = numpy.array([0.0, -1.0, 0.0])
-        self.innerflangePlateWeldW32.place(innerflangePlateWeldW32Origin, innerflangePlateWeldW32_uDir,
-                                           innerflangePlateWeldW32_wDir)
+            innerflangePlateWeldW32Origin = numpy.array(
+                [-self.innerFlangePlate.L / 2, innerFlangePlatespacing + self.innerFlangePlate.W,
+                 -(self.beam.D) / 2 + self.beam.T])
+            innerflangePlateWeldW32_uDir = numpy.array([0.0, 0.0, 1.0])
+            innerflangePlateWeldW32_wDir = numpy.array([0.0, -1.0, 0.0])
+            self.innerflangePlateWeldW32.place(innerflangePlateWeldW32Origin, innerflangePlateWeldW32_uDir,
+                                               innerflangePlateWeldW32_wDir)
 
-        self.innerflangePlateWeldW32Model = self.innerflangePlateWeldW32.create_model()
+            self.innerflangePlateWeldW32Model = self.innerflangePlateWeldW32.create_model()
 
-        # innetplate4 (left bottom)
-        innerflangePlateWeldL41Origin = numpy.array(
-            [-self.innerFlangePlate.L / 2, -innerFlangePlatespacing, -(self.beam.D) / 2 + self.beam.T])
-        innerflangePlateWeldL41_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerflangePlateWeldL41_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.innerflangePlateWeldL41.place(innerflangePlateWeldL41Origin, innerflangePlateWeldL41_uDir,
-                                           innerflangePlateWeldL41_wDir)
+            # innetplate4 (left bottom)
+            innerflangePlateWeldL41Origin = numpy.array(
+                [-self.innerFlangePlate.L / 2, -innerFlangePlatespacing, -(self.beam.D) / 2 + self.beam.T])
+            innerflangePlateWeldL41_uDir = numpy.array([0.0, 1.0, 0.0])
+            innerflangePlateWeldL41_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.innerflangePlateWeldL41.place(innerflangePlateWeldL41Origin, innerflangePlateWeldL41_uDir,
+                                               innerflangePlateWeldL41_wDir)
 
-        self.innerflangePlateWeldL41Model = self.innerflangePlateWeldL41.create_model()
+            self.innerflangePlateWeldL41Model = self.innerflangePlateWeldL41.create_model()
 
-        innerflangePlateWeldL42Origin = numpy.array(
-            [self.innerFlangePlate.L / 2, -innerFlangePlatespacing - self.innerFlangePlate.W,
-             -(self.beam.D) / 2 + self.beam.T])
-        innerflangePlateWeldL42_uDir = numpy.array([0.0, -1.0, 0.0])
-        innerflangePlateWeldL42_wDir = numpy.array([-1.0, 0.0, 0.0])
-        self.innerflangePlateWeldL42.place(innerflangePlateWeldL42Origin, innerflangePlateWeldL42_uDir,
-                                           innerflangePlateWeldL42_wDir)
+            innerflangePlateWeldL42Origin = numpy.array(
+                [self.innerFlangePlate.L / 2, -innerFlangePlatespacing - self.innerFlangePlate.W,
+                 -(self.beam.D) / 2 + self.beam.T])
+            innerflangePlateWeldL42_uDir = numpy.array([0.0, -1.0, 0.0])
+            innerflangePlateWeldL42_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.innerflangePlateWeldL42.place(innerflangePlateWeldL42Origin, innerflangePlateWeldL42_uDir,
+                                               innerflangePlateWeldL42_wDir)
 
-        self.innerflangePlateWeldL42Model = self.innerflangePlateWeldL42.create_model()
+            self.innerflangePlateWeldL42Model = self.innerflangePlateWeldL42.create_model()
 
-        innerflangePlateWeldW41Origin = numpy.array(
-            [self.innerFlangePlate.L / 2, -innerFlangePlatespacing - self.innerFlangePlate.W,
-             -(self.beam.D) / 2 + self.beam.T])
-        innerflangePlateWeldW41_uDir = numpy.array([0.0, 0.0, 1.0])
-        innerflangePlateWeldW41_wDir = numpy.array([0.0, 1.0, 0.0])
-        self.innerflangePlateWeldW41.place(innerflangePlateWeldW41Origin, innerflangePlateWeldW41_uDir,
-                                           innerflangePlateWeldW41_wDir)
+            innerflangePlateWeldW41Origin = numpy.array(
+                [self.innerFlangePlate.L / 2, -innerFlangePlatespacing - self.innerFlangePlate.W,
+                 -(self.beam.D) / 2 + self.beam.T])
+            innerflangePlateWeldW41_uDir = numpy.array([0.0, 0.0, 1.0])
+            innerflangePlateWeldW41_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.innerflangePlateWeldW41.place(innerflangePlateWeldW41Origin, innerflangePlateWeldW41_uDir,
+                                               innerflangePlateWeldW41_wDir)
 
-        self.innerflangePlateWeldW41Model = self.innerflangePlateWeldW41.create_model()
+            self.innerflangePlateWeldW41Model = self.innerflangePlateWeldW41.create_model()
 
-        innerflangePlateWeldW42Origin = numpy.array(
-            [-self.innerFlangePlate.L / 2, -innerFlangePlatespacing, -(self.beam.D) / 2 + self.beam.T])
-        innerflangePlateWeldW42_uDir = numpy.array([0.0, 0.0, 1.0])
-        innerflangePlateWeldW42_wDir = numpy.array([0.0, -1.0, 0.0])
-        self.innerflangePlateWeldW42.place(innerflangePlateWeldW42Origin, innerflangePlateWeldW42_uDir,
-                                           innerflangePlateWeldW42_wDir)
+            innerflangePlateWeldW42Origin = numpy.array(
+                [-self.innerFlangePlate.L / 2, -innerFlangePlatespacing, -(self.beam.D) / 2 + self.beam.T])
+            innerflangePlateWeldW42_uDir = numpy.array([0.0, 0.0, 1.0])
+            innerflangePlateWeldW42_wDir = numpy.array([0.0, -1.0, 0.0])
+            self.innerflangePlateWeldW42.place(innerflangePlateWeldW42Origin, innerflangePlateWeldW42_uDir,
+                                               innerflangePlateWeldW42_wDir)
 
-        self.innerflangePlateWeldW42Model = self.innerflangePlateWeldW42.create_model()
+            self.innerflangePlateWeldW42Model = self.innerflangePlateWeldW42.create_model()
 
         # to cut the welds
         weldCutPlateOrigin = numpy.array([0.0, -self.weldCutPlate.W / 2, 0.0])
@@ -484,10 +487,12 @@ class BBSpliceCoverPlateWeldedCAD(object):
         """
 
         # Todo: Ad an ifelse statement for outer and inner plates
-        plates_sec = [self.flangePlate1Model, self.flangePlate2Model, self.innerFlangePlate1Model,
-                      self.innerFlangePlate2Model, self.innerFlangePlate3Model, self.innerFlangePlate4Model,
-                      self.webPlate1Model, self.webPlate2Model]
-
+        if self.B.preference != 'Outside':
+            plates_sec = [self.flangePlate1Model, self.flangePlate2Model, self.innerFlangePlate1Model,
+                          self.innerFlangePlate2Model, self.innerFlangePlate3Model, self.innerFlangePlate4Model,
+                          self.webPlate1Model, self.webPlate2Model]
+        else:
+            plates_sec = [self.flangePlate1Model, self.flangePlate2Model, self.webPlate1Model, self.webPlate2Model]
         plates = plates_sec[0]
 
         for comp in plates_sec[1:]:
@@ -500,21 +505,29 @@ class BBSpliceCoverPlateWeldedCAD(object):
         :return: CAD model for all the welds
         """
         # Todo: Add an ifelse statement for outer and inner plate wleds
+        if self.B.preference != 'Outside':
+            welded_sec = [self.flangePlateWeldL11Model, self.flangePlateWeldL12Model, self.flangePlateWeldL21Model,
+                          self.flangePlateWeldL22Model, self.flangePlateWeldW11Model, self.flangePlateWeldW12Model,
+                          self.flangePlateWeldW21Model, self.flangePlateWeldW22Model, \
+                          self.webPlateWeldL11Model, self.webPlateWeldL12Model, self.webPlateWeldL21Model,
+                          self.webPlateWeldL22Model, self.webPlateWeldW11Model, self.webPlateWeldW12Model,
+                          self.webPlateWeldW21Model, self.webPlateWeldW22Model, \
+                          self.innerflangePlateWeldL11Model, self.innerflangePlateWeldL12Model,
+                          self.innerflangePlateWeldL21Model, self.innerflangePlateWeldL22Model,
+                          self.innerflangePlateWeldL31Model, self.innerflangePlateWeldL32Model,
+                          self.innerflangePlateWeldL41Model, self.innerflangePlateWeldL42Model, \
+                          self.innerflangePlateWeldW11Model, self.innerflangePlateWeldW12Model,
+                          self.innerflangePlateWeldW21Model, self.innerflangePlateWeldW22Model,
+                          self.innerflangePlateWeldW31Model, self.innerflangePlateWeldW32Model,
+                          self.innerflangePlateWeldW41Model, self.innerflangePlateWeldW42Model]
+        else:
+            welded_sec = [self.flangePlateWeldL11Model, self.flangePlateWeldL12Model, self.flangePlateWeldL21Model,
+                          self.flangePlateWeldL22Model, self.flangePlateWeldW11Model, self.flangePlateWeldW12Model,
+                          self.flangePlateWeldW21Model, self.flangePlateWeldW22Model, \
+                          self.webPlateWeldL11Model, self.webPlateWeldL12Model, self.webPlateWeldL21Model,
+                          self.webPlateWeldL22Model, self.webPlateWeldW11Model, self.webPlateWeldW12Model,
+                          self.webPlateWeldW21Model, self.webPlateWeldW22Model]
 
-        welded_sec = [self.flangePlateWeldL11Model, self.flangePlateWeldL12Model, self.flangePlateWeldL21Model,
-                      self.flangePlateWeldL22Model, self.flangePlateWeldW11Model, self.flangePlateWeldW12Model,
-                      self.flangePlateWeldW21Model, self.flangePlateWeldW22Model, \
-                      self.webPlateWeldL11Model, self.webPlateWeldL12Model, self.webPlateWeldL21Model,
-                      self.webPlateWeldL22Model, self.webPlateWeldW11Model, self.webPlateWeldW12Model,
-                      self.webPlateWeldW21Model, self.webPlateWeldW22Model, \
-                      self.innerflangePlateWeldL11Model, self.innerflangePlateWeldL12Model,
-                      self.innerflangePlateWeldL21Model, self.innerflangePlateWeldL22Model,
-                      self.innerflangePlateWeldL31Model, self.innerflangePlateWeldL32Model,
-                      self.innerflangePlateWeldL41Model, self.innerflangePlateWeldL42Model, \
-                      self.innerflangePlateWeldW11Model, self.innerflangePlateWeldW12Model,
-                      self.innerflangePlateWeldW21Model, self.innerflangePlateWeldW22Model,
-                      self.innerflangePlateWeldW31Model, self.innerflangePlateWeldW32Model,
-                      self.innerflangePlateWeldW41Model, self.innerflangePlateWeldW42Model]
         welds = welded_sec[0]
 
         for comp in welded_sec[1:]:
@@ -528,8 +541,10 @@ class BBSpliceCoverPlateWeldedCAD(object):
     def get_models(self):
         beams = self.get_beam_models()
         plate_conectors = self.get_plate_models()
+        welds = self.get_welded_modules()
 
         CAD = BRepAlgoAPI_Fuse(beams, plate_conectors).Shape()
+        CAD = BRepAlgoAPI_Fuse(CAD, welds).Shape()
 
         return CAD
 

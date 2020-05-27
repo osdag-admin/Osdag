@@ -582,7 +582,7 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
-                if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
+                if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR, KEY_AXIAL_TENSION_BP] and module == KEY_DISP_BASE_PLATE:
                     r.setGeometry(QtCore.QRect(160, 10 + i, 150, 27))
                     r.setDisabled(True)
                 else:
@@ -636,7 +636,7 @@ class Ui_ModuleWindow(QMainWindow):
                 imc.setFixedSize(imc.size())
                 in_layout2.addWidget(imc, j, 2, 1, 1)
 
-            if option[0] in [KEY_AXIAL, KEY_SHEAR]:
+            if option[0] in [KEY_AXIAL, KEY_AXIAL_BP, KEY_SHEAR]:
                 key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
                 onlyInt = QIntValidator()
                 key.setValidator(onlyInt)
@@ -665,9 +665,15 @@ class Ui_ModuleWindow(QMainWindow):
                 current_list_set = set(option[4])
                 current_red_list = list(current_list_set.intersection(red_list_set))
 
-                for value in current_red_list:
-                    indx = option[4].index(str(value))
-                    key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+            elif option[0] == KEY_TYP_ANCHOR:
+                current_red_list = [VALUES_TYP_ANCHOR[1], VALUES_TYP_ANCHOR[2]]
+            else:
+                current_red_list = []
+
+            for value in current_red_list:
+                indx = option[4].index(str(value))
+                key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
     # Customized option in Combobox
     ###############################
     # @author: Amir
@@ -1407,6 +1413,8 @@ class Ui_ModuleWindow(QMainWindow):
 
             if typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
                 k2 = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, k2_key)
+            elif typ == TYPE_WARNING:
+                k2 = str(k2_key)
             else:
                 k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
 
@@ -1447,6 +1455,9 @@ class Ui_ModuleWindow(QMainWindow):
                     k2.setEnabled(True)
                 else:
                     k2.setDisabled(True)
+            elif typ == TYPE_WARNING:
+                if val:
+                    QMessageBox.warning(self, "Application", k2)
             elif typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
                 if val:
                     k2.setVisible(False)
@@ -1739,7 +1750,8 @@ class Ui_ModuleWindow(QMainWindow):
                     if index >= 0:
                         key.setCurrentIndex(index)
             elif op[2] == TYPE_TEXTBOX:
-                key.setText(uiObj[key_str])
+                if key_str in uiObj.keys():
+                    key.setText(uiObj[key_str])
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 if key_str in uiObj.keys():
                     for n in new:
@@ -1896,19 +1908,27 @@ class Ui_ModuleWindow(QMainWindow):
 
     def output_button_dialog(self, main, button_list, button):
         dialog = QtWidgets.QDialog()
-        dialog.resize(350, 170)
-        dialog.setFixedSize(dialog.size())
+        dialog.resize(470, 300)
         dialog.setObjectName("Dialog")
 
         layout1 = QtWidgets.QVBoxLayout(dialog)
         scroll = QScrollArea(dialog)
         layout1.addWidget(scroll)
         scroll.setWidgetResizable(True)
+        scroll.horizontalScrollBar().setVisible(False)
         scrollcontent = QtWidgets.QWidget(scroll)
-        layout2 = QtWidgets.QGridLayout(scrollcontent)
-        scrollcontent.setLayout(layout2)
+        outer_grid_layout = QtWidgets.QGridLayout(scrollcontent)
+        inner_grid_widget = QtWidgets.QWidget(scrollcontent)
+        image_widget = QtWidgets.QWidget(scrollcontent)
+        image_layout = QtWidgets.QVBoxLayout(image_widget)
+        image_widget.setLayout(image_layout)
+        inner_grid_layout = QtWidgets.QGridLayout(inner_grid_widget)
+        inner_grid_widget.setLayout(inner_grid_layout)
+        scrollcontent.setLayout(outer_grid_layout)
+        section = 0
 
         for op in button_list:
+
             if op[0] == button.objectName():
                 tup = op[3]
                 title = tup[0]
@@ -1920,32 +1940,90 @@ class Ui_ModuleWindow(QMainWindow):
                     lable = option[1]
                     out_but_type = option[2]
                     _translate = QtCore.QCoreApplication.translate
-                    if out_but_type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE]:
-                        l = QtWidgets.QLabel()
+                    if out_but_type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_SECTION]:
+                        l = QtWidgets.QLabel(inner_grid_widget)
                         l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         font.setBold(False)
                         font.setWeight(50)
                         l.setFont(font)
+                        l.setFixedSize(l.size())
                         l.setObjectName(option[0] + "_label")
                         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-                        layout2.addWidget(l, j, 1, 1, 1)
+                        inner_grid_layout.addWidget(l, j, 1, 1, 1)
+
+                    if out_but_type == TYPE_SECTION:
+                        if section != 0:
+                            outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
+                            outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
+                            hl1 = QtWidgets.QFrame()
+                            hl1.setFrameShape(QtWidgets.QFrame.HLine)
+                            j += 1
+                            outer_grid_layout.addWidget(hl1, j, 1, 1, 2)
+
+                        inner_grid_widget = QtWidgets.QWidget(scrollcontent)
+                        image_widget = QtWidgets.QWidget(scrollcontent)
+                        image_layout = QtWidgets.QVBoxLayout(image_widget)
+                        image_widget.setLayout(image_layout)
+                        inner_grid_layout = QtWidgets.QGridLayout(inner_grid_widget)
+                        inner_grid_widget.setLayout(inner_grid_layout)
+
+                        im = QtWidgets.QLabel(image_widget)
+                        im.setGeometry(QtCore.QRect(330, 10, 100, 100))
+                        im.setScaledContents(True)
+                        im.setFixedSize(im.size())
+                        pmap = QPixmap(option[3])
+                        im.setPixmap(pmap)
+                        image_layout.addWidget(im)
+                        j += 1
+
+                        q = QtWidgets.QLabel(scrollcontent)
+                        q.setGeometry(QtCore.QRect(30, 10, 201, 30))
+                        font = QtGui.QFont()
+                        font.setWeight(600)
+                        font.setPointSize(11)
+                        q.setFont(font)
+                        q.setObjectName("_title")
+                        q.setText(lable)
+                        q.setFixedSize(q.size())
+                        outer_grid_layout.addWidget(q, j, 1, 1, 2)
+
+                        section += 1
 
                     if out_but_type == TYPE_TEXTBOX:
-                        r = QtWidgets.QLineEdit()
+                        r = QtWidgets.QLineEdit(inner_grid_widget)
                         r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
                         font = QtGui.QFont()
                         font.setPointSize(11)
                         font.setBold(False)
                         font.setWeight(50)
                         r.setFont(font)
+                        r.setFixedSize(r.size())
                         r.setObjectName(option[0])
                         r.setText(str(option[3]))
-                        layout2.addWidget(r, j, 2, 1, 1)
+                        inner_grid_layout.addWidget(r, j, 2, 1, 1)
+
+                    if out_but_type == TYPE_IMAGE:
+                        im = QtWidgets.QLabel(image_widget)
+                        im.setGeometry(QtCore.QRect(330, 10, 100, 100))
+                        im.setScaledContents(True)
+                        im.setFixedSize(im.size())
+                        pmap = QPixmap(option[3])
+                        im.setPixmap(pmap)
+                        image_layout.addWidget(im)
+
                     j = j + 1
                     i = i + 30
+
+                if inner_grid_layout.count() > 0:
+                    outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
+                if image_layout.count() > 0:
+                    outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
                 scroll.setWidget(scrollcontent)
+                if section == 0:
+                    dialog.resize(350, 300)
+                dialog.setFixedSize(dialog.size())
                 dialog.exec()
 
     def refresh_sections(self, prev, section):

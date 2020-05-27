@@ -289,8 +289,14 @@ class Tension_bolted(Member):
         t2 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t2)
 
-        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, None , self.fn_conn_image)
+        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE , self.fn_conn_image)
         lst.append(t3)
+
+        t4 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_DOCK, self.out_bolt_bearing)
+        lst.append(t4)
+
+        t5 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_LABEL, self.out_bolt_bearing)
+        lst.append(t5)
 
         return lst
 
@@ -307,16 +313,25 @@ class Tension_bolted(Member):
 
         "Function to populate section size based on the type of section "
         img = self[0]
-        if img =="Angles":
+        if img == VALUES_SEC_PROFILE_2[0]:
             return VALUES_IMG_TENSIONBOLTED[0]
-        elif img =="Back to Back Angles":
+        elif img ==VALUES_SEC_PROFILE_2[1]:
             return VALUES_IMG_TENSIONBOLTED[1]
-        elif img =="Star Angles":
+        elif img ==VALUES_SEC_PROFILE_2[2]:
             return VALUES_IMG_TENSIONBOLTED[2]
-        elif img =="Channels":
+        elif img ==VALUES_SEC_PROFILE_2[3]:
             return VALUES_IMG_TENSIONBOLTED[3]
         else:
             return VALUES_IMG_TENSIONBOLTED[4]
+
+    def out_bolt_bearing(self):
+
+        bolt_type= self[0]
+        if bolt_type != TYP_BEARING:
+            return True
+        else:
+            return False
+
 
     def input_values(self, existingvalues={}):
 
@@ -496,16 +511,16 @@ class Tension_bolted(Member):
         t11 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag else '', True)
         out_list.append(t11)
 
-        bolt_bearing_capacity_disp = ''
-        if flag is True:
-            if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
-                bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+        # bolt_bearing_capacity_disp = ''
+        # if flag is True:
+        #     if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
+        #         bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+        #
+        #         pass
+        #     else:
+        #         bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
-                pass
-            else:
-                bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
-
-        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, round(self.bolt.bolt_bearing_capacity / 1000, 2) if flag else '', True)
         out_list.append(t5)
 
         t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '', True)

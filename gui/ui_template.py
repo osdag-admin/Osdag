@@ -602,7 +602,7 @@ class Ui_ModuleWindow(QMainWindow):
                 combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
                 combo.setMaxVisibleItems(5)
                 combo.setObjectName(option[0])
-                for item in option[4]:
+                for item in option[3]:
                     combo.addItem(item)
                 combo.setFixedSize(combo.size())
                 in_layout2.addWidget(combo, j, 2, 1, 1)
@@ -620,9 +620,9 @@ class Ui_ModuleWindow(QMainWindow):
                 #     r.setDisabled(True)
                 # else:
                 r.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
-                r.setEnabled(True if option[5] else False)
-                if option[6] != 'No Validator':
-                    r.setValidator(self.get_validator(option[6]))
+                r.setEnabled(True if option[4] else False)
+                if option[5] != 'No Validator':
+                    r.setValidator(self.get_validator(option[5]))
                 r.setFixedSize(r.size())
                 in_layout2.addWidget(r, j, 2, 1, 1)
 
@@ -644,7 +644,7 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setAlignment(Qt.AlignHCenter)
                 l.setObjectName(option[0] + "_note")
                 # l.setText(_translate("MainWindow", "<html><head/><body><p>" + option[4] + "</p></body></html>"))
-                l.setText(option[4])
+                l.setText(option[3])
                 l.setReadOnly(True)
                 l.setFixedSize(l.size())
                 in_layout2.addWidget(l, j, 2, 1, 1)
@@ -654,7 +654,7 @@ class Ui_ModuleWindow(QMainWindow):
                 im.setGeometry(QtCore.QRect(190, 10 + i, 70, 57))
                 im.setObjectName(option[0])
                 im.setScaledContents(True)
-                pixmap = QPixmap(option[4])
+                pixmap = QPixmap(option[3])
                 im.setPixmap(pixmap)
                 i = i + 30
                 im.setFixedSize(im.size())
@@ -665,7 +665,7 @@ class Ui_ModuleWindow(QMainWindow):
                 imc.setGeometry(QtCore.QRect(130, 10 + i, 160, 150))
                 imc.setObjectName(option[0])
                 imc.setScaledContents(True)
-                pixmapc = QPixmap(option[4])
+                pixmapc = QPixmap(option[3])
                 imc.setPixmap(pixmapc)
                 i = i + 30
                 imc.setFixedSize(imc.size())
@@ -698,11 +698,11 @@ class Ui_ModuleWindow(QMainWindow):
 
             if option[0] in RED_LIST:
                 red_list_set = set(red_list_function())
-                current_list_set = set(option[4])
+                current_list_set = set(option[3])
                 current_red_list = list(current_list_set.intersection(red_list_set))
 
                 for value in current_red_list:
-                    indx = option[4].index(str(value))
+                    indx = option[3].index(str(value))
                     key.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
     # Customized option in Combobox
     ###############################

@@ -281,6 +281,9 @@ class Tension_welded(Member):
         t2 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t2)
 
+        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
+        lst.append(t3)
+
         return lst
 
     def fn_conn_type(self):
@@ -291,6 +294,21 @@ class Tension_welded(Member):
             return VALUES_LOCATION_1
         elif profile in ["Channels", "Back to Back Channels"]:
             return VALUES_LOCATION_2
+
+    def fn_conn_image(self):
+
+        "Function to populate section size based on the type of section "
+        img = self[0]
+        if img == VALUES_SEC_PROFILE_2[0]:
+            return VALUES_IMG_TENSIONWELDED[0]
+        elif img ==VALUES_SEC_PROFILE_2[1]:
+            return VALUES_IMG_TENSIONWELDED[1]
+        elif img ==VALUES_SEC_PROFILE_2[2]:
+            return VALUES_IMG_TENSIONWELDED[2]
+        elif img ==VALUES_SEC_PROFILE_2[3]:
+            return VALUES_IMG_TENSIONWELDED[3]
+        else:
+            return VALUES_IMG_TENSIONWELDED[4]
 
     def get_3d_components(self):
         components = []
@@ -348,7 +366,7 @@ class Tension_welded(Member):
         t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, existingvalue_key_sec_profile, VALUES_SEC_PROFILE_2, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/fin_cf_bw.png", True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None,VALUES_IMG_TENSIONWELDED[0] , True, 'No Validator')
         options_list.append(t15)
 
         t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, existingvalue_key_location, VALUES_LOCATION_1, True, 'No Validator')

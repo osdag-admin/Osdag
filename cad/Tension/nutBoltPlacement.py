@@ -51,8 +51,8 @@ class NutBoltArray():
         b = self.bolt
         n = self.nut
         for i in range(self.row * self.col):
-            bolt_len_required = float(b.T + self.gap)
-            b.H = bolt_len_required + (bolt_len_required) % 5
+            bolt_len_required = float(self.gap)
+            b.H = bolt_len_required + 10
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
 

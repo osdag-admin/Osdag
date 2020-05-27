@@ -110,6 +110,7 @@ class TensionAngleBoltCAD(object):
         """
         if self.Obj.sec_profile == 'Channels' or self.Obj.sec_profile == 'Back to Back Channels':
             self.member.A = self.member.D
+            self.member.T = self.member.t
         # nutboltArrayOrigin = self.baseplate.sec_origin + numpy.array([0.0, 0.0, self.baseplate.T /2+ 100])
 
         if self.Obj.sec_profile == 'Star Angles':
@@ -269,8 +270,8 @@ if __name__ == '__main__':
         member = Channel(B=50, T=6.6, D=125, t=3, R1=6.0, R2=2.4, L=4000)
         plate = GassetPlate(L=360 + 50, H=205.0, T=16, degree=30)
         # plate_intercept = plate.L - s - 50
-        if member_data == 'Channels':
-            nut_space = member.t + plate.T + nut.T  # member.T + plate.T + nut.T
+        if member_data in ['Channels', 'Angles', 'Star Angles']:
+            nut_space = member.t + plate.T + nut.T   # member.T + plate.T + nut.T
         else:
             nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
         plateObj = 0.0

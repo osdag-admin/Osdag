@@ -62,8 +62,10 @@ from design_type.connection.seated_angle_connection import SeatedAngleConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.end_plate_connection import EndPlateConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
+from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
+from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.base_plate_connection import BasePlateConnection
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
@@ -1809,12 +1811,12 @@ class Ui_ModuleWindow(QMainWindow):
             return SeatedAngleConnection
         elif name == KEY_DISP_COLUMNCOVERPLATE:
             return ColumnCoverPlate
-        # elif name == KEY_DISP_COLUMNCOVERPLATEWELD:
-        #     return ColumnCoverPlateWeld
+        elif name == KEY_DISP_COLUMNCOVERPLATEWELD:
+            return ColumnCoverPlateWeld
         elif name == KEY_DISP_BEAMCOVERPLATE:
             return BeamCoverPlate
-        # elif name == KEY_DISP_BEAMCOVERPLATEWELD:
-        #     return BeamCoverPlateWeld
+        elif name == KEY_DISP_BEAMCOVERPLATEWELD:
+            return BeamCoverPlateWeld
         elif name == KEY_DISP_BEAMENDPLATE:
             return BeamEndPlate
         elif name == KEY_DISP_COLUMNENDPLATE:
@@ -1991,9 +1993,11 @@ class Ui_ModuleWindow(QMainWindow):
             elif self.design_inputs[KEY_MODULE] == KEY_DISP_ENDPLATE:
                 module_class = EndPlateConnection
 
-            if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_CLEATANGLE,
+            if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
+                                                  KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
-                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
+                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
+                                                  KEY_DISP_COLUMNCOVERPLATEWELD]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)

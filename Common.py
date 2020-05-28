@@ -20,12 +20,14 @@ TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
 TYPE_TEXT_BROWSER = 'TextBrowser'
 TYPE_NOTE = 'Note'
+TYPE_WARNING = 'Warning'
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 DESIGN_FLAG = 'False'
 VALUE_NOT_APPLICABLE = 'N/A'
 TYPE_TAB_1 = "TYPE_TAB_1"
 TYPE_TAB_2 = "TYPE_TAB_2"
 TYPE_TAB_3 = "TYPE_TAB_3"
+TYPE_SECTION = 'Popup_Section'
 
 
 import sqlite3
@@ -354,7 +356,8 @@ VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
 ####
 
 
-VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
+# VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
+VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 
 
 
@@ -416,7 +419,7 @@ KEY_DISP_DIA_ANCHOR = 'Diameter(mm)*'
 VALUES_DIA_ANCHOR = ['All', 'Customized']
 KEY_TYP_ANCHOR = 'Anchor Bolt.Type'
 KEY_DISP_TYP_ANCHOR = 'Type*'
-VALUES_TYP_ANCHOR = ['Select Type', 'IS 5624-Type A', 'IS 5624-Type B', 'End Plate Type']
+VALUES_TYP_ANCHOR = ['Select Type', 'IS 5624-Type A', 'IS 5624-Type B', 'L-Type', 'J-Type', 'End Plate Type']
 KEY_GRD_ANCHOR = 'Anchor Bolt.Grade'
 KEY_DISP_GRD_ANCHOR = 'Grade*'
 VALUES_GRD_ANCHOR = ['All', 'Customized']
@@ -440,7 +443,12 @@ KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity Pmc (kNm)'
 KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria Mdc (kNm)'
 
 
-
+KEY_OUT_DIA_ANCHOR = 'Anchor Bolt.Diameter'
+KEY_DISP_OUT_DIA_ANCHOR = 'Diameter(mm)'
+KEY_OUT_GRD_ANCHOR = 'Anchor Bolt.Grade'
+KEY_DISP_OUT_GRD_ANCHOR = 'Grade'
+KEY_OUT_ANCHOR_BOLT_LENGTH = 'Anchor Bolt.Length'
+KEY_DISP_OUT_ANCHOR_BOLT_LENGTH = 'Total Length'
 KEY_OUT_ANCHOR_BOLT_SHEAR = 'Anchor Bolt.Shear'
 KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_ANCHOR_BOLT_BEARING = 'Anchor Bolt.Bearing'
@@ -451,6 +459,16 @@ KEY_OUT_ANCHOR_BOLT_COMBINED = 'Anchor Bolt.Combined'
 KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity'
 KEY_OUT_ANCHOR_BOLT_TENSION = 'Anchor Bolt.Tension'
 KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
+
+DISP_TITLE_ANCHOR_BOLT_UPLIFT = 'Anchor Bolt for Uplift'
+KEY_OUT_DIA_ANCHOR_UPLIFT = 'Anchor Bolt.Diameter_Uplift'
+KEY_DISP_OUT_DIA_ANCHOR_UPLIFT = 'Diameter(mm)'
+KEY_OUT_GRD_ANCHOR_UPLIFT = 'Anchor Bolt.Grade_Uplift'
+KEY_DISP_OUT_GRD_ANCHOR_UPLIFT = 'Grade'
+KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT = 'Anchor Bolt.Length_Uplift'
+KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT = 'Total Length'
+KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT = 'Anchor Bolt.Tension_Uplift'
+KEY_OUT_DISP_ANCHOR_BOLT_TENSION_UPLIFT = 'Tension Capacity (kN)'
 
 # Applied load
 KEY_DISP_APPLIED_SHEAR_LOAD ='Shear Load Vu (kN)'
@@ -491,30 +509,58 @@ KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (mm)"
 KEY_OUT_DETAILING_PROJECTION = 'Detailing.Projection'
 KEY_OUT_DISP_DETAILING_PROJECTION = 'Projection (mm)'
 
-DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
-KEY_OUT_GUSSET_PLATE_THICKNNESS = 'GussetPlate.Thickness'
-KEY_OUT_DISP_GUSSET_PLATE_THICKNESS = 'Thickness (mm)'
-KEY_OUT_GUSSET_PLATE_SHEAR_DEMAND = 'GussetPlate.Shear_Demand'
-KEY_OUT_DISP_GUSSET_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
-KEY_OUT_GUSSET_PLATE_SHEAR = 'GussetPlate.Shear'
-KEY_OUT_DISP_GUSSET_PLATE_SHEAR = 'Shear Capacity (kN)'
-KEY_OUT_GUSSET_PLATE_MOMENT_DEMAND = 'GussetPlate.Moment_Demand'
-KEY_OUT_DISP_GUSSET_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
-KEY_OUT_GUSSET_PLATE_MOMENT = 'GussetPlate.Moment'
-KEY_OUT_DISP_GUSSET_PLATE_MOMENT = 'Moment Capacity (kN-m)'
+# DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
+# KEY_OUT_GUSSET_PLATE_THICKNNESS = 'GussetPlate.Thickness'
+# KEY_OUT_DISP_GUSSET_PLATE_THICKNESS = 'Thickness (mm)'
+# KEY_OUT_GUSSET_PLATE_SHEAR_DEMAND = 'GussetPlate.Shear_Demand'
+# KEY_OUT_DISP_GUSSET_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+# KEY_OUT_GUSSET_PLATE_SHEAR = 'GussetPlate.Shear'
+# KEY_OUT_DISP_GUSSET_PLATE_SHEAR = 'Shear Capacity (kN)'
+# KEY_OUT_GUSSET_PLATE_MOMENT_DEMAND = 'GussetPlate.Moment_Demand'
+# KEY_OUT_DISP_GUSSET_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+# KEY_OUT_GUSSET_PLATE_MOMENT = 'GussetPlate.Moment'
+# KEY_OUT_DISP_GUSSET_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 
+KEY_OUT_STIFFENER_PLATE_FLANGE = 'Stiffener_Plate.Column_flange'
+KEY_DISP_OUT_STIFFENER_PLATE_FLANGE = 'Stiffener Plate'
+DISP_TITLE_STIFFENER_PLATE_FLANGE = 'Stiffener Plate along Column flange'
+KEY_OUT_STIFFENER_PLATE_FLANGE_THICKNNESS = 'Stiffener_Plate_Flange.Thickness'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_THICKNESS = 'Thickness (mm)'
+KEY_OUT_STIFFENER_PLATE_FLANGE_SHEAR_DEMAND = 'Stiffener_Plate_Flange.Shear_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_STIFFENER_PLATE_FLANGE_SHEAR = 'Stiffener_Plate_Flange.Shear'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_STIFFENER_PLATE_FLANGE_MOMENT_DEMAND = 'Stiffener_Plate_Flange.Moment_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_STIFFENER_PLATE_FLANGE_MOMENT = 'Stiffener_Plate_Flange.Moment'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_MOMENT = 'Moment Capacity (kN-m)'
 
-DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'
-KEY_OUT_STIFFENER_PLATE_THICKNNESS = 'StiffenerPlate.Thickness'
-KEY_OUT_DISP_STIFFENER_PLATE_THICKNESS = 'Thickness (mm)'
-KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND = 'StiffenerPlate.Shear_Demand'
-KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
-KEY_OUT_STIFFENER_PLATE_SHEAR = 'StiffenerPlate.Shear'
-KEY_OUT_DISP_STIFFENER_PLATE_SHEAR = 'Shear Capacity (kN)'
-KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND = 'StiffenerPlate.Moment_Demand'
-KEY_OUT_DISP_STIFFENER_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
-KEY_OUT_STIFFENER_PLATE_MOMENT = 'StiffenerPlate.Moment'
-KEY_OUT_DISP_STIFFENER_PLATE_MOMENT = 'Moment Capacity (kN-m)'
+KEY_OUT_STIFFENER_PLATE_WEB = 'Stiffener_Plate.Column_web'
+KEY_DISP_OUT_STIFFENER_PLATE_WEB = 'Stiffener Plate'
+DISP_TITLE_STIFFENER_PLATE_WEB = 'Stiffener Plate along Column web'
+KEY_OUT_STIFFENER_PLATE_WEB_THICKNNESS = 'Stiffener_Plate_Web.Thickness'
+KEY_OUT_DISP_STIFFENER_PLATE_WEB_THICKNESS = 'Thickness (mm)'
+KEY_OUT_STIFFENER_PLATE_WEB_SHEAR_DEMAND = 'Stiffener_Plate_Web.Shear_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_WEB_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_STIFFENER_PLATE_WEB_SHEAR = 'Stiffener_Plate_Web.Shear'
+KEY_OUT_DISP_STIFFENER_PLATE_WEB_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_STIFFENER_PLATE_WEB_MOMENT_DEMAND = 'Stiffener_Plate_Web.Moment_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_WEB_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_STIFFENER_PLATE_WEB_MOMENT = 'Stiffener_Plate_Web.Moment'
+KEY_OUT_DISP_STIFFENER_PLATE_WEB_MOMENT = 'Moment Capacity (kN-m)'
+
+#
+# DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'
+# KEY_OUT_STIFFENER_PLATE_THICKNNESS = 'StiffenerPlate.Thickness'
+# KEY_OUT_DISP_STIFFENER_PLATE_THICKNESS = 'Thickness (mm)'
+# KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND = 'StiffenerPlate.Shear_Demand'
+# KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+# KEY_OUT_STIFFENER_PLATE_SHEAR = 'StiffenerPlate.Shear'
+# KEY_OUT_DISP_STIFFENER_PLATE_SHEAR = 'Shear Capacity (kN)'
+# KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND = 'StiffenerPlate.Moment_Demand'
+# KEY_OUT_DISP_STIFFENER_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+# KEY_OUT_STIFFENER_PLATE_MOMENT = 'StiffenerPlate.Moment'
+# KEY_OUT_DISP_STIFFENER_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 
 
 ###################################
@@ -522,10 +568,22 @@ KEY_OUT_DISP_STIFFENER_PLATE_MOMENT = 'Moment Capacity (kN-m)'
 KEY_SHEAR = 'Load.Shear'
 KEY_DISP_SHEAR = 'Shear(kN)*'
 
+KEY_SHEAR_BP = 'Load.Shear_BP'
+KEY_DISP_SHEAR_BP = 'Shear(kN)'
+KEY_SHEAR_MAJOR = 'Load.Shear.Major'
+KEY_DISP_SHEAR_MAJOR = ' - Along major axis (z-z)'
+KEY_SHEAR_MINOR = 'Load.Shear.Minor'
+KEY_DISP_SHEAR_MINOR = ' - Along minor axis (y-y)'
+
+
 ###################################
 # Key for Storing Axial sub-key of Load
 KEY_AXIAL = 'Load.Axial'
 KEY_DISP_AXIAL = 'Axial (kN) *'
+KEY_AXIAL_BP = 'Load.Axial_Compression'
+KEY_DISP_AXIAL_BP = 'Axial Compression (kN) *'
+KEY_AXIAL_TENSION_BP = 'Load.Axial_Tension'
+KEY_DISP_AXIAL_TENSION_BP = 'Axial Tension/Uplift (kN) *'
 
 
 ###################################

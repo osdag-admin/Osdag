@@ -703,11 +703,13 @@ class CommonDesignLogic(object):
         weldSideWeb = FilletWeld(b=float(BP.weld_size_web), h=float(BP.weld_size_web),
                                  L=column.D - 2 * (column.t + column.R1))
 
-        gusset = StiffenerPlate(L=BP.gusset_plate_length, W=BP.gusset_plate_height, T=BP.gusset_plate_thick,
-                                L11=(BP.gusset_plate_length - (column.B + 100)) / 2, L12=BP.gusset_plate_height - 100,
+        gusset = StiffenerPlate(L=BP.stiffener_plt_len_along_flange, W=BP.stiffener_plt_height_along_flange,
+                                T=BP.stiffener_plt_thick_along_flange,
+                                L11=(BP.stiffener_plt_len_along_flange - (column.B + 100)) / 2, L12=BP.stiffener_plt_height_along_flange - 100,
                                 R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
-        stiffener = StiffenerPlate(L=BP.stiffener_plate_length, W=BP.stiffener_plate_height, T=BP.stiffener_plate_thick,
-                                   L11=BP.stiffener_plate_length - 50, L12=BP.stiffener_plate_height - 100)
+        stiffener = StiffenerPlate(L=BP.stiffener_plt_len_along_web, W=BP.stiffener_plt_height_along_web,
+                                   T=BP.stiffener_plt_thick_along_web,
+                                   L11=BP.stiffener_plt_len_along_web - 50, L12=BP.stiffener_plt_height_along_web - 100)
 
         concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=BP.anchor_length_provided * 1.3)
         grout = Grout(L=concrete.L, W=concrete.W, T=50)
@@ -876,7 +878,7 @@ class CommonDesignLogic(object):
                                         color=Quantity_NOC_SADDLEBROWN)
 
             elif self.connection == KEY_DISP_BASE_PLATE:
-                self.Bp = self.module_class()
+                self.Bp = self.module_class
 
                 self.BPObj = self.createBasePlateCAD()
 

@@ -655,7 +655,7 @@ class ColumnEndPlate(MomentConnection):
 
         else:
             self.design_status = False
-            logger.error(":The axial force {} acting is higher than axial capacity {} of member".format(self.load.axial_force,self.axial_capacity))
+            logger.error(":The axial force {} acting is higher than axial capacity {} of member".format(self.load.axial_force,self.axial_capacity/1000))
             logger.info("Increase member size or decrease axial load")
         # self.load.axial_force = self.factored_axial_load  # N
         print("factored_axial_load", self.factored_axial_load)
@@ -674,7 +674,7 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = True
         else:
             self.design_status = False
-            logger.error(":The shear force {} acting is higher than axial capacity {} of member".format(self.load.shear_force,self.shear_capacity))
+            logger.error(":The shear force {} acting is higher than shear capacity {} of member".format(self.load.shear_force,self.shear_capacity/1000))
             logger.info("Increase member size or decrease shear load")
         print("factored_shear_load", self.factored_shear_load)
 ###############################################################
@@ -1055,6 +1055,7 @@ class ColumnEndPlate(MomentConnection):
             #     self.get_bolt_grade(self)
 
         else:
+
             self.design_status = False
             logger.error("failed in bolt diam selection")
 
@@ -1388,6 +1389,12 @@ class ColumnEndPlate(MomentConnection):
                 self.stiff_wt = 0.0
                 self.t_s = 0.0
                 self.weld_type = "None"
+                if self.design_status:
+                    logger.info(": Overall Column end plate connection design is safe \n")
+                    logger.debug(" :=========End Of design===========")
+                else:
+                    logger.error(": Design is not safe \n ")
+                    logger.debug(" :=========End Of design===========")
             else:
                 # if 2 * self.end_dist >= 50:
                 self.stiffener_details(self)

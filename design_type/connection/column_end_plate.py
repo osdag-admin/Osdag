@@ -665,7 +665,7 @@ class ColumnEndPlate(MomentConnection):
         self.shear_capacity = ((self.section.depth - (2 * self.section.flange_thickness)) * self.section.web_thickness * self.section.fy) / (
                                  math.sqrt(3) * gamma_m0)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
         self.min_shear_load = 0.6 * self.shear_capacity  # N
-        # self.fact_shear_load = max(self.min_shear_load, self.load.shear_force * 1000)  # N
+        self.fact_shear_load = max(self.min_shear_load, self.load.shear_force * 1000)  # N
         if self.load.shear_force * 1e3 < self.min_shear_load:
             self.factored_shear_load = self.min_shear_load
             self.design_status = True
@@ -1642,3 +1642,164 @@ class ColumnEndPlate(MomentConnection):
         t6 = (KEY_PLATETHK, self.endplate_thick_customized)
         list1.append(t6)
         return list1
+        ################################ Design Report #####################################################################################
+
+    def save_design(self, popup_summary):
+        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
+                                  KEY_DISP_BEAMSEC: self.section.designation,
+                                  KEY_DISP_MATERIAL: self.section.material,
+                                  KEY_DISP_FU: self.section.fu,
+                                  KEY_DISP_FY: self.section.fy,
+                                  'Mass': self.section.mass,
+                                  'Area(mm2) - A': round(self.section.area, 2),
+                                  'D(mm)': self.section.depth,
+                                  'B(mm)': self.section.flange_width,
+                                  't(mm)': self.section.web_thickness,
+                                  'T(mm)': self.section.flange_thickness,
+                                  'FlangeSlope': self.section.flange_slope,
+                                  'R1(mm)': self.section.root_radius,
+                                  'R2(mm)': self.section.toe_radius,
+                                  'Iz(mm4)': self.section.mom_inertia_z,
+                                  'Iy(mm4)': self.section.mom_inertia_y,
+                                  'rz(mm)': self.section.rad_of_gy_z,
+                                  'ry(mm)': self.section.rad_of_gy_y,
+                                  'Zz(mm3)': self.section.elast_sec_mod_z,
+                                  'Zy(mm3)': self.section.elast_sec_mod_y,
+                                  'Zpz(mm3)': self.section.plast_sec_mod_z,
+                                  'Zpy(mm3)': self.section.elast_sec_mod_y}
+
+        self.report_input = \
+            {KEY_MODULE: self.module,
+             KEY_MAIN_MODULE: self.mainmodule,
+             # KEY_CONN: self.connectivity,
+             KEY_DISP_MOMENT: self.load.moment,
+             KEY_DISP_SHEAR: self.load.shear_force,
+             KEY_DISP_AXIAL: self.load.axial_force,
+
+             "Section": "TITLE",
+
+             "Bolt Details": "TITLE",
+             KEY_DISP_D: str(self.bolt.bolt_diameter),
+             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_TYP: self.bolt.bolt_type,
+
+
+             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+             KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+
+        self.report_check = []
+        bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
+        bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
+        kb_disp = round(self.bolt.kb, 2)
+
+        t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, '', axial_capacity(area=self.section.area,
+                                                              fy=self.section.fy,
+                                                              gamma_m0=gamma_m0,
+                                                              axial_capacity=round(self.axial_capacity / 1000, 2)), '')
+        self.report_check.append(t1)
+        self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
+                                      self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0), 2)
+        h = self.section.depth - (2 * self.section.flange_thickness)
+
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '', shear_capacity(h=h, t=self.section.web_thickness,
+                                                              f_y=self.section.fy, gamma_m0=gamma_m0,
+                                                              shear_capacity=self.shear_capacity1 / 1000), '')
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', plastic_moment_capacty(beta_b=1,
+                                                                              Z_p=self.Z_p, f_y=self.section.fy,
+                                                                              gamma_m0=gamma_m0,
+                                                                              Pmc=round(self.moment_capacity/ 1000000, 2)), '')
+        self.report_check.append(t1)
+
+
+
+        t1 = ('SubSection', 'Load Considered', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, min_max_axial_capacity(axial_capacity=round(self.axial_capacity / 1000, 2),
+                                                                  min_ac=round(self.min_axial_load / 1000, 2)),
+             prov_axial_load(axial_input=self.load.axial_force,
+                             min_ac=round(self.min_axial_load / 1000, 2),
+                             app_axial_load=round(self.factored_axial_load / 1000, 2)),
+             get_pass_fail(self.min_axial_load / 1000,
+                           self.factored_axial_load / 1000, relation="leq"))
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, min_max_shear_capacity(shear_capacity=round(self.shear_capacity1 / 1000, 2),
+                                                                 min_sc=round(self.min_shear_load / 1000, 2)),
+             prov_shear_load(shear_input=self.load.shear_force,
+                             min_sc=round( self.min_shear_load / 1000, 2),
+                             app_shear_load=round(self.fact_shear_load / 1000, 2)),
+             get_pass_fail(self.min_shear_load  / 1000,
+                           self.fact_shear_load / 1000, relation="leq"))
+        self.report_check.append(t1)
+
+        t1 = (KEY_DISP_APPLIED_MOMENT_LOAD,
+             min_max_moment_capacity(moment_capacity=round(self.moment_capacity / 1000000, 2),
+                                     min_mc=round(self.min_moment / 1000000, 2)),
+             prov_moment_load(moment_input=self.load.moment,
+                              min_mc=round(self.min_moment / 1000000, 2),
+                              app_moment_load=round(self.factored_moment / 1000000, 2)),
+             get_pass_fail(round(self.min_moment / 1000000, 2),
+                           round(self.load.moment / 1000000, 2), relation="leq"))
+        self.report_check.append(t1)
+        t1 = ('SubSection', ' Bolt Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        t6 = (
+        KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt.bolt_diameter_provided, "d"), '')
+        self.report_check.append(t6)
+
+        t8 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Grade Optimisation", self.bolt.bolt_grade_provided, '')
+        self.report_check.append(t8)
+
+        t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt.dia_hole, "d_0"), '')
+        self.report_check.append(t8)
+
+
+        if self.bolt.bolt_type == TYP_BEARING:
+             bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, 1,
+                                                                          self.bolt.bolt_net_area,
+                                                                          self.bolt.gamma_mb,
+                                                                          bolt_shear_capacity_kn), '')
+             self.report_check.append(t1)
+             t2 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(kb_disp,
+                                                                              self.bolt.bolt_diameter_provided,
+                                                                              self.bolt_conn_plates_t_fu_fy,
+                                                                              self.bolt.gamma_mb,
+                                                                              bolt_bearing_capacity_kn), '')
+             self.report_check.append(t2)
+             t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(bolt_shear_capacity_kn,
+                                                                                bolt_bearing_capacity_kn,
+                                                                                bolt_capacity_kn), '')
+             self.report_check.append(t3)
+        else:
+
+             t4 = (KEY_OUT_DISP_BOLT_SLIP, '', HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1,
+                                                                                 K_h=0.3,
+                                                                                 fub=self.bolt.bolt_fu,
+                                                                                 Anb=self.bolt.bolt_net_area,
+                                                                                 gamma_mf=self.bolt.gamma_mf,
+                                                                                 capacity=bolt_capacity_kn), '')
+             self.report_check.append(t4)
+
+        Disp_3d_image = "/ResourceFiles/images/3d.png"
+
+        # config = configparser.ConfigParser()
+        # config.read_file(open(r'Osdag.config'))
+        # desktop_path = config.get("desktop_path", "path1")
+        # print("desk:", desktop_path)
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
+
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
+                               rel_path, Disp_3d_image)
+
+
+# def save_latex(self, uiObj, Desigxn_Check, reportsummary, filename, rel_path, Disp_3d_image):

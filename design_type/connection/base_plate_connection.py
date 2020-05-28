@@ -985,8 +985,31 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # self.set_input_values(self, design_dictionary)
             self.bp_parameters(self, design_dictionary)
         else:
-            all_errors
+            return all_errors
 
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
 
 
     def tab_list(self):
@@ -1329,10 +1352,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.safe = True
 
         self.bp_analyses_parameters(self)
+        print('bp_analyses_parameters done')
         self.bp_analyses(self)
+        print('bp_analyses done')
         self.anchor_bolt_design(self)
+        print('anchor_bolt_design done')
         self.design_weld(self)
+        print('design_weld done')
         self.design_stiffeners(self)
+        print('design_stiffeners done')
 
     def bp_analyses_parameters(self):
         """ initialize detailing parameters like the end/edge/pitch/gauge distances, anchor bolt diameter and grade,

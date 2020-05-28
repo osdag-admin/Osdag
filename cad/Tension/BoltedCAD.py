@@ -50,43 +50,83 @@ class TensionAngleBoltCAD(object):
 
     def createMemberGeometry(self):
 
-        if self.Obj.sec_profile == 'Angles':
-            member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
-            member1_uDir = numpy.array([0.0, -1.0, 0.0])
-            member1_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+        if self.Obj.loc == 'Long Leg':
+            if self.Obj.sec_profile == 'Angles':
+                member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
+                member1_uDir = numpy.array([0.0, -1.0, 0.0])
+                member1_wDir = numpy.array([1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
 
-            self.member1_Model = self.member1.create_model()
+                self.member1_Model = self.member1.create_model()
 
-        elif self.Obj.sec_profile == 'Back to Back Angles':
-            member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
-            member1_uDir = numpy.array([0.0, -1.0, 0.0])
-            member1_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+            elif self.Obj.sec_profile == 'Back to Back Angles':
+                member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
+                member1_uDir = numpy.array([0.0, -1.0, 0.0])
+                member1_wDir = numpy.array([1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
 
-            self.member1_Model = self.member1.create_model()
+                self.member1_Model = self.member1.create_model()
 
-            member2OriginL = numpy.array([self.member.L - self.plate_intercept, self.plate.T, self.member.A / 2])
-            member2_uDir = numpy.array([0.0, 1.0, 0.0])
-            member2_wDir = numpy.array([-1.0, 0.0, 0.0])
-            self.member2.place(member2OriginL, member2_uDir, member2_wDir)
+                member2OriginL = numpy.array([self.member.L - self.plate_intercept, self.plate.T, self.member.A / 2])
+                member2_uDir = numpy.array([0.0, 1.0, 0.0])
+                member2_wDir = numpy.array([-1.0, 0.0, 0.0])
+                self.member2.place(member2OriginL, member2_uDir, member2_wDir)
 
-            self.member2_Model = self.member2.create_model()
+                self.member2_Model = self.member2.create_model()
 
-        elif self.Obj.sec_profile == 'Star Angles':
-            member1OriginL = numpy.array([-self.plate_intercept, 0.0, 0.0])
-            member1_uDir = numpy.array([0.0, -1.0, 0.0])
-            member1_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+            elif self.Obj.sec_profile == 'Star Angles':
+                member1OriginL = numpy.array([-self.plate_intercept, 0.0, 0.0])
+                member1_uDir = numpy.array([0.0, -1.0, 0.0])
+                member1_wDir = numpy.array([1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
 
-            self.member1_Model = self.member1.create_model()
+                self.member1_Model = self.member1.create_model()
 
-            member2OriginL = numpy.array([-self.plate_intercept, self.plate.T, 0.0])
-            member2_uDir = numpy.array([0.0, 1.0, 0.0])
-            member2_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.member2.place(member2OriginL, member2_uDir, member2_wDir)
+                member2OriginL = numpy.array([-self.plate_intercept, self.plate.T, 0.0])
+                member2_uDir = numpy.array([0.0, 1.0, 0.0])
+                member2_wDir = numpy.array([1.0, 0.0, 0.0])
+                self.member2.place(member2OriginL, member2_uDir, member2_wDir)
 
-            self.member2_Model = self.member2.create_model()
+                self.member2_Model = self.member2.create_model()
+
+        else:
+            if self.Obj.sec_profile == 'Angles':
+                member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.member.B / 2])
+                member1_uDir = numpy.array([0.0, 0.0, -1.0])
+                member1_wDir = numpy.array([-1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+
+                self.member1_Model = self.member1.create_model()
+
+            elif self.Obj.sec_profile == 'Back to Back Angles':
+                member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.member.B / 2])
+                member1_uDir = numpy.array([0.0, 0.0, -1.0])
+                member1_wDir = numpy.array([-1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+
+                self.member1_Model = self.member1.create_model()
+
+                member2OriginL = numpy.array([- self.plate_intercept, self.plate.T, self.member.B / 2])
+                member2_uDir = numpy.array([0.0, 0.0, -1.0])
+                member2_wDir = numpy.array([1.0, 0.0, 0.0])
+                self.member2.place(member2OriginL, member2_uDir, member2_wDir)
+
+                self.member2_Model = self.member2.create_model()
+
+            elif self.Obj.sec_profile == 'Star Angles':
+                member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, 0.0])
+                member1_uDir = numpy.array([0.0, 0.0, -1.0])
+                member1_wDir = numpy.array([-1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+
+                self.member1_Model = self.member1.create_model()
+
+                member2OriginL = numpy.array([-self.plate_intercept + self.member.L, self.plate.T, 0.0])
+                member2_uDir = numpy.array([0.0, 0.0, 1.0])
+                member2_wDir = numpy.array([-1.0, 0.0, 0.0])
+                self.member2.place(member2OriginL, member2_uDir, member2_wDir)
+
+                self.member2_Model = self.member2.create_model()
 
     def createPlateGeometry(self):
         plate1OriginL = numpy.array([0.0, 0.0, 0.0])
@@ -110,6 +150,7 @@ class TensionAngleBoltCAD(object):
         """
         if self.Obj.sec_profile == 'Channels' or self.Obj.sec_profile == 'Back to Back Channels':
             self.member.A = self.member.D
+            self.member.T = self.member.t
         # nutboltArrayOrigin = self.baseplate.sec_origin + numpy.array([0.0, 0.0, self.baseplate.T /2+ 100])
 
         if self.Obj.sec_profile == 'Star Angles':
@@ -147,7 +188,14 @@ class TensionAngleBoltCAD(object):
             self.nutboltArrayR_SAModels = self.nut_bolt_arrayR_SA.create_model()
 
         else:
-            nutboltArrayLOrigin = numpy.array([-self.plate_intercept, -self.member.T, self.member.A / 2])
+            if self.Obj.sec_profile in ['Back to Back Angles', 'Angles']:
+                if self.Obj.loc == 'Long Leg':
+                    self.placement = self.member.A / 2
+                else:
+                    self.placement = self.member.B / 2
+            else:
+                self.placement = self.member.A/2
+            nutboltArrayLOrigin = numpy.array([-self.plate_intercept, -self.member.T, self.placement])
             gaugeDir = numpy.array([0.0, 0, -1.0])
             pitchDir = numpy.array([1.0, 0.0, 0])
             boltDir = numpy.array([0, 1.0, 0.0])
@@ -156,7 +204,7 @@ class TensionAngleBoltCAD(object):
             self.nutboltArrayLModels = self.nut_bolt_arrayL.create_model()
 
             nutboltArrayROrigin = numpy.array(
-                [-2 * self.plate_intercept + self.member.L, -self.member.T, self.member.A / 2])
+                [-2 * self.plate_intercept + self.member.L, -self.member.T, self.placement])
             gaugeDir = numpy.array([0.0, 0, -1.0])
             pitchDir = numpy.array([1.0, 0.0, 0])
             boltDir = numpy.array([0, 1.0, 0.0])
@@ -269,8 +317,8 @@ if __name__ == '__main__':
         member = Channel(B=50, T=6.6, D=125, t=3, R1=6.0, R2=2.4, L=4000)
         plate = GassetPlate(L=360 + 50, H=205.0, T=16, degree=30)
         # plate_intercept = plate.L - s - 50
-        if member_data == 'Channels':
-            nut_space = member.t + plate.T + nut.T  # member.T + plate.T + nut.T
+        if member_data in ['Channels']:
+            nut_space = member.t + plate.T + nut.T   # member.T + plate.T + nut.T
         else:
             nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
         plateObj = 0.0

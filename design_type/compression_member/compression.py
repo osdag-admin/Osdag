@@ -51,7 +51,7 @@ class Compression(Main):
 
         return c_lst
 
-    def input_values(self, existingvalues={}):
+    def input_values(self):
 
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
@@ -61,80 +61,40 @@ class Compression(Main):
 
         options_list = []
 
-        if KEY_SEC_PROFILE in existingvalues:
-            existingvalue_key_sec_profile = existingvalues[KEY_SEC_PROFILE]
-        else:
-            existingvalue_key_sec_profile = ''
-
-        if KEY_SECSIZE in existingvalues:
-            existingvalue_key_sec_size = existingvalues[KEY_SECSIZE]
-        else:
-            existingvalue_key_sec_size = ''
-
-        if KEY_MATERIAL in existingvalues:
-            existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
-        else:
-            existingvalue_key_mtrl = ''
-
-        if KEY_LENZZ in existingvalues:
-            existingvalue_key_len_zz = existingvalues[KEY_LENZZ]
-        else:
-            existingvalue_key_len_zz = ''
-
-        if KEY_LENYY in existingvalues:
-            existingvalue_key_len_yy = existingvalues[KEY_LENYY]
-        else:
-            existingvalue_key_len_yy = ''
-
-        if KEY_AXIAL in existingvalues:
-            existingvalue_key_axial = existingvalues[KEY_AXIAL]
-        else:
-            existingvalue_key_axial = ''
-
-        if KEY_END1 in existingvalues:
-            existingvalue_key_end1 = existingvalues[KEY_END1]
-        else:
-            existingvalue_key_end1 = ''
-
-        if KEY_END2 in existingvalues:
-            existingvalue_key_end2 = existingvalues[KEY_END2]
-        else:
-            existingvalue_key_end2 = ''
-
-        t1 = (KEY_MODULE, KEY_DISP_COMPRESSION, TYPE_MODULE, None, None, True, 'No Validator')
+        t1 = (KEY_MODULE, KEY_DISP_COMPRESSION, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, existingvalue_key_sec_profile, VALUES_SEC_PROFILE, True, 'No Validator')
+        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_sec_size, ['All', 'Customized'], True, 'No Validator')
+        t3 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All', 'Customized'], True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
+        t4 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t4)
 
-        t5 = (KEY_LENZZ, KEY_DISP_LENZZ, TYPE_TEXTBOX, existingvalue_key_len_zz, None, True, 'No Validator')
+        t5 = (KEY_LENZZ, KEY_DISP_LENZZ, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (KEY_LENYY, KEY_DISP_LENYY, TYPE_TEXTBOX, existingvalue_key_len_yy, None, True, 'No Validator')
+        t6 = (KEY_LENYY, KEY_DISP_LENYY, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
+        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None, True, 'No Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
-        t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, None, True, 'No Validator')
+        t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t9)
 
-        t10 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, existingvalue_key_end1, VALUES_END1, True, 'No Validator')
+        t10 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, VALUES_END1, True, 'No Validator')
         options_list.append(t10)
 
-        t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, existingvalue_key_end2, VALUES_END2, True, 'No Validator')
+        t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_END2, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, None, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
         options_list.append(t12)
 
         return options_list
@@ -233,7 +193,7 @@ class Compression(Main):
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2]:
-                val = option[4]
+                val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
 

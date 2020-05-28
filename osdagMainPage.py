@@ -293,8 +293,8 @@ class OsdagMainWindow(QMainWindow):
                                 'Truss Connection' : self.Under_Development,
                                 },
                 'Tension Member' : [
-                            ('Bolted','ResourceFiles/images/beam_column_endplate.png','Tension_Bolted'),
-                            ('Welded','ResourceFiles/images/finplate.png','Tension_Welded'),
+                            ('Bolted','ResourceFiles/images/bolted_ten.png','Tension_Bolted'),
+                            ('Welded','ResourceFiles/images/welded_ten.png','Tension_Welded'),
                             self.show_tension_module,
                                    ],
                 'Compression Member' : [

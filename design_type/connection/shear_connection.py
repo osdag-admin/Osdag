@@ -121,6 +121,12 @@ class ShearConnection(Connection):
             plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
 
+        if KEY_CONNECTOR_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_CONNECTOR_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
+
         section = []
 
         if input_dictionary:
@@ -408,7 +414,21 @@ class ShearConnection(Connection):
         t5 = ([KEY_CONN], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t5)
 
+        t6 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_DOCK, self.out_bolt_bearing)
+        lst.append(t6)
+
+        t7 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_LABEL, self.out_bolt_bearing)
+        lst.append(t7)
+
         return lst
+
+    def out_bolt_bearing(self):
+
+        bolt_type = self[0]
+        if bolt_type != TYP_BEARING:
+            return True
+        else:
+            return False
 
     def set_input_values(self, design_dictionary):
         self.mainmodule = "Shear Connection"

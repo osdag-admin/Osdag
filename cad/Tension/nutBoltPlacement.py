@@ -42,7 +42,8 @@ class NutBoltArray():
             self.member_thickness = plateObj.section_size_1.flange_thickness
         else:
             self.member_thickness = plateObj.section_size_1.thickness
-
+        self.root_radius = plateObj.section_size_1.root_radius
+        # print(self.root_radius,self.member_thickness,"rad and thk")
     def initialiseNutBolts(self):
         '''
         Initializing the Nut Bolt
@@ -50,8 +51,8 @@ class NutBoltArray():
         b = self.bolt
         n = self.nut
         for i in range(self.row * self.col):
-            bolt_len_required = float(b.T + self.gap)
-            b.H = bolt_len_required + (bolt_len_required) % 5
+            bolt_len_required = float(self.gap)
+            b.H = bolt_len_required + 10
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
 
@@ -60,6 +61,7 @@ class NutBoltArray():
         self.pitch = plateObj.plate.pitch_provided
         self.gauge = plateObj.plate.gauge_provided
         self.edge = plateObj.plate.edge_dist_provided
+        # print(self.edge,"edge")
         self.end = plateObj.plate.end_dist_provided
         self.row = plateObj.plate.bolts_one_line
         self.col = plateObj.plate.bolt_line
@@ -72,7 +74,7 @@ class NutBoltArray():
         for rw in range(self.row):
             for col in range(self.col):
                 pos = self.origin
-                pos = pos + self.member_thickness * self.gaugeDir
+                pos = pos + (self.member_thickness + self.root_radius) * self.gaugeDir
                 pos = pos + self.edge * self.gaugeDir
                 pos = pos + col * self.pitch * self.pitchDir
                 pos = pos + self.end * self.pitchDir

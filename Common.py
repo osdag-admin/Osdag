@@ -1174,6 +1174,7 @@ KEY_OUT_WELD_TYPE = 'Stiffener.weld'
 KEY_OUT_DISP_WELD_TYPE = 'Weld Type'
 KEY_OUT_STIFFENER_DETAILS = 'Stiffener.details'
 KEY_OUT_DISP_STIFFENER_DETAILS = 'Stiffener Details'
+KEY_OUT_STIFFENER_TITLE = 'Stiffener.Title'
 
 DISP_TITLE_WELD = 'Weld'
 KEY_OUT_WELD_SIZE = 'Weld.Size'

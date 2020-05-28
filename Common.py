@@ -4,6 +4,7 @@
 
 import operator
 import math
+from utils.common.other_standards import *
 
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 
@@ -84,7 +85,7 @@ def connectdb(table_name, call_type="dropdown"):
         cursor = conn.execute("SELECT Designation FROM Beams")
 
     elif table_name == "Bolt":
-        cursor = conn.execute("SELECT Diameter_of_bolt FROM Bolt")
+        cursor = conn.execute("SELECT Bolt_diameter FROM Bolt")
 
     elif table_name == "Material":
         cursor = conn.execute("SELECT Grade FROM Material")
@@ -161,6 +162,8 @@ def tuple_to_str_popup(tl):
 def tuple_to_str(tl, call_type,table_name=None):
     if call_type is "dropdown" and table_name == 'Material':
         arr = ['Select Material']
+    elif call_type is "dropdown" and table_name == 'Bolt':
+        arr = ['Select Diameter']
     elif call_type is "dropdown" and table_name != 'Material':
         arr = ['Select Section']
     else:
@@ -348,7 +351,8 @@ VALUES_TYP = ['Select Type', TYP_FRICTION_GRIP, TYP_BEARING]
 VALUES_TYP_1 = ['Friction Grip Bolt']
 VALUES_TYP_2 = ['Bearing Bolt']
 
-VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+# VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+VALUES_GRD_CUSTOMIZED = IS1367_Part3_2002.get_bolt_PC()
 VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
@@ -359,7 +363,8 @@ VALUES_SECTYPE = ['Select Type','Beams','Columns','Angles','Back to Back Angles'
 
 VALUES_CONNLOC_BOLT = ['Bolted','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
-VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
+# VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
+VALUES_DIAM = connectdb("Bolt")
 
 
 VALUES_BEAMSEC = connectdb("Beams")

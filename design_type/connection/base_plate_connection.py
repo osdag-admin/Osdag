@@ -1667,9 +1667,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchor_tension_capa = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
                                                                                       self.anchor_area[0], self.anchor_area[1],
                                                                                       safety_factor_parameter=self.dp_weld_fab)  # N
+            self.anchor_tension_capa = round(self.anchor_tension_capa / 1000, 2)  # kN
 
             if self.load_axial_tension > 0:
-                self.anchor_nos_tension = self.load_axial_tension / self.anchor_tension_capa  # number of bolts req to resist uplift
+                self.anchor_nos_tension = self.load_axial_tension / (self.anchor_tension_capa * 1000)  # number of bolts req to resist uplift
                 self.anchor_nos_tension = round_up(self.anchor_nos_tension, 2)
 
                 if self.anchor_nos_tension > 4:
@@ -1713,7 +1714,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.combined_capacity_anchor = 0
 
             else:
-                self.v_sb = self.load_shear * 10 ** -3 / self.anchor_nos_provided  # kN
+                self.v_sb = max(self.load_shear_major, self.load_shear_minor) * 10 ** -3 / self.anchor_nos_provided  # kN
                 self.v_db = self.anchor_capacity  # kN
                 self.t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
                 self.t_db = self.tension_capacity_anchor  # kN
@@ -1927,6 +1928,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             elif self.connectivity == 'Moment Base Plate':
                 self.stiffener_along_flange = 'Yes'
                 self.stiffener_along_web = 'Yes'
+                self.stiffener_across_web = 'No'
 
             self.weld_size_flange = self.column_tf  # mm
             self.weld_size_web = self.column_tw  # mm
@@ -2040,8 +2042,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 else:
                     pass
 
-                # weld size on the gusset and the stiffener plates
-                self.weld_size_gusset = self.weld_size_flange  # mm
+                # weld size at the stiffener plate
+                # TODO: check the weld size at stiffener
+                self.weld_size_stiffener = self.weld_size_flange  # mm
 
                 self.weld_size_vertical_flange = self.cl_10_5_2_3_min_weld_size(self.column_tf, self.stiffener_plt_thick_along_flange)
                 self.weld_size_vertical_flange = max(self.weld_size_vertical_flange, 6)  # mm
@@ -2142,28 +2145,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print(self.moment_on_stiffener_along_web)
         print(self.moment_capa_stiffener_along_web)
 
-        # Gusset Plate
-            # print(self.gusset_plate_thick)  # Thickness (mm)
-            # print(self.shear_on_gusset)  # Shear Demand (kN)
-            # print(self.shear_capacity_gusset)  # Shear Capacity (kN)
-            # print(self.moment_on_gusset)  # Moment Demand (kN-m)
-            # print(self.moment_capacity_gusset)  # Moment Capacity (kN-m)
-
-        # Stiffener Plate
-            # print(self.stiffener_plate_thick)  # Thickness (mm)
-            # print(self.shear_on_stiffener)  # Shear Demand (kN)
-            # print(self.shear_capacity_stiffener)  # Shear Capacity (kN)
-            # print(self.moment_on_stiffener)  # Moment Demand (kN-m)
-            # print(self.moment_capacity_stiffener)  # Moment Capacity (kN-m)
-
-
         # Weld
 
         print(self.weld_size_flange if self.weld_type != 'Butt Weld' else '')  # Size at Flange (mm)
         print(self.weld_size_web if self.weld_type != 'Butt Weld' else '')  # Size at Web (mm)
 
         if self.stiffener_along_flange == 'Yes':
-            print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # Size at Gusset/Stiffener (mm)
+            print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along flange (mm)
+
+        if self.stiffener_along_web == 'Yes':
+            print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
+
+        if self.stiffener_across_web == 'Yes':
+            print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
 
         # this might not be required
         # print(self.weld_size if self.weld_type != 'Butt Weld' else '')  # Weld size (mm)

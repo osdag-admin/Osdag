@@ -1962,7 +1962,7 @@ class BeamCoverPlate(MomentConnection):
 
         self.flange_plate.length = self.flange_plate.length * 2
         self.web_plate.length = self.web_plate.length * 2
-        self.web_plate.height = 110
+        # self.web_plate.height = 110
         self.flange_plate.bolt_line = 2 * self.flange_plate.bolt_line
         self.flange_plate.bolts_one_line = self.flange_plate.bolts_one_line
         self.flange_plate.bolts_required = self.flange_plate.bolt_line *self.flange_plate.bolts_one_line

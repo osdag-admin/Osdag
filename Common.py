@@ -633,7 +633,8 @@ KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (cm<sup>3</sup>)'
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
-KEY_DISP_AXB= 'AXB'
+KEY_DISP_A= 'A'
+KEY_DISP_B= 'B'
 KEY_DISP_LEG_THK = 'Leg Thickness (mm)'
 KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
@@ -1310,17 +1311,18 @@ def get_leg_lengths(designation):
         Function to fetch designation values from respective Tables.
     """
     conn = sqlite3.connect(PATH_TO_DATABASE)
-    db_query = "SELECT AXB, t, R1 FROM Angles WHERE Designation = ?"
+    db_query = "SELECT a, b, t, R1 FROM Angles WHERE Designation = ?"
     cur = conn.cursor()
     cur.execute(db_query, (designation,))
     row = cur.fetchone()
 
-    axb = row[0]
-    t = row[1]
-    r_r = row[2]
-    axb = axb.lower()
-    leg_a_length = float(axb.split("x")[0])
-    leg_b_length = float(axb.split("x")[1])
+    a = row[0]
+    b = row[1]
+    t = row[2]
+    r_r = row[3]
+    # axb = axb.lower()
+    leg_a_length = float(a)
+    leg_b_length = float(b)
     conn.close()
     return leg_a_length,leg_b_length,t,r_r
 

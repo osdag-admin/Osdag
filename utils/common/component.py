@@ -383,6 +383,8 @@ class Section(Material):
             self.plast_sec_mod_y = row[17] * 1000
 
         self.source = row[19]
+        self.It = row[20]
+        self.Iw = row[21]
 
         conn.close()
 
@@ -733,6 +735,9 @@ class Channel(Section):
             self.plast_sec_mod_z = self.elast_sec_mod_z
             self.plast_sec_mod_y = self.elast_sec_mod_y
         self.source = row[20]
+        self.It = row[21]
+        self.Iw = row[22]
+
 
         if row[21] is None:
             self.Type = 'Rolled'
@@ -1599,36 +1604,38 @@ class Angle(Section):
 
         self.mass = row[2]
         self.area = row[3] * 100
-        self.axb = row[4]
-        self.axb = self.axb.lower()
-        self.leg_a_length = float(self.axb.split("x")[0])
-        self.leg_b_length = float(self.axb.split("x")[1])
+        self.a = row[4]
+        self.b = row[5]
+        self.leg_a_length = self.a
+        self.leg_b_length = self.b
         self.max_leg = max(self.leg_a_length,self.leg_b_length)
         self.min_leg = min(self.leg_a_length, self.leg_b_length)
-        self.thickness = row[5]
+        self.thickness = row[6]
         super(Section, self).__init__(material_grade,self.thickness)
-        self.root_radius = row[6]
-        self.toe_radius = row[7]
-        if self.leg_a_length != self.leg_b_length:
-            self.Cz = row[8]*10
-            self.Cy = row[9]*10
-        else:
-            self.Cz = row[8]
-            self.Cy = row[9]
+        self.root_radius = row[7]
+        self.toe_radius = row[8]
+        # if self.leg_a_length != self.leg_b_length:
+        #     self.Cz = row[8]*10
+        #     self.Cy = row[9]*10
+        # else:
+        self.Cz = row[9] * 10
+        self.Cy = row[10] * 10
 
         self.mom_inertia_z = row[11] * 10000
         self.mom_inertia_y = row[12] * 10000
-        self.mom_inertia_u = row[13] * 10000
-        self.mom_inertia_v = row[14] * 10000
-        self.rad_of_gy_z = row[15] * 10
-        self.rad_of_gy_y = row[16] * 10
-        self.rad_of_gy_u = row[17] * 10
-        self.rad_of_gy_v = row[18] * 10
-        self.elast_sec_mod_z = row[19] * 1000
-        self.elast_sec_mod_y = row[20] * 1000
-        self.plast_sec_mod_z = row[21] * 1000
-        self.plast_sec_mod_y = row[22] * 1000
-        self.source = row[23]
+        self.alpha = row[13]
+        self.mom_inertia_u = row[14] * 10000
+        self.mom_inertia_v = row[15] * 10000
+        self.rad_of_gy_z = row[16] * 10
+        self.rad_of_gy_y = row[17] * 10
+        self.rad_of_gy_u = row[18] * 10
+        self.rad_of_gy_v = row[19] * 10
+        self.elast_sec_mod_z = row[20] * 1000
+        self.elast_sec_mod_y = row[21] * 1000
+        self.plast_sec_mod_z = row[22] * 1000
+        self.plast_sec_mod_y = row[23] * 1000
+        self.source = row[24]
+        self.It = row[25]
         if row[24] is None:
             self.Type = 'Rolled'
         else:

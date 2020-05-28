@@ -298,7 +298,6 @@ class IS800_2007(object):
         Note:
             Reference:
             IS 800:2007, cl. 10.2.4.2
-self
         """
 
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)

@@ -567,16 +567,16 @@ class Tension_bolted(Member):
         t11 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  round(self.bolt.bolt_shear_capacity/1000,2) if flag else '', True)
         out_list.append(t11)
 
-        # bolt_bearing_capacity_disp = ''
-        # if flag is True:
-        #     if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
-        #         bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-        #
-        #         pass
-        #     else:
-        #         bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
+        bolt_bearing_capacity_disp = ''
+        if flag is True:
+            if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
+                bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
 
-        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, round(self.bolt.bolt_bearing_capacity / 1000, 2) if flag else '', True)
+                pass
+            else:
+                bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
+
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX,  bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)
 
         t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '', True)

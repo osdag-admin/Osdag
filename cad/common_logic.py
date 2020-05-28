@@ -851,9 +851,9 @@ class CommonDesignLogic(object):
         self.component = component
 
         self.display.EraseAll()
-        # self.display.View_Iso()
+        self.display.View_Iso()
         # self.display.SetOrthographicProjection()
-        self.display.View_Left()
+        # self.display.View_Left()
 
         self.display.FitAll()
 
@@ -1016,9 +1016,9 @@ class CommonDesignLogic(object):
                 plate = self.TObj.get_plates_models()
                 nutbolt = self.TObj.get_nut_bolt_array_models()
                 if self.component == "Model":  # Todo: change this into key
-                    osdag_display_shape(self.display, member, color='YELLOW', update=True)
+                    osdag_display_shape(self.display, member, update=True)
                     osdag_display_shape(self.display, plate, color='BLUE', update=True)
-                    osdag_display_shape(self.display, nutbolt, color='BLACK', update=True)
+                    osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
 
                 # elif self.component == "end bolt":
                 #     pass

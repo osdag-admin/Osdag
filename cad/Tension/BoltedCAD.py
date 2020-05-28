@@ -270,7 +270,7 @@ if __name__ == '__main__':
         member = Channel(B=50, T=6.6, D=125, t=3, R1=6.0, R2=2.4, L=4000)
         plate = GassetPlate(L=360 + 50, H=205.0, T=16, degree=30)
         # plate_intercept = plate.L - s - 50
-        if member_data in ['Channels', 'Angles', 'Star Angles']:
+        if member_data in ['Channels']:
             nut_space = member.t + plate.T + nut.T   # member.T + plate.T + nut.T
         else:
             nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T

@@ -117,7 +117,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.column_section = ""
         self.material = ""
 
-        self.load_axial = 0.0
+        self.load_axial_compression = 0.0
         self.load_axial_tension = 0.0
         # self.load_shear = 0.0
         self.load_shear_major = 0.0
@@ -1237,8 +1237,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.column_section = str(design_dictionary[KEY_SUPTNGSEC])
         self.material = str(design_dictionary[KEY_MATERIAL])
 
-        self.load_axial = float(design_dictionary[KEY_AXIAL_BP])
-        self.load_axial = self.load_axial * 10 ** 3  # N
+        self.load_axial_compression = float(design_dictionary[KEY_AXIAL_BP])
+        self.load_axial_compression = self.load_axial_compression * 10 ** 3  # N
 
         self.load_axial_tension = float(design_dictionary[KEY_AXIAL_TENSION_BP] if design_dictionary[KEY_AXIAL_TENSION_BP] != 'Disabled' else 0)
         self.load_axial_tension = self.load_axial_tension * 10 ** 3  # N
@@ -1246,24 +1246,25 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # self.load_shear = float(design_dictionary[KEY_SHEAR_BP])
         # self.load_shear = self.load_shear * 10 ** 3  # N
 
-        self.load_shear_major = float(design_dictionary[KEY_SHEAR_MAJOR])
+        self.load_shear_major = float(design_dictionary[KEY_SHEAR_MAJOR])  # shear force acting along the major axis
         self.load_shear_major = self.load_shear_major * 10 ** 3  # N
 
-        self.load_shear_minor = float(design_dictionary[KEY_SHEAR_MINOR])
+        self.load_shear_minor = float(design_dictionary[KEY_SHEAR_MINOR])  # shear force acting along the minor axis
         self.load_shear_minor = self.load_shear_minor * 10 ** 3  # N
 
-        self.load_moment_major = float(
-            design_dictionary[KEY_MOMENT_MAJOR] if design_dictionary[KEY_MOMENT_MAJOR] != 'Disabled' else 0)
+        # TODO: check the condition given below
+        # if self.load_shear_major < self.load_shear_minor:
+        #     self.load_shear_major = self.load_shear_minor
+        # else:
+        #     pass
+
+        self.load_moment_major = float(design_dictionary[KEY_MOMENT_MAJOR]
+                                       if design_dictionary[KEY_MOMENT_MAJOR] != 'Disabled' else 0)  # bending moment acting about the major axis
         self.load_moment_major = self.load_moment_major * 10 ** 6  # N-mm
 
-        self.load_moment_minor = float(
-            design_dictionary[KEY_MOMENT_MINOR] if design_dictionary[KEY_MOMENT_MINOR] != 'Disabled' else 0)
+        self.load_moment_minor = float(design_dictionary[KEY_MOMENT_MINOR]
+                                       if design_dictionary[KEY_MOMENT_MINOR] != 'Disabled' else 0) # bending moment acting about the minor axis
         self.load_moment_minor = self.load_moment_minor * 10 ** 6  # N-mm
-
-        if self.load_shear_major < self.load_shear_minor:
-            self.load_shear_major = self.load_shear_minor
-        else:
-            pass
 
         # checking if the user input for minor axis moment exceeds the major axis moment (practically, it shouldn't)
         if self.load_moment_major < self.load_moment_minor:
@@ -1401,6 +1402,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         elif self.connectivity == 'Welded+Bolted Column Base':
             pass
+
         else:
             pass
 
@@ -1420,17 +1422,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.connectivity == 'Welded Column Base':
 
             # minimum required area for the base plate [bearing stress = axial force / area of the base]
-            self.min_area_req = self.load_axial / self.bearing_strength_concrete  # mm^2
+            self.min_area_req = self.load_axial_compression / self.bearing_strength_concrete  # mm^2
 
             # calculate projection by the 'Effective Area Method' [Reference: Clause 7.4.1.1, IS 800:2007]
             # the calculated projection is added by half times the hole dia on each side to avoid stress concentration near holes
             if self.dp_column_type == 'Rolled' or 'Welded':
-
                 self.projection = self.calculate_c(self.column_bf, self.column_D, self.column_tw, self.column_tf, self.min_area_req,
                                                    self.anchor_hole_dia)  # mm
                 self.projection = max(self.projection, self.end_distance)  # projection should at-least be equal to the end distance
+
             else:
                 pass
+
             if self.projection <= 0:
                 self.safe = False
                 logger.error(": [Analysis Error] The value of the projection (c) as per the Effective Area Method is {} mm. [Reference:"
@@ -1467,7 +1470,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2, update area if while loop is True
 
             # actual bearing pressure acting on the provided area of the base plate
-            self.w = self.load_axial / self.bp_area_provided  # N/mm^2 (MPa)
+            self.w = self.load_axial_compression / self.bp_area_provided  # N/mm^2 (MPa)
 
             # design of plate thickness
             # thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
@@ -1478,7 +1481,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         elif self.connectivity == 'Moment Base Plate':
 
-            self.eccentricity_zz = self.load_moment_major / self.load_axial  # mm, eccentricity about major (z-z) axis
+            self.eccentricity_zz = self.load_moment_major / self.load_axial_compression  # mm, eccentricity about major (z-z) axis
 
             # Defining cases: Case 1: e <= L/6        (compression throughout the BP)
             #                 Case 2: L/6 < e < L/3   (compression throughout + moderate tension/uplift in the anchor bolts)
@@ -1489,7 +1492,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.gusseted_bp_case = 'Case1'
 
                 # fixing length and width of the base plate
-                width_min = 2 * self.load_axial / (self.bp_length_min * self.bearing_strength_concrete)  # mm
+                width_min = 2 * self.load_axial_compression / (self.bp_length_min * self.bearing_strength_concrete)  # mm
                 if width_min < self.bp_width_min:
                     width_min = self.bp_width_min
                 else:
@@ -1502,15 +1505,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # calculating the maximum and minimum bending stresses
                 self.ze_zz = self.bp_width_provided * self.bp_length_provided ** 2 / 6  # mm^3, elastic section modulus of plate (BL^2/6)
 
-                self.sigma_max_zz = (self.load_axial / self.bp_area_provided) + (self.load_moment_major / self.ze_zz)  # N/mm^2
-                self.sigma_min_zz = (self.load_axial / self.bp_area_provided) - (self.load_moment_major / self.ze_zz)  # N/mm^2
+                self.sigma_max_zz = (self.load_axial_compression / self.bp_area_provided) + (self.load_moment_major / self.ze_zz)  # N/mm^2
+                self.sigma_min_zz = (self.load_axial_compression / self.bp_area_provided) - (self.load_moment_major / self.ze_zz)  # N/mm^2
 
                 # calculating moment at the critical section
 
                 # Assumption: the critical section (critical_xx) acts at a distance of 0.95 times the column depth, along the depth
                 self.critical_xx = (self.bp_length_provided - 0.95 * self.column_D) / 2  # mm
-                self.sigma_xx = (self.sigma_max_zz - self.sigma_min_zz) * (self.bp_length_provided - self.critical_xx) / \
-                                self.bp_length_provided
+                self.sigma_xx = (self.sigma_max_zz - self.sigma_min_zz) * (self.bp_length_provided - self.critical_xx) / self.bp_length_provided
                 self.sigma_xx = self.sigma_xx + self.sigma_min_zz  # N/mm^2, bending stress at the critical section
 
                 self.critical_M_xx = (self.sigma_xx * self.critical_xx ** 2 / 2) + \
@@ -1605,6 +1607,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         elif self.connectivity == "Welded+Bolted Column Base":
             pass
+
         elif self.connectivity == "Hollow/Tubular Column Base":
             pass
 
@@ -1794,7 +1797,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.effective_length_flange = length_available_flange - (0.08 * length_available_flange)  # mm
                     self.effective_length_web = length_available_web - (0.04 * length_available_web)  # mm
 
-                    self.strength_unit_len = self.load_axial / (self.effective_length_flange + self.effective_length_web)  # N/mm
+                    self.strength_unit_len = self.load_axial_compression / (self.effective_length_flange + self.effective_length_web)  # N/mm
                     self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
                                                                                     [self.dp_weld_fu_overwrite, self.dp_column_fu],
                                                                                     [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
@@ -1817,7 +1820,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                        (4 * self.eff_stiffener_plt_len_along_flange)  # mm
 
                         # relative strength of weld per unit weld length and weld size including stiffeners along the flange
-                        self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
+                        self.strength_unit_len = self.load_axial_compression / self.total_eff_len_available  # N/mm
                         self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
                                                                                                [self.dp_weld_fu_overwrite, self.dp_column_fu],
                                                                                                [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
@@ -1836,7 +1839,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.total_eff_len_available = self.total_eff_len_available + (2 * self.eff_stiffener_plt_len_along_web)  # mm
 
                         # relative strength of weld per unit weld length and weld size, including stiffeners along the flange and the web
-                        self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
+                        self.strength_unit_len = self.load_axial_compression / self.total_eff_len_available  # N/mm
                         self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
                                                                                                [self.dp_weld_fu_overwrite, self.dp_column_fu],
                                                                                                [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
@@ -1848,7 +1851,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             # Case 3: Adding stiffeners across the web of the column, between the column depth (total two in number)
                             self.stiffener_across_web = 'Yes'
 
-                            len_required = (self.load_axial * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_size_web_max * self.weld_fu)  # mm
+                            len_required = (self.load_axial_compression * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_size_web_max * self.weld_fu)  # mm
                             # Adding 16% of the total length to incorporate end returns (total 16 end returns in this case)
                             len_required = len_required + (0.16 * len_required)  # mm
 
@@ -1862,7 +1865,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                                 # relative strength of weld per unit weld length,
                                 # and, weld size, including stiffeners along the flange, web and across the web
-                                self.strength_unit_len = self.load_axial / self.total_eff_len_available  # N/mm
+                                self.strength_unit_len = self.load_axial_compression / self.total_eff_len_available  # N/mm
                                 self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
                                                                                                 [self.dp_weld_fu_overwrite, self.dp_column_fu],
                                                                                                 [self.plate_thk, self.column_tf],

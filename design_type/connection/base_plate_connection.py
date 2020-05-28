@@ -872,23 +872,37 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def anchor_bolt_values(self, input_dictionary):
 
         self.input_dictionary = input_dictionary
+
+        values = {KEY_DP_ANCHOR_BOLT_LENGTH: '', KEY_DP_ANCHOR_BOLT_DESIGNATION: '',
+                  KEY_DP_ANCHOR_BOLT_TYPE: '', KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: ''}
         if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SECSIZE], input_dictionary[KEY_MATERIAL]]:
-            length = ''
-            designation = ''
-            anchor_type = ''
-            fu = ''
+            pass
+            # length = ''
+            # designation = ''
+            # anchor_type = ''
+            # fu = ''
         else:
             length = str(self.anchor_length_provided if self.design_button_status else 0)
             designation = str(input_dictionary[KEY_DIA_ANCHOR][0]) + "X" + length + " IS5624 GALV"
             anchor_type = input_dictionary[KEY_TYP_ANCHOR]
             fu = Material(input_dictionary[KEY_MATERIAL]).fu
+            values[KEY_DP_ANCHOR_BOLT_LENGTH] = length
+            values[KEY_DP_ANCHOR_BOLT_DESIGNATION] = designation
+            values[KEY_DP_ANCHOR_BOLT_TYPE] = anchor_type
+            values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O] = fu
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
 
         anchor_bolt = []
 
-        t1 = (KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, str(designation))
+        t1 = (KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_DESIGNATION]))
         anchor_bolt.append(t1)
 
-        t2 = (KEY_DP_ANCHOR_BOLT_TYPE, KEY_DISP_DP_ANCHOR_BOLT_TYPE, TYPE_TEXTBOX, None, str(anchor_type))
+        t2 = (KEY_DP_ANCHOR_BOLT_TYPE, KEY_DISP_DP_ANCHOR_BOLT_TYPE, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_TYPE]))
         anchor_bolt.append(t2)
 
         t3 = (KEY_DP_ANCHOR_BOLT_GALVANIZED, KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED, TYPE_COMBOBOX, ['Yes', 'No'], 'Yes')
@@ -898,10 +912,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
               ['Standard', 'Over-sized'], 'Standard')
         anchor_bolt.append(t4)
 
-        t5 = (KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DISP_DP_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX, None, length)
+        t5 = (KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DISP_DP_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX, None,
+              values[KEY_DP_ANCHOR_BOLT_LENGTH])
         anchor_bolt.append(t5)
 
-        t6 = (KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None, str(fu))
+        t6 = (KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O]))
         anchor_bolt.append(t6)
 
         t7 = (KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DISP_DP_ANCHOR_BOLT_FRICTION, TYPE_TEXTBOX, None, str(0.30))
@@ -921,6 +937,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             fu = material_attributes.fu
             fy = material_attributes.fy
 
+        if KEY_BASE_PLATE_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_BASE_PLATE_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
+
         tab_bp = []
         material = connectdb("Material", call_type="popup")
         t1 = (KEY_BASE_PLATE_MATERIAL, KEY_DISP_BASE_PLATE_MATERIAL, TYPE_COMBOBOX, material, material_grade)
@@ -936,15 +958,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def detailing_values(self, input_dictionary):
 
+        values = {KEY_DP_DETAILING_EDGE_TYPE: 'a - Sheared or hand flame cut',
+                  KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No'}
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
+
         detailing = []
 
         t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX, [
             'a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'],
-              'a - Sheared or hand flame cut')
+              values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
         t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
-              ['No', 'Yes'], 'No')
+              ['No', 'Yes'], values[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
         detailing.append(t3)
 
         t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION)
@@ -954,15 +983,21 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def design_values(self, input_dictionary):
 
+        values = {KEY_DP_DESIGN_METHOD: 'Limit State Design', KEY_DP_DESIGN_BASE_PLATE: 'Effective Area Method'}
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
+
         design = []
 
         t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX, [
             'Limit State Design', 'Limit State (Capacity based) Design', 'Working Stress Design'],
-              'Limit State Design')
+              values[KEY_DP_DESIGN_METHOD])
         design.append(t1)
 
         t2 = (KEY_DP_DESIGN_BASE_PLATE, KEY_DISP_DP_DESIGN_BASE_PLATE, TYPE_COMBOBOX, ['Effective Area Method'],
-              'Effective Area Method')
+              values[KEY_DP_DESIGN_BASE_PLATE])
         design.append(t2)
 
         return design

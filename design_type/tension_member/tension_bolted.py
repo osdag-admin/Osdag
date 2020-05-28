@@ -1666,6 +1666,7 @@ class Tension_bolted(Member):
                                                                                self.plate.pitch_provided,
                                                                                self.bolt.bolt_capacity,
                                                                                self.bolt.bolt_diameter_provided)
+                        self.plate.bolt_force = self.res_force/(self.plate.bolt_line * self.plate.bolts_one_line)
                         if self.plate.bolt_force < self.plate.bolt_capacity_red:
                             capacity = True
                             break

@@ -188,10 +188,13 @@ class TensionAngleBoltCAD(object):
             self.nutboltArrayR_SAModels = self.nut_bolt_arrayR_SA.create_model()
 
         else:
-            if self.Obj.loc == 'Long Leg':
-                self.placement = self.member.A / 2
+            if self.Obj.sec_profile in ['Back to Back Angles', 'Angles']:
+                if self.Obj.loc == 'Long Leg':
+                    self.placement = self.member.A / 2
+                else:
+                    self.placement = self.member.B / 2
             else:
-                self.placement = self.member.B / 2
+                self.placement = self.member.A/2
             nutboltArrayLOrigin = numpy.array([-self.plate_intercept, -self.member.T, self.placement])
             gaugeDir = numpy.array([0.0, 0, -1.0])
             pitchDir = numpy.array([1.0, 0.0, 0])

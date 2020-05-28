@@ -1684,8 +1684,7 @@ class ColumnEndPlate(MomentConnection):
 
         self.report_check = []
         bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
-        bolt_shear_capacity = round(self.bolt.bolt_shear_capacity / 1000, 2)
-        bolt_bearing_capacity = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+        bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
         kb_disp = round(self.bolt.kb, 2)
 
         t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
@@ -1758,16 +1757,16 @@ class ColumnEndPlate(MomentConnection):
              t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, 1,
                                                                           self.bolt.bolt_net_area,
                                                                           self.bolt.gamma_mb,
-                                                                          bolt_shear_capacity), '')
+                                                                          bolt_shear_capacity_kn), '')
              self.report_check.append(t1)
              t2 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(kb_disp,
                                                                               self.bolt.bolt_diameter_provided,
                                                                               self.bolt_conn_plates_t_fu_fy,
                                                                               self.bolt.gamma_mb,
-                                                                              bolt_bearing_capacity), '')
+                                                                              bolt_bearing_capacity_kn), '')
              self.report_check.append(t2)
-             t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(bolt_shear_capacity,
-                                                                                bolt_bearing_capacity,
+             t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(bolt_shear_capacity_kn,
+                                                                                bolt_bearing_capacity_kn,
                                                                                 bolt_capacity_kn), '')
              self.report_check.append(t3)
         else:

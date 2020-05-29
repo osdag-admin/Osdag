@@ -1568,6 +1568,7 @@ def tension_capacity_of_bolt(f_ub,A_nb,T_db):
      tension_capacity_of_bolt.append(NoEscape(r'&= ' + T_db+ r'\end{aligned}'))
      return  tension_capacity_of_bolt
 
+
 def web_plate_area_prov_bolt(D, y, webwidth, wp_area, T, r_1):
     D = str(D)
     T = str(T)

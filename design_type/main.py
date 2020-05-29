@@ -250,8 +250,8 @@ class Main():
             pm_y = ''
 
         else:
-            a = str(self[0])
-            b = str(self[1])
+            a = float(self[0])
+            b = float(self[1])
             t = float(self[2])
 
             sec_prop = Single_Angle_Properties()

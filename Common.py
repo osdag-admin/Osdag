@@ -257,6 +257,9 @@ KEY_SECSIZE = 'Member.Designation'
 KEY_SECSIZE_SELECTED = 'Member.Designation_Selected'        #Extra Keys for Display
 KEY_SUPTNGSEC = 'Member.Supporting_Section.Designation'
 KEY_SUPTNGSEC_MATERIAL = 'Member.Supporting_Section.Material'
+KEY_A = 'Member.A'
+KEY_B = 'Member.B'
+
 
 KEY_SUPTDSEC_FU = 'Member.Supported_Section.Fu'     #Extra Keys for DP Display
 KEY_SUPTDSEC_FY = 'Member.Supported_Section.Fy'     #Extra Keys for DP Display
@@ -726,6 +729,8 @@ KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
 KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Flange Moment Capacity (kNm)'
 KEY_DESIGNATION = "section_size.designation"
 KEY_DISP_DESIGNATION = "Designation"
+KEY_DISP_A = "A"
+KEY_DISP_B = "B"
 
 KEY_TENSION_YIELDCAPACITY = "Member.tension_yielding"
 KEY_DISP_TENSION_YIELDCAPACITY = 'Tension Yielding Capacity (kN)'

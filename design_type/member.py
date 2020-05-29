@@ -293,6 +293,12 @@ class Member(Main):
         t1 = (KEY_SECSIZE_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
         section.append(t1)
 
+        # t1 = (KEY_A, KEY_DISP_A, TYPE_TEXTBOX, None, a)
+        # section.append(t1)
+        #
+        # t1 = (KEY_B, KEY_DISP_B, TYPE_TEXTBOX, None, b)
+        # section.append(t1)
+
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
@@ -657,7 +663,7 @@ class Member(Main):
              KEY_SEC_FY:fy,
              KEY_SEC_FU:fu,
              'Label_1': a,
-             'Label_1': b,
+             'Label_2': b,
              'Label_3':thickness,
              'Label_4':root_radius,
              'Label_5':toe_radius,

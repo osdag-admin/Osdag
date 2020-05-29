@@ -501,11 +501,11 @@ class ColumnEndPlate(MomentConnection):
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-                val = option[4]
+                val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                if design_dictionary[option[0]] == []:
+                if design_dictionary[option[0]] == [0]:
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
@@ -1665,6 +1665,8 @@ class ColumnEndPlate(MomentConnection):
         return list1
         ################################ Design Report #####################################################################################
 
+
+# def save_design(self, popup_summary):
     def save_design(self, popup_summary):
 
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
@@ -1729,7 +1731,7 @@ class ColumnEndPlate(MomentConnection):
         h = (self.section.depth - (2 * self.section.flange_thickness))
         t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '', shear_capacity(h=h, t=self.section.web_thickness,
                                                               f_y=self.section.fy, gamma_m0=gamma_m0,
-                                                              shear_capacity=self.shear_capacity / 1000), '')
+                                                              shear_capacity=round(self.shear_capacity / 1000 ,2)), '')
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, '',  round(self.moment_capacity/ 1000000, 2), '')
         self.report_check.append(t1)
@@ -1767,7 +1769,7 @@ class ColumnEndPlate(MomentConnection):
 
 
 
-        t1 = ('SubSection', ' Bolt Checks', '|p{4cm}|p{7cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', ' Bolt Checks', '|p{4cm}|p{6.5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt_diam_provided, "d"), '')
         self.report_check.append(t1)
@@ -1809,8 +1811,8 @@ class ColumnEndPlate(MomentConnection):
                                                                                         n=self.no_bolts,
                                                                                         M=round(self.factored_moment/1000,2),
                                                                                         y_max=self.y_max,
-                                                                                        y_sqr=round(self.y_sqr ,2),T_b=self.t_b) ,
-               tension_capacity_of_bolt(f_ub=self.bolt.bolt_fu,A_nb=self.bolt.bolt_net_area,T_db=self.bolt.bolt_tension_capacity),
+                                                                                        y_sqr=round(self.y_sqr ,2),T_b=round(self.t_b/1000 ,2)) ,
+               tension_capacity_of_bolt(f_ub=self.bolt.bolt_fu,A_nb=self.bolt.bolt_net_area,T_db=round(self.bolt.bolt_tension_capacity /1000 ,2)),
                get_pass_fail(self.t_b,self.bolt.bolt_tension_capacity,relation='leq'))
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_BOLT_SHEAR,shear_force_in_bolts_near_web(V=round(self.factored_shear_load /1000 ,2),n_wb=self.n_bw,V_sb=round(self.v_sb /1000, 2)),

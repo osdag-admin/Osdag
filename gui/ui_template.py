@@ -1731,6 +1731,9 @@ class Ui_ModuleWindow(QMainWindow):
                         val = main.get_values_for_design_pref(main, key_name, design_dictionary)
                         design_dictionary.update({key_name: val})
 
+            for dp_key in self.design_pref_inputs.keys():
+                design_dictionary[dp_key] = self.design_pref_inputs[dp_key]
+
         self.design_inputs = design_dictionary
 
             # common_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL).currentText()

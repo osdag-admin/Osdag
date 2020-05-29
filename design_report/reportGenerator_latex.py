@@ -44,6 +44,12 @@ class CreateLatex(Document):
 
         does_design_exist = reportsummary['does_design_exist']
         # Add document header
+        geometry_options = {"top": "4cm", "hmargin": "2cm", "headheight": "65pt", "footskip": "65pt"}
+        doc = Document(geometry_options=geometry_options,indent=False)
+        doc.packages.append(Package('amsmath'))
+        doc.packages.append(Package('graphicx'))
+        doc.packages.append(Package('needspace'))
+        doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
 
         header = PageStyle("header")
         # Create center header
@@ -69,12 +75,8 @@ class CreateLatex(Document):
 
         # Add Heading
         # with doc.create(MiniPage(align='c')):
-        geometry_options = {"top": "1.2in", "bottom": "1in", "left": "0.6in", "right": "0.6in", "headsep": "0.8in"}
-        doc = Document(geometry_options=geometry_options, indent=False)
-        doc.packages.append(Package('amsmath'))
-        doc.packages.append(Package('graphicx'))
-        doc.packages.append(Package('needspace'))
-        doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
+
+
         doc.preamble.append(header)
         doc.change_document_style("header")
 
@@ -85,7 +87,7 @@ class CreateLatex(Document):
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
                     if i == "Selected Section Details":
                         continue
-                    print(i)
+                    print('hereiam',i, type(uiObj[i]),len(str(uiObj[i])))
                     if type(uiObj[i]) == dict:
                         table.add_hline()
                         sectiondetails = uiObj[i]
@@ -126,6 +128,19 @@ class CreateLatex(Document):
                         table.add_hline()
                         table.add_row((MultiColumn(3, align='|c|', data=i, ),MultiColumn(2, align='|c|', data="Ref List of Input Section"),))
                         table.add_hline()
+                    elif len(str(uiObj[i])) > 40:
+                        str_len = len(str(uiObj[i]))
+                        loop_len = round_up((str_len / 40), 1, 1)
+                        for j in range(1, loop_len + 1):
+                            b = 30 * j + 1
+                            if j == 1:
+                                table.add_row(
+                                    (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data=i)), MultiColumn(2, align='|c|', data=uiObj[i][0:b]),))
+                            else:
+                                table.add_row(
+                                    (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data="")),
+                                     MultiColumn(2, align='|c|', data=uiObj[i][b - 30:b]),))
+                        table.add_hline(4,5)
                     else:
                         table.add_hline()
                         table.add_row((MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))

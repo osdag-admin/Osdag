@@ -274,6 +274,12 @@ class Member(Main):
             plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
 
+        if KEY_SEC_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_SEC_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
+
         section = []
 
         if input_dictionary:
@@ -477,6 +483,12 @@ class Member(Main):
             plast_sec_mod_z = str(Channel_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(Channel_attributes.plast_sec_mod_y)
             Type = str(Channel_attributes.Type)
+
+        if KEY_SEC_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_SEC_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
 
         section = []
 

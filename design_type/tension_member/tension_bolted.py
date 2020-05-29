@@ -289,8 +289,62 @@ class Tension_bolted(Member):
         t2 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t2)
 
-        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, None , self.fn_conn_image)
+        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE , self.fn_conn_image)
         lst.append(t3)
+
+        t4 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_DOCK, self.out_bolt_bearing)
+        lst.append(t4)
+
+        t5 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_LABEL, self.out_bolt_bearing)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_D_PROVIDED, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_D_PROVIDED, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_GRD_PROVIDED, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_GRD_PROVIDED, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLT_LINE, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLT_LINE, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLTS_ONE_LINE, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLTS_ONE_LINE, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_HEIGHT, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_HEIGHT, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_LENGTH, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_LENGTH, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERCONNECTION, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERCONNECTION, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
 
         return lst
 
@@ -307,18 +361,35 @@ class Tension_bolted(Member):
 
         "Function to populate section size based on the type of section "
         img = self[0]
-        if img =="Angles":
+        if img == VALUES_SEC_PROFILE_2[0]:
             return VALUES_IMG_TENSIONBOLTED[0]
-        elif img =="Back to Back Angles":
+        elif img ==VALUES_SEC_PROFILE_2[1]:
             return VALUES_IMG_TENSIONBOLTED[1]
-        elif img =="Star Angles":
+        elif img ==VALUES_SEC_PROFILE_2[2]:
             return VALUES_IMG_TENSIONBOLTED[2]
-        elif img =="Channels":
+        elif img ==VALUES_SEC_PROFILE_2[3]:
             return VALUES_IMG_TENSIONBOLTED[3]
         else:
             return VALUES_IMG_TENSIONBOLTED[4]
 
-    def input_values(self):
+    def out_bolt_bearing(self):
+
+        bolt_type= self[0]
+        if bolt_type != TYP_BEARING:
+            return True
+        else:
+            return False
+
+    def out_intermittent(self):
+
+        sec_type = self[0]
+        if sec_type in [VALUES_SEC_PROFILE_2[0],VALUES_SEC_PROFILE_2[3]]:
+            return True
+        else:
+            return False
+
+
+    def input_values(self, existingvalues={}):
 
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
@@ -455,7 +526,7 @@ class Tension_bolted(Member):
             else:
                 bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
-        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX,  bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)
 
         t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '', True)
@@ -495,39 +566,39 @@ class Tension_bolted(Member):
         t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t8 = (None, DISP_TITLE_CONN_DETAILS, TYPE_TITLE, None, True)
+        t8 = (None, DISP_TITLE_CONN_DETAILS, TYPE_TITLE, None, False)
         out_list.append(t8)
 
         t21 = (KEY_OUT_INTERCONNECTION, KEY_OUT_DISP_INTERCONNECTION, TYPE_TEXTBOX,
-               int(round(self.inter_conn, 0)) if flag else '', True)
+               int(round(self.inter_conn, 0)) if flag else '', False)
         out_list.append(t21)
 
         t21 = (KEY_OUT_INTERSPACING, KEY_OUT_DISP_INTERSPACING, TYPE_TEXTBOX,
-               (round(self.inter_memb_length, 2)) if flag else '', True)
+               (round(self.inter_memb_length, 2)) if flag else '', False)
         out_list.append(t21)
 
         t18 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t9 = (KEY_OUT_INTER_D_PROVIDED, KEY_OUT_DISP_INTER_D_PROVIDED, TYPE_TEXTBOX, int(self.inter_dia) if flag else '',True)
+        t9 = (KEY_OUT_INTER_D_PROVIDED, KEY_OUT_DISP_INTER_D_PROVIDED, TYPE_TEXTBOX, int(self.inter_dia) if flag else '',False)
         out_list.append(t9)
 
-        t10 = (KEY_OUT_INTER_GRD_PROVIDED, KEY_OUT_DISP_INTER_GRD_PROVIDED, TYPE_TEXTBOX, self.inter_grade if flag else '',True)
+        t10 = (KEY_OUT_INTER_GRD_PROVIDED, KEY_OUT_DISP_INTER_GRD_PROVIDED, TYPE_TEXTBOX, self.inter_grade if flag else '',False)
         out_list.append(t10)
 
-        t15 = (KEY_OUT_INTER_BOLT_LINE, KEY_OUT_DISP_INTER_BOLT_LINE, TYPE_TEXTBOX, self.inter_bolt_line if flag else '', True)
+        t15 = (KEY_OUT_INTER_BOLT_LINE, KEY_OUT_DISP_INTER_BOLT_LINE, TYPE_TEXTBOX, self.inter_bolt_line if flag else '', False)
         out_list.append(t15)
 
-        t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, KEY_OUT_DISP_INTER_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.inter_bolt_one_line if flag else '',True)
+        t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, KEY_OUT_DISP_INTER_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.inter_bolt_one_line if flag else '',False)
         out_list.append(t16)
 
         t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,int(round(self.inter_plate_height, 0)) if flag else '', True)
+        t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,int(round(self.inter_plate_height, 0)) if flag else '', False)
         out_list.append(t20)
 
-        t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX,int(round(self.inter_plate_length, 0)) if flag else '',True)
+        t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX,int(round(self.inter_plate_length, 0)) if flag else '',False)
         out_list.append(t21)
 
         return out_list
@@ -1595,6 +1666,7 @@ class Tension_bolted(Member):
                                                                                self.plate.pitch_provided,
                                                                                self.bolt.bolt_capacity,
                                                                                self.bolt.bolt_diameter_provided)
+                        self.plate.bolt_force = self.res_force/(self.plate.bolt_line * self.plate.bolts_one_line)
                         if self.plate.bolt_force < self.plate.bolt_capacity_red:
                             capacity = True
                             break

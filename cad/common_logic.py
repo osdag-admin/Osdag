@@ -883,7 +883,7 @@ class CommonDesignLogic(object):
                                  D=float(T.section_size_1.depth), t=float(T.section_size_1.web_thickness),
                                  R1=float(T.section_size_1.root_radius), R2=float(T.section_size_1.toe_radius),
                                  L=float(T.length))
-                if T.sec_profile == 'Channel':
+                if T.sec_profile == 'Channels':
                     nut_space = member.t + plate.T + nut.T  # member.T + plate.T + nut.T
                 else:
                     nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
@@ -938,7 +938,6 @@ class CommonDesignLogic(object):
 
         self.display.EraseAll()
         self.display.View_Iso()
-        # self.display.View_Left()
         self.display.FitAll()
 
         self.display.DisableAntiAliasing()

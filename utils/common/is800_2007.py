@@ -351,19 +351,23 @@ self
             IS 800:2007, cl. 10.2.4.3
         """
         # TODO : Differentiate outer plates and connected plates.
-        t_epsilon_prev = conn_plates_t_fu_fy[0][0] * math.sqrt(250 / float(conn_plates_t_fu_fy[0][2]))
-        thk_considered = conn_plates_t_fu_fy[0][0]
+        t_epsilon_considered = conn_plates_t_fu_fy[0][0] * math.sqrt(250 / float(conn_plates_t_fu_fy[0][2]))
+        t_considered = conn_plates_t_fu_fy[0][0]
+        t_min = t_considered
         for i in conn_plates_t_fu_fy:
             t = i[0]
             f_y = i[2]
             epsilon = math.sqrt(250 / f_y)
-            if t * epsilon <= t_epsilon_prev:
+            if t * epsilon <= t_epsilon_considered:
                 t_epsilon_considered = t * epsilon
                 t_considered = t
+            if t < t_min:
+                t_min = t
 
          # epsilon = math.sqrt(250 / f_y)
+
         if corrosive_influences is True:
-            return 40.0 + 4 * t_considered
+            return 40.0 + 4 * t_min
         else:
             return 12 * t_epsilon_considered
 

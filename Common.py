@@ -4,6 +4,7 @@
 
 import operator
 import math
+from utils.common.other_standards import *
 
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
 
@@ -84,7 +85,7 @@ def connectdb(table_name, call_type="dropdown"):
         cursor = conn.execute("SELECT Designation FROM Beams")
 
     elif table_name == "Bolt":
-        cursor = conn.execute("SELECT Diameter_of_bolt FROM Bolt")
+        cursor = conn.execute("SELECT Bolt_diameter FROM Bolt")
 
     elif table_name == "Material":
         cursor = conn.execute("SELECT Grade FROM Material")
@@ -161,6 +162,8 @@ def tuple_to_str_popup(tl):
 def tuple_to_str(tl, call_type,table_name=None):
     if call_type is "dropdown" and table_name == 'Material':
         arr = ['Select Material']
+    elif call_type is "dropdown" and table_name == 'Bolt':
+        arr = ['Select Diameter']
     elif call_type is "dropdown" and table_name != 'Material':
         arr = ['Select Section']
     else:
@@ -348,7 +351,8 @@ VALUES_TYP = ['Select Type', TYP_FRICTION_GRIP, TYP_BEARING]
 VALUES_TYP_1 = ['Friction Grip Bolt']
 VALUES_TYP_2 = ['Bearing Bolt']
 
-VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+# VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+VALUES_GRD_CUSTOMIZED = IS1367_Part3_2002.get_bolt_PC()
 VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
@@ -359,8 +363,10 @@ VALUES_SECTYPE = ['Select Type','Beams','Columns','Angles','Back to Back Angles'
 
 VALUES_CONNLOC_BOLT = ['Bolted','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
 VALUES_CONNLOC_WELD = ['Welded','Web','Flange','Leg','Back to Back Web','Back to Back Angles','Star Angles']
-VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
+VALUES_DIAM = connectdb("Bolt")
+# VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
 VALUES_IMG_TENSIONBOLTED = ["ResourceFiles/images/bA.png","ResourceFiles/images/bBBA.png","ResourceFiles/images/bSA.png","ResourceFiles/images/bC.png","ResourceFiles/images/bBBC.png"]
+VALUES_IMG_TENSIONWELDED = ["ResourceFiles/images/wA.png","ResourceFiles/images/wBBA.png","ResourceFiles/images/wSA.png","ResourceFiles/images/wC.png","ResourceFiles/images/wBBC.png"]
 
 VALUES_BEAMSEC = connectdb("Beams")
 VALUES_SECBM = connectdb("Beams")
@@ -632,7 +638,8 @@ KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (cm<sup>3</sup>)'
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
-KEY_DISP_AXB= 'AXB'
+KEY_DISP_A= 'A'
+KEY_DISP_B= 'B'
 KEY_DISP_LEG_THK = 'Leg Thickness (mm)'
 KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
@@ -1196,6 +1203,13 @@ KEY_OUT_WELD_TYPE = 'Stiffener.weld'
 KEY_OUT_DISP_WELD_TYPE = 'Weld Type'
 KEY_OUT_STIFFENER_DETAILS = 'Stiffener.details'
 KEY_OUT_DISP_STIFFENER_DETAILS = 'Stiffener Details'
+KEY_OUT_STIFFENER_TITLE = 'Stiffener.Title'
+KEY_P2_WEB = 'Bolt.pitch2_web'
+KEY_P2_FLANGE = 'Bolt.pitch2_flange'
+KEY_Y_SQR = 'Bolt.y_sqr'
+KEY_BOLT_TENSION = 'Bolt.t_b'
+KEY_BOLT_SHEAR = 'Bolt.v_sb'
+KEY_PLATE_MOMENT = 'Plate.m_ep'
 
 DISP_TITLE_WELD = 'Weld'
 KEY_OUT_WELD_SIZE = 'Weld.Size'
@@ -1332,17 +1346,18 @@ def get_leg_lengths(designation):
         Function to fetch designation values from respective Tables.
     """
     conn = sqlite3.connect(PATH_TO_DATABASE)
-    db_query = "SELECT AXB, t, R1 FROM Angles WHERE Designation = ?"
+    db_query = "SELECT a, b, t, R1 FROM Angles WHERE Designation = ?"
     cur = conn.cursor()
     cur.execute(db_query, (designation,))
     row = cur.fetchone()
 
-    axb = row[0]
-    t = row[1]
-    r_r = row[2]
-    axb = axb.lower()
-    leg_a_length = float(axb.split("x")[0])
-    leg_b_length = float(axb.split("x")[1])
+    a = row[0]
+    b = row[1]
+    t = row[2]
+    r_r = row[3]
+    # axb = axb.lower()
+    leg_a_length = float(a)
+    leg_b_length = float(b)
     conn.close()
     return leg_a_length,leg_b_length,t,r_r
 

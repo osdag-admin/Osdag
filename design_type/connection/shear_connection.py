@@ -4,6 +4,7 @@ from Common import *
 from utils.common.load import Load
 from utils.common.material import Material
 from utils.common.common_calculation import *
+from utils.common.is800_2007 import IS800_2007
 
 
 
@@ -120,6 +121,12 @@ class ShearConnection(Connection):
             elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
+
+        if KEY_CONNECTOR_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_CONNECTOR_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
 
         section = []
 
@@ -424,6 +431,127 @@ class ShearConnection(Connection):
         else:
             return False
 
+    def func_for_validation(self, design_dictionary):
+        all_errors = []
+        self.design_status = False
+        flag = False
+        flag1 = False
+        flag2=False
+        option_list = self.input_values(self)
+        missing_fields_list = []
+        for option in option_list:
+            if option[2] == TYPE_TEXTBOX:
+                if design_dictionary[option[0]] == '':
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                val = option[3]
+                if design_dictionary[option[0]] == val[0]:
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                if design_dictionary[option[0]] == []:
+                    missing_fields_list.append(option[1])
+            # elif option[2] == TYPE_MODULE:
+            #     if design_dictionary[option[0]] == "Fin Plate":
+        if len(missing_fields_list) == 0:
+            if design_dictionary[KEY_CONN] == VALUES_CONN_2[0]:
+                primary = design_dictionary[KEY_SUPTNGSEC]
+                secondary = design_dictionary[KEY_SUPTDSEC]
+                conn = sqlite3.connect(PATH_TO_DATABASE)
+                cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
+                lst = []
+                rows = cursor.fetchall()
+                for row in rows:
+                    lst.append(row)
+                p_val = lst[0][0]
+                cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+                lst1 = []
+                rows1 = cursor2.fetchall()
+                for row1 in rows1:
+                    lst1.append(row1)
+                s_val = lst1[0][0]
+                if p_val <= s_val:
+                    error = "Secondary beam depth is higher than clear depth of primary beam web " + "\n" + "(No provision in Osdag till now)"
+                    all_errors.append(error)
+                else:
+                    flag1 = True
+
+            elif design_dictionary[KEY_CONN] == VALUES_CONN_1[1]:
+                primary = design_dictionary[KEY_SUPTNGSEC]
+                secondary = design_dictionary[KEY_SUPTDSEC]
+                conn = sqlite3.connect(PATH_TO_DATABASE)
+                cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
+                p_beam_details = cursor.fetchone()
+                p_val = p_beam_details[0] - 2*p_beam_details[1] - p_beam_details[2] - p_beam_details[3]
+                cursor2 = conn.execute("SELECT B FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+
+                s_beam_details = cursor2.fetchone()
+                s_val = s_beam_details[0]
+                #print(p_val,s_val)
+                if p_val <= s_val:
+                    error = "Secondary beam width is higher than clear depth of primary column web " + "\n" + "(No provision in Osdag till now)"
+                    all_errors.append(error)
+                else:
+                    flag1 = True
+            else:
+                flag1 = True
+
+            selected_plate_thk = list(np.float_(design_dictionary[KEY_PLATETHK]))
+            supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_MATERIAL])
+            available_plates = [i for i in selected_plate_thk if i >= supported_section.web_thickness]
+            if not available_plates:
+                error = "Plate thickness should be greater than suppported section web thicknesss."
+                all_errors.append(error)
+            else:
+                flag2=True
+            if flag1 and flag2:
+                self.set_input_values(self, design_dictionary)
+            else:
+                return all_errors
+        else:
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
+            return all_errors
+
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
+
+
+    def warn_text(self):
+
+        """
+        Function to give logger warning when any old value is selected from Column and Beams table.
+        """
+
+        # @author Arsil Zunzunia
+        global logger
+        red_list = red_list_function()
+        if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
+            logger.warning(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+            logger.info(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+
     def set_input_values(self, design_dictionary):
         self.mainmodule = "Shear Connection"
         self.connectivity = design_dictionary[KEY_CONN]
@@ -445,4 +573,26 @@ class ShearConnection(Connection):
                          bolt_tensioning=design_dictionary[KEY_DP_BOLT_TYPE])
 
         self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None))
+
+    def member_capacity(self):
+        # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)
+        if self.connectivity in VALUES_CONN_1:
+            if self.supported_section.type == "Rolled":
+                self.supported_section.web_height = self.supported_section.depth
+            else:
+                self.supported_section.web_height = self.supported_section.depth - (
+                            2 * self.supported_section.flange_thickness)  # -(2*self.supported_section.root_radius)
+        else:
+
+            self.supported_section.web_height = self.supported_section.depth - self.supported_section.notch_ht
+
+        A_g = self.supported_section.web_height * self.supported_section.web_thickness
+        # 0.6 is multiplied for shear yielding capacity to keep the section in low shear
+        self.supported_section.shear_yielding_capacity = 0.6 * IS800_2007.cl_8_4_design_shear_strength(A_g,
+                                                                                                       self.supported_section.fy)
+        self.supported_section.tension_yielding_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g,
+                                                                                                       self.supported_section.fy)
+
+        print(self.supported_section.shear_yielding_capacity, self.load.shear_force,
+              self.supported_section.tension_yielding_capacity, self.load.axial_force)
 

@@ -127,7 +127,8 @@ class Bolt:
 
         return repr
 
-    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes, seatedangle_e = 0.0):
+    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes,e=None,
+                                p=None, seatedangle_e = 0.0):
         """
 
         :param bolt_type: bearing or friction grip bolt
@@ -145,10 +146,15 @@ class Bolt:
         :param corrosive_influences: yes or no
         :return: capacity of bolt (shear and bearing), ultimate strength of bolt and yield strength of bolt
         """
+        if e is None:
+            e = self.min_edge_dist_round
+        if p is None:
+            p = self.min_gauge_round
+
         self.bolt_diameter_provided = bolt_diameter_provided
         self.bolt_grade_provided = bolt_grade_provided
         [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter_provided)
-        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided)
+        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided, self.bolt_diameter_provided)
 
         t_fu_prev = conn_plates_t_fu_fy[0][0] * conn_plates_t_fu_fy[0][1]
         thk_considered = conn_plates_t_fu_fy[0][0]
@@ -165,29 +171,22 @@ class Bolt:
             if seatedangle_e > 0.0:
                 self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                     f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
-                    e=seatedangle_e, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
+                    e=seatedangle_e, p=p, bolt_hole_type=self.bolt_hole_type)
             else:
                 self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                     f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
-                    e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
+                    e=e, p=p, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
             self.fu_considered = fu_considered
             self.thk_considered = thk_considered
-            d = self.bolt_diameter_provided
-            e = self.min_edge_dist_round
-            p = self.min_pitch_round
-            bolt_hole_type = self.bolt_hole_type
-            f_u = fu_considered
-            f_ub = self.bolt_fu
-            safety_factor_parameter = KEY_DP_WELD_FAB_FIELD
+
             # Since field or shop both is 1.25 we are not taking safety_factor_parameter as input
-
-
+            self.gamma_mb = 1.25
             if p > 0.0:
-                self.kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, f_ub / f_u, 1.0)
+                self.kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, self.bolt_fu / fu_considered, 1.0)
             else:
-                self.kb = min(e / (3.0 * self.d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
-            self.gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
+                self.kb = min(e / (3.0 * self.d_0), self.bolt_fu / fu_considered, 1.0)  # calculate k_b when there is no pitch (p = 0)
+
         elif self.bolt_type == "Friction Grip Bolt":
             self.bolt_shear_capacity,self.kh,self.gamma_mf = IS800_2007.cl_10_4_3_bolt_slip_resistance(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, n_e=n_planes, mu_f=self.mu_f, bolt_hole_type=self.bolt_hole_type)
@@ -197,9 +196,9 @@ class Bolt:
     def calculate_kb(self, e,p,d_0,f_ub,f_u):
 
         if p > 0.0:
-            kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, f_ub / f_u, 1.0)
+            kb = min(e / (3.0 * d_0), p / (3.0 * d_0) - 0.25, f_ub / f_u, 1.0)
         else:
-            kb = min(e / (3.0 * self.d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
+            kb = min(e / (3.0 * d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
 
         return kb
 
@@ -217,7 +216,7 @@ class Bolt:
 
 
         [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter_provided)
-        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided)
+        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided, self.bolt_diameter_provided)
 
         if self.bolt_type == "Bearing Bolt":
             self.bolt_tension_capacity = IS800_2007.cl_10_3_5_bearing_bolt_tension_resistance(
@@ -383,6 +382,8 @@ class Section(Material):
             self.plast_sec_mod_y = row[17] * 1000
 
         self.source = row[19]
+        self.It = row[20]
+        self.Iw = row[21]
 
         conn.close()
 
@@ -733,6 +734,9 @@ class Channel(Section):
             self.plast_sec_mod_z = self.elast_sec_mod_z
             self.plast_sec_mod_y = self.elast_sec_mod_y
         self.source = row[20]
+        self.It = row[21]
+        self.Iw = row[22]
+
 
         if row[21] is None:
             self.Type = 'Rolled'
@@ -838,9 +842,9 @@ class Weld:
         weld_thickness = round_down((max_weld_thickness - red), 1, 3)
         if weld_thickness < min_weld_thickness:
             weld_thickness = int(min(plate_thickness, member_thickness))
-            weld_reason = " Preheating of thicker plate is required."
+            weld_reason = " Preheating of thicker plate is required (IS 800:2007 Table 21)."
         else:
-            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge. "
+            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge (IS 800:2007 Clause 10.5)). "
             pass
 
         if weld_thickness > 16 :
@@ -856,6 +860,7 @@ class Plate(Material):
     def __init__(self, thickness=[], height=0.0,Innerheight=0.0, length=0.0,Innerlength=0.0, gap=0.0, material_grade=""):
         super(Plate, self).__init__(material_grade=material_grade)
         self.design_status = False
+        self.design_status_capacity = False
         self.reason = ""
         if thickness:
             self.thickness = list(np.float_(thickness))
@@ -1152,7 +1157,7 @@ class Plate(Material):
 
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge,
                               max_spacing, max_edge_dist, shear_load=0.0, axial_load=0.0, web_moment =0.0, gap=0.0,
-                              shear_ecc=False, bolt_line_limit=math.inf, min_bolts_one_line=2, min_bolt_line=1,joint =None):
+                              shear_ecc=False, bolt_line_limit=math.inf, min_bolts_one_line=2, min_bolt_line=1,joint =None,min_pitch=None):
 
 
         """
@@ -1195,6 +1200,8 @@ class Plate(Material):
             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,min_edge_dist,max_spacing, max_edge_dist)
             if bolt_line == 1:
                 pitch = 0.0
+            elif min_pitch != None:
+                pitch = min_pitch
             else:
                 pitch = min_gauge
             end_dist = min_edge_dist
@@ -1599,36 +1606,38 @@ class Angle(Section):
 
         self.mass = row[2]
         self.area = row[3] * 100
-        self.axb = row[4]
-        self.axb = self.axb.lower()
-        self.leg_a_length = float(self.axb.split("x")[0])
-        self.leg_b_length = float(self.axb.split("x")[1])
+        self.a = row[4]
+        self.b = row[5]
+        self.leg_a_length = self.a
+        self.leg_b_length = self.b
         self.max_leg = max(self.leg_a_length,self.leg_b_length)
         self.min_leg = min(self.leg_a_length, self.leg_b_length)
-        self.thickness = row[5]
+        self.thickness = row[6]
         super(Section, self).__init__(material_grade,self.thickness)
-        self.root_radius = row[6]
-        self.toe_radius = row[7]
-        if self.leg_a_length != self.leg_b_length:
-            self.Cz = row[8]*10
-            self.Cy = row[9]*10
-        else:
-            self.Cz = row[8]
-            self.Cy = row[9]
+        self.root_radius = row[7]
+        self.toe_radius = row[8]
+        # if self.leg_a_length != self.leg_b_length:
+        #     self.Cz = row[8]*10
+        #     self.Cy = row[9]*10
+        # else:
+        self.Cz = row[9] * 10
+        self.Cy = row[10] * 10
 
         self.mom_inertia_z = row[11] * 10000
         self.mom_inertia_y = row[12] * 10000
-        self.mom_inertia_u = row[13] * 10000
-        self.mom_inertia_v = row[14] * 10000
-        self.rad_of_gy_z = row[15] * 10
-        self.rad_of_gy_y = row[16] * 10
-        self.rad_of_gy_u = row[17] * 10
-        self.rad_of_gy_v = row[18] * 10
-        self.elast_sec_mod_z = row[19] * 1000
-        self.elast_sec_mod_y = row[20] * 1000
-        self.plast_sec_mod_z = row[21] * 1000
-        self.plast_sec_mod_y = row[22] * 1000
-        self.source = row[23]
+        self.alpha = row[13]
+        self.mom_inertia_u = row[14] * 10000
+        self.mom_inertia_v = row[15] * 10000
+        self.rad_of_gy_z = row[16] * 10
+        self.rad_of_gy_y = row[17] * 10
+        self.rad_of_gy_u = row[18] * 10
+        self.rad_of_gy_v = row[19] * 10
+        self.elast_sec_mod_z = row[20] * 1000
+        self.elast_sec_mod_y = row[21] * 1000
+        self.plast_sec_mod_z = row[22] * 1000
+        self.plast_sec_mod_y = row[23] * 1000
+        self.source = row[24]
+        self.It = row[25]
         if row[24] is None:
             self.Type = 'Rolled'
         else:
@@ -1725,27 +1734,29 @@ class I_sectional_Properties(object):
 
 class Single_Angle_Properties(object):
 
-    def calc_Mass(self,axb,t):
-        a = 0.0
-        return a
+    def calc_Mass(self,a,b,t):
+        self.A = t * (a+b-t)
+        self.M = 7850 * self.A / 10000
+        return self.M
 
-    def calc_Area(self,axb,t):
-        a = 0.0
-        return a
+    def calc_Area(self,a,b,t):
+        self.A = t * (a+b-t)
+        return round(self.A,2)
 
-    def calc_Cz(self,axb,t):
-        a = 0.0
-        return a
+    def calc_Cy(self,a,b,t):
+        self.A = t * (a + b - t)
+        self.Cy=(0.5 * b*a**2-0.5*(b-t)*(a**2 - t**2))/self.A
+        return round(self.Cy,2)
 
-    def calc_Cy(self,axb,t):
-        a = 0.0
-        return a
+    def calc_Cz(self,a,b,t):
+        self.A = t * (a + b - t)
+        self.Cz = (0.5 * b**2 * a - 0.5 * (b**2 - t**2) * (a - t)) / self.A
+        return round(self.Cz, 2)
 
-
-
-    def calc_MomentOfAreaZ(self,axb,t):
-        a = 0.0
-        return a
+    def calc_MomentOfAreaZ(self,a,b,t):
+        Cy = self.calc_Cy(a,b,t)
+        self.I_zz = (a**3*b)/12 - ((b-t)*(a-t)**3)/12 + (a*b*(a/2-Cy)**2) - ((a-t)*(b-t)*((a+t)/2-Cy))
+        return round(self.I_zz, 2)
 
     def calc_MomentOfAreaY(self,axb,t):
         a = 0.0

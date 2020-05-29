@@ -216,7 +216,8 @@ class Member(Main):
             fy = ''
             mass = ''
             area = ''
-            axb = ''
+            a = ''
+            b = ''
             thickness = ''
             root_radius = ''
             toe_radius = ''
@@ -247,7 +248,8 @@ class Member(Main):
             source = str(Angle_attributes.source)
             fu = str(Angle_attributes.fu)
             fy = str(Angle_attributes.fy)
-            axb = str(Angle_attributes.axb)
+            a = str(Angle_attributes.a)
+            b = str(Angle_attributes.b)
             thickness = str(Angle_attributes.thickness)
             root_radius = str(Angle_attributes.root_radius)
             toe_radius = str(Angle_attributes.toe_radius)
@@ -271,6 +273,12 @@ class Member(Main):
             elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
+
+        if KEY_SEC_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_SEC_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
 
         section = []
 
@@ -301,7 +309,10 @@ class Member(Main):
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         section.append(t5)
 
-        t6 = ('Label_1', KEY_DISP_AXB, TYPE_TEXTBOX, None, axb)
+        t6 = ('Label_1', KEY_DISP_A, TYPE_TEXTBOX, None, a)
+        section.append(t6)
+
+        t6 = ('Label_2', KEY_DISP_B, TYPE_TEXTBOX, None, b)
         section.append(t6)
 
         t8 = ('Label_3', KEY_DISP_LEG_THK, TYPE_TEXTBOX, None, thickness)
@@ -473,6 +484,12 @@ class Member(Main):
             plast_sec_mod_y = str(Channel_attributes.plast_sec_mod_y)
             Type = str(Channel_attributes.Type)
 
+        if KEY_SEC_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_SEC_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
+
         section = []
 
         if input_dictionary:
@@ -613,7 +630,8 @@ class Member(Main):
         Type= str(Angle_attributes.Type)
         fu = str(Angle_attributes.fu)
         fy = str(Angle_attributes.fy)
-        axb = str(Angle_attributes.axb)
+        a = str(Angle_attributes.a)
+        b = str(Angle_attributes.b)
         thickness = str(Angle_attributes.thickness)
         root_radius = str(Angle_attributes.root_radius)
         toe_radius = str(Angle_attributes.toe_radius)
@@ -638,7 +656,8 @@ class Member(Main):
             KEY_SEC_MATERIAL: material_grade,
              KEY_SEC_FY:fy,
              KEY_SEC_FU:fu,
-             'Label_1': axb,
+             'Label_1': a,
+             'Label_1': b,
              'Label_3':thickness,
              'Label_4':root_radius,
              'Label_5':toe_radius,

@@ -190,6 +190,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.design_inputs = {}
         self.prev_inputs = {}
         self.input_dock_inputs = {}
+        self.design_pref_inputs = {}
         self.folder = folder
         main.design_status = False
         MainWindow.setObjectName("MainWindow")
@@ -1609,6 +1610,9 @@ class Ui_ModuleWindow(QMainWindow):
             design_dictionary.update(d1)
             self.input_dock_inputs.update(d1)
 
+        for design_pref_key in self.design_pref_inputs.keys():
+            if design_pref_key not in self.input_dock_inputs.keys():
+                self.input_dock_inputs.update({design_pref_key: self.design_pref_inputs[design_pref_key]})
         if self.designPrefDialog.flag:
             print('flag true')
 
@@ -1726,6 +1730,9 @@ class Ui_ModuleWindow(QMainWindow):
                     else:
                         val = main.get_values_for_design_pref(main, key_name, design_dictionary)
                         design_dictionary.update({key_name: val})
+
+            for dp_key in self.design_pref_inputs.keys():
+                design_dictionary[dp_key] = self.design_pref_inputs[dp_key]
 
         self.design_inputs = design_dictionary
 
@@ -1865,6 +1872,11 @@ class Ui_ModuleWindow(QMainWindow):
     '''
 
     def setDictToUserInputs(self, uiObj, op_list, data, new):
+
+        for uiObj_key in uiObj.keys():
+            print(uiObj_key)
+            self.design_pref_inputs.update({uiObj_key: uiObj[uiObj_key]})
+
         for op in op_list:
             key_str = op[0]
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
@@ -2484,6 +2496,7 @@ class Ui_ModuleWindow(QMainWindow):
 # Function for showing design-preferences popup
 
     def design_preferences(self):
+        print(self.designPrefDialog.module_window.input_dock_inputs)
         self.designPrefDialog.exec()
 
     # Function for getting input for design preferences from input dock

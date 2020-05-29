@@ -1058,12 +1058,10 @@ class FinPlateConnection(ShearConnection):
         if self.plate.design_status is True:
             connecting_plates = [self.plate.thickness_provided,self.supported_section.web_thickness]
             bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
-            kb_disp= round(self.bolt.kb,2)
-            kh_disp = round(self.bolt.kh, 2)
+            
+
             bolt_force_kn=round(self.plate.bolt_force/1000,2)
             bolt_capacity_red_kn=round(self.plate.bolt_capacity_red/1000,2)
-            kb_initial = round(self.bolt.calculate_kb(e= self.bolt.min_edge_dist, p=self.bolt.min_pitch, d_0=self.bolt.dia_hole,
-                                                f_ub=self.bolt.bolt_fu,f_u=self.bolt.fu_considered),2)
 
 
             t1 = ('SubSection', 'Bolt Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
@@ -1155,7 +1153,7 @@ class FinPlateConnection(ShearConnection):
                       '')
                 self.report_check.append(t3)
             else:
-
+                kh_disp = round(self.bolt.kh, 2)
                 t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
                       HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f,n_e=1,K_h=kh_disp,fub = self.bolt.bolt_fu,
                                               Anb= self.bolt.bolt_net_area,gamma_mf=self.bolt.gamma_mf,

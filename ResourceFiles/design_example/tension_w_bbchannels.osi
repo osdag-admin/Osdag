@@ -1,9 +1,9 @@
 Conn_Location: Web
-Connector.Material: E 250 (Fe 410 W)A
+Connector.Material: E 250 (Fe 410 W)B
 Design.Design_Method: Limit State Design
 Detailing.Gap: '10'
 Load.Axial: '500'
-Material: E 250 (Fe 410 W)A
+Material: E 250 (Fe 410 W)B
 Member.Designation:
 - MC 75
 - MC 100
@@ -66,7 +66,7 @@ Member.Designation:
 - MPC 350
 - MPC 400
 Member.Length: '5000'
-Member.Material: E 250 (Fe 410 W)A
+Member.Material: E 250 (Fe 410 W)B
 Member.Profile: Back to Back Channels
 Module: Tension Members Welded Design
 Weld.Fab: Shop Weld

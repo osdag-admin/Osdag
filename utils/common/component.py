@@ -1732,27 +1732,29 @@ class I_sectional_Properties(object):
 
 class Single_Angle_Properties(object):
 
-    def calc_Mass(self,axb,t):
-        a = 0.0
-        return a
+    def calc_Mass(self,a,b,t):
+        self.A = t * (a+b-t)
+        self.M = 7850 * self.A / 10000
+        return self.M
 
-    def calc_Area(self,axb,t):
-        a = 0.0
-        return a
+    def calc_Area(self,a,b,t):
+        self.A = t * (a+b-t)
+        return round(self.A,2)
 
-    def calc_Cz(self,axb,t):
-        a = 0.0
-        return a
+    def calc_Cy(self,a,b,t):
+        self.A = t * (a + b - t)
+        self.Cy=(0.5 * b*a**2-0.5*(b-t)*(a**2 - t**2))/self.A
+        return round(self.Cy,2)
 
-    def calc_Cy(self,axb,t):
-        a = 0.0
-        return a
+    def calc_Cz(self,a,b,t):
+        self.A = t * (a + b - t)
+        self.Cz = (0.5 * b**2 * a - 0.5 * (b**2 - t**2) * (a - t)) / self.A
+        return round(self.Cz, 2)
 
-
-
-    def calc_MomentOfAreaZ(self,axb,t):
-        a = 0.0
-        return a
+    def calc_MomentOfAreaZ(self,a,b,t):
+        Cy = self.calc_Cy(a,b,t)
+        self.I_zz = (a**3*b)/12 - ((b-t)*(a-t)**3)/12 + (a*b*(a/2-Cy)**2) - ((a-t)*(b-t)*((a+t)/2-Cy))
+        return round(self.I_zz, 2)
 
     def calc_MomentOfAreaY(self,axb,t):
         a = 0.0

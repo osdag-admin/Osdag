@@ -843,9 +843,9 @@ class Weld:
         weld_thickness = round_down((max_weld_thickness - red), 1, 3)
         if weld_thickness < min_weld_thickness:
             weld_thickness = int(min(plate_thickness, member_thickness))
-            weld_reason = " Preheating of thicker plate is required."
+            weld_reason = " Preheating of thicker plate is required (IS 800:2007 Table 21)."
         else:
-            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge. "
+            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge (IS 800:2007 Clause 10.5)). "
             pass
 
         if weld_thickness > 16 :

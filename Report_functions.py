@@ -1341,6 +1341,64 @@ def web_plate_area_prov(D, y, webwidth, wp_area, T, r_1):
     web_plate_area_prov.append(NoEscape(r'&= ' + wp_area + r'\end{aligned}'))
     return web_plate_area_prov
 
+def tension_in_bolt_due_to_axial_load_n_moment(P,n,M,y_max,y_sqr,T_b):
+    P= str(P)
+    n = str(n)
+    M = str(M)
+    y_max =str(y_max)
+    y_sqr = str(y_sqr)
+    T_b = str (T_b)
+    tension_in_bolt_due_to_axial_load_n_moment  = Math(inline=True)
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_b &= \frac{P}{\ n} + \frac{M * y_{max}}{\,y_sqr}\\'))
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' +P + '}{' + n + r'} + \frac{' +M + '*' +  y_max+ r'}{' + y_sqr + r'}\\'))
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&= ' + T_b + r'\end{aligned}'))
+    return tension_in_bolt_due_to_axial_load_n_moment
+
+def no_of_bolts_along_web(D,T_f,e,p,n_bw):
+    D = str(D)
+    e= str(e)
+    p = str(p)
+    T_f = str(T_f)
+    n_bw = str(n_bw)
+    no_of_bolts_along_web = Math(inline=True)
+    no_of_bolts_along_web.append(NoEscape(r'\begin{aligned} n_bw &=  \frac{D -(2*T_f) -(2*e)}{\ p}  + 1 \\'))
+    no_of_bolts_along_web.append(NoEscape(r'&= \frac{' + D + ' -(2*'+T_f +')-(2*'+e + r')}{' + p + r'} +1 \\'))
+    no_of_bolts_along_web.append(NoEscape(r'&= ' + n_bw + r'\end{aligned}'))
+    return no_of_bolts_along_web
+
+def no_of_bolts_along_flange(b,T_w,e,p,n_bf):
+    b = str(b)
+    e= str(e)
+    p = str(p)
+    T_w = str(T_w)
+    n_bf = str(n_bf)
+    no_of_bolts_along_flange = Math(inline=True)
+    no_of_bolts_along_flange.append(NoEscape(r'\begin{aligned} n_bf &=  \frac{b/2 -(T_w / 2) -(2*e)}{\ p}  + 1 \\'))
+    no_of_bolts_along_flange.append(NoEscape(r'&= \frac{0.5*' + b + ' -(0.5*'+T_w +')-(2*'+e + r')}{' + p + r'} +1 \\'))
+    no_of_bolts_along_flange.append(NoEscape(r'&= ' + n_bf + r'\end{aligned}'))
+    return no_of_bolts_along_flange
+
+
+def shear_force_in_bolts_near_web(V,n_wb,V_sb):
+    V = str(V)
+    n_wb = str(n_wb)
+    V_sb = str(V_sb)
+    shear_force_in_bolts_near_web = Math(inline=True)
+    shear_force_in_bolts_near_web.append(NoEscape(r'\begin{aligned} V_sb &= \frac{V}{\ n_wb} \\'))
+    shear_force_in_bolts_near_web.append(NoEscape(r'&=\frac{' + V + '}{' + n_wb + r'} \\'))
+    shear_force_in_bolts_near_web.append(NoEscape(r'&= ' + V_sb + r'\end{aligned}'))
+    return shear_force_in_bolts_near_web
+
+def tension_capacity_of_bolt(f_ub,A_nb,T_db):
+     f_ub = str(f_ub)
+     A_nb= str(A_nb)
+     T_db= str(T_db)
+     tension_capacity_of_bolt =  Math(inline=True)
+     tension_capacity_of_bolt.append(NoEscape(r'\begin{aligned} T_db &= 0.9*A_nb*f_ub\\'))
+     tension_capacity_of_bolt.append(NoEscape(r'&=0.9*'+A_nb+ r'*'+f_ub+ r'\\'))
+     tension_capacity_of_bolt.append(NoEscape(r'&= ' + T_db+ r'\end{aligned}'))
+     return  tension_capacity_of_bolt
+
 # def eff_len_prov(l):
 #     l =str(l)
 #     eff_len_eqn = Math(inline=True)
@@ -1360,7 +1418,7 @@ def web_plate_area_prov(D, y, webwidth, wp_area, T, r_1):
 #     diahole_eqn = Math(inline=True)
 #     diahole_eqn.append(NoEscape(r'\begin{aligned} d &=' + d0 + r' \end{aligned}'))
 
-    return diahole_eqn
+    # return diahole_eqn
 
 
 def display_prov(v,t, ref = None):

@@ -221,7 +221,7 @@ class EndPlateConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, './ResourceFiles/images/fin_cf_bw.png', True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, './ResourceFiles/images/fin_cf_bw.png', True, 'No Validator')
         options_list.append(t15)
 
         t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, VALUES_COLSEC, True, 'No Validator')
@@ -506,9 +506,17 @@ class EndPlateConnection(ShearConnection):
 
                     # comb_bolt_ir=2
                     #     self.bolts_required = bolts_required_initial
+                        [available_welds, weld_size_min, weld_size_max] = self.get_available_welds(self, self.connecting_plates_tk)
+                        col_g = (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius + self.bolt.min_end_dist_round)
+                        beam_g = (self.supported_section.web_thickness / 2 + weld_size_min + self.bolt.min_end_dist_round)
+                        if col_g > beam_g:
+                            l_v = col_g - (self.supported_section.web_thickness / 2 + weld_size_min)
+                        else:
+                            l_v = self.bolt.min_edge_dist_round
+                        b_e = min(self.bolt.min_pitch_round, 2 * l_v)
                         [self.bolt.bolt_shear,self.bolt.bolt_tension,self.bolt.bolt_tension_prying,
                             self.bolts_required_IR_LT1] = self.get_bolt_IR(self, self.bolt.bolt_capacity,
-                                self.bolt.bolt_tension_capacity, bolts_required_initial, self.bolt.min_pitch_round, 1.0)
+                                self.bolt.bolt_tension_capacity, bolts_required_initial, b_e, l_v, 1.0)
 
                         print("Bolts required:", self.bolts_required_IR_LT1)
 
@@ -535,10 +543,10 @@ class EndPlateConnection(ShearConnection):
                                                 bolt_rows, self.bolt.min_end_dist_round, self.max_plate_height,
                                                 self.bolt.max_edge_dist_round)
                         # Updating bolt bearing capacity
-                        if self.bolt.bolt_type == "Bearing Bolt":
-                            bolt_bearing_capacity_disp = self.get_bolt_bearing_updated(self, end_dist, pitch, bolt_rows)
 
-                        [available_welds, weld_size_min, weld_size_max] = self.get_available_welds(self, self.connecting_plates_tk)
+                        if self.bolt.bolt_type == "Bearing Bolt":
+                            bolt_bearing_capacity_disp = self.get_bolt_bearing_updated(self, end_dist, pitch, bolt_rows, weld_size_min)
+
                         if self.connectivity == VALUES_CONN_1[0] and available_welds and\
                                 (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius) > \
                                 (self.supported_section.web_thickness / 2 + min(available_welds)):
@@ -597,7 +605,8 @@ class EndPlateConnection(ShearConnection):
                                                                                                 bolt_rows,
                                                                                                 self.bolt.min_end_dist_round,
                                                                                                 self.bolt.max_spacing_round,
-                                                                                                self.bolt.max_edge_dist_round)
+                                                                                                self.bolt.max_edge_dist_round,
+                                                                                                self.weld.size)
 
                             if self.connectivity == VALUES_CONN_1[0] and min(available_welds) < self.weld.size and \
                                     (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius) > \
@@ -618,6 +627,9 @@ class EndPlateConnection(ShearConnection):
                                 count += 1
                                 gauge = round_up(self.weld.size * 2 +
                                     self.bolt_dist_to_weld * 2 + self.supported_section.web_thickness, 2)
+                                plate_width = round_up(self.weld.size * 2 + self.bolt_dist_to_weld * 2 +
+                                                       self.bolt.min_edge_dist_round * 2 + self.supported_section.web_thickness,
+                                                       2)
 
                                 # TRIAL FUNCTION #
                                 # total_cost = self.plate.height*plate_width*self.plate.thickness_provided*plate_cost + \
@@ -716,7 +728,7 @@ class EndPlateConnection(ShearConnection):
         self.weld.length = self.output[0][4]
         self.weld.size = self.output[0][23]
 
-    def get_bolt_bearing_updated(self, end_dist, pitch, bolts_one_line):
+    def get_bolt_bearing_updated(self, end_dist, pitch, bolts_one_line, weld_size):
         t_fu_prev = self.bolt_conn_plates_t_fu_fy[0][0] * self.bolt_conn_plates_t_fu_fy[0][1]
         thk_considered = self.bolt_conn_plates_t_fu_fy[0][0]
         fu_considered = self.bolt_conn_plates_t_fu_fy[0][1]
@@ -734,13 +746,21 @@ class EndPlateConnection(ShearConnection):
         l_j = pitch * (bolts_one_line - 1)
         beta_lj = IS800_2007.cl_10_3_3_1_bolt_long_joint(self.bolt.bolt_diameter_provided, l_j)
         print("beta_lj", beta_lj)
-        b_e = min(pitch, 2*self.bolt.min_edge_dist_round)
+        col_g = (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius + self.bolt.min_end_dist_round)
+        beam_g = (self.supported_section.web_thickness / 2 + weld_size + self.bolt.min_end_dist_round)
+        if col_g > beam_g:
+            l_v = col_g - (self.supported_section.web_thickness / 2 + weld_size)
+        else:
+            l_v = self.bolt.min_edge_dist_round
+        b_e = min(pitch, 2 * l_v)
+
         [self.bolt.bolt_shear, self.bolt.bolt_tension, self.bolt.bolt_tension_prying, bolts_n] = \
             self.get_bolt_IR(self, self.bolt.bolt_capacity, self.bolt.bolt_tension_capacity,
-                             bolts_one_line * 2, b_e, beta_lj)
+                             bolts_one_line * 2, b_e, l_v, beta_lj)
         return bolt_bearing_capacity_disp
 
     def plate_check(self, bolt_rows, pitch, end_dist, design_status_plate):
+        [available_welds, weld_size_min, weld_size_max] = self.get_available_welds(self, self.connecting_plates_tk)
         while self.plate.height <= self.max_plate_height:
             design_status_plate = False
             self.max_bolts_one_line = int(
@@ -749,11 +769,13 @@ class EndPlateConnection(ShearConnection):
             print("max_bolts_one_line: ", self.max_bolts_one_line)
             print(bolt_rows, "bolt_rows init")
             while bolt_rows <= self.max_bolts_one_line:
+
                 [pitch, end_dist, self.plate.height, bolt_rows] = \
                     self.get_pitch_end_dist(self, self.plate.height, bolt_rows,
                                             self.bolt.min_end_dist_round,
                                             self.bolt.max_spacing_round,
-                                            self.bolt.max_edge_dist_round)
+                                            self.bolt.max_edge_dist_round,
+                                            weld_size_min)
                 print(bolt_rows, "bolt_rows")
                 [self.plate.plate_moment_capacity, self.plate.plate_shear_capacity,
                  self.plate.plate_block_shear_capacity] = \
@@ -777,7 +799,7 @@ class EndPlateConnection(ShearConnection):
                 break
         return bolt_rows, pitch, end_dist, design_status_plate
 
-    def get_pitch_end_dist(self, plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist):
+    def get_pitch_end_dist(self, plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist, weld_size):
         """
         :param web_plate_l: height of plate
         :param min_end_dist_round: minimum end distance
@@ -797,11 +819,18 @@ class EndPlateConnection(ShearConnection):
             beta_lj = IS800_2007.cl_10_3_3_1_bolt_long_joint(self.bolt.bolt_diameter_provided, l_j)
             print("beta_lj", beta_lj)
             if self.bolt.bolt_type == "Bearing Bolt":
-                bolt_bearing_capacity_disp = self.get_bolt_bearing_updated(self, edge_dist, pitch, bolts_one_line)
-            b_e = min(pitch, 2 * self.bolt.min_edge_dist_round)
+                bolt_bearing_capacity_disp = self.get_bolt_bearing_updated(self, edge_dist, pitch, bolts_one_line, weld_size)
+
+            col_g = (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius + self.bolt.min_end_dist_round)
+            beam_g = (self.supported_section.web_thickness / 2 + weld_size + self.bolt.min_end_dist_round)
+            if col_g > beam_g:
+                l_v = col_g - (self.supported_section.web_thickness / 2 + weld_size)
+            else:
+                l_v = self.bolt.min_edge_dist_round
+            b_e = min(pitch, 2 * l_v)
             [self.bolt.bolt_shear, self.bolt.bolt_tension, self.bolt.bolt_tension_prying, bolts_n]=\
                 self.get_bolt_IR(self, self.bolt.bolt_capacity, self.bolt.bolt_tension_capacity,
-                             bolts_one_line * 2, b_e, beta_lj)
+                             bolts_one_line * 2, b_e, l_v, beta_lj)
 
             if bolts_n/2 > bolts_one_line:
                 bolts_one_line = bolts_n/2
@@ -817,14 +846,14 @@ class EndPlateConnection(ShearConnection):
         print("web", pitch, edge_dist, plate_h)
         return pitch, edge_dist, plate_h, bolts_one_line
 
-    def get_bolt_IR(self, bolt_shear_capacity, bolt_tension_capacity, no_bolt, b_e, beta_lj = 1.0):
+    def get_bolt_IR(self, bolt_shear_capacity, bolt_tension_capacity, no_bolt, b_e, l_v, beta_lj = 1.0):
         while True:
             self.bolt.bolt_shear = self.load.shear_force * 1000 / no_bolt  # N
             print("bolt_shear", self.bolt.bolt_shear)
             self.bolt.bolt_tension = self.load.axial_force * 1000 / no_bolt  # N
             print("bolt_tension", self.bolt.bolt_tension)
             # TODO: check available effective width per pair of bolts (b_e)
-            self.bolt.bolt_tension_prying = IS800_2007.cl_10_4_7_bolt_prying_force(self.bolt.bolt_tension, self.bolt.min_edge_dist_round,
+            self.bolt.bolt_tension_prying = IS800_2007.cl_10_4_7_bolt_prying_force(self.bolt.bolt_tension, l_v,
                                         0.7*self.bolt.bolt_fu, b_e, self.plate.thickness_provided,
                                         self.plate.fy, self.bolt.min_end_dist_round, self.bolt.bolt_tensioning)
             print("bolt_tension_prying", self.bolt.bolt_tension_prying)
@@ -837,18 +866,18 @@ class EndPlateConnection(ShearConnection):
                 break
         return self.bolt.bolt_shear, self.bolt.bolt_tension, self.bolt.bolt_tension_prying, no_bolt
 
-    def get_plate_capacity(self, p_th, p_h, p_h_max, pitch, edge, end, n_row, bolt_hole_dia):
+    def get_plate_capacity(self, p_th, p_h, p_h_max, pitch, bolt_dist, end, n_row, bolt_hole_dia):
         # plate_moment = min_edge_dist * bolt_tension
-        Z_p = (min(pitch, 2*edge)) * p_th **2 /4
-        Z_e = (min(pitch, 2*edge)) * p_th **2 /6
+        Z_p = (min(pitch, 2 * bolt_dist)) * p_th **2 /4
+        Z_e = (min(pitch, 2 * bolt_dist)) * p_th **2 /6
         plate_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(Z_e, Z_p, self.plate.fy, 'plastic')
         A_vg = p_h* p_th
         plate_shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_vg, self.plate.fy)
 
-        A_vg = ((n_row-1)*pitch + end)*p_th
-        A_vn = ((n_row-1)*pitch + end - (float(n_row)-0.5) * bolt_hole_dia) *p_th
-        A_tg = 2 * edge * p_th
-        A_tn = 2 * (edge - 0.5*bolt_hole_dia) * p_th
+        A_vg = ((n_row-1) * pitch + end) * p_th
+        A_vn = ((n_row-1) * pitch + end - (float(n_row)-0.5) * bolt_hole_dia) * p_th
+        A_tg = 2 * self.bolt.min_edge_dist_round * p_th
+        A_tn = 2 * (self.bolt.min_edge_dist_round - 0.5 * bolt_hole_dia) * p_th
 
         plate_block_shear_capacity = IS800_2007.cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, self.plate.fu, self.plate.fy)
         plate_shear_capacity = min(plate_shear_yielding_capacity, plate_block_shear_capacity)

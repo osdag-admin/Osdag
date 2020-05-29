@@ -156,14 +156,16 @@ class IS1367_Part3_2002(object):
             return
 
         conn = sqlite3.connect(PATH_TO_DATABASE)
-        db_query = "SELECT * FROM Bolt_fy_fu WHERE Property_Class = ? AND Diameter_min < ? AND Diameter_max > ?"
+        db_query = "SELECT * FROM Bolt_fy_fu WHERE Property_Class = ? AND Diameter_min <= ? AND Diameter_max > ?"
         cur = conn.cursor()
         cur.execute(db_query, (bolt_PC, bolt_diameter, bolt_diameter,))
         row = cur.fetchone()
+
         bolt_fy = float(row[3])
         bolt_fu = float(row[4])
+
         print(bolt_fu, bolt_fy)
-        print(type(bolt_fu))
+        # print(type(bolt_fu))
 
         # bolt_fu = float(int(bolt_grade) * 100)
         # bolt_fy = float((bolt_grade - int(bolt_grade)) * bolt_fu)

@@ -1587,6 +1587,8 @@ class BeamCoverPlateWeld(MomentConnection):
                             self.design_status = False
 
             else:
+                self.web_crs_area = round(t_w * (D - (2 * tk)), 2)
+                self.Wp = self.web_crs_area * 1.05
                 self.webplatewidth = round(D - (2 * tk) - (2 * r_1) - (2 * 21) ,2)
                 self.min_web_plate_height = self.section.min_plate_height()
                 self.webheight_status = False
@@ -1596,9 +1598,8 @@ class BeamCoverPlateWeld(MomentConnection):
                     thickness = y
                     self.design_status = False
                 else:
-                    self.web_crs_area = round(t_w * (D - (2 * tk)),2)
                     self.web_plate_crs_sec_area = (2 * self.webplatewidth) * y
-                    self.Wp =self.web_crs_area * 1.05
+
                     if self.web_plate_crs_sec_area >= self.Wp:
                         thickness = y
                         self.webheight_status = True

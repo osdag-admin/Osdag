@@ -1047,10 +1047,10 @@ class Plate(Material):
             gauge is the distance between bolts along bolt line on either side of the web thickness
             """
             gauge = (int((flange_plate_h/2 - web_thickness/2 - (2 * edge_dist)-root_radius) / (bolts_one_line/2 - 1))) #
-            edge_dist =  (flange_plate_h/2 - web_thickness/2 - root_radius - ((bolts_one_line/2 - 1)*gauge))/2
+            edge_dist =  round(float((flange_plate_h/2 - web_thickness/2 - root_radius - ((bolts_one_line/2 - 1)*gauge))/2),2)
         else:
             gauge = 0.
-            edge_dist = (flange_plate_h / 2 - web_thickness / 2 - root_radius - ((bolts_one_line / 2 - 1) * gauge)) / 2
+            edge_dist = round(float((flange_plate_h / 2 - web_thickness / 2 - root_radius - ((bolts_one_line / 2 - 1) * gauge)) / 2),2)
 
 
         # multiplier=5)

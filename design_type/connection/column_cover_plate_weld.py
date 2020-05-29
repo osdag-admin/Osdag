@@ -1663,6 +1663,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                                 preference=None):  # area of flange plate should be greater than 1.05 times area of flange
         # 20 is the maximum spacing either side of the plate
         self.flange_crs_sec_area = tk * width
+        self.Ap = self.flange_crs_sec_area * 1.05
 
         for y in list_of_pt_tk:
 
@@ -1677,7 +1678,6 @@ class ColumnCoverPlateWeld(MomentConnection):
                         pass
 
                     self.flange_plate_crs_sec_area = y * self.outerwidth
-                    self.Ap = self.flange_crs_sec_area * 1.05
                     if self.flange_plate_crs_sec_area >= self.Ap:
                         thickness = y
                         self.initial_pt_thk_status = True
@@ -1688,7 +1688,6 @@ class ColumnCoverPlateWeld(MomentConnection):
                 elif preference == "Outside + Inside":
                     self.outerwidth = width - (2 * 21)
                     self.innerwidth = (width - t_w - (2 * r_1) - (4 * 21)) / 2
-                    self.Ap = self.flange_crs_sec_area * 1.05
                     if self.innerwidth < 50:
                         thickness = y
                         self.initial_pt_thk_status = False
@@ -1706,6 +1705,8 @@ class ColumnCoverPlateWeld(MomentConnection):
 
             else:
                 self.webplatewidth = round(D - (2 * tk) - (2 * r_1) - (2 * 21), 2)
+                self.web_crs_area = round(t_w * (D - (2 * tk)), 2)
+                self.Wp = self.web_crs_area * 1.05
                 self.min_web_plate_height = self.section.min_plate_height()
                 self.webheight_status = False
                 if self.webplatewidth < self.min_web_plate_height:
@@ -1716,9 +1717,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                     thickness = y
                     self.design_status = False
                 else:
-                    self.web_crs_area = round(t_w * (D - (2 * tk)), 2)
                     self.web_plate_crs_sec_area = (2 * self.webplatewidth) * y
-                    self.Wp = self.web_crs_area * 1.05
                     if self.web_plate_crs_sec_area >= self.Wp:
                         thickness = y
                         self.webheight_status = True
@@ -2133,7 +2132,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                       get_pass_fail(self.section.flange_thickness / 2, self.thick_f, relation="lesser"))
                 self.report_check.append(t2)
                 # flange_plate_crs_sec_area = (self.outerwidth + (2 * self.innerwidth)) * self.thick_f
-                if len(self.flange_plate_thickness_possible) != 0 and self.innerwidth >= 50:
+                if len(self.flange_plate_thickness_possible) != 0 and self.innerwidth >= 50 and self.outerwidth >= 50:
                     t2 = (KEY_DISP_AREA_CHECK, plate_area_req(crs_area=round(self.flange_crs_sec_area, 2),
                                                               flange_web_area=round(self.Ap, 2)),
                           flange_plate_area_prov(B=self.section.flange_width, pref="Outside+Inside",
@@ -2151,7 +2150,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                   display_prov(self.thick_w, "t_w"),
                   get_pass_fail(self.section.web_thickness / 2, self.thick_w, relation="lesser"))
             self.report_check.append(t2)
-            if len(self.web_plate_thickness_possible) != 0:
+            if len(self.web_plate_thickness_possible) != 0 and self.webplatewidth > self.min_web_plate_height:
                 # if (self.flange_plate_crs_sec_area >= 1.05 * self.flange_crs_sec_area):
                 t2 = (KEY_DISP_AREA_CHECK,
                       plate_area_req(crs_area=round(self.web_crs_area, 2), flange_web_area=round(self.Wp, )),

@@ -73,6 +73,12 @@ class Connection(Main):
             plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
 
+        if KEY_SUPTNGSEC_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_SUPTNGSEC_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
+
         supporting_section = []
         t1 = (KEY_SUPTNGSEC, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
         supporting_section.append(t1)
@@ -252,6 +258,12 @@ class Connection(Main):
             elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
+
+        if KEY_SUPTDSEC_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_SUPTDSEC_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
 
         supporting_section = []
         t1 = (KEY_SUPTDSEC, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)

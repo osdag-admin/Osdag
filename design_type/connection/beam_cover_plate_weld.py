@@ -213,99 +213,53 @@ class BeamCoverPlateWeld(MomentConnection):
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
-    def input_values(self, existingvalues={}):
+    def input_values(self):
 
         options_list = []
 
-        if KEY_SECSIZE in existingvalues:
-            existingvalue_key_secsize = existingvalues[KEY_SECSIZE]
-        else:
-            existingvalue_key_secsize = ''
-
-        if KEY_MATERIAL in existingvalues:
-            existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
-        else:
-            existingvalue_key_mtrl = ''
-
-        if KEY_MOMENT in existingvalues:
-            existingvalues_key_moment = existingvalues[KEY_MOMENT]
-        else:
-            existingvalues_key_moment = ''
-
-        if KEY_SHEAR in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_SHEAR]
-        else:
-            existingvalue_key_versh = ''
-
-        if KEY_AXIAL in existingvalues:
-            existingvalue_key_axial = existingvalues[KEY_AXIAL]
-        else:
-            existingvalue_key_axial = ''
-
-        if KEY_DP_WELD_TYPE in existingvalues:
-            existingvalue_key_weld_type = existingvalues[KEY_DP_WELD_TYPE]
-        else:
-            existingvalue_key_weld_type = ''
-
-        if KEY_FLANGEPLATE_PREFERENCES in existingvalues:
-            existingvalue_key_fplate_pref = existingvalues[KEY_PLATETHK]
-        else:
-            existingvalue_key_fplate_pref = ''
-
-        if KEY_FLANGEPLATE_THICKNESS in existingvalues:
-            existingvalue_key_fplate_thk = existingvalues[KEY_PLATETHK]
-        else:
-            existingvalue_key_fplate_thk = ''
-
-        if KEY_WEBPLATE_THICKNESS in existingvalues:
-            existingvalue_key_wplate_thk = existingvalues[KEY_PLATETHK]
-        else:
-            existingvalue_key_wplate_thk = ''
-
-        t16 = (KEY_MODULE, KEY_DISP_BEAMCOVERPLATEWELD, TYPE_MODULE, None, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_BEAMCOVERPLATEWELD, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None, True, 'No Validator')
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Beams"), True, 'No Validator')
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, connectdb("Beams"), True, 'No Validator')
         options_list.append(t4)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, True, 'No Validator')
         options_list.append(t15)
 
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t19 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, existingvalue_key_weld_type,
-            VALUES_WELD_TYPE, True, 'No Validator')
+        t19 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, VALUES_WELD_TYPE, True, 'No Validator')
         options_list.append(t19)
 
-        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
+        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX,existingvalues_key_moment, None, True, 'No Validator')
+        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t17)
 
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None, True, 'No Validator')
+        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None, True, 'No Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t8)
 
-        t18 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, None, True, 'No Validator')
+        t18 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t18)
 
-        t19 = (KEY_FLANGEPLATE_PREFERENCES, KEY_DISP_FLANGESPLATE_PREFERENCES, TYPE_COMBOBOX, existingvalue_key_fplate_pref, VALUES_FLANGEPLATE_PREFERENCES, True, 'No Validator')
+        t19 = (KEY_FLANGEPLATE_PREFERENCES, KEY_DISP_FLANGESPLATE_PREFERENCES, TYPE_COMBOBOX, VALUES_FLANGEPLATE_PREFERENCES, True, 'No Validator')
         options_list.append(t19)
 
-        t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_fplate_thk, VALUES_FLANGEPLATE_THICKNESS, True, 'No Validator')
+        t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, VALUES_FLANGEPLATE_THICKNESS, True, 'No Validator')
         options_list.append(t20)
 
-        t21 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None, None, True, 'No Validator')
+        t21 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t21)
 
-        t22 = (KEY_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_wplate_thk, VALUES_WEBPLATE_THICKNESS, True, 'No Validator')
+        t22 = (KEY_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, VALUES_WEBPLATE_THICKNESS, True, 'No Validator')
         options_list.append(t22)
 
         return options_list
@@ -349,8 +303,8 @@ class BeamCoverPlateWeld(MomentConnection):
 
     def web_weld_details(self,flag):
         web_weld_details = []
-        t15 = (KEY_WEB_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,(self.l_req_weblength) if flag else '')
-        web_weld_details.append(t15)
+        # t15 = (KEY_WEB_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,(self.l_req_weblength) if flag else '')
+        # web_weld_details.append(t15)
         t14 = (KEY_WEB_WELD_SIZE, KEY_WEB_DISP_WELD_SIZE, TYPE_TEXTBOX, self.web_weld.size if flag else '')
         web_weld_details.append(t14)
 
@@ -365,9 +319,9 @@ class BeamCoverPlateWeld(MomentConnection):
 
     def flange_weld_details(self, flag):
         flange_weld_details = []
-        t15 = (KEY_FLANGE_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,
-              (self.l_req_flangelength) if flag else '')
-        flange_weld_details.append(t15)
+        # t15 = (KEY_FLANGE_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,
+        #       (self.l_req_flangelength) if flag else '')
+        # flange_weld_details.append(t15)
 
         # t15 = (KEY_FLANGE_WELD_HEIGHT, KEY_DISP_FLANGE_WELD_HEIGHT, TYPE_TEXTBOX,
         #        (self.flange_weld.height) if flag else '')
@@ -391,9 +345,9 @@ class BeamCoverPlateWeld(MomentConnection):
         # t15 = (KEY_INNERFLANGE_WELD_LENGTH, KEY_DISP_INNERFLANGE_WELD_LENGTH, TYPE_TEXTBOX,
         #       ( self.flange_weld.Innerlength ) if flag else '')
         # Innerflange_weld_details.append(t15)
-        t15 = (KEY_FLANGE_WELD_LENGTH, KEY_DISP_WELD_LEN_EFF_OUTSIDE, TYPE_TEXTBOX,
-               (self.l_req_flangelength) if flag else '')
-        Innerflange_weld_details.append(t15)
+        # t15 = (KEY_FLANGE_WELD_LENGTH, KEY_DISP_WELD_LEN_EFF_OUTSIDE, TYPE_TEXTBOX,
+        #        (self.l_req_flangelength) if flag else '')
+        # Innerflange_weld_details.append(t15)
 
         # t15 = (KEY_INNERFLANGE_WELD_HEIGHT, KEY_DISP_INNERFLANGE_WELD_HEIGHT, TYPE_TEXTBOX,
         #        (self.flange_weld.Innerheight) if flag else '')
@@ -456,8 +410,9 @@ class BeamCoverPlateWeld(MomentConnection):
 
         t21 = (KEY_WEB_WELD_DETAILS, KEY_DISP_WEB_WELD_DETAILS, TYPE_OUT_BUTTON, ['Web Plate Weld', self.web_weld_details], True)
         out_list.append(t21)
-
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, True)
+        out_list.append(t17)
+        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_OUTER, TYPE_TITLE, None, True)
 
         out_list.append(t17)
 
@@ -484,7 +439,7 @@ class BeamCoverPlateWeld(MomentConnection):
         KEY_FLANGE_WELD_DETAILS, KEY_DISP_FLANGE_WELD_DETAILS, TYPE_OUT_BUTTON, ['Flange Plate Weld', self.flange_weld_details], True)
         out_list.append(t21)
 
-        t17 = (None, DISP_TITLE_INNERFLANGESPLICEPLATE, TYPE_TITLE, None, True)
+        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, True)
 
         out_list.append(t17)
 
@@ -506,6 +461,13 @@ class BeamCoverPlateWeld(MomentConnection):
                ['Inner plate Weld', self.Innerflange_weld_details], True)
         out_list.append(t21)
 
+        # t17 = (None, DISP_EFF, TYPE_TITLE, None, True)
+        # out_list.append(t17)
+        #
+        # t15 = (KEY_FLANGE_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,
+        #        (self.l_req_flangelength) if flag else '', True)
+        # out_list.append(t15)
+
         return out_list
 
     def func_for_validation(self, design_dictionary):
@@ -521,7 +483,7 @@ class BeamCoverPlateWeld(MomentConnection):
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-                val = option[4]
+                val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
 
@@ -1646,8 +1608,8 @@ class BeamCoverPlateWeld(MomentConnection):
 
 
     def save_design(self, popup_summary):
-        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.flange_weld.fabrication]
-        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
+        self.gamma_mw_flange = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.flange_weld.fabrication]
+        self.gamma_mw_web = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
                                   KEY_DISP_BEAMSEC: self.section.designation,
                                   KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
@@ -1655,7 +1617,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                   KEY_DISP_FU: self.section.fu,
                                   KEY_DISP_FY: self.section.fy,
                                   'Mass': self.section.mass,
-                                  'Area(mm2) - A': round(self.section.area,2),
+                                  'Area(mm2) - A': round(self.section.area, 2),
                                   'D(mm)': self.section.depth,
                                   'B(mm)': self.section.flange_width,
                                   't(mm)': self.section.web_thickness,
@@ -1663,14 +1625,15 @@ class BeamCoverPlateWeld(MomentConnection):
                                   'FlangeSlope': self.section.flange_slope,
                                   'R1(mm)': self.section.root_radius,
                                   'R2(mm)': self.section.toe_radius,
-                                  'Iz(mm4)': self.section.mom_inertia_z,
-                                  'Iy(mm4)': self.section.mom_inertia_y,
-                                  'rz(mm)': self.section.rad_of_gy_z,
-                                  'ry(mm)': round(self.section.rad_of_gy_y,2),
-                                  'Zz(mm3)': self.section.elast_sec_mod_z,
-                                  'Zy(mm3)': self.section.elast_sec_mod_y,
-                                  'Zpz(mm3)': self.section.plast_sec_mod_z,
-                                  'Zpy(mm3)': self.section.elast_sec_mod_y}
+                                  'Iz(mm4)': round(self.section.mom_inertia_z, 2),
+                                  'Iy(mm4)': round(self.section.mom_inertia_y, 2),
+                                  'rz(mm)': round(self.section.rad_of_gy_z, 2),
+                                  'ry(mm)': round(self.section.rad_of_gy_y, 2),
+                                  'Zz(mm3)': round(self.section.elast_sec_mod_z, 2),
+                                  'Zy(mm3)': round(self.section.elast_sec_mod_y, 2),
+                                  'Zpz(mm3)': round(self.section.plast_sec_mod_z, 2),
+                                  'Zpy(mm3)': round(self.section.elast_sec_mod_y, 2)}
+
         self.report_input = \
             {KEY_MODULE: self.module,
 
@@ -1692,7 +1655,7 @@ class BeamCoverPlateWeld(MomentConnection):
              "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
              KEY_DISP_GAMMA_M0: gamma(1.1, "m0"),
              KEY_DISP_GAMMA_M1: gamma(1.25, "m1"),
-             KEY_DISP_GAMMA_MW: gamma(gamma_mw, "mw")}
+             KEY_DISP_GAMMA_MW: gamma(self.gamma_mw_flange, "mw")}
 
 
         self.report_check = []
@@ -1700,7 +1663,7 @@ class BeamCoverPlateWeld(MomentConnection):
         flange_weld_conn_plates_fu = [self.section.fu, self.flange_plate.fu]
         self.flange_weld_connecting_plates = [self.section.flange_thickness, self.flange_plate.thickness_provided]
         self.flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.flange_thickness,self.flange_plate.thickness_provided)
-        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.flange_weld.fabrication]
+        self.gamma_mw_flange = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.flange_weld.fabrication]
         if self.member_capacity_status ==True and self.initial_pt_thk_status== True:
             self.thick_f = self.flange_plate.thickness_provided
             self.thick_w =self.web_plate.thickness_provided
@@ -1810,24 +1773,24 @@ class BeamCoverPlateWeld(MomentConnection):
                 t1 = (KEY_FLANGE_PLATE_HEIGHT , 'Outer.b >= 50',
                       width_pt_chk( B=self.section.flange_width,
                                         t=self.section.web_thickness, r_1=self.section.root_radius,pref= "Outside"),
-                      get_pass_fail(50, self.outerwidth, relation="leq"))
+                      get_pass_fail(50, round(self.outerwidth,2), relation="leq"))
                 self.report_check.append(t1)
             else:
                 t1 = (KEY_FLANGE_PLATE_HEIGHT , 'Outer.b >= 50',
                       width_pt_chk(B=self.section.flange_width,
                                    t=self.section.web_thickness, r_1=self.section.root_radius, pref="Outside"),
-                      get_pass_fail(50, self.outerwidth, relation="leq"))
+                      get_pass_fail(50, round(self.outerwidth,2), relation="leq"))
                 self.report_check.append(t1)
 
                 t1 = (KEY_INNERFLANGE_PLATE_HEIGHT, 'Inner.b >= 50' ,
                       width_pt_chk(B=self.section.flange_width,
                       t=self.section.web_thickness, r_1=self.section.root_radius, pref= "Outside +Inside"),
-                     get_pass_fail(50, self.innerwidth, relation="leq"))
+                     get_pass_fail(50, round(self.innerwidth,2), relation="leq"))
                 self.report_check.append(t1)
 
 
         if self.member_capacity_status == True and (self.section.tension_yielding_capacity > self.flange_force):
-            t1 = ('SubSection', 'Flange plate thickness', '|p{3cm}|p{4.5cm}|p{6.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Flange plate thickness', '|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
             if  self.preference == "Outside":
                 t2 = (KEY_DISP_FLANGESPLATE_THICKNESS, display_prov(self.section.flange_thickness, "T"),display_prov(self.thick_f, "t_f"),
@@ -1850,7 +1813,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                                  innerwidth=round(self.innerwidth,2) ),get_pass_fail(self.Ap, self.flange_plate_crs_sec_area, relation="leq"))
                     self.report_check.append(t2)
             # if (self.flange_plate_crs_sec_area >= (1.05 * self.flange_crs_sec_area)) and len(self.flange_plate_thickness_possible) != 0 and len(self.web_plate_thickness_possible) != 0 :
-            t1 = ('SubSection', 'Web plate thickness', '|p{3cm}|p{4.5cm}|p{6.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web plate thickness', '|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t2 = (KEY_DISP_WEBPLATE_THICKNESS, display_prov(self.section.web_thickness/2, "t"),display_prov(self.thick_w, "t_w"),get_pass_fail(self.section.web_thickness/2, self.thick_w, relation="lesser"))
             self.report_check.append(t2)
@@ -1878,14 +1841,14 @@ class BeamCoverPlateWeld(MomentConnection):
                 if self.preference == "Outside":
                     t1 = (DISP_EFF,' ',eff_len_prov(l_w=self.flange_weld.length,b_fp= self.flange_plate.height,t_w=self.flange_weld.size, l_eff =self.l_req_flangelength), "")
                     self.report_check.append(t1)
-                    t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,flange_weld_stress(F_f=round(self.flange_force/1000,2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress,2)),weld_strength_prov(conn_plates_weld_fu =  flange_weld_conn_plates_fu,gamma_mw =gamma_mw ,t_t =self.flange_weld.throat_tk,f_w =self.flange_weld.strength),get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
+                    t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,flange_weld_stress(F_f=round(self.flange_force/1000,2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress,2)),weld_strength_prov(conn_plates_weld_fu =  flange_weld_conn_plates_fu,gamma_mw =self.gamma_mw_flange ,t_t =self.flange_weld.throat_tk,f_w =self.flange_weld.strength),get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
                     self.report_check.append(t2)
                     # Outside +Inside#
                 else:
                     #Outside
                     t1 = (KEY_DISP_WELD_LEN_EFF_OUTSIDE ,'', eff_len_prov_out_in(l_w=self.flange_weld.length,b_fp=self.flange_plate.height,b_ifp=self.flange_plate.Innerheight,t_w=self.flange_weld.size, l_eff=self.l_req_flangelength), "")
                     self.report_check.append(t1)
-                    t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,flange_weld_stress(F_f=round(self.flange_force / 1000, 2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress, 2)),weld_strength_prov(conn_plates_weld_fu=flange_weld_conn_plates_fu, gamma_mw=gamma_mw,t_t=self.flange_weld.throat_tk,f_w=self.flange_weld.strength),get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
+                    t2 = (KEY_FLANGE_DISP_WELD_STRENGTH,flange_weld_stress(F_f=round(self.flange_force / 1000, 2), l_eff=self.l_req_flangelength,F_ws=round(self.flange_weld.stress, 2)),weld_strength_prov(conn_plates_weld_fu=flange_weld_conn_plates_fu, gamma_mw=self.gamma_mw_flange,t_t=self.flange_weld.throat_tk,f_w=self.flange_weld.strength),get_pass_fail(self.flange_weld.stress, self.flange_weld.strength, relation="lesser"))
                     self.report_check.append(t2)
 
                 if  self.preference == "Outside":
@@ -1921,8 +1884,8 @@ class BeamCoverPlateWeld(MomentConnection):
 #######################################################Web design###########################################################
                 self.web_weld_connecting_plates = [self.section.web_thickness, self.web_plate.thickness_provided]
                 self.web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(self.section.web_thickness,self.web_plate.thickness_provided)
-                web_weld_conn_plates_fu = [self.section.fu, self.web_plate.fu]
-                Gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
+                self.web_weld_conn_plates_fu = [self.section.fu, self.web_plate.fu]
+                self.gamma_mw_web = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
             if self.initial_pt_thk_status == True:
                 t1 = ('SubSection', 'Web Weld  Design Check ', '|p{3.5cm}|p{6cm}|p{6cm}|p{1.5cm}|')
                 self.report_check.append(t1)
@@ -1945,7 +1908,7 @@ class BeamCoverPlateWeld(MomentConnection):
                                                                         x_max=round(self.x_max,2),
                                                                         l_eff=self.l_req_weblength,
                                                                         R_w=round(self.web_weld.stress,2)),
-                    weld_strength_prov(conn_plates_weld_fu =  web_weld_conn_plates_fu,gamma_mw =Gamma_mw ,t_t =self.web_weld.throat_tk,f_w =self.web_weld.strength),get_pass_fail(self.web_weld.stress, self.web_weld.strength, relation="lesser"))
+                    weld_strength_prov(conn_plates_weld_fu =  self.web_weld_conn_plates_fu,gamma_mw =self.gamma_mw_web ,t_t =self.web_weld.throat_tk,f_w =self.web_weld.strength),get_pass_fail(self.web_weld.stress, self.web_weld.strength, relation="lesser"))
                 self.report_check.append(t2)
 
                 t1 = ('SubSection', 'Web Plate Check', '|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|')

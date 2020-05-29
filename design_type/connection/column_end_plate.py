@@ -229,111 +229,56 @@ class ColumnEndPlate(MomentConnection):
     def module_name(self):
         return KEY_DISP_COLUMNENDPLATE
 
-    def input_values(self, existingvalues={}):
+    def input_values(self):
 
         options_list = []
 
-        if KEY_SECSIZE in existingvalues:
-            existingvalue_key_secsize = existingvalues[KEY_SECSIZE]
-        else:
-            existingvalue_key_secsize = ''
-
-        if KEY_CONN in existingvalues:
-            existingvalue_key_conn = existingvalues[KEY_CONN]
-        else:
-            existingvalue_key_conn = ''
-
-        if KEY_MATERIAL in existingvalues:
-            existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
-        else:
-            existingvalue_key_mtrl = ''
-
-        if KEY_MOMENT in existingvalues:
-            existingvalues_key_moment = existingvalues[KEY_MOMENT]
-        else:
-            existingvalues_key_moment = ''
-
-        if KEY_SHEAR in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_SHEAR]
-        else:
-            existingvalue_key_versh = ''
-
-        if KEY_AXIAL in existingvalues:
-            existingvalue_key_axial = existingvalues[KEY_AXIAL]
-        else:
-            existingvalue_key_axial = ''
-
-        if KEY_D in existingvalues:
-            existingvalue_key_d = existingvalues[KEY_D]
-        else:
-            existingvalue_key_d = ''
-
-        if KEY_TYP in existingvalues:
-            existingvalue_key_typ = existingvalues[KEY_TYP]
-        else:
-            existingvalue_key_typ = ''
-
-        if KEY_GRD in existingvalues:
-            existingvalue_key_grd = existingvalues[KEY_GRD]
-        else:
-            existingvalue_key_grd = ''
-
-        if KEY_PLATETHK in existingvalues:
-            existingvalue_key_endplatethk = existingvalues[KEY_PLATETHK]
-        else:
-            existingvalue_key_endplatethk = ''
-
-        if KEY_CONN_PREFERENCE in existingvalues:
-            existingvalue_design_pref = existingvalues[KEY_CONN_PREFERENCE]
-        else:
-            existingvalue_design_pref = ''
-
-        t16 = (KEY_MODULE, KEY_DISP_COLUMNENDPLATE, TYPE_MODULE, None, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_COLUMNENDPLATE, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None, True, 'No Validator')
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Columns"), True, 'No Validator')
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, connectdb("Columns"), True, 'No Validator')
         options_list.append(t4)
 
-        t8 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN_3, True, 'No Validator')
+        t8 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN_3, True, 'No Validator')
         options_list.append(t8)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, True, 'No Validator')
         options_list.append(t15)
 
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
+        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX,existingvalues_key_moment,None, True, 'Int Validator')
+        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t17)
 
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None, True, 'Int Validator')
+        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None, True, 'Int Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t8)
 
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None, True, 'No Validator')
+        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t9)
 
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D, True, 'No Validator')
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
         options_list.append(t10)
 
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP, True, 'No Validator')
+        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD, True, 'No Validator')
+        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)
 
-        t21 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, None, True, 'No Validator')
+        t21 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t21)
 
-        t22 = (KEY_PLATETHK, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_endplatethk, VALUES_ENDPLATE_THICKNESS, True, 'No Validator')
+        t22 = (KEY_PLATETHK, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ENDPLATE_THICKNESS, True, 'No Validator')
         options_list.append(t22)
 
         # t13 = (KEY_CONN_PREFERENCE, KEY_DISP_CONN_PREFERENCE, TYPE_COMBOBOX, existingvalue_design_pref, VALUES_CONN_PREFERENCE)
@@ -655,7 +600,7 @@ class ColumnEndPlate(MomentConnection):
 
         else:
             self.design_status = False
-            logger.error(":The axial force {} acting is higher than axial capacity {} of member".format(self.load.axial_force,self.axial_capacity))
+            logger.error(":The axial force {} acting is higher than axial capacity {} of member".format(self.load.axial_force,self.axial_capacity/1000))
             logger.info("Increase member size or decrease axial load")
         # self.load.axial_force = self.factored_axial_load  # N
         print("factored_axial_load", self.factored_axial_load)
@@ -674,7 +619,7 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = True
         else:
             self.design_status = False
-            logger.error(":The shear force {} acting is higher than axial capacity {} of member".format(self.load.shear_force,self.shear_capacity))
+            logger.error(":The shear force {} acting is higher than shear capacity {} of member".format(self.load.shear_force,self.shear_capacity/1000))
             logger.info("Increase member size or decrease shear load")
         print("factored_shear_load", self.factored_shear_load)
 ###############################################################
@@ -1055,6 +1000,7 @@ class ColumnEndPlate(MomentConnection):
             #     self.get_bolt_grade(self)
 
         else:
+
             self.design_status = False
             logger.error("failed in bolt diam selection")
 
@@ -1388,6 +1334,12 @@ class ColumnEndPlate(MomentConnection):
                 self.stiff_wt = 0.0
                 self.t_s = 0.0
                 self.weld_type = "None"
+                if self.design_status:
+                    logger.info(": Overall Column end plate connection design is safe \n")
+                    logger.debug(" :=========End Of design===========")
+                else:
+                    logger.error(": Design is not safe \n ")
+                    logger.debug(" :=========End Of design===========")
             else:
                 # if 2 * self.end_dist >= 50:
                 self.stiffener_details(self)

@@ -21,12 +21,8 @@ Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
 Bolt.Type: Bearing Bolt
-Connectivity: Beam-Beam
-Connector.Material: E 165 (Fe 290)
-Connector.Plate.Thickness_List:
-- '3'
-- '4'
-- '5'
+Connector.Flange_Plate.Preferences: Outside
+Connector.Flange_Plate.Thickness_list: &id001
 - '6'
 - '8'
 - '10'
@@ -40,17 +36,29 @@ Connector.Plate.Thickness_List:
 - '26'
 - '28'
 - '30'
+- '32'
+- '36'
+- '40'
+- '25'
+- '28'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '80'
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Web_Plate.Thickness_List: *id001
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
-Load.Axial: '80'
-Load.Shear: '100'
-Material: E 250 (Fe 410 W)B
-Member.Supported_Section.Designation: NPB 300x200x66.7
-Member.Supported_Section.Material: E 300 (Fe 440)
-Member.Supporting_Section.Designation: MB 450
-Member.Supporting_Section.Material: E 450 (Fe 570)D
-Module: Fin Plate
-Weld.Fab: Shop Weld
-Weld.Material_Grade_OverWrite: '410'
+Load.Axial: '100'
+Load.Moment: '10'
+Load.Shear: '10'
+Material: E 250 (Fe 410 W)A
+Member.Designation: NPB 350x250x79.2
+Member.Material: E 250 (Fe 410 W)A
+Module: Beam Coverplate Connection

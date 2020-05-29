@@ -20,6 +20,8 @@ venv/*
 Osdag_Workspace/*
 /Osdag.config
 /backup
+OUTPUT_FILES/Output_PDF/*
 Output_PDF/*
+OUTPUT_FILES/Output_PDF/*
 ResourceFiles/images/3d.png
 *.xlsx

@@ -32,7 +32,8 @@ def min_pitch(d):
     return min_pitch_eqn
 
 def max_pitch(t):
-
+    t1 = str(t[0])
+    t2 = str(t[0])
     max_pitch_1 = 32*min(t)
     max_pitch_2 = 300
     max_pitch = min(max_pitch_1,max_pitch_2)
@@ -42,7 +43,9 @@ def max_pitch(t):
 
     max_pitch_eqn = Math(inline=True)
     max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max} &=\min(32~t,~300~mm)&\\'))
-    max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\end{aligned}'))
+    max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
+    max_pitch_eqn.append(NoEscape(r'where,&\\'))
+    max_pitch_eqn.append(NoEscape(r'& t &= min('+t1+','+t2+r')\end{aligned}'))
     return max_pitch_eqn
 
 def min_edge_end(d_0,edge_type):
@@ -62,6 +65,7 @@ def min_edge_end(d_0,edge_type):
     min_end_edge_eqn.append(NoEscape(r'&='+factor + r'*' + d_0+r'='+min_edge_dist+r' \end{aligned}'))
     return min_end_edge_eqn
 
+#TODO: consider using max_edge_end_new instead of this function in all modules
 def max_edge_end(f_y,t):
 
     epsilon = round(math.sqrt(250/f_y),2)
@@ -74,6 +78,44 @@ def max_edge_end(f_y,t):
     max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
     max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
     max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=12 ~*'+ t + r'*\sqrt{\frac{250}{'+f_y+r'}}\\ &='+max_edge_dist+r'\\ \end{aligned}'))
+    return max_end_edge_eqn
+
+def max_edge_end_new(t_fu_fy,corrosive_influences):
+    t_epsilon_considered = t_fu_fy[0][0] * math.sqrt(250 / float(t_fu_fy[0][2]))
+    t_considered = t_fu_fy[0][0]
+    t_min = t_considered
+    for i in t_fu_fy:
+        t = i[0]
+        f_y = i[2]
+        epsilon = math.sqrt(250 / f_y)
+        if t * epsilon <= t_epsilon_considered:
+            t_epsilon_considered = t * epsilon
+            t_considered = t
+        if t < t_min:
+            t_min = t
+
+    if corrosive_influences is True:
+        max_edge_dist =  40.0 + 4 * t_min
+    else:
+        max_edge_dist = 12 * t_epsilon_considered
+
+    max_edge_dist = str(max_edge_dist)
+    t1=str(t_fu_fy[0][0])
+    t2=str(t_fu_fy[1][0])
+    fy1 = str(t_fu_fy[0][2])
+    fy2 = str(t_fu_fy[1][2])
+    max_end_edge_eqn = Math(inline=True)
+    if corrosive_influences is False:
+        max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
+        max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
+        max_end_edge_eqn.append(NoEscape(r'e1 &= 12 ~*' + t1 + r'*\sqrt{\frac{250}{' + fy1 + r'}}\\'))
+        max_end_edge_eqn.append(NoEscape(r'e2 &= 12 ~*' + t2 + r'*\sqrt{\frac{250}{' + fy2 + r'}}\\'))
+        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=min(e1,e2)\\'))
+        max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'\\ \end{aligned}'))
+    else:
+        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=40 + 4*t \\'))
+        max_end_edge_eqn.append(NoEscape(r'Where, t&= min(' + t1 +', '+t2+r')\\'))
+        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&='+max_edge_dist+r' \end{aligned}'))
     return max_end_edge_eqn
 
 def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
@@ -154,7 +196,7 @@ def get_trial_bolts(V_u, A_u,bolt_capacity,multiple=1):
     trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
     return trial_bolts_eqn
 
-def parameter_req_bolt_force(bolts_one_line,gauge,ymax,xmax,bolt_line,pitch,length_avail):
+def parameter_req_bolt_force(bolts_one_line,gauge,ymax,xmax,bolt_line,pitch,length_avail, conn=None):
     """
        bolts_one_line =n_r
        bolt_line = n_c
@@ -169,16 +211,23 @@ def parameter_req_bolt_force(bolts_one_line,gauge,ymax,xmax,bolt_line,pitch,leng
 
     parameter_req_bolt_force_eqn = Math(inline=True)
     parameter_req_bolt_force_eqn.append(NoEscape(r'\begin{aligned} l_n~~~ &= length~available \\'))
-    parameter_req_bolt_force_eqn.append(NoEscape(r' l_n~~~ &= (n_r - 1) * g\\'))
-    parameter_req_bolt_force_eqn.append(NoEscape(r' &= ('+bolts_one_line+' - 1) *'+ gauge+ r'\\'))
+    if conn == 'fin':
+        parameter_req_bolt_force_eqn.append(NoEscape(r' l_n~~~ &= p * (n_r - 1)\\'))
+    else:
+        parameter_req_bolt_force_eqn.append(NoEscape(r' l_n~~~ &= g * (n_r - 1)\\'))
+    parameter_req_bolt_force_eqn.append(NoEscape(r' &= '+gauge+r' * (' + bolts_one_line + r' - 1)\\'))
     parameter_req_bolt_force_eqn.append(NoEscape(r' & ='+length_avail+ r'\\'))
 
     parameter_req_bolt_force_eqn.append(NoEscape(r' y_{max} &= l_n / 2\\'))
     parameter_req_bolt_force_eqn.append(NoEscape(r' &= '+length_avail+ r' / 2 \\'))
     parameter_req_bolt_force_eqn.append(NoEscape(r' & =' + ymax + r'\\'))
 
-    parameter_req_bolt_force_eqn.append(NoEscape(r'x_{max} &= p * (\frac{n_c}{2} - 1) / 2 \\'))
-    parameter_req_bolt_force_eqn.append(NoEscape(r' &= '+pitch+r' * (\frac{'+bolt_line+ r'}{2} + - 1) / 2 \\'))
+    if conn == 'fin':
+        parameter_req_bolt_force_eqn.append(NoEscape(r'x_{max} &= g * (n_c - 1)/2 \\'))
+        parameter_req_bolt_force_eqn.append(NoEscape(r' &= '+pitch+r' * (\frac{'+bolt_line+ r'}{2} + - 1) / 2 \\'))
+    else:
+        parameter_req_bolt_force_eqn.append(NoEscape(r'x_{max} &= p * (\frac{n_c}{2} - 1) / 2 \\'))
+        parameter_req_bolt_force_eqn.append(NoEscape(r' &= ' + pitch + r' * (\frac{' + bolt_line + r'}{2} + - 1) / 2 \\'))
     parameter_req_bolt_force_eqn.append(NoEscape(r' & =' + xmax + r'\end{aligned}'))
 
     return parameter_req_bolt_force_eqn

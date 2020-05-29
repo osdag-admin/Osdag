@@ -127,7 +127,8 @@ class Bolt:
 
         return repr
 
-    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes, seatedangle_e = 0.0):
+    def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes,e=None,
+                                p=None, seatedangle_e = 0.0):
         """
 
         :param bolt_type: bearing or friction grip bolt
@@ -145,6 +146,11 @@ class Bolt:
         :param corrosive_influences: yes or no
         :return: capacity of bolt (shear and bearing), ultimate strength of bolt and yield strength of bolt
         """
+        if e is None:
+            e = self.min_edge_dist_round
+        if p is None:
+            p = self.min_gauge_round
+
         self.bolt_diameter_provided = bolt_diameter_provided
         self.bolt_grade_provided = bolt_grade_provided
         [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter_provided)
@@ -165,29 +171,22 @@ class Bolt:
             if seatedangle_e > 0.0:
                 self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                     f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
-                    e=seatedangle_e, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
+                    e=seatedangle_e, p=p, bolt_hole_type=self.bolt_hole_type)
             else:
                 self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
                     f_u=fu_considered, f_ub=self.bolt_fu, t=thk_considered, d=self.bolt_diameter_provided,
-                    e=self.min_edge_dist_round, p=self.min_pitch_round, bolt_hole_type=self.bolt_hole_type)
+                    e=e, p=p, bolt_hole_type=self.bolt_hole_type)
             self.bolt_capacity = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
             self.fu_considered = fu_considered
             self.thk_considered = thk_considered
-            d = self.bolt_diameter_provided
-            e = self.min_edge_dist_round
-            p = self.min_pitch_round
-            bolt_hole_type = self.bolt_hole_type
-            f_u = fu_considered
-            f_ub = self.bolt_fu
-            safety_factor_parameter = KEY_DP_WELD_FAB_FIELD
+
             # Since field or shop both is 1.25 we are not taking safety_factor_parameter as input
-
-
+            self.gamma_mb = 1.25
             if p > 0.0:
-                self.kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, f_ub / f_u, 1.0)
+                self.kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, self.bolt_fu / fu_considered, 1.0)
             else:
-                self.kb = min(e / (3.0 * self.d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
-            self.gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
+                self.kb = min(e / (3.0 * self.d_0), self.bolt_fu / fu_considered, 1.0)  # calculate k_b when there is no pitch (p = 0)
+
         elif self.bolt_type == "Friction Grip Bolt":
             self.bolt_shear_capacity,self.kh,self.gamma_mf = IS800_2007.cl_10_4_3_bolt_slip_resistance(
                 f_ub=self.bolt_fu, A_nb=self.bolt_net_area, n_e=n_planes, mu_f=self.mu_f, bolt_hole_type=self.bolt_hole_type)
@@ -197,9 +196,9 @@ class Bolt:
     def calculate_kb(self, e,p,d_0,f_ub,f_u):
 
         if p > 0.0:
-            kb = min(e / (3.0 * self.d_0), p / (3.0 * self.d_0) - 0.25, f_ub / f_u, 1.0)
+            kb = min(e / (3.0 * d_0), p / (3.0 * d_0) - 0.25, f_ub / f_u, 1.0)
         else:
-            kb = min(e / (3.0 * self.d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
+            kb = min(e / (3.0 * d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
 
         return kb
 
@@ -856,6 +855,7 @@ class Plate(Material):
     def __init__(self, thickness=[], height=0.0,Innerheight=0.0, length=0.0,Innerlength=0.0, gap=0.0, material_grade=""):
         super(Plate, self).__init__(material_grade=material_grade)
         self.design_status = False
+        self.design_status_capacity = False
         self.reason = ""
         if thickness:
             self.thickness = list(np.float_(thickness))
@@ -1152,7 +1152,7 @@ class Plate(Material):
 
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge,
                               max_spacing, max_edge_dist, shear_load=0.0, axial_load=0.0, web_moment =0.0, gap=0.0,
-                              shear_ecc=False, bolt_line_limit=math.inf, min_bolts_one_line=2, min_bolt_line=1,joint =None):
+                              shear_ecc=False, bolt_line_limit=math.inf, min_bolts_one_line=2, min_bolt_line=1,joint =None,min_pitch=None):
 
 
         """
@@ -1195,6 +1195,8 @@ class Plate(Material):
             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line,min_edge_dist,max_spacing, max_edge_dist)
             if bolt_line == 1:
                 pitch = 0.0
+            elif min_pitch != None:
+                pitch = min_pitch
             else:
                 pitch = min_gauge
             end_dist = min_edge_dist

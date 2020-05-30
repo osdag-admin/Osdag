@@ -1274,7 +1274,7 @@ class ColumnEndPlate(MomentConnection):
         if self.connection == 'Flush End Plate':
             self.plate_height = self.section.depth
         else:
-            self.plate_height = self.section.depth + 4 * self.pitch
+            self.plate_height = self.section.depth + 4 * self.end_dist
         self.plate_width = self.section.flange_width
         self.y_2 = self.y_max - self.end_dist
         self.t_b2 = self.factored_axial_load / self.no_bolts + self.factored_moment * self.y_2 / self.y_sqr
@@ -1851,6 +1851,23 @@ class ColumnEndPlate(MomentConnection):
               get_pass_fail(self.bolt.max_end_dist, self.end_dist,
                             relation='greater'))
         self.report_check.append(t4)
+
+        if self.connection == "Flush End Plate":
+           t1 = ('SubSection', ' Flush End plate height Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+           self.report_check.append(t1)
+
+           t1 = (DISP_MIN_PLATE_HEIGHT,self.section.depth,
+               self.plate_height,
+               get_pass_fail(self.section.depth, self.plate_height, relation="leq"))
+           self.report_check.append(t1)
+        else:
+            t1 = ('SubSection', ' Extended End plate height Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t1 = (DISP_MIN_PLATE_HEIGHT, end_plate_ht_req(D=self.section.depth, e=self.end_dist, h_p=self.plate_height),
+                  self.plate_height,
+                  get_pass_fail(self.plate_height, self.plate_height, relation="leq"))
+            self.report_check.append(t1)
 
         Disp_3d_image = "/ResourceFiles/images/3d.png"
 

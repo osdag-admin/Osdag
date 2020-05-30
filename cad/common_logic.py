@@ -1,7 +1,7 @@
 '''
 Created on 18-Nov-2016
 
-@author: deepa
+@author: deepa, Sourabh Das
 '''
 
 # from utils.common.component import Bolt,Beam,Section,Angle,Plate,Nut,Column,Weld
@@ -32,11 +32,10 @@ from cad.ShearConnections.CleatAngle.nutBoltPlacement import NutBoltArray as cle
 from cad.ShearConnections.EndPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as EndBeamWebBeamWeb
 from cad.ShearConnections.EndPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as EndColFlangeBeamWeb
 from cad.ShearConnections.EndPlate.colWebBeamWebConnectivity import ColWebBeamWeb as EndColWebBeamWeb
-# from cad.ShearConnections.EndPlate.nutBoltPlacement import NutBoltArray as endNutBoltArray
+from cad.ShearConnections.EndPlate.nutBoltPlacement import NutBoltArray as endNutBoltArray
 
 from cad.ShearConnections.SeatedAngle.CAD_col_web_beam_web_connectivity import ColWebBeamWeb as seatColWebBeamWeb
-from cad.ShearConnections.SeatedAngle.CAD_col_flange_beam_web_connectivity import \
-    ColFlangeBeamWeb as seatColFlangeBeamWeb
+from cad.ShearConnections.SeatedAngle.CAD_col_flange_beam_web_connectivity import ColFlangeBeamWeb as seatColFlangeBeamWeb
 from cad.ShearConnections.SeatedAngle.CAD_nut_bolt_placement import NutBoltArray as seatNutBoltArray
 # from cad.ShearConnections.SeatedAngle.seat_angle_calc import SeatAngleCalculation
 
@@ -197,7 +196,22 @@ class CommonDesignLogic(object):
            |  |
 
         '''
-        boltHeadThick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
+        # boltHeadThick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
+
+        '''
+        This routine takes the bolt diameter and return bolt head thickness as per IS:1364 (PART-1) : 2002
+
+
+        __________
+        |        | | T = Thickness
+        |________| |
+           |  |
+           |  |
+           |  |
+
+        '''
+        boltHeadThick = {5: 3.5, 6:4, 8: 5.3, 10: 6.4, 12: 7.5, 14: 8.8, 16: 10, 18: 11.5, 20: 12.5, 22: 14, 24: 15,
+                         27: 17, 30: 18.7, 33: 21, 36: 22.5, 39: 25}
         return boltHeadThick[boltDia]
 
     def boltHeadDia_Calculation(self, boltDia):
@@ -214,7 +228,23 @@ class CommonDesignLogic(object):
            |  |
 
         '''
-        boltHeadDia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
+        # boltHeadDia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
+
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:1364 (PART-1) : 2002
+
+       bolt Head Dia
+        <-------->
+        __________
+        |        |
+        |________|
+           |  |
+           |  |
+           |  |
+
+        '''
+        boltHeadDia = {5: 8, 6: 10, 8: 13, 10: 16, 12: 18, 14: 21, 16: 24, 18: 27, 20: 30, 22: 34, 24: 36, 27: 41,
+                       30: 46, 33: 50, 36: 55, 39: 60}
         return boltHeadDia[boltDia]
 
     def boltLength_Calculation(self, boltDia):
@@ -237,20 +267,44 @@ class CommonDesignLogic(object):
            |__|    ___|__
 
         '''
-        boltHeadDia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
+        # boltHeadDia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
 
-        return boltHeadDia[boltDia]
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:1364 (PART-1) : 2002
+
+        __________ 
+        |        |  
+        |________|  ______
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       |  l= length
+           |  |       |
+           |  |       |
+           |  |       |
+           |__|    ___|__
+
+        '''
+        boltLength = {5: 25, 6: 30, 8: 40, 10: 45, 12: 50, 14: 60, 16: 65, 18: 70, 20: 80, 22: 90, 24: 90, 27: 100,
+                      30: 110, 33: 130, 36: 140, 39: 150}
+
+        return boltLength[boltDia]
 
     def nutThick_Calculation(self, boltDia):
         '''
         Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
         '''
-        nutDia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35,
-                  36: 30.65}
+        # nutDia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35,
+        #           36: 30.65}
+
+        '''
+        Returns the thickness of the nut depending upon the nut diameter as per IS1364-3(2002)
+        '''
+        nutDia = {5: 4.7, 6: 5.2, 8: 6.8, 10: 8.4, 12: 10.8, 14: 12.8, 16: 14.8, 18: 15.8, 20: 18, 22: 19.4, 24: 21.5, 27: 23.8, 30: 25.6,
+                  33: 28.7, 36: 31, 39: 33.4}
 
         return nutDia[boltDia]
-
-
 
     def create3DBeamWebBeamWeb(self):
         '''self,uiObj,resultObj,dictbeamdata,dictcoldata):

@@ -727,6 +727,23 @@ class Tension_bolted(Member):
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
+                else:
+                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH:
+                        # val = option[4]
+                        # print(design_dictionary[option[0]], "jhvhj")
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            error = "Value can't be equal or less than zero"
+                            all_errors.append(error)
+                        else:
+                            flag1 = True
+
+                    if option[2] == TYPE_TEXTBOX and option[0] == KEY_AXIAL:
+
+                        if float(design_dictionary[option[0]]) <= 0.0:
+                            error = "Value can't be equal or less than zero"
+                            all_errors.append(error)
+                        else:
+                            flag2 = True
             elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_LOCATION, KEY_END1, KEY_END2]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
@@ -742,25 +759,6 @@ class Tension_bolted(Member):
             else:
                 pass
 
-            if option[2] == TYPE_TEXTBOX and option[0]==KEY_LENGTH:
-                # val = option[4]
-                # print(design_dictionary[option[0]], "jhvhj")
-                if float(design_dictionary[option[0]]) <= 0.0 :
-                    error = "Value can't be equal or less than zero"
-                    all_errors.append(error)
-                else:
-                    flag1 = True
-
-            if option[2] == TYPE_TEXTBOX and option[0] == KEY_AXIAL:
-
-                if float(design_dictionary[option[0]]) <= 0.0:
-                    error = "Value can't be equal or less than zero"
-                    all_errors.append(error)
-                else:
-                    flag2 = True
-
-            # if option[0]== KEY_SEC_PROFILE and option[4] in ["Angles","Channels"]:
-            #     self.include_status = False
 
         if len(missing_fields_list) > 0:
             error = self.generate_missing_fields_error_string(self, missing_fields_list)
@@ -1982,8 +1980,6 @@ class Tension_bolted(Member):
             self.inter_dia = 0.0
             self.inter_grade =0.0
 
-
-
     def results_to_test(self, filename):
         test_out_list = {KEY_DISP_DESIGNATION:self.section_size_1.designation,
                          KEY_DISP_TENSION_YIELDCAPACITY:self.section_size_1.tension_yielding_capacity,
@@ -2129,13 +2125,13 @@ class Tension_bolted(Member):
                                       'R1(mm)': round(section_size.root_radius,2),
                                       'R2(mm)':round(section_size.toe_radius,2),
                                       'Cy(mm)': round(section_size.Cy,2),
-                                      'Ix(mm4)': round(section_size.mom_inertia_z,2),
+                                      'Iz(mm4)': round(section_size.mom_inertia_z,2),
                                       'Iy(mm4)': round(section_size.mom_inertia_y,2),
-                                      'rx(mm)': round(section_size.rad_of_gy_z,2),
+                                      'rz(mm)': round(section_size.rad_of_gy_z,2),
                                       'ry(mm)': round(section_size.rad_of_gy_y,2),
-                                      'Zx(mm3)': round(section_size.elast_sec_mod_z,2),
+                                      'Zz(mm3)': round(section_size.elast_sec_mod_z,2),
                                       'Zy(mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'Zpx(mm3)': round(section_size.plast_sec_mod_z,2),
+                                      'Zpz(mm3)': round(section_size.plast_sec_mod_z,2),
                                       'Zpy(mm3)': round(section_size.elast_sec_mod_y,2),
                                       'r(mm)': round(gyration,2)}
             thickness = section_size.web_thickness
@@ -2149,24 +2145,24 @@ class Tension_bolted(Member):
                                       KEY_DISP_FY: round(section_size.fy,2),
                                       'Mass': round(section_size.mass,2),
                                       'Area(mm2) - A': round((section_size.area),2),
-                                      'A(mm)': round(section_size.max_leg,2),
-                                      'B(mm)': round(section_size.min_leg,2),
+                                      'a(mm)': round(section_size.max_leg,2),
+                                      'b(mm)': round(section_size.min_leg,2),
                                       't(mm)': round(section_size.thickness,2),
                                       'R1(mm)': round(section_size.root_radius,2),
                                       'R2(mm)': round(section_size.toe_radius,2),
                                       'Cy(mm)': round(section_size.Cy,2),
-                                      'Cx(mm)': round(section_size.Cz,2),
-                                      'Ix(mm4)': round(section_size.mom_inertia_z,2),
+                                      'Cz(mm)': round(section_size.Cz,2),
+                                      'Iz(mm4)': round(section_size.mom_inertia_z,2),
                                       'Iy(mm4)': round(section_size.mom_inertia_y,2),
                                       'Iu(mm4)': round(section_size.mom_inertia_u,2),
                                       'Iv(mm4)': round(section_size.mom_inertia_v,2),
-                                      'rx(mm)': round(section_size.rad_of_gy_z,2),
+                                      'rz(mm)': round(section_size.rad_of_gy_z,2),
                                       'ry(mm)': round((section_size.rad_of_gy_y),2),
                                       'ru(mm)': round((section_size.rad_of_gy_u),2),
                                       'rv(mm)': round((section_size.rad_of_gy_v),2),
-                                      'Zx(mm3)': round(section_size.elast_sec_mod_z,2),
+                                      'Zz(mm3)': round(section_size.elast_sec_mod_z,2),
                                       'Zy(mm3)': round(section_size.elast_sec_mod_y,2),
-                                      'Zpx(mm3)': round(section_size.plast_sec_mod_z,2),
+                                      'Zpz(mm3)': round(section_size.plast_sec_mod_z,2),
                                       'Zpy(mm3)': round(section_size.elast_sec_mod_y,2),
                                       'r(mm)': round(gyration,2)}
             thickness = section_size.thickness

@@ -638,7 +638,8 @@ KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (cm<sup>3</sup>)'
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
-KEY_DISP_AXB= 'AXB'
+KEY_DISP_A= 'A'
+KEY_DISP_B= 'B'
 KEY_DISP_LEG_THK = 'Leg Thickness (mm)'
 KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
@@ -685,14 +686,14 @@ KEY_PLATE_MAX_HEIGHT = 'Plate.MaxHeight'
 KEY_SLENDER = "Member.Slenderness"
 
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
-KEY_FLANGE_PLATE_HEIGHT = 'flange_plate.Height'
+KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Height'
 
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
 
 KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 
-KEY_INNERFLANGE_PLATE_HEIGHT = 'flange_plate.InnerHeight'
+KEY_INNERFLANGE_PLATE_HEIGHT = 'Flange_Plate.InnerHeight'
 KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
 
 KEY_DISP_AREA_CHECK ="Plate Area check (mm2)"
@@ -706,24 +707,34 @@ KEY_FLANGE_PLATE_GAUGE = "Flange_plate.gauge_provided "
 KEY_ENDDIST_FLANGE= 'Flange_plate.end_dist_provided '
 KEY_EDGEDIST_FLANGE= 'Flange_plate.edge_dist_provided'
 
-
-KEY_FLANGE_CAPACITY ="Flange_plate.capacity"
-KEY_FLANGE_PLATE_TEN_CAP ="Flange_plate.tension_capacity"
+KEY_FLANGE_CAPACITY ='section.flange_capacity'
+KEY_DISP_FLANGE_CAPACITY= 'Capacity'
+# flange
 KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
 KEY_DISP_FLANGE_TEN_CAPACITY ="Flange Tension Capacity (kN)"
+KEY_TENSIONYIELDINGCAP_FLANGE = 'section.tension_yielding_capacity'
+KEY_DISP_TENSIONYIELDINGCAP_FLANGE = 'Tension Yielding Capacity (kN)'
+KEY_TENSIONRUPTURECAP_FLANGE='self.section.tension_rupture_capacity '
+KEY_DISP_TENSIONRUPTURECAP_FLANGE= 'Tension Rupture Capacity (kN)'
+KEY_BLOCKSHEARCAP_FLANGE='section.block_shear_capacity'
+KEY_DISP_BLOCKSHEARCAP_FLANGE='Block Shear Capacity (kN)'
+# flange plate
+KEY_TENSIONYIELDINGCAP_FLANGE_PLATE = 'Flange_plate.tension_yielding_capacity (kN)'
+KEY_DISP_TENSIONYIELDINGCAP_FLANGE_PLATE ='Tension Yielding Capacity (kN)'
+KEY_TENSIONRUPTURECAP_FLANGE_PLATE= 'Flange_plate.tension_rupture_capacity (kN)'
+KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE ='Tension Rupture Capacity (kN)'
+KEY_BLOCKSHEARCAP_FLANGE_PLATE = 'flange_plate.block_shear_capacity '
+KEY_DISP_BLOCKSHEARCAP_FLANGE_PLATE ='Block Shear Capacity (kN)'
+KEY_FLANGE_PLATE_TEN_CAP ="flange_plate.tension_capacity_flange_plate"
+KEY_DISP_FLANGE_PLATE_TEN_CAP ='Flange Plate Tension Capacity (kN)'
 
 
-
-KEY_BLOCKSHEARCAP_FLANGE='Flange_plate.block_shear_capacity'
-KEY_DISP_BLOCKSHEARCAP_FLANGE='Flange Block Shear Capacity (kN)'
-KEY_TENSIONYIELDINGCAP_FLANGE = 'Flange_plate.tension_yielding_capacity'
-KEY_DISP_TENSIONYIELDINGCAP_FLANGE = 'Flange Tension Yielding Capacity (kN)'
-KEY_TENSIONRUPTURECAP_FLANGE= 'Flange_plate.tension_rupture_capacity'
-KEY_DISP_TENSIONRUPTURECAP_FLANGE= 'Flange Tension Rupture Capacity (kN)'
-KEY_SHEARYIELDINGCAP_FLANGE= 'Flange_plate.shear_yielding_capacity'
-KEY_DISP_SHEARYIELDINGCAP_FLANGE= 'Shear Yielding Capacity (kN)'
-KEY_SHEARRUPTURECAP_FLANGE= 'Flange_plate.shear_rupture_capacity'
-KEY_DISP_SHEARRUPTURECAP_FLANGE= 'Shear Rupture Capacity (kN)'
+# KEY_TENSIONRUPTURECAP_FLANGE= 'Flange_plate.tension_rupture_capacity'
+# KEY_DISP_TENSIONRUPTURECAP_FLANGE= 'Flange Tension Rupture Capacity (kN)'
+# KEY_SHEARYIELDINGCAP_FLANGE= 'Flange_plate.shear_yielding_capacity'
+# KEY_DISP_SHEARYIELDINGCAP_FLANGE= 'Shear Yielding Capacity (kN)'
+# KEY_SHEARRUPTURECAP_FLANGE= 'Flange_plate.shear_rupture_capacity'
+# KEY_DISP_SHEARRUPTURECAP_FLANGE= 'Shear Rupture Capacity (kN)'
 KEY_FLANGE_PLATE_MOM_DEMAND = 'Flange_Plate.MomDemand'
 KEY_FLANGE_DISP_PLATE_MOM_DEMAND = 'Flange Moment Demand (kNm)'
 KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
@@ -860,26 +871,39 @@ KEY_DISP_END_DIST_W = 'End Distance'
 KEY_EDGEDIST_W = 'Web_plate.edge_dist_provided'
 KEY_DISP_EDGEDIST_W = 'Edge Distance'
 
-KEY_WEB_CAPACITY ="Web_plate.capacity"
-KEY_DISP_WEB_CAPACITY= 'Capacity'
-KEY_WEB_TEN_CAPACITY ="Section.Tension_capacity_web"
-KEY_DISP_WEB_TEN_CAPACITY ="Web Tension Capacity (kN)"
-KEY_WEBPLATE_SHEAR_CAPACITY ="Section.shear_capacity_web_plate"
-KEY_DISP_WEBPLATE_SHEAR_CAPACITY ="Plate Shear Capacity (kN)"
-KEY_TEN_CAP_WEB_PLATE ="Web_plate.tension_capacity"
-KEY_DISP_TEN_CAP_WEB_PLATE ="Plate Tension Capacity (kN)"
+KEY_WEB_CAPACITY ='section.web_capacities'
+KEY_DISP_WEB_CAPACITY ='Capacity'
 
-
-KEY_SHEARYIELDINGCAP_WEB= 'web_plate.shear_yielding_capacity'
-KEY_DISP_SHEARYIELDINGCAP_WEB= 'Web Shear Yielding Capacity (kN)'
-KEY_BLOCKSHEARCAP_WEB='web_plate.block_shear_capacity'
-KEY_DISP_BLOCKSHEARCAP_WEB='Web Block Shear Capacity (kN)'
-KEY_SHEARRUPTURECAP_WEB= 'web_plate.shear_rupture_capacity'
-KEY_DISP_SHEARRUPTURECAP_WEB= 'Web Shear Rupture Capacity (kN)'
-KEY_TENSIONYIELDINGCAP_WEB = "web_plate.tension_yielding_capacity"
+# Web plate
+KEY_WEB_PLATE_CAPACITY ="Web_plate.capacity"
+KEY_DISP_WEB_PLATE_CAPACITY= 'Web Plate Tension Capacity'
+KEY_TEN_YIELDCAPACITY_WEB_PLATE = "Web_plate.tension_yielding"
+KEY_DISP_TENSION_YIELDCAPACITY_WEB_PLATE = 'Tension Yielding Capacity (kN)'
+KEY_TENSION_RUPTURECAPACITY_WEB_PLATE = "Web_plate.tension_rupture"
+KEY_DISP_TENSION_RUPTURECAPACITY_WEB_PLATE= 'Tension Rupture Capacity (kN)'
+KEY_TENSION_BLOCKSHEARCAPACITY_WEB_PLATE = "Web_plate.tension_blockshear"
+KEY_DISP_TENSION_BLOCKSHEARCAPACITY_WEB_PLATE = 'Block Shear Capacity (kN)'
+# Web
+KEY_TENSIONYIELDINGCAP_WEB = "section.tension_yielding_capacity_web"
 KEY_DISP_TENSIONYIELDINGCAP_WEB ='Web Tension Yielding Capacity (kN)'
-KEY_TENSIONRUPTURECAP_WEB ='web_plate.shear_rupture_capacity'
+KEY_TENSIONRUPTURECAP_WEB ='section.tension_rupture_capacity_web'
 KEY_DISP_TENSIONRUPTURECAP_WEB ='Web Tension Rupture Capacity (kN)'
+KEY_TENSIONBLOCK_WEB ='section.block_shear_capacity_web'
+KEY_DISP_BLOCKSHEARCAP_WEB ='Block Shear Capacity (kN)'
+KEY_WEB_TEN_CAPACITY ="section.Tension_capacity_web"
+KEY_DISP_WEB_TEN_CAPACITY ="Web Tension Capacity (kN)"
+# web in shear
+KEY_SHEARYIELDINGCAP_WEB_PLATE= 'web_plate.shear_yielding_capacity'
+KEY_DISP_SHEARYIELDINGCAP_WEB_PLATE= 'Shear Yielding Capacity (kN)'
+KEY_BLOCKSHEARCAP_WEB_PLATE='web_plate.block_shear_capacity'
+KEY_DISP_BLOCKSHEARCAP_WEB_PLATE='Block Shear Capacity (kN)'
+KEY_SHEARRUPTURECAP_WEB_PLATE= 'web_plate.shear_rupture_capacity'
+KEY_DISP_SHEARRUPTURECAP_WEB_PLATE= 'Shear Rupture Capacity (kN)'
+KEY_WEBPLATE_SHEAR_CAPACITY_PLATE ="Section.shear_capacity_web_plate"
+KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE ="Web Plate Shear Capacity (kN)"
+
+
+
 KEY_WEB_PLATE_MOM_DEMAND = 'Web_Plate.MomDemand'
 KEY_WEB_DISP_PLATE_MOM_DEMAND = 'Web Moment Demand (kNm)'
 KEY_WEB_PLATE_MOM_CAPACITY='Web_plate.MomCapacity'
@@ -1180,6 +1204,12 @@ KEY_OUT_DISP_WELD_TYPE = 'Weld Type'
 KEY_OUT_STIFFENER_DETAILS = 'Stiffener.details'
 KEY_OUT_DISP_STIFFENER_DETAILS = 'Stiffener Details'
 KEY_OUT_STIFFENER_TITLE = 'Stiffener.Title'
+KEY_P2_WEB = 'Bolt.pitch2_web'
+KEY_P2_FLANGE = 'Bolt.pitch2_flange'
+KEY_Y_SQR = 'Bolt.y_sqr'
+KEY_BOLT_TENSION = 'Bolt.t_b'
+KEY_BOLT_SHEAR = 'Bolt.v_sb'
+KEY_PLATE_MOMENT = 'Plate.m_ep'
 
 DISP_TITLE_WELD = 'Weld'
 KEY_OUT_WELD_SIZE = 'Weld.Size'
@@ -1316,17 +1346,18 @@ def get_leg_lengths(designation):
         Function to fetch designation values from respective Tables.
     """
     conn = sqlite3.connect(PATH_TO_DATABASE)
-    db_query = "SELECT AXB, t, R1 FROM Angles WHERE Designation = ?"
+    db_query = "SELECT a, b, t, R1 FROM Angles WHERE Designation = ?"
     cur = conn.cursor()
     cur.execute(db_query, (designation,))
     row = cur.fetchone()
 
-    axb = row[0]
-    t = row[1]
-    r_r = row[2]
-    axb = axb.lower()
-    leg_a_length = float(axb.split("x")[0])
-    leg_b_length = float(axb.split("x")[1])
+    a = row[0]
+    b = row[1]
+    t = row[2]
+    r_r = row[3]
+    # axb = axb.lower()
+    leg_a_length = float(a)
+    leg_b_length = float(b)
     conn.close()
     return leg_a_length,leg_b_length,t,r_r
 

@@ -82,6 +82,12 @@ class MomentConnection(Connection, IS800_2007):
             plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
 
+        if KEY_SEC_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_SEC_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
+
         section = []
         t1 = (KEY_SECSIZE, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
         section.append(t1)

@@ -1250,7 +1250,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
         module = main.module_name(main)
 
-        if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE]:
+        if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE, KEY_DISP_BCENDPLATE]:
 
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
@@ -1348,7 +1348,7 @@ class Ui_Dialog(object):
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
                 if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC:
                     Designation_c = ch.text()
-                elif ch.objectName() == 'Label_21':
+                elif ch.objectName() == 'Label_23':
                     Source_c = ch.text()
                 elif ch.objectName() == 'Label_1':
                     D_c = float(ch.text())
@@ -1388,6 +1388,14 @@ class Ui_Dialog(object):
                     if ch.text() == "":
                         ch.setText("0")
                     Zpy_c = ch.text()
+                elif ch.objectName() == 'Label_21':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    It_c = ch.text()
+                elif ch.objectName() == 'Label_22':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    Iw_c = ch.text()
                 else:
                     pass
             elif isinstance(ch, QtWidgets.QComboBox):
@@ -1405,22 +1413,22 @@ class Ui_Dialog(object):
                 data = c.fetchone()[0]
             if data == 0:
                 if table == "Beams":
-                    c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
-                        Zz,zy,Zpz,Zpy,FlangeSlope,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                    c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+                        Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                               (Designation_c, Mass_c, Area_c,
-                               D_c, B_c, tw_c, T_c,
+                               D_c, B_c, tw_c, T_c,FlangeSlope_c,
                                R1_c, R2_c, Iz_c, Iy_c, rz_c,
                                ry_c, Zz_c, Zy_c,
-                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c, Type))
+                               Zpz_c, Zpy_c, It_c,Iw_c,Source_c, Type))
                     conn.commit()
                 else:
-                    c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
-                        Zz,zy,Zpz,Zpy,FlangeSlope,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                    c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+                        Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                               (Designation_c, Mass_c, Area_c,
-                               D_c, B_c, tw_c, T_c,
+                               D_c, B_c, tw_c, T_c,FlangeSlope_c,
                                R1_c, R2_c, Iz_c, Iy_c, rz_c,
                                ry_c, Zz_c, Zy_c,
-                               Zpz_c, Zpy_c, FlangeSlope_c, Source_c, Type))
+                               Zpz_c, Zpy_c, It_c,Iw_c,Source_c, Type))
                     conn.commit()
                 c.close()
                 conn.close()
@@ -1445,7 +1453,7 @@ class Ui_Dialog(object):
 
                 if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTDSEC:
                     Designation_b = ch.text()
-                elif ch.objectName() == 'Label_21':
+                elif ch.objectName() == 'Label_23':
                     Source_b = ch.text()
                 elif ch.objectName() == 'Label_1':
                     D_b = float(ch.text())
@@ -1485,6 +1493,14 @@ class Ui_Dialog(object):
                     if ch.text() == "":
                         ch.setText("0")
                     Zpy_b = ch.text()
+                elif ch.objectName() == 'Label_21':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    I_t = ch.text()
+                elif ch.objectName() == 'Label_22':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    I_w = ch.text()
                 else:
                     pass
             elif isinstance(ch, QtWidgets.QComboBox):
@@ -1498,13 +1514,13 @@ class Ui_Dialog(object):
             c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_b,))
             data = c.fetchone()[0]
             if data == 0:
-                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,Zz,zy,Zpz,Zpy,
-                    FlangeSlope,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,
+                    It,Iw,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                           (Designation_b, Mass_b, Area_b,
                            D_b, B_b, tw_b, T_b, FlangeSlope_b,
                            R1_b, R2_b, Iz_b, Iy_b, rz_b,
                            ry_b, Zz_b, Zy_b,
-                           Zpz_b, Zpy_b, Source_b, Type))
+                           Zpz_b, Zpy_b,I_t,I_w, Source_b, Type))
                 conn.commit()
                 c.close()
                 conn.close()
@@ -1539,10 +1555,12 @@ class Ui_Dialog(object):
 
                 if ch.objectName() == KEY_SECSIZE_SELECTED or ch.objectName() == KEY_ANGLE_SELECTED:
                     Designation_a = ch.text()
-                elif ch.objectName() == 'Label_23':
+                elif ch.objectName() == 'Label_24':
                     Source = ch.text()
                 elif ch.objectName() == 'Label_1':
-                    AXB = ch.text()
+                    a = ch.text()
+                elif ch.objectName() == 'Label_2':
+                    b = ch.text()
                 elif ch.objectName() == 'Label_3':
                     t = float(ch.text())
                 elif ch.objectName() == 'Label_4':
@@ -1593,6 +1611,10 @@ class Ui_Dialog(object):
                     if ch.text() == "":
                         ch.setText("0")
                     zpy = ch.text()
+                elif ch.objectName() == 'Label_23':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    It = ch.text()
 
                 else:
                     pass
@@ -1608,11 +1630,11 @@ class Ui_Dialog(object):
             c.execute("SELECT count(*) FROM Angles WHERE Designation = ?", (Designation_a,))
             data = c.fetchone()[0]
             if data == 0:
-                c.execute('''INSERT INTO Angles (Designation,Mass,Area,AXB,t,R1,R2,Cz,Cy,Iz,Iy,Iumax,Ivmin,rz,ry,
-                rumax,rvmin,Zz,Zy,Zpz,Zpy,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                c.execute('''INSERT INTO Angles (Designation,Mass,Area,a,b,t,R1,R2,Cz,Cy,Iz,Iy,Iumax,Ivmin,rz,ry,
+                rumax,rvmin,Zz,Zy,Zpz,Zpy,It,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                           (Designation_a, Mass, Area,
-                           AXB, t, R1, R2, Cz,Cy,I_z,I_y,I_u_max,
-                           I_v_min, rz, ry, ru_max, rv_min,zz,zy,zpz,zpy,Source,Type))
+                           a,b, t, R1, R2, Cz,Cy,I_z,I_y,I_u_max,
+                           I_v_min, rz, ry, ru_max, rv_min,zz,zy,zpz,zpy,It,Source,Type))
                 conn.commit()
                 c.close()
                 conn.close()

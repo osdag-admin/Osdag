@@ -391,7 +391,7 @@ class Section(Material):
                                                                                    self.web_thickness,self.flange_thickness)*10**4 \
             if row[20] is None else row[20] * 10**4
         self.source = row[21]
-        self.type = row[22]
+        self.type = 'Rolled' if row[22] is None else row[22]
 
         conn.close()
 
@@ -744,12 +744,12 @@ class Channel(Section):
         self.source = row[20]
         self.It = row[21]
         self.Iw = row[22]
+        self.source = row[23]
 
-
-        if row[21] is None:
+        if row[24] is None:
             self.Type = 'Rolled'
         else:
-            self.Type = row[21]
+            self.Type = row[24]
 
         conn.close()
 

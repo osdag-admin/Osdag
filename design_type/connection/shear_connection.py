@@ -157,7 +157,7 @@ class ShearConnection(Connection):
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         section.append(t5)
 
-        t6 = ('Label_1', KEY_DISP_AXB, TYPE_TEXTBOX, None, axb)
+        t6 = ('Label_1', KEY_DISP_A, TYPE_TEXTBOX, None, axb)
         section.append(t6)
 
         t8 = ('Label_3', KEY_DISP_LEG_THK, TYPE_TEXTBOX, None, thickness)

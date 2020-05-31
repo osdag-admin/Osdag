@@ -296,6 +296,8 @@ class Section(Material):
         self.elast_sec_mod_y = 0.0
         self.plast_sec_mod_z = 0.0
         self.plast_sec_mod_y = 0.0
+        self.torsion_const = 0.0
+        self.warping_const = 0.0
         self.source = 0.0
 
         self.tension_yielding_capacity = 0.0
@@ -380,10 +382,16 @@ class Section(Material):
                                                                                    self.web_thickness,self.flange_thickness)*1000
         else:
             self.plast_sec_mod_y = row[17] * 1000
+        print(row[19])
 
-        self.source = row[19]
-        self.It = row[20]
-        self.Iw = row[21]
+        self.It = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)*10**4\
+            if row[19] is None else row[19] * 10**4
+        self.Iw = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)*10**4 \
+            if row[20] is None else row[20] * 10**4
+        self.source = row[21]
+        self.type = row[22]
 
         conn.close()
 
@@ -1636,9 +1644,9 @@ class Angle(Section):
         self.elast_sec_mod_y = row[21] * 1000
         self.plast_sec_mod_z = row[22] * 1000
         self.plast_sec_mod_y = row[23] * 1000
-        self.source = row[24]
-        self.It = row[25]
-        if row[24] is None:
+        self.source = row[25]
+        self.It = row[24]
+        if row[26] is None:
             self.Type = 'Rolled'
         else:
             self.Type = row[24]
@@ -1732,6 +1740,13 @@ class I_sectional_Properties(object):
         self.Z_py = 2 * (self.A / 2 * self.z_p)
         return round(self.Z_py,1)
 
+    #TODO:add formula
+    def calc_torsion_const (self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        return 0.0
+
+    def calc_warping_const (self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        return 0.0
+
 class Single_Angle_Properties(object):
 
     def calc_Mass(self,a,b,t):
@@ -1758,47 +1773,51 @@ class Single_Angle_Properties(object):
         self.I_zz = (a**3*b)/12 - ((b-t)*(a-t)**3)/12 + (a*b*(a/2-Cy)**2) - ((a-t)*(b-t)*((a+t)/2-Cy))
         return round(self.I_zz, 2)
 
-    def calc_MomentOfAreaY(self,axb,t):
+    def calc_MomentOfAreaY(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_MomentOfAreaU(self,axb,t):
+    def calc_MomentOfAreaU(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_MomentOfAreaV(self,axb,t):
+    def calc_MomentOfAreaV(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_RogZ(self,axb,t):
+    def calc_RogZ(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_RogY(self,axb,t):
+    def calc_RogY(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_RogU(self,axb,t):
+    def calc_RogU(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_RogV(self,axb,t):
+    def calc_RogV(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_ElasticModulusZz(self,axb,t):
+    def calc_ElasticModulusZz(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_ElasticModulusZy(self,axb,t):
+    def calc_ElasticModulusZy(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_PlasticModulusZpz(self,axb,t):
+    def calc_PlasticModulusZpz(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_PlasticModulusZpy(self,axb,t):
+    def calc_PlasticModulusZpy(self,a,b,t):
+        a = 0.0
+        return a
+
+    def calc_TorsionConstantIt(self,a,b,t):
         a = 0.0
         return a
 

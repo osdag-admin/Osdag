@@ -66,7 +66,8 @@ class ShearConnection(Connection):
             fy = ''
             mass = ''
             area = ''
-            axb = ''
+            a = ''
+            b = ''
             thickness = ''
             root_radius = ''
             toe_radius = ''
@@ -84,6 +85,7 @@ class ShearConnection(Connection):
             elast_sec_mod_y = ''
             plast_sec_mod_z = ''
             plast_sec_mod_y = ''
+            torsion_const=''
             source = ''
             m_o_e = "200"
             m_o_r = "76.9"
@@ -97,7 +99,8 @@ class ShearConnection(Connection):
             source = str(Angle_attributes.source)
             fu = str(Angle_attributes.fu)
             fy = str(Angle_attributes.fy)
-            axb = str(Angle_attributes.axb)
+            a = str(Angle_attributes.a)
+            b = str(Angle_attributes.b)
             thickness = str(Angle_attributes.thickness)
             root_radius = str(Angle_attributes.root_radius)
             toe_radius = str(Angle_attributes.toe_radius)
@@ -121,6 +124,7 @@ class ShearConnection(Connection):
             elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
+            torsion_const = str(Angle_attributes.torsion_const)
 
         if KEY_CONNECTOR_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_CONNECTOR_MATERIAL]
@@ -157,7 +161,10 @@ class ShearConnection(Connection):
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         section.append(t5)
 
-        t6 = ('Label_1', KEY_DISP_AXB, TYPE_TEXTBOX, None, axb)
+        t6 = ('Label_1', KEY_DISP_A, TYPE_TEXTBOX, None, a)
+        section.append(t6)
+
+        t6 = ('Label_2', KEY_DISP_B, TYPE_TEXTBOX, None, b)
         section.append(t6)
 
         t8 = ('Label_3', KEY_DISP_LEG_THK, TYPE_TEXTBOX, None, thickness)
@@ -181,10 +188,10 @@ class ShearConnection(Connection):
         t18 = (None, None, TYPE_ENTER, None, None)
         section.append(t18)
 
-        t15 = ('Label_26', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        t15 = ('Label_27', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
         section.append(t15)
 
-        t16 = ('Label_27', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        t16 = ('Label_28', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
         section.append(t16)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
@@ -238,10 +245,13 @@ class ShearConnection(Connection):
         t27 = ('Label_22', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
         section.append(t27)
 
+        t27 = ('Label_23', KEY_DISP_It, TYPE_TEXTBOX, None, torsion_const)
+        section.append(t27)
+
         t28 = (None, None, TYPE_BREAK, None, None)
         section.append(t28)
 
-        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = ('Label_24', 'Source', TYPE_TEXTBOX, None, source)
         section.append(t29)
 
         t30 = (None, None, TYPE_ENTER, None, None)
@@ -250,10 +260,10 @@ class ShearConnection(Connection):
         t30 = (None, None, TYPE_ENTER, None, None)
         section.append(t30)
 
-        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        t31 = ('Label_25', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
         section.append(t31)
 
-        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        t32 = ('Label_26', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         section.append(t32)
 
         t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, None)
@@ -272,7 +282,8 @@ class ShearConnection(Connection):
         Type= str(Angle_attributes.Type)
         fu = str(Angle_attributes.fu)
         fy = str(Angle_attributes.fy)
-        axb = str(Angle_attributes.axb)
+        a = str(Angle_attributes.leg_a_length)
+        b = str(Angle_attributes.leg_b_length)
         thickness = str(Angle_attributes.thickness)
         root_radius = str(Angle_attributes.root_radius)
         toe_radius = str(Angle_attributes.toe_radius)
@@ -292,34 +303,38 @@ class ShearConnection(Connection):
         elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
         plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
         plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
+        torsion_const = str(Angle_attributes.torsion_const)
         d = {
-             KEY_ANGLE_SELECTED:designation,
+            KEY_ANGLE_SELECTED:designation,
             KEY_CONNECTOR_MATERIAL: material_grade,
-             KEY_CONNECTOR_FY:fy,
-             KEY_CONNECTOR_FU:fu,
-             'Label_1': axb,
-             'Label_3':thickness,
-             'Label_4':root_radius,
-             'Label_5':toe_radius,
+            KEY_CONNECTOR_FY:fy,
+            KEY_CONNECTOR_FU:fu,
+            'Label_1': a,
+            'Label_2': b,
+            'Label_3':thickness,
+            'Label_4':root_radius,
+            'Label_5':toe_radius,
             'Label_6':Type,
             'Label_7': Cz,
             'Label_8': Cy,
-             'Label_9':mass,
-             'Label_10':area,
-             'Label_11':mom_inertia_z,
-             'Label_12':mom_inertia_y,
-             'Label_13':mom_inertia_u,
-             'Label_14':mom_inertia_v,
-             'Label_15':rad_of_gy_z,
-             'Label_16':rad_of_gy_y,
-             'Label_17':rad_of_gy_u,
-             'Label_18':rad_of_gy_v,
-             'Label_19':elast_sec_mod_z,
-             'Label_20':elast_sec_mod_y,
-             'Label_21':plast_sec_mod_z,
-             'Label_22':plast_sec_mod_y,
-             'Label_23':source}
+            'Label_9':mass,
+            'Label_10':area,
+            'Label_11':mom_inertia_z,
+            'Label_12':mom_inertia_y,
+            'Label_13':mom_inertia_u,
+            'Label_14':mom_inertia_v,
+            'Label_15':rad_of_gy_z,
+            'Label_16':rad_of_gy_y,
+            'Label_17':rad_of_gy_u,
+            'Label_18':rad_of_gy_v,
+            'Label_19':elast_sec_mod_z,
+            'Label_20':elast_sec_mod_y,
+            'Label_21':plast_sec_mod_z,
+            'Label_22':plast_sec_mod_y,
+            'Label_23':torsion_const,
+            'Label_24':source}
         return d
+
     @staticmethod
     def pltthk_customized():
         a = VALUES_PLATETHK_CUSTOMIZED

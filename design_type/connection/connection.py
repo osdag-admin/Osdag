@@ -41,6 +41,8 @@ class Connection(Main):
             elast_sec_mod_y = ''
             plast_sec_mod_z = ''
             plast_sec_mod_y = ''
+            torsion_const = ''
+            warping_const = ''
 
         else:
             designation = str(input_dictionary[KEY_SUPTNGSEC])
@@ -72,6 +74,8 @@ class Connection(Main):
             elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
+            torsion_const = str(I_sec_attributes.torsion_const)
+            warping_const = str(I_sec_attributes.warping_const)
 
         if KEY_SUPTNGSEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SUPTNGSEC_MATERIAL]
@@ -95,6 +99,9 @@ class Connection(Main):
 
         t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         supporting_section.append(t4)
+
+        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
+        supporting_section.append(t5)
 
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         supporting_section.append(t5)
@@ -171,10 +178,16 @@ class Connection(Main):
         t27 = ('Label_20', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
         supporting_section.append(t27)
 
+        t26 = ('Label_21', KEY_DISP_It, TYPE_TEXTBOX, None, torsion_const)
+        supporting_section.append(t26)
+
+        t27 = ('Label_22', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
+        supporting_section.append(t27)
+
         t28 = (None, None, TYPE_BREAK, None, None)
         supporting_section.append(t28)
 
-        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
         supporting_section.append(t29)
 
         t30 = (None, None, TYPE_ENTER, None, None)
@@ -183,10 +196,10 @@ class Connection(Main):
         t30 = (None, None, TYPE_ENTER, None, None)
         supporting_section.append(t30)
 
-        t31 = ('Label_22', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
         supporting_section.append(t31)
 
-        t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         supporting_section.append(t32)
 
         t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, None)
@@ -226,6 +239,8 @@ class Connection(Main):
             elast_sec_mod_y = ''
             plast_sec_mod_z = ''
             plast_sec_mod_y = ''
+            torsion_const = ''
+            warping_const = ''
 
         else:
             designation = str(input_dictionary[KEY_SUPTDSEC])
@@ -258,6 +273,8 @@ class Connection(Main):
             elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
+            torsion_const = str(I_sec_attributes.torsion_const)
+            warping_const = str(I_sec_attributes.warping_const)
 
         if KEY_SUPTDSEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SUPTDSEC_MATERIAL]
@@ -357,10 +374,16 @@ class Connection(Main):
         t27 = ('Label_20', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
         supporting_section.append(t27)
 
+        t26 = ('Label_21', KEY_DISP_It, TYPE_TEXTBOX, None, torsion_const)
+        supporting_section.append(t26)
+
+        t27 = ('Label_22', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
+        supporting_section.append(t27)
+
         t28 = (None, None, TYPE_BREAK, None, None)
         supporting_section.append(t28)
 
-        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
         supporting_section.append(t29)
 
         t30 = (None, None, TYPE_ENTER, None, None)
@@ -369,63 +392,16 @@ class Connection(Main):
         t30 = (None, None, TYPE_ENTER, None, None)
         supporting_section.append(t30)
 
-        t31 = ('Label_22', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
         supporting_section.append(t31)
 
-        t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         supporting_section.append(t32)
 
         t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, None)
         supporting_section.append(t33)
 
         return supporting_section
-
-    def get_I_sec_properties(self):
-
-        if '' in self:
-            mass = ''
-            area = ''
-            moa_z = ''
-            moa_y = ''
-            rog_z = ''
-            rog_y = ''
-            em_z = ''
-            em_y = ''
-            pm_z = ''
-            pm_y = ''
-
-        else:
-            D = float(self[0])
-            B = float(self[1])
-            t_w = float(self[2])
-            t_f = float(self[3])
-
-            sec_prop = I_sectional_Properties()
-            mass = sec_prop.calc_Mass(D, B, t_w, t_f)
-            area = sec_prop.calc_Area(D, B, t_w, t_f)
-            moa_z = sec_prop.calc_MomentOfAreaZ(D, B, t_w, t_f)
-            moa_y = sec_prop.calc_MomentOfAreaY(D, B, t_w, t_f)
-            rog_z = sec_prop.calc_RogZ(D, B, t_w, t_f)
-            rog_y = sec_prop.calc_RogY(D, B, t_w, t_f)
-            em_z = sec_prop.calc_ElasticModulusZz(D, B, t_w, t_f)
-            em_y = sec_prop.calc_ElasticModulusZy(D, B, t_w, t_f)
-            pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
-            pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
-
-        d = {'Label_11': str(mass),
-             'Label_12': str(area),
-             'Label_13': str(moa_z),
-             'Label_14': str(moa_y),
-             'Label_15': str(rog_z),
-             'Label_16': str(rog_y),
-             'Label_17': str(em_z),
-             'Label_18': str(em_y),
-             'Label_19': str(pm_z),
-             'Label_20': str(pm_y),
-            }
-
-        return d
-
 
     def get_fu_fy(self):
         material_grade = self[0]

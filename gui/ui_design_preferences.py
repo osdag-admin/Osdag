@@ -822,7 +822,7 @@ class Ui_Dialog(object):
                 self.tabWidget.setTabText(tab_index, tab_name)
                 tab_index += 1
         dialog_height += 170   # 70 for buttons and 100 for whitespaces
-        DesignPreferences.resize(1170,dialog_height)
+        DesignPreferences.resize(1170,dialog_height)  # Width of Design Preference Dialog is not set automatically. You have to adjust the width manually.
         for item in buttons:
             item[0].move(item[1],dialog_height-150)
 

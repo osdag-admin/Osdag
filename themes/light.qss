@@ -566,6 +566,11 @@ QMessageBox QPushButton {
 	padding-right:10px;
 }
 
+QDialog#Dialog QPushButton{
+	font-size:10pt;
+	padding-left:7px;
+	padding-right:7px;
+}
 QFrame#frame{
 
  background: #abc250;

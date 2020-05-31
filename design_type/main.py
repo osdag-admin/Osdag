@@ -248,6 +248,7 @@ class Main():
             em_y = ''
             pm_z = ''
             pm_y = ''
+            It = ''
 
         else:
             a = float(self[0])
@@ -271,6 +272,7 @@ class Main():
             em_y = sec_prop.calc_ElasticModulusZy(a,b, t)
             pm_z = sec_prop.calc_PlasticModulusZpz(a,b, t)
             pm_y = sec_prop.calc_PlasticModulusZpy(a,b, t)
+            It = sec_prop.calc_Torsional_RigidityI_t(a, b, t)
 
         d = {'Label_9': str(mass),
              'Label_10': str(area),
@@ -288,7 +290,7 @@ class Main():
              'Label_20': str(em_y),
              'Label_21': str(pm_z),
              'Label_22': str(pm_y),
-
+             'Label_26': str(It),
              }
 
         return d

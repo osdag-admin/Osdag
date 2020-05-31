@@ -382,7 +382,7 @@ class Section(Material):
             self.plast_sec_mod_y = row[17] * 1000
 
         self.source = row[19]
-        self.It = row[20]
+        self.torsional_rigidity = row[20] *10000
         self.Iw = row[21]
 
         conn.close()
@@ -734,7 +734,7 @@ class Channel(Section):
             self.plast_sec_mod_z = self.elast_sec_mod_z
             self.plast_sec_mod_y = self.elast_sec_mod_y
         self.source = row[20]
-        self.It = row[21]
+        self.torsional_rigidity = row[21] *10000
         self.Iw = row[22]
 
 
@@ -1637,7 +1637,7 @@ class Angle(Section):
         self.plast_sec_mod_z = row[22] * 1000
         self.plast_sec_mod_y = row[23] * 1000
         self.source = row[24]
-        self.It = row[25]
+        self.torsional_rigidity = row[25] *10000
         if row[24] is None:
             self.Type = 'Rolled'
         else:
@@ -1827,14 +1827,18 @@ class Single_Angle_Properties(object):
 
     def calc_PlasticModulusZpz(self,a,b,t):
         Aa = self.calc_Area(a, b, t)
-        # self.Z_pz = t * (b-t) * (a- 0.5*Aa/t-0.5*t) + 0.5* t(a**2 + (Aa/t)**2 - a*(Aa/t))
-        self.Z_pz = 1.000
+        self.Z_pz = t * (b-t) * (a- 0.5* Aa/t-0.5*t) + 0.5* t*(a**2 + (Aa/t)**2 - a*(Aa/t))
+        # self.Z_pz = t * (b-t) * (a- 0.5* Aa/t-0.5*t)
+
+        # self.Z_pz = 1.000
         return round(self.Z_pz, 2)
 
     def calc_PlasticModulusZpy(self,a,b,t):
         Aa = self.calc_Area(a, b, t)
-        # self.Z_py = t * (a - t) * (b - 0.5 * Aa / t - 0.5 * t) + 0.5 * t(b ** 2 + (Aa / t) ** 2 - b * (Aa / t))
-        self.Z_py = 1.000
+        self.Z_py = t * (a - t) * (b - 0.5 * Aa / t - 0.5 * t) + 0.5 * t*(b ** 2 + (Aa / t) ** 2 - b * (Aa / t))
+        # self.Z_py = t * (a - t) * (b - 0.5 * Aa / t - 0.5 * t)
+
+        # self.Z_py = 1.000
         return round(self.Z_py, 2)
 
     def calc_Torsional_RigidityI_t(self,a,b,t):

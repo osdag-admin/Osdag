@@ -235,6 +235,7 @@ class Member(Main):
             elast_sec_mod_y = ''
             plast_sec_mod_z = ''
             plast_sec_mod_y = ''
+            torsional_rigidity = ''
             source = ''
             m_o_e = "200"
             m_o_r = "76.9"
@@ -273,6 +274,7 @@ class Member(Main):
             elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
+            torsional_rigidity = str(Angle_attributes.torsional_rigidity)
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -397,6 +399,9 @@ class Member(Main):
         section.append(t26)
 
         t27 = ('Label_22', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
+        section.append(t27)
+
+        t27 = ('Label_26', KEY_DISP_IT, TYPE_TEXTBOX, None, torsional_rigidity)
         section.append(t27)
 
         t28 = (None, None, TYPE_BREAK, None, None)
@@ -657,6 +662,7 @@ class Member(Main):
         elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
         plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
         plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
+        torsional_rigidity = str(Angle_attributes.torsional_rigidity)
         d = {
              KEY_SECSIZE_SELECTED:designation,
             KEY_SEC_MATERIAL: material_grade,
@@ -684,7 +690,9 @@ class Member(Main):
              'Label_20':elast_sec_mod_y,
              'Label_21':plast_sec_mod_z,
              'Label_22':plast_sec_mod_y,
-             'Label_23':source}
+             'Label_23':source,
+            'Label_26': torsional_rigidity
+        }
         return d
 
     def get_new_channel_section_properties(self):

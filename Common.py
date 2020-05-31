@@ -638,6 +638,8 @@ KEY_DISP_EM_ZZ = 'Elastic modulus, Z<sub>z</sub> (mm<sup>3</sup>)'
 KEY_DISP_EM_ZY = 'Elastic modulus, Z<sub>y</sub> (mm<sup>3</sup>)'
 KEY_DISP_PM_ZPZ = 'Plastic modulus, Z<sub>pz</sub> (mm<sup>3</sup>)'
 KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (mm<sup>3</sup>)'
+KEY_DISP_IT = 'Torsional Rigidity, Z<sub>py</sub> (mm<sup>4</sup>)'
+
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'

@@ -184,6 +184,7 @@ class SeatedAngleConnection(ShearConnection):
 
         return design_input
 
+
     def refresh_input_dock(self):
         """
 
@@ -195,10 +196,20 @@ class SeatedAngleConnection(ShearConnection):
 
         add_buttons = []
 
-        t2 = (KEY_DISP_SEATED_ANGLE, KEY_ANGLE_LIST, TYPE_COMBOBOX, KEY_ANGLE_SELECTED, None, None, "Angles")
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_1, "Columns")
+        add_buttons.append(t1)
+
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_2, "Beams")
+        add_buttons.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTDSEC, None, None, "Beams")
+        add_buttons.append(t2)
+
+        t2 = (KEY_DISP_SEATED_ANGLE, KEY_ANGLE_LIST, TYPE_COMBOBOX_CUSTOMIZED, KEY_ANGLE_SELECTED, None, None, "Angles")
         add_buttons.append(t2)
 
         return add_buttons
+
 
     ####################################
     # Design Preference Functions End

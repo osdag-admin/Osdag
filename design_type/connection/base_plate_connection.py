@@ -1819,7 +1819,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.combined_capacity_anchor = 'N/A'
 
             else:
-                self.v_sb = max(self.load_shear_major, self.load_shear_minor) * 10 ** -3 / self.anchor_nos_provided  # kN
+                # v_sb is calculated considering shear distribution in bolts only on the tension side (outside flange), this is the critical case
+                self.v_sb = (max(self.load_shear_major, self.load_shear_minor) * 10 ** -3) / (self.anchor_nos_provided / 2)  # kN
                 self.v_db = self.anchor_capacity  # kN
                 self.t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
                 self.t_db = self.tension_capacity_anchor  # kN
@@ -1875,7 +1876,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # updating anchor length (adding the length above the concrete pedestal)
         self.grout_thk = 50  # mm
-        self.plate_washer_thk = self.washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_uplift))['washer_thk']  # washer thickness, mm
+        self.plate_washer_thk = self.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_uplift))['washer_thk']  # washer thickness, mm
         self.nut_thk = self.nutThick_Calculation(max(self.anchor_dia_provided, self.anchor_dia_uplift))  # nut thickness, mm
 
         self.anchor_len_below_footing = self.anchor_length_provided  # mm
@@ -2038,7 +2039,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # design of butt/groove weld
         else:
-
             if self.connectivity == 'Welded Column Base':
                 pass
 
@@ -2061,21 +2061,21 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.stiffener_fy = self.dp_column_fy  # MPa
         self.epsilon = math.sqrt(250 / self.stiffener_fy)
 
-        # check for the limiting width to the thickness ratio of the column [Reference: Cl. 3.7.2 and 3.7.4, Table 2, IS 800:2007]
+        # check for the limiting width to the thickness ratio of the column web [Reference: Cl. 3.7.2 and 3.7.4, Table 2, IS 800:2007]
         # if the web does not classify as 'Plastic' section, stiffener shall be provided across the web to limit the effective width
-        ratio = (self.column_D - (2 * self.column_tf)) / self.column_tw
+        ratio = (self.column_D - (2 * self.column_tf)) / self.column_tw  # d/t_w
 
-        # Case 1: Axial compression
+        # Check 1: Axial compression
         if self.connectivity == 'Welded Column Base':
             if ratio > (42 * self.epsilon):
                 self.stiffener_across_web = 'Yes'
 
-        # Case 2: Neutral axis at mid depth of the column
+        # Check 2: Neutral axis at mid depth of the column
         elif self.connectivity == 'Moment Base Plate':
             if ratio > (84 * self.epsilon):
                 self.stiffener_across_web = 'Yes'
 
-        # Case 3: Generally (when there is axial tension/uplift force acting on the column)
+        # Check 3: Generally (when there is axial tension/uplift force acting on the column)
         if self.load_axial_tension > 0:
             r_1 = (self.load_axial_tension / (self.column_D - (2 * self.column_tf) * self.column_tw)) / self.dp_column_fy
             r_1 = - r_1  # r_1 is negative for axial tension
@@ -2206,9 +2206,73 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.stiffener_plt_len_btwn_D = self.column_D - (2 * self.column_tf)  # mm
                 self.stiffener_plt_height_btwn_D = self.stiffener_plt_height_along_web - 10  # mm
-
             else:
                 pass
+
+            # weld checks of the stiffener welds - Combination of stresses [Reference: Cl. 10.5.10.1, IS 800:2007]
+
+            if self.stiffener_along_flange == 'Yes':
+                # Stiffener along flange - weld connecting stiffener to the base plate
+                # the weld will have shear due to the bearing force and axial force due to in-plane bending of the stiffener
+                f_a = (self.shear_on_stiffener_along_flange * 1000 / 2) / (0.7 * self.weld_size_stiffener * self.stiffener_plt_len_along_flange)  # MPa
+                q = (self.moment_on_stiffener_along_flange * 10 ** 6 / self.stiffener_plt_height_along_flange) \
+                    / (0.7 * self.weld_size_stiffener * self.stiffener_plt_len_along_flange)  # MPa
+                f_e = math.sqrt(f_a ** 2 + (3 * q ** 2))  # MPa
+
+                if f_e > ((min(self.dp_column_fu, self.dp_weld_fu_overwrite)) / (math.sqrt(3) * self.gamma_mw)):
+                    self.safe = False
+                    logger.warning("The weld fails in the comb check")
+                    logger.info("Updating the weld size")
+                else:
+                    pass
+
+            if self.stiffener_along_web == 'Yes':
+                # Stiffener along web - weld connecting stiffener to the base plate
+                # the weld will have shear due to the bearing force and axial force due to in-plane bending of the stiffener
+                f_a = (self.shear_on_stiffener_along_web * 1000 / 2) / (0.7 * self.weld_size_stiffener * self.stiffener_plt_len_along_web)  # MPa
+                q = (self.moment_on_stiffener_along_web * 10 ** 6 / self.stiffener_plt_height_along_web) \
+                    / (0.7 * self.weld_size_stiffener * self.stiffener_plt_len_along_web)  # MPa
+                f_e = math.sqrt(f_a ** 2 + (3 * q ** 2))  # MPa
+
+                if f_e > ((min(self.dp_column_fu, self.dp_weld_fu_overwrite)) / (math.sqrt(3) * self.gamma_mw)):
+                    self.safe = False
+                    logger.warning("The weld fails in the comb check")
+                    logger.info("Updating the weld size")
+                else:
+                    pass
+
+            # updating the stiffener weld size if it fails in the stress combination check
+            if self.stiffener_along_flange or self.stiffener_along_web == 'Yes':
+
+                n = 1
+                while f_e > ((min(self.dp_column_fu, self.dp_weld_fu_overwrite)) / (math.sqrt(3) * self.gamma_mw)):
+
+                    weld_list = list(range(self.weld_size_stiffener, self.stiffener_plate_thick, 2))
+                    weld_list = weld_list + [self.stiffener_plate_thick]
+                    weld_list = weld_list[n - 1:]
+
+                    for i in weld_list:
+                        self.weld_size_stiffener = i
+                        break
+
+                    # choosing maximum force and minimum length and height combination for a conservative weld size
+                    max_shear = max(self.shear_capa_stiffener_along_flange, self.shear_on_stiffener_along_web)
+                    max_moment = max(self.moment_on_stiffener_along_flange, self.moment_on_stiffener_along_web)
+                    min_len = min(self.stiffener_plt_len_along_flange, self.stiffener_plt_len_along_web)
+                    min_height = min(self.stiffener_plt_height_along_flange, self.stiffener_plt_height_along_web)
+
+                    f_a = (max_shear * 1000 / 2) / (0.7 * self.weld_size_stiffener * min_len)  # MPa
+                    q = (max_moment * 10 ** 6 / min_height) / (0.7 * self.weld_size_stiffener * min_len)  # MPa
+                    f_e = math.sqrt(f_a ** 2 + (3 * q ** 2))  # MPa
+
+                    n += 1
+
+                    self.weld_size_stiffener = i
+
+                    if n > len(weld_list):
+                        logger.warning("The max weld size is ")
+                        logger.error("Cannot compute weld size")
+                        break
 
         elif self.connectivity == 'Hollow/Tubular Column Base':  # TODO: add condition when required
             pass

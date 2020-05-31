@@ -226,19 +226,20 @@ class CommonDesignLogic(object):
     @staticmethod
     def nutThick_Calculation(boltDia):
         '''
-        Returns the thickness of the hexagon nut depending upon the nut diameter as per IS1363-3(2002)
+        Returns the thickness of the hexagon nut (Grade A and B) depending upon the nut diameter as per IS1364-3(2002) - Table 1
 
         Note: The nut thk for 72 diameter is not available in IS code, however an approximated value is assumed.
               72 mm dia bolt is used in the base plate module.
         '''
-        nutDia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35,
-                  36: 30.65, 42: 34.9, 48: 38.9, 56: 45.9, 64: 52.4, 72: 60}
+        nutDia = {5: 4.7, 6: 5.2, 8: 6.8, 10: 8.4, 12: 10.8, 16: 14.8, 20: 18.0, 22: 19.4, 24: 21.5, 27: 23.8, 30: 25.6,
+                  36: 31.0, 42: 34.0, 48: 38.0, 56: 45.0, 64: 51.0, 72: 60.0}
 
         return nutDia[boltDia]
 
     @staticmethod
-    def washer_dimensions(bolt_dia):
-        """ Calculate the dimensions - diameter (inner and outer) and thickness for plain circular washer (Type A) confirming to IS 6649:1985
+    def circular_washer_dimensions(bolt_dia):
+        """ Calculate the dimensions - diameter (inner and outer) and thickness for circular washer (Type A) confirming to IS 6649:1985.
+        The washers are used for high strength structural bolts and nuts.
 
         Args:
             bolt_dia: diameter of the bolt in mm (int)
@@ -272,6 +273,44 @@ class CommonDesignLogic(object):
 
         return washer_dimensions
 
+    @staticmethod
+    def square_washer_dimensions(bolt_dia):
+        """ Calculate the dimensions - diameter (inner and outer) and thickness for circular washer (Type B and C) confirming to IS 6649:1985.
+        The washers are used for high strength structural bolts and nuts.
+
+        Args:
+            bolt_dia: diameter of the bolt in mm (int)
+
+        Returns:
+            inner and outer diameter of the washer in mm (dictionary)
+            thickness of the washer in mm (dictionary)
+
+        Reference - Table 2, IS 6649:1985
+
+        Note: The IS code does not specify dimensions of washer for bolt sizes of M8, M10, M12, M16, M42, M48, M56, M64 and M72
+              The dimensions of these washers are thus calculated/approximated referring to those specified by the code
+
+              Table 2 gives washer thickness for tapered washers, however for non-tapered washers, mean thickness is used.
+        """
+        washer_dimensions = {
+            8: {'dia_in': 10, 'side': 25, 'washer_thk': 6.0},
+            10: {'dia_in': 12, 'side': 25, 'washer_thk': 6.0},
+            12: {'dia_in': 14, 'side': 25, 'washer_thk': 6.0},
+            16: {'dia_in': 18, 'side': 45, 'washer_thk': 8.5},
+            20: {'dia_in': 22, 'side': 45, 'washer_thk': 8.5},
+            22: {'dia_in': 24, 'side': 45, 'washer_thk': 8.5},
+            24: {'dia_in': 26, 'side': 45, 'washer_thk': 8.5},
+            27: {'dia_in': 30, 'side': 58, 'washer_thk': 8.5},
+            30: {'dia_in': 33, 'side': 58, 'washer_thk': 8.5},
+            36: {'dia_in': 39, 'side': 58, 'washer_thk': 8.5},
+            42: {'dia_in': 45, 'side': 80, 'washer_thk': 10.0},
+            48: {'dia_in': 51, 'side': 80, 'washer_thk': 10.0},
+            56: {'dia_in': 59, 'side': 100, 'washer_thk': 12.0},
+            64: {'dia_in': 67, 'side': 100, 'washer_thk': 12.0},
+            72: {'dia_in': 75, 'side': 100, 'washer_thk': 12.0},
+        }[bolt_dia]
+
+        return washer_dimensions
 
     def create3DBeamWebBeamWeb(self):
         '''self,uiObj,resultObj,dictbeamdata,dictcoldata):

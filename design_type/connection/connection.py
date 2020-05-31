@@ -403,6 +403,46 @@ class Connection(Main):
 
         return supporting_section
 
+    def get_fu_fy_I_section_suptng(self):
+        material_grade = self[0]
+        designation = self[1].get(KEY_SUPTNGSEC, None)
+        fu = ''
+        fy = ''
+        if material_grade != "Select Material" and designation != "Select Section":
+            table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
+            I_sec_attributes = Section(designation)
+            I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
+            fu = str(I_sec_attributes.fu)
+            fy = str(I_sec_attributes.fy)
+        else:
+            pass
+
+        d = {KEY_SUPTNGSEC_FU: fu,
+             KEY_SUPTNGSEC_FY: fy}
+
+        return d
+
+    def get_fu_fy_I_section_suptd(self):
+        material_grade = self[0]
+        designation = self[1].get(KEY_SUPTDSEC, None)
+        fu = ''
+        fy = ''
+        if material_grade != "Select Material" and designation != "Select Section":
+            table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
+            I_sec_attributes = Section(designation)
+            I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
+            fu = str(I_sec_attributes.fu)
+            fy = str(I_sec_attributes.fy)
+        else:
+            pass
+
+        d = {
+             KEY_SUPTDSEC_FU: fu,
+             KEY_SUPTDSEC_FY: fy}
+
+        return d
+
+
     def get_fu_fy(self):
         material_grade = self[0]
         fu_conn = ''

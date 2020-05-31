@@ -1172,7 +1172,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
         module = main.module_name(main)
 
-        if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE]:
+        if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE, KEY_DISP_BCENDPLATE]:
 
             pushButton_Clear_Column = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
@@ -1226,7 +1226,6 @@ class Ui_Dialog(object):
             pushButton_Clear_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_ANGLE)
             pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
             pushButton_Add_Angle = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_ANGLE)
-            print("IAMDPUIPUSH",pushButton_Add_Angle,"pushButton_Add_" + DISP_TITLE_ANGLE)
             pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
             pushButton_Clear_Channel = self.tabWidget.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CHANNEL)
             pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab("Channel"))

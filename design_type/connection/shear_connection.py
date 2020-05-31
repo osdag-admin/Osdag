@@ -15,44 +15,6 @@ class ShearConnection(Connection):
     ############################
     # Design Preferences functions
     ############################
-    def get_fu_fy_I_section_suptng(self):
-        material_grade = self[0]
-        designation = self[1].get(KEY_SUPTNGSEC, None)
-        fu = ''
-        fy = ''
-        if material_grade != "Select Material" and designation != "Select Section":
-            table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = Section(designation)
-            I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
-            fu = str(I_sec_attributes.fu)
-            fy = str(I_sec_attributes.fy)
-        else:
-            pass
-
-        d = {KEY_SUPTNGSEC_FU: fu,
-             KEY_SUPTNGSEC_FY: fy}
-
-        return d
-
-    def get_fu_fy_I_section_suptd(self):
-        material_grade = self[0]
-        designation = self[1].get(KEY_SUPTDSEC, None)
-        fu = ''
-        fy = ''
-        if material_grade != "Select Material" and designation != "Select Section":
-            table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = Section(designation)
-            I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
-            fu = str(I_sec_attributes.fu)
-            fy = str(I_sec_attributes.fy)
-        else:
-            pass
-
-        d = {
-             KEY_SUPTDSEC_FU: fu,
-             KEY_SUPTDSEC_FY: fy}
-
-        return d
 
     def tab_angle_section(self, input_dictionary):
 
@@ -591,6 +553,9 @@ class ShearConnection(Connection):
 
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)
+        self.supported_section.notch_ht = round_up(
+            max(self.supporting_section.flange_thickness + self.supporting_section.root_radius + 10,
+                self.supported_section.flange_thickness + self.supported_section.root_radius + 10), 5)
         if self.connectivity in VALUES_CONN_1:
             if self.supported_section.type == "Rolled":
                 self.supported_section.web_height = self.supported_section.depth

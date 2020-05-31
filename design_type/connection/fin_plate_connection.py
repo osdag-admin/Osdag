@@ -431,6 +431,7 @@ class FinPlateConnection(ShearConnection):
 
     def member_capacity(self):
         super(FinPlateConnection,self).member_capacity(self)
+
         if self.supported_section.shear_yielding_capacity / 1000 > self.load.shear_force and \
                 self.supported_section.tension_yielding_capacity / 1000 > self.load.axial_force:
 

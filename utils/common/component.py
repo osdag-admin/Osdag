@@ -384,11 +384,11 @@ class Section(Material):
             self.plast_sec_mod_y = row[17] * 1000
         print(row[19])
 
-        self.It = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
+        self.It = I_sectional_Properties().calc_torsion_const(self.depth,self.flange_width,
                                                                                    self.web_thickness,self.flange_thickness)*10**4\
             if row[19] is None else row[19] * 10**4
-        self.Iw = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
-                                                                                   self.web_thickness,self.flange_thickness)*10**4 \
+        self.Iw = I_sectional_Properties().calc_warping_const(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)*10**6 \
             if row[20] is None else row[20] * 10**4
         self.source = row[21]
         self.type = 'Rolled' if row[22] is None else row[22]
@@ -741,15 +741,15 @@ class Channel(Section):
         except:
             self.plast_sec_mod_z = self.elast_sec_mod_z
             self.plast_sec_mod_y = self.elast_sec_mod_y
-        self.source = row[20]
-        self.It = row[21]
-        self.Iw = row[22]
-        self.source = row[23]
 
-        if row[24] is None:
-            self.Type = 'Rolled'
-        else:
-            self.Type = row[24]
+        self.It = Single_Channel_Properties().calc_torsion_const_It(self.depth, self.flange_width,
+                                                                  self.web_thickness, self.flange_thickness) * 10 ** 4 \
+            if row[20] is None else row[20] * 10 ** 4
+        self.Iw = Single_Channel_Properties().calc_warping_const_Iw(self.depth, self.flange_width,
+                                                                  self.web_thickness, self.flange_thickness) * 10 ** 6 \
+            if row[21] is None else row[21] * 10 ** 6
+        self.source = row[22]
+        self.type = 'Rolled' if row[23] is None else row[24]
 
         conn.close()
 
@@ -1644,13 +1644,10 @@ class Angle(Section):
         self.elast_sec_mod_y = row[21] * 1000
         self.plast_sec_mod_z = row[22] * 1000
         self.plast_sec_mod_y = row[23] * 1000
+        self.It = Single_Angle_Properties().calc_TorsionConstantIt(self.leg_a_length,self.leg_b_length,self.thickness) * 10 ** 4 \
+            if row[24] is None else row[24] * 10 ** 4
         self.source = row[25]
-        self.It = row[24]
-        if row[26] is None:
-            self.Type = 'Rolled'
-        else:
-            self.Type = row[24]
-
+        self.type = 'Rolled' if row[26] is None else row[26]
 
         conn.close()
 
@@ -1864,5 +1861,13 @@ class Single_Channel_Properties(object):
         return a
 
     def calc_PlasticModulusZpy(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_torsion_const_It(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_warping_const_Iw(self,f_w,f_t,w_h,w_t):
         a = 0.0
         return a

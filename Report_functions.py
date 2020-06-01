@@ -245,6 +245,20 @@ def moment_demand_req_bolt_force(shear_load, web_moment,moment_demand,ecc):
     loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\end{aligned}'))
     return loads_req_bolt_force_eqn
 
+def design_capacity_of_end_plate(M_dp,b_eff,f_y,gamma_m0,t_p):
+    M_dp= str(M_dp)
+    t_p = str(t_p)
+    b_eff= str(b_eff)
+    f_y= str(f_y)
+    gamma_m0= str(gamma_m0)
+
+    design_capacity_of_end_plate= Math(inline=True)
+
+    design_capacity_of_end_plate.append(NoEscape(r'\begin{aligned}  M_dp & = { \frac{ b_eff *t_p^2 *f_y}{ 4*\gamma_m0}}\\'))
+
+    design_capacity_of_end_plate.append(NoEscape(r'&={\frac{' + b_eff +r'*'+t_p+r'^2'+' *'+f_y + r'}{4*'+gamma_m0 + r'}}\\'))
+    design_capacity_of_end_plate.append(NoEscape(r'&=' +M_dp  + r'\end{aligned}'))
+    return design_capacity_of_end_plate
 def Vres_bolts(bolts_one_line,ymax,xmax,bolt_line,axial_load
                ,moment_demand,r,vbv,tmv,tmh,abh,vres,shear_load): #vres bolt web
     """
@@ -394,6 +408,41 @@ def end_plate_ht_req(D,e,h_p):
     end_plate_ht_eqn.append(NoEscape(r'&=' + h_p + '\end{aligned}'))
     return end_plate_ht_eqn
 
+def end_plate_thk_req(M_ep,b_eff,f_y,gamma_m0,t_p):
+    M_ep= str(M_ep)
+    t_p = str(t_p)
+    b_eff= str(b_eff)
+    f_y= str(f_y)
+    gamma_m0= str(gamma_m0)
+
+    end_plate_thk_eqn = Math(inline=True)
+
+    end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &= {\sqrt{\frac{ M_ep* 4*\gamma_m0}{ b_eff*f_y}}}\\'))
+
+    end_plate_thk_eqn.append(NoEscape(r'&={\sqrt{\frac{' + M_ep +  '*4'+'*' +gamma_m0 + r'}{'+b_eff+ r'*' + f_y + r' }}}\\'))
+    end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + '\end{aligned}'))
+    return end_plate_thk_eqn
+
+
+
+def moment_acting_on_end_plate(M_ep,b_eff,f_y,gamma_m0,t_p):
+    M_ep= str(M_ep)
+    t_p = str(t_p)
+    b_eff= str(b_eff)
+    f_y= str(f_y)
+
+    gamma_m0= str(gamma_m0)
+
+
+
+
+    moment_acting_on_end_plate= Math(inline=True)
+
+    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_ep&= {\frac{b_eff *t_p^2 *f_y}{ 4*\gamma_m0}}\\'))
+
+    moment_acting_on_end_plate.append(NoEscape(r'&={\frac{' + b_eff +'*'+t_p+'^2'+' *'+f_y + '}{4*'+gamma_m0 + r'}}\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'&=' +M_ep + '\end{aligned}'))
+    return moment_acting_on_end_plate
 
 def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     min_pitch = str(min_pitch)

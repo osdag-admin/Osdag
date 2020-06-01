@@ -383,6 +383,18 @@ def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_pla
     max_plate_ht_eqn.append(NoEscape(r'&=' + max_plate_h + '\end{aligned}'))
     return max_plate_ht_eqn
 
+def end_plate_ht_req(D,e,h_p):
+    D = str(D)
+    h_p = str(h_p)
+    e = str(e)
+    end_plate_ht_eqn = Math(inline=True)
+
+    end_plate_ht_eqn.append(NoEscape(r'\begin{aligned} &D + 4*e \\'))
+    end_plate_ht_eqn.append(NoEscape(r'&=' + D + '+' + ' 4*' + e + r'\\'))
+    end_plate_ht_eqn.append(NoEscape(r'&=' + h_p + '\end{aligned}'))
+    return end_plate_ht_eqn
+
+
 def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     min_pitch = str(min_pitch)
     min_end_dist = str(min_end_dist)
@@ -1567,6 +1579,7 @@ def tension_capacity_of_bolt(f_ub,A_nb,T_db):
      tension_capacity_of_bolt.append(NoEscape(r'&=0.9*'+A_nb+ r'*'+f_ub+ r'\\'))
      tension_capacity_of_bolt.append(NoEscape(r'&= ' + T_db+ r'\end{aligned}'))
      return  tension_capacity_of_bolt
+
 
 def web_plate_area_prov_bolt(D, y, webwidth, wp_area, T, r_1):
     D = str(D)

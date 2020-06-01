@@ -84,7 +84,7 @@ class ColumnEndPlate(MomentConnection):
 
         t5 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
 
         return change_tab
@@ -229,111 +229,58 @@ class ColumnEndPlate(MomentConnection):
     def module_name(self):
         return KEY_DISP_COLUMNENDPLATE
 
-    def input_values(self, existingvalues={}):
-
+    def input_values(self):
+        """"
+        Function to set input values
+        """
         options_list = []
 
-        if KEY_SECSIZE in existingvalues:
-            existingvalue_key_secsize = existingvalues[KEY_SECSIZE]
-        else:
-            existingvalue_key_secsize = ''
-
-        if KEY_CONN in existingvalues:
-            existingvalue_key_conn = existingvalues[KEY_CONN]
-        else:
-            existingvalue_key_conn = ''
-
-        if KEY_MATERIAL in existingvalues:
-            existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
-        else:
-            existingvalue_key_mtrl = ''
-
-        if KEY_MOMENT in existingvalues:
-            existingvalues_key_moment = existingvalues[KEY_MOMENT]
-        else:
-            existingvalues_key_moment = ''
-
-        if KEY_SHEAR in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_SHEAR]
-        else:
-            existingvalue_key_versh = ''
-
-        if KEY_AXIAL in existingvalues:
-            existingvalue_key_axial = existingvalues[KEY_AXIAL]
-        else:
-            existingvalue_key_axial = ''
-
-        if KEY_D in existingvalues:
-            existingvalue_key_d = existingvalues[KEY_D]
-        else:
-            existingvalue_key_d = ''
-
-        if KEY_TYP in existingvalues:
-            existingvalue_key_typ = existingvalues[KEY_TYP]
-        else:
-            existingvalue_key_typ = ''
-
-        if KEY_GRD in existingvalues:
-            existingvalue_key_grd = existingvalues[KEY_GRD]
-        else:
-            existingvalue_key_grd = ''
-
-        if KEY_PLATETHK in existingvalues:
-            existingvalue_key_endplatethk = existingvalues[KEY_PLATETHK]
-        else:
-            existingvalue_key_endplatethk = ''
-
-        if KEY_CONN_PREFERENCE in existingvalues:
-            existingvalue_design_pref = existingvalues[KEY_CONN_PREFERENCE]
-        else:
-            existingvalue_design_pref = ''
-
-        t16 = (KEY_MODULE, KEY_DISP_COLUMNENDPLATE, TYPE_MODULE, None, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_COLUMNENDPLATE, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None, True, 'No Validator')
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_secsize, connectdb("Columns"), True, 'No Validator')
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, connectdb("Columns"), True, 'No Validator')
         options_list.append(t4)
 
-        t8 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN_3, True, 'No Validator')
+        t8 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN_3, True, 'No Validator')
         options_list.append(t8)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, True, 'No Validator')
         options_list.append(t15)
 
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
+        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX,existingvalues_key_moment,None, True, 'Int Validator')
+        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t17)
 
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, existingvalue_key_versh, None, True, 'Int Validator')
+        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None, True, 'Int Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t8)
 
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None, True, 'No Validator')
+        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t9)
 
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D, True, 'No Validator')
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
         options_list.append(t10)
 
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP, True, 'No Validator')
+        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD, True, 'No Validator')
+        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)
 
-        t21 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, None, True, 'No Validator')
+        t21 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t21)
 
-        t22 = (KEY_PLATETHK, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_endplatethk, VALUES_ENDPLATE_THICKNESS, True, 'No Validator')
+        t22 = (KEY_PLATETHK, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ENDPLATE_THICKNESS, True, 'No Validator')
         options_list.append(t22)
 
         # t13 = (KEY_CONN_PREFERENCE, KEY_DISP_CONN_PREFERENCE, TYPE_COMBOBOX, existingvalue_design_pref, VALUES_CONN_PREFERENCE)
@@ -470,22 +417,76 @@ class ColumnEndPlate(MomentConnection):
         # if 2*self.end_dist < 50 and self.h_s < 100:
         #     pass
         # elif 2*self.end_dist >= 50 and self.h_s >= 100:
-        t33 = (None, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, True)
+
+        # if flag is True:
+        #     if self.connection == "Extended Both Ways":
+        #         t33 = (None, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, True)
+        #         out_list.append(t33)
+        #
+        #         t21 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.stiff_ht if flag else '', True)
+        #         out_list.append(t21)
+        #         t22 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
+        #         out_list.append(t22)
+        #         t23 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
+        #         out_list.append(t23)
+        #         t24 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
+        #         out_list.append(t24)
+        #     else:
+        #         t33 = (None, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, False)
+        #         out_list.append(t33)
+        #         t21 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX, self.stiff_ht if flag else '',False)
+        #         out_list.append(t21)
+        #         t22 = (KEY_OUT_STIFFENER_WIDTH, KEY_OUT_DISP_STIFFENER_WIDTH, TYPE_TEXTBOX, self.stiff_wt if flag else '',False)
+        #         out_list.append(t22)
+        #         t23 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX, self.t_s if flag else '',False)
+        #         out_list.append(t23)
+        #         t24 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, self.weld_type if flag else '', False)
+        #         out_list.append(t24)
+        #         pass
+
+        t33 = (KEY_OUT_STIFFENER_TITLE, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, True)
         out_list.append(t33)
-
-        t21 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.stiff_ht if flag else '', True)
+        t21 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX, self.stiff_ht if flag else '', True)
         out_list.append(t21)
-        t22 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
+        t22 = (KEY_OUT_STIFFENER_WIDTH, KEY_OUT_DISP_STIFFENER_WIDTH, TYPE_TEXTBOX, self.stiff_wt if flag else '', True)
         out_list.append(t22)
-        t23 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
+        t23 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX, self.t_s if flag else '', True)
         out_list.append(t23)
-        t24 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
+        t24 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, self.weld_type if flag else '', True)
         out_list.append(t24)
-
         # t22 = (KEY_OUT_STIFFENER_DETAILS,KEY_OUT_DISP_STIFFENER_DETAILS,TYPE_OUT_BUTTON, ['Stiffener Details',self.stiffener_details], True)
         # out_list.append(t22)
 
         return out_list
+
+    def input_value_changed(self):
+        lst = []
+        # t6 = ([KEY_CONN], KEY_OUT_STIFFENER_TITLE, TYPE_LABEL, self.out_stiffener)
+        # lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_HEIGHT, TYPE_OUT_DOCK, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_WIDTH, TYPE_OUT_DOCK, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_THICKNESS, TYPE_OUT_DOCK, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_WELD_TYPE, TYPE_OUT_DOCK, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_HEIGHT, TYPE_OUT_LABEL, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_WIDTH, TYPE_OUT_LABEL, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_STIFFENER_THICKNESS, TYPE_OUT_LABEL, self.out_stiffener)
+        lst.append(t6)
+        t6 = ([KEY_CONN], KEY_OUT_WELD_TYPE, TYPE_OUT_LABEL, self.out_stiffener)
+        lst.append(t6)
+        return lst
+
+    def out_stiffener(self):
+        conn_type = self[0]
+        if conn_type != 'Extended Both Ways':
+            return True
+        else:
+            return False
 
     def func_for_validation(self, design_dictionary):
 
@@ -586,7 +587,12 @@ class ColumnEndPlate(MomentConnection):
         self.member_capacity(self)
 
     def member_capacity(self):
-##############  Axial capacity   ##########################
+        """"
+        This function is used to update the axial, shear and moment loads provided
+        by user according to miminum member capacity and also provides an error if
+        exceeds full capacity of member
+        """
+    #########  Axial capacity   ##########################
         gamma_m0 = 1.1
         # Axial Capacity
         self.axial_capacity = (self.section.area * self.section.fy) / gamma_m0  # N
@@ -601,17 +607,17 @@ class ColumnEndPlate(MomentConnection):
 
         else:
             self.design_status = False
-            logger.error(":The axial force {} acting is higher than axial capacity {} of member".format(self.load.axial_force,self.axial_capacity))
+            logger.error(":The axial force {} acting is higher than axial capacity {} of member".format(self.load.axial_force,self.axial_capacity/1000))
             logger.info("Increase member size or decrease axial load")
         # self.load.axial_force = self.factored_axial_load  # N
         print("factored_axial_load", self.factored_axial_load)
-###############################################################
+    ###############################################################
 
-##################   Shear Capacity  ######################
+    ##################   Shear Capacity  ######################
         self.shear_capacity = ((self.section.depth - (2 * self.section.flange_thickness)) * self.section.web_thickness * self.section.fy) / (
                                  math.sqrt(3) * gamma_m0)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
         self.min_shear_load = 0.6 * self.shear_capacity  # N
-        # self.fact_shear_load = max(self.min_shear_load, self.load.shear_force * 1000)  # N
+        self.fact_shear_load = max(self.min_shear_load, self.load.shear_force * 1000)  # N
         if self.load.shear_force * 1e3 < self.min_shear_load:
             self.factored_shear_load = self.min_shear_load
             self.design_status = True
@@ -620,12 +626,12 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = True
         else:
             self.design_status = False
-            logger.error(":The shear force {} acting is higher than axial capacity {} of member".format(self.load.shear_force,self.shear_capacity))
+            logger.error(":The shear force {} acting is higher than shear capacity {} of member".format(self.load.shear_force,self.shear_capacity/1000))
             logger.info("Increase member size or decrease shear load")
         print("factored_shear_load", self.factored_shear_load)
-###############################################################
+    ###############################################################
 
-################  Moment Capacity  ############################
+    ################  Moment Capacity  ############################
         if self.section.type == "Rolled":
             self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                            column_t_w=self.section.web_thickness,
@@ -704,13 +710,16 @@ class ColumnEndPlate(MomentConnection):
             self.get_bolt_diam(self)
         else:
             logger.error("Either decrease the loads or increase member size")
-#############################################################################################
 
-#############################################################################################
+    #############################################################################################
     ## Function to get bolt diam ##
-############################################################################################
+    ############################################################################################
 
     def get_bolt_diam(self, previous_size = None):
+        """"
+        Each diam size selected by user goes in a loop and gives no of bolts based on pitch, end dist and
+        section size, the bolt diam which gives minimum bolt numbers is selected
+        """
         self.lst1 = []
         self.lst2 = []
 
@@ -1001,16 +1010,19 @@ class ColumnEndPlate(MomentConnection):
             #     self.get_bolt_grade(self)
 
         else:
+
             self.design_status = False
             logger.error("failed in bolt diam selection")
 
- #############################################################################################################
-
-#############################################################################################################
+    #############################################################################################################
     ## Function to get Bolt grade ##
-###############################################################################################################
+    ###############################################################################################################
 
     def get_bolt_grade(self):
+        """"
+        Bolt size selected in upper function is checked with each bolt grade and the minimum
+        bolt grade which passes the chech is selected
+        """
         self.lst3 = []
         # self.lst2 = []
         # for (x,y) in (self.bolt.bolt_diameter,self.bolt.bolt_grade):
@@ -1253,11 +1265,11 @@ class ColumnEndPlate(MomentConnection):
 
         # bolt_grade_provided=12.9)
 
-########################################################################################################
+    ########################################################################################################
 
-########################################################################################################
+    ########################################################################################################
     ## Function to get plate thickness ##
-#########################################################################################################
+    #########################################################################################################
     def plate_details(self):
         if self.connection == 'Flush End Plate':
             self.plate_height = self.section.depth
@@ -1334,6 +1346,12 @@ class ColumnEndPlate(MomentConnection):
                 self.stiff_wt = 0.0
                 self.t_s = 0.0
                 self.weld_type = "None"
+                if self.design_status:
+                    logger.info(": Overall Column end plate connection design is safe \n")
+                    logger.debug(" :=========End Of design===========")
+                else:
+                    logger.error(": Design is not safe \n ")
+                    logger.debug(" :=========End Of design===========")
             else:
                 # if 2 * self.end_dist >= 50:
                 self.stiffener_details(self)
@@ -1351,6 +1369,30 @@ class ColumnEndPlate(MomentConnection):
             self.get_bolt_diam(self,previous_diam)
             # self.design_status = False
             # logger.error("Plate thickness provided is not satisfied")
+
+    def get_3d_components(self):
+        components = []
+
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t3 = ('Column', self.call_3DColumn)
+        components.append(t3)
+
+        t4 = ('Cover Plate', self.call_3DPlate)
+        components.append(t4)
+
+        return components
+
+    def call_3DPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'End Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Connector", bgcolor)
 
 ##########################################################################################
              ####   Stiffener details   ####
@@ -1428,6 +1470,70 @@ class ColumnEndPlate(MomentConnection):
         else:
             logger.error(": Design is not safe \n ")
             logger.debug(" :=========End Of design===========")
+
+#####################################################################
+    ###   Output Dict   ###
+#####################################################################
+
+    def results_to_test(self):
+        test_input = {KEY_MODULE : self.module,
+                      KEY_MAIN_MODULE: self.mainmodule,
+                      KEY_DISP_SEC_PROFILE: "ISection",
+                      KEY_DISP_BEAMSEC: self.section.designation,
+                      KEY_MATERIAL: self.section.material,
+                      KEY_SEC_FU: self.section.fu,
+                      KEY_SEC_FY: self.section.fy,
+                      KEY_D: self.bolt.bolt_diameter,
+                      KEY_GRD: self.bolt.bolt_grade,
+                      KEY_TYP: self.bolt.bolt_type,
+                      KEY_PLATETHK: self.plate.thickness,
+                      KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+                      KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+                      KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+                      KEY_DP_DETAILING_GAP: self.plate.gap,
+                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+
+        test_output = {KEY_MEMBER_MOM_CAPACITY: round(self.moment_capacity / 1000000, 2),
+                       KEY_MEMBER_SHEAR_CAPACITY: round(self.shear_capacity / 1000, 2),
+                       KEY_MEMBER_AXIALCAPACITY: round(self.axial_capacity / 1000, 2),
+
+                       # applied loads
+                       KEY_DISP_APPLIED_AXIAL_FORCE: round(self.factored_axial_load / 1000, 2),
+                       KEY_DISP_APPLIED_SHEAR_LOAD: round(self.factored_shear_load / 1000, 2),
+                       KEY_DISP_APPLIED_MOMENT_LOAD: round(self.factored_moment / 1000000, 2),
+
+                       # bolt_capacity
+                       KEY_OUT_BOLT_SHEAR: round(self.bolt.bolt_shear_capacity / 1000, 2),
+                       KEY_OUT_BOLT_BEARING: round(self.bolt.bolt_bearing_capacity / 1000, 2),
+                       KEY_OUT_BOLT_CAPACITY: round(self.bolt.bolt_capacity / 1000, 2),
+                       KEY_OUT_BOLT_TENSION_CAPACITY: round(self.bolt.bolt_tension_capacity / 1000, 2),
+                       KEY_Y_SQR: round(self.y_sqr,2),
+                       KEY_BOLT_TENSION: round(self.t_b,2),
+                       KEY_BOLT_SHEAR: round(self.v_sb,2),
+
+                       # detailng
+                       KEY_D: self.bolt_diam_provided,
+                       KEY_GRD: self.bolt_grade_provided,
+                       KEY_OUT_PITCH: self.pitch,
+                       KEY_OUT_END_DIST: self.end_dist,
+                       KEY_OUT_NO_BOLTS_WEB: (self.n_bw),
+                       KEY_OUT_NO_BOLTS_FLANGE: (self.n_bf),
+                       KEY_OUT_NO_BOLTS: round(self.no_bolts),
+                       KEY_P2_WEB: self.p_2_web,
+                       KEY_P2_FLANGE: self.p_2_flange,
+
+                       # plate
+                       KEY_OUT_PLATETHK: self.plate_thickness_provided,
+                       KEY_OUT_PLATE_HEIGHT: self.plate_height,
+                       KEY_OUT_PLATE_LENGTH: self.plate_width,
+                       KEY_OUT_PLATE_MOM_CAPACITY: round(self.m_dp/1000000,2),
+                       KEY_PLATE_MOMENT: round(self.m_ep/1000000,2),
+
+                       #stiffener
+                       KEY_OUT_STIFFENER_HEIGHT: self.stiff_ht,
+                       KEY_OUT_STIFFENER_WIDTH: self.stiff_wt,
+                       KEY_OUT_STIFFENER_THICKNESS: self.t_s,
+                       KEY_OUT_WELD_TYPE: self.weld_type}
 
     @staticmethod
     def grdval_customized():
@@ -1557,3 +1663,164 @@ class ColumnEndPlate(MomentConnection):
         t6 = (KEY_PLATETHK, self.endplate_thick_customized)
         list1.append(t6)
         return list1
+        ################################ Design Report #####################################################################################
+
+    def save_design(self, popup_summary):
+        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
+                                  KEY_DISP_BEAMSEC: self.section.designation,
+                                  KEY_DISP_MATERIAL: self.section.material,
+                                  KEY_DISP_FU: self.section.fu,
+                                  KEY_DISP_FY: self.section.fy,
+                                  'Mass': self.section.mass,
+                                  'Area(mm2) - A': round(self.section.area, 2),
+                                  'D(mm)': self.section.depth,
+                                  'B(mm)': self.section.flange_width,
+                                  't(mm)': self.section.web_thickness,
+                                  'T(mm)': self.section.flange_thickness,
+                                  'FlangeSlope': self.section.flange_slope,
+                                  'R1(mm)': self.section.root_radius,
+                                  'R2(mm)': self.section.toe_radius,
+                                  'Iz(mm4)': self.section.mom_inertia_z,
+                                  'Iy(mm4)': self.section.mom_inertia_y,
+                                  'rz(mm)': self.section.rad_of_gy_z,
+                                  'ry(mm)': self.section.rad_of_gy_y,
+                                  'Zz(mm3)': self.section.elast_sec_mod_z,
+                                  'Zy(mm3)': self.section.elast_sec_mod_y,
+                                  'Zpz(mm3)': self.section.plast_sec_mod_z,
+                                  'Zpy(mm3)': self.section.elast_sec_mod_y}
+
+        self.report_input = \
+            {KEY_MODULE: self.module,
+             KEY_MAIN_MODULE: self.mainmodule,
+             # KEY_CONN: self.connectivity,
+             KEY_DISP_MOMENT: self.load.moment,
+             KEY_DISP_SHEAR: self.load.shear_force,
+             KEY_DISP_AXIAL: self.load.axial_force,
+
+             "Section": "TITLE",
+
+             "Bolt Details": "TITLE",
+             KEY_DISP_D: str(self.bolt.bolt_diameter),
+             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_TYP: self.bolt.bolt_type,
+
+
+             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+             KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+
+        self.report_check = []
+        bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
+        bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
+        kb_disp = round(self.bolt.kb, 2)
+
+        t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, '', axial_capacity(area=self.section.area,
+                                                              fy=self.section.fy,
+                                                              gamma_m0=gamma_m0,
+                                                              axial_capacity=round(self.axial_capacity / 1000, 2)), '')
+        self.report_check.append(t1)
+        self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
+                                      self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0), 2)
+        h = self.section.depth - (2 * self.section.flange_thickness)
+
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '', shear_capacity(h=h, t=self.section.web_thickness,
+                                                              f_y=self.section.fy, gamma_m0=gamma_m0,
+                                                              shear_capacity=self.shear_capacity1 / 1000), '')
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', plastic_moment_capacty(beta_b=1,
+                                                                              Z_p=self.Z_p, f_y=self.section.fy,
+                                                                              gamma_m0=gamma_m0,
+                                                                              Pmc=round(self.moment_capacity/ 1000000, 2)), '')
+        self.report_check.append(t1)
+
+
+
+        t1 = ('SubSection', 'Load Considered', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, min_max_axial_capacity(axial_capacity=round(self.axial_capacity / 1000, 2),
+                                                                  min_ac=round(self.min_axial_load / 1000, 2)),
+             prov_axial_load(axial_input=self.load.axial_force,
+                             min_ac=round(self.min_axial_load / 1000, 2),
+                             app_axial_load=round(self.factored_axial_load / 1000, 2)),
+             get_pass_fail(self.min_axial_load / 1000,
+                           self.factored_axial_load / 1000, relation="leq"))
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, min_max_shear_capacity(shear_capacity=round(self.shear_capacity1 / 1000, 2),
+                                                                 min_sc=round(self.min_shear_load / 1000, 2)),
+             prov_shear_load(shear_input=self.load.shear_force,
+                             min_sc=round( self.min_shear_load / 1000, 2),
+                             app_shear_load=round(self.fact_shear_load / 1000, 2)),
+             get_pass_fail(self.min_shear_load  / 1000,
+                           self.fact_shear_load / 1000, relation="leq"))
+        self.report_check.append(t1)
+
+        t1 = (KEY_DISP_APPLIED_MOMENT_LOAD,
+             min_max_moment_capacity(moment_capacity=round(self.moment_capacity / 1000000, 2),
+                                     min_mc=round(self.min_moment / 1000000, 2)),
+             prov_moment_load(moment_input=self.load.moment,
+                              min_mc=round(self.min_moment / 1000000, 2),
+                              app_moment_load=round(self.factored_moment / 1000000, 2)),
+             get_pass_fail(round(self.min_moment / 1000000, 2),
+                           round(self.load.moment / 1000000, 2), relation="leq"))
+        self.report_check.append(t1)
+        t1 = ('SubSection', ' Bolt Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        t6 = (
+        KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt.bolt_diameter_provided, "d"), '')
+        self.report_check.append(t6)
+
+        t8 = (KEY_OUT_DISP_GRD_PROVIDED, "Bolt Grade Optimisation", self.bolt.bolt_grade_provided, '')
+        self.report_check.append(t8)
+
+        t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(self.bolt.dia_hole, "d_0"), '')
+        self.report_check.append(t8)
+
+
+        if self.bolt.bolt_type == TYP_BEARING:
+             bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+             t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, 1,
+                                                                          self.bolt.bolt_net_area,
+                                                                          self.bolt.gamma_mb,
+                                                                          bolt_shear_capacity_kn), '')
+             self.report_check.append(t1)
+             t2 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(kb_disp,
+                                                                              self.bolt.bolt_diameter_provided,
+                                                                              self.bolt_conn_plates_t_fu_fy,
+                                                                              self.bolt.gamma_mb,
+                                                                              bolt_bearing_capacity_kn), '')
+             self.report_check.append(t2)
+             t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(bolt_shear_capacity_kn,
+                                                                                bolt_bearing_capacity_kn,
+                                                                                bolt_capacity_kn), '')
+             self.report_check.append(t3)
+        else:
+
+             t4 = (KEY_OUT_DISP_BOLT_SLIP, '', HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1,
+                                                                                 K_h=0.3,
+                                                                                 fub=self.bolt.bolt_fu,
+                                                                                 Anb=self.bolt.bolt_net_area,
+                                                                                 gamma_mf=self.bolt.gamma_mf,
+                                                                                 capacity=bolt_capacity_kn), '')
+             self.report_check.append(t4)
+
+        Disp_3d_image = "/ResourceFiles/images/3d.png"
+
+        # config = configparser.ConfigParser()
+        # config.read_file(open(r'Osdag.config'))
+        # desktop_path = config.get("desktop_path", "path1")
+        # print("desk:", desktop_path)
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
+
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
+                               rel_path, Disp_3d_image)
+
+
+# def save_latex(self, uiObj, Desigxn_Check, reportsummary, filename, rel_path, Disp_3d_image):

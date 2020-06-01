@@ -90,7 +90,7 @@ class Tension_bolted(Member):
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t3)
 
-        t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_3'],
+        t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2','Label_3'],
               ['Label_7','Label_8','Label_9', 'Label_10','Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
                'Label_16', 'Label_17', 'Label_18','Label_19', 'Label_20','Label_21', 'Label_22'],
               TYPE_TEXTBOX, self.get_Angle_sec_properties)
@@ -193,10 +193,12 @@ class Tension_bolted(Member):
 
         add_buttons = []
 
-        t2 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE_SELECTED, None, None, "Angles")
+        t2 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
+              ['Angles', 'Back to Back Angles', 'Star Angles'], "Angles")
         add_buttons.append(t2)
 
-        t2 = (DISP_TITLE_CHANNEL, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE_SELECTED, None, None, "Channels")
+        t2 = (DISP_TITLE_CHANNEL, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
+              ['Channels', 'Back to Back Channels'], "Channels")
         add_buttons.append(t2)
 
         return add_buttons
@@ -289,8 +291,62 @@ class Tension_bolted(Member):
         t2 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t2)
 
-        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, None , self.fn_conn_image)
+        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE , self.fn_conn_image)
         lst.append(t3)
+
+        t4 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_DOCK, self.out_bolt_bearing)
+        lst.append(t4)
+
+        t5 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_LABEL, self.out_bolt_bearing)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_D_PROVIDED, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_D_PROVIDED, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_GRD_PROVIDED, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_GRD_PROVIDED, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLT_LINE, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLT_LINE, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLTS_ONE_LINE, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_BOLTS_ONE_LINE, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_HEIGHT, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_HEIGHT, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_LENGTH, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_LENGTH, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERCONNECTION, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERCONNECTION, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
 
         return lst
 
@@ -307,16 +363,33 @@ class Tension_bolted(Member):
 
         "Function to populate section size based on the type of section "
         img = self[0]
-        if img =="Angles":
+        if img == VALUES_SEC_PROFILE_2[0]:
             return VALUES_IMG_TENSIONBOLTED[0]
-        elif img =="Back to Back Angles":
+        elif img ==VALUES_SEC_PROFILE_2[1]:
             return VALUES_IMG_TENSIONBOLTED[1]
-        elif img =="Star Angles":
+        elif img ==VALUES_SEC_PROFILE_2[2]:
             return VALUES_IMG_TENSIONBOLTED[2]
-        elif img =="Channels":
+        elif img ==VALUES_SEC_PROFILE_2[3]:
             return VALUES_IMG_TENSIONBOLTED[3]
         else:
             return VALUES_IMG_TENSIONBOLTED[4]
+
+    def out_bolt_bearing(self):
+
+        bolt_type= self[0]
+        if bolt_type != TYP_BEARING:
+            return True
+        else:
+            return False
+
+    def out_intermittent(self):
+
+        sec_type = self[0]
+        if sec_type in [VALUES_SEC_PROFILE_2[0],VALUES_SEC_PROFILE_2[3]]:
+            return True
+        else:
+            return False
+
 
     def input_values(self, existingvalues={}):
 
@@ -330,96 +403,46 @@ class Tension_bolted(Member):
 
         options_list = []
 
-        if KEY_LOCATION in existingvalues:
-            existingvalue_key_location = existingvalues[KEY_LOCATION]
-        else:
-            existingvalue_key_location = ''
-
-        if KEY_SEC_PROFILE in existingvalues:
-            existingvalue_key_sec_profile = existingvalues[KEY_SEC_PROFILE]
-        else:
-            existingvalue_key_sec_profile = ''
-
-        if KEY_SECSIZE in existingvalues:
-            existingvalue_key_sec_size = existingvalues[KEY_SECSIZE]
-        else:
-            existingvalue_key_sec_size = ''
-
-        if KEY_MATERIAL in existingvalues:
-            existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
-        else:
-            existingvalue_key_mtrl = ''
-
-        if KEY_LENGTH in existingvalues:
-            existingvalue_key_length = existingvalues[KEY_LENGTH]
-        else:
-            existingvalue_key_length = ''
-
-        if KEY_AXIAL in existingvalues:
-            existingvalue_key_axial = existingvalues[KEY_AXIAL]
-        else:
-            existingvalue_key_axial = ''
-
-        if KEY_D in existingvalues:
-            existingvalue_key_d = existingvalues[KEY_D]
-        else:
-            existingvalue_key_d = ''
-
-        if KEY_TYP in existingvalues:
-            existingvalue_key_typ = existingvalues[KEY_TYP]
-        else:
-            existingvalue_key_typ = ''
-
-        if KEY_GRD in existingvalues:
-            existingvalue_key_grd = existingvalues[KEY_GRD]
-        else:
-            existingvalue_key_grd = ''
-
-        # if KEY_PLATETHK in existingvalues:
-        #     existingvalue_key_platethk = existingvalues[KEY_PLATETHK]
-        # else:
-        #     existingvalue_key_platethk = ''
-
-        t16 = (KEY_MODULE, KEY_DISP_TENSION_BOLTED, TYPE_MODULE, None, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_TENSION_BOLTED, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None, True, 'No Validator')
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, existingvalue_key_sec_profile, VALUES_SEC_PROFILE_2, True, 'No Validator')
+        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE_2, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_TENSIONBOLTED[0], True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, VALUES_IMG_TENSIONBOLTED[0], True, 'No Validator')
         options_list.append(t15)
 
-        t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, existingvalue_key_location, VALUES_LOCATION_1, True, 'No Validator')
+        t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, VALUES_LOCATION_1, True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_sec_size, ['All','Customized'], True, 'No Validator')
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator')
         options_list.append(t4)
 
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL, True, 'No Validator')
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, existingvalue_key_length, None, True, 'No Validator')
+        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None, True, 'No Validator')
+        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None, True, 'No Validator')
+        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None, True, 'No Validator')
+        t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t8)
 
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_D, True, 'No Validator')
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
         options_list.append(t10)
 
-        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP, True, 'No Validator')
+        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_grd, VALUES_GRD, True, 'No Validator')
+        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)
 
         return options_list
@@ -505,7 +528,7 @@ class Tension_bolted(Member):
             else:
                 bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
 
-        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX,  bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)
 
         t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '', True)
@@ -545,39 +568,39 @@ class Tension_bolted(Member):
         t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t8 = (None, DISP_TITLE_CONN_DETAILS, TYPE_TITLE, None, True)
+        t8 = (None, DISP_TITLE_CONN_DETAILS, TYPE_TITLE, None, False)
         out_list.append(t8)
 
         t21 = (KEY_OUT_INTERCONNECTION, KEY_OUT_DISP_INTERCONNECTION, TYPE_TEXTBOX,
-               int(round(self.inter_conn, 0)) if flag else '', True)
+               int(round(self.inter_conn, 0)) if flag else '', False)
         out_list.append(t21)
 
         t21 = (KEY_OUT_INTERSPACING, KEY_OUT_DISP_INTERSPACING, TYPE_TEXTBOX,
-               (round(self.inter_memb_length, 2)) if flag else '', True)
+               (round(self.inter_memb_length, 2)) if flag else '', False)
         out_list.append(t21)
 
         t18 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t9 = (KEY_OUT_INTER_D_PROVIDED, KEY_OUT_DISP_INTER_D_PROVIDED, TYPE_TEXTBOX, int(self.inter_dia) if flag else '',True)
+        t9 = (KEY_OUT_INTER_D_PROVIDED, KEY_OUT_DISP_INTER_D_PROVIDED, TYPE_TEXTBOX, int(self.inter_dia) if flag else '',False)
         out_list.append(t9)
 
-        t10 = (KEY_OUT_INTER_GRD_PROVIDED, KEY_OUT_DISP_INTER_GRD_PROVIDED, TYPE_TEXTBOX, self.inter_grade if flag else '',True)
+        t10 = (KEY_OUT_INTER_GRD_PROVIDED, KEY_OUT_DISP_INTER_GRD_PROVIDED, TYPE_TEXTBOX, self.inter_grade if flag else '',False)
         out_list.append(t10)
 
-        t15 = (KEY_OUT_INTER_BOLT_LINE, KEY_OUT_DISP_INTER_BOLT_LINE, TYPE_TEXTBOX, self.inter_bolt_line if flag else '', True)
+        t15 = (KEY_OUT_INTER_BOLT_LINE, KEY_OUT_DISP_INTER_BOLT_LINE, TYPE_TEXTBOX, self.inter_bolt_line if flag else '', False)
         out_list.append(t15)
 
-        t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, KEY_OUT_DISP_INTER_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.inter_bolt_one_line if flag else '',True)
+        t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, KEY_OUT_DISP_INTER_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.inter_bolt_one_line if flag else '',False)
         out_list.append(t16)
 
         t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, True)
         out_list.append(t18)
 
-        t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,int(round(self.inter_plate_height, 0)) if flag else '', True)
+        t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,int(round(self.inter_plate_height, 0)) if flag else '', False)
         out_list.append(t20)
 
-        t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX,int(round(self.inter_plate_length, 0)) if flag else '',True)
+        t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX,int(round(self.inter_plate_length, 0)) if flag else '',False)
         out_list.append(t21)
 
         return out_list
@@ -707,7 +730,7 @@ class Tension_bolted(Member):
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_LOCATION, KEY_END1, KEY_END2]:
-                val = option[4]
+                val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
             # elif option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH:
@@ -1291,8 +1314,9 @@ class Tension_bolted(Member):
             elif (self.load.axial_force*1000 > self.force1) :
                 self.max_limit_status_1 = True
                 # self.design_status = False
-                logger.error(" : Tension force exceeds tension capacity for maximum available member size.")
-                # logger.error(": Design is not safe. \n ")
+                logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(round(self.load.axial_force,2),round(self.force1/1000,2),self.max_area))
+                logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
+                # logge r.error(": Design is not safe. \n ")
                 # logger.debug(" :=========End Of design===========")
                 break
 
@@ -1301,7 +1325,8 @@ class Tension_bolted(Member):
             elif self.length > self.len2:
                 self.max_limit_status_2 = True
                 # self.design_status = False
-                logger.error(" : Length exceeds maximum allowable length for maximum available member size .")
+                logger.warning(" : Member Length {} mm exceeds maximum allowable length of {} mm for maximum available member size {}.".format(self.length,round(self.len2,2),self.max_gyr))
+                logger.info(" : Select Members with higher radius of gyration value than the above mentioned Member.")
                 # logger.error(": Design is not safe. \n ")
                 # logger.debug(" :=========End Of design===========")
                 break
@@ -1310,8 +1335,8 @@ class Tension_bolted(Member):
                 pass
 
         if self.member_design_status == False and self.max_limit_status_1!=True and self.max_limit_status_2!=True:
-            logger.error(" : Member depth can't accomodate minimum avaialble bolt diameter.")
-            logger.error(" : Reduce the bolt size or increase the member size")
+            logger.warning(" : Member Depth can't accomodate minimum available bolt diameter of {} mm based on minimum spacing limit (IS 800:2007 - Clause 10.2).".format(self.bolt_diameter_min))
+            logger.info(" : Reduce the bolt size or increase the Member Depth.")
             # logger.error(": Design is not safe. \n ")
             # logger.debug(" :=========End Of design===========")
 
@@ -1468,7 +1493,7 @@ class Tension_bolted(Member):
 
         else:
             self.design_status = False
-            logger.error(self.plate.reason)
+            logger.warning(self.plate.reason)
             logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
 
@@ -1645,6 +1670,7 @@ class Tension_bolted(Member):
                                                                                self.plate.pitch_provided,
                                                                                self.bolt.bolt_capacity,
                                                                                self.bolt.bolt_diameter_provided)
+                        self.plate.bolt_force = self.res_force/(self.plate.bolt_line * self.plate.bolts_one_line)
                         if self.plate.bolt_force < self.plate.bolt_capacity_red:
                             capacity = True
                             break
@@ -1733,7 +1759,8 @@ class Tension_bolted(Member):
                 self.initial_member_capacity(self, design_dictionary, self.previous_size)
             else:
                 self.design_status = False
-                logger.error(" : Tension force exceeds tension capacity for maximum available member size.")
+                logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(round(self.load.axial_force/1000,2),round(self.force1/1000,2),self.max_area))
+                logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
 
@@ -1863,18 +1890,21 @@ class Tension_bolted(Member):
 
         if self.plate_tension_capacity > self.res_force:
             # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
-            if (2 * self.plate.length + 100) > self.length:
+            if (2 * self.plate.length) > self.length:
                 self.design_status = False
-                logger.info("Plate length exceeds the Member length")
-                logger.info("Try higher diameter of bolt to get a safe design or member length is not sufficient")
+                logger.warning ("Plate length of {} mm is higher than Member length of {} mm". format(2*self.plate.length,self.length))
+                logger.info("Try higher diameter of bolt or increase member length to get a safe design.")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
             else:
                 self.plate_design_status = True
                 self.design_status = True
                 self.intermittent_bolt(self, design_dictionary)
-                logger.info("In case of reverse load, slenderness value shall be less than 180.")
-                logger.info("In case of reverse load, spacing of intermittent connection shall be less than 600.")
+                logger.info("In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
+                if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
+                    logger.info("In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
+                else:
+                    pass
                 logger.info(": Overall bolted tension member design is safe. \n")
                 logger.debug(" :=========End Of design===========")
         else:
@@ -1890,14 +1920,13 @@ class Tension_bolted(Member):
                     self.initial_member_capacity(self, design_dictionary, self.previous_size)
                 else:
                     self.design_status = False
-                    logger.error("Plate thickness is not sufficient.")
-                    logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness.")
+                    logger.warning(" : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.". format(round(self.res_force/1000,2),round(max_tension_yield/1000,2)))
                     logger.error(": Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
             else:
                 self.design_status = False
-                logger.error("Plate thickness is not sufficient.")
-                logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness.")
+                logger.warning(" : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
+                        round(self.res_force / 1000, 2), round(max_tension_yield/1000,2)))
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
                 print(self.design_status)

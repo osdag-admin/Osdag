@@ -202,6 +202,58 @@ class Member(Main):
 
         return section
 
+    def get_new_I_Sec_Properties(self):
+        designation = self[0]
+        material_grade = self[1]
+        if designation in connectdb("Beams", call_type="popup"):
+            table = "Beams"
+        else:
+            table = "Columns"
+        col_attributes = Section(designation, material_grade)
+        Section.connect_to_database_update_other_attributes(
+            col_attributes, table, designation)
+        source = str(col_attributes.source)
+        depth = str(col_attributes.depth)
+        flange_width = str(col_attributes.flange_width)
+        flange_thickness = str(col_attributes.flange_thickness)
+        web_thickness = str(col_attributes.web_thickness)
+        flange_slope = str(col_attributes.flange_slope)
+        root_radius = str(col_attributes.root_radius)
+        toe_radius = str(col_attributes.toe_radius)
+        mass = str(col_attributes.mass)
+        area = str(col_attributes.area)
+        mom_inertia_z = str(col_attributes.mom_inertia_z)
+        mom_inertia_y = str(col_attributes.mom_inertia_y)
+        rad_of_gy_z = str(col_attributes.rad_of_gy_z)
+        rad_of_gy_y = str(col_attributes.rad_of_gy_y)
+        elast_sec_mod_z = str(col_attributes.elast_sec_mod_z)
+        elast_sec_mod_y = str(col_attributes.elast_sec_mod_y)
+        plast_sec_mod_z = str(col_attributes.plast_sec_mod_z)
+        plast_sec_mod_y = str(col_attributes.plast_sec_mod_y)
+
+        d = {
+            KEY_SECSIZE: str(designation),
+            'Label_1': str(depth),
+            'Label_2': str(flange_width),
+            'Label_3': str(flange_thickness),
+            'Label_4': str(web_thickness),
+            'Label_5': str(flange_slope),
+            'Label_6': str(root_radius),
+            'Label_7': str(toe_radius),
+            'Label_11': str(mass),
+            'Label_12': str(area),
+            'Label_13': str(mom_inertia_z),
+            'Label_14': str(mom_inertia_y),
+            'Label_15': str(rad_of_gy_z),
+            'Label_16': str(rad_of_gy_y),
+            'Label_17': str(elast_sec_mod_z),
+            'Label_18': str(elast_sec_mod_y),
+            'Label_19': str(plast_sec_mod_z),
+            'Label_20': str(plast_sec_mod_y),
+            'Label_21': str(source)
+        }
+
+        return d
 
     def tab_angle_section(self, input_dictionary):
 
@@ -216,7 +268,8 @@ class Member(Main):
             fy = ''
             mass = ''
             area = ''
-            axb = ''
+            a = ''
+            b = ''
             thickness = ''
             root_radius = ''
             toe_radius = ''
@@ -234,6 +287,7 @@ class Member(Main):
             elast_sec_mod_y = ''
             plast_sec_mod_z = ''
             plast_sec_mod_y = ''
+            torsion_const = ''
             source = ''
             m_o_e = "200"
             m_o_r = "76.9"
@@ -247,7 +301,8 @@ class Member(Main):
             source = str(Angle_attributes.source)
             fu = str(Angle_attributes.fu)
             fy = str(Angle_attributes.fy)
-            axb = str(Angle_attributes.axb)
+            a = str(Angle_attributes.a)
+            b = str(Angle_attributes.b)
             thickness = str(Angle_attributes.thickness)
             root_radius = str(Angle_attributes.root_radius)
             toe_radius = str(Angle_attributes.toe_radius)
@@ -271,6 +326,7 @@ class Member(Main):
             elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
+            torsion_const = str(Angle_attributes.torsion_const)
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -307,7 +363,10 @@ class Member(Main):
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         section.append(t5)
 
-        t6 = ('Label_1', KEY_DISP_AXB, TYPE_TEXTBOX, None, axb)
+        t6 = ('Label_1', KEY_DISP_A, TYPE_TEXTBOX, None, a)
+        section.append(t6)
+
+        t6 = ('Label_2', KEY_DISP_B, TYPE_TEXTBOX, None, b)
         section.append(t6)
 
         t8 = ('Label_3', KEY_DISP_LEG_THK, TYPE_TEXTBOX, None, thickness)
@@ -331,10 +390,10 @@ class Member(Main):
         t18 = (None, None, TYPE_ENTER, None, None)
         section.append(t18)
 
-        t15 = ('Label_26', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        t15 = ('Label_27', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
         section.append(t15)
 
-        t16 = ('Label_27', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        t16 = ('Label_28', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
         section.append(t16)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
@@ -388,10 +447,13 @@ class Member(Main):
         t27 = ('Label_22', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
         section.append(t27)
 
+        t27 = ('Label_23', KEY_DISP_It, TYPE_TEXTBOX, None, torsion_const)
+        section.append(t27)
+
         t28 = (None, None, TYPE_BREAK, None, None)
         section.append(t28)
 
-        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = ('Label_24', 'Source', TYPE_TEXTBOX, None, source)
         section.append(t29)
 
         t30 = (None, None, TYPE_ENTER, None, None)
@@ -400,17 +462,16 @@ class Member(Main):
         t30 = (None, None, TYPE_ENTER, None, None)
         section.append(t30)
 
-        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        t31 = ('Label_25', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
         section.append(t31)
 
-        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        t32 = ('Label_26', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         section.append(t32)
 
         t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, None)
         section.append(t33)
 
         return section
-
 
     def tab_channel_section(self, input_dictionary):
 
@@ -595,7 +656,6 @@ class Member(Main):
         t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
         section.append(t29)
 
-
         t30 = (None, None, TYPE_ENTER, None, None)
         section.append(t30)
 
@@ -612,67 +672,6 @@ class Member(Main):
         section.append(t33)
 
         return section
-
-
-    def get_new_angle_section_properties(self):
-
-        designation = self[0]
-        material_grade = self[1]
-
-        Angle_attributes = Angle(designation, material_grade)
-        Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
-        source = str(Angle_attributes.source)
-        Type= str(Angle_attributes.Type)
-        fu = str(Angle_attributes.fu)
-        fy = str(Angle_attributes.fy)
-        axb = str(Angle_attributes.axb)
-        thickness = str(Angle_attributes.thickness)
-        root_radius = str(Angle_attributes.root_radius)
-        toe_radius = str(Angle_attributes.toe_radius)
-        mass = str(Angle_attributes.mass)
-        area = str(Angle_attributes.area)
-        Cz = str(Angle_attributes.Cz)
-        Cy = str(Angle_attributes.Cy)
-        mom_inertia_z = str(Angle_attributes.mom_inertia_z)
-        mom_inertia_y = str(Angle_attributes.mom_inertia_y)
-        mom_inertia_u = str(Angle_attributes.mom_inertia_u)
-        mom_inertia_v = str(Angle_attributes.mom_inertia_v)
-        rad_of_gy_z = str(Angle_attributes.rad_of_gy_z)
-        rad_of_gy_y = str(Angle_attributes.rad_of_gy_y)
-        rad_of_gy_u = str(Angle_attributes.rad_of_gy_u)
-        rad_of_gy_v = str(Angle_attributes.rad_of_gy_v)
-        elast_sec_mod_z = str(Angle_attributes.elast_sec_mod_z)
-        elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
-        plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
-        plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
-        d = {
-             KEY_SECSIZE_SELECTED:designation,
-            KEY_SEC_MATERIAL: material_grade,
-             KEY_SEC_FY:fy,
-             KEY_SEC_FU:fu,
-             'Label_1': axb,
-             'Label_3':thickness,
-             'Label_4':root_radius,
-             'Label_5':toe_radius,
-            'Label_6':Type,
-            'Label_7': Cz,
-            'Label_8': Cy,
-             'Label_9':mass,
-             'Label_10':area,
-             'Label_11':mom_inertia_z,
-             'Label_12':mom_inertia_y,
-             'Label_13':mom_inertia_u,
-             'Label_14':mom_inertia_v,
-             'Label_15':rad_of_gy_z,
-             'Label_16':rad_of_gy_y,
-             'Label_17':rad_of_gy_u,
-             'Label_18':rad_of_gy_v,
-             'Label_19':elast_sec_mod_z,
-             'Label_20':elast_sec_mod_y,
-             'Label_21':plast_sec_mod_z,
-             'Label_22':plast_sec_mod_y,
-             'Label_23':source}
-        return d
 
     def get_new_channel_section_properties(self):
         designation = self[0]
@@ -712,79 +711,90 @@ class Member(Main):
             KEY_SEC_MATERIAL: material_grade,
             KEY_SEC_FY: fy,
             KEY_SEC_FU: fu,
-            'Label_1':str(flange_width),
-             'Label_2':str(flange_thickness),
-             'Label_3': str(depth),
-             'Label_13':str(web_thickness),
-             'Label_14': str(flange_slope),
-             'Label_5':str(toe_radius),
-             'Label_6':str(Type),
-             'Label_4':str(root_radius),
+            'Label_1': str(flange_width),
+            'Label_2': str(flange_thickness),
+            'Label_3': str(depth),
+            'Label_13': str(web_thickness),
+            'Label_14': str(flange_slope),
+            'Label_5': str(toe_radius),
+            'Label_6': str(Type),
+            'Label_4': str(root_radius),
             'Label_9': str(mass),
             'Label_10': str(area),
             'Label_11': str(mom_inertia_z),
             'Label_12': str(mom_inertia_y),
             'Label_15': str(rad_of_gy_z),
             'Label_16': str(rad_of_gy_y),
-            'Label_17':str(Cy),
+            'Label_17': str(Cy),
             'Label_19': str(elast_sec_mod_z),
             'Label_20': str(elast_sec_mod_y),
-             'Label_21': str(plast_sec_mod_z),
-             'Label_22': str(plast_sec_mod_y),
-             'Label_23':str(source)}
+            'Label_21': str(plast_sec_mod_z),
+            'Label_22': str(plast_sec_mod_y),
+            'Label_23': str(source)}
         return d
 
-    def get_new_I_Sec_Properties(self):
+    def get_new_angle_section_properties(self):
+
         designation = self[0]
         material_grade = self[1]
-        if designation in connectdb("Beams", call_type="popup"):
-            table = "Beams"
-        else:
-            table = "Columns"
-        col_attributes = Section(designation, material_grade)
-        Section.connect_to_database_update_other_attributes(
-            col_attributes, table, designation)
-        source = str(col_attributes.source)
-        depth = str(col_attributes.depth)
-        flange_width = str(col_attributes.flange_width)
-        flange_thickness = str(col_attributes.flange_thickness)
-        web_thickness = str(col_attributes.web_thickness)
-        flange_slope = str(col_attributes.flange_slope)
-        root_radius = str(col_attributes.root_radius)
-        toe_radius = str(col_attributes.toe_radius)
-        mass = str(col_attributes.mass)
-        area = str(col_attributes.area)
-        mom_inertia_z = str(col_attributes.mom_inertia_z)
-        mom_inertia_y = str(col_attributes.mom_inertia_y)
-        rad_of_gy_z = str(col_attributes.rad_of_gy_z)
-        rad_of_gy_y = str(col_attributes.rad_of_gy_y)
-        elast_sec_mod_z = str(col_attributes.elast_sec_mod_z)
-        elast_sec_mod_y = str(col_attributes.elast_sec_mod_y)
-        plast_sec_mod_z = str(col_attributes.plast_sec_mod_z)
-        plast_sec_mod_y = str(col_attributes.plast_sec_mod_y)
 
+        Angle_attributes = Angle(designation, material_grade)
+        Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
+        source = str(Angle_attributes.source)
+        Type = str(Angle_attributes.Type)
+        fu = str(Angle_attributes.fu)
+        fy = str(Angle_attributes.fy)
+        a = str(Angle_attributes.leg_a_length)
+        b = str(Angle_attributes.leg_b_length)
+        thickness = str(Angle_attributes.thickness)
+        root_radius = str(Angle_attributes.root_radius)
+        toe_radius = str(Angle_attributes.toe_radius)
+        mass = str(Angle_attributes.mass)
+        area = str(Angle_attributes.area)
+        Cz = str(Angle_attributes.Cz)
+        Cy = str(Angle_attributes.Cy)
+        mom_inertia_z = str(Angle_attributes.mom_inertia_z)
+        mom_inertia_y = str(Angle_attributes.mom_inertia_y)
+        mom_inertia_u = str(Angle_attributes.mom_inertia_u)
+        mom_inertia_v = str(Angle_attributes.mom_inertia_v)
+        rad_of_gy_z = str(Angle_attributes.rad_of_gy_z)
+        rad_of_gy_y = str(Angle_attributes.rad_of_gy_y)
+        rad_of_gy_u = str(Angle_attributes.rad_of_gy_u)
+        rad_of_gy_v = str(Angle_attributes.rad_of_gy_v)
+        elast_sec_mod_z = str(Angle_attributes.elast_sec_mod_z)
+        elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
+        plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
+        plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
+        torsion_const = str(Angle_attributes.torsion_const)
         d = {
-            KEY_SECSIZE: str(designation),
-            'Label_1': str(depth),
-            'Label_2': str(flange_width),
-            'Label_3': str(flange_thickness),
-            'Label_4': str(web_thickness),
-            'Label_5': str(flange_slope),
-            'Label_6': str(root_radius),
-            'Label_7': str(toe_radius),
-            'Label_11': str(mass),
-            'Label_12': str(area),
-            'Label_13': str(mom_inertia_z),
-            'Label_14': str(mom_inertia_y),
-            'Label_15': str(rad_of_gy_z),
-            'Label_16': str(rad_of_gy_y),
-            'Label_17': str(elast_sec_mod_z),
-            'Label_18': str(elast_sec_mod_y),
-            'Label_19': str(plast_sec_mod_z),
-            'Label_20': str(plast_sec_mod_y),
-            'Label_21': str(source)
-            }
-
+            KEY_SECSIZE_SELECTED: designation,
+            KEY_SEC_MATERIAL: material_grade,
+            KEY_SEC_FY: fy,
+            KEY_SEC_FU: fu,
+            'Label_1': a,
+            'Label_2': b,
+            'Label_3': thickness,
+            'Label_4': root_radius,
+            'Label_5': toe_radius,
+            'Label_6': Type,
+            'Label_7': Cz,
+            'Label_8': Cy,
+            'Label_9': mass,
+            'Label_10': area,
+            'Label_11': mom_inertia_z,
+            'Label_12': mom_inertia_y,
+            'Label_13': mom_inertia_u,
+            'Label_14': mom_inertia_v,
+            'Label_15': rad_of_gy_z,
+            'Label_16': rad_of_gy_y,
+            'Label_17': rad_of_gy_u,
+            'Label_18': rad_of_gy_v,
+            'Label_19': elast_sec_mod_z,
+            'Label_20': elast_sec_mod_y,
+            'Label_21': plast_sec_mod_z,
+            'Label_22': plast_sec_mod_y,
+            'Label_23': torsion_const,
+            'Label_24': source}
         return d
 
     def get_fu_fy_section(self):
@@ -947,19 +957,19 @@ class Member(Main):
 
         add_buttons = []
 
-        t1 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE, KEY_SEC_PROFILE,
+        t1 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
               ['Angles', 'Back to Back Angles', 'Star Angles'], "Angles")
         add_buttons.append(t1)
 
-        t1 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE, KEY_SEC_PROFILE,
+        t1 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
               ['Channels', 'Back to Back Channels'], "Channels")
         add_buttons.append(t1)
 
-        t1 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE, KEY_SEC_PROFILE,
+        t1 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
               ['Beams'], "Beams")
         add_buttons.append(t1)
 
-        t1 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE, KEY_SEC_PROFILE,
+        t1 = (DISP_TITLE_ANGLE, KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, KEY_SECSIZE_SELECTED, KEY_SEC_PROFILE,
               ['Columns'], "Columns")
         add_buttons.append(t1)
 

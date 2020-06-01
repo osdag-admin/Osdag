@@ -154,7 +154,7 @@ class Bolt:
         self.bolt_diameter_provided = bolt_diameter_provided
         self.bolt_grade_provided = bolt_grade_provided
         [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter_provided)
-        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided)
+        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided, self.bolt_diameter_provided)
 
         t_fu_prev = conn_plates_t_fu_fy[0][0] * conn_plates_t_fu_fy[0][1]
         thk_considered = conn_plates_t_fu_fy[0][0]
@@ -216,7 +216,7 @@ class Bolt:
 
 
         [self.bolt_shank_area, self.bolt_net_area] = IS1367_Part3_2002.bolt_area(self.bolt_diameter_provided)
-        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided)
+        [self.bolt_fu, self.bolt_fy] = IS1367_Part3_2002.get_bolt_fu_fy(self.bolt_grade_provided, self.bolt_diameter_provided)
 
         if self.bolt_type == "Bearing Bolt":
             self.bolt_tension_capacity = IS800_2007.cl_10_3_5_bearing_bolt_tension_resistance(
@@ -296,6 +296,8 @@ class Section(Material):
         self.elast_sec_mod_y = 0.0
         self.plast_sec_mod_z = 0.0
         self.plast_sec_mod_y = 0.0
+        self.torsion_const = 0.0
+        self.warping_const = 0.0
         self.source = 0.0
 
         self.tension_yielding_capacity = 0.0
@@ -380,8 +382,16 @@ class Section(Material):
                                                                                    self.web_thickness,self.flange_thickness)*1000
         else:
             self.plast_sec_mod_y = row[17] * 1000
+        print(row[19])
 
-        self.source = row[19]
+        self.It = I_sectional_Properties().calc_torsion_const(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)*10**4\
+            if row[19] is None else row[19] * 10**4
+        self.Iw = I_sectional_Properties().calc_warping_const(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)*10**6 \
+            if row[20] is None else row[20] * 10**4
+        self.source = row[21]
+        self.type = 'Rolled' if row[22] is None else row[22]
 
         conn.close()
 
@@ -731,12 +741,15 @@ class Channel(Section):
         except:
             self.plast_sec_mod_z = self.elast_sec_mod_z
             self.plast_sec_mod_y = self.elast_sec_mod_y
-        self.source = row[20]
 
-        if row[21] is None:
-            self.Type = 'Rolled'
-        else:
-            self.Type = row[21]
+        self.It = Single_Channel_Properties().calc_torsion_const_It(self.depth, self.flange_width,
+                                                                  self.web_thickness, self.flange_thickness) * 10 ** 4 \
+            if row[20] is None else row[20] * 10 ** 4
+        self.Iw = Single_Channel_Properties().calc_warping_const_Iw(self.depth, self.flange_width,
+                                                                  self.web_thickness, self.flange_thickness) * 10 ** 6 \
+            if row[21] is None else row[21] * 10 ** 6
+        self.source = row[22]
+        self.type = 'Rolled' if row[23] is None else row[24]
 
         conn.close()
 
@@ -837,9 +850,9 @@ class Weld:
         weld_thickness = round_down((max_weld_thickness - red), 1, 3)
         if weld_thickness < min_weld_thickness:
             weld_thickness = int(min(plate_thickness, member_thickness))
-            weld_reason = " Preheating of thicker plate is required."
+            weld_reason = " Preheating of thicker plate is required (IS 800:2007 Table 21)."
         else:
-            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge. "
+            weld_reason = "Size of weld is calculated based on the edge type i.e. square edge or round edge (IS 800:2007 Clause 10.5)). "
             pass
 
         if weld_thickness > 16 :
@@ -1601,41 +1614,40 @@ class Angle(Section):
 
         self.mass = row[2]
         self.area = row[3] * 100
-        self.axb = row[4]
-        self.axb = self.axb.lower()
-        self.leg_a_length = float(self.axb.split("x")[0])
-        self.leg_b_length = float(self.axb.split("x")[1])
+        self.a = row[4]
+        self.b = row[5]
+        self.leg_a_length = self.a
+        self.leg_b_length = self.b
         self.max_leg = max(self.leg_a_length,self.leg_b_length)
         self.min_leg = min(self.leg_a_length, self.leg_b_length)
-        self.thickness = row[5]
+        self.thickness = row[6]
         super(Section, self).__init__(material_grade,self.thickness)
-        self.root_radius = row[6]
-        self.toe_radius = row[7]
-        if self.leg_a_length != self.leg_b_length:
-            self.Cz = row[8]*10
-            self.Cy = row[9]*10
-        else:
-            self.Cz = row[8]
-            self.Cy = row[9]
+        self.root_radius = row[7]
+        self.toe_radius = row[8]
+        # if self.leg_a_length != self.leg_b_length:
+        #     self.Cz = row[8]*10
+        #     self.Cy = row[9]*10
+        # else:
+        self.Cz = row[9] * 10
+        self.Cy = row[10] * 10
 
         self.mom_inertia_z = row[11] * 10000
         self.mom_inertia_y = row[12] * 10000
-        self.mom_inertia_u = row[13] * 10000
-        self.mom_inertia_v = row[14] * 10000
-        self.rad_of_gy_z = row[15] * 10
-        self.rad_of_gy_y = row[16] * 10
-        self.rad_of_gy_u = row[17] * 10
-        self.rad_of_gy_v = row[18] * 10
-        self.elast_sec_mod_z = row[19] * 1000
-        self.elast_sec_mod_y = row[20] * 1000
-        self.plast_sec_mod_z = row[21] * 1000
-        self.plast_sec_mod_y = row[22] * 1000
-        self.source = row[23]
-        if row[24] is None:
-            self.Type = 'Rolled'
-        else:
-            self.Type = row[24]
-
+        self.alpha = row[13]
+        self.mom_inertia_u = row[14] * 10000
+        self.mom_inertia_v = row[15] * 10000
+        self.rad_of_gy_z = row[16] * 10
+        self.rad_of_gy_y = row[17] * 10
+        self.rad_of_gy_u = row[18] * 10
+        self.rad_of_gy_v = row[19] * 10
+        self.elast_sec_mod_z = row[20] * 1000
+        self.elast_sec_mod_y = row[21] * 1000
+        self.plast_sec_mod_z = row[22] * 1000
+        self.plast_sec_mod_y = row[23] * 1000
+        self.It = Single_Angle_Properties().calc_TorsionConstantIt(self.leg_a_length,self.leg_b_length,self.thickness) * 10 ** 4 \
+            if row[24] is None else row[24] * 10 ** 4
+        self.source = row[25]
+        self.type = 'Rolled' if row[26] is None else row[26]
 
         conn.close()
 
@@ -1725,71 +1737,84 @@ class I_sectional_Properties(object):
         self.Z_py = 2 * (self.A / 2 * self.z_p)
         return round(self.Z_py,1)
 
+    #TODO:add formula
+    def calc_torsion_const (self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        return 0.0
+
+    def calc_warping_const (self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        return 0.0
+
 class Single_Angle_Properties(object):
 
-    def calc_Mass(self,axb,t):
+    def calc_Mass(self,a,b,t):
+        self.A = t * (a+b-t)
+        self.M = 7850 * self.A / 10000
+        return self.M
+
+    def calc_Area(self,a,b,t):
+        self.A = t * (a+b-t)
+        return round(self.A,2)
+
+    def calc_Cy(self,a,b,t):
+        self.A = t * (a + b - t)
+        self.Cy=(0.5 * b*a**2-0.5*(b-t)*(a**2 - t**2))/self.A
+        return round(self.Cy,2)
+
+    def calc_Cz(self,a,b,t):
+        self.A = t * (a + b - t)
+        self.Cz = (0.5 * b**2 * a - 0.5 * (b**2 - t**2) * (a - t)) / self.A
+        return round(self.Cz, 2)
+
+    def calc_MomentOfAreaZ(self,a,b,t):
+        Cy = self.calc_Cy(a,b,t)
+        self.I_zz = (a**3*b)/12 - ((b-t)*(a-t)**3)/12 + (a*b*(a/2-Cy)**2) - ((a-t)*(b-t)*((a+t)/2-Cy))
+        return round(self.I_zz, 2)
+
+    def calc_MomentOfAreaY(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_Area(self,axb,t):
+    def calc_MomentOfAreaU(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_Cz(self,axb,t):
+    def calc_MomentOfAreaV(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_Cy(self,axb,t):
+    def calc_RogZ(self,a,b,t):
         a = 0.0
         return a
 
-
-
-    def calc_MomentOfAreaZ(self,axb,t):
+    def calc_RogY(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_MomentOfAreaY(self,axb,t):
+    def calc_RogU(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_MomentOfAreaU(self,axb,t):
+    def calc_RogV(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_MomentOfAreaV(self,axb,t):
+    def calc_ElasticModulusZz(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_RogZ(self,axb,t):
+    def calc_ElasticModulusZy(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_RogY(self,axb,t):
+    def calc_PlasticModulusZpz(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_RogU(self,axb,t):
+    def calc_PlasticModulusZpy(self,a,b,t):
         a = 0.0
         return a
 
-    def calc_RogV(self,axb,t):
-        a = 0.0
-        return a
-
-    def calc_ElasticModulusZz(self,axb,t):
-        a = 0.0
-        return a
-
-    def calc_ElasticModulusZy(self,axb,t):
-        a = 0.0
-        return a
-
-    def calc_PlasticModulusZpz(self,axb,t):
-        a = 0.0
-        return a
-
-    def calc_PlasticModulusZpy(self,axb,t):
+    def calc_TorsionConstantIt(self,a,b,t):
         a = 0.0
         return a
 
@@ -1836,5 +1861,13 @@ class Single_Channel_Properties(object):
         return a
 
     def calc_PlasticModulusZpy(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_torsion_const_It(self,f_w,f_t,w_h,w_t):
+        a = 0.0
+        return a
+
+    def calc_warping_const_Iw(self,f_w,f_t,w_h,w_t):
         a = 0.0
         return a

@@ -1673,7 +1673,7 @@ def display_prov(v,t, ref = None):
 
     v = str(v)
     display_eqn = Math(inline=True)
-    if ref is None:
+    if ref is not None:
         display_eqn.append(NoEscape(r'\begin{aligned} '+t+' &=' + v + '~('+ref+r')\end{aligned}'))
     else:
         display_eqn.append(NoEscape(r'\begin{aligned} ' + t + ' &=' + v + r'\end{aligned}'))

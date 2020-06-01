@@ -1451,7 +1451,7 @@ class Ui_ModuleWindow(QMainWindow):
                             else:
                                 pass
             else:
-                self.design_pref_inputs.update({uiObj_key: uiObj[uiObj_key]})
+                pass
 
     def common_function_for_save_and_design(self, main, data, trigger_type):
 
@@ -1650,7 +1650,6 @@ class Ui_ModuleWindow(QMainWindow):
     # Function for showing design-preferences popup
 
     def design_preferences(self):
-        print(self.designPrefDialog.module_window.input_dock_inputs)
         self.designPrefDialog.exec()
 
     # Function for getting input for design preferences from input dock
@@ -1711,7 +1710,6 @@ class Ui_ModuleWindow(QMainWindow):
                     val = self.dockWidgetContents.findChild(QtWidgets.QWidget, master_key).currentText()
                     if val not in value:
                         continue
-                print("IAMADDBUTTON", add_button, "pushButton_Add_" + tab_name)
                 self.refresh_section_connect(add_button, selected, key_name, key_type, tab_key, database_arg,data)
 
     def connect_textbox_for_tab(self, key, tab, new):
@@ -1737,13 +1735,13 @@ class Ui_ModuleWindow(QMainWindow):
                     arg_list.append(key.text())
 
             arg_list.append(self.input_dock_inputs)
-            # try:
-            #     tab1 = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
-            #     key1 = tab.findChild(QtWidgets.QWidget, KEY_SECSIZE_SELECTED)
-            #     value1 = key1.text()
-            #     arg_list.append({KEY_SECSIZE_SELECTED: value1})
-            # except:
-            #     pass
+            try:
+                tab1 = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+                key1 = tab.findChild(QtWidgets.QWidget, KEY_SECSIZE_SELECTED)
+                value1 = key1.text()
+                arg_list.append({KEY_SECSIZE_SELECTED: value1})
+            except:
+                pass
             val = f(arg_list)
 
             for k2_key_name in k2_key_list:

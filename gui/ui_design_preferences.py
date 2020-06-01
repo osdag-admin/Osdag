@@ -575,7 +575,7 @@ class Ui_Dialog(object):
                         im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
                         im.setObjectName(element[0])
                         im.setScaledContents(True)
-                        image = QPixmap("./ResourceFiles/images/ColumnsBeams.png")
+                        image = QPixmap(element[4])
                         im.setPixmap(image)
                         i = i + 300
                         im.resize(im.sizeHint().width(), im.sizeHint().height())

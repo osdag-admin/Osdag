@@ -768,6 +768,7 @@ class Weld:
         self.height =0.0
         self.Innerheight = 0.0
         self.strength = 0.0
+        self.strength_red = 0.0
         self.throat = 0.0
         self.stress = 0.0
         self.Innerstrength = 0.0

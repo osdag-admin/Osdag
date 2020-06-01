@@ -4,6 +4,7 @@ from Common import *
 from utils.common.load import Load
 import logging
 
+
 class BeamColumnEndPlate(MomentConnection):
 
     def __init__(self):
@@ -323,7 +324,6 @@ class BeamColumnEndPlate(MomentConnection):
 
         self.supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],
                                       material_grade=design_dictionary[KEY_SUPTDSEC_MATERIAL])
-        self.supported_section.notch_ht = round_up(self.supporting_section.flange_thickness * 2, 5)
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
                          bolt_type=design_dictionary[KEY_TYP],
                          bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
@@ -344,6 +344,31 @@ class BeamColumnEndPlate(MomentConnection):
         print("input values are set. Doing preliminary member checks")
         self.warn_text(self)
         self.member_capacity(self)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def warn_text(self):
 

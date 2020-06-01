@@ -799,7 +799,7 @@ class Weld:
         return repr
 
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
-        connecting_fu.append(self.fu)
+        # connecting_fu.append(self.fu)
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         self.throat_tk = \
             round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \

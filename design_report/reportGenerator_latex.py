@@ -68,7 +68,7 @@ class CreateLatex(Document):
 
         # Create right footer
         with header.create(Foot("R")):
-            header.append(simple_page_number())
+            header.append(NoEscape(r'Page \thepage'))
         #
         # doc.preamble.append(header)
         # doc.change_document_style("header")

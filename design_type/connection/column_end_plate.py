@@ -1851,23 +1851,68 @@ class ColumnEndPlate(MomentConnection):
               get_pass_fail(self.bolt.max_end_dist, self.end_dist,
                             relation='greater'))
         self.report_check.append(t4)
+        t1 = ('SubSection', '   plate Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
 
         if self.connection == "Flush End Plate":
-           t1 = ('SubSection', ' Flush End plate height Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
-           self.report_check.append(t1)
 
-           t1 = (DISP_MIN_PLATE_HEIGHT,self.section.depth,
-               self.plate_height,
-               get_pass_fail(self.section.depth, self.plate_height, relation="leq"))
-           self.report_check.append(t1)
+              t1 = (DISP_MIN_PLATE_LENGTH,self.section.depth,
+                  self.plate_height,
+                  get_pass_fail(self.section.depth, self.plate_height, relation="leq"))
+              self.report_check.append(t1)
         else:
-            t1 = ('SubSection', ' Extended End plate height Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
-            self.report_check.append(t1)
 
-            t1 = (DISP_MIN_PLATE_HEIGHT, end_plate_ht_req(D=self.section.depth, e=self.end_dist, h_p=self.plate_height),
+              t1 = (DISP_MIN_PLATE_LENGTH, end_plate_ht_req(D=self.section.depth, e=self.end_dist, h_p=self.plate_height),
                   self.plate_height,
                   get_pass_fail(self.plate_height, self.plate_height, relation="leq"))
+              self.report_check.append(t1)
+        t1 = (DISP_MIN_PLATE_HEIGHT, self.section.flange_width,
+                                            self.plate_width,
+              get_pass_fail(self.section.flange_width, self.plate_width, relation="leq"))
+        self.report_check.append(t1)
+        t1 = (DISP_MIN_PLATE_THICK,end_plate_thk_req(M_ep=round(self.m_ep ,2),b_eff=self.b_eff,f_y=self.plate.fy,gamma_m0=gamma_m0,t_p=self.plate_thickness_provided),
+               self.plate_thickness_provided,
+               get_pass_fail(self.plate.thickness_provided,  self.plate_thickness_provided, relation="leq"))
+        self.report_check.append(t1)
+        if self.pitch >= 2*self.end_dist:
+
+            t1=(KEY_OUT_DISP_PLATE_MOM_CAPACITY,moment_acting_on_end_plate(M_ep=round(self.m_ep, 2), b_eff=2*self.end_dist, f_y=self.plate.fy, gamma_m0=gamma_m0,
+                              t_p=self.plate_thickness_provided),
+              design_capacity_of_end_plate(M_dp=round(self.m_dp, 2), b_eff=self.b_eff, f_y=self.plate.fy, gamma_m0=gamma_m0,
+                              t_p=self.plate_thickness_provided),
+                get_pass_fail(self.m_ep, self.m_dp, relation="leq"))
+
+
             self.report_check.append(t1)
+        else:
+            t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY,moment_acting_on_end_plate(M_ep=round(self.m_ep, 2), b_eff=self.pitch, f_y=self.plate.fy, gamma_m0=gamma_m0,
+                              t_p=self.plate_thickness_provided),
+              design_capacity_of_end_plate(M_dp=round(self.m_dp, 2), b_eff=self.b_eff, f_y=self.plate.fy, gamma_m0=gamma_m0,
+                              t_p=self.plate_thickness_provided),
+                get_pass_fail(self.m_ep, self.m_dp, relation="leq"))
+
+            self.report_check.append(t1)
+
+        if self.connection == "Extended Both Ways":
+
+               t1 = ('SubSection', '   Stiffener Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+               self.report_check.append(t1)
+               t1 = (KEY_OUT_DISP_STIFFENER_HEIGHT,self.section.depth,
+                       self.stiff_ht,
+               get_pass_fail(self.section.depth, self.stiff_ht, relation="geq"))
+               self.report_check.append(t1)
+               t1 = (KEY_OUT_DISP_STIFFENER_WIDTH,end_plate_ht_req(D=self.section.depth, e=self.end_dist, h_p=self.plate_height),
+
+                     self.stiff_wt,
+                     get_pass_fail(self.plate_height, self.stiff_wt, relation="geq"))
+               self.report_check.append(t1)
+               t1 = ( KEY_OUT_DISP_STIFFENER_THICKNESS, '',  self.t_s,'')
+               self.report_check.append(t1)
+               t1 = (KEY_OUT_DISP_WELD_TYPE, '', self.weld_type, '')
+               self.report_check.append(t1)
+
+        else:
+               pass
 
         Disp_3d_image = "/ResourceFiles/images/3d.png"
 

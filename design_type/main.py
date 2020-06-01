@@ -196,6 +196,8 @@ class Main():
             em_y = ''
             pm_z = ''
             pm_y = ''
+            I_t = ''
+            I_w = ''
 
         else:
             D = float(self[0])
@@ -214,6 +216,8 @@ class Main():
             em_y = sec_prop.calc_ElasticModulusZy(D, B, t_w, t_f)
             pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
             pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
+            I_t = sec_prop.calc_torsion_const(D,B,t_w,t_f)
+            I_w = sec_prop.calc_torsion_const(D, B, t_w, t_f)
 
         d = {'Label_11': str(mass),
              'Label_12': str(area),
@@ -225,9 +229,12 @@ class Main():
              'Label_18': str(em_y),
              'Label_19': str(pm_z),
              'Label_20': str(pm_y),
-             }
+             'Label_21': str(I_t),
+             'Label_22': str(I_w),
+            }
 
         return d
+
 
     def get_Angle_sec_properties(self):
 
@@ -248,7 +255,7 @@ class Main():
             em_y = ''
             pm_z = ''
             pm_y = ''
-            It = ''
+            I_t = ''
 
         else:
             a = float(self[0])
@@ -272,7 +279,8 @@ class Main():
             em_y = sec_prop.calc_ElasticModulusZy(a,b, t)
             pm_z = sec_prop.calc_PlasticModulusZpz(a,b, t)
             pm_y = sec_prop.calc_PlasticModulusZpy(a,b, t)
-            It = sec_prop.calc_Torsional_RigidityI_t(a, b, t)
+            I_t = sec_prop.calc_TorsionConstantIt(a,b,t)
+
 
         d = {'Label_9': str(mass),
              'Label_10': str(area),
@@ -290,7 +298,7 @@ class Main():
              'Label_20': str(em_y),
              'Label_21': str(pm_z),
              'Label_22': str(pm_y),
-             'Label_26': str(It),
+             'Label_23': str(I_t),
              }
 
         return d
@@ -347,6 +355,7 @@ class Main():
              }
 
         return d
+
 
     #########################################
     # Design Preferences Functions End

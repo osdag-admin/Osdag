@@ -483,17 +483,17 @@ KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
 
 # Applied load
-KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load Vu (kN)'
-KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load Au (kN)'
-KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load Mu (kNm)'
+KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load (kNm)'
 KEY_DISP_AXIAL_FORCE_CON= 'Axial Load Considered (kN)'
 
 # capacity
-KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member Ac (kN)"
-KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member Sc (kN)"
-KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member Mc (kNm)"
-KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity Pmc (kNm)'
-KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria Mdc (kNm)'
+KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member (kN)"
+KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member (kN)"
+KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member (kNm)"
+KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity (kNm)'
+KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
 KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_BEARING = 'Bearing Capacity (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
@@ -880,7 +880,7 @@ KEY_DISP_WEB_CAPACITY ='Capacity'
 
 # Web plate
 KEY_WEB_PLATE_CAPACITY ="Web_plate.capacity"
-KEY_DISP_WEB_PLATE_CAPACITY= 'Web Plate Tension Capacity'
+KEY_DISP_WEB_PLATE_CAPACITY= 'Web Plate Tension Capacity (kN)'
 KEY_TEN_YIELDCAPACITY_WEB_PLATE = "Web_plate.tension_yielding"
 KEY_DISP_TENSION_YIELDCAPACITY_WEB_PLATE = 'Tension Yielding Capacity (kN)'
 KEY_TENSION_RUPTURECAPACITY_WEB_PLATE = "Web_plate.tension_rupture"

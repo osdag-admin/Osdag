@@ -347,10 +347,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.member_capacity()
 
 
-    # Load osi file
-    # Get input objects
-    input_file_path = "/home/ajmalbabums/Desktop/OsdagWorkspace/bcinput.osi"
-    design_dictionary = yaml.load(input_file_path, Loader=yaml.FullLoader)
+
 
 
 

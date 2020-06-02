@@ -689,7 +689,6 @@ class Member(Main):
 
         designation = self[0]
         material_grade = self[1]
-
         Angle_attributes = Angle(designation, material_grade)
         Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
         source = str(Angle_attributes.source)

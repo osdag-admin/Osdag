@@ -9,11 +9,12 @@ import copy
 
 
 class CCEndPlateCAD(object):
-    def __init__(self, column, endPlate, flangeWeld, webWeld):
+    def __init__(self, column, endPlate, flangeWeld, webWeld, nut_bolt_array):
         self.endPlate = endPlate
         self.column = column
         self.flangeWeld = flangeWeld
         self.webWeld = webWeld
+        self.nut_bolt_array = nut_bolt_array
 
         self.column1 = copy.deepcopy(self.column)
         self.column2 = copy.deepcopy(self.column)
@@ -36,6 +37,7 @@ class CCEndPlateCAD(object):
 
         self.createColumnGeometry()
         self.createPlateGeometry()
+        self.createNutBoltArray()
         self.createWeldGeometry()
 
     def createColumnGeometry(self):
@@ -72,16 +74,25 @@ class CCEndPlateCAD(object):
 
         self.endPlate2Model = self.endPlate2.create_model()
 
+    def createNutBoltArray(self):
+        nut_bolt_arrayOrigin = numpy.array([-self.endPlate.W / 2, -self.endPlate.L / 2, -self.endPlate.T])
+        gaugeDir = numpy.array([0.0, 1.0, 0])
+        pitchDir = numpy.array([1.0, 0.0, 0])
+        boltDir = numpy.array([0, 0, 1.0])
+        self.nut_bolt_array.place(nut_bolt_arrayOrigin, pitchDir, gaugeDir, boltDir)
+
+        self.nut_bolt_arrayModel = self.nut_bolt_array.create_model()
+
     def createWeldGeometry(self):
-        flangeWeldT1Origin = numpy.array(
-            [-self.endPlate.W / 2, -self.column.D / 2 + self.flangeWeld.b / 2, self.endPlate.T + self.flangeWeld.h / 2])
+        flangeWeldT1Origin = numpy.array([-self.flangeWeld.L / 2, -self.column.D / 2 + self.flangeWeld.b / 2,
+                                          self.endPlate.T + self.flangeWeld.h / 2])
         flangeWeldT1_uDir = numpy.array([0.0, 1.0, 0.0])
         flangeWeldT1_wDir = numpy.array([1.0, 0.0, 0.0])
         self.flangeWeldT1.place(flangeWeldT1Origin, flangeWeldT1_uDir, flangeWeldT1_wDir)
 
         self.flangeWeldT1Model = self.flangeWeldT1.create_model()
 
-        flangeWeldT2Origin = numpy.array([-self.endPlate.W / 2, -(-self.column.D / 2 + self.flangeWeld.b / 2),
+        flangeWeldT2Origin = numpy.array([-self.flangeWeld.L / 2, -(-self.column.D / 2 + self.flangeWeld.b / 2),
                                           (self.endPlate.T + self.flangeWeld.h / 2)])
         flangeWeldT2_uDir = numpy.array([0.0, 1.0, 0.0])
         flangeWeldT2_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -89,7 +100,7 @@ class CCEndPlateCAD(object):
 
         self.flangeWeldT2Model = self.flangeWeldT2.create_model()
 
-        flangeWeldB1Origin = numpy.array([-self.endPlate.W / 2, (-self.column.D / 2 + self.flangeWeld.b / 2),
+        flangeWeldB1Origin = numpy.array([-self.flangeWeld.L / 2, (-self.column.D / 2 + self.flangeWeld.b / 2),
                                           -(self.endPlate.T + self.flangeWeld.h / 2)])
         flangeWeldB1_uDir = numpy.array([0.0, 1.0, 0.0])
         flangeWeldB1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -97,7 +108,7 @@ class CCEndPlateCAD(object):
 
         self.flangeWeldB1Model = self.flangeWeldB1.create_model()
 
-        flangeWeldB2Origin = numpy.array([-self.endPlate.W / 2, -(-self.column.D / 2 + self.flangeWeld.b / 2),
+        flangeWeldB2Origin = numpy.array([-self.flangeWeld.L / 2, -(-self.column.D / 2 + self.flangeWeld.b / 2),
                                           -(self.endPlate.T + self.flangeWeld.h / 2)])
         flangeWeldB2_uDir = numpy.array([0.0, 1.0, 0.0])
         flangeWeldB2_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -143,6 +154,12 @@ class CCEndPlateCAD(object):
 
         return plates
 
+    def get_nut_bolt_models(self):
+        """
+        :return: CAD model for all the nut bolt arrangement
+        """
+        return self.nut_bolt_arrayModel
+
     def get_weld_models(self):
         """
         :return: CAD model for all the welds
@@ -166,8 +183,11 @@ class CCEndPlateCAD(object):
 if __name__ == '__main__':
     from cad.items.ISection import ISection
     from cad.items.plate import Plate
+    from cad.items.bolt import Bolt
+    from cad.items.nut import Nut
     from cad.items.filletweld import FilletWeld
     from cad.items.groove_weld import GrooveWeld
+    from cad.MomentConnections.CCEndPlateCAD.nutBoltPlacement import NutBoltArray
 
     import OCC.Core.V3d
 
@@ -176,17 +196,25 @@ if __name__ == '__main__':
 
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    column = ISection(B=250, T=10.6, D=300, t=7.6, R1=11, R2=5.5, alpha=94, length=1000, notchObj=None)
-    endPlate = Plate(L=300, W=250, T=28)
+    column = ISection(B=250, T=12.7, D=400, t=9.1, R1=11, R2=5.5, alpha=94, length=1000, notchObj=None)
+    endPlate = Plate(L=column.D, W=column.B, T=45)
     flangeWeld = GrooveWeld(b=column.T, h=20, L=column.B)
     webWeld = GrooveWeld(b=column.t, h=20, L=column.D - 2 * column.T)
 
-    CCEndPlate = CCEndPlateCAD(column, endPlate, flangeWeld, webWeld)
+    bolt = Bolt(R=14, T=10, H=13, r=8)
+    nut = Nut(R=bolt.R, T=bolt.T, H=bolt.T + 1, innerR1=bolt.r)
+    nut_space = 2 * endPlate.T + nut.T  # member.T + plate.T + nut.T
+    Obj = '6'
+
+    nut_bolt_array = NutBoltArray(Obj, nut, bolt, nut_space)
+
+    CCEndPlate = CCEndPlateCAD(column, endPlate, flangeWeld, webWeld, nut_bolt_array)
 
     CCEndPlate.create_3DModel()
     column = CCEndPlate.get_column_models()
     plates = CCEndPlate.get_plate_models()
     welds = CCEndPlate.get_weld_models()
+    nutBolts = CCEndPlate.get_nut_bolt_models()
 
     Point = gp_Pnt(0.0, 0.0, 0.0)
     display.DisplayMessage(Point, "Origin")
@@ -195,6 +223,7 @@ if __name__ == '__main__':
     display.DisplayShape(column, update=True)
     display.DisplayColoredShape(plates, color='BLUE', update=True)
     display.DisplayShape(welds, color='RED', update=True)
+    display.DisplayShape(nutBolts, color='YELLOW', update=True)
 
     display.DisableAntiAliasing()
     start_display()

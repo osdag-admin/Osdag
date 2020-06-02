@@ -956,7 +956,7 @@ class BeamCoverPlateWeld(MomentConnection):
         self.web_plate.height = round_down((self.section.depth - (2 * self.section.flange_thickness)
                                             - (2 * self.section.root_radius) - (2 * self.webspace)), 5)
         self.available_long_web_length = round_up((self.section.flange_width/2) - (self.flange_plate.gap/2),5)
-
+        # self.available_long_web_length = self.section.depth *0.1
         self.web_plate_weld_status = False
         while self.web_plate_weld_status == False:
             self.weld_stress(self, d=self.available_long_web_length,
@@ -1522,17 +1522,18 @@ class BeamCoverPlateWeld(MomentConnection):
                     class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 10.5 * epsilon:
                     class_of_section1 = "compact"
-                elif column_b * 0.5 / column_f_t <= 15.7 * epsilon:
+                # elif column_b * 0.5 / column_f_t <= 15.7 * epsilon:
+                #     class_of_section1 = "semi-compact"
+                else:
                     class_of_section1 = "semi-compact"
-                # else:
-                #     print('fail')
-                # print("class_of_section", class_of_section )
             elif section == "welded":
                 if column_b * 0.5 / column_f_t <= 8.4 * epsilon:
                     class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 9.4 * epsilon:
                     class_of_section1 = "compact"
-                elif column_b * 0.5 / column_f_t <= 13.6 * epsilon:
+                # elif column_b * 0.5 / column_f_t <= 13.6 * epsilon:
+                # class_of_section1 = "semi-compact"
+                else:
                     class_of_section1 = "semi-compact"
                 # else:
                 #     print('fail')
@@ -1541,9 +1542,14 @@ class BeamCoverPlateWeld(MomentConnection):
                     class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 33.5 * epsilon:
                     class_of_section1 = "compact"
-                elif column_b * 0.5 / column_f_t <= 42 * epsilon:
+                # elif column_b * 0.5 / column_f_t <= 42 * epsilon:
+                # class_of_section1 = "semi-compact"
+                else:
                     class_of_section1 = "semi-compact"
                 # else:
+                #     print('fail')
+            # else:
+            #     pass
                 #     print('fail')
             # else:
             #     pass

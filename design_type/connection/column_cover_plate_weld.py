@@ -1646,17 +1646,18 @@ class ColumnCoverPlateWeld(MomentConnection):
                     class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 10.5 * epsilon:
                     class_of_section1 = "compact"
-                elif column_b * 0.5 / column_f_t <= 15.7 * epsilon:
+                # elif column_b * 0.5 / column_f_t <= 15.7 * epsilon:
+                #     class_of_section1 = "semi-compact"
+                else:
                     class_of_section1 = "semi-compact"
-                # else:
-                #     print('fail')
-                # print("class_of_section", class_of_section )
             elif section == "welded":
                 if column_b * 0.5 / column_f_t <= 8.4 * epsilon:
                     class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 9.4 * epsilon:
                     class_of_section1 = "compact"
-                elif column_b * 0.5 / column_f_t <= 13.6 * epsilon:
+                # elif column_b * 0.5 / column_f_t <= 13.6 * epsilon:
+                # class_of_section1 = "semi-compact"
+                else:
                     class_of_section1 = "semi-compact"
                 # else:
                 #     print('fail')
@@ -1665,11 +1666,12 @@ class ColumnCoverPlateWeld(MomentConnection):
                     class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 33.5 * epsilon:
                     class_of_section1 = "compact"
-                elif column_b * 0.5 / column_f_t <= 42 * epsilon:
+                # elif column_b * 0.5 / column_f_t <= 42 * epsilon:
+                # class_of_section1 = "semi-compact"
+                else:
                     class_of_section1 = "semi-compact"
                 # else:
-                #     print('fail')
-            # else:
+
             #     pass
 
         elif compression_element == "Web of an I-H" or compression_element == "box section":

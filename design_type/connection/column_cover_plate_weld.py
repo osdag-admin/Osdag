@@ -1815,7 +1815,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         # b = self.web_plate.height - (2 * self.web_weld.size)
         # self.design_status = False
         '''
-        # while self.design_status == False:
+     #
         cgy = d ** 2 / (2 * d + b)
         cgx = b / 2
         self.y_max = (d ** 2 / (2 * d + b))

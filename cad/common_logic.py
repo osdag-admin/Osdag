@@ -848,6 +848,9 @@ class CommonDesignLogic(object):
 
         return ccCoverPlateCAD
 
+    def createCCEndPlate(self):
+        pass
+
     def createBasePlateCAD(self):
         """
         :return: The calculated values/parameters to create 3D CAD model of individual components.

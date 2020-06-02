@@ -53,40 +53,82 @@ class NutBoltArray(object):
         self.edgeDist = 55.45
         self.pitch = 82.5
         self.p2flange = 122.3
+        self.p2web = 122.3
+        # todo for flush plate
+        if self.row == 2:
+            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.p2web]
+        elif self.row == 3:
+            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.p2web, self.endDist + 12 + 2 * self.p2web]
+        elif self.row == 4:
+            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.pitch,
+                              self.endDist + 12 + self.pitch + self.p2web,
+                              self.endDist + 12 + 2 * self.pitch + self.p2web]
+        elif self.row == 5:
+            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.pitch,
+                              self.endDist + 12 + self.pitch + self.p2flange,
+                              self.endDist + 12 + self.pitch + 2 * self.p2flange,
+                              self.endDist + 12 + 2 * self.pitch + 2 * self.p2flange]
+
+        elif self.row == 6:
+            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.pitch, self.endDist + 12 + 2 * self.pitch,
+                              self.endDist + 12 + 2 * self.pitch + self.p2flange,
+                              self.endDist + 12 + 3 * self.pitch + self.p2flange,
+                              self.endDist + 12 + 4 * self.pitch + self.p2flange]
+        elif self.row == 7:
+            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.pitch, self.endDist + 12 + 2 * self.pitch,
+                              self.endDist + 12 + 2 * self.pitch + self.p2flange,
+                              self.endDist + 12 + 2 * self.pitch + 2 * self.p2flange,
+                              self.endDist + 12 + 3 * self.pitch + 2 * self.p2flange,
+                              self.endDist + 12 + 4 * self.pitch + 2 * self.p2flange]
+
         if self.col == 2:
             self.gauge = [self.edgeDist, 65 + 12.7 + 65]  # end+T+end
+
         elif self.col == 4:
-            self.gauge = [self.endDist, self.endDist + self.p2flange,
-                          self.endDist + self.p2flange + 2 * self.endDist + 10,
-                          self.endDist + self.p2flange + 2 * self.endDist + 10 + self.p2flange]
+        self.gauge = [self.endDist, self.endDist + self.p2flange,
+                      self.endDist + self.p2flange + 2 * self.endDist + 10,
+                      self.endDist + self.p2flange + 2 * self.endDist + 10 + self.p2flange]
         elif self.col == 6:
             self.gauge = [self.endDist, self.endDist + self.p2flange, self.endDist + self.p2flange + self.p2flange,
                           self.endDist + self.p2flange + self.p2flange + 2 * self.endDist + 10,
                           self.endDist + self.p2flange + self.p2flange + 2 * self.endDist + 10 + self.p2flange,
                           self.endDist + self.p2flange + self.p2flange + 2 * self.endDist + 10 + self.p2flange + self.p2flange]
-        elif self.col == 8:
-            self.gauge = [self.endDist, self.endDist + self.pitch, self.endDist + self.pitch + self.p2flange,
-                          self.endDist + self.pitch + self.p2flange + self.pitch,
-                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10,
-                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10 + self.pitch,
-                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10 + self.pitch + self.p2flange,
-                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10 + self.pitch + self.p2flange + self.pitch]
 
-    def calculatePositions(self):
-        self.positions = []
-        # Todo: if member == flush:
-        self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
-        self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
-        for col in range(self.col):
-            for rw in range(self.row):
-                pos = self.boltOrigin
-                pos = pos + rw * self.p2flange * self.pitchDir
-                pos = pos + self.gauge[col] * self.gaugeDir
+elif self.col == 8:
+self.gauge = [self.endDist, self.endDist + self.pitch, self.endDist + self.pitch + self.p2flange,
+              self.endDist + self.pitch + self.p2flange + self.pitch,
+              self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10,
+              self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10 + self.pitch,
+              self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10 + self.pitch + self.p2flange,
+              self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10 + self.pitch + self.p2flange + self.pitch]
+elif self.col == 10:
+self.gauge = [self.endDist, self.endDist + self.pitch, self.endDist + self.pitch + self.p2flange,
+              self.endDist + self.pitch + 2 * self.p2flange,
+              self.endDist + 2 * self.pitch + 2 * self.p2flange,
+              10 + 2 * self.endDist + 2 * self.pitch + 2 * self.p2flange,
+              10 + 2 * self.endDist + 3 * self.pitch + 2 * self.p2flange,
+              10 + 2 * self.endDist + 3 * self.pitch + 3 * self.p2flange,
+              10 + 2 * self.endDist + 3 * self.pitch + 4 * self.p2flange,
+              10 + 2 * self.endDist + 4 * self.pitch + 4 * self.p2flange]
 
-                self.positions.append(pos)
-        # 4 column bolts
-        # elif self.col == 4:
-        #     self.boltOrigin = self.origin + self.endDist * self.gaugeDir
+
+def calculatePositions(self):
+    self.positions = []
+    # Todo: if member == flush:
+    if self.col != 2:
+        self.edgeDist = self.endDist
+    self.boltOrigin = self.origin  # + (self.edgeDist + 10) * self.gaugeDir
+    self.boltOrigin = self.boltOrigin  # + self.endDist * self.pitchDir
+    for col in range(self.col):
+        for rw in range(self.row):
+            pos = self.boltOrigin
+            pos = pos + self.pitchDist[rw] * self.pitchDir
+            pos = pos + self.gauge[col] * self.gaugeDir
+
+            self.positions.append(pos)
+    # 4 column bolts
+    # elif self.col == 4:
+    #     self.boltOrigin = self.origin + self.endDist * self.gaugeDir
         #     self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
         #     for col in range(self.col):
         #         if col <= 2:

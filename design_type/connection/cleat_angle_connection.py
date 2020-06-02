@@ -52,29 +52,29 @@ class CleatAngleConnection(ShearConnection):
               TYPE_TEXTBOX, self.get_fu_fy_I_section_suptd)
         change_tab.append(t2)
 
-        t5 = (DISP_TITLE_CLEAT, ['Label_1', 'Label_3'],
+        t5 = (DISP_TITLE_CLEAT, ['Label_1', 'Label_2','Label_3'],
               ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
-               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22'],
+               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'],
               TYPE_TEXTBOX, self.get_Angle_sec_properties)
         change_tab.append(t5)
 
         t6 = (DISP_TITLE_CLEAT, [KEY_ANGLE_LIST, KEY_CONNECTOR_MATERIAL],
-              [KEY_ANGLE_SELECTED, KEY_CONNECTOR_FY, KEY_CONNECTOR_FU, 'Label_1', 'Label_3', 'Label_4', 'Label_5', 'Label_7',
+              [KEY_ANGLE_SELECTED, KEY_CONNECTOR_FY, KEY_CONNECTOR_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5', 'Label_7',
                'Label_8', 'Label_9',
                'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
                'Label_18',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX,
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23','Label_24'], TYPE_TEXTBOX,
               self.get_new_angle_section_properties)
         change_tab.append(t6)
 
         t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t4)
 
         t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
 
         return change_tab
@@ -123,6 +123,31 @@ class CleatAngleConnection(ShearConnection):
         design_input.append(t2)
 
         return design_input
+
+    def refresh_input_dock(self):
+        """
+
+         :return: This function returns list of tuples which has keys that needs to be updated,
+          on changing Keys in design preference (ex: adding a new section to database should reflect in input dock)
+
+          [(Tab Name,  Input Dock Key, Input Dock Key type, design preference key, Master key, Value, Database Table Name)]
+         """
+
+        add_buttons = []
+
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_1, "Columns")
+        add_buttons.append(t1)
+
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_2, "Beams")
+        add_buttons.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTDSEC, None, None, "Beams")
+        add_buttons.append(t2)
+
+        t2 = (DISP_TITLE_CLEAT, KEY_ANGLE_LIST, TYPE_COMBOBOX_CUSTOMIZED, KEY_ANGLE_SELECTED, None, None, "Angles")
+        add_buttons.append(t2)
+
+        return add_buttons
 
     ####################################
     # Design Preference Functions End
@@ -275,6 +300,7 @@ class CleatAngleConnection(ShearConnection):
         lst.append(t5)
 
         return lst
+
 
     def spacing(self, status):
 

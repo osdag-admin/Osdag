@@ -90,6 +90,9 @@ available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDE
                     KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
                     KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate}
 
+# available_module = {KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
+#                     KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate}
+
 #predefined pop-up summary.
 popup_summary = {'ProfileSummary': {'CompanyName': 'LoremIpsum', 'CompanyLogo': '', 'Group/TeamName': 'LoremIpsum', 'Designer': 'LoremIpsum'},
                 'ProjectTitle': 'Fossee', 'Subtitle': '', 'JobNumber': '123', 'AdditionalComments': 'No comments', 'Client': 'LoremIpsum'}

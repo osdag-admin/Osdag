@@ -110,7 +110,7 @@ class SeatedAngleConnection(ShearConnection):
               TYPE_TEXTBOX, self.get_fu_fy_I_section_suptd)
         change_tab.append(t2)
 
-        t5 = (KEY_DISP_SEATED_ANGLE, ['Label_1', 'Label_3'],
+        t5 = (KEY_DISP_SEATED_ANGLE, ['Label_1', 'Label_2','Label_3'],
               ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14',
                'Label_15',
                'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22'],
@@ -118,23 +118,23 @@ class SeatedAngleConnection(ShearConnection):
         change_tab.append(t5)
 
         t6 = (KEY_DISP_SEATED_ANGLE, [KEY_ANGLE_LIST, KEY_CONNECTOR_MATERIAL],
-              [KEY_ANGLE_SELECTED, KEY_CONNECTOR_FY, KEY_CONNECTOR_FU, 'Label_1', 'Label_3', 'Label_4', 'Label_5',
+              [KEY_ANGLE_SELECTED, KEY_CONNECTOR_FY, KEY_CONNECTOR_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
                'Label_7',
                'Label_8', 'Label_9',
                'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
                'Label_18',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX,
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', 'Label_24'], TYPE_TEXTBOX,
               self.get_new_angle_section_properties)
         change_tab.append(t6)
 
         t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t4)
 
         t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
 
         return change_tab
@@ -183,6 +183,33 @@ class SeatedAngleConnection(ShearConnection):
         design_input.append(t2)
 
         return design_input
+
+
+    def refresh_input_dock(self):
+        """
+
+         :return: This function returns list of tuples which has keys that needs to be updated,
+          on changing Keys in design preference (ex: adding a new section to database should reflect in input dock)
+
+          [(Tab Name,  Input Dock Key, Input Dock Key type, design preference key, Master key, Value, Database Table Name)]
+         """
+
+        add_buttons = []
+
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_1, "Columns")
+        add_buttons.append(t1)
+
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_2, "Beams")
+        add_buttons.append(t1)
+
+        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTDSEC, None, None, "Beams")
+        add_buttons.append(t2)
+
+        t2 = (KEY_DISP_SEATED_ANGLE, KEY_ANGLE_LIST, TYPE_COMBOBOX_CUSTOMIZED, KEY_ANGLE_SELECTED, None, None, "Angles")
+        add_buttons.append(t2)
+
+        return add_buttons
+
 
     ####################################
     # Design Preference Functions End
@@ -238,7 +265,7 @@ class SeatedAngleConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN_1, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_IMAGE, None, TYPE_IMAGE, None, True, 'No Validator')
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, './ResourceFiles/images/fin_cf_bw.png', True, 'No Validator')
         options_list.append(t3)
 
         t4 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, VALUES_COLSEC, True, 'No Validator')
@@ -348,9 +375,8 @@ class SeatedAngleConnection(ShearConnection):
         red_list = red_list_function()
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
             logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
-            logger.info(" : You are using a section (in red color) that is not available in latest version of IS 808")
+            # logger.info(" : You are using a section (in red color) that is not available in latest version of IS 808")
 
-    @staticmethod
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
         Args:
@@ -389,6 +415,7 @@ class SeatedAngleConnection(ShearConnection):
         # self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL], material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O], fabrication=design_dictionary[KEY_DP_WELD_FAB])
         # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
         # print("input values are set. Doing preliminary member checks")
+        self.warn_text(self)
         self.member_capacity(self)
 
     def member_capacity(self):
@@ -846,13 +873,13 @@ class SeatedAngleConnection(ShearConnection):
 
             if self.top_angle.width < self.supporting_section.flange_width:
                 self.bolt.top_angle_gauge_column = round_up((self.top_angle.width -
-                            self.supporting_section.root_radius * 2 + self.supporting_section.web_thickness) / 2 +
+                            self.supporting_section.root_radius * 2 - self.supporting_section.web_thickness) / 2 +
                             self.supporting_section.root_radius * 2 + self.supporting_section.web_thickness, 1)
                 self.bolt.top_angle_edge_column = round((self.top_angle.width - self.bolt.top_angle_gauge_column) / 2, 1)
                 # self.top_angle.width = self.bolt.top_angle_gauge_column + 2 * self.bolt.top_angle_edge_column
             else:
                 self.bolt.top_angle_gauge_column = round_up((self.supporting_section.flange_width -
-                            self.supporting_section.root_radius * 2 + self.supporting_section.web_thickness) / 2 +
+                            self.supporting_section.root_radius * 2 - self.supporting_section.web_thickness) / 2 +
                             self.supporting_section.root_radius * 2 + self.supporting_section.web_thickness, 1)
                 self.bolt.top_angle_edge_column = round((self.top_angle.width - self.bolt.top_angle_gauge_column) / 2, 1)
                 # self.top_angle.width = self.bolt.top_angle_gauge_column + 2 * self.bolt.top_angle_edge_column
@@ -860,13 +887,13 @@ class SeatedAngleConnection(ShearConnection):
             if self.top_angle.width < self.supported_section.flange_width:
                 # self.bolt.top_angle_gauge_beam = round_up((self.top_angle.width - self.bolt.min_edge_dist_round * 2), 1)
                 self.bolt.top_angle_gauge_beam = round_up((self.top_angle.width -
-                            self.supported_section.root_radius * 2 + self.supported_section.web_thickness) / 2 +
+                            self.supported_section.root_radius * 2 - self.supported_section.web_thickness) / 2 +
                             self.supported_section.root_radius * 2 + self.supported_section.web_thickness, 1)
                 self.bolt.top_angle_edge_beam = round((self.top_angle.width - self.bolt.top_angle_gauge_beam) / 2, 1)
 
             else:
                 self.bolt.top_angle_gauge_beam = round_up((self.supported_section.flange_width -
-                            self.supported_section.root_radius * 2 + self.supported_section.web_thickness) / 2 +
+                            self.supported_section.root_radius * 2 - self.supported_section.web_thickness) / 2 +
                             self.supported_section.root_radius * 2 + self.supported_section.web_thickness, 1)
                 self.bolt.top_angle_edge_beam = round((self.top_angle.width - self.bolt.top_angle_gauge_beam) / 2, 1)
 
@@ -877,7 +904,7 @@ class SeatedAngleConnection(ShearConnection):
                                                 self.bolt.min_end_dist_round * 2 + self.bolt.min_edge_dist_round * 2), 1) )
 
             self.bolt.top_angle_gauge_beam = round_up((self.supported_section.flange_width -
-                            self.supported_section.root_radius * 2 + self.supported_section.web_thickness) / 2 +
+                            self.supported_section.root_radius * 2 - self.supported_section.web_thickness) / 2 +
                             self.supported_section.root_radius * 2 + self.supported_section.web_thickness, 1)
             self.bolt.top_angle_edge_beam = round((self.top_angle.width - self.bolt.top_angle_gauge_beam) / 2, 1)
             self.bolt.top_angle_gauge_column = self.bolt.top_angle_gauge_beam
@@ -908,7 +935,7 @@ class SeatedAngleConnection(ShearConnection):
                                                                 (self.bolt.bolt_col - 2) * self.bolt.min_gauge_round), 1)
 
             self.bolt.seated_angle_gauge_beam = round_up((self.supported_section.flange_width -
-                                    self.supported_section.root_radius * 2 + self.supported_section.web_thickness)/2 +
+                                    self.supported_section.root_radius * 2 - self.supported_section.web_thickness)/2 +
                                     self.supported_section.root_radius * 2 + self.supported_section.web_thickness, 1)
             self.bolt.seated_angle_edge_beam = round((self.seated_angle.width - self.bolt.seated_angle_gauge_beam) / 2, 1)
             self.bolt.seated_angle_end_column = round_up((self.seated.leg_a_length - self.seated.thickness -

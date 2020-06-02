@@ -87,7 +87,7 @@ class Tension_welded(Member):
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t3)
 
-        t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_3'],
+        t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2','Label_3'],
               ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14',
                'Label_15',
                'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22'],
@@ -1010,8 +1010,10 @@ class Tension_welded(Member):
             elif (self.load.axial_force * 1000 > self.force1):
                 self.max_limit_status_1 = True
                 # self.design_status = False
-                logger.error(" : Tension force exceeds tension capacity for maximum available member size.")
-                # logger.error(": Design is not safe. \n ")
+                logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(
+                        round(self.load.axial_force, 2), round(self.force1 / 1000, 2), self.max_area))
+                logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
+                # logge r.error(": Design is not safe. \n ")
                 # logger.debug(" :=========End Of design===========")
                 break
 
@@ -1021,7 +1023,9 @@ class Tension_welded(Member):
             elif self.length > self.len2:
                 self.max_limit_status_2 = True
                 # self.design_status = False
-                logger.error(" : Length exceeds maximum allowable length for maximum available member size .")
+                logger.warning(" : Member Length {} mm exceeds maximum allowable length of {} mm for maximum available member size {}.".format(
+                        self.length, round(self.len2,2), self.max_gyr))
+                logger.info(" : Select Members with higher radius of gyration value than the above mentioned Member.")
                 # logger.error(": Design is not safe. \n ")
                 # logger.debug(" :=========End Of design===========")
                 break
@@ -1031,8 +1035,9 @@ class Tension_welded(Member):
 
 
         if self.member_design_status == False and self.max_limit_status_1 != True and self.max_limit_status_2 != True:
-            logger.error(" : Member depth can't accomodate minimum avaialble bolt diameter.")
-            logger.error(" : Reduce the bolt size or increase the member size")
+            logger.warning(" : Member Depth can't accomodate minimum available bolt diameter of {} mm based on minimum spacing limit (IS 800:2007 - Clause 10.2).".format(
+                    self.bolt_diameter_min))
+            logger.info(" : Reduce the bolt size or increase the Member Depth.")
             # logger.error(": Design is not safe. \n ")
             # logger.debug(" :=========End Of design===========")
 
@@ -1093,9 +1098,9 @@ class Tension_welded(Member):
                 break
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels',"Star Angles"]:
-            max_tension_yield = 400*self.plate.fy*80/1.1
+            self.max_tension_yield = 400*self.plate.fy*80/1.1
         else:
-            max_tension_yield = 200*self.plate.fy*80/1.1
+            self.max_tension_yield = 200*self.plate.fy*80/1.1
 
         "Increasing sectionsize to suffice the plate requirement"
 
@@ -1106,7 +1111,7 @@ class Tension_welded(Member):
             self.select_weld(self, design_dictionary)
 
         else:
-            if tension_capacity < max_tension_yield and self.res_force < max_tension_yield:
+            if tension_capacity < self.max_tension_yield and self.res_force < self.max_tension_yield:
                 # self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
                 if len(self.sizelist) >= 2:
                     print("recheck")
@@ -1116,14 +1121,14 @@ class Tension_welded(Member):
                     self.initial_member_capacity(self, design_dictionary, self.previous_size)
                 else:
                     self.design_status = False
-                    logger.error("Plate thickness is not sufficient.")
-                    logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness.")
+                    logger.warning( " : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
+                            round(self.res_force / 1000, 2), round(self.max_tension_yield/1000,2)))
                     logger.error(": Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
             else:
                 self.design_status = False
-                logger.error("Plate thickness is not sufficient.")
-                logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness.")
+                logger.warning(" : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
+                        round(self.res_force / 1000, 2),  round(self.max_tension_yield/1000,2)))
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
 
@@ -1188,7 +1193,7 @@ class Tension_welded(Member):
             self.member_check(self, design_dictionary)
         else:
             self.design_status = False
-            logger.error(": The member failes in long joint \n ")
+            logger.warning(": The member fails in long joint \n ")
             logger.error(": Design is not safe.\n ")
             logger.debug(" :=========End Of design===========")
 
@@ -1357,7 +1362,9 @@ class Tension_welded(Member):
                 self.initial_member_capacity(self, design_dictionary, self.previous_size)
             else:
                 self.design_status = False
-                logger.error(" : Tension force exceeds tension capacity for maximum available member size.")
+                logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(
+                        round(self.load.axial_force, 2), round(self.force1 / 1000, 2), self.max_area))
+                logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
 
@@ -1403,27 +1410,36 @@ class Tension_welded(Member):
 
             elif (self.plate_tension_capacity < self.res_force) and self.plate.thickness_provided == self.plate_last:
                 self.design_status = False
-                logger.error("Plate thickness is not sufficient.")
-                logger.error(" : Tension force exceeds tension capacity of maximum available plate thickness.")
+                logger.warning(
+                    " : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
+                        round(self.res_force / 1000, 2),  round(self.max_tension_yield/1000,2)))
+                logger.error(": Design is not safe. \n ")
+                logger.debug(" :=========End Of design===========")
 
             else:
                 pass
         if self.plate_tension_capacity > self.res_force:
-            if (2 * self.plate.length + 100) > self.length:
+            if (2 * self.plate.length) > self.length:
                 self.design_status = False
-                logger.info("Plate length exceeds the Member length")
-                logger.info("Try higher diameter of bolt to get a safe design")
+                logger.warning("Plate length of {} mm is higher than Member length of {} mm".format(2 * self.plate.length,
+                                                                                                    self.length))
+                logger.info("Try higher diameter of bolt or increase member length to get a safe design.")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
             else:
                 self.plate_design_status = True
                 self.design_status = True
                 self.intermittent_bolt(self, design_dictionary)
-                logger.info("In case of reverse load, slenderness value should be less than 180.")
-                logger.info("In case of reverse load, spacing of intermittent connection shall be less than 600.")
+
+                logger.info("In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
+                if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
+                    logger.info("In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
+                else:
+                    pass
                 logger.info(self.weld.reason)
-                logger.info(": Overall welded tension member design is safe. \n")
+                logger.info(": Overall bolted tension member design is safe. \n")
                 logger.debug(" :=========End Of design===========")
+
         else:
             self.design_status = False
             logger.error(": Design is not safe. \n ")

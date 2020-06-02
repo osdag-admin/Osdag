@@ -17,46 +17,27 @@ Bolt.Grade:
 - '9.8'
 - '10.9'
 - '12.9'
-Bolt.Material_Grade_OverWrite: '590'
+Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
 Bolt.Type: Bearing Bolt
 Conn_Location: Web
-Connector.Material: E 410 (Fe 540)
+Connector.Material: E 250 (Fe 410 W)A
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
-Load.Axial: '200'
-Material: E 450 (Fe 590) E
+Load.Axial: '500'
+Material: E 250 (Fe 410 W)A
 Member.Designation:
-- JC 100
-- JC 125
-- JC 150
-- JC 175
-- JC 200
-- LC 100
-- LC 125
-- LC 150
-- LC 175
-- LC 200
-- LC 225
-- LC 250
-- LC 300
-- LC 350
-- LC 400
-- LC 75
-- LC(P )150
-- LC(P) 125
-- LC(P) 200
-- LC(P) 300
+- MC 75
 - MC 100
 - MC 125
 - MC 125*
 - MC 150
 - MC 150*
 - MC 175
-- 'MC 175* '
+- MC 175*
 - MC 200
 - MC 200*
 - MC 225
@@ -69,28 +50,47 @@ Member.Designation:
 - MC 300*
 - MC 350
 - MC 400
-- 'MC 75                     '
-- MCP 100
-- MCP 125
-- MCP 125*
-- MCP 150
-- MCP 150*
-- MCP 175
-- MCP 175*
-- MCP 200
-- MCP 200*
-- MCP 225
-- MCP 225*
-- MCP 250
-- MCP 250*
-- MCP 250*
-- MCP 300
-- MCP 300*
-- MCP 300*
-- MCP 350
-- MCP 400
-- MCP 75
-Member.Length: '1000'
-Member.Material: E 410 (Fe 540)
+- JC 100
+- JC 125
+- JC 150
+- JC 175
+- JC 200
+- LC 75
+- LC 100
+- LC 125
+- LC (P) 125
+- LC 150
+- LC (P) 150
+- LC 175
+- LC 200
+- LC (P) 200
+- LC 225
+- LC 250
+- LC 300
+- LC (P) 300
+- LC 350
+- LC 400
+- MPC 75
+- MPC 100
+- MPC 125
+- MPC 125*
+- MPC 150
+- MPC 150*
+- MPC 175
+- MPC 175*
+- MPC 200
+- MPC 200*
+- MPC 225
+- MPC 225*
+- MPC 250
+- MPC 250*
+- MPC 250*
+- MPC 300
+- MPC 300*
+- MPC 300*
+- MPC 350
+- MPC 400
+Member.Length: '5000'
+Member.Material: E 250 (Fe 410 W)A
 Member.Profile: Channels
 Module: Tension Members Bolted Design

@@ -84,7 +84,7 @@ class ColumnEndPlate(MomentConnection):
 
         t5 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
 
         return change_tab
@@ -230,7 +230,9 @@ class ColumnEndPlate(MomentConnection):
         return KEY_DISP_COLUMNENDPLATE
 
     def input_values(self):
-
+        """"
+        Function to set input values
+        """
         options_list = []
 
         t16 = (KEY_MODULE, KEY_DISP_COLUMNENDPLATE, TYPE_MODULE, None, True, 'No Validator')
@@ -585,7 +587,12 @@ class ColumnEndPlate(MomentConnection):
         self.member_capacity(self)
 
     def member_capacity(self):
-##############  Axial capacity   ##########################
+        """"
+        This function is used to update the axial, shear and moment loads provided
+        by user according to miminum member capacity and also provides an error if
+        exceeds full capacity of member
+        """
+    #########  Axial capacity   ##########################
         gamma_m0 = 1.1
         # Axial Capacity
         self.axial_capacity = (self.section.area * self.section.fy) / gamma_m0  # N
@@ -604,9 +611,9 @@ class ColumnEndPlate(MomentConnection):
             logger.info("Increase member size or decrease axial load")
         # self.load.axial_force = self.factored_axial_load  # N
         print("factored_axial_load", self.factored_axial_load)
-###############################################################
+    ###############################################################
 
-##################   Shear Capacity  ######################
+    ##################   Shear Capacity  ######################
         self.shear_capacity = ((self.section.depth - (2 * self.section.flange_thickness)) * self.section.web_thickness * self.section.fy) / (
                                  math.sqrt(3) * gamma_m0)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
         self.min_shear_load = 0.6 * self.shear_capacity  # N
@@ -622,9 +629,9 @@ class ColumnEndPlate(MomentConnection):
             logger.error(":The shear force {} acting is higher than shear capacity {} of member".format(self.load.shear_force,self.shear_capacity/1000))
             logger.info("Increase member size or decrease shear load")
         print("factored_shear_load", self.factored_shear_load)
-###############################################################
+    ###############################################################
 
-################  Moment Capacity  ############################
+    ################  Moment Capacity  ############################
         if self.section.type == "Rolled":
             self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                            column_t_w=self.section.web_thickness,
@@ -703,13 +710,16 @@ class ColumnEndPlate(MomentConnection):
             self.get_bolt_diam(self)
         else:
             logger.error("Either decrease the loads or increase member size")
-#############################################################################################
 
-#############################################################################################
+    #############################################################################################
     ## Function to get bolt diam ##
-############################################################################################
+    ############################################################################################
 
     def get_bolt_diam(self, previous_size = None):
+        """"
+        Each diam size selected by user goes in a loop and gives no of bolts based on pitch, end dist and
+        section size, the bolt diam which gives minimum bolt numbers is selected
+        """
         self.lst1 = []
         self.lst2 = []
 
@@ -1004,13 +1014,15 @@ class ColumnEndPlate(MomentConnection):
             self.design_status = False
             logger.error("failed in bolt diam selection")
 
- #############################################################################################################
-
-#############################################################################################################
+    #############################################################################################################
     ## Function to get Bolt grade ##
-###############################################################################################################
+    ###############################################################################################################
 
     def get_bolt_grade(self):
+        """"
+        Bolt size selected in upper function is checked with each bolt grade and the minimum
+        bolt grade which passes the chech is selected
+        """
         self.lst3 = []
         # self.lst2 = []
         # for (x,y) in (self.bolt.bolt_diameter,self.bolt.bolt_grade):
@@ -1253,11 +1265,11 @@ class ColumnEndPlate(MomentConnection):
 
         # bolt_grade_provided=12.9)
 
-########################################################################################################
+    ########################################################################################################
 
-########################################################################################################
+    ########################################################################################################
     ## Function to get plate thickness ##
-#########################################################################################################
+    #########################################################################################################
     def plate_details(self):
         if self.connection == 'Flush End Plate':
             self.plate_height = self.section.depth
@@ -1458,6 +1470,70 @@ class ColumnEndPlate(MomentConnection):
         else:
             logger.error(": Design is not safe \n ")
             logger.debug(" :=========End Of design===========")
+
+#####################################################################
+    ###   Output Dict   ###
+#####################################################################
+
+    def results_to_test(self):
+        test_input = {KEY_MODULE : self.module,
+                      KEY_MAIN_MODULE: self.mainmodule,
+                      KEY_DISP_SEC_PROFILE: "ISection",
+                      KEY_DISP_BEAMSEC: self.section.designation,
+                      KEY_MATERIAL: self.section.material,
+                      KEY_SEC_FU: self.section.fu,
+                      KEY_SEC_FY: self.section.fy,
+                      KEY_D: self.bolt.bolt_diameter,
+                      KEY_GRD: self.bolt.bolt_grade,
+                      KEY_TYP: self.bolt.bolt_type,
+                      KEY_PLATETHK: self.plate.thickness,
+                      KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+                      KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+                      KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+                      KEY_DP_DETAILING_GAP: self.plate.gap,
+                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+
+        test_output = {KEY_MEMBER_MOM_CAPACITY: round(self.moment_capacity / 1000000, 2),
+                       KEY_MEMBER_SHEAR_CAPACITY: round(self.shear_capacity / 1000, 2),
+                       KEY_MEMBER_AXIALCAPACITY: round(self.axial_capacity / 1000, 2),
+
+                       # applied loads
+                       KEY_DISP_APPLIED_AXIAL_FORCE: round(self.factored_axial_load / 1000, 2),
+                       KEY_DISP_APPLIED_SHEAR_LOAD: round(self.factored_shear_load / 1000, 2),
+                       KEY_DISP_APPLIED_MOMENT_LOAD: round(self.factored_moment / 1000000, 2),
+
+                       # bolt_capacity
+                       KEY_OUT_BOLT_SHEAR: round(self.bolt.bolt_shear_capacity / 1000, 2),
+                       KEY_OUT_BOLT_BEARING: round(self.bolt.bolt_bearing_capacity / 1000, 2),
+                       KEY_OUT_BOLT_CAPACITY: round(self.bolt.bolt_capacity / 1000, 2),
+                       KEY_OUT_BOLT_TENSION_CAPACITY: round(self.bolt.bolt_tension_capacity / 1000, 2),
+                       KEY_Y_SQR: round(self.y_sqr,2),
+                       KEY_BOLT_TENSION: round(self.t_b,2),
+                       KEY_BOLT_SHEAR: round(self.v_sb,2),
+
+                       # detailng
+                       KEY_D: self.bolt_diam_provided,
+                       KEY_GRD: self.bolt_grade_provided,
+                       KEY_OUT_PITCH: self.pitch,
+                       KEY_OUT_END_DIST: self.end_dist,
+                       KEY_OUT_NO_BOLTS_WEB: (self.n_bw),
+                       KEY_OUT_NO_BOLTS_FLANGE: (self.n_bf),
+                       KEY_OUT_NO_BOLTS: round(self.no_bolts),
+                       KEY_P2_WEB: self.p_2_web,
+                       KEY_P2_FLANGE: self.p_2_flange,
+
+                       # plate
+                       KEY_OUT_PLATETHK: self.plate_thickness_provided,
+                       KEY_OUT_PLATE_HEIGHT: self.plate_height,
+                       KEY_OUT_PLATE_LENGTH: self.plate_width,
+                       KEY_OUT_PLATE_MOM_CAPACITY: round(self.m_dp/1000000,2),
+                       KEY_PLATE_MOMENT: round(self.m_ep/1000000,2),
+
+                       #stiffener
+                       KEY_OUT_STIFFENER_HEIGHT: self.stiff_ht,
+                       KEY_OUT_STIFFENER_WIDTH: self.stiff_wt,
+                       KEY_OUT_STIFFENER_THICKNESS: self.t_s,
+                       KEY_OUT_WELD_TYPE: self.weld_type}
 
     @staticmethod
     def grdval_customized():

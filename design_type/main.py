@@ -196,6 +196,8 @@ class Main():
             em_y = ''
             pm_z = ''
             pm_y = ''
+            I_t = ''
+            I_w = ''
 
         else:
             D = float(self[0])
@@ -214,6 +216,8 @@ class Main():
             em_y = sec_prop.calc_ElasticModulusZy(D, B, t_w, t_f)
             pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
             pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
+            I_t = sec_prop.calc_torsion_const(D,B,t_w,t_f)
+            I_w = sec_prop.calc_torsion_const(D, B, t_w, t_f)
 
         d = {'Label_11': str(mass),
              'Label_12': str(area),
@@ -225,9 +229,12 @@ class Main():
              'Label_18': str(em_y),
              'Label_19': str(pm_z),
              'Label_20': str(pm_y),
-             }
+             'Label_21': str(I_t),
+             'Label_22': str(I_w),
+            }
 
         return d
+
 
     def get_Angle_sec_properties(self):
 
@@ -248,28 +255,31 @@ class Main():
             em_y = ''
             pm_z = ''
             pm_y = ''
+            I_t = ''
 
         else:
-            axb = str(self[0])
-            t = float(self[1])
+            a = float(self[0])
+            b = float(self[1])
+            t = float(self[2])
 
             sec_prop = Single_Angle_Properties()
-            mass = sec_prop.calc_Mass(axb, t)
-            area = sec_prop.calc_Area(axb, t)
-            Cz = sec_prop.calc_Cz(axb, t)
-            Cy = sec_prop.calc_Cy(axb, t)
-            moa_z = sec_prop.calc_MomentOfAreaZ(axb, t)
-            moa_y = sec_prop.calc_MomentOfAreaY(axb, t)
-            moa_u = sec_prop.calc_MomentOfAreaU(axb, t)
-            moa_v = sec_prop.calc_MomentOfAreaV(axb, t)
-            rog_z = sec_prop.calc_RogZ(axb, t)
-            rog_y = sec_prop.calc_RogY(axb, t)
-            rog_u = sec_prop.calc_RogU(axb, t)
-            rog_v = sec_prop.calc_RogV(axb, t)
-            em_z = sec_prop.calc_ElasticModulusZz(axb, t)
-            em_y = sec_prop.calc_ElasticModulusZy(axb, t)
-            pm_z = sec_prop.calc_PlasticModulusZpz(axb, t)
-            pm_y = sec_prop.calc_PlasticModulusZpy(axb, t)
+            mass = sec_prop.calc_Mass(a,b, t)
+            area = sec_prop.calc_Area(a,b, t)
+            Cz = sec_prop.calc_Cz(a,b, t)
+            Cy = sec_prop.calc_Cy(a,b, t)
+            moa_z = sec_prop.calc_MomentOfAreaZ(a,b, t)
+            moa_y = sec_prop.calc_MomentOfAreaY(a,b, t)
+            moa_u = sec_prop.calc_MomentOfAreaU(a,b, t)
+            moa_v = sec_prop.calc_MomentOfAreaV(a,b, t)
+            rog_z = sec_prop.calc_RogZ(a,b, t)
+            rog_y = sec_prop.calc_RogY(a,b, t)
+            rog_u = sec_prop.calc_RogU(a,b, t)
+            rog_v = sec_prop.calc_RogV(a,b, t)
+            em_z = sec_prop.calc_ElasticModulusZz(a,b, t)
+            em_y = sec_prop.calc_ElasticModulusZy(a,b, t)
+            pm_z = sec_prop.calc_PlasticModulusZpz(a,b, t)
+            pm_y = sec_prop.calc_PlasticModulusZpy(a,b, t)
+            I_t = sec_prop.calc_TorsionConstantIt(a,b,t)
 
         d = {'Label_9': str(mass),
              'Label_10': str(area),
@@ -287,7 +297,7 @@ class Main():
              'Label_20': str(em_y),
              'Label_21': str(pm_z),
              'Label_22': str(pm_y),
-
+             'Label_23': str(I_t),
              }
 
         return d
@@ -344,6 +354,7 @@ class Main():
              }
 
         return d
+
 
     #########################################
     # Design Preferences Functions End

@@ -3,6 +3,7 @@ from utils.common.component import *
 from Common import *
 from utils.common.load import Load
 import logging
+import yaml
 
 
 class BeamColumnEndPlate(MomentConnection):
@@ -342,13 +343,14 @@ class BeamColumnEndPlate(MomentConnection):
         self.weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                          fabrication=design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
-        self.warn_text(self)
-        self.member_capacity(self)
+        self.warn_text()
+        self.member_capacity()
 
 
-
-
-
+    # Load osi file
+    # Get input objects
+    input_file_path = "/home/ajmalbabums/Desktop/OsdagWorkspace/bcinput.osi"
+    design_dictionary = yaml.load(input_file_path, Loader=yaml.FullLoader)
 
 
 

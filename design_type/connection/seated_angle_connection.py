@@ -423,21 +423,21 @@ class SeatedAngleConnection(ShearConnection):
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
         if self.supported_section.type == "Rolled":
-            length = self.supported_section.depth
+            self.supported_section.length = self.supported_section.depth
         else:
-            length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # For Built-up section
+            self.supported_section.length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # For Built-up section
 
         # self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
-        self.supported_section.shear_yielding_capacity = round(IS800_2007.cl_8_4_design_shear_strength(
-            length * self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
-        if self.supported_section.shear_yielding_capacity > self.load.shear_force :
+        self.supported_section.shear_capacity = round(IS800_2007.cl_8_4_design_shear_strength(
+            self.supported_section.length * self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
+        if self.supported_section.shear_capacity > self.load.shear_force :
             # print("preliminary member check is satisfactory. Checking available angle thickness")
             self.design_status = True
             self.select_angle_thickness(self)
         else:
             self.design_status = False
             logger.error(" : shear yielding capacity {} is less than applied load, Please select larger sections or decrease loads"
-                            .format(self.supported_section.shear_yielding_capacity))
+                            .format(self.supported_section.shear_capacity))
             # print("failed in preliminary member checks. Select larger sections or decrease loads")
 
     def select_angle_thickness(self):
@@ -1359,11 +1359,17 @@ class SeatedAngleConnection(ShearConnection):
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
              KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
              KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences,
-             "Plate Details": "TITLE",
-             KEY_DISP_PLATETHK: str(self.plate.thickness),
+             "Seated Angle Details": "TITLE",
+             KEY_DISP_SEATEDANGLE: str(self.seated_list),
              KEY_DISP_MATERIAL: self.plate.material,
              KEY_DISP_FU: self.plate.fu,
-             KEY_DISP_FY: self.plate.fy}
+             KEY_DISP_FY: self.plate.fy,
+             "Top Angle Details": "TITLE",
+             KEY_DISP_TOP_ANGLE: str(self.topangle_list),
+             KEY_DISP_MATERIAL: self.plate.material,
+             KEY_DISP_FU: self.plate.fu,
+             KEY_DISP_FY: self.plate.fy
+             }
 
         self.report_check = []
         if self.plate.design_status is True:
@@ -1490,8 +1496,8 @@ class SeatedAngleConnection(ShearConnection):
             #       get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="lesser"))
             # self.report_check.append(t5)
             #
-            # t1 = ('SubSection', 'Plate Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-            # self.report_check.append(t1)
+            t1 = ('SubSection', 'Seated Angle Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
             #
             # t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth, self.min_plate_height),
             #       self.plate.height,
@@ -1520,33 +1526,34 @@ class SeatedAngleConnection(ShearConnection):
             #######################
             # Plate and Section Capacities
             #######################
-            # for a in [self.plate, self.supported_section]:
-            for a in [self.supported_section]:
+            for a in [self.plate, self.supported_section]:
+            # for a in [self.supported_section]:
                 gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
                 gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
                 if a == self.plate:
-                    h = a.height
+                    h = self.seated_angle.width
                     t = a.thickness_provided
                 else:
                     t1 = ('SubSection', 'Section Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
                     self.report_check.append(t1)
-                    h = a.web_height
+                    h = self.supported_section.length
                     t = a.web_thickness
 
-                t1 = (KEY_DISP_SHEAR_YLD, '', shear_yield_prov(h, t, a.fy, gamma_m0,
-                                                               round(a.shear_yielding_capacity / 1000, 2)), '')
+                t1 = (KEY_DISP_SHEAR_YLD, '', shear_yield_prov(h, t, a.fy, gamma_m0, a.shear_capacity), '')
                 self.report_check.append(t1)
 
                 t1 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force,
-                      shear_capacity_prov(round(a.shear_yielding_capacity / 1000, 2),
-                                          0.00, 0.00),
-                      get_pass_fail(self.load.shear_force, round(a.shear_capacity / 1000, 2), relation="lesser"))
+                      shear_capacity_prov(a.shear_capacity, 0.00, 0.00),
+                      get_pass_fail(self.load.shear_force, a.shear_capacity, relation="lesser"))
                 self.report_check.append(t1)
 
-                t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY, round(self.plate.moment_demand / 1000000, 2),
-                      round(a.moment_capacity / 1000000, 2),
-                      get_pass_fail(self.plate.moment_demand, a.moment_capacity, relation="lesser"))
-                self.report_check.append(t1)
+                #######################
+                # Plate Capacities
+                #######################
+                if a == self.plate:
+                    t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY, self.plate.moment_demand, self.plate.moment_capacity,
+                          get_pass_fail(self.plate.moment_demand, self.plate.moment_capacity, relation="lesser"))
+                    self.report_check.append(t1)
 
         Disp_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])

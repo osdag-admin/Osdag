@@ -937,6 +937,8 @@ KEY_DISP_WEB_WELD_LENGTH = 'Web Weld Length'
 KEY_WEB_WELD_LENGTH_EFF = 'Web_Weld.EffLength'
 KEY_WEB_WELD_HEIGHT ='Web_Weld.height'
 KEY_DISP_WEB_WELD_HEIGHT = 'Web Weld Height'
+KEY_OUT_LONG_JOINT_WELD = 'Weld Strength post Long Joint (N/mm)'
+KEY_OUT_DISP_RED_WELD_STRENGTH = 'Weld Strength (N/mm)'
 
 
 DISP_TITLE_ENDPLATE = 'End plate'

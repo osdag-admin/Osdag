@@ -1600,7 +1600,7 @@ class Angle(Section):
     def connect_to_database_update_other_attributes_angles(self, designation,material_grade):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         # db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
-        db_query =  "SELECT * FROM Angles WHERE Designation = ?"
+        db_query = "SELECT * FROM Angles WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
         row = cur.fetchone()

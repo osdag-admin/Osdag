@@ -748,8 +748,7 @@ KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
 KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Flange Moment Capacity (kNm)'
 KEY_DESIGNATION = "section_size.designation"
 KEY_DISP_DESIGNATION = "Designation"
-KEY_DISP_A = "A"
-KEY_DISP_B = "B"
+
 
 KEY_TENSION_YIELDCAPACITY = "Member.tension_yielding"
 KEY_DISP_TENSION_YIELDCAPACITY = 'Tension Yielding Capacity (kN)'

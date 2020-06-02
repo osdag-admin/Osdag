@@ -93,18 +93,50 @@ class Tension_bolted(Member):
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t3)
 
-
-        t5 = (DISP_TITLE_ANGLE, ['Label_1','Label_2','Label_3'],
+        # if self.sec_profile == "Angles":
+        t5 = (DISP_TITLE_ANGLE, ['Label_1','Label_2','Label_3',KEY_LOCATION,KEY_SEC_PROFILE],
               ['Label_7','Label_8','Label_9', 'Label_10','Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
                'Label_16', 'Label_17', 'Label_18','Label_19', 'Label_20','Label_21', 'Label_22','Label_23'],
               TYPE_TEXTBOX, self.get_Angle_sec_properties)
         change_tab.append(t5)
 
-        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL,KEY_LOCATION,KEY_SEC_PROFILE],
               [KEY_SECSIZE_SELECTED, KEY_SEC_FY,KEY_SEC_FU,'Label_1','Label_2','Label_3', 'Label_4', 'Label_5','Label_7','Label_8','Label_9',
                'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
                'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX, self.get_new_angle_section_properties)
         change_tab.append(t6)
+        # elif self.sec_profile == "Back to Back Angles":
+        #     t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3',KEY_LOCATION],
+        #           ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14',
+        #            'Label_15', 'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'],
+        #           TYPE_TEXTBOX, self.get_Angle_sec_properties)
+        #     change_tab.append(t5)
+        #
+        # #     t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+        # #           [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
+        # #            'Label_7', 'Label_8', 'Label_9',
+        # # 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
+        # #            'Label_18',
+        # #            'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX,
+        # #           self.get_new_angle_section_properties)
+        # #     change_tab.append(t6)
+        # else:
+        #     t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3'],
+        #           ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14',
+        #            'Label_15', 'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22',
+        #            'Label_23'],
+        #           TYPE_TEXTBOX, self.get_Angle_sec_properties)
+        #     change_tab.append(t5)
+
+            # t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+            #       [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
+            #        'Label_7', 'Label_8', 'Label_9',
+            #        'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
+            #        'Label_18',
+            #        'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX,
+            #       self.get_new_angle_section_properties)
+            # change_tab.append(t6)
+
 
 
         t5 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13'],
@@ -1158,7 +1190,10 @@ class Tension_bolted(Member):
             pass
         else:
             for i in previous_size:
-                self.sizelist.remove(i)
+                if i in self.sizelist:
+                    self.sizelist.remove(i)
+                else:
+                    pass
 
 
         for selectedsize in self.sizelist:

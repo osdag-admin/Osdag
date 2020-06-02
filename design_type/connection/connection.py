@@ -605,6 +605,14 @@ class Connection(Main):
                 chkbox.setChecked(Qt.Unchecked)
         ui.commLogicObj.display_3DModel("Beam", bgcolor)
 
+    def new_material(self):
+
+        selected_material = self[0]
+        if selected_material == "Custom":
+            return True
+        else:
+            return False
+
 if __name__ == "__main__":
     connection = Connection()
     connection.test()

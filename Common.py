@@ -98,6 +98,9 @@ def connectdb(table_name, call_type="dropdown"):
         lst.append(row)
 
     final_lst = tuple_to_str(lst,call_type,table_name)
+    if table_name == "Material":
+        final_lst.append("Custom")
+
     return final_lst
 
 
@@ -191,6 +194,7 @@ TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
 TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
+TYPE_CUSTOM_MATERIAL = 'New_Material_Popup'
 TYPE_OUT_BUTTON = 'Output_dock_Button'
 TYPE_OUT_DOCK = 'Output_dock_Item'
 TYPE_OUT_LABEL = 'Output_dock_Label'

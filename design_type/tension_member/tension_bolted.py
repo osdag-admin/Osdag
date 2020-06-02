@@ -348,6 +348,9 @@ class Tension_bolted(Member):
         t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_LABEL, self.out_intermittent)
         lst.append(t5)
 
+        t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t8)
+
         return lst
 
     def fn_conn_type(self):

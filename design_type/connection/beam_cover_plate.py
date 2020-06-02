@@ -949,7 +949,7 @@ class BeamCoverPlate(MomentConnection):
             else:
                 if self.load_moment > self.section.moment_capacity:
                     self.member_capacity_status = False
-                    logger.warning(' : Moment load is exceeding moment capacity  %2.2f KN-m' % round(self.section.moment_capacity),2)
+                    logger.warning(' : Moment load is exceeding moment capacity  {} KN-m' .format(round(self.section.moment_capacity),2))
                     logger.error(" : Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
                 else:
@@ -1051,7 +1051,7 @@ class BeamCoverPlate(MomentConnection):
                             if self.webplatewidth < self.min_web_plate_height:
                                 self.webheight_status = False
                                 logger.error(" : Web plate is not possible")
-                                logger.warning(" : Web plate height {} is less than min depth of the plate {}".format(self.webplatewidth,elf.min_web_plate_height))
+                                logger.warning(" : Web plate height {} is less than min depth of the plate {}".format(self.webplatewidth,self.min_web_plate_height))
                                 logger.warning("Try another section")
                             else:
                                 self.webheight_status = True

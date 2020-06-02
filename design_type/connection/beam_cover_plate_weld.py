@@ -1700,19 +1700,22 @@ class BeamCoverPlateWeld(MomentConnection):
 
 ##########################################################################################################################
     def results_to_test(self):
-        test_in_list = {KEY_MODULE: self.module,
-                        KEY_MAIN_MODULE: self.mainmodule,
-                        KEY_DISP_SEC_PROFILE: "ISection",
-                        KEY_DISP_BEAMSEC: self.section.designation,
-                        KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
-                        KEY_MATERIAL: self.section.material,
-                        KEY_SEC_FU: self.section.fu,
-                        KEY_SEC_FY: self.section.fy,
-                        VALUES_WELD_TYPE :"Fillet Weld",
-                        KEY_FLANGEPLATE_THICKNESS: self.flange_plate.thickness,
-                        KEY_WEBPLATE_THICKNESS: self.web_plate.thickness,
-                        KEY_DP_DETAILING_GAP: self.flange_plate.gap}
+        print(type(self.flange_plate.gap))
+        # test_in_list = {KEY_MODULE: self.module,
+        #                 KEY_MAIN_MODULE: self.mainmodule,
+        #                 KEY_DISP_SEC_PROFILE: "ISection",
+        #                 KEY_DISP_BEAMSEC: self.section.designation,
+        #                 KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
+        #                 KEY_MATERIAL: self.section.material,
+        #                 KEY_SEC_FU: self.section.fu,
+        #                 KEY_SEC_FY: self.section.fy,
+        #                 KEY_WELD_TYPE :"Fillet Weld",
+        #                 KEY_CONNECTOR_MATERIAL:self.flange_plate.material,
+        #                 KEY_FLANGEPLATE_THICKNESS: self.flange_plate.thickness,
+        #                 KEY_WEBPLATE_THICKNESS: self.web_plate.thickness,
+        #                 KEY_DP_DETAILING_GAP: self.flange_plate.gap}
 
+        # print(test_in_list)
                         # def member_capacityoutput(self, flag):
         test_out_list ={KEY_MEMBER_MOM_CAPACITY: round(self.section.moment_capacity / 1000000, 2),
                         KEY_MEMBER_SHEAR_CAPACITY: round(self.shear_capacity1 / 1000, 2),
@@ -1732,7 +1735,7 @@ class BeamCoverPlateWeld(MomentConnection):
                         KEY_WEB_WELD_STRENGTH : self.web_weld.strength,
                         KEY_WEB_WELD_STRESS : self.web_weld.stress,
                         #inner plate weld
-                        KEY_FLANGE_WELD_SIZE : self.flange_weld.size,
+                        # KEY_FLANGE_WELD_SIZE : self.flange_weld.size,
                         KEY_INNERFLANGE_WELD_STRENGTH : self.flange_weld.strength,
                         KEY_INNERFLANGE_WELD_STRESS: self.flange_weld.stress,
                         # webplate
@@ -1770,6 +1773,7 @@ class BeamCoverPlateWeld(MomentConnection):
                         KEY_SHEARRUPTURECAP_WEB_PLATE: round(self.web_plate.shear_rupture_capacity / 1000, 2),
                         KEY_WEBPLATE_SHEAR_CAPACITY_PLATE: round(self.web_plate.shear_capacity_web_plate / 1000, 2),
                         KEY_WEB_PLATE_MOM_DEMAND: round(self.web_plate.moment_demand / 1000000, 2)}
+        return test_out_list
     ################################ Design Report #####################################################################################
 
 

@@ -292,15 +292,15 @@ class Member(Main):
             t_e = "12"
             mass = str(Channel_attributes.mass)
             area = str(Channel_attributes.area)
-            C_y = str(Channel_attributes.Cy)
-            mom_inertia_z = str(Channel_attributes.mom_inertia_z)
-            mom_inertia_y = str(Channel_attributes.mom_inertia_y)
-            rad_of_gy_z = str(Channel_attributes.rad_of_gy_z)
-            rad_of_gy_y = str(Channel_attributes.rad_of_gy_y)
-            elast_sec_mod_z = str(Channel_attributes.elast_sec_mod_z)
-            elast_sec_mod_y = str(Channel_attributes.elast_sec_mod_y)
-            plast_sec_mod_z = str(Channel_attributes.plast_sec_mod_z)
-            plast_sec_mod_y = str(Channel_attributes.plast_sec_mod_y)
+            C_y = str(round(Channel_attributes.Cy/10,2))
+            mom_inertia_z = str(round(Channel_attributes.mom_inertia_z/10000,2))
+            mom_inertia_y = str(round(Channel_attributes.mom_inertia_y/10000,2))
+            rad_of_gy_z = str(round(Channel_attributes.rad_of_gy_z/10,2))
+            rad_of_gy_y = str(round(Channel_attributes.rad_of_gy_y/10,2))
+            elast_sec_mod_z = str(round(Channel_attributes.elast_sec_mod_z/1000,2))
+            elast_sec_mod_y = str(round(Channel_attributes.elast_sec_mod_y/1000,2))
+            plast_sec_mod_z = str(round(Channel_attributes.plast_sec_mod_z/1000,2))
+            plast_sec_mod_y = str(round(Channel_attributes.plast_sec_mod_y/1000,2))
             Type = str(Channel_attributes.type)
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
@@ -368,15 +368,6 @@ class Member(Main):
         t19 = ('Label_10', KEY_DISP_AREA, TYPE_TEXTBOX, None, area)
         section.append(t19)
 
-        t20 = ('Label_17', KEY_DISP_Cy, TYPE_TEXTBOX, None, C_y)
-        section.append(t20)
-
-        t20 = ('Label_11', KEY_DISP_MOA_IZ, TYPE_TEXTBOX, None, mom_inertia_z)
-        section.append(t20)
-
-        t21 = ('Label_12', KEY_DISP_MOA_IY, TYPE_TEXTBOX, None, mom_inertia_y)
-        section.append(t21)
-
         t13 = (None, None, TYPE_BREAK, None, None)
         section.append(t13)
 
@@ -394,6 +385,21 @@ class Member(Main):
 
         t16 = ('Label_8', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
         section.append(t16)
+
+        t18 = (None, None, TYPE_ENTER, None, None)
+        section.append(t18)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        section.append(t17)
+
+        t20 = ('Label_17', KEY_DISP_Cy, TYPE_TEXTBOX, None, C_y)
+        section.append(t20)
+
+        t20 = ('Label_11', KEY_DISP_MOA_IZ, TYPE_TEXTBOX, None, mom_inertia_z)
+        section.append(t20)
+
+        t21 = ('Label_12', KEY_DISP_MOA_IY, TYPE_TEXTBOX, None, mom_inertia_y)
+        section.append(t21)
 
         t22 = ('Label_15', KEY_DISP_ROG_RZ, TYPE_TEXTBOX, None, rad_of_gy_z)
         section.append(t22)
@@ -431,7 +437,7 @@ class Member(Main):
         t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         section.append(t32)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles\images\Channels.png')
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles\images\Channel.png')
         section.append(t33)
 
         return section
@@ -443,7 +449,7 @@ class Member(Main):
         Channel_attributes.connect_to_database_update_other_attributes_channels(designation, material_grade)
 
         source = str(Channel_attributes.source)
-        Type = str(Channel_attributes.Type)
+        Type = str(Channel_attributes.type)
         fu = str(Channel_attributes.fu)
         fy = str(Channel_attributes.fy)
         flange_width = str(Channel_attributes.flange_width)
@@ -459,15 +465,15 @@ class Member(Main):
         t_e = "12"
         mass = str(Channel_attributes.mass)
         area = str(Channel_attributes.area)
-        Cy = str(Channel_attributes.Cy)
-        mom_inertia_z = str(Channel_attributes.mom_inertia_z)
-        mom_inertia_y = str(Channel_attributes.mom_inertia_y)
-        rad_of_gy_z = str(Channel_attributes.rad_of_gy_z)
-        rad_of_gy_y = str(Channel_attributes.rad_of_gy_y)
-        elast_sec_mod_z = str(Channel_attributes.elast_sec_mod_z)
-        elast_sec_mod_y = str(Channel_attributes.elast_sec_mod_y)
-        plast_sec_mod_z = str(Channel_attributes.plast_sec_mod_z)
-        plast_sec_mod_y = str(Channel_attributes.plast_sec_mod_y)
+        C_y = str(round(Channel_attributes.Cy / 10, 2))
+        mom_inertia_z = str(round(Channel_attributes.mom_inertia_z / 10000, 2))
+        mom_inertia_y = str(round(Channel_attributes.mom_inertia_y / 10000, 2))
+        rad_of_gy_z = str(round(Channel_attributes.rad_of_gy_z / 10, 2))
+        rad_of_gy_y = str(round(Channel_attributes.rad_of_gy_y / 10, 2))
+        elast_sec_mod_z = str(round(Channel_attributes.elast_sec_mod_z / 1000, 2))
+        elast_sec_mod_y = str(round(Channel_attributes.elast_sec_mod_y / 1000, 2))
+        plast_sec_mod_z = str(round(Channel_attributes.plast_sec_mod_z / 1000, 2))
+        plast_sec_mod_y = str(round(Channel_attributes.plast_sec_mod_y / 1000, 2))
 
         d = {
             KEY_SECSIZE_SELECTED: designation,
@@ -488,7 +494,7 @@ class Member(Main):
             'Label_12': str(mom_inertia_y),
             'Label_15': str(rad_of_gy_z),
             'Label_16': str(rad_of_gy_y),
-            'Label_17': str(Cy),
+            'Label_17': str(C_y),
             'Label_19': str(elast_sec_mod_z),
             'Label_20': str(elast_sec_mod_y),
             'Label_21': str(plast_sec_mod_z),

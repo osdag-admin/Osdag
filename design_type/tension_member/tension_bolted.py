@@ -2194,12 +2194,14 @@ class Tension_bolted(Member):
              # KEY_DISP_DP_BOLT_FY: round(self.bolt.bolt_fy,2),
              KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-             KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
-             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences,
+             # KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
+             KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
              "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
              KEY_DISP_GAMMA_M0 : gamma(1.1,"m0"),
              KEY_DISP_GAMMA_M1 : gamma(1.25,"m1"),
              variable : value }
+        if self.bolt.bolt_type != TYP_FRICTION_GRIP:
+            del self.report_input[KEY_DISP_DP_BOLT_SLIP_FACTOR]
 
 
 

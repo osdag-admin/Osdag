@@ -383,6 +383,12 @@ def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_pla
     max_plate_ht_eqn.append(NoEscape(r'&=' + max_plate_h + '\end{aligned}'))
     return max_plate_ht_eqn
 
+def disp_clause(disp,clause):
+    disp_clause_eqn = Math(inline=True)
+
+    disp_clause_eqn.append(NoEscape(r'\begin{aligned}&'+ disp+r'\\'))
+    disp_clause_eqn.append(NoEscape(r'&'+clause+r'\end{aligned}'))
+    return disp_clause_eqn
 def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     min_pitch = str(min_pitch)
     min_end_dist = str(min_end_dist)

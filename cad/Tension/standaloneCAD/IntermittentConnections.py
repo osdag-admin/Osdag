@@ -18,8 +18,8 @@ class IntermittentNutBoltPlateArray():
     add a diagram here
     """
 
-    def __init__(self, plateObj, nut, bolt, intermittentPlate, nut_space):
-
+    def __init__(self, Obj, nut, bolt, intermittentPlate, nut_space):
+        self.Obj = Obj
         self.nut = nut
         self.bolt = bolt
         self.intermittentPlate = intermittentPlate
@@ -30,7 +30,7 @@ class IntermittentNutBoltPlateArray():
         self.pitchDir = None
         self.boltDir = None
 
-        self.initBoltPlaceParams(plateObj)
+        self.initBoltPlaceParams()
 
         self.bolts = []
         self.nuts = []
@@ -56,16 +56,16 @@ class IntermittentNutBoltPlateArray():
         for i in range(self.no_intermitent_connections):
             self.plates.append(Plate(p.L, p.W, p.T))
 
-    def initBoltPlaceParams(self, plateObj):
+    def initBoltPlaceParams(self):
 
-        self.pitch = plateObj.plate.pitch_provided  # 35
-        self.spacing = plateObj.inter_memb_length  # 200
-        self.gauge = plateObj.plate.gauge_provided  # 35
-        self.edge = plateObj.plate.edge_dist_provided  # 35
-        self.end = plateObj.plate.end_dist_provided  # 35
-        self.row = plateObj.inter_bolt_one_line  # 2
-        self.col = plateObj.inter_bolt_line  # 1
-        self.no_intermitent_connections = plateObj.inter_conn
+        self.pitch = 35
+        self.spacing = 200
+        self.gauge = 35
+        self.edge = 35
+        self.end = 35
+        self.row = 2
+        self.col = 1
+        self.no_intermitent_connections = 1
 
     def calculatePositions(self):
         """
@@ -167,8 +167,8 @@ class IntermittentWelds():
     add a diagram here
     """
 
-    def __init__(self, plateObj, welds, intermittentPlate):
-
+    def __init__(self, Obj, welds, intermittentPlate):
+        self.Obj = Obj
         self.welds = welds
         self.intermittentPlate = intermittentPlate
 
@@ -181,7 +181,7 @@ class IntermittentWelds():
         self.weldsblw = []
         self.plates = []
 
-        self.initWeldPlaceParams(plateObj)
+        self.initWeldPlaceParams()
         self.initialiseWelds()
 
         self.weldabwPositions = []
@@ -199,19 +199,12 @@ class IntermittentWelds():
             self.weldsblw.append(FilletWeld(w.h, w.b, w.L))
             self.plates.append(Plate(p.L, p.W, p.T))
 
-    def initWeldPlaceParams(self, plateObj):
+    def initWeldPlaceParams(self):
 
-        self.spacing = plateObj.inter_memb_length  # 300
-        self.no_intermitent_connections = 3  # int(plateObj.inter_conn)  # 2
+        self.spacing = 300
         # todo: add member depth here
-        # self.memberdepth = 175
-        if plateObj.sec_profile in ['Back to Back Angles', 'Angles']:
-            if plateObj.loc == 'Long Leg':
-                self.memberdepth = float(plateObj.section_size_1.max_leg)
-            else:
-                self.memberdepth = float(plateObj.section_size_1.min_leg)
-        else:
-            self.memberdepth = float(plateObj.section_size_1.depth)
+        self.memberdepth = 175
+        self.no_intermitent_connections = 2
 
     def calculatePositions(self):
         """

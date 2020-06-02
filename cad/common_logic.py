@@ -55,7 +55,7 @@ from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
 from cad.Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
 from cad.Tension.BoltedCAD import TensionAngleBoltCAD, TensionChannelBoltCAD
 from cad.Tension.nutBoltPlacement import NutBoltArray as TNutBoltArray
-from cad.Tension.intermittentConnections import IntermittentNutBoltPlateArray, IntermittentWelds
+# from cad.Tension.intermittentConnections import IntermittentNutBoltPlateArray, IntermittentWelds
 
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.cleat_angle_connection import CleatAngleConnection
@@ -878,8 +878,8 @@ class CommonDesignLogic(object):
 
             plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
                                 T=float(T.plate.thickness_provided), degree=30)
-            intermittentPlates = Plate(L=float(T.inter_plate_length), W=float(T.inter_plate_height),
-                                       T=float(T.plate.thickness_provided))
+            # intermittentPlates = Plate(L=float(T.inter_plate_length), W=float(T.inter_plate_height),
+            #                            T=float(T.plate.thickness_provided))
 
             if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
                 member = Channel(B=float(T.section_size_1.flange_width), T=float(T.section_size_1.flange_thickness),
@@ -891,9 +891,9 @@ class CommonDesignLogic(object):
                 else:
                     nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
 
-                inter_array = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlate, nut_space)
+                # inter_array = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlate, nut_space)
                 nut_bolt_array = TNutBoltArray(T, nut, bolt, nut_space)
-                tensionCAD = TensionChannelBoltCAD(T, member, plate, nut_bolt_array, inter_array)
+                tensionCAD = TensionChannelBoltCAD(T, member, plate, nut_bolt_array)
 
             else:
                 member = Angle(L=float(T.length), A=float(T.section_size_1.max_leg), B=float(T.section_size_1.min_leg),
@@ -904,18 +904,20 @@ class CommonDesignLogic(object):
                 else:
                     nut_space = member.T + plate.T + nut.T
 
-                inter_array = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlates, nut_space)
+                # inter_array = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlates, nut_space)
                 nut_bolt_array = TNutBoltArray(T, nut, bolt, nut_space)
-                tensionCAD = TensionAngleBoltCAD(T, member, plate, nut_bolt_array, inter_array)
+                tensionCAD = TensionAngleBoltCAD(T, member, plate, nut_bolt_array)
 
         else:
             plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
                                 T=float(T.plate.thickness_provided), degree=30)
-            intermittentPlates = Plate(L=float(T.inter_plate_length), W=float(T.inter_plate_height),
-                                       T=float(T.plate.thickness_provided))
-
-            intermittentWelds = FilletWeld(h=float(T.inter_weld_size), b=float(T.inter_weld_size),
-                                           L=intermittentPlates.W)
+            # intermittentPlates = Plate(L=float(T.inter_plate_length), W=float(T.inter_plate_height),
+            #                            T=float(T.plate.thickness_provided))
+            #
+            # # intermittentWelds = FilletWeld(h=float(T.inter_weld_size), b=float(T.inter_weld_size),
+            # #                                L=intermittentPlates.W)
+            # intermittentWelds = FilletWeld(h= 5, b= 5,
+            #                                L=intermittentPlates.W)
             s = max(15, float(T.weld.size))
             plate_intercept = plate.L - s - 50
             if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
@@ -926,8 +928,8 @@ class CommonDesignLogic(object):
                 inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
                 opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.D))
 
-                weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
-                tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
+                # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
+                tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld, opline_weld)
 
             else:
                 member = Angle(L=float(T.length), A=float(T.section_size_1.max_leg), B=float(T.section_size_1.min_leg),
@@ -939,8 +941,8 @@ class CommonDesignLogic(object):
                 else:  # 'Short Leg'
                     opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
 
-                weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
-                tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
+                # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
+                tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld, opline_weld)
 
         tensionCAD.create_3DModel()
 

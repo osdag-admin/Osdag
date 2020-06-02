@@ -1733,10 +1733,17 @@ class ColumnEndPlate(MomentConnection):
                                                               f_y=self.section.fy, gamma_m0=gamma_m0,
                                                               shear_capacity=round(self.shear_capacity / 1000 ,2)), '')
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, '',  round(self.moment_capacity/ 1000000, 2), '')
-        self.report_check.append(t1)
+        if self.class_of_section == 1 or self.class_of_section == 2:
 
-
+            t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, '', moment_cap(beta=1,m_d=round(self.moment_capacity /1000,2),f_y=self.section.fy,
+                                                           gamma_m0=gamma_m0,m_fd=round(self.factored_moment/1000,2),
+                                                           mom_cap=round(self.moment_capacity/1000,2)),'')
+            self.report_check.append(t1)
+        else:
+            t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, '', moment_CAP( m_d=round(self.moment_capacity/1000,2), f_y=self.section.fy,
+                                                               gamma_m0=gamma_m0,Z_e=self.Z_e,
+                                                                mom_cap=round(self.moment_capacity/1000,2)), '')
+            self.report_check.append(t1)
 
         t1 = ('SubSection', 'Load Considered', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
@@ -1837,7 +1844,7 @@ class ColumnEndPlate(MomentConnection):
               self.pitch,
               get_pass_fail(self.bolt.min_pitch, self.pitch, relation='lesser'))
         self.report_check.append(t1)
-        t1 = (DISP_MAX_PITCH, max_pitch(self.plate.thickness),
+        t1 = (DISP_MAX_PITCH ,max_pitch(self.plate.thickness),
               self.pitch,
               get_pass_fail(self.bolt.max_spacing, self.pitch, relation='greater'))
         self.report_check.append(t1)
@@ -1851,7 +1858,7 @@ class ColumnEndPlate(MomentConnection):
               get_pass_fail(self.bolt.max_end_dist, self.end_dist,
                             relation='greater'))
         self.report_check.append(t4)
-        t1 = ('SubSection', '   plate Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', '  End plate Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         if self.connection == "Flush End Plate":

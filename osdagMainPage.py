@@ -84,6 +84,7 @@ import os
 import shutil
 from pathlib import Path
 
+
 ############################ Pre-Build Database Updation/Creation #################
 sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
 sqlitepath = Path('ResourceFiles/Database/Intg_osdag.sqlite')
@@ -114,7 +115,7 @@ if sqlpath.exists():
             print('Error: ', e)
 #########################################################################################
 
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize
+from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize, QFile, QTextStream
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication, QWidget, QLabel, QGridLayout, QVBoxLayout, QTabWidget, QRadioButton, QButtonGroup, QSizePolicy
 from PyQt5.QtGui import QIcon
 from PyQt5 import uic
@@ -154,7 +155,6 @@ import subprocess
 from gui.ui_template import Ui_ModuleWindow
 
 
-
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -180,36 +180,8 @@ class MyAskQuestion(QDialog):
 class New_Tab_Widget(QTabWidget):           # Empty Custom Tab Widget
     def __init__(self):
         super().__init__()
-        self.setTabShape(QTabWidget.Triangular)
-        self.setStyleSheet(
-            '''
-            QTabBar::tab {
-                margin-right: 10;
-                border-top-left-radius: 2px ;
-                border-top-right-radius: 2px ;
-                border-bottom-left-radius: 0px ;
-                border-bottom-right-radius: 0px ;
-                height: 40px;
-                width: 200px;
-                background-color: #925a5b;
-                color:#ffffff;
-                font-family: "Arial", Helvetica, sans-serif;
-                font-size: 18px;
-                font-weight: bold;
-                        }
+        #self.setTabShape(QTabWidget.Triangular)
 
-            QTabBar::tab::selected{
-	            background-color: #d97f7f;
-                color:#000000 ;
-                        }
-
-            QTabBar::tab::hover{
-                background-color: #d97f7f;
-                color:#000000 ;
-                        }
-
-            '''
-                        )
 
 class Submodule_Page(QWidget):             # Module Varaints' page with a GridLayout and a Start Button
     def __init__(self):
@@ -246,7 +218,7 @@ class ModulePage(QWidget):              # Empty Page with a layout
         super().__init__()
         self.layout=QGridLayout()
         self.setLayout(self.layout)
-        self.layout.setContentsMargins(0,5,0,0)
+        self.layout.setContentsMargins(0,0,0,0)
 
 class LeftPanelButton(QWidget):          # Custom Button widget for the Left Panel
     def __init__(self,text):
@@ -260,6 +232,7 @@ class OsdagMainWindow(QMainWindow):
         self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
+        self.ui.myStackedWidget.currentChanged.connect(self.current_changed)
         self.Under_Development='UNDER DEVELOPMENT'
         self.Modules={
                 'Connection' : {
@@ -315,7 +288,6 @@ class OsdagMainWindow(QMainWindow):
                 }
 
 ####################################### UI Formation ################################
-
         for ModuleName in self.Modules:                      #Level 1 dictionary handling
             Button= LeftPanelButton(ModuleName)
             self.ButtonConnection(Button,list(self.Modules.keys()),ModuleName)
@@ -415,6 +387,21 @@ class OsdagMainWindow(QMainWindow):
             else:
                 raise ValueError
         self.showMaximized()
+
+
+    @pyqtSlot(int)
+    def current_changed(self, index):
+        l = list(self.Modules.keys())
+        items = list(self.ui.verticalLayout.itemAt(i) for i in range(self.ui.verticalLayout.count()))
+        for item in range(len(items)):
+            if item == index-1:
+                items[item].widget().ui.LP_Button.setStyleSheet('''
+
+                background-color: qradialgradient(cx: 0.5, cy: 0.5, radius: 2, fx: 0.5, fy: 1, stop: 0 rgba(130, 36, 38,190), stop: 0.2 rgb(171, 39, 42), stop: 0.4 rgba(255,30,30,32));
+
+                ''')
+            else:
+                items[item].widget().ui.LP_Button.setStyleSheet(";")
 
 ################################ UI Methods ###############################################
 
@@ -668,14 +655,21 @@ class OsdagMainWindow(QMainWindow):
         for html_file in os.listdir(root_path):
            if html_file.startswith('index'):
                if sys.platform == ("win32" or "win64"):
-                   os.startfile("%s/%s" % (root_path, html_file))
+                   os.startfile("%s/%7s" % (root_path, html_file))
                else:
                    opener ="open" if sys.platform == "darwin" else "xdg-open"
                    subprocess.call([opener, "%s/%s" % (root_path, html_file)])
 
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    path = os.path.join(os.path.dirname(__file__), 'themes', 'light.qss')
+    file = open(path,'r')
+    file = file.read()
+    app.setStyleSheet(file)
+    app.setStyle('Fusion')
+
     window = OsdagMainWindow()
     window.show()
     # app.exec_()

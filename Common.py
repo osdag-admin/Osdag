@@ -232,7 +232,7 @@ KEY_DISP_BEAMCOVERPLATEWELD = 'Beam Coverplate Weld Connection'
 KEY_DISP_COLUMNCOVERPLATEWELD = 'Column Coverplate Weld Connection'
 KEY_DISP_BEAMENDPLATE = 'Beam Endplate Connection'
 KEY_DISP_COLUMNENDPLATE = 'Column Endplate Connection'
-
+KEY_DISP_BCENDPLATE = 'Beam Column Endplate'
 KEY_DISP_TENSION_BOLTED = 'Tension Members Bolted Design'
 KEY_DISP_TENSION_WELDED = 'Tension Members Welded Design'
 KEY_DISP_COMPRESSION = 'Compression Member'
@@ -246,7 +246,7 @@ DISP_TITLE_CM = 'Connecting members'
 KEY_MODULE = 'Module'
 KEY_CONN = 'Connectivity'
 KEY_LOCATION = 'Conn_Location'
-
+KEY_ENDPLATE_TYPE = 'EndPlateType'
 KEY_MATERIAL = 'Material'
 KEY_MATERIAL_FU = 'Material.Fu'
 KEY_MATERIAL_FY = 'Material.Fy'
@@ -329,6 +329,7 @@ VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
 VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
+VALUES_ENDPLATE_TYPE = ['Flush End Plate','Extended One Way','Extended Both Ways']
 VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
 VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
 
@@ -419,6 +420,7 @@ DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 DISP_TITLE_FOOTING = 'Pedestal/Footing'
 
 KEY_DISP_CONN = 'Connectivity *'
+KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
 KEY_DISP_LENGTH = 'Length(mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
 KEY_DISP_MATERIAL = 'Material *'
@@ -635,6 +637,8 @@ KEY_DISP_EM_ZZ = 'Elastic modulus, Z<sub>z</sub> (cm<sup>3</sup>)'
 KEY_DISP_EM_ZY = 'Elastic modulus, Z<sub>y</sub> (cm<sup>3</sup>)'
 KEY_DISP_PM_ZPZ = 'Plastic modulus, Z<sub>pz</sub> (cm<sup>3</sup>)'
 KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (cm<sup>3</sup>)'
+KEY_DISP_It = 'Torsion Constant, I<sub>t</sub> (cm<sup>4</sup>)'
+KEY_DISP_Iw = 'Warping Constant, I<sub>w</sub> (cm<sup>6</sup>)'
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'

@@ -934,22 +934,21 @@ class ColumnCoverPlate(MomentConnection):
         ###########################################################
         if self.factored_axial_load > self.axial_capacity:
             logger.warning(
-                ' : Factored axial load is exceeding axial capacity  %2.2f KN' % round(self.axial_capacity, 2))
+                ' : Factored axial load is exceeding axial capacity  %2.2f KN' % (round(self.axial_capacity/1000, 2)))
             logger.error(" : Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
             self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity1:
                 logger.warning(
-                    ' : Factored shear load is exceeding shear capacity  %2.2f KN' % round(self.shear_capacity1, 2))
+                    ' : Factored shear load is exceeding shear capacity  %2.2f KN' % (round(self.shear_capacity1/1000, 2)))
                 logger.error(" : Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
                 self.member_capacity_status = False
             else:
                 if self.load_moment > self.section.moment_capacity:
                     self.member_capacity_status = False
-                    logger.warning(' : Moment load is exceeding moment capacity  %2.2f KN-m' % round(
-                        self.section.moment_capacity), 2)
+                    logger.warning(' : Moment load is exceeding moment capacity  {} kN-m.'.format(round(self.section.moment_capacity/1000000), 2))
                     logger.error(" : Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
                 else:

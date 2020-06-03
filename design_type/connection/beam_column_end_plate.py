@@ -3,13 +3,13 @@ from utils.common.component import *
 from Common import *
 from utils.common.load import Load
 import logging
-import yaml
 
 
 class BeamColumnEndPlate(MomentConnection):
 
     def __init__(self):
         super(BeamColumnEndPlate, self).__init__()
+
 
     ###############################################
     # Design Preference Functions Start
@@ -344,12 +344,80 @@ class BeamColumnEndPlate(MomentConnection):
                          fabrication=design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
         self.warn_text()
-        self.member_capacity()
+        # self.member_capacity()
 
+    #TODO: Do I need to check moment capacity of beam. It will be compleate beam design.
+    '''
+    def member_capacity(self):
+        """Check for the moment carrying capacity of beam"""
+        
+        # Rolled beam
+        if self.supported_section.type == "Rolled":
+            length = self.supported_section.depth
+        # Welded beam
+        else:
+            length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)
+        
+        # self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
+        self.supported_section.shear_yielding_capacity = round(IS800_2007.cl_8_4_design_shear_strength(
+            length*self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
+        # self.supported_section.tension_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
+        self.supported_section.tension_yielding_capacity = round(IS800_2007.cl_6_2_tension_yielding_strength(
+            length*self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
+        if self.load.shear_force <= min(0.15 * self.supported_section.shear_yielding_capacity, 40.0):
+            logger.warning(" : User input for shear force is very less compared to section capacity. "
+                "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
+            self.load.shear_force = min(0.15 * self.supported_section.shear_yielding_capacity, 40.0)
 
+        if self.supported_section.shear_yielding_capacity > self.load.shear_force and \
+                self.supported_section.tension_yielding_capacity > self.load.axial_force:
+            print("preliminary member check is satisfactory. Doing bolt checks")
+            self.design_status = True
+            self.select_bolt_plate_arrangement(self)
+        else:
+            self.design_status = False
+            logger.error(" : shear yielding capacity {} and/or tension yielding capacity {} is less "
+                           "than applied loads, Please select larger sections or decrease loads"
+                            .format(self.supported_section.shear_yielding_capacity,
+                                    self.supported_section.tension_yielding_capacity))
+            print("failed in preliminary member checks. Select larger sections or decrease loads")
+        '''
 
+    # Check for minimum Design Action (Cl. 10.7, IS 800:2007) #TODO:  Correction for plastic moment capacity
+    def check_minimum_design_action(self):
+        beam_moment = 1.2 * self.supported_section.plast_sec_mod_z * self.supported_section.fy / 1.10 #TODO use predefined function
+        min_connection_moment = 0.5 * beam_moment #TODO use predefined function
+        if self.load.moment < min_connection_moment:
+            min_connection_moment_kNm = round((min_connection_moment/1e6), 3)
+            # logger.warning(": The connection is designed for %s kNm (Cl. 10.7, IS 800:2007)" % min_connection_moment_kNm) #TODO
+            self.load.moment = min_connection_moment
 
+    def check_compatibility(self):
 
+        # Column web connectivity
+        column_clear_d = self.supporting_section.depth  #TODO Make it clear depth:
+        if self.connectivity is VALUES_CONN_1[1]:
+            if self.supported_section.flange_width > column_clear_d:
+                self.design_status = False  #TODO Check self.design_status
+                logger.error(": Beam is wider than column clear depth")
+                logger.warning(": Width of beam should be less than %s mm" % column_clear_d)
+                logger.info(": Currently, Osdag doesn't design such connections")
+
+        # Column flange connectivity
+        else:
+            if self.supported_section.flange_width > self.supporting_section.flange_width:
+                self.design_status = False
+                logger.error(": Beam is wider than column width")
+                logger.warning(": Width of beam should be less than %s mm" % self.supporting_section.flange_width)
+                logger.info(": Currently, Osdag doesn't design such connections")
+
+    def trial_design(self):
+        self.set_osdaglogger()
+        bolt_dia = max(self.bolt.bolt_diameter)
+        bolt_grade = max(self.bolt.bolt_grade)
+        end_plate_thickness = min(self.plate.thickness)
+        self.check_minimum_design_action()
+        self.check_compatibility()
 
 
 

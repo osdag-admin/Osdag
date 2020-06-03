@@ -46,8 +46,8 @@ def max_pitch(t):
     max_pitch_eqn = Math(inline=True)
     max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max} &=\min(32~t,~300~mm)&\\'))
     max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
-    max_pitch_eqn.append(NoEscape(r'where,&\\'))
-    max_pitch_eqn.append(NoEscape(r' t &= min('+t1+','+t2+r')\end{aligned}'))
+    max_pitch_eqn.append(NoEscape(r' t& = min('+t1+','+t2+r')\end{aligned}'))
+
     return max_pitch_eqn
 
 
@@ -257,6 +257,20 @@ def moment_demand_req_bolt_force(shear_load, web_moment,moment_demand,ecc):
     loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\end{aligned}'))
     return loads_req_bolt_force_eqn
 
+def design_capacity_of_end_plate(M_dp,b_eff,f_y,gamma_m0,t_p):
+    M_dp= str(M_dp)
+    t_p = str(t_p)
+    b_eff= str(b_eff)
+    f_y= str(f_y)
+    gamma_m0= str(gamma_m0)
+
+    design_capacity_of_end_plate= Math(inline=True)
+
+    design_capacity_of_end_plate.append(NoEscape(r'\begin{aligned}  M_{dp} & = { \frac{ b_{eff} *t_p^2 *f_y}{ 4*\gamma_m0}}\\'))
+
+    design_capacity_of_end_plate.append(NoEscape(r'&={\frac{' + b_eff +r'*'+t_p+r'^2'+' *'+f_y + r'}{4*'+gamma_m0 + r'}}\\'))
+    design_capacity_of_end_plate.append(NoEscape(r'&=' +M_dp  + r'\end{aligned}'))
+    return design_capacity_of_end_plate
 
 def Vres_bolts(bolts_one_line,ymax,xmax,bolt_line,axial_load
                ,moment_demand,r,vbv,tmv,tmh,abh,vres,shear_load): #vres bolt web
@@ -400,6 +414,53 @@ def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_pla
         max_plate_ht_eqn.append(NoEscape(r'&=' + beam_depth + '-' + beam_f_t + '+' + beam_r_r + '-'+ notch+ r'\\'))
     max_plate_ht_eqn.append(NoEscape(r'&=' + max_plate_h + '\end{aligned}'))
     return max_plate_ht_eqn
+
+def end_plate_ht_req(D,e,h_p):
+    D = str(D)
+    h_p = str(h_p)
+    e = str(e)
+    end_plate_ht_eqn = Math(inline=True)
+
+    end_plate_ht_eqn.append(NoEscape(r'\begin{aligned} &D + 4*e \\'))
+    end_plate_ht_eqn.append(NoEscape(r'&=' + D + '+' + ' 4*' + e + r'\\'))
+    end_plate_ht_eqn.append(NoEscape(r'&=' + h_p + '\end{aligned}'))
+    return end_plate_ht_eqn
+
+def end_plate_thk_req(M_ep,b_eff,f_y,gamma_m0,t_p):
+    M_ep= str(M_ep)
+    t_p = str(t_p)
+    b_eff= str(b_eff)
+    f_y= str(f_y)
+    gamma_m0= str(gamma_m0)
+
+    end_plate_thk_eqn = Math(inline=True)
+
+    end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &= {\sqrt{\frac{ M_{ep}* 4*\gamma_m0}{ b_{eff}*f_y}}}\\'))
+
+    end_plate_thk_eqn.append(NoEscape(r'&={\sqrt{\frac{' + M_ep +  '*4'+'*' +gamma_m0 + r'}{'+b_eff+ r'*' + f_y + r' }}}\\'))
+    end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + '\end{aligned}'))
+    return end_plate_thk_eqn
+
+
+
+def moment_acting_on_end_plate(M_ep,b_eff,f_y,gamma_m0,t_p):
+    M_ep= str(M_ep)
+    t_p = str(t_p)
+    b_eff= str(b_eff)
+    f_y= str(f_y)
+
+    gamma_m0= str(gamma_m0)
+
+
+
+
+    moment_acting_on_end_plate= Math(inline=True)
+
+    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= {\frac{b_{eff} *t_p^2 *f_y}{ 4*\gamma_m0}}\\'))
+
+    moment_acting_on_end_plate.append(NoEscape(r'&={\frac{' + b_eff +'*'+t_p+'^2'+' *'+f_y + '}{4*'+gamma_m0 + r'}}\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'&=' +M_ep + '\end{aligned}'))
+    return moment_acting_on_end_plate
 
 
 def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
@@ -1723,6 +1784,93 @@ def web_plate_area_prov(D, y, webwidth, wp_area, T, r_1):
     return web_plate_area_prov
 
 
+def tension_in_bolt_due_to_axial_load_n_moment(P,n,M,y_max,y_sqr,T_b):
+    P= str(P)
+    n = str(n)
+    M = str(M)
+    y_max =str(y_max)
+    y_sqr = str(y_sqr)
+    T_b = str (T_b)
+    tension_in_bolt_due_to_axial_load_n_moment  = Math(inline=True)
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_b &= \frac{P}{\ n} + \frac{M * y_{max}}{\ y_{sqr}}\\'))
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' +P + '}{' + n + r'} + \frac{' +M + '*' +  y_max+ r'}{' + y_sqr + r'}\\'))
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&= ' + T_b + r'\end{aligned}'))
+    return tension_in_bolt_due_to_axial_load_n_moment
+
+def moment_cap(beta,m_d,f_y,gamma_m0,m_fd,mom_cap):
+    beta= str(beta)
+    m_d= str(m_d)
+    f_y= str(f_y)
+    gamma_m0 = str(gamma_m0)
+    m_fd = str(m_fd)
+    mom_cap = str(mom_cap)
+    moment_cap =Math(inline=True)
+
+    moment_cap.append(NoEscape(r'\begin{aligned} mom_{cap} &=  m_d - beta*(m_d -m_fd)  \\'))
+    moment_cap.append(NoEscape(r'&= ' + m_d + r'-' + beta + r'*('+m_d+r'-'+m_fd+r') \\'))
+    moment_cap.append(NoEscape(r'&= ' + mom_cap + r'\end{aligned}'))
+    return moment_cap
+
+def moment_CAP( m_d, f_y, gamma_m0, Z_e, mom_cap):
+    m_d = str(m_d)
+    f_y = str(f_y)
+    gamma_m0 = str(gamma_m0)
+    Z_e = str(Z_e)
+    mom_cap = str(mom_cap)
+    moment_cap = Math(inline=True)
+
+    moment_cap.append(NoEscape(r'\begin{aligned} mom_cap &=  \frac{Z_e*f_y}{\ gamma_m0}  \\'))
+    moment_cap.append(NoEscape(r'&= \frac{' + Z_e + '*'+f_y+ r'}{' +gamma_m0+r'} \\'))
+    moment_cap.append(NoEscape(r'&= ' + mom_cap + r'\end{aligned}'))
+    return moment_CAP
+
+def no_of_bolts_along_web(D,T_f,e,p,n_bw):
+    D = str(D)
+    e= str(e)
+    p = str(p)
+    T_f = str(T_f)
+    n_bw = str(n_bw)
+    no_of_bolts_along_web = Math(inline=True)
+    no_of_bolts_along_web.append(NoEscape(r'\begin{aligned} n_{bw} &=  \frac{D -(2*T_f) -(2*e)}{\ p}  + 1 \\'))
+    no_of_bolts_along_web.append(NoEscape(r'&= \frac{' + D + ' -(2*'+T_f +')-(2*'+e + r')}{' + p + r'} +1 \\'))
+    no_of_bolts_along_web.append(NoEscape(r'&= ' + n_bw + r'\end{aligned}'))
+    return no_of_bolts_along_web
+
+def no_of_bolts_along_flange(b,T_w,e,p,n_bf):
+    b = str(b)
+    e= str(e)
+    p = str(p)
+    T_w = str(T_w)
+    n_bf = str(n_bf)
+    no_of_bolts_along_flange = Math(inline=True)
+    no_of_bolts_along_flange.append(NoEscape(r'\begin{aligned} n_{bf} &=  \frac{b/2 -(T_w / 2) -(2*e)}{\ p}  + 1 \\'))
+    no_of_bolts_along_flange.append(NoEscape(r'&= \frac{0.5*' + b + ' -(0.5*'+T_w +')-(2*'+e + r')}{' + p + r'} +1 \\'))
+    no_of_bolts_along_flange.append(NoEscape(r'&= ' + n_bf + r'\end{aligned}'))
+    return no_of_bolts_along_flange
+
+
+def shear_force_in_bolts_near_web(V,n_wb,V_sb):
+    V = str(V)
+    n_wb = str(n_wb)
+    V_sb = str(V_sb)
+    shear_force_in_bolts_near_web = Math(inline=True)
+    shear_force_in_bolts_near_web.append(NoEscape(r'\begin{aligned} V_{sb} &= \frac{V}{\ n_{wb}} \\'))
+    shear_force_in_bolts_near_web.append(NoEscape(r'&=\frac{' + V + '}{' + n_wb + r'} \\'))
+    shear_force_in_bolts_near_web.append(NoEscape(r'&= ' + V_sb + r'\end{aligned}'))
+    return shear_force_in_bolts_near_web
+
+def tension_capacity_of_bolt(f_ub,A_nb,T_db):
+     f_ub= str(f_ub)
+     A_nb= str(A_nb)
+     T_db= str(T_db)
+     tension_capacity_of_bolt =  Math(inline=True)
+     tension_capacity_of_bolt.append(NoEscape(r'\begin{aligned} T_{db} &= 0.9*A_{nb}*f_{ub}\\'))
+     tension_capacity_of_bolt.append(NoEscape(r'&=0.9*'+A_nb+ r'*'+f_ub+ r'\\'))
+     tension_capacity_of_bolt.append(NoEscape(r'&= ' + T_db+ r'\end{aligned}'))
+     return  tension_capacity_of_bolt
+
+
+
 def web_plate_area_prov_bolt(D, y, webwidth, wp_area, T, r_1):
     D = str(D)
     T = str(T)
@@ -1738,6 +1886,7 @@ def web_plate_area_prov_bolt(D, y, webwidth, wp_area, T, r_1):
     web_plate_area_prov.append(NoEscape(r' pt.area &= ' + y + '*2* ' + webwidth + r'\\'))
     web_plate_area_prov.append(NoEscape(r'&= ' + wp_area + r'\end{aligned}'))
     return web_plate_area_prov
+
 
 # def eff_len_prov(l):
 #     l =str(l)

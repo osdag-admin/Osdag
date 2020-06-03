@@ -126,14 +126,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.shear_resistance = 0.0
         self.shear_key_required = 'No'
-        self.shear_key_thk = self.plate_thk
+        self.plate_thk = 0.0
+
 
         self.shear_key_along_ColDepth = 'No'
-        self.shear_key_len_ColDepth = self.column_D
+
         self.shear_key_depth_ColDepth = 0.0
 
         self.shear_key_along_ColWidth = 'No'
-        self.shear_key_len_ColWidth = self.column_bf
+
         self.shear_key_depth_ColWidth = 0.0
 
         self.anchor_dia = []
@@ -143,10 +144,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.footing_grade = 0.0
 
-        if self.connectivity == 'Welded Column Base':
-            self.weld_type = self.weld_type
-        else:
-            self.weld_type = 'Butt Weld'
+
 
         # attributes for design preferences
         self.dp_column_designation = ""  # dp for column
@@ -195,11 +193,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.min_area_req = 0.0
         self.effective_bearing_area = 0.0
         self.projection = 0.0
-        self.plate_thk = 0.0
         self.standard_plate_thk = []
         self.neglect_anchor_dia = []
         self.anchor_bolt = ''
-        self.anchor_dia_provided = 20
+        self.anchor_dia_provided = 'M20'
         self.grout_thk = 50
         self.plate_washer_thk = 1
         self.nut_thk = 1
@@ -221,7 +218,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.pitch_distance = 0.0
         self.gauge_distance = 0.0
         self.bp_area_provided = 0.0
-        self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # TODO check if this works
+
         self.shear_capacity_anchor = 0.0
         self.bearing_capacity_anchor = 0.0
         self.anchor_capacity = 0.0
@@ -254,8 +251,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.total_eff_len_gusset_available = 0.0
         self.gusset_outstand_length = 0.0
         self.stiffener_outstand_length = 0.0
-        self.gusset_fy = self.dp_column_fy
-        self.stiffener_fy = self.dp_column_fy
+
         self.epsilon = 1
         self.gusset_plate_thick = 0.0
         self.stiffener_plate_thick = 0.0
@@ -325,17 +321,26 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.y = 0.0
         self.tension_demand_anchor = 0.0
         self.tension_capacity_anchor = 0.0
-        self.tension_capacity_anchor_uplift = self.tension_capacity_anchor
         self.tension_bolts_req = 1
-
         self.anchor_inside_flange = 'No'
-        self.anchor_dia_uplift = self.anchor_dia_provided
-        self.anchor_grade_tension = self.anchor_grade
         self.anchor_tension_capa = 0.0
         self.anchor_nos_tension = 0.0
         self.anchor_nos_uplift = 0.0
-
         self.safe = True
+
+        self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # TODO check if this works
+        self.gusset_fy = self.dp_column_fy
+        self.stiffener_fy = self.dp_column_fy
+        self.tension_capacity_anchor_uplift = self.tension_capacity_anchor
+        self.anchor_dia_uplift = self.anchor_dia_provided
+        self.anchor_grade_tension = self.anchor_grade
+        self.shear_key_len_ColDepth = self.column_D
+        self.shear_key_len_ColWidth = self.column_bf
+        if self.connectivity == 'Welded Column Base':
+            self.weld_type = self.weld_type
+        else:
+            self.weld_type = 'Butt Weld'
+        self.shear_key_thk = self.plate_thk
 
     def set_osdaglogger(key):
         """
@@ -368,7 +373,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         """
         return KEY_DISP_BASE_PLATE
 
-    def input_values(self, existingvalues={}):
+    def input_values(self):
         """
         Return a-list of tuple, used to create the Base Plate input dock U.I in Osdag design window.
         """
@@ -377,130 +382,80 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         options_list = []
 
-        if KEY_DISP_CONN in existingvalues:
-            existingvalue_key_conn = existingvalues[KEY_DISP_CONN]
-        else:
-            existingvalue_key_conn = ''
-
-        if KEY_SUPTNGSEC in existingvalues:  # this might not be required
-            existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
-        else:
-            existingvalue_key_suptngsec = ''
-
-        if KEY_SUPTDSEC in existingvalues:
-            existingvalue_key_suptdsec = existingvalues[KEY_SUPTDSEC]
-        else:
-            existingvalue_key_suptdsec = ''
-
-        if KEY_MATERIAL in existingvalues:
-            existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
-        else:
-            existingvalue_key_mtrl = ''
-
-        if KEY_AXIAL in existingvalues:
-            existingvalue_key_axial = existingvalues[KEY_AXIAL]
-        else:
-            existingvalue_key_axial = ''
-
-        if KEY_MOMENT in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_MOMENT]
-        else:
-            existingvalue_key_versh = ''
-
-        if KEY_SHEAR in existingvalues:
-            existingvalue_key_versh = existingvalues[KEY_SHEAR]
-        else:
-            existingvalue_key_versh = ''
-
-        if KEY_DIA_ANCHOR in existingvalues:
-            existingvalue_key_d = existingvalues[KEY_DIA_ANCHOR]
-        else:
-            existingvalue_key_d = ''
-
-        # if KEY_TYP in existingvalues:
-        #     existingvalue_key_typ = existingvalues[KEY_TYP]
-        # else:
-        #     existingvalue_key_typ = ''
-
-        # if KEY_GRD in existingvalues:
-        #     existingvalue_key_grd = existingvalues[KEY_GRD]
-        # else:
-        #     existingvalue_key_grd = ''
-
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_MODULE, KEY_DISP_BASE_PLATE, TYPE_MODULE, None, None)
+        t2 = (KEY_MODULE, KEY_DISP_BASE_PLATE, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN_BP)
+        t3 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN_BP, True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/base_plate.png")
+        t4 = (KEY_IMAGE, None, TYPE_IMAGE, "./ResourceFiles/images/base_plate.png", True, 'No Validator')
         options_list.append(t4)
 
-        t5 = (KEY_END_CONDITION, KEY_DISP_END_CONDITION, TYPE_NOTE, existingvalue_key_conn, 'Pinned')
+        t5 = (KEY_END_CONDITION, KEY_DISP_END_CONDITION, TYPE_NOTE, 'Pinned', True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec,
-              connectdb("Columns"))  # this might not be required
+        t6 = (KEY_SECSIZE, KEY_DISP_COLSEC, TYPE_COMBOBOX,
+              connectdb("Columns"), True, 'No Validator')  # this might not be required
         options_list.append(t6)
 
         # t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, connectdb("Columns"))
         # options_list.append(t4)
 
-        t7 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
+        t7 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t7)
 
-        t8 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
+        t8 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t8)
 
-        t9 = (KEY_AXIAL_BP, KEY_DISP_AXIAL_BP, TYPE_TEXTBOX, existingvalue_key_axial, None)
+        t9 = (KEY_AXIAL_BP, KEY_DISP_AXIAL_BP, TYPE_TEXTBOX, None,True,'Int Validator')
         options_list.append(t9)
 
-        t22 = (KEY_AXIAL_TENSION_BP, KEY_DISP_AXIAL_TENSION_BP, TYPE_TEXTBOX, existingvalue_key_axial, None)
+        t22 = (KEY_AXIAL_TENSION_BP, KEY_DISP_AXIAL_TENSION_BP, TYPE_TEXTBOX,  None,True,'Int Validator')
         options_list.append(t22)
 
-        t10 = (KEY_SHEAR_BP, KEY_DISP_SHEAR_BP, '', existingvalue_key_versh, None)
+        t10 = (KEY_SHEAR_BP, KEY_DISP_SHEAR_BP, '',  None,True,'Int Validator')
         options_list.append(t10)
 
-        t10 = (KEY_SHEAR_MAJOR, KEY_DISP_SHEAR_MAJOR, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        t10 = (KEY_SHEAR_MAJOR, KEY_DISP_SHEAR_MAJOR, TYPE_TEXTBOX,  None,True,'Int Validator')
         options_list.append(t10)
 
-        t10 = (KEY_SHEAR_MINOR, KEY_DISP_SHEAR_MINOR, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        t10 = (KEY_SHEAR_MINOR, KEY_DISP_SHEAR_MINOR, TYPE_TEXTBOX, None,True,'Int Validator')
         options_list.append(t10)
 
-        t11 = (KEY_MOMENT, KEY_DISP_MOMENT, '', existingvalue_key_axial, None)
+        t11 = (KEY_MOMENT, KEY_DISP_MOMENT, '', None, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_MOMENT_MAJOR, KEY_DISP_MOMENT_MAJOR, TYPE_TEXTBOX, existingvalue_key_conn, None)
+        t12 = (KEY_MOMENT_MAJOR, KEY_DISP_MOMENT_MAJOR, TYPE_TEXTBOX, None, False, 'No Validator')
         options_list.append(t12)
 
-        t13 = (KEY_MOMENT_MINOR, KEY_DISP_MOMENT_MINOR, TYPE_TEXTBOX, existingvalue_key_conn, None)
+        t13 = (KEY_MOMENT_MINOR, KEY_DISP_MOMENT_MINOR, TYPE_TEXTBOX, None, False, 'No Validator')
         options_list.append(t13)
 
-        t14 = (None, DISP_TITLE_ANCHOR_BOLT, TYPE_TITLE, None, None)
+        t14 = (None, DISP_TITLE_ANCHOR_BOLT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t14)
 
-        t15 = (KEY_DIA_ANCHOR, KEY_DISP_DIA_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_DIA_ANCHOR)
+        t15 = (KEY_DIA_ANCHOR, KEY_DISP_DIA_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_DIA_ANCHOR, True, 'No Validator')
         options_list.append(t15)
 
-        t16 = (KEY_TYP_ANCHOR, KEY_DISP_TYP_ANCHOR, TYPE_COMBOBOX, existingvalue_key_d, VALUES_TYP_ANCHOR)
+        t16 = (KEY_TYP_ANCHOR, KEY_DISP_TYP_ANCHOR, TYPE_COMBOBOX, VALUES_TYP_ANCHOR, True, 'No Validator')
         options_list.append(t16)
 
-        t17 = (KEY_GRD_ANCHOR, KEY_DISP_GRD_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, existingvalue_key_d, VALUES_GRD_ANCHOR)
+        t17 = (KEY_GRD_ANCHOR, KEY_DISP_GRD_ANCHOR, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD_ANCHOR, True, 'No Validator')
         options_list.append(t17)
 
-        t18 = (None, DISP_TITLE_FOOTING, TYPE_TITLE, None, None)
+        t18 = (None, DISP_TITLE_FOOTING, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t18)
 
-        t19 = (KEY_GRD_FOOTING, KEY_DISP_GRD_FOOTING, TYPE_COMBOBOX, existingvalue_key_d, VALUES_GRD_FOOTING)
+        t19 = (KEY_GRD_FOOTING, KEY_DISP_GRD_FOOTING, TYPE_COMBOBOX, VALUES_GRD_FOOTING, True, 'No Validator')
         options_list.append(t19)
 
-        t20 = (None, DISP_TITLE_WELD, TYPE_TITLE, None)
+        t20 = (None, DISP_TITLE_WELD, TYPE_TITLE, True, 'No Validator')
         options_list.append(t20)
 
-        t21 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, existingvalue_key_d, VALUES_WELD_TYPE)
+        t21 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, VALUES_WELD_TYPE, True, 'No Validator')
         options_list.append(t21)
 
         # t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
@@ -520,109 +475,109 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def output_values(self, flag):
         out_list = []
 
-        t1 = (None, DISP_TITLE_ANCHOR_BOLT, TYPE_TITLE, None)
+        t1 = (None, DISP_TITLE_ANCHOR_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
 
-        t2 = (KEY_OUT_DIA_ANCHOR, KEY_DISP_OUT_DIA_ANCHOR, TYPE_TEXTBOX, self.anchor_dia_provided if flag else '')
+        t2 = (KEY_OUT_DIA_ANCHOR, KEY_DISP_OUT_DIA_ANCHOR, TYPE_TEXTBOX, self.anchor_dia_provided if flag else '',True)
         out_list.append(t2)
 
-        t3 = (KEY_OUT_GRD_ANCHOR, KEY_DISP_OUT_GRD_ANCHOR, TYPE_TEXTBOX, self.anchor_grade if flag else '')
+        t3 = (KEY_OUT_GRD_ANCHOR, KEY_DISP_OUT_GRD_ANCHOR, TYPE_TEXTBOX, self.anchor_grade if flag else '',True)
         out_list.append(t3)
 
         t4 = (KEY_OUT_ANCHOR_BOLT_LENGTH, KEY_DISP_OUT_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX,
-              self.anchor_length_provided if flag else '')
+              self.anchor_length_provided if flag else '',True)
         out_list.append(t4)
 
         t5 = (KEY_OUT_ANCHOR_BOLT_SHEAR, KEY_OUT_DISP_ANCHOR_BOLT_SHEAR, TYPE_TEXTBOX,
-              self.shear_capacity_anchor if flag else '')
+              self.shear_capacity_anchor if flag else '', True)
         out_list.append(t5)
 
         t6 = (KEY_OUT_ANCHOR_BOLT_BEARING, KEY_OUT_DISP_ANCHOR_BOLT_BEARING, TYPE_TEXTBOX,
-              self.bearing_capacity_anchor if flag else '')
+              self.bearing_capacity_anchor if flag else '', True)
         out_list.append(t6)
 
         t7 = (KEY_OUT_ANCHOR_BOLT_CAPACITY, KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY, TYPE_TEXTBOX,
-              self.anchor_capacity if flag else '')
+              self.anchor_capacity if flag else '', True)
         out_list.append(t7)
 
         t8 = (KEY_OUT_ANCHOR_BOLT_COMBINED, KEY_OUT_DISP_ANCHOR_BOLT_COMBINED, TYPE_TEXTBOX,
-              self.combined_capacity_anchor if flag else '')
+              self.combined_capacity_anchor if flag else '', True)
         out_list.append(t8)
 
         t20 = (KEY_OUT_ANCHOR_BOLT_TENSION, KEY_OUT_DISP_ANCHOR_BOLT_TENSION, TYPE_TEXTBOX,
-               self.tension_capacity_anchor if flag and self.connectivity == 'Moment Base Plate' else '')
+               self.tension_capacity_anchor if flag and self.connectivity == 'Moment Base Plate' else '',True)
         out_list.append(t20)
 
-        t101 = (None, DISP_TITLE_ANCHOR_BOLT_UPLIFT, TYPE_TITLE, None)
+        t101 = (None, DISP_TITLE_ANCHOR_BOLT_UPLIFT, TYPE_TITLE, None,True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_DIA_ANCHOR_UPLIFT, KEY_DISP_OUT_DIA_ANCHOR_UPLIFT, TYPE_TEXTBOX,
                 self.anchor_dia_uplift if flag and self.connectivity ==
-                'Moment Base Plate' and self.load_axial_tension > 0 else '')
+                'Moment Base Plate' and self.load_axial_tension > 0 else '',True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_GRD_ANCHOR_UPLIFT, KEY_DISP_OUT_GRD_ANCHOR_UPLIFT, TYPE_TEXTBOX,
                 self.anchor_grade_tension if flag and self.connectivity ==
-                'Moment Base Plate' and self.load_axial_tension > 0 else '')
+                'Moment Base Plate' and self.load_axial_tension > 0 else '',True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, TYPE_TEXTBOX,
                 self.anchor_length_provided if flag and self.connectivity ==
-                'Moment Base Plate' and self.load_axial_tension > 0 else '')
+                'Moment Base Plate' and self.load_axial_tension > 0 else '',True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT, KEY_OUT_DISP_ANCHOR_BOLT_TENSION_UPLIFT, TYPE_TEXTBOX,
                 self.tension_capacity_anchor_uplift if flag and self.connectivity ==
-                'Moment Base Plate' and self.load_axial_tension > 0 else '')
+                'Moment Base Plate' and self.load_axial_tension > 0 else '',True)
         out_list.append(t101)
 
-        t9 = (None, KEY_DISP_BASE_PLATE, TYPE_TITLE, None)
+        t9 = (None, KEY_DISP_BASE_PLATE, TYPE_TITLE, None,True)
         out_list.append(t9)
 
         t10 = (KEY_OUT_BASEPLATE_THICKNNESS, KEY_OUT_DISP_BASEPLATE_THICKNNESS, TYPE_TEXTBOX,
-               self.plate_thk if flag else '')
+               self.plate_thk if flag else '', True)
         out_list.append(t10)
 
         t11 = (KEY_OUT_BASEPLATE_LENGTH, KEY_OUT_DISP_BASEPLATE_LENGTH, TYPE_TEXTBOX,
-               self.bp_length_provided if flag else '')
+               self.bp_length_provided if flag else '', True)
         out_list.append(t11)
 
         t12 = (KEY_OUT_BASEPLATE_WIDTH, KEY_OUT_DISP_BASEPLATE_WIDTH, TYPE_TEXTBOX,
-               self.bp_width_provided if flag else '')
+               self.bp_width_provided if flag else '', True)
         out_list.append(t12)
 
-        t13 = (None, DISP_TITLE_DETAILING, TYPE_TITLE, None)
+        t13 = (None, DISP_TITLE_DETAILING, TYPE_TITLE, None, True)
         out_list.append(t13)
 
         t14 = (KEY_OUT_DETAILING_NO_OF_ANCHOR_BOLT, KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT, TYPE_TEXTBOX,
-               self.anchor_nos_provided if flag else '')
+               self.anchor_nos_provided if flag else '', True)
         out_list.append(t14)
 
         t21 = (KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DISP_DETAILING_PITCH_DISTANCE, TYPE_TEXTBOX,
-               self.pitch_distance if flag else '')
+               self.pitch_distance if flag else '',True)
         out_list.append(t21)
 
         t22 = (KEY_OUT_DETAILING_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX,
-               self.gauge_distance if flag else '')
+               self.gauge_distance if flag else '',True)
         out_list.append(t22)
 
         t15 = (KEY_OUT_DETAILING_END_DISTANCE, KEY_OUT_DISP_DETAILING_END_DISTANCE, TYPE_TEXTBOX,
-               self.end_distance if flag else '')
+               self.end_distance if flag else '', True)
         out_list.append(t15)
 
         t16 = (KEY_OUT_DETAILING_EDGE_DISTANCE, KEY_OUT_DISP_DETAILING_EDGE_DISTANCE, TYPE_TEXTBOX,
-               self.edge_distance if flag else '')
+               self.edge_distance if flag else '', True)
         out_list.append(t16)
 
         t17 = (KEY_OUT_DETAILING_PROJECTION, KEY_OUT_DISP_DETAILING_PROJECTION, TYPE_TEXTBOX,
-               self.projection if flag and self.connectivity == 'Welded Column Base' else '')
+               self.projection if flag and self.connectivity == 'Welded Column Base' else '',True)
         out_list.append(t17)
 
-        t23 = (None, DISP_TITLE_STIFFENER_PLATE_FLANGE, TYPE_TITLE, None)
+        t23 = (None, DISP_TITLE_STIFFENER_PLATE_FLANGE, TYPE_TITLE, None,True)
         out_list.append(t23)
 
         t24 = (KEY_OUT_STIFFENER_PLATE_FLANGE, KEY_DISP_OUT_STIFFENER_PLATE_FLANGE, TYPE_OUT_BUTTON,
-               ['Stiffener Details', self.stiffener_flange_details])
+               ['Stiffener Details', self.stiffener_flange_details],True)
         out_list.append(t24)
 
         # t24 = (KEY_OUT_STIFFENER_PLATE_FLANGE_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_THICKNESS, TYPE_TEXTBOX,
@@ -725,7 +680,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         #        self.moment_capacity_stiffener if flag and self.stiffener_along_web == 'Yes' else '')
         # out_list.append(t34)
 
-        t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None)
+        t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
         out_list.append(t18)
 
         # t19 = (KEY_OUT_WELD_SIZE, DISP_TITLE_WELD, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details])
@@ -736,18 +691,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # out_list.append(t19)
 
         t20 = (KEY_OUT_WELD_SIZE_FLANGE, KEY_OUT_DISP_WELD_SIZE_FLANGE, TYPE_TEXTBOX,
-               self.weld_size_flange if flag and self.weld_type != 'Butt Weld' else '')
+               self.weld_size_flange if flag and self.weld_type != 'Butt Weld' else '', True)
         out_list.append(t20)
 
         t21 = (KEY_OUT_WELD_SIZE_WEB, KEY_OUT_DISP_WELD_SIZE_WEB, TYPE_TEXTBOX,
-               self.weld_size_web if flag and self.weld_type != 'Butt Weld' else '')
+               self.weld_size_web if flag and self.weld_type != 'Butt Weld' else '', True)
         out_list.append(t21)
 
         t22 = (KEY_OUT_WELD_SIZE_STIFFENER, KEY_OUT_DISP_WELD_SIZE_STIFFENER, TYPE_TEXTBOX,
-               self.weld_size_stiffener if flag and self.weld_type != 'Butt Weld' and self.gusset_along_flange == 'Yes' else '')
+               self.weld_size_stiffener if flag and self.weld_type != 'Butt Weld' else '', True)
         out_list.append(t22)
 
-        t19 = (KEY_OUT_WELD_SIZE, DISP_TITLE_WELD, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details])
+        t19 = (KEY_OUT_WELD_SIZE, DISP_TITLE_WELD, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details],True)
         out_list.append(t19)
 
         return out_list
@@ -844,32 +799,32 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         return weld
 
     def major_minor(self):
-        if self in ['Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']:
+        if self[0] in ['Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']:
             return True
         else:
             return False
 
     def conn_axial_tension(self):
-        if self == 'Moment Base Plate':
+        if self[0] == 'Moment Base Plate':
             return True
         else:
             return False
 
     def label_end_condition(self):
-        if self in ['Moment Base Plate', 'Hollow/Tubular Column Base']:
+        if self[0] in ['Moment Base Plate', 'Hollow/Tubular Column Base']:
             return 'Fixed'
         else:
             return 'Pinned'
 
     def anchor_type_warning(self):
 
-        if self in ['IS 5624-Type A', 'IS 5624-Type B']:
+        if self[0] in ['IS 5624-Type A', 'IS 5624-Type B']:
             return True
         else:
             return False
 
     def conn_weld_type(self):
-        if self in ['Welded+Bolted Column Base', 'Hollow/Tubular Column Base']:
+        if self[0] in ['Welded+Bolted Column Base', 'Hollow/Tubular Column Base']:
             return VALUES_WELD_TYPE
         else:
             weld = []
@@ -878,25 +833,27 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             return weld
 
     def out_weld(self):
-        if self == 'Butt Weld':
+
+        conn = self[0]
+        if conn == 'Butt Weld':
             return True
         else:
             return False
 
     def out_anchor_tension(self):
-        if self != 'Moment Base Plate':
+        if self[0] != 'Moment Base Plate':
             return True
         else:
             return False
 
     def out_detail_projection(self):
-        if self != 'Welded Column Base':
+        if self[0] != 'Welded Column Base':
             return True
         else:
             return False
 
     def out_anchor_combined(self):
-        if self != 'Welded Column Base':
+        if self[0] != 'Welded Column Base':
             return True
         else:
             return False
@@ -905,16 +862,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         lst = []
 
-        t1 = (KEY_CONN, KEY_MOMENT_MAJOR, TYPE_TEXTBOX, self.major_minor)
+        t1 = ([KEY_CONN], KEY_MOMENT_MAJOR, TYPE_TEXTBOX, self.major_minor)
         lst.append(t1)
 
-        t2 = (KEY_CONN, KEY_MOMENT_MINOR, TYPE_TEXTBOX, self.major_minor)
+        t2 = ([KEY_CONN], KEY_MOMENT_MINOR, TYPE_TEXTBOX, self.major_minor)
         lst.append(t2)
 
-        t19 = (KEY_CONN, KEY_AXIAL_TENSION_BP, TYPE_TEXTBOX, self.conn_axial_tension)
+        t19 = ([KEY_CONN], KEY_AXIAL_TENSION_BP, TYPE_TEXTBOX, self.conn_axial_tension)
         lst.append(t19)
 
-        t3 = (KEY_CONN, KEY_END_CONDITION, TYPE_NOTE, self.label_end_condition)
+        t3 = ([KEY_CONN], KEY_END_CONDITION, TYPE_NOTE, self.label_end_condition)
         lst.append(t3)
 
         # t4 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE, TYPE_OUT_DOCK, self.out_weld)
@@ -923,74 +880,73 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # t5 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE, TYPE_OUT_LABEL, self.out_weld)
         # lst.append(t5)
 
-        t18 = (KEY_TYP_ANCHOR,
+        t18 = ([KEY_TYP_ANCHOR],
                'The selected anchor bolt type is not suggested by Osdag due to its less on field acceptance and '
                'availability in the market.', TYPE_WARNING, self.anchor_type_warning)
         lst.append(t18)
 
-        t20 = (KEY_CONN, KEY_WELD_TYPE, TYPE_COMBOBOX, self.conn_weld_type)
+        t20 = ([KEY_CONN], KEY_WELD_TYPE, TYPE_COMBOBOX, self.conn_weld_type)
         lst.append(t20)
 
-        t12 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_FLANGE, TYPE_OUT_DOCK, self.out_weld)
+        t12 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_FLANGE, TYPE_OUT_DOCK, self.out_weld)
         lst.append(t12)
 
-        t13 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_FLANGE, TYPE_OUT_LABEL, self.out_weld)
+        t13 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_FLANGE, TYPE_OUT_LABEL, self.out_weld)
         lst.append(t13)
 
-        t14 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_WEB, TYPE_OUT_DOCK, self.out_weld)
+        t14 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_WEB, TYPE_OUT_DOCK, self.out_weld)
         lst.append(t14)
 
-        t15 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_WEB, TYPE_OUT_LABEL, self.out_weld)
+        t15 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_WEB, TYPE_OUT_LABEL, self.out_weld)
         lst.append(t15)
 
-        t16 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_STIFFENER, TYPE_OUT_DOCK, self.out_weld)
+        t16 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_STIFFENER, TYPE_OUT_DOCK, self.out_weld)
         lst.append(t16)
 
-        t17 = (KEY_WELD_TYPE, KEY_OUT_WELD_SIZE_STIFFENER, TYPE_OUT_LABEL, self.out_weld)
+        t17 = ([KEY_WELD_TYPE], KEY_OUT_WELD_SIZE_STIFFENER, TYPE_OUT_LABEL, self.out_weld)
         lst.append(t17)
 
-        t6 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_TENSION, TYPE_OUT_DOCK, self.out_anchor_tension)
+        t6 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_TENSION, TYPE_OUT_DOCK, self.out_anchor_tension)
         lst.append(t6)
 
-        t7 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_TENSION, TYPE_OUT_LABEL, self.out_anchor_tension)
+        t7 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_TENSION, TYPE_OUT_LABEL, self.out_anchor_tension)
         lst.append(t7)
 
-        t8 = (KEY_CONN, KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_DOCK, self.out_detail_projection)
+        t8 = ([KEY_CONN], KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_DOCK, self.out_detail_projection)
         lst.append(t8)
 
-        t9 = (KEY_CONN, KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_LABEL, self.out_detail_projection)
+        t9 = ([KEY_CONN], KEY_OUT_DETAILING_PROJECTION, TYPE_OUT_LABEL, self.out_detail_projection)
         lst.append(t9)
 
-        t10 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_DOCK, self.out_anchor_combined)
+        t10 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_DOCK, self.out_anchor_combined)
         lst.append(t10)
 
-        t11 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_LABEL, self.out_anchor_combined)
+        t11 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_COMBINED, TYPE_OUT_LABEL, self.out_anchor_combined)
         lst.append(t11)
 
-        t12 = (KEY_CONN, KEY_OUT_DIA_ANCHOR_UPLIFT, TYPE_OUT_DOCK, self.out_anchor_tension)
+        t12 = ([KEY_CONN], KEY_OUT_DIA_ANCHOR_UPLIFT, TYPE_OUT_DOCK, self.out_anchor_tension)
         lst.append(t12)
 
-        t13 = (KEY_CONN, KEY_OUT_DIA_ANCHOR_UPLIFT, TYPE_OUT_LABEL, self.out_anchor_tension)
+        t13 = ([KEY_CONN], KEY_OUT_DIA_ANCHOR_UPLIFT, TYPE_OUT_LABEL, self.out_anchor_tension)
         lst.append(t13)
 
-        t14 = (KEY_CONN, KEY_OUT_GRD_ANCHOR_UPLIFT, TYPE_OUT_DOCK, self.out_anchor_tension)
+        t14 = ([KEY_CONN], KEY_OUT_GRD_ANCHOR_UPLIFT, TYPE_OUT_DOCK, self.out_anchor_tension)
         lst.append(t14)
 
-        t15 = (KEY_CONN, KEY_OUT_GRD_ANCHOR_UPLIFT, TYPE_OUT_LABEL, self.out_anchor_tension)
+        t15 = ([KEY_CONN], KEY_OUT_GRD_ANCHOR_UPLIFT, TYPE_OUT_LABEL, self.out_anchor_tension)
         lst.append(t15)
 
-        t16 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, TYPE_OUT_DOCK, self.out_anchor_tension)
+        t16 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, TYPE_OUT_DOCK, self.out_anchor_tension)
         lst.append(t16)
 
-        t17 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, TYPE_OUT_LABEL, self.out_anchor_tension)
+        t17 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, TYPE_OUT_LABEL, self.out_anchor_tension)
         lst.append(t17)
 
-        t18 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT, TYPE_OUT_DOCK, self.out_anchor_tension)
+        t18 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT, TYPE_OUT_DOCK, self.out_anchor_tension)
         lst.append(t18)
 
-        t19 = (KEY_CONN, KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT, TYPE_OUT_LABEL, self.out_anchor_tension)
+        t19 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT, TYPE_OUT_LABEL, self.out_anchor_tension)
         lst.append(t19)
-
         return lst
 
     @staticmethod
@@ -1033,7 +989,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 if design_dictionary[option[0]] == '':
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-                val = option[4]
+                val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
             elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
@@ -1049,42 +1005,167 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         if flag:
             print(design_dictionary)
+
             # self.set_input_values(self, design_dictionary)
+
             self.bp_parameters(self, design_dictionary)
         else:
             return all_errors
 
-    def generate_missing_fields_error_string(self, missing_fields_list):
-        """
-        Args:
-            missing_fields_list: list of fields that are not selected or entered
-        Returns:
-            error string that has to be displayed
-        """
-        # The base string which should be displayed
-        information = "Please input the following required field"
-        if len(missing_fields_list) > 1:
-            # Adds 's' to the above sentence if there are multiple missing input fields
-            information += "s"
-        information += ": "
-        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+    def input_dictionary_design_pref(self):
 
-        for item in missing_fields_list:
-            information = information + item + ", "
+        design_input = []
+        t1 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, ['Label_8', KEY_SEC_MATERIAL])
+        design_input.append(t1)
 
-        # Removes the last comma
-        information = information[:-2]
-        information += "."
+        t1 = (KEY_DISP_COLSEC, TYPE_TEXTBOX, [KEY_SEC_FU, KEY_SEC_FY, 'Label_21'])
+        design_input.append(t1)
 
-        return information
+        t2 = ("Base Plate", TYPE_COMBOBOX, [KEY_BASE_PLATE_MATERIAL])
+        design_input.append(t2)
 
+        t2 = ("Base Plate", TYPE_TEXTBOX, [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY])
+        design_input.append(t2)
+
+        t3 = ("Anchor Bolt", TYPE_TEXTBOX,
+              [KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O,
+               KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_ANCHOR_BOLT_TYPE])
+        design_input.append(t3)
+
+        t3 = ("Anchor Bolt", TYPE_COMBOBOX, [KEY_DP_ANCHOR_BOLT_HOLE_TYPE])
+        design_input.append(t3)
+
+        t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
+        design_input.append(t4)
+
+        t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
+        design_input.append(t4)
+
+        t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        design_input.append(t5)
+
+        t6 = ("Design", TYPE_COMBOBOX, [KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE])
+        design_input.append(t6)
+
+        return design_input
+
+    def input_dictionary_without_design_pref(self):
+
+        design_input = []
+        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL, KEY_BASE_PLATE_MATERIAL], 'Input Dock')
+        design_input.append(t1)
+
+        t2 = (KEY_TYP_ANCHOR, [KEY_DP_ANCHOR_BOLT_TYPE], 'Input Dock')
+        design_input.append(t2)
+
+        t3 = (None, ['Label_8', 'Label_21', KEY_SEC_FU, KEY_BASE_PLATE_FU,
+                     KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_SEC_FY, KEY_BASE_PLATE_FY,
+                     KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_HOLE_TYPE,
+                     KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE,
+                     KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE], '')
+        design_input.append(t3)
+
+        return design_input
+
+    def get_values_for_design_pref(self, key, design_dictionary):
+
+        section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        length = str(self.anchor_length_provided if self.design_button_status else 0)
+        fu = Material(design_dictionary[KEY_MATERIAL]).fu
+
+        val = {'Label_8': "Rolled",
+               'Label_21': str(section.source),
+               KEY_SEC_FU: str(section.fu),
+               KEY_BASE_PLATE_FU: str(section.fu),
+               KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(section.fu),
+               KEY_SEC_FY: str(section.fy),
+               KEY_BASE_PLATE_FY: str(section.fy),
+               KEY_DP_ANCHOR_BOLT_DESIGNATION:
+                   str(str(design_dictionary[KEY_DIA_ANCHOR][0]) + "X" + length + " IS5624 GALV"),
+               KEY_DP_ANCHOR_BOLT_LENGTH: str(length),
+               KEY_DP_ANCHOR_BOLT_HOLE_TYPE: "Standard",
+               KEY_DP_ANCHOR_BOLT_FRICTION: str(0.30),
+               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_MATERIAL_G_O: str(fu),
+               KEY_DP_DETAILING_EDGE_TYPE: "a - Sheared or hand flame cut",
+               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: "No",
+               KEY_DP_DESIGN_METHOD: "Limit State Design",
+               KEY_DP_DESIGN_BASE_PLATE: "Effective Area Method"
+               }[key]
+
+        return val
+
+    def refresh_input_dock(self):
+
+        add_buttons = []
+
+        t1 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
+        add_buttons.append(t1)
+
+        return add_buttons
+
+    def edit_tabs(self):
+        return []
+
+    def tab_value_changed(self):
+
+        change_tab = []
+
+        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX,
+              self.get_fu_fy_I_section)
+        change_tab.append(t1)
+
+        t2 = ("Base Plate", [KEY_BASE_PLATE_MATERIAL], [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY], TYPE_TEXTBOX,
+              self.get_fu_fy)
+
+        t3 = ("Anchor Bolt", [KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_GALVANIZED],
+              [KEY_DP_ANCHOR_BOLT_DESIGNATION], TYPE_TEXTBOX, self.anchor_bolt_designation)
+        change_tab.append(t3)
+
+        change_tab.append(t2)
+
+        return change_tab
+
+    def anchor_bolt_designation(self):
+
+        length = str(self[0])
+        galvanized = str(self[1])
+        input_dictionary = self[2]
+        if not input_dictionary:
+            d = ''
+        else:
+            d = input_dictionary[KEY_DIA_ANCHOR][0]
+        new_des = str(d)+'X'
+
+        if galvanized == 'Yes':
+            new_des = str(new_des)+str(length)+' IS5624 '+'GALV'
+        elif galvanized == 'No':
+            new_des = str(new_des)+str(length)+' IS5624'
+        else:
+            new_des = ''
+
+        d = {KEY_DP_ANCHOR_BOLT_DESIGNATION: str(new_des)}
+        return d
+
+    def list_for_fu_fy_validation(self):
+
+        fu_fy_list = []
+
+        t1 = (KEY_SEC_MATERIAL, KEY_SEC_FU, KEY_SEC_FY)
+        fu_fy_list.append(t1)
+
+        t2 = (KEY_BASE_PLATE_MATERIAL, KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY)
+        fu_fy_list.append(t2)
+
+        return fu_fy_list
 
     def tab_list(self):
+
         self.design_button_status = False
 
         tabs = []
 
-        t0 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_column_section)
+        t0 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
         tabs.append(t0)
 
         t5 = ("Base Plate", TYPE_TAB_2, self.tab_bp)
@@ -1107,203 +1188,163 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return tabs
 
-    @staticmethod
-    def anchor_bolt_values():
+    def anchor_bolt_values(self, input_dictionary):
+
+        self.input_dictionary = input_dictionary
+
+        values = {KEY_DP_ANCHOR_BOLT_LENGTH: '', KEY_DP_ANCHOR_BOLT_DESIGNATION: '',
+                  KEY_DP_ANCHOR_BOLT_TYPE: '', KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: ''}
+        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SECSIZE], input_dictionary[KEY_MATERIAL]]:
+            pass
+            # length = ''
+            # designation = ''
+            # anchor_type = ''
+            # fu = ''
+        else:
+            length = str(self.anchor_length_provided if self.design_button_status else 0)
+            designation = str(input_dictionary[KEY_DIA_ANCHOR][0]) + "X" + length + " IS5624 GALV"
+            anchor_type = input_dictionary[KEY_TYP_ANCHOR]
+            fu = Material(input_dictionary[KEY_MATERIAL]).fu
+            values[KEY_DP_ANCHOR_BOLT_LENGTH] = length
+            values[KEY_DP_ANCHOR_BOLT_DESIGNATION] = designation
+            values[KEY_DP_ANCHOR_BOLT_TYPE] = anchor_type
+            values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O] = fu
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
+
         anchor_bolt = []
 
-        t1 = (KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, '')
+        t1 = (KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_DESIGNATION]))
         anchor_bolt.append(t1)
 
-        t2 = (KEY_DP_ANCHOR_BOLT_TYPE, KEY_DISP_DP_ANCHOR_BOLT_TYPE, TYPE_TEXTBOX, '')
+        t2 = (KEY_DP_ANCHOR_BOLT_TYPE, KEY_DISP_DP_ANCHOR_BOLT_TYPE, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_TYPE]))
         anchor_bolt.append(t2)
 
-        t3 = (KEY_DP_ANCHOR_BOLT_GALVANIZED, KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED, TYPE_COMBOBOX, ['Yes', 'No'])
+        t3 = (KEY_DP_ANCHOR_BOLT_GALVANIZED, KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED, TYPE_COMBOBOX, ['Yes', 'No'], 'Yes')
         anchor_bolt.append(t3)
 
-        t4 = (
-            KEY_DP_ANCHOR_BOLT_HOLE_TYPE, KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'])
+        t4 = (KEY_DP_ANCHOR_BOLT_HOLE_TYPE, KEY_DISP_DP_ANCHOR_BOLT_HOLE_TYPE, TYPE_COMBOBOX,
+              ['Standard', 'Over-sized'], 'Standard')
         anchor_bolt.append(t4)
 
-        t5 = (KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DISP_DP_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX, '')
+        t5 = (KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DISP_DP_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX, None,
+              values[KEY_DP_ANCHOR_BOLT_LENGTH])
         anchor_bolt.append(t5)
 
-        t6 = (KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, '')
+        t6 = (KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_DISP_DP_ANCHOR_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None,
+              str(values[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O]))
         anchor_bolt.append(t6)
 
-        t7 = (KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DISP_DP_ANCHOR_BOLT_FRICTION, TYPE_TEXTBOX, '0.30')
+        t7 = (KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DISP_DP_ANCHOR_BOLT_FRICTION, TYPE_TEXTBOX, None, str(0.30))
         anchor_bolt.append(t7)
 
         return anchor_bolt
 
-    @staticmethod
-    def tab_bp():
+    def tab_bp(self, input_dictionary):
+
+        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_MATERIAL]]:
+            material_grade = ''
+            fu = ''
+            fy = ''
+        else:
+            material_grade = input_dictionary[KEY_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
+
+        if KEY_BASE_PLATE_MATERIAL in input_dictionary.keys():
+            material_grade = input_dictionary[KEY_BASE_PLATE_MATERIAL]
+            material_attributes = Material(material_grade)
+            fu = material_attributes.fu
+            fy = material_attributes.fy
+
         tab_bp = []
-        t1 = (KEY_BASE_PLATE_MATERIAL, KEY_DISP_BASE_PLATE_MATERIAL, TYPE_TEXTBOX, None)
+        material = connectdb("Material", call_type="popup")
+        t1 = (KEY_BASE_PLATE_MATERIAL, KEY_DISP_BASE_PLATE_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         tab_bp.append(t1)
 
-        t2 = (KEY_BASE_PLATE_FU, KEY_DISP_BASE_PLATE_FU, TYPE_TEXTBOX, None)
+        t2 = (KEY_BASE_PLATE_FU, KEY_DISP_BASE_PLATE_FU, TYPE_TEXTBOX, None, fu)
         tab_bp.append(t2)
 
-        t3 = (KEY_BASE_PLATE_FY, KEY_DSIP_BASE_PLATE_FY, TYPE_TEXTBOX, None)
+        t3 = (KEY_BASE_PLATE_FY, KEY_DSIP_BASE_PLATE_FY, TYPE_TEXTBOX, None, fy)
         tab_bp.append(t3)
 
         return tab_bp
 
-    @staticmethod
-    def detailing_values():
+    def detailing_values(self, input_dictionary):
+
+        values = {KEY_DP_DETAILING_EDGE_TYPE: 'a - Sheared or hand flame cut',
+                  KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No'}
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
+
         detailing = []
 
         t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX, [
-            'a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'])
+            'a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'],
+              values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
         t3 = (KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES, TYPE_COMBOBOX,
-              ['No', 'Yes'])
+              ['No', 'Yes'], values[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
         detailing.append(t3)
 
-        t4 = ["textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION]
+        t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION)
         detailing.append(t4)
 
         return detailing
 
-    @staticmethod
-    def design_values():
+    def design_values(self, input_dictionary):
+
+        values = {KEY_DP_DESIGN_METHOD: 'Limit State Design', KEY_DP_DESIGN_BASE_PLATE: 'Effective Area Method'}
+
+        for key in values.keys():
+            if key in input_dictionary.keys():
+                values[key] = input_dictionary[key]
 
         design = []
 
-        t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX, ['Limit State Design',
-                                                                               'Limit State (Capacity based) Design',
-                                                                               'Working Stress Design'])
+        t1 = (KEY_DP_DESIGN_METHOD, KEY_DISP_DP_DESIGN_METHOD, TYPE_COMBOBOX, [
+            'Limit State Design', 'Limit State (Capacity based) Design', 'Working Stress Design'],
+              values[KEY_DP_DESIGN_METHOD])
         design.append(t1)
 
-        t2 = (KEY_DP_DESIGN_BASE_PLATE, KEY_DISP_DP_DESIGN_BASE_PLATE, TYPE_COMBOBOX, ['Effective Area Method'])
+        t2 = (KEY_DP_DESIGN_BASE_PLATE, KEY_DISP_DP_DESIGN_BASE_PLATE, TYPE_COMBOBOX, ['Effective Area Method'],
+              values[KEY_DP_DESIGN_BASE_PLATE])
         design.append(t2)
 
         return design
 
-    @staticmethod
-    def tab_column_section():
-        supporting_section = []
-        t1 = (KEY_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_DESIGNATION, TYPE_TEXTBOX, None)
-        supporting_section.append(t1)
+    def get_3d_components(self):
+        components = []
 
-        t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None)
-        supporting_section.append(t2)
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
 
-        # material = connectdb("Material", call_type="popup")
-        # material.append('Custom')
-        t34 = (KEY_SUPTNGSEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_TEXTBOX, None)
-        supporting_section.append(t34)
+        t3 = ('Column', self.call_3DColumn)
+        components.append(t3)
 
-        # t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
-        # supporting_section.append(t3)
+        t4 = ('Base Plate', self.call_3DPlate)
+        components.append(t4)
 
-        # t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None)
-        # supporting_section.append(t4)
+        return components
 
-        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None)
-        supporting_section.append(t5)
+    def call_3DPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Base Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Connector", bgcolor)
 
-        t6 = (KEY_SUPTNGSEC_DEPTH, KEY_DISP_SUPTNGSEC_DEPTH, TYPE_TEXTBOX, None)
-        supporting_section.append(t6)
-
-        t7 = (KEY_SUPTNGSEC_FLANGE_W, KEY_DISP_SUPTNGSEC_FLANGE_W, TYPE_TEXTBOX, None)
-        supporting_section.append(t7)
-
-        t8 = (KEY_SUPTNGSEC_FLANGE_T, KEY_DISP_SUPTNGSEC_FLANGE_T, TYPE_TEXTBOX, None)
-        supporting_section.append(t8)
-
-        t9 = (KEY_SUPTNGSEC_WEB_T, KEY_DISP_SUPTNGSEC_WEB_T, TYPE_TEXTBOX, None)
-        supporting_section.append(t9)
-
-        t10 = (KEY_SUPTNGSEC_FLANGE_S, KEY_DISP_SUPTNGSEC_FLANGE_S, TYPE_TEXTBOX, None)
-        supporting_section.append(t10)
-
-        t11 = (KEY_SUPTNGSEC_ROOT_R, KEY_DISP_SUPTNGSEC_ROOT_R, TYPE_TEXTBOX, None)
-        supporting_section.append(t11)
-
-        t12 = (KEY_SUPTNGSEC_TOE_R, KEY_DISP_SUPTNGSEC_TOE_R, TYPE_TEXTBOX, None)
-        supporting_section.append(t12)
-
-        t13 = (None, None, TYPE_BREAK, None)
-        supporting_section.append(t13)
-
-        t14 = (KEY_SUPTNGSEC_TYPE, KEY_DISP_SUPTNGSEC_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'])
-        supporting_section.append(t14)
-
-        # t18 = (None, None, TYPE_ENTER, None)
-        # supporting_section.append(t18)
-
-        t18 = (None, None, TYPE_ENTER, None)
-        supporting_section.append(t18)
-
-        t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None)
-        supporting_section.append(t3)
-
-        # t15 = (KEY_SUPTNGSEC_MOD_OF_ELAST, KEY_SUPTNGSEC_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None)
-        # supporting_section.append(t15)
-        #
-        # t16 = (KEY_SUPTNGSEC_MOD_OF_RIGID, KEY_SUPTNGSEC_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None)
-        # supporting_section.append(t16)
-
-        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None)
-        supporting_section.append(t17)
-
-        t18 = (KEY_SUPTNGSEC_MASS, KEY_DISP_SUPTNGSEC_MASS, TYPE_TEXTBOX, None)
-        supporting_section.append(t18)
-
-        t19 = (KEY_SUPTNGSEC_SEC_AREA, KEY_DISP_SUPTNGSEC_SEC_AREA, TYPE_TEXTBOX, None)
-        supporting_section.append(t19)
-
-        t20 = (KEY_SUPTNGSEC_MOA_LZ, KEY_DISP_SUPTNGSEC_MOA_LZ, TYPE_TEXTBOX, None)
-        supporting_section.append(t20)
-
-        t21 = (KEY_SUPTNGSEC_MOA_LY, KEY_DISP_SUPTNGSEC_MOA_LY, TYPE_TEXTBOX, None)
-        supporting_section.append(t21)
-
-        t22 = (KEY_SUPTNGSEC_ROG_RZ, KEY_DISP_SUPTNGSEC_ROG_RZ, TYPE_TEXTBOX, None)
-        supporting_section.append(t22)
-
-        t23 = (KEY_SUPTNGSEC_ROG_RY, KEY_DISP_SUPTNGSEC_ROG_RY, TYPE_TEXTBOX, None)
-        supporting_section.append(t23)
-
-        t24 = (KEY_SUPTNGSEC_EM_ZZ, KEY_DISP_SUPTNGSEC_EM_ZZ, TYPE_TEXTBOX, None)
-        supporting_section.append(t24)
-
-        t25 = (KEY_SUPTNGSEC_EM_ZY, KEY_DISP_SUPTNGSEC_EM_ZY, TYPE_TEXTBOX, None)
-        supporting_section.append(t25)
-
-        t26 = (KEY_SUPTNGSEC_PM_ZPZ, KEY_DISP_SUPTNGSEC_PM_ZPZ, TYPE_TEXTBOX, None)
-        supporting_section.append(t26)
-
-        t27 = (KEY_SUPTNGSEC_PM_ZPY, KEY_DISP_SUPTNGSEC_PM_ZPY, TYPE_TEXTBOX, None)
-        supporting_section.append(t27)
-
-        t28 = (None, None, TYPE_BREAK, None)
-        supporting_section.append(t28)
-
-        t29 = (KEY_SUPTNGSEC_SOURCE, KEY_DISP_SUPTNGSEC_SOURCE, TYPE_TEXTBOX, None)
-        supporting_section.append(t29)
-
-        # t30 = (None, None, TYPE_ENTER, None)
-        # supporting_section.append(t30)
-
-        t30 = (None, None, TYPE_ENTER, None)
-        supporting_section.append(t30)
-
-        t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None)
-        supporting_section.append(t4)
-
-        # t31 = (KEY_SUPTNGSEC_POISSON_RATIO, KEY_DISP_SUPTNGSEC_POISSON_RATIO, TYPE_TEXTBOX, None)
-        # supporting_section.append(t31)
-        #
-        # t32 = (KEY_SUPTNGSEC_THERMAL_EXP, KEY_DISP_SUPTNGSEC_THERMAL_EXP, TYPE_TEXTBOX, None)
-        # supporting_section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None)
-        supporting_section.append(t33)
-
-        return supporting_section
 
     # def dia_to_len(self, d):
     #
@@ -1324,7 +1365,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.mainmodule = "Moment Connection"
         self.connectivity = str(design_dictionary[KEY_CONN])
         self.end_condition = str(design_dictionary[KEY_END_CONDITION])
-        self.column_section = str(design_dictionary[KEY_SUPTNGSEC])
+        self.column_section = str(design_dictionary[KEY_SECSIZE])
         self.material = str(design_dictionary[KEY_MATERIAL])
 
         self.load_axial_compression = float(design_dictionary[KEY_AXIAL_BP])
@@ -1372,12 +1413,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_type = str(design_dictionary[KEY_WELD_TYPE])
 
         # attributes of design preferences
-        self.dp_column_designation = str(design_dictionary[KEY_SUPTNGSEC])
-        self.dp_column_type = str(design_dictionary[KEY_SUPTNGSEC_TYPE])
-        self.dp_column_source = str(design_dictionary[KEY_SUPTNGSEC_SOURCE])
-        self.dp_column_material = str(design_dictionary[KEY_SUPTNGSEC_MATERIAL])
-        self.dp_column_fu = float(design_dictionary[KEY_SUPTNGSEC_FU])
-        self.dp_column_fy = float(design_dictionary[KEY_SUPTNGSEC_FY])
+        self.dp_column_designation = str(design_dictionary[KEY_SECSIZE])
+        self.dp_column_type = str(design_dictionary['Label_8'])
+        self.dp_column_source = str(design_dictionary['Label_21'])
+        self.dp_column_material = str(design_dictionary[KEY_SEC_MATERIAL])
+        self.dp_column_fu = float(design_dictionary[KEY_SEC_FU])
+        self.dp_column_fy = float(design_dictionary[KEY_SEC_FY])
 
         self.dp_bp_material = str(design_dictionary[KEY_BASE_PLATE_MATERIAL])
         self.dp_bp_fu = float(design_dictionary[KEY_BASE_PLATE_FU])
@@ -1418,7 +1459,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gamma_m1 = self.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]  # gamma_m1 = 1.25
         self.gamma_mb = self.cl_5_4_1_Table_5["gamma_mb"][self.dp_weld_fab]  # gamma_mb = 1.25
         self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"][self.dp_weld_fab]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
-
         self.safe = True
 
         self.stiffener_plt_thick_along_flange = 0.0
@@ -1474,6 +1514,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.bp_analyses_parameters(self)
         print('bp_analyses_parameters done')
         self.bp_analyses(self)
+
         print('bp_analyses done')
         self.anchor_bolt_design(self)
         print('anchor_bolt_design done')
@@ -1514,7 +1555,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchor_grade = i
             break
 
-        self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade)  # returns a list with strength values - [bolt_fu, bolt_fy]
+        self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade, self.anchor_dia_provided)  # returns a list with strength values - [bolt_fu, bolt_fy]
 
         # TODO add condition for number of anchor bolts depending on col depth and force
         # number of anchor bolts outside the column flange

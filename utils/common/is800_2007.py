@@ -40,7 +40,35 @@ class IS800_2007(object):
     # ==========================================================================
     """    SECTION  6     DESIGN OF TENSION MEMBERS   """
 
+    # ------------------------------------------------------------
+    #   6.2 Design Strength Due to Yielding of Gross Section
     # -------------------------------------------------------------
+
+    @staticmethod
+    def cl_6_2_tension_yielding_strength(A_g, f_y):
+        """Calcualte the tension rupture capacity of plate as per clause 6.3.1
+        :param A_g: gross area of cross section
+        :param f_y: yield stress of the material
+        :return: design strength in tension yielding
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        T_dg = A_g * f_y / gamma_m0
+        return T_dg
+    # ------------------------------------------------------------
+    #   6.3 Design Strength Due to Rupture of Critical Section
+    # -------------------------------------------------------------
+
+    # cl.6.3.1 Plates
+    @staticmethod
+    def cl_6_3_1_tension_rupture_strength(A_n,f_u):
+        """Calcualte the tension rupture capacity of plate as per clause 6.3.1
+        :param A_n: net effective area of member
+        :param f_u: ultimate stress of the material
+        :return: design strength in tension rupture
+        """
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_dn = 0.9*A_n*f_u/gamma_m1
+        return T_dn
     #   6.4 Design Strength Due to Block Shear
     # -------------------------------------------------------------
 
@@ -178,7 +206,7 @@ class IS800_2007(object):
         bearing_length = round((float(shear_force) * 1000) * gamma_m0 / web_thickness / fy, 3)
         b1_req = bearing_length - (flange_thickness + root_radius)
         k = flange_thickness + root_radius
-        b1 = min(b1_req, k)
+        b1 = max(b1_req, k)
         return b1
 
     # ==========================================================================
@@ -309,7 +337,7 @@ class IS800_2007(object):
 
     # cl. 10.2.4.3  Maximum Edge Distance
     @staticmethod
-    def cl_10_2_4_3_max_edge_dist(plate_thicknesses, f_y, corrosive_influences=False):
+    def cl_10_2_4_3_max_edge_dist(conn_plates_t_fu_fy, corrosive_influences=False):
         """Calculate maximum end and edge distance
         Args:
              plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
@@ -322,12 +350,25 @@ class IS800_2007(object):
             IS 800:2007, cl. 10.2.4.3
         """
         # TODO : Differentiate outer plates and connected plates.
-        t = min(plate_thicknesses)
-        epsilon = math.sqrt(250 / f_y)
+        t_epsilon_considered = conn_plates_t_fu_fy[0][0] * math.sqrt(250 / float(conn_plates_t_fu_fy[0][2]))
+        t_considered = conn_plates_t_fu_fy[0][0]
+        t_min = t_considered
+        for i in conn_plates_t_fu_fy:
+            t = i[0]
+            f_y = i[2]
+            epsilon = math.sqrt(250 / f_y)
+            if t * epsilon <= t_epsilon_considered:
+                t_epsilon_considered = t * epsilon
+                t_considered = t
+            if t < t_min:
+                t_min = t
+
+         # epsilon = math.sqrt(250 / f_y)
+
         if corrosive_influences is True:
-            return 40.0 + 4 * t
+            return 40.0 + 4 * t_min
         else:
-            return 12 * t * epsilon
+            return 12 * t_epsilon_considered
 
     # -------------------------------------------------------------
     #   10.3 Bearing Type Bolts
@@ -674,7 +715,9 @@ class IS800_2007(object):
             Effective throat thickness of fillet weld for stress calculation in mm (float)
         Note:
             Reference:
+
             IS 800:2007,  cl 10.5.3.2
+
         """
         table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
         fusion_face_angle = int(round(fusion_face_angle))
@@ -700,11 +743,49 @@ class IS800_2007(object):
         return throat
 
     @staticmethod
+    def cl_10_5_3_2_fillet_weld_effective_throat_thickness_constant( fusion_face_angle=90):
+
+        """Calculate effective throat thickness of fillet weld for stress calculation
+
+        Args:
+            fusion_face_angle - Angle between fusion faces in degrees (int)
+
+        Returns:
+            Effective throat thickness of fillet weld constant
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.3.2zzz
+
+        """
+        table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
+        fusion_face_angle = int(round(fusion_face_angle))
+        if 60 <= fusion_face_angle <= 90:
+            K = table_22['60-90']
+        elif 91 <= fusion_face_angle <= 100:
+            K = table_22['91-100']
+        elif 101 <= fusion_face_angle <= 106:
+            K = table_22['101-106']
+        elif 107 <= fusion_face_angle <= 113:
+            K = table_22['107-113']
+        elif 114 <= fusion_face_angle <= 120:
+            K = table_22['114-120']
+        else:
+            K = "NOT DEFINED"
+        try:
+            K = float(K)
+        except ValueError:
+            return
+
+        return K
+
+
+    @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):
 
         """Calculate effective length of fillet weld from available length to weld in practice
         Args:
-            fillet_size - Size of fillet weld in mm (float)
+            #fillet_size - Size of fillet weld in mm (float)
             available_length - Available length in mm to weld the plates in practice (float)
         Returns:
             Effective length of fillet weld in mm (float)
@@ -758,6 +839,7 @@ class IS800_2007(object):
         elif beta_lw <= 0.6:
             beta_lw = 0.6
         return beta_lw
+
 
     # -------------------------------------------------------------
     #   10.6 Design of Connections

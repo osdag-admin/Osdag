@@ -85,7 +85,7 @@ def makeEdgesFromPoints(points):
     for i in range(num - 1):
         edge = make_edge(getGpPt(points[i]), getGpPt(points[i + 1]))
         edges.append(edge)
-    print(points,"points")
+    # print(points,"points")
     cycleEdge = make_edge(getGpPt(points[num - 1]), getGpPt(points[0]))
     edges.append(cycleEdge)
 

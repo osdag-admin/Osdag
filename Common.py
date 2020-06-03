@@ -6,7 +6,9 @@ import operator
 import math
 from utils.common.other_standards import *
 
+
 PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
+
 
 import sqlite3
 
@@ -194,7 +196,6 @@ TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
 TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
-TYPE_CUSTOM_MATERIAL = 'New_Material_Popup'
 TYPE_OUT_BUTTON = 'Output_dock_Button'
 TYPE_OUT_DOCK = 'Output_dock_Item'
 TYPE_OUT_LABEL = 'Output_dock_Label'
@@ -202,16 +203,17 @@ TYPE_BREAK = 'Break'
 TYPE_ENTER = 'Enter'
 TYPE_TEXT_BROWSER = 'TextBrowser'
 TYPE_NOTE = 'Note'
-TYPE_ENABLE_DISABLE = 'Enable/Disable'
-TYPE_CHANGE_TAB_NAME = 'Change tab_name'
-TYPE_REMOVE_TAB = 'Remove tab'
-TYPE_SECTION = 'Popup_Section'
-
+TYPE_WARNING = 'Warning'
 DESIGN_FLAG = 'False'
 VALUE_NOT_APPLICABLE = 'N/A'
 TYPE_TAB_1 = "TYPE_TAB_1"
 TYPE_TAB_2 = "TYPE_TAB_2"
 TYPE_TAB_3 = "TYPE_TAB_3"
+TYPE_SECTION = 'Popup_Section'
+TYPE_CUSTOM_MATERIAL = 'New_Material_Popup'
+TYPE_ENABLE_DISABLE = 'Enable/Disable'
+TYPE_CHANGE_TAB_NAME = 'Change tab_name'
+TYPE_REMOVE_TAB = 'Remove tab'
 KEY_IMAGE = 'Image'
 TYP_BEARING = "Bearing Bolt"
 TYP_FRICTION_GRIP = "Friction Grip Bolt"
@@ -337,7 +339,7 @@ VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
 VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
 VALUES_ENDPLATE_TYPE = ['Flush End Plate','Extended One Way','Extended Both Ways']
-VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
+VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
 
 # TODO: Every one is requested to use VALUES_ALL_CUSTOMIZED key instead of all other keys
@@ -427,7 +429,12 @@ DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
 DISP_TITLE_FOOTING = 'Pedestal/Footing'
 
 KEY_DISP_CONN = 'Connectivity *'
+
 KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
+
+
+# VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
+
 KEY_DISP_LENGTH = 'Length(mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
 KEY_DISP_MATERIAL = 'Material *'
@@ -482,8 +489,8 @@ DISP_TITLE_PLATE = 'Plate'
 KEY_DISP_TYP_ANCHOR = 'Type*'
 KEY_DISP_TYP = 'Type *'
 
-KEY_DISP_GRD_FOOTING = 'Grade*'
 KEY_DISP_GRD_ANCHOR = 'Grade*'
+KEY_DISP_GRD_FOOTING = 'Grade*'
 KEY_DISP_GRD = 'Grade *'
 
 KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
@@ -501,11 +508,32 @@ KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member Sc (kN)"
 KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member Mc (kNm)"
 KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity Pmc (kNm)'
 KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria Mdc (kNm)'
+
+
+
+KEY_OUT_DIA_ANCHOR = 'Anchor Bolt.Diameter'
+KEY_DISP_OUT_DIA_ANCHOR = 'Diameter(mm)'
+KEY_OUT_GRD_ANCHOR = 'Anchor Bolt.Grade'
+KEY_DISP_OUT_GRD_ANCHOR = 'Grade'
+KEY_OUT_ANCHOR_BOLT_LENGTH = 'Anchor Bolt.Length'
+KEY_DISP_OUT_ANCHOR_BOLT_LENGTH = 'Total Length'
+
 KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_BEARING = 'Bearing Capacity (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
 KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity'
 KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
+
+
+DISP_TITLE_ANCHOR_BOLT_UPLIFT = 'Anchor Bolt for Uplift'
+KEY_OUT_DIA_ANCHOR_UPLIFT = 'Anchor Bolt.Diameter_Uplift'
+KEY_DISP_OUT_DIA_ANCHOR_UPLIFT = 'Diameter(mm)'
+KEY_OUT_GRD_ANCHOR_UPLIFT = 'Anchor Bolt.Grade_Uplift'
+KEY_DISP_OUT_GRD_ANCHOR_UPLIFT = 'Grade'
+KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT = 'Anchor Bolt.Length_Uplift'
+KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT = 'Total Length'
+KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT = 'Anchor Bolt.Tension_Uplift'
+KEY_OUT_DISP_ANCHOR_BOLT_TENSION_UPLIFT = 'Tension Capacity (kN)'
 
 
 DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"
@@ -523,6 +551,7 @@ KEY_OUT_DISP_DETAILING_PITCH_DISTANCE = 'Pitch Distance (mm)'
 
 KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE = 'Gauge Distance (mm)'
 KEY_OUT_DETAILING_END_DISTANCE = 'Detailing.End Distance'
+
 KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End Distance (e)'
 
 KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (e')"
@@ -547,6 +576,63 @@ DISP_TITLE_INNERFLANGESPLICEPLATE = 'Inner Flange splice plate'
 KEY_DISP_INNERFLANGE_PLATE_HEIGHT = 'Height (mm)'
 KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length (mm)'
 
+
+
+
+# DISP_TITLE_GUSSET_PLATE = 'Gusset Plate'
+# KEY_OUT_GUSSET_PLATE_THICKNNESS = 'GussetPlate.Thickness'
+# KEY_OUT_DISP_GUSSET_PLATE_THICKNESS = 'Thickness (mm)'
+# KEY_OUT_GUSSET_PLATE_SHEAR_DEMAND = 'GussetPlate.Shear_Demand'
+# KEY_OUT_DISP_GUSSET_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+# KEY_OUT_GUSSET_PLATE_SHEAR = 'GussetPlate.Shear'
+# KEY_OUT_DISP_GUSSET_PLATE_SHEAR = 'Shear Capacity (kN)'
+# KEY_OUT_GUSSET_PLATE_MOMENT_DEMAND = 'GussetPlate.Moment_Demand'
+# KEY_OUT_DISP_GUSSET_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+# KEY_OUT_GUSSET_PLATE_MOMENT = 'GussetPlate.Moment'
+# KEY_OUT_DISP_GUSSET_PLATE_MOMENT = 'Moment Capacity (kN-m)'
+
+KEY_OUT_STIFFENER_PLATE_FLANGE = 'Stiffener_Plate.Column_flange'
+KEY_DISP_OUT_STIFFENER_PLATE_FLANGE = 'Stiffener Plate'
+DISP_TITLE_STIFFENER_PLATE_FLANGE = 'Stiffener Plate along Column flange'
+KEY_OUT_STIFFENER_PLATE_FLANGE_THICKNNESS = 'Stiffener_Plate_Flange.Thickness'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_THICKNESS = 'Thickness (mm)'
+KEY_OUT_STIFFENER_PLATE_FLANGE_SHEAR_DEMAND = 'Stiffener_Plate_Flange.Shear_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_STIFFENER_PLATE_FLANGE_SHEAR = 'Stiffener_Plate_Flange.Shear'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_STIFFENER_PLATE_FLANGE_MOMENT_DEMAND = 'Stiffener_Plate_Flange.Moment_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_STIFFENER_PLATE_FLANGE_MOMENT = 'Stiffener_Plate_Flange.Moment'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_MOMENT = 'Moment Capacity (kN-m)'
+
+KEY_OUT_STIFFENER_PLATE_WEB = 'Stiffener_Plate.Column_web'
+KEY_DISP_OUT_STIFFENER_PLATE_WEB = 'Stiffener Plate'
+DISP_TITLE_STIFFENER_PLATE_WEB = 'Stiffener Plate along Column web'
+KEY_OUT_STIFFENER_PLATE_WEB_THICKNNESS = 'Stiffener_Plate_Web.Thickness'
+KEY_OUT_DISP_STIFFENER_PLATE_WEB_THICKNESS = 'Thickness (mm)'
+KEY_OUT_STIFFENER_PLATE_WEB_SHEAR_DEMAND = 'Stiffener_Plate_Web.Shear_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_WEB_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_STIFFENER_PLATE_WEB_SHEAR = 'Stiffener_Plate_Web.Shear'
+KEY_OUT_DISP_STIFFENER_PLATE_WEB_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_STIFFENER_PLATE_WEB_MOMENT_DEMAND = 'Stiffener_Plate_Web.Moment_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_WEB_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_STIFFENER_PLATE_WEB_MOMENT = 'Stiffener_Plate_Web.Moment'
+KEY_OUT_DISP_STIFFENER_PLATE_WEB_MOMENT = 'Moment Capacity (kN-m)'
+
+#
+# DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'
+# KEY_OUT_STIFFENER_PLATE_THICKNNESS = 'StiffenerPlate.Thickness'
+# KEY_OUT_DISP_STIFFENER_PLATE_THICKNESS = 'Thickness (mm)'
+# KEY_OUT_STIFFENER_PLATE_SHEAR_DEMAND = 'StiffenerPlate.Shear_Demand'
+# KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
+# KEY_OUT_STIFFENER_PLATE_SHEAR = 'StiffenerPlate.Shear'
+# KEY_OUT_DISP_STIFFENER_PLATE_SHEAR = 'Shear Capacity (kN)'
+# KEY_OUT_STIFFENER_PLATE_MOMENT_DEMAND = 'StiffenerPlate.Moment_Demand'
+# KEY_OUT_DISP_STIFFENER_PLATE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+# KEY_OUT_STIFFENER_PLATE_MOMENT = 'StiffenerPlate.Moment'
+# KEY_OUT_DISP_STIFFENER_PLATE_MOMENT = 'Moment Capacity (kN-m)'
+
+
 KEY_DP_ANCHOR_BOLT_DESIGNATION = 'DesignPreferences.Anchor_Bolt.Designation'
 KEY_DP_ANCHOR_BOLT_TYPE = 'DesignPreferences.Anchor_Bolt.Type'
 KEY_DISP_DP_ANCHOR_BOLT_TYPE = 'Anchor Bolt type'
@@ -564,7 +650,30 @@ KEY_DISP_DP_ANCHOR_BOLT_LENGTH = 'Length'
 KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficient'
 KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction coefficient between <br>concrete and anchor bolt'
 
+
 KEY_DISP_DP_BOLT_TYPE = 'Bolt type'
+
+###################################
+# Key for Storing Shear sub-key of Load
+
+
+KEY_SHEAR_BP = 'Load.Shear_BP'
+KEY_DISP_SHEAR_BP = 'Shear(kN)'
+KEY_SHEAR_MAJOR = 'Load.Shear.Major'
+KEY_DISP_SHEAR_MAJOR = ' - Along major axis (z-z)'
+KEY_SHEAR_MINOR = 'Load.Shear.Minor'
+KEY_DISP_SHEAR_MINOR = ' - Along minor axis (y-y)'
+
+
+###################################
+# Key for Storing Axial sub-key of Load
+KEY_AXIAL_BP = 'Load.Axial_Compression'
+KEY_DISP_AXIAL_BP = 'Axial Compression (kN) *'
+KEY_AXIAL_TENSION_BP = 'Load.Axial_Tension'
+KEY_DISP_AXIAL_TENSION_BP = 'Axial Tension/Uplift (kN) *'
+
+
+
 
 KEY_DISP_DP_BOLT_HOLE_TYPE = 'Bolt hole type'
 
@@ -719,7 +828,7 @@ KEY_ENDDIST_FLANGE= 'Flange_plate.end_dist_provided '
 KEY_EDGEDIST_FLANGE= 'Flange_plate.edge_dist_provided'
 
 KEY_FLANGE_CAPACITY ='section.flange_capacity'
-KEY_DISP_FLANGE_CAPACITY= 'Capacity'
+
 # flange
 KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
 KEY_DISP_FLANGE_TEN_CAPACITY ="Flange Tension Capacity (kN)"
@@ -737,7 +846,7 @@ KEY_DISP_TENSIONRUPTURECAP_FLANGE_PLATE ='Tension Rupture Capacity (kN)'
 KEY_BLOCKSHEARCAP_FLANGE_PLATE = 'flange_plate.block_shear_capacity '
 KEY_DISP_BLOCKSHEARCAP_FLANGE_PLATE ='Block Shear Capacity (kN)'
 KEY_FLANGE_PLATE_TEN_CAP ="flange_plate.tension_capacity_flange_plate"
-KEY_DISP_FLANGE_PLATE_TEN_CAP ='Flange Plate Tension Capacity (kN)'
+
 
 
 # KEY_TENSIONRUPTURECAP_FLANGE= 'Flange_plate.tension_rupture_capacity'

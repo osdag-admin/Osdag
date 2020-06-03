@@ -98,6 +98,9 @@ def connectdb(table_name, call_type="dropdown"):
         lst.append(row)
 
     final_lst = tuple_to_str(lst,call_type,table_name)
+    if table_name == "Material":
+        final_lst.append("Custom")
+
     return final_lst
 
 
@@ -191,6 +194,7 @@ TYPE_LABEL = 'Label'
 TYPE_IMAGE = 'Image'
 TYPE_IMAGE_COMPRESSION = 'Image_compression'
 TYPE_COMBOBOX_CUSTOMIZED = 'ComboBox_Customized'
+TYPE_CUSTOM_MATERIAL = 'New_Material_Popup'
 TYPE_OUT_BUTTON = 'Output_dock_Button'
 TYPE_OUT_DOCK = 'Output_dock_Item'
 TYPE_OUT_LABEL = 'Output_dock_Label'
@@ -260,6 +264,9 @@ KEY_SECSIZE = 'Member.Designation'
 KEY_SECSIZE_SELECTED = 'Member.Designation_Selected'        #Extra Keys for Display
 KEY_SUPTNGSEC = 'Member.Supporting_Section.Designation'
 KEY_SUPTNGSEC_MATERIAL = 'Member.Supporting_Section.Material'
+KEY_A = 'Member.A'
+KEY_B = 'Member.B'
+
 
 KEY_SUPTDSEC_FU = 'Member.Supported_Section.Fu'     #Extra Keys for DP Display
 KEY_SUPTDSEC_FY = 'Member.Supported_Section.Fy'     #Extra Keys for DP Display
@@ -625,20 +632,20 @@ KEY_DISP_MASS = 'Mass, M (Kg/m)'
 KEY_DISP_Cz = 'Cz'
 KEY_DISP_Cy = 'Cy'
 KEY_DISP_AREA = 'Sectional area, a (mm<sup>2</sup>)'
-KEY_DISP_MOA_IZ = '2nd Moment of area, I<sub>z</sub> (cm<sup>4</sup>)'
-KEY_DISP_MOA_IY = '2nd Moment of area, I<sub>y</sub> (cm<sup>4</sup>)'
-KEY_DISP_MOA_IU = '2nd Moment of area, I<sub>u</sub> (cm<sup>4</sup>)'
-KEY_DISP_MOA_IV = '2nd Moment of area, I<sub>v</sub> (cm<sup>4</sup>)'
-KEY_DISP_ROG_RZ = 'Radius of gyration, r<sub>z</sub> (cm)'
-KEY_DISP_ROG_RY = 'Radius of gyration, r<sub>y</sub> (cm)'
-KEY_DISP_ROG_RU = 'Radius of gyration, r<sub>u</sub> (cm)'
-KEY_DISP_ROG_RV = 'Radius of gyration, r<sub>v</sub> (cm)'
-KEY_DISP_EM_ZZ = 'Elastic modulus, Z<sub>z</sub> (cm<sup>3</sup>)'
-KEY_DISP_EM_ZY = 'Elastic modulus, Z<sub>y</sub> (cm<sup>3</sup>)'
-KEY_DISP_PM_ZPZ = 'Plastic modulus, Z<sub>pz</sub> (cm<sup>3</sup>)'
-KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (cm<sup>3</sup>)'
-KEY_DISP_It = 'Torsion Constant, I<sub>t</sub> (cm<sup>4</sup>)'
-KEY_DISP_Iw = 'Warping Constant, I<sub>w</sub> (cm<sup>6</sup>)'
+KEY_DISP_MOA_IZ = '2nd Moment of area, I<sub>z</sub> (mm<sup>4</sup>)'
+KEY_DISP_MOA_IY = '2nd Moment of area, I<sub>y</sub> (mm<sup>4</sup>)'
+KEY_DISP_MOA_IU = '2nd Moment of area, I<sub>u</sub> (mm<sup>4</sup>)'
+KEY_DISP_MOA_IV = '2nd Moment of area, I<sub>v</sub> (mm<sup>4</sup>)'
+KEY_DISP_ROG_RZ = 'Radius of gyration, r<sub>z</sub> (mm)'
+KEY_DISP_ROG_RY = 'Radius of gyration, r<sub>y</sub> (mm)'
+KEY_DISP_ROG_RU = 'Radius of gyration, r<sub>u</sub> (mm)'
+KEY_DISP_ROG_RV = 'Radius of gyration, r<sub>v</sub> (mm)'
+KEY_DISP_EM_ZZ = 'Elastic modulus, Z<sub>z</sub> (mm<sup>3</sup>)'
+KEY_DISP_EM_ZY = 'Elastic modulus, Z<sub>y</sub> (mm<sup>3</sup>)'
+KEY_DISP_PM_ZPZ = 'Plastic modulus, Z<sub>pz</sub> (mm<sup>3</sup>)'
+KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (mm<sup>3</sup>)'
+KEY_DISP_It = 'Torsion Constant, I<sub>t</sub> (mm<sup>4</sup>)'
+KEY_DISP_Iw = 'Warping Constant, I<sub>w</sub> (mm<sup>6</sup>)'
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
@@ -745,6 +752,7 @@ KEY_FLANGE_PLATE_MOM_CAPACITY='Flange_plate.MomCapacity'
 KEY_FLANGE_DISP_PLATE_MOM_CAPACITY = 'Flange Moment Capacity (kNm)'
 KEY_DESIGNATION = "section_size.designation"
 KEY_DISP_DESIGNATION = "Designation"
+
 
 KEY_TENSION_YIELDCAPACITY = "Member.tension_yielding"
 KEY_DISP_TENSION_YIELDCAPACITY = 'Tension Yielding Capacity (kN)'

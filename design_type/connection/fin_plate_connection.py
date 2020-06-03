@@ -409,12 +409,12 @@ class FinPlateConnection(ShearConnection):
     ####################################
     def set_input_values(self, design_dictionary):
 
-        if design_dictionary[KEY_SUPTNGSEC_MATERIAL] == "Custom":
-            design_dictionary[KEY_SUPTNGSEC_MATERIAL] = "Custom" + " " + str(design_dictionary[KEY_SUPTNGSEC_FU]) + " " \
-                                                        + str(design_dictionary[KEY_SUPTNGSEC_FY])
-        if design_dictionary[KEY_SUPTDSEC_MATERIAL] == "Custom":
-            design_dictionary[KEY_SUPTDSEC_MATERIAL] = "Custom" + " " + str(design_dictionary[KEY_SUPTDSEC_FU]) + " " \
-                                                        + str(design_dictionary[KEY_SUPTDSEC_FY])
+        # if design_dictionary[KEY_SUPTNGSEC_MATERIAL] == "Custom":
+        #     design_dictionary[KEY_SUPTNGSEC_MATERIAL] = "Custom" + " " + str(design_dictionary[KEY_SUPTNGSEC_FU]) + " " \
+        #                                                 + str(design_dictionary[KEY_SUPTNGSEC_FY])
+        # if design_dictionary[KEY_SUPTDSEC_MATERIAL] == "Custom":
+        #     design_dictionary[KEY_SUPTDSEC_MATERIAL] = "Custom" + " " + str(design_dictionary[KEY_SUPTDSEC_FU]) + " " \
+        #                                                 + str(design_dictionary[KEY_SUPTDSEC_FY])
 
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
 

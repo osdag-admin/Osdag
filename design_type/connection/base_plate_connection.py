@@ -1363,8 +1363,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.dp_design_method = str(design_dictionary[KEY_DP_DESIGN_METHOD])
         self.dp_bp_method = str(design_dictionary[KEY_DP_DESIGN_BASE_PLATE])
 
-        # properties of the column section
+        # properties of the column sections
 
+        # Rolled sections
         self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
         self.column_D = self.column_properties.depth
         self.column_bf = self.column_properties.flange_width
@@ -1372,6 +1373,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.column_tw = self.column_properties.web_thickness
         self.column_r1 = self.column_properties.root_radius
         self.column_r2 = self.column_properties.toe_radius
+
+        # Hollow sections
 
         # other attributes
         self.gamma_m0 = self.cl_5_4_1_Table_5["gamma_m0"]["yielding"]  # gamma_mo = 1.10
@@ -1440,14 +1443,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # If the shear force acting along any axis of the column is large (braced frames or buildings designed for seismic forces, heavy winds etc.),
         # the minimum recommended end/edge distance is six times the anchor diameter (min_end_distance = 6 * anchor_diameter).
         # This is to prevent the side bursting/face break-out of the concrete [Reference: AISC Design Guide 1, section 3.2.2, page 22]
-        if self.load_shear_major or self.load_shear_minor > 0:
-            min_end_distance = 6 * self.anchor_dia_provided  # TODO: check if shear is large enough
-            min_end_distance = round_up(min_end_distance, 5)  # mm
-
-            self.end_distance = max(self.end_distance, min_end_distance)
-            # TODO: give suitable log messages
-        else:
-            pass
+        # if self.load_shear_major or self.load_shear_minor > 0:
+        #     min_end_distance = 6 * self.anchor_dia_provided  # TODO: check if shear is large enough
+        #     min_end_distance = round_up(min_end_distance, 5)  # mm
+        #
+        #     self.end_distance = max(self.end_distance, min_end_distance)
+        #     TODO: give suitable log messages
+        # else:
+        #     pass
 
         # TODO: add max end, edge distance check after the plate thk check
         # self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive)
@@ -1468,7 +1471,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
         if self.connectivity == 'Welded Column Base' or 'Moment Base Plate':
             self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
-            self.bp_width_min = round_up(self.column_bf + 1.5 * self.edge_distance + 1.5 * self.edge_distance, 5)  # mm
+            self.bp_width_min = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
 
         elif self.connectivity == 'Welded+Bolted Column Base':
             pass
@@ -1696,7 +1699,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # Assumption: The minimum number of anchor bolts is 2, for stability purpose.
             self.tension_bolts_req = max(self.tension_demand_anchor / self.tension_capacity_anchor, 2)
 
-            # if the number of bolts required to resist tension exceeds 2 in number, then the loop will check
+            # if the number of bolts required to resist tension exceeds 3 in number, then the loop will check
             # for a higher diameter of bolt from the given list of anchor diameters by the user.
             n = 1
             while self.tension_bolts_req > 3:  # the maximum number of bolts that can be accommodated is 3
@@ -1786,7 +1789,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                                          safety_factor_parameter=self.dp_weld_fab)  # N
                     self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
 
-                    self.anchor_nos_uplift = max(self.load_axial_tension / self.tension_capacity_anchor_uplift, 2)
+                    self.anchor_nos_uplift = max(((self.load_axial_tension * 10 ** -3) / self.tension_capacity_anchor_uplift), 2)
                     n += 1
 
                     self.anchor_dia_uplift = self.table1(i)[0]  # updating the initialised anchor diameter for uplift force
@@ -2034,6 +2037,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # length of anchor for cast-in situ anchor bolts (k = 15.5)
                 self.anchor_length_provided = (self.tension_capacity_anchor * 1000 /
                                                (15.5 * math.sqrt(self.bearing_strength_concrete / 0.45))) ** (1 / 1.5)  # mm
+                self.anchor_length_provided = round_up(self.anchor_length_provided, 5)
                 self.anchor_length_provided = max(self.anchor_length_provided, self.anchor_length_min)
 
             logger.info(": [Anchor Bolt Length] The length of the anchor bolt is computed assuming the anchor bolt is casted in-situ"

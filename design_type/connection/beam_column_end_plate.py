@@ -411,13 +411,27 @@ class BeamColumnEndPlate(MomentConnection):
                 logger.warning(": Width of beam should be less than %s mm" % self.supporting_section.flange_width)
                 logger.info(": Currently, Osdag doesn't design such connections")
 
+    def find_bolt_conn_plates_t_fu_fy(self):
+        self.bolt_conn_plates_t_fu_fy = [(self.plate.thickness_provided, self.plate.fu, self.plate.fy)]
+        # Column web connectivity
+        if self.connectivity is VALUES_CONN_1[1]:
+            self.bolt_conn_plates_t_fu_fy.append(
+                (self.supported_section.web_thickness, self.supported_section.fu, self.supported_section.fy))
+        else:
+            self.bolt_conn_plates_t_fu_fy.append(
+                (self.supported_section.flange_thickness, self.supported_section.fu, self.supported_section.fy))
+
     def trial_design(self):
         self.set_osdaglogger()
         bolt_dia = max(self.bolt.bolt_diameter)
         bolt_grade = max(self.bolt.bolt_grade)
         end_plate_thickness = min(self.plate.thickness)
+
         self.check_minimum_design_action()
         self.check_compatibility()
+        self.find_bolt_conn_plates_t_fu_fy()
+        self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=bolt_dia,
+                                                conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
 
 

@@ -7,12 +7,14 @@ from utils.common.load import Load
 
 # Load osi file
 # Get input objects
-
+'''
 input_file_path = 'bcinput.osi'
 design_dictionary = yaml.load(input_file_path, Loader=yaml.FullLoader)
 print(design_dictionary)
+'''
 
 
+# Hardcoded inputs
 bcinput = BeamColumnEndPlate()
 
 bcinput.mainmodule = "Moment Connection"

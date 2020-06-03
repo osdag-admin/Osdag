@@ -31,8 +31,8 @@ for f in files:
 
     module = d['Module']
 
-    if module == KEY_DISP_BEAMCOVERPLATEWELD:
-        main = BeamCoverPlateWeld
+    if module == KEY_DISP_BEAMCOVERPLATE:
+        main = BeamCoverPlate
         main.set_osdaglogger(None)
         main.set_input_values(main, d)
         base = os.path.basename(f)

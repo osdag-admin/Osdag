@@ -94,6 +94,7 @@ class Tension_bolted(Member):
         change_tab.append(t3)
 
         # if self.sec_profile == "Angles":
+
         t5 = (DISP_TITLE_ANGLE, ['Label_1','Label_2','Label_3',KEY_LOCATION,KEY_SEC_PROFILE],
               ['Label_7','Label_8','Label_9', 'Label_10','Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
                'Label_16', 'Label_17', 'Label_18','Label_19', 'Label_20','Label_21', 'Label_22','Label_23'],

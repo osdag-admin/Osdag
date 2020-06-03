@@ -398,6 +398,9 @@ class ShearConnection(Connection):
         t7 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_LABEL, self.out_bolt_bearing)
         lst.append(t7)
 
+        t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t8)
+
         return lst
 
     def out_bolt_bearing(self):

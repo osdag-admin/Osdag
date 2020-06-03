@@ -48,5 +48,7 @@ bcinput.warn_text()
 # bcinput.member_capacity()
 
 
+bcinput.trial_design()
+
 
 

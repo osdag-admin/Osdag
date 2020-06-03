@@ -47,7 +47,7 @@ def max_pitch(t):
     max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max} &=\min(32~t,~300~mm)&\\'))
     max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
     max_pitch_eqn.append(NoEscape(r'where,&\\'))
-    max_pitch_eqn.append(NoEscape(r'& t &= min('+t1+','+t2+r')\end{aligned}'))
+    max_pitch_eqn.append(NoEscape(r' t &= min('+t1+','+t2+r')\end{aligned}'))
     return max_pitch_eqn
 
 

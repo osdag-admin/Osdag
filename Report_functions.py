@@ -458,9 +458,6 @@ def moment_acting_on_end_plate(M_ep,b_eff,f_y,gamma_m0,t_p):
 
     gamma_m0= str(gamma_m0)
 
-
-
-
     moment_acting_on_end_plate= Math(inline=True)
 
     moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= {\frac{b_{eff} *t_p^2 *f_y}{ 4*\gamma_m0}}\\'))
@@ -469,7 +466,6 @@ def moment_acting_on_end_plate(M_ep,b_eff,f_y,gamma_m0,t_p):
     moment_acting_on_end_plate.append(NoEscape(r'&=' +M_ep + '\end{aligned}'))
     return moment_acting_on_end_plate
 
->>>>>>> 2ebe8744a7eb793663aad05f1ab78211674a5696
 
 def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     min_pitch = str(min_pitch)

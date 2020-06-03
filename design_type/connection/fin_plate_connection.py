@@ -876,7 +876,7 @@ class FinPlateConnection(ShearConnection):
             Ip_weld = 2 * self.weld.eff_length ** 3 / 12
             y_max = self.weld.eff_length / 2
             x_max = 0
-            self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
+            self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.plate.fu, self.weld.fu],
                                         weld_fabrication=self.weld.fabrication,
                                         t_weld=self.weld.size, weld_angle=90)
             self.weld.get_weld_stress(weld_axial=force_w, weld_shear=force_l, weld_twist=force_t, Ip_weld=Ip_weld,

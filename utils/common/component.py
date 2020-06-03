@@ -307,14 +307,6 @@ class Section(Material):
         self.block_shear_capacity_shear = 0.0
         self.block_shear_capacity_axial = 0.0
         self.block_shear_capacity = 0.0
-        self.shear_capacity = 0.0
-        self.tension_capacity = 0.0
-        self.tension_capacity_flange = 0.0
-
-        self.tension_yielding_capacity_web = 0.0  #
-        self.tension_rupture_capacity_web = 0.0
-        self.block_shear_capacity_web = 0.0
-        self.tension_capacity_web = 0.0
 
         # self.shear_yielding_capacity = 0.0
         # self.shear_rupture_capacity = 0.0
@@ -776,6 +768,7 @@ class Weld:
         self.height =0.0
         self.Innerheight = 0.0
         self.strength = 0.0
+        self.strength_red = 0.0
         self.throat = 0.0
         self.stress = 0.0
         self.Innerstrength = 0.0
@@ -799,7 +792,7 @@ class Weld:
         return repr
 
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
-        connecting_fu.append(self.fu)
+        # connecting_fu.append(self.fu)
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         self.throat_tk = \
             round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
@@ -1060,10 +1053,10 @@ class Plate(Material):
             gauge is the distance between bolts along bolt line on either side of the web thickness
             """
             gauge = (int((flange_plate_h/2 - web_thickness/2 - (2 * edge_dist)-root_radius) / (bolts_one_line/2 - 1))) #
-            edge_dist =  (flange_plate_h/2 - web_thickness/2 - root_radius - ((bolts_one_line/2 - 1)*gauge))/2
+            edge_dist =  round(float((flange_plate_h/2 - web_thickness/2 - root_radius - ((bolts_one_line/2 - 1)*gauge))/2),2)
         else:
             gauge = 0.
-            edge_dist = (flange_plate_h / 2 - web_thickness / 2 - root_radius - ((bolts_one_line / 2 - 1) * gauge)) / 2
+            edge_dist = round(float((flange_plate_h / 2 - web_thickness / 2 - root_radius - ((bolts_one_line / 2 - 1) * gauge)) / 2),2)
 
 
         # multiplier=5)
@@ -1607,7 +1600,7 @@ class Angle(Section):
     def connect_to_database_update_other_attributes_angles(self, designation,material_grade):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         # db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
-        db_query =  "SELECT * FROM Angles WHERE Designation = ?"
+        db_query = "SELECT * FROM Angles WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
         row = cur.fetchone()

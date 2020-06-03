@@ -341,8 +341,8 @@ self
     def cl_10_2_4_3_max_edge_dist(conn_plates_t_fu_fy, corrosive_influences=False):
         """Calculate maximum end and edge distance
         Args:
-             plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
-             f_y - Yield strength of plate material in MPa (float)
+             conn_plates_t_fu_fy - List of tuples with plate thicknesses in mm, fu in MPa, fy in MPa (list of tuples)
+                                example:- [ (12, 410, 250), (10, 440, 300) ]
              corrosive_influences - Whether the members are exposed to corrosive influences or not (Boolean)
         Returns:
             Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)

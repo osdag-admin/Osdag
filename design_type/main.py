@@ -264,6 +264,7 @@ class Main():
             t = float(self[2])
             l = str(self[3])
             p = str(self[4])
+            print(p, "shxv")
             if p == "Angles":
                 sec_prop = Single_Angle_Properties()
             elif p == "Back to Back Angles":

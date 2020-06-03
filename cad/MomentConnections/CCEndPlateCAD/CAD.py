@@ -9,7 +9,8 @@ import copy
 
 
 class CCEndPlateCAD(object):
-    def __init__(self, column, endPlate, flangeWeld, webWeld, nut_bolt_array):
+    def __init__(self, Obj, column, endPlate, flangeWeld, webWeld, nut_bolt_array):
+        self.Obj = Obj
         self.endPlate = endPlate
         self.column = column
         self.flangeWeld = flangeWeld

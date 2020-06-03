@@ -12,8 +12,9 @@ from cad.items.nut import Nut
 
 
 class NutBoltArray(object):
-    def __init__(self, Obj, nut, bolt, nut_space):
-        self.Obj = Obj
+    def __init__(self, Obj, column, nut, bolt, nut_space):
+
+        self.column = column
         self.nut = nut
         self.bolt = bolt
         self.gap = nut_space
@@ -23,7 +24,7 @@ class NutBoltArray(object):
         self.pitchDir = None
         self.boltDir = None
 
-        self.initBoltPlaceParams()
+        self.initBoltPlaceParams(Obj)
 
         self.bolts = []
         self.nuts = []
@@ -45,79 +46,83 @@ class NutBoltArray(object):
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
 
-    def initBoltPlaceParams(self):
-        self.row = 4
-        self.col = 4
+    def initBoltPlaceParams(self, Obj):
+        self.row = int(Obj.n_bw)  # 4    #         #4
+        self.col = 2  # int(Obj.n_bf * 2)  #4    #        #4
         self.webcol = 2
-        self.numOfBolts = 12
-        self.endDist = 65
-        self.edgeDist = 150
-        self.pitch = 82.5
-        self.p2flange = 122.3
-        self.p2web = 122.3
-        self.webColgauge = 2 * self.endDist + 10
+        self.numOfBolts = Obj.no_bolts  # 12    #
+        self.endDist = Obj.end_dist
+
+        self.pitch = Obj.pitch
+        self.p2flange = Obj.p_2_flange
+        self.p2web = Obj.p_2_web
+        self.webColgauge = 2 * self.endDist + self.column.t
+        self.edgeDist = self.column.B / 2 - self.endDist - self.column.t / 2
         # todo for flush plate
         if self.row == 2:
-            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.p2web]
+            self.pitchDist = [self.endDist + self.column.T, self.endDist + self.column.T + self.p2web]
         elif self.row == 3:
-            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.p2web, self.endDist + 12 + 2 * self.p2web]
+            self.pitchDist = [self.endDist + self.column.T, self.endDist + self.column.T + self.p2web,
+                              self.endDist + self.column.T + 2 * self.p2web]
         elif self.row == 4:
-            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.pitch,
-                              self.endDist + 12 + self.pitch + self.p2web,
-                              self.endDist + 12 + 2 * self.pitch + self.p2web]
+            self.pitchDist = [self.endDist + self.column.T, self.endDist + self.column.T + self.pitch,
+                              self.endDist + self.column.T + self.pitch + self.p2web,
+                              self.endDist + self.column.T + 2 * self.pitch + self.p2web]
         elif self.row == 5:
-            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.pitch,
-                              self.endDist + 12 + self.pitch + self.p2flange,
-                              self.endDist + 12 + self.pitch + 2 * self.p2flange,
-                              self.endDist + 12 + 2 * self.pitch + 2 * self.p2flange]
+            self.pitchDist = [self.endDist + self.column.T, self.endDist + self.column.T + self.pitch,
+                              self.endDist + self.column.T + self.pitch + self.p2flange,
+                              self.endDist + self.column.T + self.pitch + 2 * self.p2flange,
+                              self.endDist + self.column.T + 2 * self.pitch + 2 * self.p2flange]
 
         elif self.row == 6:
-            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.pitch, self.endDist + 12 + 2 * self.pitch,
-                              self.endDist + 12 + 2 * self.pitch + self.p2flange,
-                              self.endDist + 12 + 3 * self.pitch + self.p2flange,
-                              self.endDist + 12 + 4 * self.pitch + self.p2flange]
+            self.pitchDist = [self.endDist + self.column.T, self.endDist + self.column.T + self.pitch,
+                              self.endDist + self.column.T + 2 * self.pitch,
+                              self.endDist + self.column.T + 2 * self.pitch + self.p2flange,
+                              self.endDist + self.column.T + 3 * self.pitch + self.p2flange,
+                              self.endDist + self.column.T + 4 * self.pitch + self.p2flange]
         elif self.row == 7:
-            self.pitchDist = [self.endDist + 12, self.endDist + 12 + self.pitch, self.endDist + 12 + 2 * self.pitch,
-                              self.endDist + 12 + 2 * self.pitch + self.p2flange,
-                              self.endDist + 12 + 2 * self.pitch + 2 * self.p2flange,
-                              self.endDist + 12 + 3 * self.pitch + 2 * self.p2flange,
-                              self.endDist + 12 + 4 * self.pitch + 2 * self.p2flange]
+            self.pitchDist = [self.endDist + self.column.T, self.endDist + self.column.T + self.pitch,
+                              self.endDist + self.column.T + 2 * self.pitch,
+                              self.endDist + self.column.T + 2 * self.pitch + self.p2flange,
+                              self.endDist + self.column.T + 2 * self.pitch + 2 * self.p2flange,
+                              self.endDist + self.column.T + 3 * self.pitch + 2 * self.p2flange,
+                              self.endDist + self.column.T + 4 * self.pitch + 2 * self.p2flange]
 
         if self.col == 2:
-            self.gauge = [self.edgeDist, 65 + 12.7 + 65]  # end+T+end
+            self.gauge = [self.edgeDist, self.edgeDist + 2 * self.endDist + self.column.t]  # end+T+end
 
         elif self.col == 4:
             self.gauge = [self.endDist, self.endDist + self.p2flange,
-                          self.endDist + self.p2flange + 2 * self.endDist + 10,
-                          self.endDist + self.p2flange + 2 * self.endDist + 10 + self.p2flange]
+                          self.endDist + self.p2flange + 2 * self.endDist + self.column.t,
+                          self.endDist + self.p2flange + 2 * self.endDist + self.column.t + self.p2flange]
         elif self.col == 6:
             self.gauge = [self.endDist, self.endDist + self.p2flange, self.endDist + self.p2flange + self.p2flange,
-                          self.endDist + self.p2flange + self.p2flange + 2 * self.endDist + 10,
-                          self.endDist + self.p2flange + self.p2flange + 2 * self.endDist + 10 + self.p2flange,
-                          self.endDist + self.p2flange + self.p2flange + 2 * self.endDist + 10 + self.p2flange + self.p2flange]
+                          self.endDist + self.p2flange + self.p2flange + 2 * self.endDist + self.column.t,
+                          self.endDist + self.p2flange + self.p2flange + 2 * self.endDist + self.column.t + self.p2flange,
+                          self.endDist + self.p2flange + self.p2flange + 2 * self.endDist + self.column.t + self.p2flange + self.p2flange]
 
         elif self.col == 8:
             self.gauge = [self.endDist, self.endDist + self.pitch, self.endDist + self.pitch + self.p2flange,
                           self.endDist + self.pitch + self.p2flange + self.pitch,
-                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10,
-                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10 + self.pitch,
-                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10 + self.pitch + self.p2flange,
-                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + 10 + self.pitch + self.p2flange + self.pitch]
+                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + self.column.t,
+                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + self.column.t + self.pitch,
+                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + self.column.t + self.pitch + self.p2flange,
+                          self.endDist + self.pitch + self.p2flange + self.pitch + 2 * self.endDist + self.column.t + self.pitch + self.p2flange + self.pitch]
 
         elif self.col == 10:
             self.gauge = [self.endDist, self.endDist + self.pitch, self.endDist + self.pitch + self.p2flange,
                           self.endDist + self.pitch + 2 * self.p2flange,
                           self.endDist + 2 * self.pitch + 2 * self.p2flange,
-                          10 + 2 * self.endDist + 2 * self.pitch + 2 * self.p2flange,
-                          10 + 2 * self.endDist + 3 * self.pitch + 2 * self.p2flange,
-                          10 + 2 * self.endDist + 3 * self.pitch + 3 * self.p2flange,
-                          10 + 2 * self.endDist + 3 * self.pitch + 4 * self.p2flange,
-                          10 + 2 * self.endDist + 4 * self.pitch + 4 * self.p2flange]
+                          self.column.t + 2 * self.endDist + 2 * self.pitch + 2 * self.p2flange,
+                          self.column.t + 2 * self.endDist + 3 * self.pitch + 2 * self.p2flange,
+                          self.column.t + 2 * self.endDist + 3 * self.pitch + 3 * self.p2flange,
+                          self.column.t + 2 * self.endDist + 3 * self.pitch + 4 * self.p2flange,
+                          self.column.t + 2 * self.endDist + 4 * self.pitch + 4 * self.p2flange]
 
     def calculatePositions(self):
         self.positions = []
         # Todo: if member == flush:
-        self.boltOrigin = self.origin  # + (self.edgeDist + 10) * self.gaugeDir
+        self.boltOrigin = self.origin  # + (self.edgeDist + self.column.t) * self.gaugeDir
         # self.boltOrigin = self.boltOrigin  # + self.endDist * self.pitchDir
         for rw in range(self.row):
             if rw == 0 or rw == self.row - 1:

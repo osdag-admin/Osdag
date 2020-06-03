@@ -871,14 +871,14 @@ class CommonDesignLogic(object):
                           R1=float(CEP.section.root_radius), R2=float(CEP.section.toe_radius),
                           alpha=float(CEP.section.flange_slope), length=1000, notchObj=None)
         endPlate = Plate(L=float(CEP.plate_height), W=float(CEP.plate_width), T=float(CEP.plate_thickness_provided))
-        flangeWeld = GrooveWeld(b=column.T, h=float(CEP.weld_size), L=column.B)
+        flangeWeld = GrooveWeld(b=column.T, h=float(10.0), L=column.B)
         webWeld = GrooveWeld(b=column.t, h=flangeWeld.h, L=column.D - 2 * column.T)
 
         # bolt = Bolt(R=14, T=10, H=13, r=8)
         # nut = Nut(R=bolt.R, T=bolt.T, H=bolt.T + 1, innerR1=bolt.r)
         nut_space = 2 * endPlate.T + nut.T  # member.T + plate.T + nut.T
 
-        nut_bolt_array = CEPNutBoltArray(CEP, nut, bolt, nut_space)
+        nut_bolt_array = CEPNutBoltArray(CEP, column, nut, bolt, nut_space)
 
         ccEndPlateCad = CCEndPlateCAD(CEP, column, endPlate, flangeWeld, webWeld, nut_bolt_array)
 

@@ -299,6 +299,9 @@ class CleatAngleConnection(ShearConnection):
         t5 = ([KEY_CONN], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t5)
 
+        t6 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t6)
+
         return lst
 
 

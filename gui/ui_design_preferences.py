@@ -1320,6 +1320,13 @@ class Ui_Dialog(object):
         elif tab_name == "Beam":
             tab_Beam = self.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
             tab = tab_Beam
+        elif tab_name == "Angle":
+            tab_Angle = self.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+            tab = tab_Angle
+        elif tab_name == "Channel":
+            tab_Channel = self.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_CHANNEL)
+            tab = tab_Channel
+
         for c in tab.children():
             if isinstance(c, QtWidgets.QComboBox):
                 c.setCurrentIndex(0)

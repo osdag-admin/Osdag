@@ -280,6 +280,9 @@ class Tension_welded(Member):
         t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t3)
 
+        t4 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t4)
+
         return lst
 
     def fn_conn_type(self):

@@ -1010,9 +1010,13 @@ class ColumnEndPlate(MomentConnection):
             #     self.get_bolt_grade(self)
 
         else:
+            if KEY_D == 'Customized':
+                self.design_status = False
+                logger.error("Try Different bolt diam")
 
-            self.design_status = False
-            logger.error("failed in bolt diam selection")
+            else:
+                self.design_status = False
+                logger.error("Try Different material")
 
     #############################################################################################################
     ## Function to get Bolt grade ##
@@ -1038,10 +1042,10 @@ class ColumnEndPlate(MomentConnection):
                         (self.section.web_thickness / 2) + (2 * self.end_dist))) / self.pitch) - 2))
             # print("n_bf",self.n_bf)
 
-            if self.n_bf < 0:
-                self.n_bf = 0
-            elif self.n_bf == 0:
+            if self.n_bf <= 0:
                 self.n_bf = 1
+            # elif self.n_bf == 0:
+            #     self.n_bf = 1
             elif self.n_bf > 0:
                 self.n_bf = self.n_bf + 1
             print("no bolts web", self.n_bw, "no bolts flange", self.n_bf)
@@ -1070,6 +1074,10 @@ class ColumnEndPlate(MomentConnection):
                             2 * self.end_dist) - ((self.n_bf - 1) * self.pitch)
             # print("p_2_flange",self.p_2_flange)
 
+            if self.p_2_flange < 0:
+                self.p_2_flange = 0
+            else:
+                pass
             # self.x = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - self.end_dist - (self.n_bf * self.pitch)
 
             ############# y_max and y square ################

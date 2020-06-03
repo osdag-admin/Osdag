@@ -668,11 +668,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         #        self.moment_capacity_gusset if flag and self.stiffener_along_flange == 'Yes' else '')
         # out_list.append(t28)
 
-        t29 = (None, DISP_TITLE_STIFFENER_PLATE_WEB, TYPE_TITLE, None)
+        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ALONG_WEB, TYPE_TITLE, None)
         out_list.append(t29)
 
-        t30 = (KEY_OUT_STIFFENER_PLATE_WEB, KEY_DISP_OUT_STIFFENER_PLATE_WEB, TYPE_OUT_BUTTON,
-               ['Stiffener Details', self.stiffener_web_details])
+        t30 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB, KEY_DISP_OUT_STIFFENER_PLATE_ALONG_WEB, TYPE_OUT_BUTTON,
+               ['Stiffener Details', self.stiffener_along_web_details])
+        out_list.append(t30)
+
+        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ACROSS_WEB, TYPE_TITLE, None)
+        out_list.append(t29)
+
+        t30 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB, KEY_DISP_OUT_STIFFENER_PLATE_ACROSS_WEB, TYPE_OUT_BUTTON,
+               ['Stiffener Details', self.stiffener_across_web_details])
         out_list.append(t30)
 
         # t30 = (KEY_OUT_STIFFENER_PLATE_WEB_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_WEB_THICKNESS, TYPE_TEXTBOX,
@@ -772,28 +779,54 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return sf
 
-    def stiffener_web_details(self, flag):
+    def stiffener_along_web_details(self, flag):
 
         sw = []
 
-        t30 = (KEY_OUT_STIFFENER_PLATE_WEB_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_WEB_THICKNESS, TYPE_TEXTBOX,
+        t30 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_THICKNESS, TYPE_TEXTBOX,
                self.stiffener_plt_thick_along_web if flag and self.stiffener_along_web == 'Yes' else '')
         sw.append(t30)
 
-        t31 = (KEY_OUT_STIFFENER_PLATE_WEB_SHEAR_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_WEB_SHEAR_DEMAND, TYPE_TEXTBOX,
+        t31 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB_SHEAR_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_SHEAR_DEMAND, TYPE_TEXTBOX,
                self.shear_on_stiffener_along_web if flag and self.stiffener_along_web == 'Yes' else '')
         sw.append(t31)
 
-        t32 = (KEY_OUT_STIFFENER_PLATE_WEB_SHEAR, KEY_OUT_DISP_STIFFENER_PLATE_WEB_SHEAR, TYPE_TEXTBOX,
+        t32 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB_SHEAR, KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_SHEAR, TYPE_TEXTBOX,
                self.shear_capa_stiffener_along_web if flag and self.stiffener_along_web == 'Yes' else '')
         sw.append(t32)
 
-        t33 = (KEY_OUT_STIFFENER_PLATE_WEB_MOMENT_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_WEB_MOMENT_DEMAND, TYPE_TEXTBOX,
+        t33 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB_MOMENT_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_MOMENT_DEMAND, TYPE_TEXTBOX,
                self.moment_on_stiffener_along_web if flag and self.stiffener_along_web == 'Yes' else '')
         sw.append(t33)
 
-        t34 = (KEY_OUT_STIFFENER_PLATE_WEB_MOMENT, KEY_OUT_DISP_STIFFENER_PLATE_WEB_MOMENT, TYPE_TEXTBOX,
+        t34 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB_MOMENT, KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_MOMENT, TYPE_TEXTBOX,
                self.moment_capa_stiffener_along_web if flag and self.stiffener_along_web == 'Yes' else '')
+        sw.append(t34)
+
+        return sw
+
+    def stiffener_across_web_details(self, flag):
+
+        sw = []
+
+        t30 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_THICKNESS, TYPE_TEXTBOX,
+               self.stiffener_plt_thick_across_web if flag and self.stiffener_across_web == 'Yes' else '')
+        sw.append(t30)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_SHEAR_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_SHEAR_DEMAND, TYPE_TEXTBOX,
+               self.shear_on_stiffener_across_web if flag and self.stiffener_across_web == 'Yes' else '')
+        sw.append(t31)
+
+        t32 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_SHEAR, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_SHEAR, TYPE_TEXTBOX,
+               self.shear_capa_stiffener_across_web if flag and self.stiffener_across_web == 'Yes' else '')
+        sw.append(t32)
+
+        t33 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND, TYPE_TEXTBOX,
+               self.moment_on_stiffener_across_web if flag and self.stiffener_across_web == 'Yes' else '')
+        sw.append(t33)
+
+        t34 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_MOMENT, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT, TYPE_TEXTBOX,
+               self.moment_capa_stiffener_across_web if flag and self.stiffener_across_web == 'Yes' else '')
         sw.append(t34)
 
         return sw
@@ -991,6 +1024,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             design_dictionary[KEY_MOMENT_MINOR] = 'Disabled'
         if design_dictionary[KEY_CONN] != 'Moment Base Plate' or design_dictionary[KEY_AXIAL_TENSION_BP] == '':
             design_dictionary[KEY_AXIAL_TENSION_BP] = 'Disabled'
+        if design_dictionary[KEY_SHEAR_MAJOR] == '':
+            design_dictionary[KEY_SHEAR_MAJOR] = '0'
+        if design_dictionary[KEY_SHEAR_MINOR] == '':
+            design_dictionary[KEY_SHEAR_MINOR] = '0'
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
@@ -1380,6 +1417,56 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"][self.dp_weld_fab]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
 
         self.safe = True
+
+        self.stiffener_plt_thick_along_flange = 0.0
+        self.stiffener_plt_thick_along_web = 0.0
+        self.stiffener_plt_thick_across_web = 0.0
+        self.stiffener_plt_height_along_flange = 0.0
+        self.stiffener_plt_height_along_web = 0.0
+        self.stiffener_plt_height_across_web = 0.0
+
+        self.shear_on_stiffener_along_flange = 0.0
+        self.shear_capa_stiffener_along_flange = 0.0
+        self.moment_on_stiffener_along_flange = 0.0
+        self.moment_capa_stiffener_along_flange = 0.0
+        self.z_e_stiffener_along_flange = 0.0
+
+        self.shear_on_stiffener_along_web = 0.0
+        self.shear_capa_stiffener_along_web = 0.0
+        self.moment_on_stiffener_along_web = 0.0
+        self.moment_capa_stiffener_along_web = 0.0
+        self.z_e_stiffener_along_web = 0.0
+
+        self.weld_size_flange = 0.0
+        self.weld_size_web = 0.0
+        self.gusset_along_flange = 'No'
+        self.gusset_along_web = 'No'
+        self.gusset_plate_length = 0.0
+        self.stiffener_plate_length = 0.0
+        self.total_eff_len_gusset_available = 0.0
+        self.gusset_outstand_length = 0.0
+        self.stiffener_outstand_length = 0.0
+        self.gusset_fy = self.dp_column_fy
+        self.stiffener_fy = self.dp_column_fy
+        self.epsilon = 1
+        self.gusset_plate_thick = 0.0
+        self.stiffener_plate_thick = 0.0
+        self.gusset_plate_height = 0.0
+        self.stiffener_plate_height = 0.0
+        self.stiffener_plt_len_along_flange = 0.0
+        self.stiffener_plt_len_along_web = 0.0
+        self.stiffener_plt_len_across_web = 0.0
+
+        self.weld_size_gusset = 0.0
+        self.weld_size_stiffener = 0.0
+        self.weld_size_vertical_flange = 0.0
+        self.weld_size_vertical_web = 0.0
+
+        self.stiffener_plt_thick_across_web = 0
+        self.shear_on_stiffener_across_web = 0
+        self.shear_capa_stiffener_across_web = 0
+        self.moment_on_stiffener_across_web = 0
+        self.moment_capa_stiffener_across_web = 0
 
         self.bp_analyses_parameters(self)
         print('bp_analyses_parameters done')

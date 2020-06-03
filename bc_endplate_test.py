@@ -9,7 +9,9 @@ from utils.common.load import Load
 # Get input objects
 '''
 input_file_path = 'bcinput.osi'
-design_dictionary = yaml.load(input_file_path, Loader=yaml.FullLoader)
+with open(input_file_path, 'r') as input_file:
+        design_dictionary  = yaml.load(input_file, Loader=yaml.FullLoader)
+
 print(design_dictionary)
 '''
 

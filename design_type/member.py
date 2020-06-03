@@ -979,5 +979,11 @@ class Member(Main):
         #     self.supporting_section = Beam(designation=design_dictionary[KEY_SUPTNGSEC], material_grade=design_dictionary[KEY_MATERIAL])
 
 
+    def new_material(self):
 
+        selected_material = self[0]
+        if selected_material == "Custom":
+            return True
+        else:
+            return False
 

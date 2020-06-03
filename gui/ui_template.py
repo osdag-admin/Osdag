@@ -1196,6 +1196,10 @@ class Ui_ModuleWindow(QMainWindow):
             elif typ == TYPE_COMBOBOX_CUSTOMIZED:
                 k2.setCurrentIndex(0)
                 data[k2_key + "_customized"] = val
+            elif typ == TYPE_CUSTOM_MATERIAL:
+                if val:
+                    self.new_material_dialog()
+
             elif typ == TYPE_LABEL:
                 k2.setText(val)
             elif typ == TYPE_NOTE:
@@ -1646,6 +1650,132 @@ class Ui_ModuleWindow(QMainWindow):
                     dialog.resize(350, 300)
                 dialog.setFixedSize(dialog.size())
                 dialog.exec()
+
+    def new_material_dialog(self):
+        dialog = QtWidgets.QDialog()
+        dialog.setWindowTitle('Custom Material')
+        layout = QtWidgets.QGridLayout(dialog)
+        widget = QtWidgets.QWidget(dialog)
+        widget.setLayout(layout)
+        _translate = QtCore.QCoreApplication.translate
+        textbox_list = ['Grade', 'Fy_20', 'Fy_20_40', 'Fy_40', 'Fu']
+        i = 0
+        for textbox_name in textbox_list:
+            label = QtWidgets.QLabel(widget)
+            label.setObjectName(textbox_name+"_label")
+            font = QtGui.QFont()
+            font.setPointSize(9)
+            font.setBold(False)
+            font.setWeight(50)
+            label.setFont(font)
+            label.setText(_translate("MainWindow", "<html><body><p>" + textbox_name + "</p></body></html>"))
+            # label.resize(120, 30)
+            label.setFixedSize(100, 30)
+            layout.addWidget(label, i, 1, 1, 1)
+
+            textbox = QtWidgets.QLineEdit(widget)
+            textbox.setObjectName(textbox_name)
+            font = QtGui.QFont()
+            font.setPointSize(11)
+            font.setBold(False)
+            font.setWeight(50)
+            textbox.setFont(font)
+            # textbox.resize(120, 30)
+            textbox.setFixedSize(200, 24)
+            if textbox_name == 'Grade':
+                textbox.setText('Cus____')
+                textbox.setReadOnly(True)
+            else:
+                textbox.setValidator(QtGui.QIntValidator())
+
+            self.connect_change_popup_material(textbox, widget)
+            layout.addWidget(textbox, i, 2, 1, 1)
+
+            i += 1
+
+        add_button = QtWidgets.QPushButton(widget)
+        add_button.setObjectName("material_add")
+        add_button.setText("Add")
+        add_button.clicked.connect(lambda: self.update_material_db(widget))
+        layout.addWidget(add_button, i, 1, 1, 2)
+
+        dialog.setFixedSize(350, 250)
+        closed = dialog.exec()
+        if closed is not None:
+            input_dock_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
+            input_dock_material.clear()
+            for item in connectdb("Material"):
+                input_dock_material.addItem(item)
+
+    def update_material_db(self, widget):
+
+        material = widget.findChild(QtWidgets.QLineEdit, 'Grade').text()
+        values = material.split("_")
+
+        fy_20 = values[1]
+        fy_20_40 = values[2]
+        fy_40 = values[3]
+        fu = values[4]
+        elongation = 0
+
+        if "" in [fy_20, fy_40, fy_20_40, fu]:
+            QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+            return
+
+        fy_20 = int(fy_20)
+        fy_20_40 = int(fy_20_40)
+        fy_40 = int(fy_40)
+        fu = int(fu)
+
+        if not 0 <= fy_20 <= 1000:
+            QMessageBox.information(QMessageBox(), 'Warning', 'Please select Fy_20 in valid range!')
+            return
+        elif not 0 <= fy_20_40 <= 1000:
+            QMessageBox.information(QMessageBox(), 'Warning', 'Please select Fy_20_40 in valid range!')
+            return
+        elif not 0 <= fy_40 <= 1000:
+            QMessageBox.information(QMessageBox(), 'Warning', 'Please select Fy_40 in valid range!')
+            return
+        elif not 0 <= fu <= 1000:
+            QMessageBox.information(QMessageBox(), 'Warning', 'Please select Fu in valid range!')
+            return
+
+        if fy_20 > 350:
+            elongation = 20
+        elif 250 < fy_20 <= 350:
+            elongation = 22
+        elif fy_20 <= 250:
+            elongation = 23
+
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        c = conn.cursor()
+        c.execute("SELECT count(*) FROM Material WHERE Grade = ?", (material,))
+        data = c.fetchone()[0]
+
+        if data == 0:
+            c.execute('''INSERT INTO Material (Grade,[Yield Stress (< 20)],[Yield Stress (20 -40)],
+            [Yield Stress (> 40)],[Ultimate Tensile Stress],[Elongation ]) VALUES (?,?,?,?,?,?)''',
+                      (material, fy_20, fy_20_40, fy_40, fu, elongation))
+            conn.commit()
+            c.close()
+            conn.close()
+            QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+
+        else:
+            QMessageBox.information(QMessageBox(), 'Warning', 'Material already exists in Database!')
+
+    def connect_change_popup_material(self, textbox, widget):
+        textbox.textChanged.connect(lambda: self.change_popup_material(widget))
+
+    def change_popup_material(self, widget):
+
+        grade = widget.findChild(QtWidgets.QLineEdit, 'Grade')
+        fy_20 = widget.findChild(QtWidgets.QLineEdit, 'Fy_20').text()
+        fy_20_40 = widget.findChild(QtWidgets.QLineEdit, 'Fy_20_40').text()
+        fy_40 = widget.findChild(QtWidgets.QLineEdit, 'Fy_40').text()
+        fu = widget.findChild(QtWidgets.QLineEdit, 'Fu').text()
+        material = str("Cus_"+fy_20+"_"+fy_20_40+"_"+fy_40+"_"+fu)
+        grade.setText(material)
 
     # Function for showing design-preferences popup
 

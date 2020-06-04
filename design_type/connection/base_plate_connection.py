@@ -1514,7 +1514,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.bp_analyses_parameters(self)
         print('bp_analyses_parameters done')
         self.bp_analyses(self)
-
         print('bp_analyses done')
         self.anchor_bolt_design(self)
         print('anchor_bolt_design done')
@@ -1560,6 +1559,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # TODO add condition for number of anchor bolts depending on col depth and force
         # number of anchor bolts outside the column flange
         self.anchor_nos_provided = 4
+
+        # initialize the stiffener length
 
         # perform detailing checks
         # Note: end distance is along the depth, whereas, the edge distance is along the flange, of the column section
@@ -2375,31 +2376,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # check for the limiting width to the thickness ratio of the column web [Reference: Cl. 3.7.2 and 3.7.4, Table 2, IS 800:2007]
         # if the web does not classify as 'Plastic' section, stiffener shall be provided across the web to limit the effective width
-        ratio = (self.column_D - (2 * self.column_tf)) / self.column_tw  # d/t_w
 
-        # Check 1: Axial compression
-        if self.connectivity == 'Welded Column Base':
-            if ratio > (42 * self.epsilon):
-                self.stiffener_across_web = 'Yes'
-            else:
-                self.stiffener_across_web = 'No'
+        check = self.Table2_web_OfI_H_box_section((self.column_D - (2 * self.column_tf)), self.column_tw, self.dp_column_fy,
+                                                  self.load_axial_compression, load_type='Compression', section_class='Plastic')
 
-        # Check 2: Neutral axis at mid depth of the column
-        elif self.connectivity == 'Moment Base Plate':
-            if ratio > (84 * self.epsilon):
-                self.stiffener_across_web = 'Yes'
-            else:
-                self.stiffener_across_web = 'No'
+        # check[0]: Neutral axis at mid depth of the column
+        # check[1]: Generally (when there is axial tension/uplift force acting on the column)
+        # check[2]: Axial compression
 
-        # Check 3: Generally (when there is axial tension/uplift force acting on the column)
-        if self.load_axial_tension > 0:
-            actual_stress = self.load_axial_tension / ((self.column_D - (2 * self.column_tf)) * self.column_tw)
-            r_1 = - (actual_stress / self.dp_column_fy)  # r_1 is negative for axial tension
-
-            if ratio > (((84 * self.epsilon) / (1 + r_1)) or (42 * self.epsilon)):
-                self.stiffener_across_web = 'Yes'
-            else:
-                self.stiffener_across_web = 'No'
+        if (check[0] or check[1] or check[2]) == 'Fail':
+            self.stiffener_across_web = 'Yes'
+        else:
+            self.stiffener_across_web = 'No'
 
         # design of stiffener
         if self.connectivity == 'Welded Column Base' or 'Moment Base Plate':

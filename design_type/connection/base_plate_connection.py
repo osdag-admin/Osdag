@@ -623,18 +623,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         #        self.moment_capacity_gusset if flag and self.stiffener_along_flange == 'Yes' else '')
         # out_list.append(t28)
 
-        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ALONG_WEB, TYPE_TITLE, None, True)
+        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ALONG_WEB, TYPE_TITLE, None,True)
         out_list.append(t29)
 
         t30 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB, KEY_DISP_OUT_STIFFENER_PLATE_ALONG_WEB, TYPE_OUT_BUTTON,
-               ['Stiffener Details', self.stiffener_along_web_details], True)
+               ['Stiffener Details', self.stiffener_along_web_details],True)
         out_list.append(t30)
 
-        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ACROSS_WEB, TYPE_TITLE, None, True)
+        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ACROSS_WEB, TYPE_TITLE, None,True)
         out_list.append(t29)
 
         t30 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB, KEY_DISP_OUT_STIFFENER_PLATE_ACROSS_WEB, TYPE_OUT_BUTTON,
-               ['Stiffener Details', self.stiffener_across_web_details], True)
+               ['Stiffener Details', self.stiffener_across_web_details],True)
         out_list.append(t30)
 
         # t30 = (KEY_OUT_STIFFENER_PLATE_WEB_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_WEB_THICKNESS, TYPE_TEXTBOX,

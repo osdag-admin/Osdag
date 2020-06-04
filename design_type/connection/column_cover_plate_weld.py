@@ -787,8 +787,7 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         ###########################################################
         if self.factored_axial_load > self.axial_capacity:
-            logger.error(" : Axial capacity of the member is less than the factored axial force, %2.2f kN "
-                         % round(self.factored_axial_load / 1000, 2))
+            logger.error(" : Axial capacity of the member is less than the factored axial force, {} kN.".format( round(self.factored_axial_load / 1000, 2)))
             logger.warning(" : Axial capacity of the member is {} kN".format(round(self.axial_capacity / 1000, 2)))
             logger.info(" : Increase the plate thickness,material grade or decrease the axial force")
             logger.error(" : Design is not safe. \n ")
@@ -796,8 +795,7 @@ class ColumnCoverPlateWeld(MomentConnection):
             self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity1:
-                logger.error(" : Shear capacity of the member is less than the factored shear force, %2.2f kN "
-                             % round(self.fact_shear_load / 1000, 2))
+                logger.error(" : Shear capacity of the member is less than the factored shear force, {} kN.".format( round(self.fact_shear_load / 1000, 2)))
                 logger.warning(
                     " : Shear capacity of the member is {} kN".format(round(self.shear_capacity1 / 1000, 2)))
                 logger.info(" : Increase the plate thickness,material grade or decrease the Shear force")
@@ -807,9 +805,8 @@ class ColumnCoverPlateWeld(MomentConnection):
             else:
                 if self.load_moment > self.section.moment_capacity:
                     self.member_capacity_status = False
-                    logger.error(" : Moment capacity of the member is less than the factored moment, %2.2f kN "
-                                 % round(self.load_moment / 1000000, 2))
-                    logger.warning(" : Moment capacity of the member is {} kN".format(
+                    logger.error(" : Moment capacity of the member is less than the factored moment, {} kN-m.".format( round(self.load_moment / 1000000, 2)))
+                    logger.warning(" : Moment capacity of the member is {} kN-m".format(
                         round(self.section.moment_capacity / 1000000, 2)))
                     logger.info(" : Increase the plate thickness,material grade or decrease the moment")
                     logger.error(" : Design is not safe. \n ")
@@ -856,7 +853,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                 if len(self.flange_plate_thickness_possible) == 0:
                     logger.error(" : Flange Plate thickness less than section flange thicknesss.")
                     logger.warning(
-                        " : Flange Plate thickness should be greater than section flange thicknesss.%2.2f mm" % self.section.flange_thickness)
+                        " : Flange Plate thickness should be greater than section flange thicknesss {} mm.".format(self.section.flange_thickness))
                     self.initial_pt_thk_status = False
                     self.design_status = False
                 else:
@@ -916,7 +913,7 @@ class ColumnCoverPlateWeld(MomentConnection):
                 if len(self.web_plate_thickness_possible) == 0:
                     logger.error(" : Web Plate thickness less than section web thicknesss.")
                     logger.warning(
-                        " : Web Plate thickness should be greater than section web thicknesss.%2.2f mm" % self.section.web_thickness)
+                        " : Web Plate thickness should be greater than section web thicknesss {} mm.".format( self.section.web_thickness))
                     self.initial_pt_thk_status_web = False
                     self.design_status = False
                 else:
@@ -1008,16 +1005,16 @@ class ColumnCoverPlateWeld(MomentConnection):
             else:
                 self.initial_pt_thk_status = False
                 self.design_status = False
-                logger.warning(" : Tension capacity of flange is less than required flange force %2.2f KN" % round(
-                    self.flange_force / 1000, 2))
+                logger.warning(" : Tension capacity of flange is less than required flange force {} kN.".format( round(
+                    self.flange_force / 1000, 2)))
                 logger.info(" : Select the larger column section or decrease the applied loads")
                 logger.error(" : Design is not safe. \n ")
                 logger.debug(" : =========End Of design===========")
         else:
             self.initial_pt_thk_status_web = False
             self.design_status = False
-            logger.warning(" : Tension capacity of web is less than required axial_force_w %2.2f KN" % round(
-                self.axial_force_w / 1000, 2))
+            logger.warning(" : Tension capacity of web is less than required axial_force_w {} kN.".format( round(
+                self.axial_force_w / 1000, 2)))
             logger.info(" : Select the larger column section or decrease the applied axial load")
             logger.error(" : Design is not safe. \n ")
             logger.debug(" : =========End Of design===========")
@@ -1289,8 +1286,8 @@ class ColumnCoverPlateWeld(MomentConnection):
                     self.initial_pt_thk(self, previous_thk_web=self.flange_check_thk)
                 else:
                     logger.warning(
-                        ": Tension capacity of flange plate is less than required flange force %2.2f KN" % round(
-                            self.flange_force / 1000, 2))
+                        ": Tension capacity of flange plate is less than required flange force {} kN.".format( round(
+                            self.flange_force / 1000, 2)))
                     logger.info(": Increase the thickness of the flange plate or decrease the applied loads")
                     logger.error(" : Design is not safe. \n ")
                     logger.debug(" : =========End Of design===========")
@@ -1300,8 +1297,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         else:
             #  yielding,rupture  for  Oustide + Inside flange plate
 
-            A_v_flange = ((
-                                      2 * self.flange_plate.Innerheight) + self.flange_plate.height) * self.flange_plate.thickness_provided
+            A_v_flange = ((2 * self.flange_plate.Innerheight) + self.flange_plate.height) * self.flange_plate.thickness_provided
 
             self.flange_plate.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
                 A_v=A_v_flange,
@@ -1316,8 +1312,8 @@ class ColumnCoverPlateWeld(MomentConnection):
             if self.flange_plate.tension_capacity_flange_plate < self.flange_force:
                 self.flange_plate_capacity_axial_status = False
                 logger.warning(
-                    ": Tension capacity of flange plate is less than required flange force %2.2f KN" % round(
-                        self.flange_force / 1000, 2))
+                    ": Tension capacity of flange plate is less than required flange force {} kN.".format( round(
+                        self.flange_force / 1000, 2)))
                 logger.info(": Increase the thickness of the flange plate or decrease the applied loads")
                 logger.error(" : Design is not safe. \n ")
                 logger.debug(" : =========End Of design===========")
@@ -1338,8 +1334,8 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         if self.section.tension_capacity_flange < self.flange_force:
             self.recheck_flange_capacity_axial_status = False
-            logger.warning(": Tension capacity of flange is less than required flange force %2.2f KN" % round(
-                self.flange_force / 1000, 2))
+            logger.warning(": Tension capacity of flange is less than required flange force {} kN.".format( round(
+                self.flange_force / 1000, 2)))
             logger.info(": Select the larger column section or decrease the applied loads")
             logger.error(" : Design is not safe. \n ")
             logger.debug(" : =========End Of design===========")
@@ -1365,8 +1361,8 @@ class ColumnCoverPlateWeld(MomentConnection):
                 self.initial_pt_thk(self, previous_thk_web=self.web_check_thk)
             else:
                 logger.warning(
-                    ": Tension capacity of web plate is less than required axial_force_w %2.2f KN" % round(
-                        self.axial_force_w / 1000, 2))
+                    ": Tension capacity of web plate is less than required axial_force_w {} kN.".format( round(
+                        self.axial_force_w / 1000, 2)))
                 logger.info(": Increase the thickness of the web plate or decrease the applied axial load")
                 logger.error(" : Design is not safe. \n ")
                 logger.debug(" : =========End Of design===========")
@@ -1393,8 +1389,8 @@ class ColumnCoverPlateWeld(MomentConnection):
                 self.initial_pt_thk(self, previous_thk_web=self.web_check_thk)
             else:
                 logger.warning(
-                    ": Shear capacity of web plate is less than required fact_shear_load  %2.2f KN" % round(
-                        self.fact_shear_load / 1000, 2))
+                    ": Shear capacity of web plate is less than required fact_shear_load {} kN.".format( round(
+                        self.fact_shear_load / 1000, 2)))
                 logger.info(": Increase the thickness of the web plate or decrease the applied shear loads")
                 logger.error(" : Design is not safe. \n ")
                 logger.debug(" : =========End Of design===========")
@@ -1439,8 +1435,8 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                           self.section.block_shear_capacity_web), 2)
             if self.section.tension_capacity_web < self.axial_force_w:
                 self.design_status = False
-                logger.warning(" : Tension capacity of web is less than required axial_force_w %2.2f KN" % round(
-                    self.axial_force_w / 1000, 2))
+                logger.warning(" : Tension capacity of web is less than required axial_force_w {} kN.".format(round(
+                    self.axial_force_w / 1000, 2)))
                 logger.info(" : Select the larger column section or decrease the applied axial load")
                 logger.error(" : Design is not safe. \n ")
                 logger.debug(" : =========End Of design===========")
@@ -1468,8 +1464,8 @@ class ColumnCoverPlateWeld(MomentConnection):
                 logger.info(" : Overall column cover plate welded member design is safe. \n")
                 logger.debug(" : =========End Of design===========")
         else:
-            logger.warning(" : Block Shear of web is less than required axial_force_w %2.2f KN" % round(
-                self.axial_force_w / 1000, 2))
+            logger.warning(" : Block Shear of web is less than required axial_force_w {} kN.".format( round(
+                self.axial_force_w / 1000, 2)))
             logger.info(" : Select the larger column section or decrease the applied axial load")
             logger.error(" : Design is not safe. \n ")
             logger.debug(" : =========End Of design===========")

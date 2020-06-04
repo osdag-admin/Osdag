@@ -23,6 +23,9 @@ class TensionAngleWeldCAD(object):
         self.plate = plate
         self.inline_weld = inline_weld
         self.opline_weld = opline_weld
+        # self.intermittentConnection = weld_plate_array
+
+        # self.Obj.loc = 'Long Leg'#'Short Leg'
 
         self.plate1 = copy.deepcopy(self.plate)
         self.plate2 = copy.deepcopy(self.plate)
@@ -60,43 +63,84 @@ class TensionAngleWeldCAD(object):
 
     def createMemberGeometry(self):
 
-        if self.Obj.sec_profile == 'Angles':
-            member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
-            member1_uDir = numpy.array([0.0, -1.0, 0.0])
-            member1_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+        if self.Obj.loc == 'Long Leg':
+            if self.Obj.sec_profile == 'Angles':
+                member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.opline_weld.L / 2])
+                member1_uDir = numpy.array([0.0, -1.0, 0.0])
+                member1_wDir = numpy.array([1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
 
-            self.member1_Model = self.member1.create_model()
+                self.member1_Model = self.member1.create_model()
 
-        elif self.Obj.sec_profile == 'Back to Back Angles':
-            member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
-            member1_uDir = numpy.array([0.0, -1.0, 0.0])
-            member1_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+            elif self.Obj.sec_profile == 'Back to Back Angles':
+                member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.opline_weld.L / 2])
+                member1_uDir = numpy.array([0.0, -1.0, 0.0])
+                member1_wDir = numpy.array([1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
 
-            self.member1_Model = self.member1.create_model()
+                self.member1_Model = self.member1.create_model()
 
-            member2OriginL = numpy.array([self.member.L - self.plate_intercept, self.plate.T, self.member.A / 2])
-            member2_uDir = numpy.array([0.0, 1.0, 0.0])
-            member2_wDir = numpy.array([-1.0, 0.0, 0.0])
-            self.member2.place(member2OriginL, member2_uDir, member2_wDir)
+                member2OriginL = numpy.array(
+                    [self.member.L - self.plate_intercept, self.plate.T, self.opline_weld.L / 2])
+                member2_uDir = numpy.array([0.0, 1.0, 0.0])
+                member2_wDir = numpy.array([-1.0, 0.0, 0.0])
+                self.member2.place(member2OriginL, member2_uDir, member2_wDir)
 
-            self.member2_Model = self.member2.create_model()
+                self.member2_Model = self.member2.create_model()
 
-        elif self.Obj.sec_profile == 'Star Angles':
-            member1OriginL = numpy.array([-self.plate_intercept, 0.0, 0.0])
-            member1_uDir = numpy.array([0.0, -1.0, 0.0])
-            member1_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+            elif self.Obj.sec_profile == 'Star Angles':
+                member1OriginL = numpy.array([-self.plate_intercept, 0.0, 0.0])
+                member1_uDir = numpy.array([0.0, -1.0, 0.0])
+                member1_wDir = numpy.array([1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
 
-            self.member1_Model = self.member1.create_model()
+                self.member1_Model = self.member1.create_model()
 
-            member2OriginL = numpy.array([-self.plate_intercept, self.plate.T, 0.0])
-            member2_uDir = numpy.array([0.0, 1.0, 0.0])
-            member2_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.member2.place(member2OriginL, member2_uDir, member2_wDir)
+                member2OriginL = numpy.array([-self.plate_intercept, self.plate.T, 0.0])
+                member2_uDir = numpy.array([0.0, 1.0, 0.0])
+                member2_wDir = numpy.array([1.0, 0.0, 0.0])
+                self.member2.place(member2OriginL, member2_uDir, member2_wDir)
 
-            self.member2_Model = self.member2.create_model()
+                self.member2_Model = self.member2.create_model()
+
+        else:
+            if self.Obj.sec_profile == 'Angles':
+                member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.opline_weld.L / 2])
+                member1_uDir = numpy.array([0.0, 0.0, -1.0])
+                member1_wDir = numpy.array([-1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+
+                self.member1_Model = self.member1.create_model()
+
+            elif self.Obj.sec_profile == 'Back to Back Angles':
+                member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.opline_weld.L / 2])
+                member1_uDir = numpy.array([0.0, 0.0, -1.0])
+                member1_wDir = numpy.array([-1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+
+                self.member1_Model = self.member1.create_model()
+
+                member2OriginL = numpy.array([- self.plate_intercept, self.plate.T, self.opline_weld.L / 2])
+                member2_uDir = numpy.array([0.0, 0.0, -1.0])
+                member2_wDir = numpy.array([1.0, 0.0, 0.0])
+                self.member2.place(member2OriginL, member2_uDir, member2_wDir)
+
+                self.member2_Model = self.member2.create_model()
+
+            elif self.Obj.sec_profile == 'Star Angles':
+                member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, 0.0])
+                member1_uDir = numpy.array([0.0, 0.0, -1.0])
+                member1_wDir = numpy.array([-1.0, 0.0, 0.0])
+                self.member1.place(member1OriginL, member1_uDir, member1_wDir)
+
+                self.member1_Model = self.member1.create_model()
+
+                member2OriginL = numpy.array([-self.plate_intercept + self.member.L, self.plate.T, 0.0])
+                member2_uDir = numpy.array([0.0, 0.0, 1.0])
+                member2_wDir = numpy.array([-1.0, 0.0, 0.0])
+                self.member2.place(member2OriginL, member2_uDir, member2_wDir)
+
+                self.member2_Model = self.member2.create_model()
 
     def createPlateGeometry(self):
         plate1OriginL = numpy.array([0.0, 0.0, 0.0])
@@ -113,88 +157,101 @@ class TensionAngleWeldCAD(object):
 
         self.plate2_Model = self.plate2.create_model()
 
-    def createWeldGeometry(self):
+        # intermittentConnectionOriginL = numpy.array([300, 0.0, 0.0])
+        # intermittentConnection_uDir = numpy.array([1.0, 0.0, 0.0])
+        # intermittentConnection_vDir = numpy.array([0.0, 1.0, 0.0])
+        # intermittentConnection_wDir = numpy.array([0.0, 0.0, 1.0])
+        # self.intermittentConnection.place(intermittentConnectionOriginL, intermittentConnection_uDir,
+        #                                   intermittentConnection_vDir, intermittentConnection_wDir)
+        #
+        # self.intermittentConnection_Model = self.intermittentConnection.create_model()
+        # self.inter_conc_welds = self.intermittentConnection.get_welded_models()
+        # self.inter_conc_plates = self.intermittentConnection.get_plate_models()
 
-        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Angles':
-            weldHL11OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
+    def createWeldGeometry(self):
+        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Angles' or self.Obj.sec_profile == 'Channels' or self.Obj.sec_profile == 'Back to Back Channels':
+            weldHL11OriginL = numpy.array([-self.plate_intercept, 0.0, self.opline_weld.L / 2])
             weldHL11_uDir = numpy.array([0.0, 0.0, 1.0])
             weldHL11_wDir = numpy.array([1.0, 0.0, 0.0])
             self.weldHL11.place(weldHL11OriginL, weldHL11_uDir, weldHL11_wDir)
 
             self.weldHL11_Model = self.weldHL11.create_model()
 
-            weldHL12OriginL = numpy.array([0.0, 0.0, -self.member.A / 2])
+            weldHL12OriginL = numpy.array([0.0, 0.0, -self.opline_weld.L / 2])
             weldHL12_uDir = numpy.array([0.0, 0.0, -1.0])
             weldHL12_wDir = numpy.array([-1.0, 0.0, 0.0])
             self.weldHL12.place(weldHL12OriginL, weldHL12_uDir, weldHL12_wDir)
 
             self.weldHL12_Model = self.weldHL12.create_model()
 
-            weldHR11OriginL = numpy.array([-2 * self.plate_intercept + self.member.L, 0.0, self.member.A / 2])
+            weldHR11OriginL = numpy.array([-2 * self.plate_intercept + self.member.L, 0.0, self.opline_weld.L / 2])
             weldHR11_uDir = numpy.array([0.0, 0.0, 1.0])
             weldHR11_wDir = numpy.array([1.0, 0.0, 0.0])
             self.weldHR11.place(weldHR11OriginL, weldHR11_uDir, weldHR11_wDir)
 
             self.weldHR11_Model = self.weldHR11.create_model()
 
-            weldHR12OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, -self.member.A / 2])
+            weldHR12OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, -self.opline_weld.L / 2])
             weldHR12_uDir = numpy.array([0.0, 0.0, -1.0])
             weldHR12_wDir = numpy.array([-1.0, 0.0, 0.0])
             self.weldHR12.place(weldHR12OriginL, weldHR12_uDir, weldHR12_wDir)
 
             self.weldHR12_Model = self.weldHR12.create_model()
 
-            weldVL11OriginL = numpy.array([-self.plate_intercept, 0.0, -self.member.A / 2])
+            weldVL11OriginL = numpy.array([-self.plate_intercept, 0.0, -self.opline_weld.L / 2])
             weldVL11_uDir = numpy.array([-1.0, 0.0, 0.0])
             weldVL11_wDir = numpy.array([0.0, 0.0, 1.0])
             self.weldVL11.place(weldVL11OriginL, weldVL11_uDir, weldVL11_wDir)
 
             self.weldVL11_Model = self.weldVL11.create_model()
 
-            weldVR11OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.member.A / 2])
+            weldVR11OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.opline_weld.L / 2])
             weldVR11_uDir = numpy.array([1.0, 0.0, 0.0])
             weldVR11_wDir = numpy.array([0.0, 0.0, -1.0])
             self.weldVR11.place(weldVR11OriginL, weldVR11_uDir, weldVR11_wDir)
 
             self.weldVR11_Model = self.weldVR11.create_model()
 
-        if self.Obj.sec_profile == 'Back to Back Angles':
-            weldHL21OriginL = numpy.array([0.0, self.plate.T, self.member.A / 2])
+        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels':
+            weldHL21OriginL = numpy.array([0.0, self.plate.T, self.opline_weld.L / 2])
             weldHL21_uDir = numpy.array([0.0, 0.0, 1.0])
             weldHL21_wDir = numpy.array([-1.0, 0.0, 0.0])
             self.weldHL21.place(weldHL21OriginL, weldHL21_uDir, weldHL21_wDir)
 
             self.weldHL21_Model = self.weldHL21.create_model()
 
-            weldHL22OriginL = numpy.array([- self.plate_intercept, self.plate.T, -self.member.A / 2])
+            weldHL22OriginL = numpy.array([- self.plate_intercept, self.plate.T, -self.opline_weld.L / 2])
             weldHL22_uDir = numpy.array([0.0, 0.0, -1.0])
             weldHL22_wDir = numpy.array([1.0, 0.0, 0.0])
             self.weldHL22.place(weldHL22OriginL, weldHL22_uDir, weldHL22_wDir)
 
             self.weldHL22_Model = self.weldHL22.create_model()
 
-            weldHR21OriginL = numpy.array([- self.plate_intercept + self.member.L, self.plate.T, self.member.A / 2])
+            weldHR21OriginL = numpy.array(
+                [- self.plate_intercept + self.member.L, self.plate.T, self.opline_weld.L / 2])
             weldHR21_uDir = numpy.array([0.0, 0.0, 1.0])
             weldHR21_wDir = numpy.array([-1.0, 0.0, 0.0])
             self.weldHR21.place(weldHR21OriginL, weldHR21_uDir, weldHR21_wDir)
 
             self.weldHR21_Model = self.weldHR21.create_model()
 
-            weldHR22OriginL = numpy.array([-2 * self.plate_intercept + self.member.L, self.plate.T, -self.member.A / 2])
+            weldHR22OriginL = numpy.array(
+                [-2 * self.plate_intercept + self.member.L, self.plate.T, -self.opline_weld.L / 2])
             weldHR22_uDir = numpy.array([0.0, 0.0, -1.0])
             weldHR22_wDir = numpy.array([1.0, 0.0, 0.0])
             self.weldHR22.place(weldHR22OriginL, weldHR22_uDir, weldHR22_wDir)
 
             self.weldHR22_Model = self.weldHR22.create_model()
 
-            weldVL21OriginL = numpy.array([-self.plate_intercept, self.plate.T, self.member.A / 2])
+            weldVL21OriginL = numpy.array([-self.plate_intercept, self.plate.T, self.opline_weld.L / 2])
             weldVL21_uDir = numpy.array([-1.0, 0.0, 0.0])
             weldVL21_wDir = numpy.array([0.0, 0.0, -1.0])
             self.weldVL21.place(weldVL21OriginL, weldVL21_uDir, weldVL21_wDir)
 
             self.weldVL21_Model = self.weldVL21.create_model()
 
-            weldVR21OriginL = numpy.array([-self.plate_intercept + self.member.L, self.plate.T, -self.member.A / 2])
+            weldVR21OriginL = numpy.array(
+                [-self.plate_intercept + self.member.L, self.plate.T, -self.opline_weld.L / 2])
             weldVR21_uDir = numpy.array([1.0, 0.0, 0.0])
             weldVR21_wDir = numpy.array([0.0, 0.0, 1.0])
             self.weldVR21.place(weldVR21OriginL, weldVR21_uDir, weldVR21_wDir)
@@ -210,7 +267,7 @@ class TensionAngleWeldCAD(object):
 
             self.weldHL11_Model = self.weldHL11.create_model()
 
-            weldHL12OriginL = numpy.array([0.0, 0.0, -self.member.A])
+            weldHL12OriginL = numpy.array([0.0, 0.0, -self.opline_weld.L])
             weldHL12_uDir = numpy.array([0.0, 0.0, -1.0])
             weldHL12_wDir = numpy.array([-1.0, 0.0, 0.0])
             self.weldHL12.place(weldHL12OriginL, weldHL12_uDir, weldHL12_wDir)
@@ -224,14 +281,14 @@ class TensionAngleWeldCAD(object):
 
             self.weldHR11_Model = self.weldHR11.create_model()
 
-            weldHR12OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, -self.member.A])
+            weldHR12OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, -self.opline_weld.L])
             weldHR12_uDir = numpy.array([0.0, 0.0, -1.0])
             weldHR12_wDir = numpy.array([-1.0, 0.0, 0.0])
             self.weldHR12.place(weldHR12OriginL, weldHR12_uDir, weldHR12_wDir)
 
             self.weldHR12_Model = self.weldHR12.create_model()
 
-            weldVL11OriginL = numpy.array([-self.plate_intercept, 0.0, -self.member.A])
+            weldVL11OriginL = numpy.array([-self.plate_intercept, 0.0, -self.opline_weld.L])
             weldVL11_uDir = numpy.array([-1.0, 0.0, 0.0])
             weldVL11_wDir = numpy.array([0.0, 0.0, 1.0])
             self.weldVL11.place(weldVL11OriginL, weldVL11_uDir, weldVL11_wDir)
@@ -245,7 +302,7 @@ class TensionAngleWeldCAD(object):
 
             self.weldVR11_Model = self.weldVR11.create_model()
 
-            weldHL21OriginL = numpy.array([0.0, self.plate.T, self.member.A])
+            weldHL21OriginL = numpy.array([0.0, self.plate.T, self.opline_weld.L])
             weldHL21_uDir = numpy.array([0.0, 0.0, 1.0])
             weldHL21_wDir = numpy.array([-1.0, 0.0, 0.0])
             self.weldHL21.place(weldHL21OriginL, weldHL21_uDir, weldHL21_wDir)
@@ -259,7 +316,7 @@ class TensionAngleWeldCAD(object):
 
             self.weldHL22_Model = self.weldHL22.create_model()
 
-            weldHR21OriginL = numpy.array([-self.plate_intercept + self.member.L, self.plate.T, self.member.A])
+            weldHR21OriginL = numpy.array([-self.plate_intercept + self.member.L, self.plate.T, self.opline_weld.L])
             weldHR21_uDir = numpy.array([0.0, 0.0, 1.0])
             weldHR21_wDir = numpy.array([-1.0, 0.0, 0.0])
             self.weldHR21.place(weldHR21OriginL, weldHR21_uDir, weldHR21_wDir)
@@ -273,7 +330,7 @@ class TensionAngleWeldCAD(object):
 
             self.weldHR22_Model = self.weldHR22.create_model()
 
-            weldVL21OriginL = numpy.array([-self.plate_intercept, self.plate.T, self.member.A])
+            weldVL21OriginL = numpy.array([-self.plate_intercept, self.plate.T, self.opline_weld.L])
             weldVL21_uDir = numpy.array([-1.0, 0.0, 0.0])
             weldVL21_wDir = numpy.array([0.0, 0.0, -1.0])
             self.weldVL21.place(weldVL21OriginL, weldVL21_uDir, weldVL21_wDir)
@@ -287,6 +344,7 @@ class TensionAngleWeldCAD(object):
 
             self.weldVR21_Model = self.weldVR21.create_model()
 
+
     def get_members_models(self):
 
         if self.Obj.sec_profile == 'Angles':
@@ -299,6 +357,7 @@ class TensionAngleWeldCAD(object):
 
     def get_plates_models(self):
         plate = BRepAlgoAPI_Fuse(self.plate1_Model, self.plate2_Model).Shape()
+        # plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
         return plate
 
     def get_welded_models(self):
@@ -323,7 +382,7 @@ class TensionChannelWeldCAD(TensionAngleWeldCAD):
 
     def createMemberGeometry(self):
         if self.Obj.sec_profile == 'Channels':
-            member1OriginL = numpy.array([-self.plate_intercept, -self.member.B, self.member.D / 2])
+            member1OriginL = numpy.array([-self.plate_intercept, -self.member.B, self.opline_weld.L / 2])
             member1_uDir = numpy.array([0.0, -1.0, 0.0])
             member1_wDir = numpy.array([1.0, 0.0, 0.0])
             self.member1.place(member1OriginL, member1_uDir, member1_wDir)
@@ -331,7 +390,7 @@ class TensionChannelWeldCAD(TensionAngleWeldCAD):
             self.member1_Model = self.member1.create_model()
 
         elif self.Obj.sec_profile == 'Back to Back Channels':
-            member1OriginL = numpy.array([-self.plate_intercept, -self.member.B, self.member.D / 2])
+            member1OriginL = numpy.array([-self.plate_intercept, -self.member.B, self.opline_weld.L / 2])
             member1_uDir = numpy.array([0.0, -1.0, 0.0])
             member1_wDir = numpy.array([1.0, 0.0, 0.0])
             self.member1.place(member1OriginL, member1_uDir, member1_wDir)
@@ -339,143 +398,13 @@ class TensionChannelWeldCAD(TensionAngleWeldCAD):
             self.member1_Model = self.member1.create_model()
 
             member2OriginL = numpy.array(
-                [self.member.L - self.plate_intercept, self.plate.T + self.member.B, self.member.D / 2])
+                [self.member.L - self.plate_intercept, self.plate.T + self.member.B, self.opline_weld.L / 2])
             member2_uDir = numpy.array([0.0, 1.0, 0.0])
             member2_wDir = numpy.array([-1.0, 0.0, 0.0])
             self.member2.place(member2OriginL, member2_uDir, member2_wDir)
 
             self.member2_Model = self.member2.create_model()
 
-    def createWeldGeometry(self):
-
-        if self.Obj.sec_profile == 'Channels':
-            weldHL11OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.D / 2])
-            weldHL11_uDir = numpy.array([0.0, 0.0, 1.0])
-            weldHL11_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.weldHL11.place(weldHL11OriginL, weldHL11_uDir, weldHL11_wDir)
-
-            self.weldHL11_Model = self.weldHL11.create_model()
-
-            weldHL12OriginL = numpy.array([0.0, 0.0, -self.member.D / 2])
-            weldHL12_uDir = numpy.array([0.0, 0.0, -1.0])
-            weldHL12_wDir = numpy.array([-1.0, 0.0, 0.0])
-            self.weldHL12.place(weldHL12OriginL, weldHL12_uDir, weldHL12_wDir)
-
-            self.weldHL12_Model = self.weldHL12.create_model()
-
-            weldHR11OriginL = numpy.array([-2 * self.plate_intercept + self.member.L, 0.0, self.member.D / 2])
-            weldHR11_uDir = numpy.array([0.0, 0.0, 1.0])
-            weldHR11_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.weldHR11.place(weldHR11OriginL, weldHR11_uDir, weldHR11_wDir)
-
-            self.weldHR11_Model = self.weldHR11.create_model()
-
-            weldHR12OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, -self.member.D / 2])
-            weldHR12_uDir = numpy.array([0.0, 0.0, -1.0])
-            weldHR12_wDir = numpy.array([-1.0, 0.0, 0.0])
-            self.weldHR12.place(weldHR12OriginL, weldHR12_uDir, weldHR12_wDir)
-
-            self.weldHR12_Model = self.weldHR12.create_model()
-
-            weldVL11OriginL = numpy.array([-self.plate_intercept, 0.0, -self.member.D / 2])
-            weldVL11_uDir = numpy.array([-1.0, 0.0, 0.0])
-            weldVL11_wDir = numpy.array([0.0, 0.0, 1.0])
-            self.weldVL11.place(weldVL11OriginL, weldVL11_uDir, weldVL11_wDir)
-
-            self.weldVL11_Model = self.weldVL11.create_model()
-
-            weldVR11OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.member.D / 2])
-            weldVR11_uDir = numpy.array([1.0, 0.0, 0.0])
-            weldVR11_wDir = numpy.array([0.0, 0.0, -1.0])
-            self.weldVR11.place(weldVR11OriginL, weldVR11_uDir, weldVR11_wDir)
-
-            self.weldVR11_Model = self.weldVR11.create_model()
-
-        elif self.Obj.sec_profile == 'Back to Back Channels':
-
-            weldHL11OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.D / 2])
-            weldHL11_uDir = numpy.array([0.0, 0.0, 1.0])
-            weldHL11_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.weldHL11.place(weldHL11OriginL, weldHL11_uDir, weldHL11_wDir)
-
-            self.weldHL11_Model = self.weldHL11.create_model()
-
-            weldHL12OriginL = numpy.array([0.0, 0.0, -self.member.D / 2])
-            weldHL12_uDir = numpy.array([0.0, 0.0, -1.0])
-            weldHL12_wDir = numpy.array([-1.0, 0.0, 0.0])
-            self.weldHL12.place(weldHL12OriginL, weldHL12_uDir, weldHL12_wDir)
-
-            self.weldHL12_Model = self.weldHL12.create_model()
-
-            weldHR11OriginL = numpy.array([-2 * self.plate_intercept + self.member.L, 0.0, self.member.D / 2])
-            weldHR11_uDir = numpy.array([0.0, 0.0, 1.0])
-            weldHR11_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.weldHR11.place(weldHR11OriginL, weldHR11_uDir, weldHR11_wDir)
-
-            self.weldHR11_Model = self.weldHR11.create_model()
-
-            weldHR12OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, -self.member.D / 2])
-            weldHR12_uDir = numpy.array([0.0, 0.0, -1.0])
-            weldHR12_wDir = numpy.array([-1.0, 0.0, 0.0])
-            self.weldHR12.place(weldHR12OriginL, weldHR12_uDir, weldHR12_wDir)
-
-            self.weldHR12_Model = self.weldHR12.create_model()
-
-            weldVL11OriginL = numpy.array([-self.plate_intercept, 0.0, -self.member.D / 2])
-            weldVL11_uDir = numpy.array([-1.0, 0.0, 0.0])
-            weldVL11_wDir = numpy.array([0.0, 0.0, 1.0])
-            self.weldVL11.place(weldVL11OriginL, weldVL11_uDir, weldVL11_wDir)
-
-            self.weldVL11_Model = self.weldVL11.create_model()
-
-            weldVR11OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.member.D / 2])
-            weldVR11_uDir = numpy.array([1.0, 0.0, 0.0])
-            weldVR11_wDir = numpy.array([0.0, 0.0, -1.0])
-            self.weldVR11.place(weldVR11OriginL, weldVR11_uDir, weldVR11_wDir)
-
-            self.weldVR11_Model = self.weldVR11.create_model()
-
-            weldHL21OriginL = numpy.array([0.0, self.plate.T, self.member.D / 2])
-            weldHL21_uDir = numpy.array([0.0, 0.0, 1.0])
-            weldHL21_wDir = numpy.array([-1.0, 0.0, 0.0])
-            self.weldHL21.place(weldHL21OriginL, weldHL21_uDir, weldHL21_wDir)
-
-            self.weldHL21_Model = self.weldHL21.create_model()
-
-            weldHL22OriginL = numpy.array([- self.plate_intercept, self.plate.T, -self.member.D / 2])
-            weldHL22_uDir = numpy.array([0.0, 0.0, -1.0])
-            weldHL22_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.weldHL22.place(weldHL22OriginL, weldHL22_uDir, weldHL22_wDir)
-
-            self.weldHL22_Model = self.weldHL22.create_model()
-
-            weldHR21OriginL = numpy.array([- self.plate_intercept + self.member.L, self.plate.T, self.member.D / 2])
-            weldHR21_uDir = numpy.array([0.0, 0.0, 1.0])
-            weldHR21_wDir = numpy.array([-1.0, 0.0, 0.0])
-            self.weldHR21.place(weldHR21OriginL, weldHR21_uDir, weldHR21_wDir)
-
-            self.weldHR21_Model = self.weldHR21.create_model()
-
-            weldHR22OriginL = numpy.array([-2 * self.plate_intercept + self.member.L, self.plate.T, -self.member.D / 2])
-            weldHR22_uDir = numpy.array([0.0, 0.0, -1.0])
-            weldHR22_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.weldHR22.place(weldHR22OriginL, weldHR22_uDir, weldHR22_wDir)
-
-            self.weldHR22_Model = self.weldHR22.create_model()
-
-            weldVL21OriginL = numpy.array([-self.plate_intercept, self.plate.T, self.member.D / 2])
-            weldVL21_uDir = numpy.array([-1.0, 0.0, 0.0])
-            weldVL21_wDir = numpy.array([0.0, 0.0, -1.0])
-            self.weldVL21.place(weldVL21OriginL, weldVL21_uDir, weldVL21_wDir)
-
-            self.weldVL21_Model = self.weldVL21.create_model()
-
-            weldVR21OriginL = numpy.array([-self.plate_intercept + self.member.L, self.plate.T, -self.member.D / 2])
-            weldVR21_uDir = numpy.array([1.0, 0.0, 0.0])
-            weldVR21_wDir = numpy.array([0.0, 0.0, 1.0])
-            self.weldVR21.place(weldVR21OriginL, weldVR21_uDir, weldVR21_wDir)
-
-            self.weldVR21_Model = self.weldVR21.create_model()
 
     def get_members_models(self):
 
@@ -507,8 +436,8 @@ if __name__ == '__main__':
 
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    member_data = 'Star Angles'  # 'Back to Back Angles'  #'Angles'  #'Channels'  #'Back to Back Channels'  #     or 'Angles' 'Channels' or
-
+    member_data = 'Star Angles'  # 'Back to Back Angles' #'Angles' #''Back to Back Channels'#'Channels' #  #
+    loc = 'Long Leg'  # 'Short Leg'#
     weld_size = 6
     s = max(15, weld_size)
 
@@ -519,17 +448,20 @@ if __name__ == '__main__':
         inline_weld = FilletWeld(b=weld_size, h=weld_size, L=plate_intercept)
         opline_weld = FilletWeld(b=weld_size, h=weld_size, L=member.D)
 
-        tensionCAD = TensionChannelWeldCAD(member, plate, inline_weld, opline_weld, member_data)
+        tensionCAD = TensionChannelWeldCAD(member_data, member, plate, inline_weld, opline_weld)
 
 
     else:
-        member = Angle(L=2000.0, A=75.0, B=75.0, T=5.0, R1=0.0, R2=0.0)
+        member = Angle(L=2000.0, A=70.0, B=20.0, T=5.0, R1=0.0, R2=0.0)
         plate = GassetPlate(L=540 + 50, H=255, T=5, degree=30)
         plate_intercept = plate.L - s - 50
         inline_weld = FilletWeld(b=weld_size, h=weld_size, L=plate_intercept)
-        opline_weld = FilletWeld(b=weld_size, h=weld_size, L=member.B)
+        if loc == 'Long Leg':
+            opline_weld = FilletWeld(b=weld_size, h=weld_size, L=member.A)
+        else:
+            opline_weld = FilletWeld(b=weld_size, h=weld_size, L=member.B)
 
-        tensionCAD = TensionAngleWeldCAD(member, plate, inline_weld, opline_weld, member_data)
+        tensionCAD = TensionAngleWeldCAD(member_data, member, plate, inline_weld, opline_weld)
 
     tensionCAD.create_3DModel()
     plate = tensionCAD.get_plates_models()

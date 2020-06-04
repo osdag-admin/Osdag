@@ -10,8 +10,11 @@ Included standards,
 
 Started on 15 - Nov - 2018
 
-@author: ajmalbabums, Danish Ansari
+@author: ajmalbabums, Danish Ansari, Sourabh Das
 """
+PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
+
+import sqlite3
 import math
 
 
@@ -124,16 +127,19 @@ class IS1367_Part3_2002(object):
     Bolts, screws and studs
     """
 
-    # Bolt grades available as per Table 1 of IS 1367(Part-3) :2002 (list)
-    bolt_grades = [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]
+    @staticmethod
+    def get_bolt_PC():
+        # Bolt grades available as per Table 1 of IS 1367(Part-3) :2002 (list)
+        bolt_grades = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+        return bolt_grades
 
     # Calculate bolt nominal tensile strength depending upon grade of bolt
     @staticmethod
-    def get_bolt_fu_fy(bolt_grade):
+    def get_bolt_fu_fy(bolt_PC, bolt_diameter):
         """Calculate nominal tensile strength and yield strength of bolt
 
         Args:
-            bolt_grade: Grade of bolt (property class as per the designation)  (float)
+            bolt_PC: Property Class of bolt (property class as per the designation)  (float)
 
         Return:
              Nominal tensile strength of bolt in MPa and Yield strength in MPa (list)
@@ -144,11 +150,25 @@ class IS1367_Part3_2002(object):
 
         """
         try:
-            bolt_grade = float(bolt_grade)
+            bolt_PC = float(bolt_PC)
+            bolt_diameter = int(bolt_diameter)
         except ValueError:
             return
-        bolt_fu = float(int(bolt_grade) * 100)
-        bolt_fy = float((bolt_grade - int(bolt_grade)) * bolt_fu)
+
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        db_query = "SELECT * FROM Bolt_fy_fu WHERE Property_Class = ? AND Diameter_min <= ? AND Diameter_max > ?"
+        cur = conn.cursor()
+        cur.execute(db_query, (bolt_PC, bolt_diameter, bolt_diameter,))
+        row = cur.fetchone()
+
+        bolt_fy = float(row[3])
+        bolt_fu = float(row[4])
+
+        print(bolt_fu, bolt_fy)
+        # print(type(bolt_fu))
+
+        # bolt_fu = float(int(bolt_grade) * 100)
+        # bolt_fy = float((bolt_grade - int(bolt_grade)) * bolt_fu)
         return [bolt_fu, bolt_fy]
 
     # Returns bolt shank area and nominal stress area depending upon diameter of bolt

@@ -452,7 +452,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t19 = (KEY_GRD_FOOTING, KEY_DISP_GRD_FOOTING, TYPE_COMBOBOX, VALUES_GRD_FOOTING, True, 'No Validator')
         options_list.append(t19)
 
-        t20 = (None, DISP_TITLE_WELD, TYPE_TITLE, True, 'No Validator')
+        t20 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t20)
 
         t21 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, VALUES_WELD_TYPE, True, 'No Validator')
@@ -858,6 +858,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             return False
 
+    def secsize_for_hollow(self):
+        if self[0] == 'Hollow/Tubular Column Base':
+            secsize = []
+            secsize.extend(connectdb("RHS"))
+            secsize.extend(connectdb("SHS", call_type="popup"))
+            return secsize
+        else:
+            return connectdb("Columns")
+
     def input_value_changed(self):
 
         lst = []
@@ -947,6 +956,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t19 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT, TYPE_OUT_LABEL, self.out_anchor_tension)
         lst.append(t19)
+
+        t20 = ([KEY_CONN], KEY_SECSIZE, TYPE_COMBOBOX, self.secsize_for_hollow)
+        lst.append(t20)
         return lst
 
     @staticmethod

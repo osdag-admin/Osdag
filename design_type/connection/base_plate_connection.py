@@ -36,12 +36,12 @@ from Common import *
 from utils.common.load import Load
 from utils.common.other_standards import *
 from design_report.reportGenerator import save_html
-from cad.common_logic import CommonDesignLogic
+# from cad.common_logic import CommonDesignLogic
 
 import logging
 
 
-class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Part3_2002, Column, CommonDesignLogic):
+class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Part3_2002, Column):
     """
     Perform stress analyses --> design base plate and anchor bolt--> provide connection detailing.
 

@@ -705,6 +705,7 @@ class Ui_ModuleWindow(QMainWindow):
         out_scroll = QScrollArea(out_widget)
         out_layout1.addWidget(out_scroll)
         out_scroll.setWidgetResizable(True)
+        out_scroll.horizontalScrollBar().hide()
         out_scrollcontent = QtWidgets.QWidget(out_scroll)
         out_layout2 = QtWidgets.QGridLayout(out_scrollcontent)
         out_scrollcontent.setLayout(out_layout2)
@@ -731,6 +732,7 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setBold(False)
                 font.setWeight(50)
                 l.setFont(font)
+                l.setFixedSize(l.size())
                 l.setObjectName(option[0] + "_label")
                 #l.setFixedSize(l.size())
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
@@ -743,6 +745,7 @@ class Ui_ModuleWindow(QMainWindow):
 
             if output_type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents_out)
+
                 #r.setGeometry(QtCore.QRect(100, 10 + i, 150, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
@@ -751,6 +754,7 @@ class Ui_ModuleWindow(QMainWindow):
                 r.setFont(font)
                 r.setObjectName(option[0])
                 r.setReadOnly(True)
+
                 #r.setFixedSize(r.size())
                 out_layout2.addWidget(r, j, 2, 1, 1)
                 r.setVisible(True if option[4] else False)
@@ -761,6 +765,7 @@ class Ui_ModuleWindow(QMainWindow):
             if output_type == TYPE_OUT_BUTTON:
                 v = option[3]
                 b = QtWidgets.QPushButton(self.dockWidgetContents_out)
+
                 #b.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
@@ -772,6 +777,7 @@ class Ui_ModuleWindow(QMainWindow):
                 b.resize(b.sizeHint().width(), b.sizeHint().height())
                 b.setText(v[0])
                 b.setDisabled(True)
+                b.setFixedSize(b.size())
                 button_list.append(option)
                 out_layout2.addWidget(b, j, 2, 1, 1)
                 maxi_width_right = max(maxi_width_right, b.sizeHint().width())
@@ -779,12 +785,14 @@ class Ui_ModuleWindow(QMainWindow):
 
             if output_type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
+
                 #q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
                 font = QtGui.QFont()
                 font.setPointSize(10)
                 font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")
+
                 #q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
@@ -1511,7 +1519,10 @@ class Ui_ModuleWindow(QMainWindow):
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
-
+                    if status:
+                        txt.setVisible(True if option[3] else False)
+                        txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
+                        txt_label.setVisible(True if option[3] else False)
 
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)

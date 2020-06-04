@@ -1740,6 +1740,7 @@ class I_sectional_Properties(object):
     def calc_warping_const (self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
         return 0.0
 
+
 class Single_Angle_Properties(object):
 
     def calc_Mass(self,a,b,t,l):
@@ -1749,89 +1750,89 @@ class Single_Angle_Properties(object):
 
     def calc_Area(self,a,b,t,l):
         self.A = t * (a+b-t)
-        return round(self.A,2)
+        return round(self.A/100,2)
 
     def calc_Cy(self,a,b,t,l):
         self.A = t * (a + b - t)
         self.Cy=((0.5 * (b*a**2))-(0.5*(b-t)*(a**2 - t**2)))/self.A
-        return round(self.Cy,2)
+        return round(self.Cy/10,2)
 
     def calc_Cz(self,a,b,t,l):
         self.A = t * (a + b - t)
         self.Cz = ((0.5 * (b**2) * a) - (0.5 * (b**2 - t**2) * (a - t))) / self.A
-        return round(self.Cz, 2)
+        return round(self.Cz/10, 2)
 
     def calc_MomentOfAreaZ(self,a,b,t,l):
         Cya = self.calc_Cy(a,b,t,l)
         self.I_zz = (a**3*b)/12 - ((b-t)*(a-t)**3)/12 + (a*b*(a/2-Cya)**2) - ((a-t)*(b-t)*((a+t)/2-Cya)**2)
-        return round(self.I_zz, 2)
+        return round(self.I_zz/10000, 2)
 
     def calc_MomentOfAreaY(self,a,b,t,l):
         Cza = self.calc_Cz(a, b, t,l)
         self.I_yy = (b ** 3 * a) / 12 - ((a - t) * (b - t) ** 3) / 12 + (a * b * (b / 2 - Cza) ** 2) - (
                     (a - t) * (b - t) * ((b + t) / 2 - Cza)**2)
-        return round(self.I_yy, 2)
+        return round(self.I_yy/10000, 2)
 
     def calc_MomentOfAreaYZ(self,a,b,t,l):
         Cza = self.calc_Cz(a, b, t,l)
         Cya = self.calc_Cy(a, b, t,l)
         self.I_yz = a*b*(a/2-Cya) * (b/2-Cza) - ((a-t)*(b-t)*(0.5*(a+t)-Cya)*(0.5*(b+t)-Cza))
         # self.I_yz = 1.000
-        return round(self.I_yz, 2)
+        return round(self.I_yz/10000, 2)
 
     def calc_MomentOfAreaU(self,a,b,t,l):
         I_zza = self.calc_MomentOfAreaZ(a, b, t,l)
         I_yya = self.calc_MomentOfAreaY( a, b, t,l)
         I_yza = self.calc_MomentOfAreaYZ( a, b, t,l)
         self.I_u = 0.5*(I_zza + I_yya) + math.sqrt(0.25 * (I_zza - I_yya)**2 + I_yza**2 )
-        return round(self.I_u, 2)
+        return round(self.I_u/10000, 2)
 
     def calc_MomentOfAreaV(self,a,b,t,l):
         I_zza = self.calc_MomentOfAreaZ(a, b, t,l)
         I_yya = self.calc_MomentOfAreaY(a, b, t,l)
         I_yza = self.calc_MomentOfAreaYZ(a, b, t,l)
         self.I_v = 0.5*(I_zza + I_yya) - math.sqrt(0.25 * (I_zza - I_yya) ** 2 + I_yza ** 2)
-        return round(self.I_v, 2)
+        return round(self.I_v/10000, 2)
 
     def calc_RogZ(self,a,b,t,l):
         I_zza = self.calc_MomentOfAreaZ(a, b, t,l)
         Aa = self.calc_Area(a, b, t,l)
         self.r_z = math.sqrt(I_zza/Aa)
 
-        return round(self.r_z, 2)
+        return round(self.r_z/10, 2)
 
     def calc_RogY(self,a,b,t,l):
         I_yya = self.calc_MomentOfAreaY(a, b, t,l)
         Aa = self.calc_Area( a, b, t,l)
         self.r_y = math.sqrt(I_yya / Aa)
 
-        return round(self.r_y, 2)
+        return round(self.r_y/10, 2)
 
     def calc_RogU(self,a,b,t,l):
         I_ua = self.calc_MomentOfAreaU(a, b, t,l)
         Aa = self.calc_Area(a, b, t,l)
         self.r_u = math.sqrt(I_ua / Aa)
 
-        return round(self.r_u, 2)
+        return round(self.r_u/10, 2)
 
     def calc_RogV(self,a,b,t,l):
         I_va = self.calc_MomentOfAreaV(a, b, t,l)
         Aa = self.calc_Area(a, b, t,l)
         self.r_v = math.sqrt(I_va/ Aa)
 
-        return round(self.r_v, 2)
+        return round(self.r_v/10, 2)
 
     def calc_ElasticModulusZz(self,a,b,t,l):
         I_zza = self.calc_MomentOfAreaZ(a, b, t,l)
         Cya = self.calc_Cy(a, b, t,l)
         self.Z_zz = I_zza/(a-Cya)
-        return round(self.Z_zz, 2)
+        return round(self.Z_zz/1000, 2)
 
     def calc_ElasticModulusZy(self,a,b,t,l):
         I_yya = self.calc_MomentOfAreaY(a, b, t,l)
         Cza = self.calc_Cz(a, b, t,l)
         self.Z_yy = I_yya / (b - Cza)
-        return round(self.Z_yy, 2)
+        return round(self.Z_yy/1000, 2)
 
     def calc_PlasticModulusZpz(self,a,b,t,l):
         Aa = self.calc_Area(a, b, t,l)
@@ -1839,7 +1840,7 @@ class Single_Angle_Properties(object):
         # self.Z_pz = t * (b-t) * (a- 0.5* Aa/t-0.5*t)
 
         # self.Z_pz = 1.000
-        return round(self.Z_pz, 2)
+        return round(self.Z_pz/1000, 2)
 
     def calc_PlasticModulusZpy(self,a,b,t,l):
         Aa = self.calc_Area(a, b, t,l)
@@ -1847,12 +1848,12 @@ class Single_Angle_Properties(object):
         # self.Z_py = t * (a - t) * (b - 0.5 * Aa / t - 0.5 * t)
 
         # self.Z_py = 1.000
-        return round(self.Z_py, 2)
+        return round(self.Z_py/1000, 2)
 
     def calc_TorsionConstantIt(self,a,b,t,l):
 
         self.I_t = ((b*(t**3))/3) + ((a-t)*(t**3)/3)
-        return round(self.I_t, 2)
+        return round(self.I_t/10000, 2)
 
 class BBAngle_Properties(object):
 
@@ -2089,31 +2090,31 @@ class Single_Channel_Properties(object):
 
     def calc_Area(self,f_w,f_t,w_h,w_t):
         self.A = f_w * w_h - (w_h - 2 * f_t) * (f_w - w_t)
-        return round(self.A,2)
+        return round(self.A/100,2)
 
     def calc_C_y(self,f_w,f_t,w_h,w_t):
         Ac = self.calc_Area(f_w, f_t, w_h, w_t)
         # self.Cy = ((f_w * (w_h**2)/2) - ((f_w - w_t)**2 * (w_h - (2 * f_t))/2))/Ac
         self.Cy = ((w_h * (f_w ** 2) / 2) - (f_w - w_t) * (w_h - (2 * f_t)) * (w_t+(f_w-w_t)/2))/ Ac
-        return round(self.Cy,2)
+        return round(self.Cy/10,2)
 
     def calc_MomentOfAreaZ(self,f_w,f_t,w_h,w_t):
         self.I_zz = (f_w * w_h**3)/12 - ((f_w -w_t)*(w_h - 2 * f_t)**3)/12
         print(self.I_zz,"duvbdf")
-        return round(self.I_zz,2)
+        return round(self.I_zz/10000,2)
 
     def calc_MomentOfAreaY(self,f_w,f_t,w_h,w_t):
         Cyc = self.calc_C_y(f_w,f_t,w_h,w_t)
         # self.I_yy = (w_h * (f_w**3)/12) + (f_w * w_h * (Cyc - (f_w/2))**2) - (((w_h - (2 * f_t)) * ((f_w - w_t)**3)/12) - ((w_h - (2 * f_t)) * (f_w - w_t) * (Cyc - ((f_w+w_t)/2))**2))
         self.I_yy = ((w_h * f_w ** 3) / 12) + w_h * f_w * (Cyc - (f_w / 2))** 2 - (((w_h - 2 * f_t) * (f_w - w_t)**3) / 12) - (
                     w_h - 2 * f_t) * (f_w - w_t) * (Cyc - ((f_w + w_t) / 2))** 2
-        return round(self.I_yy, 2)
+        return round(self.I_yy/10000, 2)
 
     def calc_RogZ(self,f_w,f_t,w_h,w_t):
         Ac = self.calc_Area(f_w, f_t, w_h, w_t)
         I_zzc = self.calc_MomentOfAreaZ(f_w,f_t,w_h,w_t)
         self.R_zz = math.sqrt(I_zzc/Ac)
-        return round(self.R_zz, 2)
+        return round(self.R_zz/10, 2)
 
     def calc_RogY(self,f_w,f_t,w_h,w_t):
         Ac = self.calc_Area(f_w, f_t, w_h, w_t)
@@ -2121,28 +2122,28 @@ class Single_Channel_Properties(object):
         I_yyc = self.calc_MomentOfAreaY(f_w, f_t, w_h, w_t)
         print(I_yyc,"djgbdf")
         self.R_yy = math.sqrt(I_yyc/Ac)
-        return round(self.R_yy, 2)
+        return round(self.R_yy/10, 2)
 
     def calc_ElasticModulusZz(self,f_w,f_t,w_h,w_t):
         I_zzc = self.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t)
         self.Z_zz = I_zzc/(0.5 * w_h)
-        return round(self.Z_zz, 2)
+        return round(self.Z_zz/1000, 2)
 
     def calc_ElasticModulusZy(self,f_w,f_t,w_h,w_t):
         Cyc = self.calc_C_y(f_w, f_t, w_h, w_t)
         I_yyc = self.calc_MomentOfAreaY(f_w, f_t, w_h, w_t)
         self.Z_yy = I_yyc / (f_w - Cyc)
-        return round(self.Z_yy, 2)
+        return round(self.Z_yy/1000, 2)
 
     def calc_PlasticModulusZpz(self,f_w,f_t,w_h,w_t):
         self.Z_pz = f_w * (w_h**2)/4  - (f_w - w_t) * ((w_h - 2 * f_t)**2)/4
-        return round(self.Z_pz, 2)
+        return round(self.Z_pz/1000, 2)
 
     def calc_PlasticModulusZpy(self,f_w,f_t,w_h,w_t):
 
         Ac = self.calc_Area(f_w, f_t, w_h, w_t)
-        self.Z_pz = f_t * (Ac/4 * f_t)**2 + f_t * (f_w - w_t -(Ac/4*f_t))**2 + w_h * w_t * (f_w - 0.5 * w_t - Ac/4 * f_t)**2
-        return round(self.Z_pz, 2)
+        self.Z_py = f_t * (Ac/4 * f_t)**2 + f_t * (f_w - w_t -(Ac/4*f_t))**2 + w_h * w_t * (f_w - 0.5 * w_t - Ac/4 * f_t)**2
+        return round(self.Z_py/1000, 2)
 
     def calc_torsion_const_It(self,f_w,f_t,w_h,w_t):
         a = 0.0

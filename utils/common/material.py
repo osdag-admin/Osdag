@@ -14,15 +14,15 @@ class Material(object):
         self.fy_40 = 0.0
         self.fu = 0.0
         self.fy = 0.0
-        if material_grade not in ["Select Material", "Custom"] and "Custom" not in material_grade:
-            self.connect_to_database_to_get_fy_fu(grade=material_grade, thickness=thickness)
-            self.material=material_grade
-        if material_grade.split(" ")[0] == "Custom":
-            material = material_grade.split(" ")
-            if len(material) == 3:
-                self.material = material[0]
-                self.fu = float(material[1])
-                self.fy = float(material[2])
+        # if material_grade not in ["Select Material", "Custom"] and "Custom" not in material_grade:
+        self.connect_to_database_to_get_fy_fu(grade=material_grade, thickness=thickness)
+        self.material=material_grade
+        # if material_grade.split(" ")[0] == "Custom":
+        #     material = material_grade.split(" ")
+        #     if len(material) == 3:
+        #         self.material = material[0]
+        #         self.fu = float(material[1])
+        #         self.fy = float(material[2])
 
     def __repr__(self):
         repr = "Material:\n"

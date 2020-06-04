@@ -409,12 +409,12 @@ class FinPlateConnection(ShearConnection):
     ####################################
     def set_input_values(self, design_dictionary):
 
-        if design_dictionary[KEY_SUPTNGSEC_MATERIAL] == "Custom":
-            design_dictionary[KEY_SUPTNGSEC_MATERIAL] = "Custom" + " " + str(design_dictionary[KEY_SUPTNGSEC_FU]) + " " \
-                                                        + str(design_dictionary[KEY_SUPTNGSEC_FY])
-        if design_dictionary[KEY_SUPTDSEC_MATERIAL] == "Custom":
-            design_dictionary[KEY_SUPTDSEC_MATERIAL] = "Custom" + " " + str(design_dictionary[KEY_SUPTDSEC_FU]) + " " \
-                                                        + str(design_dictionary[KEY_SUPTDSEC_FY])
+        # if design_dictionary[KEY_SUPTNGSEC_MATERIAL] == "Custom":
+        #     design_dictionary[KEY_SUPTNGSEC_MATERIAL] = "Custom" + " " + str(design_dictionary[KEY_SUPTNGSEC_FU]) + " " \
+        #                                                 + str(design_dictionary[KEY_SUPTNGSEC_FY])
+        # if design_dictionary[KEY_SUPTDSEC_MATERIAL] == "Custom":
+        #     design_dictionary[KEY_SUPTDSEC_MATERIAL] = "Custom" + " " + str(design_dictionary[KEY_SUPTDSEC_FU]) + " " \
+        #                                                 + str(design_dictionary[KEY_SUPTDSEC_FY])
 
         super(FinPlateConnection,self).set_input_values(self, design_dictionary)
 
@@ -1179,7 +1179,9 @@ class FinPlateConnection(ShearConnection):
             t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.min_plate_height), self.plate.height,
                   get_pass_fail(self.min_plate_height, self.plate.height,relation="lesser"))
             self.report_check.append(t1)
-            t1 = (DISP_MAX_PLATE_HEIGHT, max_plate_ht_req(self.connectivity,self.supported_section.depth,
+            pl_ht = 'Maximum~plate~height~(h_{plate})'
+            plate_ht_clause = '[cl.10.2.3]'
+            t1 = (disp_clause(pl_ht,plate_ht_clause), max_plate_ht_req(self.connectivity,self.supported_section.depth,
                                                           self.supported_section.flange_thickness,
                                                           self.supported_section.root_radius, self.supported_section.notch_ht,
                                                           self.max_plate_height), self.plate.height,

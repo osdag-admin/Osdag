@@ -280,7 +280,13 @@ class MomentConnection(Connection, IS800_2007):
 
 
     def input_value_changed(self):
-        pass
+
+        lst = []
+
+        t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t8)
+
+        return lst
 
     def web_force(column_d, column_f_t, column_t_w, factored_axial_force, column_area):
         pass

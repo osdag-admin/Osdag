@@ -402,8 +402,12 @@ class Main():
             f_t = float(self[1])
             w_h = float(self[2])
             w_t = float(self[3])
-
-            sec_prop = Single_Channel_Properties()
+            l = self[4]
+            section_profile = self[5]
+            if section_profile == "Channels":
+                sec_prop = Single_Channel_Properties()
+            else:
+                sec_prop = BBChannel_Properties()
             mass = sec_prop.calc_Mass(f_w, f_t, w_h, w_t)
             area = sec_prop.calc_Area(f_w, f_t, w_h, w_t)
             C_y = sec_prop.calc_C_y(f_w, f_t, w_h, w_t)

@@ -286,14 +286,16 @@ class Member(Main):
                 input_dictionary[KEY_SEC_PROFILE] not in ['Channels', 'Back to Back Channels']:
             designation = ''
             material_grade = ''
+            section_profile = ''
+            l = ''
             fu = ''
             fy = ''
             mass = ''
             area = ''
-            flange_width = ''
-            flange_thickness = ''
-            depth = ''
-            web_thickness = ''
+            f_w = ''
+            f_t = ''
+            w_h = ''
+            w_t = ''
             flange_slope = ''
             root_radius = ''
             toe_radius = ''
@@ -315,15 +317,17 @@ class Member(Main):
         else:
             designation = str(input_dictionary[KEY_SECSIZE][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
+            section_profile = str(input_dictionary[KEY_SEC_PROFILE])
+            l = str(input_dictionary[KEY_LOCATION])
             Channel_attributes = Channel(designation,material_grade)
             Channel_attributes.connect_to_database_update_other_attributes_channels(designation, material_grade)
             source = str(Channel_attributes.source)
             fu = str(Channel_attributes.fu)
             fy = str(Channel_attributes.fy)
-            flange_width = str(Channel_attributes.flange_width)
-            flange_thickness = str(Channel_attributes.flange_thickness)
-            depth = str(Channel_attributes.depth)
-            web_thickness = str(Channel_attributes.web_thickness)
+            f_w = (Channel_attributes.flange_width)
+            f_t = (Channel_attributes.flange_thickness)
+            w_h = (Channel_attributes.depth)
+            w_t = (Channel_attributes.web_thickness)
             flange_slope = str(Channel_attributes.flange_slope)
             root_radius = str(Channel_attributes.root_radius)
             toe_radius = str(Channel_attributes.toe_radius)
@@ -331,18 +335,33 @@ class Member(Main):
             m_o_r = "76.9"
             p_r = "0.3"
             t_e = "12"
-            mass = str(Channel_attributes.mass)
-            area = str(Channel_attributes.area)
-            C_y = str(round(Channel_attributes.Cy/10,2))
-            mom_inertia_z = str(round(Channel_attributes.mom_inertia_z/10000,2))
-            mom_inertia_y = str(round(Channel_attributes.mom_inertia_y/10000,2))
-            rad_of_gy_z = str(round(Channel_attributes.rad_of_gy_z/10,2))
-            rad_of_gy_y = str(round(Channel_attributes.rad_of_gy_y/10,2))
-            elast_sec_mod_z = str(round(Channel_attributes.elast_sec_mod_z/1000,2))
-            elast_sec_mod_y = str(round(Channel_attributes.elast_sec_mod_y/1000,2))
-            plast_sec_mod_z = str(round(Channel_attributes.plast_sec_mod_z/1000,2))
-            plast_sec_mod_y = str(round(Channel_attributes.plast_sec_mod_y/1000,2))
-            Type = str(Channel_attributes.type)
+            if section_profile == "Channels":
+                mass = str(Channel_attributes.mass)
+                area = str(Channel_attributes.area)
+                C_y = str(Channel_attributes.Cy)
+                mom_inertia_z = str(Channel_attributes.mom_inertia_z)
+                mom_inertia_y = str(Channel_attributes.mom_inertia_y)
+                rad_of_gy_z = str(Channel_attributes.rad_of_gy_z)
+                rad_of_gy_y = str(Channel_attributes.rad_of_gy_y)
+                elast_sec_mod_z = str(Channel_attributes.elast_sec_mod_z)
+                elast_sec_mod_y = str(Channel_attributes.elast_sec_mod_y)
+                plast_sec_mod_z = str(Channel_attributes.plast_sec_mod_z)
+                plast_sec_mod_y = str(Channel_attributes.plast_sec_mod_y)
+                Type = str(Channel_attributes.type)
+            else:
+                Channel_attributes = BBChannel_Properties()
+                mass = str(Channel_attributes.calc_Mass(f_w, f_t, w_h, w_t))
+                area = str(Channel_attributes.calc_Area(f_w, f_t, w_h, w_t))
+                C_y = str(Channel_attributes.calc_C_y(f_w, f_t, w_h, w_t))
+                mom_inertia_z = str(Channel_attributes.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t))
+                mom_inertia_y = str(Channel_attributes.calc_MomentOfAreaY(f_w, f_t, w_h, w_t))
+                rad_of_gy_z = str(Channel_attributes.calc_RogZ(f_w, f_t, w_h, w_t))
+                rad_of_gy_y = str(Channel_attributes.calc_RogY(f_w, f_t, w_h, w_t))
+                elast_sec_mod_z = str(Channel_attributes.calc_ElasticModulusZz(f_w, f_t, w_h, w_t))
+                elast_sec_mod_y = str(Channel_attributes.calc_ElasticModulusZy(f_w, f_t, w_h, w_t))
+                plast_sec_mod_z = str(Channel_attributes.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t))
+                plast_sec_mod_y = str(Channel_attributes.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t))
+
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -363,6 +382,12 @@ class Member(Main):
         t1 = (KEY_SECSIZE_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
         section.append(t1)
 
+        t1 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_TEXTBOX, None, section_profile)
+        section.append(t1)
+
+        t1 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_TEXTBOX, None, l)
+        section.append(t1)
+
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
@@ -379,16 +404,16 @@ class Member(Main):
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         section.append(t5)
 
-        t6 = ('Label_1', KEY_DISP_FLANGE_W, TYPE_TEXTBOX, None, flange_width)
+        t6 = ('Label_1', KEY_DISP_FLANGE_W, TYPE_TEXTBOX, None, f_w)
         section.append(t6)
 
-        t7 = ('Label_2', KEY_DISP_FLANGE_T, TYPE_TEXTBOX, None, flange_thickness)
+        t7 = ('Label_2', KEY_DISP_FLANGE_T, TYPE_TEXTBOX, None, f_t)
         section.append(t7)
 
-        t8 = ('Label_3', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, depth)
+        t8 = ('Label_3', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, w_h)
         section.append(t8)
 
-        t22 = ('Label_13', KEY_DISP_WEB_T, TYPE_TEXTBOX, None, web_thickness)
+        t22 = ('Label_13', KEY_DISP_WEB_T, TYPE_TEXTBOX, None, w_t)
         section.append(t22)
 
         t23 = ('Label_14', KEY_DISP_FLANGE_S, TYPE_TEXTBOX, None, flange_slope)
@@ -586,6 +611,8 @@ class Member(Main):
     def get_new_channel_section_properties(self):
         designation = self[0]
         material_grade = self[1]
+        l = self[2]
+        section_profile = self[3]
         Channel_attributes = Channel(designation, material_grade)
         Channel_attributes.connect_to_database_update_other_attributes_channels(designation, material_grade)
 
@@ -593,10 +620,10 @@ class Member(Main):
         Type = str(Channel_attributes.type)
         fu = str(Channel_attributes.fu)
         fy = str(Channel_attributes.fy)
-        flange_width = str(Channel_attributes.flange_width)
-        flange_thickness = str(Channel_attributes.flange_thickness)
-        depth = str(Channel_attributes.depth)
-        web_thickness = str(Channel_attributes.web_thickness)
+        f_w = (Channel_attributes.flange_width)
+        f_t = (Channel_attributes.flange_thickness)
+        w_h = (Channel_attributes.depth)
+        w_t = (Channel_attributes.web_thickness)
         flange_slope = str(Channel_attributes.flange_slope)
         root_radius = str(Channel_attributes.root_radius)
         toe_radius = str(Channel_attributes.toe_radius)
@@ -604,27 +631,42 @@ class Member(Main):
         m_o_r = "76.9"
         p_r = "0.3"
         t_e = "12"
-        mass = str(Channel_attributes.mass)
-        area = str(Channel_attributes.area)
-        C_y = str(round(Channel_attributes.Cy / 10, 2))
-        mom_inertia_z = str(round(Channel_attributes.mom_inertia_z / 10000, 2))
-        mom_inertia_y = str(round(Channel_attributes.mom_inertia_y / 10000, 2))
-        rad_of_gy_z = str(round(Channel_attributes.rad_of_gy_z / 10, 2))
-        rad_of_gy_y = str(round(Channel_attributes.rad_of_gy_y / 10, 2))
-        elast_sec_mod_z = str(round(Channel_attributes.elast_sec_mod_z / 1000, 2))
-        elast_sec_mod_y = str(round(Channel_attributes.elast_sec_mod_y / 1000, 2))
-        plast_sec_mod_z = str(round(Channel_attributes.plast_sec_mod_z / 1000, 2))
-        plast_sec_mod_y = str(round(Channel_attributes.plast_sec_mod_y / 1000, 2))
+        if section_profile == "Channels":
+            mass = str(Channel_attributes.mass)
+            area = str(Channel_attributes.area)
+            C_y = str(Channel_attributes.Cy)
+            mom_inertia_z = str(Channel_attributes.mom_inertia_z)
+            mom_inertia_y = str(Channel_attributes.mom_inertia_y )
+            rad_of_gy_z = str(Channel_attributes.rad_of_gy_z )
+            rad_of_gy_y = str(Channel_attributes.rad_of_gy_y)
+            elast_sec_mod_z = str(Channel_attributes.elast_sec_mod_z)
+            elast_sec_mod_y = str(Channel_attributes.elast_sec_mod_y)
+            plast_sec_mod_z = str(Channel_attributes.plast_sec_mod_z)
+            plast_sec_mod_y = str(Channel_attributes.plast_sec_mod_y)
+        else:
+            mass = str(2 * Channel_attributes.mass)
+            area = str(2 * Channel_attributes.area)
+            C_y = str(Channel_attributes.Cy)
+            mom_inertia_z = str(2 * Channel_attributes.mom_inertia_z)
+            Channel_attributes = BBChannel_Properties()
+            mom_inertia_y = str(Channel_attributes.calc_MomentOfAreaY(f_w, f_t, w_h, w_t))
+            rad_of_gy_z = str(Channel_attributes.calc_RogZ(f_w, f_t, w_h, w_t))
+            rad_of_gy_y = str(Channel_attributes.calc_RogY(f_w, f_t, w_h, w_t))
+            elast_sec_mod_z = str(Channel_attributes.calc_ElasticModulusZz(f_w, f_t, w_h, w_t))
+            elast_sec_mod_y = str(Channel_attributes.calc_ElasticModulusZy(f_w, f_t, w_h, w_t))
+            plast_sec_mod_z = str(Channel_attributes.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t))
+            plast_sec_mod_y = str(Channel_attributes.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t))
+
 
         d = {
             KEY_SECSIZE_SELECTED: designation,
             KEY_SEC_MATERIAL: material_grade,
             KEY_SEC_FY: fy,
             KEY_SEC_FU: fu,
-            'Label_1': str(flange_width),
-            'Label_2': str(flange_thickness),
-            'Label_3': str(depth),
-            'Label_13': str(web_thickness),
+            'Label_1': str(f_w),
+            'Label_2': str(f_t),
+            'Label_3': str(w_h),
+            'Label_13': str(w_t),
             'Label_14': str(flange_slope),
             'Label_5': str(toe_radius),
             'Label_6': str(Type),

@@ -58,11 +58,15 @@ from cad.Tension.nutBoltPlacement import NutBoltArray as TNutBoltArray
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.beam_cover_plate import BeamCoverPlate
-from design_type.connection.base_plate_connection import BasePlateConnection
+# from design_type.connection.base_plate_connection import BasePlateConnection
 from utilities import osdag_display_shape
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 import copy
 
+from cad.BBCad.nutBoltPlacement_AF import NutBoltArray_AF
+from cad.BBCad.nutBoltPlacement_BF import NutBoltArray_BF
+from cad.BBCad.nutBoltPlacement_Web import NutBoltArray_Web
+from cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 from Common import *
 
 # from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
@@ -291,20 +295,102 @@ class CommonDesignLogic(object):
 
         return boltLength[boltDia]
 
-    def nutThick_Calculation(self, boltDia):
+    @staticmethod
+    def nutThick_Calculation(boltDia):
         '''
-        Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
+        Returns the thickness of the hexagon nut (Grade A and B) depending upon the nut diameter as per IS1364-3(2002) - Table 1
+
+        Note: The nut thk for 72 diameter is not available in IS code, however an approximated value is assumed.
+              72 mm dia bolt is used in the base plate module.
         '''
+
         # nutDia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35,
         #           36: 30.65}
 
         '''
         Returns the thickness of the nut depending upon the nut diameter as per IS1364-3(2002)
         '''
-        nutDia = {5: 4.7, 6: 5.2, 8: 6.8, 10: 8.4, 12: 10.8, 14: 12.8, 16: 14.8, 18: 15.8, 20: 18, 22: 19.4, 24: 21.5, 27: 23.8, 30: 25.6,
-                  33: 28.7, 36: 31, 39: 33.4}
+
+        nutDia = {5: 4.7, 6: 5.2, 8: 6.8, 10: 8.4, 12: 10.8, 14: 12.8, 16: 14.8, 18: 15.8, 20: 18.0, 22: 19.4, 24: 21.5, 27: 23.8, 30: 25.6,
+                  33: 28.7, 36: 31, 39: 33.4, 42: 34.0, 48: 38.0, 56: 45.0, 64: 51.0, 72: 60.0}
 
         return nutDia[boltDia]
+
+    @staticmethod
+    def circular_washer_dimensions(bolt_dia):
+        """ Calculate the dimensions - diameter (inner and outer) and thickness for circular washer (Type A) confirming to IS 6649:1985.
+        The washers are used for high strength structural bolts and nuts.
+
+        Args:
+            bolt_dia: diameter of the bolt in mm (int)
+
+        Returns:
+            inner and outer diameter of the washer in mm (dictionary)
+            thickness of the washer in mm (dictionary)
+
+        Reference - Table 1, IS 6649:1985
+
+        Note: The IS code does not specify dimensions of washer for bolt sizes of M8, M10, M12, M16, M42, M48, M56, M64 and M72
+              The dimensions of these washers are thus calculated/approximated referring to those specified by the code
+        """
+        washer_dimensions = {
+            8: {'dia_in': 10, 'dia_out': 18, 'washer_thk': 4.6},
+            10: {'dia_in': 12, 'dia_out': 20, 'washer_thk': 4.6},
+            12: {'dia_in': 14, 'dia_out': 25, 'washer_thk': 4.6},
+            16: {'dia_in': 18, 'dia_out': 34, 'washer_thk': 4.6},
+            20: {'dia_in': 22, 'dia_out': 42, 'washer_thk': 4.6},
+            22: {'dia_in': 24, 'dia_out': 44, 'washer_thk': 4.6},
+            24: {'dia_in': 26, 'dia_out': 50, 'washer_thk': 4.6},
+            27: {'dia_in': 30, 'dia_out': 66, 'washer_thk': 4.6},
+            30: {'dia_in': 33, 'dia_out': 60, 'washer_thk': 4.6},
+            36: {'dia_in': 39, 'dia_out': 72, 'washer_thk': 4.6},
+            42: {'dia_in': 45, 'dia_out': 85, 'washer_thk': 6.0},
+            48: {'dia_in': 51, 'dia_out': 100, 'washer_thk': 6.0},
+            56: {'dia_in': 59, 'dia_out': 115, 'washer_thk': 6.0},
+            64: {'dia_in': 67, 'dia_out': 130, 'washer_thk': 6.0},
+            72: {'dia_in': 75, 'dia_out': 145, 'washer_thk': 6.0},
+        }[bolt_dia]
+
+        return washer_dimensions
+
+    @staticmethod
+    def square_washer_dimensions(bolt_dia):
+        """ Calculate the dimensions - diameter (inner and outer) and thickness for circular washer (Type B and C) confirming to IS 6649:1985.
+        The washers are used for high strength structural bolts and nuts.
+
+        Args:
+            bolt_dia: diameter of the bolt in mm (int)
+
+        Returns:
+            inner and outer diameter of the washer in mm (dictionary)
+            thickness of the washer in mm (dictionary)
+
+        Reference - Table 2, IS 6649:1985
+
+        Note: The IS code does not specify dimensions of washer for bolt sizes of M8, M10, M12, M16, M42, M48, M56, M64 and M72
+              The dimensions of these washers are thus calculated/approximated referring to those specified by the code
+
+              Table 2 gives washer thickness for tapered washers, however for non-tapered washers, mean thickness is used.
+        """
+        washer_dimensions = {
+            8: {'dia_in': 10, 'side': 25, 'washer_thk': 6.0},
+            10: {'dia_in': 12, 'side': 25, 'washer_thk': 6.0},
+            12: {'dia_in': 14, 'side': 25, 'washer_thk': 6.0},
+            16: {'dia_in': 18, 'side': 45, 'washer_thk': 8.5},
+            20: {'dia_in': 22, 'side': 45, 'washer_thk': 8.5},
+            22: {'dia_in': 24, 'side': 45, 'washer_thk': 8.5},
+            24: {'dia_in': 26, 'side': 45, 'washer_thk': 8.5},
+            27: {'dia_in': 30, 'side': 58, 'washer_thk': 8.5},
+            30: {'dia_in': 33, 'side': 58, 'washer_thk': 8.5},
+            36: {'dia_in': 39, 'side': 58, 'washer_thk': 8.5},
+            42: {'dia_in': 45, 'side': 80, 'washer_thk': 10.0},
+            48: {'dia_in': 51, 'side': 80, 'washer_thk': 10.0},
+            56: {'dia_in': 59, 'side': 100, 'washer_thk': 12.0},
+            64: {'dia_in': 67, 'side': 100, 'washer_thk': 12.0},
+            72: {'dia_in': 75, 'side': 100, 'washer_thk': 12.0},
+        }[bolt_dia]
+
+        return washer_dimensions
 
     def create3DBeamWebBeamWeb(self):
         '''self,uiObj,resultObj,dictbeamdata,dictcoldata):
@@ -871,11 +957,13 @@ class CommonDesignLogic(object):
         weldSideWeb = FilletWeld(b=float(BP.weld_size_web), h=float(BP.weld_size_web),
                                  L=column.D - 2 * (column.t + column.R1))
 
-        gusset = StiffenerPlate(L=BP.gusset_plate_length, W=BP.gusset_plate_height, T=BP.gusset_plate_thick,
-                                L11=(BP.gusset_plate_length - (column.B + 100)) / 2, L12=BP.gusset_plate_height - 100,
+        gusset = StiffenerPlate(L=BP.stiffener_plt_len_along_flange, W=BP.stiffener_plt_height_along_flange,
+                                T=BP.stiffener_plt_thick_along_flange,
+                                L11=(BP.stiffener_plt_len_along_flange - (column.B + 100)) / 2, L12=BP.stiffener_plt_height_along_flange - 100,
                                 R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
-        stiffener = StiffenerPlate(L=BP.stiffener_plate_length, W=BP.stiffener_plate_height, T=BP.stiffener_plate_thick,
-                                   L11=BP.stiffener_plate_length - 50, L12=BP.stiffener_plate_height - 100)
+        stiffener = StiffenerPlate(L=BP.stiffener_plt_len_along_web, W=BP.stiffener_plt_height_along_web,
+                                   T=BP.stiffener_plt_thick_along_web,
+                                   L11=BP.stiffener_plt_len_along_web - 50, L12=BP.stiffener_plt_height_along_web - 100)
 
         concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=BP.anchor_length_provided * 1.3)
         grout = Grout(L=concrete.L, W=concrete.W, T=50)
@@ -1155,7 +1243,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, welds, update=True, color='Red')
 
             elif self.connection == KEY_DISP_BASE_PLATE:
-                self.Bp = self.module_class()
+                self.Bp = self.module_class
 
                 self.BPObj = self.createBasePlateCAD()
 

@@ -482,6 +482,13 @@ class Ui_ModuleWindow(QMainWindow):
                     r.setValidator(self.get_validator(option[5]))
                 #r.setFixedSize(r.size())
 
+                # if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR, KEY_AXIAL_TENSION_BP] and module == KEY_DISP_BASE_PLATE:
+                #     r.setGeometry(QtCore.QRect(160, 10 + i, 150, 27))
+                #     r.setDisabled(True)
+                # else:
+                #     r.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
+                # r.setFixedSize(r.size())
+
                 in_layout2.addWidget(r, j, 2, 1, 1)
                 #maxi_width_right = max(maxi_width_right, 120)
 
@@ -530,6 +537,14 @@ class Ui_ModuleWindow(QMainWindow):
                 imc.setFixedSize(imc.size())
                 in_layout2.addWidget(imc, j, 2, 1, 1)
 
+# <<<<<<< HEAD
+# =======
+#             if option[0] in [KEY_AXIAL, KEY_AXIAL_BP, KEY_SHEAR]:
+#                 key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
+#                 onlyInt = QIntValidator()
+#                 key.setValidator(onlyInt)
+#
+# >>>>>>> 436f627ed59112463791456e6d1eceb9749f6d4c
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents)
                 #q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
@@ -583,6 +598,7 @@ class Ui_ModuleWindow(QMainWindow):
         Since, we don't know how may customized popups can be used in a module we have provided,
          "triggered.connect" for up to 10 customized popups
         """
+
         new_list = main.customized_input(main)
         updated_list = main.input_value_changed(main)
         data = {}
@@ -1169,6 +1185,8 @@ class Ui_ModuleWindow(QMainWindow):
 
             if typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
                 k2 = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, k2_key)
+            elif typ == TYPE_WARNING:
+                k2 = str(k2_key)
             else:
                 k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
 
@@ -1186,7 +1204,6 @@ class Ui_ModuleWindow(QMainWindow):
                     k2.addItem(values)
                     k2.setCurrentIndex(0)
                 if k2_key in RED_LIST:
-                    red_list_set = set(red_list_function())
                     red_list_set = set(red_list_function())
                     current_list_set = set(val)
                     current_red_list = list(current_list_set.intersection(red_list_set))
@@ -1212,6 +1229,9 @@ class Ui_ModuleWindow(QMainWindow):
                     k2.setEnabled(True)
                 else:
                     k2.setDisabled(True)
+            elif typ == TYPE_WARNING:
+                if val:
+                    QMessageBox.warning(self, "Application", k2)
             elif typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
                 if val:
                     k2.setVisible(False)
@@ -1436,7 +1456,8 @@ class Ui_ModuleWindow(QMainWindow):
                     if index >= 0:
                         key.setCurrentIndex(index)
             elif op[2] == TYPE_TEXTBOX:
-                key.setText(uiObj[key_str])
+                if key_str in uiObj.keys():
+                    key.setText(uiObj[key_str])
             elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 if key_str in uiObj.keys():
                     for n in new:
@@ -1540,6 +1561,7 @@ class Ui_ModuleWindow(QMainWindow):
 
         dialog = QtWidgets.QDialog()
         #dialog.resize(470, 300)
+
         dialog.setObjectName("Dialog")
         #q.sizeHint().width(), q.sizeHint().height()
         #sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -1559,6 +1581,7 @@ class Ui_ModuleWindow(QMainWindow):
         inner_grid_widget.setLayout(inner_grid_layout)
         scrollcontent.setLayout(outer_grid_layout)
         section = 0
+
         for op in button_list:
 
             if op[0] == button.objectName():
@@ -1575,6 +1598,7 @@ class Ui_ModuleWindow(QMainWindow):
                     if out_but_type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_SECTION]:
                         l = QtWidgets.QLabel(inner_grid_widget)
                         #l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
+
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         font.setBold(False)
@@ -1585,6 +1609,7 @@ class Ui_ModuleWindow(QMainWindow):
                         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                         inner_grid_layout.addWidget(l, j, 1, 1, 1)
                         l.resize(l.sizeHint().width(), l.sizeHint().height())
+
 
                     if out_but_type == TYPE_SECTION:
                         if section != 0:
@@ -1605,6 +1630,10 @@ class Ui_ModuleWindow(QMainWindow):
                         im = QtWidgets.QLabel(image_widget)
                         #im.setGeometry(QtCore.QRect(330, 10, 150, 150))
                         #im.setFixedSize(im.size())
+                        # im.setGeometry(QtCore.QRect(330, 10, 100, 100))
+                        # im.setScaledContents(True)
+                        # im.setFixedSize(im.size())
+
                         pmap = QPixmap(option[3])
                         im.setPixmap(pmap)
                         image_layout.addWidget(im)
@@ -1613,6 +1642,7 @@ class Ui_ModuleWindow(QMainWindow):
 
                         q = QtWidgets.QLabel(scrollcontent)
                         #q.setGeometry(QtCore.QRect(30, 10, 201, 30))
+
                         font = QtGui.QFont()
                         font.setWeight(600)
                         font.setPointSize(11)
@@ -1622,6 +1652,7 @@ class Ui_ModuleWindow(QMainWindow):
                         #q.setFixedSize(q.size())
                         q.resize(q.sizeHint().width(), q.sizeHint().height())
                         outer_grid_layout.addWidget(q, j, 1, 1, 2)
+
                         section += 1
 
                     if out_but_type == TYPE_TEXTBOX:
@@ -1632,20 +1663,28 @@ class Ui_ModuleWindow(QMainWindow):
                         font.setBold(False)
                         font.setWeight(50)
                         r.setFont(font)
-                        #r.setFixedSize(r.size())
+                        r.setFixedSize(r.size())
                         r.setObjectName(option[0])
                         r.setText(str(option[3]))
                         inner_grid_layout.addWidget(r, j, 2, 1, 1)
-                        r.resize(r.sizeHint().width()+30, r.sizeHint().height())
+
+                    if out_but_type == TYPE_IMAGE:
+                        im = QtWidgets.QLabel(image_widget)
+                        im.setGeometry(QtCore.QRect(330, 10, 100, 100))
+                        im.setScaledContents(True)
+                        im.setFixedSize(im.size())
+                        pmap = QPixmap(option[3])
+                        im.setPixmap(pmap)
+                        image_layout.addWidget(im)
+
                     j = j + 1
                     i = i + 30
-                outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
-                outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
+
+                if inner_grid_layout.count() > 0:
+                    outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
+                if image_layout.count() > 0:
+                    outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
                 scroll.setWidget(scrollcontent)
-                dialog.setMinimumSize(dialog.sizeHint().width(), 350)
-                #scrollcontent.setGeometry(0,0,maxi_width, 350)
-                #dialog.resize(dialog.sizeHint().width()+140, 300)
-                #scrollcontent.resize(scrollcontent.sizeHint().width()+140, 300)
                 if section == 0:
                     dialog.resize(350, 300)
                 dialog.setFixedSize(dialog.size())

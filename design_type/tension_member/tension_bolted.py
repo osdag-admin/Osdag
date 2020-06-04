@@ -83,9 +83,6 @@ class Tension_bolted(Member):
         t1 = (DISP_TITLE_ANGLE, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_section)
         change_tab.append(t1)
 
-        t1 = (DISP_TITLE_ANGLE, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_section)
-        change_tab.append(t1)
-
         t2 = (DISP_TITLE_CHANNEL, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_section)
         change_tab.append(t2)
 
@@ -104,41 +101,8 @@ class Tension_bolted(Member):
         t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL,KEY_LOCATION,KEY_SEC_PROFILE],
               [KEY_SECSIZE_SELECTED, KEY_SEC_FY,KEY_SEC_FU,'Label_1','Label_2','Label_3', 'Label_4', 'Label_5','Label_7','Label_8','Label_9',
                'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX, self.get_new_angle_section_properties)
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23','Label_24'], TYPE_TEXTBOX, self.get_new_angle_section_properties)
         change_tab.append(t6)
-        # elif self.sec_profile == "Back to Back Angles":
-        #     t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3',KEY_LOCATION],
-        #           ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14',
-        #            'Label_15', 'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'],
-        #           TYPE_TEXTBOX, self.get_Angle_sec_properties)
-        #     change_tab.append(t5)
-        #
-        # #     t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
-        # #           [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
-        # #            'Label_7', 'Label_8', 'Label_9',
-        # # 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
-        # #            'Label_18',
-        # #            'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX,
-        # #           self.get_new_angle_section_properties)
-        # #     change_tab.append(t6)
-        # else:
-        #     t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3'],
-        #           ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14',
-        #            'Label_15', 'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22',
-        #            'Label_23'],
-        #           TYPE_TEXTBOX, self.get_Angle_sec_properties)
-        #     change_tab.append(t5)
-
-            # t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
-            #       [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
-            #        'Label_7', 'Label_8', 'Label_9',
-            #        'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
-            #        'Label_18',
-            #        'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX,
-            #       self.get_new_angle_section_properties)
-            # change_tab.append(t6)
-
-
 
         t5 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13'],
               ['Label_9', 'Label_10','Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
@@ -2234,12 +2198,14 @@ class Tension_bolted(Member):
              # KEY_DISP_DP_BOLT_FY: round(self.bolt.bolt_fy,2),
              KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-             KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
-             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences,
+             # KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
+             KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
              "Safety Factors - IS 800:2007 Table 5 (Clause 5.4.1) ": "TITLE",
              KEY_DISP_GAMMA_M0 : gamma(1.1,"m0"),
              KEY_DISP_GAMMA_M1 : gamma(1.25,"m1"),
              variable : value }
+        if self.bolt.bolt_type != TYP_FRICTION_GRIP:
+            del self.report_input[KEY_DISP_DP_BOLT_SLIP_FACTOR]
 
 
 

@@ -107,7 +107,7 @@ class BasePlateCad(object):
 
         self.baseplateModel = self.baseplate.create_model()
 
-        if self.BP.gusset_along_flange == 'Yes':
+        if self.BP.stiffener_along_flange == 'Yes':
             gusset1OriginL = numpy.array([0.0, self.column.D / 2, self.gusset.W / 2])
             gusset1L_uDir = numpy.array([-1.0, 0.0, 0.0])
             gusset1L_wDir = numpy.array([0.0, 1.0, 0.0])
@@ -290,7 +290,7 @@ class BasePlateCad(object):
 
     def get_plate_connector_models(self):
 
-        if self.BP.gusset_along_flange == 'Yes':
+        if self.BP.stiffener_along_flange == 'Yes':
             plate_list = [self.baseplateModel, self.gusset1Model, self.gusset2Model, self.stiffener1Model,
                           self.stiffener2Model, self.stiffener3Model, self.stiffener4Model]
             plate = plate_list[0]

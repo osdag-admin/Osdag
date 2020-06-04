@@ -572,7 +572,7 @@ class Ui_Dialog(object):
                         combo_text.append((r,l.sizeHint().width() + 10 + j,10+i))
                     if type == TYPE_IMAGE:
                         im = QtWidgets.QLabel(tab)
-                        im.setGeometry(QtCore.QRect(60 + j, 30 + i, 200, 300))
+                        im.setGeometry(QtCore.QRect(20 + j, 30 + i, 200, 200))
                         im.setObjectName(element[0])
                         im.setScaledContents(True)
                         image = QPixmap(element[4])

@@ -140,7 +140,7 @@ class CreateLatex(Document):
                                 table.add_row(
                                     (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data="")),
                                      MultiColumn(2, align='|c|', data=uiObj[i][b - 30:b]),))
-                        table.add_hline(4,5)
+                        table.add_hline()
                     else:
                         table.add_hline()
                         table.add_row((MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))

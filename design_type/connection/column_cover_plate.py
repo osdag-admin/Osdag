@@ -1002,9 +1002,9 @@ class ColumnCoverPlate(MomentConnection):
                     self.flange_plate_thickness_possible = [i for i in self.flange_plate.thickness if
                                                             i >= (self.section.flange_thickness / 2)]
                 if len(self.flange_plate_thickness_possible) == 0:
-                    logger.error(" : Flange Plate thickness less than section flange thicknesss.")
+                    logger.error(" : Flange Plate thickness less than section flange thickness.")
                     logger.warning(
-                        " : Flange Plate thickness should be greater than section flange thicknesss{} kN.".format(self.section.flange_thickness))
+                        " : Flange Plate thickness should be greater than section flange thickness {} kN.".format(self.section.flange_thickness))
                     self.initial_pt_thk_status = False
                     self.design_status = False
                 else:
@@ -1062,9 +1062,9 @@ class ColumnCoverPlate(MomentConnection):
                 self.initial_pt_thk_status_web = False
                 # self.webheight_status = False
                 if len(self.web_plate_thickness_possible) == 0:
-                    logger.error(" : Web Plate thickness less than section web thicknesss.")
+                    logger.error(" : Web Plate thickness less than section web thickness.")
                     logger.warning(
-                        " : Web Plate thickness should be greater than section web thicknesss {} kN.".format(self.section.web_thickness))
+                        " : Web Plate thickness should be greater than section web thickness {} kN.".format(self.section.web_thickness))
                     self.initial_pt_thk_status_web = False
                     self.design_status = False
                 else:

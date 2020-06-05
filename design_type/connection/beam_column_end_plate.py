@@ -243,6 +243,9 @@ class BeamColumnEndPlate(MomentConnection):
         t1 = ([KEY_CONN, KEY_ENDPLATE_TYPE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t1)
 
+        t2 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t2)
+
         return lst
 
     def fn_conn_image(self):

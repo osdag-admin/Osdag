@@ -479,6 +479,10 @@ class ColumnEndPlate(MomentConnection):
         lst.append(t6)
         t6 = ([KEY_CONN], KEY_OUT_WELD_TYPE, TYPE_OUT_LABEL, self.out_stiffener)
         lst.append(t6)
+
+        t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t8)
+
         return lst
 
     def out_stiffener(self):

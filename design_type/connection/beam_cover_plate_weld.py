@@ -755,7 +755,7 @@ class BeamCoverPlateWeld(MomentConnection):
             ################################# FLANGE MEMBER CAPACITY CHECK##############################
             A_v_flange = self.section.flange_thickness * self.section.flange_width
             self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
-                A_v=A_v_flange, fy=self.flange_plate.fy)
+                A_v=A_v_flange, fy=self.section.fy)
             if self.section.tension_yielding_capacity > self.flange_force:
                 self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if
                                                      i >= (self.section.web_thickness / 2)]
@@ -1924,7 +1924,7 @@ class BeamCoverPlateWeld(MomentConnection):
         flange_weld_strength_red_kn = round(self.flange_weld.strength_red, 2)
         flange_weld_stress_kn = round(self.flange_weld.stress, 2)
         flange_weld_strength_recal_kn = round(self.flange_weld.stress, 2)
-        if self.member_capacity_status ==True and self.initial_pt_thk_status== True:
+        if  self.initial_pt_thk_status== True:
             self.thick_f = self.flange_plate.thickness_provided
             self.thick_w =self.web_plate.thickness_provided
         else:

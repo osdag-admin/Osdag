@@ -1726,7 +1726,7 @@ def long_joint_welded_req():
     long_joint_bolted_eqn.append(NoEscape(r'& if~l < 150 * t_t~then~V_{rd} = V_{db} \\'))
     long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
     long_joint_bolted_eqn.append(NoEscape(r'&  l ~= pt.length ~ or ~ pt.height \\'))
-    long_joint_bolted_eqn.append(NoEscape(r'& \beta_{l_w} = 1.2 - \frac{(0.2*l )}{(150*t_t}  \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& \beta_{l_w} = 1.2 - \frac{(0.2*l )}{(150*t_t)}  \\'))
     long_joint_bolted_eqn.append(NoEscape(r'& but~0.6\leq\beta_{l_w}\leq1.0 \end{aligned}'))
 
 
@@ -1949,7 +1949,7 @@ def web_width_chk_weld (D,tk,R_1,webplatewidth):
     webplatewidth = str(webplatewidth)
     web_width_chk_weld_eqn = Math(inline=True)
     web_width_chk_weld_eqn.append(NoEscape(r'\begin{aligned} W_{wp} &= D - (2 * T) - (2 * R1)- (2*21)\\'))
-    web_width_chk_weld_eqn.append(NoEscape(r' &= ' + D + ' - (2 * ' + tk + ') - (2 *' + R_1 + r')- (2*21))\\'))
+    web_width_chk_weld_eqn.append(NoEscape(r' &= ' + D + ' - (2 * ' + tk + ') - (2 *' + R_1 + r')- (2*21)\\'))
     web_width_chk_weld_eqn.append(NoEscape(r' &=' + webplatewidth + r'\end{aligned}'))
     return web_width_chk_weld_eqn
 
@@ -2028,10 +2028,11 @@ def web_plate_area_prov(D, y, webwidth, wp_area, T, r_1):
     y =str(y)
 
     web_plate_area_prov = Math(inline=True)
-    web_plate_area_prov.append(NoEscape(r'\begin{aligned} W_{wp}&= D-(2*T)-(2*R1)-(2*21)\\'))
-    web_plate_area_prov.append(NoEscape(r'&='+D+'-(2*'+T+')-(2*'+r_1+r')-(2*21)\\'))
-    web_plate_area_prov.append(NoEscape(r'&= ' + webwidth + r' \\'))
-    web_plate_area_prov.append(NoEscape(r' pt.area &= ' + y + '*2* ' + webwidth + r'\\'))
+    # web_plate_area_prov.append(NoEscape(r'\begin{aligned} W_{wp}&= D-(2*T)-(2*R1)-(2*21)\\'))
+    # web_plate_area_prov.append(NoEscape(r'&='+D+'-(2*'+T+')-(2*'+r_1+r')-(2*21)\\'))
+    # web_plate_area_prov.append(NoEscape(r'&= ' + webwidth + r' \\'))
+    web_plate_area_prov.append(NoEscape(r'\begin{aligned} pt.area &= t_{wp}*2* W_{wp}\\'))
+    web_plate_area_prov.append(NoEscape(r'  &= ' + y + '*2* ' + webwidth + r'\\'))
     web_plate_area_prov.append(NoEscape(r'&= ' + wp_area + r'\end{aligned}'))
     return web_plate_area_prov
 

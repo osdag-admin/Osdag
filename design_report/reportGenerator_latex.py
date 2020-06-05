@@ -96,11 +96,11 @@ class CreateLatex(Document):
                         Img_path = '/ResourceFiles/images/'+image_name+'.png'
                         if (len(sectiondetails))% 2 == 0:
                         # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
-                            merge_rows = int((len(sectiondetails)/2))
+                            merge_rows = int((len(sectiondetails)/2)) +2
                         else:
                             merge_rows = round_up((len(sectiondetails)/2),2)
                         print('Hi', len(sectiondetails)/2,round_up(len(sectiondetails),2)/2, merge_rows)
-                        if (len(sectiondetails))% 2 != 0:
+                        if (len(sectiondetails))% 2 == 0:
                             sectiondetails['']=''
 
                         a = list(sectiondetails.keys())

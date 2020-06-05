@@ -982,7 +982,7 @@ class BeamCoverPlate(MomentConnection):
 
         ################################# FLANGE MEMBER CAPACITY CHECK##############################
             A_v_flange = self.section.flange_thickness * self.section.flange_width
-            self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(A_v=A_v_flange,fy=self.flange_plate.fy)
+            self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(A_v=A_v_flange,fy=self.section.fy)
             if self.section.tension_yielding_capacity > self.flange_force:
                 self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if i >= (self.section.web_thickness / 2)]
                 if self.preference == "Outside":
@@ -1481,11 +1481,11 @@ class BeamCoverPlate(MomentConnection):
 
         self.section.tension_yielding_capacity= self.tension_member_design_due_to_yielding_of_gross_section(
                                                 A_v=A_v_flange,
-                                                fy=self.flange_plate.fy)
+                                                fy=self.section.fy)
 
         self.section.tension_rupture_capacity = self.tension_member_design_due_to_rupture_of_critical_section(
                                                 A_vn=A_vn_flange,
-                                                fu=self.flange_plate.fu)
+                                                fu=self.section.fu)
         #  Block shear strength for flange
         design_status_block_shear = False
         edge_dist = self.flange_plate.edge_dist_provided
@@ -1510,8 +1510,8 @@ class BeamCoverPlate(MomentConnection):
 
             self.section.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
                                                                                   A_tn=Atn,
-                                                                                  f_u=self.flange_plate.fu,
-                                                                                  f_y=self.flange_plate.fy)
+                                                                                  f_u=self.section.fu,
+                                                                                  f_y=self.section.fy)
 
             if self.section.block_shear_capacity <  self.flange_force:
                 if self.flange_bolt.max_spacing_round >= pitch + 5 and self.flange_bolt.max_end_dist_round >= end_dist + 5:  # increase thickness todo
@@ -1776,9 +1776,9 @@ class BeamCoverPlate(MomentConnection):
                    * self.section.web_thickness
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
         self.section.tension_yielding_capacity_web = self.tension_member_design_due_to_yielding_of_gross_section(
-            A_v=A_v_web, fy=self.web_plate.fy)
+            A_v=A_v_web, fy=self.section.fy)
         self.section.tension_rupture_capacity_web = self.tension_member_design_due_to_rupture_of_critical_section(
-            A_vn=A_vn_web, fu=self.web_plate.fu)
+            A_vn=A_vn_web, fu=self.section.fu)
 
         design_status_block_shear = False
         edge_dist = self.web_plate.edge_dist_provided
@@ -1801,8 +1801,8 @@ class BeamCoverPlate(MomentConnection):
 
             self.section.block_shear_capacity_web = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
                                                                                     A_tn=Atn,
-                                                                                    f_u=self.web_plate.fu,
-                                                                                    f_y=self.web_plate.fy)
+                                                                                    f_u=self.section.fu,
+                                                                                    f_y=self.section.fy)
 
             if self.section.block_shear_capacity_web <  self.axial_force_w :
                 if self.web_bolt.max_spacing_round >= pitch + 5 and self.web_bolt.max_end_dist_round >= end_dist + 5:  # increase thickness todo
@@ -2685,7 +2685,7 @@ class BeamCoverPlate(MomentConnection):
         flange_kh_disp = round(self.flange_bolt.kh, 2)
         flange_bolt_force_kn = round(self.flange_plate.bolt_force, 2)
         flange_bolt_capacity_red_kn = round(self.flange_plate.bolt_capacity_red/1000, 2)
-        if self.member_capacity_status == True and self.initial_pt_thk_status == True:
+        if  self.initial_pt_thk_status == True:
             self.thick_f = self.flange_plate.thickness_provided
             self.thick_w = self.web_plate.thickness_provided
         else:

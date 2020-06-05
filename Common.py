@@ -822,7 +822,7 @@ KEY_PLATE_MAX_HEIGHT = 'Plate.MaxHeight'
 KEY_SLENDER = "Member.Slenderness"
 
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
-KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Height'
+KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Height (mm)'
 
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
@@ -977,7 +977,7 @@ KEY_OUT_DISP_WEB_BOLT_CAPACITY ="Bolt Capacity (kN)"
 KEY_OUT_DISP_WEB_BOLT_SLIP= 'Slip Resistance'
 KEY_WEB_BOLT_GRP_CAPACITY = 'web_bolt.grp_bolt_capacity'
 KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'Web bolt grp bolt capacity (kN)'
-KEY_OUT_REQ_MOMENT_DEMAND_BOLT = "Moment Demand (kNm"
+KEY_OUT_REQ_MOMENT_DEMAND_BOLT = "Moment Demand (kNm)"
 KEY_OUT_REQ_PARA_BOLT = "Parameters required for bolt force (mm)"
 
 
@@ -990,7 +990,7 @@ VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20'
  '25','28','32','36','40','45','50','56','63','80']
 
 
-KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
+KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
 KEY_DISP_WEB_PLATE_LENGTH ='Length (mm)'

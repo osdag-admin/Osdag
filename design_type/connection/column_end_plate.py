@@ -387,13 +387,13 @@ class ColumnEndPlate(MomentConnection):
         t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.end_dist if flag else '', True)
         out_list.append(t10)
 
-        t8 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
+        t8 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw_prov * 2 if flag else '', True)
         out_list.append(t8)
 
-        t9 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf + 4 if flag else '', True)
+        t9 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.no_bolts_flange if flag else '', True)
         out_list.append(t9)
 
-        t11 = (KEY_OUT_NO_BOLTS, KEY_OUT_DISP_NO_BOLTS, TYPE_TEXTBOX, self.no_bolts if flag else '', True)
+        t11 = (KEY_OUT_NO_BOLTS, KEY_OUT_DISP_NO_BOLTS, TYPE_TEXTBOX, self.no_bolts_prov if flag else '', True)
         out_list.append(t11)
 
         # t21 = (KEY_BOLT_DETAILS, KEY_DISP_BOLT_DETAILS, TYPE_OUT_BUTTON, ['Bolt detailing', self.detailing])
@@ -732,18 +732,22 @@ class ColumnEndPlate(MomentConnection):
             self.n_bw = int(math.floor(((self.section.depth - (2 * self.section.flange_thickness + (2 * self.end_dist))) / self.pitch) + 1))
             self.n_bf = int(math.ceil((((self.section.flange_width / 2) - ((self.section.web_thickness / 2) + (2 * self.end_dist))) / self.pitch) - 2))
 
-            if self.n_bf < 0:
-                self.n_bf = 0
-            elif self.n_bf == 0:
+            if self.n_bf <= 0:
                 self.n_bf = 1
             elif self.n_bf > 0:
-                self.n_bf = self.n_bf + 1
+                self.n_bf = self.n_bf + 2
             print("no bolts web",self.n_bw, "no bolts flange",self.n_bf)
 
             if self.connection == 'Flush End Plate':
-                self.no_bolts = self.n_bw * 2 + self.n_bf * 4
+                if self.n_bf == 1:
+                    self.no_bolts = self.n_bw * 2
+                elif self.n_bf > 1:
+                    self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4
             else:
-                self.no_bolts = self.n_bw * 2 + self.n_bf * 8 + 4
+                if self.n_bf == 1:
+                    self.no_bolts = self.n_bw * 2 + 4
+                elif self.n_bf > 1:
+                    self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4 + self.n_bf*4
             print("no of bolts", self.no_bolts)
 
         ######### pitch 2 along web  ##################
@@ -755,9 +759,20 @@ class ColumnEndPlate(MomentConnection):
 
         ######### pitch 2 along flange  ################
             if self.n_bf % 2 == 0:
-                self.p_2_flange = (self.section.flange_width/2) - (self.section.web_thickness/2) - (2 * self.end_dist) - (self.n_bf * self.pitch)
+                if self.n_bf == 2:
+                    self.p_2_flange = (self.section.flange_width/2) - (self.section.web_thickness/2) - (2 * self.end_dist)
+                else:
+                    self.p_2_flange = (self.section.flange_width/2) - (self.section.web_thickness/2) - (2 * self.end_dist) - ((self.n_bf-2) * self.pitch)
             else:
-                self.p_2_flange = (self.section.flange_width/2) - (self.section.web_thickness/2) - (2 * self.end_dist) - ((self.n_bf - 1) * self.pitch)
+                if self.n_bf == 3:
+                    ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist))/2
+                else:
+                    self.p_2_flange = ((self.section.flange_width/2) - (self.section.web_thickness/2) - (2 * self.end_dist) - ((self.n_bf - 3) * self.pitch))/2
+
+            if self.p_2_flange < 0:
+                self.p_2_flange = 0.0
+            else:
+                pass
             print("p_2_flange",self.p_2_flange)
             # self.x = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - self.end_dist - (self.n_bf * self.pitch)
 
@@ -767,19 +782,6 @@ class ColumnEndPlate(MomentConnection):
             else:
                 self.y_max = self.section.depth - self.section.flange_thickness/2 + self.end_dist
             print("y_max",self.y_max)
-            # if self.connection == 'Flush End Plate':
-            #     if self.n_bf % 2 == 0:
-            #         for p in range(1,self.n_bf+1):
-            #             self.y_sqr1 = (self.section.flange_thickness/2 + self.end_dist + ((p/2) -1) * self.pitch) ** 2
-            #             self.y_sqr2 = self.y_sqr1 + (self.p_2_web + ((p/2) - 1) * self.plate.pitch_provided) ** 2
-            #             self.y_sqr = self.y_sqr1 + self.y_sqr2
-            #     else:
-            #         for p in range(1,self.n_bf+1):
-            #             self.y_sqr1 = (self.section.flange_thickness/2 + self.end_dist + ((p/2) -1.5) * self.pitch) ** 2
-            #             self.y_sqr2 = self.y_sqr1 + (2 * self.p_2_web + ((p/2) - 1) * self.pitch) ** 2
-            #             self.y_sqr = self.y_sqr1 + self.y_sqr2
-            # else:
-            #     self.y_sqr = self.y_sqr + (2 * self.end_dist + self.section.flange_thickness) ** 2
 
             if self.connection == 'Flush End Plate':
                 if self.n_bw % 2 == 0:
@@ -911,22 +913,6 @@ class ColumnEndPlate(MomentConnection):
                                                       # bolt_grade_provided=self.bolt.bolt_grade[y]
                                                       bolt_grade_provided=(self.bolt.bolt_grade[-1]))
 
-            # if self.t_b > self.bolt.bolt_tension_capacity:
-            #     self.design_status = False
-            #     logger.error("Force is not sufficient")
-            #     logger.info("Increase bolt diam")
-            #
-            # if self.v_sb > self.bolt.bolt_capacity:
-            #     self.design_status = False
-            #     logger.error("Force is not sufficient")
-            #     logger.info("Increase bolt diam")
-
-            # if ((self.v_sb / self.bolt.bolt_capacity) ** 2 + (self.t_b / self.bolt.bolt_tension_capacity) ** 2) > 1.0:
-            #     self.design_status = False
-            #     logger.error("Force is not sufficient")
-            #     logger.info("Increase bolt diam")
-            #     return self.design_status
-
             print("T_b: ",self.t_b,"Bolt tension capacity: ",self.bolt.bolt_tension_capacity)
             if self.t_b < self.bolt.bolt_tension_capacity:
                 # self.lst1.append(x)
@@ -1014,9 +1000,9 @@ class ColumnEndPlate(MomentConnection):
                 self.design_status = False
                 logger.error("Try Different bolt diam")
 
-            else:
+            elif self.connection == "Flush End Plate":
                 self.design_status = False
-                logger.error("Try Different material")
+                logger.error("Try Different material or Try Extended both ways Connection")
 
     #############################################################################################################
     ## Function to get Bolt grade ##
@@ -1033,51 +1019,67 @@ class ColumnEndPlate(MomentConnection):
         for x in self.bolt.bolt_grade:
             self.pitch = IS800_2007.cl_10_2_2_min_spacing(self.bolt_diam_provided)
             self.end_dist = round_up(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diam_provided,self.bolt.bolt_hole_type,self.bolt.edge_type),5)
+            print("Bolt diam: ", self.bolt_diam_provided,"Pitch: ",self.pitch,"End-dist: ",self.end_dist)
 
             ########## no of bolts along each side of web and flange  ##################
-            self.n_bw = int(math.floor(
+            self.n_bw_prov = int(math.floor(
                 ((self.section.depth - (2 * self.section.flange_thickness + (2 * self.end_dist))) / self.pitch) + 1))
             # print("n_bw",self.n_bw)
-            self.n_bf = int(math.ceil((((self.section.flange_width / 2) - (
+            self.n_bf_prov = int(math.ceil((((self.section.flange_width / 2) - (
                         (self.section.web_thickness / 2) + (2 * self.end_dist))) / self.pitch) - 2))
             # print("n_bf",self.n_bf)
-
-            if self.n_bf <= 0:
-                self.n_bf = 1
+            print("In bolt grade loop")
+            if self.n_bf_prov <= 0:
+                self.n_bf_prov = 1
             # elif self.n_bf == 0:
             #     self.n_bf = 1
-            elif self.n_bf > 0:
-                self.n_bf = self.n_bf + 1
-            print("no bolts web", self.n_bw, "no bolts flange", self.n_bf)
+            elif self.n_bf_prov > 0:
+                self.n_bf_prov = self.n_bf_prov + 2
+            print("no bolts web", self.n_bw_prov, "no bolts flange", self.n_bf_prov)
+
+            if self.connection == "Flush End Plate":
+                self.no_bolts_flange = self.n_bf_prov *4
+            else:
+                self.no_bolts_flange = self.n_bf_prov * 8
 
             if self.connection == 'Flush End Plate':
-                self.no_bolts = self.n_bw * 2 + self.n_bf * 4
+                if self.n_bf_prov == 1:
+                    self.no_bolts_prov = self.n_bw_prov * 2
+                elif self.n_bf_prov > 1:
+                    self.no_bolts_prov = self.n_bw_prov * 2 + (self.n_bf_prov-1) * 4
             else:
-                self.no_bolts = self.n_bw * 2 + self.n_bf * 8 + 4
-            print("no of bolts", self.no_bolts)
+                if self.n_bf_prov == 1:
+                    self.no_bolts_prov = self.n_bw_prov * 2 + 4
+                elif self.n_bf_prov > 1:
+                    self.no_bolts_prov = self.n_bw_prov * 2 + (self.n_bf_prov-1) * 4 + self.n_bf_prov*4
+            print("no of bolts", self.no_bolts_prov)
 
             ######### pitch 2 along web  ##################
-            if self.n_bw % 2 == 0:
-                self.p_2_web = self.section.depth - (2 * self.section.flange_thickness) - (2 * self.end_dist) - (
-                            (self.n_bw - 2) * self.pitch)
+            if self.n_bw_prov % 2 == 0:
+                self.p_2_web_prov = self.section.depth - (2 * self.section.flange_thickness) - (2 * self.end_dist) - ((self.n_bw_prov - 2) * self.pitch)
             else:
-                self.p_2_web = self.section.depth - (2 * self.section.flange_thickness) - (2 * self.end_dist) - (
-                            (self.n_bw - 3) * self.pitch)
-            # print("p_2_web",self.p_2_web)
+                self.p_2_web_prov = (self.section.depth - (2 * self.section.flange_thickness) - (2 * self.end_dist) - ((self.n_bw_prov - 3) * self.pitch))/2
+            print("p_2_web",self.p_2_web_prov)
 
             ######### pitch 2 along flange  ################
-            if self.n_bf % 2 == 0:
-                self.p_2_flange = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (
-                            2 * self.end_dist) - (self.n_bf * self.pitch)
+            if self.n_bf_prov % 2 == 0:
+                if self.n_bf_prov == 2:
+                    self.p_2_flange_prov = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist)
+                else:
+                    self.p_2_flange_prov = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf_prov -2) * self.pitch)
             else:
-                self.p_2_flange = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (
-                            2 * self.end_dist) - ((self.n_bf - 1) * self.pitch)
+                if self.n_bf_prov == 3:
+                    self.p_2_flange_prov = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist))/2
+                else:
+                    self.p_2_flange_prov = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf_prov - 3) * self.pitch))/2
             # print("p_2_flange",self.p_2_flange)
 
-            if self.p_2_flange < 0:
-                self.p_2_flange = 0
+            if self.p_2_flange_prov < 0:
+                self.p_2_flange_prov = 0.0
             else:
                 pass
+            print("p_2_flange",self.p_2_flange_prov)
+
             # self.x = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - self.end_dist - (self.n_bf * self.pitch)
 
             ############# y_max and y square ################
@@ -1088,120 +1090,120 @@ class ColumnEndPlate(MomentConnection):
             # print("y_max", self.y_max)
 
             if self.connection == 'Flush End Plate':
-                if self.n_bw % 2 == 0:
-                    if self.n_bw == 2:
+                if self.n_bw_prov % 2 == 0:
+                    if self.n_bw_prov == 2:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
-                        self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + self.p_2_web) ** 2
+                        self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + self.p_2_web_prov) ** 2
                         self.y_sqr = self.y_sqr1 + self.y_sqr2
                     else:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
                         # print("y_sqr1", self.y_sqr1)
 
-                        for i in range(1, int(self.n_bw / 2)):
+                        for i in range(1, int(self.n_bw_prov / 2)):
                             self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + i * self.pitch) ** 2
                         # print("y_sqr2", self.y_sqr2)
 
                         self.y_sqr3 = (self.section.flange_thickness / 2 + self.end_dist + (
-                                    (self.n_bw / 2) - 1) * self.pitch + self.p_2_web) ** 2
+                                    (self.n_bw_prov / 2) - 1) * self.pitch + self.p_2_web_prov) ** 2
                         # print("y_sqr3", self.y_sqr3)
 
-                        for i in range(1, int(self.n_bw / 2)):
+                        for i in range(1, int(self.n_bw_prov / 2)):
                             self.y_sqr4 = (self.section.flange_thickness / 2 + self.end_dist + (
-                                        (self.n_bw / 2) - 1) * self.pitch + self.p_2_web + i * self.pitch) ** 2
+                                        (self.n_bw_prov / 2) - 1) * self.pitch + self.p_2_web_prov + i * self.pitch) ** 2
                         # print("y_sqr4", self.y_sqr4)
 
                         self.y_sqr = self.y_sqr1 + self.y_sqr2 + self.y_sqr3 + self.y_sqr4
                     # print("y_sqr", self.y_sqr)
                 else:
-                    if self.n_bw == 3:
+                    if self.n_bw_prov == 3:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
-                        self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + 2 * self.p_2_web) ** 2
+                        self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + 2 * self.p_2_web_prov) ** 2
                         self.y_sqr = self.y_sqr1 + self.y_sqr2
                     else:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
                         # print("y_sqr1", self.y_sqr1)
 
-                        for i in range(1, int(self.n_bw / 2 - 0.5)):
+                        for i in range(1, int(self.n_bw_prov / 2 - 0.5)):
                             self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + i * self.pitch) ** 2
                         # print("y_sqr2", self.y_sqr2)
 
                         self.y_sqr3 = (self.section.flange_thickness / 2 + self.end_dist + (
-                                    (self.n_bw / 2) - 1.5) * self.pitch + self.p_2_web) ** 2
+                                    (self.n_bw_prov / 2) - 1.5) * self.pitch + self.p_2_web_prov) ** 2
                         # print("y_sqr3", self.y_sqr3)
 
                         self.y_sqr4 = (self.section.flange_thickness / 2 + self.end_dist + (
-                                    (self.n_bw / 2) - 1.5) * self.pitch + 2 * self.p_2_web) ** 2
+                                    (self.n_bw_prov / 2) - 1.5) * self.pitch + 2 * self.p_2_web_prov) ** 2
                         # print("y_sqr4", self.y_sqr4)
 
-                        for i in range(1, int(self.n_bw / 2 - 0.5)):
+                        for i in range(1, int(self.n_bw_prov / 2 - 0.5)):
                             self.y_sqr5 = (self.section.flange_thickness / 2 + self.end_dist + (
-                                        (self.n_bw / 2) - 1.5) * self.pitch + 2 * self.p_2_web + i * self.pitch) ** 2
+                                        (self.n_bw_prov / 2) - 1.5) * self.pitch + 2 * self.p_2_web_prov + i * self.pitch) ** 2
                         # print("y_sqr5", self.y_sqr5)
 
                         self.y_sqr = self.y_sqr1 + self.y_sqr2 + self.y_sqr3 + self.y_sqr4 + self.y_sqr5
                     # print("y_sqr", self.y_sqr)
             else:
-                if self.n_bw % 2 == 0:
-                    if self.n_bw == 2:
+                if self.n_bw_prov % 2 == 0:
+                    if self.n_bw_prov == 2:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
-                        self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + self.p_2_web) ** 2
+                        self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + self.p_2_web_prov) ** 2
                         self.y_sqr = self.y_sqr1 + self.y_sqr2
                     else:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
                         # print("y_sqr1", self.y_sqr1)
 
-                        for i in range(1, int(self.n_bw / 2)):
+                        for i in range(1, int(self.n_bw_prov / 2)):
                             self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + i * self.pitch) ** 2
                         # print("y_sqr2", self.y_sqr2)
 
                         self.y_sqr3 = (self.section.flange_thickness / 2 + self.end_dist + (
-                                (self.n_bw / 2) - 1) * self.pitch + self.p_2_web) ** 2
+                                (self.n_bw_prov / 2) - 1) * self.pitch + self.p_2_web_prov) ** 2
                         # print("y_sqr3", self.y_sqr3)
 
-                        for i in range(1, int(self.n_bw / 2)):
+                        for i in range(1, int(self.n_bw_prov / 2)):
                             self.y_sqr4 = (self.section.flange_thickness / 2 + self.end_dist + (
-                                    (self.n_bw / 2) - 1) * self.pitch + self.p_2_web + i * self.pitch) ** 2
+                                    (self.n_bw_prov / 2) - 1) * self.pitch + self.p_2_web_prov + i * self.pitch) ** 2
                         # print("y_sqr4", self.y_sqr4)
 
                         self.y_sqr5 = (1.5 * self.section.flange_thickness + 3 * self.end_dist + (
-                                    self.n_bw - 2) * self.pitch + self.p_2_web) ** 2
+                                    self.n_bw_prov - 2) * self.pitch + self.p_2_web_prov) ** 2
 
                         self.y_sqr = self.y_sqr1 + self.y_sqr2 + self.y_sqr3 + self.y_sqr4 + self.y_sqr5
                     # print("y_sqr", self.y_sqr)
                 else:
-                    if self.n_bw == 3:
+                    if self.n_bw_prov == 3:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
-                        self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + 2 * self.p_2_web) ** 2
+                        self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + 2 * self.p_2_web_prov) ** 2
                         self.y_sqr = self.y_sqr1 + self.y_sqr2
                     else:
                         self.y_sqr1 = (self.section.flange_thickness / 2 + self.end_dist) ** 2
                         # print("y_sqr1", self.y_sqr1)
 
-                        for i in range(1, int(self.n_bw / 2 - 0.5)):
+                        for i in range(1, int((self.n_bw_prov / 2) - 0.5)):
                             self.y_sqr2 = (self.section.flange_thickness / 2 + self.end_dist + i * self.pitch) ** 2
                         # print("y_sqr2", self.y_sqr2)
 
                         self.y_sqr3 = (self.section.flange_thickness / 2 + self.end_dist + (
-                                (self.n_bw / 2) - 1.5) * self.pitch + self.p_2_web) ** 2
+                                (self.n_bw_prov / 2) - 1.5) * self.pitch + self.p_2_web_prov) ** 2
                         # print("y_sqr3", self.y_sqr3)
 
                         self.y_sqr4 = (self.section.flange_thickness / 2 + self.end_dist + (
-                                (self.n_bw / 2) - 1.5) * self.pitch + 2 * self.p_2_web) ** 2
+                                (self.n_bw_prov / 2) - 1.5) * self.pitch + 2 * self.p_2_web_prov) ** 2
                         # print("y_sqr4", self.y_sqr4)
 
-                        for i in range(1, int(self.n_bw / 2 - 0.5)):
+                        for i in range(1, int((self.n_bw_prov / 2) - 0.5)):
                             self.y_sqr5 = (self.section.flange_thickness / 2 + self.end_dist + (
-                                    (self.n_bw / 2) - 1.5) * self.pitch + 2 * self.p_2_web + i * self.pitch) ** 2
+                                    (self.n_bw / 2) - 1.5) * self.pitch + 2 * self.p_2_web_prov + i * self.pitch) ** 2
                         # print("y_sqr5", self.y_sqr5)
 
                         self.y_sqr6 = (1.5 * self.section.flange_thickness + 3 * self.end_dist + (
-                                    self.n_bw - 3) * self.pitch + 2 * self.p_2_web) ** 2
+                                    self.n_bw_prov - 3) * self.pitch + 2 * self.p_2_web_prov) ** 2
 
                         self.y_sqr = self.y_sqr1 + self.y_sqr2 + self.y_sqr3 + self.y_sqr4 + self.y_sqr5 + self.y_sqr6
                     print("y_sqr", self.y_sqr)
 
             self.t_b = round(
-                (self.factored_axial_load / self.no_bolts) + (self.factored_moment * self.y_max) / self.y_sqr, 2)
+                (self.factored_axial_load / self.no_bolts_prov) + (self.factored_moment * self.y_max) / self.y_sqr, 2)
             # self.t_b = 0
 
             # self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt_diam_provided,

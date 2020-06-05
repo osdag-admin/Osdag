@@ -226,13 +226,13 @@ class ColumnCoverPlateWeld(MomentConnection):
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'No Validator')
+        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t17)
 
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
+        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t8)
 
         # t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
@@ -1937,7 +1937,6 @@ class ColumnCoverPlateWeld(MomentConnection):
         self.gamma_mw_web = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
                                   KEY_DISP_BEAMSEC: self.section.designation,
-                                  KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
                                   KEY_DISP_MATERIAL: self.section.material,
                                   KEY_DISP_FU: self.section.fu,
                                   KEY_DISP_FY: self.section.fy,
@@ -1972,6 +1971,8 @@ class ColumnCoverPlateWeld(MomentConnection):
              "Section Details": self.report_supporting,
 
              "Weld Details": "TITLE",
+
+             KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
              KEY_DISP_DP_WELD_TYPE: "Fillet",
              KEY_DISP_DP_WELD_FAB: self.flange_weld.fabrication,
              KEY_DISP_DP_WELD_MATERIAL_G_O: self.flange_weld.fu,

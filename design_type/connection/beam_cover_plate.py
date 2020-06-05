@@ -235,13 +235,13 @@ class BeamCoverPlate(MomentConnection):
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'No Validator')
+        t17 = (KEY_MOMENT, KEY_DISP_MOMENT, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t17)
 
-        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'No Validator')
+        t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t8)
 
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
@@ -2421,7 +2421,7 @@ class BeamCoverPlate(MomentConnection):
                         self.design_status = False
                     else:
                         self.webheight_status = True
-                        self.web_plate_crs_sec_area = 2 * self.webwidth * y
+                        self.web_plate_crs_sec_area = 2 * self.webplatewidth* y
                         if self.web_plate_crs_sec_area >= self.web_crs_area * 1.05:
                             thickness = y
                             break
@@ -2629,7 +2629,6 @@ class BeamCoverPlate(MomentConnection):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
                                   KEY_DISP_BEAMSEC: self.section.designation,
-                                  KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
                                   KEY_DISP_MATERIAL: self.section.material,
                                   KEY_DISP_FU: self.section.fu,
                                   KEY_DISP_FY: self.section.fy,
@@ -2663,10 +2662,10 @@ class BeamCoverPlate(MomentConnection):
              "Section Details": self.report_supporting,
 
              "Bolt Details": "TITLE",
+             KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
              KEY_DISP_D: str(self.bolt.bolt_diameter),
              KEY_DISP_GRD: str(self.bolt.bolt_grade),
              KEY_DISP_TYP: self.bolt.bolt_type,
-
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
              KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
@@ -2906,7 +2905,7 @@ class BeamCoverPlate(MomentConnection):
                 t2 = (KEY_DISP_AREA_CHECK, plate_area_req(crs_area=round(self.web_crs_area, 2),
                                                           flange_web_area = round( self.Wp,2)),
                       web_plate_area_prov_bolt(D=self.section.depth, y = self.thick_w,
-                                               webwidth = round(self.webwidth,2),
+                                               webwidth = self.webplatewidth,
                                                wp_area =round(self.web_plate_crs_sec_area,2),T = self.section.flange_thickness, r_1 = self.section.root_radius),
                                             get_pass_fail(self.Wp, self.web_plate_crs_sec_area, relation="lesser"))
                 self.report_check.append(t2)
@@ -3376,7 +3375,7 @@ class BeamCoverPlate(MomentConnection):
             ### web Check ###
             gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
             # A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
-            webheight = (self.section.depth - 2 * self.section.flange_thickness)
+            webheight = round((self.section.depth - 2 * self.section.flange_thickness),2)
             t1 = (KEY_DISP_TENSIONYIELDINGCAP_WEB, '', tension_yield_prov(webheight,
                                                                           self.section.web_thickness,
                                                                           self.section.fy, gamma_m0,
@@ -3559,14 +3558,14 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t1)
 
             t1 = (KEY_DISP_BLOCKSHEARCAP_WEB_PLATE, '',
-                  blockshear_prov(Tdb=round(self.web_plate.block_shear_capacity_shear / 1000, 2)), '')
+                  blockshear_prov(Tdb=round(self.web_plate.block_shear_capacity_shear / 1000, 2),stress ="shear"), '')
             self.report_check.append(t1)
 
             t1 = (KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, display_prov(round(self.fact_shear_load / 1000, 2), "V_u"),
 
                   shear_capacity_prov(round(self.web_plate.shear_yielding_capacity / 1000, 2),
                                       round(self.web_plate.shear_rupture_capacity / 1000, 2),
-                                      round(self.web_plate.block_shear_capacity / 1000, 2)),
+                                      round(self.web_plate.block_shear_capacity_shear/ 1000, 2)),
                   get_pass_fail(round(self.fact_shear_load / 1000, 2),
                                 round(self.web_plate.shear_capacity_web_plate / 1000, 2), relation="lesser"))
             self.report_check.append(t1)

@@ -1441,7 +1441,7 @@ def flange_weld_stress(F_f,l_eff,F_ws):
     return flange_weld_stress_eqn
 
 
-def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u = None, f_y = None ,gamma_m0 = None ,gamma_m1 = None):
+def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u = None, f_y = None ,gamma_m0 = None ,gamma_m1 = None,stress=None):
     Tdb = str(Tdb)
     A_vg = str(A_vg)
     A_vn = str(A_vn)
@@ -1453,9 +1453,14 @@ def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u 
     gamma_m0 = str(gamma_m0)
 
     member_block_eqn = Math(inline=True)
-    member_block_eqn.append(NoEscape(r'\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
-    member_block_eqn.append(NoEscape(r'T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
-    member_block_eqn.append(NoEscape(r'T_{db} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\end{aligned}'))
+    if stress == "shear":
+        member_block_eqn.append(NoEscape(r'\begin{aligned}V_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
+        member_block_eqn.append(NoEscape(r'V_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+        member_block_eqn.append(NoEscape(r'V_{db} &= min(V_{db1}, V_{db2})= ' + Tdb + r'\end{aligned}'))
+    else:
+        member_block_eqn.append(NoEscape(r'\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
+        member_block_eqn.append(NoEscape(r'T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+        member_block_eqn.append(NoEscape(r'T_{db} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\end{aligned}'))
     # member_block_eqn.append(NoEscape(r'&= \frac{' + A_vg + '*' + f_y + '}{" 1.732*' + gamma_m0 + 'r'} + &+ +'\frac{"0.9*" + A_vn + '*' + f_u + '}{'+1.732+'*' + gamma_m0 + r'} '\\'))
 
     return member_block_eqn
@@ -1615,7 +1620,7 @@ def long_joint_bolted_beam(nc,nr,p,g,d,Tc,Tr,joint,end_dist,gap,edge_dist,web_th
     l = round(max(lc,lr) ,2)
     lt = 15 * d
     B = 1.075 - (l / (200 * d))
-    Bi = round(B,2)
+    # Bi = round(B,2)
     nc= str(nc)
     nr= str(nr)
     g= str(g)
@@ -1629,8 +1634,8 @@ def long_joint_bolted_beam(nc,nr,p,g,d,Tc,Tr,joint,end_dist,gap,edge_dist,web_th
         B =1
     else:
         B=B
-    B = str(round(B,2))
-    Bi = str(Bi)
+    B = round(B,2)
+    Bi = str(B)
     lc_str = str(lc)
     lr_str = str(lr)
     l_str = str(l)
@@ -1693,7 +1698,7 @@ def long_joint_bolted_beam(nc,nr,p,g,d,Tc,Tr,joint,end_dist,gap,edge_dist,web_th
             long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
             long_joint_bolted_eqn.append(NoEscape(r'&since,~l \geq 15 * d~ \\&then~V_{rd} = \beta_{ij} * V_{db} \\'))
             long_joint_bolted_eqn.append(NoEscape(r'\beta_{ij} &= 1.075 - '+ l_str +'/(200*'+d+r') \\&='+Bi+r'\\'))
-            long_joint_bolted_eqn.append(NoEscape(r'V_{rd} &= '+B+' * '+Tc+'='+Tr+ r' \end{aligned}'))
+            long_joint_bolted_eqn.append(NoEscape(r'V_{rd} &= '+Bi+' * '+Tc+'='+Tr+ r' \end{aligned}'))
         else:
             long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l~&= ((nc~or~nr) - 1) * (p~or~g) \\'))
             if conn == "beam_beam":
@@ -1710,7 +1715,7 @@ def long_joint_bolted_beam(nc,nr,p,g,d,Tc,Tr,joint,end_dist,gap,edge_dist,web_th
             long_joint_bolted_eqn.append(NoEscape(r'&15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
             long_joint_bolted_eqn.append(NoEscape(r'&since,~l \geq 15 * d~\\ &then~V_{rd} = \beta_{ij} * V_{db} \\'))
             long_joint_bolted_eqn.append(NoEscape(r'\beta_{ij} &= 1.075 - '+ l_str +'/(200*'+d+ r')\\& ='+Bi+r'\\'))
-            long_joint_bolted_eqn.append(NoEscape(r' V_{rd}& = '+B+' * '+Tc+'='+Tr+ r' \end{aligned}'))
+            long_joint_bolted_eqn.append(NoEscape(r' V_{rd}& = '+Bi+' * '+Tc+'='+Tr+ r' \end{aligned}'))
 
     return long_joint_bolted_eqn
 
@@ -2127,10 +2132,11 @@ def web_plate_area_prov_bolt(D, y, webwidth, wp_area, T, r_1):
     y = str(y)
 
     web_plate_area_prov = Math(inline=True)
-    web_plate_area_prov.append(NoEscape(r'\begin{aligned} W_{wp}&= D-(2*T)-(2*R1)\\'))
-    web_plate_area_prov.append(NoEscape(r'&=' + D + '-(2*' + T + ')-(2*' + r_1 + r')\\'))
-    web_plate_area_prov.append(NoEscape(r'&= ' + webwidth + r' \\'))
-    web_plate_area_prov.append(NoEscape(r' pt.area &= ' + y + '*2* ' + webwidth + r'\\'))
+    # web_plate_area_prov.append(NoEscape( W_{wp}&= D-(2*T)-(2*R1)\\'))
+    # web_plate_area_prov.append(NoEscape(r'&=' + D + '-(2*' + T + ')-(2*' + r_1 + r')\\'))
+    # web_plate_area_prov.append(NoEscape(r'&= ' + webwidth + r' \\'))
+    web_plate_area_prov.append(NoEscape(r'\begin{aligned}pt.area &= t_{wp} *2*  W_{wp} \\'))
+    web_plate_area_prov.append(NoEscape(r'&= ' + y + '*2* ' + webwidth + r'\\'))
     web_plate_area_prov.append(NoEscape(r'&= ' + wp_area + r'\end{aligned}'))
     return web_plate_area_prov
 

@@ -1138,10 +1138,10 @@ class Plate(Material):
                 bolt_capacity_red = bolt_capacity
         else:
             if web_thickness == 0.0:
-                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2 * gap)), ((bolts_one_line - 1) * gauge))
+                length_avail = max((2 * (((bolts_line-1) * pitch) + end_dist) + (2 * gap)), ((bolts_one_line - 1) * gauge))
             else:
                 midgauge = 2 * (edge_dist + root_radius) + web_thickness
-                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2 * gap)),
+                length_avail = max((2 * (((bolts_line-1) * pitch) + end_dist) + (2 * gap)),
                                    (((bolts_one_line / 2 - 1) * gauge) + midgauge))
             if length_avail > 15 * bolt_dia:
                 beta_lj = 1.075 - length_avail / (200 * bolt_dia)

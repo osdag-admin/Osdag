@@ -1301,8 +1301,8 @@ class BeamCoverPlateWeld(MomentConnection):
             self.section.block_shear_capacity_web = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn,
                                                                                   A_tg=Atg,
                                                                                   A_tn=Atn,
-                                                                                  f_u=self.web_plate.fu,
-                                                                                  f_y=self.web_plate.fy)
+                                                                                  f_u=self.section.fu,
+                                                                                  f_y=self.section.fy)
             if self.section.block_shear_capacity_web < self.axial_force_w:
                 self.available_long_web_length = self.available_long_web_length + 50
             else:

@@ -840,7 +840,7 @@ class ColumnCoverPlateWeld(MomentConnection):
             ################################# FLANGE MEMBER CAPACITY CHECK##############################
             A_v_flange = self.section.flange_thickness * self.section.flange_width
             self.section.tension_yielding_capacity = self.tension_member_design_due_to_yielding_of_gross_section(
-                A_v=A_v_flange, fy=self.flange_plate.fy)
+                A_v=A_v_flange, fy=self.section.fy)
             if self.section.tension_yielding_capacity > self.flange_force:
                 self.web_plate_thickness_possible = [i for i in self.web_plate.thickness if
                                                      i >= (self.section.web_thickness / 2)]
@@ -1420,8 +1420,8 @@ class ColumnCoverPlateWeld(MomentConnection):
             self.section.block_shear_capacity_web = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn,
                                                                                       A_tg=Atg,
                                                                                       A_tn=Atn,
-                                                                                      f_u=self.web_plate.fu,
-                                                                                      f_y=self.web_plate.fy)
+                                                                                      f_u=self.section.fu,
+                                                                                      f_y=self.section.fy)
             if self.section.block_shear_capacity_web < self.axial_force_w:
                 self.available_long_web_length = self.available_long_web_length + 50
             else:

@@ -684,11 +684,11 @@ class EndPlateConnection(ShearConnection):
                             and self.plate.thickness_provided == sorted(self.plate.thickness)[-1]:
                         self.design_status = False
                         design_status_bolt = False
-                        logger.error(" : Select bolt of lower diameter, sufficient plate height not available")
+                        logger.error(" : Select bolt of lower diameter, sufficient plate height/ width not available to arrange bolts")
 
         if count == 0 and self.plate.design_status == False:
             self.design_status = False
-            logger.error(" : Select bolt of lower diameter, sufficient plate width is not available")
+            logger.error(" : Select bolt of lower diameter, sufficient plate width/ height is not available to arrange bolts")
         elif count == 0:
             self.design_status = False
             # print(self.design_status)

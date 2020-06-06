@@ -32,7 +32,7 @@ class MyTableWidget(QWidget):
         widget.setAutoFillBackground(True)
 
 
-class Example(QMainWindow):
+class Window(QMainWindow):
 
     def __init__(self, main, input_dictionary):
         super().__init__()
@@ -179,7 +179,8 @@ class Example(QMainWindow):
                         font.setWeight(50)
                         combo.setFont(font)
                         metrices = QtGui.QFontMetrics(font)
-                        item_width = max([metrices.boundingRect(item).width() for item in element[3]])
+                        item_width = 0
+                        item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
                         combo.view().setMinimumWidth(item_width + 30)
                         combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
                         r += 1
@@ -299,7 +300,7 @@ class Example(QMainWindow):
                         font.setWeight(50)
                         combo.setFont(font)
                         metrices = QtGui.QFontMetrics(font)
-                        item_width = max([metrices.boundingRect(item).width() for item in element[3]])
+                        item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
                         combo.view().setMinimumWidth(item_width + 30)
                         if element[0] == KEY_DP_DESIGN_METHOD:
                             combo.model().item(1).setEnabled(False)
@@ -887,7 +888,7 @@ class DesignPreferences():
 
     def __init__(self, module_window, main, input_dictionary, parent=None):
 
-        self.ui = Example( main, input_dictionary)
+        self.ui = Window( main, input_dictionary)
 
         #self.ui.setupUi(self, main, input_dictionary)
         #self.ui.show()

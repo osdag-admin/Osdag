@@ -242,7 +242,6 @@ class Window(QMainWindow):
         main.design_status = False
         MainWindow.setObjectName("MainWindow")
 
-        print(MainWindow.width(),'llllllll')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/finwindow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -563,7 +562,6 @@ class Window(QMainWindow):
                 l.setReadOnly(True)
                 l.setFixedSize(l.size())
                 in_layout2.addWidget(l, j, 2, 1, 1)
-                print('note is here ')
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
@@ -574,7 +572,6 @@ class Window(QMainWindow):
                 im.setPixmap(pixmap)
                 i = i + 30
                 im.setFixedSize(im.size())
-                print('imag is here ')
                 in_layout2.addWidget(im, j, 2, 1, 1)
 
             if type == TYPE_IMAGE_COMPRESSION:
@@ -586,7 +583,6 @@ class Window(QMainWindow):
                 imc.setPixmap(pixmapc)
                 i = i + 30
                 imc.setFixedSize(imc.size())
-                print('image compression is ')
                 in_layout2.addWidget(imc, j, 2, 1, 1)
 
 # <<<<<<< HEAD

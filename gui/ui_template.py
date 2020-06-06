@@ -780,15 +780,14 @@ class Window(QMainWindow):
                 font.setBold(False)
                 font.setWeight(50)
                 l.setFont(font)
-                #l.setFixedSize(l.size())
                 l.setObjectName(option[0] + "_label")
-                #l.setFixedSize(l.size())
+                l.resize(l.sizeHint().width(), l.sizeHint().height())
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                 out_layout2.addWidget(l, j, 1, 1, 1)
                 l.setVisible(True if option[4] else False)
                 metrices = QtGui.QFontMetrics(font)
                 maxi_width_left = max(metrices.boundingRect(lable).width() + 8, maxi_width_left)
-                l.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
+                #l.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
                 # if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
                 #     l.setVisible(False)
 
@@ -808,7 +807,7 @@ class Window(QMainWindow):
                 out_layout2.addWidget(r, j, 2, 1, 1)
                 r.setVisible(True if option[4] else False)
                 maxi_width_right = max(maxi_width_right, 100)    # predefined minimum width of 110 for textboxes
-                r.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
+                #r.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
                 # if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
                 #     r.setVisible(False)
 
@@ -846,7 +845,7 @@ class Window(QMainWindow):
                 #q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
-                q.setFixedSize(q.sizeHint().width(), q.sizeHint().height())
+                q.resize(q.sizeHint().width(), q.sizeHint().height())
                 out_layout2.addWidget(q, j, 1, 2, 2)
                 j = j + 1
             i = i + 30
@@ -855,7 +854,7 @@ class Window(QMainWindow):
         out_scroll.setWidget(out_scrollcontent)
         maxi_width = maxi_width_left + maxi_width_right
 
-        maxi_width += 80    # +80 coz of whitespaces
+        maxi_width += 80    # +73 coz of whitespaces
         maxi_width = max(maxi_width, 350) # in case no widget
         out_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         out_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)

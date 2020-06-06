@@ -93,6 +93,11 @@ class Ui_ModuleWindow(QMainWindow):
         return self.ui.get_right_elements()
 
     def open_summary_popup(self, main):
+
+        if not main.design_button_status:
+            QMessageBox.warning(QMessageBox(), 'Warning', 'No design created!')
+            return
+
         self.new_window = QtWidgets.QDialog()
         self.new_ui = Ui_Dialog1(self.design_exist)
         self.new_ui.setupUi(self.new_window, main)
@@ -106,22 +111,19 @@ class Ui_ModuleWindow(QMainWindow):
 
     def getLogoFilePath(self, window, lblwidget):
 
-        self.new_ui.lbl_browse.clear()
         filename, _ = QFileDialog.getOpenFileName(window, "Open Image", os.path.join(str(' '), ''), "InputFiles(*.png *.svg *.jpg)")
 
         # filename, _ = QFileDialog.getOpenFileName(
         #     self, 'Open File', " ../../",
         #     'Images (*.png *.svg *.jpg)',
         #     None, QFileDialog.DontUseNativeDialog)
-        flag = True
         if filename == '':
-            flag = False
-            return flag
+            return False
         else:
-            base = os.path.basename(str(filename))
-            lblwidget.setText(base)
-            base_type = base[-4:]
-            self.desired_location(filename, base_type)
+            # base = os.path.basename(str(filename))
+            lblwidget.setText(str(filename))
+            # base_type = base[-4:]
+            # self.desired_location(filename, base_type)
 
         return str(filename)
 
@@ -134,13 +136,11 @@ class Ui_ModuleWindow(QMainWindow):
 
     def saveUserProfile(self, window):
 
-        flag = True
         inputData = self.getPopUpInputs()
         filename, _ = QFileDialog.getSaveFileName(window, 'Save Files',
                                                   os.path.join(str(self.folder), "Profile"), '*.txt')
         if filename == '':
-            flag = False
-            return flag
+            return False
         else:
             infile = open(filename, 'w')
             yaml.dump(inputData, infile)
@@ -154,11 +154,11 @@ class Ui_ModuleWindow(QMainWindow):
         input_summary["ProfileSummary"]["Group/TeamName"] = str(self.new_ui.lineEdit_groupName.text())
         input_summary["ProfileSummary"]["Designer"] = str(self.new_ui.lineEdit_designer.text())
 
-        input_summary["ProjectTitle"] = str(self.new_ui.lineEdit_projectTitle.text())
-        input_summary["Subtitle"] = str(self.new_ui.lineEdit_subtitle.text())
-        input_summary["JobNumber"] = str(self.new_ui.lineEdit_jobNumber.text())
-        input_summary["AdditionalComments"] = str(self.new_ui.txt_additionalComments.toPlainText())
-        input_summary["Client"] = str(self.new_ui.lineEdit_client.text())
+        # input_summary["ProjectTitle"] = str(self.new_ui.lineEdit_projectTitle.text())
+        # input_summary["Subtitle"] = str(self.new_ui.lineEdit_subtitle.text())
+        # input_summary["JobNumber"] = str(self.new_ui.lineEdit_jobNumber.text())
+        # input_summary["AdditionalComments"] = str(self.new_ui.txt_additionalComments.toPlainText())
+        # input_summary["Client"] = str(self.new_ui.lineEdit_client.text())
 
         return input_summary
 
@@ -178,11 +178,20 @@ class Ui_ModuleWindow(QMainWindow):
         else:
             pass
 
+    def zoom_model(self, zoom_type="in"):
+        if zoom_type == "in":
+            self.display.ZoomFactor(3)
+        elif zoom_type == "out":
+            self.display.ZoomFactor(1/3)
+        else:
+            self.display.ZoomFactor(0)
+
+
     def get_validator(self, validator):
         if validator == 'Int Validator':
             return QIntValidator()
         elif validator == 'Double Validator':
-            return QDoubleValidator
+            return QDoubleValidator()
         else:
             return None
 
@@ -193,6 +202,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.design_pref_inputs = {}
         self.folder = folder
         main.design_status = False
+        main.design_button_status = False
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
         icon = QtGui.QIcon()
@@ -1081,9 +1091,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.menuFile.addAction(self.actionSave_Side_View)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionfinPlate_quit)
-        self.menuEdit.addAction(self.actionCut)
-        self.menuEdit.addAction(self.actionCopy)
-        self.menuEdit.addAction(self.actionPaste)
+        # self.menuEdit.addAction(self.actionCut)
+        # self.menuEdit.addAction(self.actionCopy)
+        # self.menuEdit.addAction(self.actionPaste)
         self.menuEdit.addAction(self.actionDesign_Preferences)
         self.menuView.addAction(self.actionEnlarge_font_size)
         self.menuView.addSeparator()
@@ -1123,6 +1133,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionSave_3D_model.triggered.connect(lambda: self.save3DcadImages(main))
         self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
+        self.actionCreate_design_report.triggered.connect(lambda:self.open_summary_popup(main))
+        self.actionZoom_out.triggered.connect(lambda: self.zoom_model(zoom_type="out"))
+        self.actionZoom_in.triggered.connect(lambda: self.zoom_model(zoom_type="in"))
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -2157,7 +2170,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionBolt.setText(_translate("MainWindow", "Bolt"))
         self.action2D_view.setText(_translate("MainWindow", "2D view"))
         self.actionZoom_in.setText(_translate("MainWindow", "Zoom in"))
+        self.actionZoom_in.setShortcut(_translate("MainWindow", "Ctrl+I"))
         self.actionZoom_out.setText(_translate("MainWindow", "Zoom out"))
+        self.actionZoom_out.setShortcut(_translate("MainWindow", "Ctrl+O"))
         self.actionPan.setText(_translate("MainWindow", "Pan"))
         self.actionRotate_3D_model.setText(_translate("MainWindow", "Rotate 3D model"))
         self.actionView_2D_on_XY.setText(_translate("MainWindow", "View 2D on XY"))

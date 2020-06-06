@@ -1161,7 +1161,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def tab_list(self):
 
-        self.design_button_status = False
+        # self.design_button_status = False
 
         tabs = []
 

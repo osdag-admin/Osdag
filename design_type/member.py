@@ -489,8 +489,8 @@ class Member(Main):
         print('vvvvv')
         designation = self[0]
         material_grade = self[1]
-        l = self[2]
-        section_profile = self[3]
+        l = self[2] [KEY_LOCATION]
+        section_profile = self[2] [KEY_SEC_PROFILE]
         Angle_attributes = Angle(designation, material_grade)
         Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
         source = str(Angle_attributes.source)
@@ -525,7 +525,7 @@ class Member(Main):
             plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
             torsional_rigidity = str(Angle_attributes.It)
         else:
-            Angle_attributes = Angle(designation, material_grade)
+            # Angle_attributes = Angle(designation, material_grade)
             if section_profile == "Back to Back Angles":
                 print(section_profile, "hjcxhf")
                 Angle_attributes = BBAngle_Properties()
@@ -643,6 +643,131 @@ class Member(Main):
             'Label_23': str(source)}
         return d
 
+    def get_Angle_sec_properties(self):
+        if '' in self:
+            mass = ''
+            area = ''
+            Cz = ''
+            Cy = ''
+            moa_z = ''
+            moa_y = ''
+            moa_u = ''
+            moa_v = ''
+            rog_z = ''
+            rog_y = ''
+            rog_u = ''
+            rog_v = ''
+            em_z = ''
+            em_y = ''
+            pm_z = ''
+            pm_y = ''
+            I_t = ''
+
+        else:
+            a = float(self[0])
+            b = float(self[1])
+            t = float(self[2])
+            l = self[3][KEY_LOCATION]
+            p = self[3][KEY_SEC_PROFILE]
+            if p == "Angles":
+                sec_prop = Single_Angle_Properties()
+            elif p == "Back to Back Angles":
+                sec_prop = BBAngle_Properties()
+            else:
+                sec_prop = SAngle_Properties()
+            # sec_prop = Single_Angle_Properties()
+            mass = sec_prop.calc_Mass(a,b,t,l)
+            area = sec_prop.calc_Area(a,b,t,l)
+            Cz = sec_prop.calc_Cz(a,b,t,l)
+            Cy = sec_prop.calc_Cy(a,b,t,l)
+            moa_z = sec_prop.calc_MomentOfAreaZ(a,b,t,l)
+            moa_y = sec_prop.calc_MomentOfAreaY(a,b,t,l)
+            moa_u = sec_prop.calc_MomentOfAreaU(a,b,t,l)
+            moa_v = sec_prop.calc_MomentOfAreaV(a,b,t,l)
+            rog_z = sec_prop.calc_RogZ(a,b,t,l)
+            rog_y = sec_prop.calc_RogY(a,b,t,l)
+            rog_u = sec_prop.calc_RogU(a,b,t,l)
+            rog_v = sec_prop.calc_RogV(a,b,t,l)
+            em_z = sec_prop.calc_ElasticModulusZz(a,b,t,l)
+            em_y = sec_prop.calc_ElasticModulusZy(a,b,t,l)
+            pm_z = sec_prop.calc_PlasticModulusZpz(a,b,t,l)
+            pm_y = sec_prop.calc_PlasticModulusZpy(a,b,t,l)
+            I_t = sec_prop.calc_TorsionConstantIt(a,b,t,l)
+
+
+        d = {'Label_9': str(mass),
+             'Label_10': str(area),
+             'Label_7': str(Cz),
+             'Label_8': str(Cy),
+             'Label_11': str(moa_z),
+             'Label_12': str(moa_y),
+             'Label_13': str(moa_u),
+             'Label_14': str(moa_v),
+             'Label_15': str(rog_z),
+             'Label_16': str(rog_y),
+             'Label_17': str(rog_u),
+             'Label_18': str(rog_v),
+             'Label_19': str(em_z),
+             'Label_20': str(em_y),
+             'Label_21': str(pm_z),
+             'Label_22': str(pm_y),
+             'Label_23': str(I_t),
+             }
+
+        return d
+
+    def get_Channel_sec_properties(self):
+
+        if '' in self:
+            mass = ''
+            area = ''
+            C_y = ''
+            moa_z = ''
+            moa_y = ''
+
+            rog_z = ''
+            rog_y = ''
+
+            em_z = ''
+            em_y = ''
+            pm_z = ''
+            pm_y = ''
+
+        else:
+            f_w = float(self[0])
+            f_t = float(self[1])
+            w_h = float(self[2])
+            w_t = float(self[3])
+
+            sec_prop = Single_Channel_Properties()
+            mass = sec_prop.calc_Mass(f_w, f_t, w_h, w_t)
+            area = sec_prop.calc_Area(f_w, f_t, w_h, w_t)
+            C_y = sec_prop.calc_C_y(f_w, f_t, w_h, w_t)
+            moa_z = sec_prop.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t)
+            moa_y = sec_prop.calc_MomentOfAreaY(f_w, f_t, w_h, w_t)
+
+            rog_z = sec_prop.calc_RogZ(f_w, f_t, w_h, w_t)
+            rog_y = sec_prop.calc_RogY(f_w, f_t, w_h, w_t)
+
+            em_z = sec_prop.calc_ElasticModulusZz(f_w, f_t, w_h, w_t)
+            em_y = sec_prop.calc_ElasticModulusZy(f_w, f_t, w_h, w_t)
+            pm_z = sec_prop.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t)
+            pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t)
+
+        d = {'Label_9': str(mass),
+             'Label_10': str(area),
+             'Label_11': str(moa_z),
+             'Label_12': str(moa_y),
+             'Label_15': str(rog_z),
+             'Label_16': str(rog_y),
+             'Label_17': str(C_y),
+             'Label_19': str(em_z),
+             'Label_20': str(em_y),
+             'Label_21': str(pm_z),
+             'Label_22': str(pm_y),
+             }
+
+        return d
     def get_fu_fy_section(self):
         material_grade = self[0]
         designation = self[2][KEY_SECSIZE_SELECTED]

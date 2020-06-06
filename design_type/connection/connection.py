@@ -74,8 +74,8 @@ class Connection(Main):
             elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
-            torsion_const = str(I_sec_attributes.torsion_const)
-            warping_const = str(I_sec_attributes.warping_const)
+            torsion_const = str(I_sec_attributes.It)
+            warping_const = str(I_sec_attributes.Iw)
 
         if KEY_SUPTNGSEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SUPTNGSEC_MATERIAL]
@@ -273,8 +273,8 @@ class Connection(Main):
             elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
-            torsion_const = str(I_sec_attributes.torsion_const)
-            warping_const = str(I_sec_attributes.warping_const)
+            torsion_const = str(I_sec_attributes.It)
+            warping_const = str(I_sec_attributes.Iw)
 
         if KEY_SUPTDSEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SUPTDSEC_MATERIAL]

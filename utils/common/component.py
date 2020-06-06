@@ -1740,6 +1740,7 @@ class I_sectional_Properties(object):
     def calc_warping_const (self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
         return 0.0
 
+
 class Single_Angle_Properties(object):
 
     def calc_Mass(self,a,b,t,l):

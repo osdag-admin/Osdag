@@ -45,7 +45,8 @@ from .ui_design_preferences import Ui_Dialog
 
 from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
-from .ui_design_preferences import DesignPreferences
+#from .ui_design_preferences import DesignPreferences
+from .REBIT import DesignPreferences
 from design_type.connection.shear_connection import ShearConnection
 from cad.common_logic import CommonDesignLogic
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
@@ -72,9 +73,55 @@ from design_type.tension_member.tension_welded import Tension_welded
 
 from cad.cad3dconnection import cadconnection
 
-
-class Ui_ModuleWindow(QMainWindow):
+class Ui_ModuleWindow(QtWidgets.QMainWindow):
+    resized = QtCore.pyqtSignal()
     closed = pyqtSignal()
+    def  __init__(self, main,folder,parent=None):
+        super(Ui_ModuleWindow, self).__init__(parent=parent)
+        self.ui = Window()
+        self.ui.setupUi(self,main,folder)
+        #self.showMaximized()
+        self.resized.connect(self.resize_dockComponents)
+
+    def resizeEvent(self, event):
+        self.resized.emit()
+        return super(Ui_ModuleWindow, self).resizeEvent(event)
+
+    def resize_dockComponents(self):
+
+        posi = (3/4)*(self.height())
+
+        # Input Dock
+        width = self.ui.inputDock.width()
+        self.ui.inputDock.resize(width,self.height())
+        self.ui.in_widget.resize(width,posi)
+
+        self.ui.btn_Reset.move((width/2)-110,posi+8)
+        self.ui.btn_Design.move((width/2)+17,posi+8)
+        #self.ui.btn_Design.move(,posi+10)
+
+        # Output Dock
+        width = self.ui.outputDock.width()
+        self.ui.outputDock.resize(width,self.height())
+        self.ui.out_widget.resize(width,posi)
+        self.ui.btn_CreateDesign.move((width/2)-173,posi+8)
+        self.ui.save_outputDock.move((width/2)+25,posi+8)
+
+    def closeEvent(self, event):
+        '''
+        Closing module window.
+        '''
+        reply = QMessageBox.question(self, 'Message',
+                                     "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            self.closed.emit()
+            event.accept()
+        else:
+            event.ignore()
+
+class Window(QMainWindow):
+    #closed = pyqtSignal()
 
     def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
         """
@@ -194,7 +241,8 @@ class Ui_ModuleWindow(QMainWindow):
         self.folder = folder
         main.design_status = False
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1328, 769)
+
+        print(MainWindow.width(),'llllllll')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/finwindow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -387,16 +435,19 @@ class Ui_ModuleWindow(QMainWindow):
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Link, brush)
 
-        in_widget = QtWidgets.QWidget(self.dockWidgetContents)
-        #sin_widget.setGeometry(QtCore.QRect(0, 0, 325, 600))
-        in_layout1 = QtWidgets.QVBoxLayout(in_widget)
-        in_scroll = QScrollArea(in_widget)
+        self.in_widget = QtWidgets.QWidget(self.dockWidgetContents)
+        #sself.in_widget.setGeometry(QtCore.QRect(0, 0, 325, 600))
+        in_layout1 = QtWidgets.QVBoxLayout(self.in_widget)
+        in_scroll = QScrollArea(self.in_widget)
         in_layout1.addWidget(in_scroll)
         in_scroll.setWidgetResizable(True)
         in_scrollcontent = QtWidgets.QWidget(in_scroll)
         in_layout2 = QtWidgets.QGridLayout(in_scrollcontent)
         in_scrollcontent.setLayout(in_layout2)
-        in_scroll.horizontalScrollBar().hide()
+        #in_scroll.horizontalScrollBar().hide()
+        in_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        in_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+
 
         """
         This routine takes the returned list from input_values function of corresponding module
@@ -431,7 +482,7 @@ class Ui_ModuleWindow(QMainWindow):
                 #l.setFixedSize(l.size())
                 in_layout2.addWidget(l, j, 1, 1, 1)
                 metrices = QtGui.QFontMetrics(font)
-                maxi_width_left = max(maxi_width_left, metrices.boundingRect(lable).width())
+                maxi_width_left = max(maxi_width_left, metrices.boundingRect(lable).width() + 8)
 
 
             if type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
@@ -458,8 +509,7 @@ class Ui_ModuleWindow(QMainWindow):
                 in_layout2.addWidget(combo, j, 2, 1, 1)
 
                 if lable == 'Material *':
-
-                    maxi_width_right = max(maxi_width_right, combo.sizeHint().width())
+                    maxi_width_right = max(maxi_width_right, item_width)
                 else:
                     combo.view().setMinimumWidth(item_width + 10)
 
@@ -507,6 +557,7 @@ class Ui_ModuleWindow(QMainWindow):
                 l.setReadOnly(True)
                 l.setFixedSize(l.size())
                 in_layout2.addWidget(l, j, 2, 1, 1)
+                print('note is here ')
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
@@ -517,6 +568,7 @@ class Ui_ModuleWindow(QMainWindow):
                 im.setPixmap(pixmap)
                 i = i + 30
                 im.setFixedSize(im.size())
+                print('imag is here ')
                 in_layout2.addWidget(im, j, 2, 1, 1)
 
             if type == TYPE_IMAGE_COMPRESSION:
@@ -528,6 +580,7 @@ class Ui_ModuleWindow(QMainWindow):
                 imc.setPixmap(pixmapc)
                 i = i + 30
                 imc.setFixedSize(imc.size())
+                print('image compression is ')
                 in_layout2.addWidget(imc, j, 2, 1, 1)
 
             if type == TYPE_TITLE:
@@ -550,12 +603,12 @@ class Ui_ModuleWindow(QMainWindow):
         in_scroll.setWidget(in_scrollcontent)
 
         maxi_width = maxi_width_left + maxi_width_right
-
+        print(maxi_width)
         in_scrollcontent.setMinimumSize(maxi_width,in_scrollcontent.sizeHint().height())
         maxi_width += 82
         maxi_width = max(maxi_width, 350)    # In case there is no widget
-        self.inputDock.setFixedSize(maxi_width, 710)
-        in_widget.setFixedSize( maxi_width, 650)
+        self.inputDock.setFixedWidth(maxi_width)
+        self.in_widget.setFixedWidth( maxi_width)
         for option in option_list:
             key = self.dockWidgetContents.findChild(QtWidgets.QWidget, option[0])
 
@@ -683,16 +736,16 @@ class Ui_ModuleWindow(QMainWindow):
         self.dockWidgetContents_out = QtWidgets.QWidget()
         self.dockWidgetContents_out.setObjectName("dockWidgetContents_out")
 
-        out_widget = QtWidgets.QWidget(self.dockWidgetContents_out)
-        #out_widget.setGeometry(QtCore.QRect(0, 0, 400, 600))
-        out_layout1 = QtWidgets.QVBoxLayout(out_widget)
-        out_scroll = QScrollArea(out_widget)
+        self.out_widget = QtWidgets.QWidget(self.dockWidgetContents_out)
+        #self.out_widget.setGeometry(QtCore.QRect(0, 0, 400, 600))
+        out_layout1 = QtWidgets.QVBoxLayout(self.out_widget)
+        out_scroll = QScrollArea(self.out_widget)
         out_layout1.addWidget(out_scroll)
         out_scroll.setWidgetResizable(True)
         out_scrollcontent = QtWidgets.QWidget(out_scroll)
         out_layout2 = QtWidgets.QGridLayout(out_scrollcontent)
         out_scrollcontent.setLayout(out_layout2)
-        out_scroll.horizontalScrollBar().hide()
+        #out_scroll.horizontalScrollBar().hide()
         _translate = QtCore.QCoreApplication.translate
 
         """
@@ -704,6 +757,7 @@ class Ui_ModuleWindow(QMainWindow):
         j = 1
         button_list = []
         maxi_width_left, maxi_width_right = -1, -1
+        self.labels_outputDock = []
         for option in out_list:
             lable = option[1]
             output_type = option[2]
@@ -721,7 +775,7 @@ class Ui_ModuleWindow(QMainWindow):
                 out_layout2.addWidget(l, j, 1, 1, 1)
                 l.setVisible(True if option[4] else False)
                 metrices = QtGui.QFontMetrics(font)
-                maxi_width_left = max(metrices.boundingRect(lable).width(), maxi_width_left)
+                maxi_width_left = max(metrices.boundingRect(lable).width() + 8, maxi_width_left)
                 # if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
                 #     l.setVisible(False)
 
@@ -739,6 +793,7 @@ class Ui_ModuleWindow(QMainWindow):
                 out_layout2.addWidget(r, j, 2, 1, 1)
                 r.setVisible(True if option[4] else False)
                 maxi_width_right = max(maxi_width_right, 110)    # predefined minimum width of 110 for textboxes
+                self.labels_outputDock.append(lable)
                 # if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
                 #     r.setVisible(False)
 
@@ -783,10 +838,11 @@ class Ui_ModuleWindow(QMainWindow):
 
         maxi_width += 80    # +80 coz of whitespaces
         maxi_width = max(maxi_width, 350) # in case no widget
+        out_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        out_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
-
-        self.outputDock.setFixedSize(maxi_width, 710)
-        out_widget.setFixedSize(maxi_width, 650)
+        self.outputDock.setFixedWidth(maxi_width)
+        self.out_widget.setFixedWidth(maxi_width)
         # common_button = QtWidgets.QPushButton()
         # d = {
         #     'Button_1': common_button,
@@ -825,7 +881,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.outputDock.setWidget(self.dockWidgetContents_out)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
         self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_out)
-        self.btn_CreateDesign.setGeometry(QtCore.QRect(((maxi_width)/2) - 100, 650, 200, 35))
+        self.save_outputDock = QtWidgets.QPushButton(self.dockWidgetContents_out)
+        self.btn_CreateDesign.setGeometry(QtCore.QRect((maxi_width/2)-173, 650, 185, 35))
+        self.save_outputDock.setGeometry(QtCore.QRect((maxi_width/2)+25, 650, 145, 35))
         self.btn_CreateDesign.setAutoDefault(True)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -833,6 +891,10 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(65)
         self.btn_CreateDesign.setFont(font)
         self.btn_CreateDesign.setObjectName("btn_CreateDesign")
+        self.save_outputDock.setFont(font)
+        self.save_outputDock.setObjectName("save_outputDock")
+        self.save_outputDock.setText("Save Output")
+        self.save_outputDock.clicked.connect(self.save_output_to_txt(main))
         # self.btn_CreateDesign.clicked.connect(self.createDesignReport(main))
 
         ##################################
@@ -1105,6 +1167,30 @@ class Ui_ModuleWindow(QMainWindow):
         self.connectivity = None
         self.fuse_model = None
 
+    def save_output_to_txt(self, main):
+        def save_fun():
+            status = main.design_status
+            out_list = main.output_values(main, status)
+            l = []
+            for option in out_list:
+                if option[2] == TYPE_TEXTBOX:
+                    txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
+                    l.append(str(option[3]))
+            to_Save = dict(zip(self.labels_outputDock,l))
+            if all(s=='' for s in l):
+                QMessageBox.information(self, "Information",
+                                        "Nothing to save.")
+            else:
+                fileName, _ = QFileDialog.getSaveFileName(self,
+                                                          "Save Output", os.path.join(self.folder, "untitled.txt"),
+                                                          "Input Files(*.txt)")
+                if fileName:
+                    with open(fileName,'w') as f:
+                        f.write(str(to_Save))
+                    QMessageBox.information(self, "Information",
+                                            "Saved successfully.")
+        return save_fun
+
     def popup(self,key, for_custom_list,updated_list,data):
 
         """
@@ -1295,7 +1381,7 @@ class Ui_ModuleWindow(QMainWindow):
 
                 input_dock_key = self.dockWidgetContents.findChild(QtWidgets.QWidget, input_dock_key_name)
                 result = list(filter(lambda get_tab:
-                                     self.designPrefDialog.findChild(QtWidgets.QWidget, get_tab[0]).objectName() !=
+                                     self.designPrefDialog.ui.findChild(QtWidgets.QWidget, get_tab[0]).objectName() !=
                                      f(input_dock_key.currentText()), remove_tabs))
 
             if result is not None:
@@ -1307,7 +1393,7 @@ class Ui_ModuleWindow(QMainWindow):
                 tab_name = des_pref[0]
                 input_type = des_pref[1]
                 input_list = des_pref[2]
-                tab = self.designPrefDialog.findChild(QtWidgets.QWidget, tab_name)
+                tab = self.designPrefDialog.ui.findChild(QtWidgets.QWidget, tab_name)
                 for key_name in input_list:
                     key = tab.findChild(QtWidgets.QWidget, key_name)
                     if input_type == TYPE_TEXTBOX:
@@ -1555,6 +1641,7 @@ class Ui_ModuleWindow(QMainWindow):
         inner_grid_widget.setLayout(inner_grid_layout)
         scrollcontent.setLayout(outer_grid_layout)
         section = 0
+        maxi_width = -1
         for op in button_list:
 
             if op[0] == button.objectName():
@@ -1580,7 +1667,11 @@ class Ui_ModuleWindow(QMainWindow):
                         l.setObjectName(option[0] + "_label")
                         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                         inner_grid_layout.addWidget(l, j, 1, 1, 1)
-                        l.resize(l.sizeHint().width(), l.sizeHint().height())
+                        #l.resize(l.sizeHint().width() + 8, l.sizeHint().height())
+                        metrices = QtGui.QFontMetrics(font)
+                        l.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
+                        maxi_width = max(maxi_width, metrices.boundingRect(lable).width() + 8)
+
 
                     if out_but_type == TYPE_SECTION:
                         if section != 0:
@@ -1597,15 +1688,17 @@ class Ui_ModuleWindow(QMainWindow):
                         image_widget.setLayout(image_layout)
                         inner_grid_layout = QtWidgets.QGridLayout(inner_grid_widget)
                         inner_grid_widget.setLayout(inner_grid_layout)
-
                         im = QtWidgets.QLabel(image_widget)
                         #im.setGeometry(QtCore.QRect(330, 10, 150, 150))
                         #im.setFixedSize(im.size())
                         pmap = QPixmap(option[3])
-                        im.setPixmap(pmap)
+                        #im.setScaledContents(1)
+                        im.setPixmap(pmap.scaled(170,340,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+                        #im.setPixmap(pmap)
                         image_layout.addWidget(im)
                         j += 1
-                        im.resize(im.sizeHint().width(), im.sizeHint().height())
+                        #maxi_width = max(maxi_width, im.width())
+                        #im.resize(im.sizeHint().width(), im.sizeHint().height())
 
                         q = QtWidgets.QLabel(scrollcontent)
                         #q.setGeometry(QtCore.QRect(30, 10, 201, 30))
@@ -1632,26 +1725,30 @@ class Ui_ModuleWindow(QMainWindow):
                         r.setObjectName(option[0])
                         r.setText(str(option[3]))
                         inner_grid_layout.addWidget(r, j, 2, 1, 1)
-                        r.resize(r.sizeHint().width()+30, r.sizeHint().height())
+                        #r.resize(r.sizeHint().width()+30, r.sizeHint().height())
+                        #r.setFixedWidth(110)
+                        r.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
+                        maxi_width = max(maxi_width,110)
                     j = j + 1
                     i = i + 30
                 outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
                 outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
                 scroll.setWidget(scrollcontent)
-                dialog.setMinimumSize(dialog.sizeHint().width(), 350)
+                dialog.setFixedSize(maxi_width+200+150, 450)
                 #scrollcontent.setGeometry(0,0,maxi_width, 350)
                 #dialog.resize(dialog.sizeHint().width()+140, 300)
                 #scrollcontent.resize(scrollcontent.sizeHint().width()+140, 300)
+                print(section,maxi_width,'llllllllll')
                 if section == 0:
                     dialog.resize(350, 300)
-                dialog.setFixedSize(dialog.size())
+                #dialog.setFixedSize(dialog.size())
                 dialog.exec()
 
     # Function for showing design-preferences popup
 
     def design_preferences(self):
-        print(self.designPrefDialog.module_window.input_dock_inputs)
-        self.designPrefDialog.exec()
+        #print(self.designPrefDialog.module_window.input_dock_inputs)
+        self.designPrefDialog.show()
 
     # Function for getting input for design preferences from input dock
     '''
@@ -1662,7 +1759,7 @@ class Ui_ModuleWindow(QMainWindow):
         on_change_tab_list = main.tab_value_changed(main)
         for new_values in on_change_tab_list:
             (tab_name, key_list, key_to_change, key_type, f) = new_values
-            tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+            tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, tab_name)
             for key_name in key_list:
                 key = tab.findChild(QtWidgets.QWidget, key_name)
                 if isinstance(key, QtWidgets.QComboBox):
@@ -1685,22 +1782,22 @@ class Ui_ModuleWindow(QMainWindow):
 
         for edit in main.edit_tabs(main):
             (tab_name, input_dock_key_name, change_typ, f) = edit
-            tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+            tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, tab_name)
             input_dock_key = self.dockWidgetContents.findChild(QtWidgets.QWidget, input_dock_key_name)
             if change_typ == TYPE_CHANGE_TAB_NAME:
-                self.designPrefDialog.ui.tabWidget.setTabText(
-                    self.designPrefDialog.ui.tabWidget.indexOf(tab), f(input_dock_key.currentText()))
+                self.designPrefDialog.ui.tabWidget.tabs.setTabText(
+                    self.designPrefDialog.ui.tabWidget.tabs.indexOf(tab), f(input_dock_key.currentText()))
             elif change_typ == TYPE_REMOVE_TAB:
 
                 if tab.objectName() != f(input_dock_key.currentText()):
-                    self.designPrefDialog.ui.tabWidget.removeTab(
-                        self.designPrefDialog.ui.tabWidget.indexOf(tab))
+                    self.designPrefDialog.ui.tabWidget.tabs.removeTab(
+                        self.designPrefDialog.ui.tabWidget.tabs.indexOf(tab))
                 # if tab:
                 #     self.designPrefDialog.ui.tabWidget.insertTab(0, tab, tab_name)
 
         for refresh in main.refresh_input_dock(main):
             (tab_name, key_name, key_type, tab_key, master_key, value, database_arg) = refresh
-            tab = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+            tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, tab_name)
             if tab:
                 add_button = tab.findChild(QtWidgets.QWidget, "pushButton_Add_"+tab_name)
                 key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
@@ -1764,7 +1861,7 @@ class Ui_ModuleWindow(QMainWindow):
             current_list = connectdb(arg,"popup")
         else:
             current_list = connectdb(arg)
-        text = self.designPrefDialog.findChild(QtWidgets.QWidget, tab_key).text()
+        text = self.designPrefDialog.ui.findChild(QtWidgets.QWidget, tab_key).text()
         key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
 
         if key_type == TYPE_COMBOBOX:
@@ -2034,18 +2131,7 @@ class Ui_ModuleWindow(QMainWindow):
             widget.hide()
 
 
-    def closeEvent(self, event):
-        '''
-        Closing module window.
-        '''
-        reply = QMessageBox.question(self, 'Message',
-                                     "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
 
-        if reply == QMessageBox.Yes:
-            self.closed.emit()
-            event.accept()
-        else:
-            event.ignore()
 
 
 from . import icons_rc

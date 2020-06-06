@@ -398,7 +398,8 @@ class BeamColumnEndPlate(MomentConnection):
     def check_compatibility(self):
 
         # Column web connectivity
-        column_clear_d = self.supporting_section.depth  #TODO Make it clear depth:
+        column_clear_d = self.supporting_section.depth - 2*self.supporting_section.flange_thickness \
+                         - 2*self.supporting_section.root_radius    # TODO Make it clear depth:
         if self.connectivity is VALUES_CONN_1[1]:
             if self.supported_section.flange_width > column_clear_d:
                 self.design_status = False  #TODO Check self.design_status
@@ -423,6 +424,27 @@ class BeamColumnEndPlate(MomentConnection):
         else:
             self.bolt_conn_plates_t_fu_fy.append(
                 (self.supported_section.flange_thickness, self.supported_section.fu, self.supported_section.fy))
+
+    def find_end_plate_spacing(self):
+        #######################################################################
+        # l_v = Distance from the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
+        # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge, Steel designers manual, pp733, 6th edition - 2003)
+        endplate_type = ""
+        if endplate_type == 'flush':
+            l_v = 45.0
+            g_1 = 90.0
+        elif endplate_type == 'one_way':
+            l_v = 50.0
+            g_1 = 100.0
+        else:  # endplate_type == 'both_ways':
+            l_v = 50.0
+            g_1 = 100.0
+
+        if self.weld.type is 'fillet': # TODO Type?? other name ?
+            flange_projection = round_up(value=weld_thickness_flange + 2, multiplier=5, minimum_value=5)
+        else:  # 'groove'
+            flange_projection = 5
+
 
     def trial_design(self):
         self.set_osdaglogger()

@@ -1,14 +1,8 @@
 
-
-import sys
-from PyQt5.QtWidgets import QLayout, QVBoxLayout ,QTabWidget, QMainWindow,QApplication, QWidget, QSizePolicy, QScrollArea
-from PyQt5.QtGui import QColor, QPalette
-from PyQt5.QtCore import QSize
+from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-
-
 
 from Common import *
 from utils.common.component import Section,I_sectional_Properties
@@ -17,30 +11,12 @@ from utils.common.other_standards import *
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.connection import Connection
 
-from PyQt5.QtWidgets import QMessageBox, qApp
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtGui import QTextCharFormat
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
-from PyQt5.QtGui import QStandardItem
 import os
-import json
-import logging
 from drawing_2D.Svg_Window import SvgWindow
 import sys
 import sqlite3
 import shutil
 import openpyxl
-import warnings
-warnings.filterwarnings("ignore")
 
 
 class MyTableWidget(QWidget):
@@ -63,11 +39,17 @@ class Example(QMainWindow):
 
         self.initUI(main,input_dictionary)
 
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
+
     def initUI(self,main,input_dictionary):
 
-        self.statusBar().showMessage('')
+        #self.statusBar().showMessage('')
         self.setGeometry(300, 300, 550, 550)
-        #self.setMinimumSize(self.sizeHint())
         self.setObjectName("DesignPreferences")
         self.setWindowTitle('Design Preference')
         self.tabWidget = MyTableWidget(self)
@@ -150,7 +132,6 @@ class Example(QMainWindow):
                     lable = element[1]
                     if type in [TYPE_COMBOBOX, TYPE_TEXTBOX]:
                         label = QLabel(tab)
-                        #label.setWordWrap(True)
                         label.setObjectName(element[0] + "_label")
                         label.setText("<html><head/><body><p>" + lable + "</p></body></html>")
                         grid.addWidget(label,r,1)
@@ -169,7 +150,6 @@ class Example(QMainWindow):
                         grid.addWidget(line,r,2)
                         line.setObjectName(element[0])
                         line.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        #grid.setSpacing(30)
                         line.setFixedSize(130, 22)
                         if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4']:
                             line.setValidator(QDoubleValidator())
@@ -186,22 +166,26 @@ class Example(QMainWindow):
                         combo = QComboBox(tab)
                         grid.addWidget(combo,r,2)
                         combo.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        #grid.setSpacing(30)
+                        combo.setMaxVisibleItems(5)
                         combo.setFixedSize(130, 22)
                         combo.setObjectName(element[0])
                         combo.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
                         combo.addItems(element[3])
-
+                        if input_dictionary:
+                            combo.setCurrentText(str(element[4]))
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         font.setBold(False)
                         font.setWeight(50)
                         combo.setFont(font)
+                        metrices = QtGui.QFontMetrics(font)
+                        item_width = max([metrices.boundingRect(item).width() for item in element[3]])
+                        combo.view().setMinimumWidth(item_width + 30)
+                        combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
                         r += 1
 
                     if type == TYPE_TITLE:
                         title = QLabel(tab)
-                        #title.setWordWrap(True)
                         title.setText("<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>")
                         grid.addWidget(title,r,1,1,2)
                         title.setObjectName("_title")
@@ -261,7 +245,6 @@ class Example(QMainWindow):
 
                 Notes = []
                 elements = tab_elements(main, input_dictionary)
-                #elements = list(lmao1)
                 for element in elements:
                     type = element[2]
                     lable = element[1]
@@ -284,7 +267,6 @@ class Example(QMainWindow):
                         line.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         line.setObjectName(element[0])
                         line.setFixedSize(130, 22)
-                        #grid.setSpacing(30)
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         font.setBold(False)
@@ -306,14 +288,19 @@ class Example(QMainWindow):
                         combo.setMaxVisibleItems(5)
                         combo.setObjectName(element[0])
                         combo.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
+                        combo.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+                        combo.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
+                        combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
                         combo.setFixedSize(130, 22)
-                        #grid.setSpacing(30)
                         combo.addItems(element[3])
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         font.setBold(False)
                         font.setWeight(50)
                         combo.setFont(font)
+                        metrices = QtGui.QFontMetrics(font)
+                        item_width = max([metrices.boundingRect(item).width() for item in element[3]])
+                        combo.view().setMinimumWidth(item_width + 30)
                         if element[0] == KEY_DP_DESIGN_METHOD:
                             combo.model().item(1).setEnabled(False)
                             combo.model().item(2).setEnabled(False)
@@ -323,7 +310,6 @@ class Example(QMainWindow):
 
                     if type == 'Title':
                         title = QLabel(tab)
-                        #title.setWordWrap(True)
                         title.setText(element[1])
                         grid.addWidget(title,r,1)
                         title.setObjectName("_title")
@@ -347,7 +333,6 @@ class Example(QMainWindow):
                         grid.setAlignment(Qt.AlignRight|Qt.AlignTop)
                         grid.setContentsMargins(50,0,0,0)
                         lbl = QLabel(tab)
-                        #lbl.setWordWrap(True)
                         lbl.setText('Description')
                         grid.addWidget(lbl,r,1)
                         lbl.setObjectName("label_3")
@@ -387,7 +372,6 @@ class Example(QMainWindow):
                         lbl.setWordWrap(True)
                         lbl.setText("<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>")
                         lbl.setObjectName("_title")
-                        #lbl.setMaximumWidth(300)
                         font = QtGui.QFont()
                         font.setPointSize(10)
                         lbl.setFont(font)
@@ -397,7 +381,6 @@ class Example(QMainWindow):
             scrollArea.setWidget(scrollAreaWidgetContents)
 
         self.setCentralWidget(self.tabWidget)
-        #self.show()
 
 
         self.tabWidget.tabs.setCurrentIndex(2)
@@ -922,8 +905,10 @@ class DesignPreferences():
         self.window_close_flag = True
 
     def show(self):
+        self.ui.resize(1170,680)
+        self.ui.center()
         self.ui.show()
-        self.ui.resize(1200,700)
+
     def default_fn(self):
         '''
         @author: Umair

@@ -46,7 +46,7 @@ from .ui_design_preferences import Ui_Dialog
 from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
 #from .ui_design_preferences import DesignPreferences
-from .REBIT import DesignPreferences
+from .UI_DESIGN_PREFERENCE import DesignPreferences
 from design_type.connection.shear_connection import ShearConnection
 from cad.common_logic import CommonDesignLogic
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs

@@ -36,6 +36,28 @@ def choose_smaller_value(max_value, available_values):
     return max(filter(lambda i: i <= max_value, available_values))
 
 
+def choose_next_value(current_value, available_values):
+    """Choose next value, higher than current_value from the list of available values
+
+    :param current_value: float
+    :param available_values: list
+    :return: float
+    # TODO: What if the current_value is higher than all values in the list
+    """
+    return min(filter(lambda i: i > current_value, available_values))
+
+
+def choose_previous_value(current_value, available_values):
+    """Choose the previous value, smaller than current_value from the list of available values
+
+    :param current_value: float
+    :param available_values: list
+    :return: float
+    # TODO: What if the current_value is smaller than all values in the list
+    """
+    return max(filter(lambda i: i <= current_value, available_values))
+
+
 def calculate_roots(lst=None):
     """Calculate the roots for a given equation
 

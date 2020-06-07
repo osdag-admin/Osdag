@@ -14,6 +14,28 @@ def round_down(value, multiplier=1, minimum_value=0):
     return math.floor(value / multiplier) * multiplier
 
 
+def choose_higher_value(min_value, available_values):
+    """Choose a smallest value, higher than or equal to min_value from the list of available values
+
+    :param min_value: float
+    :param available_values: list
+    :return: float
+    # TODO: What if the min_value is higher than all values in the list
+    """
+    return min(filter(lambda i: i >= min_value, available_values))
+
+
+def choose_smaller_value(max_value, available_values):
+    """Choose a highest value, smaller than or equal to min_value from the list of available values
+
+    :param max_value: float
+    :param available_values: list
+    :return: float
+    # TODO: What if the max_value is smaller than all values in the list
+    """
+    return max(filter(lambda i: i <= max_value, available_values))
+
+
 def calculate_roots(lst=None):
     """Calculate the roots for a given equation
 

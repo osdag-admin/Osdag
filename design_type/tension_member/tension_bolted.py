@@ -104,19 +104,23 @@ class Tension_bolted(Member):
               TYPE_TEXTBOX, self.get_Angle_sec_properties)
         change_tab.append(t5)
 
-
+        # t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE,KEY_SEC_MATERIAL],
+        #       [KEY_SECSIZE_SELECTED, KEY_SEC_FY,KEY_SEC_FU,'Label_1','Label_2','Label_3', 'Label_4', 'Label_5','Label_7','Label_8','Label_9',
+        #        'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+        #        'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23','Label_24'], TYPE_TEXTBOX, self.get_new_angle_section_properties)
+        # change_tab.append(t6)
+        t6 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+              [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14',
+               'Label_4', 'Label_5',
+               'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
+               'Label_19', 'Label_20', 'Label_21',
+               'Label_22', 'Label_23'], TYPE_TEXTBOX, self.get_new_channel_section_properties)
+        change_tab.append(t6)
 
         t5 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13'],
               ['Label_9', 'Label_10','Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
                'Label_19', 'Label_20', 'Label_21', 'Label_22'], TYPE_TEXTBOX, self.get_Channel_sec_properties)
         change_tab.append(t5)
-
-        t6 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL],
-              [KEY_SECSIZE_SELECTED, KEY_SEC_FY,KEY_SEC_FU,'Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14','Label_4', 'Label_5',
-               'Label_9', 'Label_10','Label_11', 'Label_12', 'Label_15', 'Label_16','Label_17',
-               'Label_19', 'Label_20','Label_21',
-               'Label_22', 'Label_23'], TYPE_TEXTBOX, self.get_new_channel_section_properties)
-        change_tab.append(t6)
 
         return change_tab
 
@@ -261,8 +265,8 @@ class Tension_bolted(Member):
         c_lst.append(t2)
         t3 = (KEY_D, self.diam_bolt_customized)
         c_lst.append(t3)
-        t4= (KEY_IMAGE, self.fn_conn_image)
-        c_lst.append(t3)
+        # t3= (KEY_IMAGE, self.fn_conn_image)
+        # c_lst.append(t3)
         # t4 = (KEY_PLATETHK, self.plate_thick_customized)
         # c_lst.append(t4)
         # t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
@@ -431,13 +435,13 @@ class Tension_bolted(Member):
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'No Validator')
+        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
 
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
+        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
         t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
@@ -451,6 +455,12 @@ class Tension_bolted(Member):
 
         t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)
+
+        # t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, True, 'No Validator')
+        # options_list.append(t13)
+        #
+        # t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'No Validator')
+        # options_list.append(t14)
 
         return options_list
 
@@ -837,6 +847,7 @@ class Tension_bolted(Member):
         self.material = design_dictionary[KEY_SEC_MATERIAL]
 
         self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
+        # self.plate_thickness = design_dictionary[KEY_PLATETHK]
         # print(self.sizelist)
         self.length = float(design_dictionary[KEY_LENGTH])
         # print(self.bolt)

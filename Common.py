@@ -263,6 +263,7 @@ KEY_SEC_FU = 'Member.Fu'    #Extra Keys
 KEY_SEC_FY = 'Member.Fy'    #Extra Keys
 
 KEY_SECSIZE = 'Member.Designation'
+KEY_SECSIZE_DP = 'Member.Designation_dp'
 KEY_SECSIZE_SELECTED = 'Member.Designation_Selected'        #Extra Keys for Display
 KEY_SUPTNGSEC = 'Member.Supporting_Section.Designation'
 KEY_SUPTNGSEC_MATERIAL = 'Member.Supporting_Section.Material'
@@ -363,7 +364,7 @@ VALUES_TYP_2 = ['Bearing Bolt']
 
 # VALUES_GRD_CUSTOMIZED = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
 VALUES_GRD_CUSTOMIZED = IS1367_Part3_2002.get_bolt_PC()
-VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
+VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24','25', '26', '28', '30','32','36','40','45','50','56','63','80']
 VALUES_ENDPLATE_THICKNESS_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30']
 VALUES_COLUMN_ENDPLATE_THICKNESS_CUSTOMIZED = VALUES_ENDPLATE_THICKNESS_CUSTOMIZED[3:12] + ['25','28','32','36','40','45','50','56','63','80']
 VALUES_FLANGEPLATE_PREFERENCES = ['Cover plate location', 'Outside','Outside + Inside']
@@ -377,6 +378,8 @@ VALUES_DIAM = connectdb("Bolt")
 # VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
 VALUES_IMG_TENSIONBOLTED = ["ResourceFiles/images/bA.png","ResourceFiles/images/bBBA.png","ResourceFiles/images/bSA.png","ResourceFiles/images/bC.png","ResourceFiles/images/bBBC.png"]
 VALUES_IMG_TENSIONWELDED = ["ResourceFiles/images/wA.png","ResourceFiles/images/wBBA.png","ResourceFiles/images/wSA.png","ResourceFiles/images/wC.png","ResourceFiles/images/wBBC.png"]
+VALUES_IMG_TENSIONBOLTED_DF01 = ["ResourceFiles/images/equaldp.png","ResourceFiles/images/bblequaldp.png","ResourceFiles/images/bbsequaldp.png","ResourceFiles/images/salequaldp.png","ResourceFiles/images/sasequaldp.png"]
+VALUES_IMG_TENSIONBOLTED_DF02 = ["ResourceFiles/images/unequaldp.png","ResourceFiles/images/bblunequaldp.png","ResourceFiles/images/bbsunequaldp.png","ResourceFiles/images/salunequaldp.png","ResourceFiles/images/sasunequaldp.png"]
 
 VALUES_BEAMSEC = connectdb("Beams")
 VALUES_SECBM = connectdb("Beams")

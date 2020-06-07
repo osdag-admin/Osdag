@@ -11,6 +11,22 @@ class Member(Main):
     ########################################
     # Design Preference Functions Start
     ########################################
+    def df_conn_image(self):
+
+        "Function to populate section size based on the type of section "
+        img = self[0]
+        if img == VALUES_SEC_PROFILE_2[0]:
+            return VALUES_IMG_TENSIONBOLTED[0]
+        elif img == VALUES_SEC_PROFILE_2[1]:
+            return VALUES_IMG_TENSIONBOLTED[1]
+        elif img == VALUES_SEC_PROFILE_2[2]:
+            return VALUES_IMG_TENSIONBOLTED[2]
+        elif img == VALUES_SEC_PROFILE_2[3]:
+            return VALUES_IMG_TENSIONBOLTED[3]
+        else:
+            return VALUES_IMG_TENSIONBOLTED[4]
+
+
 
     def tab_angle_section(self, input_dictionary):
 
@@ -133,7 +149,7 @@ class Member(Main):
         else:
             designation_list = []
 
-        t0 = (KEY_SECSIZE, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, designation_list, designation)
+        t0 = (KEY_SECSIZE_DP, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, designation_list, designation)
         section.append(t0)
 
         t1 = (KEY_SECSIZE_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
@@ -274,7 +290,7 @@ class Member(Main):
         t32 = ('Label_26', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         section.append(t32)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/Angles.png')
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_TENSIONBOLTED_DF01[0])
         section.append(t33)
 
         return section

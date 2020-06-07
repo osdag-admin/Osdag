@@ -87,16 +87,17 @@ class Tension_welded(Member):
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t3)
 
-        t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3'],
+        t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3', KEY_LOCATION, KEY_SEC_PROFILE],
               ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
                'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'],
               TYPE_TEXTBOX, self.get_Angle_sec_properties)
         change_tab.append(t5)
 
-        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL, KEY_LOCATION, KEY_SEC_PROFILE],
               [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
                'Label_7', 'Label_8', 'Label_9','Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
-               'Label_18','Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'], TYPE_TEXTBOX,self.get_new_angle_section_properties)
+               'Label_18','Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', 'Label_24'], TYPE_TEXTBOX,
+              self.get_new_angle_section_properties)
         change_tab.append(t6)
 
         t5 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13'],
@@ -283,6 +284,36 @@ class Tension_welded(Member):
         t4 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t4)
 
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERCONNECTION, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERCONNECTION, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTERSPACING, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_HEIGHT, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_HEIGHT, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_LENGTH, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_PLATE_LENGTH, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_WELD_SIZE, TYPE_OUT_DOCK, self.out_intermittent)
+        lst.append(t5)
+
+        t5 = ([KEY_SEC_PROFILE], KEY_OUT_INTER_WELD_SIZE, TYPE_OUT_LABEL, self.out_intermittent)
+        lst.append(t5)
+
         return lst
 
     def fn_conn_type(self):
@@ -313,6 +344,14 @@ class Tension_welded(Member):
         components = []
         return components
 
+    def out_intermittent(self):
+
+        sec_type = self[0]
+        if sec_type in [VALUES_SEC_PROFILE_2[0], VALUES_SEC_PROFILE_2[3]]:
+            return True
+        else:
+            return False
+
     def input_values(self):
 
         '''
@@ -335,7 +374,7 @@ class Tension_welded(Member):
         t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE_2, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None,VALUES_IMG_TENSIONWELDED[0] , True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, VALUES_IMG_TENSIONWELDED[0] , True, 'No Validator')
 
         options_list.append(t15)
 
@@ -348,14 +387,16 @@ class Tension_welded(Member):
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'No Validator')
+        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
 
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
+        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
+
+
 
         return options_list
 
@@ -463,35 +504,35 @@ class Tension_welded(Member):
 
         out_list.append(t21)
 
-        t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, True)
+        t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, False)
         out_list.append(t18)
 
-        t8 = (None, DISP_TITLE_CONN_DETAILS , TYPE_TITLE, None, True)
+        t8 = (None, DISP_TITLE_CONN_DETAILS , TYPE_TITLE, None, False)
         out_list.append(t8)
 
         t21 = (KEY_OUT_INTERCONNECTION, KEY_OUT_DISP_INTERCONNECTION, TYPE_TEXTBOX,
-               int(round(self.inter_conn, 0)) if flag else '', True)
+               int(round(self.inter_conn, 0)) if flag else '', False)
         out_list.append(t21)
 
         t21 = (KEY_OUT_INTERSPACING, KEY_OUT_DISP_INTERSPACING, TYPE_TEXTBOX,
-               (round(self.inter_memb_length, 2)) if flag else '', True)
+               (round(self.inter_memb_length, 2)) if flag else '', False)
         out_list.append(t21)
 
-        t8 = (None, DISP_TITLE_WELD_DETAILS, TYPE_TITLE, None, True)
+        t8 = (None, DISP_TITLE_WELD_DETAILS, TYPE_TITLE, None, False)
         out_list.append(t8)
 
-        t9 = (KEY_OUT_INTER_WELD_SIZE, KEY_OUT_DISP_INTER_WELD_SIZE, TYPE_TEXTBOX, self.inter_weld_size if flag else '', True)
+        t9 = (KEY_OUT_INTER_WELD_SIZE, KEY_OUT_DISP_INTER_WELD_SIZE, TYPE_TEXTBOX, self.inter_weld_size if flag else '', False)
         out_list.append(t9)
 
-        t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, True)
+        t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, False)
         out_list.append(t18)
 
         t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,
-               int(round(self.inter_plate_height, 0)) if flag else '', True)
+               int(round(self.inter_plate_height, 0)) if flag else '', False)
         out_list.append(t20)
 
         t21 = (KEY_OUT_INTER_PLATE_LENGTH, KEY_OUT_DISP_INTER_PLATE_LENGTH, TYPE_TEXTBOX,
-               int(round(self.inter_plate_length, 0)) if flag else '', True)
+               int(round(self.inter_plate_length, 0)) if flag else '', False)
         out_list.append(t21)
 
         return out_list
@@ -894,7 +935,10 @@ class Tension_welded(Member):
             pass
         else:
             for i in previous_size:
-                self.sizelist.remove(i)
+                if i in self.sizelist:
+                    self.sizelist.remove(i)
+                else:
+                    pass
 
         for selectedsize in self.sizelist:
             # print(self.sizelist)
@@ -1475,16 +1519,16 @@ class Tension_welded(Member):
             self.inter_plate_length = max(50, 4*self.weld.size)
             if self.loc == "Long Leg":
                 if self.sec_profile == "Star Angles":
-                    self.inter_plate_height = 2 * self.section_size_1.max_leg
+                    self.inter_plate_height = 2 * self.section_size_1.max_leg + max(30, 4*self.weld.size)
                 else:
-                    self.inter_plate_height = self.section_size_1.max_leg
+                    self.inter_plate_height = self.section_size_1.max_leg + max(30, 4*self.weld.size)
             elif self.loc == "Short Leg":
                 if self.sec_profile == "Star Angles":
-                    self.inter_plate_height = 2 * self.section_size_1.max_leg
+                    self.inter_plate_height = 2 * self.section_size_1.max_leg + max(30, 4*self.weld.size)
                 else:
-                    self.inter_plate_height = self.section_size_1.max_leg
+                    self.inter_plate_height = self.section_size_1.max_leg + max(30, 4*self.weld.size)
             else:
-                self.inter_plate_height = self.section_size_1.depth
+                self.inter_plate_height = self.section_size_1.depth + max(30, 4*self.weld.size)
             self.inter_weld_size = self.weld.size
         else:
             self.inter_conn = 0.0

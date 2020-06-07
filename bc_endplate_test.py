@@ -7,15 +7,18 @@ from utils.common.load import Load
 
 # Load osi file
 # Get input objects
-'''
+# '''
 input_file_path = 'bcinput.osi'
 with open(input_file_path, 'r') as input_file:
         design_dictionary  = yaml.load(input_file, Loader=yaml.FullLoader)
 
-print(design_dictionary)
+# print(design_dictionary)
+
+bcinput = BeamColumnEndPlate()
+bcinput.set_input_values(design_dictionary)
+
+
 '''
-
-
 # Hardcoded inputs
 bcinput = BeamColumnEndPlate()
 
@@ -45,12 +48,13 @@ bcinput.plate = Plate(thickness=[12, 220],
 bcinput.plate.design_status_capacity = False
 bcinput.weld = Weld(material_g_o=410,
                  fabrication='Shop Weld')
+
+'''
 print("input values are set. Doing preliminary member checks")
 bcinput.warn_text()
 # bcinput.member_capacity()
 
 
 bcinput.trial_design()
-
 
 

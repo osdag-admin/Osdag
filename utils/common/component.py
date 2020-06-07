@@ -758,31 +758,28 @@ class Channel(Section):
 
 class Weld:
 
-    def __init__(self, material_g_o="",type="fillet", fabrication=KEY_DP_WELD_FAB_SHOP):
+    def __init__(self, material_g_o="",type=KEY_DP_WELD_TYPE_FILLET, fabrication=KEY_DP_WELD_FAB_SHOP):
         self.design_status = True
         self.type = type
+        self.fabrication = fabrication
 
         self.size = 0.0
         self.length = 0.0
         self.eff_length = 0.0
-        self.Innerlength = 0.0
+        self.inner_length = 0.0
         self.effective = 0.0
-        self.height =0.0
-        self.Innerheight = 0.0
+        self.height = 0.0
+        self.inner_height = 0.0
         self.strength = 0.0
         self.strength_red = 0.0
         self.throat = 0.0
         self.stress = 0.0
-        self.Innerstrength = 0.0
-        self.Innerstress = 0.0
+        self.inner_strength = 0.0
+        self.inner_stress = 0.0
 
-        self.fabrication = fabrication
         self.fu = float(material_g_o)
-
-        self.throat_tk =0.0
-
+        self.throat_tk = 0.0
         self.reason = 0.0
-
 
     def __repr__(self):
         repr = "Weld\n"
@@ -1138,10 +1135,10 @@ class Plate(Material):
                 bolt_capacity_red = bolt_capacity
         else:
             if web_thickness == 0.0:
-                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2 * gap)), ((bolts_one_line - 1) * gauge))
+                length_avail = max((2 * (((bolts_line-1) * pitch) + end_dist) + (2 * gap)), ((bolts_one_line - 1) * gauge))
             else:
                 midgauge = 2 * (edge_dist + root_radius) + web_thickness
-                length_avail = max((2 * ((bolts_line * pitch) + end_dist) + (2 * gap)),
+                length_avail = max((2 * (((bolts_line-1) * pitch) + end_dist) + (2 * gap)),
                                    (((bolts_one_line / 2 - 1) * gauge) + midgauge))
             if length_avail > 15 * bolt_dia:
                 beta_lj = 1.075 - length_avail / (200 * bolt_dia)

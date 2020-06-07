@@ -295,7 +295,7 @@ QSlider::sub-page:vertical {
 QScrollBar:horizontal {
   height: 16px;
   margin: 2px 16px 2px 16px;
-  border: 1px solid #32414B;
+  border: 0.1px solid #32414B;
   border-radius: 4px;
   background-color: white;
 }
@@ -310,14 +310,14 @@ QScrollBar:vertical {
 
 QScrollBar::handle:horizontal {
   background-color: lightgray;
-  border: 1px solid #32414B;
+  border: 0.3px solid #32414B;
   border-radius: 4px;
   min-width: 8px;
 }
 
 QScrollBar::handle:horizontal:hover {
   background-color: #abc250;
-  border: 1px solid #148CD2;
+  border: 0.1px solid #148CD2;
   border-radius: 4px;
   min-width: 8px;
 }
@@ -433,7 +433,7 @@ QComboBox QAbstractItemView
   selection-color:black ;
 
 }
-QDialog#DesignPreferences QTabBar::tab {
+QMainWindow#DesignPreferences QTabBar::tab {
                 margin-right: 10;
                 border-top-left-radius: 2px ;
                 border-top-right-radius: 2px ;
@@ -447,7 +447,7 @@ QDialog#DesignPreferences QTabBar::tab {
 				border: 0.5px inset #abc250;
                }
 
-QDialog#DesignPreferences QTabBar::tab:!selected:hover
+QMainWindow#DesignPreferences QTabBar::tab:!selected:hover
 {
     /*border-top: 2px solid #ffaa00;
     padding-bottom: 3px;*/
@@ -456,17 +456,22 @@ QDialog#DesignPreferences QTabBar::tab:!selected:hover
     background-color: qradialgradient(cx: 0.5, cy: 0.5, radius: 2, fx: 0.5, fy: 1, stop: 0 #abc250, stop: 0.2 #abc250, stop: 0.4 rgba(211,211,211, 80));
 }
 
-QDialog#DesignPreferences QPushButton{
+QMainWindow#DesignPreferences QPushButton{
 		color: black;
 		background:lightgray;
 		border: 1.2px inset #abc250;
+		
+		padding-left: 7px;
+		padding-right: 7px;
+		font-family: Arial;
+		font-size:16px;
 
 }
 
-QDialog#DesignPreferences QPushButton:hover{
+QMainWindow#DesignPreferences QPushButton:hover{
 	background-color: qradialgradient(cx: 0.5, cy: 0.5, radius: 2, fx: 0.5, fy: 1, stop: 0 #abc250, stop: 0.2 #abc250, stop: 0.4 rgba(211,211,211, 80));
 }
-QDialog#DesignPreferences QTabBar::tab:selected
+QMainWindow#DesignPreferences QTabBar::tab:selected
 {
     /*border-top: 2px solid #ffaa00;
     padding-bottom: 3px;*/

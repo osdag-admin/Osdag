@@ -500,17 +500,18 @@ KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
 
 # Applied load
-KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load Vu (kN)'
-KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load Au (kN)'
-KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load Mu (kNm)'
+KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load (kNm)'
 KEY_DISP_AXIAL_FORCE_CON= 'Axial Load Considered (kN)'
 
 # capacity
-KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member Ac (kN)"
-KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member Sc (kN)"
-KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member Mc (kNm)"
-KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity Pmc (kNm)'
-KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria Mdc (kNm)'
+
+KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member (kN)"
+KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member (kN)"
+KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member (kNm)"
+KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity (kNm)'
+KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
 
 
 
@@ -520,6 +521,7 @@ KEY_OUT_GRD_ANCHOR = 'Anchor Bolt.Grade'
 KEY_DISP_OUT_GRD_ANCHOR = 'Grade'
 KEY_OUT_ANCHOR_BOLT_LENGTH = 'Anchor Bolt.Length'
 KEY_DISP_OUT_ANCHOR_BOLT_LENGTH = 'Total Length'
+
 
 KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_BEARING = 'Bearing Capacity (kN)'
@@ -711,17 +713,17 @@ KEY_DISP_GAMMA_MF = "Connection Bolts - Friction Type"
 KEY_DISP_GAMMA_MW = "Connection Weld"
 
 
+KEY_DISP_DP_WELD_TYPE = 'Weld Type'
+KEY_DP_WELD_TYPE_FILLET = 'Fillet Weld'
+KEY_DP_WELD_TYPE_GROOVE = 'Groove Weld'
+KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_FILLET, KEY_DP_WELD_TYPE_GROOVE]
 
-KEY_DISP_DP_WELD_TYPE ='Weld Type'
+KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
 KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
 KEY_DP_WELD_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
 
-KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
-
-
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
-
 
 
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
@@ -823,7 +825,7 @@ KEY_PLATE_MAX_HEIGHT = 'Plate.MaxHeight'
 KEY_SLENDER = "Member.Slenderness"
 
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
-KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Height'
+KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Height (mm)'
 
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
@@ -978,7 +980,7 @@ KEY_OUT_DISP_WEB_BOLT_CAPACITY ="Bolt Capacity (kN)"
 KEY_OUT_DISP_WEB_BOLT_SLIP= 'Slip Resistance'
 KEY_WEB_BOLT_GRP_CAPACITY = 'web_bolt.grp_bolt_capacity'
 KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'Web bolt grp bolt capacity (kN)'
-KEY_OUT_REQ_MOMENT_DEMAND_BOLT = "Moment Demand (kNm"
+KEY_OUT_REQ_MOMENT_DEMAND_BOLT = "Moment Demand (kNm)"
 KEY_OUT_REQ_PARA_BOLT = "Parameters required for bolt force (mm)"
 
 
@@ -991,7 +993,7 @@ VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20'
  '25','28','32','36','40','45','50','56','63','80']
 
 
-KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
+KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
 KEY_DISP_WEB_PLATE_LENGTH ='Length (mm)'
@@ -1014,7 +1016,7 @@ KEY_DISP_WEB_CAPACITY ='Capacity'
 
 # Web plate
 KEY_WEB_PLATE_CAPACITY ="Web_plate.capacity"
-KEY_DISP_WEB_PLATE_CAPACITY= 'Web Plate Tension Capacity'
+KEY_DISP_WEB_PLATE_CAPACITY= 'Web Plate Tension Capacity (kN)'
 KEY_TEN_YIELDCAPACITY_WEB_PLATE = "Web_plate.tension_yielding"
 KEY_DISP_TENSION_YIELDCAPACITY_WEB_PLATE = 'Tension Yielding Capacity (kN)'
 KEY_TENSION_RUPTURECAPACITY_WEB_PLATE = "Web_plate.tension_rupture"

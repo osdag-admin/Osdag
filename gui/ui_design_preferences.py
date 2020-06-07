@@ -494,11 +494,14 @@ class Ui_Dialog(object):
         tab_index = 0
         dialog_height = 500
         buttons = []
+
         for tab_details in main.tab_list(main):
             tab_name = tab_details[0]
             tab_elements = tab_details[2]
             tab_type = tab_details[1]
+
             if tab_type == TYPE_TAB_1:
+
                 tab = QtWidgets.QWidget()
                 tab.setObjectName(tab_name)
                 elements = tab_elements(main, input_dictionary)
@@ -574,11 +577,12 @@ class Ui_Dialog(object):
                         im = QtWidgets.QLabel(tab)
                         im.setGeometry(QtCore.QRect(20 + j, 30 + i, 200, 200))
                         im.setObjectName(element[0])
-                        im.setScaledContents(True)
+                        #im.setScaledContents(True)
                         image = QPixmap(element[4])
-                        im.setPixmap(image)
+                        im.setPixmap(image.scaled(200,400,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+                        #im.setPixmap(image)
                         i = i + 300
-                        im.resize(im.sizeHint().width(), im.sizeHint().height())
+                        #im.resize(im.sizeHint().width(), im.sizeHint().height())
 
                     if type == TYPE_BREAK:
                         ki = -1
@@ -663,6 +667,7 @@ class Ui_Dialog(object):
                 tab_index += 1
                 #dialog_height = max(i+70, dialog_height)
             elif tab_type == TYPE_TAB_2:
+
                 labels = []
                 combo_text = []
                 tab = QtWidgets.QWidget()
@@ -679,6 +684,7 @@ class Ui_Dialog(object):
                 _translate = QtCore.QCoreApplication.translate
                 i = 30
                 j = 6
+                print(elements)
                 for element in elements:
                     lable = element[1]
                     type = element[2]
@@ -817,12 +823,20 @@ class Ui_Dialog(object):
                     for item in combo_text:
                         x,y = item[1], item[2]
                         item[0].move(ki+10,y)
-
-                self.tabWidget.addTab(tab, "")
+                #scroll_A = QtWidgets.QScrollArea()
+                dummy = QtWidgets.QWidget()
+                lay = QtWidgets.QVBoxLayout(dummy)
+                scroll_A = QtWidgets.QScrollArea()
+                lay.addWidget(scroll_A)
+                scroll_A.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+                scroll_A.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+                scroll_A.setWidget(tab)
+                scroll_A.setWidgetResizable(True)
+                self.tabWidget.addTab(dummy, "")
                 self.tabWidget.setTabText(tab_index, tab_name)
                 tab_index += 1
         dialog_height += 170   # 70 for buttons and 100 for whitespaces
-        DesignPreferences.resize(1170,dialog_height)  # Width of Design Preference Dialog is not set automatically. You have to adjust the width manually.
+        DesignPreferences.resize(1170,100)  # Width of Design Preference Dialog is not set automatically. You have to adjust the width manually.
         for item in buttons:
             item[0].move(item[1],dialog_height-150)
 

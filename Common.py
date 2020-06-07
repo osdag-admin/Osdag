@@ -710,17 +710,17 @@ KEY_DISP_GAMMA_MF = "Connection Bolts - Friction Type"
 KEY_DISP_GAMMA_MW = "Connection Weld"
 
 
+KEY_DISP_DP_WELD_TYPE = 'Weld Type'
+KEY_DP_WELD_TYPE_FILLET = 'Fillet Weld'
+KEY_DP_WELD_TYPE_GROOVE = 'Groove Weld'
+KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_FILLET, KEY_DP_WELD_TYPE_GROOVE]
 
-KEY_DISP_DP_WELD_TYPE ='Weld Type'
+KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
 KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
 KEY_DP_WELD_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
 
-KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
-
-
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
-
 
 
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'

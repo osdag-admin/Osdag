@@ -610,8 +610,8 @@ class BeamCoverPlateWeld(MomentConnection):
         #  Inner Flange weld
         self.flange_weld.size = 8  # mm
         self.flange_plate.thickness_provided = 10
-        self.flange_weld.Innerheight=60
-        self.flange_weld.Innerlength = 490
+        self.flange_weld.inner_height=60
+        self.flange_weld.inner_length = 490
         #  Inner Flange plate
         self.flange_plate.thickness_provided = 10
         self.flange_plate.Innerheight = 80
@@ -1123,11 +1123,11 @@ class BeamCoverPlateWeld(MomentConnection):
                 self.l_req_flangelength = round_up(((6 * self.available_long_flange_length) + self.flange_plate.height +
                                                 2 * self.flange_plate.Innerheight - (6 * self.flange_weld.size)),5)
                 # Inner Plate Details
-                self.flange_weld.Innerlength =  self.flange_weld.length
+                self.flange_weld.inner_length =  self.flange_weld.length
                 self.available_long_flange_length = self.available_long_flange_length
                 self.flange_plate.Innerlength = self.flange_plate.length
                 self.flange_plate.Innerheight = round_down( self.flange_plate.Innerheight , 5)
-                self.flange_weld.Innerheight = (self.flange_plate.Innerheight - 2 * self.flange_weld.size)
+                self.flange_weld.inner_height = (self.flange_plate.Innerheight - 2 * self.flange_weld.size)
                 self.flange_weld.strength = round(self.flange_weld.strength, 2)
                 self.flange_weld.stress = round(self.flange_weld.stress, 2)
 
@@ -2186,7 +2186,7 @@ class BeamCoverPlateWeld(MomentConnection):
                     self.report_check.append(t1)
                     t1 = (DISP_MAX_PLATE_INNERHEIGHT,inner_plate_height_weld(B = self.section.flange_width, sp =self.flangespace,t= self.section.web_thickness, r_1 = self.section.root_radius ,b_ifp =self.flange_plate.Innerheight),self.flange_plate.Innerheight,get_pass_fail(self.flange_plate.Innerheight, self.flange_plate.Innerheight, relation="leq"))
                     self.report_check.append(t1)
-                    t1 = (DISP_MIN_PLATE_INNERLENGTH, self.min_length_required,plate_Length_req(l_w=self.flange_weld.Innerlength, t_w=self.flange_weld.size,g=self.flange_plate.gap, l_fp=self.flange_plate.Innerlength,conn ="Flange"),get_pass_fail(self.min_length_required, self.flange_plate.Innerlength, relation="lesser"))
+                    t1 = (DISP_MIN_PLATE_INNERLENGTH, self.min_length_required, plate_Length_req(l_w=self.flange_weld.inner_length, t_w=self.flange_weld.size, g=self.flange_plate.gap, l_fp=self.flange_plate.Innerlength, conn ="Flange"), get_pass_fail(self.min_length_required, self.flange_plate.Innerlength, relation="lesser"))
                     self.report_check.append(t1)
 
 

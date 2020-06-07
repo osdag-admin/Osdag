@@ -343,7 +343,9 @@ class BeamColumnEndPlate(MomentConnection):
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
                            gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.plate.design_status_capacity = False
-        self.weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+        self.flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+                         fabrication=design_dictionary[KEY_DP_WELD_FAB])     # TODO: Add weld type in design dictionary
+        self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                          fabrication=design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
         self.warn_text()
@@ -425,6 +427,18 @@ class BeamColumnEndPlate(MomentConnection):
             self.bolt_conn_plates_t_fu_fy.append(
                 (self.supported_section.flange_thickness, self.supported_section.fu, self.supported_section.fy))
 
+    def assign_weld_sizes(self):
+        """Assign minimum required weld sizes to flange and web welds"""
+
+        flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(
+            self.supported_section.flange_thickness, self.plate.thickness_provided)
+        self.flange_weld.size = choose_higher_value(flange_weld_size_min, ALL_WELD_SIZES)
+
+        web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(
+            self.supported_section.web_thickness, self.plate.thickness_provided)
+        self.web_weld.size = choose_higher_value(web_weld_size_min, ALL_WELD_SIZES)
+        return
+
     def find_end_plate_spacing(self):
         #######################################################################
         # l_v = Distance from the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
@@ -440,8 +454,8 @@ class BeamColumnEndPlate(MomentConnection):
             l_v = 50.0
             g_1 = 100.0
 
-        if self.weld.type is 'fillet': # TODO Type?? other name ?
-            flange_projection = round_up(value=weld_thickness_flange + 2, multiplier=5, minimum_value=5)
+        if self.flange_weld.type is KEY_DP_WELD_TYPE_FILLET:
+            flange_projection = round_up(value=self.flange_weld.size + 2, multiplier=5, minimum_value=5)
         else:  # 'groove'
             flange_projection = 5
 
@@ -457,6 +471,8 @@ class BeamColumnEndPlate(MomentConnection):
         self.find_bolt_conn_plates_t_fu_fy()
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=bolt_dia,
                                                 conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+        self.assign_weld_sizes()
+
 
 
 

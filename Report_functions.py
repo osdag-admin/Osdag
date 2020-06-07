@@ -658,8 +658,9 @@ def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     min_plate_length_eqn.append(NoEscape(r'&=' + min_length + '\end{aligned}'))
     return min_plate_length_eqn
 
+
 def min_flange_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length,gap,sec =None):
-    min_pitch = str( min_pitch)
+    min_pitch = str(min_pitch)
     min_end_dist = str(min_end_dist)
     bolt_line = str(bolt_line)
     min_length = str(min_length)
@@ -1245,6 +1246,7 @@ def prov_moment_load(moment_input,min_mc,app_moment_load):
     app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\end{aligned}'))
     return  app_moment_load_eqn
 
+
 def shear_rupture_prov_beam(h, t, n_r, d_o, fu,v_dn,gamma_m1,multiple=1):
     h = str(h)
     t = str(t)
@@ -1726,7 +1728,6 @@ def long_joint_welded_beam_prov(plate_height,l_w,t_w,gap,t_t,Tc,Tr):
 
 
     return long_joint_welded_beam_prov
-
 
 
 def throat_req():

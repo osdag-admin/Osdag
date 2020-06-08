@@ -1877,21 +1877,21 @@ class BBAngle_Properties():
             self.A = 2 * self.Angle_attributes.area
         return round(self.A/100,2)
 
-    def calc_Cy(self,a,b,t,l):
-        if self.db == False:
-            self.A = t * (a + b - t)
-            self.Cy = ((0.5 * (b * a ** 2)) - (0.5 * (b - t) * (a ** 2 - t ** 2))) / self.A
-        else:
-            self.Cy = self.Angle_attributes.Cy
-        return round(self.Cy / 10, 2)
-
-    def calc_Cz(self,a,b,t,l):
-        if self.db == False:
-            self.A = t * (a + b - t)
-            self.Cz = ((0.5 * (b ** 2) * a) - (0.5 * (b ** 2 - t ** 2) * (a - t))) / self.A
-        else:
-            self.Cz = self.Angle_attributes.Cz
-        return round(self.Cz / 10, 2)
+    # def calc_Cy(self,a,b,t,l):
+    #     if self.db == False:
+    #         self.A = t * (a + b - t)
+    #         self.Cy = ((0.5 * (b * a ** 2)) - (0.5 * (b - t) * (a ** 2 - t ** 2))) / self.A
+    #     else:
+    #         self.Cy = self.Angle_attributes.Cy
+    #     return round(self.Cy / 10, 2)
+    #
+    # def calc_Cz(self,a,b,t,l):
+    #     if self.db == False:
+    #         self.A = t * (a + b - t)
+    #         self.Cz = ((0.5 * (b ** 2) * a) - (0.5 * (b ** 2 - t ** 2) * (a - t))) / self.A
+    #     else:
+    #         self.Cz = self.Angle_attributes.Cz
+    #     return round(self.Cz / 10, 2)
 
     def calc_MomentOfAreaZ(self,a,b,t,l):
         if self.db == False:
@@ -2010,21 +2010,21 @@ class SAngle_Properties(object):
             self.A = 2 * self.Angle_attributes.area
         return round(self.A / 100, 2)
 
-    def calc_Cy(self, a, b, t, l):
-        if self.db == False:
-            self.A = t * (a + b - t)
-            self.Cy = ((0.5 * (b * a ** 2)) - (0.5 * (b - t) * (a ** 2 - t ** 2))) / self.A
-        else:
-            self.Cy = self.Angle_attributes.Cy
-        return round(self.Cy / 10, 2)
-
-    def calc_Cz(self, a, b, t, l):
-        if self.db == False:
-            self.A = t * (a + b - t)
-            self.Cz = ((0.5 * (b ** 2) * a) - (0.5 * (b ** 2 - t ** 2) * (a - t))) / self.A
-        else:
-            self.Cz = self.Angle_attributes.Cz
-        return round(self.Cz / 10, 2)
+    # def calc_Cy(self, a, b, t, l):
+    #     if self.db == False:
+    #         self.A = t * (a + b - t)
+    #         self.Cy = ((0.5 * (b * a ** 2)) - (0.5 * (b - t) * (a ** 2 - t ** 2))) / self.A
+    #     else:
+    #         self.Cy = self.Angle_attributes.Cy
+    #     return round(self.Cy / 10, 2)
+    #
+    # def calc_Cz(self, a, b, t, l):
+    #     if self.db == False:
+    #         self.A = t * (a + b - t)
+    #         self.Cz = ((0.5 * (b ** 2) * a) - (0.5 * (b ** 2 - t ** 2) * (a - t))) / self.A
+    #     else:
+    #         self.Cz = self.Angle_attributes.Cz
+    #     return round(self.Cz / 10, 2)
 
     def calc_MomentOfAreaZ(self, a, b, t, l):
         if self.db == False:
@@ -2230,7 +2230,7 @@ class BBChannel_Properties(object):
         else:
             self.A = 2 * self.Channel_attributes.area
         return round(self.A / 100, 2)
-
+    #
     def calc_C_y(self,f_w,f_t,w_h,w_t):
         if self.db == False:
             Ac = Single_Channel_Properties.calc_Area(self,f_w, f_t, w_h, w_t)*100

@@ -47,8 +47,8 @@ class NutBoltArray(object):
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
 
     def initBoltPlaceParams(self, Obj):
-        self.row = int(Obj.n_bw)  # 4    #         #4
-        self.col = 2  # int(Obj.n_bf * 2)  #4    #        #4
+        self.row = int(Obj.n_bw_prov)  # int(Obj.n_bw)  # 4    #         #4
+        self.col = int(Obj.n_bf_prov) * 2  # 2  # int(Obj.n_bf * 2)  #4    #        #4
         self.webcol = 2
         self.numOfBolts = Obj.no_bolts  # 12    #
         self.endDist = Obj.end_dist
@@ -79,6 +79,7 @@ class NutBoltArray(object):
                                   self.pitch, self.p2flange, self.p2flange, self.pitch, self.pitch]
 
         elif Obj.connection == "Extended Both Ways":
+            self.row = self.row + 2
             if self.row == 4:
                 self.pitchDist = [self.endDist, 2 * self.endDist + self.column.T, self.p2web,
                                   2 * self.endDist + self.column.T]

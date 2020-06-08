@@ -2039,6 +2039,12 @@ class Window(QMainWindow):
                         k2.addItem(str(values))
                 elif typ == TYPE_TEXTBOX:
                     k2.setText(str(val[k2_key_name]))
+                elif typ == TYPE_IMAGE:
+                    # k2 = tab.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key_name)
+                    pixmap1 = QPixmap(val)
+                    print(pixmap1,"gbfbf")
+                    k2.setPixmap(pixmap1)
+
 
     def refresh_section_connect(self, add_button, prev, key_name, key_type, tab_key, arg,data):
         add_button.clicked.connect(lambda: self.refresh_section(prev, key_name, key_type, tab_key, arg,data))

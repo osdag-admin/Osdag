@@ -100,7 +100,7 @@ def connectdb(table_name, call_type="dropdown"):
         lst.append(row)
 
     final_lst = tuple_to_str(lst,call_type,table_name)
-    if table_name == "Material":
+    if table_name == "Material" and call_type == "dropdown":
         final_lst.append("Custom")
 
     return final_lst

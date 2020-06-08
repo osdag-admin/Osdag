@@ -16,7 +16,7 @@ class Member(Main):
 
         "In design preference, it shows other properties of section used "
         "In design preference, it shows other properties of section used "
-        if not input_dictionary or input_dictionary[KEY_SECSIZE] == '' or \
+        if not input_dictionary or input_dictionary[KEY_SECSIZE] == [] or \
                 input_dictionary[KEY_MATERIAL] == 'Select Material' or \
                 input_dictionary[KEY_SEC_PROFILE] not in ['Angles', 'Back to Back Angles', 'Star Angles']:
             designation = ''
@@ -149,7 +149,7 @@ class Member(Main):
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t34 = (KEY_SEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         section.append(t34)
 
@@ -283,7 +283,7 @@ class Member(Main):
 
         "In design preference, it shows other properties of section used "
         "In design preference, it shows other properties of section used "
-        if not input_dictionary or input_dictionary[KEY_SECSIZE] == '' or \
+        if not input_dictionary or input_dictionary[KEY_SECSIZE] == [] or \
                 input_dictionary[KEY_MATERIAL] == 'Select Material' or \
                 input_dictionary[KEY_SEC_PROFILE] not in ['Channels', 'Back to Back Channels']:
             designation = ''
@@ -393,7 +393,7 @@ class Member(Main):
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t34 = (KEY_SEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         section.append(t34)
 

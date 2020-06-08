@@ -113,7 +113,7 @@ class Window(QMainWindow):
                     horizontal.addWidget(button)
                     button.setObjectName(object_name)
                     button.setText(btn_text)
-                    button.setFixedSize(160, 30)
+                    button.setFixedSize(160, 27)
 
                     font = QtGui.QFont()
                     font.setPointSize(9)
@@ -125,7 +125,8 @@ class Window(QMainWindow):
                 grid = QGridLayout()
                 horizontalLayout.addLayout(grid)
                 grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
-
+                grid.setHorizontalSpacing(10)
+                grid.setVerticalSpacing(10)
 
                 for element in elements:
                     type = element[2]
@@ -136,7 +137,6 @@ class Window(QMainWindow):
                         label.setText("<html><head/><body><p>" + lable + "</p></body></html>")
                         grid.addWidget(label,r,1)
                         label.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        grid.setSpacing(30)
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         if lable in [KEY_DISP_DESIGNATION, 'Type', 'Source']:
@@ -150,7 +150,11 @@ class Window(QMainWindow):
                         grid.addWidget(line,r,2)
                         line.setObjectName(element[0])
                         line.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        line.setFixedSize(130, 22)
+                        if lable == 'Designation':
+                            print(element[0],'lmoa shit is this')
+                            line.setFixedSize(130, 22)
+                        else:
+                            line.setFixedSize(91,22)
                         if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4']:
                             line.setValidator(QDoubleValidator())
                         if input_dictionary:
@@ -167,7 +171,7 @@ class Window(QMainWindow):
                         grid.addWidget(combo,r,2)
                         combo.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         combo.setMaxVisibleItems(5)
-                        combo.setFixedSize(130, 22)
+                        combo.setFixedSize(91, 22)
                         combo.setObjectName(element[0])
                         combo.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
                         combo.addItems(element[3])
@@ -208,6 +212,8 @@ class Window(QMainWindow):
                         grid = QGridLayout()
                         horizontalLayout.addLayout(grid)
                         grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
+                        grid.setHorizontalSpacing(10)
+                        grid.setVerticalSpacing(10)
                         continue
 
             elif tab_type == TYPE_TAB_2:
@@ -231,6 +237,8 @@ class Window(QMainWindow):
                 r = 1
                 grid = QGridLayout()
                 horizontalLayout.addLayout(grid)
+                grid.setHorizontalSpacing(10)
+                grid.setVerticalSpacing(10)
                 grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
 
                 label_1 = QLabel(tab)
@@ -260,7 +268,6 @@ class Window(QMainWindow):
                         font.setPointSize(9)
                         font.setWeight(50)
                         label.setFont(font)
-                        grid.setSpacing(30)
 
                     if type == TYPE_TEXTBOX:
                         line = QLineEdit(tab)
@@ -331,6 +338,8 @@ class Window(QMainWindow):
                         r = 1
                         grid = QGridLayout()
                         horizontalLayout.addLayout(grid)
+                        grid.setHorizontalSpacing(10)
+                        grid.setVerticalSpacing(10)
                         grid.setAlignment(Qt.AlignRight|Qt.AlignTop)
                         grid.setContentsMargins(50,0,0,0)
                         lbl = QLabel(tab)
@@ -360,6 +369,8 @@ class Window(QMainWindow):
                         r = 1
                         grid = QGridLayout()
                         horizontalLayout.addLayout(grid)
+                        grid.setHorizontalSpacing(10)
+                        grid.setVerticalSpacing(10)
                         grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
                         continue
 

@@ -81,7 +81,16 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         self.ui = Window()
         self.ui.setupUi(self,main,folder)
         #self.showMaximized()
+        #self.showNormal()
+        self.center()
         self.resized.connect(self.resize_dockComponents)
+
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     def resizeEvent(self, event):
         self.resized.emit()
@@ -106,6 +115,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         self.ui.out_widget.resize(width,posi)
         self.ui.btn_CreateDesign.move((width/2)-168,posi+8)
         self.ui.save_outputDock.move((width/2)+28,posi+8)
+        print(self.height(),self.width())
 
     def closeEvent(self, event):
         '''
@@ -517,9 +527,9 @@ class Window(QMainWindow):
                 in_layout2.addWidget(combo, j, 2, 1, 1)
 
                 if lable == 'Material *':
-                    maxi_width_right = max(maxi_width_right, item_width+5)
-                else:
-                    combo.view().setMinimumWidth(item_width + 25)
+                    maxi_width_right = max(maxi_width_right, item_width)
+
+                combo.view().setMinimumWidth(item_width + 25)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)

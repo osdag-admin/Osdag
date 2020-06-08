@@ -433,6 +433,9 @@ QComboBox QAbstractItemView
   selection-color:black ;
 
 }
+QMainWindow#DesignPreferences QTabWidget::tab-bar{
+    alignment: left;
+}
 QMainWindow#DesignPreferences QTabBar::tab {
                 margin-right: 10;
                 border-top-left-radius: 2px ;

@@ -155,6 +155,11 @@ import os.path
 import subprocess
 from gui.ui_template import Ui_ModuleWindow
 
+if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+
+if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -662,11 +667,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
 if __name__ == '__main__':
 
-    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
-        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
-    if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
-        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 
     app = QApplication(sys.argv)
     path = os.path.join(os.path.dirname(__file__), 'themes', 'light.qss')

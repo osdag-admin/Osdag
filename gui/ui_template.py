@@ -1187,7 +1187,7 @@ class Window(QMainWindow):
         self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list, main))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
-        self.actionChange_background.triggered.connect(lambda: main.showColorDialog(self))
+        self.actionChange_background.triggered.connect(self.showColorDialog)
         self.actionSave_3D_model.triggered.connect(lambda: self.save3DcadImages(main))
         self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
@@ -1602,6 +1602,9 @@ class Window(QMainWindow):
 
         else:
             main.design_button_status = True
+            self.textEdit.clear()
+            with open("logging_text.log", 'w') as log_file:
+                pass
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
             print(status)

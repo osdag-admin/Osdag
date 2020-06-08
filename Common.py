@@ -497,17 +497,18 @@ KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
 
 # Applied load
-KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load Vu (kN)'
-KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load Au (kN)'
-KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load Mu (kNm)'
+KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load (kN)'
+KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load (kN)'
+KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load (kNm)'
 KEY_DISP_AXIAL_FORCE_CON= 'Axial Load Considered (kN)'
 
 # capacity
-KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member Ac (kN)"
-KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member Sc (kN)"
-KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member Mc (kNm)"
-KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity Pmc (kNm)'
-KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria Mdc (kNm)'
+
+KEY_OUT_DISP_AXIAL_CAPACITY = "Axial Capacity Member (kN)"
+KEY_OUT_DISP_SHEAR_CAPACITY ="Shear Capacity Member (kN)"
+KEY_OUT_DISP_MOMENT_CAPACITY ="Moment Capacity Member (kNm)"
+KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY  = 'Plastic Moment Capacity (kNm)'
+KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
 
 
 
@@ -517,6 +518,7 @@ KEY_OUT_GRD_ANCHOR = 'Anchor Bolt.Grade'
 KEY_DISP_OUT_GRD_ANCHOR = 'Grade'
 KEY_OUT_ANCHOR_BOLT_LENGTH = 'Anchor Bolt.Length'
 KEY_DISP_OUT_ANCHOR_BOLT_LENGTH = 'Total Length'
+
 
 KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_BEARING = 'Bearing Capacity (kN)'
@@ -605,19 +607,33 @@ KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_MOMENT_DEMAND = 'Moment Demand (kN-m)'
 KEY_OUT_STIFFENER_PLATE_FLANGE_MOMENT = 'Stiffener_Plate_Flange.Moment'
 KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_MOMENT = 'Moment Capacity (kN-m)'
 
-KEY_OUT_STIFFENER_PLATE_WEB = 'Stiffener_Plate.Column_web'
-KEY_DISP_OUT_STIFFENER_PLATE_WEB = 'Stiffener Plate'
-DISP_TITLE_STIFFENER_PLATE_WEB = 'Stiffener Plate along Column web'
-KEY_OUT_STIFFENER_PLATE_WEB_THICKNNESS = 'Stiffener_Plate_Web.Thickness'
-KEY_OUT_DISP_STIFFENER_PLATE_WEB_THICKNESS = 'Thickness (mm)'
-KEY_OUT_STIFFENER_PLATE_WEB_SHEAR_DEMAND = 'Stiffener_Plate_Web.Shear_Demand'
-KEY_OUT_DISP_STIFFENER_PLATE_WEB_SHEAR_DEMAND = 'Shear Demand (kN)'
-KEY_OUT_STIFFENER_PLATE_WEB_SHEAR = 'Stiffener_Plate_Web.Shear'
-KEY_OUT_DISP_STIFFENER_PLATE_WEB_SHEAR = 'Shear Capacity (kN)'
-KEY_OUT_STIFFENER_PLATE_WEB_MOMENT_DEMAND = 'Stiffener_Plate_Web.Moment_Demand'
-KEY_OUT_DISP_STIFFENER_PLATE_WEB_MOMENT_DEMAND = 'Moment Demand (kN-m)'
-KEY_OUT_STIFFENER_PLATE_WEB_MOMENT = 'Stiffener_Plate_Web.Moment'
-KEY_OUT_DISP_STIFFENER_PLATE_WEB_MOMENT = 'Moment Capacity (kN-m)'
+KEY_OUT_STIFFENER_PLATE_ALONG_WEB = 'Stiffener_Plate.Along_Column_web'
+KEY_DISP_OUT_STIFFENER_PLATE_ALONG_WEB = 'Stiffener Plate'
+DISP_TITLE_STIFFENER_PLATE_ALONG_WEB = 'Stiffener Plate along Column web'
+KEY_OUT_STIFFENER_PLATE_ALONG_WEB_THICKNNESS = 'Stiffener_Plate_along_Web.Thickness'
+KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_THICKNESS = 'Thickness (mm)'
+KEY_OUT_STIFFENER_PLATE_ALONG_WEB_SHEAR_DEMAND = 'Stiffener_Plate_along_Web.Shear_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_STIFFENER_PLATE_ALONG_WEB_SHEAR = 'Stiffener_Plate_along_Web.Shear'
+KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_STIFFENER_PLATE_ALONG_WEB_MOMENT_DEMAND = 'Stiffener_Plate_along_Web.Moment_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_STIFFENER_PLATE_ALONG_WEB_MOMENT = 'Stiffener_Plate_along_Web.Moment'
+KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_MOMENT = 'Moment Capacity (kN-m)'
+
+KEY_OUT_STIFFENER_PLATE_ACROSS_WEB = 'Stiffener_Plate.Across_Column_web'
+KEY_DISP_OUT_STIFFENER_PLATE_ACROSS_WEB = 'Stiffener Plate'
+DISP_TITLE_STIFFENER_PLATE_ACROSS_WEB = 'Stiffener Plate across Column web'
+KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_THICKNNESS = 'Stiffener_Plate_across_Web.Thickness'
+KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_THICKNESS = 'Thickness (mm)'
+KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_SHEAR_DEMAND = 'Stiffener_Plate_across_Web.Shear_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_SHEAR_DEMAND = 'Shear Demand (kN)'
+KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_SHEAR = 'Stiffener_Plate_across_Web.Shear'
+KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND = 'Stiffener_Plate_across_Web.Moment_Demand'
+KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND = 'Moment Demand (kN-m)'
+KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_MOMENT = 'Stiffener_Plate_across_Web.Moment'
+KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT = 'Moment Capacity (kN-m)'
 
 #
 # DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'
@@ -694,17 +710,17 @@ KEY_DISP_GAMMA_MF = "Connection Bolts - Friction Type"
 KEY_DISP_GAMMA_MW = "Connection Weld"
 
 
+KEY_DISP_DP_WELD_TYPE = 'Weld Type'
+KEY_DP_WELD_TYPE_FILLET = 'Fillet Weld'
+KEY_DP_WELD_TYPE_GROOVE = 'Groove Weld'
+KEY_DP_WELD_TYPE_VALUES = [KEY_DP_WELD_TYPE_FILLET, KEY_DP_WELD_TYPE_GROOVE]
 
-KEY_DISP_DP_WELD_TYPE ='Weld Type'
+KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
 KEY_DP_WELD_FAB_SHOP = 'Shop Weld'
 KEY_DP_WELD_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_FAB_FIELD]
 
-KEY_DISP_DP_WELD_FAB = 'Type of weld fabrication'
-
-
 KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
-
 
 
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
@@ -740,21 +756,21 @@ KEY_DISP_SEC_PROP = 'Sectional Properties'
 KEY_DISP_MASS = 'Mass, M (Kg/m)'
 KEY_DISP_Cz = 'Cz (cm)'
 KEY_DISP_Cy = 'Cy (cm)'
-KEY_DISP_AREA = 'Sectional area, a (mm<sup>2</sup>)'
-KEY_DISP_MOA_IZ = '2nd Moment of area, I<sub>z</sub> (mm<sup>4</sup>)'
-KEY_DISP_MOA_IY = '2nd Moment of area, I<sub>y</sub> (mm<sup>4</sup>)'
-KEY_DISP_MOA_IU = '2nd Moment of area, I<sub>u</sub> (mm<sup>4</sup>)'
-KEY_DISP_MOA_IV = '2nd Moment of area, I<sub>v</sub> (mm<sup>4</sup>)'
-KEY_DISP_ROG_RZ = 'Radius of gyration, r<sub>z</sub> (mm)'
-KEY_DISP_ROG_RY = 'Radius of gyration, r<sub>y</sub> (mm)'
-KEY_DISP_ROG_RU = 'Radius of gyration, r<sub>u</sub> (mm)'
-KEY_DISP_ROG_RV = 'Radius of gyration, r<sub>v</sub> (mm)'
-KEY_DISP_EM_ZZ = 'Elastic modulus, Z<sub>z</sub> (mm<sup>3</sup>)'
-KEY_DISP_EM_ZY = 'Elastic modulus, Z<sub>y</sub> (mm<sup>3</sup>)'
-KEY_DISP_PM_ZPZ = 'Plastic modulus, Z<sub>pz</sub> (mm<sup>3</sup>)'
-KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (mm<sup>3</sup>)'
-KEY_DISP_It = 'Torsion Constant, I<sub>t</sub> (mm<sup>4</sup>)'
-KEY_DISP_Iw = 'Warping Constant, I<sub>w</sub> (mm<sup>6</sup>)'
+KEY_DISP_AREA = 'Sectional area, a (cm<sup>2</sup>)'
+KEY_DISP_MOA_IZ = '2nd Moment of area, I<sub>z</sub> (cm<sup>4</sup>)'
+KEY_DISP_MOA_IY = '2nd Moment of area, I<sub>y</sub> (cm<sup>4</sup>)'
+KEY_DISP_MOA_IU = '2nd Moment of area, I<sub>u</sub> (cm<sup>4</sup>)'
+KEY_DISP_MOA_IV = '2nd Moment of area, I<sub>v</sub> (cm<sup>4</sup>)'
+KEY_DISP_ROG_RZ = 'Radius of gyration, r<sub>z</sub> (cm)'
+KEY_DISP_ROG_RY = 'Radius of gyration, r<sub>y</sub> (cm)'
+KEY_DISP_ROG_RU = 'Radius of gyration, r<sub>u</sub> (cm)'
+KEY_DISP_ROG_RV = 'Radius of gyration, r<sub>v</sub> (cm)'
+KEY_DISP_EM_ZZ = 'Elastic modulus, Z<sub>z</sub> (cm<sup>3</sup>)'
+KEY_DISP_EM_ZY = 'Elastic modulus, Z<sub>y</sub> (ccm<sup>3</sup>)'
+KEY_DISP_PM_ZPZ = 'Plastic modulus, Z<sub>pz</sub> (cm<sup>3</sup>)'
+KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (cm<sup>3</sup>)'
+KEY_DISP_It = 'Torsion Constant, I<sub>t</sub> (cm<sup>4</sup>)'
+KEY_DISP_Iw = 'Warping Constant, I<sub>w</sub> (cm<sup>6</sup>)'
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
@@ -806,7 +822,7 @@ KEY_PLATE_MAX_HEIGHT = 'Plate.MaxHeight'
 KEY_SLENDER = "Member.Slenderness"
 
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
-KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Height'
+KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Height (mm)'
 
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
@@ -961,7 +977,7 @@ KEY_OUT_DISP_WEB_BOLT_CAPACITY ="Bolt Capacity (kN)"
 KEY_OUT_DISP_WEB_BOLT_SLIP= 'Slip Resistance'
 KEY_WEB_BOLT_GRP_CAPACITY = 'web_bolt.grp_bolt_capacity'
 KEY_OUT_WEB_BOLT_GRP_CAPACITY = 'Web bolt grp bolt capacity (kN)'
-KEY_OUT_REQ_MOMENT_DEMAND_BOLT = "Moment Demand (kNm"
+KEY_OUT_REQ_MOMENT_DEMAND_BOLT = "Moment Demand (kNm)"
 KEY_OUT_REQ_PARA_BOLT = "Parameters required for bolt force (mm)"
 
 
@@ -974,7 +990,7 @@ VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20'
  '25','28','32','36','40','45','50','56','63','80']
 
 
-KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height'
+KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
 KEY_DISP_WEB_PLATE_LENGTH ='Length (mm)'
@@ -997,7 +1013,7 @@ KEY_DISP_WEB_CAPACITY ='Capacity'
 
 # Web plate
 KEY_WEB_PLATE_CAPACITY ="Web_plate.capacity"
-KEY_DISP_WEB_PLATE_CAPACITY= 'Web Plate Tension Capacity'
+KEY_DISP_WEB_PLATE_CAPACITY= 'Web Plate Tension Capacity (kN)'
 KEY_TEN_YIELDCAPACITY_WEB_PLATE = "Web_plate.tension_yielding"
 KEY_DISP_TENSION_YIELDCAPACITY_WEB_PLATE = 'Tension Yielding Capacity (kN)'
 KEY_TENSION_RUPTURECAPACITY_WEB_PLATE = "Web_plate.tension_rupture"

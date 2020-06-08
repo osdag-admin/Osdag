@@ -36,12 +36,12 @@ from Common import *
 from utils.common.load import Load
 from utils.common.other_standards import *
 from design_report.reportGenerator import save_html
-from cad.common_logic import CommonDesignLogic
+# from cad.common_logic import CommonDesignLogic
 
 import logging
 
 
-class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Part3_2002, Column, CommonDesignLogic):
+class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Part3_2002, Column):
     """
     Perform stress analyses --> design base plate and anchor bolt--> provide connection detailing.
 
@@ -623,11 +623,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         #        self.moment_capacity_gusset if flag and self.stiffener_along_flange == 'Yes' else '')
         # out_list.append(t28)
 
-        t29 = (None, DISP_TITLE_STIFFENER_PLATE_WEB, TYPE_TITLE, None,True)
+        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ALONG_WEB, TYPE_TITLE, None,True)
         out_list.append(t29)
 
-        t30 = (KEY_OUT_STIFFENER_PLATE_WEB, KEY_DISP_OUT_STIFFENER_PLATE_WEB, TYPE_OUT_BUTTON,
-               ['Stiffener Details', self.stiffener_web_details],True)
+        t30 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB, KEY_DISP_OUT_STIFFENER_PLATE_ALONG_WEB, TYPE_OUT_BUTTON,
+               ['Stiffener Details', self.stiffener_along_web_details],True)
+        out_list.append(t30)
+
+        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ACROSS_WEB, TYPE_TITLE, None,True)
+        out_list.append(t29)
+
+        t30 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB, KEY_DISP_OUT_STIFFENER_PLATE_ACROSS_WEB, TYPE_OUT_BUTTON,
+               ['Stiffener Details', self.stiffener_across_web_details],True)
         out_list.append(t30)
 
         # t30 = (KEY_OUT_STIFFENER_PLATE_WEB_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_WEB_THICKNESS, TYPE_TEXTBOX,
@@ -727,28 +734,54 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         return sf
 
-    def stiffener_web_details(self, flag):
+    def stiffener_along_web_details(self, flag):
 
         sw = []
 
-        t30 = (KEY_OUT_STIFFENER_PLATE_WEB_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_WEB_THICKNESS, TYPE_TEXTBOX,
+        t30 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_THICKNESS, TYPE_TEXTBOX,
                self.stiffener_plt_thick_along_web if flag and self.stiffener_along_web == 'Yes' else '')
         sw.append(t30)
 
-        t31 = (KEY_OUT_STIFFENER_PLATE_WEB_SHEAR_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_WEB_SHEAR_DEMAND, TYPE_TEXTBOX,
+        t31 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB_SHEAR_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_SHEAR_DEMAND, TYPE_TEXTBOX,
                self.shear_on_stiffener_along_web if flag and self.stiffener_along_web == 'Yes' else '')
         sw.append(t31)
 
-        t32 = (KEY_OUT_STIFFENER_PLATE_WEB_SHEAR, KEY_OUT_DISP_STIFFENER_PLATE_WEB_SHEAR, TYPE_TEXTBOX,
+        t32 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB_SHEAR, KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_SHEAR, TYPE_TEXTBOX,
                self.shear_capa_stiffener_along_web if flag and self.stiffener_along_web == 'Yes' else '')
         sw.append(t32)
 
-        t33 = (KEY_OUT_STIFFENER_PLATE_WEB_MOMENT_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_WEB_MOMENT_DEMAND, TYPE_TEXTBOX,
+        t33 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB_MOMENT_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_MOMENT_DEMAND, TYPE_TEXTBOX,
                self.moment_on_stiffener_along_web if flag and self.stiffener_along_web == 'Yes' else '')
         sw.append(t33)
 
-        t34 = (KEY_OUT_STIFFENER_PLATE_WEB_MOMENT, KEY_OUT_DISP_STIFFENER_PLATE_WEB_MOMENT, TYPE_TEXTBOX,
+        t34 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB_MOMENT, KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_MOMENT, TYPE_TEXTBOX,
                self.moment_capa_stiffener_along_web if flag and self.stiffener_along_web == 'Yes' else '')
+        sw.append(t34)
+
+        return sw
+
+    def stiffener_across_web_details(self, flag):
+
+        sw = []
+
+        t30 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_THICKNESS, TYPE_TEXTBOX,
+               self.stiffener_plt_thick_across_web if flag and self.stiffener_across_web == 'Yes' else '')
+        sw.append(t30)
+
+        t31 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_SHEAR_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_SHEAR_DEMAND, TYPE_TEXTBOX,
+               self.shear_on_stiffener_across_web if flag and self.stiffener_across_web == 'Yes' else '')
+        sw.append(t31)
+
+        t32 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_SHEAR, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_SHEAR, TYPE_TEXTBOX,
+               self.shear_capa_stiffener_across_web if flag and self.stiffener_across_web == 'Yes' else '')
+        sw.append(t32)
+
+        t33 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND, TYPE_TEXTBOX,
+               self.moment_on_stiffener_across_web if flag and self.stiffener_across_web == 'Yes' else '')
+        sw.append(t33)
+
+        t34 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_MOMENT, KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT, TYPE_TEXTBOX,
+               self.moment_capa_stiffener_across_web if flag and self.stiffener_across_web == 'Yes' else '')
         sw.append(t34)
 
         return sw
@@ -947,6 +980,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             design_dictionary[KEY_MOMENT_MINOR] = 'Disabled'
         if design_dictionary[KEY_CONN] != 'Moment Base Plate' or design_dictionary[KEY_AXIAL_TENSION_BP] == '':
             design_dictionary[KEY_AXIAL_TENSION_BP] = 'Disabled'
+        if design_dictionary[KEY_SHEAR_MAJOR] == '':
+            design_dictionary[KEY_SHEAR_MAJOR] = '0'
+        if design_dictionary[KEY_SHEAR_MINOR] == '':
+            design_dictionary[KEY_SHEAR_MINOR] = '0'
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
@@ -1124,7 +1161,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def tab_list(self):
 
-        self.design_button_status = False
+        # self.design_button_status = False
 
         tabs = []
 
@@ -1404,8 +1441,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.dp_design_method = str(design_dictionary[KEY_DP_DESIGN_METHOD])
         self.dp_bp_method = str(design_dictionary[KEY_DP_DESIGN_BASE_PLATE])
 
-        # properties of the column section
+        # properties of the column sections
 
+        # Rolled sections
         self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
         self.column_D = self.column_properties.depth
         self.column_bf = self.column_properties.flange_width
@@ -1414,12 +1452,64 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.column_r1 = self.column_properties.root_radius
         self.column_r2 = self.column_properties.toe_radius
 
+        # Hollow sections
+
         # other attributes
         self.gamma_m0 = self.cl_5_4_1_Table_5["gamma_m0"]["yielding"]  # gamma_mo = 1.10
         self.gamma_m1 = self.cl_5_4_1_Table_5["gamma_m1"]["ultimate_stress"]  # gamma_m1 = 1.25
         self.gamma_mb = self.cl_5_4_1_Table_5["gamma_mb"][self.dp_weld_fab]  # gamma_mb = 1.25
         self.gamma_mw = self.cl_5_4_1_Table_5["gamma_mw"][self.dp_weld_fab]  # gamma_mw = 1.25 for 'Shop Weld' and 1.50 for 'Field Weld'
         self.safe = True
+
+        self.stiffener_plt_thick_along_flange = 0.0
+        self.stiffener_plt_thick_along_web = 0.0
+        self.stiffener_plt_thick_across_web = 0.0
+        self.stiffener_plt_height_along_flange = 0.0
+        self.stiffener_plt_height_along_web = 0.0
+        self.stiffener_plt_height_across_web = 0.0
+
+        self.shear_on_stiffener_along_flange = 0.0
+        self.shear_capa_stiffener_along_flange = 0.0
+        self.moment_on_stiffener_along_flange = 0.0
+        self.moment_capa_stiffener_along_flange = 0.0
+        self.z_e_stiffener_along_flange = 0.0
+
+        self.shear_on_stiffener_along_web = 0.0
+        self.shear_capa_stiffener_along_web = 0.0
+        self.moment_on_stiffener_along_web = 0.0
+        self.moment_capa_stiffener_along_web = 0.0
+        self.z_e_stiffener_along_web = 0.0
+
+        self.weld_size_flange = 0.0
+        self.weld_size_web = 0.0
+        self.gusset_along_flange = 'No'
+        self.gusset_along_web = 'No'
+        self.gusset_plate_length = 0.0
+        self.stiffener_plate_length = 0.0
+        self.total_eff_len_gusset_available = 0.0
+        self.gusset_outstand_length = 0.0
+        self.stiffener_outstand_length = 0.0
+        self.gusset_fy = self.dp_column_fy
+        self.stiffener_fy = self.dp_column_fy
+        self.epsilon = 1
+        self.gusset_plate_thick = 0.0
+        self.stiffener_plate_thick = 0.0
+        self.gusset_plate_height = 0.0
+        self.stiffener_plate_height = 0.0
+        self.stiffener_plt_len_along_flange = 0.0
+        self.stiffener_plt_len_along_web = 0.0
+        self.stiffener_plt_len_across_web = 0.0
+
+        self.weld_size_gusset = 0.0
+        self.weld_size_stiffener = 0.0
+        self.weld_size_vertical_flange = 0.0
+        self.weld_size_vertical_web = 0.0
+
+        self.stiffener_plt_thick_across_web = 0
+        self.shear_on_stiffener_across_web = 0
+        self.shear_capa_stiffener_across_web = 0
+        self.moment_on_stiffener_across_web = 0
+        self.moment_capa_stiffener_across_web = 0
 
         self.bp_analyses_parameters(self)
         print('bp_analyses_parameters done')
@@ -1481,14 +1571,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # If the shear force acting along any axis of the column is large (braced frames or buildings designed for seismic forces, heavy winds etc.),
         # the minimum recommended end/edge distance is six times the anchor diameter (min_end_distance = 6 * anchor_diameter).
         # This is to prevent the side bursting/face break-out of the concrete [Reference: AISC Design Guide 1, section 3.2.2, page 22]
-        if self.load_shear_major or self.load_shear_minor > 0:
-            min_end_distance = 6 * self.anchor_dia_provided  # TODO: check if shear is large enough
-            min_end_distance = round_up(min_end_distance, 5)  # mm
-
-            self.end_distance = max(self.end_distance, min_end_distance)
-            # TODO: give suitable log messages
-        else:
-            pass
+        # if self.load_shear_major or self.load_shear_minor > 0:
+        #     min_end_distance = 6 * self.anchor_dia_provided  # TODO: check if shear is large enough
+        #     min_end_distance = round_up(min_end_distance, 5)  # mm
+        #
+        #     self.end_distance = max(self.end_distance, min_end_distance)
+        #     TODO: give suitable log messages
+        # else:
+        #     pass
 
         # TODO: add max end, edge distance check after the plate thk check
         # self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive)
@@ -1509,7 +1599,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
         if self.connectivity == 'Welded Column Base' or 'Moment Base Plate':
             self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
-            self.bp_width_min = round_up(self.column_bf + 1.5 * self.edge_distance + 1.5 * self.edge_distance, 5)  # mm
+            self.bp_width_min = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
 
         elif self.connectivity == 'Welded+Bolted Column Base':
             pass
@@ -1737,7 +1827,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # Assumption: The minimum number of anchor bolts is 2, for stability purpose.
             self.tension_bolts_req = max(self.tension_demand_anchor / self.tension_capacity_anchor, 2)
 
-            # if the number of bolts required to resist tension exceeds 2 in number, then the loop will check
+            # if the number of bolts required to resist tension exceeds 3 in number, then the loop will check
             # for a higher diameter of bolt from the given list of anchor diameters by the user.
             n = 1
             while self.tension_bolts_req > 3:  # the maximum number of bolts that can be accommodated is 3
@@ -1827,7 +1917,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                                                                          safety_factor_parameter=self.dp_weld_fab)  # N
                     self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
 
-                    self.anchor_nos_uplift = max(self.load_axial_tension / self.tension_capacity_anchor_uplift, 2)
+                    self.anchor_nos_uplift = max(((self.load_axial_tension * 10 ** -3) / self.tension_capacity_anchor_uplift), 2)
                     n += 1
 
                     self.anchor_dia_uplift = self.table1(i)[0]  # updating the initialised anchor diameter for uplift force
@@ -2075,6 +2165,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # length of anchor for cast-in situ anchor bolts (k = 15.5)
                 self.anchor_length_provided = (self.tension_capacity_anchor * 1000 /
                                                (15.5 * math.sqrt(self.bearing_strength_concrete / 0.45))) ** (1 / 1.5)  # mm
+                self.anchor_length_provided = round_up(self.anchor_length_provided, 5)
                 self.anchor_length_provided = max(self.anchor_length_provided, self.anchor_length_min)
 
             logger.info(": [Anchor Bolt Length] The length of the anchor bolt is computed assuming the anchor bolt is casted in-situ"

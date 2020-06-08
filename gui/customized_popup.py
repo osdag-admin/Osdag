@@ -66,6 +66,7 @@ class Ui_Popup(object):
         self.listWidget.setObjectName("listWidget")
         self.listWidget.setSortingEnabled(True)
         self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.listWidget.itemDoubleClicked.connect(self.move_to_selected)
         # self.listWidget_2 = QtWidgets.QListWidget(MainWindow)
         self.listWidget_2 = My_ListWidget(MainWindow)
 
@@ -73,6 +74,7 @@ class Ui_Popup(object):
         self.listWidget_2.setObjectName("listWidget_2")
         self.listWidget_2.setSortingEnabled(True)
         self.listWidget_2.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.listWidget_2.itemDoubleClicked.connect(self.move_to_available)
         self.pushButton = QtWidgets.QPushButton(MainWindow)
         self.pushButton.setGeometry(QtCore.QRect(265, 130, 75, 23))
         self.pushButton.setObjectName("pushButton")
@@ -222,6 +224,14 @@ class Ui_Popup(object):
             it = self.listWidget_2.item(i)
             r.append(it.text())
         return r
+
+    def move_to_selected(self, item):
+        self.listWidget_2.addItem(item.text())
+        self.listWidget.takeItem(self.listWidget.row(item))
+
+    def move_to_available(self, item):
+        self.listWidget.addItem(item.text())
+        self.listWidget_2.takeItem(self.listWidget_2.row(item))
 
 if __name__ == "__main__":
     import sys

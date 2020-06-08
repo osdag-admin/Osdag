@@ -1138,7 +1138,7 @@ class Window(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
-        self.designPrefDialog = DesignPreferences(self, main, input_dictionary=self.input_dock_inputs)
+        self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
 
         # self.designPrefDialog.rejected.connect(lambda: self.design_preferences('rejected'))
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
@@ -1604,8 +1604,7 @@ class Window(QMainWindow):
         elif trigger_type == "Design_Pref":
 
             if self.prev_inputs != self.input_dock_inputs:
-                self.designPrefDialog = DesignPreferences(self, main, input_dictionary=self.input_dock_inputs)
-
+                self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
                 if 'Select Section' in self.input_dock_inputs.values():
                     self.designPrefDialog.flag = False
                 else:
@@ -1945,6 +1944,7 @@ class Window(QMainWindow):
     def design_preferences(self):
         #print(self.designPrefDialog.module_window.input_dock_inputs)
         self.designPrefDialog.show()
+        self.prev_inputs = self.input_dock_inputs
 
     # Function for getting input for design preferences from input dock
     '''
@@ -2046,6 +2046,12 @@ class Window(QMainWindow):
                         k2.addItem(str(values))
                 elif typ == TYPE_TEXTBOX:
                     k2.setText(str(val[k2_key_name]))
+                elif typ == TYPE_IMAGE:
+                    # k2 = tab.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key_name)
+                    pixmap1 = QPixmap(val)
+                    print(pixmap1,"gbfbf")
+                    k2.setPixmap(pixmap1)
+
 
     def refresh_section_connect(self, add_button, prev, key_name, key_type, tab_key, arg,data):
         add_button.clicked.connect(lambda: self.refresh_section(prev, key_name, key_type, tab_key, arg,data))

@@ -2037,7 +2037,9 @@ class Window(QMainWindow):
                 elif typ == TYPE_TEXTBOX:
                     k2.setText(str(val[k2_key_name]))
                 elif typ == TYPE_IMAGE:
+                    # k2 = tab.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key_name)
                     pixmap1 = QPixmap(val)
+                    print(pixmap1,"gbfbf")
                     k2.setPixmap(pixmap1)
 
 

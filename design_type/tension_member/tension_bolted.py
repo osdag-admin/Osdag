@@ -86,13 +86,8 @@ class Tension_bolted(Member):
         t2 = (DISP_TITLE_CHANNEL, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_section)
         change_tab.append(t2)
 
-
-        t3 = (DISP_TITLE_ANGLE,[KEY_SEC_PROFILE, KEY_LOCATION, KEY_SECSIZE_DP], [KEY_IMAGE], TYPE_IMAGE, self.fn_conn_dp_image)
-        change_tab.append(t3)
-
-        t3 = (DISP_TITLE_ANGLE, [KEY_SEC_PROFILE], [KEY_IMAGE], TYPE_IMAGE,
-              self.fn_conn_dp_image_initial)
-        change_tab.append(t3)
+        # t3 = (DISP_TITLE_ANGLE,[KEY_SECSIZE_DP], [KEY_IMAGE], TYPE_IMAGE, self.fn_conn_dp_image)
+        # change_tab.append(t3)
 
         t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
@@ -103,12 +98,12 @@ class Tension_bolted(Member):
         t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
               [KEY_SECSIZE_SELECTED, KEY_SEC_FY,KEY_SEC_FU,'Label_1','Label_2','Label_3', 'Label_4', 'Label_5','Label_7','Label_8','Label_9',
                'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23','Label_24'], TYPE_TEXTBOX, self.get_new_angle_section_properties)
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23','Label_24',KEY_IMAGE], TYPE_TEXTBOX, self.get_new_angle_section_properties)
         change_tab.append(t6)
 
         t5 = (DISP_TITLE_ANGLE, ['Label_1','Label_2','Label_3'],
               ['Label_7','Label_8','Label_9', 'Label_10','Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
-               'Label_16', 'Label_17', 'Label_18','Label_19', 'Label_20','Label_21', 'Label_22','Label_23'],
+               'Label_16', 'Label_17', 'Label_18','Label_19', 'Label_20','Label_21', 'Label_22','Label_23',KEY_IMAGE],
               TYPE_TEXTBOX, self.get_Angle_sec_properties)
         change_tab.append(t5)
 
@@ -394,57 +389,57 @@ class Tension_bolted(Member):
         else:
             return VALUES_IMG_TENSIONBOLTED[4]
 
-    def fn_conn_dp_image(self):
+    # def fn_conn_dp_image(self):
+    #
+    #     "Function to populate section images based on the type of section "
+    #     size = self[0]
+    #     sec = self[1][KEY_SEC_PROFILE]
+    #     loc = self[1][KEY_LOCATION]
+    #     axb = size.split('x')
+    #     a = (axb[0]).strip()
+    #     b = (axb[1]).strip()
+    #
+    #     if sec == "Angles":
+    #         if a == b:
+    #             return VALUES_IMG_TENSIONBOLTED_DF01[0]
+    #         else:
+    #             return VALUES_IMG_TENSIONBOLTED_DF02[0]
+    #     elif sec == "Back to Back Angles" and loc == "Long Leg":
+    #         if a == b:
+    #             return VALUES_IMG_TENSIONBOLTED_DF01[1]
+    #         else:
+    #             return VALUES_IMG_TENSIONBOLTED_DF02[1]
+    #     elif sec == "Back to Back Angles" and loc == "Short Leg":
+    #         if a == b:
+    #             return VALUES_IMG_TENSIONBOLTED_DF01[2]
+    #         else:
+    #             return VALUES_IMG_TENSIONBOLTED_DF02[2]
+    #     elif sec == "Star Angles" and loc == "Long Leg":
+    #         if a == b:
+    #             return VALUES_IMG_TENSIONBOLTED_DF01[3]
+    #         else:
+    #             return VALUES_IMG_TENSIONBOLTED_DF02[3]
+    #     elif sec == "Star Angles" and loc == "Short Leg":
+    #         if a == b:
+    #             return VALUES_IMG_TENSIONBOLTED_DF01[4]
+    #         else:
+    #             return VALUES_IMG_TENSIONBOLTED_DF02[4]
+    #     else:
+    #         pass
 
-        "Function to populate section images based on the type of section "
-        sec = self[0]
-        loc = self[1]
-        size = self[2]
-        axb = size.split('x')
-        a = (axb[0]).strip()
-        b = (axb[1]).strip()
-
-        if sec == "Angles":
-            if a == b:
-                return VALUES_IMG_TENSIONBOLTED_DF01[0]
-            else:
-                return VALUES_IMG_TENSIONBOLTED_DF02[0]
-        elif sec == "Back to Back Angles" and loc == "Long Leg":
-            if a == b:
-                return VALUES_IMG_TENSIONBOLTED_DF01[1]
-            else:
-                return VALUES_IMG_TENSIONBOLTED_DF02[1]
-        elif sec == "Back to Back Angles" and loc == "Short Leg":
-            if a == b:
-                return VALUES_IMG_TENSIONBOLTED_DF01[2]
-            else:
-                return VALUES_IMG_TENSIONBOLTED_DF02[2]
-        elif sec == "Star Angles" and loc == "Long Leg":
-            if a == b:
-                return VALUES_IMG_TENSIONBOLTED_DF01[3]
-            else:
-                return VALUES_IMG_TENSIONBOLTED_DF02[3]
-        elif sec == "Star Angles" and loc == "Short Leg":
-            if a == b:
-                return VALUES_IMG_TENSIONBOLTED_DF01[4]
-            else:
-                return VALUES_IMG_TENSIONBOLTED_DF02[4]
-        else:
-            pass
-
-    def fn_conn_dp_image_initial(self):
-
-        "Function to populate section images based on the type of section "
-        sec = self[0]
-
-        if sec == "Angles":
-            return VALUES_IMG_TENSIONBOLTED_DF01[0]
-        elif sec == "Back to Back Angles":
-            return VALUES_IMG_TENSIONBOLTED_DF01[1]
-        elif sec == "Star Angles":
-            return VALUES_IMG_TENSIONBOLTED_DF01[3]
-        else:
-            pass
+    # def fn_conn_dp_image_initial(self):
+    #
+    #     "Function to populate section images based on the type of section "
+    #     sec = self[0]
+    #
+    #     if sec == "Angles":
+    #         return VALUES_IMG_TENSIONBOLTED_DF01[0]
+    #     elif sec == "Back to Back Angles":
+    #         return VALUES_IMG_TENSIONBOLTED_DF01[1]
+    #     elif sec == "Star Angles":
+    #         return VALUES_IMG_TENSIONBOLTED_DF01[3]
+    #     else:
+    #         pass
 
     def out_bolt_bearing(self):
 

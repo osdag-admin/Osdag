@@ -35,7 +35,7 @@ class OurLog(logging.Handler):
         elif record.levelname == 'INFO':
             msg = "<span style='color: green;'>" + msg + "</span>"
         self.key.append(msg)
-        # self.key.append(record.levelname)
+        self.key.append(record.levelname)
 
 def connectdb1():
     """
@@ -438,7 +438,7 @@ KEY_DISP_ENDPLATE_TYPE = 'End Plate Type'
 
 # VALUES_CONN_BP = ['Welded-Slab Base', 'Bolted-Slab Base', 'Gusseted Base Plate', 'Hollow Section']
 
-KEY_DISP_LENGTH = 'Length(mm) *'
+KEY_DISP_LENGTH = 'Length (mm) *'
 KEY_DISP_LOCATION = 'Conn_Location *'
 KEY_DISP_MATERIAL = 'Material *'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
@@ -460,7 +460,7 @@ DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate '
 DISP_TITLE_FLANGESPLICEPLATE_OUTER = 'Outer plate '
 DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner plate '
 KEY_DISP_SLENDER = 'Slenderness'
-KEY_DISP_PLATETHK = 'Thickness(mm)*'
+KEY_DISP_PLATETHK = 'Thickness (mm)*'
 DISP_TITLE_TENSION = 'Tension Capacity'
 KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
 KEY_DISP_FLANGESPLATE_THICKNESS = 'Thickness (mm)*'

@@ -448,11 +448,11 @@ class BeamColumnEndPlate(MomentConnection):
     def assign_throat_tk(self):
         # Throat thickness
         self.top_flange_weld.throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
-        fillet_size=self.top_flange_weld.size)
+            fillet_size=self.top_flange_weld.size)
         self.bottom_flange_weld.throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
-        fillet_size=self.bottom_flange_weld.size)
+            fillet_size=self.bottom_flange_weld.size)
         self.web_weld.throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
-        fillet_size=self.web_weld.size)
+            fillet_size=self.web_weld.size)
         return
 
     def assign_weld_lengths(self):
@@ -481,6 +481,18 @@ class BeamColumnEndPlate(MomentConnection):
             l_j=self.bottom_flange_weld.eff_length, t_t=self.bottom_flange_weld.throat_tk)
         web_weld_long_joint_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(
             l_j=self.web_weld.eff_length, t_t=self.web_weld.throat_tk)
+
+    def assign_weld_strength(self):
+        self.top_flange_weld.strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+            ultimate_stresses=[self.supported_section.fu, self.top_flange_weld.fu],
+            fabrication=self.top_flange_weld.fabrication)
+        self.bottom_flange_weld.strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+            ultimate_stresses=[self.supported_section.fu, self.bottom_flange_weld.fu],
+            fabrication=self.bottom_flange_weld.fabrication)
+        self.web_weld.strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+            ultimate_stresses=[self.supported_section.fu, self.web_weld.fu],
+            fabrication=self.web_weld.fabrication)
+        return
 
     def find_end_plate_spacing(self):
         #######################################################################
@@ -515,6 +527,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.assign_weld_sizes()
         self.assign_throat_tk()
         self.assign_weld_lengths()
+        self.assign_weld_strength()
 
         self.find_bolt_conn_plates_t_fu_fy()
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=bolt_dia,

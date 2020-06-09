@@ -758,7 +758,7 @@ class Channel(Section):
 
 class Weld:
 
-    def __init__(self, material_g_o="",type=KEY_DP_WELD_TYPE_FILLET, fabrication=KEY_DP_WELD_FAB_SHOP):
+    def __init__(self, material_g_o="", type=KEY_DP_WELD_TYPE_FILLET, fabrication=KEY_DP_WELD_FAB_SHOP):
         self.design_status = True
         self.type = type
         self.fabrication = fabrication
@@ -766,6 +766,7 @@ class Weld:
         self.size = 0.0
         self.length = 0.0
         self.eff_length = 0.0
+        self.lj_factor = 1.0
         self.inner_length = 0.0
         self.effective = 0.0
         self.height = 0.0

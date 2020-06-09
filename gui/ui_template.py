@@ -516,7 +516,8 @@ class Window(QMainWindow):
                     item_width = max(item_width, metrices.boundingRect(item).width())
                 in_layout2.addWidget(combo, j, 2, 1, 1)
 
-                if lable == 'Material *':
+                if lable == 'Material':
+                    combo.setCurrentIndex(1)
                     maxi_width_right = max(maxi_width_right, item_width+5)
                 else:
                     combo.view().setMinimumWidth(item_width + 25)

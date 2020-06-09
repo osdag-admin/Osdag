@@ -49,6 +49,9 @@ class CreateLatex(Document):
         doc.packages.append(Package('amsmath'))
         doc.packages.append(Package('graphicx'))
         doc.packages.append(Package('needspace'))
+        doc.append(pyl.Command('fontsize', arguments= [8,12]))
+        doc.append(pyl.Command('selectfont'))
+
         doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
 
         header = PageStyle("header")
@@ -128,9 +131,9 @@ class CreateLatex(Document):
                         table.add_hline()
                         table.add_row((MultiColumn(3, align='|c|', data=i, ),MultiColumn(2, align='|c|', data="Ref List of Input Section"),))
                         table.add_hline()
-                    elif len(str(uiObj[i])) > 40 and type(uiObj[i]) != pyl.math.Math:
+                    elif len(str(uiObj[i])) > 30 and type(uiObj[i]) != pyl.math.Math:
                         str_len = len(str(uiObj[i]))
-                        loop_len = round_up((str_len / 40), 1, 1)
+                        loop_len = round_up((str_len / 30), 1, 1)
                         for j in range(1, loop_len + 1):
                             b = 30 * j + 1
                             if j == 1:

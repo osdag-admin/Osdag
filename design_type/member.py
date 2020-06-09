@@ -124,12 +124,16 @@ class Member(Main):
                             image = VALUES_IMG_TENSIONBOLTED_DF01[1]
                         else:
                             image = VALUES_IMG_TENSIONBOLTED_DF02[1]
+                        Cz = str(Angle_attributes.calc_Cz(a, b,thickness, l))
+                        Cy = "N/A"
+
                     else:
                         if a == b:
                             image = VALUES_IMG_TENSIONBOLTED_DF01[2]
                         else:
                             image = VALUES_IMG_TENSIONBOLTED_DF02[2]
-
+                        Cy = str(Angle_attributes.calc_Cy(a, b,thickness, l))
+                        Cz = "N/A"
                 elif section_profile == "Star Angles":
                     Angle_attributes = SAngle_Properties()
                     Angle_attributes.data(designation, material_grade)
@@ -143,11 +147,12 @@ class Member(Main):
                             image = VALUES_IMG_TENSIONBOLTED_DF01[4]
                         else:
                             image = VALUES_IMG_TENSIONBOLTED_DF02[4]
+                    Cz = "N/A"
+                    Cy = "N/A"
+
 
                 mass = str(Angle_attributes.calc_Mass(a, b,thickness, l))
                 area = str(Angle_attributes.calc_Area(a, b, thickness, l))
-                Cz = "N/A"
-                Cy = "N/A"
                 mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l))
                 mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l))
                 mom_inertia_u = "N/A"
@@ -399,11 +404,12 @@ class Member(Main):
                     image = VALUES_IMG_TENSIONBOLTED_DF03[1]
 
             else:
-                mass = str(round((2*Channel_attributes.mass), 2))
-                area = str(round((2*Channel_attributes.area / 100), 2))
-                C_y = str(round((Channel_attributes.Cy / 10), 2))
-                mom_inertia_z = str(round((2*Channel_attributes.mom_inertia_z) / 10000, 2))
                 Channel_attributes = BBChannel_Properties()
+                Channel_attributes.data(designation,material_grade)
+                mass = str(round(Channel_attributes.calc_Mass(f_w, f_t, w_h, w_t), 2))
+                area = str(round(Channel_attributes.calc_Area(f_w, f_t, w_h, w_t), 2))
+                C_y = "N/A"
+                mom_inertia_z = str(round(Channel_attributes.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t), 2))
                 mom_inertia_y = str(Channel_attributes.calc_MomentOfAreaY(f_w, f_t, w_h, w_t))
                 rad_of_gy_z = str(Channel_attributes.calc_RogZ(f_w, f_t, w_h, w_t))
                 rad_of_gy_y = str(Channel_attributes.calc_RogY(f_w, f_t, w_h, w_t))
@@ -617,11 +623,15 @@ class Member(Main):
                         image = VALUES_IMG_TENSIONBOLTED_DF01[1]
                     else:
                         image = VALUES_IMG_TENSIONBOLTED_DF02[1]
+                    Cz = str(Angle_attributes.calc_Cz(a, b, thickness, l))
+                    Cy = "N/A"
                 else:
                     if a == b:
                         image = VALUES_IMG_TENSIONBOLTED_DF01[2]
                     else:
                         image = VALUES_IMG_TENSIONBOLTED_DF02[2]
+                    Cy = str(Angle_attributes.calc_Cy(a, b, thickness, l))
+                    Cz = "N/A"
             elif section_profile == "Star Angles":
                 Angle_attributes = SAngle_Properties()
                 Angle_attributes.data(designation, material_grade)
@@ -635,11 +645,12 @@ class Member(Main):
                         image = VALUES_IMG_TENSIONBOLTED_DF01[4]
                     else:
                         image = VALUES_IMG_TENSIONBOLTED_DF02[4]
+                Cz = "N/A"
+                Cy = "N/A"
 
             mass = str(Angle_attributes.calc_Mass(a, b, thickness, l))
             area = str(Angle_attributes.calc_Area(a, b,thickness, l))
-            Cz = "N/A"
-            Cy = "N/A"
+
             mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l))
             mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l))
             mom_inertia_u = "N/A"
@@ -729,6 +740,7 @@ class Member(Main):
                 image = VALUES_IMG_TENSIONBOLTED_DF03[1]
         else:
             Channel_attributes = BBChannel_Properties()
+            Channel_attributes.data(designation,material_grade)
             mass = str(Channel_attributes.calc_Mass(f_w, f_t, w_h, w_t))
             area = str(Channel_attributes.calc_Area(f_w, f_t, w_h, w_t))
             C_y = "N/A"
@@ -829,8 +841,12 @@ class Member(Main):
                 sec_prop = BBAngle_Properties()
                 mass = sec_prop.calc_Mass(a, b, t, l)
                 area = sec_prop.calc_Area(a, b, t, l)
-                Cz = "N/A"
-                Cy = "N/A"
+                if l == "Long Leg":
+                    Cz = sec_prop.calc_Cz()
+                    Cy = "N/A"
+                else:
+                    Cz = "N/A"
+                    Cy = sec_prop.calc_Cy()
                 moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l)
                 moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l)
                 moa_u = "N/A"

@@ -847,7 +847,7 @@ class Window(QMainWindow):
 
                 #q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
                 font = QtGui.QFont()
-                font.setPointSize(10)
+                font.setPointSize(11)
                 font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")

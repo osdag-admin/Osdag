@@ -343,8 +343,11 @@ class BeamColumnEndPlate(MomentConnection):
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
                            gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.plate.design_status_capacity = False
-        self.flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+        self.top_flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                          fabrication=design_dictionary[KEY_DP_WELD_FAB])     # TODO: Add weld type in design dictionary
+        self.bottom_flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
+                                     fabrication=design_dictionary[
+                                         KEY_DP_WELD_FAB])  # TODO: Add weld type in design dictionary
         self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                          fabrication=design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
@@ -428,16 +431,56 @@ class BeamColumnEndPlate(MomentConnection):
                 (self.supported_section.flange_thickness, self.supported_section.fu, self.supported_section.fy))
 
     def assign_weld_sizes(self):
-        """Assign minimum required weld sizes to flange and web welds"""
+        """Assign minimum required weld sizes to flange and web welds and update throat sizes"""
 
+        # Find minimum sizes
         flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(
-            self.supported_section.flange_thickness, self.plate.thickness_provided)
-        self.flange_weld.size = choose_higher_value(flange_weld_size_min, ALL_WELD_SIZES)
-
+        self.supported_section.flange_thickness, self.plate.thickness_provided)
         web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(
-            self.supported_section.web_thickness, self.plate.thickness_provided)
+        self.supported_section.web_thickness, self.plate.thickness_provided)
+
+        # Assign minimum sizes
+        self.top_flange_weld.size = choose_higher_value(flange_weld_size_min, ALL_WELD_SIZES)
+        self.bottom_flange_weld.size = choose_higher_value(flange_weld_size_min, ALL_WELD_SIZES)
         self.web_weld.size = choose_higher_value(web_weld_size_min, ALL_WELD_SIZES)
         return
+
+    def assign_throat_tk(self):
+        # Throat thickness
+        self.top_flange_weld.throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+        fillet_size=self.top_flange_weld.size)
+        self.bottom_flange_weld.throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+        fillet_size=self.bottom_flange_weld.size)
+        self.web_weld.throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+        fillet_size=self.web_weld.size)
+        return
+
+    def assign_weld_lengths(self):
+        """Available and effective weld lengths are found and multiplied with long joint reduction factors"""
+
+        # Available lengths
+        self.top_flange_weld.length = self.supported_section.flange_width
+        self.bottom_flange_weld.length = (
+            self.supported_section.flange_width - self.supported_section.web_thickness -
+            2*self.supported_section.root_radius - 2*self.supported_section.toe_radius) / 2
+        self.web_weld.length = self.supported_section.depth - 2 * (self.supported_section.flange_thickness +
+                                                                        self.supported_section.root_radius)
+
+        # Effective lengths
+        self.top_flange_weld.eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=self.top_flange_weld.size, available_length=self.top_flange_weld.length)
+        self.bottom_flange_weld.eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=self.bottom_flange_weld.size, available_length=self.bottom_flange_weld.length)
+        self.web_weld.eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=self.web_weld.size, available_length=self.web_weld.length)
+
+        # long joint factors
+        top_flange_weld_long_joint_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(
+            l_j=self.top_flange_weld.eff_length, t_t=self.top_flange_weld.throat_tk)
+        bottom_flange_weld_long_joint_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(
+            l_j=self.bottom_flange_weld.eff_length, t_t=self.bottom_flange_weld.throat_tk)
+        web_weld_long_joint_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(
+            l_j=self.web_weld.eff_length, t_t=self.web_weld.throat_tk)
 
     def find_end_plate_spacing(self):
         #######################################################################
@@ -455,10 +498,9 @@ class BeamColumnEndPlate(MomentConnection):
             g_1 = 100.0
 
         if self.flange_weld.type is KEY_DP_WELD_TYPE_FILLET:
-            flange_projection = round_up(value=self.flange_weld.size + 2, multiplier=5, minimum_value=5)
+            flange_projection = round_up(value=self.top_flange_weld.size + 2, multiplier=5, minimum_value=5)
         else:  # 'groove'
             flange_projection = 5
-
 
     def trial_design(self):
         self.set_osdaglogger()
@@ -468,10 +510,13 @@ class BeamColumnEndPlate(MomentConnection):
 
         self.check_minimum_design_action()
         self.check_compatibility()
+
+        # Weld design
+        self.assign_weld_sizes()
+
         self.find_bolt_conn_plates_t_fu_fy()
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=bolt_dia,
                                                 conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
-        self.assign_weld_sizes()
 
 
 

@@ -103,9 +103,6 @@ class Connection(Main):
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         supporting_section.append(t5)
 
-        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
-        supporting_section.append(t5)
-
         t6 = ('Label_1', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, depth)
         supporting_section.append(t6)
 

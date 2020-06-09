@@ -747,7 +747,24 @@ def shear_rupture_prov(h, t, n_r, d_o, fu,v_dn,multiple =1):
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + '\end{aligned}'))
     return shear_rup_eqn
 
+def vres_cap_bolt_check(V_u, A_u,bolt_capacity,bolt_req,multiple=1,conn=None):
 
+    res_force = math.sqrt(V_u**2+ A_u**2)
+    trial_bolts = multiple * math.ceil(res_force/bolt_req)
+    V_u=str(V_u)
+    A_u=str(A_u)
+    bolt_req =str(bolt_req)
+    bolt_capacity=str(bolt_capacity)
+    trial_bolts=str(trial_bolts)
+    trial_bolts_eqn = Math(inline=True)
+    trial_bolts_eqn.append(NoEscape(r'\begin{aligned}R_{u} &= 2* \sqrt{V_u^2+A_u^2}\\'))
+    trial_bolts_eqn.append(NoEscape(r'n_{trial} &= R_u/ bolt_{req}\\'))
+    if conn == "flange_web":
+        trial_bolts_eqn.append(NoEscape(r'R_{u} &= \frac{2*\sqrt{' + V_u + r'^2+' + A_u + r'^2}}{' + bolt_req + r'}\\'))
+    else:
+        trial_bolts_eqn.append(NoEscape(r'R_{u} &= \frac{\sqrt{'+V_u+r'^2+'+A_u+r'^2}}{'+bolt_req+ r'}\\'))
+    trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
+    return trial_bolts_eqn
 # def shear_Rupture_prov_weld(h, t,  fu,v_dn,gamma_mo):  #weld
 #     h = str(h)
 #     t = str(t)
@@ -1965,7 +1982,7 @@ def web_width_min (D,min_req_width):
     return web_width_min_eqn
 
 
-def flange_plate_area_prov(B,pref,y,outerwidth,fp_area,t,r_1,innerwidth =None):
+def flange_plate_area_prov(B,pref,y,outerwidth,fp_area,t,r_1,innerwidth =None,):
     outerwidth = str(outerwidth)
     B = str(B)
     fp_area = str(fp_area)
@@ -1974,6 +1991,7 @@ def flange_plate_area_prov(B,pref,y,outerwidth,fp_area,t,r_1,innerwidth =None):
     innerwidth = str(innerwidth)
     y = str(y)
     flangeplate_crs_sec_area_eqn = Math(inline=True)
+
     if pref == "Outside":
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} B_{fp} &= B - (2 * 21)\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= '+B+r' - (2 * 21)\\'))
@@ -1990,8 +2008,46 @@ def flange_plate_area_prov(B,pref,y,outerwidth,fp_area,t,r_1,innerwidth =None):
         flangeplate_crs_sec_area_eqn.append(NoEscape(r' pt.area &=('+outerwidth+'+(2*'+innerwidth+'))*'+y+r'\\'))
         flangeplate_crs_sec_area_eqn.append(NoEscape(r'&= ' + fp_area + r'\end{aligned}'))
 
+
     return flangeplate_crs_sec_area_eqn
 
+
+def plate_recheck_area_weld(outerwidth,innerwidth=None,f_tp=None,t_wp=None,conn=None,pref=None):
+
+    if conn == "flange":
+        if pref =="Outside":
+            flange_plate_area = (outerwidth * f_tp)
+
+        else:
+            flange_plate_area = (outerwidth + (2 * innerwidth)) * f_tp
+            # flange_plate_area = str(flange_plate_area)
+    else :
+        web_plate_area = (2 * outerwidth * t_wp)
+        # web_plate_area = str(web_plate_area)
+    outerwidth = str(outerwidth)
+    innerwidth = str(innerwidth)
+    f_tp= str(f_tp)
+    t_wp = str(t_wp)
+    # flange_plate_area  = str(flange_plate_area)
+    # web_plate_area  = str(web_plate_area)
+    plate_recheck_area_weld_eqn = Math(inline=True)
+    if conn == "flange":
+        if pref =="Outside":
+            flange_plate_area = str(flange_plate_area)
+            plate_recheck_area_weld_eqn.append(NoEscape(r'\begin{aligned}  pt.area &=B_{fp} *  t_{ifp}\\'))
+            plate_recheck_area_weld_eqn.append(NoEscape(r' &='+outerwidth+'*'+f_tp+r'\\'))
+            plate_recheck_area_weld_eqn.append(NoEscape(r'&= ' + flange_plate_area + r'\end{aligned}'))
+        else:
+            flange_plate_area = str(flange_plate_area)
+            plate_recheck_area_weld_eqn.append(NoEscape(r'\begin{aligned}  pt.area &=(B_{fp} +(2* B_{ifp}))*  t_{ifp}  \\'))
+            plate_recheck_area_weld_eqn.append(NoEscape(r' &=(' + outerwidth + '+(2*' + innerwidth + '))*' + f_tp + r'\\'))
+            plate_recheck_area_weld_eqn.append(NoEscape(r'&= ' + flange_plate_area +r'\end{aligned}'))
+    else:
+        web_plate_area  = str(web_plate_area)
+        plate_recheck_area_weld_eqn.append(NoEscape(r'\begin{aligned}  pt.area &=2*W_{wp} * t_{wp}  \\'))
+        plate_recheck_area_weld_eqn.append(NoEscape(r' &=2*' + outerwidth +' *' + t_wp + r'\\'))
+        plate_recheck_area_weld_eqn.append(NoEscape(r'&= ' + web_plate_area + r'\end{aligned}'))
+    return plate_recheck_area_weld_eqn
 
 def flange_plate_area_prov_bolt(B,pref,y,outerwidth,fp_area,t,r_1,innerwidth =None):
     outerwidth = str(outerwidth)

@@ -402,13 +402,13 @@ KEY_SPACING = "Spacing Check"
 DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
 DISP_MIN_END = 'Min. End Distance (mm)'
 DISP_MAX_END = 'Max. End Distance (mm)'
-DISP_MIN_PLATE_HEIGHT = 'Min. Plate Height (mm)'
-DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
+DISP_MIN_PLATE_HEIGHT = 'Min. Plate Width (mm)'
+DISP_MAX_PLATE_HEIGHT = 'Max. Plate Width(mm)'
 DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
 DISP_MIN_PLATE_THICK = 'Min.Plate Thickness (mm)'
 
-DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Height (mm)'
-DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Height (mm)'
+DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Width (mm)'
+DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Width (mm)'
 DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
 KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (V_db) (kN)'
@@ -731,8 +731,10 @@ DISP_TITLE_BOLTD = 'Bolt Details'
 DISP_TITLE_PLATED = 'Plate Details'
 
 KEY_DISP_DP_DETAILING_GAP = 'Gap between beam and <br>support (mm)'
-
+KEY_DISP_DP_DETAILING_GAP_BEAM = 'Gap between beam and beam (mm)'
+KEY_DISP_DP_DETAILING_GAP_COL = 'Gap between column and column (mm)'
 KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES = 'Are the members exposed to <br>corrosive influences'
+KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM = 'Are the members exposed to corrosive influences'
 KEY_DISP_CORR_INFLUENCES = 'Are the members exposed to corrosive influences'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
 
@@ -822,14 +824,14 @@ KEY_PLATE_MAX_HEIGHT = 'Plate.MaxHeight'
 KEY_SLENDER = "Member.Slenderness"
 
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
-KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Height (mm)'
+KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Width (mm)'
 
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
 
 KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 
-KEY_INNERFLANGE_PLATE_HEIGHT = 'Flange_Plate.InnerHeight'
+KEY_INNERFLANGE_PLATE_HEIGHT = 'Flange_Plate.InnerWidth'
 KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
 
 KEY_DISP_AREA_CHECK ="Plate Area check (mm2)"
@@ -849,11 +851,11 @@ KEY_FLANGE_CAPACITY ='section.flange_capacity'
 KEY_FLANGE_TEN_CAPACITY ="Section.flange_capacity"
 KEY_DISP_FLANGE_TEN_CAPACITY ="Flange Tension Capacity (kN)"
 KEY_TENSIONYIELDINGCAP_FLANGE = 'section.tension_yielding_capacity'
-KEY_DISP_TENSIONYIELDINGCAP_FLANGE = 'Tension Yielding Capacity (kN)'
+KEY_DISP_TENSIONYIELDINGCAP_FLANGE = 'Flange Tension Yielding Capacity (kN)'
 KEY_TENSIONRUPTURECAP_FLANGE='section.tension_rupture_capacity '
-KEY_DISP_TENSIONRUPTURECAP_FLANGE= 'Tension Rupture Capacity (kN)'
+KEY_DISP_TENSIONRUPTURECAP_FLANGE= 'Flange Tension Rupture Capacity (kN)'
 KEY_BLOCKSHEARCAP_FLANGE='section.block_shear_capacity'
-KEY_DISP_BLOCKSHEARCAP_FLANGE='Block Shear Capacity (kN)'
+KEY_DISP_BLOCKSHEARCAP_FLANGE='Flange Block Shear Capacity (kN)'
 # flange plate
 KEY_TENSIONYIELDINGCAP_FLANGE_PLATE = 'Flange_plate.tension_yielding_capacity (kN)'
 KEY_DISP_TENSIONYIELDINGCAP_FLANGE_PLATE ='Tension Yielding Capacity (kN)'
@@ -986,11 +988,11 @@ DISP_TITLE_WEBSPLICEPLATE = 'Web splice plate'
 
 KEY_DISP_WEBPLATE_THICKNESS = 'Thickness (mm)*'
 
-VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30','32','36','40',
- '25','28','32','36','40','45','50','56','63','80']
+VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '25', '26', '28', '30','32',
+                                    '36','40','45','50','56','63','80']
 
 
-KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
+KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Width (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
 KEY_DISP_WEB_PLATE_LENGTH ='Length (mm)'
@@ -1026,7 +1028,7 @@ KEY_DISP_TENSIONYIELDINGCAP_WEB ='Web Tension Yielding Capacity (kN)'
 KEY_TENSIONRUPTURECAP_WEB ='section.tension_rupture_capacity_web'
 KEY_DISP_TENSIONRUPTURECAP_WEB ='Web Tension Rupture Capacity (kN)'
 KEY_TENSIONBLOCK_WEB ='section.block_shear_capacity_web'
-KEY_DISP_BLOCKSHEARCAP_WEB ='Block Shear Capacity (kN)'
+KEY_DISP_BLOCKSHEARCAP_WEB ='Web Block Shear Capacity (kN)'
 KEY_WEB_TEN_CAPACITY ="section.Tension_capacity_web"
 KEY_DISP_WEB_TEN_CAPACITY ="Web Tension Capacity (kN)"
 # web in shear

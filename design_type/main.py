@@ -16,7 +16,7 @@ class Main():
         values = {KEY_DP_BOLT_TYPE: 'Pretensioned', KEY_DP_BOLT_HOLE_TYPE: 'Standard',
                   KEY_DP_BOLT_MATERIAL_G_O: '', KEY_DP_BOLT_SLIP_FACTOR: '0.3'}
 
-        if not input_dictionary or 'Select Material' in [input_dictionary[KEY_MATERIAL]]:
+        if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
             pass
             # bolt_type = 'Pretensioned'
             # hole_type = 'Standard'
@@ -70,7 +70,7 @@ class Main():
 
         values = {KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP, KEY_DP_WELD_MATERIAL_G_O: ''}
 
-        if not input_dictionary or 'Select Material' in [input_dictionary[KEY_MATERIAL]]:
+        if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
             pass
         else:
             values[KEY_DP_WELD_MATERIAL_G_O] = Material(input_dictionary[KEY_MATERIAL]).fu
@@ -141,8 +141,8 @@ class Main():
 
     def plate_connector_values(self, input_dictionary):
 
-        if not input_dictionary or 'Select Material' in [input_dictionary[KEY_MATERIAL]]:
-            material_grade = 'Select Material'
+        if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
+            material_grade = ''
             fu = ''
             fy_20 = ''
             fy_20_40 = ''
@@ -165,7 +165,7 @@ class Main():
 
         connector = []
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t1 = (KEY_CONNECTOR_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         connector.append(t1)
 

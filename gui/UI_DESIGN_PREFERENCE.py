@@ -24,7 +24,9 @@ class MyTableWidget(QWidget):
         super(QWidget, self).__init__(parent)
         self.layout = QVBoxLayout(self)
         self.tabs = QTabWidget(self)
+        self.tabs.setStyleSheet("QTabBar::tab { height: 40px; width: 150px;}")
         self.layout.addWidget(self.tabs)
+        self.setLayout(self.layout)
 
 
     def addTab(self, widget, text):
@@ -32,7 +34,7 @@ class MyTableWidget(QWidget):
         widget.setAutoFillBackground(True)
 
 
-class Window(QMainWindow):
+class Window(QDialog):
 
     def __init__(self, main, input_dictionary):
         super().__init__()
@@ -46,10 +48,21 @@ class Window(QMainWindow):
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
 
+    def changeEvent(self, event):
+        if event.type() == QtCore.QEvent.WindowStateChange:
+            if self.windowState() & QtCore.Qt.WindowMinimized:
+                pass
+            elif self.windowState() & QtCore.Qt.WindowMaximized:
+                self.tabWidget.resize(self.size())
+            else:
+                self.tabWidget.resize(QSize(1170, 710))
+
+        QDialog.changeEvent(self, event)
+
     def initUI(self,main,input_dictionary):
 
         #self.statusBar().showMessage('')
-        self.setGeometry(300, 300, 550, 550)
+        self.setGeometry(300, 300, 1170, 710)
         self.setObjectName("DesignPreferences")
         self.setWindowTitle('Design Preference')
         self.tabWidget = MyTableWidget(self)
@@ -381,8 +394,8 @@ class Window(QMainWindow):
 
             scrollArea.setWidget(scrollAreaWidgetContents)
 
-        self.setCentralWidget(self.tabWidget)
-
+        # self.setCentralWidget(self.tabWidget)
+        self.tabWidget.resize(self.size())
 
         self.tabWidget.tabs.setCurrentIndex(2)
         #QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
@@ -886,7 +899,7 @@ class Window(QMainWindow):
 
 class DesignPreferences():
 
-    def __init__(self, module_window, main, input_dictionary, parent=None):
+    def __init__(self, main, input_dictionary, parent=None):
 
         self.ui = Window( main, input_dictionary)
 
@@ -894,21 +907,23 @@ class DesignPreferences():
         #self.ui.show()
         self.main_controller = parent
         #self.uiobj = self.main_controller.uiObj
-        self.module_window = module_window
+        # self.module_window = module_window
         self.saved = None
         self.flag = False
         self.sectionalprop = I_sectional_Properties()
         #self.ui.btn_save.hide()
-        #self.ui.btn_close.clicked.connect(self.close_designPref)
+        self.ui.btn_save.clicked.connect(self.close_designPref)
         self.ui.btn_defaults.clicked.connect(self.default_fn)
         self.module = main.module_name(main)
         self.main = main
         self.window_close_flag = True
 
     def show(self):
-        self.ui.resize(1170,680)
+        # self.ui.resize(1170,710)
+        self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
+        self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
         self.ui.center()
-        self.ui.show()
+        self.ui.exec()
 
     def default_fn(self):
         '''
@@ -1107,7 +1122,7 @@ class DesignPreferences():
     def closeEvent(self, event):
         if self.window_close_flag:
             event.accept()
-            self.module_window.prev_inputs = self.module_window.input_dock_inputs
+            # self.module_window.prev_inputs = self.module_window.input_dock_inputs
         else:
             QMessageBox.warning(self, "Error", "Select correct values for fu and fy!")
             event.ignore()
@@ -1217,7 +1232,7 @@ class DesignPreferences():
         self.ui.pushButton_Import_Beam.setDisabled(True)
 
     def close_designPref(self):
-        self.close()
+        self.ui.close()
 
     # def closeEvent(self, QCloseEvent):
     #     self.save_designPref_para()

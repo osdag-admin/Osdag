@@ -244,6 +244,9 @@ class Tension_welded(Member):
 
         t1 = (KEY_SECSIZE, self.fn_profile_section)
         c_lst.append(t1)
+
+        t4 = (KEY_PLATETHK, self.plate_thick_customized)
+        c_lst.append(t4)
         # t2 = (KEY_GRD, self.grdval_customized)
         # c_lst.append(t2)
         # t3 = (KEY_D, self.diam_bolt_customized)
@@ -395,6 +398,12 @@ class Tension_welded(Member):
 
         t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
+
+        t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t13)
+
+        t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'No Validator')
+        options_list.append(t14)
 
 
 

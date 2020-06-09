@@ -20,7 +20,7 @@ class ShearConnection(Connection):
 
         "In design preference, it shows other properties of section used "
         "In design preference, it shows other properties of section used "
-        if not input_dictionary or input_dictionary[KEY_ANGLE_LIST] == '' or \
+        if not input_dictionary or input_dictionary[KEY_ANGLE_LIST] == [] or \
                 input_dictionary[KEY_MATERIAL] == 'Select Material':
             designation = ''
             material_grade = ''
@@ -110,7 +110,7 @@ class ShearConnection(Connection):
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t34 = (KEY_CONNECTOR_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         section.append(t34)
 

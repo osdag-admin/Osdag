@@ -513,6 +513,8 @@ class BeamColumnEndPlate(MomentConnection):
 
         # Weld design
         self.assign_weld_sizes()
+        self.assign_throat_tk()
+        self.assign_weld_lengths()
 
         self.find_bolt_conn_plates_t_fu_fy()
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=bolt_dia,

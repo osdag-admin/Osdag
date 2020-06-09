@@ -662,9 +662,9 @@ class EndPlateConnection(ShearConnection):
                                        end_dist,                                                        #15-End Distance
                                        self.bolt.min_edge_dist_round,                                   #16-Edge Distance
                                        round(self.bolt.bolt_tension_prying/1000, 2),                    #17-Bolt Prying Force
-                                       round(self.plate.plate_shear, 2),                           #18-Plate Shear
+                                       round(self.plate.plate_shear, 2),                                #18-Plate Shear
                                        round(self.plate.plate_moment/1000000, 3),                       #19-Plate Moment
-                                       round(self.plate.shear_capacity, 2),                  #20-Plate Shear Capacity
+                                       round(self.plate.shear_capacity, 2),                             #20-Plate Shear Capacity
                                        round(self.plate.plate_block_shear_capacity/1000, 2),            #21-Plate Block Shear Capacity
                                        round(self.plate.plate_moment_capacity/1000000, 3),              #22-Plate Moment Capacity
                                        self.weld.size,                                                  #23-Weld Size

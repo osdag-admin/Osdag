@@ -765,6 +765,19 @@ def vres_cap_bolt_check(V_u, A_u,bolt_capacity,bolt_req,multiple=1,conn=None):
         trial_bolts_eqn.append(NoEscape(r'R_{u} &= \frac{\sqrt{'+V_u+r'^2+'+A_u+r'^2}}{'+bolt_req+ r'}\\'))
     trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
     return trial_bolts_eqn
+
+def section_classification(class_of_section=None):
+    section_classification_eqn = Math(inline=True)
+    if class_of_section == int(1):
+        section_classification_eqn.append(NoEscape( r'\begin{aligned} Plastic \end{aligned}'))
+    elif class_of_section == int(2):
+        section_classification_eqn.append(NoEscape( r'\begin{aligned} Compact \end{aligned}'))
+    else:
+        section_classification_eqn.append(NoEscape( r'\begin{aligned} Semi-C0mpact \end{aligned}'))
+
+    return section_classification_eqn
+
+
 # def shear_Rupture_prov_weld(h, t,  fu,v_dn,gamma_mo):  #weld
 #     h = str(h)
 #     t = str(t)
@@ -1173,18 +1186,18 @@ def axial_capacity_req(axial_capacity,min_ac):
     return ac_req_eqn
 
 
-def prov_axial_load(axial_input,min_ac,app_axial_load):
+def prov_axial_load(axial_input,min_ac,app_axial_load,axial_capacity):
     min_ac = str(min_ac)
     axial_input = str(axial_input)
     app_axial_load = str(app_axial_load)
 
-    # axial_capacity = str(axial_capacity)
+    axial_capacity = str(axial_capacity)
     prov_axial_load_eqn = Math(inline=True)
-    # prov_axial_load_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
-    # prov_axial_load_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
-    # prov_axial_load_eqn.append(NoEscape(r'&=' + min_ac + r'\\'))
+    prov_axial_load_eqn.append(NoEscape(r'\begin{aligned} Ac_{min} &= 0.3 * A_c\\'))
+    prov_axial_load_eqn.append(NoEscape(r'&= 0.3 *' + axial_capacity + r'\\'))
+    prov_axial_load_eqn.append(NoEscape(r'&=' + min_ac + r'\\'))
 
-    prov_axial_load_eqn.append(NoEscape(r'\begin{aligned} Au~~ &= max(A,Ac_{min} )\\'))
+    prov_axial_load_eqn.append(NoEscape(r'Au~~ &= max(A,Ac_{min} )\\'))
     prov_axial_load_eqn.append(NoEscape(r'&= max( ' + axial_input + ',' + min_ac + r')\\'))
     prov_axial_load_eqn.append(NoEscape(r'&=' + app_axial_load + r'\end{aligned}'))
     return prov_axial_load_eqn
@@ -1198,8 +1211,8 @@ def shear_capacity(h, t,f_y, gamma_m0,shear_capacity): # same as #todo anjali
     gamma_m0 = str(gamma_m0)
     shear_capacity = str(shear_capacity)
     shear_capacity_eqn = Math(inline=True)
-    shear_capacity_eqn.append(NoEscape(r'\begin{aligned} S_c &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo} *10^3}\\'))
-    shear_capacity_eqn.append(NoEscape(r'&=\frac{' + h + r'*' + t + r'*' + f_y + r'}{\sqrt{3}*' + gamma_m0 + r' *10^3}\\'))
+    shear_capacity_eqn.append(NoEscape(r'\begin{aligned} S_c &= \frac{0.6*A_v*f_y}{\sqrt{3}*\gamma_{mo} *10^3}\\'))
+    shear_capacity_eqn.append(NoEscape(r'&=\frac{0.6*' + h + r'*' + t + r'*' + f_y + r'}{\sqrt{3}*' + gamma_m0 + r' *10^3}\\'))
     shear_capacity_eqn.append(NoEscape(r'&=' + shear_capacity + r'\end{aligned}'))
     return shear_capacity_eqn
 
@@ -1208,6 +1221,7 @@ def min_max_shear_capacity(shear_capacity,min_sc): #todo anjali
     min_sc = str(min_sc)
     shear_capacity = str(shear_capacity)
     min_sc_eqn = Math(inline=True)
+
     min_sc_eqn.append(NoEscape(r'\begin{aligned} Vc_{min} &= 0.6 * S_c\\'))
     min_sc_eqn.append(NoEscape(r'&= 0.6 *' + shear_capacity +r'\\'))
     min_sc_eqn.append(NoEscape(r'&=' + min_sc + r'\\'))
@@ -1216,17 +1230,17 @@ def min_max_shear_capacity(shear_capacity,min_sc): #todo anjali
     return min_sc_eqn
 
 
-def prov_shear_load(shear_input,min_sc,app_shear_load):
+def prov_shear_load(shear_input,min_sc,app_shear_load,shear_capacity_1):
     min_sc = str(min_sc)
     shear_input = str(shear_input)
     app_shear_load = str(app_shear_load)
-    # shear_capacity = str(shear_capacity)
+    shear_capacity_1 = str(shear_capacity_1)
     app_shear_load_eqn = Math(inline=True)
-    # app_shear_load_eqn.append(NoEscape(r'\begin{aligned} Vc_{min} &= 0.6 * S_c\\'))
-    # app_shear_load_eqn.append(NoEscape(r'&= 0.6 *' + shear_capacity + r'\\'))
-    # app_shear_load_eqn.append(NoEscape(r'&=' + min_sc + r'\\'))
-    # app_shear_load_eqn.append(NoEscape(r' Vu~~ &= max(V,Vc_{min})\\'))
-    app_shear_load_eqn.append(NoEscape(r'\begin{aligned} Vu~~ &= max(V,Vc_{min})\\'))
+    app_shear_load_eqn.append(NoEscape(r'\begin{aligned} Vc_{min} &=  min(0.15 * S_c / 0.6, 40.0)\\'))
+
+    app_shear_load_eqn.append(NoEscape(r'& =  min(0.15 *'+ shear_capacity_1 +r'/ 0.6, 40.0)\\'))
+    app_shear_load_eqn.append(NoEscape(r'&=' + min_sc + r'\\'))
+    app_shear_load_eqn.append(NoEscape(r' Vu~~ &= max(V,Vc_{min})\\'))
     app_shear_load_eqn.append(NoEscape(r'&=  max(' + shear_input + ',' + min_sc + r')\\'))
     app_shear_load_eqn.append(NoEscape(r'&=' + app_shear_load + r'\end{aligned}'))
     return app_shear_load_eqn
@@ -1281,14 +1295,16 @@ def min_max_moment_capacity(moment_capacity,min_mc): #todo anjali
     return min_mc_eqn
 
 
-def prov_moment_load(moment_input,min_mc,app_moment_load):
+def prov_moment_load(moment_input,min_mc,app_moment_load,moment_capacity):
     min_mc = str(min_mc)
     moment_input = str(moment_input)
     app_moment_load = str(app_moment_load)
-    # moment_capacity = str(moment_capacity)
+    moment_capacity = str(moment_capacity)
     app_moment_load_eqn = Math(inline=True)
-
-    app_moment_load_eqn.append(NoEscape(r' \begin{aligned}Mu &= max(M,Mc_{min} )\\'))
+    app_moment_load_eqn.append(NoEscape(r'\begin{aligned} Mc_{min} &= 0.5 * M_c\\'))
+    app_moment_load_eqn.append(NoEscape(r'&= 0.5 *' + moment_capacity + r'\\'))
+    app_moment_load_eqn.append(NoEscape(r'&=' + min_mc + r'\\'))
+    app_moment_load_eqn.append(NoEscape(r' Mu &= max(M,Mc_{min} )\\'))
     app_moment_load_eqn.append(NoEscape(r'&= max(' + moment_input + r',' + min_mc + r')\\'))
     app_moment_load_eqn.append(NoEscape(r'&=' + app_moment_load + r'\end{aligned}'))
     return  app_moment_load_eqn

@@ -18,11 +18,11 @@ class TensionAngleBoltCAD(object):
         :param memb_data: data of the members
         """
 
-        self.Obj = Obj
+        self.Obj = Obj  # 'Star Angles'  # 'Back to Back Channels'  #'Channels'  #'  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
+        self.loc = 'Long Leg'
         self.member = member
         self.plate = plate
         self.nut_bolt_array = nut_bolt_array
-        # self.inter_array = inter_array
 
         self.plate1 = copy.deepcopy(self.plate)
         self.plate2 = copy.deepcopy(self.plate)
@@ -38,9 +38,9 @@ class TensionAngleBoltCAD(object):
         # front side member
         # weld vertical right side
 
-        self.col = self.Obj.plate.bolt_line
-        self.end = self.Obj.plate.end_dist_provided
-        self.pitch = self.Obj.plate.pitch_provided
+        self.col = 2  # self.Obj.plate.bolt_line
+        self.end = 35  # self.Obj.plate.end_dist_provided
+        self.pitch = 45  # self.Obj.plate.pitch_provided
         self.plate_intercept = 2 * self.end + (self.col - 1) * self.pitch
 
     def create_3DModel(self):
@@ -51,8 +51,8 @@ class TensionAngleBoltCAD(object):
 
     def createMemberGeometry(self):
 
-        if self.Obj.loc == 'Long Leg':
-            if self.Obj.sec_profile == 'Angles':
+        if self.loc == 'Long Leg':
+            if self.Obj == 'Angles':
                 member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
                 member1_uDir = numpy.array([0.0, -1.0, 0.0])
                 member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -60,7 +60,7 @@ class TensionAngleBoltCAD(object):
 
                 self.member1_Model = self.member1.create_model()
 
-            elif self.Obj.sec_profile == 'Back to Back Angles':
+            elif self.Obj == 'Back to Back Angles':
                 member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.member.A / 2])
                 member1_uDir = numpy.array([0.0, -1.0, 0.0])
                 member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -75,7 +75,7 @@ class TensionAngleBoltCAD(object):
 
                 self.member2_Model = self.member2.create_model()
 
-            elif self.Obj.sec_profile == 'Star Angles':
+            elif self.Obj == 'Star Angles':
                 member1OriginL = numpy.array([-self.plate_intercept, 0.0, 0.0])
                 member1_uDir = numpy.array([0.0, -1.0, 0.0])
                 member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -91,7 +91,7 @@ class TensionAngleBoltCAD(object):
                 self.member2_Model = self.member2.create_model()
 
         else:
-            if self.Obj.sec_profile == 'Angles':
+            if self.Obj == 'Angles':
                 member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.member.B / 2])
                 member1_uDir = numpy.array([0.0, 0.0, -1.0])
                 member1_wDir = numpy.array([-1.0, 0.0, 0.0])
@@ -99,7 +99,7 @@ class TensionAngleBoltCAD(object):
 
                 self.member1_Model = self.member1.create_model()
 
-            elif self.Obj.sec_profile == 'Back to Back Angles':
+            elif self.Obj == 'Back to Back Angles':
                 member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.member.B / 2])
                 member1_uDir = numpy.array([0.0, 0.0, -1.0])
                 member1_wDir = numpy.array([-1.0, 0.0, 0.0])
@@ -114,7 +114,7 @@ class TensionAngleBoltCAD(object):
 
                 self.member2_Model = self.member2.create_model()
 
-            elif self.Obj.sec_profile == 'Star Angles':
+            elif self.Obj == 'Star Angles':
                 member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, 0.0])
                 member1_uDir = numpy.array([0.0, 0.0, -1.0])
                 member1_wDir = numpy.array([-1.0, 0.0, 0.0])
@@ -149,12 +149,11 @@ class TensionAngleBoltCAD(object):
 
         :return: Geometric Orientation of this component
         """
-        if self.Obj.sec_profile == 'Channels' or self.Obj.sec_profile == 'Back to Back Channels':
+        if self.Obj == 'Channels' or self.Obj == 'Back to Back Channels':
             self.member.A = self.member.D
-            self.member.T = self.member.t
         # nutboltArrayOrigin = self.baseplate.sec_origin + numpy.array([0.0, 0.0, self.baseplate.T /2+ 100])
 
-        if self.Obj.sec_profile == 'Star Angles':
+        if self.Obj == 'Star Angles':
             nutboltArrayLOrigin = numpy.array([-self.plate_intercept, -self.member.T, 0.0])
             gaugeDir = numpy.array([0.0, 0, -1.0])
             pitchDir = numpy.array([1.0, 0.0, 0])
@@ -189,13 +188,10 @@ class TensionAngleBoltCAD(object):
             self.nutboltArrayR_SAModels = self.nut_bolt_arrayR_SA.create_model()
 
         else:
-            if self.Obj.sec_profile in ['Back to Back Angles', 'Angles']:
-                if self.Obj.loc == 'Long Leg':
-                    self.placement = self.member.A / 2
-                else:
-                    self.placement = self.member.B / 2
+            if self.loc == 'Long Leg':
+                self.placement = self.member.A / 2
             else:
-                self.placement = self.member.A/2
+                self.placement = self.member.B / 2
             nutboltArrayLOrigin = numpy.array([-self.plate_intercept, -self.member.T, self.placement])
             gaugeDir = numpy.array([0.0, 0, -1.0])
             pitchDir = numpy.array([1.0, 0.0, 0])
@@ -215,7 +211,7 @@ class TensionAngleBoltCAD(object):
 
     def get_members_models(self):
 
-        if self.Obj.sec_profile == 'Angles':
+        if self.Obj == 'Angles':
             member = self.member1_Model
 
         else:
@@ -229,7 +225,7 @@ class TensionAngleBoltCAD(object):
 
     def get_nut_bolt_array_models(self):
 
-        if self.Obj.sec_profile == 'Star Angles':
+        if self.Obj == 'Star Angles':
             nut_bolts = [self.nutboltArrayLModels, self.nutboltArrayRModels, self.nutboltArrayL_SAModels,
                          self.nutboltArrayR_SAModels]
             array = nut_bolts[0]
@@ -250,7 +246,7 @@ class TensionAngleBoltCAD(object):
 class TensionChannelBoltCAD(TensionAngleBoltCAD):
 
     def createMemberGeometry(self):
-        if self.Obj.sec_profile == 'Channels':
+        if self.Obj == 'Channels':
             member1OriginL = numpy.array([-self.plate_intercept, -self.member.B, self.member.D / 2])
             member1_uDir = numpy.array([0.0, -1.0, 0.0])
             member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -258,7 +254,7 @@ class TensionChannelBoltCAD(TensionAngleBoltCAD):
 
             self.member1_Model = self.member1.create_model()
 
-        elif self.Obj.sec_profile == 'Back to Back Channels':
+        elif self.Obj == 'Back to Back Channels':
             member1OriginL = numpy.array([-self.plate_intercept, -self.member.B, self.member.D / 2])
             member1_uDir = numpy.array([0.0, -1.0, 0.0])
             member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -276,9 +272,9 @@ class TensionChannelBoltCAD(TensionAngleBoltCAD):
 
     def get_members_models(self):
 
-        if self.Obj.sec_profile == 'Channels':
+        if self.Obj == 'Channels':
             member = self.member1_Model
-        elif self.Obj.sec_profile == 'Back to Back Channels':
+        elif self.Obj == 'Back to Back Channels':
             member = BRepAlgoAPI_Fuse(self.member1_Model, self.member2_Model).Shape()
 
         return member
@@ -293,7 +289,7 @@ if __name__ == '__main__':
     from cad.items.nut import Nut
     from cad.items.stiffener_plate import StiffenerPlate
     from cad.items.Gasset_plate import GassetPlate
-    from cad.Tension.nutBoltPlacement import NutBoltArray
+    from cad.Tension.standaloneCAD.nutBoltPlacement import NutBoltArray
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
@@ -306,7 +302,7 @@ if __name__ == '__main__':
 
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    member_data = 'Star Angles'  # 'Back to Back Channels'  #'Channels'  #'  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
+    Obj = 'Star Angles'  # 'Back to Back Channels'  #'Channels'  #'  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
 
     # weld_size = 6
     # s = max(15, weld_size)
@@ -314,26 +310,26 @@ if __name__ == '__main__':
     bolt = Bolt(R=8, T=5, H=6, r=3)
     nut = Nut(R=bolt.R, T=bolt.T, H=bolt.T + 1, innerR1=bolt.r)
 
-    if member_data == 'Channels' or member_data == 'Back to Back Channels':
+    if Obj == 'Channels' or Obj == 'Back to Back Channels':
         member = Channel(B=50, T=6.6, D=125, t=3, R1=6.0, R2=2.4, L=4000)
         plate = GassetPlate(L=360 + 50, H=205.0, T=16, degree=30)
         # plate_intercept = plate.L - s - 50
-        if member_data in ['Channels']:
-            nut_space = member.t + plate.T + nut.T   # member.T + plate.T + nut.T
+        if Obj == 'Channels':
+            nut_space = member.t + plate.T + nut.T  # member.T + plate.T + nut.T
         else:
             nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
-        plateObj = 0.0
+        # plateObj = 0.0
 
-        nut_bolt_array = NutBoltArray(plateObj, nut, bolt, nut_space)
+        nut_bolt_array = NutBoltArray(Obj, nut, bolt, nut_space)
 
-        tensionCAD = TensionChannelBoltCAD(member, plate, nut_bolt_array, member_data)
+        tensionCAD = TensionChannelBoltCAD(Obj, member, plate, nut_bolt_array)
 
 
     else:
         member = Angle(L=2000.0, A=90.0, B=65.0, T=10.0, R1=8.0, R2=0.0)
         plate = GassetPlate(L=295 + 50, H=120, T=10, degree=30)
         # plate_intercept = plate.L - s - 50
-        if member_data == 'Back to Back Angles':
+        if Obj == 'Back to Back Angles':
             nut_space = 2 * member.T + plate.T + nut.T  # member.T + plate.T + nut.T
         else:
             nut_space = member.T + plate.T + nut.T  # 2*member.T + plate.T + nut.T
@@ -342,7 +338,7 @@ if __name__ == '__main__':
 
         nut_bolt_array = NutBoltArray(plateObj, nut, bolt, nut_space)
 
-        tensionCAD = TensionAngleBoltCAD(member, plate, nut_bolt_array, member_data)
+        tensionCAD = TensionAngleBoltCAD(member, plate, nut_bolt_array, Obj)
 
     tensionCAD.create_3DModel()
     plate = tensionCAD.get_plates_models()

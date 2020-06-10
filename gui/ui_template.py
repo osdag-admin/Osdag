@@ -516,7 +516,8 @@ class Window(QMainWindow):
                     item_width = max(item_width, metrices.boundingRect(item).width())
                 in_layout2.addWidget(combo, j, 2, 1, 1)
 
-                if lable == 'Material *':
+                if lable == 'Material':
+                    combo.setCurrentIndex(1)
                     maxi_width_right = max(maxi_width_right, item_width+5)
                 else:
                     combo.view().setMinimumWidth(item_width + 25)
@@ -1632,7 +1633,7 @@ class Window(QMainWindow):
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
                                                   KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
-                                                  KEY_DISP_COLUMNCOVERPLATEWELD]:
+                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)

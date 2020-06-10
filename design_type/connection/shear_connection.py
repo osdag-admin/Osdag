@@ -646,4 +646,3 @@ class ShearConnection(Connection):
 
         print(self.supported_section.shear_yielding_capacity, self.load.shear_force,
               self.supported_section.tension_yielding_capacity, self.load.axial_force)
-

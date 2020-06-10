@@ -243,6 +243,7 @@ class Tension_bolted(Member):
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+        print(type(key),'jddddddddddddddddds')
         if key is not None:
             handler = OurLog(key)
             formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
@@ -987,7 +988,7 @@ class Tension_bolted(Member):
                 sec_gyr[self.section.designation] = self.section.min_radius_gyration
 
             sec_area[self.section.designation] = self.section.area
-            
+
         print(sec_gyr)
         if len(sec_area)>=2:
             self.max_area = max(sec_area, key=sec_area.get)
@@ -1218,7 +1219,7 @@ class Tension_bolted(Member):
         "selection of member based on the yield capacity"
 
         min_yield = 0
-        
+
         self.max_section(self,design_dictionary,self.sizelist)
         # print(area,gyr,"hgsvfsg")
         # self.max_size = self.select_section(self, design_dictionary, max)
@@ -1432,7 +1433,7 @@ class Tension_bolted(Member):
     def select_bolt_dia(self,design_dictionary):
 
         "Selection of bolt (dia) from te available list of bolts based on the spacing limits and capacity"
-        
+
         print(self.section_size_1.designation)
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             self.min_plate_height = self.section_size_1.min_plate_height()
@@ -2107,7 +2108,7 @@ class Tension_bolted(Member):
                     section_size = Channel(designation=self.max_area, material_grade=self.material)
 
             depth_max = self.max_depth
-        
+
         # if self.member_design_status == True:
         if self.sec_profile in ["Channels", "Back to Back Channels"]:
             image = "Channel"
@@ -2307,7 +2308,7 @@ class Tension_bolted(Member):
             multiple = 2
         else:
             multiple =1
-            
+
 
         t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
         self.report_check.append(t1)
@@ -2352,7 +2353,7 @@ class Tension_bolted(Member):
         if self.member_design_status == True and self.bolt_design_status == True:
             t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
             self.report_check.append(t1)
-            
+
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(section_size.area,section_size.fy,gamma_m0,member_yield_kn,multiple), '')
             self.report_check.append(t2)
             t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',member_rupture_prov(self.A_nc,self.A_go,section_size.fu, section_size.fy, self.L_c,self.w,self.b_s, self.t,gamma_m0,gamma_m1,section_size.beta,member_rupture_kn,multiple), '')

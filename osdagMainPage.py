@@ -115,7 +115,7 @@ if sqlpath.exists():
             print('Error: ', e)
 #########################################################################################
 
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize, QFile, QTextStream
+from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize, QFile, QTextStream, QCoreApplication
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication, QWidget, QLabel, QGridLayout, QVBoxLayout, QTabWidget, QRadioButton, QButtonGroup, QSizePolicy
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -155,11 +155,6 @@ import os.path
 import subprocess
 from gui.ui_template import Ui_ModuleWindow
 
-if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
-
-if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -480,6 +475,7 @@ class OsdagMainWindow(QMainWindow):
         if self.findChild(QRadioButton,'Fin_Plate').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(FinPlateConnection, ' ')
+            #self.ui2.center()
             self.ui2.show()
             self.ui2.closed.connect(self.show)
         elif self.findChild(QRadioButton,'Cleat_Angle').isChecked():
@@ -662,7 +658,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
 
     def exit(self):
-        QtCore.QCoreApplication.exit()
+        QCoreApplication.exit()
 
 
 if __name__ == '__main__':
@@ -684,6 +680,6 @@ if __name__ == '__main__':
     # app.exec_()
     # sys.exit(app.exec_())
     try:
-        sys.exit(app.exec_())
+        QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)

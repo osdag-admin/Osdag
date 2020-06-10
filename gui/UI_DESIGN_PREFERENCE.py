@@ -24,9 +24,9 @@ class MyTableWidget(QWidget):
         super(QWidget, self).__init__(parent)
         self.layout = QVBoxLayout(self)
         self.tabs = QTabWidget(self)
-        self.tabs.setStyleSheet("QTabBar::tab { height: 40px; width: 150px;}")
+        #self.tabs.setStyleSheet("QTabBar::tab { height: 40px; width: 150px;}")
         self.layout.addWidget(self.tabs)
-        self.setLayout(self.layout)
+        #self.setLayout(self.layout)
 
 
     def addTab(self, widget, text):
@@ -34,7 +34,7 @@ class MyTableWidget(QWidget):
         widget.setAutoFillBackground(True)
 
 
-class Window(QDialog):
+class Window(QMainWindow):
 
     def __init__(self, main, input_dictionary):
         super().__init__()
@@ -48,21 +48,10 @@ class Window(QDialog):
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
 
-    def changeEvent(self, event):
-        if event.type() == QtCore.QEvent.WindowStateChange:
-            if self.windowState() & QtCore.Qt.WindowMinimized:
-                pass
-            elif self.windowState() & QtCore.Qt.WindowMaximized:
-                self.tabWidget.resize(self.size())
-            else:
-                self.tabWidget.resize(QSize(1170, 710))
-
-        QDialog.changeEvent(self, event)
-
     def initUI(self,main,input_dictionary):
 
         #self.statusBar().showMessage('')
-        self.setGeometry(300, 300, 1170, 710)
+        #self.setGeometry(300, 300, 1170, 710)
         self.setObjectName("DesignPreferences")
         self.setWindowTitle('Design Preference')
         self.tabWidget = MyTableWidget(self)
@@ -108,10 +97,10 @@ class Window(QDialog):
                 vertical.addLayout(horizontalLayout)
 
                 horizontal = QHBoxLayout()
-                hl1 = QFrame(tab)
-                hl1.setFrameShape(QFrame.HLine)
-                vertical.addWidget(hl1)
-                vertical.addLayout(horizontal)
+                #hl1 = QFrame(tab)
+                #hl1.setFrameShape(QFrame.HLine)
+                #vertical.addWidget(hl1)
+                lay.addLayout(horizontal)
 
                 buttons = [(str("pushButton_Add_" + tab_name), 'Add'), (str("pushButton_Clear_" + tab_name), 'Clear'),
                             (str("pushButton_Import_" + tab_name), "Import xlsx file"), (str("pushButton_Download_" + tab_name), "Download xlsx file")]
@@ -164,10 +153,8 @@ class Window(QDialog):
                         line.setObjectName(element[0])
                         line.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         if lable == 'Designation':
-                            print(element[0],'lmoa shit is this')
-                            line.setFixedSize(130, 22)
-                        else:
-                            line.setFixedSize(91,22)
+                            line.textChanged.connect(self.manage_designation_size(line))
+                        line.setFixedSize(91,22)
                         if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4']:
                             line.setValidator(QDoubleValidator())
                         if input_dictionary:
@@ -217,7 +204,7 @@ class Window(QDialog):
                         img = QLabel(tab)
                         grid.addWidget(img,r,1,10,2)
                         pmap = QPixmap(element[4])
-                        img.setPixmap(pmap.scaled(220,800,Qt.KeepAspectRatio, Qt.FastTransformation))
+                        img.setPixmap(pmap.scaled(300,300,Qt.KeepAspectRatio, Qt.FastTransformation)) # you can also use IgnoreAspectRatio
                         r += 10
 
                     if type == TYPE_BREAK:
@@ -405,8 +392,8 @@ class Window(QDialog):
 
             scrollArea.setWidget(scrollAreaWidgetContents)
 
-        # self.setCentralWidget(self.tabWidget)
-        self.tabWidget.resize(self.size())
+        self.setCentralWidget(self.tabWidget)
+        #self.tabWidget.resize(self.size())
 
         self.tabWidget.tabs.setCurrentIndex(2)
         #QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
@@ -471,6 +458,19 @@ class Window(QDialog):
             pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab("Channel"))
             pushButton_Add_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
             pushButton_Add_Channel.clicked.connect(self.add_tab_channel)
+
+    def manage_designation_size(self,line_edit):
+        def change_size():
+            font = line_edit.font()
+            text = line_edit.text()
+            metrices = QtGui.QFontMetrics(font)
+            width = metrices.boundingRect(text).width()
+            width += 25
+            if width > 91:
+                line_edit.setFixedWidth(width)
+            else:
+                line_edit.setFixedWidth(91)
+        return change_size
 
     def clear_tab(self, tab_name):
         '''
@@ -930,11 +930,14 @@ class DesignPreferences():
         self.window_close_flag = True
 
     def show(self):
-        # self.ui.resize(1170,710)
-        self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
-        self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
+        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        width = resolution.width()
+        height = resolution.height()
+        self.ui.resize(width*(0.67),height*(0.60))
+        #self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
+        #self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
         self.ui.center()
-        self.ui.exec()
+        self.ui.show()
 
     def default_fn(self):
         '''

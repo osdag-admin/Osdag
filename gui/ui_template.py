@@ -419,7 +419,7 @@ class Window(QMainWindow):
         #self.inputDock.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         font = QtGui.QFont()
         font.setFamily("Arial")
-        font.setPointSize(11)
+        font.setPointSize(10)
         font.setBold(True)
         font.setItalic(False)
         font.setWeight(75)
@@ -482,7 +482,7 @@ class Window(QMainWindow):
                 #l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
 
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 l.setFont(font)
@@ -498,7 +498,7 @@ class Window(QMainWindow):
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)
                 #combo.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 combo.setFont(font)
@@ -516,7 +516,8 @@ class Window(QMainWindow):
                     item_width = max(item_width, metrices.boundingRect(item).width())
                 in_layout2.addWidget(combo, j, 2, 1, 1)
 
-                if lable == 'Material *':
+                if lable == 'Material':
+                    combo.setCurrentIndex(1)
                     maxi_width_right = max(maxi_width_right, item_width+5)
                 else:
                     combo.view().setMinimumWidth(item_width + 25)
@@ -524,7 +525,7 @@ class Window(QMainWindow):
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 r.setFont(font)
@@ -561,7 +562,7 @@ class Window(QMainWindow):
                 l = QtWidgets.QLineEdit(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(True)
                 font.setWeight(50)
                 l.setFont(font)
@@ -706,7 +707,7 @@ class Window(QMainWindow):
                     self.on_change_connect(key_changed, updated_list, data)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 35))
+        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 30))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -716,7 +717,7 @@ class Window(QMainWindow):
         self.btn_Reset.setObjectName("btn_Reset")
 
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 35))
+        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 30))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -748,7 +749,7 @@ class Window(QMainWindow):
         #self.outputDock.setMaximumSize(QtCore.QSize(maxi_width+220, 710))
         font = QtGui.QFont()
         font.setFamily("Arial")
-        font.setPointSize(11)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.outputDock.setFont(font)
@@ -786,7 +787,7 @@ class Window(QMainWindow):
                 l = QtWidgets.QLabel(self.dockWidgetContents_out)
                 #l.setGeometry(QtCore.QRect(6, 10 + i, maxi_width , 25))
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 l.setFont(font)
@@ -806,7 +807,7 @@ class Window(QMainWindow):
 
                 #r.setGeometry(QtCore.QRect(100, 10 + i, 150, 27))
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 r.setFont(font)
@@ -827,7 +828,7 @@ class Window(QMainWindow):
 
                 #b.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 b.setFont(font)
@@ -851,7 +852,7 @@ class Window(QMainWindow):
                 font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")
-
+                # q.setVisible(True if option[4] else False)
                 #q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
@@ -912,8 +913,8 @@ class Window(QMainWindow):
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
         self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_out)
         self.save_outputDock = QtWidgets.QPushButton(self.dockWidgetContents_out)
-        self.btn_CreateDesign.setFixedSize(185, 35)
-        self.save_outputDock.setFixedSize(140, 35)
+        self.btn_CreateDesign.setFixedSize(185, 30)
+        self.save_outputDock.setFixedSize(140, 30)
         self.btn_CreateDesign.setAutoDefault(True)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -1632,7 +1633,7 @@ class Window(QMainWindow):
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
                                                   KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
-                                                  KEY_DISP_COLUMNCOVERPLATEWELD]:
+                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)

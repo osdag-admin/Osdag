@@ -1788,14 +1788,46 @@ def long_joint_welded_beam_prov(plate_height,l_w,t_w,gap,t_t,Tc,Tr):
         long_joint_welded_beam_prov.append(NoEscape(r'\beta_{l_w}& = 1.2 - (0.2*' + l_str + ')/(150*' + t_t+ r')\\& =' + Bi + r'\\'))
         long_joint_welded_beam_prov.append(NoEscape(r' V_{rd}& = ' + Bi + ' * ' + Tc + '=' + Tr + r' \end{aligned}'))
 
-
-
-
-
-
-
-
     return long_joint_welded_beam_prov
+
+def long_joint_welded_prov(h,l,t_t,ws,wsr):
+    lj = max(h,l)
+    lt = 150 * t_t
+    B = 1.2 - ((0.2 * lj) / (150 * t_t))
+    if B <= 0.6:
+        B = 0.6
+    elif B >= 1:
+        B = 1
+    else:
+        B = B
+    Bi = str(round(B, 2))
+    t_t= str(t_t)
+    lt_str = str(lt)
+    h = str(h)
+    l = str(l)
+    ws = str(ws)
+    wsr = str(wsr)
+    ljs= str(lj)
+
+    long_joint_welded_prov = Math(inline=True)
+    # if conn =="web":
+    if lj < lt:
+        long_joint_welded_prov.append(NoEscape(r'\begin{aligned} l ~&= pt.length ~ or ~ pt.height \\'))
+        long_joint_welded_prov.append(NoEscape(r' l_l &= max('+h +','+l+r') \\'))
+        long_joint_welded_prov.append(NoEscape(r' &='+ ljs + r' \\'))
+        long_joint_welded_prov.append(NoEscape(r'& 150 * t_t =150 * '+t_t+' = '+lt_str +r' \\'))
+        long_joint_welded_prov.append(NoEscape(r'& since,~l < 150 * t_t~\\&then~V_{rd} = V_{db} \\'))
+        long_joint_welded_prov.append(NoEscape(r' V_{rd} &= ' + ws + r' \end{aligned}'))
+    else:
+        long_joint_welded_prov.append(NoEscape(r'\begin{aligned} l~&= pt.length ~or ~pt.height \\'))
+        long_joint_welded_prov.append(NoEscape(r' l_l &= max(' + h + ',' + l + r') \\'))
+        long_joint_welded_prov.append(NoEscape(r' &=' + ljs + r' \\'))
+        long_joint_welded_prov.append(NoEscape(r'& 150 * t_t =150 * ' + t_t + ' = ' + lt_str + r' \\'))
+        long_joint_welded_prov.append(NoEscape(r'&since,~l \geq 150 * t_t~ \\&then~V_{rd} = \beta_{lw} * V_{db} \\'))
+        long_joint_welded_prov.append(NoEscape(r'\beta_{l_w}& = 1.2 - (0.2*' + lj + ')/(150*' + t_t+ r')\\& =' + Bi + r'\\'))
+        long_joint_welded_prov.append(NoEscape(r' V_{rd}& = ' + Bi + ' * ' + ws + '=' + wsr + r' \end{aligned}'))
+
+    return long_joint_welded_prov
 
 
 def throat_req():

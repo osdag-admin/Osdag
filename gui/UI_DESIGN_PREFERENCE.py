@@ -213,7 +213,8 @@ class Window(QDialog):
                         img = QLabel(tab)
                         grid.addWidget(img,r,1,10,2)
                         pmap = QPixmap(element[4])
-                        img.setPixmap(pmap.scaled(220,800,Qt.KeepAspectRatio, Qt.FastTransformation))
+                        img.setPixmap(pmap.scaled(300,300,Qt.IgnoreAspectRatio, Qt.FastTransformation))
+                        img.setPixmap(pmap)
                         r += 10
 
                     if type == TYPE_BREAK:

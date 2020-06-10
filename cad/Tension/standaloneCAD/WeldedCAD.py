@@ -8,8 +8,9 @@ import numpy
 import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
+
 class TensionAngleWeldCAD(object):
-    def __init__(self, Obj, member, plate, inline_weld, opline_weld):
+    def __init__(self, Obj, member, plate, inline_weld, opline_weld, weld_plate_array):
         """
         :param member: Angle or Channel
         :param plate: Plate
@@ -23,9 +24,9 @@ class TensionAngleWeldCAD(object):
         self.plate = plate
         self.inline_weld = inline_weld
         self.opline_weld = opline_weld
-        # self.intermittentConnection = weld_plate_array
+        self.intermittentConnection = weld_plate_array
 
-        # self.Obj.loc = 'Long Leg'#'Short Leg'
+        self.loc = 'Long Leg'  # 'Short Leg'
 
         self.plate1 = copy.deepcopy(self.plate)
         self.plate2 = copy.deepcopy(self.plate)
@@ -63,8 +64,8 @@ class TensionAngleWeldCAD(object):
 
     def createMemberGeometry(self):
 
-        if self.Obj.loc == 'Long Leg':
-            if self.Obj.sec_profile == 'Angles':
+        if self.loc == 'Long Leg':
+            if self.Obj == 'Angles':
                 member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.opline_weld.L / 2])
                 member1_uDir = numpy.array([0.0, -1.0, 0.0])
                 member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -72,7 +73,7 @@ class TensionAngleWeldCAD(object):
 
                 self.member1_Model = self.member1.create_model()
 
-            elif self.Obj.sec_profile == 'Back to Back Angles':
+            elif self.Obj == 'Back to Back Angles':
                 member1OriginL = numpy.array([-self.plate_intercept, 0.0, self.opline_weld.L / 2])
                 member1_uDir = numpy.array([0.0, -1.0, 0.0])
                 member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -88,7 +89,7 @@ class TensionAngleWeldCAD(object):
 
                 self.member2_Model = self.member2.create_model()
 
-            elif self.Obj.sec_profile == 'Star Angles':
+            elif self.Obj == 'Star Angles':
                 member1OriginL = numpy.array([-self.plate_intercept, 0.0, 0.0])
                 member1_uDir = numpy.array([0.0, -1.0, 0.0])
                 member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -104,7 +105,7 @@ class TensionAngleWeldCAD(object):
                 self.member2_Model = self.member2.create_model()
 
         else:
-            if self.Obj.sec_profile == 'Angles':
+            if self.Obj == 'Angles':
                 member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.opline_weld.L / 2])
                 member1_uDir = numpy.array([0.0, 0.0, -1.0])
                 member1_wDir = numpy.array([-1.0, 0.0, 0.0])
@@ -112,7 +113,7 @@ class TensionAngleWeldCAD(object):
 
                 self.member1_Model = self.member1.create_model()
 
-            elif self.Obj.sec_profile == 'Back to Back Angles':
+            elif self.Obj == 'Back to Back Angles':
                 member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, self.opline_weld.L / 2])
                 member1_uDir = numpy.array([0.0, 0.0, -1.0])
                 member1_wDir = numpy.array([-1.0, 0.0, 0.0])
@@ -127,7 +128,7 @@ class TensionAngleWeldCAD(object):
 
                 self.member2_Model = self.member2.create_model()
 
-            elif self.Obj.sec_profile == 'Star Angles':
+            elif self.Obj == 'Star Angles':
                 member1OriginL = numpy.array([-self.plate_intercept + self.member.L, 0.0, 0.0])
                 member1_uDir = numpy.array([0.0, 0.0, -1.0])
                 member1_wDir = numpy.array([-1.0, 0.0, 0.0])
@@ -157,19 +158,8 @@ class TensionAngleWeldCAD(object):
 
         self.plate2_Model = self.plate2.create_model()
 
-        # intermittentConnectionOriginL = numpy.array([300, 0.0, 0.0])
-        # intermittentConnection_uDir = numpy.array([1.0, 0.0, 0.0])
-        # intermittentConnection_vDir = numpy.array([0.0, 1.0, 0.0])
-        # intermittentConnection_wDir = numpy.array([0.0, 0.0, 1.0])
-        # self.intermittentConnection.place(intermittentConnectionOriginL, intermittentConnection_uDir,
-        #                                   intermittentConnection_vDir, intermittentConnection_wDir)
-        #
-        # self.intermittentConnection_Model = self.intermittentConnection.create_model()
-        # self.inter_conc_welds = self.intermittentConnection.get_welded_models()
-        # self.inter_conc_plates = self.intermittentConnection.get_plate_models()
-
     def createWeldGeometry(self):
-        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Angles' or self.Obj.sec_profile == 'Channels' or self.Obj.sec_profile == 'Back to Back Channels':
+        if self.Obj == 'Back to Back Angles' or self.Obj == 'Angles' or self.Obj == 'Channels' or self.Obj == 'Back to Back Channels':
             weldHL11OriginL = numpy.array([-self.plate_intercept, 0.0, self.opline_weld.L / 2])
             weldHL11_uDir = numpy.array([0.0, 0.0, 1.0])
             weldHL11_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -212,7 +202,7 @@ class TensionAngleWeldCAD(object):
 
             self.weldVR11_Model = self.weldVR11.create_model()
 
-        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels':
+        if self.Obj == 'Back to Back Angles' or self.Obj == 'Back to Back Channels':
             weldHL21OriginL = numpy.array([0.0, self.plate.T, self.opline_weld.L / 2])
             weldHL21_uDir = numpy.array([0.0, 0.0, 1.0])
             weldHL21_wDir = numpy.array([-1.0, 0.0, 0.0])
@@ -258,7 +248,7 @@ class TensionAngleWeldCAD(object):
 
             self.weldVR21_Model = self.weldVR21.create_model()
 
-        elif self.Obj.sec_profile == 'Star Angles':
+        elif self.Obj == 'Star Angles':
 
             weldHL11OriginL = numpy.array([-self.plate_intercept, 0.0, 0.0])
             weldHL11_uDir = numpy.array([0.0, 0.0, 1.0])
@@ -344,10 +334,20 @@ class TensionAngleWeldCAD(object):
 
             self.weldVR21_Model = self.weldVR21.create_model()
 
+        intermittentConnectionOriginL = numpy.array([300, 0.0, 0.0])
+        intermittentConnection_uDir = numpy.array([1.0, 0.0, 0.0])
+        intermittentConnection_vDir = numpy.array([0.0, 1.0, 0.0])
+        intermittentConnection_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.intermittentConnection.place(intermittentConnectionOriginL, intermittentConnection_uDir,
+                                          intermittentConnection_vDir, intermittentConnection_wDir)
+
+        self.intermittentConnection_Model = self.intermittentConnection.create_model()
+        self.inter_conc_welds = self.intermittentConnection.get_welded_models()
+        self.inter_conc_plates = self.intermittentConnection.get_plate_models()
 
     def get_members_models(self):
 
-        if self.Obj.sec_profile == 'Angles':
+        if self.Obj == 'Angles':
             member = self.member1_Model
 
         else:
@@ -357,18 +357,19 @@ class TensionAngleWeldCAD(object):
 
     def get_plates_models(self):
         plate = BRepAlgoAPI_Fuse(self.plate1_Model, self.plate2_Model).Shape()
-        # plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
+        plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
         return plate
 
     def get_welded_models(self):
 
-        if self.Obj.sec_profile == 'Angles' or self.Obj.sec_profile == 'Channels':
+        if self.Obj == 'Angles' or self.Obj == 'Channels':
             welded_sec = [self.weldHL11_Model, self.weldHL12_Model, self.weldHR11_Model, self.weldHR12_Model,
-                          self.weldVL11_Model, self.weldVR11_Model]
+                          self.weldVL11_Model, self.weldVR11_Model, self.inter_conc_welds]
         else:
             welded_sec = [self.weldHL11_Model, self.weldHL12_Model, self.weldHR11_Model, self.weldHR12_Model,
                           self.weldVL11_Model, self.weldVR11_Model, self.weldHL21_Model, self.weldHL22_Model,
-                          self.weldHR21_Model, self.weldHR22_Model, self.weldVL21_Model, self.weldVR21_Model]
+                          self.weldHR21_Model, self.weldHR22_Model, self.weldVL21_Model, self.weldVR21_Model,
+                          self.inter_conc_welds]
         welds = welded_sec[0]
         for comp in welded_sec[1:]:
             welds = BRepAlgoAPI_Fuse(comp, welds).Shape()
@@ -381,7 +382,7 @@ class TensionAngleWeldCAD(object):
 class TensionChannelWeldCAD(TensionAngleWeldCAD):
 
     def createMemberGeometry(self):
-        if self.Obj.sec_profile == 'Channels':
+        if self.Obj == 'Channels':
             member1OriginL = numpy.array([-self.plate_intercept, -self.member.B, self.opline_weld.L / 2])
             member1_uDir = numpy.array([0.0, -1.0, 0.0])
             member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -389,7 +390,7 @@ class TensionChannelWeldCAD(TensionAngleWeldCAD):
 
             self.member1_Model = self.member1.create_model()
 
-        elif self.Obj.sec_profile == 'Back to Back Channels':
+        elif self.Obj == 'Back to Back Channels':
             member1OriginL = numpy.array([-self.plate_intercept, -self.member.B, self.opline_weld.L / 2])
             member1_uDir = numpy.array([0.0, -1.0, 0.0])
             member1_wDir = numpy.array([1.0, 0.0, 0.0])
@@ -405,12 +406,11 @@ class TensionChannelWeldCAD(TensionAngleWeldCAD):
 
             self.member2_Model = self.member2.create_model()
 
-
     def get_members_models(self):
 
-        if self.Obj.sec_profile == 'Channels':
+        if self.Obj == 'Channels':
             member = self.member1_Model
-        elif self.Obj.sec_profile == 'Back to Back Channels':
+        elif self.Obj == 'Back to Back Channels':
             member = BRepAlgoAPI_Fuse(self.member1_Model, self.member2_Model).Shape()
 
         return member
@@ -424,6 +424,7 @@ if __name__ == '__main__':
     from cad.items.angle import Angle
     from cad.items.stiffener_plate import StiffenerPlate
     from cad.items.Gasset_plate import GassetPlate
+    from cad.Tension.standaloneCAD.IntermittentConnections import IntermittentWelds
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
@@ -436,19 +437,23 @@ if __name__ == '__main__':
 
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    member_data = 'Star Angles'  # 'Back to Back Angles' #'Angles' #''Back to Back Channels'#'Channels' #  #
+    member_data = 'Channels'  # 'Star Angles' #'Back to Back Angles' #'Angles' #''Back to Back Channels'#  #
     loc = 'Long Leg'  # 'Short Leg'#
     weld_size = 6
     s = max(15, weld_size)
 
+    intermittentPlate = Plate(L=185, W=80, T=16)
+    welds = FilletWeld(h=5, b=5, L=intermittentPlate.W)
+    weld_plate_array = IntermittentWelds(member_data, welds, intermittentPlate)
+
     if member_data == 'Channels' or member_data == 'Back to Back Channels':
-        member = Channel(B=75, T=10.2, D=175, t=6, R1=0, R2=0, L=5000)
+        member = Channel(B=75, T=10.2, D=175, t=6, R1=0, R2=0, L=2000)
         plate = GassetPlate(L=560 + 50, H=210, T=16, degree=30)
         plate_intercept = plate.L - s - 50
         inline_weld = FilletWeld(b=weld_size, h=weld_size, L=plate_intercept)
         opline_weld = FilletWeld(b=weld_size, h=weld_size, L=member.D)
 
-        tensionCAD = TensionChannelWeldCAD(member_data, member, plate, inline_weld, opline_weld)
+        tensionCAD = TensionChannelWeldCAD(member_data, member, plate, inline_weld, opline_weld, weld_plate_array)
 
 
     else:

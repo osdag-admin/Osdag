@@ -2657,7 +2657,7 @@ class BeamCoverPlate(MomentConnection):
              "Section Details": self.report_supporting,
 
              "Bolt Details": "TITLE",
-             KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
+             # KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
              KEY_DISP_D: str(self.bolt.bolt_diameter),
              KEY_DISP_GRD: str(self.bolt.bolt_grade),
              KEY_DISP_TYP: self.bolt.bolt_type,
@@ -2683,7 +2683,7 @@ class BeamCoverPlate(MomentConnection):
         h = self.section.depth - (2 * self.section.flange_thickness)
         self.Pmc = self.section.plastic_moment_capactiy
         self.Mdc = self.section.moment_d_def_criteria
-        t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         t1=(SECTION_CLASSIFICATION,"",section_classification(class_of_section=self.class_of_section),"")
@@ -2867,7 +2867,7 @@ class BeamCoverPlate(MomentConnection):
                                                 get_pass_fail(self.Wp, self.web_plate_crs_sec_area, relation="lesser"))
                     self.report_check.append(t2)
             if self.member_capacity_status == True and self.initial_pt_thk_status == True and self.initial_pt_thk_status_web ==True:
-                t1 = ('SubSection', 'Web Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{5cm}|p{1cm}|')
+                t1 = ('SubSection', 'Web Spacing Checks', '|p{3.0cm}|p{6.5cm}|p{5 cm}|p{1cm}|')
                 self.report_check.append(t1)
                 self.bolt_diameter_min = min(self.bolt.bolt_diameter)
                 min_gauge =self.web_bolt.min_gauge_round
@@ -2890,7 +2890,7 @@ class BeamCoverPlate(MomentConnection):
                 self.report_check.append(t3)
 
 
-                t1 = ('SubSection', 'Flange Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{5cm}|p{1cm}|')
+                t1 = ('SubSection', 'Flange Spacing Checks', '|p{3.0cm}|p{6.5cm}|p{5cm}|p{1cm}|')
                 self.report_check.append(t1)
                 self.bolt_diameter_min = min(self.bolt.bolt_diameter)
                 min_gauge =0.0
@@ -2943,7 +2943,7 @@ class BeamCoverPlate(MomentConnection):
                     2 * self.flange_bolt.min_end_dist) + (self.flange_plate.gap / 2))
 
 
-            t1 = ('SubSection', 'Flange Bolt Checks', '|p{3cm}|p{5.5cm}|p{6cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Flange Bolt Checks', '|p{3cm}|p{4.5cm}|p{6.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt.bolt_diameter_provided, "d"), '')
@@ -3123,7 +3123,7 @@ class BeamCoverPlate(MomentConnection):
             res_force = self.web_plate.bolt_force * self.web_plate.bolt_line * self.web_plate.bolts_one_line
             print("res_focce", res_force)
 
-            t1 = ('SubSection', 'Web Bolt Checks', '|p{3cm}|p{7cm}|p{6cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Bolt Checks', '|p{3cm}|p{5.5cm}|p{5.5cm}|p{1.5cm}|')
 
             self.report_check.append(t1)
             t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt.bolt_diameter_provided, "d"),
@@ -3265,7 +3265,7 @@ class BeamCoverPlate(MomentConnection):
         ######Flange plate check####
         if self.select_bolt_dia_status == True:
             if self.preference == "Outside":
-                t1 = ('SubSection', 'Flange plate dimensions Checks- Outside', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Flange plate dimensions Checks- Outside', '|p{4cm}|p{5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
                 t1 = (DISP_MIN_FLANGE_PLATE_HEIGHT, min_flange_plate_ht_req(beam_width=self.section.flange_width,
@@ -3300,7 +3300,7 @@ class BeamCoverPlate(MomentConnection):
                       get_pass_fail(self.Ap, self.flange_plate_crs_sec_area, relation="leq"))
                 self.report_check.append(t2)
             else:
-                t1 = ('SubSection', 'Flange plates dimensions Checks-Outside/Inside', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Flange plates dimensions Checks-Outside/Inside', '|p{4cm}|p{5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 ####OUTER PLATE####
                 t1 = (DISP_MIN_FLANGE_PLATE_HEIGHT, min_flange_plate_ht_req(beam_width=self.section.flange_width,
@@ -3368,7 +3368,7 @@ class BeamCoverPlate(MomentConnection):
          ################
         if self.select_bolt_dia_status == True:
             self.min_web_plate_height = round(self.section.min_plate_height(), 2)
-            t1 = ('SubSection', 'Web Plate dimensions Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Plate dimensions Checks', '|p{4cm}|p{4.5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t1 = (DISP_MIN_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
@@ -3406,7 +3406,7 @@ class BeamCoverPlate(MomentConnection):
         ###################
         ### Flange Check ###
         if self.get_plate_details_status ==True:
-            t1 = ('SubSection', 'Member Checks', '|p{4cm}|p{4cm}|p{7cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Member Checks', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
             gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
@@ -3485,7 +3485,7 @@ class BeamCoverPlate(MomentConnection):
         if self.flange_check_axial_status == True:
             if self.preference == "Outside":
 
-                t1 = ('SubSection', 'Flange Plate Capacity Checks in Axial-Outside ', '|p{4cm}|p{4cm}|p{7cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Flange Plate Capacity Checks in Axial-Outside ', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
@@ -3524,7 +3524,7 @@ class BeamCoverPlate(MomentConnection):
                 self.report_check.append(t1)
             else:
                 t1 = (
-                'SubSection', 'Flange Plate Capacity Checks in axial-Outside/Inside ', '|p{4cm}|p{4cm}|p{7cm}|p{1.5cm}|')
+                'SubSection', 'Flange Plate Capacity Checks in axial-Outside/Inside ', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
                 total_height = self.flange_plate.height + (2 * self.flange_plate.Innerheight)
@@ -3568,7 +3568,7 @@ class BeamCoverPlate(MomentConnection):
         # Web plate Capacities check axial
         ###################
         if self.flange_plate_check_status == True and self.web_axial_check_status == True:
-            t1 = ('SubSection', 'Web Plate Capacity Checks in Axial', '|p{4cm}|p{4cm}|p{7cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Plate Capacity Checks in Axial', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
             gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
@@ -3611,7 +3611,7 @@ class BeamCoverPlate(MomentConnection):
         # Web plate Capacities check Shear
         ###################
         if self.web_plate_axial_check_status == True:
-            t1 = ('SubSection', 'Web Plate Capacity Checks in Shear', '|p{4cm}|p{4cm}|p{7cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Web Plate Capacity Checks in Shear', '|p{4cm}|p{3cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t1 = (KEY_DISP_SHEARYIELDINGCAP_WEB_PLATE, '', shear_yield_prov(self.web_plate.height, self.web_plate.thickness_provided,

@@ -167,7 +167,7 @@ class CreateLatex(Document):
 
 
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
-        doc.append(NewPage())
+        # doc.append(NewPage())
         count = 0
         with doc.create(Section('Design Checks')):
             for check in Design_Check:

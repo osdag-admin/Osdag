@@ -20,7 +20,7 @@ class ShearConnection(Connection):
 
         "In design preference, it shows other properties of section used "
         "In design preference, it shows other properties of section used "
-        if not input_dictionary or input_dictionary[KEY_ANGLE_LIST] == '' or \
+        if not input_dictionary or input_dictionary[KEY_ANGLE_LIST] == [] or \
                 input_dictionary[KEY_MATERIAL] == 'Select Material':
             designation = ''
             material_grade = ''
@@ -110,7 +110,7 @@ class ShearConnection(Connection):
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t34 = (KEY_CONNECTOR_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         section.append(t34)
 
@@ -479,112 +479,6 @@ class ShearConnection(Connection):
         else:
             return False
 
-    def func_for_validation(self, design_dictionary):
-        all_errors = []
-        self.design_status = False
-        flag = False
-        flag1 = False
-        flag2=False
-        option_list = self.input_values(self)
-        missing_fields_list = []
-        for option in option_list:
-            if option[2] == TYPE_TEXTBOX:
-                if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-                val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                if design_dictionary[option[0]] == []:
-                    missing_fields_list.append(option[1])
-            # elif option[2] == TYPE_MODULE:
-            #     if design_dictionary[option[0]] == "Fin Plate":
-        if len(missing_fields_list) == 0:
-            if design_dictionary[KEY_CONN] == VALUES_CONN_2[0]:
-                primary = design_dictionary[KEY_SUPTNGSEC]
-                secondary = design_dictionary[KEY_SUPTDSEC]
-                conn = sqlite3.connect(PATH_TO_DATABASE)
-                cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
-                lst = []
-                rows = cursor.fetchall()
-                for row in rows:
-                    lst.append(row)
-                p_val = lst[0][0]
-                cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
-                lst1 = []
-                rows1 = cursor2.fetchall()
-                for row1 in rows1:
-                    lst1.append(row1)
-                s_val = lst1[0][0]
-                if p_val <= s_val:
-                    error = "Secondary beam depth is higher than clear depth of primary beam web " + "\n" + "(No provision in Osdag till now)"
-                    all_errors.append(error)
-                else:
-                    flag1 = True
-
-            elif design_dictionary[KEY_CONN] == VALUES_CONN_1[1]:
-                primary = design_dictionary[KEY_SUPTNGSEC]
-                secondary = design_dictionary[KEY_SUPTDSEC]
-                conn = sqlite3.connect(PATH_TO_DATABASE)
-                cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
-                p_beam_details = cursor.fetchone()
-                p_val = p_beam_details[0] - 2*p_beam_details[1] - p_beam_details[2] - p_beam_details[3]
-                cursor2 = conn.execute("SELECT B FROM BEAMS WHERE Designation = ( ? )", (secondary,))
-
-                s_beam_details = cursor2.fetchone()
-                s_val = s_beam_details[0]
-                #print(p_val,s_val)
-                if p_val <= s_val:
-                    error = "Secondary beam width is higher than clear depth of primary column web " + "\n" + "(No provision in Osdag till now)"
-                    all_errors.append(error)
-                else:
-                    flag1 = True
-            else:
-                flag1 = True
-
-            selected_plate_thk = list(np.float_(design_dictionary[KEY_PLATETHK]))
-            supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_MATERIAL])
-            available_plates = [i for i in selected_plate_thk if i >= supported_section.web_thickness]
-            if not available_plates:
-                error = "Plate thickness should be greater than suppported section web thicknesss."
-                all_errors.append(error)
-            else:
-                flag2=True
-            if flag1 and flag2:
-                self.set_input_values(self, design_dictionary)
-            else:
-                return all_errors
-        else:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
-            all_errors.append(error)
-            return all_errors
-
-    def generate_missing_fields_error_string(self, missing_fields_list):
-        """
-        Args:
-            missing_fields_list: list of fields that are not selected or entered
-        Returns:
-            error string that has to be displayed
-        """
-        # The base string which should be displayed
-        information = "Please input the following required field"
-        if len(missing_fields_list) > 1:
-            # Adds 's' to the above sentence if there are multiple missing input fields
-            information += "s"
-        information += ": "
-        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
-
-        for item in missing_fields_list:
-            information = information + item + ", "
-
-        # Removes the last comma
-        information = information[:-2]
-        information += "."
-
-        return information
-
-
     def warn_text(self):
 
         """
@@ -620,7 +514,7 @@ class ShearConnection(Connection):
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES],
                          bolt_tensioning=design_dictionary[KEY_DP_BOLT_TYPE])
 
-        self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None))
+        self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, ""))
 
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)

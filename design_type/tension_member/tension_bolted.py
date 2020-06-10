@@ -521,7 +521,7 @@ class Tension_bolted(Member):
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
+        t7 = (KEY_AXIAL, KEY_DISP_AXIAL_STAR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
         t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
@@ -843,7 +843,7 @@ class Tension_bolted(Member):
                             all_errors.append(error)
                         else:
                             flag2 = True
-            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_LOCATION, KEY_END1, KEY_END2]:
+            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_LOCATION, KEY_TYP]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
@@ -935,7 +935,7 @@ class Tension_bolted(Member):
 
         self.length = float(design_dictionary[KEY_LENGTH])
         # print(self.bolt)
-        self.load = Load(shear_force=None, axial_force=design_dictionary.get(KEY_AXIAL))
+        self.load = Load(shear_force="", axial_force=design_dictionary.get(KEY_AXIAL))
         self.efficiency = 0.0
         self.K = 1
         self.previous_size = []
@@ -2420,7 +2420,7 @@ class Tension_bolted(Member):
 
         self.report_input = \
             {KEY_MODULE: self.module,
-             KEY_DISP_AXIAL: self.load.axial_force,
+             KEY_DISP_AXIAL_STAR: self.load.axial_force,
              KEY_DISP_LENGTH: self.length,
              # "Section": "TITLE",
              "Selected Section Details":self.report_supporting,

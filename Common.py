@@ -405,13 +405,28 @@ KEY_SPACING = "Spacing Check"
 DISP_MAX_EDGE = 'Max. Edge Distance (mm)'
 DISP_MIN_END = 'Min. End Distance (mm)'
 DISP_MAX_END = 'Max. End Distance (mm)'
-DISP_MIN_PLATE_HEIGHT = 'Min. Plate Width (mm)'
-DISP_MAX_PLATE_HEIGHT = 'Max. Plate Width(mm)'
+DISP_MIN_PLATE_HEIGHT = 'Min. Plate Height (mm)'
+DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
 DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
-DISP_MIN_PLATE_THICK = 'Min.Plate Thickness (mm)'
+DISP_MIN_PLATE_THICK = 'Min. Plate Thickness (mm)'
 
-DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Width (mm)'
-DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Width (mm)'
+######### Minimun for Flange####
+DISP_MIN_FLANGE_PLATE_HEIGHT = 'Min. Flange Plate Height (mm)'
+DISP_MAX_FLANGE_PLATE_HEIGHT = 'Max. Flange Plate Height (mm)'
+DISP_MIN_FLANGE_PLATE_LENGTH = 'Min. Flange Plate Length (mm)'
+DISP_MIN_FLANGE_PLATE_THICK = 'Min. Flange Plate Thickness (mm)'
+
+######### Minimun for Flange####
+DISP_MIN_WEB_PLATE_HEIGHT = 'Min. Web Plate Height (mm)'
+DISP_MAX_WEB_PLATE_HEIGHT = 'Max. Web Plate Height (mm)'
+DISP_MIN_WEB_PLATE_LENGTH = 'Min. Web Plate Length (mm)'
+DISP_MIN_WEB_PLATE_THICK = 'Min. Web Plate Thickness (mm)'
+
+
+
+
+DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Height (mm)'
+DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Height (mm)'
 DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
 KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (V_db) (kN)'
@@ -827,14 +842,14 @@ KEY_PLATE_MAX_HEIGHT = 'Plate.MaxHeight'
 KEY_SLENDER = "Member.Slenderness"
 
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
-KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Width (mm)'
+KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Height (mm)'
 
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
 
 KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 
-KEY_INNERFLANGE_PLATE_HEIGHT = 'Flange_Plate.InnerWidth'
+KEY_INNERFLANGE_PLATE_HEIGHT = 'Flange_Plate.InnerHeight'
 KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
 
 KEY_DISP_AREA_CHECK ="Plate Area check (mm2)"
@@ -995,7 +1010,7 @@ VALUES_PLATETHICKNESS_CUSTOMIZED = ['6', '8', '10', '12', '14', '16', '18', '20'
                                     '36','40','45','50','56','63','80']
 
 
-KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Width (mm)'
+KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Length'
 KEY_DISP_WEB_PLATE_LENGTH ='Length (mm)'

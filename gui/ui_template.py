@@ -851,7 +851,7 @@ class Window(QMainWindow):
                 font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")
-
+                # q.setVisible(True if option[4] else False)
                 #q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))

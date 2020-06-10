@@ -363,6 +363,30 @@ class Tension_bolted(Member):
         t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t8)
 
+        # t5 = ([KEY_SEC_PROFILE], DISP_TITLE_INTERMITTENT , TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], DISP_TITLE_INTERMITTENT, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], DISP_TITLE_CONN_DETAILS, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], DISP_TITLE_CONN_DETAILS, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], DISP_TITLE_BOLTD, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], DISP_TITLE_BOLTD, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], DISP_TITLE_PLATED, TYPE_OUT_DOCK, self.out_intermittent)
+        # lst.append(t5)
+        #
+        # t5 = ([KEY_SEC_PROFILE], DISP_TITLE_PLATED, TYPE_OUT_LABEL, self.out_intermittent)
+        # lst.append(t5)
+
         return lst
 
     def fn_conn_type(self):
@@ -638,7 +662,7 @@ class Tension_bolted(Member):
 
         # if KEY_SEC_PROFILE in ['Back to Back Angles', 'Star Angles','Back to Back Channels']:
 
-        t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, True)
+        t18 = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, False)
         out_list.append(t18)
 
         t8 = (None, DISP_TITLE_CONN_DETAILS, TYPE_TITLE, None, False)
@@ -652,7 +676,7 @@ class Tension_bolted(Member):
                (round(self.inter_memb_length, 2)) if flag else '', False)
         out_list.append(t21)
 
-        t18 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, True)
+        t18 = (None, DISP_TITLE_BOLTD, TYPE_TITLE, None, False)
         out_list.append(t18)
 
         t9 = (KEY_OUT_INTER_D_PROVIDED, KEY_OUT_DISP_INTER_D_PROVIDED, TYPE_TEXTBOX, int(self.inter_dia) if flag else '',False)
@@ -667,7 +691,7 @@ class Tension_bolted(Member):
         t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, KEY_OUT_DISP_INTER_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.inter_bolt_one_line if flag else '',False)
         out_list.append(t16)
 
-        t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, True)
+        t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, False)
         out_list.append(t18)
 
         t20 = (KEY_OUT_INTER_PLATE_HEIGHT, KEY_OUT_DISP_INTER_PLATE_HEIGHT, TYPE_TEXTBOX,int(round(self.inter_plate_height, 0)) if flag else '', False)

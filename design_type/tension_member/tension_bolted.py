@@ -847,13 +847,6 @@ class Tension_bolted(Member):
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
-            # elif option[2] == TYPE_TEXTBOX and option[0] == KEY_LENGTH:
-            #     val = option[4]
-            #     if val <=1000:
-            #         error = "Length of Tension member should be higher than 1000 mm"
-            #         all_errors.append(error)
-            #     else:
-            #         flag1 = True
 
             else:
                 pass
@@ -2006,6 +1999,10 @@ class Tension_bolted(Member):
                 logger.info("In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
                 if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
                     logger.info("In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
+                else:
+                    pass
+                if self.load.axial_force < (self.res_force/1000):
+                    logger.info("Minimum Design Force based on Member Size is used for Connection Design,i.e.{} kN (IS 800:2007 - Clause 10.7)". format(round(self.res_force/1000,2)))
                 else:
                     pass
                 logger.info(": Overall bolted tension member design is safe. \n")

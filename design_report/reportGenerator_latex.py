@@ -167,7 +167,7 @@ class CreateLatex(Document):
 
 
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
-        # doc.append(NewPage())
+        doc.append(NewPage())
         count = 0
         with doc.create(Section('Design Checks')):
             for check in Design_Check:
@@ -238,7 +238,9 @@ class CreateLatex(Document):
             with doc.create(Section('3D View')):
                 with doc.create(Figure(position='h!')) as view_3D:
                     view_3dimg_path = rel_path + Disp_3d_image
-                    view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
+                    # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
+                    view_3D.add_image(filename=view_3dimg_path)
+
                     view_3D.add_caption('3D View')
 
         doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)

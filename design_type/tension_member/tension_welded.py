@@ -763,7 +763,7 @@ class Tension_welded(Member):
         # print(self.sizelist)
         self.length = float(design_dictionary[KEY_LENGTH])
         # print(self.bolt)
-        self.load = Load(shear_force=None, axial_force=design_dictionary.get(KEY_AXIAL))
+        self.load = Load(shear_force="", axial_force=design_dictionary.get(KEY_AXIAL))
         self.efficiency = 0.0
         self.K = 1
 

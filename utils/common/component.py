@@ -1089,15 +1089,16 @@ class Plate(Material):
         b = float((bolt_line - 1)) / 2
         for x in np.arange(b, -b - 1, -1):
             for y in np.arange(-n, n + 1, 1):
-
                 r_sq = r_sq + ((pitch * x) ** 2 + (abs(y) * gauge) ** 2)
         sigma_r_sq = r_sq
+
         vbv = shear_load / (bolts_one_line * bolt_line)
         moment_demand = round((shear_load * ecc + web_moment), 3)
         tmh = moment_demand * ymax / sigma_r_sq
         tmv = moment_demand * xmax / sigma_r_sq
         abh = axial_load / (bolts_one_line * bolt_line)
         vres = math.sqrt((vbv + tmv) ** 2 + (tmh+abh) ** 2)
+        print('rsq,vres',sigma_r_sq,vres)
         self.ymax = ymax
         self.xmax = xmax
         self.sigma_r_sq = sigma_r_sq

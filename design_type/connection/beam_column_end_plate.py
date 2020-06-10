@@ -236,6 +236,12 @@ class BeamColumnEndPlate(MomentConnection):
         t22 = (KEY_PLATETHK, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ENDPLATE_THICKNESS, True, 'No Validator')
         options_list.append(t22)
 
+        t23 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t23)
+
+        t24 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, VALUES_WELD_TYPE_EP, True, 'No Validator')
+        options_list.append(t24)
+
         return options_list
 
     def input_value_changed(self):
@@ -288,35 +294,6 @@ class BeamColumnEndPlate(MomentConnection):
 
         out_list = []
         return []
-
-    def func_for_validation(self, design_dictionary):
-
-        all_errors = []
-        self.design_status = False
-        flag = False
-
-        option_list = self.input_values(self)
-        missing_fields_list = []
-        for option in option_list:
-            if option[2] == TYPE_TEXTBOX:
-                if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN and option[0] != KEY_ENDPLATE_TYPE:
-                val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    missing_fields_list.append(option[1])
-
-        if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
-            all_errors.append(error)
-            # flag = False
-        else:
-            flag = True
-
-        if flag:
-            self.set_input_values(self, design_dictionary)
-        else:
-            return all_errors
 
     def set_input_values(self, design_dictionary):
         self.mainmodule = "Moment Connection"

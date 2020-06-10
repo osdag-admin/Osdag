@@ -219,6 +219,7 @@ class BBCoverPlateBoltedCAD(object):
 
 
     def get_nutboltmodelsAF(self):
+        # return self.nut_bolt_array_AF.get_modelsAF()
         nut_bolts = self.nut_bolt_array_AF.get_modelsAF()
         array = nut_bolts[0]
         for comp in nut_bolts:
@@ -234,6 +235,8 @@ class BBCoverPlateBoltedCAD(object):
             array = BRepAlgoAPI_Fuse(comp, array).Shape()
 
         return array
+
+
 
     def get_nutboltmodelsWeb(self):
         nut_bolts = self.nut_bolt_array_Web.get_modelsW()

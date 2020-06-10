@@ -13,6 +13,7 @@ from cad.items.bolt import Bolt
 from cad.items.nut import Nut
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from cad.items.ModelUtils import getGpPt
+from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 
 class NutBoltArray_AF():
@@ -104,8 +105,8 @@ class NutBoltArray_AF():
         """
         self.positions_AF = []
         # self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.gauge_AF / 2) * self.gaugeDirAF
-        self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (
-                (self.plateAbvFlangeL - self.gauge_AF) / 2 - ((self.col_AF / 2 - 1) * self.gauge)) * self.gaugeDirAF
+        self.boltOrigin_AF = self.originAF - (self.row_AF/2 * self.pitch_AF) * self.pitchDirAF  - ((self.col_AF / 2) * self.gauge) * self.gaugeDirAF
+                # + ((self.plateAbvFlangeL - self.gauge_AF) / 2 - ((self.col_AF / 2 - 1) * self.gauge)) * self.gaugeDirAF
 
         for rw_AF in range(self.row_AF):
             for cl_AF in range(self.col_AF):
@@ -158,6 +159,13 @@ class NutBoltArray_AF():
         return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Shape()
 
     def get_modelsAF(self):
+        # nut_bolts = self.models_AF
+        # array = nut_bolts[0]
+        # for comp in nut_bolts:
+        #     array = BRepAlgoAPI_Fuse(comp, array).Shape()
+        #
+        # return array
+        #todo: using for loops is here is slowing down the cad generating process
         return self.models_AF
 
     # Below methods are for creating holes in flange and web

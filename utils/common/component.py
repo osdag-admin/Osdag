@@ -764,6 +764,9 @@ class Weld:
         self.fabrication = fabrication
 
         self.size = 0.0
+        self.min_size = 0.0
+        self.max_size = 0.0
+
         self.length = 0.0
         self.eff_length = 0.0
         self.lj_factor = 1.0
@@ -790,6 +793,16 @@ class Weld:
         repr += "Strength: {}\n".format(self.strength)
         repr += "throattk: {}\n".format(self.throat_tk )
         return repr
+
+    def set_size(self, weld_size, fusion_face_angle=90):
+        """Set weld size, update eff. throat thickness, eff. length, long joint factor
+        NOTE: weld length should be assigned before this function call"""
+        self.size = weld_size
+        self.throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=self.size, fusion_face_angle=fusion_face_angle)
+        self.eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=self.size, available_length=self.length)
+        self.lj_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.eff_length, t_t=self.throat_tk)
 
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
         # connecting_fu.append(self.fu)

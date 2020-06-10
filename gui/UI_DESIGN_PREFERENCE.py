@@ -202,6 +202,7 @@ class Window(QMainWindow):
 
                     if type == TYPE_IMAGE:
                         img = QLabel(tab)
+                        img.setObjectName(element[0])
                         grid.addWidget(img,r,1,10,2)
                         pmap = QPixmap(element[4])
                         img.setPixmap(pmap.scaled(300,300,Qt.KeepAspectRatio, Qt.FastTransformation)) # you can also use IgnoreAspectRatio

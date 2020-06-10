@@ -23,6 +23,32 @@ Bolt.TensionType: Pretensioned
 Bolt.Type: Bearing Bolt
 Conn_Location: Long Leg
 Connector.Material: E 250 (Fe 410 W)A
+Connector.Plate.Thickness_List:
+- '3'
+- '4'
+- '5'
+- '6'
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '24'
+- '25'
+- '26'
+- '28'
+- '30'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '80'
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: a - Sheared or hand flame cut

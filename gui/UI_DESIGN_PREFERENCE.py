@@ -24,7 +24,9 @@ class MyTableWidget(QWidget):
         super(QWidget, self).__init__(parent)
         self.layout = QVBoxLayout(self)
         self.tabs = QTabWidget(self)
+        #self.tabs.setStyleSheet("QTabBar::tab { height: 40px; width: 150px;}")
         self.layout.addWidget(self.tabs)
+        #self.setLayout(self.layout)
 
 
     def addTab(self, widget, text):
@@ -49,7 +51,7 @@ class Window(QMainWindow):
     def initUI(self,main,input_dictionary):
 
         #self.statusBar().showMessage('')
-        self.setGeometry(300, 300, 550, 550)
+        #self.setGeometry(300, 300, 1170, 710)
         self.setObjectName("DesignPreferences")
         self.setWindowTitle('Design Preference')
         self.tabWidget = MyTableWidget(self)
@@ -95,10 +97,10 @@ class Window(QMainWindow):
                 vertical.addLayout(horizontalLayout)
 
                 horizontal = QHBoxLayout()
-                hl1 = QFrame(tab)
-                hl1.setFrameShape(QFrame.HLine)
-                vertical.addWidget(hl1)
-                vertical.addLayout(horizontal)
+                #hl1 = QFrame(tab)
+                #hl1.setFrameShape(QFrame.HLine)
+                #vertical.addWidget(hl1)
+                lay.addLayout(horizontal)
 
                 buttons = [(str("pushButton_Add_" + tab_name), 'Add'), (str("pushButton_Clear_" + tab_name), 'Clear'),
                             (str("pushButton_Import_" + tab_name), "Import xlsx file"), (str("pushButton_Download_" + tab_name), "Download xlsx file")]
@@ -113,7 +115,7 @@ class Window(QMainWindow):
                     horizontal.addWidget(button)
                     button.setObjectName(object_name)
                     button.setText(btn_text)
-                    button.setFixedSize(160, 30)
+                    button.setFixedSize(160, 27)
 
                     font = QtGui.QFont()
                     font.setPointSize(9)
@@ -125,7 +127,8 @@ class Window(QMainWindow):
                 grid = QGridLayout()
                 horizontalLayout.addLayout(grid)
                 grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
-
+                grid.setHorizontalSpacing(10)
+                grid.setVerticalSpacing(10)
 
                 for element in elements:
                     type = element[2]
@@ -136,7 +139,6 @@ class Window(QMainWindow):
                         label.setText("<html><head/><body><p>" + lable + "</p></body></html>")
                         grid.addWidget(label,r,1)
                         label.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        grid.setSpacing(30)
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         if lable in [KEY_DISP_DESIGNATION, 'Type', 'Source']:
@@ -150,7 +152,9 @@ class Window(QMainWindow):
                         grid.addWidget(line,r,2)
                         line.setObjectName(element[0])
                         line.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        line.setFixedSize(130, 22)
+                        if lable == 'Designation':
+                            line.textChanged.connect(self.manage_designation_size(line))
+                        line.setFixedSize(91,22)
                         if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4']:
                             line.setValidator(QDoubleValidator())
                         if input_dictionary:
@@ -167,7 +171,7 @@ class Window(QMainWindow):
                         grid.addWidget(combo,r,2)
                         combo.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         combo.setMaxVisibleItems(5)
-                        combo.setFixedSize(130, 22)
+                        combo.setFixedSize(91, 22)
                         combo.setObjectName(element[0])
                         combo.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
                         combo.addItems(element[3])
@@ -200,7 +204,7 @@ class Window(QMainWindow):
                         img = QLabel(tab)
                         grid.addWidget(img,r,1,10,2)
                         pmap = QPixmap(element[4])
-                        img.setPixmap(pmap.scaled(220,800,Qt.KeepAspectRatio, Qt.FastTransformation))
+                        img.setPixmap(pmap.scaled(300,300,Qt.KeepAspectRatio, Qt.FastTransformation)) # you can also use IgnoreAspectRatio
                         r += 10
 
                     if type == TYPE_BREAK:
@@ -208,6 +212,8 @@ class Window(QMainWindow):
                         grid = QGridLayout()
                         horizontalLayout.addLayout(grid)
                         grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
+                        grid.setHorizontalSpacing(10)
+                        grid.setVerticalSpacing(10)
                         continue
 
             elif tab_type == TYPE_TAB_2:
@@ -231,6 +237,8 @@ class Window(QMainWindow):
                 r = 1
                 grid = QGridLayout()
                 horizontalLayout.addLayout(grid)
+                grid.setHorizontalSpacing(10)
+                grid.setVerticalSpacing(10)
                 grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
 
                 label_1 = QLabel(tab)
@@ -260,7 +268,6 @@ class Window(QMainWindow):
                         font.setPointSize(9)
                         font.setWeight(50)
                         label.setFont(font)
-                        grid.setSpacing(30)
 
                     if type == TYPE_TEXTBOX:
                         line = QLineEdit(tab)
@@ -331,6 +338,8 @@ class Window(QMainWindow):
                         r = 1
                         grid = QGridLayout()
                         horizontalLayout.addLayout(grid)
+                        grid.setHorizontalSpacing(10)
+                        grid.setVerticalSpacing(10)
                         grid.setAlignment(Qt.AlignRight|Qt.AlignTop)
                         grid.setContentsMargins(50,0,0,0)
                         lbl = QLabel(tab)
@@ -360,6 +369,8 @@ class Window(QMainWindow):
                         r = 1
                         grid = QGridLayout()
                         horizontalLayout.addLayout(grid)
+                        grid.setHorizontalSpacing(10)
+                        grid.setVerticalSpacing(10)
                         grid.setAlignment(Qt.AlignTop|Qt.AlignLeft)
                         continue
 
@@ -382,7 +393,7 @@ class Window(QMainWindow):
             scrollArea.setWidget(scrollAreaWidgetContents)
 
         self.setCentralWidget(self.tabWidget)
-
+        #self.tabWidget.resize(self.size())
 
         self.tabWidget.tabs.setCurrentIndex(2)
         #QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
@@ -447,6 +458,19 @@ class Window(QMainWindow):
             pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab("Channel"))
             pushButton_Add_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
             pushButton_Add_Channel.clicked.connect(self.add_tab_channel)
+
+    def manage_designation_size(self,line_edit):
+        def change_size():
+            font = line_edit.font()
+            text = line_edit.text()
+            metrices = QtGui.QFontMetrics(font)
+            width = metrices.boundingRect(text).width()
+            width += 25
+            if width > 91:
+                line_edit.setFixedWidth(width)
+            else:
+                line_edit.setFixedWidth(91)
+        return change_size
 
     def clear_tab(self, tab_name):
         '''
@@ -886,7 +910,7 @@ class Window(QMainWindow):
 
 class DesignPreferences():
 
-    def __init__(self, module_window, main, input_dictionary, parent=None):
+    def __init__(self, main, input_dictionary, parent=None):
 
         self.ui = Window( main, input_dictionary)
 
@@ -894,19 +918,24 @@ class DesignPreferences():
         #self.ui.show()
         self.main_controller = parent
         #self.uiobj = self.main_controller.uiObj
-        self.module_window = module_window
+        # self.module_window = module_window
         self.saved = None
         self.flag = False
         self.sectionalprop = I_sectional_Properties()
         #self.ui.btn_save.hide()
-        #self.ui.btn_close.clicked.connect(self.close_designPref)
+        self.ui.btn_save.clicked.connect(self.close_designPref)
         self.ui.btn_defaults.clicked.connect(self.default_fn)
         self.module = main.module_name(main)
         self.main = main
         self.window_close_flag = True
 
     def show(self):
-        self.ui.resize(1170,680)
+        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        width = resolution.width()
+        height = resolution.height()
+        self.ui.resize(width*(0.67),height*(0.60))
+        #self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
+        #self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
         self.ui.center()
         self.ui.show()
 
@@ -1107,7 +1136,7 @@ class DesignPreferences():
     def closeEvent(self, event):
         if self.window_close_flag:
             event.accept()
-            self.module_window.prev_inputs = self.module_window.input_dock_inputs
+            # self.module_window.prev_inputs = self.module_window.input_dock_inputs
         else:
             QMessageBox.warning(self, "Error", "Select correct values for fu and fy!")
             event.ignore()
@@ -1217,7 +1246,7 @@ class DesignPreferences():
         self.ui.pushButton_Import_Beam.setDisabled(True)
 
     def close_designPref(self):
-        self.close()
+        self.ui.close()
 
     # def closeEvent(self, QCloseEvent):
     #     self.save_designPref_para()

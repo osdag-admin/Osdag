@@ -95,7 +95,7 @@ class MomentConnection(Connection, IS800_2007):
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t34 = (KEY_SEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         section.append(t34)
 

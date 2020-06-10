@@ -86,6 +86,9 @@ class Tension_bolted(Member):
         t2 = (DISP_TITLE_CHANNEL, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_section)
         change_tab.append(t2)
 
+        # t3 = (DISP_TITLE_ANGLE,[KEY_SECSIZE_DP], [KEY_IMAGE], TYPE_IMAGE, self.fn_conn_dp_image)
+        # change_tab.append(t3)
+
         t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t3)
@@ -95,28 +98,32 @@ class Tension_bolted(Member):
         t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
               [KEY_SECSIZE_SELECTED, KEY_SEC_FY,KEY_SEC_FU,'Label_1','Label_2','Label_3', 'Label_4', 'Label_5','Label_7','Label_8','Label_9',
                'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23','Label_24'], TYPE_TEXTBOX, self.get_new_angle_section_properties)
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23','Label_24',KEY_IMAGE], TYPE_TEXTBOX, self.get_new_angle_section_properties)
         change_tab.append(t6)
 
         t5 = (DISP_TITLE_ANGLE, ['Label_1','Label_2','Label_3'],
               ['Label_7','Label_8','Label_9', 'Label_10','Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
-               'Label_16', 'Label_17', 'Label_18','Label_19', 'Label_20','Label_21', 'Label_22','Label_23'],
+               'Label_16', 'Label_17', 'Label_18','Label_19', 'Label_20','Label_21', 'Label_22','Label_23',KEY_IMAGE],
               TYPE_TEXTBOX, self.get_Angle_sec_properties)
         change_tab.append(t5)
 
-
+        # t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE,KEY_SEC_MATERIAL],
+        #       [KEY_SECSIZE_SELECTED, KEY_SEC_FY,KEY_SEC_FU,'Label_1','Label_2','Label_3', 'Label_4', 'Label_5','Label_7','Label_8','Label_9',
+        #        'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+        #        'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23','Label_24'], TYPE_TEXTBOX, self.get_new_angle_section_properties)
+        # change_tab.append(t6)
+        t6 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+              [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14',
+               'Label_4', 'Label_5',
+               'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
+               'Label_19', 'Label_20', 'Label_21',
+               'Label_22', 'Label_23'], TYPE_TEXTBOX, self.get_new_channel_section_properties)
+        change_tab.append(t6)
 
         t5 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13'],
               ['Label_9', 'Label_10','Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
                'Label_19', 'Label_20', 'Label_21', 'Label_22'], TYPE_TEXTBOX, self.get_Channel_sec_properties)
         change_tab.append(t5)
-
-        t6 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL],
-              [KEY_SECSIZE_SELECTED, KEY_SEC_FY,KEY_SEC_FU,'Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14','Label_4', 'Label_5',
-               'Label_9', 'Label_10','Label_11', 'Label_12', 'Label_15', 'Label_16','Label_17',
-               'Label_19', 'Label_20','Label_21',
-               'Label_22', 'Label_23'], TYPE_TEXTBOX, self.get_new_channel_section_properties)
-        change_tab.append(t6)
 
         return change_tab
 
@@ -143,6 +150,7 @@ class Tension_bolted(Member):
 
         t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
         design_input.append(t3)
+
 
         # t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
         # design_input.append(t4)
@@ -235,6 +243,7 @@ class Tension_bolted(Member):
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+        print(type(key),'jddddddddddddddddds')
         if key is not None:
             handler = OurLog(key)
             formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
@@ -261,10 +270,10 @@ class Tension_bolted(Member):
         c_lst.append(t2)
         t3 = (KEY_D, self.diam_bolt_customized)
         c_lst.append(t3)
-        t4= (KEY_IMAGE, self.fn_conn_image)
-        c_lst.append(t3)
-        # t4 = (KEY_PLATETHK, self.plate_thick_customized)
-        # c_lst.append(t4)
+        # t3= (KEY_IMAGE, self.fn_conn_image)
+        # c_lst.append(t3)
+        t4 = (KEY_PLATETHK, self.plate_thick_customized)
+        c_lst.append(t4)
         # t5 = (KEY_SEC_PROFILE, self.fn_conn_type)
         # c_lst.append(t5)
 
@@ -295,7 +304,7 @@ class Tension_bolted(Member):
         t2 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
         lst.append(t2)
 
-        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE , self.fn_conn_image)
+        t3 = ([KEY_SEC_PROFILE], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
         lst.append(t3)
 
         t4 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_DOCK, self.out_bolt_bearing)
@@ -368,7 +377,7 @@ class Tension_bolted(Member):
 
     def fn_conn_image(self):
 
-        "Function to populate section size based on the type of section "
+        "Function to populate section images based on the type of section "
         img = self[0]
         if img == VALUES_SEC_PROFILE_2[0]:
             return VALUES_IMG_TENSIONBOLTED[0]
@@ -380,6 +389,58 @@ class Tension_bolted(Member):
             return VALUES_IMG_TENSIONBOLTED[3]
         else:
             return VALUES_IMG_TENSIONBOLTED[4]
+
+    # def fn_conn_dp_image(self):
+    #
+    #     "Function to populate section images based on the type of section "
+    #     size = self[0]
+    #     sec = self[1][KEY_SEC_PROFILE]
+    #     loc = self[1][KEY_LOCATION]
+    #     axb = size.split('x')
+    #     a = (axb[0]).strip()
+    #     b = (axb[1]).strip()
+    #
+    #     if sec == "Angles":
+    #         if a == b:
+    #             return VALUES_IMG_TENSIONBOLTED_DF01[0]
+    #         else:
+    #             return VALUES_IMG_TENSIONBOLTED_DF02[0]
+    #     elif sec == "Back to Back Angles" and loc == "Long Leg":
+    #         if a == b:
+    #             return VALUES_IMG_TENSIONBOLTED_DF01[1]
+    #         else:
+    #             return VALUES_IMG_TENSIONBOLTED_DF02[1]
+    #     elif sec == "Back to Back Angles" and loc == "Short Leg":
+    #         if a == b:
+    #             return VALUES_IMG_TENSIONBOLTED_DF01[2]
+    #         else:
+    #             return VALUES_IMG_TENSIONBOLTED_DF02[2]
+    #     elif sec == "Star Angles" and loc == "Long Leg":
+    #         if a == b:
+    #             return VALUES_IMG_TENSIONBOLTED_DF01[3]
+    #         else:
+    #             return VALUES_IMG_TENSIONBOLTED_DF02[3]
+    #     elif sec == "Star Angles" and loc == "Short Leg":
+    #         if a == b:
+    #             return VALUES_IMG_TENSIONBOLTED_DF01[4]
+    #         else:
+    #             return VALUES_IMG_TENSIONBOLTED_DF02[4]
+    #     else:
+    #         pass
+
+    # def fn_conn_dp_image_initial(self):
+    #
+    #     "Function to populate section images based on the type of section "
+    #     sec = self[0]
+    #
+    #     if sec == "Angles":
+    #         return VALUES_IMG_TENSIONBOLTED_DF01[0]
+    #     elif sec == "Back to Back Angles":
+    #         return VALUES_IMG_TENSIONBOLTED_DF01[1]
+    #     elif sec == "Star Angles":
+    #         return VALUES_IMG_TENSIONBOLTED_DF01[3]
+    #     else:
+    #         pass
 
     def out_bolt_bearing(self):
 
@@ -431,13 +492,13 @@ class Tension_bolted(Member):
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'No Validator')
+        t5 = (KEY_LENGTH, KEY_DISP_LENGTH, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t5)
 
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t7 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
+        t7 = (KEY_AXIAL, KEY_DISP_AXIAL_STAR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
         t8 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
@@ -451,6 +512,12 @@ class Tension_bolted(Member):
 
         t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
         options_list.append(t12)
+
+        t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t13)
+
+        t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX_CUSTOMIZED, VALUES_PLATETHK, True, 'No Validator')
+        options_list.append(t14)
 
         return options_list
 
@@ -753,7 +820,7 @@ class Tension_bolted(Member):
                             all_errors.append(error)
                         else:
                             flag2 = True
-            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_LOCATION, KEY_END1, KEY_END2]:
+            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_LOCATION, KEY_TYP]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
@@ -836,15 +903,20 @@ class Tension_bolted(Member):
         self.main_material = design_dictionary[KEY_MATERIAL]
         self.material = design_dictionary[KEY_SEC_MATERIAL]
 
-        self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
+        # self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
+        # self.plate.thickness = design_dictionary[KEY_PLATETHK]
         # print(self.sizelist)
+        # self.plate.thickness = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+        #                        material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
+        #                        gap=design_dictionary[KEY_DP_DETAILING_GAP])
+
         self.length = float(design_dictionary[KEY_LENGTH])
         # print(self.bolt)
-        self.load = Load(shear_force=None, axial_force=design_dictionary.get(KEY_AXIAL))
+        self.load = Load(shear_force="", axial_force=design_dictionary.get(KEY_AXIAL))
         self.efficiency = 0.0
         self.K = 1
         self.previous_size = []
-        self.plate = Plate(thickness=self.plate_thickness,
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
 
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
@@ -916,7 +988,7 @@ class Tension_bolted(Member):
                 sec_gyr[self.section.designation] = self.section.min_radius_gyration
 
             sec_area[self.section.designation] = self.section.area
-            
+
         print(sec_gyr)
         if len(sec_area)>=2:
             self.max_area = max(sec_area, key=sec_area.get)
@@ -1147,7 +1219,7 @@ class Tension_bolted(Member):
         "selection of member based on the yield capacity"
 
         min_yield = 0
-        
+
         self.max_section(self,design_dictionary,self.sizelist)
         # print(area,gyr,"hgsvfsg")
         # self.max_size = self.select_section(self, design_dictionary, max)
@@ -1361,7 +1433,7 @@ class Tension_bolted(Member):
     def select_bolt_dia(self,design_dictionary):
 
         "Selection of bolt (dia) from te available list of bolts based on the spacing limits and capacity"
-        
+
         print(self.section_size_1.designation)
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             self.min_plate_height = self.section_size_1.min_plate_height()
@@ -1394,7 +1466,7 @@ class Tension_bolted(Member):
             bolts_required_previous = 1
             self.thick = self.section_size_1.thickness
 
-        thickness_provided = [i for i in self.plate_thickness if i >= self.thick or i==80.0]
+        thickness_provided = [i for i in self.plate.thickness if i >= self.thick or i==80.0]
         if len(thickness_provided) >= 2:
             self.plate.thickness_provided = min(thickness_provided)
         else:
@@ -1516,10 +1588,10 @@ class Tension_bolted(Member):
         bolts_required_previous = self.plate.bolts_required
         # if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
         #     self.thick = self.section_size_1.web_thickness
-        #     self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+        #     self.plate.thickness_provided = min([i for i in self.plate.thickness if i >= self.thick])
         # else:
         #     self.thick = self.section_size_1.thickness
-        #     self.plate.thickness_provided = min([i for i in self.plate_thickness if i >= self.thick])
+        #     self.plate.thickness_provided = min([i for i in self.plate.thickness if i >= self.thick])
 
         self.bolt_conn_plates_t_fu_fy = []
         self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
@@ -2036,7 +2108,7 @@ class Tension_bolted(Member):
                     section_size = Channel(designation=self.max_area, material_grade=self.material)
 
             depth_max = self.max_depth
-        
+
         # if self.member_design_status == True:
         if self.sec_profile in ["Channels", "Back to Back Channels"]:
             image = "Channel"
@@ -2183,7 +2255,7 @@ class Tension_bolted(Member):
 
         self.report_input = \
             {KEY_MODULE: self.module,
-             KEY_DISP_AXIAL: self.load.axial_force,
+             KEY_DISP_AXIAL_STAR: self.load.axial_force,
              KEY_DISP_LENGTH: self.length,
              # "Section": "TITLE",
              "Selected Section Details":self.report_supporting,
@@ -2236,7 +2308,7 @@ class Tension_bolted(Member):
             multiple = 2
         else:
             multiple =1
-            
+
 
         t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
         self.report_check.append(t1)
@@ -2281,7 +2353,7 @@ class Tension_bolted(Member):
         if self.member_design_status == True and self.bolt_design_status == True:
             t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
             self.report_check.append(t1)
-            
+
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(section_size.area,section_size.fy,gamma_m0,member_yield_kn,multiple), '')
             self.report_check.append(t2)
             t3 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',member_rupture_prov(self.A_nc,self.A_go,section_size.fu, section_size.fy, self.L_c,self.w,self.b_s, self.t,gamma_m0,gamma_m1,section_size.beta,member_rupture_kn,multiple), '')

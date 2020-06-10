@@ -70,7 +70,7 @@ from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.base_plate_connection import BasePlateConnection
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
-
+import logging
 from cad.cad3dconnection import cadconnection
 
 class Ui_ModuleWindow(QtWidgets.QMainWindow):
@@ -78,10 +78,24 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
     closed = pyqtSignal()
     def  __init__(self, main,folder,parent=None):
         super(Ui_ModuleWindow, self).__init__(parent=parent)
+        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        width = resolution.width()
+        height = resolution.height()
+        self.resize(width*(0.75),height*(0.7))
         self.ui = Window()
+
         self.ui.setupUi(self,main,folder)
         #self.showMaximized()
+        #self.showNormal()
+
         self.resized.connect(self.resize_dockComponents)
+
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     def resizeEvent(self, event):
         self.resized.emit()
@@ -104,8 +118,8 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         width = self.ui.outputDock.width()
         self.ui.outputDock.resize(width,self.height())
         self.ui.out_widget.resize(width,posi)
-        self.ui.btn_CreateDesign.move((width/2)-168,posi+8)
-        self.ui.save_outputDock.move((width/2)+28,posi+8)
+        self.ui.btn_CreateDesign.move((width/2)-(186/2),posi+8)
+        self.ui.save_outputDock.move((width/2)-(186/2),posi+52)
 
     def closeEvent(self, event):
         '''
@@ -115,6 +129,9 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
                                      "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
+            logger = logging.getLogger('osdag')  #  Remove all the previous handlers
+            for handler in logger.handlers[:]:
+                logger.removeHandler(handler)
             self.closed.emit()
             event.accept()
         else:
@@ -122,6 +139,12 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
 
 class Window(QMainWindow):
     #closed = pyqtSignal()
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
         """
@@ -140,8 +163,13 @@ class Window(QMainWindow):
         return self.ui.get_right_elements()
 
     def open_summary_popup(self, main):
+
+        if not main.design_button_status:
+            QMessageBox.warning(self, 'Warning', 'No design created!')
+            return
+
         self.new_window = QtWidgets.QDialog()
-        self.new_ui = Ui_Dialog1(self.design_exist)
+        self.new_ui = Ui_Dialog1(main.design_button_status)
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
@@ -153,22 +181,19 @@ class Window(QMainWindow):
 
     def getLogoFilePath(self, window, lblwidget):
 
-        self.new_ui.lbl_browse.clear()
         filename, _ = QFileDialog.getOpenFileName(window, "Open Image", os.path.join(str(' '), ''), "InputFiles(*.png *.svg *.jpg)")
 
         # filename, _ = QFileDialog.getOpenFileName(
         #     self, 'Open File', " ../../",
         #     'Images (*.png *.svg *.jpg)',
         #     None, QFileDialog.DontUseNativeDialog)
-        flag = True
         if filename == '':
-            flag = False
-            return flag
+            return False
         else:
-            base = os.path.basename(str(filename))
-            lblwidget.setText(base)
-            base_type = base[-4:]
-            self.desired_location(filename, base_type)
+            # base = os.path.basename(str(filename))
+            lblwidget.setText(str(filename))
+            # base_type = base[-4:]
+            # self.desired_location(filename, base_type)
 
         return str(filename)
 
@@ -181,13 +206,11 @@ class Window(QMainWindow):
 
     def saveUserProfile(self, window):
 
-        flag = True
         inputData = self.getPopUpInputs()
         filename, _ = QFileDialog.getSaveFileName(window, 'Save Files',
                                                   os.path.join(str(self.folder), "Profile"), '*.txt')
         if filename == '':
-            flag = False
-            return flag
+            return False
         else:
             infile = open(filename, 'w')
             yaml.dump(inputData, infile)
@@ -201,11 +224,11 @@ class Window(QMainWindow):
         input_summary["ProfileSummary"]["Group/TeamName"] = str(self.new_ui.lineEdit_groupName.text())
         input_summary["ProfileSummary"]["Designer"] = str(self.new_ui.lineEdit_designer.text())
 
-        input_summary["ProjectTitle"] = str(self.new_ui.lineEdit_projectTitle.text())
-        input_summary["Subtitle"] = str(self.new_ui.lineEdit_subtitle.text())
-        input_summary["JobNumber"] = str(self.new_ui.lineEdit_jobNumber.text())
-        input_summary["AdditionalComments"] = str(self.new_ui.txt_additionalComments.toPlainText())
-        input_summary["Client"] = str(self.new_ui.lineEdit_client.text())
+        # input_summary["ProjectTitle"] = str(self.new_ui.lineEdit_projectTitle.text())
+        # input_summary["Subtitle"] = str(self.new_ui.lineEdit_subtitle.text())
+        # input_summary["JobNumber"] = str(self.new_ui.lineEdit_jobNumber.text())
+        # input_summary["AdditionalComments"] = str(self.new_ui.txt_additionalComments.toPlainText())
+        # input_summary["Client"] = str(self.new_ui.lineEdit_client.text())
 
         return input_summary
 
@@ -225,11 +248,20 @@ class Window(QMainWindow):
         else:
             pass
 
+    def zoom_model(self, zoom_type="in"):
+        if zoom_type == "in":
+            self.display.ZoomFactor(3)
+        elif zoom_type == "out":
+            self.display.ZoomFactor(1/3)
+        else:
+            self.display.ZoomFactor(0)
+
+
     def get_validator(self, validator):
         if validator == 'Int Validator':
             return QIntValidator()
         elif validator == 'Double Validator':
-            return QDoubleValidator
+            return QDoubleValidator()
         else:
             return None
 
@@ -240,6 +272,7 @@ class Window(QMainWindow):
         self.design_pref_inputs = {}
         self.folder = folder
         main.design_status = False
+        main.design_button_status = False
         MainWindow.setObjectName("MainWindow")
 
         icon = QtGui.QIcon()
@@ -339,8 +372,8 @@ class Window(QMainWindow):
         self.frame_2.setMinimumSize(QtCore.QSize(0, 100))
         self.frame_2.setFrameShape(QtWidgets.QFrame.Box)
         self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_2.setLineWidth(1)
-        self.frame_2.setMidLineWidth(1)
+        #self.frame_2.setLineWidth(1)
+        #self.frame_2.setMidLineWidth(1)
         self.frame_2.setObjectName("frame_2")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.frame_2)
         self.verticalLayout.setContentsMargins(1, 1, 1, 1)
@@ -506,8 +539,9 @@ class Window(QMainWindow):
                     item_width = max(item_width, metrices.boundingRect(item).width())
                 in_layout2.addWidget(combo, j, 2, 1, 1)
 
-                if lable == 'Material *':
-                    maxi_width_right = max(maxi_width_right, item_width+5)
+                if lable == 'Material':
+                    combo.setCurrentIndex(1)
+                    maxi_width_right = max(maxi_width_right, item_width)
                 else:
                     combo.view().setMinimumWidth(item_width + 25)
 
@@ -903,7 +937,7 @@ class Window(QMainWindow):
         self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_out)
         self.save_outputDock = QtWidgets.QPushButton(self.dockWidgetContents_out)
         self.btn_CreateDesign.setFixedSize(185, 35)
-        self.save_outputDock.setFixedSize(140, 35)
+        self.save_outputDock.setFixedSize(185, 35)
         self.btn_CreateDesign.setAutoDefault(True)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -1118,7 +1152,7 @@ class Window(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
-        self.designPrefDialog = DesignPreferences(self, main, input_dictionary=self.input_dock_inputs)
+        self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
 
         # self.designPrefDialog.rejected.connect(lambda: self.design_preferences('rejected'))
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
@@ -1139,9 +1173,9 @@ class Window(QMainWindow):
         self.menuFile.addAction(self.actionSave_Side_View)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionfinPlate_quit)
-        self.menuEdit.addAction(self.actionCut)
-        self.menuEdit.addAction(self.actionCopy)
-        self.menuEdit.addAction(self.actionPaste)
+        # self.menuEdit.addAction(self.actionCut)
+        # self.menuEdit.addAction(self.actionCopy)
+        # self.menuEdit.addAction(self.actionPaste)
         self.menuEdit.addAction(self.actionDesign_Preferences)
         self.menuView.addAction(self.actionEnlarge_font_size)
         self.menuView.addSeparator()
@@ -1177,10 +1211,13 @@ class Window(QMainWindow):
         self.btn_Design.clicked.connect(lambda: self.common_function_for_save_and_design(main, data, "Design"))
         self.action_load_input.triggered.connect(lambda: self.loadDesign_inputs(option_list, data, new_list, main))
         self.btn_Reset.clicked.connect(lambda: self.reset_fn(option_list, out_list, new_list, data))
-        self.actionChange_background.triggered.connect(lambda: main.showColorDialog(self))
+        self.actionChange_background.triggered.connect(self.showColorDialog)
         self.actionSave_3D_model.triggered.connect(lambda: self.save3DcadImages(main))
         self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
+        self.actionCreate_design_report.triggered.connect(lambda:self.open_summary_popup(main))
+        self.actionZoom_out.triggered.connect(lambda: self.zoom_model(zoom_type="out"))
+        self.actionZoom_in.triggered.connect(lambda: self.zoom_model(zoom_type="in"))
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -1581,7 +1618,7 @@ class Window(QMainWindow):
         elif trigger_type == "Design_Pref":
 
             if self.prev_inputs != self.input_dock_inputs:
-                self.designPrefDialog = DesignPreferences(self, main, input_dictionary=self.input_dock_inputs)
+                self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
 
                 if 'Select Section' in self.input_dock_inputs.values():
                     self.designPrefDialog.flag = False
@@ -1590,13 +1627,16 @@ class Window(QMainWindow):
 
         else:
             main.design_button_status = True
+            self.textEdit.clear()
+            with open("logging_text.log", 'w') as log_file:
+                pass
             error = main.func_for_validation(main, self.design_inputs)
             status = main.design_status
             print(status)
 
             if error is not None:
                 self.show_error_msg(error)
-
+                return
             out_list = main.output_values(main, status)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
@@ -1611,13 +1651,11 @@ class Window(QMainWindow):
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
 
-            self.design_exist = False
-
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
                                                   KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
-                                                  KEY_DISP_COLUMNCOVERPLATEWELD]:
+                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
@@ -1628,9 +1666,9 @@ class Window(QMainWindow):
                     action.setEnabled(True)
                 fName = str('./ResourceFiles/images/3d.png')
                 file_extension = fName.split(".")[-1]
+
                 if file_extension == 'png':
                     self.display.ExportToImage(fName)
-                self.design_exist = True
 
             else:
                 for chkbox in main.get_3d_components(main):
@@ -2248,7 +2286,9 @@ class Window(QMainWindow):
         self.actionBolt.setText(_translate("MainWindow", "Bolt"))
         self.action2D_view.setText(_translate("MainWindow", "2D view"))
         self.actionZoom_in.setText(_translate("MainWindow", "Zoom in"))
+        self.actionZoom_in.setShortcut(_translate("MainWindow", "Ctrl+I"))
         self.actionZoom_out.setText(_translate("MainWindow", "Zoom out"))
+        self.actionZoom_out.setShortcut(_translate("MainWindow", "Ctrl+O"))
         self.actionPan.setText(_translate("MainWindow", "Pan"))
         self.actionRotate_3D_model.setText(_translate("MainWindow", "Rotate 3D model"))
         self.actionView_2D_on_XY.setText(_translate("MainWindow", "View 2D on XY"))

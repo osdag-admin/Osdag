@@ -8,7 +8,7 @@ from utils.common.load import Load
 # Load osi file
 # Get input objects
 # '''
-input_file_path = 'bcinput.osi'
+input_file_path = 'bcinput1.osi'
 with open(input_file_path, 'r') as input_file:
         design_dictionary  = yaml.load(input_file, Loader=yaml.FullLoader)
 
@@ -53,8 +53,7 @@ bcinput.weld = Weld(material_g_o=410,
 print("input values are set. Doing preliminary member checks")
 bcinput.warn_text()
 # bcinput.member_capacity()
-
-
+print(bcinput.endplate_type)
 bcinput.trial_design()
 
 

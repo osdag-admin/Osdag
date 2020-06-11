@@ -126,7 +126,6 @@ class Member(Main):
                             image = VALUES_IMG_TENSIONBOLTED_DF02[1]
                         Cz = str(Angle_attributes.calc_Cz(a, b,thickness, l))
                         Cy = "N/A"
-
                     else:
                         if a == b:
                             image = VALUES_IMG_TENSIONBOLTED_DF01[2]
@@ -149,8 +148,6 @@ class Member(Main):
                             image = VALUES_IMG_TENSIONBOLTED_DF02[4]
                     Cz = "N/A"
                     Cy = "N/A"
-
-
                 mass = str(Angle_attributes.calc_Mass(a, b,thickness, l))
                 area = str(Angle_attributes.calc_Area(a, b, thickness, l))
                 mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l))
@@ -180,7 +177,7 @@ class Member(Main):
         else:
             designation_list = []
 
-        t0 = (KEY_SECSIZE, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, designation_list, designation)
+        t0 = (KEY_SECSIZE_DP, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, designation_list, designation)
         section.append(t0)
 
         t1 = (KEY_SECSIZE_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
@@ -647,7 +644,6 @@ class Member(Main):
                         image = VALUES_IMG_TENSIONBOLTED_DF02[4]
                 Cz = "N/A"
                 Cy = "N/A"
-
             mass = str(Angle_attributes.calc_Mass(a, b, thickness, l))
             area = str(Angle_attributes.calc_Area(a, b,thickness, l))
 

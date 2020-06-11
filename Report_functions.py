@@ -758,12 +758,12 @@ def vres_cap_bolt_check(V_u, A_u,bolt_capacity,bolt_req,multiple=1,conn=None):
     trial_bolts=str(trial_bolts)
     trial_bolts_eqn = Math(inline=True)
     trial_bolts_eqn.append(NoEscape(r'\begin{aligned}R_{u} &= 2* \sqrt{V_u^2+A_u^2}\\'))
-    trial_bolts_eqn.append(NoEscape(r'n_{trial} &= R_u/ bolt_{req}\\'))
+    trial_bolts_eqn.append(NoEscape(r' V_{res} &= R_u/ bolt_{req}\\'))
     if conn == "flange_web":
-        trial_bolts_eqn.append(NoEscape(r'R_{u} &= \frac{2*\sqrt{' + V_u + r'^2+' + A_u + r'^2}}{' + bolt_req + r'}\\'))
+        trial_bolts_eqn.append(NoEscape(r' &= \frac{2*\sqrt{' + V_u + r'^2+' + A_u + r'^2}}{' + bolt_req + r'}\\'))
     else:
-        trial_bolts_eqn.append(NoEscape(r'R_{u} &= \frac{\sqrt{'+V_u+r'^2+'+A_u+r'^2}}{'+bolt_req+ r'}\\'))
-    trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
+        trial_bolts_eqn.append(NoEscape(r' &= \frac{\sqrt{'+V_u+r'^2+'+A_u+r'^2}}{'+bolt_req+ r'}\\'))
+    trial_bolts_eqn.append(NoEscape(r'&='+bolt_capacity+ r'\end{aligned}'))
     return trial_bolts_eqn
 
 def section_classification(class_of_section=None):
@@ -773,7 +773,7 @@ def section_classification(class_of_section=None):
     elif class_of_section == int(2):
         section_classification_eqn.append(NoEscape( r'\begin{aligned} Compact \end{aligned}'))
     else:
-        section_classification_eqn.append(NoEscape( r'\begin{aligned} Semi-C0mpact \end{aligned}'))
+        section_classification_eqn.append(NoEscape( r'\begin{aligned} Semi-Compact \end{aligned}'))
 
     return section_classification_eqn
 

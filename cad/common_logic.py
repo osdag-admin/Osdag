@@ -1285,7 +1285,7 @@ class CommonDesignLogic(object):
                 self.CPObj = self.createBBCoverPlateCAD()  # CPBoltedObj is an object which gets all the calculated values of CAD models
                 if self.component == "Beam":
                     # Displays both beams
-                    osdag_display_shape(self.display, self.CPObj.get_beamsModel(), update=True)
+                    osdag_display_shape(self.display, self.CPObj.get_only_beams_Models(), update=True)
 
                 elif self.component == "Connector":
                     osdag_display_shape(self.display, self.CPObj.get_flangewebplatesModel(), update=True,
@@ -1342,7 +1342,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, onlycolumn, update=True)
                 elif self.component == "Cover Plate":
                     osdag_display_shape(self.display, plates, update=True, color='Blue')
-                    # osdag_display_shape(self.display, nutbolt, update=True, color='YELLOW')
+                    osdag_display_shape(self.display, nutbolt, update=True, color='YELLOW')
                 elif self.component == "Model":
                     osdag_display_shape(self.display, columns, update=True)
                     osdag_display_shape(self.display, plates, update=True, color='Blue')

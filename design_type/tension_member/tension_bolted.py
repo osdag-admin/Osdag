@@ -87,6 +87,9 @@ class Tension_bolted(Member):
         t2 = (DISP_TITLE_CHANNEL, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_section)
         change_tab.append(t2)
 
+        # t3 = (DISP_TITLE_ANGLE,[KEY_SECSIZE_DP], [KEY_IMAGE], TYPE_IMAGE, self.fn_conn_dp_image)
+        # change_tab.append(t3)
+
         t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t3)

@@ -2,6 +2,14 @@ import math
 import numpy as np
 
 
+class Value(object):
+    def __init__(self, provided=0.0, min=0.0, max=0.0, available_values=None):
+        self.available_values = available_values
+        self.min = min
+        self.max = max
+        self.provided = provided
+
+
 def round_up(value, multiplier=1, minimum_value=0):
     """Round up the value to the next multiple of 'multiplier' with a minimum of 'minimum_value'"""
     value = max(value, minimum_value)

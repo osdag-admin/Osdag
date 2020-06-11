@@ -36,12 +36,12 @@ from Common import *
 from utils.common.load import Load
 from utils.common.other_standards import *
 from design_report.reportGenerator import save_html
-from cad.common_logic import CommonDesignLogic
+# from cad.common_logic import CommonDesignLogic
 
 import logging
 
 
-class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Part3_2002, Column, CommonDesignLogic):
+class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Part3_2002, Column):
     """
     Perform stress analyses --> design base plate and anchor bolt--> provide connection detailing.
 
@@ -1173,7 +1173,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def tab_list(self):
 
-        self.design_button_status = False
+        # self.design_button_status = False
 
         tabs = []
 
@@ -1206,7 +1206,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         values = {KEY_DP_ANCHOR_BOLT_LENGTH: '', KEY_DP_ANCHOR_BOLT_DESIGNATION: '',
                   KEY_DP_ANCHOR_BOLT_TYPE: '', KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: ''}
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_SECSIZE], input_dictionary[KEY_MATERIAL]]:
+        if not input_dictionary or input_dictionary[KEY_SECSIZE] == 'Select Section' or \
+                input_dictionary[KEY_MATERIAL] == 'Select Material':
             pass
             # length = ''
             # designation = ''
@@ -1258,7 +1259,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def tab_bp(self, input_dictionary):
 
-        if not input_dictionary or 'Select Section' in [input_dictionary[KEY_MATERIAL]]:
+        if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
             material_grade = ''
             fu = ''
             fy = ''

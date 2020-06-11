@@ -11,6 +11,7 @@ from cad.items.nut import Nut
 from cad.items.plate import Plate
 from cad.items.ISection import ISection
 from cad.items.filletweld import FilletWeld
+from cad.items.groove_weld import GrooveWeld
 from cad.items.angle import Angle
 from cad.items.anchor_bolt import AnchorBolt_A, AnchorBolt_B, AnchorBolt_Endplate
 from cad.items.stiffener_plate import StiffenerPlate
@@ -54,6 +55,10 @@ from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
 from cad.Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
 from cad.Tension.BoltedCAD import TensionAngleBoltCAD, TensionChannelBoltCAD
 from cad.Tension.nutBoltPlacement import NutBoltArray as TNutBoltArray
+
+from cad.MomentConnections.CCEndPlateCAD.CAD import CCEndPlateCAD
+from cad.MomentConnections.CCEndPlateCAD.nutBoltPlacement import NutBoltArray as CEPNutBoltArray
+# from cad.Tension.intermittentConnections import IntermittentNutBoltPlateArray, IntermittentWelds
 
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.cleat_angle_connection import CleatAngleConnection
@@ -933,6 +938,40 @@ class CommonDesignLogic(object):
 
         return ccCoverPlateCAD
 
+    def createCCEndPlateCAD(self):
+        CEP = self.module_class
+
+        bolt_d = float(CEP.bolt_diam_provided)  # Bolt diameter (shank part), entered by user
+        bolt_r = bolt_d / 2  # Bolt radius (Shank part)
+        bolt_T = self.boltHeadThick_Calculation(bolt_d)  # Bolt head thickness
+        bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
+        bolt_Ht = self.boltLength_Calculation(bolt_d)  # Bolt head height
+
+        bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component directory
+        nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
+        nut_Ht = nut_T
+        nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+
+        column = ISection(B=float(CEP.section.flange_width), T=float(CEP.section.flange_thickness),
+                          D=float(CEP.section.depth), t=float(CEP.section.web_thickness),
+                          R1=float(CEP.section.root_radius), R2=float(CEP.section.toe_radius),
+                          alpha=float(CEP.section.flange_slope), length=1000, notchObj=None)
+        endPlate = Plate(L=float(CEP.plate_height), W=float(CEP.plate_width), T=float(CEP.plate_thickness_provided))
+        flangeWeld = GrooveWeld(b=column.T, h=float(10.0), L=column.B)
+        webWeld = GrooveWeld(b=column.t, h=flangeWeld.h, L=column.D - 2 * column.T)
+
+        # bolt = Bolt(R=14, T=10, H=13, r=8)
+        # nut = Nut(R=bolt.R, T=bolt.T, H=bolt.T + 1, innerR1=bolt.r)
+        nut_space = 2 * endPlate.T + nut.T  # member.T + plate.T + nut.T
+
+        nut_bolt_array = CEPNutBoltArray(CEP, column, nut, bolt, nut_space)
+
+        ccEndPlateCad = CCEndPlateCAD(CEP, column, endPlate, flangeWeld, webWeld, nut_bolt_array)
+
+        ccEndPlateCad.create_3DModel()
+
+        return ccEndPlateCad
+
     def createBasePlateCAD(self):
         """
         :return: The calculated values/parameters to create 3D CAD model of individual components.
@@ -1019,6 +1058,8 @@ class CommonDesignLogic(object):
 
             plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
                                 T=float(T.plate.thickness_provided), degree=30)
+            # intermittentPlates = Plate(L=float(T.inter_plate_length), W=float(T.inter_plate_height),
+            #                            T=float(T.plate.thickness_provided))
 
             if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
                 member = Channel(B=float(T.section_size_1.flange_width), T=float(T.section_size_1.flange_thickness),
@@ -1029,6 +1070,8 @@ class CommonDesignLogic(object):
                     nut_space = member.t + plate.T + nut.T  # member.T + plate.T + nut.T
                 else:
                     nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
+
+                # inter_array = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlate, nut_space)
                 nut_bolt_array = TNutBoltArray(T, nut, bolt, nut_space)
                 tensionCAD = TensionChannelBoltCAD(T, member, plate, nut_bolt_array)
 
@@ -1040,12 +1083,21 @@ class CommonDesignLogic(object):
                     nut_space = 2 * member.T + plate.T + nut.T
                 else:
                     nut_space = member.T + plate.T + nut.T
+
+                # inter_array = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlates, nut_space)
                 nut_bolt_array = TNutBoltArray(T, nut, bolt, nut_space)
                 tensionCAD = TensionAngleBoltCAD(T, member, plate, nut_bolt_array)
 
         else:
             plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
                                 T=float(T.plate.thickness_provided), degree=30)
+            # intermittentPlates = Plate(L=float(T.inter_plate_length), W=float(T.inter_plate_height),
+            #                            T=float(T.plate.thickness_provided))
+            #
+            # # intermittentWelds = FilletWeld(h=float(T.inter_weld_size), b=float(T.inter_weld_size),
+            # #                                L=intermittentPlates.W)
+            # intermittentWelds = FilletWeld(h= 5, b= 5,
+            #                                L=intermittentPlates.W)
             s = max(15, float(T.weld.size))
             plate_intercept = plate.L - s - 50
             if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
@@ -1056,6 +1108,7 @@ class CommonDesignLogic(object):
                 inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
                 opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.D))
 
+                # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
                 tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld, opline_weld)
 
             else:
@@ -1068,6 +1121,7 @@ class CommonDesignLogic(object):
                 else:  # 'Short Leg'
                     opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
 
+                # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
                 tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld, opline_weld)
 
         tensionCAD.create_3DModel()
@@ -1242,6 +1296,28 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, plates, update=True, color='Blue')
                     osdag_display_shape(self.display, welds, update=True, color='Red')
 
+            elif self.connection == KEY_DISP_COLUMNENDPLATE:
+                self.CEP = self.module_class()
+                self.CEPObj = self.createCCEndPlateCAD()
+                columns = self.CEPObj.get_column_models()
+                plates = self.CEPObj.get_plate_models()
+                welds = self.CEPObj.get_weld_models()
+                nutBolts = self.CEPObj.get_nut_bolt_models()
+
+                if self.component == "Column":
+                    osdag_display_shape(self.display, columns, update=True)
+
+                elif self.component == "Connector":
+                    osdag_display_shape(self.display, plates, update=True, color='Blue')
+                    osdag_display_shape(self.display, welds, update=True, color='Red')
+                    osdag_display_shape(self.display, nutBolts, update=True, color='YELLOW')
+
+                elif self.component == "Model":
+                    osdag_display_shape(self.display, columns, update=True)
+                    osdag_display_shape(self.display, plates, update=True, color='Blue')
+                    osdag_display_shape(self.display, welds, update=True, color='Red')
+                    osdag_display_shape(self.display, nutBolts, update=True, color='YELLOW')
+
             elif self.connection == KEY_DISP_BASE_PLATE:
                 self.Bp = self.module_class
 
@@ -1356,6 +1432,14 @@ class CommonDesignLogic(object):
 
                     self.display_3DModel("Model", "gradient_bg")
 
+                else:
+                    self.display.EraseAll()
+
+            elif self.connection == KEY_DISP_COLUMNENDPLATE:
+                if flag is True:
+                    self.CEPObj = self.createCCEndPlateCAD()
+
+                    self.display_3DModel("Model", "gradient_bg")
                 else:
                     self.display.EraseAll()
 
@@ -1487,6 +1571,8 @@ class CommonDesignLogic(object):
                 Obj = self.CPObj
             if self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 Obj = self.CPObj
+            elif self.connection == KEY_DISP_COLUMNENDPLATE:
+                Obh = self.CEPObj
             elif self.connection == KEY_DISP_BASE_PLATE:
                 Obj = self.BPObj
 

@@ -221,6 +221,16 @@ class BeamEndPlate(MomentConnection):
 
     def input_values(self):
 
+        '''
+                Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
+
+                e.g.
+                t = (Key, Key_display, Type, Current_Value, enabled/disabled, Validator_type)
+                '''
+
+        # @author: Amir, Umair
+        self.module = KEY_DISP_BCENDPLATE
+
         options_list = []
 
         t16 = (KEY_MODULE, KEY_DISP_BEAMENDPLATE, TYPE_MODULE, None, True, 'No Validator')
@@ -229,13 +239,19 @@ class BeamEndPlate(MomentConnection):
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
+        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN, True, 'No Validator')
+        options_list.append(t2)
+
+        t2 = (KEY_ENDPLATE_TYPE, KEY_DISP_ENDPLATE_TYPE, TYPE_COMBOBOX, VALUES_ENDPLATE_TYPE, True, 'No Validator')
+        options_list.append(t2)
+
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, "./ResourceFiles/images/cf_bw_flush.png", True, 'No Validator')
+        options_list.append(t15)
+
         t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, connectdb("Beams"),True, 'No Validator')
         options_list.append(t4)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, True, 'No Validator')
-        options_list.append(t15)
-
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL,True, 'No Validator')
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -247,7 +263,7 @@ class BeamEndPlate(MomentConnection):
         t7 = (KEY_SHEAR, KEY_DISP_SHEAR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t7)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None,True, 'Int Validator')
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t8)
 
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
@@ -265,8 +281,15 @@ class BeamEndPlate(MomentConnection):
         t21 = (None, DISP_TITLE_ENDPLATE, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t21)
 
-        t22 = (KEY_PLATETHK, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ENDPLATE_THICKNESS, True, 'No Validator')
+        t22 = (KEY_PLATETHK, KEY_DISP_ENDPLATE_THICKNESS, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ENDPLATE_THICKNESS, True,
+               'No Validator')
         options_list.append(t22)
+
+        t23 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
+        options_list.append(t23)
+
+        t24 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, VALUES_WELD_TYPE_EP, True, 'No Validator')
+        options_list.append(t24)
 
         return options_list
 
@@ -285,35 +308,33 @@ class BeamEndPlate(MomentConnection):
     def output_values(self, flag):
         return []
 
-    def func_for_validation(self, design_dictionary):
-
-        all_errors = []
-        self.design_status = False
-        flag = False
-
-        option_list = self.input_values(self)
-        missing_fields_list = []
-        for option in option_list:
-            if option[2] == TYPE_TEXTBOX:
-                if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-                val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    missing_fields_list.append(option[1])
-
-        if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
-            all_errors.append(error)
-            # flag = False
-        else:
-            flag = True
-
-        if flag:
-            self.set_input_values(self, design_dictionary)
-        else:
-            return all_errors
-
     def set_input_values(self, design_dictionary):
         print(design_dictionary)
+
+    def get_3d_components(self):
+        components = []
+
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t2 = ('Beam', self.call_3DBeam)
+        components.append(t2)
+
+        t3 = ('Column', self.call_3DColumn)
+        components.append(t3)
+
+        t4 = ('End Plate', self.call_3DEndPlate)
+        components.append(t4)
+
+        return components
+
+    def call_3DEndPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'End Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Plate", bgcolor)
 

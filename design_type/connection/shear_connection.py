@@ -1,5 +1,5 @@
 from design_type.connection.connection import Connection
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, Section
+from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, Section, Single_Angle_Properties
 from Common import *
 from utils.common.load import Load
 from utils.common.material import Material
@@ -20,7 +20,7 @@ class ShearConnection(Connection):
 
         "In design preference, it shows other properties of section used "
         "In design preference, it shows other properties of section used "
-        if not input_dictionary or input_dictionary[KEY_ANGLE_LIST] == '' or \
+        if not input_dictionary or input_dictionary[KEY_ANGLE_LIST] == [] or \
                 input_dictionary[KEY_MATERIAL] == 'Select Material':
             designation = ''
             material_grade = ''
@@ -86,7 +86,7 @@ class ShearConnection(Connection):
             elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
-            torsion_const = str(Angle_attributes.torsion_const)
+            torsion_const = str(Angle_attributes.It)
 
         if KEY_CONNECTOR_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_CONNECTOR_MATERIAL]
@@ -110,7 +110,7 @@ class ShearConnection(Connection):
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t34 = (KEY_CONNECTOR_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         section.append(t34)
 
@@ -233,6 +233,74 @@ class ShearConnection(Connection):
 
         return section
 
+    def get_Angle_sec_properties(self):
+        # print(self,profile,"shxv")
+        # print(self, "shxv")
+        if '' in self:
+            mass = ''
+            area = ''
+            Cz = ''
+            Cy = ''
+            moa_z = ''
+            moa_y = ''
+            moa_u = ''
+            moa_v = ''
+            rog_z = ''
+            rog_y = ''
+            rog_u = ''
+            rog_v = ''
+            em_z = ''
+            em_y = ''
+            pm_z = ''
+            pm_y = ''
+            I_t = ''
+
+        else:
+            a = float(self[0])
+            b = float(self[1])
+            t = float(self[2])
+            l = None
+            sec_prop = Single_Angle_Properties()
+            mass = sec_prop.calc_Mass(a,b,t,l)
+            area = sec_prop.calc_Area(a,b,t,l)
+            Cz = sec_prop.calc_Cz(a,b,t,l)
+            Cy = sec_prop.calc_Cy(a,b,t,l)
+            moa_z = sec_prop.calc_MomentOfAreaZ(a,b,t,l)
+            moa_y = sec_prop.calc_MomentOfAreaY(a,b,t,l)
+            moa_u = sec_prop.calc_MomentOfAreaU(a,b,t,l)
+            moa_v = sec_prop.calc_MomentOfAreaV(a,b,t,l)
+            rog_z = sec_prop.calc_RogZ(a,b,t,l)
+            rog_y = sec_prop.calc_RogY(a,b,t,l)
+            rog_u = sec_prop.calc_RogU(a,b,t,l)
+            rog_v = sec_prop.calc_RogV(a,b,t,l)
+            em_z = sec_prop.calc_ElasticModulusZz(a,b,t,l)
+            em_y = sec_prop.calc_ElasticModulusZy(a,b,t,l)
+            pm_z = sec_prop.calc_PlasticModulusZpz(a,b,t,l)
+            pm_y = sec_prop.calc_PlasticModulusZpy(a,b,t,l)
+            I_t = sec_prop.calc_TorsionConstantIt(a,b,t,l)
+
+
+        d = {'Label_9': str(mass),
+             'Label_10': str(area),
+             'Label_7': str(Cz),
+             'Label_8': str(Cy),
+             'Label_11': str(moa_z),
+             'Label_12': str(moa_y),
+             'Label_13': str(moa_u),
+             'Label_14': str(moa_v),
+             'Label_15': str(rog_z),
+             'Label_16': str(rog_y),
+             'Label_17': str(rog_u),
+             'Label_18': str(rog_v),
+             'Label_19': str(em_z),
+             'Label_20': str(em_y),
+             'Label_21': str(pm_z),
+             'Label_22': str(pm_y),
+             'Label_23': str(I_t),
+             }
+
+        return d
+
     def get_new_angle_section_properties(self):
 
         designation = self[0]
@@ -241,7 +309,7 @@ class ShearConnection(Connection):
         Angle_attributes = Angle(designation, material_grade)
         Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
         source = str(Angle_attributes.source)
-        Type= str(Angle_attributes.Type)
+        Type= str(Angle_attributes.type)
         fu = str(Angle_attributes.fu)
         fy = str(Angle_attributes.fy)
         a = str(Angle_attributes.leg_a_length)
@@ -265,7 +333,7 @@ class ShearConnection(Connection):
         elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
         plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
         plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
-        torsion_const = str(Angle_attributes.torsion_const)
+        torsion_const = str(Angle_attributes.It)
         d = {
             KEY_ANGLE_SELECTED:designation,
             KEY_CONNECTOR_MATERIAL: material_grade,
@@ -411,112 +479,6 @@ class ShearConnection(Connection):
         else:
             return False
 
-    def func_for_validation(self, design_dictionary):
-        all_errors = []
-        self.design_status = False
-        flag = False
-        flag1 = False
-        flag2=False
-        option_list = self.input_values(self)
-        missing_fields_list = []
-        for option in option_list:
-            if option[2] == TYPE_TEXTBOX:
-                if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-                val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                if design_dictionary[option[0]] == []:
-                    missing_fields_list.append(option[1])
-            # elif option[2] == TYPE_MODULE:
-            #     if design_dictionary[option[0]] == "Fin Plate":
-        if len(missing_fields_list) == 0:
-            if design_dictionary[KEY_CONN] == VALUES_CONN_2[0]:
-                primary = design_dictionary[KEY_SUPTNGSEC]
-                secondary = design_dictionary[KEY_SUPTDSEC]
-                conn = sqlite3.connect(PATH_TO_DATABASE)
-                cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
-                lst = []
-                rows = cursor.fetchall()
-                for row in rows:
-                    lst.append(row)
-                p_val = lst[0][0]
-                cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
-                lst1 = []
-                rows1 = cursor2.fetchall()
-                for row1 in rows1:
-                    lst1.append(row1)
-                s_val = lst1[0][0]
-                if p_val <= s_val:
-                    error = "Secondary beam depth is higher than clear depth of primary beam web " + "\n" + "(No provision in Osdag till now)"
-                    all_errors.append(error)
-                else:
-                    flag1 = True
-
-            elif design_dictionary[KEY_CONN] == VALUES_CONN_1[1]:
-                primary = design_dictionary[KEY_SUPTNGSEC]
-                secondary = design_dictionary[KEY_SUPTDSEC]
-                conn = sqlite3.connect(PATH_TO_DATABASE)
-                cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
-                p_beam_details = cursor.fetchone()
-                p_val = p_beam_details[0] - 2*p_beam_details[1] - p_beam_details[2] - p_beam_details[3]
-                cursor2 = conn.execute("SELECT B FROM BEAMS WHERE Designation = ( ? )", (secondary,))
-
-                s_beam_details = cursor2.fetchone()
-                s_val = s_beam_details[0]
-                #print(p_val,s_val)
-                if p_val <= s_val:
-                    error = "Secondary beam width is higher than clear depth of primary column web " + "\n" + "(No provision in Osdag till now)"
-                    all_errors.append(error)
-                else:
-                    flag1 = True
-            else:
-                flag1 = True
-
-            selected_plate_thk = list(np.float_(design_dictionary[KEY_PLATETHK]))
-            supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_MATERIAL])
-            available_plates = [i for i in selected_plate_thk if i >= supported_section.web_thickness]
-            if not available_plates:
-                error = "Plate thickness should be greater than suppported section web thicknesss."
-                all_errors.append(error)
-            else:
-                flag2=True
-            if flag1 and flag2:
-                self.set_input_values(self, design_dictionary)
-            else:
-                return all_errors
-        else:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
-            all_errors.append(error)
-            return all_errors
-
-    def generate_missing_fields_error_string(self, missing_fields_list):
-        """
-        Args:
-            missing_fields_list: list of fields that are not selected or entered
-        Returns:
-            error string that has to be displayed
-        """
-        # The base string which should be displayed
-        information = "Please input the following required field"
-        if len(missing_fields_list) > 1:
-            # Adds 's' to the above sentence if there are multiple missing input fields
-            information += "s"
-        information += ": "
-        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
-
-        for item in missing_fields_list:
-            information = information + item + ", "
-
-        # Removes the last comma
-        information = information[:-2]
-        information += "."
-
-        return information
-
-
     def warn_text(self):
 
         """
@@ -552,7 +514,7 @@ class ShearConnection(Connection):
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES],
                          bolt_tensioning=design_dictionary[KEY_DP_BOLT_TYPE])
 
-        self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, None))
+        self.load = Load(shear_force=design_dictionary[KEY_SHEAR], axial_force=design_dictionary.get(KEY_AXIAL, ""))
 
     def member_capacity(self):
         # print(KEY_CONN,VALUES_CONN_1,self.supported_section.type)
@@ -578,4 +540,3 @@ class ShearConnection(Connection):
 
         print(self.supported_section.shear_yielding_capacity, self.load.shear_force,
               self.supported_section.tension_yielding_capacity, self.load.axial_force)
-

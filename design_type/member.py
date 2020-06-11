@@ -11,12 +11,28 @@ class Member(Main):
     ########################################
     # Design Preference Functions Start
     ########################################
+    def df_conn_image(self):
+
+        "Function to populate section size based on the type of section "
+        img = self[0]
+        if img == VALUES_SEC_PROFILE_2[0]:
+            return VALUES_IMG_TENSIONBOLTED[0]
+        elif img == VALUES_SEC_PROFILE_2[1]:
+            return VALUES_IMG_TENSIONBOLTED[1]
+        elif img == VALUES_SEC_PROFILE_2[2]:
+            return VALUES_IMG_TENSIONBOLTED[2]
+        elif img == VALUES_SEC_PROFILE_2[3]:
+            return VALUES_IMG_TENSIONBOLTED[3]
+        else:
+            return VALUES_IMG_TENSIONBOLTED[4]
+
+
 
     def tab_angle_section(self, input_dictionary):
 
         "In design preference, it shows other properties of section used "
         "In design preference, it shows other properties of section used "
-        if not input_dictionary or input_dictionary[KEY_SECSIZE] == '' or \
+        if not input_dictionary or input_dictionary[KEY_SECSIZE] == [] or \
                 input_dictionary[KEY_MATERIAL] == 'Select Material' or \
                 input_dictionary[KEY_SEC_PROFILE] not in ['Angles', 'Back to Back Angles', 'Star Angles']:
             designation = ''
@@ -53,6 +69,7 @@ class Member(Main):
             m_o_r = "76.9"
             p_r = "0.3"
             t_e = "12"
+            image=''
         else:
             designation = str(input_dictionary[KEY_SECSIZE][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
@@ -75,48 +92,80 @@ class Member(Main):
             p_r = "0.3"
             t_e = "12"
             if section_profile == 'Angles':
-                mass = str(Angle_attributes.mass)
-                area = str(Angle_attributes.area)
-                Cz = str(Angle_attributes.Cz)
-                Cy = str(Angle_attributes.Cy)
-                mom_inertia_z = str(Angle_attributes.mom_inertia_z)
-                mom_inertia_y = str(Angle_attributes.mom_inertia_y)
-                mom_inertia_u = str(Angle_attributes.mom_inertia_u)
-                mom_inertia_v = str(Angle_attributes.mom_inertia_v)
-                rad_of_gy_z = str(Angle_attributes.rad_of_gy_z)
-                rad_of_gy_y = str(Angle_attributes.rad_of_gy_y)
-                rad_of_gy_u = str(Angle_attributes.rad_of_gy_u)
-                rad_of_gy_v = str(Angle_attributes.rad_of_gy_v)
-                elast_sec_mod_z = str(Angle_attributes.elast_sec_mod_z)
-                elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
-                plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
-                plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
-                torsional_rigidity = str(Angle_attributes.It)
+                mass = str(round((Angle_attributes.mass), 2))
+                area = str(round((Angle_attributes.area / 100), 2))
+                Cz = str(round((Angle_attributes.Cz / 10), 2))
+                Cy = str(round((Angle_attributes.Cy / 10), 2))
+                mom_inertia_z = str(round((Angle_attributes.mom_inertia_z) / 10000, 2))
+                mom_inertia_y = str(round((Angle_attributes.mom_inertia_y) / 10000, 2))
+                mom_inertia_u = str(round((Angle_attributes.mom_inertia_u) / 10000, 2))
+                mom_inertia_v = str(round((Angle_attributes.mom_inertia_v) / 10000, 2))
+                rad_of_gy_z = str(round((Angle_attributes.rad_of_gy_z / 10), 2))
+                rad_of_gy_y = str(round((Angle_attributes.rad_of_gy_y / 10), 2))
+                rad_of_gy_u = str(round((Angle_attributes.rad_of_gy_u / 10), 2))
+                rad_of_gy_v = str(round((Angle_attributes.rad_of_gy_v / 10), 2))
+                elast_sec_mod_z = str(round((Angle_attributes.elast_sec_mod_z / 1000), 2))
+                elast_sec_mod_y = str(round((Angle_attributes.elast_sec_mod_y / 1000), 2))
+                plast_sec_mod_z = str(round((Angle_attributes.plast_sec_mod_z / 1000), 2))
+                plast_sec_mod_y = str(round((Angle_attributes.plast_sec_mod_y / 1000), 2))
+                torsional_rigidity = str(round((Angle_attributes.It / 10000), 2))
+                if a == b:
+                    image = VALUES_IMG_TENSIONBOLTED_DF01[0]
+                else:
+                    image = VALUES_IMG_TENSIONBOLTED_DF02[0]
+
             else:
-                Angle_attributes = Angle(designation, material_grade)
                 if section_profile == "Back to Back Angles":
-                    print(section_profile,"hjcxhf")
+                    print(section_profile, "hjcxhf")
                     Angle_attributes = BBAngle_Properties()
+                    Angle_attributes.data(designation, material_grade)
+                    if l == "Long Leg":
+                        if a == b:
+                            image = VALUES_IMG_TENSIONBOLTED_DF01[1]
+                        else:
+                            image = VALUES_IMG_TENSIONBOLTED_DF02[1]
+                        Cz = str(Angle_attributes.calc_Cz(a, b,thickness, l))
+                        Cy = "N/A"
+
+                    else:
+                        if a == b:
+                            image = VALUES_IMG_TENSIONBOLTED_DF01[2]
+                        else:
+                            image = VALUES_IMG_TENSIONBOLTED_DF02[2]
+                        Cy = str(Angle_attributes.calc_Cy(a, b,thickness, l))
+                        Cz = "N/A"
                 elif section_profile == "Star Angles":
                     Angle_attributes = SAngle_Properties()
+                    Angle_attributes.data(designation, material_grade)
+                    if l == "Long Leg":
+                        if a == b:
+                            image = VALUES_IMG_TENSIONBOLTED_DF01[3]
+                        else:
+                            image = VALUES_IMG_TENSIONBOLTED_DF02[3]
+                    else:
+                        if a == b:
+                            image = VALUES_IMG_TENSIONBOLTED_DF01[4]
+                        else:
+                            image = VALUES_IMG_TENSIONBOLTED_DF02[4]
+                    Cz = "N/A"
+                    Cy = "N/A"
 
-                mass = Angle_attributes.calc_Mass(a, b, thickness, l)
-                area = Angle_attributes.calc_Area(a, b, thickness, l)
-                Cz = Angle_attributes.calc_Cz(a, b, thickness, l)
-                Cy = Angle_attributes.calc_Cy(a, b, thickness, l)
-                mom_inertia_z = Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l)
-                mom_inertia_y = Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l)
-                mom_inertia_u = Angle_attributes.calc_MomentOfAreaU(a, b, thickness, l)
-                mom_inertia_v = Angle_attributes.calc_MomentOfAreaV(a, b, thickness, l)
-                rad_of_gy_z = Angle_attributes.calc_RogZ(a, b, thickness, l)
-                rad_of_gy_y = Angle_attributes.calc_RogY(a, b, thickness, l)
-                rad_of_gy_u = Angle_attributes.calc_RogU(a, b, thickness, l)
-                rad_of_gy_v = Angle_attributes.calc_RogV(a, b, thickness, l)
-                elast_sec_mod_z = Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l)
-                elast_sec_mod_y = Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l)
-                plast_sec_mod_z = Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l)
-                plast_sec_mod_y = Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l)
-                torsional_rigidity = Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l)
+
+                mass = str(Angle_attributes.calc_Mass(a, b,thickness, l))
+                area = str(Angle_attributes.calc_Area(a, b, thickness, l))
+                mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l))
+                mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l))
+                mom_inertia_u = "N/A"
+                mom_inertia_v = "N/A"
+                rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l))
+                rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l))
+                rad_of_gy_u = "N/A"
+                rad_of_gy_v = "N/A"
+                elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l))
+                elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l))
+                plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l))
+                plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l))
+                torsional_rigidity = "N/A"
 
         # if KEY_SEC_MATERIAL in input_dictionary.keys():
         #     material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -147,7 +196,7 @@ class Member(Main):
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t34 = (KEY_SEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         section.append(t34)
 
@@ -187,7 +236,7 @@ class Member(Main):
         t18 = ('Label_7', KEY_DISP_Cz, TYPE_TEXTBOX, None, Cz)
         section.append(t18)
 
-        t19 = ('Label_8', KEY_DISP_Cz, TYPE_TEXTBOX, None, Cy)
+        t19 = ('Label_8', KEY_DISP_Cy, TYPE_TEXTBOX, None, Cy)
         section.append(t19)
 
         t20 = ('Label_11', KEY_DISP_MOA_IZ, TYPE_TEXTBOX, None, mom_inertia_z)
@@ -272,7 +321,7 @@ class Member(Main):
         t32 = ('Label_26', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         section.append(t32)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/Angles.png')
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
         section.append(t33)
 
         return section
@@ -281,19 +330,21 @@ class Member(Main):
 
         "In design preference, it shows other properties of section used "
         "In design preference, it shows other properties of section used "
-        if not input_dictionary or input_dictionary[KEY_SECSIZE] == '' or \
+        if not input_dictionary or input_dictionary[KEY_SECSIZE] == [] or \
                 input_dictionary[KEY_MATERIAL] == 'Select Material' or \
                 input_dictionary[KEY_SEC_PROFILE] not in ['Channels', 'Back to Back Channels']:
             designation = ''
             material_grade = ''
+            section_profile = ''
+            l = ''
             fu = ''
             fy = ''
             mass = ''
             area = ''
-            flange_width = ''
-            flange_thickness = ''
-            depth = ''
-            web_thickness = ''
+            f_w = ''
+            f_t = ''
+            w_h = ''
+            w_t = ''
             flange_slope = ''
             root_radius = ''
             toe_radius = ''
@@ -312,18 +363,21 @@ class Member(Main):
             p_r = "0.3"
             t_e = "12"
             Type='Rolled'
+            image = ''
         else:
             designation = str(input_dictionary[KEY_SECSIZE][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
+            section_profile = str(input_dictionary[KEY_SEC_PROFILE])
+            l = str(input_dictionary[KEY_LOCATION])
             Channel_attributes = Channel(designation,material_grade)
             Channel_attributes.connect_to_database_update_other_attributes_channels(designation, material_grade)
             source = str(Channel_attributes.source)
             fu = str(Channel_attributes.fu)
             fy = str(Channel_attributes.fy)
-            flange_width = str(Channel_attributes.flange_width)
-            flange_thickness = str(Channel_attributes.flange_thickness)
-            depth = str(Channel_attributes.depth)
-            web_thickness = str(Channel_attributes.web_thickness)
+            f_w = (Channel_attributes.flange_width)
+            f_t = (Channel_attributes.flange_thickness)
+            w_h = (Channel_attributes.depth)
+            w_t = (Channel_attributes.web_thickness)
             flange_slope = str(Channel_attributes.flange_slope)
             root_radius = str(Channel_attributes.root_radius)
             toe_radius = str(Channel_attributes.toe_radius)
@@ -331,18 +385,42 @@ class Member(Main):
             m_o_r = "76.9"
             p_r = "0.3"
             t_e = "12"
-            mass = str(Channel_attributes.mass)
-            area = str(Channel_attributes.area)
-            C_y = str(round(Channel_attributes.Cy/10,2))
-            mom_inertia_z = str(round(Channel_attributes.mom_inertia_z/10000,2))
-            mom_inertia_y = str(round(Channel_attributes.mom_inertia_y/10000,2))
-            rad_of_gy_z = str(round(Channel_attributes.rad_of_gy_z/10,2))
-            rad_of_gy_y = str(round(Channel_attributes.rad_of_gy_y/10,2))
-            elast_sec_mod_z = str(round(Channel_attributes.elast_sec_mod_z/1000,2))
-            elast_sec_mod_y = str(round(Channel_attributes.elast_sec_mod_y/1000,2))
-            plast_sec_mod_z = str(round(Channel_attributes.plast_sec_mod_z/1000,2))
-            plast_sec_mod_y = str(round(Channel_attributes.plast_sec_mod_y/1000,2))
             Type = str(Channel_attributes.type)
+            if section_profile == "Channels":
+                mass = str(round((Channel_attributes.mass), 2))
+                area = str(round((Channel_attributes.area / 100), 2))
+                C_y = str(round((Channel_attributes.Cy / 10), 2))
+                mom_inertia_z = str(round((Channel_attributes.mom_inertia_z) / 10000, 2))
+                mom_inertia_y = str(round((Channel_attributes.mom_inertia_y) / 10000, 2))
+                rad_of_gy_z = str(round((Channel_attributes.rad_of_gy_z / 10), 2))
+                rad_of_gy_y = str(round((Channel_attributes.rad_of_gy_y / 10), 2))
+                elast_sec_mod_z = str(round((Channel_attributes.elast_sec_mod_z / 1000), 2))
+                elast_sec_mod_y = str(round((Channel_attributes.elast_sec_mod_y / 1000), 2))
+                plast_sec_mod_z = str(round((Channel_attributes.plast_sec_mod_z / 1000), 2))
+                plast_sec_mod_y = str(round((Channel_attributes.plast_sec_mod_y / 1000), 2))
+                if flange_slope != 90:
+                    image = VALUES_IMG_TENSIONBOLTED_DF03[0]
+                else:
+                    image = VALUES_IMG_TENSIONBOLTED_DF03[1]
+
+            else:
+                Channel_attributes = BBChannel_Properties()
+                Channel_attributes.data(designation,material_grade)
+                mass = str(round(Channel_attributes.calc_Mass(f_w, f_t, w_h, w_t), 2))
+                area = str(round(Channel_attributes.calc_Area(f_w, f_t, w_h, w_t), 2))
+                C_y = "N/A"
+                mom_inertia_z = str(round(Channel_attributes.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t), 2))
+                mom_inertia_y = str(Channel_attributes.calc_MomentOfAreaY(f_w, f_t, w_h, w_t))
+                rad_of_gy_z = str(Channel_attributes.calc_RogZ(f_w, f_t, w_h, w_t))
+                rad_of_gy_y = str(Channel_attributes.calc_RogY(f_w, f_t, w_h, w_t))
+                elast_sec_mod_z = str(Channel_attributes.calc_ElasticModulusZz(f_w, f_t, w_h, w_t))
+                elast_sec_mod_y = str(Channel_attributes.calc_ElasticModulusZy(f_w, f_t, w_h, w_t))
+                plast_sec_mod_z = str(Channel_attributes.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t))
+                plast_sec_mod_y = str(Channel_attributes.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t))
+                if flange_slope != 90:
+                    image = VALUES_IMG_TENSIONBOLTED_DF03[2]
+                else:
+                    image = VALUES_IMG_TENSIONBOLTED_DF03[3]
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -363,10 +441,16 @@ class Member(Main):
         t1 = (KEY_SECSIZE_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
         section.append(t1)
 
+        t1 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_TEXTBOX, None, section_profile)
+        section.append(t1)
+
+        t1 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_TEXTBOX, None, l)
+        section.append(t1)
+
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
-        material = connectdb("Material")
+        material = connectdb("Material", call_type="popup")
         t34 = (KEY_SEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         section.append(t34)
 
@@ -379,16 +463,16 @@ class Member(Main):
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         section.append(t5)
 
-        t6 = ('Label_1', KEY_DISP_FLANGE_W, TYPE_TEXTBOX, None, flange_width)
+        t6 = ('Label_1', KEY_DISP_FLANGE_W, TYPE_TEXTBOX, None, f_w)
         section.append(t6)
 
-        t7 = ('Label_2', KEY_DISP_FLANGE_T, TYPE_TEXTBOX, None, flange_thickness)
+        t7 = ('Label_2', KEY_DISP_FLANGE_T, TYPE_TEXTBOX, None, f_t)
         section.append(t7)
 
-        t8 = ('Label_3', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, depth)
+        t8 = ('Label_3', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, w_h)
         section.append(t8)
 
-        t22 = ('Label_13', KEY_DISP_WEB_T, TYPE_TEXTBOX, None, web_thickness)
+        t22 = ('Label_13', KEY_DISP_WEB_T, TYPE_TEXTBOX, None, w_t)
         section.append(t22)
 
         t23 = ('Label_14', KEY_DISP_FLANGE_S, TYPE_TEXTBOX, None, flange_slope)
@@ -478,7 +562,7 @@ class Member(Main):
         t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         section.append(t32)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles\images\Channel.png')
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
         section.append(t33)
 
         return section
@@ -486,11 +570,11 @@ class Member(Main):
 
     def get_new_angle_section_properties(self):
 
-        print('vvvvv')
+        print(self[2],'vvvvv')
         designation = self[0]
         material_grade = self[1]
-        l = self[2]
-        section_profile = self[3]
+        l = self[2][KEY_LOCATION]
+        section_profile = self[2][KEY_SEC_PROFILE]
         Angle_attributes = Angle(designation, material_grade)
         Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
         source = str(Angle_attributes.source)
@@ -507,48 +591,79 @@ class Member(Main):
         p_r = "0.3"
         t_e = "12"
         if section_profile == 'Angles':
-            mass = str(Angle_attributes.mass)
-            area = str(Angle_attributes.area)
-            Cz = str(Angle_attributes.Cz)
-            Cy = str(Angle_attributes.Cy)
-            mom_inertia_z = str(Angle_attributes.mom_inertia_z)
-            mom_inertia_y = str(Angle_attributes.mom_inertia_y)
-            mom_inertia_u = str(Angle_attributes.mom_inertia_u)
-            mom_inertia_v = str(Angle_attributes.mom_inertia_v)
-            rad_of_gy_z = str(Angle_attributes.rad_of_gy_z)
-            rad_of_gy_y = str(Angle_attributes.rad_of_gy_y)
-            rad_of_gy_u = str(Angle_attributes.rad_of_gy_u)
-            rad_of_gy_v = str(Angle_attributes.rad_of_gy_v)
-            elast_sec_mod_z = str(Angle_attributes.elast_sec_mod_z)
-            elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
-            plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
-            plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
-            torsional_rigidity = str(Angle_attributes.It)
+            mass = str(round((Angle_attributes.mass),2))
+            area = str(round((Angle_attributes.area/100),2))
+            Cz = str(round((Angle_attributes.Cz/10),2))
+            Cy = str(round((Angle_attributes.Cy/10),2))
+            mom_inertia_z = str(round((Angle_attributes.mom_inertia_z)/10000,2))
+            mom_inertia_y = str(round((Angle_attributes.mom_inertia_y)/10000,2))
+            mom_inertia_u = str(round((Angle_attributes.mom_inertia_u)/10000,2))
+            mom_inertia_v = str(round((Angle_attributes.mom_inertia_v)/10000,2))
+            rad_of_gy_z = str(round((Angle_attributes.rad_of_gy_z/10),2))
+            rad_of_gy_y = str(round((Angle_attributes.rad_of_gy_y/10),2))
+            rad_of_gy_u = str(round((Angle_attributes.rad_of_gy_u/10),2))
+            rad_of_gy_v = str(round((Angle_attributes.rad_of_gy_v/10),2))
+            elast_sec_mod_z = str(round((Angle_attributes.elast_sec_mod_z/1000),2))
+            elast_sec_mod_y = str(round((Angle_attributes.elast_sec_mod_y/1000),2))
+            plast_sec_mod_z = str(round((Angle_attributes.plast_sec_mod_z/1000),2))
+            plast_sec_mod_y = str(round((Angle_attributes.plast_sec_mod_y/1000),2))
+            torsional_rigidity = str(round((Angle_attributes.It/10000),2))
+            if a == b:
+                image = VALUES_IMG_TENSIONBOLTED_DF01[0]
+            else:
+                image = VALUES_IMG_TENSIONBOLTED_DF02[0]
         else:
-            Angle_attributes = Angle(designation, material_grade)
+            # Angle_attributes = Angle(designation, material_grade)
             if section_profile == "Back to Back Angles":
                 print(section_profile, "hjcxhf")
                 Angle_attributes = BBAngle_Properties()
+                Angle_attributes.data(designation, material_grade)
+                if l == "Long Leg":
+                    if a == b:
+                        image = VALUES_IMG_TENSIONBOLTED_DF01[1]
+                    else:
+                        image = VALUES_IMG_TENSIONBOLTED_DF02[1]
+                    Cz = str(Angle_attributes.calc_Cz(a, b, thickness, l))
+                    Cy = "N/A"
+                else:
+                    if a == b:
+                        image = VALUES_IMG_TENSIONBOLTED_DF01[2]
+                    else:
+                        image = VALUES_IMG_TENSIONBOLTED_DF02[2]
+                    Cy = str(Angle_attributes.calc_Cy(a, b, thickness, l))
+                    Cz = "N/A"
             elif section_profile == "Star Angles":
                 Angle_attributes = SAngle_Properties()
+                Angle_attributes.data(designation, material_grade)
+                if l == "Long Leg":
+                    if a == b:
+                        image = VALUES_IMG_TENSIONBOLTED_DF01[3]
+                    else:
+                        image = VALUES_IMG_TENSIONBOLTED_DF02[3]
+                else:
+                    if a == b:
+                        image = VALUES_IMG_TENSIONBOLTED_DF01[4]
+                    else:
+                        image = VALUES_IMG_TENSIONBOLTED_DF02[4]
+                Cz = "N/A"
+                Cy = "N/A"
 
-            mass = Angle_attributes.calc_Mass(a, b, thickness, l)
-            area = Angle_attributes.calc_Area(a, b, thickness, l)
-            Cz = Angle_attributes.calc_Cz(a, b, thickness, l)
-            Cy = Angle_attributes.calc_Cy(a, b, thickness, l)
-            mom_inertia_z = Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l)
-            mom_inertia_y = Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l)
-            mom_inertia_u = Angle_attributes.calc_MomentOfAreaU(a, b, thickness, l)
-            mom_inertia_v = Angle_attributes.calc_MomentOfAreaV(a, b, thickness, l)
-            rad_of_gy_z = Angle_attributes.calc_RogZ(a, b, thickness, l)
-            rad_of_gy_y = Angle_attributes.calc_RogY(a, b, thickness, l)
-            rad_of_gy_u = Angle_attributes.calc_RogU(a, b, thickness, l)
-            rad_of_gy_v = Angle_attributes.calc_RogV(a, b, thickness, l)
-            elast_sec_mod_z = Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l)
-            elast_sec_mod_y = Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l)
-            plast_sec_mod_z = Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l)
-            plast_sec_mod_y = Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l)
-            torsional_rigidity = Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l)
+            mass = str(Angle_attributes.calc_Mass(a, b, thickness, l))
+            area = str(Angle_attributes.calc_Area(a, b,thickness, l))
+
+            mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l))
+            mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l))
+            mom_inertia_u = "N/A"
+            mom_inertia_v = "N/A"
+            rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l))
+            rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l))
+            rad_of_gy_u = "N/A"
+            rad_of_gy_v = "N/A"
+            elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l))
+            elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l))
+            plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l))
+            plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l))
+            torsional_rigidity = "N/A"
 
         d = {
              KEY_SECSIZE_SELECTED:designation,
@@ -579,6 +694,7 @@ class Member(Main):
              'Label_22':plast_sec_mod_y,
              'Label_23':torsional_rigidity,
             'Label_24':source
+            ,KEY_IMAGE:image
         }
         return d
 
@@ -586,6 +702,8 @@ class Member(Main):
     def get_new_channel_section_properties(self):
         designation = self[0]
         material_grade = self[1]
+        l = self[2][KEY_LOCATION]
+        section_profile = self[2][KEY_SEC_PROFILE]
         Channel_attributes = Channel(designation, material_grade)
         Channel_attributes.connect_to_database_update_other_attributes_channels(designation, material_grade)
 
@@ -593,10 +711,10 @@ class Member(Main):
         Type = str(Channel_attributes.type)
         fu = str(Channel_attributes.fu)
         fy = str(Channel_attributes.fy)
-        flange_width = str(Channel_attributes.flange_width)
-        flange_thickness = str(Channel_attributes.flange_thickness)
-        depth = str(Channel_attributes.depth)
-        web_thickness = str(Channel_attributes.web_thickness)
+        f_w = (Channel_attributes.flange_width)
+        f_t = (Channel_attributes.flange_thickness)
+        w_h = (Channel_attributes.depth)
+        w_t = (Channel_attributes.web_thickness)
         flange_slope = str(Channel_attributes.flange_slope)
         root_radius = str(Channel_attributes.root_radius)
         toe_radius = str(Channel_attributes.toe_radius)
@@ -604,27 +722,51 @@ class Member(Main):
         m_o_r = "76.9"
         p_r = "0.3"
         t_e = "12"
-        mass = str(Channel_attributes.mass)
-        area = str(Channel_attributes.area)
-        C_y = str(round(Channel_attributes.Cy / 10, 2))
-        mom_inertia_z = str(round(Channel_attributes.mom_inertia_z / 10000, 2))
-        mom_inertia_y = str(round(Channel_attributes.mom_inertia_y / 10000, 2))
-        rad_of_gy_z = str(round(Channel_attributes.rad_of_gy_z / 10, 2))
-        rad_of_gy_y = str(round(Channel_attributes.rad_of_gy_y / 10, 2))
-        elast_sec_mod_z = str(round(Channel_attributes.elast_sec_mod_z / 1000, 2))
-        elast_sec_mod_y = str(round(Channel_attributes.elast_sec_mod_y / 1000, 2))
-        plast_sec_mod_z = str(round(Channel_attributes.plast_sec_mod_z / 1000, 2))
-        plast_sec_mod_y = str(round(Channel_attributes.plast_sec_mod_y / 1000, 2))
+        if section_profile == "Channels":
+            mass = str(round((Channel_attributes.mass), 2))
+            area = str(round((Channel_attributes.area / 100), 2))
+            C_y = str(round((Channel_attributes.Cy / 10), 2))
+            mom_inertia_z = str(round((Channel_attributes.mom_inertia_z) / 10000, 2))
+            mom_inertia_y = str(round((Channel_attributes.mom_inertia_y) / 10000, 2))
+            rad_of_gy_z = str(round((Channel_attributes.rad_of_gy_z / 10), 2))
+            rad_of_gy_y = str(round((Channel_attributes.rad_of_gy_y / 10), 2))
+            elast_sec_mod_z = str(round((Channel_attributes.elast_sec_mod_z / 1000), 2))
+            elast_sec_mod_y = str(round((Channel_attributes.elast_sec_mod_y / 1000), 2))
+            plast_sec_mod_z = str(round((Channel_attributes.plast_sec_mod_z / 1000), 2))
+            plast_sec_mod_y = str(round((Channel_attributes.plast_sec_mod_y / 1000), 2))
+            if flange_slope != 90:
+                image = VALUES_IMG_TENSIONBOLTED_DF03[0]
+            else:
+                image = VALUES_IMG_TENSIONBOLTED_DF03[1]
+        else:
+            Channel_attributes = BBChannel_Properties()
+            Channel_attributes.data(designation,material_grade)
+            mass = str(Channel_attributes.calc_Mass(f_w, f_t, w_h, w_t))
+            area = str(Channel_attributes.calc_Area(f_w, f_t, w_h, w_t))
+            C_y = "N/A"
+            mom_inertia_z = str(Channel_attributes.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t))
+            mom_inertia_y = str(Channel_attributes.calc_MomentOfAreaY(f_w, f_t, w_h, w_t))
+            rad_of_gy_z = str(Channel_attributes.calc_RogZ(f_w, f_t, w_h, w_t))
+            rad_of_gy_y = str(Channel_attributes.calc_RogY(f_w, f_t, w_h, w_t))
+            elast_sec_mod_z = str(Channel_attributes.calc_ElasticModulusZz(f_w, f_t, w_h, w_t))
+            elast_sec_mod_y = str(Channel_attributes.calc_ElasticModulusZy(f_w, f_t, w_h, w_t))
+            plast_sec_mod_z = str(Channel_attributes.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t))
+            plast_sec_mod_y = str(Channel_attributes.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t))
+            if flange_slope != 90:
+                image = VALUES_IMG_TENSIONBOLTED_DF03[2]
+            else:
+                image = VALUES_IMG_TENSIONBOLTED_DF03[3]
+
 
         d = {
             KEY_SECSIZE_SELECTED: designation,
             KEY_SEC_MATERIAL: material_grade,
             KEY_SEC_FY: fy,
             KEY_SEC_FU: fu,
-            'Label_1': str(flange_width),
-            'Label_2': str(flange_thickness),
-            'Label_3': str(depth),
-            'Label_13': str(web_thickness),
+            'Label_1': str(f_w),
+            'Label_2': str(f_t),
+            'Label_3': str(w_h),
+            'Label_13': str(w_t),
             'Label_14': str(flange_slope),
             'Label_5': str(toe_radius),
             'Label_6': str(Type),
@@ -640,9 +782,219 @@ class Member(Main):
             'Label_20': str(elast_sec_mod_y),
             'Label_21': str(plast_sec_mod_z),
             'Label_22': str(plast_sec_mod_y),
-            'Label_23': str(source)}
+            'Label_23': str(source),
+            KEY_IMAGE: image
+        }
         return d
 
+    def get_Angle_sec_properties(self):
+        if '' in self:
+            mass = ''
+            area = ''
+            Cz = ''
+            Cy = ''
+            moa_z = ''
+            moa_y = ''
+            moa_u = ''
+            moa_v = ''
+            rog_z = ''
+            rog_y = ''
+            rog_u = ''
+            rog_v = ''
+            em_z = ''
+            em_y = ''
+            pm_z = ''
+            pm_y = ''
+            I_t = ''
+            image = ''
+        else:
+            a = float(self[0])
+            b = float(self[1])
+            t = float(self[2])
+            l = self[3][KEY_LOCATION]
+            p = self[3][KEY_SEC_PROFILE]
+            if p == "Angles":
+                sec_prop = Single_Angle_Properties()
+                mass = sec_prop.calc_Mass(a, b, t, l)
+                area = sec_prop.calc_Area(a, b, t, l)
+                Cz = sec_prop.calc_Cz(a, b, t, l)
+                Cy = sec_prop.calc_Cy(a, b, t, l)
+                moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l)
+                moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l)
+                moa_u = sec_prop.calc_MomentOfAreaU(a, b, t, l)
+                moa_v = sec_prop.calc_MomentOfAreaV(a, b, t, l)
+                rog_z = sec_prop.calc_RogZ(a, b, t, l)
+                rog_y = sec_prop.calc_RogY(a, b, t, l)
+                rog_u = sec_prop.calc_RogU(a, b, t, l)
+                rog_v = sec_prop.calc_RogV(a, b, t, l)
+                em_z = sec_prop.calc_ElasticModulusZz(a, b, t, l)
+                em_y = sec_prop.calc_ElasticModulusZy(a, b, t, l)
+                pm_z = sec_prop.calc_PlasticModulusZpz(a, b, t, l)
+                pm_y = sec_prop.calc_PlasticModulusZpy(a, b, t, l)
+                I_t = sec_prop.calc_TorsionConstantIt(a, b, t, l)
+                if a == b:
+                    image = VALUES_IMG_TENSIONBOLTED_DF01[0]
+                else:
+                    image = VALUES_IMG_TENSIONBOLTED_DF02[0]
+
+            elif p == "Back to Back Angles":
+                sec_prop = BBAngle_Properties()
+                mass = sec_prop.calc_Mass(a, b, t, l)
+                area = sec_prop.calc_Area(a, b, t, l)
+                if l == "Long Leg":
+                    Cz = sec_prop.calc_Cz()
+                    Cy = "N/A"
+                else:
+                    Cz = "N/A"
+                    Cy = sec_prop.calc_Cy()
+                moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l)
+                moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l)
+                moa_u = "N/A"
+                moa_v = "N/A"
+                rog_z = sec_prop.calc_RogZ(a, b, t, l)
+                rog_y = sec_prop.calc_RogY(a, b, t, l)
+                rog_u = "N/A"
+                rog_v = "N/A"
+                em_z = sec_prop.calc_ElasticModulusZz(a, b, t, l)
+                em_y = sec_prop.calc_ElasticModulusZy(a, b, t, l)
+                pm_z = sec_prop.calc_PlasticModulusZpz(a, b, t, l)
+                pm_y = sec_prop.calc_PlasticModulusZpy(a, b, t, l)
+                I_t = sec_prop.calc_TorsionConstantIt(a, b, t, l)
+                if l == "Long Leg":
+                    if a == b:
+                        image = VALUES_IMG_TENSIONBOLTED_DF01[1]
+                    else:
+                        image = VALUES_IMG_TENSIONBOLTED_DF02[1]
+                else:
+                    if a == b:
+                        image = VALUES_IMG_TENSIONBOLTED_DF01[2]
+                    else:
+                        image = VALUES_IMG_TENSIONBOLTED_DF02[2]
+            else:
+                sec_prop = SAngle_Properties()
+                mass = sec_prop.calc_Mass(a, b, t, l)
+                area = sec_prop.calc_Area(a, b, t, l)
+                Cz = "N/A"
+                Cy = "N/A"
+                moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l)
+                moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l)
+                moa_u = "N/A"
+                moa_v = "N/A"
+                rog_z = sec_prop.calc_RogZ(a, b, t, l)
+                rog_y = sec_prop.calc_RogY(a, b, t, l)
+                rog_u = "N/A"
+                rog_v = "N/A"
+                em_z = sec_prop.calc_ElasticModulusZz(a, b, t, l)
+                em_y = sec_prop.calc_ElasticModulusZy(a, b, t, l)
+                pm_z = sec_prop.calc_PlasticModulusZpz(a, b, t, l)
+                pm_y = sec_prop.calc_PlasticModulusZpy(a, b, t, l)
+                I_t = sec_prop.calc_TorsionConstantIt(a, b, t, l)
+                if l == "Long Leg":
+                    if a == b:
+                        image = VALUES_IMG_TENSIONBOLTED_DF01[3]
+                    else:
+                        image = VALUES_IMG_TENSIONBOLTED_DF02[3]
+                else:
+                    if a == b:
+                        image = VALUES_IMG_TENSIONBOLTED_DF01[4]
+                    else:
+                        image = VALUES_IMG_TENSIONBOLTED_DF02[4]
+
+        d = {'Label_9': str(mass),
+             'Label_10': str(area),
+             'Label_7': str(Cz),
+             'Label_8': str(Cy),
+             'Label_11': str(moa_z),
+             'Label_12': str(moa_y),
+             'Label_13': str(moa_u),
+             'Label_14': str(moa_v),
+             'Label_15': str(rog_z),
+             'Label_16': str(rog_y),
+             'Label_17': str(rog_u),
+             'Label_18': str(rog_v),
+             'Label_19': str(em_z),
+             'Label_20': str(em_y),
+             'Label_21': str(pm_z),
+             'Label_22': str(pm_y),
+             'Label_23': str(I_t)
+             ,KEY_IMAGE: image
+             }
+
+        return d
+
+    def get_Channel_sec_properties(self):
+
+        if '' in self:
+            mass = ''
+            area = ''
+            C_y = ''
+            moa_z = ''
+            moa_y = ''
+
+            rog_z = ''
+            rog_y = ''
+
+            em_z = ''
+            em_y = ''
+            pm_z = ''
+            pm_y = ''
+
+        else:
+            f_w = float(self[0])
+            f_t = float(self[1])
+            w_h = float(self[2])
+            w_t = float(self[3])
+            l = self[4][KEY_LOCATION]
+            p = self[4][KEY_SEC_PROFILE]
+
+            if p =="Channels":
+                sec_prop = Single_Channel_Properties()
+                mass = sec_prop.calc_Mass(f_w, f_t, w_h, w_t)
+                area = sec_prop.calc_Area(f_w, f_t, w_h, w_t)
+                C_y = sec_prop.calc_C_y(f_w, f_t, w_h, w_t)
+                moa_z = sec_prop.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t)
+                moa_y = sec_prop.calc_MomentOfAreaY(f_w, f_t, w_h, w_t)
+
+                rog_z = sec_prop.calc_RogZ(f_w, f_t, w_h, w_t)
+                rog_y = sec_prop.calc_RogY(f_w, f_t, w_h, w_t)
+
+                em_z = sec_prop.calc_ElasticModulusZz(f_w, f_t, w_h, w_t)
+                em_y = sec_prop.calc_ElasticModulusZy(f_w, f_t, w_h, w_t)
+                pm_z = sec_prop.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t)
+                pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t)
+
+
+            else:
+                sec_prop = BBChannel_Properties()
+                mass = sec_prop.calc_Mass(f_w, f_t, w_h, w_t)
+                area = sec_prop.calc_Area(f_w, f_t, w_h, w_t)
+                C_y = "N/A"
+                moa_z = sec_prop.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t)
+                moa_y = sec_prop.calc_MomentOfAreaY(f_w, f_t, w_h, w_t)
+
+                rog_z = sec_prop.calc_RogZ(f_w, f_t, w_h, w_t)
+                rog_y = sec_prop.calc_RogY(f_w, f_t, w_h, w_t)
+
+                em_z = sec_prop.calc_ElasticModulusZz(f_w, f_t, w_h, w_t)
+                em_y = sec_prop.calc_ElasticModulusZy(f_w, f_t, w_h, w_t)
+                pm_z = sec_prop.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t)
+                pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t)
+
+
+        d = {'Label_9': str(mass),
+             'Label_10': str(area),
+             'Label_11': str(moa_z),
+             'Label_12': str(moa_y),
+             'Label_15': str(rog_z),
+             'Label_16': str(rog_y),
+             'Label_17': str(C_y),
+             'Label_19': str(em_z),
+             'Label_20': str(em_y),
+             'Label_21': str(pm_z),
+             'Label_22': str(pm_y),
+             }
+
+        return d
     def get_fu_fy_section(self):
         material_grade = self[0]
         designation = self[2][KEY_SECSIZE_SELECTED]

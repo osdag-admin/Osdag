@@ -83,7 +83,8 @@ class NutBoltArray_Web():
         :return: The positions/coordinates to place the bolts in the form of list, positions_W = [list of bolting coordinates]
         """
         self.positions_W = []
-        self.boltOrigin_W = self.originW - ((self.row_W/2 * self.gauge_W) - self.end_W/2) * self.pitchDirW - (((self.col_W/2)*self.pitch_W)*self.gaugeDirW)
+        # self.boltOrigin_W = self.originW - ((self.row_W/2 * self.gauge_W) - self.end_W/2) * self.pitchDirW - (((self.col_W/2)*self.pitch_W)*self.gaugeDirW)
+        self.boltOrigin_W = self.originW + self.end_W * self.pitchDirW + (self.edge_W) * self.gaugeDirW
         for rw_W in range(self.row_W):
             for cl_W in range(self.col_W):
                 pos_W = self.boltOrigin_W

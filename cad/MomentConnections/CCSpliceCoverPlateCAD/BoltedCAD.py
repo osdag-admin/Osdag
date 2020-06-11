@@ -5,6 +5,7 @@ created on 14-04-2020
 
 import numpy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
 import copy
 
 class CCSpliceCoverPlateBoltedCAD(object):
@@ -126,7 +127,7 @@ class CCSpliceCoverPlateBoltedCAD(object):
 
     def create_nut_bolt_array(self):
 
-        nutBoltOriginAF = self.flangePlate1.sec_origin + numpy.array([self.flangePlate.W/2,  self.flangePlate.T/2, 0.0])
+        nutBoltOriginAF = self.flangePlate1.sec_origin + numpy.array([0.0,  self.flangePlate.T/2, -self.flangePlate.L/2])
 
         gaugeDirAF = numpy.array([1.0, 0, 0])
         pitchDirAF = numpy.array([0, 0.0, 1.0])
@@ -135,7 +136,7 @@ class CCSpliceCoverPlateBoltedCAD(object):
         self.nut_bolt_array_AF.placeAF(nutBoltOriginAF, gaugeDirAF, pitchDirAF, boltDirAF, width)
         self.nut_bolt_array_AF.create_modelAF()
 
-        nutBoltOriginBF = self.flangePlate2.sec_origin + numpy.array([self.flangePlate.W/2, -self.flangePlate.T/2, 0.0])
+        nutBoltOriginBF = self.flangePlate2.sec_origin + numpy.array([0.0, -self.flangePlate.T/2, -self.flangePlate.L/2])
 
         gaugeDirBF = numpy.array([1.0, 0, 0])
         pitchDirBF = numpy.array([0, 0.0, 1.0])
@@ -145,8 +146,8 @@ class CCSpliceCoverPlateBoltedCAD(object):
         self.nut_bolt_array_BF.create_modelBF()
 
         boltWeb_X = self.webPlate.T / 2
-        boltWeb_Y = self.webPlate.W/2
-        nutBoltOriginW = self.webPlate1.sec_origin + numpy.array([boltWeb_X, boltWeb_Y, 0.0])
+        boltWeb_Y = self.webPlate.W
+        nutBoltOriginW = self.webPlate1.sec_origin + numpy.array([boltWeb_X, boltWeb_Y, -self.webPlate.L/2])
         gaugeDirW = numpy.array([0, 0.0, 1.0])
         pitchDirW = numpy.array([0, -1.0, .0])
         boltDirW = numpy.array([-1.0, 0, 0])
@@ -207,6 +208,14 @@ class CCSpliceCoverPlateBoltedCAD(object):
         nut_bolts_array = BRepAlgoAPI_Fuse(nut_bolts_array, array_W).Shape()
 
         return nut_bolts_array
+
+    def get_only_column_models(self):
+        columns = self.get_column_models()
+        nutbolt = self.get_nut_bolt_models()
+
+        onlycolumn = BRepAlgoAPI_Cut(columns, nutbolt).Shape()
+
+        return onlycolumn
 
     def get_models(self):
         columns = self.get_column_models()

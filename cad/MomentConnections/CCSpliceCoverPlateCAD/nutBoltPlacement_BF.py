@@ -83,7 +83,8 @@ class NutBoltArray_BF():
         :return: The positions/coordinates to place the bolts in the form of list, positions_BF = [list of bolting coordinates]
         """
         self.positions_BF = []
-        self.boltOrigin_BF = self.originBF - (self.row_BF/2* self.pitch_BF) * self.pitchDirBF - (((self.col_BF / 2) * self.gauge)) * self.gaugeDirBF
+        # self.boltOrigin_BF = self.originBF - (self.row_BF/2* self.pitch_BF) * self.pitchDirBF - (((self.col_BF / 2) * self.gauge)) * self.gaugeDirBF
+        self.boltOrigin_BF = self.originBF + self.end_BF * self.pitchDirBF + (self.edge_BF) * self.gaugeDirBF
 
         for rw_BF in range(self.row_BF):
             for cl_BF in range(self.col_BF):

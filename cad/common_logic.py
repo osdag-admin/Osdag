@@ -1335,13 +1335,14 @@ class CommonDesignLogic(object):
                 columns = self.CPObj.get_column_models()
                 plates = self.CPObj.get_plate_models()
                 nutbolt = self.CPObj.get_nut_bolt_models()
+                onlycolumn = self.CPObj.get_only_column_models()
 
-                if self.component == "Beam":
+                if self.component == "Column":
                     # Displays both beams
-                    osdag_display_shape(self.display, columns, update=True)
-                elif self.component == "Connector":
+                    osdag_display_shape(self.display, onlycolumn, update=True)
+                elif self.component == "Cover Plate":
                     osdag_display_shape(self.display, plates, update=True, color='Blue')
-                    osdag_display_shape(self.display, nutbolt, update=True, color='YELLOW')
+                    # osdag_display_shape(self.display, nutbolt, update=True, color='YELLOW')
                 elif self.component == "Model":
                     osdag_display_shape(self.display, columns, update=True)
                     osdag_display_shape(self.display, plates, update=True, color='Blue')
@@ -1354,10 +1355,10 @@ class CommonDesignLogic(object):
                 plates = self.CPObj.get_plate_models()
                 welds = self.CPObj.get_welded_modules()
 
-                if self.component == "Beam":
+                if self.component == "Column":
                     # Displays both beams
                     osdag_display_shape(self.display, columns, update=True)
-                elif self.component == "Connector":
+                elif self.component == "Cover Plate":
                     osdag_display_shape(self.display, plates, update=True, color='Blue')
                     osdag_display_shape(self.display, welds, update=True, color='Red')
                 elif self.component == "Model":

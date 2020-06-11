@@ -90,18 +90,18 @@ class NutBoltArray_AF():
         self.gap = Obj.flange_plate.gap
         # if self.col_AF ==2:
         #     self.gauge =0
-        #     self.gauge_AF= outputobj.flange_plate.midgauge
+        #     self.gauge_AF= Obj.flange_plate.midgauge
         # else:
-        #     self.gauge =outputobj.flange_plate.gauge_provided
-        #     self.gauge_AF=outputobj.flange_plate.midgauge
+        #     self.gauge = Obj.flange_plate.gauge_provided
+        #     self.gauge_AF= Obj.flange_plate.midgauge
 
     def calculatePositions_AF(self):
         """
         :return: The positions/coordinates to place the bolts in the form of list, positions_AF = [list of bolting coordinates]
         """
         self.positions_AF = []
-        # self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.gauge_AF / 2) * self.gaugeDirAF
-        self.boltOrigin_AF = self.originAF - (self.row_AF/2 * self.pitch_AF) * self.pitchDirAF  - ((self.col_AF / 2) * self.gauge) * self.gaugeDirAF
+        self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.edge_AF) * self.gaugeDirAF
+        # self.boltOrigin_AF = self.originAF - (self.row_AF/2 * self.pitch_AF) * self.pitchDirAF  - ((self.col_AF / 2) * self.gauge) * self.gaugeDirAF
                 # + ((self.plateAbvFlangeL - self.gauge_AF) / 2 - ((self.col_AF / 2 - 1) * self.gauge)) * self.gaugeDirAF
 
         for rw_AF in range(self.row_AF):

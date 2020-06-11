@@ -54,8 +54,8 @@ class NutBoltArray(object):
         self.endDist = Obj.end_dist
 
         self.pitch = Obj.pitch
-        self.p2flange = Obj.p_2_flange
-        self.p2web = Obj.p_2_web
+        self.p2flange = Obj.p_2_flange_prov
+        self.p2web = Obj.p_2_web_prov
         # self.webColgauge = 2 * self.endDist + self.column.t
         self.edgeDist = self.column.B / 2 - self.endDist - self.column.t / 2
         # todo for flush plate
@@ -69,14 +69,14 @@ class NutBoltArray(object):
                                   self.p2web, self.pitch]
             elif self.row == 5:
                 self.pitchDist = [self.endDist + self.column.T, self.pitch,
-                                  self.p2flange, self.p2flange, self.pitch]
+                                  self.p2web, self.p2web, self.pitch]
 
             elif self.row == 6:
                 self.pitchDist = [self.endDist + self.column.T, self.pitch,
-                                  self.pitch, self.p2flange, self.pitch, self.pitch]
+                                  self.pitch, self.p2web, self.pitch, self.pitch]
             elif self.row == 7:
                 self.pitchDist = [self.endDist + self.column.T, self.pitch,
-                                  self.pitch, self.p2flange, self.p2flange, self.pitch, self.pitch]
+                                  self.pitch, self.p2web, self.p2web, self.pitch, self.pitch]
 
         elif Obj.connection == "Extended Both Ways":
             self.row = self.row + 2
@@ -91,14 +91,14 @@ class NutBoltArray(object):
                                   self.p2web, self.pitch, 2 * self.endDist + self.column.T]
             elif self.row == 7:
                 self.pitchDist = [self.endDist, 2 * self.endDist + self.column.T, self.pitch,
-                                  self.p2flange, self.p2flange, self.pitch, 2 * self.endDist + self.column.T]
+                                  self.p2web, self.p2web, self.pitch, 2 * self.endDist + self.column.T]
 
             elif self.row == 8:
                 self.pitchDist = [self.endDist, 2 * self.endDist + self.column.T, self.pitch,
-                                  self.pitch, self.p2flange, self.pitch, self.pitch, 2 * self.endDist + self.column.T]
+                                  self.pitch, self.p2web, self.pitch, self.pitch, 2 * self.endDist + self.column.T]
             elif self.row == 9:
                 self.pitchDist = [self.endDist, 2 * self.endDist + self.column.T, self.pitch,
-                                  self.pitch, self.p2flange, self.p2flange, self.pitch, self.pitch,
+                                  self.pitch, self.p2web, self.p2web, self.pitch, self.pitch,
                                   2 * self.endDist + self.column.T]
 
         if self.col == 2:

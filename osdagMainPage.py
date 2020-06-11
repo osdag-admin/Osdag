@@ -83,6 +83,9 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 import os
 import shutil
 from pathlib import Path
+from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
+import urllib.request
+#from Thread import timer
 
 
 ############################ Pre-Build Database Updation/Creation #################
@@ -659,6 +662,25 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
     def exit(self):
         QtCore.QCoreApplication.exit()
 
+######################### UpDateNotifi ################
+
+class Update(QMainWindow):
+    def __init__(self, old_version):
+        super().__init__()
+        self.old_version=old_version
+    def notifi(self):
+        try:
+            url = "https://anshulsingh-py.github.io/test/version.txt"
+            file = urllib.request.urlopen(url)
+            for line in file:
+                decoded_line = line.decode("utf-8")
+            new_version = decoded_line.split("=")[1]
+            if int(new_version) > self.old_version:
+                print("update")
+                msg = QMessageBox.information(self, 'Update available','<a href=https://google.com>Click to downlaod<a/>')
+        except:
+            print("No internet connection")
+
 
 if __name__ == '__main__':
 
@@ -683,6 +705,8 @@ if __name__ == '__main__':
     # app.exec_()
     # sys.exit(app.exec_())
     try:
+        update = Update(0)
+        update.notifi()
         sys.exit(app.exec_())
     except BaseException as e:
         print("ERROR", e)

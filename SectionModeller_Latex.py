@@ -77,9 +77,9 @@ class CreateLatex(Document):
                     if(type(reportsummary['Section Properties'][ppty])==str):
                         table.add_row((bold(ppty),reportsummary['Section Properties'][ppty]))
                     else:
-                        table.add_row((bold(ppty),""))
+                        table.add_row((bold(ppty),None))
                         for sub_ppty in reportsummary['Section Properties'][ppty]:
                             table.add_hline()
                             table.add_row((sub_ppty,reportsummary['Section Properties'][ppty][sub_ppty]))
                 table.add_hline()
-        doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+        doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False,)

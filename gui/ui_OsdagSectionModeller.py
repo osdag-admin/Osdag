@@ -7,24 +7,26 @@
 # WARNING! All changes made in this file will be lost!
 
 
+import math
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
+from Common import *
 from gui.ui_section_parameters import Ui_SectionParameters
 from gui.ui_SectionModeller_SummaryPopUp import Ui_Dialog1 as SummaryDialog
 from SectionModeller_Latex import CreateLatex
-from Common import *
-import sys
+
 
 class Ui_OsdagSectionModeller(object):
     def setupUi(self,Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(901, 790)
+        Dialog.resize(900, 900)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(Dialog.sizePolicy().hasHeightForWidth())
         Dialog.setSizePolicy(sizePolicy)
-        Dialog.setMinimumSize(QtCore.QSize(901, 0))
-        Dialog.setMaximumSize(QtCore.QSize(901, 825))
+        Dialog.setMinimumSize(QtCore.QSize(900, 900))
+        Dialog.setMaximumSize(QtCore.QSize(906, 900))
         Dialog.setSizeGripEnabled(False)
         Dialog.setModal(True)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
@@ -96,7 +98,7 @@ class Ui_OsdagSectionModeller(object):
         self.section_type_combobox.addItem("")
         self.horizontalLayout_2.addWidget(self.section_type_combobox)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed) 
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed) 
         self.verticalLayout_2.addItem(spacerItem1)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -116,7 +118,7 @@ class Ui_OsdagSectionModeller(object):
         self.section_template_combobox.addItem("")
         self.horizontalLayout_3.addWidget(self.section_template_combobox)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout_2.addItem(spacerItem2)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
         self.verticalLayout_3.setSpacing(15)
@@ -143,19 +145,26 @@ class Ui_OsdagSectionModeller(object):
         spacerItem3 = QtWidgets.QSpacerItem(20, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout_17.addItem(spacerItem3)
         self.horizontalLayout.addWidget(self.design_section)
-        self.occ = QtWidgets.QFrame(Dialog)
+        self.OCCFrame = QtWidgets.QFrame(Dialog)
         font = QtGui.QFont()
         font.setPointSize(9)
-        self.occ.setFont(font)
-        self.occ.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.occ.setStyleSheet("QFrame{\n"
+        self.OCCFrame.setFont(font)
+        self.OCCFrame.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.OCCFrame.setStyleSheet("QFrame{\n"
 "background:#ffffff;\n"
 "}")
-        self.occ.setFrameShape(QtWidgets.QFrame.Box)
-        self.occ.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.occ.setLineWidth(3)
-        self.occ.setObjectName("occ")
-        self.horizontalLayout.addWidget(self.occ)
+        self.OCCFrame.setFrameShape(QtWidgets.QFrame.Box)
+        self.OCCFrame.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.OCCFrame.setLineWidth(3)
+        self.OCCFrame.setObjectName("OCCFrame")
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.OCCFrame.sizePolicy().hasHeightForWidth())
+        self.OCCFrame.setSizePolicy(sizePolicy)
+        self.OCCFrame.setMinimumSize(QtCore.QSize(500, 400))
+        self.OCCFrame.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.horizontalLayout.addWidget(self.OCCFrame)
         self.horizontalLayout.setStretch(0, 1)
         self.horizontalLayout.setStretch(1, 1)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -205,7 +214,7 @@ class Ui_OsdagSectionModeller(object):
         self.Area.setFont(font)
         self.Area.setObjectName("Area")
         self.horizontalLayout_9.addWidget(self.Area)
-        spacerItem5 = QtWidgets.QSpacerItem(172, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        spacerItem5 = QtWidgets.QSpacerItem(170, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_9.addItem(spacerItem5)
         self.Area_text = QtWidgets.QLineEdit(self.section_properties)
         font = QtGui.QFont()
@@ -235,6 +244,7 @@ class Ui_OsdagSectionModeller(object):
         self.horizontalLayout_7.addItem(spacerItem6)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.horizontalLayout_4.setSpacing(22)
         self.verticalLayout_7 = QtWidgets.QVBoxLayout()
         self.verticalLayout_7.setSpacing(5)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
@@ -357,6 +367,7 @@ class Ui_OsdagSectionModeller(object):
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_6.setSpacing(22)
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.horizontalLayout_6.setSpacing(30)
         self.verticalLayout_9 = QtWidgets.QVBoxLayout()
         self.verticalLayout_9.setSpacing(5)
         self.verticalLayout_9.setObjectName("verticalLayout_9")
@@ -623,6 +634,7 @@ class Ui_OsdagSectionModeller(object):
         ))
         self.disable_usability(True)
         self.exportBtn.clicked.connect(self.export_to_pdf)
+        display,_=self.init_display()
     
     def get_section_properties(self):
             '''
@@ -653,7 +665,24 @@ class Ui_OsdagSectionModeller(object):
 
 
 
-                
+    def init_display(self):
+            from OCC.Display.backend import load_backend, get_qt_modules
+
+            global display
+            from OCC.Display.qtDisplay import qtViewer3d
+            self.OCCWindow = qtViewer3d(self.OCCFrame)
+            self.OCCWindow.InitDriver()
+            display = self.OCCWindow._display
+            display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
+            display.display_triedron()
+            display.View.SetProj(1, 1, 1)
+            layout=QtWidgets.QVBoxLayout()
+            layout.addWidget(self.OCCWindow)
+            layout.setContentsMargins(0, 0, 0, 0)
+            self.OCCFrame.setLayout(layout)
+            def start_display():
+                    self.OCCWindow.raise_()
+            return display, start_display       
 
     def export_to_pdf(self):
             '''
@@ -664,19 +693,22 @@ class Ui_OsdagSectionModeller(object):
             dialog=QtWidgets.QDialog()
             self.summary_dialog.setupUi(dialog)
             dialog.exec()
-            input_summary=self.summary_dialog.input_summary
-            input_summary['Design Section']={
-                    'Section Designation':str(self.section_designation_lineEdit.text()),
-                    'Section Type':str(self.section_type_combobox.currentText()),
-                    'Section Template':str(self.section_template_combobox.currentText()),
-                    'Section Parameters':self.Parameters,
-            }
-            input_summary['Section Properties']=self.get_section_properties()
-            rel_path = str(sys.path[0])
-            rel_path = rel_path.replace("\\", "/")
-            Disp_3D_image = "/ResourceFiles/images/3d.png"
-            latex=CreateLatex()
-            latex.save_latex(input_summary,input_summary['filename'],rel_path,Disp_3D_image)
+            try:
+                input_summary=self.summary_dialog.input_summary
+                input_summary['Design Section']={
+                        'Section Designation':str(self.section_designation_lineEdit.text()),
+                        'Section Type':str(self.section_type_combobox.currentText()),
+                        'Section Template':str(self.section_template_combobox.currentText()),
+                        'Section Parameters':self.Parameters,
+                }
+                input_summary['Section Properties']=self.get_section_properties()
+                rel_path = str(sys.path[0])
+                rel_path = rel_path.replace("\\", "/")
+                Disp_3D_image = "/ResourceFiles/images/3d.png"
+                latex=CreateLatex()
+                latex.save_latex(input_summary,input_summary['filename'],rel_path,Disp_3D_image)
+            except KeyError:
+                pass
 
     def disable_usability(self,toggle):
             '''
@@ -715,7 +747,7 @@ class Ui_OsdagSectionModeller(object):
                 self.MI_text_6.hide()
                 self.PSM_label_3.show()
                 self.PSM_text_3.show()
-                self.MI_label_3.setText('Czz:')
+                self.MI_label_3.setText('Czz(mm⁴):')
 
         elif(index_type==3):
                 self.Centroid_box.show()
@@ -729,7 +761,7 @@ class Ui_OsdagSectionModeller(object):
                 self.MI_text_6.show()
                 self.PSM_label_3.hide()
                 self.PSM_text_3.hide()
-                self.MI_label_3.setText('Ixy:')
+                self.MI_label_3.setText('Ixy(mm⁴):')
         
         templates={
                 0:[],
@@ -755,6 +787,614 @@ class Ui_OsdagSectionModeller(object):
         self.section_template_combobox.addItems(templates)
         self.section_template_combobox.blockSignals(False)
         self.section_template_combobox.setProperty("lastitem", None)
+
+    def update_section_properties(self,index_type,index_template):
+        '''
+        Method to fill output parameters to Section Properties
+        '''
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        if(index_type==1):
+                cursor = conn.execute("SELECT Area,B,T,tw,D FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                Area,B,T,t,Di=map(float,cursor.fetchall()[0])
+                l=float(self.SectionParameters.parameterText_6.text())
+                ti=float(self.SectionParameters.parameterText_7.text())
+                S=float(self.SectionParameters.parameterText_3.text())
+                A=round((2*Area)+(2*l*ti),4)
+                D=round(Di-(2*T),4)
+                Ybottom=round((
+                        (l*ti*t/2)+
+                        (2*B*T*ti*T/2)+
+                        (2*((D*t)*((D/2)+T+ti)))+
+                        (2*((B*T)*((T/2)+D+T+ti)))+
+                        ((l*ti)*((ti/2)+D+ti+(2*T)))
+                )/((4*B*T)+(2*l*ti)+(2*D*t)),4)
+                Ytop=Ybottom
+                Yleft=round((
+                        (2*l*ti*l/2)+
+                        (2*B*T*B/2)+
+                        (D*t*B/2)+
+                        (2*((B*T)*(l-S+(B/2))))+
+                        ((D*t)*(l-S+(B/2)))
+                )/((l*ti)+(4*B*T)+(2*D*t)),4)
+                Yright=Yleft
+                Izz=round((
+                        ((B*(T**3)/12)+((B*T)*((Ybottom-(T/2)-ti)**2)))+
+                        ((l*(ti**3)/12)+((l*ti)*((Ybottom-(ti/2))**2)))+
+                        (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ybottom-(D/4)-T-ti)**2))))+
+                        (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ytop-(D/4)-T-ti)**2))))+
+                        (2*((B*(T**3)/12)+((B*T)*((Ytop-(T/2)-ti)**2))))+
+                        ((l*(ti**3)/12)+((l*ti)*((Ytop-(ti/2))**2)))
+                ),4)
+                Iyy=round((
+                        (2*(((l/2)*(ti**3)/12)+(((l/2)*ti)*((Yleft-(l/4))**2))))+
+                        (2*((B*(T**3)/12)+((B*T)*((Yleft-(B/2))**2))))+
+                        ((t*(D**3)/12)+((D*t)*((Yleft-(B/2))**2)))+
+                        ((t*(D**3)/12)+((D*t)*((Yright-(B/2))**2)))+
+                        (2*((B*(T**3)/12)+((B*T)*((Yright-(B/2))**2))))+
+                        (2*(((l/2)*(ti**3)/12)+(((l/2)*ti)*((Yright-(l/4))**2))))
+                ),4)
+                Rzz=round(math.sqrt(Izz/A),4)
+                Ryy=round(math.sqrt(Iyy/A),4)
+                Zzz=round((A/2)*(Ytop+Ybottom),4)
+                Zyy=round((A/2)*(Yleft+Yright),4)
+                self.Area_text.setText(str(A))
+                self.MI_text_1.setText(str(Izz))
+                self.MI_text_2.setText(str(Iyy))
+                self.RG_text_1.setText(str(Rzz))
+                self.RG_text_2.setText(str(Ryy))
+                self.ESM_text_1.setText(str(Zzz))
+                self.ESM_text_2.setText(str(Zyy))
+        elif(index_type==2):
+                cursor = conn.execute("SELECT Area,B,T,tw,D FROM Channels where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                ChannelArea,B,T,t,Dc=map(float,cursor.fetchall()[0])
+                l=float(self.SectionParameters.parameterText_6.text())
+                ti=float(self.SectionParameters.parameterText_7.text())
+                S=float(self.SectionParameters.parameterText_3.text())
+                A=round((2*ChannelArea)+(2*l*ti),4)
+                D=round(Dc-(2*T),4)
+                if(index_template==1):
+                        Yleft=round((
+                                (D*t*t/2)+
+                                (2*(B*T*B/2))+
+                                (2*(l*ti*l/2))+
+                                (2*(B*T*(S+t-(B/2))))+
+                                (2*(D*t*(S+t+(t/2))))
+                        )/((2*D*t)+(B*T)+(2*l*t)),4)
+                        Yright=(2*t)+S-Yleft
+                        Ybottom=round((
+                                (2*(B*T*T+(ti/2)))+
+                                (2*(D*t*((D/2)+T+ti)))+
+                                (l*ti*(D+(2*T)+ti+(ti/2)))+
+                                (2*(l*ti*(ti/2)))+
+                                (2*(B*T*(D+T+(T/2))))
+                        )/((4*B*T)+(2*D*t)+(2*l*ti)),4)
+                        Ytop=D+(2*T)-Ybottom-(2*ti)
+                        Izz=round((
+                                (2*((B*(T**3)/12)+((B*T)*((Ybottom-(T/2))**2))))+
+                                (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ybottom-(D/4)-T-ti)**2))))+
+                                (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ytop-(D/4)-T-ti)**2))))+
+                                (2*((B*(T**3)/12)+((B*T)*((Ytop-(T/2)-ti)**2))))+
+                                (2*((l*(ti**3)/12)+((l*ti)*((Ybottom-(ti/2))**2))))
+                        ),4)
+                        Iyy=round((
+                                (((t*(D**3)/12)+((D*t)*((Yleft-(t/2))**2))))+
+                                (2*((B*(T**3)/12)+((B*T)*((Yleft-(B/2))**2))))+
+                                (2*((B*(T**3)/12)+((B*T)*((Yright-(B/2))**2))))+
+                                (((t*(D**3)/12)+((D*t)*((Yright-(t/2))**2))))+
+                                (4*(((l/2)*(ti**3)/12)+(((l/2)*ti)*((Yleft-(l/4))**2))))
+                        ),4)
+                        Rzz=round(math.sqrt(Izz/A),4)
+                        Ryy=round(math.sqrt(Iyy/A),4)
+                        Zzz=round((A/2)*(Ytop+Ybottom),4)
+                        Zyy=round((A/2)*(Yleft+Yright),4)
+                        self.Area_text.setText(str(A))
+                        self.MI_text_1.setText(str(Izz))
+                        self.MI_text_2.setText(str(Iyy))
+                        self.RG_text_1.setText(str(Rzz))
+                        self.RG_text_2.setText(str(Ryy))
+                        self.ESM_text_1.setText(str(Zzz))
+                        self.ESM_text_2.setText(str(Zyy))
+                elif(index_template==2):
+                        Ybottom=round((
+                                (l*ti*ti/2)+
+                                (2*(B*T*(ti*T/2)))+
+                                (2*((D*t)*((D/2)+T+ti)))+
+                                (2*((B*T)*((T/2)+D+ti+T)))+
+                                ((l*ti)*(D+(2*T)+(ti/2)+t))
+                        )/((2*l*ti)+(2*D*t)+(4*B*T)),4)
+                        Ytop=Ybottom
+                        Yleft=round((
+                                (2*(l*ti*l/2))+
+                                (2*(B*T*T/2))+
+                                ((D*t)*((t/2)+B-(t/2)))+
+                                (2*((B*T)*(B+S+(B/2))))+
+                                ((D*t)*(B+S+(t/2)))
+                        )/((2*l*t)+(4*B*T)+(2*D*t)),4)
+                        Yright=Yleft
+                        Izz=round((
+                                (((l*(ti**3)/12)+((l*ti)*((Ybottom-(ti/2))**2))))+
+                                (2*((B*(T**3)/12)+((B*T)*((Ybottom-(T/2)-ti)**2))))+
+                                (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ybottom-(D/2)-T-ti)**2))))+
+                                (2*((B*(T**3)/12)+((B*T)*((Ytop-(T/2)-ti)**2))))+
+                                (((l*(ti**3)/12)+((l*ti)*((Ytop-(ti/2))**2))))
+                        ),4)
+                        Iyy=round((
+                                (2*(((l/2)*(ti**3)/12)+(((l/2)*ti)*((Yleft-(l/4))**2))))+
+                                (2*((B*(T**3)/12)+((B*T)*((Yleft-(B/2))**2))))+
+                                (((t*(D**3)/12)+((D*T)*((Yleft-(t/2)-B)**2))))+
+                                (((t*(D**3)/12)+((D*T)*((Yright-(t/2)-B)**2))))+
+                                (2*((B*(T**3)/12)+((B*T)*((Yright-(B/2))**2))))+
+                                (2*(((l/2)*(ti**3)/12)+(((l/2)*ti)*((Yright-(l/4))**2))))
+                        ),4)
+                        Rzz=round(math.sqrt(Izz/A),4)
+                        Ryy=round(math.sqrt(Iyy/A),4)
+                        Zzz=round((A/2)*(Ytop+Ybottom),4)
+                        Zyy=round((A/2)*(Yleft+Yright),4)
+                        Cy=Ybottom
+                        Cz=Yleft
+                        self.C_text_1.setText(str(Cy))
+                        self.C_text_2.setText(str(Cz))
+                        self.Area_text.setText(str(A))
+                        self.MI_text_1.setText(str(Izz))
+                        self.MI_text_2.setText(str(Iyy))
+                        self.RG_text_1.setText(str(Rzz))
+                        self.RG_text_2.setText(str(Ryy))
+                        self.ESM_text_1.setText(str(Zzz))
+                        self.ESM_text_2.setText(str(Zyy))
+
+        elif(index_type==3):
+                if(index_template==1):
+                        cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        a,b = map(float,cursor.fetchall()[0][0].split('x'))
+                        cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        Area,t=map(float,cursor.fetchall()[0])
+                        ti=float(self.SectionParameters.parameterText_7.text())
+                        l=float(self.SectionParameters.parameterText_6.text())
+                        A=round((4*Area)+(l*ti),4)
+                        D=a-t
+                        Ybottom=round((
+                                (l*ti*l/2)+
+                                (2*D*t*D/2)+
+                                (2*((b*t)*((t/2)+D)))+
+                                (2*((b*t)*((t/2)+t+D)))+
+                                (2*((D*t)*((D/2)+D+(2*t))))
+                        )/((l*ti)+(4*b*t)+(4*D*t)),4)
+                        Ytop=Ybottom
+                        Yleft=round((
+                                (2*b*t*b/2)+
+                                (2*D*t*b/2)+
+                                (l*ti*(b+(ti/2)))+
+                                (2*((D*t)*(ti+b+(t/2))))+
+                                (2*((b*t)*(ti+b+(b/2))))
+                        )/((4*b*t)+(4*D*t)+(l*ti)),4)
+                        Yright=Yleft
+                        Izz=round((
+                              (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+  
+                              (2*((t*(D**3)/12)+((D*t)*((Ybottom-(D/2))**2))))+
+                              (2*((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-D)**2))))+
+                              (2*((t*(D**3)/12)+((D*t)*((Ytop-(D/2))**2))))+
+                              (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ytop-(D/2))**2))))+
+                              (2*((b*(t**3)/12)+((b*t)*((Ytop-(t/2)-D)**2))))
+                        ),4)
+                        Iyy=round((
+                                (((b*(t**3)/12)+((b*t)*((Yleft-(b/2))**2))))+
+                                (2*((b*(t**3)/12)+((b*t)*((Yright-(b/2))**2))))+
+                                (2*((t*(D**3)/12)+((D*t)*((Yleft+(t/2)-b)**2))))+
+                                (2*((t*(D**3)/12)+((D*t)*((Yright+(t/2)-b)**2))))+
+                                (((l*(ti**3)/12)+((l*ti)*((Yleft-(ti/2)-b)**2))))
+                        ),4)
+                        Rzz=round(math.sqrt(Izz/A),4)
+                        Ryy=round(math.sqrt(Iyy/A),4)
+                        Zzz=round((A/2)*(Ytop+Ybottom),4)
+                        Zyy=round((A/2)*(Yleft+Yright),4)
+                        Cy=Ybottom
+                        Cz=Yleft
+                        self.C_text_1.setText(str(Cy))
+                        self.C_text_2.setText(str(Cz))
+                        self.Area_text.setText(str(A))
+                        self.MI_text_1.setText(str(Izz))
+                        self.MI_text_2.setText(str(Iyy))
+                        self.RG_text_1.setText(str(Rzz))
+                        self.RG_text_2.setText(str(Ryy))
+                        self.ESM_text_1.setText(str(Zzz))
+                        self.ESM_text_2.setText(str(Zyy))
+                elif(index_template==2):
+                        cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        a,b = map(float,cursor.fetchall()[0][0].split('x'))
+                        cursor = conn.execute("SELECT Area,Iy,Cy,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        Area,Iy,Cy,t=map(float,cursor.fetchall()[0])
+                        ti=float(self.SectionParameters.parameterText_7.text())
+                        l=float(self.SectionParameters.parameterText_6.text())
+                        D=a-t
+                        A=round((2*Area)+(l*ti),4)
+                        Ybottom=round((
+                                (2*D*t*D/2)+
+                                (2*((b*t)*(D+(t/2))))+
+                                (l*ti*l/2)
+                        )/((2*D*t)+(2*b*t)+(l*ti)),4)
+                        Ytop=D+t-Ybottom
+                        Yleft=round((
+                                (b*t*b/2)+
+                                (D*t*(b-(t/2)))+
+                                (l*ti*(b+(ti/2)))+
+                                (D*t*(b+ti+(t/2)))+
+                                (b*t*(b+ti+(b/2)))
+                        )/((2*b*t)+(2*D*t)+(l*ti)),4)
+                        Yright=Yleft
+                        Izz=round((
+                                (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ybottom-(D/4))**2))))+
+                                (((ti*(l/2))+(((l/2)*ti)*((Ybottom-(l/4))**2))))+
+                                (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ytop-(D/4)-t)**2))))+
+                                (((ti*(l/2))+(((l/2)*ti)*((Ytop-(l/4))**2))))+
+                                (2*((b*(t**3)/12)+((b*t)*((Ytop-(t/2))**2))))
+                        ),4)
+                        Iyy=round( 2*(Iy+(A*((Cy+(t/2))**2))),4)
+                        Ryy=round(math.sqrt(Iyy/A),4)
+                        Rzz=round(math.sqrt(Izz/A),4)
+                        Zzz=round((A/2)*(Ytop+Ybottom),4)
+                        Zyy=round((A/2)*(Yleft+Yright),4)
+                        Cy=Ybottom
+                        Cz=Yleft
+                        self.C_text_1.setText(str(Cy))
+                        self.C_text_2.setText(str(Cz))
+                        self.Area_text.setText(str(A))
+                        self.MI_text_1.setText(str(Izz))
+                        self.MI_text_2.setText(str(Iyy))
+                        self.RG_text_1.setText(str(Rzz))
+                        self.RG_text_2.setText(str(Ryy))
+                        self.ESM_text_1.setText(str(Zzz))
+                        self.ESM_text_2.setText(str(Zyy))
+                
+                elif(index_template==3):
+                        cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        a,b = map(float,cursor.fetchall()[0][0].split('x'))
+                        cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        Area,t=map(float,cursor.fetchall()[0])
+                        ti=float(self.SectionParameters.parameterText_7.text())
+                        l=float(self.SectionParameters.parameterText_6.text())
+                        A=round((2*Area)+(l*ti),4)
+                        D=a-t
+                        Ybottom=round((
+                                (l*ti*l/2)+
+                                (D*t*D/2)+
+                                (b*t*(D+(t/2)))+
+                                (b*t*(t+D+(t/2)))+
+                                (D*t*((2*t)+(D/2)+D))
+                        )/((l*ti)+(2*D*t)+(2*b*t)),4)
+                        Ytop=Ybottom
+                        Yleft=round((
+                                (b*t*b/2)+
+                                (D*t*b/2)+
+                                (l*ti*(b+(ti/2)))+
+                                (D*t*(ti+b+(t/2)))+
+                                (b*t*(ti+b+(b/2)))
+                        )/((2*b*t)+(2*D*t)+(l*ti)),4)
+                        Yright=Yleft
+                        Izz=round((
+                                (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+
+                                (((t*(D**3)/12)+((D*t)*((Ybottom-(D/2))**2))))+
+                                (((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-D)**2))))+
+                                (((b*(t**3)/12)+((b*t)*((Ytop-(t/2)-D)**2))))+
+                                (((t*(D**3)/12)+((D*t)*((Ytop-(D/2))**2))))+
+                                (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ytop-(l/4))**2))))
+
+                        ),4)
+                        Iyy=round((
+                                (((b*(t**3)/12)+((b*t)*((Yleft-(b/2))**2))))+
+                                (((t*(D**3)/12)+((D*t)*((Yleft+(t/2)-b)**2))))+
+                                (((ti*(l**3)/12)+((l*t)*((Yleft-(t/2)-b)**2))))+                        
+                                (((t*(D**3)/12)+((D*t)*((Yright+(t/2)-b)**2))))+
+                                (((b*(t**3)/12)+((b*t)*((Yleft-(b/2))**2))))
+                        ),4)
+                        Ryy=round(math.sqrt(Iyy/A),4)
+                        Rzz=round(math.sqrt(Izz/A),4)
+                        Zzz=round((A/2)*(Ytop+Ybottom),4)
+                        Zyy=round((A/2)*(Yleft+Yright),4)
+                        Cy=Ybottom
+                        Cz=Yleft
+                        self.C_text_1.setText(str(Cy))
+                        self.C_text_2.setText(str(Cz))
+                        self.Area_text.setText(str(A))
+                        self.MI_text_1.setText(str(Izz))
+                        self.MI_text_2.setText(str(Iyy))
+                        self.RG_text_1.setText(str(Rzz))
+                        self.RG_text_2.setText(str(Ryy))
+                        self.ESM_text_1.setText(str(Zzz))
+                        self.ESM_text_2.setText(str(Zyy))
+        
+                elif(index_template==4):
+                        cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        a,b = map(float,cursor.fetchall()[0][0].split('x'))
+                        cursor = conn.execute("SELECT Area,Iy,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        Area,Iy,t=map(float,cursor.fetchall()[0])
+                        ti=float(self.SectionParameters.parameterText_7.text())
+                        l=float(self.SectionParameters.parameterText_6.text())
+                        A=round((2*Area)+(l*ti),4)
+                        D=a-t
+                        Ybottom=round((
+                                (l*ti+l/2)+
+                                (D*t*D/2)+
+                                (b*t*(D+(t/2)))+
+                                ((b*t)*(D+t+(t/2)))+
+                                ((D*t)*(D+t+t+(D/2)))
+                        )/((l*t)+(2*D*t)+(2*b*t)),4)
+                        Ytop=Ybottom
+                        Yleft=round((
+                                (l*t*ti/2)+
+                                (2*((D*t)*(ti+(t/2))))+
+                                (2*((b*t)*(ti+(b/2))))
+                        )/((l+ti)+(2*b*t)+(2*D*t)),4)
+                        Yright=ti+b-Yleft
+                        Izz=round((
+                                (((ti*((l**3)/2)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+
+                                (((t*(D**3)/12)+((D*t)*((Ybottom-(D/2))**2))))+
+                                (((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-D)**2))))+
+                                (((b*(t**3)/12)+((b*t)*((Ytop-(t/2))**2))))+
+                                (((t*(D**3)/12)+((D*t)*((Ytop-(D/2)-t)**2))))+
+                                (((ti*((l/2)**3)/12)+(((l/2)*t)*((Ytop-(l/4))**2))))
+
+                        ),4)
+                        Ryy=round(math.sqrt(Iy/A),4)
+                        Rzz=round(math.sqrt(Izz/A),4)
+                        Zzz=round((A/2)*(Ytop+Ybottom),4)
+                        Zyy=round((A/2)*(Yleft+Yright),4)
+                        Cy=Ybottom
+                        Cz=Yleft
+                        self.C_text_1.setText(str(Cy))
+                        self.C_text_2.setText(str(Cz))
+                        self.Area_text.setText(str(A))
+                        self.MI_text_1.setText(str(Izz))
+                        self.MI_text_2.setText(str(Iy))
+                        self.RG_text_1.setText(str(Rzz))
+                        self.RG_text_2.setText(str(Ryy))
+                        self.ESM_text_1.setText(str(Zzz))
+                        self.ESM_text_2.setText(str(Zyy))
+                elif(index_template==5):
+                       cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                       a,b = map(float,cursor.fetchall()[0][0].split('x'))
+                       cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                       Area,t=map(float,cursor.fetchall()[0])
+                       ti=float(self.SectionParameters.parameterText_7.text())
+                       S=float(self.SectionParameters.parameterText_3.text())
+                       l=float(self.SectionParameters.parameterText_5.text())
+                       lv=float(self.SectionParameters.parameterText_6.text())
+                       A=round((4*Area)+(2*l*ti)+(2*lv*ti),4)
+                       D=a-t 
+                       Ybottom=round((
+                               (l*ti*ti/2)+
+                               (2*b*t*(ti*t/2))+
+                               (2*((D*t)*(t+ti+(D/2))))+
+                               (2*((D*t)*(D+t+ti+(D/2))))+
+                               (2*((b*t)*(D+D+t+ti+(t/2))))+
+                               ((l*ti)*(ti+D+t+t+D+(ti/2)))+
+                               (2*((lv*ti)*(lv/2)))
+                       )/((2*l*ti)+(2*lv*ti)+(4*D*t)+(4*b*t)),4)
+                       Ytop=Ybottom
+                       Yleft=round((
+                               (lv*ti*ti/2)+
+                               (2*((D*t)*(ti+(t/2))))+
+                               (2*((b*t)*(ti+(b/2))))+
+                               (2*((b*t)*(ti+t+S+t-(b/2))))+
+                               (2*((D*t)*(ti+t+S+(t/2))))+
+                               ((lv*ti)*(t+S+t+ti+(ti/2)))+
+                               (2*((l*t)*(ti+(l/2))))
+                       )/((4*b*t)+(2*l*t)+(2*lv*ti)+(D*t)),4)
+                       Yright=Yleft
+                       Izz=round((
+                             ((l*(ti**3)/12)+(l*ti)*((Ybottom-(ti/2))**2))+  
+                             (2*((b*(t**3)/12)+(b*t)*((Ybottom-(t/2)-ti)**2)))+
+                             (2*((t*(D**3)/12)+(D*t)*((Ybottom-(D/2)-ti-t)**2)))+
+                             (2*((t*(D**3)/12)+(D*t)*((Ytop-(D/2)-ti-t)**2)))+
+                             ((b*(t**3)/12)+(b*t)*((Ytop-(t/2)-ti)**2))+
+                             ((l*(ti**3)/12)+(l*ti)*((Ybottom-(ti/2))**2))+  
+                             (2*((ti*((lv**3)/2)/12)+(((lv/2)*ti)*((Ybottom-(l/4))**2))))+
+                             (2*((ti*((lv**3)/2)/12)+(((lv/2)*ti)*((Ytop-(l/4))**2))))
+
+                       ),4)
+                       Iyy=round((
+                               ((lv*(ti**3)/12)+(lv*ti)*((Yleft-(ti/2))**2))+
+                               (2*((t*(D**3)/12)+(D*t)*((Yleft-(t/2)-ti)**2)))+
+                               (2*((b*(t**3)/12)+(b*t)*((Yleft-(b/2)-ti)**2)))+
+                               ((l*(ti**3)/12)+(l*ti)*((Yleft-(l/2))**2))+  
+                               (2*((b*(t**3)/12)+(b*t)*((Yright-(b/2)-ti-t)**2)))+
+                               (2*((t*(D**3)/12)+(D*t)*((Yright-(t/2)-ti)**2)))+
+                               ((lv*(ti**3)/12)+(lv*ti)*((Yright-(ti/2))**2))
+                       ),4)
+                       Ryy=round(math.sqrt(Iyy/A),4)
+                       Rzz=round(math.sqrt(Izz/A),4)
+                       Zzz=round((A/2)*(Ytop+Ybottom),4)
+                       Zyy=round((A/2)*(Yleft+Yright),4)
+                       Cy=Ybottom
+                       Cz=Yleft
+                       self.C_text_1.setText(str(Cy))
+                       self.C_text_2.setText(str(Cz))
+                       self.Area_text.setText(str(A))
+                       self.MI_text_1.setText(str(Izz))
+                       self.MI_text_2.setText(str(Iyy))
+                       self.RG_text_1.setText(str(Rzz))
+                       self.RG_text_2.setText(str(Ryy))
+                       self.ESM_text_1.setText(str(Zzz))
+                       self.ESM_text_2.setText(str(Zyy))
+        elif(index_type==4):
+                if(index_template==1):
+                        cursor = conn.execute("SELECT Area,B,T,tw,D FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        ISectionArea,B,T,t,Di=map(float,cursor.fetchall()[0])
+                        D=Di-(2*T)
+                        P,Q=float(self.SectionParameters.parameterText_6.text()),float(self.SectionParameters.parameterText_7.text())
+                        A=ISectionArea+(2*P*Q)
+                        Ybottom=(
+                                (B*T*T/2)+
+                                (t*D*(D/2)*t)+
+                                (B*T*(B+T+(T/2)))+
+                                (2*Q*P*((2*T)+D-(P/2)))
+                        )/((B*T)+(t*D)+(B*T)+(2*Q*P))
+                        Ytop=((2*T)+D-Ybottom)
+                        Yleft=(
+                                ((P**3)*Q*Q/2)+
+                                (2*(B/2)*T*((B/4)+Q))+
+                                (D*(t/2)*((t/2)+(B/2)+Q))
+                        )/(P*Q*2*(B/2)*T*D*(t/2))
+                        Yright=Yleft
+                        Izz=round((
+                                ((B*(T**3)/12)+(B*T)*((Ybottom-(T/2))**2))+
+                                ((t*(D**3)/12)+(D*T)*((D-(D/2)-Ybottom)**2))+
+                                ((B*(T**3)/12)+(B*T)*((Ytop-(T/2))**2))+
+                                (2*((Q*(P**3)/12)+(Q*P)*((Ytop-(P/2))**2)))),4)
+                        Iyy=round((
+                                ((Q*(P**3)/12)+(P*Q)*((Yleft-(Q/2))**2))+
+                                (((B/2)*(T**3)/12)+((B/2)*T)*((Yleft-(B/4))**2))+
+                                (((t/2)*(D**3)/12)+(D*t/2)*((Yleft-Q-(B/2)+(t/4))**2))),4)
+                        Rzz=round(math.sqrt(Izz/A),4)
+                        Ryy=round(math.sqrt(Iyy/A),4)
+                        Zzz=round((A/2)*(Ytop+Ybottom),4)
+                        Zyy=round((A/2)*(Yleft+Yright),4)
+                        self.Area_text.setText(str(A))
+                        self.MI_text_1.setText(str(Izz))
+                        self.MI_text_2.setText(str(Iyy))
+                        self.RG_text_1.setText(str(Rzz))
+                        self.RG_text_2.setText(str(Ryy))
+                        self.ESM_text_1.setText(str(Zzz))
+                        self.ESM_text_2.setText(str(Zyy))
+                elif(index_template==2):
+                        cursor = conn.execute("SELECT Area,D,tw,B,T FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        Area,Dc,t,B,T=map(float,cursor.fetchall()[0])
+                        D=Dc-(2*T)
+                        d=round(((D-(2*T))/2)-t,4)
+                        A=round((2*Area)-(t**2),4)
+                        Ybottom=round((
+                                (B*T*T/2)+
+                                (D*t*((D/2)+T))+
+                                (2*(D*T*((D/2)+T)))+
+                                (2*(d*t*((D/2)+T)))+
+                                (B*T*(D+T+(T/2)))
+                        )/((2*B*T)+(D*t)+(D*T)+(D*T)+(2*d*t)),4)
+                        Ytop=Ybottom
+                        Yleft=round((
+                                (D*T*T/2)+
+                                (B*T*B)+
+                                (d*t*((d/2)+T))+
+                                (D*t*(d+T+(t/2)))+
+                                (d*t*(T+d+t+(d/2)))+
+                                (D*T*(d+t+d+T+(T/2)))
+                        )/((2*D*T)+(D*t)+(2*B*T)+(2*d*T)),4)
+                        Yright=Yleft
+                        Izz=round((
+                                ((B*(T**3)/12)+(B*T)*((Ybottom-(T/2))**2))+
+                                (2*((T*((D/2)**3)/12)+((D/2)*T)*((Ybottom-(D/4)-T)**2)))+
+                                ((t*((D/2)**3)/12)+((D/2)*t)*((Ybottom-(D/4)-T)**2))+
+                                (2*((d*((t/2)**3)/12)+((t/2)*d)*((Ybottom-(D/2)-T)**2)))+
+                                (2*((d*((t/2)**3)/12)+((t/2)*d)*((Ytop-(D/2)-T)**2)))+
+                                (2*((T*((D/2)**3)/12)+((D/2)*T)*((Ytop-(D/4)-T)**2)))+
+                                ((T*((D/2)**3)/12)+((D/2)*T)*((Ytop-(D/4)-T)**2))+
+                                ((B*(T**3)/12)+(B*T)*((Ytop-(T/2))**2))
+                        ),4)
+                        Iyy=round((
+                                ((T*(D**3)/12)+(D*T)*((Yleft-(T/2))**2))+
+                                (2*(((B/2)*(T**3)/12)+((B/2)*T)*((Yleft-(B/4))**2)))+
+                                (2*(((B/2)*(T**3)/12)+((B/2)*T)*((Yright-(B/4))**2)))+
+                                ((d*(t**3)/12)+((T*d)*((Yleft-(d/2)-T)**2)))+
+                                ((d*(t**3)/12)+((t*d)*((Yright-(d/2)-T)**2)))+
+                                (((t/2)*(D**3)/12)+((t/2)*D)*((Yleft-(t/4)-T-d)**2))+
+                                (((t/2)*(D**3)/12)+((t/2)*D)*((Yright-(t/4)-T-d)**2))+
+                                ((T*(D**3)/12)+(D*T)*((Yright-(T/2))**2))
+                        ),4)
+                        Rzz=round(math.sqrt(Izz/A),4)
+                        Ryy=round(math.sqrt(Iyy/A),4)
+                        Zzz=round((A/2)*(Ytop+Ybottom),4)
+                        Zyy=round((A/2)*(Yleft+Yright),4)
+                        self.Area_text.setText(str(A))
+                        self.MI_text_1.setText(str(Izz))
+                        self.MI_text_2.setText(str(Iyy))
+                        self.RG_text_1.setText(str(Rzz))
+                        self.RG_text_2.setText(str(Ryy))
+                        self.ESM_text_1.setText(str(Zzz))
+                        self.ESM_text_2.setText(str(Zyy))
+                elif(index_template==3):
+                        cursor = conn.execute("SELECT B,T FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        B,T=map(float,cursor.fetchall()[0])
+                        A=4*B*T
+                        Ybottom=round((
+                                (B*T*T/2)+
+                                (2*(B/2)*T*(B/4))
+                        )/((B*T)+((B/2)*T)),4)
+                        Ytop=Ybottom
+                        Yleft=round((
+                                (B*T*T/2)+
+                                (2*(B/2)*T*(B/4))
+                        )/((B*T)+(2*(B/2)*T)),4)
+                        Yright=Yleft
+                        Izz=round((
+                                (B*(T**3)/12)+
+                                ((B*T)*((Ybottom-(T/2))**2))+
+                                (2*((((B/2)**3)*T/12))+(((B/2)*T)*((Ybottom-T-(B/4))**2)))
+                        ),4)
+                        Iyy=round((
+                                (B*(T**3)/12)+
+                                ((B*T)*((Ytop-(T/2))**2))+
+                                (2*(((((B/2)**3)+T)/12))+(((B/2)*T)*((Yleft-T-(B/4))**2)))
+                        ),4)
+                        Rzz=round(math.sqrt(Izz/A),4)
+                        Ryy=round(math.sqrt(Iyy/A),4)
+                        Zzz=round((A/2)*(Ytop+Ybottom),4)
+                        Zyy=round((A/2)*(Yleft+Yright),4)
+                        self.Area_text.setText(str(A))
+                        self.MI_text_1.setText(str(Izz))
+                        self.MI_text_2.setText(str(Iyy))
+                        self.RG_text_1.setText(str(Rzz))
+                        self.RG_text_2.setText(str(Ryy))
+                        self.ESM_text_1.setText(str(Zzz))
+                        self.ESM_text_2.setText(str(Zyy))
+                        
+        elif(index_type==5):
+                cursor = conn.execute("SELECT Area,B,T,tw,D FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                ISectionArea,B,T,t,Di=map(float,cursor.fetchall()[0])
+                D=Di-(2*T)
+                cursor = conn.execute("SELECT Area,B,T,tw,D FROM Channels where Designation="+repr(self.SectionParameters.parameterText_2.currentText()))
+                ChannelArea,R,P,U,Dc = map(float,cursor.fetchall()[0])
+                Q=Dc-(2*P)
+                S=float(self.SectionParameters.parameterText_3.text())
+                A = ISectionArea+ChannelArea
+                Ybottom=round((
+                        (B*T*T/2)+
+                        ((T*D)*((D/2)+T))+
+                        (B*T*(D+T+(T/2)))+
+                        (Q*U*(D+T+T+(U/2)))+
+                        (2*P*R*(T+D+T+U-(R/2)))
+                )/((2*B*T)+(D*t)+(U*Q)+(2*P*R)),4)
+                Ytop=((2*T)+D+U)-Ybottom
+                Yleft=round((
+                        (R*P*P/2)+
+                        ((Q/2)*U*(Q/4)*U)+
+                        (2*(B/2)*T*(S+P+(t/2)-(B/4)))+
+                        (D*t/2*(S+P+(t/4)))
+                )/((R*P)+((Q/2)*U)+(2*(B/2)*T)+(D*(t/2))),4)
+                Yright=(P+S+t+S+P)-Yleft
+                Izz=round((
+                        ((B*(T**3)/12)+((B*T)*((Ybottom-((T/3)**2)))))+
+                        ((t*(D**3)/12)+(t*D)+(((D/2)+T-Ybottom)**2))+
+                        ((B*(T**3)/12)+(B*T)*((Ytop-U-(T/2))**2))+
+                        ((Q*(U**3)/12)+(Q*U)*((Ytop-(U/2))**2))+
+                        (((P*(R**3)/12)+(P*R)*((Ytop-R+(R/2))**2))/2)
+                ),4)
+                Iyy=round((
+                        ((P*(R**3)/12)+(R*P)*((Yleft-P)**2))+
+                        (((Q/2)*(U**3))+((Q/2)*U)*((Yleft-(U/4)-P)**2))+
+                        (2*(((B/2)*(T**3))+((B/2)*T)*((Yleft-(B/4)-S-P)**2)))+
+                        (((t/2)*(D**3))+((t/2)*D)*((Yleft-(t/4)-S-P)**2))
+                ),4)
+                Rzz=round(math.sqrt(Izz/A),4)
+                Ryy=round(math.sqrt(Iyy/A),4)
+                Zzy=round(A*(Yleft+Yright)/2,4)
+                Zzz=round(A*(Ytop+Ybottom)/2,4)
+                self.Area_text.setText(str(A))
+                self.MI_text_1.setText(str(Izz))
+                self.MI_text_2.setText(str(Iyy))
+                self.RG_text_1.setText(str(Rzz))
+                self.RG_text_2.setText(str(Ryy))
+                self.ESM_text_1.setText(str(Zzy))
+                self.ESM_text_2.setText(str(Zzz))
+
+
 
     def template_change(self,new_index):
         '''
@@ -796,6 +1436,8 @@ class Ui_OsdagSectionModeller(object):
                         self.disable_usability(True)
                 else:
                         self.disable_usability(False)
+                        self.update_section_properties(index_type,index_template)
+
         if(index_type==2):
                 if(index_template==1):
                                 self.Centroid_box.hide()                        
@@ -819,29 +1461,28 @@ class Ui_OsdagSectionModeller(object):
         self.section_template_combobox.setItemText(0, _translate("Dialog", "-------Select Template-------"))
         self.label_4.setText(_translate("Dialog", "Section Designation:"))
         self.label_5.setText(_translate("Dialog", "Section Properties"))
-        self.Area.setText(_translate("Dialog", "Area:"))
+        self.Area.setText(_translate("Dialog", "Area(mm²):"))
         self.RG.setText(_translate("Dialog", "Radius of Gyration:"))
-        self.RG_label_1.setText(_translate("Dialog", "Rzz:"))
-        self.RG_label_2.setText(_translate("Dialog", "Ryy:"))
+        self.RG_label_1.setText(_translate("Dialog", "Rzz(mm):"))
+        self.RG_label_2.setText(_translate("Dialog", "Ryy(mm):"))
         self.ESM.setText(_translate("Dialog", "Elastic Section Moduli:"))
-        self.ESM_label_1.setText(_translate("Dialog", "Zzz:"))
-        self.ESM_label_2.setText(_translate("Dialog", "Zyy:"))
+        self.ESM_label_1.setText(_translate("Dialog", "Zzz(mm³):"))
+        self.ESM_label_2.setText(_translate("Dialog", "Zyy(mm³):"))
         self.C.setText(_translate("Dialog", "Centroid:"))
-        self.C_label_1.setText(_translate("Dialog", "Cy:"))
-        self.C_label_2.setText(_translate("Dialog", "Cz:"))
+        self.C_label_1.setText(_translate("Dialog", "Cy(mm):"))
+        self.C_label_2.setText(_translate("Dialog", "Cz(mm):"))
         self.MI.setText(_translate("Dialog", "Moment of Inertia:"))
-        self.MI_label_1.setText(_translate("Dialog", "Izz:"))
-        self.MI_label_2.setText(_translate("Dialog", "Iyy:"))
-        self.MI_label_3.setText(_translate("Dialog", "Ixy:"))
-        self.MI_label_4.setText(_translate("Dialog", "𝛼:"))
-        self.MI_label_5.setText(_translate("Dialog", "Iu:"))
-        self.MI_label_6.setText(_translate("Dialog", "Iv:"))
+        self.MI_label_1.setText(_translate("Dialog", "Izz(mm⁴):"))
+        self.MI_label_2.setText(_translate("Dialog", "Iyy(mm⁴):"))
+        self.MI_label_3.setText(_translate("Dialog", "Ixy(mm⁴):"))
+        self.MI_label_4.setText(_translate("Dialog", "𝛼(°):"))
+        self.MI_label_5.setText(_translate("Dialog", "Iu(mm⁴):"))
+        self.MI_label_6.setText(_translate("Dialog", "Iv(mm⁴):"))
         self.PSM.setText(_translate("Dialog", "Plastic Section Moduli:"))
-        self.PSM_label_1.setText(_translate("Dialog", "Zpy:"))
-        self.PSM_label_2.setText(_translate("Dialog", "Zpz:"))
-        self.PSM_label_3.setText(_translate("Dialog", "Czp:"))
+        self.PSM_label_1.setText(_translate("Dialog", "Zpy(mm³):"))
+        self.PSM_label_2.setText(_translate("Dialog", "Zpz(mm³):"))
+        self.PSM_label_3.setText(_translate("Dialog", "Czp(mm³):"))
         self.saveBtn.setText(_translate("Dialog", "Save"))
         self.exportBtn.setText(_translate("Dialog", "Export"))
-
 
 

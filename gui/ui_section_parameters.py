@@ -225,7 +225,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             QtWidgets.QMessageBox.critical(self,'Save Error','All Parameters not entered/selected')
             self.textBoxVisible={}
             return
-
+############################ Validations ##############################
 
         if(index_type<=2):
             conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -249,6 +249,11 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                     QtWidgets.QMessageBox.critical(self,'Save Error','The following condition is not satisfied:\n\tS=S*=T')
                     self.textBoxVisible={}
                     return
+                elif(float(self.parameterText_5.text())!=float(self.parameterText_6.text())):
+                    QtWidgets.QMessageBox.critical(self,'Save Error','The following condition is not satisfied:\n\tl=l*')
+                    self.textBoxVisible={}
+                    return
+
             elif(index_template==1):
                 if(float(self.parameterText_3.text())!=float(self.parameterText_4.text()) or float(self.parameterText_4.text())!=float(self.parameterText_7.text())):
                     QtWidgets.QMessageBox.critical(self,'Save Error','The following condition is not satisfied:\n\tS=S*=T')
@@ -303,9 +308,9 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.parameterLabel_5.hide()
             self.parameterText_5.hide()
             self.parameterLabel_1.setText('I-Section Type:')
-            self.parameterLabel_3.setText('Spacing between the Columns(s):')
-            self.parameterLabel_6.setText('Cover Plate Length(l):')
-            self.parameterLabel_7.setText('Cover Plate Thickness(t):')
+            self.parameterLabel_3.setText('Spacing between the Columns, S(mm):')
+            self.parameterLabel_6.setText('Cover Plate Length, l(mm):')
+            self.parameterLabel_7.setText('Cover Plate Thickness, t(mm):')
         elif(index_type==2):
             self.parameterLabel_2.hide()
             self.parameterText_2.hide()
@@ -313,48 +318,55 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.parameterText_4.hide()
             self.parameterLabel_5.hide()
             self.parameterText_5.hide()
-            self.parameterLabel_6.setText('Cover Plate Length(l):')
-            self.parameterLabel_7.setText('Cover Plate Thickness(t):')
+            self.parameterLabel_6.setText('Cover Plate Length, l(mm):')
+            self.parameterLabel_7.setText('Cover Plate Thickness, t(mm):')
             if(index_template==1):
                 self.parameterLabel_1.setText('Channel Section Type:')
-                self.parameterLabel_3.setText('Spacing between two Channels(s):')
+                self.parameterLabel_3.setText('Spacing between two Channels, S(mm):')
             elif(index_template==2):
                 self.parameterLabel_1.setText('Angle Section Type:')
-                self.parameterLabel_3.setText('Spacing between two Angles(s):')
+                self.parameterLabel_3.setText('Spacing between two Angles, S(mm):')
         elif(index_type==3):
             self.parameterLabel_2.hide()
             self.parameterText_2.hide()
-            self.parameterLabel_5.hide()
-            self.parameterText_5.hide()
             self.parameterLabel_1.setText('Angle Section Type:')
             if(index_template==1):
-                self.parameterLabel_3.setText('Spacing Horizontal(s):')
-                self.parameterLabel_4.setText('Spacing Vertical(s*):')
-                self.parameterLabel_6.setText('Gusset Plate Length(l):')
-                self.parameterLabel_7.setText('Gusset Plate Thickness(t):') 
+                self.parameterLabel_5.hide()
+                self.parameterText_5.hide()
+                self.parameterLabel_3.setText('Spacing Horizontal, S(mm):')
+                self.parameterLabel_4.setText('Spacing Vertical, S*(mm):')
+                self.parameterLabel_6.setText('Gusset Plate Length, l(mm):')
+                self.parameterLabel_7.setText('Gusset Plate Thickness, t(mm):') 
             elif(index_template==2):
+                self.parameterLabel_5.hide()
+                self.parameterText_5.hide()
                 self.parameterLabel_4.hide()
                 self.parameterText_4.hide()
-                self.parameterLabel_3.setText('Spacing Horizontal(s):')
-                self.parameterLabel_6.setText('Gusset Plate Length(l):')
-                self.parameterLabel_7.setText('Gusset Plate Thickness(t):')
+                self.parameterLabel_3.setText('Spacing Horizontal, S(mm):')
+                self.parameterLabel_6.setText('Gusset Plate Length, l(mm):')
+                self.parameterLabel_7.setText('Gusset Plate Thickness, t(mm):')
             elif(index_template==3):
+                self.parameterLabel_5.hide()
+                self.parameterText_5.hide()
                 self.parameterLabel_4.hide()
                 self.parameterText_4.hide()
-                self.parameterLabel_3.setText('Spacing between the Angle Section(s):')
-                self.parameterLabel_6.setText('Gusset Plate Length(l):')
-                self.parameterLabel_7.setText('Gusset Plate Thickness(t):')
+                self.parameterLabel_3.setText('Spacing between the Angle Section, S(mm):')
+                self.parameterLabel_6.setText('Gusset Plate Length, l(mm):')
+                self.parameterLabel_7.setText('Gusset Plate Thickness, t(mm):')
             elif(index_template==4):
+                self.parameterLabel_5.hide()
+                self.parameterText_5.hide()
                 self.parameterLabel_4.hide()
                 self.parameterText_4.hide()
-                self.parameterLabel_3.setText('Spacing between the Angles(s):')
-                self.parameterLabel_6.setText('Gusset Plate Length(l):')
-                self.parameterLabel_7.setText('Gusset Plate Thickness(t):')
+                self.parameterLabel_3.setText('Spacing between the Angles, S(mm):')
+                self.parameterLabel_6.setText('Gusset Plate Length, l(mm):')
+                self.parameterLabel_7.setText('Gusset Plate Thickness, t(mm):')
             elif(index_template==5):
-                self.parameterLabel_3.setText('Spacing between Sections_Horizontal(s):')
-                self.parameterLabel_4.setText('Spacing between Sections_Vertical(s*):')
-                self.parameterLabel_6.setText('Plate Length(l):')
-                self.parameterLabel_7.setText('Plate Thickness(t):') 
+                self.parameterLabel_3.setText('Spacing between Sections_Horizontal, S(mm):')
+                self.parameterLabel_4.setText('Spacing between Sections_Vertical, S*(mm):')
+                self.parameterLabel_5.setText('Plate Length(Horizontal), l(mm):')
+                self.parameterLabel_6.setText('Plate Length(Vertical), l*(mm):')
+                self.parameterLabel_7.setText('Plate Thickness, t(mm):') 
         elif(index_type==4):
             self.parameterLabel_2.hide()
             self.parameterText_2.hide()
@@ -363,19 +375,18 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.parameterText_4.hide()
                 self.parameterLabel_5.hide()
                 self.parameterText_5.hide()
-                self.parameterLabel_7.hide()
-                self.parameterText_7.hide()
                 self.parameterLabel_1.setText('I-Section Type:')
-                self.parameterLabel_3.setText('Spacing between Lip and Web(s):')
-                self.parameterLabel_6.setText('Length of Lips(l):')
+                self.parameterLabel_3.setText('Spacing between Lip and Web, S(mm):')
+                self.parameterLabel_6.setText('Length of Lips, l(mm):')
+                self.parameterLabel_7.setText('Breadth of Lips, b(mm):')
             elif(index_template==2):
                 self.parameterLabel_4.hide()
                 self.parameterText_4.hide()
                 self.parameterLabel_1.setText('I-Section Type:')
-                self.parameterLabel_3.setText('Spacing between the two Sections(s):')
+                self.parameterLabel_3.setText('Spacing between the two Sections, S(mm):')
                 self.parameterLabel_5.setText('I-Sections Connection Angle(𝛼):')
-                self.parameterLabel_6.setText('Plate Length(l):')
-                self.parameterLabel_7.setText('Cover Plate Thickness(t):') 
+                self.parameterLabel_6.setText('Plate Length, l(mm):')
+                self.parameterLabel_7.setText('Cover Plate Thickness, t(mm):') 
             elif(index_template==3):
                 self.parameterLabel_6.hide()
                 self.parameterText_6.hide()
@@ -384,8 +395,8 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.parameterLabel_5.hide()
                 self.parameterText_5.hide()
                 self.parameterLabel_1.setText('Select the proper Section:')
-                self.parameterLabel_3.setText('Spacing between the Tubes_Horizontal(s):')
-                self.parameterLabel_4.setText('Spacing between the Tubes_Vertical(s*):')
+                self.parameterLabel_3.setText('Spacing between the Tubes_Horizontal, S(mm):')
+                self.parameterLabel_4.setText('Spacing between the Tubes_Vertical, S*(mm):')
         elif(index_type==5):
             self.parameterLabel_4.hide()
             self.parameterText_4.hide()
@@ -395,10 +406,9 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.parameterText_6.hide()
             self.parameterLabel_7.hide()
             self.parameterText_7.hide()
-            self.parameterLabel_3.hide()
-            self.parameterText_3.hide()
             self.parameterLabel_1.setText('I-Section Type:')
             self.parameterLabel_2.setText('Channel Section Type:')
+            self.parameterLabel_3.setText('Spacing Between Channel and I-Section, S(mm):')
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate

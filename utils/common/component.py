@@ -9,9 +9,6 @@ from builtins import str
 from Common import *
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic, NoEscape
-
-
-
 import math
 import numpy as np
 from utils.common.common_calculation import *
@@ -36,8 +33,7 @@ class Bolt:
 
         self.d_0 = 0.0
         self.kb = 0.0
-
-        self.kh= 0.0
+        self.kh = 0.0
 
         self.gamma_mb=0.0
         self.gamma_mf=0.0
@@ -56,7 +52,7 @@ class Bolt:
         self.bolt_capacity = 0.0
         self.ymax = 0.0
         self.xmax = 0.0
-        self.sigma_r_sq =0.0
+        self.sigma_r_sq = 0.0
         self.moment_demand = 0.0
         self.vres = 0.0
         self.length_avail = 0.0
@@ -71,24 +67,26 @@ class Bolt:
         # self.bolt_bearing_capacity_disp = round(self.bolt_bearing_capacity/1000, 2)
         # self.bolt_capacity_disp = round(self.bolt_capacity/1000, 2)
 
-
         self.bolt_fu = 0.0
         self.bolt_fy = 0.0
         self.fu_considered = 0.0
         self.thk_considered = 0.0
-
 
         if corrosive_influences == "Yes":
             self.corrosive_influences = True
         else:
             self.corrosive_influences = False
 
+        self.max_spacing = 0.0
+
         self.min_pitch = 0.0
+        self.pitch = 0.0
+        self.edge_dist = 0.0
         self.min_gauge = 0.0
         self.min_edge_dist = 0.0
         self.min_end_dist = 0.0
-        self.max_spacing = 0.0
-        self.max_edge_dist= 0.0
+        self.end_dist = 0.0
+        self.max_edge_dist = 0.0
         self.max_end_dist = 0.0
         self.dia_hole = 0.0
         self.min_pitch_round = round_up(self.min_pitch, 5)
@@ -870,8 +868,10 @@ class Weld:
         self.red = red
         self.min_weld = min_weld_thickness
 
+
 class Plate(Material):
-    def __init__(self, thickness=[], height=0.0,Innerheight=0.0, length=0.0,Innerlength=0.0, gap=0.0, material_grade=""):
+    def __init__(self, thickness=[], height=0.0,Innerheight=0.0, length=0.0,Innerlength=0.0, gap=0.0,
+                 material_grade="", width=0.0):
         super(Plate, self).__init__(material_grade=material_grade)
         self.design_status = False
         self.design_status_capacity = False
@@ -883,8 +883,14 @@ class Plate(Material):
             self.thickness = 0.0
         self.thickness_provided = 0.0
         super(Plate, self).__init__(material_grade, self.thickness_provided)
-        self.height = height
+        self.height = height    # TODO: replace height with length
         self.length = length
+        self.length_max = 0.0
+        self.length_min = 0.0
+
+        self.width = width
+        self.width_max = 0.0
+        self.width_min = 0.0
         self.gap = float(gap)
         self.Innerlength = Innerlength
         self.Innerheight = Innerheight

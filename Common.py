@@ -35,6 +35,7 @@ class OurLog(logging.Handler):
         elif record.levelname == 'INFO':
             msg = "<span style='color: green;'>" + msg + "</span>"
         self.key.append(msg)
+        self.key.append(record.levelname)
 
 def connectdb1():
     """
@@ -181,6 +182,27 @@ def tuple_to_str_red(tl):
         val = ''.join(v)
         arr.append(val)
     return arr
+
+def get_db_header(table_name):
+
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+
+    if table_name == "Angles":
+        cursor = conn.execute("SELECT * FROM Angles")
+
+    elif table_name == "Channels":
+        cursor = conn.execute("SELECT * FROM Channels")
+
+    elif table_name == "Beams":
+        cursor = conn.execute("SELECT * FROM Beams")
+
+    else:
+        cursor = conn.execute("SELECT * FROM Columns")
+
+    header = [description[0] for description in cursor.description]
+
+    return header
+
 
 ##########################
 # Type Keys (Type of input field, tab type etc.)
@@ -376,10 +398,10 @@ VALUES_IMG_TENSIONBOLTED = ["ResourceFiles/images/bA.png","ResourceFiles/images/
 VALUES_IMG_TENSIONWELDED = ["ResourceFiles/images/wA.png","ResourceFiles/images/wBBA.png","ResourceFiles/images/wSA.png","ResourceFiles/images/wC.png","ResourceFiles/images/wBBC.png"]
 VALUES_IMG_TENSIONBOLTED_DF01 = ["ResourceFiles/images/equaldp.png","ResourceFiles/images/bblequaldp.png","ResourceFiles/images/bbsequaldp.png","ResourceFiles/images/salequaldp.png","ResourceFiles/images/sasequaldp.png"]
 VALUES_IMG_TENSIONBOLTED_DF02 = ["ResourceFiles/images/unequaldp.png","ResourceFiles/images/bblunequaldp.png","ResourceFiles/images/bbsunequaldp.png","ResourceFiles/images/salunequaldp.png","ResourceFiles/images/sasunequaldp.png"]
+
 VALUES_IMG_TENSIONBOLTED_DF03 = ["ResourceFiles/images/Slope_Channel.png","ResourceFiles/images/Parallel_Channel.png","ResourceFiles/images/Slope_BBChannel.png","ResourceFiles/images/Parallel_BBChannel.png"]
 
 VALUES_IMG_BEAM = "ResourceFiles/images/Slope_Beam.png"
-
 
 VALUES_BEAMSEC = connectdb("Beams")
 VALUES_SECBM = connectdb("Beams")
@@ -476,6 +498,7 @@ DISP_TITLE_FLANGESPLICEPLATE = 'Flange splice plate '
 DISP_TITLE_FLANGESPLICEPLATE_OUTER = 'Outer plate '
 DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner plate '
 KEY_DISP_SLENDER = 'Slenderness'
+
 
 KEY_DISP_PLATETHK = 'Thickness(mm)'
 

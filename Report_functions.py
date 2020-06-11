@@ -459,7 +459,7 @@ def design_capacity_of_end_plate(M_dp,b_eff,f_y,gamma_m0,t_p):
 
     design_capacity_of_end_plate= Math(inline=True)
 
-    design_capacity_of_end_plate.append(NoEscape(r'\begin{aligned}  M_{dp} & = { \frac{ b_{eff} *t_p^2 *f_y}{ 4*\gamma_m0}}\\'))
+    design_capacity_of_end_plate.append(NoEscape(r'\begin{aligned}  M_{dp} & = { \frac{ b_{eff} *t_p^2 *f_y}{ 4*\gamma_{m0}}}\\'))
 
     design_capacity_of_end_plate.append(NoEscape(r'&={\frac{' + b_eff +r'*'+t_p+r'^2'+' *'+f_y + r'}{4*'+gamma_m0 + r'}}\\'))
     design_capacity_of_end_plate.append(NoEscape(r'&=' +M_dp  + r'\end{aligned}'))
@@ -652,7 +652,7 @@ def end_plate_thk_req(M_ep,b_eff,f_y,gamma_m0,t_p):
 
     end_plate_thk_eqn = Math(inline=True)
 
-    end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &= {\sqrt{\frac{ M_{ep}* 4*\gamma_m0}{ b_{eff}*f_y}}}\\'))
+    end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &= {\sqrt{\frac{ M_{ep}* 4*\gamma_{m0}}{ b_{eff}*f_y}}}\\'))
 
     end_plate_thk_eqn.append(NoEscape(r'&={\sqrt{\frac{' + M_ep +  '*4'+'*' +gamma_m0 + r'}{'+b_eff+ r'*' + f_y + r' }}}\\'))
     end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + '\end{aligned}'))
@@ -670,7 +670,7 @@ def moment_acting_on_end_plate(M_ep,b_eff,f_y,gamma_m0,t_p):
 
     moment_acting_on_end_plate= Math(inline=True)
 
-    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= {\frac{b_{eff} *t_p^2 *f_y}{ 4*\gamma_m0}}\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= {\frac{b_{eff} *t_p^2 *f_y}{ 4*\gamma_{m0}}}\\'))
 
     moment_acting_on_end_plate.append(NoEscape(r'&={\frac{' + b_eff +'*'+t_p+'^2'+' *'+f_y + '}{4*'+gamma_m0 + r'}}\\'))
     moment_acting_on_end_plate.append(NoEscape(r'&=' +M_ep + '\end{aligned}'))
@@ -2164,8 +2164,8 @@ def moment_cap(beta,m_d,f_y,gamma_m0,m_fd,mom_cap):
     mom_cap = str(mom_cap)
     moment_cap =Math(inline=True)
 
-    moment_cap.append(NoEscape(r'\begin{aligned} mom_{cap} &=  m_d - beta*(m_d -m_fd)  \\'))
-    moment_cap.append(NoEscape(r'&= ' + m_d + r'-' + beta + r'*('+m_d+r'-'+m_fd+r') \\'))
+    moment_cap.append(NoEscape(r'\begin{aligned} M_{c} &=  m_d - \beta(m_d -m_{fd})  \\'))
+    moment_cap.append(NoEscape(r'&= ' + m_d + r'-' + beta + r'('+m_d+r'-'+m_fd+r') \\'))
     moment_cap.append(NoEscape(r'&= ' + mom_cap + r'\end{aligned}'))
     return moment_cap
 

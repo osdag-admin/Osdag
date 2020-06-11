@@ -77,7 +77,7 @@ class CreateLatex(Document):
                     if(type(reportsummary['Section Properties'][ppty])==str):
                         table.add_row((bold(ppty),reportsummary['Section Properties'][ppty]))
                     else:
-                        table.add_row((bold(ppty),None))
+                        table.add_row((bold(ppty),""))
                         for sub_ppty in reportsummary['Section Properties'][ppty]:
                             table.add_hline()
                             table.add_row((sub_ppty,reportsummary['Section Properties'][ppty][sub_ppty]))

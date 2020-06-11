@@ -369,7 +369,7 @@ class Ui_OsdagSectionModeller(object):
         self.C.setFont(font)
         self.C.setObjectName("C")
         self.horizontalLayout_10.addWidget(self.C)
-        spacerItem8 = QtWidgets.QSpacerItem(108, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        spacerItem8 = QtWidgets.QSpacerItem(100, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_10.addItem(spacerItem8)
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_6.setSpacing(22)
@@ -754,7 +754,7 @@ class Ui_OsdagSectionModeller(object):
                 self.MI_text_6.hide()
                 self.PSM_label_3.show()
                 self.PSM_text_3.show()
-                self.MI_label_3.setText('Czz(mm⁴):')
+                self.MI_label_3.setText('Czz(mm4):')
 
         elif(index_type==3):
                 self.Centroid_box.show()
@@ -768,22 +768,22 @@ class Ui_OsdagSectionModeller(object):
                 self.MI_text_6.show()
                 self.PSM_label_3.hide()
                 self.PSM_text_3.hide()
-                self.MI_label_3.setText('Ixy(mm⁴):')
+                self.MI_label_3.setText('Ixy(mm4):')
         
         templates={
                 0:[],
-                1:['I I Side by Side'],
-                2:['[ ] Face to Face','] [ Back to Back'],
+                1:['Side by Side'],
+                2:['Face to Face','Back to Back'],
                 3:[
-                        u'\u256c'+' Star Angles-4 Angles',
-                        u'\u2309'+u'\u2308'+'Star Angles-2 Angles',
-                        u'\u230d'+u'\u230e'+'Star Angles-2 Angles',
-                        u'\u22a7'+'  Star Angles-2 Angles',
-                        u'\u26f6'+' Box Section-4 Angles'
+                        'Star Angles-4 Angles',
+                        '2 Angles on same side',
+                        '2 Angles on opposite sides',
+                        'Star Angles-2 Angles',
+                        'Box Section-4 Angles'
                 ],
                 4:[
-                        u'\u02e1'+'I'+u'\u02e1'+'  I-Section with Stiffening',
-                        u'\ua585'+' I-Section from Plates',
+                        'I-Section with Stiffening',
+                        'I-Section from Plates',
                         'Built up SHS/RHS',
                 ],
                 5:['I & Channel on One Flange'],
@@ -951,8 +951,8 @@ class Ui_OsdagSectionModeller(object):
 
         elif(index_type==3):
                 if(index_template==1):
-                        cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                        a,b = map(float,cursor.fetchall()[0][0].split('x'))
+                        cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        a,b = cursor.fetchall()[0]
                         cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,t=map(float,cursor.fetchall()[0])
                         ti=float(self.SectionParameters.parameterText_7.text())
@@ -1006,8 +1006,8 @@ class Ui_OsdagSectionModeller(object):
                         self.ESM_text_1.setText(str(Zzz))
                         self.ESM_text_2.setText(str(Zyy))
                 elif(index_template==2):
-                        cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                        a,b = map(float,cursor.fetchall()[0][0].split('x'))
+                        cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        a,b = cursor.fetchall()[0]
                         cursor = conn.execute("SELECT Area,Iy,Cy,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,Iy,Cy,t=map(float,cursor.fetchall()[0])
                         ti=float(self.SectionParameters.parameterText_7.text())
@@ -1053,8 +1053,8 @@ class Ui_OsdagSectionModeller(object):
                         self.ESM_text_2.setText(str(Zyy))
                 
                 elif(index_template==3):
-                        cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                        a,b = map(float,cursor.fetchall()[0][0].split('x'))
+                        cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        a,b = cursor.fetchall()[0]
                         cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,t=map(float,cursor.fetchall()[0])
                         ti=float(self.SectionParameters.parameterText_7.text())
@@ -1110,8 +1110,8 @@ class Ui_OsdagSectionModeller(object):
                         self.ESM_text_2.setText(str(Zyy))
         
                 elif(index_template==4):
-                        cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                        a,b = map(float,cursor.fetchall()[0][0].split('x'))
+                        cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        a,b = cursor.fetchall()[0]
                         cursor = conn.execute("SELECT Area,Iy,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,Iy,t=map(float,cursor.fetchall()[0])
                         ti=float(self.SectionParameters.parameterText_7.text())
@@ -1157,8 +1157,8 @@ class Ui_OsdagSectionModeller(object):
                         self.ESM_text_1.setText(str(Zzz))
                         self.ESM_text_2.setText(str(Zyy))
                 elif(index_template==5):
-                       cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                       a,b = map(float,cursor.fetchall()[0][0].split('x'))
+                       cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                       a,b = cursor.fetchall()[0]
                        cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                        Area,t=map(float,cursor.fetchall()[0])
                        ti=float(self.SectionParameters.parameterText_7.text())
@@ -1479,12 +1479,12 @@ class Ui_OsdagSectionModeller(object):
         self.C_label_1.setText(_translate("Dialog", "Cy(mm):"))
         self.C_label_2.setText(_translate("Dialog", "Cz(mm):"))
         self.MI.setText(_translate("Dialog", "Moment of Inertia:"))
-        self.MI_label_1.setText(_translate("Dialog", "Izz(mm⁴):"))
-        self.MI_label_2.setText(_translate("Dialog", "Iyy(mm⁴):"))
-        self.MI_label_3.setText(_translate("Dialog", "Ixy(mm⁴):"))
-        self.MI_label_4.setText(_translate("Dialog", "𝛼(°):"))
-        self.MI_label_5.setText(_translate("Dialog", "Iu(mm⁴):"))
-        self.MI_label_6.setText(_translate("Dialog", "Iv(mm⁴):"))
+        self.MI_label_1.setText(_translate("Dialog", "Izz(mm4):"))
+        self.MI_label_2.setText(_translate("Dialog", "Iyy(mm4):"))
+        self.MI_label_3.setText(_translate("Dialog", "Ixy(mm4):"))
+        self.MI_label_4.setText(_translate("Dialog", "Alpha(°):"))
+        self.MI_label_5.setText(_translate("Dialog", "Iu(mm4):"))
+        self.MI_label_6.setText(_translate("Dialog", "Iv(mm4):"))
         self.PSM.setText(_translate("Dialog", "Plastic Section Moduli:"))
         self.PSM_label_1.setText(_translate("Dialog", "Zpy(mm³):"))
         self.PSM_label_2.setText(_translate("Dialog", "Zpz(mm³):"))

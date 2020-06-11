@@ -174,6 +174,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         self.update_parameters(index_type,index_template)
         self.saveBtn.clicked.connect(lambda:self.save_parameters(index_type,index_template))
         self.textBoxVisible={}
+        print(self.sizeHint())
         self.setFixedSize(self.sizeHint())    
         self.apply_character_validations()   
 
@@ -239,8 +240,8 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         elif(index_type==3):
             if(index_template==5):
                 conn = sqlite3.connect(PATH_TO_DATABASE)
-                cursor = conn.execute("SELECT AXB FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
-                a = float(cursor.fetchall()[0][0].split('x')[0])
+                cursor = conn.execute("SELECT a FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
+                a = float(cursor.fetchall()[0][0])
                 if(float(self.parameterText_3.text())<=3*a/2):
                     QtWidgets.QMessageBox.critical(self,'Save Error','Increase the Spacing(s) > '+str(3*a/2))
                     self.textBoxVisible={}
@@ -384,7 +385,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.parameterText_4.hide()
                 self.parameterLabel_1.setText('I-Section Type:')
                 self.parameterLabel_3.setText('Spacing between the two Sections, S(mm):')
-                self.parameterLabel_5.setText('I-Sections Connection Angle(𝛼):')
+                self.parameterLabel_5.setText('I-Sections Connection Angle(Aplha):')
                 self.parameterLabel_6.setText('Plate Length, l(mm):')
                 self.parameterLabel_7.setText('Cover Plate Thickness, t(mm):') 
             elif(index_template==3):

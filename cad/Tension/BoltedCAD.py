@@ -22,6 +22,7 @@ class TensionAngleBoltCAD(object):
         self.member = member
         self.plate = plate
         self.nut_bolt_array = nut_bolt_array
+        # self.inter_array = inter_array
 
         self.plate1 = copy.deepcopy(self.plate)
         self.plate2 = copy.deepcopy(self.plate)

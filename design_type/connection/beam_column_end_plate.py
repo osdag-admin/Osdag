@@ -298,6 +298,8 @@ class BeamColumnEndPlate(MomentConnection):
     def set_input_values(self, design_dictionary):
         self.mainmodule = "Moment Connection"
         self.connectivity = design_dictionary[KEY_CONN]
+        self.endplate_type = design_dictionary[KEY_ENDPLATE_TYPE]
+
         self.material = Material(material_grade=design_dictionary[KEY_MATERIAL])
 
         self.supporting_section = Column(designation=design_dictionary[KEY_SUPTNGSEC],
@@ -321,12 +323,13 @@ class BeamColumnEndPlate(MomentConnection):
                            gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.plate.design_status_capacity = False
         self.top_flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
-                         fabrication=design_dictionary[KEY_DP_WELD_FAB])     # TODO: Add weld type in design dictionary
+                                    type=design_dictionary[KEY_DP_WELD_TYPE],
+                                    fabrication=design_dictionary[KEY_DP_WELD_FAB])
         self.bottom_flange_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
-                                     fabrication=design_dictionary[
-                                         KEY_DP_WELD_FAB])  # TODO: Add weld type in design dictionary
+                                       type=design_dictionary[KEY_DP_WELD_TYPE],
+                                       fabrication=design_dictionary[KEY_DP_WELD_FAB])
         self.web_weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
-                         fabrication=design_dictionary[KEY_DP_WELD_FAB])
+                             type=design_dictionary[KEY_DP_WELD_TYPE], fabrication=design_dictionary[KEY_DP_WELD_FAB])
         print("input values are set. Doing preliminary member checks")
         self.warn_text()
         # self.member_capacity()
@@ -403,8 +406,8 @@ class BeamColumnEndPlate(MomentConnection):
     def compression_flange(self):
         # Strength of flange under compression or tension TODO: Get function from IS 800
 
-        A_f = beam_B * beam_tf  # area of beam flange
-        capacity_beam_flange = (beam_fy / gamma_m0) * A_f
+        A_f = self.supported_section.flange_width * self.supported_section.flange_thickness  # area of beam flange
+        capacity_beam_flange = (self.supported_section.fy / gamma_m0) * A_f
         force_flange = max(t_bf, p_bf)
 
         if capacity_beam_flange < force_flange:
@@ -427,58 +430,57 @@ class BeamColumnEndPlate(MomentConnection):
 
     def bolt_design(self):
         #######################################################################
-        # Calculate bolt capacities
 
-        if bolt_type == "Friction Grip Bolt":
+        if self.bolt.bolt_type == "Friction Grip Bolt":
             bolt_slip_capacity = IS800_2007.cl_10_4_3_bolt_slip_resistance(
-                f_ub=bolt_fu, A_nb=bolt_net_area, n_e=1, mu_f=mu_f, bolt_hole_type=bolt_hole_type)
+                f_ub=self.bolt.bolt_fu, A_nb=self.bolt.bolt_net_area, n_e=1, mu_f=self.bolt.mu_f, bolt_hole_type=self.bolt.bolt_hole_type)
             bolt_tension_capacity = IS800_2007.cl_10_4_5_friction_bolt_tension_resistance(
-                f_ub=bolt_fu, f_yb=bolt_fy, A_sb=bolt_shank_area, A_n=bolt_net_area)
+                f_ub=self.bolt.bolt_fu, f_yb=self.bolt.bolt_fy, A_sb=self.bolt.bolt_shank_area, A_n=self.bolt.bolt_net_area)
             bearing_capacity = 0.0
             bolt_shear_capacity = 0.0
             bolt_capacity = bolt_slip_capacity
 
         else:
             bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
-                f_u=bolt_fu, A_nb=bolt_net_area, A_sb=bolt_shank_area, n_n=1, n_s=0)
+                f_u=self.bolt.bolt_fu, A_nb=self.bolt.bolt_net_area, A_sb=self.bolt.bolt_shank_area, n_n=1, n_s=0)
             bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
-                f_u=min(column_fu, end_plate_fu), f_ub=bolt_fu, t=sum(bolt_plates_tk), d=bolt_dia, e=edge_dist,
-                p=pitch_dist, bolt_hole_type=bolt_hole_type)
+                f_u=min(self.supporting_section.fu, self.plate.fu), f_ub=self.bolt.bolt_fu, t=sum(bolt_plates_tk), d=self.bolt.bolt_diameter_provided, e=self.bolt.edge_dist,
+                p=self.bolt.pitch, bolt_hole_type=self.bolt.bolt_hole_type)
             bolt_slip_capacity = 0.0
             bolt_capacity = min(bolt_shear_capacity, bearing_capacity)
             bolt_tension_capacity = IS800_2007.cl_10_3_5_bearing_bolt_tension_resistance(
-                f_ub=bolt_fu, f_yb=bolt_fy, A_sb=bolt_shank_area, A_n=bolt_net_area)
+                f_ub=self.bolt.bolt_fu, f_yb=self.bolt.bolt_fy, A_sb=self.bolt.bolt_shank_area, A_n=self.bolt.bolt_net_area)
 
         #######################################################################
 
         # Calculation for number of bolts around tension flange
-        flange_tension = factored_moment / (beam_d - beam_tf) + factored_axial_load / 2
+        flange_tension = self.load.moment / (self.supported_section.depth - self.supported_section.flange_thickness) + self.load.axial_force / 2
         no_tension_side_rqd = flange_tension / (0.80 * bolt_tension_capacity)
         no_tension_side = round_up(no_tension_side_rqd, multiplier=2, minimum_value=2)
 
-        b_e = beam_B / 2
+        b_e = self.supported_section.flange_width / 2
         prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(
-            T_e=flange_tension / 4, l_v=l_v, f_o=0.7 * bolt_fu, b_e=b_e, t=end_plate_thickness, f_y=end_plate_fy,
-            end_dist=end_dist, pre_tensioned=False)
+            T_e=flange_tension / 4, l_v=l_v, f_o=0.7 * self.bolt.bolt_fu, b_e=b_e, t=self.plate.thickness_provided, f_y=self.plate.fy,
+            end_dist=self.bolt.end_dist, pre_tensioned=False)
 
         # Detailing
         bolt_combined_status = False
         detailing_status = True
         while bolt_combined_status is False:
 
-            if endplate_type == 'flush':
+            if self.endplate_type == 'flush':
                 number_of_bolts = 2 * no_tension_side
 
                 if no_tension_side == 2:
                     no_rows = {'out_tension_flange': 0, 'in_tension_flange': 1,
                                'out_compression_flange': 0, 'in_compression_flange': 1}
-                    if beam_d - 2 * beam_tf - 2 * l_v < pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < self.bolt.pitch:
                         detailing_status = False
 
                 elif no_tension_side == 4:
                     no_rows = {'out_tension_flange': 0, 'in_tension_flange': 2,
                                'out_compression_flange': 0, 'in_compression_flange': 2}
-                    if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < 3 * self.bolt.pitch:
                         detailing_status = False
                         # logger.error("Large number of bolts are required for the connection")
                         # # logger.warning()
@@ -491,7 +493,7 @@ class BeamColumnEndPlate(MomentConnection):
                 elif no_tension_side == 6:
                     no_rows = {'out_tension_flange': 0, 'in_tension_flange': 3,
                                'out_compression_flange': 0, 'in_compression_flange': 3}
-                    if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < 5 * self.bolt.pitch:
                         detailing_status = False
                         # logger.error("Large number of bolts are required for the connection")
                         # logger.info(": Re-design the connection using bolt of higher grade or diameter")
@@ -509,14 +511,14 @@ class BeamColumnEndPlate(MomentConnection):
 
                 # #######################################################################
 
-            elif endplate_type == 'one_way':
+            elif self.endplate_type == 'one_way':
                 number_of_bolts = no_tension_side + 2
                 if no_tension_side <= 4:
                     no_tension_side = 4
                     number_of_bolts = no_tension_side + 2
                     no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
                                'out_compression_flange': 0, 'in_compression_flange': 1}
-                    if beam_d - 2 * beam_tf - 2 * l_v < pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < self.bolt.pitch:
                         detailing_status = False
                         # logger.error("Large number of bolts are required for the connection")
                         # # logger.warning()
@@ -529,7 +531,7 @@ class BeamColumnEndPlate(MomentConnection):
                 elif no_tension_side == 6:
                     no_rows = {'out_tension_flange': 1, 'in_tension_flange': 2,
                                'out_compression_flange': 0, 'in_compression_flange': 1}
-                    if beam_d - 2 * beam_tf - 2 * l_v < 2 * pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < 2 * self.bolt.pitch:
                         detailing_status = False
                         # logger.error("Large number of bolts are required for the connection")
                         # # logger.warning()
@@ -542,7 +544,7 @@ class BeamColumnEndPlate(MomentConnection):
                 elif no_tension_side == 8:
                     no_rows = {'out_tension_flange': 1, 'in_tension_flange': 3,
                                'out_compression_flange': 0, 'in_compression_flange': 1}
-                    if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < 3 * self.bolt.pitch:
                         detailing_status = False
                         # logger.error("Large number of bolts are required for the connection")
                         # logger.info(": Re-design the connection using bolt of higher grade or diameter")
@@ -553,7 +555,7 @@ class BeamColumnEndPlate(MomentConnection):
                 elif no_tension_side == 10:
                     no_rows = {'out_tension_flange': 2, 'in_tension_flange': 3,
                                'out_compression_flange': 0, 'in_compression_flange': 1}
-                    if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < 3 * self.bolt.pitch:
                         detailing_status = False
                         # logger.error("Large number of bolts are required for the connection")
                         # logger.info(": Re-design the connection using bolt of higher grade or diameter")
@@ -567,7 +569,7 @@ class BeamColumnEndPlate(MomentConnection):
 
                 # #######################################################################
 
-            else:  # endplate_type == "both_way":
+            else:  # self.endplate_type == "both_way":
                 number_of_bolts = 2 * no_tension_side
 
                 if no_tension_side <= 4:
@@ -575,13 +577,13 @@ class BeamColumnEndPlate(MomentConnection):
                     number_of_bolts = 2 * no_tension_side
                     no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
                                'out_compression_flange': 1, 'in_compression_flange': 1}
-                    if beam_d - 2 * beam_tf - 2 * l_v < pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < self.bolt.pitch:
                         detailing_status = False
 
                 elif no_tension_side == 6:
                     no_rows = {'out_tension_flange': 1, 'in_tension_flange': 2,
                                'out_compression_flange': 1, 'in_compression_flange': 2}
-                    if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < 3 * self.bolt.pitch:
                         detailing_status = False
                         # logger.error("Large number of bolts are required for the connection")
                         # # logger.warning()
@@ -594,7 +596,7 @@ class BeamColumnEndPlate(MomentConnection):
                 elif no_tension_side == 8:
                     no_rows = {'out_tension_flange': 1, 'in_tension_flange': 3,
                                'out_compression_flange': 1, 'in_compression_flange': 3}
-                    if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < 5 * self.bolt.pitch:
                         detailing_status = False
                         # logger.error("Large number of bolts are required for the connection")
                         # logger.info(": Re-design the connection using bolt of higher grade or diameter")
@@ -605,7 +607,7 @@ class BeamColumnEndPlate(MomentConnection):
                 elif no_tension_side == 10:
                     no_rows = {'out_tension_flange': 2, 'in_tension_flange': 3,
                                'out_compression_flange': 2, 'in_compression_flange': 3}
-                    if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
+                    if self.supported_section.depth - 2 * self.supported_section.flange_thickness - 2 * l_v < 5 * self.bolt.pitch:
                         detailing_status = False
                         # logger.error("Large number of bolts are required for the connection")
                         # logger.info(": Re-design the connection using bolt of higher grade or diameter")
@@ -625,54 +627,54 @@ class BeamColumnEndPlate(MomentConnection):
             if no_rows['out_tension_flange'] == 0:
                 tens_plate_outer = flange_projection
             else:
-                tens_plate_outer = end_dist + l_v + (no_rows['out_tension_flange'] - 1) * pitch_dist
+                tens_plate_outer = self.bolt.end_dist + l_v + (no_rows['out_tension_flange'] - 1) * self.bolt.pitch
             if no_rows['out_compression_flange'] == 0:
                 comp_plate_outer = flange_projection
             else:
-                comp_plate_outer = end_dist + l_v + (no_rows['out_compression_flange'] - 1) * pitch_dist
+                comp_plate_outer = self.bolt.end_dist + l_v + (no_rows['out_compression_flange'] - 1) * self.bolt.pitch
 
-            plate_height = beam_d + comp_plate_outer + tens_plate_outer
-            plate_width = g_1 + 2 * edge_dist
-            while plate_width < beam_B:
-                edge_dist += 5
-                plate_width = g_1 + 2 * edge_dist
-                if edge_dist > edge_dist_max:
-                    edge_dist -= 5
+            plate_height = self.supported_section.depth + comp_plate_outer + tens_plate_outer
+            self.plate.width = g_1 + 2 * self.bolt.edge_dist
+            while self.plate.width < self.supported_section.flange_width:
+                self.bolt.edge_dist += 5
+                self.plate.width = g_1 + 2 * self.bolt.edge_dist
+                if self.bolt.edge_dist > self.bolt.max_edge_dist:
+                    self.bolt.edge_dist -= 5
                     g_1 += 5
-                    plate_width = g_1 + 2 * edge_dist
+                    self.plate.width = g_1 + 2 * self.bolt.edge_dist
                     # TODO: Apply max limit for g_1, design fails
 
-            if plate_width > plate_width_max:
+            if self.plate.width > self.plate.width_max:
                 design_status = False
                 logger.error(": Required plate width is more than the available width")
-                logger.warning(": Width of plate should be less than %s mm" % plate_width_max)
+                logger.warning(": Width of plate should be less than %s mm" % self.plate.width_max)
                 logger.info(": Currently, Osdag doesn't design such connections")
 
             # Tension in bolts
-            axial_tension = factored_axial_load / number_of_bolts
+            axial_tension = self.load.axial_force / number_of_bolts
             if no_rows['out_tension_flange'] == 0:
-                extreme_bolt_dist = beam_d - beam_tf * 3 / 2 - l_v
+                extreme_bolt_dist = self.supported_section.depth - self.supported_section.flange_thickness * 3 / 2 - l_v
             else:
-                extreme_bolt_dist = beam_d - beam_tf / 2 + l_v + (no_rows['out_tension_flange'] - 1) * pitch_dist
+                extreme_bolt_dist = self.supported_section.depth - self.supported_section.flange_thickness / 2 + l_v + (no_rows['out_tension_flange'] - 1) * self.bolt.pitch
             sigma_yi_sq = 0
             for bolt_row in range(int(no_rows['out_tension_flange'])):
-                print("out_tension_flange", bolt_row, beam_d - beam_tf / 2 + l_v + bolt_row * pitch_dist)
-                sigma_yi_sq += (beam_d - beam_tf / 2 + l_v + bolt_row * pitch_dist) ** 2
+                print("out_tension_flange", bolt_row, self.supported_section.depth - self.supported_section.flange_thickness / 2 + l_v + bolt_row * self.bolt.pitch)
+                sigma_yi_sq += (self.supported_section.depth - self.supported_section.flange_thickness / 2 + l_v + bolt_row * self.bolt.pitch) ** 2
 
             for bolt_row in range(int(no_rows['in_tension_flange'])):
-                print("in_tension_flange", bolt_row, beam_d - 3 * beam_tf / 2 - l_v - bolt_row * pitch_dist)
-                sigma_yi_sq += (beam_d - 3 * beam_tf / 2 - l_v - bolt_row * pitch_dist) ** 2
+                print("in_tension_flange", bolt_row, self.supported_section.depth - 3 * self.supported_section.flange_thickness / 2 - l_v - bolt_row * self.bolt.pitch)
+                sigma_yi_sq += (self.supported_section.depth - 3 * self.supported_section.flange_thickness / 2 - l_v - bolt_row * self.bolt.pitch) ** 2
 
             for bolt_row in range(int(no_rows['in_compression_flange'])):
-                print("in_compression_flange", bolt_row, beam_tf / 2 + l_v + bolt_row * pitch_dist)
-                sigma_yi_sq += (beam_tf / 2 + l_v + bolt_row * pitch_dist) ** 2
+                print("in_compression_flange", bolt_row, self.supported_section.flange_thickness / 2 + l_v + bolt_row * self.bolt.pitch)
+                sigma_yi_sq += (self.supported_section.flange_thickness / 2 + l_v + bolt_row * self.bolt.pitch) ** 2
 
-            moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq / 2
+            moment_tension = self.load.moment * extreme_bolt_dist / sigma_yi_sq / 2
             tension_in_bolt = axial_tension + moment_tension + prying_force
-            shear_in_bolt = factored_shear_load / number_of_bolts
+            shear_in_bolt = self.load.shear_force / number_of_bolts
 
             # Check for combined tension and shear
-            if bolt_type == "Friction Grip Bolt":
+            if self.bolt.bolt_type == "Friction Grip Bolt":
                 combined_capacity = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(
                     V_sf=shear_in_bolt, V_df=bolt_capacity, T_f=tension_in_bolt, T_df=bolt_tension_capacity)
             else:
@@ -691,13 +693,13 @@ class BeamColumnEndPlate(MomentConnection):
             # Prying force
 
             print("prying force:", prying_force)
-            # toe_of_weld_moment = abs(flange_tension/4 * l_v - prying_force * end_dist)
-            toe_of_weld_moment = abs(tension_in_bolt * l_v - prying_force * end_dist)
-            end_plate_thickness_min = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (end_plate_fy * b_e))
+            # toe_of_weld_moment = abs(flange_tension/4 * l_v - prying_force * self.bolt.end_dist)
+            toe_of_weld_moment = abs(tension_in_bolt * l_v - prying_force * self.bolt.end_dist)
+            end_plate_thickness_min = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (self.plate.fy * b_e))
 
             # End Plate Thickness
-            if end_plate_thickness < max(column_tf, end_plate_thickness_min):
-                end_plate_thickness_min = math.ceil(max(column_tf, end_plate_thickness_min))
+            if self.plate.thickness_provided < max(self.supporting_section.flange_thickness, end_plate_thickness_min):
+                end_plate_thickness_min = math.ceil(max(self.supporting_section.flange_thickness, end_plate_thickness_min))
                 design_status = False
                 logger.error(": Chosen end plate thickness is not sufficient")
                 logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness_min)
@@ -758,7 +760,7 @@ class BeamColumnEndPlate(MomentConnection):
                     2 * self.bottom_flange_weld.eff_length * self.bottom_flange_weld.lj_factor +
                     self.web_weld.eff_length * self.web_weld.lj_factor))
 
-        flange_tension_moment = self.load.moment / (beam_d - beam_tf)
+        flange_tension_moment = self.load.moment / (self.supported_section.depth - self.supported_section.flange_thickness)
         weld_force_moment = flange_tension_moment / (self.top_flange_weld.eff_length +
                                                              2 * self.bottom_flange_weld.eff_length)
         weld_force_shear = self.load.shear_force / (2 * self.web_weld.eff_length * self.web_weld.lj_factor)
@@ -797,7 +799,7 @@ class BeamColumnEndPlate(MomentConnection):
                     4 * self.bottom_flange_weld.eff_length * self.bottom_flange_weld.lj_factor * self.top_flange_weld.throat_tk + \
                     2 * self.web_weld.eff_length * self.web_weld.lj_factor * self.web_weld.throat_tk)
 
-        # flange_tension_moment = self.load.moment / (beam_d - beam_tf)
+        # flange_tension_moment = self.load.moment / (self.supported_section.depth - self.supported_section.flange_thickness)
         # weld_force_moment = flange_tension_moment / (
         #         self.top_flange_weld.eff_length * self.top_flange_weld.lj_factor * self.web_weld.eff_length / 2 +
         #         self.bottom_flange_weld.eff_length * self.bottom_flange_weld.lj_factor * self.web_weld.eff_length / 2 +
@@ -806,11 +808,12 @@ class BeamColumnEndPlate(MomentConnection):
         # Stresses in extreme weld (top flange) due to applied moment
 
         weld_Iz = (2 * (self.web_weld.eff_length ** 3) / 12) * self.web_weld.throat_tk + \
-                  (2 * self.top_flange_weld.eff_length * (beam_d / 2) ** 2 + \
-                   4 * self.bottom_flange_weld.eff_length * (beam_d / 2 - beam_tf) ** 2) * self.top_flange_weld.throat_tk
+                  (2 * self.top_flange_weld.eff_length * (self.supported_section.depth / 2) ** 2 + \
+                   4 * self.bottom_flange_weld.eff_length * (self.supported_section.depth / 2 - self.supported_section.flange_thickness) ** 2) * self.top_flange_weld.throat_tk
 
-        flange_weld_Z = weld_Iz / (beam_d / 2)
-        web_weld_Z = weld_Iz / (beam_d / 2 - beam_tf - beam_R1)
+        flange_weld_Z = weld_Iz / (self.supported_section.depth / 2)
+        web_weld_Z = weld_Iz / (self.supported_section.depth / 2 - self.supported_section.flange_thickness - self.supported_section.root_radius)
+
 
         flange_weld_stress = self.load.moment / flange_weld_Z + weld_force_axial_stress
 
@@ -832,7 +835,7 @@ class BeamColumnEndPlate(MomentConnection):
         if flange_weld_stress >= self.top_flange_weld.strength:
             design_status = False
             logger.error(": The weld size at beam flange is less than required")
-            if flange_weld_size_reqd > flange_weld_size_max:
+            if flange_weld_size_reqd > self.top_flange_weld.max_size:
                 logger.warning(": The connection can not be possible with fillet weld")
                 logger.info(": Use groove welds to connect beam and end plate")
             else:
@@ -842,7 +845,7 @@ class BeamColumnEndPlate(MomentConnection):
         if web_weld_stress >= self.web_weld.strength:
             design_status = False
             logger.error(": The weld size at beam web is less than required")
-            if web_weld_size_reqd > web_weld_size_max and flange_weld_size_reqd < flange_weld_size_max:
+            if web_weld_size_reqd > self.web_weld.max_size and flange_weld_size_reqd < self.top_flange_weld.max_size:
                 logger.warning(": The connection can not be possible with fillet weld")
                 logger.info(": Use groove welds to connect beam and end plate")
             else:
@@ -852,54 +855,54 @@ class BeamColumnEndPlate(MomentConnection):
     def groove_weld(self):
         # weld_method == 'groove'
         groove_weld_size_flange = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
-            beam_tf, end_plate_thickness)
+            self.supported_section.flange_thickness, self.plate.thickness_provided)
         groove_weld_size_web = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
-            beam_tw, end_plate_thickness)
+            self.supported_section.web_thickness, self.plate.thickness_provided)
 
     def find_end_plate_spacing(self):
         #######################################################################
         # l_v = Distance from the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
         # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge, Steel designers manual, pp733, 6th edition - 2003)
-        endplate_type = ""
-        if endplate_type == 'flush':
+        self.endplate_type = ""
+        if self.endplate_type == 'flush':
             l_v = 45.0
             g_1 = 90.0
-        elif endplate_type == 'one_way':
+        elif self.endplate_type == 'one_way':
             l_v = 50.0
             g_1 = 100.0
-        else:  # endplate_type == 'both_ways':
+        else:  # self.endplate_type == 'both_ways':
             l_v = 50.0
             g_1 = 100.0
 
-        if self.flange_weld.type is KEY_DP_WELD_TYPE_FILLET:
+        if self.top_flange_weld.type is KEY_DP_WELD_TYPE_FILLET:
             flange_projection = round_up(value=self.top_flange_weld.size + 2, multiplier=5, minimum_value=5)
         else:  # 'groove'
             flange_projection = 5
 
     def continuity_plaste(self):
         # Continuity Plates
-        cont_plate_fu = beam_fu
-        cont_plate_fy = beam_fy
+        cont_plate_fu = self.supported_section.fu
+        cont_plate_fy = self.supported_section.fy
         cont_plate_e = math.sqrt(250 / cont_plate_fy)
         gamma_m0 = 1.10
         gamma_m1 = 1.10
 
         # Continuity Plates on compression side
-        p_bf = factored_moment / (beam_d - beam_tf) - factored_axial_load  # Compressive force at beam flanges
-        cont_plate_comp_length = column_d - 2 * column_tf
-        cont_plate_comp_width = (column_B - column_tw) / 2
-        notch_cont_comp = round_up(value=column_R1, multiplier=5, minimum_value=5)
+        p_bf = self.load.moment / (self.supported_section.depth - self.supported_section.flange_thickness) - self.load.axial_force  # Compressive force at beam flanges
+        cont_plate_comp_length = self.supporting_section.depth - 2 * self.supporting_section.flange_thickness
+        cont_plate_comp_width = (self.supporting_section.flange_width - self.supporting_section.web_thickness) / 2
+        notch_cont_comp = round_up(value=self.supporting_section.root_radius, multiplier=5, minimum_value=5)
         available_cont_comp_width = cont_plate_comp_width - notch_cont_comp
         available_cont_comp_length = cont_plate_comp_length - 2 * notch_cont_comp
 
-        col_web_capacity_yielding = column_tw * (5 * column_tf + 5 * column_R1 + beam_tf) * column_fy / gamma_m0
-        col_web_capacity_crippling = ((300 * column_tw ** 2) / gamma_m1) * (
-                1 + 3 * (beam_tf / column_d) * (column_tw / column_tf) ** 1.5) * math.sqrt(
-            column_fy * column_tf / column_tw)
-        col_web_capacity_buckling = (10710 * (column_tw ** 3) / column_d) * math.sqrt(column_fy / gamma_m0)
+        col_web_capacity_yielding = self.supporting_section.web_thickness * (5 * self.supporting_section.flange_thickness + 5 * self.supporting_section.root_radius + self.supported_section.flange_thickness) * self.supporting_section.fy / gamma_m0
+        col_web_capacity_crippling = ((300 * self.supporting_section.web_thickness ** 2) / gamma_m1) * (
+                1 + 3 * (self.supported_section.flange_thickness / self.supporting_section.depth) * (self.supporting_section.web_thickness / self.supporting_section.flange_thickness) ** 1.5) * math.sqrt(
+            self.supporting_section.fy * self.supporting_section.flange_thickness / self.supporting_section.web_thickness)
+        col_web_capacity_buckling = (10710 * (self.supporting_section.web_thickness ** 3) / self.supporting_section.depth) * math.sqrt(self.supporting_section.fy / gamma_m0)
         col_web_capacity = min(col_web_capacity_yielding, col_web_capacity_crippling, col_web_capacity_buckling)
         cont_plate_comp_tk_local_buckling = cont_plate_comp_width / (9.4 * cont_plate_e)
-        cont_plate_comp_tk_min = max(cont_plate_comp_tk_local_buckling, beam_tf,
+        cont_plate_comp_tk_min = max(cont_plate_comp_tk_local_buckling, self.supported_section.flange_thickness,
                                      (p_bf - col_web_capacity) / (cont_plate_comp_width * cont_plate_fy / gamma_m0))
         cont_plate_comp_tk = cont_plate_comp_tk_min
         available_plates = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30, 32, 34, 35, 36, 40, 45, 50, 55, 60]
@@ -909,14 +912,14 @@ class BeamColumnEndPlate(MomentConnection):
                 break
 
         # Continuity Plates on tension side
-        t_bf = factored_moment / (beam_d - beam_tf) + factored_axial_load  # Tensile force at beam flanges
-        cont_plate_tens_length = column_d - 2 * column_tf
-        cont_plate_tens_width = (column_B - column_tw) / 2
-        notch_cont_tens = round_up(value=column_R1, multiplier=5, minimum_value=5)
+        t_bf = self.load.moment / (self.supported_section.depth - self.supported_section.flange_thickness) + self.load.axial_force  # Tensile force at beam flanges
+        cont_plate_tens_length = self.supporting_section.depth - 2 * self.supporting_section.flange_thickness
+        cont_plate_tens_width = (self.supporting_section.flange_width - self.supporting_section.web_thickness) / 2
+        notch_cont_tens = round_up(value=self.supporting_section.root_radius, multiplier=5, minimum_value=5)
         available_cont_tens_width = cont_plate_tens_width - notch_cont_tens
         available_cont_tens_length = cont_plate_tens_length - 2 * notch_cont_tens
 
-        col_flange_tens_capacity = (column_tf ** 2) * beam_fy / (0.16 * gamma_m0)
+        col_flange_tens_capacity = (self.supporting_section.flange_thickness ** 2) * self.supported_section.fy / (0.16 * gamma_m0)
         cont_plate_tens_tk_min = (t_bf - col_flange_tens_capacity) / (cont_plate_tens_width * cont_plate_fy / gamma_m0)
         cont_plate_tens_tk = cont_plate_tens_tk_min
         for plate_tk in available_plates:
@@ -933,8 +936,8 @@ class BeamColumnEndPlate(MomentConnection):
         welds_sizes = [3, 4, 5, 6, 8, 10, 12, 14, 16]
         # continuity plate weld design on compression side
         # same is assumed for tension side
-        cont_web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(cont_plate_comp_tk, column_tw)
-        cont_web_weld_size_max = min(beam_tw, cont_plate_comp_tk)
+        cont_web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(cont_plate_comp_tk, self.supporting_section.web_thickness)
+        cont_web_weld_size_max = min(self.supported_section.web_thickness, cont_plate_comp_tk)
         available_welds = list([x for x in welds_sizes if (cont_web_weld_size_min <= x <= cont_web_weld_size_max)])
         for cont_web_weld_size in available_welds:
             cont_web_weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
@@ -943,11 +946,11 @@ class BeamColumnEndPlate(MomentConnection):
                 fillet_size=cont_web_weld_size, available_length=available_cont_comp_length)
             if (max(p_bf, t_bf) / 2) / (2 * cont_web_weld_eff_length * cont_web_weld_throat) <= \
                     IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
-                        ultimate_stresses=(weld_fu, column_fu, cont_plate_fu)):
+                        ultimate_stresses=(weld_fu, self.supporting_section.fu, cont_plate_fu)):
                 break
 
-        cont_flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(cont_plate_comp_tk, column_tf)
-        cont_flange_weld_size_max = max(column_tf, cont_plate_comp_tk)
+        cont_flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(cont_plate_comp_tk, self.supporting_section.flange_thickness)
+        cont_flange_weld_size_max = max(self.supporting_section.flange_thickness, cont_plate_comp_tk)
         available_welds = list(
             [x for x in welds_sizes if (cont_flange_weld_size_min <= x <= cont_flange_weld_size_max)])
         for cont_flange_weld_size in available_welds:
@@ -956,11 +959,11 @@ class BeamColumnEndPlate(MomentConnection):
             cont_flange_Weld_eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
                 fillet_size=cont_flange_weld_size, available_length=available_cont_comp_width)
             cont_axial_stress = (max(p_bf, t_bf) / 2) / (4 * cont_flange_Weld_eff_length * cont_flange_weld_throat)
-            cont_moment_stress = (max(p_bf, t_bf) / 2) * (l_v + beam_tw / 2) / (
+            cont_moment_stress = (max(p_bf, t_bf) / 2) * (l_v + self.supported_section.web_thickness / 2) / (
                     cont_plate_comp_length * cont_flange_weld_throat * 4 * cont_flange_Weld_eff_length)
             if math.sqrt(
                     cont_axial_stress ** 2 + cont_moment_stress ** 2) <= IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
-                ultimate_stresses=(weld_fu, column_fu, cont_plate_fu)):
+                ultimate_stresses=(weld_fu, self.supporting_section.fu, cont_plate_fu)):
                 break
         # same weld size is considered for flange and web connectivity of continuity plates
         # TODO: Should we recalculate stresses for common weld thickness?
@@ -971,12 +974,12 @@ class BeamColumnEndPlate(MomentConnection):
         # continuity plate warnings
         if math.sqrt(
                 cont_axial_stress ** 2 + cont_moment_stress ** 2) >= IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
-            ultimate_stresses=(weld_fu, column_fu, cont_plate_fu)):
+            ultimate_stresses=(weld_fu, self.supporting_section.fu, cont_plate_fu)):
             logger.warning("weld between column flange and continuity plates is not safe")
 
         if (max(p_bf, t_bf) / 2) / (2 * cont_web_weld_eff_length * cont_web_weld_throat) >= \
                 IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
-                    ultimate_stresses=(weld_fu, column_fu, cont_plate_fu)):
+                    ultimate_stresses=(weld_fu, self.supporting_section.fu, cont_plate_fu)):
             logger.warning("weld between column web and continuity plates is not safe")
 
         # Note: for more number of iteration more numbers of  available size should be provided
@@ -984,9 +987,9 @@ class BeamColumnEndPlate(MomentConnection):
     def stiffener(self):
         # Beam stiffeners
         st_status = False
-        if endplate_type == 'flush':
+        if self.endplate_type == 'flush':
             st_number = 0
-        elif endplate_type == 'one_way':
+        elif self.endplate_type == 'one_way':
             st_number = 1
             if number_of_bolts >= 12:
                 st_status = True
@@ -995,28 +998,28 @@ class BeamColumnEndPlate(MomentConnection):
             if number_of_bolts >= 20:
                 st_status = True
 
-        st_fu = beam_fu
-        st_fy = beam_fy
-        st_height = l_v + pitch_dist + end_dist
+        st_fu = self.supported_section.fu
+        st_fy = self.supported_section.fy
+        st_height = l_v + self.bolt.pitch + self.bolt.end_dist
         # for plate_tk in available_plates:
-        #     if plate_tk >= beam_tw:
+        #     if plate_tk >= self.supported_section.web_thickness:
         #         st_thickness = plate_tk
         #         break
-        available_thickness = list([x for x in available_plates if (beam_tw <= x <= max(available_plates))])
+        available_thickness = list([x for x in available_plates if (self.supported_section.web_thickness <= x <= max(available_plates))])
         st_thickness = min(available_thickness)
         st_length_min = st_height + 100.0
         st_notch_top = 50.0
         st_notch_bottom = round_up(value=weld_thickness_flange, multiplier=5, minimum_value=5)
 
         st_force = 4 * tension_in_bolt
-        st_moment = st_force * (l_v + pitch_dist / 2)
+        st_moment = st_force * (l_v + self.bolt.pitch / 2)
         st_length = st_length_min
         st_beam_weld = 3.0
         if st_status is True:
             # stiffener plate design
             for st_thickness in available_thickness:
                 print(st_thickness)
-                while st_length <= float(int(beam_d / 100) * 100):
+                while st_length <= float(int(self.supported_section.depth / 100) * 100):
                     st_eff_length = st_length - st_notch_bottom
                     st_shear_capacity = st_eff_length * st_thickness * st_fy / (math.sqrt(3) * gamma_m0)
                     st_moment_capacity = st_eff_length ** 2 * st_thickness * st_fy / (4 * gamma_m0)
@@ -1031,8 +1034,8 @@ class BeamColumnEndPlate(MomentConnection):
                     st_length = st_length_min
 
             # Stiffener Weld Design
-            st_beam_weld_min = IS800_2007.cl_10_5_2_3_min_weld_size(st_thickness, beam_tf)
-            st_beam_weld_max = max(beam_tf, st_thickness)
+            st_beam_weld_min = IS800_2007.cl_10_5_2_3_min_weld_size(st_thickness, self.supported_section.flange_thickness)
+            st_beam_weld_max = max(self.supported_section.flange_thickness, st_thickness)
 
             available_welds = list([x for x in welds_sizes if (st_beam_weld_min <= x <= st_beam_weld_max)])
             for st_beam_weld in available_welds:
@@ -1046,7 +1049,7 @@ class BeamColumnEndPlate(MomentConnection):
                 st_weld_moment_stress = st_moment / (2 * st_beam_weld * st_beam_weld_eff_length ** 2 / 4)
                 st_eq_weld_stress = math.sqrt(st_weld_shear_stress ** 2 + st_weld_moment_stress ** 2)
                 if st_eq_weld_stress <= IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
-                        ultimate_stresses=(weld_fu, beam_fu, st_fu)):
+                        ultimate_stresses=(weld_fu, self.supported_section.fu, st_fu)):
                     break
             # stiffener warnings
 
@@ -1055,28 +1058,27 @@ class BeamColumnEndPlate(MomentConnection):
             if st_force >= st_shear_capacity:
                 logger.warning("stiffener cannot take shear force, current stiffener length %2.2f" % st_length)
             if st_eq_weld_stress >= IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
-                    ultimate_stresses=(weld_fu, beam_fu, st_fu)):
+                    ultimate_stresses=(weld_fu, self.supported_section.fu, st_fu)):
                 logger.warning(
                     "stiffener weld cannot take stiffener loads, current weld thickness is %2.2f" % st_beam_weld)
 
         # Strength of flange under compression or tension TODO: Get function from IS 800
 
-        A_f = beam_B * beam_tf  # area of beam flange
-        capacity_beam_flange = (beam_fy / gamma_m0) * A_f
+        A_f = self.supported_section.flange_width * self.supported_section.flange_thickness  # area of beam flange
+        capacity_beam_flange = (self.supported_section.fy / gamma_m0) * A_f
         force_flange = max(t_bf, p_bf)
 
     def trial_design(self):
         self.set_osdaglogger()
         bolt_dia = max(self.bolt.bolt_diameter)
         bolt_grade = max(self.bolt.bolt_grade)
-        end_plate_thickness = min(self.plate.thickness)
+        self.plate.thickness_provided = min(self.plate.thickness)
 
         self.check_minimum_design_action()
         self.check_compatibility()
 
         # Weld design
         self.assign_weld_sizes()
-        self.assign_throat_tk()
         self.assign_weld_lengths()
         self.assign_weld_strength()
 

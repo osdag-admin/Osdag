@@ -15,7 +15,7 @@ from cad.items.ModelUtils import getGpPt
 
 
 class NutBoltArray_Web():
-    def __init__(self, outputobj, nut, bolt, numOfboltsW, nutSpaceW):
+    def __init__(self, Obj, nut, bolt, numOfboltsW, nutSpaceW):
         """
         :param alist: Input values, entered by user
         :param beam_data: Beam dimensions
@@ -35,11 +35,10 @@ class NutBoltArray_Web():
         # self.beamDim = beam_data
         self.bolt = bolt
         self.nut = nut
-        self.outputobj = outputobj
         self.numOfboltsW = numOfboltsW
         self.nutSpaceW = nutSpaceW
 
-        self.initBoltPlaceParams_Web(outputobj)
+        self.initBoltPlaceParams_Web(Obj)
         self.bolts_W = []
         self.nuts_W = []
         self.initialiseNutBolts_Web()
@@ -62,21 +61,21 @@ class NutBoltArray_Web():
             self.bolts_W.append(Bolt(b_W.R, b_W.T, b_W.H, b_W.r))
             self.nuts_W.append(Nut(n_W.R, n_W.T, n_W.H, n_W.r1))
 
-    def initBoltPlaceParams_Web(self, outputobj):
+    def initBoltPlaceParams_Web(self, Obj):
         '''
         :param outputobj: This is output dictionary for bolt placement parameters
         :return: Edge, end, gauge and pitch distances for placement
         '''
-        self.edge_W = 25     #outputobj.web_plate.edge_dist_provided  # 33
-        self.end_W = 25     #outputobj.web_plate.end_dist_provided  # 33
+        self.edge_W = Obj.web_plate.edge_dist_provided  # 33
+        self.end_W = Obj.web_plate.end_dist_provided  # 33
         # self.pitch_W = 150     #70
         # self.gauge_W = outputobj.web_plate.length - 2* self.edge_W
-        self.pitch_W = 30       #outputobj.web_plate.pitch_provided
-        self.pitch_MW = 60      #outputobj.web_plate.midpitch  # todo for gap
-        self.gauge_W = 30       #outputobj.web_plate.gauge_provided
+        self.pitch_W = Obj.web_plate.pitch_provided
+        self.pitch_MW = Obj.web_plate.midpitch  # todo for gap
+        self.gauge_W = Obj.web_plate.gauge_provided
 
-        self.row_W = 6      #outputobj.web_plate.bolts_one_line
-        self.col_W = 4      #outputobj.web_plate.bolt_line
+        self.row_W = Obj.web_plate.bolts_one_line
+        self.col_W = Obj.web_plate.bolt_line
 
     def calculatePositions_Web(self):
         """

@@ -48,6 +48,10 @@ from cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 from cad.MomentConnections.BBSpliceCoverlateCAD.WeldedCAD import BBSpliceCoverPlateWeldedCAD
 
 from cad.MomentConnections.CCSpliceCoverPlateCAD.WeldedCAD import CCSpliceCoverPlateWeldedCAD
+from cad.MomentConnections.CCSpliceCoverPlateCAD.BoltedCAD import CCSpliceCoverPlateBoltedCAD
+from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_AF import NutBoltArray_AF as CCSpliceNutBolt_AF
+from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_BF import NutBoltArray_BF as CCSpliceNutBolt_BF
+from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_Web import NutBoltArray_Web as CCSpliceNutBolt_Web
 
 from cad.BasePlateCad.baseplateconnection import BasePlateCad
 from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
@@ -901,7 +905,56 @@ class CommonDesignLogic(object):
     def createCCCoverPlateCAD(self):
 
         if self.connection == KEY_DISP_COLUMNCOVERPLATE:
-            pass
+            C = self.module_class()
+            columnLenght = (max(float(C.flange_plate.length), float(C.web_plate.length)) + 600) / 2
+            # column = ISection(B=206.4, T=17.3, D=215.8, t=10, R1=15, R2=75, alpha=94, length=1000, notchObj=None)
+            # flangePlate = Plate(L=240, W=203.6, T=10)
+            # innerFlangePlate = Plate(L=240, W=85, T=10)
+            # webPlate = Plate(L=600, W=120, T=8)
+            # gap = 10
+            column = ISection(B=float(C.section.flange_width), T=float(C.section.flange_thickness),
+                              D=float(C.section.depth), t=float(C.section.web_thickness),
+                              R1=float(C.section.root_radius),
+                              R2=float(C.section.toe_radius), alpha=float(C.section.flange_slope), length=columnLenght,
+                              notchObj=None)
+            flangePlate = Plate(L=float(C.flange_plate.length), W=float(C.flange_plate.height),
+                                T=float(C.flange_plate.thickness_provided))
+            innerFlangePlate = Plate(L=float(C.flange_plate.Innerlength), W=float(C.flange_plate.Innerheight),
+                                     T=float(C.flange_plate.thickness_provided))
+            webPlate = Plate(L=float(C.web_plate.length), W=float(C.web_plate.height),
+                             T=float(C.web_plate.thickness_provided))
+
+            bolt_d = float(C.bolt.bolt_diameter_provided)  # Bolt diameter (shank part), entered by user
+            bolt_r = bolt_d / 2  # Bolt radius (Shank part)
+            bolt_T = self.boltHeadThick_Calculation(bolt_d)  # Bolt head thickness
+            bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
+            bolt_Ht = self.boltLength_Calculation(bolt_d)  # Bolt head height
+
+            bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component directory
+            nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
+            nut_Ht = nut_T
+            nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+            if C.preference != 'Outside':
+                nut_space = 2 * flangePlate.T + column.T
+                nut_spaceW = 2 * webPlate.T + column.t
+            else:
+                nut_space = flangePlate.T + column.T
+                nut_spaceW = webPlate.T + column.t
+
+            numOfboltsF = C.flange_plate.bolts_required
+            numOfboltsW = C.web_plate.bolts_required
+
+            nut_bolt_array_AF = CCSpliceNutBolt_AF(C, nut, bolt, numOfboltsF, nut_space)
+            nut_bolt_array_BF = CCSpliceNutBolt_BF(C, nut, bolt, numOfboltsF, nut_space)
+            nut_bolt_array_Web = CCSpliceNutBolt_Web(C, nut, bolt, numOfboltsW, nut_spaceW)
+
+            ccCoverPlateCAD = CCSpliceCoverPlateBoltedCAD(C, column, flangePlate, innerFlangePlate, webPlate,
+                                                                nut_bolt_array_AF, nut_bolt_array_BF,
+                                                                nut_bolt_array_Web)
+
+            ccCoverPlateCAD.create_3DModel()
+
+
         elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
 
             C = self.module_class()
@@ -1277,7 +1330,23 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, welds, update=True, color='Red')
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE:
-                pass
+                self.C = self.module_class()
+                self.CPObj = self.createCCCoverPlateCAD()
+                columns = self.CPObj.get_column_models()
+                plates = self.CPObj.get_plate_models()
+                nutbolt = self.CPObj.get_nut_bolt_models()
+
+                if self.component == "Beam":
+                    # Displays both beams
+                    osdag_display_shape(self.display, columns, update=True)
+                elif self.component == "Connector":
+                    osdag_display_shape(self.display, plates, update=True, color='Blue')
+                    osdag_display_shape(self.display, nutbolt, update=True, color='YELLOW')
+                elif self.component == "Model":
+                    osdag_display_shape(self.display, columns, update=True)
+                    osdag_display_shape(self.display, plates, update=True, color='Blue')
+                    osdag_display_shape(self.display, nutbolt, update=True, color='YELLOW')
+
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 self.C = self.module_class()
                 self.CPObj = self.createCCCoverPlateCAD()

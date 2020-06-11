@@ -7,20 +7,20 @@ import numpy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 import copy
 
-class CCSpliceCoverPlateWeldedCAD(object):
-    def __init__(self,column, flangePlate, innerFlangePlate, webPlate, gap,  nut_bolt_array_AF, nut_bolt_array_BF, nut_bolt_array_Web):
+class CCSpliceCoverPlateBoltedCAD(object):
+    def __init__(self, C, column, flangePlate, innerFlangePlate, webPlate,  nut_bolt_array_AF, nut_bolt_array_BF, nut_bolt_array_Web):
 
+        self.C = C
         self.column = column
         self.flangePlate = flangePlate
         self.innerFlangePlate = innerFlangePlate
         self.webPlate = webPlate
-        self.gap = gap
         self.nut_bolt_array_AF = nut_bolt_array_AF
         self.nut_bolt_array_BF = nut_bolt_array_BF
         self.nut_bolt_array_Web = nut_bolt_array_Web
 
-        self.flangespace = 15
-        self.webspace = 15
+        self.gap = float(self.C.flange_plate.gap)
+
 
         self.column1 = copy.deepcopy(self.column)
         self.column2 = copy.deepcopy(self.column)
@@ -79,36 +79,6 @@ class CCSpliceCoverPlateWeldedCAD(object):
 
         self.flangePlate2Model = self.flangePlate2.create_model()
 
-
-        innerFlangePlatespacing = self.flangespace + self.column.t/2 + self.column.R1
-        innerFlangePlate1Origin = numpy.array([innerFlangePlatespacing,  (self.column.D - self.innerFlangePlate.T)/2 - self.column.T, 0.0])
-        innerFlangePlate1_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerFlangePlate1_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.innerFlangePlate1.place(innerFlangePlate1Origin, innerFlangePlate1_uDir, innerFlangePlate1_wDir)
-
-        self.innerFlangePlate1Model = self.innerFlangePlate1.create_model()
-
-        innerFlangePlate2Origin = numpy.array([innerFlangePlatespacing, -(self.column.D - self.innerFlangePlate.T)/2 + self.column.T, 0.0])
-        innerFlangePlate2_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerFlangePlate2_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.innerFlangePlate2.place(innerFlangePlate2Origin, innerFlangePlate2_uDir, innerFlangePlate2_wDir)
-
-        self.innerFlangePlate2Model = self.innerFlangePlate2.create_model()
-
-        innerFlangePlate3Origin = numpy.array([-innerFlangePlatespacing, -(self.column.D --- self.innerFlangePlate.T)/2 + self.column.T, 0.0])
-        innerFlangePlate3_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerFlangePlate3_wDir = numpy.array([-1.0, 0.0, 0.0])
-        self.innerFlangePlate3.place(innerFlangePlate3Origin, innerFlangePlate3_uDir, innerFlangePlate3_wDir)
-
-        self.innerFlangePlate3Model = self.innerFlangePlate3.create_model()
-
-        innerFlangePlate4Origin = numpy.array([-innerFlangePlatespacing, (self.column.D - self.innerFlangePlate.T)/2 - self.column.T, 0.0])
-        innerFlangePlate4_uDir = numpy.array([0.0, 1.0, 0.0])
-        innerFlangePlate4_wDir = numpy.array([-1.0, 0.0, 0.0])
-        self.innerFlangePlate4.place(innerFlangePlate4Origin, innerFlangePlate4_uDir, innerFlangePlate4_wDir)
-
-        self.innerFlangePlate4Model = self.innerFlangePlate4.create_model()
-
         webPlate1Origin = numpy.array([(self.column.t + self.webPlate.T)/2, -self.webPlate.W/2, 0.0])
         webPlate1_uDir = numpy.array([1.0, 0.0, 0.0])
         webPlate1_wDir = numpy.array([0.0, 1.0, 0.0])
@@ -122,6 +92,37 @@ class CCSpliceCoverPlateWeldedCAD(object):
         self.webPlate2.place(webPlate2Origin, webPlate2_uDir, webPlate2_wDir)
 
         self.webPlate2Model = self.webPlate2.create_model()
+
+        if self.C.preference != 'Outside':
+            innerFlangePlatespacing = self.column.B/2 - self.innerFlangePlate.W
+            innerFlangePlate1Origin = numpy.array([innerFlangePlatespacing,  (self.column.D - self.innerFlangePlate.T)/2 - self.column.T, 0.0])
+            innerFlangePlate1_uDir = numpy.array([0.0, 1.0, 0.0])
+            innerFlangePlate1_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.innerFlangePlate1.place(innerFlangePlate1Origin, innerFlangePlate1_uDir, innerFlangePlate1_wDir)
+
+            self.innerFlangePlate1Model = self.innerFlangePlate1.create_model()
+
+            innerFlangePlate2Origin = numpy.array([innerFlangePlatespacing, -(self.column.D - self.innerFlangePlate.T)/2 + self.column.T, 0.0])
+            innerFlangePlate2_uDir = numpy.array([0.0, 1.0, 0.0])
+            innerFlangePlate2_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.innerFlangePlate2.place(innerFlangePlate2Origin, innerFlangePlate2_uDir, innerFlangePlate2_wDir)
+
+            self.innerFlangePlate2Model = self.innerFlangePlate2.create_model()
+
+            innerFlangePlate3Origin = numpy.array([-innerFlangePlatespacing, -(self.column.D --- self.innerFlangePlate.T)/2 + self.column.T, 0.0])
+            innerFlangePlate3_uDir = numpy.array([0.0, 1.0, 0.0])
+            innerFlangePlate3_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.innerFlangePlate3.place(innerFlangePlate3Origin, innerFlangePlate3_uDir, innerFlangePlate3_wDir)
+
+            self.innerFlangePlate3Model = self.innerFlangePlate3.create_model()
+
+            innerFlangePlate4Origin = numpy.array([-innerFlangePlatespacing, (self.column.D - self.innerFlangePlate.T)/2 - self.column.T, 0.0])
+            innerFlangePlate4_uDir = numpy.array([0.0, 1.0, 0.0])
+            innerFlangePlate4_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.innerFlangePlate4.place(innerFlangePlate4Origin, innerFlangePlate4_uDir, innerFlangePlate4_wDir)
+
+            self.innerFlangePlate4Model = self.innerFlangePlate4.create_model()
+
 
     def create_nut_bolt_array(self):
 
@@ -168,7 +169,13 @@ class CCSpliceCoverPlateWeldedCAD(object):
         """
         :return: CAD model for all the plates
         """
-        plates_sec = [self.flangePlate1Model, self.flangePlate2Model, self.innerFlangePlate1Model, self.innerFlangePlate2Model, self.innerFlangePlate3Model, self.innerFlangePlate4Model, self.webPlate1Model, self.webPlate2Model]
+        if self.C.preference != 'Outside':
+            plates_sec = [self.flangePlate1Model, self.flangePlate2Model, self.innerFlangePlate1Model,
+                          self.innerFlangePlate2Model, self.innerFlangePlate3Model, self.innerFlangePlate4Model,
+                          self.webPlate1Model, self.webPlate2Model]
+        else:
+            plates_sec = [self.flangePlate1Model, self.flangePlate2Model,
+                          self.webPlate1Model, self.webPlate2Model]
 
         plates = plates_sec[0]
 
@@ -244,7 +251,7 @@ if __name__ == '__main__':
     nut_space = 2 * webPlate.T + column.t
     nut_bolt_array_Web = NutBoltArray_Web(Obj, nut, bolt, numOfboltsF, nut_space)
 
-    CCSpliceCoverPlateCAD = CCSpliceCoverPlateWeldedCAD(column, flangePlate, innerFlangePlate, webPlate, gap, nut_bolt_array_AF, nut_bolt_array_BF, nut_bolt_array_Web)
+    CCSpliceCoverPlateCAD = CCSpliceCoverPlateBoltedCAD(column, flangePlate, innerFlangePlate, webPlate, gap, nut_bolt_array_AF, nut_bolt_array_BF, nut_bolt_array_Web)
 
     CCSpliceCoverPlateCAD.create_3DModel()
     column = CCSpliceCoverPlateCAD.get_column_models()

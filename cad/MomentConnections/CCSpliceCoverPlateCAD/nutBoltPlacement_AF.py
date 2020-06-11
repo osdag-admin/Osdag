@@ -17,7 +17,7 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 
 class NutBoltArray_AF():
-    def __init__(self, outputobj, nut, bolt, numOfboltsF, nutSpaceF):
+    def __init__(self, Obj, nut, bolt, numOfboltsF, nutSpaceF):
         """
         :param alist: Input values, entered by user
         :param beam_data: Beam dimensions
@@ -38,11 +38,10 @@ class NutBoltArray_AF():
         # self.beamDim = beam_data
         self.bolt = bolt
         self.nut = nut
-        self.outputobj = outputobj
         self.numOfboltsF = numOfboltsF
         self.nutSpaceF = nutSpaceF
 
-        self.initBoltPlaceParams_AF(outputobj)
+        self.initBoltPlaceParams_AF(Obj)
         self.bolts_AF = []
         self.nuts_AF = []
         self.initialiseNutBolts_AF()
@@ -71,33 +70,30 @@ class NutBoltArray_AF():
             self.nuts_AF.append(Nut(n_AF.R, n_AF.T, n_AF.H, n_AF.r1))
             print('Nut', (n_AF.R, n_AF.T, n_AF.H, n_AF.r1))
 
-    def initBoltPlaceParams_AF(self, outputobj):
+    def initBoltPlaceParams_AF(self, Obj):
         '''
         :param outputobj: This is output dictionary for bolt placement parameters
         :return: Edge, end, gauge and pitch distances for placement
         '''
 
-        self.edge_AF = 25  # outputobj.flange_plate.edge_dist_provided     #33
-        self.end_AF = 25  # outputobj.flange_plate.end_dist_provided         #33
-        self.edge_gauge_AF = 25  # outputobj.flange_plate.edge_dist_provided  #33
-        self.pitch_AF = 30  # outputobj.flange_plate.pitch_provided           #50
-        self.midpitch_AF = 60  # outputobj.flange_plate.midpitch
-        self.gauge_AF = 80.4  # outputobj.flange_plate.midgauge
-        self.gauge = 38  # outputobj.flange_plate.gauge_provided
+        self.edge_AF = Obj.flange_plate.edge_dist_provided
+        self.end_AF = Obj.flange_plate.end_dist_provided
+        self.edge_gauge_AF = Obj.flange_plate.edge_dist_provided
+        self.pitch_AF = Obj.flange_plate.pitch_provided
+        self.midpitch_AF = Obj.flange_plate.midpitch  #=(2 * self.flange_plate.end_dist_provided) + self.flange_plate.gap + self.section.web_thickness
+        self.gauge_AF = Obj.flange_plate.midgauge
+        self.gauge = Obj.flange_plate.gauge_provided
 
         # outputobj.flange_plate.gauge_provided   # Revised gauge distance   #0.0
-        self.row_AF = 6  # outputobj.flange_plate.bolt_line             #2
-        self.col_AF = 4  # outputobj.flange_plate.bolts_one_line                  #2
-        self.gap = 10  # outputobj.flange_plate.gap
+        self.row_AF = Obj.flange_plate.bolt_line
+        self.col_AF = Obj.flange_plate.bolts_one_line                  #2
+        self.gap = Obj.flange_plate.gap
         # if self.col_AF ==2:
         #     self.gauge =0
         #     self.gauge_AF= outputobj.flange_plate.midgauge
         # else:
         #     self.gauge =outputobj.flange_plate.gauge_provided
         #     self.gauge_AF=outputobj.flange_plate.midgauge
-        print('iniBoltPlaceParams_AF', (
-            self.edge_AF, self.end_AF, self.edge_gauge_AF, self.pitch_AF, self.gauge_AF, self.row_AF, self.col_AF,
-            self.gap))
 
     def calculatePositions_AF(self):
         """

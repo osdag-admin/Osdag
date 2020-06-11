@@ -15,7 +15,7 @@ from cad.items.ModelUtils import getGpPt
 
 
 class NutBoltArray_BF():
-    def __init__(self, outputobj, nut, bolt, numOfboltsF, nutSpaceF):
+    def __init__(self, Obj, nut, bolt, numOfboltsF, nutSpaceF):
         """
         :param alist: Input values, entered by user
         :param beam_data: Beam dimensions
@@ -36,11 +36,10 @@ class NutBoltArray_BF():
         # self.beamDim = beam_data
         self.bolt = bolt
         self.nut = nut
-        self.outputobj = outputobj
         self.numOfboltsF = numOfboltsF
         self.nutSpaceF = nutSpaceF
 
-        self.initBoltPlaceParams_BF(outputobj)
+        self.initBoltPlaceParams_BF(Obj)
         self.bolts_BF = []
         self.nuts_BF = []
         self.initialiseNutBolts_BF()
@@ -63,21 +62,21 @@ class NutBoltArray_BF():
             self.bolts_BF.append(Bolt(b_BF.R, b_BF.T, b_BF.H, b_BF.r))
             self.nuts_BF.append(Nut(n_BF.R, n_BF.T, n_BF.H, n_BF.r1))
 
-    def initBoltPlaceParams_BF(self, outputobj):
+    def initBoltPlaceParams_BF(self, Obj):
         '''
         :param outputobj: This is output dictionary for bolt placement parameters
         :return: Edge, end, gauge and pitch distances for placement
         '''
-        self.edge_BF = 25   #outputobj.flange_plate.edge_dist_provided
-        self.end_BF = 25    #outputobj.flange_plate.end_dist_provided
-        self.edge_gauge_BF = 25 #outputobj.flange_plate.edge_dist_provided
-        self.pitch_BF = 30  #outputobj.flange_plate.pitch_provided
-        self.gauge_BF = 80.04       #outputobj.flange_plate.midgauge
-        self.gauge = 38     #outputobj.flange_plate.gauge_provided
+        self.edge_BF = Obj.flange_plate.edge_dist_provided
+        self.end_BF = Obj.flange_plate.end_dist_provided
+        self.edge_gauge_BF = Obj.flange_plate.edge_dist_provided
+        self.pitch_BF = Obj.flange_plate.pitch_provided
+        self.gauge_BF = Obj.flange_plate.midgauge
+        self.gauge = Obj.flange_plate.gauge_provided
         # outputobj.flange_plate.gauge_provided  # Revised gauge distance
-        self.row_BF = 6     #outputobj.flange_plate.bolt_line
-        self.col_BF = 4     #outputobj.flange_plate.bolts_one_line
-        self.gap = 10       #outputobj.flange_plate.gap
+        self.row_BF = Obj.flange_plate.bolt_line
+        self.col_BF = Obj.flange_plate.bolts_one_line
+        self.gap = Obj.flange_plate.gap
 
     def calculatePositions_BF(self):
         """

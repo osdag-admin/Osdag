@@ -198,7 +198,7 @@ class MomentConnection(Connection, IS800_2007):
         t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         section.append(t32)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, None)
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, VALUES_IMG_BEAM)
         section.append(t33)
 
         return section

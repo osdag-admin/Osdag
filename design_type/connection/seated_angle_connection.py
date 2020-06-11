@@ -308,64 +308,6 @@ class SeatedAngleConnection(ShearConnection):
 
         return options_list
 
-
-    def func_for_validation(self, design_dictionary):
-        all_errors = []
-        self.design_status = False
-        flag = False
-        flag1 = False
-        option_list = self.input_values(self)
-        missing_fields_list = []
-        for option in option_list:
-            if option[2] == TYPE_TEXTBOX:
-                if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-                val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                if design_dictionary[option[0]] == []:
-                    missing_fields_list.append(option[1])
-
-        if design_dictionary[KEY_CONN] == VALUES_CONN_1[1]:
-            column = design_dictionary[KEY_SUPTNGSEC]
-            beam = design_dictionary[KEY_SUPTDSEC]
-            conn = sqlite3.connect(PATH_TO_DATABASE)
-            cursor = conn.execute("SELECT D FROM COLUMNS WHERE Designation = ( ? ) ", (column,))
-            lst = []
-            rows = cursor.fetchall()
-            for row in rows:
-                lst.append(row)
-            c_val = lst[0][0]
-            cursor2 = conn.execute("SELECT B FROM BEAMS WHERE Designation = ( ? )", (beam,))
-            lst1 = []
-            rows1 = cursor2.fetchall()
-            for row1 in rows1:
-                lst1.append(row1)
-            b_val = lst1[0][0]
-            if c_val <= b_val:
-                error = "Beam width is higher than clear depth of column web " + "\n" + "(No provision in Osdag till now)"
-                all_errors.append(error)
-            else:
-                flag1 = True
-        else:
-            flag1 = True
-
-        if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
-            all_errors.append(error)
-            # QMessageBox.information(window, "Information",
-            #                         generate_missing_fields_error_string(missing_fields_list))
-            # flag = False
-        else:
-            flag = True
-
-        if flag and flag1:
-            self.set_input_values(self, design_dictionary)
-        else:
-            return all_errors
-
     def warn_text(self):
 
         """
@@ -378,30 +320,6 @@ class SeatedAngleConnection(ShearConnection):
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
             logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
             # logger.info(" : You are using a section (in red color) that is not available in latest version of IS 808")
-
-    def generate_missing_fields_error_string(self, missing_fields_list):
-        """
-        Args:
-            missing_fields_list: list of fields that are not selected or entered
-        Returns:
-            error string that has to be displayed
-        """
-        # The base string which should be displayed
-        information = "Please input the following required field"
-        if len(missing_fields_list) > 1:
-            # Adds 's' to the above sentence if there are multiple missing input fields
-            information += "s"
-        information += ": "
-        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
-
-        for item in missing_fields_list:
-            information = information + item + ", "
-
-        # Removes the last comma
-        information = information[:-2]
-        information += "."
-
-        return information
 
     def set_input_values(self, design_dictionary):
         super(SeatedAngleConnection,self).set_input_values(self, design_dictionary)

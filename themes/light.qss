@@ -433,16 +433,20 @@ QComboBox QAbstractItemView
   selection-color:black ;
 
 }
+QMainWindow#DesignPreferences QTabWidget::tab-bar{
+    alignment: left;
+}
 QMainWindow#DesignPreferences QTabBar::tab {
-                margin-right: 10;
+				margin-right:2px;
                 border-top-left-radius: 2px ;
                 border-top-right-radius: 2px ;
                 border-bottom-left-radius: 0px ;
                 border-bottom-right-radius: 0px ;
-                height: 35px;
-                width: 150px;
+                height: 28px;
+                width: 122px;
 				background: lightgray;
-                font-size: 18px;
+                font-size: 14px;
+		
 				color: black;
 				border: 0.5px inset #abc250;
                }
@@ -590,3 +594,11 @@ QFrame#frame{
  QScrollArea{
  background: white;
  }
+
+QLineEdit:disabled{
+	background-color: lightgray;
+}
+
+QComboBox:disabled{
+	background-color: lightgray;
+}

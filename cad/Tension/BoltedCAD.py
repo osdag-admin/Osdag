@@ -10,7 +10,7 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 
 class TensionAngleBoltCAD(object):
-    def __init__(self, Obj, member, plate, nut_bolt_array, inter_array):
+    def __init__(self, Obj, member, plate, nut_bolt_array):
         """
         :param member: Angle or Channel
         :param plate: Plate
@@ -22,7 +22,7 @@ class TensionAngleBoltCAD(object):
         self.member = member
         self.plate = plate
         self.nut_bolt_array = nut_bolt_array
-        self.inter_array = inter_array
+        # self.inter_array = inter_array
 
         self.plate1 = copy.deepcopy(self.plate)
         self.plate2 = copy.deepcopy(self.plate)

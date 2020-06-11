@@ -492,62 +492,6 @@ class ColumnEndPlate(MomentConnection):
         else:
             return False
 
-    def func_for_validation(self, design_dictionary):
-
-        all_errors = []
-        self.design_status = False
-        flag = False
-
-        option_list = self.input_values(self)
-        missing_fields_list = []
-        for option in option_list:
-            if option[2] == TYPE_TEXTBOX:
-                if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-                val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
-                if design_dictionary[option[0]] == [0]:
-                    missing_fields_list.append(option[1])
-
-        if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
-            all_errors.append(error)
-            # flag = False
-        else:
-            flag = True
-
-        if flag:
-            self.set_input_values(self, design_dictionary)
-        else:
-            return all_errors
-
-    def generate_missing_fields_error_string(self, missing_fields_list):
-        """
-        Args:
-            missing_fields_list: list of fields that are not selected or entered
-        Returns:
-            error string that has to be displayed
-        """
-        # The base string which should be displayed
-        information = "Please input the following required field"
-        if len(missing_fields_list) > 1:
-            # Adds 's' to the above sentence if there are multiple missing input fields
-            information += "s"
-        information += ": "
-        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
-
-        for item in missing_fields_list:
-            information = information + item + ", "
-
-        # Removes the last comma
-        information = information[:-2]
-        information += "."
-
-        return information
-
     def warn_text(self):
 
         """
@@ -1393,7 +1337,7 @@ class ColumnEndPlate(MomentConnection):
         t3 = ('Column', self.call_3DColumn)
         components.append(t3)
 
-        t4 = ('Cover Plate', self.call_3DPlate)
+        t4 = ('End Plate', self.call_3DPlate)
         components.append(t4)
 
         return components
@@ -1548,6 +1492,7 @@ class ColumnEndPlate(MomentConnection):
                        KEY_OUT_STIFFENER_WIDTH: self.stiff_wt,
                        KEY_OUT_STIFFENER_THICKNESS: self.t_s,
                        KEY_OUT_WELD_TYPE: self.weld_type}
+        return test_input, test_output
 
     @staticmethod
     def grdval_customized():
@@ -1587,8 +1532,10 @@ class ColumnEndPlate(MomentConnection):
                     class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 10.5 * epsilon:
                     class_of_section1 = "compact"
-                elif column_b * 0.5 / column_f_t <= 15.7 * epsilon:
-                    class_of_section1 = "semi-compact"
+                # elif column_b * 0.5 / column_f_t <= 15.7 * epsilon:
+                #     class_of_section1 = "semi-compact"
+                else:
+                      class_of_section1 = "semi-compact"
                 # else:
                 #     print('fail')
                 # print("class_of_section", class_of_section )
@@ -1597,8 +1544,10 @@ class ColumnEndPlate(MomentConnection):
                     class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 9.4 * epsilon:
                     class_of_section1 = "compact"
-                elif column_b * 0.5 / column_f_t <= 13.6 * epsilon:
-                    class_of_section1 = "semi-compact"
+                # elif column_b * 0.5 / column_f_t <= 13.6 * epsilon:
+                #     class_of_section1 = "semi-compact"
+                else:
+                      class_of_section1 = "semi-compact"
                 # else:
                 #     print('fail')
             elif section == "compression due to bending":
@@ -1606,8 +1555,10 @@ class ColumnEndPlate(MomentConnection):
                     class_of_section1 = "plastic"
                 elif column_b * 0.5 / column_f_t <= 33.5 * epsilon:
                     class_of_section1 = "compact"
-                elif column_b * 0.5 / column_f_t <= 42 * epsilon:
-                    class_of_section1 = "semi-compact"
+                # elif column_b * 0.5 / column_f_t <= 42 * epsilon:
+                #     class_of_section1 = "semi-compact"
+                else:
+                      class_of_section1 = "semi-compact"
                 # else:
                 #     print('fail')
             # else:
@@ -1620,8 +1571,10 @@ class ColumnEndPlate(MomentConnection):
                         class_of_section1 = "plastic"
                     elif column_d / column_t_w <= (max(105 * epsilon / (1 + r1)), (42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2 * r1)), column_d / column_t_w >= (
-                            42 * epsilon)):
+                    # elif column_d / column_t_w <= max((126 * epsilon / (1 + 2 * r1)), column_d / column_t_w >= (
+                    #         42 * epsilon)):
+                    #     class_of_section1 = "semi-compact"
+                    else:
                         class_of_section1 = "semi-compact"
                     # else:
                     #     print('fail')
@@ -1632,9 +1585,11 @@ class ColumnEndPlate(MomentConnection):
                     elif column_d / column_t_w <= max((105 * epsilon / (1 + (r1 * 1.5))), (
                             42 * epsilon)):
                         class_of_section1 = "compact"
-                    elif column_d / column_t_w <= max((126 * epsilon / (1 + 2 * r1)), (
-                            42 * epsilon)):
+                    else:
                         class_of_section1 = "semi-compact"
+                    # elif column_d / column_t_w <= max((126 * epsilon / (1 + 2 * r1)), (
+                    #                     #         42 * epsilon)):
+                    #                     #     class_of_section1 = "semi-compact"
                     # else:
                     #     self.design_status ==False
                     #     # print(self.design_status,"reduce Axial Force")
@@ -1665,7 +1620,7 @@ class ColumnEndPlate(MomentConnection):
 
         return class_of_section1
 
-        print("class_of_section1", class_of_section1)
+        # print("class_of_section1", class_of_section1)
 
     def customized_input(self):
 
@@ -1734,7 +1689,7 @@ class ColumnEndPlate(MomentConnection):
         bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
         kb_disp = round(self.bolt.kb, 2)
 
-        t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{4cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, '', axial_capacity(area=self.section.area,
@@ -1867,7 +1822,7 @@ class ColumnEndPlate(MomentConnection):
               get_pass_fail(self.bolt.min_end_dist, self.end_dist,
                             relation='lesser'))
         self.report_check.append(t3)
-        t4 = (DISP_MAX_END, max_edge_end(self.plate.fy, self.plate.thickness_provided),
+        t4 = (DISP_MAX_END, max_edge_end(self.plate.fy, self.plate_thickness_provided),
               self.end_dist,
               get_pass_fail(self.bolt.max_end_dist, self.end_dist,
                             relation='greater'))

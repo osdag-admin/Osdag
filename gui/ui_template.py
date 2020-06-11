@@ -70,7 +70,7 @@ from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
 from design_type.connection.base_plate_connection import BasePlateConnection
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
-
+import logging
 from cad.cad3dconnection import cadconnection
 
 class Ui_ModuleWindow(QtWidgets.QMainWindow):
@@ -78,10 +78,24 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
     closed = pyqtSignal()
     def  __init__(self, main,folder,parent=None):
         super(Ui_ModuleWindow, self).__init__(parent=parent)
+        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        width = resolution.width()
+        height = resolution.height()
+        self.resize(width*(0.75),height*(0.7))
         self.ui = Window()
+
         self.ui.setupUi(self,main,folder)
         #self.showMaximized()
+        #self.showNormal()
+
         self.resized.connect(self.resize_dockComponents)
+
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     def resizeEvent(self, event):
         self.resized.emit()
@@ -104,8 +118,8 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         width = self.ui.outputDock.width()
         self.ui.outputDock.resize(width,self.height())
         self.ui.out_widget.resize(width,posi)
-        self.ui.btn_CreateDesign.move((width/2)-168,posi+8)
-        self.ui.save_outputDock.move((width/2)+28,posi+8)
+        self.ui.btn_CreateDesign.move((width/2)-(186/2),posi+8)
+        self.ui.save_outputDock.move((width/2)-(186/2),posi+52)
 
     def closeEvent(self, event):
         '''
@@ -115,6 +129,9 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
                                      "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
+            logger = logging.getLogger('osdag')  #  Remove all the previous handlers
+            for handler in logger.handlers[:]:
+                logger.removeHandler(handler)
             self.closed.emit()
             event.accept()
         else:
@@ -122,6 +139,12 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
 
 class Window(QMainWindow):
     #closed = pyqtSignal()
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
         """
@@ -142,11 +165,11 @@ class Window(QMainWindow):
     def open_summary_popup(self, main):
 
         if not main.design_button_status:
-            QMessageBox.warning(QMessageBox(), 'Warning', 'No design created!')
+            QMessageBox.warning(self, 'Warning', 'No design created!')
             return
 
         self.new_window = QtWidgets.QDialog()
-        self.new_ui = Ui_Dialog1(self.design_exist)
+        self.new_ui = Ui_Dialog1(main.design_button_status)
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
@@ -349,8 +372,8 @@ class Window(QMainWindow):
         self.frame_2.setMinimumSize(QtCore.QSize(0, 100))
         self.frame_2.setFrameShape(QtWidgets.QFrame.Box)
         self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_2.setLineWidth(1)
-        self.frame_2.setMidLineWidth(1)
+        #self.frame_2.setLineWidth(1)
+        #self.frame_2.setMidLineWidth(1)
         self.frame_2.setObjectName("frame_2")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.frame_2)
         self.verticalLayout.setContentsMargins(1, 1, 1, 1)
@@ -419,7 +442,7 @@ class Window(QMainWindow):
         #self.inputDock.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         font = QtGui.QFont()
         font.setFamily("Arial")
-        font.setPointSize(11)
+        font.setPointSize(10)
         font.setBold(True)
         font.setItalic(False)
         font.setWeight(75)
@@ -482,7 +505,7 @@ class Window(QMainWindow):
                 #l.setGeometry(QtCore.QRect(6, 10 + i, 120, 25))
 
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 l.setFont(font)
@@ -498,7 +521,7 @@ class Window(QMainWindow):
                 combo = QtWidgets.QComboBox(self.dockWidgetContents)
                 #combo.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 combo.setFont(font)
@@ -516,15 +539,16 @@ class Window(QMainWindow):
                     item_width = max(item_width, metrices.boundingRect(item).width())
                 in_layout2.addWidget(combo, j, 2, 1, 1)
 
-                if lable == 'Material *':
-                    maxi_width_right = max(maxi_width_right, item_width+5)
+                if lable == 'Material':
+                    combo.setCurrentIndex(1)
+                    maxi_width_right = max(maxi_width_right, item_width)
                 else:
                     combo.view().setMinimumWidth(item_width + 25)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 r.setFont(font)
@@ -561,7 +585,7 @@ class Window(QMainWindow):
                 l = QtWidgets.QLineEdit(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(True)
                 font.setWeight(50)
                 l.setFont(font)
@@ -706,7 +730,7 @@ class Window(QMainWindow):
                     self.on_change_connect(key_changed, updated_list, data)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 35))
+        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 30))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -716,7 +740,7 @@ class Window(QMainWindow):
         self.btn_Reset.setObjectName("btn_Reset")
 
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 35))
+        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 30))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -748,7 +772,7 @@ class Window(QMainWindow):
         #self.outputDock.setMaximumSize(QtCore.QSize(maxi_width+220, 710))
         font = QtGui.QFont()
         font.setFamily("Arial")
-        font.setPointSize(11)
+        font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.outputDock.setFont(font)
@@ -786,7 +810,7 @@ class Window(QMainWindow):
                 l = QtWidgets.QLabel(self.dockWidgetContents_out)
                 #l.setGeometry(QtCore.QRect(6, 10 + i, maxi_width , 25))
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 l.setFont(font)
@@ -806,7 +830,7 @@ class Window(QMainWindow):
 
                 #r.setGeometry(QtCore.QRect(100, 10 + i, 150, 27))
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 r.setFont(font)
@@ -827,7 +851,7 @@ class Window(QMainWindow):
 
                 #b.setGeometry(QtCore.QRect(150, 10 + i, 150, 27))
                 font = QtGui.QFont()
-                font.setPointSize(11)
+                font.setPointSize(10)
                 font.setBold(False)
                 font.setWeight(50)
                 b.setFont(font)
@@ -851,7 +875,7 @@ class Window(QMainWindow):
                 font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")
-
+                # q.setVisible(True if option[4] else False)
                 #q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
@@ -912,8 +936,9 @@ class Window(QMainWindow):
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2), self.outputDock)
         self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_out)
         self.save_outputDock = QtWidgets.QPushButton(self.dockWidgetContents_out)
+
         self.btn_CreateDesign.setFixedSize(185, 35)
-        self.save_outputDock.setFixedSize(140, 35)
+        self.save_outputDock.setFixedSize(185, 35)
         self.btn_CreateDesign.setAutoDefault(True)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -1595,6 +1620,7 @@ class Window(QMainWindow):
 
             if self.prev_inputs != self.input_dock_inputs:
                 self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
+
                 if 'Select Section' in self.input_dock_inputs.values():
                     self.designPrefDialog.flag = False
                 else:
@@ -1611,7 +1637,7 @@ class Window(QMainWindow):
 
             if error is not None:
                 self.show_error_msg(error)
-
+                return
             out_list = main.output_values(main, status)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
@@ -1626,13 +1652,11 @@ class Window(QMainWindow):
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
 
-            self.design_exist = False
-
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
                                                   KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
-                                                  KEY_DISP_COLUMNCOVERPLATEWELD]:
+                                                  KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
@@ -1643,9 +1667,9 @@ class Window(QMainWindow):
                     action.setEnabled(True)
                 fName = str('./ResourceFiles/images/3d.png')
                 file_extension = fName.split(".")[-1]
+
                 if file_extension == 'png':
                     self.display.ExportToImage(fName)
-                self.design_exist = True
 
             else:
                 for chkbox in main.get_3d_components(main):
@@ -1937,7 +1961,6 @@ class Window(QMainWindow):
     def design_preferences(self):
         #print(self.designPrefDialog.module_window.input_dock_inputs)
         self.designPrefDialog.show()
-        self.prev_inputs = self.input_dock_inputs
 
     # Function for getting input for design preferences from input dock
     '''
@@ -2032,19 +2055,17 @@ class Window(QMainWindow):
             val = f(arg_list)
 
             for k2_key_name in k2_key_list:
+                print(k2_key_name)
                 k2 = tab.findChild(QtWidgets.QWidget, k2_key_name)
-                if typ == TYPE_COMBOBOX:
+                if isinstance(k2, QtWidgets.QComboBox):
                     k2.clear()
                     for values in val[k2_key_name]:
                         k2.addItem(str(values))
-                elif typ == TYPE_TEXTBOX:
+                if isinstance(k2, QtWidgets.QLineEdit):
                     k2.setText(str(val[k2_key_name]))
-                elif typ == TYPE_IMAGE:
-                    # k2 = tab.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key_name)
-                    pixmap1 = QPixmap(val)
-                    print(pixmap1,"gbfbf")
+                if isinstance(k2, QtWidgets.QLabel):
+                    pixmap1 = QPixmap(val[k2_key_name])
                     k2.setPixmap(pixmap1)
-
 
     def refresh_section_connect(self, add_button, prev, key_name, key_type, tab_key, arg,data):
         add_button.clicked.connect(lambda: self.refresh_section(prev, key_name, key_type, tab_key, arg,data))

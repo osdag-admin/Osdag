@@ -23,6 +23,7 @@ class TensionAngleWeldCAD(object):
         self.plate = plate
         self.inline_weld = inline_weld
         self.opline_weld = opline_weld
+        # self.intermittentConnection = weld_plate_array
 
         # self.Obj.loc = 'Long Leg'#'Short Leg'
 
@@ -155,6 +156,17 @@ class TensionAngleWeldCAD(object):
         self.plate2.place(plate2OriginL, plate2_uDir, plate2_wDir)
 
         self.plate2_Model = self.plate2.create_model()
+
+        # intermittentConnectionOriginL = numpy.array([300, 0.0, 0.0])
+        # intermittentConnection_uDir = numpy.array([1.0, 0.0, 0.0])
+        # intermittentConnection_vDir = numpy.array([0.0, 1.0, 0.0])
+        # intermittentConnection_wDir = numpy.array([0.0, 0.0, 1.0])
+        # self.intermittentConnection.place(intermittentConnectionOriginL, intermittentConnection_uDir,
+        #                                   intermittentConnection_vDir, intermittentConnection_wDir)
+        #
+        # self.intermittentConnection_Model = self.intermittentConnection.create_model()
+        # self.inter_conc_welds = self.intermittentConnection.get_welded_models()
+        # self.inter_conc_plates = self.intermittentConnection.get_plate_models()
 
     def createWeldGeometry(self):
         if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Angles' or self.Obj.sec_profile == 'Channels' or self.Obj.sec_profile == 'Back to Back Channels':
@@ -332,6 +344,7 @@ class TensionAngleWeldCAD(object):
 
             self.weldVR21_Model = self.weldVR21.create_model()
 
+
     def get_members_models(self):
 
         if self.Obj.sec_profile == 'Angles':
@@ -344,6 +357,7 @@ class TensionAngleWeldCAD(object):
 
     def get_plates_models(self):
         plate = BRepAlgoAPI_Fuse(self.plate1_Model, self.plate2_Model).Shape()
+        # plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
         return plate
 
     def get_welded_models(self):

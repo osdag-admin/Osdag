@@ -258,7 +258,7 @@ class OsdagMainWindow(QMainWindow):
                                                     'Column to Column' :[
                                                                 ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
-                                                                ('End Plate Connection','ResourceFiles/images/column_end_plate.jpg','C2C_End_Plate_Connection'),
+                                                                ('End Plate Connection','ResourceFiles/images/ccep_flush.png','C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
                                                     'PEB' : self.Under_Development,

@@ -45,13 +45,9 @@ from .ui_design_preferences import Ui_Dialog
 
 from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
-<<<<<<< HEAD
-from .ui_design_preferences import DesignPreferences
 from .ui_OsdagSectionModeller import Ui_OsdagSectionModeller
-=======
 #from .ui_design_preferences import DesignPreferences
 from .UI_DESIGN_PREFERENCE import DesignPreferences
->>>>>>> 0e4fde1c84e3936e085eb2f5cec580c7115ad28c
 from design_type.connection.shear_connection import ShearConnection
 from cad.common_logic import CommonDesignLogic
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
@@ -1158,31 +1154,11 @@ class Window(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
-<<<<<<< HEAD
-        self.designPrefDialog = DesignPreferences(main)
-        add_column = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_COLSEC)
-        add_beam = self.designPrefDialog.findChild(QtWidgets.QWidget, "pushButton_Add_"+KEY_DISP_BEAMSEC)
+        self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
 
         self.actionOsdagSectionModeller=QtWidgets.QAction(MainWindow)
-        self.actionOsdagSectionModeller.setFont(font)
-        self.actionOsdagSectionModeller.setObjectName("actionOsdagSectionModeller")
+        self.actionOsdagSectionModeller.setObjectName("actionDesign_Preferences")
         self.actionOsdagSectionModeller.triggered.connect(self.osdag_section_modeller)
-
-        if module in [KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_ENDPLATE, KEY_DISP_SEATED_ANGLE]:
-            column_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC).currentIndex()
-            beam_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC).currentIndex()
-            add_column.clicked.connect(lambda: self.refresh_sections(column_index, "Supporting"))
-            add_beam.clicked.connect(lambda: self.refresh_sections(beam_index, "Supported"))
-        elif module == KEY_DISP_COLUMNCOVERPLATE:
-            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-            add_column.clicked.connect(lambda: self.refresh_sections(section_index, "Section_col"))
-        elif module == KEY_DISP_BEAMCOVERPLATE and module == KEY_DISP_BEAMCOVERPLATEWELD:
-            section_index = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE).currentIndex()
-            add_beam.clicked.connect(lambda: self.refresh_sections(section_index, "Section_bm"))
-=======
-        self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
->>>>>>> 0e4fde1c84e3936e085eb2f5cec580c7115ad28c
-
         # self.designPrefDialog.rejected.connect(lambda: self.design_preferences('rejected'))
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
         self.actionfinPlate_quit.setObjectName("actionfinPlate_quit")
@@ -2378,11 +2354,6 @@ class Window(QMainWindow):
         else:
             widget.hide()
 
-
-<<<<<<< HEAD
-    def design_preferences(self):
-        self.designPrefDialog.exec()
-
 # Function for showing Osdag Section Modeller popup
 
     def osdag_section_modeller(self):
@@ -2390,63 +2361,6 @@ class Window(QMainWindow):
         dialog=QtWidgets.QDialog()
         self.OsdagSectionModeller.setupUi(dialog)
         dialog.exec()
-        
-# Function for getting input for design preferences from input dock
-    '''
-    @author: Umair
-    '''
-
-    def combined_design_prefer(self, module):
-        self.designPrefDialog.flag = True
-        key_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_CONN)
-        key_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTNGSEC)
-        key_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SUPTDSEC)
-        key_4 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
-        key_5 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SECSIZE)
-        key_6 = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE)
-
-        tab_Column = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-        tab_Beam = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-        tab_Angle = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
-        tab_Channel = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Channel Section")
-        tab_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Bolt")
-        tab_Weld = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
-        tab_Detailing = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
-        tab_Design = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
-        tab_Connector = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Connector")
-        tab_Anchor_Bolt = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Anchor Bolt")
-        tab_Base_Plate = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, "Base Plate")
-
-        table_1 = "Columns"
-        table_2 = "Beams"
-        material_grade = key_4.currentText()
-        material = Material(material_grade)
-
-        if module != KEY_DISP_BASE_PLATE:
-            tab_Bolt.findChild(QtWidgets.QWidget, KEY_DP_BOLT_MATERIAL_G_O).setText(str(material.fu))
-        # else:
-        #     tab_Anchor_Bolt.findChild(QtWidgets.QWidget, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O).setText(str(material.fu))
-        tab_Weld.findChild(QtWidgets.QWidget, KEY_DP_WELD_MATERIAL_G_O).setText(str(material.fu))
-
-        if module not in [KEY_DISP_BASE_PLATE,KEY_DISP_TENSION_BOLTED,KEY_DISP_TENSION_WELDED]:
-
-            material_connector = tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_MATERIAL)
-            material_connector.setCurrentText(str(material_grade))
-
-            def f(material_g):
-                m = Material(material_g)
-                tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(m.fu))
-                tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(m.fy))
-
-            material_connector.currentIndexChanged.connect(lambda: f(material_connector.currentText()))
-            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FU).setText(str(material.fu))
-            tab_Connector.findChild(QtWidgets.QWidget, KEY_PLATE_FY).setText(str(material.fy))
-        else:
-            pass
-=======
->>>>>>> 0e4fde1c84e3936e085eb2f5cec580c7115ad28c
-
-
 
 from . import icons_rc
 if __name__ == '__main__':

@@ -341,6 +341,13 @@ class Ui_OsdagSectionModeller(object):
         self.horizontalLayout_8.addLayout(self.horizontalLayout_5)
         self.verticalLayout_14.addLayout(self.horizontalLayout_8)
         self.Centroid_box = QtWidgets.QFrame(self.section_properties)
+        self.Centroid_box.setStyleSheet(
+                '''
+                QFrame{
+                        border-style:none;
+                }
+                '''
+        )
         self.Centroid_box.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.Centroid_box.setFrameShadow(QtWidgets.QFrame.Raised)
         self.Centroid_box.setObjectName("Centroid_box")

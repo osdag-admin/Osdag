@@ -82,4 +82,4 @@ class CreateLatex(Document):
                             table.add_hline()
                             table.add_row((sub_ppty,reportsummary['Section Properties'][ppty][sub_ppty]))
                 table.add_hline()
-        doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False,)
+        doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)

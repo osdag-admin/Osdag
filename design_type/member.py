@@ -180,7 +180,7 @@ class Member(Main):
         else:
             designation_list = []
 
-        t0 = (KEY_SECSIZE_DP, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, designation_list, designation)
+        t0 = (KEY_SECSIZE, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, designation_list, designation)
         section.append(t0)
 
         t1 = (KEY_SECSIZE_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)

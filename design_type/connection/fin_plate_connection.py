@@ -1059,7 +1059,7 @@ class FinPlateConnection(ShearConnection):
         if self.plate.design_status is True:
             connecting_plates = [self.plate.thickness_provided,self.supported_section.web_thickness]
             bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
-            
+
 
             bolt_force_kn=round(self.plate.bolt_force/1000,2)
             bolt_capacity_red_kn=round(self.plate.bolt_capacity_red/1000,2)

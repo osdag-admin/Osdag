@@ -2192,12 +2192,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # updating anchor length (adding the length above the concrete pedestal)
         self.grout_thk = 50  # mm
         if self.connectivity == 'Moment Base Plate':
-            self.plate_washer_thk = self.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_uplift))[
+            self.plate_washer_thk = IS6649.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_uplift))[
                 'washer_thk']  # washer thickness, mm
-            self.nut_thk = self.nutThick_Calculation(max(self.anchor_dia_provided, self.anchor_dia_uplift))  # nut thickness, mm
+            self.nut_thk = IS1364.nut_thick((max(self.anchor_dia_provided, self.anchor_dia_uplift)))  # nut thickness, mm
         elif self.connectivity == 'Welded Column Base':
-            self.plate_washer_thk = self.square_washer_dimensions(self.anchor_dia_provided)['washer_thk']  # washer thickness, mm
-            self.nut_thk = self.nutThick_Calculation(self.anchor_dia_provided)  # nut thickness, mm
+            self.plate_washer_thk = IS6649.square_washer_dimensions(self.anchor_dia_provided)['washer_thk']  # washer thickness, mm
+            self.nut_thk = IS1364.nut_thick(self.anchor_dia_provided)  # nut thickness, mm
 
         self.anchor_len_below_footing = self.anchor_length_provided  # mm
         self.anchor_len_above_footing = self.grout_thk + self.plate_thk + self.plate_washer_thk + self.nut_thk + 20  # mm, 20 mm is extra len

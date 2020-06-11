@@ -200,7 +200,7 @@ class Connection(Main):
         t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         supporting_section.append(t32)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/ISection.png')
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM)
         supporting_section.append(t33)
 
         return supporting_section

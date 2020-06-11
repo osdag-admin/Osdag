@@ -49,6 +49,9 @@ class CreateLatex(Document):
         doc.packages.append(Package('amsmath'))
         doc.packages.append(Package('graphicx'))
         doc.packages.append(Package('needspace'))
+        doc.append(pyl.Command('fontsize', arguments= [8,12]))
+        doc.append(pyl.Command('selectfont'))
+
         doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
 
         header = PageStyle("header")
@@ -81,13 +84,12 @@ class CreateLatex(Document):
         doc.change_document_style("header")
 
         with doc.create(Section('Input Parameters')):
-            with doc.create(LongTable('|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|', row_height=1.2)) as table:
+            with doc.create(LongTable('|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4.5cm}|', row_height=1.2)) as table:
                 table.add_hline()
                 for i in uiObj:
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
                     if i == "Selected Section Details":
                         continue
-                    print('hereiam',i, type(uiObj[i]),len(str(uiObj[i])))
                     if type(uiObj[i]) == dict:
                         table.add_hline()
                         sectiondetails = uiObj[i]
@@ -99,7 +101,6 @@ class CreateLatex(Document):
                             merge_rows = int((len(sectiondetails)/2)) +2
                         else:
                             merge_rows = round_up((len(sectiondetails)/2),2)
-                        print('Hi', len(sectiondetails)/2,round_up(len(sectiondetails),2)/2, merge_rows)
                         if (len(sectiondetails))% 2 == 0:
                             sectiondetails['']=''
 
@@ -128,18 +129,18 @@ class CreateLatex(Document):
                         table.add_hline()
                         table.add_row((MultiColumn(3, align='|c|', data=i, ),MultiColumn(2, align='|c|', data="Ref List of Input Section"),))
                         table.add_hline()
-                    elif len(str(uiObj[i])) > 40 and type(uiObj[i]) != pyl.math.Math:
+                    elif len(str(uiObj[i])) > 55 and type(uiObj[i]) != pyl.math.Math:
                         str_len = len(str(uiObj[i]))
-                        loop_len = round_up((str_len / 40), 1, 1)
+                        loop_len = round_up((str_len / 55), 1, 1)
                         for j in range(1, loop_len + 1):
-                            b = 30 * j + 1
+                            b = 55 * j + 1
                             if j == 1:
                                 table.add_row(
                                     (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data=i)), MultiColumn(2, align='|c|', data=uiObj[i][0:b]),))
                             else:
                                 table.add_row(
                                     (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data="")),
-                                     MultiColumn(2, align='|c|', data=uiObj[i][b - 30:b]),))
+                                     MultiColumn(2, align='|c|', data=uiObj[i][b - 55:b]),))
                         table.add_hline()
                     else:
                         table.add_hline()
@@ -162,7 +163,6 @@ class CreateLatex(Document):
                                                        MultiColumn(1, align='|c|', data=uiObj[i][b-83:b]),))
                                     table.add_hline()
 
-
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
         # doc.append(NewPage())
         count = 0
@@ -170,7 +170,8 @@ class CreateLatex(Document):
             for check in Design_Check:
                 if check[0] == 'SubSection':
                     if count >=1:
-                        doc.append(NewPage())
+                        # doc.append(NewPage())
+                        doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
                     with doc.create(Subsection(check[1])):
                         with doc.create(LongTable(check[2], row_height=1.2)) as table:  # todo anjali remove
                             table.add_hline()
@@ -181,7 +182,8 @@ class CreateLatex(Document):
                             count = count + 1
                 elif check[0] == "Selected":
                     if count >=1:
-                        doc.append(NewPage())
+                        # doc.append(NewPage())
+                        doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
                     with doc.create(Subsection(check[1])):
                         with doc.create(LongTable(check[2], row_height=1.2)) as table:
                             table.add_hline()
@@ -226,7 +228,7 @@ class CreateLatex(Document):
                 else:
                     table.add_row((check[0], check[1], check[2], check[3]))
                     table.add_hline()
-        doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        # doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
 
         doc.append(NewPage())
 
@@ -235,7 +237,9 @@ class CreateLatex(Document):
             with doc.create(Section('3D View')):
                 with doc.create(Figure(position='h!')) as view_3D:
                     view_3dimg_path = rel_path + Disp_3d_image
-                    view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
+                    # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
+                    view_3D.add_image(filename=view_3dimg_path)
+
                     view_3D.add_caption('3D View')
 
         doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)

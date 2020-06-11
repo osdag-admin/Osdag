@@ -856,6 +856,28 @@ class Weld:
         self.red = red
         self.min_weld = min_weld_thickness
 
+    def get_weld_red(self,t_t,strength, height=0.0 , length =0.0):
+        """Calculate the reduction factor for long joints in welds and reduced strength
+                Args:
+                    l_j - maximum length of joints in the direction of force transfer in mm (float)
+                    t_t - throat size of the weld in mm (float)
+                    strength - Actual strength of weld
+                Returns:
+                     Reduction factor, beta_lw for long joints in welds (float)
+                Note:
+                    Reference:
+                    IS 800:2007,  cl 10.5.7.3
+                """
+        lj = max(height,length)
+        beta_lw = IS800_2007.cl_10_5_7_3_weld_long_joint(lj, t_t)
+
+        self.beta_lw = round(beta_lw,2)
+
+        self.strength_red = round(self.beta_lw * strength,2)
+
+
+
+
 class Plate(Material):
     def __init__(self, thickness=[], height=0.0,Innerheight=0.0, length=0.0,Innerlength=0.0, gap=0.0, material_grade=""):
         super(Plate, self).__init__(material_grade=material_grade)
@@ -2231,7 +2253,7 @@ class BBChannel_Properties(object):
         else:
             self.A = 2 * self.Channel_attributes.area
         return round(self.A / 100, 2)
-
+    #
     def calc_C_y(self,f_w,f_t,w_h,w_t):
         if self.db == False:
             Ac = Single_Channel_Properties.calc_Area(self,f_w, f_t, w_h, w_t)*100
@@ -2256,9 +2278,9 @@ class BBChannel_Properties(object):
             thickness = 0
             self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
         else:
-            mom_inertia_y = self.Channel_attributes.mom_inertia_y
-            area = self.Channel_attributes.area
-            Cg_1 = self.calc_C_y(f_w,f_t,w_h,w_t)*10
+            mom_inertia_y = self.Channel_attributes.mom_inertia_y/10000
+            area = self.Channel_attributes.area/100
+            Cg_1 = self.calc_C_y(f_w,f_t,w_h,w_t)
             thickness = 0
             self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
 

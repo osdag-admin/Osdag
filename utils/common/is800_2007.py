@@ -705,20 +705,8 @@ class IS800_2007(object):
             return 0.7 * min(part1_thickness, part2_thickness)
 
     @staticmethod
-    def cl_10_5_3_2_fillet_weld_effective_throat_thickness(fillet_size, fusion_face_angle=90):
+    def cl_10_5_3_2_factor_for_throat_thickness (fusion_face_angle = 90):
 
-        """Calculate effective throat thickness of fillet weld for stress calculation
-        Args:
-            fillet_size - Size of fillet weld in mm (float)
-            fusion_face_angle - Angle between fusion faces in degrees (int)
-        Returns:
-            Effective throat thickness of fillet weld for stress calculation in mm (float)
-        Note:
-            Reference:
-
-            IS 800:2007,  cl 10.5.3.2
-
-        """
         table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
         fusion_face_angle = int(round(fusion_face_angle))
         if 60 <= fusion_face_angle <= 90:
@@ -738,7 +726,27 @@ class IS800_2007(object):
         except ValueError:
             return
 
-        throat = max((K * fillet_size), 3)
+        return K
+
+
+    @staticmethod
+    def cl_10_5_3_2_fillet_weld_effective_throat_thickness(fillet_size, fusion_face_angle=90):
+
+        """Calculate effective throat thickness of fillet weld for stress calculation
+        Args:
+            fillet_size - Size of fillet weld in mm (float)
+            fusion_face_angle - Angle between fusion faces in degrees (int)
+        Returns:
+            Effective throat thickness of fillet weld for stress calculation in mm (float)
+        Note:
+            Reference:
+
+            IS 800:2007,  cl 10.5.3.2
+
+        """
+        K = IS800_2007.cl_10_5_3_2_factor_for_throat_thickness(fusion_face_angle)
+
+        throat = max(round((K * fillet_size),2), 3)
 
         return throat
 

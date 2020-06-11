@@ -817,11 +817,12 @@ class ColumnCoverPlate(MomentConnection):
         #     else:
         #         self.member_capacity = True
         # #############################################################
-
-        self.Z_p = round(((self.section.web_thickness * (
+        self.Z_wp = round(((self.section.web_thickness * (
                 self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4), 2)  # mm3
-        self.Z_e = round(((self.section.web_thickness * (
+        self.Z_we = round(((self.section.web_thickness * (
                 self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 6), 2)  # mm3
+        self.Z_p = self.section.plast_sec_mod_z
+        self.Z_e = self.section.elast_sec_mod_z
         # if self.member_capacity == True:
         if self.section.type == "Rolled":
             self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
@@ -851,9 +852,9 @@ class ColumnCoverPlate(MomentConnection):
 
         self.class_of_section = int(max(self.limitwidththkratio_flange, self.limitwidththkratio_web))
         if self.class_of_section == 1 or self.class_of_section == 2:
-            Z_w = self.Z_p
+            self.Z_w = self.Z_wp
         elif self.class_of_section == 3:
-            Z_w = self.Z_e
+            self.Z_w = self.Z_we
 
         if self.class_of_section == 1 or self.class_of_section == 2:
             self.beta_b = 1
@@ -869,7 +870,7 @@ class ColumnCoverPlate(MomentConnection):
             min(self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria), 2)
         self.load_moment_min = 0.5 * self.section.moment_capacity
         self.load_moment = round(max(self.load_moment_min, self.load.moment * 1000000), 2)  # N
-        self.moment_web = round((Z_w * self.load_moment / (self.section.plast_sec_mod_z)),
+        self.moment_web = round((self.Z_w * self.load_moment / (self.section.plast_sec_mod_z)),
                                 2)  # Nm todo add in ddcl # z_w of web & z_p  of section
         self.moment_flange = round(((self.load_moment) - self.moment_web), 2)
         self.axial_force_w = ((self.section.depth - (

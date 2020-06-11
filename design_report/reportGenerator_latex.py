@@ -12,7 +12,7 @@ from pylatex.utils import italic, bold
 import sys
 import datetime
 import pylatex as pyl
-
+from PyQt5.QtWidgets import QMessageBox
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic
@@ -241,6 +241,8 @@ class CreateLatex(Document):
                     view_3D.add_image(filename=view_3dimg_path)
 
                     view_3D.add_caption('3D View')
-
-        doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+        try:
+            doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+        except:
+            QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no pdf is open with same name. If error persists send us the log file created in location you are trying to save.')
 

@@ -1716,44 +1716,14 @@ class Tension_welded(Member):
                                       'FlangeSlope': round(section_size.flange_slope, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),
                                       'R2(mm)': round(section_size.toe_radius, 2),
-                                      'Iz(mm4)': round((BBChannel.calc_MomentOfAreaZ(section_size.flange_width,
-                                                                                     section_size.flange_thickness,
-                                                                                     section_size.depth,
-                                                                                     section_size.web_thickness) * 10000),
-                                                       2),
-                                      'Iy(mm4)': round((BBChannel.calc_MomentOfAreaY(section_size.flange_width,
-                                                                                     section_size.flange_thickness,
-                                                                                     section_size.depth,
-                                                                                     section_size.web_thickness) * 10000),
-                                                       2),
-                                      'rz(mm)': round((BBChannel.calc_RogZ(section_size.flange_width,
-                                                                           section_size.flange_thickness,
-                                                                           section_size.depth,
-                                                                           section_size.web_thickness) * 10), 2),
-                                      'ry(mm)': round((BBChannel.calc_RogY(section_size.flange_width,
-                                                                           section_size.flange_thickness,
-                                                                           section_size.depth,
-                                                                           section_size.web_thickness) * 10), 2),
-                                      'Zz(mm3)': round((BBChannel.calc_ElasticModulusZz(section_size.flange_width,
-                                                                                        section_size.flange_thickness,
-                                                                                        section_size.depth,
-                                                                                        section_size.web_thickness) * 1000),
-                                                       2),
-                                      'Zy(mm3)': round((BBChannel.calc_ElasticModulusZy(section_size.flange_width,
-                                                                                        section_size.flange_thickness,
-                                                                                        section_size.depth,
-                                                                                        section_size.web_thickness) * 1000),
-                                                       2),
-                                      'Zpz(mm3)': round((BBChannel.calc_PlasticModulusZpz(section_size.flange_width,
-                                                                                          section_size.flange_thickness,
-                                                                                          section_size.depth,
-                                                                                          section_size.web_thickness) * 1000),
-                                                        2),
-                                      'Zpy(mm3)': round((BBChannel.calc_PlasticModulusZpy(section_size.flange_width,
-                                                                                          section_size.flange_thickness,
-                                                                                          section_size.depth,
-                                                                                          section_size.web_thickness) * 1000),
-                                                        2),
+                                      'Iz(mm4)': round((BBChannel.calc_MomentOfAreaZ(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 10000),2),
+                                      'Iy(mm4)': round((BBChannel.calc_MomentOfAreaY(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 10000),2),
+                                      'rz(mm)': round((BBChannel.calc_RogZ(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 10), 2),
+                                      'ry(mm)': round((BBChannel.calc_RogY(section_size.flange_width,section_size.flange_thickness, section_size.depth,section_size.web_thickness) * 10), 2),
+                                      'Zz(mm3)': round((BBChannel.calc_ElasticModulusZz(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 1000),2),
+                                      'Zy(mm3)': round((BBChannel.calc_ElasticModulusZy(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 1000),2),
+                                      'Zpz(mm3)': round((BBChannel.calc_PlasticModulusZpz(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 1000),2),
+                                      'Zpy(mm3)': round((BBChannel.calc_PlasticModulusZpy(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 1000),2),
                                       'r(mm)': round(gyration, 2)}
             thickness = section_size.web_thickness
             text = "C"
@@ -1971,11 +1941,11 @@ class Tension_welded(Member):
             else:
                 pass
 
-        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
+        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
         self.report_check.append(t1)
 
         if self.member_design_status == True and self.weld_design_status == True and self.thick_design_status == True:
-            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
+            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7.5cm}|p{1cm}|')
             self.report_check.append(t1)
 
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
@@ -2006,7 +1976,7 @@ class Tension_welded(Member):
                                round((section_size.tension_yielding_capacity / 1000), 2)))
             self.report_check.append(t1)
         else:
-            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
+            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7.5cm}|p{1cm}|')
             self.report_check.append(t1)
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, self.load.axial_force,
                   member_yield_prov(section_size.area, section_size.fy, gamma_m0, member_yield_kn,
@@ -2049,7 +2019,7 @@ class Tension_welded(Member):
 
         if self.thick_design_status == True:
 
-            t7 = ('SubSection', 'Weld Checks', '|p{3cm}|p{7cm}|p{5cm}|p{1cm}|')
+            t7 = ('SubSection', 'Weld Checks', '|p{3cm}|p{6.5 cm}|p{5cm}|p{1cm}|')
             self.report_check.append(t7)
 
             t1 = (DISP_MIN_WELD_SIZE, min_weld_size_req_01(self.weld_connecting_plates, self.weld.red, self.weld.min_weld), self.weld.size,

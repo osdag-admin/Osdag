@@ -192,7 +192,6 @@ class Member(Main):
         t1 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_TEXTBOX, None, l)
         section.append(t1)
 
-
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
         section.append(t2)
 
@@ -205,6 +204,27 @@ class Member(Main):
 
         t4 = (KEY_SEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         section.append(t4)
+
+        t15 = ('Label_27', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        section.append(t15)
+
+        t16 = ('Label_28', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        section.append(t16)
+
+        t31 = ('Label_25', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        section.append(t31)
+
+        t32 = ('Label_26', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        section.append(t32)
+
+        t14 = ('Label_6', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], Type)
+        section.append(t14)
+
+        t29 = ('Label_24', 'Source', TYPE_TEXTBOX, None, source)
+        section.append(t29)
+
+        t13 = (None, None, TYPE_BREAK, None, None)
+        section.append(t13)
 
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         section.append(t5)
@@ -245,29 +265,15 @@ class Member(Main):
         t21 = ('Label_12', KEY_DISP_MOA_IY, TYPE_TEXTBOX, None, mom_inertia_y)
         section.append(t21)
 
-        t13 = (None, None, TYPE_BREAK, None, None)
-        section.append(t13)
+        # t13 = (None, None, TYPE_BREAK, None, None)
+        # section.append(t13)
+        #
+        #
+        # t18 = (None, None, TYPE_ENTER, None, None)
+        # section.append(t18)
 
-        t14 = ('Label_6', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], Type)
-        section.append(t14)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
-
-        t15 = ('Label_27', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
-        section.append(t15)
-
-        t16 = ('Label_28', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
-        section.append(t16)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
-
-        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
-        section.append(t17)
+        # t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        # section.append(t17)
 
         t22 = ('Label_13', KEY_DISP_MOA_IU, TYPE_TEXTBOX, None, mom_inertia_u)
         section.append(t22)
@@ -280,6 +286,15 @@ class Member(Main):
 
         t23 = ('Label_16', KEY_DISP_ROG_RY, TYPE_TEXTBOX, None, rad_of_gy_y)
         section.append(t23)
+
+        t13 = (None, None, TYPE_BREAK, None, None)
+        section.append(t13)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
+        section.append(t33)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        section.append(t17)
 
         t22 = ('Label_17', KEY_DISP_ROG_RU, TYPE_TEXTBOX, None, rad_of_gy_u)
         section.append(t22)
@@ -302,27 +317,6 @@ class Member(Main):
         t27 = ('Label_23', KEY_DISP_It, TYPE_TEXTBOX, None, torsional_rigidity)
 
         section.append(t27)
-
-        t28 = (None, None, TYPE_BREAK, None, None)
-        section.append(t28)
-
-        t29 = ('Label_24', 'Source', TYPE_TEXTBOX, None, source)
-        section.append(t29)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        section.append(t30)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        section.append(t30)
-
-        t31 = ('Label_25', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
-        section.append(t31)
-
-        t32 = ('Label_26', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
-        section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
-        section.append(t33)
 
         return section
 
@@ -364,6 +358,9 @@ class Member(Main):
             t_e = "12"
             Type='Rolled'
             image = ''
+            It = ""
+            Iw = ""
+
         else:
             designation = str(input_dictionary[KEY_SECSIZE][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
@@ -402,7 +399,8 @@ class Member(Main):
                     image = VALUES_IMG_TENSIONBOLTED_DF03[0]
                 else:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[1]
-
+                It =  str(round((Channel_attributes.It / 10000), 2))
+                Iw = str(round((Channel_attributes.Iw / 1000000), 2))
             else:
                 Channel_attributes = BBChannel_Properties()
                 Channel_attributes.data(designation,material_grade)
@@ -421,6 +419,8 @@ class Member(Main):
                     image = VALUES_IMG_TENSIONBOLTED_DF03[2]
                 else:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[3]
+                It = "N/A"
+                Iw = "N/A"
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -460,6 +460,27 @@ class Member(Main):
         t4 = (KEY_SEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         section.append(t4)
 
+        t15 = ('Label_7', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        section.append(t15)
+
+        t16 = ('Label_8', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        section.append(t16)
+
+        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        section.append(t31)
+
+        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        section.append(t32)
+
+        t14 = ('Label_6', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], Type)
+        section.append(t14)
+
+        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
+        section.append(t29)
+
+        t28 = (None, None, TYPE_BREAK, None, None)
+        section.append(t28)
+
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         section.append(t5)
 
@@ -493,29 +514,24 @@ class Member(Main):
         t19 = ('Label_10', KEY_DISP_AREA, TYPE_TEXTBOX, None, area)
         section.append(t19)
 
-        t13 = (None, None, TYPE_BREAK, None, None)
-        section.append(t13)
+        # t13 = (None, None, TYPE_BREAK, None, None)
+        # section.append(t13)
+        #
+        #
 
-        t14 = ('Label_6', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], Type)
-        section.append(t14)
+        # t18 = (None, None, TYPE_ENTER, None, None)
+        # section.append(t18)
+        #
+        # t18 = (None, None, TYPE_ENTER, None, None)
+        # section.append(t18)
 
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
 
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
 
-        t15 = ('Label_7', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
-        section.append(t15)
+        # t18 = (None, None, TYPE_ENTER, None, None)
+        # section.append(t18)
 
-        t16 = ('Label_8', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
-        section.append(t16)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
-
-        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
-        section.append(t17)
+        # t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        # section.append(t17)
 
         t20 = ('Label_17', KEY_DISP_Cy, TYPE_TEXTBOX, None, C_y)
         section.append(t20)
@@ -538,32 +554,26 @@ class Member(Main):
         t25 = ('Label_20', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
         section.append(t25)
 
+        t28 = (None, None, TYPE_BREAK, None, None)
+        section.append(t28)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
+        section.append(t33)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        section.append(t17)
+
         t26 = ('Label_21', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
         section.append(t26)
 
         t27 = ('Label_22', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
         section.append(t27)
 
-        t28 = (None, None, TYPE_BREAK, None, None)
-        section.append(t28)
+        t27 = ('Label_26', KEY_DISP_It, TYPE_TEXTBOX, None, It)
+        section.append(t27)
 
-        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
-        section.append(t29)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        section.append(t30)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        section.append(t30)
-
-        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
-        section.append(t31)
-
-        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
-        section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
-        section.append(t33)
+        t27 = ('Label_27', KEY_DISP_Iw, TYPE_TEXTBOX, None, Iw)
+        section.append(t27)
 
         return section
 
@@ -738,6 +748,8 @@ class Member(Main):
                 image = VALUES_IMG_TENSIONBOLTED_DF03[0]
             else:
                 image = VALUES_IMG_TENSIONBOLTED_DF03[1]
+            It = str(round((Channel_attributes.It/ 10000), 2))
+            Iw = str(round((Channel_attributes.Iw/ 1000000), 2))
         else:
             Channel_attributes = BBChannel_Properties()
             Channel_attributes.data(designation,material_grade)
@@ -756,7 +768,8 @@ class Member(Main):
                 image = VALUES_IMG_TENSIONBOLTED_DF03[2]
             else:
                 image = VALUES_IMG_TENSIONBOLTED_DF03[3]
-
+            It = "N/A"
+            Iw = "N/A"
 
         d = {
             KEY_SECSIZE_SELECTED: designation,
@@ -783,6 +796,8 @@ class Member(Main):
             'Label_21': str(plast_sec_mod_z),
             'Label_22': str(plast_sec_mod_y),
             'Label_23': str(source),
+            'Label_26': str(It),
+            'Label_27': str(Iw),
             KEY_IMAGE: image
         }
         return d
@@ -939,6 +954,9 @@ class Member(Main):
             pm_z = ''
             pm_y = ''
 
+            It = ''
+            Iw = ''
+
         else:
             f_w = float(self[0])
             f_t = float(self[1])
@@ -962,7 +980,8 @@ class Member(Main):
                 em_y = sec_prop.calc_ElasticModulusZy(f_w, f_t, w_h, w_t)
                 pm_z = sec_prop.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t)
                 pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t)
-
+                It = "N/A"
+                Iw = "N/A"
 
             else:
                 sec_prop = BBChannel_Properties()
@@ -980,6 +999,9 @@ class Member(Main):
                 pm_z = sec_prop.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t)
                 pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t)
 
+                It = "N/A"
+                Iw = "N/A"
+
 
         d = {'Label_9': str(mass),
              'Label_10': str(area),
@@ -992,6 +1014,8 @@ class Member(Main):
              'Label_20': str(em_y),
              'Label_21': str(pm_z),
              'Label_22': str(pm_y),
+             'Label_26': str(It),
+             'Label_27': str(Iw),
              }
 
         return d

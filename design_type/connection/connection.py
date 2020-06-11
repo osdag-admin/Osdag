@@ -101,6 +101,27 @@ class Connection(Main):
         t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         supporting_section.append(t4)
 
+        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        supporting_section.append(t15)
+
+        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        supporting_section.append(t16)
+
+        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        supporting_section.append(t31)
+
+        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        supporting_section.append(t32)
+
+        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        supporting_section.append(t14)
+
+        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
+        supporting_section.append(t29)
+
+        t28 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t28)
+
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         supporting_section.append(t5)
 
@@ -124,24 +145,6 @@ class Connection(Main):
 
         t12 = ('Label_7', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         supporting_section.append(t12)
-
-        t13 = (None, None, TYPE_BREAK, None, None)
-        supporting_section.append(t13)
-
-        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
-        supporting_section.append(t14)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t18)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t18)
-
-        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
-        supporting_section.append(t15)
-
-        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
-        supporting_section.append(t16)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
         supporting_section.append(t17)
@@ -170,6 +173,15 @@ class Connection(Main):
         t25 = ('Label_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
         supporting_section.append(t25)
 
+        t28 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t28)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM)
+        supporting_section.append(t33)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        supporting_section.append(t17)
+
         t26 = ('Label_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
         supporting_section.append(t26)
 
@@ -181,27 +193,6 @@ class Connection(Main):
 
         t27 = ('Label_22', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
         supporting_section.append(t27)
-
-        t28 = (None, None, TYPE_BREAK, None, None)
-        supporting_section.append(t28)
-
-        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
-        supporting_section.append(t29)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t30)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t30)
-
-        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
-        supporting_section.append(t31)
-
-        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
-        supporting_section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM)
-        supporting_section.append(t33)
 
         return supporting_section
 
@@ -297,6 +288,27 @@ class Connection(Main):
         t4 = (KEY_SUPTDSEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         supporting_section.append(t4)
 
+        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        supporting_section.append(t15)
+
+        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        supporting_section.append(t16)
+
+        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        supporting_section.append(t31)
+
+        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        supporting_section.append(t32)
+
+        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        supporting_section.append(t14)
+
+        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
+        supporting_section.append(t29)
+
+        t28 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t28)
+
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         supporting_section.append(t5)
 
@@ -320,24 +332,6 @@ class Connection(Main):
 
         t12 = ('Label_7', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         supporting_section.append(t12)
-
-        t13 = (None, None, TYPE_BREAK, None, None)
-        supporting_section.append(t13)
-
-        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
-        supporting_section.append(t14)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t18)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t18)
-
-        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
-        supporting_section.append(t15)
-
-        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
-        supporting_section.append(t16)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
         supporting_section.append(t17)
@@ -366,6 +360,15 @@ class Connection(Main):
         t25 = ('Label_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
         supporting_section.append(t25)
 
+        t28 = (None, None, TYPE_BREAK, None, None)
+        supporting_section.append(t28)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/ISection.png')
+        supporting_section.append(t33)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        supporting_section.append(t17)
+
         t26 = ('Label_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
         supporting_section.append(t26)
 
@@ -377,27 +380,6 @@ class Connection(Main):
 
         t27 = ('Label_22', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
         supporting_section.append(t27)
-
-        t28 = (None, None, TYPE_BREAK, None, None)
-        supporting_section.append(t28)
-
-        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
-        supporting_section.append(t29)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t30)
-
-        t30 = (None, None, TYPE_ENTER, None, None)
-        supporting_section.append(t30)
-
-        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
-        supporting_section.append(t31)
-
-        t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
-        supporting_section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/ISection.png')
-        supporting_section.append(t33)
 
         return supporting_section
 

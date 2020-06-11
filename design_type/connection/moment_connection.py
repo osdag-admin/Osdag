@@ -50,6 +50,9 @@ class MomentConnection(Connection, IS800_2007):
             elast_sec_mod_y = ''
             plast_sec_mod_z = ''
             plast_sec_mod_y = ''
+            torsion_const = ''
+            warping_const = ''
+
 
         else:
             designation = str(input_dictionary[KEY_SECSIZE])
@@ -81,7 +84,8 @@ class MomentConnection(Connection, IS800_2007):
             elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
             plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
-
+            torsion_const = str(I_sec_attributes.It)
+            warping_const =  str(I_sec_attributes.Iw)
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
             material_attributes = Material(material_grade)
@@ -104,6 +108,27 @@ class MomentConnection(Connection, IS800_2007):
 
         t4 = (KEY_SEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         section.append(t4)
+
+        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        section.append(t15)
+
+        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        section.append(t16)
+
+        t31 = ('Label_22', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        section.append(t31)
+
+        t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        section.append(t32)
+
+        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        section.append(t14)
+
+        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
+        section.append(t29)
+
+        t13 = (None, None, TYPE_BREAK, None, None)
+        section.append(t13)
 
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         section.append(t5)
@@ -128,24 +153,6 @@ class MomentConnection(Connection, IS800_2007):
 
         t12 = ('Label_7', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         section.append(t12)
-
-        t13 = (None, None, TYPE_BREAK, None, None)
-        section.append(t13)
-
-        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
-        section.append(t14)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
-
-        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
-        section.append(t15)
-
-        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
-        section.append(t16)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
         section.append(t17)
@@ -174,32 +181,28 @@ class MomentConnection(Connection, IS800_2007):
         t25 = ('Label_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
         section.append(t25)
 
+        t28 = (None, None, TYPE_BREAK, None, None)
+        section.append(t28)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/ISection.png')
+        section.append(t33)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        section.append(t17)
+
         t26 = ('Label_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
         section.append(t26)
 
         t27 = ('Label_20', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
         section.append(t27)
 
-        t28 = (None, None, TYPE_BREAK, None, None)
-        section.append(t28)
+        t26 = ('Label_21', KEY_DISP_It, TYPE_TEXTBOX, None, torsion_const)
+        section.append(t26)
 
-        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
-        section.append(t29)
+        t27 = ('Label_22', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
+        section.append(t27)
 
-        t30 = (None, None, TYPE_ENTER, None, None)
-        section.append(t30)
 
-        t30 = (None, None, TYPE_ENTER, None, None)
-        section.append(t30)
-
-        t31 = ('Label_22', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
-        section.append(t31)
-
-        t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
-        section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, VALUES_IMG_BEAM)
-        section.append(t33)
 
         return section
 

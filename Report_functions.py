@@ -1588,8 +1588,8 @@ def long_joint_bolted_req():
     long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
     long_joint_bolted_eqn.append(NoEscape(r'& l = ((nc~or~nr) - 1) * (p~or~g) \\'))
     long_joint_bolted_eqn.append(NoEscape(r'& \beta_{ij} = 1.075 - l/(200 * d) \\'))
-    long_joint_bolted_eqn.append(NoEscape(r'& but~0.75\leq\beta_{ij}\leq1.0 \end{aligned}'))
-
+    long_joint_bolted_eqn.append(NoEscape(r'& but~0.75\leq\beta_{ij}\leq1.0 \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'&(Ref~IS~800:2007,~Clause~10.3.3.1)&\end{aligned}'))
     return long_joint_bolted_eqn
 
 
@@ -1629,7 +1629,8 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr):
         long_joint_bolted_eqn.append(NoEscape(r' l&= '+ l_str + r'\\'))
         long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * '+d+' = '+lt_str +r' \\'))
         long_joint_bolted_eqn.append(NoEscape(r'& since,~l < 15 * d~then~V_{rd} = V_{db} \\'))
-        long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+Tc+r' \end{aligned}'))
+        long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+Tc+r' \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'&(Ref~IS~800:2007,~Clause~10.3.3.1)&\end{aligned}'))
     else:
         long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= ((nc~or~nr) - 1) * (p~or~g) \\'))
         long_joint_bolted_eqn.append(NoEscape(r' &= (' + nc + ' - 1) * ' + p + '=' + lc_str + r'\\'))
@@ -1638,7 +1639,8 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr):
         long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
         long_joint_bolted_eqn.append(NoEscape(r'& since,~l \geq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
         long_joint_bolted_eqn.append(NoEscape(r'& \beta_{ij} = 1.075 - '+ l_str +'/(200*'+d+') ='+Bi+r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \end{aligned}'))
+        long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'&(Ref~IS~800:2007,~Clause~10.3.3.1)&\end{aligned}'))
 
     return long_joint_bolted_eqn
 
@@ -2278,6 +2280,21 @@ def display_prov(v,t, ref = None):
     else:
         display_eqn.append(NoEscape(r'\begin{aligned} ' + t + ' &=' + v + r'\end{aligned}'))
     return display_eqn
+
+def display_l(t, ref = None , cl = None ):
+
+    t = t.replace(" ","~")
+    displayl_eqn = Math(inline=True)
+    if ref is not None:
+        ref = ref.replace(" ", "~")
+        cl = cl.replace(" ", "~")
+        displayl_eqn.append(NoEscape(r'&\begin{aligned}'+ t + r'\\'))
+        displayl_eqn.append(NoEscape(r'&' + ref + r'\\'))
+        displayl_eqn.append(NoEscape(r'' + cl + r'\end{aligned}'))
+
+    else:
+        displayl_eqn.append(NoEscape(r'\begin{aligned} '+ t + r'\end{aligned}'))
+    return displayl_eqn
 
 
 def gamma(v,t):

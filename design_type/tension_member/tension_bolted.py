@@ -115,12 +115,12 @@ class Tension_bolted(Member):
                'Label_4', 'Label_5',
                'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
                'Label_19', 'Label_20', 'Label_21',
-               'Label_22', 'Label_23'], TYPE_TEXTBOX, self.get_new_channel_section_properties)
+               'Label_22', 'Label_23', 'Label_26','Label_27'], TYPE_TEXTBOX, self.get_new_channel_section_properties)
         change_tab.append(t6)
 
         t5 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13'],
               ['Label_9', 'Label_10','Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22'], TYPE_TEXTBOX, self.get_Channel_sec_properties)
+               'Label_19', 'Label_20', 'Label_21', 'Label_22','Label_26','Label_27'], TYPE_TEXTBOX, self.get_Channel_sec_properties)
         change_tab.append(t5)
 
         return change_tab
@@ -2475,11 +2475,11 @@ class Tension_bolted(Member):
             multiple =1
 
 
-        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
+        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
         self.report_check.append(t1)
 
         if self.member_design_status == True:
-            t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{3cm}|')
+            t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{2.5cm}|')
             self.report_check.append(t1)
             t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt.bolt_diameter_provided), "d"), '')
             self.report_check.append(t6)
@@ -2498,7 +2498,7 @@ class Tension_bolted(Member):
             self.report_check.append(t3)
 
         else:
-            t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{3cm}|')
+            t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{2.5cm}|')
             self.report_check.append(t1)
             t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt_diameter_min), "d"), '')
             self.report_check.append(t6)
@@ -2516,7 +2516,7 @@ class Tension_bolted(Member):
             self.report_check.append(t3)
 
         if self.member_design_status == True and self.bolt_design_status == True:
-            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
+            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '', member_yield_prov(section_size.area,section_size.fy,gamma_m0,member_yield_kn,multiple), '')
@@ -2539,7 +2539,7 @@ class Tension_bolted(Member):
         else:
             # t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
             # self.report_check.append(t1)
-            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
+            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, self.load.axial_force,
                   member_yield_prov(section_size.area, section_size.fy, gamma_m0, member_yield_kn,
@@ -2554,7 +2554,7 @@ class Tension_bolted(Member):
 
         if self.member_design_status == True:
 
-            t7 = ('SubSection', 'Bolt Checks', '|p{2.5cm}|p{5.5cm}|p{7cm}|p{1cm}|')
+            t7 = ('SubSection', 'Bolt Checks', '|p{2.5cm}|p{5.5cm}|p{6.5cm}|p{1cm}|')
 
             self.report_check.append(t7)
 
@@ -2656,7 +2656,7 @@ class Tension_bolted(Member):
             pass
 
         if self.bolt_design_status == True:
-            t7 = ('SubSection', 'Gusset Plate Checks', '|p{2.5cm}|p{5cm}|p{7.5cm}|p{1cm}|')
+            t7 = ('SubSection', 'Gusset Plate Checks', '|p{2.5cm}|p{5cm}|p{7cm}|p{1cm}|')
 
             self.report_check.append(t7)
 
@@ -2732,7 +2732,7 @@ class Tension_bolted(Member):
 
         if self.plate_design_status == True and self.sec_profile not in ["Angles", "Channels"]:
 
-            t7 = ('SubSection', 'Intermittent Connection', '|p{2.5cm}|p{5cm}|p{7.5cm}|p{1cm}|')
+            t7 = ('SubSection', 'Intermittent Connection', '|p{2.5cm}|p{5cm}|p{7cm}|p{1cm}|')
             self.report_check.append(t7)
 
             t5 = (KEY_OUT_DISP_INTERCONNECTION, " ", self.inter_conn, "")

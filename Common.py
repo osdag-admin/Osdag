@@ -515,6 +515,8 @@ KEY_DISP_AXIAL = 'Axial (kN)'
 KEY_DISP_AXIAL_STAR = 'Axial (kN)* '
 DISP_TITLE_PLATE = 'Plate'
 KEY_DISP_TYP = 'Type'
+KEY_DISP_TYP_ANCHOR = 'Type*'
+KEY_DISP_GRD_ANCHOR = 'Grade*'
 KEY_DISP_GRD_FOOTING = 'Grade*'
 KEY_DISP_GRD = 'Grade'
 
@@ -709,9 +711,9 @@ KEY_DISP_SHEAR_MINOR = ' - Along minor axis (y-y)'
 ###################################
 # Key for Storing Axial sub-key of Load
 KEY_AXIAL_BP = 'Load.Axial_Compression'
-KEY_DISP_AXIAL_BP = 'Axial Compression (kN) *'
+KEY_DISP_AXIAL_BP = 'Axial Compression (kN)'
 KEY_AXIAL_TENSION_BP = 'Load.Axial_Tension'
-KEY_DISP_AXIAL_TENSION_BP = 'Axial Tension/Uplift (kN) *'
+KEY_DISP_AXIAL_TENSION_BP = 'Axial Tension/Uplift (kN)'
 
 
 

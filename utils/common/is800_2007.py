@@ -24,7 +24,7 @@ class IS800_2007(object):
 
     # Clause 3.7 - Classification of cross-section, Table 2, Limiting width to thickness ratio
     @staticmethod
-    def Table2_web_OfI_H_box_section(self, depth, web_thickness, f_y,axial_load, load_type='Compression', section_class='Plastic'):
+    def Table2_web_OfI_H_box_section(depth, web_thickness, f_y, axial_load, load_type='Compression', section_class='Plastic'):
         """ Calculate the limiting width to thickness ratio; for web of an I, H or Box section in accordance to Table 2
 
         Args:

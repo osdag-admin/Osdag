@@ -186,6 +186,27 @@ def tuple_to_str_red(tl):
         arr.append(val)
     return arr
 
+def get_db_header(table_name):
+
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+
+    if table_name == "Angles":
+        cursor = conn.execute("SELECT * FROM Angles")
+
+    elif table_name == "Channels":
+        cursor = conn.execute("SELECT * FROM Channels")
+
+    elif table_name == "Beams":
+        cursor = conn.execute("SELECT * FROM Beams")
+
+    else:
+        cursor = conn.execute("SELECT * FROM Columns")
+
+    header = [description[0] for description in cursor.description]
+
+    return header
+
+
 ##########################
 # Type Keys (Type of input field, tab type etc.)
 ###########################

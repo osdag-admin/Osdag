@@ -829,7 +829,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             weld = []
             weld.append(VALUES_WELD_TYPE[0])
-            weld.append(VALUES_WELD_TYPE[2])
+            weld.append(VALUES_WELD_TYPE[1])
             return weld
 
     def out_weld(self):
@@ -992,15 +992,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             design_dictionary[KEY_MOMENT_MINOR] = 'Disabled'
         if design_dictionary[KEY_CONN] != 'Moment Base Plate' or design_dictionary[KEY_AXIAL_TENSION_BP] == '':
             design_dictionary[KEY_AXIAL_TENSION_BP] = 'Disabled'
-        if design_dictionary[KEY_SHEAR_MAJOR] == '':
-            design_dictionary[KEY_SHEAR_MAJOR] = '0'
-        if design_dictionary[KEY_SHEAR_MINOR] == '':
-            design_dictionary[KEY_SHEAR_MINOR] = '0'
+        # if design_dictionary[KEY_SHEAR_MAJOR] == '':
+        #     design_dictionary[KEY_SHEAR_MAJOR] = '0'
+        # if design_dictionary[KEY_SHEAR_MINOR] == '':
+        #     design_dictionary[KEY_SHEAR_MINOR] = '0'
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                    design_dictionary[option[0]] = '0'
+                    # missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX and option[0] in [KEY_SECSIZE, KEY_GRD_FOOTING]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])

@@ -1,18 +1,20 @@
 class Load(object):
 
     def __init__(self, axial_force=0.0, shear_force=0.0, moment=0.0):
-        if axial_force is not None:
+
+        if axial_force is not "":
+            print('hi', axial_force)
             self.axial_force = float(axial_force)
         else:
-            self.axial_force = None
-        if shear_force is not None:
+            self.axial_force = 0.0
+        if shear_force is not "":
             self.shear_force = float(shear_force)
         else:
-            self.shear_force = None
-        if moment is not None:
+            self.shear_force = 0.0
+        if moment is not "":
             self.moment = float(moment)
         else:
-            self.moment = None
+            self.moment = 0.0
 
     def __repr__(self):
         repr = "Load\n"

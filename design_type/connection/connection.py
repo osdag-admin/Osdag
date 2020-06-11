@@ -1,6 +1,7 @@
-from utils.common.component import Section,I_sectional_Properties, Material
+from utils.common.component import Section,I_sectional_Properties, Material, Beam
 from design_type.main import Main
 from Common import *
+import numpy as np
 
 
 class Connection(Main):
@@ -103,9 +104,6 @@ class Connection(Main):
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         supporting_section.append(t5)
 
-        t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
-        supporting_section.append(t5)
-
         t6 = ('Label_1', KEY_DISP_DEPTH, TYPE_TEXTBOX, None, depth)
         supporting_section.append(t6)
 
@@ -202,7 +200,7 @@ class Connection(Main):
         t32 = ('Label_25', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
         supporting_section.append(t32)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/ISection.png')
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM)
         supporting_section.append(t33)
 
         return supporting_section
@@ -442,7 +440,6 @@ class Connection(Main):
 
         return d
 
-
     def get_fu_fy(self):
         material_grade = self[0]
         fu_conn = ''
@@ -550,6 +547,82 @@ class Connection(Main):
     # Design Preference Functions End
     ########################################
 
+    def func_for_validation(self, design_dictionary):
+        all_errors = []
+        self.design_status = False
+        flag1 = False
+        flag2=True
+        option_list = self.input_values(self)
+        missing_fields_list = []
+        for option in option_list:
+            if option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                if design_dictionary[option[0]] == 'Select Section' or design_dictionary[option[0]] == 'Select Grade':
+                    missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
+                if design_dictionary[option[0]] == []:
+                    missing_fields_list.append(option[1])
+
+        if len(missing_fields_list) == 0:
+            if KEY_CONN in design_dictionary and design_dictionary[KEY_CONN] == VALUES_CONN_2[0]:
+                primary = design_dictionary[KEY_SUPTNGSEC]
+                secondary = design_dictionary[KEY_SUPTDSEC]
+                conn = sqlite3.connect(PATH_TO_DATABASE)
+                cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
+                lst = []
+                rows = cursor.fetchall()
+                for row in rows:
+                    lst.append(row)
+                p_val = lst[0][0]
+                cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+                lst1 = []
+                rows1 = cursor2.fetchall()
+                for row1 in rows1:
+                    lst1.append(row1)
+                s_val = lst1[0][0]
+                if p_val <= s_val:
+                    error = "Secondary beam depth is higher than clear depth of primary beam web " + "\n" + "(No provision in Osdag till now)"
+                    all_errors.append(error)
+                else:
+                    flag1 = True
+
+            elif KEY_CONN in design_dictionary and design_dictionary[KEY_CONN] == VALUES_CONN_1[1]:
+                primary = design_dictionary[KEY_SUPTNGSEC]
+                secondary = design_dictionary[KEY_SUPTDSEC]
+                conn = sqlite3.connect(PATH_TO_DATABASE)
+                cursor = conn.execute("SELECT D, T, R1, R2 FROM COLUMNS WHERE Designation = ( ? ) ", (primary,))
+                p_beam_details = cursor.fetchone()
+                p_val = p_beam_details[0] - 2*p_beam_details[1] - p_beam_details[2] - p_beam_details[3]
+                cursor2 = conn.execute("SELECT B FROM BEAMS WHERE Designation = ( ? )", (secondary,))
+
+                s_beam_details = cursor2.fetchone()
+                s_val = s_beam_details[0]
+                #print(p_val,s_val)
+                if p_val <= s_val:
+                    error = "Secondary beam width is higher than clear depth of primary column web " + "\n" + "(No provision in Osdag till now)"
+                    all_errors.append(error)
+                else:
+                    flag1 = True
+            else:
+                flag1 = True
+            if design_dictionary[KEY_MODULE] == KEY_DISP_FINPLATE:
+                selected_plate_thk = list(np.float_(design_dictionary[KEY_PLATETHK]))
+                supported_section = Beam(designation=design_dictionary[KEY_SUPTDSEC],material_grade=design_dictionary[KEY_MATERIAL])
+                available_plates = [i for i in selected_plate_thk if i >= supported_section.web_thickness]
+                if not available_plates:
+                    error = "Plate thickness should be greater than suppported section web thicknesss."
+                    all_errors.append(error)
+                    flag2 = False
+                else:
+                    flag2=True
+            if flag1 and flag2:
+                self.set_input_values(self, design_dictionary)
+            else:
+                return all_errors
+
+        else:
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            all_errors.append(error)
+            return all_errors
 
     def generate_missing_fields_error_string(self, missing_fields_list):
         """
@@ -574,6 +647,7 @@ class Connection(Main):
         information += "."
 
         return information
+
 
     def call_3DModel(self, ui, bgcolor):
         from PyQt5.QtWidgets import QCheckBox

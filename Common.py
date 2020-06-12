@@ -35,7 +35,6 @@ class OurLog(logging.Handler):
         elif record.levelname == 'INFO':
             msg = "<span style='color: green;'>" + msg + "</span>"
         self.key.append(msg)
-        self.key.append(record.levelname)
 
 def connectdb1():
     """

@@ -208,6 +208,25 @@ def get_db_header(table_name):
 
     return header
 
+def get_source(table_name, designation):
+
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+
+    if table_name == "Angles":
+        cursor = conn.execute("SELECT Source FROM Angles WHERE Designation = ?", (designation,))
+
+    elif table_name == "Channels":
+        cursor = conn.execute("SELECT Source FROM Channels WHERE Designation = ?", (designation,))
+
+    elif table_name == "Beams":
+        cursor = conn.execute("SELECT Source FROM Beams WHERE Designation = ?", (designation,))
+
+    else:
+        cursor = conn.execute("SELECT Source FROM Columns WHERE Designation = ?", (designation,))
+
+    source = cursor.fetchone()[0]
+    return str(source)
+
 
 ##########################
 # Type Keys (Type of input field, tab type etc.)

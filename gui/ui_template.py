@@ -1154,7 +1154,7 @@ class Window(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
-        self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
+        self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
 
         self.actionOsdagSectionModeller=QtWidgets.QAction(MainWindow)
         self.actionOsdagSectionModeller.setObjectName("actionDesign_Preferences")
@@ -1624,7 +1624,7 @@ class Window(QMainWindow):
         elif trigger_type == "Design_Pref":
 
             if self.prev_inputs != self.input_dock_inputs:
-                self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
+                self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
 
                 if 'Select Section' in self.input_dock_inputs.values():
                     self.designPrefDialog.flag = False

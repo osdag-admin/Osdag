@@ -114,6 +114,12 @@ class Tension_bolted(Member):
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t5)
 
+        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE_SELECTED], ['Label_24'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t6)
+
+        t7 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE_SELECTED], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t7)
+
         return change_tab
 
     def input_dictionary_design_pref(self):

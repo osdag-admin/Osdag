@@ -83,6 +83,9 @@ class ColumnCoverPlate(MomentConnection):
                'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
 
+        t6 = (KEY_DISP_COLSEC, [KEY_SECSIZE], ['Label_21'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t6)
+
         return change_tab
 
     def edit_tabs(self):
@@ -820,11 +823,17 @@ class ColumnCoverPlate(MomentConnection):
         print('shear_force', self.load.shear_force)
 
         # #############################################################
+
         # TODO: to be reviewed by anjali. web section modulus is renamed as Z_wp,Z_we instead of Z_p,Z_e
         self.Z_wp = round(((self.section.web_thickness * (
-                self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4), 2)  # mm3
+                self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4), 2) # mm3
+        print("zpp",self.Z_wp)
+        print("secZp",self.section.plast_sec_mod_z)
+
         self.Z_we = round(((self.section.web_thickness * (
                 self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 6), 2)  # mm3
+        self.Z_p = self.section.plast_sec_mod_z
+        self.Z_e = self.section.elast_sec_mod_z
         # if self.member_capacity == True:
         # TODO: To be reviewed by anjali. section modulus is saved in Z_p,Z_e
         self.Z_p = self.section.plast_sec_mod_z

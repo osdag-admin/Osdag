@@ -433,21 +433,25 @@ QComboBox QAbstractItemView
   selection-color:black ;
 
 }
-QMainWindow#DesignPreferences QTabBar::tab {
-                margin-right: 10;
+QDialog#DesignPreferences QTabWidget::tab-bar{
+    alignment: left;
+}
+QDialog#DesignPreferences QTabBar::tab {
+				margin-right:2px;
                 border-top-left-radius: 2px ;
                 border-top-right-radius: 2px ;
                 border-bottom-left-radius: 0px ;
                 border-bottom-right-radius: 0px ;
-                height: 35px;
-                width: 150px;
+                height: 28px;
+                width: 122px;
 				background: lightgray;
-                font-size: 18px;
+                font-size: 14px;
+		
 				color: black;
 				border: 0.5px inset #abc250;
                }
 
-QMainWindow#DesignPreferences QTabBar::tab:!selected:hover
+QDialog#DesignPreferences QTabBar::tab:!selected:hover
 {
     /*border-top: 2px solid #ffaa00;
     padding-bottom: 3px;*/
@@ -456,7 +460,7 @@ QMainWindow#DesignPreferences QTabBar::tab:!selected:hover
     background-color: qradialgradient(cx: 0.5, cy: 0.5, radius: 2, fx: 0.5, fy: 1, stop: 0 #abc250, stop: 0.2 #abc250, stop: 0.4 rgba(211,211,211, 80));
 }
 
-QMainWindow#DesignPreferences QPushButton{
+QDialog#DesignPreferences QPushButton{
 		color: black;
 		background:lightgray;
 		border: 1.2px inset #abc250;
@@ -468,10 +472,10 @@ QMainWindow#DesignPreferences QPushButton{
 
 }
 
-QMainWindow#DesignPreferences QPushButton:hover{
+QDialog#DesignPreferences QPushButton:hover{
 	background-color: qradialgradient(cx: 0.5, cy: 0.5, radius: 2, fx: 0.5, fy: 1, stop: 0 #abc250, stop: 0.2 #abc250, stop: 0.4 rgba(211,211,211, 80));
 }
-QMainWindow#DesignPreferences QTabBar::tab:selected
+QDialog#DesignPreferences QTabBar::tab:selected
 {
     /*border-top: 2px solid #ffaa00;
     padding-bottom: 3px;*/
@@ -590,3 +594,11 @@ QFrame#frame{
  QScrollArea{
  background: white;
  }
+
+QLineEdit:disabled{
+	background-color: lightgray;
+}
+
+QComboBox:disabled{
+	background-color: lightgray;
+}

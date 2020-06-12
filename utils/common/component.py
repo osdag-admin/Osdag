@@ -1,4 +1,5 @@
-from utils.common.is800_2007 import IS800_2007, KEY_DP_WELD_FAB_SHOP
+from utils.common.is800_2007 import IS800_2007
+from utils.common.is800_2007 import IS800_2007
 from utils.common.material import *
 from utils.common.other_standards import *
 from Common import *
@@ -9,9 +10,6 @@ from builtins import str
 from Common import *
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic, NoEscape
-
-
-
 import math
 import numpy as np
 from utils.common.common_calculation import *
@@ -36,8 +34,7 @@ class Bolt:
 
         self.d_0 = 0.0
         self.kb = 0.0
-
-        self.kh= 0.0
+        self.kh = 0.0
 
         self.gamma_mb=0.0
         self.gamma_mf=0.0
@@ -56,7 +53,7 @@ class Bolt:
         self.bolt_capacity = 0.0
         self.ymax = 0.0
         self.xmax = 0.0
-        self.sigma_r_sq =0.0
+        self.sigma_r_sq = 0.0
         self.moment_demand = 0.0
         self.vres = 0.0
         self.length_avail = 0.0
@@ -71,24 +68,26 @@ class Bolt:
         # self.bolt_bearing_capacity_disp = round(self.bolt_bearing_capacity/1000, 2)
         # self.bolt_capacity_disp = round(self.bolt_capacity/1000, 2)
 
-
         self.bolt_fu = 0.0
         self.bolt_fy = 0.0
         self.fu_considered = 0.0
         self.thk_considered = 0.0
-
 
         if corrosive_influences == "Yes":
             self.corrosive_influences = True
         else:
             self.corrosive_influences = False
 
+        self.max_spacing = 0.0
+
         self.min_pitch = 0.0
+        self.pitch = 0.0
+        self.edge_dist = 0.0
         self.min_gauge = 0.0
         self.min_edge_dist = 0.0
         self.min_end_dist = 0.0
-        self.max_spacing = 0.0
-        self.max_edge_dist= 0.0
+        self.end_dist = 0.0
+        self.max_edge_dist = 0.0
         self.max_end_dist = 0.0
         self.dia_hole = 0.0
         self.min_pitch_round = round_up(self.min_pitch, 5)
@@ -337,15 +336,14 @@ class Section(Material):
         # self.member_rup_eqn = 0.0
         # self.member_block_eqn = 0.0
 
-
-    def connect_to_database_update_other_attributes(self, table, designation,material_grade = ""):
+    def connect_to_database_update_other_attributes(self, table, designation, material_grade=""):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
         row = cur.fetchone()
         self.mass = row[2]
-        self.area = row[3] *100
+        self.area = row[3] * 100
         self.depth = row[4]
         self.flange_width = row[5]
         self.web_thickness = row[6]
@@ -355,12 +353,12 @@ class Section(Material):
         self.flange_slope = row[8]
         self.root_radius = row[9]
         self.toe_radius = row[10]
-        self.mom_inertia_z = row[11]*10000
-        self.mom_inertia_y = row[12] *10000
-        self.rad_of_gy_z = row[13]* 10
-        self.rad_of_gy_y = row[14] *10
-        self.elast_sec_mod_z = row[15] *1000
-        self.elast_sec_mod_y = row[16] *1000
+        self.mom_inertia_z = row[11] * 10000
+        self.mom_inertia_y = row[12] * 10000
+        self.rad_of_gy_z = row[13] * 10
+        self.rad_of_gy_y = row[14] * 10
+        self.elast_sec_mod_z = row[15] * 1000
+        self.elast_sec_mod_y = row[16] * 1000
         self.plast_sec_mod_z = row[17]
         if self.plast_sec_mod_z is None:  # Todo: add in database
             self.plast_sec_mod_z = I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,
@@ -375,7 +373,6 @@ class Section(Material):
         else:
             self.plast_sec_mod_y = row[17] * 1000
 
-
         self.It = I_sectional_Properties().calc_torsion_const(self.depth,self.flange_width,
                                                                                    self.web_thickness,self.flange_thickness)*10**4\
             if row[19] is None else row[19] * 10**4
@@ -384,7 +381,6 @@ class Section(Material):
             if row[20] is None else row[20] * 10**4
         self.source = row[21]
         self.type = 'Rolled' if row[22] is None else row[22]
-
 
         conn.close()
 
@@ -696,6 +692,23 @@ class Column(Section):
         clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
         return clear_depth
 
+
+class SHS(Section):
+
+    def __init__(self, designation, material_grade):
+        super(SHS, self).__init__(designation, material_grade)
+
+        self.connect_to_database_update_other_attributes("SHS", designation, material_grade)
+
+
+class RHS(Section):
+
+    def __init__(self, designation, material_grade):
+        super(RHS, self).__init__(designation, material_grade)
+
+        self.connect_to_database_update_other_attributes("RHS", designation, material_grade)
+
+
 class Channel(Section):
 
     def __init__(self, designation, material_grade):
@@ -758,14 +771,18 @@ class Channel(Section):
 
 class Weld:
 
-    def __init__(self, material_g_o="",type=KEY_DP_WELD_TYPE_FILLET, fabrication=KEY_DP_WELD_FAB_SHOP):
+    def __init__(self, material_g_o="", type=KEY_DP_WELD_TYPE_FILLET, fabrication=KEY_DP_WELD_FAB_SHOP):
         self.design_status = True
         self.type = type
         self.fabrication = fabrication
 
         self.size = 0.0
+        self.min_size = 0.0
+        self.max_size = 0.0
+
         self.length = 0.0
         self.eff_length = 0.0
+        self.lj_factor = 1.0
         self.inner_length = 0.0
         self.effective = 0.0
         self.height = 0.0
@@ -789,6 +806,16 @@ class Weld:
         repr += "Strength: {}\n".format(self.strength)
         repr += "throattk: {}\n".format(self.throat_tk )
         return repr
+
+    def set_size(self, weld_size, fusion_face_angle=90):
+        """Set weld size, update eff. throat thickness, eff. length, long joint factor
+        NOTE: weld length should be assigned before this function call"""
+        self.size = weld_size
+        self.throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=self.size, fusion_face_angle=fusion_face_angle)
+        self.eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=self.size, available_length=self.length)
+        self.lj_factor = IS800_2007.cl_10_5_7_3_weld_long_joint(l_j=self.eff_length, t_t=self.throat_tk)
 
     def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, weld_angle):
         # connecting_fu.append(self.fu)
@@ -856,8 +883,29 @@ class Weld:
         self.red = red
         self.min_weld = min_weld_thickness
 
+    def get_weld_red(self,t_t,strength, height=0.0 , length =0.0):
+        """Calculate the reduction factor for long joints in welds and reduced strength
+                Args:
+                    l_j - maximum length of joints in the direction of force transfer in mm (float)
+                    t_t - throat size of the weld in mm (float)
+                    strength - Actual strength of weld
+                Returns:
+                     Reduction factor, beta_lw for long joints in welds (float)
+                Note:
+                    Reference:
+                    IS 800:2007,  cl 10.5.7.3
+                """
+        lj = max(height,length)
+        beta_lw = IS800_2007.cl_10_5_7_3_weld_long_joint(lj, t_t)
+
+        self.beta_lw = round(beta_lw,2)
+
+        self.strength_red = round(self.beta_lw * strength,2)
+
+
 class Plate(Material):
-    def __init__(self, thickness=[], height=0.0,Innerheight=0.0, length=0.0,Innerlength=0.0, gap=0.0, material_grade=""):
+    def __init__(self, thickness=[], height=0.0,Innerheight=0.0, length=0.0,Innerlength=0.0, gap=0.0,
+                 material_grade="", width=0.0):
         super(Plate, self).__init__(material_grade=material_grade)
         self.design_status = False
         self.design_status_capacity = False
@@ -869,8 +917,14 @@ class Plate(Material):
             self.thickness = 0.0
         self.thickness_provided = 0.0
         super(Plate, self).__init__(material_grade, self.thickness_provided)
-        self.height = height
+        self.height = height    # TODO: replace height with length
         self.length = length
+        self.length_max = 0.0
+        self.length_min = 0.0
+
+        self.width = width
+        self.width_max = 0.0
+        self.width_min = 0.0
         self.gap = float(gap)
         self.Innerlength = Innerlength
         self.Innerheight = Innerheight
@@ -2231,7 +2285,7 @@ class BBChannel_Properties(object):
         else:
             self.A = 2 * self.Channel_attributes.area
         return round(self.A / 100, 2)
-
+    #
     def calc_C_y(self,f_w,f_t,w_h,w_t):
         if self.db == False:
             Ac = Single_Channel_Properties.calc_Area(self,f_w, f_t, w_h, w_t)*100
@@ -2256,9 +2310,9 @@ class BBChannel_Properties(object):
             thickness = 0
             self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
         else:
-            mom_inertia_y = self.Channel_attributes.mom_inertia_y
-            area = self.Channel_attributes.area
-            Cg_1 = self.calc_C_y(f_w,f_t,w_h,w_t)*10
+            mom_inertia_y = self.Channel_attributes.mom_inertia_y/10000
+            area = self.Channel_attributes.area/100
+            Cg_1 = self.calc_C_y(f_w,f_t,w_h,w_t)
             thickness = 0
             self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
 

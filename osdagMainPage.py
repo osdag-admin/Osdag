@@ -81,8 +81,10 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 '''
 
 import os
-import shutil
 from pathlib import Path
+from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
+import urllib.request
+#from Thread import timer
 
 
 ############################ Pre-Build Database Updation/Creation #################
@@ -115,7 +117,7 @@ if sqlpath.exists():
             print('Error: ', e)
 #########################################################################################
 
-from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize, QFile, QTextStream
+from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject, Qt,QSize, QFile, QTextStream, QCoreApplication
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication, QWidget, QLabel, QGridLayout, QVBoxLayout, QTabWidget, QRadioButton, QButtonGroup, QSizePolicy
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -258,7 +260,7 @@ class OsdagMainWindow(QMainWindow):
                                                     'Column to Column' :[
                                                                 ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
-                                                                ('End Plate Connection','ResourceFiles/images/column_end_plate.jpg','C2C_End_Plate_Connection'),
+                                                                ('End Plate Connection','ResourceFiles/images/ccep_flush.png','C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
                                                     'PEB' : self.Under_Development,
@@ -475,6 +477,7 @@ class OsdagMainWindow(QMainWindow):
         if self.findChild(QRadioButton,'Fin_Plate').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(FinPlateConnection, ' ')
+            #self.ui2.center()
             self.ui2.show()
             self.ui2.closed.connect(self.show)
         elif self.findChild(QRadioButton,'Cleat_Angle').isChecked():
@@ -636,11 +639,13 @@ class OsdagMainWindow(QMainWindow):
         self.ask_question()
 
     def design_examples(self):
-        root_path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'design_example', '_build', 'html')
+        root_path = os.path.join('ResourceFiles', 'design_example', '_build', 'html')
         for html_file in os.listdir(root_path):
-           if html_file.startswith('index'):
+            # if html_file.startswith('index'):
+            print(os.path.splitext(html_file)[1])
+            if os.path.splitext(html_file)[1] == 'html':
                if sys.platform == ("win32" or "win64"):
-                   os.startfile("%s/%7s" % (root_path, html_file))
+                   os.startfile(os.path.join(root_path, html_file))
                else:
                    opener ="open" if sys.platform == "darwin" else "xdg-open"
                    subprocess.call([opener, "%s/%s" % (root_path, html_file)])
@@ -657,16 +662,31 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
 
     def exit(self):
-        QtCore.QCoreApplication.exit()
+        QCoreApplication.exit()
+
+######################### UpDateNotifi ################
+
+class Update(QMainWindow):
+    def __init__(self, old_version):
+        super().__init__()
+        self.old_version=old_version
+    def notifi(self):
+        try:
+            url = "https://anshulsingh-py.github.io/test/version.txt"
+            file = urllib.request.urlopen(url)
+            for line in file:
+                decoded_line = line.decode("utf-8")
+            new_version = decoded_line.split("=")[1]
+            if int(new_version) > self.old_version:
+                print("update")
+                msg = QMessageBox.information(self, 'Update available','<a href=https://google.com>Click to downlaod<a/>')
+        except:
+            print("No internet connection")
 
 
 if __name__ == '__main__':
 
-    if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
-        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
-    if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
-        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 
     app = QApplication(sys.argv)
     path = os.path.join(os.path.dirname(__file__), 'themes', 'light.qss')
@@ -683,6 +703,8 @@ if __name__ == '__main__':
     # app.exec_()
     # sys.exit(app.exec_())
     try:
-        sys.exit(app.exec_())
+        update = Update(0)
+        update.notifi()
+        QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)

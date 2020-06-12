@@ -982,6 +982,7 @@ def tensile_capacity_prov(T_dg, T_dn, T_db =0.0):
 
 
 def spacing (sp,t_w):
+ 
     # sp = max(15,s+5)
     sp = str(sp)
     t_w = str(t_w)
@@ -1037,6 +1038,7 @@ def IR_req(IR):
 
 
 def min_weld_size_req(conn_plates_weld,min_weld_size):
+
     t1 = str(conn_plates_weld[0])
     t2 = str(conn_plates_weld[1])
     tmax = str(max(conn_plates_weld))

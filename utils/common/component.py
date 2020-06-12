@@ -1,4 +1,5 @@
-from utils.common.is800_2007 import IS800_2007, KEY_DP_WELD_FAB_SHOP
+from utils.common.is800_2007 import IS800_2007
+from utils.common.is800_2007 import IS800_2007
 from utils.common.material import *
 from utils.common.other_standards import *
 from Common import *
@@ -335,15 +336,14 @@ class Section(Material):
         # self.member_rup_eqn = 0.0
         # self.member_block_eqn = 0.0
 
-
-    def connect_to_database_update_other_attributes(self, table, designation,material_grade = ""):
+    def connect_to_database_update_other_attributes(self, table, designation, material_grade=""):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
         row = cur.fetchone()
         self.mass = row[2]
-        self.area = row[3] *100
+        self.area = row[3] * 100
         self.depth = row[4]
         self.flange_width = row[5]
         self.web_thickness = row[6]
@@ -353,12 +353,12 @@ class Section(Material):
         self.flange_slope = row[8]
         self.root_radius = row[9]
         self.toe_radius = row[10]
-        self.mom_inertia_z = row[11]*10000
-        self.mom_inertia_y = row[12] *10000
-        self.rad_of_gy_z = row[13]* 10
-        self.rad_of_gy_y = row[14] *10
-        self.elast_sec_mod_z = row[15] *1000
-        self.elast_sec_mod_y = row[16] *1000
+        self.mom_inertia_z = row[11] * 10000
+        self.mom_inertia_y = row[12] * 10000
+        self.rad_of_gy_z = row[13] * 10
+        self.rad_of_gy_y = row[14] * 10
+        self.elast_sec_mod_z = row[15] * 1000
+        self.elast_sec_mod_y = row[16] * 1000
         self.plast_sec_mod_z = row[17]
         if self.plast_sec_mod_z is None:  # Todo: add in database
             self.plast_sec_mod_z = I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,
@@ -373,7 +373,6 @@ class Section(Material):
         else:
             self.plast_sec_mod_y = row[17] * 1000
 
-
         self.It = I_sectional_Properties().calc_torsion_const(self.depth,self.flange_width,
                                                                                    self.web_thickness,self.flange_thickness)*10**4\
             if row[19] is None else row[19] * 10**4
@@ -382,7 +381,6 @@ class Section(Material):
             if row[20] is None else row[20] * 10**4
         self.source = row[21]
         self.type = 'Rolled' if row[22] is None else row[22]
-
 
         conn.close()
 
@@ -693,6 +691,23 @@ class Column(Section):
 
         clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
         return clear_depth
+
+
+class SHS(Section):
+
+    def __init__(self, designation, material_grade):
+        super(SHS, self).__init__(designation, material_grade)
+
+        self.connect_to_database_update_other_attributes("SHS", designation, material_grade)
+
+
+class RHS(Section):
+
+    def __init__(self, designation, material_grade):
+        super(RHS, self).__init__(designation, material_grade)
+
+        self.connect_to_database_update_other_attributes("RHS", designation, material_grade)
+
 
 class Channel(Section):
 

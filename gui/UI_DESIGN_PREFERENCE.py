@@ -34,11 +34,11 @@ class MyTableWidget(QWidget):
         widget.setAutoFillBackground(True)
 
 
-class Window(QMainWindow):
+class Window(QDialog):
 
     def __init__(self, main, input_dictionary):
         super().__init__()
-
+        self.do_not_clear_list = []
         self.initUI(main,input_dictionary)
 
     def center(self):
@@ -55,7 +55,7 @@ class Window(QMainWindow):
         self.setObjectName("DesignPreferences")
         self.setWindowTitle('Design Preference')
         self.tabWidget = MyTableWidget(self)
-
+        self.setLayout(self.tabWidget.layout)
         hlayout = QHBoxLayout()
         self.tabWidget.layout.addLayout(hlayout)
         self.btn_defaults = QPushButton()
@@ -164,6 +164,10 @@ class Window(QMainWindow):
                         font.setBold(False)
                         font.setWeight(50)
                         line.setFont(font)
+                        if lable in [KEY_DISP_FU, KEY_DISP_FY, KEY_DISP_POISSON_RATIO, KEY_DISP_THERMAL_EXP,
+                                     KEY_DISP_MOD_OF_ELAST, KEY_DISP_MOD_OF_RIGID]:
+                            line.setReadOnly(True)
+                            self.do_not_clear_list.append(line)
                         r += 1
 
                     if type == TYPE_COMBOBOX:
@@ -187,6 +191,8 @@ class Window(QMainWindow):
                         item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
                         combo.view().setMinimumWidth(item_width + 30)
                         combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+                        if lable == KEY_DISP_MATERIAL:
+                            self.do_not_clear_list.append(combo)
                         r += 1
 
                     if type == TYPE_TITLE:
@@ -393,7 +399,7 @@ class Window(QMainWindow):
 
             scrollArea.setWidget(scrollAreaWidgetContents)
 
-        self.setCentralWidget(self.tabWidget)
+        # self.setCentralWidget(self.tabWidget)
         #self.tabWidget.resize(self.size())
 
         self.tabWidget.tabs.setCurrentIndex(2)
@@ -403,62 +409,106 @@ class Window(QMainWindow):
         if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE, KEY_DISP_BCENDPLATE]:
 
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
-            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
+            pushButton_Import_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
+            pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
+            pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
+            pushButton_Download_Column.clicked.connect(lambda: self.download_Database("Columns"))
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
-            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+            pushButton_Import_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
+            pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
+            pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
+            pushButton_Download_Beam.clicked.connect(lambda: self.download_Database("Beams"))
+
             if module== KEY_DISP_CLEATANGLE:
                 pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CLEAT)
-                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(DISP_TITLE_CLEAT))
                 pushButton_Add_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CLEAT)
                 pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+                pushButton_Import_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + DISP_TITLE_CLEAT)
+                pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
+                pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_CLEAT)
+                pushButton_Download_Angle.clicked.connect(lambda: self.download_Database("Angles"))
             if module == KEY_DISP_SEATED_ANGLE:
                 pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_SEATED_ANGLE)
-                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(KEY_DISP_SEATED_ANGLE))
                 pushButton_Add_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_SEATED_ANGLE)
                 pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+                pushButton_Import_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_SEATED_ANGLE)
+                pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
+                pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_SEATED_ANGLE)
+                pushButton_Download_Angle.clicked.connect(lambda: self.download_Database("Angles"))
 
         if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD or module == KEY_DISP_COLUMNENDPLATE:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
-            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
-
+            pushButton_Import_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
+            pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
+            pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
+            pushButton_Download_Column.clicked.connect(lambda: self.download_Database("Columns"))
 
         if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD or module == KEY_DISP_BEAMENDPLATE:
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
-            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+            pushButton_Import_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
+            pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
+            pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
+            pushButton_Download_Beam.clicked.connect(lambda: self.download_Database("Beams"))
 
         if module == KEY_DISP_COMPRESSION:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
-            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
+            pushButton_Import_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
+            pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
+            pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
+            pushButton_Download_Column.clicked.connect(lambda: self.download_Database("Columns"))
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
-            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+            pushButton_Import_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
+            pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
+            pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
+            pushButton_Download_Beam.clicked.connect(lambda: self.download_Database("Beams"))
 
         if module == KEY_DISP_BASE_PLATE:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
-            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
+            pushButton_Import_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
+            pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
+            pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
+            pushButton_Download_Column.clicked.connect(lambda: self.download_Database("Columns"))
 
         if module == KEY_DISP_TENSION_BOLTED or module == KEY_DISP_TENSION_WELDED:
             pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_ANGLE)
-            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(DISP_TITLE_ANGLE))
             pushButton_Add_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_ANGLE)
             pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+            pushButton_Import_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + DISP_TITLE_ANGLE)
+            pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
+            pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_ANGLE)
+            pushButton_Download_Angle.clicked.connect(lambda: self.download_Database("Angles"))
             pushButton_Clear_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CHANNEL)
-            pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab("Channel"))
+            pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab(DISP_TITLE_CHANNEL))
             pushButton_Add_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
             pushButton_Add_Channel.clicked.connect(self.add_tab_channel)
+            pushButton_Import_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + DISP_TITLE_CHANNEL)
+            pushButton_Import_Channel.clicked.connect(lambda: self.import_section("Channels"))
+            pushButton_Download_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Download_" + DISP_TITLE_CHANNEL)
+            pushButton_Download_Channel.clicked.connect(lambda: self.download_Database("Channels"))
 
     def manage_designation_size(self,line_edit):
         def change_size():
@@ -477,19 +527,17 @@ class Window(QMainWindow):
         '''
         @author: Umair
         '''
-        if tab_name == "Column":
-            tab_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-            tab = tab_Column
-        elif tab_name == "Beam":
-            tab_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-            tab = tab_Beam
-        for c in tab.findChildren(QtWidgets.QWidget):
-            if isinstance(c, QtWidgets.QComboBox):
-                c.setCurrentIndex(0)
-            elif isinstance(c, QtWidgets.QLineEdit):
-                c.clear()
+        tab = self.tabWidget.tabs.findChild(QtWidgets.QWidget, tab_name)
 
+        if tab:
+            for c in tab.findChildren(QtWidgets.QWidget):
+                if c in self.do_not_clear_list:
+                    continue
 
+                if isinstance(c, QtWidgets.QComboBox):
+                    c.setCurrentIndex(0)
+                elif isinstance(c, QtWidgets.QLineEdit):
+                    c.clear()
 
     def add_tab_column(self):
         '''
@@ -507,8 +555,8 @@ class Window(QMainWindow):
         for ch in tab_Column.findChildren(QtWidgets.QWidget):
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
                 QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
-                add_col = tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Add_'+KEY_DISP_COLSEC)
-                add_col.setDisabled(True)
+                # add_col = tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Add_'+KEY_DISP_COLSEC)
+                # add_col.setDisabled(True)
                 break
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
                 if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC:
@@ -567,7 +615,8 @@ class Window(QMainWindow):
                 if ch.objectName() == 'Label_8':
                     Type = ch.currentText()
 
-        if ch.objectName() == "pushButton_Download_" + name:   # If Download button
+        # if ch.objectName() == "pushButton_Download_" + name:   # If Download button
+        if ch:
             conn = sqlite3.connect(PATH_TO_DATABASE)
             c = conn.cursor()
             if table == "Beams":
@@ -673,7 +722,8 @@ class Window(QMainWindow):
                 if ch.objectName() == 'Label_8':
                     Type = ch.currentText()
 
-        if ch.objectName() ==  "pushButton_Download_" + name:
+        # if ch.objectName() ==  "pushButton_Download_" + name:
+        if ch:
             conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
@@ -789,7 +839,8 @@ class Window(QMainWindow):
                 if ch.objectName() == 'Label_6':
                     Type = ch.currentText()
 
-        if ch.objectName() ==  "pushButton_Download_" + name:
+        # if ch.objectName() ==  "pushButton_Download_" + name:
+        if ch:
             conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
@@ -882,7 +933,8 @@ class Window(QMainWindow):
                 if ch.objectName() == 'Label_6':
                     Type = ch.currentText()
 
-        if ch.objectName() ==  "pushButton_Download_" + name:
+        # if ch.objectName() ==  "pushButton_Download_" + name:
+        if ch:
             conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
@@ -900,6 +952,230 @@ class Window(QMainWindow):
             else:
                 QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
 
+    def download_Database(self, table):
+        # file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))
+        fileName, _ = QFileDialog.getSaveFileName(QFileDialog(), "Download File", os.path.join(os.getcwd(), str(table+"_Details.xlsx")),
+                                                  "SectionDetails(*.xlsx)")
+        if not fileName:
+            return
+        try:
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            c = conn.cursor()
+            if table == 'Columns':
+                c.execute("SELECT * FROM Columns")
+            elif table == 'Beams':
+                c.execute("SELECT * FROM Beams")
+            elif table == 'Angles':
+                c.execute("SELECT * FROM Angles")
+            elif table == 'Channels':
+                c.execute("SELECT * FROM Channels")
+            header = get_db_header(table)
+            data = c.fetchall()
+            conn.commit()
+            c.close()
+            wb = openpyxl.Workbook()
+            sheet = wb.create_sheet(table, 0)
+
+            col = 1
+            for head in header:
+                sheet.cell(row=1, column=col).value = head
+                col += 1
+            row = 2
+            for rows in data:
+                col = 1
+                for cols in range(len(header)):
+                    sheet.cell(row=row, column=col).value = rows[col - 1]
+                    col += 1
+                row += 1
+            wb.save(fileName)
+            QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded.')
+
+        except IOError:
+            QMessageBox.information(QMessageBox(), "Unable to save file",
+                                    "There was an error saving \"%s\"" % fileName)
+            return
+
+    # def download_Database_Beam(self):
+    #     file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))
+    #     shutil.copyfile(file_path, os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+    #     QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded in your selected workspace')
+    #     # self.ui.pushButton_Import_Beam.setEnabled(True)
+
+    def import_section(self, tab_name):
+        fileName, _ = QFileDialog.getOpenFileName(QFileDialog(), "Open File", os.getcwd(),
+                                                  "SectionDetails(*.xlsx)")
+        if not fileName:
+            return
+        try:
+            wb = openpyxl.load_workbook(fileName)
+            if tab_name in wb.sheetnames:
+                if wb.sheetnames.count(tab_name) > 1:
+                    QMessageBox.information(QMessageBox(), 'Information',
+                                            str(' File contains multiple ' + tab_name + ' Sheet.'))
+                    return
+
+                sheet = wb[tab_name]
+                header = []
+                for cell in sheet[1]:
+                    header.append(str(cell.value))
+                if header == get_db_header(tab_name):
+                    conn = sqlite3.connect(PATH_TO_DATABASE)
+
+                    values = {}
+                    for rows in range(2, sheet.max_row + 1):
+                        for cols in range(1, len(header)+1):
+                            values.update({header[cols - 1]: sheet.cell(row=rows, column=cols).value})
+
+                        c = conn.cursor()
+                        if tab_name == 'Columns':
+                            c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (values['Designation'],))
+                        elif tab_name == 'Beams':
+                            c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (values['Designation'],))
+                        elif tab_name == 'Angles':
+                            c.execute("SELECT count(*) FROM Angles WHERE Designation = ?", (values['Designation'],))
+                        elif tab_name == 'Channels':
+                            c.execute("SELECT count(*) FROM Channels WHERE Designation = ?", (values['Designation'],))
+
+                        data = c.fetchone()[0]
+                        if data == 0:
+                            if tab_name == 'Columns':
+                                c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES 
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                                          (values['Designation'], values['Mass'], values['Area'], values['D'],
+                                           values['B'], values['tw'], values['T'], values['FlangeSlope'],
+                                           values['R1'], values['R2'], values['Iz'], values['Iy'], values['rz'],
+                                           values['ry'], values['Zz'], values['Zy'], values['Zpz'], values['Zpy'],
+                                           values['It'], values['Iw'], values['Source'], values['Type']))
+                            elif tab_name == 'Beams':
+                                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES 
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                                          (values['Designation'], values['Mass'], values['Area'], values['D'],
+                                           values['B'], values['tw'], values['T'], values['FlangeSlope'],
+                                           values['R1'], values['R2'], values['Iz'], values['Iy'], values['rz'],
+                                           values['ry'], values['Zz'], values['Zy'], values['Zpz'], values['Zpy'],
+                                           values['It'], values['Iw'], values['Source'], values['Type']))
+                            elif tab_name == 'Angles':
+                                c.execute('''INSERT INTO Angles (Designation,Mass,Area,a,b,t,R1,R2,Cz,Cy,Iz,Iy,Iumax,
+                                Ivmin,rz,ry,rumax,rvmin,Zz,Zy,Zpz,Zpy,It,Source,Type) VALUES 
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                                          (values['Designation'], values['Mass'], values['Area'], values['a'],
+                                           values['b'], values['t'], values['R1'], values['R2'], values['Cz'],
+                                           values['Cy'], values['Iz'], values['Iy'], values['Iumax'], values['Ivmin'],
+                                           values['rz'], values['ry'], values['rumax'], values['rvmin'], values['Zz'],
+                                           values['Zy'], values['Zpz'], values['Zpy'], values['It'], values['Source'],
+                                           values['Type']))
+                            elif tab_name == 'Channels':
+                                c.execute('''INSERT INTO Channels (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Cy,
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES 
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                                          (values['Designation'], values['Mass'], values['Area'], values['D'],
+                                           values['B'], values['tw'], values['T'], values['FlangeSlope'], values['R1'],
+                                           values['R2'], values['Cy'], values['Iz'], values['Iy'], values['rz'],
+                                           values['ry'], values['Zz'], values['Zy'], values['Zpz'], values['Zpy'],
+                                           values['Source'], values['Type']))
+
+                            conn.commit()
+                            c.close()
+
+                    # for rowNum in range(2, sheet.max_row + 1):
+                    #     designation = sheet.cell(row=rowNum, column=2).value
+                    #     mass = sheet.cell(row=rowNum, column=3).value
+                    #     area = sheet.cell(row=rowNum, column=4).value
+                    #     d = sheet.cell(row=rowNum, column=5).value
+                    #     b = sheet.cell(row=rowNum, column=6).value
+                    #     tw = sheet.cell(row=rowNum, column=7).value
+                    #     t = sheet.cell(row=rowNum, column=8).value
+                    #     flangeSlope = sheet.cell(row=rowNum, column=9).value
+                    #     r1 = sheet.cell(row=rowNum, column=10).value
+                    #     r2 = sheet.cell(row=rowNum, column=11).value
+                    #     iz = sheet.cell(row=rowNum, column=12).value
+                    #     iy = sheet.cell(row=rowNum, column=13).value
+                    #     rz = sheet.cell(row=rowNum, column=14).value
+                    #     ry = sheet.cell(row=rowNum, column=15).value
+                    #     zz = sheet.cell(row=rowNum, column=16).value
+                    #     zy = sheet.cell(row=rowNum, column=17).value
+                    #     zpz = sheet.cell(row=rowNum, column=18).value
+                    #     zpy = sheet.cell(row=rowNum, column=19).value
+                    #     source = sheet.cell(row=rowNum, column=20).value
+                    #
+                    #     c = conn.cursor()
+                    #     c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (designation,))
+                    #     data = c.fetchone()[0]
+                    #     if data == 0:
+                    #         c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,Zz,zy,Zpz,Zpy,
+                    #         FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                    #                   (designation, mass, area,
+                    #                    d, b, tw, t,
+                    #                    r1, r2, iz, iy, rz, ry,
+                    #                    zz, zy,
+                    #                    zpz, zpy, flangeSlope, source))
+                    #         conn.commit()
+                    #         c.close()
+
+                    conn.close()
+                    QMessageBox.information(QMessageBox(), 'Successful', 'File data is imported successfully to the database.')
+                else:
+                    QMessageBox.information(QMessageBox(), 'Information',
+                                            str(str(tab_name) + ' Sheet has headers different than database.'))
+
+            else:
+                QMessageBox.information(QMessageBox(), 'Information', str(' File does not contain '+str(tab_name)+' Sheet.'))
+
+        except IOError:
+            QMessageBox.information(QMessageBox(), "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+
+        # self.ui.pushButton_Import_Column.setDisabled(True)
+
+    # def import_BeamPref(self):
+    #     wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+    #     sheet = wb['First Sheet']
+    #     conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
+    #
+    #     for rowNum in range(2, sheet.max_row + 1):
+    #         designation = sheet.cell(row=rowNum, column=2).value
+    #         mass = sheet.cell(row=rowNum, column=3).value
+    #         area = sheet.cell(row=rowNum, column=4).value
+    #         d = sheet.cell(row=rowNum, column=5).value
+    #         b = sheet.cell(row=rowNum, column=6).value
+    #         tw = sheet.cell(row=rowNum, column=7).value
+    #         t = sheet.cell(row=rowNum, column=8).value
+    #         flangeSlope = sheet.cell(row=rowNum, column=9).value
+    #         r1 = sheet.cell(row=rowNum, column=10).value
+    #         r2 = sheet.cell(row=rowNum, column=11).value
+    #         iz = sheet.cell(row=rowNum, column=12).value
+    #         iy = sheet.cell(row=rowNum, column=13).value
+    #         rz = sheet.cell(row=rowNum, column=14).value
+    #         ry = sheet.cell(row=rowNum, column=15).value
+    #         zz = sheet.cell(row=rowNum, column=16).value
+    #         zy = sheet.cell(row=rowNum, column=17).value
+    #         zpz = sheet.cell(row=rowNum, column=18).value
+    #         zpy = sheet.cell(row=rowNum, column=19).value
+    #         source = sheet.cell(row=rowNum, column=20).value
+    #
+    #         c = conn.cursor()
+    #         c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (designation,))
+    #         data = c.fetchone()[0]
+    #         if data == 0:
+    #             c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+    #                                                    Zz,zy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+    #                       (designation, mass, area,
+    #                        d, b, tw, t,
+    #                        flangeSlope, r1
+    #                        ,
+    #                        r2, iz, iy, rz, ry,
+    #                        zz, zy
+    #                        ,
+    #                        zpz, zpy, source))
+    #             conn.commit()
+    #             c.close()
+    #
+    #     conn.close()
+    #     QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
+    #     self.ui.pushButton_Import_Beam.setDisabled(True)
 
         # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Column), _translate("DesignPreferences", "Column"))
         # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Beam), _translate("DesignPreferences", "Beam"))
@@ -911,7 +1187,7 @@ class Window(QMainWindow):
 
 class DesignPreferences():
 
-    def __init__(self, main, input_dictionary, parent=None):
+    def __init__(self, main, module_window, input_dictionary, parent=None):
 
         self.ui = Window( main, input_dictionary)
 
@@ -919,7 +1195,7 @@ class DesignPreferences():
         #self.ui.show()
         self.main_controller = parent
         #self.uiobj = self.main_controller.uiObj
-        # self.module_window = module_window
+        self.module_window = module_window
         self.saved = None
         self.flag = False
         self.sectionalprop = I_sectional_Properties()
@@ -935,10 +1211,12 @@ class DesignPreferences():
         width = resolution.width()
         height = resolution.height()
         self.ui.resize(width*(0.67),height*(0.60))
-        #self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
-        #self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
+        # self.ui.tabWidget.resize(width * (0.67), height * (0.60))
+        self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
+        self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
         self.ui.center()
-        self.ui.show()
+        self.ui.exec()
+        self.module_window.prev_inputs = self.module_window.input_dock_inputs
 
     def default_fn(self):
         '''
@@ -1141,110 +1419,6 @@ class DesignPreferences():
         else:
             QMessageBox.warning(self, "Error", "Select correct values for fu and fy!")
             event.ignore()
-
-
-    def download_Database_Column(self):
-        file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))
-        shutil.copyfile(file_path, os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
-        QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded in your selected workspace')
-        #self.ui.pushButton_Import_Column.setEnabled(True)
-
-    def download_Database_Beam(self):
-        file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))
-        shutil.copyfile(file_path, os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
-        QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded in your selected workspace')
-        #self.ui.pushButton_Import_Beam.setEnabled(True)
-
-    def import_ColumnPref(self):
-        wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
-        sheet = wb['First Sheet']
-        conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
-
-        for rowNum in range(2, sheet.max_row + 1):
-            designation = sheet.cell(row=rowNum, column=2).value
-            mass = sheet.cell(row=rowNum, column=3).value
-            area = sheet.cell(row=rowNum, column=4).value
-            d = sheet.cell(row=rowNum, column=5).value
-            b = sheet.cell(row=rowNum, column=6).value
-            tw = sheet.cell(row=rowNum, column=7).value
-            t = sheet.cell(row=rowNum, column=8).value
-            flangeSlope = sheet.cell(row=rowNum, column=9).value
-            r1 = sheet.cell(row=rowNum, column=10).value
-            r2 = sheet.cell(row=rowNum, column=11).value
-            iz = sheet.cell(row=rowNum, column=12).value
-            iy = sheet.cell(row=rowNum, column=13).value
-            rz = sheet.cell(row=rowNum, column=14).value
-            ry = sheet.cell(row=rowNum, column=15).value
-            zz = sheet.cell(row=rowNum, column=16).value
-            zy = sheet.cell(row=rowNum, column=17).value
-            zpz = sheet.cell(row=rowNum, column=18).value
-            zpy = sheet.cell(row=rowNum, column=19).value
-            source = sheet.cell(row=rowNum, column=20).value
-            c = conn.cursor()
-            c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (designation,))
-            data = c.fetchone()[0]
-            if data == 0:
-                c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
-    				                           Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                          (designation, mass, area,
-                           d, b, tw, t,
-                           r1, r2, iz, iy, rz, ry,
-                           zz, zy
-                           ,
-                           zpz, zpy, flangeSlope, source))
-                conn.commit()
-                c.close()
-
-        conn.close()
-        QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
-        self.ui.pushButton_Import_Column.setDisabled(True)
-
-    def import_BeamPref(self):
-        wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
-        sheet = wb['First Sheet']
-        conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
-
-        for rowNum in range(2, sheet.max_row + 1):
-            designation = sheet.cell(row=rowNum, column=2).value
-            mass = sheet.cell(row=rowNum, column=3).value
-            area = sheet.cell(row=rowNum, column=4).value
-            d = sheet.cell(row=rowNum, column=5).value
-            b = sheet.cell(row=rowNum, column=6).value
-            tw = sheet.cell(row=rowNum, column=7).value
-            t = sheet.cell(row=rowNum, column=8).value
-            flangeSlope = sheet.cell(row=rowNum, column=9).value
-            r1 = sheet.cell(row=rowNum, column=10).value
-            r2 = sheet.cell(row=rowNum, column=11).value
-            iz = sheet.cell(row=rowNum, column=12).value
-            iy = sheet.cell(row=rowNum, column=13).value
-            rz = sheet.cell(row=rowNum, column=14).value
-            ry = sheet.cell(row=rowNum, column=15).value
-            zz = sheet.cell(row=rowNum, column=16).value
-            zy = sheet.cell(row=rowNum, column=17).value
-            zpz = sheet.cell(row=rowNum, column=18).value
-            zpy = sheet.cell(row=rowNum, column=19).value
-            source = sheet.cell(row=rowNum, column=20).value
-
-            c = conn.cursor()
-            c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (designation,))
-            data = c.fetchone()[0]
-            if data == 0:
-                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
-            				                           Zz,zy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                          (designation, mass, area,
-                           d, b, tw, t,
-                           flangeSlope, r1
-                           ,
-                           r2, iz, iy, rz, ry,
-                           zz, zy
-                           ,
-                           zpz, zpy, source))
-                conn.commit()
-                c.close()
-
-        conn.close()
-        QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
-        self.ui.pushButton_Import_Beam.setDisabled(True)
 
     def close_designPref(self):
         self.ui.close()

@@ -242,6 +242,24 @@ class Main():
 
         return d
 
+    def change_source(self):
+
+        designation = self[0]
+        source = 'Custom'
+        if designation in connectdb("Columns", call_type="dropdown"):
+            source = get_source("Columns", designation)
+        elif designation in connectdb("Beams", call_type="dropdown"):
+            source = get_source("Beams", designation)
+        elif designation in connectdb("Angles", call_type="dropdown"):
+            source = get_source("Angles", designation)
+        elif designation in connectdb("Channels", call_type="dropdown"):
+            source = get_source("Channels", designation)
+
+        d = {'Label_23': str(source),
+             'Label_24': str(source),
+             'Label_21': str(source)}
+        return d
+
 
 
 # <<<<<<< HEAD

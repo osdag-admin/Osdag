@@ -718,7 +718,7 @@ class CommonDesignLogic(object):
             beam_R1 = float(B.section.root_radius)
             beam_R2 = float(B.section.toe_radius)
             beam_alpha = float(B.section.flange_slope)
-            beam_length = 800.0
+            beam_length = B.flange_plate.length/2+300
 
             beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
                                  R1=beam_R1, R2=beam_R2, alpha=beam_alpha,

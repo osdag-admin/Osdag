@@ -1516,12 +1516,12 @@ def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_
             min_leg_length_outer = min_leg_length
             max_leg_length_outer = max_leg_length
 
-        print(min_leg_length,max_leg_length)
+        # print(min_leg_length,max_leg_length)
         if operator.le(max(leg_a_length,leg_b_length),max_leg_length_outer) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length_outer) and leg_a_length==leg_b_length:
-            print("appended", designation)
+            # print("appended", designation)
             available_angles.append(designation)
-        else:
-            print("popped",designation)
+        # else:
+            # print("popped",designation)
     return available_angles
 
 

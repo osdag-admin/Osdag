@@ -53,6 +53,7 @@ class ShearConnection(Connection):
             m_o_r = "76.9"
             p_r = "0.3"
             t_e = "12"
+            image = ''
         else:
             designation = str(input_dictionary[KEY_ANGLE_LIST][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
@@ -87,6 +88,11 @@ class ShearConnection(Connection):
             plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
             plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
             torsion_const = str(Angle_attributes.It)
+            if a == b:
+                image = VALUES_IMG_TENSIONBOLTED_DF01[0]
+            else:
+                image = VALUES_IMG_TENSIONBOLTED_DF02[0]
+
 
         if KEY_CONNECTOR_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_CONNECTOR_MATERIAL]
@@ -207,7 +213,7 @@ class ShearConnection(Connection):
         t13 = (None, None, TYPE_BREAK, None, None)
         section.append(t13)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/Angles.png')
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
         section.append(t33)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
@@ -245,12 +251,14 @@ class ShearConnection(Connection):
             pm_z = ''
             pm_y = ''
             I_t = ''
+            image = ''
 
         else:
             a = float(self[0])
             b = float(self[1])
             t = float(self[2])
             l = None
+
             sec_prop = Single_Angle_Properties()
             mass = sec_prop.calc_Mass(a,b,t,l)
             area = sec_prop.calc_Area(a,b,t,l)
@@ -269,6 +277,8 @@ class ShearConnection(Connection):
             pm_z = sec_prop.calc_PlasticModulusZpz(a,b,t,l)
             pm_y = sec_prop.calc_PlasticModulusZpy(a,b,t,l)
             I_t = sec_prop.calc_TorsionConstantIt(a,b,t,l)
+            image = VALUES_IMG_TENSIONBOLTED_DF01[0]
+
 
 
         d = {'Label_9': str(mass),
@@ -288,6 +298,7 @@ class ShearConnection(Connection):
              'Label_21': str(pm_z),
              'Label_22': str(pm_y),
              'Label_23': str(I_t),
+             KEY_IMAGE: image
              }
 
         return d
@@ -296,6 +307,7 @@ class ShearConnection(Connection):
 
         designation = self[0]
         material_grade = self[1]
+
 
         Angle_attributes = Angle(designation, material_grade)
         Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
@@ -325,6 +337,8 @@ class ShearConnection(Connection):
         plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
         plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
         torsion_const = str(Angle_attributes.It)
+        image = VALUES_IMG_TENSIONBOLTED_DF01[0]
+
         d = {
             KEY_ANGLE_SELECTED:designation,
             KEY_CONNECTOR_MATERIAL: material_grade,
@@ -353,7 +367,10 @@ class ShearConnection(Connection):
             'Label_21':plast_sec_mod_z,
             'Label_22':plast_sec_mod_y,
             'Label_23':torsion_const,
-            'Label_24':source}
+            'Label_24':source,
+            KEY_IMAGE: image
+
+        }
         return d
 
     @staticmethod

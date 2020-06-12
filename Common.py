@@ -378,7 +378,7 @@ VALUES_IMG_TENSIONBOLTED_DF01 = ["ResourceFiles/images/equaldp.png","ResourceFil
 VALUES_IMG_TENSIONBOLTED_DF02 = ["ResourceFiles/images/unequaldp.png","ResourceFiles/images/bblunequaldp.png","ResourceFiles/images/bbsunequaldp.png","ResourceFiles/images/salunequaldp.png","ResourceFiles/images/sasunequaldp.png"]
 VALUES_IMG_TENSIONBOLTED_DF03 = ["ResourceFiles/images/Slope_Channel.png","ResourceFiles/images/Parallel_Channel.png","ResourceFiles/images/Slope_BBChannel.png","ResourceFiles/images/Parallel_BBChannel.png"]
 
-VALUES_IMG_BEAM = "ResourceFiles/images/Slope_Beam.png"
+VALUES_IMG_BEAM = ["ResourceFiles/images/Slope_Beam.png","ResourceFiles/images/Parallel_Beam.png"]
 
 
 VALUES_BEAMSEC = connectdb("Beams")

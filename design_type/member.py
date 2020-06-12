@@ -857,11 +857,11 @@ class Member(Main):
                 mass = sec_prop.calc_Mass(a, b, t, l)
                 area = sec_prop.calc_Area(a, b, t, l)
                 if l == "Long Leg":
-                    Cz = sec_prop.calc_Cz()
+                    Cz = sec_prop.calc_Cz(a, b, t, l)
                     Cy = "N/A"
                 else:
                     Cz = "N/A"
-                    Cy = sec_prop.calc_Cy()
+                    Cy = sec_prop.calc_Cy(a, b, t, l)
                 moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l)
                 moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l)
                 moa_u = "N/A"

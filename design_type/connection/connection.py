@@ -44,7 +44,7 @@ class Connection(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
-
+            image= ''
         else:
             designation = str(input_dictionary[KEY_SUPTNGSEC])
             material_grade = str(input_dictionary[KEY_MATERIAL])
@@ -77,6 +77,11 @@ class Connection(Main):
             plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
             torsion_const = str(I_sec_attributes.It)
             warping_const = str(I_sec_attributes.Iw)
+            if flange_slope != 90:
+                image = VALUES_IMG_BEAM[0]
+            else:
+                image = VALUES_IMG_BEAM[1]
+
 
         if KEY_SUPTNGSEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SUPTNGSEC_MATERIAL]
@@ -176,7 +181,7 @@ class Connection(Main):
         t28 = (None, None, TYPE_BREAK, None, None)
         supporting_section.append(t28)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM)
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
         supporting_section.append(t33)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
@@ -230,6 +235,7 @@ class Connection(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
+            image = ''
 
         else:
             designation = str(input_dictionary[KEY_SUPTDSEC])
@@ -264,6 +270,10 @@ class Connection(Main):
             plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
             torsion_const = str(I_sec_attributes.It)
             warping_const = str(I_sec_attributes.Iw)
+            # if flange_slope != 90:
+            #     image = VALUES_IMG_BEAM[0]
+            # else:
+            #     image = VALUES_IMG_BEAM[1]
 
         if KEY_SUPTDSEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SUPTDSEC_MATERIAL]
@@ -363,7 +373,10 @@ class Connection(Main):
         t28 = (None, None, TYPE_BREAK, None, None)
         supporting_section.append(t28)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/ISection.png')
+        if flange_slope != 90:
+            t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM[0])
+        else:
+            t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM[1])
         supporting_section.append(t33)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)

@@ -2050,13 +2050,13 @@ class Window(QMainWindow):
                     arg_list.append(key.text())
 
             arg_list.append(self.input_dock_inputs)
-            try:
-                tab1 = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
-                key1 = tab.findChild(QtWidgets.QWidget, KEY_SECSIZE_SELECTED)
-                value1 = key1.text()
-                arg_list.append({KEY_SECSIZE_SELECTED: value1})
-            except:
-                pass
+            # try:
+            #     tab1 = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+            #     key1 = tab.findChild(QtWidgets.QWidget, KEY_SECSIZE_SELECTED)
+            #     value1 = key1.text()
+            #     arg_list.append({KEY_SECSIZE_SELECTED: value1})
+            # except:
+            #     pass
             val = f(arg_list)
 
             for k2_key_name in k2_key_list:

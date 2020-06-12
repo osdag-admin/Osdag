@@ -177,7 +177,8 @@ class Ui_Dialog1(object):
         main.save_design(main,input_summary)
         if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
             QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
-        
+        else:
+            QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no pdf is open with same name. If error persists send us the log file created in location you are trying to save.')
 
 
     def call_designreport(self, main,fileName, report_summary, folder):

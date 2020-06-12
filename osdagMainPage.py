@@ -81,7 +81,6 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 '''
 
 import os
-import shutil
 from pathlib import Path
 from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 import urllib.request

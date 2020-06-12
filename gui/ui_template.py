@@ -45,6 +45,7 @@ from .ui_design_preferences import Ui_Dialog
 
 from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
+from .ui_OsdagSectionModeller import Ui_OsdagSectionModeller
 #from .ui_design_preferences import DesignPreferences
 from .UI_DESIGN_PREFERENCE import DesignPreferences
 from design_type.connection.shear_connection import ShearConnection
@@ -1155,6 +1156,9 @@ class Window(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
         self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
 
+        self.actionOsdagSectionModeller=QtWidgets.QAction(MainWindow)
+        self.actionOsdagSectionModeller.setObjectName("actionDesign_Preferences")
+        self.actionOsdagSectionModeller.triggered.connect(self.osdag_section_modeller)
         # self.designPrefDialog.rejected.connect(lambda: self.design_preferences('rejected'))
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
         self.actionfinPlate_quit.setObjectName("actionfinPlate_quit")
@@ -1178,6 +1182,7 @@ class Window(QMainWindow):
         # self.menuEdit.addAction(self.actionCopy)
         # self.menuEdit.addAction(self.actionPaste)
         self.menuEdit.addAction(self.actionDesign_Preferences)
+        self.menuEdit.addAction(self.actionOsdagSectionModeller)
         self.menuView.addAction(self.actionEnlarge_font_size)
         self.menuView.addSeparator()
         self.menuHelp.addAction(self.actionSample_Tutorials)
@@ -2328,6 +2333,8 @@ class Window(QMainWindow):
         self.actionFAQ.setText(_translate("MainWindow", "FAQ"))
         self.actionDesign_Preferences.setText(_translate("MainWindow", "Design Preferences"))
         self.actionDesign_Preferences.setShortcut(_translate("MainWindow", "Alt+P"))
+        self.actionOsdagSectionModeller.setText(_translate("MainWindow", "Section Modeller"))
+        self.actionOsdagSectionModeller.setShortcut(_translate("MainWindow", "Alt+S"))
         self.actionfinPlate_quit.setText(_translate("MainWindow", "Quit"))
         self.actionfinPlate_quit.setShortcut(_translate("MainWindow", "Shift+Q"))
         self.actio_load_input.setText(_translate("MainWindow", "Load input"))
@@ -2347,9 +2354,13 @@ class Window(QMainWindow):
         else:
             widget.hide()
 
+# Function for showing Osdag Section Modeller popup
 
-
-
+    def osdag_section_modeller(self):
+        self.OsdagSectionModeller=Ui_OsdagSectionModeller()
+        dialog=QtWidgets.QDialog()
+        self.OsdagSectionModeller.setupUi(dialog)
+        dialog.exec()
 
 from . import icons_rc
 if __name__ == '__main__':

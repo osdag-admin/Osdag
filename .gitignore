@@ -20,6 +20,9 @@
 venv/*
 Osdag_Workspace/*
 /Osdag.config
+/Osdag.bat
+/Osdag.lnk
+/Uninstall_Osdag.exe
 /backup
 OUTPUT_FILES/Output_PDF/*
 Output_PDF/*

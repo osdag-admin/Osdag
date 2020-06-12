@@ -239,7 +239,7 @@ class Window(QMainWindow):
                                                   '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
-            reportsummary = yaml.load(outfile)
+            reportsummary = yaml.safe_load(outfile)
             self.new_ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
             self.new_ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
             self.new_ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
@@ -1546,7 +1546,7 @@ class Window(QMainWindow):
         try:
             in_file = str(fileName)
             with open(in_file, 'r') as fileObject:
-                uiObj = yaml.load(fileObject)
+                uiObj = yaml.safe_load(fileObject)
             module = uiObj[KEY_MODULE]
 
             # module_class = self.return_class(module)

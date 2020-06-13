@@ -342,19 +342,48 @@ class BeamColumnEndPlate(MomentConnection):
     ############################################################################################
     # DESIGN STARTS
     ############################################################################################
+    # Check whether the beam can be connected to the column
+    def check_compatibility(self):
+
+        # Column web connectivity
+        column_clear_d = self.supporting_section.depth - 2*self.supporting_section.flange_thickness \
+                         - 2*self.supporting_section.root_radius    # TODO Make it clear depth:
+        if self.connectivity is VALUES_CONN_1[1]:
+            if self.supported_section.flange_width > column_clear_d:
+                self.design_status = False  #TODO Check self.design_status
+                logger.error(": Beam is wider than column clear depth")
+                logger.warning(": Width of beam should be less than %s mm" % column_clear_d)
+                logger.info(": Currently, Osdag doesn't design such connections")
+
+        # Column flange connectivity
+        else:
+            if self.supported_section.flange_width > self.supporting_section.flange_width:
+                self.design_status = False
+                logger.error(": Beam is wider than column width")
+                logger.warning(": Width of beam should be less than %s mm" % self.supporting_section.flange_width)
+                logger.info(": Currently, Osdag doesn't design such connections")
+
+    # Check for minimum Design Action (Cl. 10.7, IS 800:2007) #TODO:  Correction for plastic moment capacity
+    def check_minimum_design_action(self):
+        beam_moment = 1.2 * self.supported_section.plast_sec_mod_z * self.supported_section.fy / 1.10 #TODO use predefined function
+        min_connection_moment = 0.5 * beam_moment #TODO use predefined function
+        if self.load.moment < min_connection_moment:
+            min_connection_moment_kNm = round((min_connection_moment/1e6), 3)
+            # logger.warning(": The connection is designed for %s kNm (Cl. 10.7, IS 800:2007)" % min_connection_moment_kNm) #TODO
+            self.load.moment = min_connection_moment
 
     # TODO: Do I need to check moment capacity of beam. It will be complete beam design.
     '''
     def member_capacity(self):
         """Check for the moment carrying capacity of beam"""
-        
+
         # Rolled beam
         if self.supported_section.type == "Rolled":
             length = self.supported_section.depth
         # Welded beam
         else:
             length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)
-        
+
         # self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
         self.supported_section.shear_yielding_capacity = round(IS800_2007.cl_8_4_design_shear_strength(
             length*self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
@@ -380,35 +409,6 @@ class BeamColumnEndPlate(MomentConnection):
             print("failed in preliminary member checks. Select larger sections or decrease loads")
         '''
 
-    # Check for minimum Design Action (Cl. 10.7, IS 800:2007) #TODO:  Correction for plastic moment capacity
-    def check_minimum_design_action(self):
-        beam_moment = 1.2 * self.supported_section.plast_sec_mod_z * self.supported_section.fy / 1.10 #TODO use predefined function
-        min_connection_moment = 0.5 * beam_moment #TODO use predefined function
-        if self.load.moment < min_connection_moment:
-            min_connection_moment_kNm = round((min_connection_moment/1e6), 3)
-            # logger.warning(": The connection is designed for %s kNm (Cl. 10.7, IS 800:2007)" % min_connection_moment_kNm) #TODO
-            self.load.moment = min_connection_moment
-
-    def check_compatibility(self):
-
-        # Column web connectivity
-        column_clear_d = self.supporting_section.depth - 2*self.supporting_section.flange_thickness \
-                         - 2*self.supporting_section.root_radius    # TODO Make it clear depth:
-        if self.connectivity is VALUES_CONN_1[1]:
-            if self.supported_section.flange_width > column_clear_d:
-                self.design_status = False  #TODO Check self.design_status
-                logger.error(": Beam is wider than column clear depth")
-                logger.warning(": Width of beam should be less than %s mm" % column_clear_d)
-                logger.info(": Currently, Osdag doesn't design such connections")
-
-        # Column flange connectivity
-        else:
-            if self.supported_section.flange_width > self.supporting_section.flange_width:
-                self.design_status = False
-                logger.error(": Beam is wider than column width")
-                logger.warning(": Width of beam should be less than %s mm" % self.supporting_section.flange_width)
-                logger.info(": Currently, Osdag doesn't design such connections")
-
     def compression_flange(self):
         # Strength of flange under compression or tension TODO: Get function from IS 800
 
@@ -423,6 +423,153 @@ class BeamColumnEndPlate(MomentConnection):
                            % (round(capacity_beam_flange / 1000, 3)))
             logger.info(": Use a higher beam section with wider and/or thicker flange")
 
+    # Weld design
+    def assign_weld_sizes(self):
+        """Assign minimum required weld sizes to flange and web welds and update throat sizes, eff. lengths,
+        long joint factors"""
+
+        # Find minimum sizes
+        flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(
+            self.supported_section.flange_thickness, self.plate.thickness_provided)
+        web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(
+            self.supported_section.web_thickness, self.plate.thickness_provided)
+
+        # Assign minimum sizes
+        top_flange_weld_size = choose_higher_value(flange_weld_size_min, ALL_WELD_SIZES)
+        bottom_flange_weld_size = choose_higher_value(flange_weld_size_min, ALL_WELD_SIZES)
+        web_weld_size = choose_higher_value(web_weld_size_min, ALL_WELD_SIZES)
+
+        self.top_flange_weld.set_size(weld_size=top_flange_weld_size)
+        self.bottom_flange_weld.set_size(weld_size=bottom_flange_weld_size)
+        self.web_weld.set_size(weld_size=web_weld_size)
+        return
+
+    def assign_weld_lengths(self):
+        """Available and effective weld lengths are found and multiplied with long joint reduction factors"""
+
+        # Available lengths
+        self.top_flange_weld.length = self.supported_section.flange_width
+        self.bottom_flange_weld.length = (
+            self.supported_section.flange_width - self.supported_section.web_thickness -
+            2*self.supported_section.root_radius - 2*self.supported_section.toe_radius) / 2
+        self.web_weld.length = self.supported_section.depth - 2 * (self.supported_section.flange_thickness +
+                                                                        self.supported_section.root_radius)
+
+    def assign_weld_strength(self):
+        # TODO: Use method from weld class
+        self.top_flange_weld.strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+            ultimate_stresses=[self.supported_section.fu, self.top_flange_weld.fu],
+            fabrication=self.top_flange_weld.fabrication)
+        self.bottom_flange_weld.strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+            ultimate_stresses=[self.supported_section.fu, self.bottom_flange_weld.fu],
+            fabrication=self.bottom_flange_weld.fabrication)
+        self.web_weld.strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+            ultimate_stresses=[self.supported_section.fu, self.web_weld.fu],
+            fabrication=self.web_weld.fabrication)
+        return
+
+    def weld_design(self):
+        """
+        axial force is taken by flange and web welds = P/(2*lw+ltf+lbf)
+        shear force is taken by web welds only = V/(2*lw)
+        moment is taken by flange welds only M/(d-tf) / (ltf+lbf)
+        """
+        # Design forces per unit length of welds due to applied loads
+        # Applied axial force acting on unit length of weld group [flange+web welds]
+        weld_force_axial = self.load.axial_force / (
+                2 * (self.top_flange_weld.eff_length * self.top_flange_weld.lj_factor +
+                     2 * self.bottom_flange_weld.eff_length * self.bottom_flange_weld.lj_factor +
+                     self.web_weld.eff_length * self.web_weld.lj_factor))
+
+        # Applied moment acting on unit length of weld group [flange welds]
+        flange_tension_moment = self.load.moment / (self.supported_section.depth -
+                                                    self.supported_section.flange_thickness)
+        weld_force_moment = flange_tension_moment / (self.top_flange_weld.eff_length +
+                                                     2 * self.bottom_flange_weld.eff_length)
+
+        # Applied shear force acting on unit length of weld group [web welds]
+        weld_force_shear = self.load.shear_force / (2 * self.web_weld.eff_length * self.web_weld.lj_factor)
+
+        # check for weld strength
+        flange_weld_stress = (weld_force_moment + weld_force_axial) / self.top_flange_weld.throat_tk
+        # flange_weld_throat_reqd = round((weld_force_moment + weld_force_axial) / self.top_flange_weld.strength, 3)
+        # flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
+
+        web_weld_stress = math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / self.web_weld.throat_tk
+        # web_weld_throat_reqd = round(math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) /
+        #                              self.web_weld.strength, 3)
+        # web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
+
+        if self.top_flange_weld.strength < flange_weld_stress:
+            self.top_flange_weld.design_status = False
+        if self.bottom_flange_weld.strength < flange_weld_stress:
+            self.bottom_flange_weld.design_status = False
+        if self.web_weld.strength < web_weld_stress:
+            self.web_weld.design_status = False
+
+    def weld_design2(self):
+        """
+        axial force is taken by flange and web welds = P/(2*lw+ltf+lbf)
+        shear force is taken by web welds only = V/(2*lw)
+        moment is taken by both flange and web welds = M/Z 
+        z = ltf*lw/2 + lbf*lw/2 + d^2/3 
+
+        Stress for axial load in beam=Axial load/sum of (individual weld length *corresponding weld throat thickness)
+        Total length for flange weld = 2* self.top_flange_weld.eff_length + 4* self.bottom_flange_weld.eff_length
+        Weld throat thickness for flange = self.top_flange_weld.throat_tk
+        Total length for web weld = 2* self.web_weld.eff_length
+        Weld throat thickness for flange = self.web_weld.throat_tk
+        """
+
+        # Stresses on weld due to applied axial force TODO: Check if this method is correct
+        weld_force_axial_stress = self.load.axial_force / (
+                2 * self.top_flange_weld.eff_length * self.top_flange_weld.lj_factor * self.top_flange_weld.throat_tk +
+                4 * self.bottom_flange_weld.eff_length * self.bottom_flange_weld.lj_factor *
+                                                                                    self.top_flange_weld.throat_tk +
+                2 * self.web_weld.eff_length * self.web_weld.lj_factor * self.web_weld.throat_tk)
+
+        # Stresses in extreme weld (top flange) due to applied moment
+        weld_Iz = (2 * (self.web_weld.eff_length ** 3) / 12) * self.web_weld.throat_tk +\
+                  (2 * self.top_flange_weld.eff_length * (self.supported_section.depth / 2) ** 2 +
+                   4 * self.bottom_flange_weld.eff_length * (
+                           self.supported_section.depth / 2 -
+                           self.supported_section.flange_thickness) ** 2) * self.top_flange_weld.throat_tk
+
+        flange_weld_Z = weld_Iz / (self.supported_section.depth / 2)
+        web_weld_Z = weld_Iz / (self.supported_section.depth / 2 - self.supported_section.flange_thickness -
+                                self.supported_section.root_radius)
+
+        flange_weld_stress = self.load.moment / flange_weld_Z + weld_force_axial_stress
+
+        weld_force_shear = self.load.shear_force / (
+                    2 * self.web_weld.eff_length * self.web_weld.throat_tk * self.web_weld.lj_factor)
+
+        # calculation of required weld size is not accurate since Iz has different web and flange sizes
+        # but to get required throat thickness either flange or weld size is multiplied
+        # flange_weld_throat_reqd = round(flange_weld_stress * self.top_flange_weld.throat_tk /
+        #                                 self.top_flange_weld.strength, 3)
+        # flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
+
+        web_weld_stress = math.sqrt((self.load.moment / web_weld_Z + weld_force_axial_stress) ** 2 +
+                                    weld_force_shear ** 2)
+
+        # web_weld_throat_reqd = round(web_weld_stress * self.web_weld.throat_tk /
+        #                              self.web_weld.strength, 3)
+        # web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
+
+        if self.top_flange_weld.strength < flange_weld_stress:
+            self.top_flange_weld.design_status = False
+        if self.bottom_flange_weld.strength < flange_weld_stress:
+            self.bottom_flange_weld.design_status = False
+        if self.web_weld.strength < web_weld_stress:
+            self.web_weld.design_status = False
+
+    def groove_weld(self):
+        # weld_method == 'groove'
+        groove_weld_size_flange = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
+            self.supported_section.flange_thickness, self.plate.thickness_provided)
+        groove_weld_size_web = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
+            self.supported_section.web_thickness, self.plate.thickness_provided)
 
     def find_bolt_conn_plates_t_fu_fy(self):
         self.bolt_conn_plates_t_fu_fy = [(self.plate.thickness_provided, self.plate.fu, self.plate.fy)]
@@ -711,159 +858,6 @@ class BeamColumnEndPlate(MomentConnection):
                 logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness_min)
                 logger.info(": Increase the thickness of end plate ")
         #######################################################################
-
-    def assign_weld_sizes(self):
-        """Assign minimum required weld sizes to flange and web welds and update throat sizes, eff. lengths,
-        long joint factors"""
-
-        # Find minimum sizes
-        flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(
-        self.supported_section.flange_thickness, self.plate.thickness_provided)
-        web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(
-        self.supported_section.web_thickness, self.plate.thickness_provided)
-
-        # Assign minimum sizes
-        top_flange_weld_size = choose_higher_value(flange_weld_size_min, ALL_WELD_SIZES)
-        bottom_flange_weld_size = choose_higher_value(flange_weld_size_min, ALL_WELD_SIZES)
-        web_weld_size = choose_higher_value(web_weld_size_min, ALL_WELD_SIZES)
-
-        self.top_flange_weld.set_size(weld_size=top_flange_weld_size)
-        self.bottom_flange_weld.set_size(weld_size=bottom_flange_weld_size)
-        self.web_weld.set_size(weld_size=web_weld_size)
-        return
-
-    def assign_weld_lengths(self):
-        """Available and effective weld lengths are found and multiplied with long joint reduction factors"""
-
-        # Available lengths
-        self.top_flange_weld.length = self.supported_section.flange_width
-        self.bottom_flange_weld.length = (
-            self.supported_section.flange_width - self.supported_section.web_thickness -
-            2*self.supported_section.root_radius - 2*self.supported_section.toe_radius) / 2
-        self.web_weld.length = self.supported_section.depth - 2 * (self.supported_section.flange_thickness +
-                                                                        self.supported_section.root_radius)
-
-    def assign_weld_strength(self):
-        # TODO: Use method from weld class
-        self.top_flange_weld.strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
-            ultimate_stresses=[self.supported_section.fu, self.top_flange_weld.fu],
-            fabrication=self.top_flange_weld.fabrication)
-        self.bottom_flange_weld.strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
-            ultimate_stresses=[self.supported_section.fu, self.bottom_flange_weld.fu],
-            fabrication=self.bottom_flange_weld.fabrication)
-        self.web_weld.strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
-            ultimate_stresses=[self.supported_section.fu, self.web_weld.fu],
-            fabrication=self.web_weld.fabrication)
-        return
-
-    def weld_design(self):
-        #  Design forces per unit length of welds due to applied loads
-        # """
-
-
-        weld_force_axial = self.load.axial_force / (
-                2 * (self.top_flange_weld.eff_length * self.top_flange_weld.lj_factor +
-                    2 * self.bottom_flange_weld.eff_length * self.bottom_flange_weld.lj_factor +
-                    self.web_weld.eff_length * self.web_weld.lj_factor))
-
-        flange_tension_moment = self.load.moment / (self.supported_section.depth - self.supported_section.flange_thickness)
-        weld_force_moment = flange_tension_moment / (self.top_flange_weld.eff_length +
-                                                             2 * self.bottom_flange_weld.eff_length)
-        weld_force_shear = self.load.shear_force / (2 * self.web_weld.eff_length * self.web_weld.lj_factor)
-
-        # check for weld strength
-
-        flange_weld_stress = (weld_force_moment + weld_force_axial) / self.top_flange_weld.throat_tk
-        flange_weld_throat_reqd = round((weld_force_moment + weld_force_axial) / self.top_flange_weld.strength, 3)
-        flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
-
-        web_weld_stress = math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / self.web_weld.throat_tk
-        web_weld_throat_reqd = round(math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / self.web_weld.strength, 3)
-        web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
-
-        # """
-        """
-        axial force is taken by flange and web welds = P/(2*lw+ltf+lbf)
-        shear force is taken by web welds only = V/(2*lw)
-        moment is taken by both flange and web welds = M/Z 
-        z = ltf*lw/2 + lbf*lw/2 + d^2/3 
-
-        Stress for axial load in beam=Axial load/sum of (individual weld length *corresponding weld throat thickness)
-        Total length for flange weld = 2* self.top_flange_weld.eff_length + 4* self.bottom_flange_weld.eff_length
-        Weld throat thickness for flange = self.top_flange_weld.throat_tk
-        Total length for web weld = 2* self.web_weld.eff_length
-        Weld throat thickness for flange = self.web_weld.throat_tk
-        """
-
-        weld_force_axial = self.load.axial_force / \
-                            (self.top_flange_weld.eff_length * self.top_flange_weld.lj_factor +
-                            self.bottom_flange_weld.eff_length * self.bottom_flange_weld.lj_factor +
-                            2 *self.web_weld.eff_length * self.web_weld.lj_factor)
-        # """
-        weld_force_axial_stress = self.load.axial_force / ( \
-                    2 * self.top_flange_weld.eff_length * self.top_flange_weld.lj_factor * self.top_flange_weld.throat_tk + \
-                    4 * self.bottom_flange_weld.eff_length * self.bottom_flange_weld.lj_factor * self.top_flange_weld.throat_tk + \
-                    2 * self.web_weld.eff_length * self.web_weld.lj_factor * self.web_weld.throat_tk)
-
-        # flange_tension_moment = self.load.moment / (self.supported_section.depth - self.supported_section.flange_thickness)
-        # weld_force_moment = flange_tension_moment / (
-        #         self.top_flange_weld.eff_length * self.top_flange_weld.lj_factor * self.web_weld.eff_length / 2 +
-        #         self.bottom_flange_weld.eff_length * self.bottom_flange_weld.lj_factor * self.web_weld.eff_length / 2 +
-        #         self.web_weld.eff_length**2/3)
-
-        # Stresses in extreme weld (top flange) due to applied moment
-
-        weld_Iz = (2 * (self.web_weld.eff_length ** 3) / 12) * self.web_weld.throat_tk + \
-                  (2 * self.top_flange_weld.eff_length * (self.supported_section.depth / 2) ** 2 + \
-                   4 * self.bottom_flange_weld.eff_length * (self.supported_section.depth / 2 - self.supported_section.flange_thickness) ** 2) * self.top_flange_weld.throat_tk
-
-        flange_weld_Z = weld_Iz / (self.supported_section.depth / 2)
-        web_weld_Z = weld_Iz / (self.supported_section.depth / 2 - self.supported_section.flange_thickness - self.supported_section.root_radius)
-
-
-        flange_weld_stress = self.load.moment / flange_weld_Z + weld_force_axial_stress
-
-        weld_force_shear = self.load.shear_force / (
-                    2 * self.web_weld.eff_length * self.web_weld.throat_tk * self.web_weld.lj_factor)
-
-        # calculation of required weld size is not accurate since Iz has different web and flange sizes
-        # but to get required throat thickness either flange or weld size is multiplied
-        flange_weld_throat_reqd = round(flange_weld_stress * self.top_flange_weld.throat_tk / self.top_flange_weld.strength, 3)
-        flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
-
-        web_weld_stress = math.sqrt((self.load.moment / web_weld_Z + weld_force_axial_stress) ** 2 + \
-                                    weld_force_shear ** 2)
-
-        web_weld_throat_reqd = round(web_weld_stress * self.web_weld.throat_tk /
-                                     self.web_weld.strength, 3)
-        web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
-
-        if flange_weld_stress >= self.top_flange_weld.strength:
-            design_status = False
-            logger.error(": The weld size at beam flange is less than required")
-            if flange_weld_size_reqd > self.top_flange_weld.max_size:
-                logger.warning(": The connection can not be possible with fillet weld")
-                logger.info(": Use groove welds to connect beam and end plate")
-            else:
-                logger.warning(": The minimum required size of weld at flanges is %s mm" % flange_weld_size_reqd)
-                logger.info(": Increase the size of weld at beam flanges")
-
-        if web_weld_stress >= self.web_weld.strength:
-            design_status = False
-            logger.error(": The weld size at beam web is less than required")
-            if web_weld_size_reqd > self.web_weld.max_size and flange_weld_size_reqd < self.top_flange_weld.max_size:
-                logger.warning(": The connection can not be possible with fillet weld")
-                logger.info(": Use groove welds to connect beam and end plate")
-            else:
-                logger.warning(": The minimum required size of weld at web is %s mm" % web_weld_size_reqd)
-                logger.info(": Increase the size of weld at beam web")
-
-    def groove_weld(self):
-        # weld_method == 'groove'
-        groove_weld_size_flange = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
-            self.supported_section.flange_thickness, self.plate.thickness_provided)
-        groove_weld_size_web = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
-            self.supported_section.web_thickness, self.plate.thickness_provided)
 
     def find_end_plate_spacing(self):
         #######################################################################

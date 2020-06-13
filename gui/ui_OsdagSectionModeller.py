@@ -8,27 +8,41 @@
 
 
 import math
+import numpy
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Common import *
 from gui.ui_section_parameters import Ui_SectionParameters
 from gui.ui_SectionModeller_SummaryPopUp import Ui_Dialog1 as SummaryDialog
 from SectionModeller_Latex import CreateLatex
-
+from cad.cadfiles.isection_coverplate import IsectionCoverPlate
+from cad.cadfiles.isection_channel import ISectionChannel
+from cad.cadfiles.isection_channel2 import ISectionChannel2
+from cad.cadfiles.star_angle2 import StarAngle2
+from cad.cadfiles.star_angle4 import StarAngle4
+from cad.cadfiles.star_angle_opp import StarAngleOpposite
+from cad.cadfiles.star_angle_same import StarAngleSame
+from cad.cadfiles.TIsection import TISection
+from cad.cadfiles.channel_section import ChannelSection
+from cad.cadfiles.channel_section_opp import ChannelSectionOpposite
+from cad.cadfiles.box import Box
+from cad.cadfiles.box_angle import BoxAngle
+from cad.cadfiles.cross_isection import cross_isection
+from cad.items.notch import Notch
 
 class Ui_OsdagSectionModeller(object):
     def setupUi(self,Dialog):
+        super().__init__()
         Dialog.setObjectName("Dialog")
-        Dialog.resize(900, 900)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(Dialog.sizePolicy().hasHeightForWidth())
         Dialog.setSizePolicy(sizePolicy)
-        Dialog.setMinimumSize(QtCore.QSize(900, 900))
-        Dialog.setMaximumSize(QtCore.QSize(906, 900))
+        #self.setMinimumSize(QtCore.QSize(700, 500))
+        #self.setMaximumSize(QtCore.QSize(906, 800))
         Dialog.setSizeGripEnabled(False)
-        Dialog.setModal(True)
+        #self.setModal(True)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setContentsMargins(11, 11, 11, 11)
         self.verticalLayout.setSpacing(0)
@@ -157,13 +171,13 @@ class Ui_OsdagSectionModeller(object):
         self.OCCFrame.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.OCCFrame.setLineWidth(3)
         self.OCCFrame.setObjectName("OCCFrame")
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.OCCFrame.sizePolicy().hasHeightForWidth())
         self.OCCFrame.setSizePolicy(sizePolicy)
-        self.OCCFrame.setMinimumSize(QtCore.QSize(500, 400))
-        self.OCCFrame.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        #self.OCCFrame.setMinimumSize(QtCore.QSize(300, 200))
+        self.OCCFrame.setMaximumSize(QtCore.QSize(500, 400))
         self.horizontalLayout.addWidget(self.OCCFrame)
         self.horizontalLayout.setStretch(0, 1)
         self.horizontalLayout.setStretch(1, 1)
@@ -641,8 +655,9 @@ class Ui_OsdagSectionModeller(object):
         ))
         self.disable_usability(True)
         self.exportBtn.clicked.connect(self.export_to_pdf)
-        display,_=self.init_display()
-    
+        display=self.init_display()
+        Dialog.setFixedSize(Dialog.sizeHint())
+
     def get_section_properties(self):
             '''
             Method to get the values and names of the Section properties,
@@ -668,32 +683,11 @@ class Ui_OsdagSectionModeller(object):
                 i+=1
                 if(Labels[i][0][-1].isdigit()):
                         break
-            return(Properties)
-
-
-
-    def init_display(self):
-            from OCC.Display.backend import load_backend, get_qt_modules
-
-            global display
-            from OCC.Display.qtDisplay import qtViewer3d
-            self.OCCWindow = qtViewer3d(self.OCCFrame)
-            self.OCCWindow.InitDriver()
-            display = self.OCCWindow._display
-            display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
-            display.display_triedron()
-            display.View.SetProj(1, 1, 1)
-            layout=QtWidgets.QVBoxLayout()
-            layout.addWidget(self.OCCWindow)
-            layout.setContentsMargins(0, 0, 0, 0)
-            self.OCCFrame.setLayout(layout)
-            def start_display():
-                    self.OCCWindow.raise_()
-            return display, start_display       
+            return(Properties)       
 
     def export_to_pdf(self):
             '''
-            Method to create and convert information from section modeller into Latex formatted PDF
+            Method to send information from section modeller into Latex creator
             '''
 
             self.summary_dialog=SummaryDialog()
@@ -711,7 +705,7 @@ class Ui_OsdagSectionModeller(object):
                 input_summary['Section Properties']=self.get_section_properties()
                 rel_path = str(sys.path[0])
                 rel_path = rel_path.replace("\\", "/")
-                Disp_3D_image = "/ResourceFiles/images/3d.png"
+                Disp_3D_image = "/ResourceFiles/images/3DSectionfromSectionModeller.png"
                 latex=CreateLatex()
                 latex.save_latex(input_summary,input_summary['filename'],rel_path,Disp_3D_image)
             except KeyError:
@@ -754,7 +748,7 @@ class Ui_OsdagSectionModeller(object):
                 self.MI_text_6.hide()
                 self.PSM_label_3.show()
                 self.PSM_text_3.show()
-                self.MI_label_3.setText('Czz(mm4):')
+                self.MI_label_3.setText('Czz(cm4):')
 
         elif(index_type==3):
                 self.Centroid_box.show()
@@ -768,7 +762,7 @@ class Ui_OsdagSectionModeller(object):
                 self.MI_text_6.show()
                 self.PSM_label_3.hide()
                 self.PSM_text_3.hide()
-                self.MI_label_3.setText('Ixy(mm4):')
+                self.MI_label_3.setText('Ixy(cm4):')
         
         templates={
                 0:[],
@@ -803,27 +797,17 @@ class Ui_OsdagSectionModeller(object):
         if(index_type==1):
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                 Area,B,T,t,Di=map(float,cursor.fetchall()[0])
-                l=float(self.SectionParameters.parameterText_6.text())
-                ti=float(self.SectionParameters.parameterText_7.text())
-                S=float(self.SectionParameters.parameterText_3.text())
+                B/=10
+                T/=10
+                t/=10
+                Di/=10
+                l=float(self.SectionParameters.parameterText_6.text())/10
+                ti=float(self.SectionParameters.parameterText_7.text())/10
+                S=float(self.SectionParameters.parameterText_3.text())/10
                 A=round((2*Area)+(2*l*ti),4)
                 D=round(Di-(2*T),4)
-                Ybottom=round((
-                        (l*ti*t/2)+
-                        (2*B*T*ti*T/2)+
-                        (2*((D*t)*((D/2)+T+ti)))+
-                        (2*((B*T)*((T/2)+D+T+ti)))+
-                        ((l*ti)*((ti/2)+D+ti+(2*T)))
-                )/((4*B*T)+(2*l*ti)+(2*D*t)),4)
-                Ytop=Ybottom
-                Yleft=round((
-                        (2*l*ti*l/2)+
-                        (2*B*T*B/2)+
-                        (D*t*B/2)+
-                        (2*((B*T)*(l-S+(B/2))))+
-                        ((D*t)*(l-S+(B/2)))
-                )/((l*ti)+(4*B*T)+(2*D*t)),4)
-                Yright=Yleft
+                Ytop=Ybottom=round((D+(2*ti))/2,4)
+                Yleft=Yright=l/2
                 Izz=round((
                         ((B*(T**3)/12)+((B*T)*((Ybottom-(T/2)-ti)**2)))+
                         ((l*(ti**3)/12)+((l*ti)*((Ybottom-(ti/2))**2)))+
@@ -833,12 +817,12 @@ class Ui_OsdagSectionModeller(object):
                         ((l*(ti**3)/12)+((l*ti)*((Ytop-(ti/2))**2)))
                 ),4)
                 Iyy=round((
-                        (2*(((l/2)*(ti**3)/12)+(((l/2)*ti)*((Yleft-(l/4))**2))))+
-                        (2*((B*(T**3)/12)+((B*T)*((Yleft-(B/2))**2))))+
-                        ((t*(D**3)/12)+((D*t)*((Yleft-(B/2))**2)))+
-                        ((t*(D**3)/12)+((D*t)*((Yright-(B/2))**2)))+
-                        (2*((B*(T**3)/12)+((B*T)*((Yright-(B/2))**2))))+
-                        (2*(((l/2)*(ti**3)/12)+(((l/2)*ti)*((Yright-(l/4))**2))))
+                        (2*((ti*((l/2)**3)/12)+(((l/2)*ti)*((Yleft-(l/4))**2))))+
+                        (2*((T*(B**3)/12)+((B*T)*((Yleft-(B/2))**2))))+
+                        ((D*(t**3)/12)+((D*t)*((Yleft-(B/2))**2)))+
+                        ((D*(t**3)/12)+((D*t)*((Yright-(B/2))**2)))+
+                        (2*((T*(B**3)/12)+((B*T)*((Yright-(B/2))**2))))+
+                        (2*((ti*((l/2)**3)/12)+(((l/2)*ti)*((Yright-(l/4))**2))))
                 ),4)
                 Rzz=round(math.sqrt(Izz/A),4)
                 Ryy=round(math.sqrt(Iyy/A),4)
@@ -854,41 +838,33 @@ class Ui_OsdagSectionModeller(object):
         elif(index_type==2):
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Channels where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                 ChannelArea,B,T,t,Dc=map(float,cursor.fetchall()[0])
-                l=float(self.SectionParameters.parameterText_6.text())
-                ti=float(self.SectionParameters.parameterText_7.text())
-                S=float(self.SectionParameters.parameterText_3.text())
+                B/=10
+                T/=10
+                t/=10
+                Dc/=10
+                l=float(self.SectionParameters.parameterText_6.text())/10
+                ti=float(self.SectionParameters.parameterText_7.text())/10
+                S=float(self.SectionParameters.parameterText_3.text())/10
                 A=round((2*ChannelArea)+(2*l*ti),4)
                 D=round(Dc-(2*T),4)
+                Ytop=Ybottom=round((D+(2*ti))/2,4)
+                Yleft=Yright=l/2
                 if(index_template==1):
-                        Yleft=round((
-                                (D*t*t/2)+
-                                (2*(B*T*B/2))+
-                                (2*(l*ti*l/2))+
-                                (2*(B*T*(S+t-(B/2))))+
-                                (2*(D*t*(S+t+(t/2))))
-                        )/((2*D*t)+(B*T)+(2*l*t)),4)
-                        Yright=(2*t)+S-Yleft
-                        Ybottom=round((
-                                (2*(B*T*T+(ti/2)))+
-                                (2*(D*t*((D/2)+T+ti)))+
-                                (l*ti*(D+(2*T)+ti+(ti/2)))+
-                                (2*(l*ti*(ti/2)))+
-                                (2*(B*T*(D+T+(T/2))))
-                        )/((4*B*T)+(2*D*t)+(2*l*ti)),4)
-                        Ytop=D+(2*T)-Ybottom-(2*ti)
                         Izz=round((
-                                (2*((B*(T**3)/12)+((B*T)*((Ybottom-(T/2))**2))))+
+                                (2*((B*(T**3)/12)+((B*T)*((Ybottom-(T/2)-ti)**2))))+
                                 (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ybottom-(D/4)-T-ti)**2))))+
                                 (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ytop-(D/4)-T-ti)**2))))+
                                 (2*((B*(T**3)/12)+((B*T)*((Ytop-(T/2)-ti)**2))))+
-                                (2*((l*(ti**3)/12)+((l*ti)*((Ybottom-(ti/2))**2))))
+                                ((l*(ti**3)/12)+((l*ti)*((Ybottom-(ti/2))**2)))+
+                                ((l*(ti**3)/12)+((l*ti)*((Ytop-(ti/2))**2)))
                         ),4)
                         Iyy=round((
-                                (((t*(D**3)/12)+((D*t)*((Yleft-(t/2))**2))))+
-                                (2*((B*(T**3)/12)+((B*T)*((Yleft-(B/2))**2))))+
-                                (2*((B*(T**3)/12)+((B*T)*((Yright-(B/2))**2))))+
-                                (((t*(D**3)/12)+((D*t)*((Yright-(t/2))**2))))+
-                                (4*(((l/2)*(ti**3)/12)+(((l/2)*ti)*((Yleft-(l/4))**2))))
+                                (((D*(t**3)/12)+((D*t)*((Yleft-(t/2))**2))))+
+                                (2*((T*(B**3)/12)+((B*T)*((Yleft-(B/2))**2))))+
+                                (2*((T*(B**3)/12)+((B*T)*((Yright-(B/2))**2))))+
+                                ((D*(t**3)/12)+((D*t)*((Yright-(t/2))**2)))+
+                                (2*((ti*((l/2)**3)/12)+(((l/2)*ti)*((Yleft-(l/4))**2))))+
+                                (2*((ti*((l/2)**3)/12)+(((l/2)*ti)*((Yright-(l/4))**2))))
                         ),4)
                         Rzz=round(math.sqrt(Izz/A),4)
                         Ryy=round(math.sqrt(Iyy/A),4)
@@ -902,36 +878,20 @@ class Ui_OsdagSectionModeller(object):
                         self.ESM_text_1.setText(str(Zzz))
                         self.ESM_text_2.setText(str(Zyy))
                 elif(index_template==2):
-                        Ybottom=round((
-                                (l*ti*ti/2)+
-                                (2*(B*T*(ti*T/2)))+
-                                (2*((D*t)*((D/2)+T+ti)))+
-                                (2*((B*T)*((T/2)+D+ti+T)))+
-                                ((l*ti)*(D+(2*T)+(ti/2)+t))
-                        )/((2*l*ti)+(2*D*t)+(4*B*T)),4)
-                        Ytop=Ybottom
-                        Yleft=round((
-                                (2*(l*ti*l/2))+
-                                (2*(B*T*T/2))+
-                                ((D*t)*((t/2)+B-(t/2)))+
-                                (2*((B*T)*(B+S+(B/2))))+
-                                ((D*t)*(B+S+(t/2)))
-                        )/((2*l*t)+(4*B*T)+(2*D*t)),4)
-                        Yright=Yleft
                         Izz=round((
                                 (((l*(ti**3)/12)+((l*ti)*((Ybottom-(ti/2))**2))))+
                                 (2*((B*(T**3)/12)+((B*T)*((Ybottom-(T/2)-ti)**2))))+
-                                (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ybottom-(D/2)-T-ti)**2))))+
+                                (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ybottom-(D/4)-T-ti)**2))))+
                                 (2*((B*(T**3)/12)+((B*T)*((Ytop-(T/2)-ti)**2))))+
                                 (((l*(ti**3)/12)+((l*ti)*((Ytop-(ti/2))**2))))
                         ),4)
                         Iyy=round((
-                                (2*(((l/2)*(ti**3)/12)+(((l/2)*ti)*((Yleft-(l/4))**2))))+
-                                (2*((B*(T**3)/12)+((B*T)*((Yleft-(B/2))**2))))+
-                                (((t*(D**3)/12)+((D*T)*((Yleft-(t/2)-B)**2))))+
-                                (((t*(D**3)/12)+((D*T)*((Yright-(t/2)-B)**2))))+
-                                (2*((B*(T**3)/12)+((B*T)*((Yright-(B/2))**2))))+
-                                (2*(((l/2)*(ti**3)/12)+(((l/2)*ti)*((Yright-(l/4))**2))))
+                                (2*((ti*((l/2)**3)/12)+(((l/2)*ti)*((Yleft-(l/4))**2))))+
+                                (2*((T*(B**3)/12)+((B*T)*((Yleft-(B/2))**2))))+
+                                (((D*(t**3)/12)+((D*T)*((Yleft-(t/2)-B)**2))))+
+                                (((D*(t**3)/12)+((D*T)*((Yright-(t/2)-B)**2))))+
+                                (2*((T*(B**3)/12)+((B*T)*((Yright-(B/2))**2))))+
+                                (2*((ti*((l/2)**3)/12)+(((l/2)*ti)*((Yright-(l/4))**2))))
                         ),4)
                         Rzz=round(math.sqrt(Izz/A),4)
                         Ryy=round(math.sqrt(Iyy/A),4)
@@ -953,42 +913,32 @@ class Ui_OsdagSectionModeller(object):
                 if(index_template==1):
                         cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         a,b = cursor.fetchall()[0]
+                        a/=10
+                        b/=10
                         cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,t=map(float,cursor.fetchall()[0])
-                        ti=float(self.SectionParameters.parameterText_7.text())
-                        l=float(self.SectionParameters.parameterText_6.text())
+                        t/=10
+                        ti=float(self.SectionParameters.parameterText_7.text())/10
+                        l=float(self.SectionParameters.parameterText_6.text())/10
                         A=round((4*Area)+(l*ti),4)
                         D=a-t
-                        Ybottom=round((
-                                (l*ti*l/2)+
-                                (2*D*t*D/2)+
-                                (2*((b*t)*((t/2)+D)))+
-                                (2*((b*t)*((t/2)+t+D)))+
-                                (2*((D*t)*((D/2)+D+(2*t))))
-                        )/((l*ti)+(4*b*t)+(4*D*t)),4)
-                        Ytop=Ybottom
-                        Yleft=round((
-                                (2*b*t*b/2)+
-                                (2*D*t*b/2)+
-                                (l*ti*(b+(ti/2)))+
-                                (2*((D*t)*(ti+b+(t/2))))+
-                                (2*((b*t)*(ti+b+(b/2))))
-                        )/((4*b*t)+(4*D*t)+(l*ti)),4)
-                        Yright=Yleft
+                        Yleft=Yright=round(((2*b)+ti)/2,4)
+                        Ytop=Ybottom=l/2
                         Izz=round((
-                              (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+  
+                              ((((l/2)*(ti**3)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+  
                               (2*((t*(D**3)/12)+((D*t)*((Ybottom-(D/2))**2))))+
                               (2*((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-D)**2))))+
                               (2*((t*(D**3)/12)+((D*t)*((Ytop-(D/2))**2))))+
-                              (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ytop-(D/2))**2))))+
+                              ((((l/2)*(ti**3)/12)+(((l/2)*ti)*((Ytop-(l/4))**2))))+
                               (2*((b*(t**3)/12)+((b*t)*((Ytop-(t/2)-D)**2))))
                         ),4)
                         Iyy=round((
-                                (((b*(t**3)/12)+((b*t)*((Yleft-(b/2))**2))))+
-                                (2*((b*(t**3)/12)+((b*t)*((Yright-(b/2))**2))))+
-                                (2*((t*(D**3)/12)+((D*t)*((Yleft+(t/2)-b)**2))))+
-                                (2*((t*(D**3)/12)+((D*t)*((Yright+(t/2)-b)**2))))+
-                                (((l*(ti**3)/12)+((l*ti)*((Yleft-(ti/2)-b)**2))))
+                                (((t*(b**3)/12)+((b*t)*((Yleft-(b/2))**2))))+
+                                (2*((t*(b**3)/12)+((b*t)*((Yright-(b/2))**2))))+
+                                (2*((D*(t**3)/12)+((D*t)*((Yleft+(t/2)-b)**2))))+
+                                (2*((D*(t**3)/12)+((D*t)*((Yright+(t/2)-b)**2))))+
+                                ((l*((ti/2)**3)/12)+((l*ti/2)*((Yleft-(t/4))**2)))+
+                                ((l*((ti/2)**3)/12)+((l*ti/2)*((Yright-(t/4))**2)))
                         ),4)
                         Rzz=round(math.sqrt(Izz/A),4)
                         Ryy=round(math.sqrt(Iyy/A),4)
@@ -1008,34 +958,31 @@ class Ui_OsdagSectionModeller(object):
                 elif(index_template==2):
                         cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         a,b = cursor.fetchall()[0]
+                        a/=10
+                        b/=10
                         cursor = conn.execute("SELECT Area,Iy,Cy,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,Iy,Cy,t=map(float,cursor.fetchall()[0])
-                        ti=float(self.SectionParameters.parameterText_7.text())
-                        l=float(self.SectionParameters.parameterText_6.text())
+                        t/=10
+                        ti=float(self.SectionParameters.parameterText_7.text())/10
+                        l=float(self.SectionParameters.parameterText_6.text())/10
                         D=a-t
                         A=round((2*Area)+(l*ti),4)
-                        Ybottom=round((
-                                (2*D*t*D/2)+
-                                (2*((b*t)*(D+(t/2))))+
-                                (l*ti*l/2)
-                        )/((2*D*t)+(2*b*t)+(l*ti)),4)
-                        Ytop=D+t-Ybottom
+                        Ytop=Ybottom=l/2
                         Yleft=round((
-                                (b*t*b/2)+
-                                (D*t*(b-(t/2)))+
-                                (l*ti*(b+(ti/2)))+
-                                (D*t*(b+ti+(t/2)))+
-                                (b*t*(b+ti+(b/2)))
-                        )/((2*b*t)+(2*D*t)+(l*ti)),4)
-                        Yright=Yleft
+                                (l*ti*ti/2)+
+                                (2*(D*t*(ti+(t/2))))+
+                                (2*(b*t*(ti+(b/2))))
+                        )/((l*ti)+(2*b*t)+(2*D*t)),4)
+                        Yright=(2*b)+ti-Yleft
                         Izz=round((
-                                (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ybottom-(D/4))**2))))+
-                                (((ti*(l/2))+(((l/2)*ti)*((Ybottom-(l/4))**2))))+
-                                (2*((t*((D/2)**3)/12)+(((D/2)*t)*((Ytop-(D/4)-t)**2))))+
-                                (((ti*(l/2))+(((l/2)*ti)*((Ytop-(l/4))**2))))+
-                                (2*((b*(t**3)/12)+((b*t)*((Ytop-(t/2))**2))))
+                                (((ti*((l/2))**3)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+
+                                ((t*(D**3)/12)+((D*t)*((Ybottom-(D/2))**2)))+
+                                ((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-D)**2)))+
+                                ((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-D)**2)))+
+                                ((t*(D**3)/12)+((D*t)*((Ybottom-(D/2))**2)))+
+                                (((ti*((l/2))**3)+(((l/2)*ti)*((Ybottom-(l/4))**2))))
                         ),4)
-                        Iyy=round( 2*(Iy+(A*((Cy+(t/2))**2))),4)
+                        Iyy=round( 2*(Iy+(A*((Cy+(ti/2))**2))),4)
                         Ryy=round(math.sqrt(Iyy/A),4)
                         Rzz=round(math.sqrt(Izz/A),4)
                         Zzz=round((A/2)*(Ytop+Ybottom),4)
@@ -1055,43 +1002,25 @@ class Ui_OsdagSectionModeller(object):
                 elif(index_template==3):
                         cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         a,b = cursor.fetchall()[0]
-                        cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                        Area,t=map(float,cursor.fetchall()[0])
-                        ti=float(self.SectionParameters.parameterText_7.text())
-                        l=float(self.SectionParameters.parameterText_6.text())
+                        a/=10
+                        b/=10
+                        cursor = conn.execute("SELECT Area,Iz,Cy,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        Area,Iz,Cy,t=map(float,cursor.fetchall()[0])
+                        t/=10
+                        ti=float(self.SectionParameters.parameterText_7.text())/10
+                        l=float(self.SectionParameters.parameterText_6.text())/10
                         A=round((2*Area)+(l*ti),4)
                         D=a-t
-                        Ybottom=round((
-                                (l*ti*l/2)+
-                                (D*t*D/2)+
-                                (b*t*(D+(t/2)))+
-                                (b*t*(t+D+(t/2)))+
-                                (D*t*((2*t)+(D/2)+D))
-                        )/((l*ti)+(2*D*t)+(2*b*t)),4)
-                        Ytop=Ybottom
-                        Yleft=round((
-                                (b*t*b/2)+
-                                (D*t*b/2)+
-                                (l*ti*(b+(ti/2)))+
-                                (D*t*(ti+b+(t/2)))+
-                                (b*t*(ti+b+(b/2)))
-                        )/((2*b*t)+(2*D*t)+(l*ti)),4)
-                        Yright=Yleft
-                        Izz=round((
-                                (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+
-                                (((t*(D**3)/12)+((D*t)*((Ybottom-(D/2))**2))))+
-                                (((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-D)**2))))+
-                                (((b*(t**3)/12)+((b*t)*((Ytop-(t/2)-D)**2))))+
-                                (((t*(D**3)/12)+((D*t)*((Ytop-(D/2))**2))))+
-                                (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ytop-(l/4))**2))))
-
-                        ),4)
+                        Ytop=Ybottom=l/2
+                        Yleft=Yright=round(((2*b)+ti)/2,4)
+                        Izz=round(2*(Iz+(A*((Cz+(ti/2))**2))),4)
                         Iyy=round((
-                                (((b*(t**3)/12)+((b*t)*((Yleft-(b/2))**2))))+
-                                (((t*(D**3)/12)+((D*t)*((Yleft+(t/2)-b)**2))))+
-                                (((ti*(l**3)/12)+((l*t)*((Yleft-(t/2)-b)**2))))+                        
-                                (((t*(D**3)/12)+((D*t)*((Yright+(t/2)-b)**2))))+
-                                (((b*(t**3)/12)+((b*t)*((Yleft-(b/2))**2))))
+                                (((t*(b**3)/12)+((b*t)*((Yleft-(b/2))**2))))+
+                                (((D*(t**3)/12)+((D*t)*((Yleft+(t/2)-b)**2))))+
+                                (((l*((ti/2)**3)/12)+(((ti/2)*l)*((Yleft-(t/4)-b)**2))))+                        
+                                (((t*(b**3)/12)+((b*t)*((Yright-(b/2))**2))))+
+                                (((D*(t**3)/12)+((D*t)*((Yright+(t/2)-b)**2))))+
+                                (((l*((ti/2)**3)/12)+(((ti/2)*l)*((Yright-(t/4)-b)**2))))
                         ),4)
                         Ryy=round(math.sqrt(Iyy/A),4)
                         Rzz=round(math.sqrt(Izz/A),4)
@@ -1112,36 +1041,35 @@ class Ui_OsdagSectionModeller(object):
                 elif(index_template==4):
                         cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         a,b = cursor.fetchall()[0]
-                        cursor = conn.execute("SELECT Area,Iy,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                        Area,Iy,t=map(float,cursor.fetchall()[0])
-                        ti=float(self.SectionParameters.parameterText_7.text())
-                        l=float(self.SectionParameters.parameterText_6.text())
+                        a/=10
+                        b/=10
+                        cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        Area,t=map(float,cursor.fetchall()[0])
+                        t/=10
+                        ti=float(self.SectionParameters.parameterText_7.text())/10
+                        l=float(self.SectionParameters.parameterText_6.text())/10
                         A=round((2*Area)+(l*ti),4)
                         D=a-t
-                        Ybottom=round((
-                                (l*ti+l/2)+
-                                (D*t*D/2)+
-                                (b*t*(D+(t/2)))+
-                                ((b*t)*(D+t+(t/2)))+
-                                ((D*t)*(D+t+t+(D/2)))
-                        )/((l*t)+(2*D*t)+(2*b*t)),4)
-                        Ytop=Ybottom
-                        Yleft=round((
-                                (l*t*ti/2)+
-                                (2*((D*t)*(ti+(t/2))))+
-                                (2*((b*t)*(ti+(b/2))))
-                        )/((l+ti)+(2*b*t)+(2*D*t)),4)
-                        Yright=ti+b-Yleft
+                        Ytop=Ybottom=l/2
+                        Yleft=Yright=round(((2*b)+ti)/2,4)
                         Izz=round((
-                                (((ti*((l**3)/2)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+
+                                (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+
                                 (((t*(D**3)/12)+((D*t)*((Ybottom-(D/2))**2))))+
                                 (((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-D)**2))))+
-                                (((b*(t**3)/12)+((b*t)*((Ytop-(t/2))**2))))+
-                                (((t*(D**3)/12)+((D*t)*((Ytop-(D/2)-t)**2))))+
-                                (((ti*((l/2)**3)/12)+(((l/2)*t)*((Ytop-(l/4))**2))))
+                                (((b*(t**3)/12)+((b*t)*((Ytop-(t/2)-D)**2))))+
+                                (((t*(D**3)/12)+((D*t)*((Ytop-(t/2)-D)**2))))+
+                                (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ytop-(l/4))**2))))
 
                         ),4)
-                        Ryy=round(math.sqrt(Iy/A),4)
+                        Iyy=round((
+                                (((t*(b**3)/12)+((b*t)*((Yleft-(b/2))**2))))+
+                                (((D*(t**3)/12)+((D*t)*((Yleft+(t/2)-b)**2))))+
+                                (((l*((ti/2)**3)/12)+(((ti/2)*l)*((Yleft-(t/4)-b)**2))))+
+                                (((l*((ti/2)**3)/12)+(((ti/2)*l)*((Yright-(t/4)-b)**2))))+
+                                (((D*(t**3)/12)+((D*t)*((Yright+(t/2)-b)**2))))+
+                                (((t*(b**3)/12)+((b*t)*((Yright-(b/2))**2))))
+                        ),4)
+                        Ryy=round(math.sqrt(Iyy/A),4)
                         Rzz=round(math.sqrt(Izz/A),4)
                         Zzz=round((A/2)*(Ytop+Ybottom),4)
                         Zyy=round((A/2)*(Yleft+Yright),4)
@@ -1151,7 +1079,7 @@ class Ui_OsdagSectionModeller(object):
                         self.C_text_2.setText(str(Cz))
                         self.Area_text.setText(str(A))
                         self.MI_text_1.setText(str(Izz))
-                        self.MI_text_2.setText(str(Iy))
+                        self.MI_text_2.setText(str(Iyy))
                         self.RG_text_1.setText(str(Rzz))
                         self.RG_text_2.setText(str(Ryy))
                         self.ESM_text_1.setText(str(Zzz))
@@ -1159,12 +1087,15 @@ class Ui_OsdagSectionModeller(object):
                 elif(index_template==5):
                        cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                        a,b = cursor.fetchall()[0]
+                       a/=10
+                       b/=10
                        cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                        Area,t=map(float,cursor.fetchall()[0])
-                       ti=float(self.SectionParameters.parameterText_7.text())
-                       S=float(self.SectionParameters.parameterText_3.text())
-                       l=float(self.SectionParameters.parameterText_5.text())
-                       lv=float(self.SectionParameters.parameterText_6.text())
+                       t/=10
+                       ti=float(self.SectionParameters.parameterText_7.text())/10
+                       S=float(self.SectionParameters.parameterText_3.text())/10
+                       l=float(self.SectionParameters.parameterText_5.text())/10
+                       lv=float(self.SectionParameters.parameterText_6.text())/10
                        A=round((4*Area)+(2*l*ti)+(2*lv*ti),4)
                        D=a-t 
                        Ybottom=round((
@@ -1226,8 +1157,12 @@ class Ui_OsdagSectionModeller(object):
                 if(index_template==1):
                         cursor = conn.execute("SELECT Area,B,T,tw,D FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         ISectionArea,B,T,t,Di=map(float,cursor.fetchall()[0])
+                        B/=10
+                        T/=10
+                        t/=10
+                        Di/=10
                         D=Di-(2*T)
-                        P,Q=float(self.SectionParameters.parameterText_6.text()),float(self.SectionParameters.parameterText_7.text())
+                        P,Q=float(self.SectionParameters.parameterText_6.text())/10,float(self.SectionParameters.parameterText_7.text())/10
                         A=ISectionArea+(2*P*Q)
                         Ybottom=(
                                 (B*T*T/2)+
@@ -1265,6 +1200,10 @@ class Ui_OsdagSectionModeller(object):
                 elif(index_template==2):
                         cursor = conn.execute("SELECT Area,D,tw,B,T FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,Dc,t,B,T=map(float,cursor.fetchall()[0])
+                        Dc/=10
+                        t/=10
+                        B/=10
+                        T/=10
                         D=Dc-(2*T)
                         d=round(((D-(2*T))/2)-t,4)
                         A=round((2*Area)-(t**2),4)
@@ -1319,7 +1258,9 @@ class Ui_OsdagSectionModeller(object):
                 elif(index_template==3):
                         cursor = conn.execute("SELECT B,T FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         B,T=map(float,cursor.fetchall()[0])
-                        A=4*B*T
+                        B/=10
+                        T/=10
+                        A=round(4*B*T,4)
                         Ybottom=round((
                                 (B*T*T/2)+
                                 (2*(B/2)*T*(B/4))
@@ -1355,11 +1296,19 @@ class Ui_OsdagSectionModeller(object):
         elif(index_type==5):
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                 ISectionArea,B,T,t,Di=map(float,cursor.fetchall()[0])
+                B/=10
+                T/=10
+                t/=10
+                Di/=10
                 D=Di-(2*T)
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Channels where Designation="+repr(self.SectionParameters.parameterText_2.currentText()))
                 ChannelArea,R,P,U,Dc = map(float,cursor.fetchall()[0])
+                R/=10
+                P/=10
+                U/=10
+                Dc/=10
                 Q=Dc-(2*P)
-                S=float(self.SectionParameters.parameterText_3.text())
+                S=float(self.SectionParameters.parameterText_3.text())/10
                 A = ISectionArea+ChannelArea
                 Ybottom=round((
                         (B*T*T/2)+
@@ -1400,8 +1349,216 @@ class Ui_OsdagSectionModeller(object):
                 self.RG_text_2.setText(str(Ryy))
                 self.ESM_text_1.setText(str(Zzy))
                 self.ESM_text_2.setText(str(Zzz))
+        
+        display.EraseAll()
+        self.create_cad_model(index_type,index_template)
+        
+    def init_display(self):
+            from OCC.Display.backend import load_backend, get_qt_modules
+            global display
+            from OCC.Display.qtDisplay import qtViewer3d
+            self.OCCWindow = qtViewer3d(self.OCCFrame)
+            self.OCCWindow.InitDriver()
+            display = self.OCCWindow._display
+            display.set_bg_gradient_color([23, 1, 32], [23, 1, 32])
+            display.display_triedron()
+            display.View.SetProj(1, 1, 1)
+            layout=QtWidgets.QVBoxLayout()
+            layout.addWidget(self.OCCWindow)
+            layout.setContentsMargins(0, 0, 0, 0)
+            self.OCCFrame.setLayout(layout)
+            return display
 
-
+    def create_cad_model(self,index_type,index_template):
+        origin = numpy.array([0.,0.,0.])
+        uDir = numpy.array([1.,0.,0.])
+        shaftDir = wDir = numpy.array([0.,0.,1.])
+        if(index_type==1):
+                B = 40
+                T = 3
+                D = 40
+                t = 3
+                R1 = 5
+                R2 = 5
+                alpha = 1
+                length = 100
+                d = 10
+                t2 = 3
+                W = 100
+                ISecPlate = IsectionCoverPlate(B, T, D, t, R1, R2, alpha, length, d, t2, W)
+                ISecPlate.place(origin, uDir, shaftDir)
+                prism = ISecPlate.create_model()
+                display.DisplayShape(prism, update=True)
+        elif(index_type==2):
+                if(index_template==1):
+                        B = 20
+                        T = 2
+                        D = 40
+                        t = 2
+                        L = 100
+                        l = 4
+                        W = 100
+                        H = 60
+                        d = 10
+                        channel_section = ChannelSection(B, T, D, t, 0, 0, L, l, W, H, d)
+                        _place = channel_section.place(origin, uDir, shaftDir)
+                        point = channel_section.compute_params()
+                        prism = channel_section.create_model()
+                        display.DisplayShape(prism, update=True)
+                elif(index_template==2):
+                        B = 20
+                        T = 2
+                        D = 40
+                        t = 2
+                        L = 100
+                        l = 4
+                        W = 100
+                        H = 60
+                        d = 0
+                        channel_section = ChannelSectionOpposite(B, T, D, t, 0, 0, L, l, W, H, d)
+                        _place = channel_section.place(origin, uDir, shaftDir)
+                        point = channel_section.compute_params()
+                        prism = channel_section.create_model()
+                        display.DisplayShape(prism, update=True)
+        elif(index_type==3):
+                if(index_template==1):
+                        L = 50
+                        A = 15
+                        B = 15
+                        T = 2
+                        R1 = 8
+                        R2 = 5
+                        W = 40
+                        t = 2
+                        star_angle = StarAngle4(L, A, B, T, R1, R2, W, t)
+                        _place = star_angle.place(origin, uDir, wDir)
+                        point = star_angle.compute_params()
+                        prism = star_angle.create_model()
+                        display.DisplayShape(prism, update=True)
+                elif(index_template==2):
+                        L = 50
+                        A = 15
+                        B = 15
+                        T = 2
+                        R1 = 8
+                        R2 = 5
+                        W = 40
+                        t = 2
+                        star_angle_same = StarAngleSame(L, A, B, T, R1, R2, W, t)
+                        _place = star_angle_same.place(origin, uDir, wDir)
+                        point = star_angle_same.compute_params()
+                        prism = star_angle_same.create_model()
+                        display.DisplayShape(prism, update=True)
+                elif(index_template==3):
+                        L = 50
+                        A = 15
+                        B = 15
+                        T = 2
+                        R1 = 8
+                        R2 = 5
+                        W = 40
+                        t = 2
+                        star_angle_opposite = StarAngleOpposite(L, A, B, T, R1, R2, W, t)
+                        _place = star_angle_opposite.place(origin, uDir, wDir)
+                        point = star_angle_opposite.compute_params()
+                        prism = star_angle_opposite.create_model()
+                        display.DisplayShape(prism, update=True)
+                elif(index_template==4):
+                        L = 50
+                        A = 15
+                        B = 15
+                        T = 2
+                        R1 = 8
+                        R2 = 5
+                        W = 40
+                        t = 2
+                        star_angle = StarAngle2(L, A, B, T, R1, R2, W, t)
+                        _place = star_angle.place(origin, uDir, wDir)
+                        point = star_angle.compute_params()
+                        prism = star_angle.create_model()
+                        display.DisplayShape(prism, update=True)
+                elif(index_template==5):
+                        L = 50
+                        A = 15
+                        B = 15
+                        T = 2
+                        R1 = 8
+                        R2 = 5
+                        W = 40
+                        t = 2
+                        box_angle = BoxAngle(L, A, B, T, R1, R2, W, t)
+                        _place = box_angle.place(origin, uDir, wDir)
+                        point = box_angle.compute_params()
+                        prism = box_angle.create_model()
+                        display.DisplayShape(prism, update=True)
+        elif(index_type==4):
+                if(index_template==1):
+                        B = 40
+                        T = 3
+                        D = 50
+                        t = 2
+                        R1 = 5
+                        R2 = 5
+                        d = 4
+                        b = 4
+                        alpha = 1
+                        length = 100
+                        width = 10
+                        hight = 10
+                        notchObj = Notch(R1, hight, width, length)
+                        TISec = TISection(B, T, D, t, R1, R2, d, b, alpha, length, notchObj)
+                        _place = TISec.place(origin, uDir, shaftDir)
+                        point = TISec.compute_params()
+                        prism = TISec.create_model()
+                        display.DisplayShape(prism, update=True)
+                elif(index_template==2):
+                        B = 45
+                        T = 3
+                        D = 50
+                        t = 2
+                        R1 = 5
+                        R2 = 5
+                        alpha = 1
+                        length = 100
+                        #    width = 10
+                        #    hight = 10
+                        #    d = 10
+                        #    L = 3
+                        #    W = 200
+                        #    H = 90
+                        ISecPlate = cross_isection(B, T, D, t, R1, R2, alpha, length)
+                        #iseccover = IsectionCoverPlate(Isec1, Isec2, plate1, plate2)
+                        ISecPlate.place(origin, uDir, shaftDir)
+                        ISecPlate.compute_params()
+                        prism = ISecPlate.create_model()
+                        display.DisplayShape(prism, update=True)
+                elif(index_template==3):
+                        L = 50
+                        B = 30
+                        H = 50
+                        T = 2
+                        box = Box(L, B, H, T)
+                        _place = box.place(origin, uDir, wDir)
+                        point = box.compute_params()
+                        prism = box.create_model()
+                        display.DisplayShape(prism, update=True)
+        elif(index_type==5):
+                B = 20
+                T = 2
+                D = 40
+                t = 1.5
+                L = 100
+                l = 4
+                W = 100
+                H = 60
+                b = 25
+                d = 50
+                isection_channel = ISectionChannel(B, T, D, t, 0, 0, L, l, W, H, b, d)
+                _place = isection_channel.place(origin, uDir, shaftDir)
+                point = isection_channel.compute_params()
+                prism = isection_channel.create_model()
+                display.DisplayShape(prism, update=True)
+        display.ExportToImage("./ResourceFiles/images/3DSectionfromSectionModeller.png")
 
     def template_change(self,new_index):
         '''
@@ -1468,27 +1625,27 @@ class Ui_OsdagSectionModeller(object):
         self.section_template_combobox.setItemText(0, _translate("Dialog", "-------Select Template-------"))
         self.label_4.setText(_translate("Dialog", "Section Designation:"))
         self.label_5.setText(_translate("Dialog", "Section Properties"))
-        self.Area.setText(_translate("Dialog", "Area(mm²):"))
+        self.Area.setText(_translate("Dialog", "Area(cm²):"))
         self.RG.setText(_translate("Dialog", "Radius of Gyration:"))
-        self.RG_label_1.setText(_translate("Dialog", "Rzz(mm):"))
-        self.RG_label_2.setText(_translate("Dialog", "Ryy(mm):"))
+        self.RG_label_1.setText(_translate("Dialog", "Rzz(cm):"))
+        self.RG_label_2.setText(_translate("Dialog", "Ryy(cm):"))
         self.ESM.setText(_translate("Dialog", "Elastic Section Moduli:"))
-        self.ESM_label_1.setText(_translate("Dialog", "Zzz(mm³):"))
-        self.ESM_label_2.setText(_translate("Dialog", "Zyy(mm³):"))
+        self.ESM_label_1.setText(_translate("Dialog", "Zzz(cm³):"))
+        self.ESM_label_2.setText(_translate("Dialog", "Zyy(cm³):"))
         self.C.setText(_translate("Dialog", "Centroid:"))
-        self.C_label_1.setText(_translate("Dialog", "Cy(mm):"))
-        self.C_label_2.setText(_translate("Dialog", "Cz(mm):"))
+        self.C_label_1.setText(_translate("Dialog", "Cy(cm):"))
+        self.C_label_2.setText(_translate("Dialog", "Cz(cm):"))
         self.MI.setText(_translate("Dialog", "Moment of Inertia:"))
-        self.MI_label_1.setText(_translate("Dialog", "Izz(mm4):"))
-        self.MI_label_2.setText(_translate("Dialog", "Iyy(mm4):"))
-        self.MI_label_3.setText(_translate("Dialog", "Ixy(mm4):"))
+        self.MI_label_1.setText(_translate("Dialog", "Izz(cm4):"))
+        self.MI_label_2.setText(_translate("Dialog", "Iyy(cm4):"))
+        self.MI_label_3.setText(_translate("Dialog", "Ixy(cm4):"))
         self.MI_label_4.setText(_translate("Dialog", "Alpha(°):"))
-        self.MI_label_5.setText(_translate("Dialog", "Iu(mm4):"))
-        self.MI_label_6.setText(_translate("Dialog", "Iv(mm4):"))
+        self.MI_label_5.setText(_translate("Dialog", "Iu(cm4):"))
+        self.MI_label_6.setText(_translate("Dialog", "Iv(cm4):"))
         self.PSM.setText(_translate("Dialog", "Plastic Section Moduli:"))
-        self.PSM_label_1.setText(_translate("Dialog", "Zpy(mm³):"))
-        self.PSM_label_2.setText(_translate("Dialog", "Zpz(mm³):"))
-        self.PSM_label_3.setText(_translate("Dialog", "Czp(mm³):"))
+        self.PSM_label_1.setText(_translate("Dialog", "Zpy(cm³):"))
+        self.PSM_label_2.setText(_translate("Dialog", "Zpz(cm³):"))
+        self.PSM_label_3.setText(_translate("Dialog", "Czp(cm³):"))
         self.saveBtn.setText(_translate("Dialog", "Save"))
         self.exportBtn.setText(_translate("Dialog", "Export"))
 

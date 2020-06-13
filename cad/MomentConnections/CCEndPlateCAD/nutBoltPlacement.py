@@ -50,7 +50,7 @@ class NutBoltArray(object):
         self.row = int(Obj.n_bw_prov)  # int(Obj.n_bw)  # 4    #         #4
         self.col = int(Obj.n_bf_prov) * 2  # 2  # int(Obj.n_bf * 2)  #4    #        #4
         self.webcol = 2
-        self.numOfBolts = Obj.no_bolts  # 12    #
+        self.numOfBolts = Obj.no_bolts_prov  # 12    #
         self.endDist = Obj.end_dist
 
         self.pitch = Obj.pitch
@@ -77,6 +77,15 @@ class NutBoltArray(object):
             elif self.row == 7:
                 self.pitchDist = [self.endDist + self.column.T, self.pitch,
                                   self.pitch, self.p2web, self.p2web, self.pitch, self.pitch]
+            elif self.row == 8:
+                self.pitchDist = [self.endDist + self.column.T, self.pitch,
+                                  self.pitch, self.pitch, self.p2web, self.pitch, self.pitch, self.pitch]
+            elif self.row == 9:
+                self.pitchDist = [self.endDist + self.column.T, self.pitch,
+                                  self.pitch, self.pitch, self.p2web, self.p2web, self.pitch, self.pitch, self.pitch]
+            elif self.row == 8:
+                self.pitchDist = [self.endDist + self.column.T, self.pitch,
+                                  self.pitch, self.pitch, self.pitch, self.p2web, self.pitch, self.pitch, self.pitch, self.pitch]
 
         elif Obj.connection == "Extended Both Ways":
             self.row = self.row + 2

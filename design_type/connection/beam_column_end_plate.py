@@ -456,7 +456,7 @@ class BeamColumnEndPlate(MomentConnection):
                                                                         self.supported_section.root_radius)
 
     def assign_weld_strength(self):
-        # TODO: Use method from weld class
+        # TODO: Move this method to weld class
         self.top_flange_weld.strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
             ultimate_stresses=[self.supported_section.fu, self.top_flange_weld.fu],
             fabrication=self.top_flange_weld.fabrication)
@@ -468,7 +468,7 @@ class BeamColumnEndPlate(MomentConnection):
             fabrication=self.web_weld.fabrication)
         return
 
-    def weld_design(self):
+    def check_fillet_weld1(self):
         """
         axial force is taken by flange and web welds = P/(2*lw+ltf+lbf)
         shear force is taken by web welds only = V/(2*lw)
@@ -507,7 +507,7 @@ class BeamColumnEndPlate(MomentConnection):
         if self.web_weld.strength < web_weld_stress:
             self.web_weld.design_status = False
 
-    def weld_design2(self):
+    def check_fillet_weld2(self):
         """
         axial force is taken by flange and web welds = P/(2*lw+ltf+lbf)
         shear force is taken by web welds only = V/(2*lw)
@@ -565,11 +565,35 @@ class BeamColumnEndPlate(MomentConnection):
             self.web_weld.design_status = False
 
     def groove_weld(self):
-        # weld_method == 'groove'
-        groove_weld_size_flange = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
+        # TODO: Incomplete.
+        self.top_flange_weld.throat_tk = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
             self.supported_section.flange_thickness, self.plate.thickness_provided)
-        groove_weld_size_web = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
+        self.top_flange_weld.size = self.top_flange_weld.throat_tk
+
+        self.web_weld.throat_tk = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
             self.supported_section.web_thickness, self.plate.thickness_provided)
+        self.web_weld.size = self.web_weld.throat_tk
+
+    def weld_design(self):
+        if self.web_weld.type is KEY_DP_WELD_TYPE_FILLET:
+            self.assign_weld_lengths()
+            self.assign_weld_sizes()
+            self.check_fillet_weld2()
+            while self.top_flange_weld.design_status and self.bottom_flange_weld.design_status is False:
+                current_flange_weld_size = min(self.top_flange_weld.size, self.bottom_flange_weld.size)
+                next_flange_weld_size = choose_next_value(current_value=current_flange_weld_size,
+                                                          available_values=ALL_WELD_SIZES)
+                self.top_flange_weld.set_size(next_flange_weld_size)
+                self.bottom_flange_weld.set_size(next_flange_weld_size)
+                self.check_fillet_weld2()
+            while self.web_weld.design_status is False:
+                next_web_weld_size = choose_next_value(current_value=self.web_weld.size,
+                                                       available_values=ALL_WELD_SIZES)
+                self.web_weld.set_size(next_web_weld_size)
+                self.check_fillet_weld2()
+
+        else:
+            pass
 
     def find_bolt_conn_plates_t_fu_fy(self):
         self.bolt_conn_plates_t_fu_fy = [(self.plate.thickness_provided, self.plate.fu, self.plate.fy)]

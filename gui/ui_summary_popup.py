@@ -23,8 +23,9 @@ from design_report.reportGenerator_latex import CreateLatex
 
 class Ui_Dialog1(object):
 
-    def __init__(self,design_exist):
+    def __init__(self,design_exist,loggermsg):
         self.design_exist = design_exist
+        self.loggermsg=loggermsg
 
     def setupUi(self, Dialog,main):
         Dialog.setObjectName("Dialog")
@@ -174,12 +175,16 @@ class Ui_Dialog1(object):
         fname_no_ext = filename.split(".")[0]
         input_summary['filename'] = fname_no_ext
         input_summary['does_design_exist'] = self.design_exist
+        input_summary['logger_messages']=self.loggermsg
         main.save_design(main,input_summary)
         if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
             QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
         else:
-            QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no pdf is open with same name. If error persists send us the log file created in location you are trying to save.')
-
+            logfile=open(fname_no_ext+'.log','r')
+            logs=logfile.read()
+            if('! I can\'t write on file' in logs):
+                QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no pdf is open with same name. If error persists send us the log file created in location you are trying to save.')
+            logfile.close()
 
     def call_designreport(self, main,fileName, report_summary, folder):
         self.alist = main.report_input

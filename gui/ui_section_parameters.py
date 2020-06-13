@@ -9,21 +9,21 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sqlite3
-from Common import *
+from Common import PATH_TO_DATABASE
 
 class Ui_SectionParameters(QtWidgets.QDialog):
     def __init__(self,index_type,index_template):
         super().__init__()
         self.setObjectName("Dialog")
         self.setWindowModality(QtCore.Qt.NonModal)
-        self.resize(319, 300)
+        #self.resize(319, 300)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
         self.setSizePolicy(sizePolicy)
-        self.setMinimumSize(QtCore.QSize(0, 300))
-        self.setMaximumSize(QtCore.QSize(100000, 300))
+        #self.setMinimumSize(QtCore.QSize(0, 300))
+        self.setMaximumSize(QtCore.QSize(100000, 100000))
         self.setModal(True)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
@@ -99,7 +99,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         self.parameterText_2.setObjectName("parameterText_2")
         self.verticalLayout_2.addWidget(self.parameterText_2)
         self.parameterText_3 = QtWidgets.QLineEdit(self)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.parameterText_3.sizePolicy().hasHeightForWidth())
@@ -110,7 +110,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         self.parameterText_3.setObjectName("parameterText_3")
         self.verticalLayout_2.addWidget(self.parameterText_3)
         self.parameterText_4 = QtWidgets.QLineEdit(self)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.parameterText_4.sizePolicy().hasHeightForWidth())
@@ -121,7 +121,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         self.parameterText_4.setObjectName("parameterText_4")
         self.verticalLayout_2.addWidget(self.parameterText_4)
         self.parameterText_5 = QtWidgets.QLineEdit(self)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.parameterText_5.sizePolicy().hasHeightForWidth())
@@ -132,7 +132,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         self.parameterText_5.setObjectName("parameterText_5")
         self.verticalLayout_2.addWidget(self.parameterText_5)
         self.parameterText_6 = QtWidgets.QLineEdit(self)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.parameterText_6.sizePolicy().hasHeightForWidth())
@@ -143,7 +143,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         self.parameterText_6.setObjectName("parameterText_6")
         self.verticalLayout_2.addWidget(self.parameterText_6)
         self.parameterText_7 = QtWidgets.QLineEdit(self)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.parameterText_7.sizePolicy().hasHeightForWidth())
@@ -174,7 +174,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         self.update_parameters(index_type,index_template)
         self.saveBtn.clicked.connect(lambda:self.save_parameters(index_type,index_template))
         self.textBoxVisible={}
-        self.setFixedSize(self.sizeHint())    
+        #self.setFixedSize(self.sizeHint())    
         self.apply_character_validations()   
 
     def apply_character_validations(self):

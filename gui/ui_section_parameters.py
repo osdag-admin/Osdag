@@ -238,10 +238,10 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.textBoxVisible={}
                 return
         elif(index_type==3):
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            cursor = conn.execute("SELECT a FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
+            a = float(cursor.fetchall()[0][0])
             if(index_template==5):
-                conn = sqlite3.connect(PATH_TO_DATABASE)
-                cursor = conn.execute("SELECT a FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
-                a = float(cursor.fetchall()[0][0])
                 if(float(self.parameterText_3.text())<=3*a/2):
                     QtWidgets.QMessageBox.critical(self,'Save Error','Increase the Spacing(s) > '+str(3*a/2))
                     self.textBoxVisible={}
@@ -263,6 +263,11 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             else:
                 if(float(self.parameterText_3.text())!=float(self.parameterText_7.text())):
                     QtWidgets.QMessageBox.critical(self,'Save Error','The following condition is not satisfied:\n\tS=T')
+                    self.textBoxVisible={}
+                    return
+            if(index_template!=3):
+                if(float(self.parameterText_6.text())!=2*a):
+                    QtWidgets.QMessageBox.critical(self,'Save Error',f'The following condition is not satisfied:\n\tL={2*a}')
                     self.textBoxVisible={}
                     return
         elif(index_type==4):

@@ -11,7 +11,6 @@
 .vscode
 *.sqlite
 **/*.sqlite
-*.html
 *.log
 *.bak
 *.pdf
@@ -27,7 +26,6 @@ Osdag_Workspace/*
 /backup
 OUTPUT_FILES/Output_PDF/*
 Output_PDF/*
-OUTPUT_FILES/Output_PDF/*
 ResourceFiles/images/3d.png
 ResourceFiles/Osi_Files/*
 *.xlsx

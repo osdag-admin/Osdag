@@ -34,11 +34,11 @@ class MyTableWidget(QWidget):
         widget.setAutoFillBackground(True)
 
 
-class Window(QMainWindow):
+class Window(QDialog):
 
     def __init__(self, main, input_dictionary):
         super().__init__()
-
+        self.do_not_clear_list = []
         self.initUI(main,input_dictionary)
 
     def center(self):
@@ -55,7 +55,7 @@ class Window(QMainWindow):
         self.setObjectName("DesignPreferences")
         self.setWindowTitle('Design Preference')
         self.tabWidget = MyTableWidget(self)
-
+        self.setLayout(self.tabWidget.layout)
         hlayout = QHBoxLayout()
         self.tabWidget.layout.addLayout(hlayout)
         self.btn_defaults = QPushButton()
@@ -164,6 +164,10 @@ class Window(QMainWindow):
                         font.setBold(False)
                         font.setWeight(50)
                         line.setFont(font)
+                        if lable in [KEY_DISP_FU, KEY_DISP_FY, KEY_DISP_POISSON_RATIO, KEY_DISP_THERMAL_EXP,
+                                     KEY_DISP_MOD_OF_ELAST, KEY_DISP_MOD_OF_RIGID]:
+                            line.setReadOnly(True)
+                            self.do_not_clear_list.append(line)
                         r += 1
 
                     if type == TYPE_COMBOBOX:
@@ -187,6 +191,8 @@ class Window(QMainWindow):
                         item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
                         combo.view().setMinimumWidth(item_width + 30)
                         combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+                        if lable == KEY_DISP_MATERIAL:
+                            self.do_not_clear_list.append(combo)
                         r += 1
 
                     if type == TYPE_TITLE:
@@ -393,7 +399,7 @@ class Window(QMainWindow):
 
             scrollArea.setWidget(scrollAreaWidgetContents)
 
-        self.setCentralWidget(self.tabWidget)
+        # self.setCentralWidget(self.tabWidget)
         #self.tabWidget.resize(self.size())
 
         self.tabWidget.tabs.setCurrentIndex(2)
@@ -403,7 +409,7 @@ class Window(QMainWindow):
         if module in [KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE, KEY_DISP_BCENDPLATE]:
 
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
-            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
@@ -411,7 +417,7 @@ class Window(QMainWindow):
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
             pushButton_Download_Column.clicked.connect(lambda: self.download_Database("Columns"))
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
-            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
             pushButton_Import_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
@@ -421,7 +427,7 @@ class Window(QMainWindow):
 
             if module== KEY_DISP_CLEATANGLE:
                 pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CLEAT)
-                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(DISP_TITLE_CLEAT))
                 pushButton_Add_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CLEAT)
                 pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
                 pushButton_Import_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + DISP_TITLE_CLEAT)
@@ -430,7 +436,7 @@ class Window(QMainWindow):
                 pushButton_Download_Angle.clicked.connect(lambda: self.download_Database("Angles"))
             if module == KEY_DISP_SEATED_ANGLE:
                 pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_SEATED_ANGLE)
-                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+                pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(KEY_DISP_SEATED_ANGLE))
                 pushButton_Add_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_SEATED_ANGLE)
                 pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
                 pushButton_Import_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_SEATED_ANGLE)
@@ -440,7 +446,7 @@ class Window(QMainWindow):
 
         if module == KEY_DISP_COLUMNCOVERPLATE or module == KEY_DISP_COLUMNCOVERPLATEWELD or module == KEY_DISP_COLUMNENDPLATE:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
-            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
@@ -450,7 +456,7 @@ class Window(QMainWindow):
 
         if module == KEY_DISP_BEAMCOVERPLATE or module == KEY_DISP_BEAMCOVERPLATEWELD or module == KEY_DISP_BEAMENDPLATE:
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
-            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
             pushButton_Import_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
@@ -460,7 +466,7 @@ class Window(QMainWindow):
 
         if module == KEY_DISP_COMPRESSION:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
-            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
@@ -468,7 +474,7 @@ class Window(QMainWindow):
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
             pushButton_Download_Column.clicked.connect(lambda: self.download_Database("Columns"))
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
-            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab("Beam"))
+            pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
             pushButton_Import_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
@@ -478,7 +484,7 @@ class Window(QMainWindow):
 
         if module == KEY_DISP_BASE_PLATE:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
-            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab("Column"))
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
@@ -488,7 +494,7 @@ class Window(QMainWindow):
 
         if module == KEY_DISP_TENSION_BOLTED or module == KEY_DISP_TENSION_WELDED:
             pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_ANGLE)
-            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab("Angle"))
+            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(DISP_TITLE_ANGLE))
             pushButton_Add_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_ANGLE)
             pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
             pushButton_Import_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + DISP_TITLE_ANGLE)
@@ -496,7 +502,7 @@ class Window(QMainWindow):
             pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_ANGLE)
             pushButton_Download_Angle.clicked.connect(lambda: self.download_Database("Angles"))
             pushButton_Clear_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Clear_" + DISP_TITLE_CHANNEL)
-            pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab("Channel"))
+            pushButton_Clear_Channel.clicked.connect(lambda: self.clear_tab(DISP_TITLE_CHANNEL))
             pushButton_Add_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
             pushButton_Add_Channel.clicked.connect(self.add_tab_channel)
             pushButton_Import_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Import_" + DISP_TITLE_CHANNEL)
@@ -521,19 +527,17 @@ class Window(QMainWindow):
         '''
         @author: Umair
         '''
-        if tab_name == "Column":
-            tab_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
-            tab = tab_Column
-        elif tab_name == "Beam":
-            tab_Beam = self.tabWidget.tabs.findChild(QtWidgets.QWidget, KEY_DISP_BEAMSEC)
-            tab = tab_Beam
-        for c in tab.findChildren(QtWidgets.QWidget):
-            if isinstance(c, QtWidgets.QComboBox):
-                c.setCurrentIndex(0)
-            elif isinstance(c, QtWidgets.QLineEdit):
-                c.clear()
+        tab = self.tabWidget.tabs.findChild(QtWidgets.QWidget, tab_name)
 
+        if tab:
+            for c in tab.findChildren(QtWidgets.QWidget):
+                if c in self.do_not_clear_list:
+                    continue
 
+                if isinstance(c, QtWidgets.QComboBox):
+                    c.setCurrentIndex(0)
+                elif isinstance(c, QtWidgets.QLineEdit):
+                    c.clear()
 
     def add_tab_column(self):
         '''
@@ -1183,7 +1187,7 @@ class Window(QMainWindow):
 
 class DesignPreferences():
 
-    def __init__(self, main, input_dictionary, parent=None):
+    def __init__(self, main, module_window, input_dictionary, parent=None):
 
         self.ui = Window( main, input_dictionary)
 
@@ -1191,7 +1195,7 @@ class DesignPreferences():
         #self.ui.show()
         self.main_controller = parent
         #self.uiobj = self.main_controller.uiObj
-        # self.module_window = module_window
+        self.module_window = module_window
         self.saved = None
         self.flag = False
         self.sectionalprop = I_sectional_Properties()
@@ -1207,10 +1211,12 @@ class DesignPreferences():
         width = resolution.width()
         height = resolution.height()
         self.ui.resize(width*(0.67),height*(0.60))
-        #self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
-        #self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
+        # self.ui.tabWidget.resize(width * (0.67), height * (0.60))
+        self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
+        self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
         self.ui.center()
-        self.ui.show()
+        self.ui.exec()
+        self.module_window.prev_inputs = self.module_window.input_dock_inputs
 
     def default_fn(self):
         '''

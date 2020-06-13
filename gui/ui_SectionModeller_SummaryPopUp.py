@@ -8,25 +8,10 @@
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
 from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5 import QtCore, QtGui, QtWidgets
-import pdfkit
-import configparser
 import os
-import pickle
-import cairosvg
-# from gui.ui_summary_popup import Ui_Dialog1
-from design_report.reportGenerator import save_html
-from design_report.reportGenerator_latex import CreateLatex
-
-
-
-# from design_type.connection.fin_plate_connection import sa
 
 class Ui_Dialog1(object):
-
-    def __init__(self,design_exist):
-        self.design_exist = design_exist
-
-    def setupUi(self, Dialog,main):
+    def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(539, 595)
         Dialog.setInputMethodHints(QtCore.Qt.ImhNone)
@@ -151,7 +136,7 @@ class Ui_Dialog1(object):
         self.retranslateUi(Dialog)
 
         self.buttonBox.accepted.connect(Dialog.accept)
-        self.buttonBox.accepted.connect(lambda: self.save_inputSummary(main))
+        self.buttonBox.accepted.connect(lambda:self.save_inputSummary(Dialog))
         self.buttonBox.rejected.connect(Dialog.reject)
         self.btn_browse.clicked.connect(self.lbl_browse.clear)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -166,31 +151,18 @@ class Ui_Dialog1(object):
         Dialog.setTabOrder(self.lineEdit_jobNumber, self.lineEdit_client)
         Dialog.setTabOrder(self.lineEdit_client, self.txt_additionalComments)
         Dialog.setTabOrder(self.txt_additionalComments, self.buttonBox)
+        self.input_summary={}
 
-    def save_inputSummary(self,main):
-        input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
+    def save_inputSummary(self,Dialog):
+        self.input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
         file_type = "PDF (*.pdf)"
-        filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
-        fname_no_ext = filename.split(".")[0]
-        input_summary['filename'] = fname_no_ext
-        input_summary['does_design_exist'] = self.design_exist
-        main.save_design(main,input_summary)
-        if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
-            QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
-        else:
-            QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no pdf is open with same name. If error persists send us the log file created in location you are trying to save.')
+        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        fname_no_ext = filename[0].split(".")[0]
+        self.input_summary['filename'] = fname_no_ext
+        Dialog.close()
 
 
-    def call_designreport(self, main,fileName, report_summary, folder):
-        self.alist = main.report_input
-        self.column_details = main.report_supporting
-        self.beam_details = main.report_supported
-        self.result = main.report_result
-        self.Design_Check = main.report_check
-        # save_html(main.report_result, main.report_input, main.report_check, main.report_supporting,main.report_supported, report_summary,fileName, folder)
-        # CreateLatex.\
-        #     save_latex(CreateLatex(),main.report_result, main.report_input, main.report_check, main.report_supporting,
-        #           main.report_supported, report_summary, fileName, folder)
+
     def getPopUpInputs(self):
         input_summary = {}
         input_summary["ProfileSummary"] = {}
@@ -229,12 +201,3 @@ class Ui_Dialog1(object):
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.5pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:11pt;\"><br /></p></body></html>"))
 
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog1()
-    ui.setupUi(Dialog)
-    Dialog.show()
-    sys.exit(app.exec_())

@@ -35,7 +35,6 @@ class OurLog(logging.Handler):
         elif record.levelname == 'INFO':
             msg = "<span style='color: green;'>" + msg + "</span>"
         self.key.append(msg)
-        self.key.append(record.levelname)
 
 def connectdb1():
     """
@@ -91,6 +90,12 @@ def connectdb(table_name, call_type="dropdown"):
 
     elif table_name == "Material":
         cursor = conn.execute("SELECT Grade FROM Material")
+
+    elif table_name == "RHS":
+        cursor = conn.execute("SELECT Designation FROM RHS")
+
+    elif table_name == "SHS":
+        cursor = conn.execute("SELECT Designation FROM SHS")
 
     else:
         cursor = conn.execute("SELECT Designation FROM Columns")
@@ -202,6 +207,25 @@ def get_db_header(table_name):
     header = [description[0] for description in cursor.description]
 
     return header
+
+def get_source(table_name, designation):
+
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+
+    if table_name == "Angles":
+        cursor = conn.execute("SELECT Source FROM Angles WHERE Designation = ?", (designation,))
+
+    elif table_name == "Channels":
+        cursor = conn.execute("SELECT Source FROM Channels WHERE Designation = ?", (designation,))
+
+    elif table_name == "Beams":
+        cursor = conn.execute("SELECT Source FROM Beams WHERE Designation = ?", (designation,))
+
+    else:
+        cursor = conn.execute("SELECT Source FROM Columns WHERE Designation = ?", (designation,))
+
+    source = cursor.fetchone()[0]
+    return str(source)
 
 
 ##########################
@@ -532,6 +556,8 @@ KEY_DISP_AXIAL = 'Axial (kN)'
 KEY_DISP_AXIAL_STAR = 'Axial (kN)* '
 DISP_TITLE_PLATE = 'Plate'
 KEY_DISP_TYP = 'Type'
+KEY_DISP_TYP_ANCHOR = 'Type*'
+KEY_DISP_GRD_ANCHOR = 'Grade*'
 KEY_DISP_GRD_FOOTING = 'Grade*'
 KEY_DISP_GRD = 'Grade'
 
@@ -726,9 +752,9 @@ KEY_DISP_SHEAR_MINOR = ' - Along minor axis (y-y)'
 ###################################
 # Key for Storing Axial sub-key of Load
 KEY_AXIAL_BP = 'Load.Axial_Compression'
-KEY_DISP_AXIAL_BP = 'Axial Compression (kN) *'
+KEY_DISP_AXIAL_BP = 'Axial Compression (kN)'
 KEY_AXIAL_TENSION_BP = 'Load.Axial_Tension'
-KEY_DISP_AXIAL_TENSION_BP = 'Axial Tension/Uplift (kN) *'
+KEY_DISP_AXIAL_TENSION_BP = 'Axial Tension/Uplift (kN)'
 
 
 

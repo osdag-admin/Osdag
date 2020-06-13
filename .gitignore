@@ -26,5 +26,6 @@ OUTPUT_FILES/Output_PDF/*
 Output_PDF/*
 OUTPUT_FILES/Output_PDF/*
 ResourceFiles/images/3d.png
+ResourceFiles/images/3DSectionfromSectionModeller.png
 ResourceFiles/Osi_Files/*
 *.xlsx

@@ -687,7 +687,7 @@ class Ui_OsdagSectionModeller(object):
 
     def export_to_pdf(self):
             '''
-            Method to create and convert information from section modeller into Latex formatted PDF
+            Method to send information from section modeller into Latex creator
             '''
 
             self.summary_dialog=SummaryDialog()
@@ -705,7 +705,7 @@ class Ui_OsdagSectionModeller(object):
                 input_summary['Section Properties']=self.get_section_properties()
                 rel_path = str(sys.path[0])
                 rel_path = rel_path.replace("\\", "/")
-                Disp_3D_image = "/ResourceFiles/images/3d.png"
+                Disp_3D_image = "/ResourceFiles/images/3DSectionfromSectionModeller.png"
                 latex=CreateLatex()
                 latex.save_latex(input_summary,input_summary['filename'],rel_path,Disp_3D_image)
             except KeyError:
@@ -797,6 +797,7 @@ class Ui_OsdagSectionModeller(object):
         if(index_type==1):
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                 Area,B,T,t,Di=map(float,cursor.fetchall()[0])
+                Area*=100
                 l=float(self.SectionParameters.parameterText_6.text())
                 ti=float(self.SectionParameters.parameterText_7.text())
                 S=float(self.SectionParameters.parameterText_3.text())
@@ -834,6 +835,7 @@ class Ui_OsdagSectionModeller(object):
         elif(index_type==2):
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Channels where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                 ChannelArea,B,T,t,Dc=map(float,cursor.fetchall()[0])
+                ChannelArea*=100
                 l=float(self.SectionParameters.parameterText_6.text())
                 ti=float(self.SectionParameters.parameterText_7.text())
                 S=float(self.SectionParameters.parameterText_3.text())
@@ -907,6 +909,7 @@ class Ui_OsdagSectionModeller(object):
                         a,b = cursor.fetchall()[0]
                         cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,t=map(float,cursor.fetchall()[0])
+                        Area*=100
                         ti=float(self.SectionParameters.parameterText_7.text())
                         l=float(self.SectionParameters.parameterText_6.text())
                         A=round((4*Area)+(l*ti),4)
@@ -949,6 +952,9 @@ class Ui_OsdagSectionModeller(object):
                         a,b = cursor.fetchall()[0]
                         cursor = conn.execute("SELECT Area,Iy,Cy,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,Iy,Cy,t=map(float,cursor.fetchall()[0])
+                        Area*=100
+                        Iy*=10000
+                        Cy*=10
                         ti=float(self.SectionParameters.parameterText_7.text())
                         l=float(self.SectionParameters.parameterText_6.text())
                         D=a-t
@@ -996,6 +1002,7 @@ class Ui_OsdagSectionModeller(object):
                         a,b = cursor.fetchall()[0]
                         cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,t=map(float,cursor.fetchall()[0])
+                        Area*=100
                         ti=float(self.SectionParameters.parameterText_7.text())
                         l=float(self.SectionParameters.parameterText_6.text())
                         A=round((2*Area)+(l*ti),4)
@@ -1053,6 +1060,8 @@ class Ui_OsdagSectionModeller(object):
                         a,b = cursor.fetchall()[0]
                         cursor = conn.execute("SELECT Area,Iy,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,Iy,t=map(float,cursor.fetchall()[0])
+                        Area*=100
+                        Iy*=10000
                         ti=float(self.SectionParameters.parameterText_7.text())
                         l=float(self.SectionParameters.parameterText_6.text())
                         A=round((2*Area)+(l*ti),4)
@@ -1100,6 +1109,7 @@ class Ui_OsdagSectionModeller(object):
                        a,b = cursor.fetchall()[0]
                        cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                        Area,t=map(float,cursor.fetchall()[0])
+                       Area*=100
                        ti=float(self.SectionParameters.parameterText_7.text())
                        S=float(self.SectionParameters.parameterText_3.text())
                        l=float(self.SectionParameters.parameterText_5.text())
@@ -1165,6 +1175,7 @@ class Ui_OsdagSectionModeller(object):
                 if(index_template==1):
                         cursor = conn.execute("SELECT Area,B,T,tw,D FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         ISectionArea,B,T,t,Di=map(float,cursor.fetchall()[0])
+                        Area*=100
                         D=Di-(2*T)
                         P,Q=float(self.SectionParameters.parameterText_6.text()),float(self.SectionParameters.parameterText_7.text())
                         A=ISectionArea+(2*P*Q)
@@ -1204,6 +1215,7 @@ class Ui_OsdagSectionModeller(object):
                 elif(index_template==2):
                         cursor = conn.execute("SELECT Area,D,tw,B,T FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         Area,Dc,t,B,T=map(float,cursor.fetchall()[0])
+                        Area*=100
                         D=Dc-(2*T)
                         d=round(((D-(2*T))/2)-t,4)
                         A=round((2*Area)-(t**2),4)
@@ -1294,9 +1306,11 @@ class Ui_OsdagSectionModeller(object):
         elif(index_type==5):
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                 ISectionArea,B,T,t,Di=map(float,cursor.fetchall()[0])
+                ISectionArea*=100
                 D=Di-(2*T)
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Channels where Designation="+repr(self.SectionParameters.parameterText_2.currentText()))
                 ChannelArea,R,P,U,Dc = map(float,cursor.fetchall()[0])
+                ChannelArea*=100
                 Q=Dc-(2*P)
                 S=float(self.SectionParameters.parameterText_3.text())
                 A = ISectionArea+ChannelArea
@@ -1379,7 +1393,6 @@ class Ui_OsdagSectionModeller(object):
                 ISecPlate.place(origin, uDir, shaftDir)
                 prism = ISecPlate.create_model()
                 display.DisplayShape(prism, update=True)
-                display.DisableAntiAliasing()
         elif(index_type==2):
                 if(index_template==1):
                         B = 20
@@ -1396,7 +1409,6 @@ class Ui_OsdagSectionModeller(object):
                         point = channel_section.compute_params()
                         prism = channel_section.create_model()
                         display.DisplayShape(prism, update=True)
-                        display.DisableAntiAliasing()
                 elif(index_template==2):
                         B = 20
                         T = 2
@@ -1412,7 +1424,6 @@ class Ui_OsdagSectionModeller(object):
                         point = channel_section.compute_params()
                         prism = channel_section.create_model()
                         display.DisplayShape(prism, update=True)
-                        display.DisableAntiAliasing()
         elif(index_type==3):
                 if(index_template==1):
                         L = 50
@@ -1428,7 +1439,6 @@ class Ui_OsdagSectionModeller(object):
                         point = star_angle.compute_params()
                         prism = star_angle.create_model()
                         display.DisplayShape(prism, update=True)
-                        display.DisableAntiAliasing()
                 elif(index_template==2):
                         L = 50
                         A = 15
@@ -1443,7 +1453,6 @@ class Ui_OsdagSectionModeller(object):
                         point = star_angle_same.compute_params()
                         prism = star_angle_same.create_model()
                         display.DisplayShape(prism, update=True)
-                        display.DisableAntiAliasing()
                 elif(index_template==3):
                         L = 50
                         A = 15
@@ -1458,7 +1467,6 @@ class Ui_OsdagSectionModeller(object):
                         point = star_angle_opposite.compute_params()
                         prism = star_angle_opposite.create_model()
                         display.DisplayShape(prism, update=True)
-                        display.DisableAntiAliasing()
                 elif(index_template==4):
                         L = 50
                         A = 15
@@ -1473,7 +1481,6 @@ class Ui_OsdagSectionModeller(object):
                         point = star_angle.compute_params()
                         prism = star_angle.create_model()
                         display.DisplayShape(prism, update=True)
-                        display.DisableAntiAliasing()
                 elif(index_template==5):
                         L = 50
                         A = 15
@@ -1488,7 +1495,6 @@ class Ui_OsdagSectionModeller(object):
                         point = box_angle.compute_params()
                         prism = box_angle.create_model()
                         display.DisplayShape(prism, update=True)
-                        display.DisableAntiAliasing()
         elif(index_type==4):
                 if(index_template==1):
                         B = 40
@@ -1509,7 +1515,6 @@ class Ui_OsdagSectionModeller(object):
                         point = TISec.compute_params()
                         prism = TISec.create_model()
                         display.DisplayShape(prism, update=True)
-                        display.DisableAntiAliasing()
                 elif(index_template==2):
                         B = 45
                         T = 3
@@ -1531,7 +1536,6 @@ class Ui_OsdagSectionModeller(object):
                         ISecPlate.compute_params()
                         prism = ISecPlate.create_model()
                         display.DisplayShape(prism, update=True)
-                        display.DisableAntiAliasing()
                 elif(index_template==3):
                         L = 50
                         B = 30
@@ -1542,7 +1546,6 @@ class Ui_OsdagSectionModeller(object):
                         point = box.compute_params()
                         prism = box.create_model()
                         display.DisplayShape(prism, update=True)
-                        display.DisableAntiAliasing()
         elif(index_type==5):
                 B = 20
                 T = 2
@@ -1559,7 +1562,7 @@ class Ui_OsdagSectionModeller(object):
                 point = isection_channel.compute_params()
                 prism = isection_channel.create_model()
                 display.DisplayShape(prism, update=True)
-                display.DisableAntiAliasing()
+        display.ExportToImage("./ResourceFiles/images/3DSectionfromSectionModeller.png")
 
     def template_change(self,new_index):
         '''

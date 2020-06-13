@@ -174,7 +174,6 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         self.update_parameters(index_type,index_template)
         self.saveBtn.clicked.connect(lambda:self.save_parameters(index_type,index_template))
         self.textBoxVisible={}
-        print(self.sizeHint())
         self.setFixedSize(self.sizeHint())    
         self.apply_character_validations()   
 

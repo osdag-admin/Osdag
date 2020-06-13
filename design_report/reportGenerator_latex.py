@@ -241,6 +241,9 @@ class CreateLatex(Document):
                     view_3D.add_image(filename=view_3dimg_path)
 
                     view_3D.add_caption('3D View')
+        
+        with doc.create(Section('Design Log')):
+            doc.append(reportsummary['logger_messages'])
         try:
             doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
         except:

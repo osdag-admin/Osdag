@@ -169,7 +169,7 @@ class Window(QMainWindow):
             return
 
         self.new_window = QtWidgets.QDialog()
-        self.new_ui = Ui_Dialog1(main.design_button_status)
+        self.new_ui = Ui_Dialog1(main.design_button_status,loggermsg=self.textEdit.toPlainText())
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
@@ -1610,7 +1610,6 @@ class Window(QMainWindow):
     def common_function_for_save_and_design(self, main, data, trigger_type):
 
         # @author: Amir
-
         option_list = main.input_values(self)
         self.design_fn(option_list, data, main)
 

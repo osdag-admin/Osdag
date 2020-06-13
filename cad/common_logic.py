@@ -321,81 +321,6 @@ class CommonDesignLogic(object):
 
         return nutDia[boltDia]
 
-    @staticmethod
-    def circular_washer_dimensions(bolt_dia):
-        """ Calculate the dimensions - diameter (inner and outer) and thickness for circular washer (Type A) confirming to IS 6649:1985.
-        The washers are used for high strength structural bolts and nuts.
-
-        Args:
-            bolt_dia: diameter of the bolt in mm (int)
-
-        Returns:
-            inner and outer diameter of the washer in mm (dictionary)
-            thickness of the washer in mm (dictionary)
-
-        Reference - Table 1, IS 6649:1985
-
-        Note: The IS code does not specify dimensions of washer for bolt sizes of M8, M10, M12, M16, M42, M48, M56, M64 and M72
-              The dimensions of these washers are thus calculated/approximated referring to those specified by the code
-        """
-        washer_dimensions = {
-            8: {'dia_in': 10, 'dia_out': 18, 'washer_thk': 4.6},
-            10: {'dia_in': 12, 'dia_out': 20, 'washer_thk': 4.6},
-            12: {'dia_in': 14, 'dia_out': 25, 'washer_thk': 4.6},
-            16: {'dia_in': 18, 'dia_out': 34, 'washer_thk': 4.6},
-            20: {'dia_in': 22, 'dia_out': 42, 'washer_thk': 4.6},
-            22: {'dia_in': 24, 'dia_out': 44, 'washer_thk': 4.6},
-            24: {'dia_in': 26, 'dia_out': 50, 'washer_thk': 4.6},
-            27: {'dia_in': 30, 'dia_out': 66, 'washer_thk': 4.6},
-            30: {'dia_in': 33, 'dia_out': 60, 'washer_thk': 4.6},
-            36: {'dia_in': 39, 'dia_out': 72, 'washer_thk': 4.6},
-            42: {'dia_in': 45, 'dia_out': 85, 'washer_thk': 6.0},
-            48: {'dia_in': 51, 'dia_out': 100, 'washer_thk': 6.0},
-            56: {'dia_in': 59, 'dia_out': 115, 'washer_thk': 6.0},
-            64: {'dia_in': 67, 'dia_out': 130, 'washer_thk': 6.0},
-            72: {'dia_in': 75, 'dia_out': 145, 'washer_thk': 6.0},
-        }[bolt_dia]
-
-        return washer_dimensions
-
-    @staticmethod
-    def square_washer_dimensions(bolt_dia):
-        """ Calculate the dimensions - diameter (inner and outer) and thickness for circular washer (Type B and C) confirming to IS 6649:1985.
-        The washers are used for high strength structural bolts and nuts.
-
-        Args:
-            bolt_dia: diameter of the bolt in mm (int)
-
-        Returns:
-            inner and outer diameter of the washer in mm (dictionary)
-            thickness of the washer in mm (dictionary)
-
-        Reference - Table 2, IS 6649:1985
-
-        Note: The IS code does not specify dimensions of washer for bolt sizes of M8, M10, M12, M16, M42, M48, M56, M64 and M72
-              The dimensions of these washers are thus calculated/approximated referring to those specified by the code
-
-              Table 2 gives washer thickness for tapered washers, however for non-tapered washers, mean thickness is used.
-        """
-        washer_dimensions = {
-            8: {'dia_in': 10, 'side': 25, 'washer_thk': 6.0},
-            10: {'dia_in': 12, 'side': 25, 'washer_thk': 6.0},
-            12: {'dia_in': 14, 'side': 25, 'washer_thk': 6.0},
-            16: {'dia_in': 18, 'side': 45, 'washer_thk': 8.5},
-            20: {'dia_in': 22, 'side': 45, 'washer_thk': 8.5},
-            22: {'dia_in': 24, 'side': 45, 'washer_thk': 8.5},
-            24: {'dia_in': 26, 'side': 45, 'washer_thk': 8.5},
-            27: {'dia_in': 30, 'side': 58, 'washer_thk': 8.5},
-            30: {'dia_in': 33, 'side': 58, 'washer_thk': 8.5},
-            36: {'dia_in': 39, 'side': 58, 'washer_thk': 8.5},
-            42: {'dia_in': 45, 'side': 80, 'washer_thk': 10.0},
-            48: {'dia_in': 51, 'side': 80, 'washer_thk': 10.0},
-            56: {'dia_in': 59, 'side': 100, 'washer_thk': 12.0},
-            64: {'dia_in': 67, 'side': 100, 'washer_thk': 12.0},
-            72: {'dia_in': 75, 'side': 100, 'washer_thk': 12.0},
-        }[bolt_dia]
-
-        return washer_dimensions
 
     def create3DBeamWebBeamWeb(self):
         '''self,uiObj,resultObj,dictbeamdata,dictcoldata):
@@ -793,7 +718,7 @@ class CommonDesignLogic(object):
             beam_R1 = float(B.section.root_radius)
             beam_R2 = float(B.section.toe_radius)
             beam_alpha = float(B.section.flange_slope)
-            beam_length = 800.0
+            beam_length = B.flange_plate.length/2+300
 
             beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
                                  R1=beam_R1, R2=beam_R2, alpha=beam_alpha,

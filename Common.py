@@ -91,6 +91,12 @@ def connectdb(table_name, call_type="dropdown"):
     elif table_name == "Material":
         cursor = conn.execute("SELECT Grade FROM Material")
 
+    elif table_name == "RHS":
+        cursor = conn.execute("SELECT Designation FROM RHS")
+
+    elif table_name == "SHS":
+        cursor = conn.execute("SELECT Designation FROM SHS")
+
     else:
         cursor = conn.execute("SELECT Designation FROM Columns")
     rows = cursor.fetchall()
@@ -181,6 +187,46 @@ def tuple_to_str_red(tl):
         val = ''.join(v)
         arr.append(val)
     return arr
+
+def get_db_header(table_name):
+
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+
+    if table_name == "Angles":
+        cursor = conn.execute("SELECT * FROM Angles")
+
+    elif table_name == "Channels":
+        cursor = conn.execute("SELECT * FROM Channels")
+
+    elif table_name == "Beams":
+        cursor = conn.execute("SELECT * FROM Beams")
+
+    else:
+        cursor = conn.execute("SELECT * FROM Columns")
+
+    header = [description[0] for description in cursor.description]
+
+    return header
+
+def get_source(table_name, designation):
+
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+
+    if table_name == "Angles":
+        cursor = conn.execute("SELECT Source FROM Angles WHERE Designation = ?", (designation,))
+
+    elif table_name == "Channels":
+        cursor = conn.execute("SELECT Source FROM Channels WHERE Designation = ?", (designation,))
+
+    elif table_name == "Beams":
+        cursor = conn.execute("SELECT Source FROM Beams WHERE Designation = ?", (designation,))
+
+    else:
+        cursor = conn.execute("SELECT Source FROM Columns WHERE Designation = ?", (designation,))
+
+    source = cursor.fetchone()[0]
+    return str(source)
+
 
 ##########################
 # Type Keys (Type of input field, tab type etc.)
@@ -376,10 +422,10 @@ VALUES_IMG_TENSIONBOLTED = ["ResourceFiles/images/bA.png","ResourceFiles/images/
 VALUES_IMG_TENSIONWELDED = ["ResourceFiles/images/wA.png","ResourceFiles/images/wBBA.png","ResourceFiles/images/wSA.png","ResourceFiles/images/wC.png","ResourceFiles/images/wBBC.png"]
 VALUES_IMG_TENSIONBOLTED_DF01 = ["ResourceFiles/images/equaldp.png","ResourceFiles/images/bblequaldp.png","ResourceFiles/images/bbsequaldp.png","ResourceFiles/images/salequaldp.png","ResourceFiles/images/sasequaldp.png"]
 VALUES_IMG_TENSIONBOLTED_DF02 = ["ResourceFiles/images/unequaldp.png","ResourceFiles/images/bblunequaldp.png","ResourceFiles/images/bbsunequaldp.png","ResourceFiles/images/salunequaldp.png","ResourceFiles/images/sasunequaldp.png"]
+
 VALUES_IMG_TENSIONBOLTED_DF03 = ["ResourceFiles/images/Slope_Channel.png","ResourceFiles/images/Parallel_Channel.png","ResourceFiles/images/Slope_BBChannel.png","ResourceFiles/images/Parallel_BBChannel.png"]
 
 VALUES_IMG_BEAM = "ResourceFiles/images/Slope_Beam.png"
-
 
 VALUES_BEAMSEC = connectdb("Beams")
 VALUES_SECBM = connectdb("Beams")
@@ -477,6 +523,7 @@ DISP_TITLE_FLANGESPLICEPLATE_OUTER = 'Outer plate '
 DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner plate '
 KEY_DISP_SLENDER = 'Slenderness'
 
+
 KEY_DISP_PLATETHK = 'Thickness(mm)'
 
 DISP_TITLE_TENSION = 'Tension Capacity'
@@ -509,6 +556,8 @@ KEY_DISP_AXIAL = 'Axial (kN)'
 KEY_DISP_AXIAL_STAR = 'Axial (kN)* '
 DISP_TITLE_PLATE = 'Plate'
 KEY_DISP_TYP = 'Type'
+KEY_DISP_TYP_ANCHOR = 'Type*'
+KEY_DISP_GRD_ANCHOR = 'Grade*'
 KEY_DISP_GRD_FOOTING = 'Grade*'
 KEY_DISP_GRD = 'Grade'
 
@@ -703,9 +752,9 @@ KEY_DISP_SHEAR_MINOR = ' - Along minor axis (y-y)'
 ###################################
 # Key for Storing Axial sub-key of Load
 KEY_AXIAL_BP = 'Load.Axial_Compression'
-KEY_DISP_AXIAL_BP = 'Axial Compression (kN) *'
+KEY_DISP_AXIAL_BP = 'Axial Compression (kN)'
 KEY_AXIAL_TENSION_BP = 'Load.Axial_Tension'
-KEY_DISP_AXIAL_TENSION_BP = 'Axial Tension/Uplift (kN) *'
+KEY_DISP_AXIAL_TENSION_BP = 'Axial Tension/Uplift (kN)'
 
 
 

@@ -892,10 +892,10 @@ class ColumnCoverPlate(MomentConnection):
         ###############################################################################
         #Interaction Ratio
         ##############################################################################
-        self.IR_axial = self.load.axial_force * 1000 / self.axial_capacity
-        self.IR_shear = self.load.shear_force * 1000 / self.shear_capacity1
-        self.IR_moment = self.load.moment * 1000000 / self.section.moment_capacity
-        self.sum_IR = self.IR_axial + self.IR_moment
+        self.IR_axial = round(self.load.axial_force * 1000 / self.axial_capacity, 4)
+        self.IR_shear = round(self.load.shear_force * 1000 / self.shear_capacity1, 4)
+        self.IR_moment = round(self.load.moment * 1000000 / self.section.moment_capacity, 4)
+        self.sum_IR = round(self.IR_axial + self.IR_moment, 4)
 
         if self.IR_axial < 0.3 and self.IR_moment < 0.5:
             self.min_axial_load = 0.3 * self.axial_capacity
@@ -2813,12 +2813,7 @@ class ColumnCoverPlate(MomentConnection):
         flange_kh_disp = round(self.flange_bolt.kh, 2)
         flange_bolt_force_kn = round(self.flange_plate.bolt_force, 2)
         flange_bolt_capacity_red_kn = round(self.flange_plate.bolt_capacity_red / 1000, 2)
-        if  self.initial_pt_thk_status == True:
-            self.thick_f = self.flange_plate.thickness_provided
-            self.thick_w = self.web_plate.thickness_provided
-        else:
-            self.thick_f = self.max_thick_f
-            self.thick_w = self.max_thick_w
+
         ########Inner plate#####
         innerflange_connecting_plates = [self.flange_plate.thickness_provided, self.section.flange_thickness]
 
@@ -2851,21 +2846,27 @@ class ColumnCoverPlate(MomentConnection):
         print("res_focce", res_force)
         self.min_web_plate_height = round(self.section.min_plate_height(),2)
 
-        t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        t1 = (SECTION_CLASSIFICATION, "", section_classification(class_of_section=self.class_of_section), "")
+        self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, self.load.axial_force, axial_capacity(area=round(self.section.area, 2),
-                                                              fy=self.section.fy,
-                                                              gamma_m0=gamma_m0,
-                                                              axial_capacity=round(self.axial_capacity / 1000, 2)), '')
+                                                                                 fy=self.section.fy,
+                                                                                 gamma_m0=gamma_m0,
+                                                                                 axial_capacity=round(
+                                                                                     self.axial_capacity / 1000, 2)),
+              '')
         self.report_check.append(t1)
 
-        self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
-                                      self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0), 2)
+        # self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
+        #                               self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0), 2)
 
         t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, self.load.shear_force, shear_capacity(h=h, t=self.section.web_thickness,
-                                                              f_y=self.section.fy, gamma_m0=gamma_m0,
-                                                              shear_capacity=round(self.shear_capacity1 / 1000, 2)), '')
+                                                                                 f_y=self.section.fy, gamma_m0=gamma_m0,
+                                                                                 shear_capacity=round(
+                                                                                     self.shear_capacity1 / 1000, 2)),
+              'Restrict to low shear case')
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', plastic_moment_capacty(beta_b=round(self.beta_b, 2),
                                                                                Z_p=round(self.Z_p, 2),
@@ -2880,44 +2881,53 @@ class ColumnCoverPlate(MomentConnection):
               '')
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, self.load.moment, moment_capacity(Pmc=round(self.Pmc / 1000000, 2),
-                                                                Mdc=round(self.Mdc / 1000000, 2),
-                                                                M_c=round(self.section.moment_capacity / 1000000, 2)),
+                                                                              Mdc=round(self.Mdc / 1000000, 2),
+                                                                              M_c=round(
+                                                                                  self.section.moment_capacity / 1000000,
+                                                                                  2)),
               '')
         self.report_check.append(t1)
-        t1 = ('SubSection', 'Load Consideration', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
-        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE,
-              min_max_axial_capacity(axial_capacity=round(self.axial_capacity / 1000, 2),
-                                     min_ac=round(self.min_axial_load / 1000, 2)),
-              display_prov(round(self.factored_axial_load / 1000, 2), "A_u"),
-              # prov_axial_load(axial_input=self.load.axial_force,min_ac=round(self.min_axial_load / 1000, 2),
-              #                 app_axial_load=round(self.factored_axial_load / 1000, 2)),
-              get_pass_fail2(round(self.min_axial_load / 1000, 2), round(self.factored_axial_load / 1000, 2),
-                             round(self.axial_capacity / 1000, 2)))
+        #####INTERACTION RATIO#######
+
+        t1 = (KEY_INTERACTION_RATIO, '', ir_sum_bb_cc(Al=self.load.axial_force, M=self.load.moment,
+                                                      A_c=round(self.axial_capacity / 1000, 2),
+                                                      M_c=round(self.section.moment_capacity / 1000000, 2),
+                                                      IR_axial=self.IR_axial, IR_moment=self.IR_moment,
+                                                      sum_IR=self.sum_IR), '')
         self.report_check.append(t1)
-        t1 = (KEY_DISP_APPLIED_SHEAR_LOAD,
-              min_max_shear_capacity(shear_capacity=round(self.shear_capacity1 / 1000, 2),
-                                     min_sc=round(self.shear_load1 / 1000, 2)),
-              display_prov(round(self.fact_shear_load / 1000, 2), "V_u"),
-              # prov_shear_load(shear_input=self.load.shear_force,min_sc=round(self.shear_load1 / 1000, 2),
-              #                 app_shear_load=round(self.fact_shear_load / 1000, 2)),
-              get_pass_fail2(round(self.shear_load1 / 1000, 2), round(self.fact_shear_load / 1000, 2),
-                             round(self.shear_capacity1 / 1000, 2)))
+        #############################
+        #### Min load Required ###############
+        t2 = (MIN_LOADS_REQUIRED, min_loads_required(conn="beam_beam"),
+              min_loads_provided(min_ac=round(self.min_axial_load / 1000, 2),
+                                 min_mc=round(self.load_moment_min / 1000000, 2),
+                                 conn="beam_beam"), '')
+        self.report_check.append(t2)
+
+        #############################
+        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, self.load.axial_force,
+              prov_axial_load(axial_input=self.load.axial_force, min_ac=round(self.min_axial_load / 1000, 2),
+                              app_axial_load=round(self.factored_axial_load / 1000, 2),
+                              axial_capacity=round(self.axial_capacity / 1000, 2)), '')
+
         self.report_check.append(t1)
-        t1 = (KEY_DISP_APPLIED_MOMENT_LOAD,
-              min_max_moment_capacity(moment_capacity=round(self.section.moment_capacity / 1000000, 2),
-                                      min_mc=round(self.load_moment_min / 1000000, 2)),
-              display_prov(round(self.load_moment / 1000000, 2), "M_u"),
-              # prov_moment_load(moment_input=self.load.moment,min_mc=round(self.load_moment_min / 1000000, 2),
-              #                  app_moment_load=round(self.load_moment / 1000000, 2)),
-              get_pass_fail2(round(self.load_moment_min / 1000000, 2), round(self.load_moment / 1000000, 2),
-                             round(self.section.moment_capacity / 1000000, 2)))
+        t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, self.load.shear_force,
+              prov_shear_load(shear_input=self.load.shear_force, min_sc=round(self.shear_load1 / 1000, 2),
+                              app_shear_load=round(self.fact_shear_load / 1000, 2),
+                              shear_capacity_1=round(self.shear_capacity1 / 1000, 2)), "")
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_MOMENT_LOAD, self.load.moment,
+              prov_moment_load(moment_input=self.load.moment, min_mc=round(self.load_moment_min / 1000000, 2),
+                               app_moment_load=round(self.load_moment / 1000000, 2),
+                               moment_capacity=round(self.section.moment_capacity / 1000000, 2)), "")
+
         self.report_check.append(t1)
         t23 = (KEY_OUT_DISP_FORCES_WEB, '', forces_in_web(Au=round(self.factored_axial_load / 1000, 2),
                                                           T=self.section.flange_thickness,
                                                           A=round(self.section.area, 2),
                                                           t=self.section.web_thickness, D=self.section.depth,
-                                                          Zw=round(self.Z_p, 2),
+                                                          Zw=round(self.Z_w, 2),
                                                           Mu=round(self.load_moment / 1000000, 2),
                                                           Z=round(self.section.plast_sec_mod_z, 2),
                                                           Mw=round(self.moment_web / 1000000, 2),
@@ -2982,6 +2992,12 @@ class ColumnCoverPlate(MomentConnection):
 
             if self.member_capacity_status == True and (
                     self.section.tension_yielding_capacity > self.flange_force) and self.webheight_status == True:
+                if self.initial_pt_thk_status == True:
+                    self.thick_f = self.flange_plate.thickness_provided
+                    self.thick_w = self.web_plate.thickness_provided
+                else:
+                    self.thick_f = self.max_thick_f
+                    self.thick_w = self.max_thick_w
                 t1 = ('SubSection', 'Flange plate thickness', '|p{2.5cm}|p{5cm}|p{6.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.preference == "Outside":
@@ -2995,16 +3011,18 @@ class ColumnCoverPlate(MomentConnection):
                               flange_plate_area_prov_bolt(B=self.section.flange_width, pref="Outside", y=self.thick_f,
                                                           outerwidth=round(self.outerwidth, 2),
                                                           fp_area=round(self.flange_plate_crs_sec_area, 2),
-                                                          t=self.section.web_thickness, r_1=self.section.root_radius, ),
+                                                          t=self.section.web_thickness,
+                                                          r_1=self.section.root_radius, ),
                               get_pass_fail(self.Ap, self.flange_plate_crs_sec_area, relation="leq"))
-                        self.report_check.append(t2)
+
                 else:
                     t2 = (KEY_DISP_FLANGESPLATE_THICKNESS, display_prov(self.section.flange_thickness / 2, "T"),
-                          display_prov(self.thick_f, "t_{fp}"),
-                          get_pass_fail(self.section.flange_thickness / 2, self.thick_f, relation="lesser"))
+                          display_prov(self.thick_f, "t_{fp}"), get_pass_fail(self.section.flange_thickness / 2,
+                                                                              self.thick_f, relation="lesser"))
                     self.report_check.append(t2)
                     # flange_plate_crs_sec_area = (self.outerwidth + (2 * self.innerwidth)) * self.thick_f
-                    if len(self.flange_plate_thickness_possible) != 0 and self.innerwidth >= 50 and self.outerwidth >= 50:
+                    if len(
+                            self.flange_plate_thickness_possible) != 0 and self.innerwidth >= 50 and self.outerwidth >= 50:
                         t2 = (KEY_DISP_AREA_CHECK, plate_area_req(crs_area=round(self.flange_crs_sec_area, 2),
                                                                   flange_web_area=round(self.Ap, 2)),
                               flange_plate_area_prov_bolt(B=self.section.flange_width, pref="Outside+Inside",
@@ -3016,14 +3034,16 @@ class ColumnCoverPlate(MomentConnection):
                               get_pass_fail(self.Ap, self.flange_plate_crs_sec_area, relation="leq"))
                         self.report_check.append(t2)
 
-            if self.member_capacity_status == True and (self.section.tension_yielding_capacity > self.flange_force) and (
+            if self.member_capacity_status == True and (
+                    self.section.tension_yielding_capacity > self.flange_force) and (
                     len(self.flange_plate_thickness_possible) != 0):
                 t1 = ('SubSection', 'Initial web plate height check', '|p{4.5cm}|p{2.5cm}|p{7cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.preference == "Outside":
 
                     t1 = (
-                        KEY_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
+                        KEY_WEB_PLATE_HEIGHT,
+                        web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
                         web_width_chk_bolt(pref=self.preference, D=self.section.depth,
                                            tk=self.flange_plate.thickness_provided, T=self.section.flange_thickness,
                                            R_1=self.section.root_radius, webplatewidth=self.webplatewidth,
@@ -3034,8 +3054,8 @@ class ColumnCoverPlate(MomentConnection):
                     # self.min_web_plate_height = self.section.min_plate_height()
                     t1 = (
                     KEY_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
-                    web_width_chk_bolt(pref=self.preference, D=self.section.depth, tk=self.flange_plate.thickness_provided,
-                                       T=self.section.flange_thickness,
+                    web_width_chk_bolt(pref=self.preference, D=self.section.depth,
+                                       tk=self.flange_plate.thickness_provided, T=self.section.flange_thickness,
                                        R_1=self.section.root_radius, webplatewidth=self.webplatewidth,
                                        webclearance=self.webclearance),
                     get_pass_fail(self.min_web_plate_height, self.webplatewidth, relation="leq"))
@@ -3438,13 +3458,14 @@ class ColumnCoverPlate(MomentConnection):
                       get_pass_fail(self.section.flange_thickness, self.flange_plate.thickness_provided,
                                     relation="lesser"))
                 self.report_check.append(t1)
+                self.Recheck_flange_pt_area_o = (self.flange_plate.height) * \
+                                                self.flange_plate.thickness_provided
                 t2 = (KEY_DISP_AREA_CHECK, plate_area_req(crs_area=round(self.flange_crs_sec_area, 2),
                                                           flange_web_area=round(self.Ap, 2)),
-                      flange_plate_area_prov_bolt(B=self.section.flange_width, pref="Outside", y=self.thick_f,
-                                                  outerwidth=round(self.outerwidth, 2),
-                                                  fp_area=round(self.flange_plate_crs_sec_area, 2),
-                                                  t=self.section.web_thickness, r_1=self.section.root_radius, ),
-                      get_pass_fail(self.Ap, self.flange_plate_crs_sec_area, relation="leq"))
+                      plate_recheck_area_weld(outerwidth=self.flange_plate.height,
+                                              f_tp=self.flange_plate.thickness_provided, conn="flange",
+                                              pref="Outside"),
+                      get_pass_fail(self.Ap, self.Recheck_flange_pt_area_o, relation="leq"))
                 self.report_check.append(t2)
             else:
                 t1 = ('SubSection', 'Inner and Outer flange plate Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
@@ -3501,15 +3522,15 @@ class ColumnCoverPlate(MomentConnection):
                       get_pass_fail(self.section.flange_thickness / 2, self.flange_plate.thickness_provided,
                                     relation="lesser"))
                 self.report_check.append(t1)
+                self.Recheck_flange_pt_area_oi = (self.flange_plate.height + (2 * self.flange_plate.Innerheight)) * \
+                                                 self.flange_plate.thickness_provided
                 t2 = (KEY_DISP_AREA_CHECK, plate_area_req(crs_area=round(self.flange_crs_sec_area, 2),
                                                           flange_web_area=round(self.Ap, 2)),
-                      flange_plate_area_prov_bolt(B=self.section.flange_width, pref="Outside+Inside",
-                                                  y=self.thick_f,
-                                                  outerwidth=round(self.outerwidth, 2),
-                                                  fp_area=round(self.flange_plate_crs_sec_area, 2),
-                                                  t=self.section.web_thickness, r_1=self.section.root_radius,
-                                                  innerwidth=round(self.innerwidth, 2)),
-                      get_pass_fail(self.Ap, self.flange_plate_crs_sec_area, relation="leq"))
+                      plate_recheck_area_weld(outerwidth=self.flange_plate.height,
+                                              innerwidth=self.flange_plate.Innerheight,
+                                              f_tp=self.flange_plate.thickness_provided, t_wp=None, conn="flange",
+                                              pref="Outside+Inside"),
+                      get_pass_fail(self.Ap, self.Recheck_flange_pt_area_oi, relation="leq"))
                 self.report_check.append(t2)
 
         ################
@@ -3538,13 +3559,14 @@ class ColumnCoverPlate(MomentConnection):
                   display_prov(self.web_plate.thickness_provided, "t_{wp}"),
                   get_pass_fail(self.section.web_thickness / 2, self.web_plate.thickness_provided, relation="lesser"))
             self.report_check.append(t1)
-            t2 = (KEY_DISP_AREA_CHECK, plate_area_req(crs_area=round(self.web_crs_area, 2),
-                                                      flange_web_area=round(self.Wp, 2)),
-                  web_plate_area_prov_bolt(D=self.section.depth, y=self.thick_w,
-                                           webwidth=self.webplatewidth,
-                                           wp_area=round(self.web_plate_crs_sec_area, 2),
-                                           T=self.section.flange_thickness, r_1=self.section.root_radius),
-                  get_pass_fail(self.Wp, self.web_plate_crs_sec_area, relation="lesser"))
+            self.Recheck_web_pt_area_o = (2 * self.web_plate.height) * \
+                                         self.web_plate.thickness_provided
+            t2 = (KEY_DISP_AREA_CHECK, plate_area_req(crs_area=round(self.flange_crs_sec_area, 2),
+                                                      flange_web_area=round(self.Ap, 2)),
+                  plate_recheck_area_weld(outerwidth=self.web_plate.height, innerwidth=None,
+                                          f_tp=None, t_wp=self.web_plate.thickness_provided, conn="web",
+                                          pref=None),
+                  get_pass_fail(self.Ap, self.Recheck_web_pt_area_o, relation="leq"))
             self.report_check.append(t2)
 
         ###################

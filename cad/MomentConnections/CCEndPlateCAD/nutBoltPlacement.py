@@ -83,7 +83,7 @@ class NutBoltArray(object):
             elif self.row == 9:
                 self.pitchDist = [self.endDist + self.column.T, self.pitch,
                                   self.pitch, self.pitch, self.p2web, self.p2web, self.pitch, self.pitch, self.pitch]
-            elif self.row == 8:
+            elif self.row == 10:
                 self.pitchDist = [self.endDist + self.column.T, self.pitch,
                                   self.pitch, self.pitch, self.pitch, self.p2web, self.pitch, self.pitch, self.pitch, self.pitch]
 

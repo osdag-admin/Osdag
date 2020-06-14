@@ -18,7 +18,7 @@ class Connection(Main):
             KEY_MATERIAL] == 'Select Material':
             designation = ''
             material_grade = ''
-            source = ''
+            source = 'Custom'
             fu = ''
             fy = ''
             depth = ''
@@ -213,7 +213,7 @@ class Connection(Main):
             KEY_MATERIAL] == 'Select Material':
             designation = ''
             material_grade = ''
-            source = ''
+            source = 'Custom'
             fu = ''
             fy = ''
             depth = ''

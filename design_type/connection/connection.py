@@ -44,7 +44,7 @@ class Connection(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
-            image= ''
+            image= VALUES_IMG_BEAM[0]
         else:
             designation = str(input_dictionary[KEY_SUPTNGSEC])
             material_grade = str(input_dictionary[KEY_MATERIAL])
@@ -235,7 +235,7 @@ class Connection(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
-            image = ''
+            image = image = VALUES_IMG_BEAM[0]
 
         else:
             designation = str(input_dictionary[KEY_SUPTDSEC])
@@ -270,10 +270,10 @@ class Connection(Main):
             plast_sec_mod_y = str(round((I_sec_attributes.plast_sec_mod_y / 10 ** 3), 2))
             torsion_const = str(round((I_sec_attributes.It / 10 ** 4), 2))
             warping_const = str(round((I_sec_attributes.Iw / 10 ** 6), 2))
-            # if flange_slope != 90:
-            #     image = VALUES_IMG_BEAM[0]
-            # else:
-            #     image = VALUES_IMG_BEAM[1]
+            if flange_slope != 90:
+                image = VALUES_IMG_BEAM[0]
+            else:
+                image = VALUES_IMG_BEAM[1]
 
         if KEY_SUPTDSEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SUPTDSEC_MATERIAL]
@@ -373,10 +373,10 @@ class Connection(Main):
         t28 = (None, None, TYPE_BREAK, None, None)
         supporting_section.append(t28)
 
-        if flange_slope != 90:
-            t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM[0])
-        else:
-            t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM[1])
+        # if flange_slope != 90:
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None,image)
+        # else:
+        #     t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, VALUES_IMG_BEAM[1])
         supporting_section.append(t33)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)

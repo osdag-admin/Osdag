@@ -71,23 +71,24 @@ class ShearConnection(Connection):
             m_o_r = "76.9"
             p_r = "0.3"
             t_e = "12"
-            mass = str(Angle_attributes.mass)
-            area = str(Angle_attributes.area)
-            Cz = str(Angle_attributes.Cz)
-            Cy = str(Angle_attributes.Cy)
-            mom_inertia_z = str(Angle_attributes.mom_inertia_z)
-            mom_inertia_y = str(Angle_attributes.mom_inertia_y)
-            mom_inertia_u = str(Angle_attributes.mom_inertia_u)
-            mom_inertia_v = str(Angle_attributes.mom_inertia_v)
-            rad_of_gy_z = str(Angle_attributes.rad_of_gy_z)
-            rad_of_gy_y = str(Angle_attributes.rad_of_gy_y)
-            rad_of_gy_u = str(Angle_attributes.rad_of_gy_u)
-            rad_of_gy_v = str(Angle_attributes.rad_of_gy_v)
-            elast_sec_mod_z = str(Angle_attributes.elast_sec_mod_z)
-            elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
-            plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
-            plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
-            torsion_const = str(Angle_attributes.It)
+            mass = str(round((Angle_attributes.mass), 2))
+            area = str(round((Angle_attributes.area / 100), 2))
+            Cz = str(round((Angle_attributes.Cz / 10), 2))
+            Cy = str(round((Angle_attributes.Cy / 10), 2))
+            mom_inertia_z = str(round((Angle_attributes.mom_inertia_z) / 10000, 2))
+            mom_inertia_y = str(round((Angle_attributes.mom_inertia_y) / 10000, 2))
+            mom_inertia_u = str(round((Angle_attributes.mom_inertia_u) / 10000, 2))
+            mom_inertia_v = str(round((Angle_attributes.mom_inertia_v) / 10000, 2))
+            rad_of_gy_z = str(round((Angle_attributes.rad_of_gy_z / 10), 2))
+            rad_of_gy_y = str(round((Angle_attributes.rad_of_gy_y / 10), 2))
+            rad_of_gy_u = str(round((Angle_attributes.rad_of_gy_u / 10), 2))
+            rad_of_gy_v = str(round((Angle_attributes.rad_of_gy_v / 10), 2))
+            elast_sec_mod_z = str(round((Angle_attributes.elast_sec_mod_z / 1000), 2))
+            elast_sec_mod_y = str(round((Angle_attributes.elast_sec_mod_y / 1000), 2))
+            plast_sec_mod_z = str(round((Angle_attributes.plast_sec_mod_z / 1000), 2))
+            plast_sec_mod_y = str(round((Angle_attributes.plast_sec_mod_y / 1000), 2))
+            torsion_const = str(round((Angle_attributes.It / 10000), 2))
+
             if a == b:
                 image = VALUES_IMG_TENSIONBOLTED_DF01[0]
             else:
@@ -198,6 +199,15 @@ class ShearConnection(Connection):
         t23 = ('Label_16', KEY_DISP_ROG_RY, TYPE_TEXTBOX, None, rad_of_gy_y)
         section.append(t23)
 
+        t13 = (None, None, TYPE_BREAK, None, None)
+        section.append(t13)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
+        section.append(t33)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        section.append(t17)
+
         t22 = ('Label_17', KEY_DISP_ROG_RU, TYPE_TEXTBOX, None, rad_of_gy_u)
         section.append(t22)
 
@@ -209,15 +219,6 @@ class ShearConnection(Connection):
 
         t25 = ('Label_20', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
         section.append(t25)
-
-        t13 = (None, None, TYPE_BREAK, None, None)
-        section.append(t13)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
-        section.append(t33)
-
-        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
-        section.append(t17)
 
         t26 = ('Label_21', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
         section.append(t26)
@@ -277,7 +278,10 @@ class ShearConnection(Connection):
             pm_z = sec_prop.calc_PlasticModulusZpz(a,b,t,l)
             pm_y = sec_prop.calc_PlasticModulusZpy(a,b,t,l)
             I_t = sec_prop.calc_TorsionConstantIt(a,b,t,l)
-            image = VALUES_IMG_TENSIONBOLTED_DF01[0]
+            if a == b:
+                image = VALUES_IMG_TENSIONBOLTED_DF01[0]
+            else:
+                image = VALUES_IMG_TENSIONBOLTED_DF02[0]
 
 
 
@@ -337,7 +341,10 @@ class ShearConnection(Connection):
         plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
         plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
         torsion_const = str(Angle_attributes.It)
-        image = VALUES_IMG_TENSIONBOLTED_DF01[0]
+        if a == b:
+            image = VALUES_IMG_TENSIONBOLTED_DF01[0]
+        else:
+            image = VALUES_IMG_TENSIONBOLTED_DF02[0]
 
         d = {
             KEY_ANGLE_SELECTED:designation,

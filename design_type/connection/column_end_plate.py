@@ -1810,7 +1810,7 @@ class ColumnEndPlate(MomentConnection):
                                                                                  capacity=bolt_capacity_kn), '')
              self.report_check.append(t4)
         t1 = (KEY_OUT_BOLT_TENSION_CAPACITY, tension_in_bolt_due_to_axial_load_n_moment(P=round(self.factored_axial_load /1000,2),
-                                                                                        n=self.no_bolts,
+                                                                                        n=self.no_bolts_prov,
                                                                                         M=round(self.load_moment/1000,2),
                                                                                         y_max=self.y_max,
                                                                                         y_sqr=round(self.y_sqr ,2),T_b=round(self.t_b/1000 ,2)) ,

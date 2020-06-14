@@ -769,7 +769,7 @@ class Tension_welded(Member):
         self.load = Load(shear_force="", axial_force=design_dictionary.get(KEY_AXIAL))
         self.efficiency = 0.0
         self.K = 1
-
+        self.count = 0
         self.plate = Plate(thickness=self.plate_thickness,
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
         self.weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
@@ -935,22 +935,22 @@ class Tension_welded(Member):
         "selection of member based on the yield capacity"
         min_yield = 0
 
-        self.max_section(self, design_dictionary, self.sizelist)
-        # print(area,gyr,"hgsvfsg")
-        # self.max_size = self.select_section(self, design_dictionary, max)
+        if self.count == 0:
+            self.max_section(self, design_dictionary, self.sizelist)
+            [self.force1, self.len1, self.slen1, self.gyr1] = self.max_force_length(self, self.max_area)
+            [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self, self.max_gyr)
+        else:
+            pass
 
-        [self.force1, self.len1, self.slen1, self.gyr1] = self.max_force_length(self, self.max_area)
-        [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self, self.max_gyr)
-
-        "Loop checking each member from sizelist based on yield capacity"
+        self.count = self.count + 1
+        "Loop checking each member from sizelist based on yield capacity on recheck"
         if (previous_size) == None:
             pass
         else:
-            for i in previous_size:
-                if i in self.sizelist:
-                    self.sizelist.remove(i)
-                else:
-                    pass
+            if previous_size in self.sizelist:
+                self.sizelist.remove(previous_size)
+            else:
+                pass
 
         for selectedsize in self.sizelist:
             # print(self.sizelist)
@@ -1171,11 +1171,9 @@ class Tension_welded(Member):
             if tension_capacity < self.max_tension_yield and self.res_force < self.max_tension_yield:
                 # self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
                 if len(self.sizelist) >= 2:
-                    print("recheck")
                     size = self.section_size_1.designation
-                    self.previous_size.append(size)
-                    print(self.previous_size)
-                    self.initial_member_capacity(self, design_dictionary, self.previous_size)
+                    print("recheck", size)
+                    self.initial_member_capacity(self, design_dictionary, size)
                 else:
                     self.design_status = False
                     logger.warning( " : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
@@ -1314,7 +1312,7 @@ class Tension_welded(Member):
                 self.web_weld = (self.section_size_1.max_leg - 2 * self.weld.size)
             else:
                 self.web_weld = 0.0
-            length_weld = self.section_size_1.angle_weld_length(self.weld.strength,self.web_weld,self.res_force,self.section_size_1.Cy,self.section_size_1.min_leg )
+            length_weld = self.section_size_1.angle_weld_length(self.weld.strength,self.web_weld,self.res_force,self.section_size_1.Cy,self.section_size_1.max_leg )
             self.flange_weld = round_up((length_weld), 1, 50)
             self.weld.length = (self.web_weld + 2 * self.flange_weld)
 
@@ -1411,12 +1409,10 @@ class Tension_welded(Member):
             print("recheck")
             # previous_size = self.section_size_1.designation
             # self.initial_member_capacity(self, design_dictionary, previous_size)
-            if len(self.sizelist)>=2:
-                print("recheck")
+            if len(self.sizelist) >= 2:
                 size = self.section_size_1.designation
-                self.previous_size.append(size)
-                print(self.previous_size)
-                self.initial_member_capacity(self, design_dictionary, self.previous_size)
+                print("recheck", size)
+                self.initial_member_capacity(self, design_dictionary, size)
             else:
                 self.design_status = False
                 logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(

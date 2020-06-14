@@ -103,7 +103,7 @@ class Tension_bolted(Member):
                'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
                'Label_19', 'Label_20', 'Label_21',
                'Label_22', 'Label_23', 'Label_26','Label_27'], TYPE_TEXTBOX, self.get_new_channel_section_properties)
-        change_tab.append(t6)
+        change_tab.append(t3)
 
 
         t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13'],
@@ -931,7 +931,7 @@ class Tension_bolted(Member):
         self.load = Load(shear_force="", axial_force=design_dictionary.get(KEY_AXIAL))
         self.efficiency = 0.0
         self.K = 1
-        self.previous_size = []
+        # self.previous_size = []
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
 
@@ -941,7 +941,7 @@ class Tension_bolted(Member):
                          edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
                          mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
-
+        self.count = 0
         self.member_design_status = False
         self.max_limit_status_1 = False
         self.max_limit_status_2 = False
@@ -1233,25 +1233,24 @@ class Tension_bolted(Member):
     def initial_member_capacity(self,design_dictionary,previous_size = None):
 
         "selection of member based on the yield capacity"
-
         min_yield = 0
 
-        self.max_section(self,design_dictionary,self.sizelist)
-        # print(area,gyr,"hgsvfsg")
-        # self.max_size = self.select_section(self, design_dictionary, max)
+        if self.count == 0:
+            self.max_section(self,design_dictionary,self.sizelist)
+            [self.force1, self.len1, self.slen1, self.gyr1]= self.max_force_length(self,  self.max_area)
+            [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self,  self.max_gyr)
+        else:
+            pass
 
-        [self.force1, self.len1, self.slen1, self.gyr1]= self.max_force_length(self,  self.max_area)
-        [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self,  self.max_gyr)
-
+        self.count = self.count + 1
         "Loop checking each member from sizelist based on yield capacity"
         if (previous_size) == None:
             pass
         else:
-            for i in previous_size:
-                if i in self.sizelist:
-                    self.sizelist.remove(i)
-                else:
-                    pass
+            if previous_size in self.sizelist:
+                self.sizelist.remove(previous_size)
+            else:
+                pass
 
 
         for selectedsize in self.sizelist:
@@ -1848,14 +1847,12 @@ class Tension_bolted(Member):
             # previous_size = self.section_size_1.designation
             # self.initial_member_capacity(self, design_dictionary, previous_size)
             if len(self.sizelist)>=2:
-                print("recheck")
                 size = self.section_size_1.designation
-                self.previous_size.append(size)
-                print(self.previous_size)
-                self.initial_member_capacity(self, design_dictionary, self.previous_size)
+                print("recheck",size )
+                self.initial_member_capacity(self, design_dictionary, size)
             else:
                 self.design_status = False
-                logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(round(self.load.axial_force/1000,2),round(self.force1/1000,2),self.max_area))
+                logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(round(self.load.axial_force,2),round(self.section_size_1.tension_rupture_capacity/1000,2),self.max_area))
                 logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
@@ -2013,11 +2010,9 @@ class Tension_bolted(Member):
                 print(self.section_size_1.designation, "hsdvdhsd")
                 # self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
                 if len(self.sizelist) >= 2:
-                    print("recheck")
                     size = self.section_size_1.designation
-                    self.previous_size.append(size)
-                    print(self.previous_size)
-                    self.initial_member_capacity(self, design_dictionary, self.previous_size)
+                    print("recheck", size)
+                    self.initial_member_capacity(self, design_dictionary, size)
                 else:
                     self.design_status = False
                     logger.warning(" : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.". format(round(self.res_force/1000,2),round(max_tension_yield/1000,2)))

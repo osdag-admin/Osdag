@@ -738,6 +738,8 @@ class BeamCoverPlate(MomentConnection):
 
         self.flange_check_thk =[]
         self.web_check_thk = []
+        # self.previous_thk_flange =[]
+        # self.previous_thk_web =[]
         self.member_capacity_status = False
         self.initial_pt_thk_status = False
         self.initial_pt_thk_status_web = False
@@ -1021,18 +1023,47 @@ class BeamCoverPlate(MomentConnection):
 
         ############################### WEB MENBER CAPACITY CHECK ############################
         ###### # capacity Check for web in axial = yielding
+
         if (previous_thk_flange) == None:
             pass
         else:
-            for i in previous_thk_flange:
-                self.flange_plate.thickness.remove(i)
+            # for i in previous_thk_flange:
+            if previous_thk_flange in self.flange_plate.thickness:
+                self.flange_plate.thickness.remove(previous_thk_flange)
+            else:
+                pass
+
         if (previous_thk_web) == None:
             pass
         else:
-            for i in previous_thk_web:
-                self.web_plate.thickness.remove(i)
+            if previous_thk_web in self.web_plate.thickness:
+                self.web_plate.thickness.remove(previous_thk_web)
+            else:
+                pass
 
 
+        #
+        # if (previous_thk_flange) == None:
+        #     pass
+        # else:
+        #     for i in previous_thk_flange:
+        #         if i in self.flange_plate.thickness:
+        #             self.flange_plate.thickness.remove(i)
+        #         else:
+        #             pass
+        #
+        # if (previous_thk_web) == None:
+        #     pass
+        # else:
+        #     for i in previous_thk_web:
+        #         if i in self.web_plate.thickness:
+        #             self.web_plate.thickness.remove(i)
+        #         else:
+        #             pass
+        print("thickness_previous_list_flange", previous_thk_flange)
+        print("thickness_previous_list_web",previous_thk_web)
+        print("thicknesslist",self.web_plate.thickness)
+        print("thicknesslist", self.flange_plate.thickness)
         self.initial_pt_thk_status = False
         self.initial_pt_thk_status_web =False
         A_v_web = (self.section.depth - 2 * self.section.flange_thickness) * self.section.web_thickness
@@ -1480,7 +1511,7 @@ class BeamCoverPlate(MomentConnection):
         axial_force_w = ((self.section.depth - (2 * self.section.flange_thickness)) *
                          self.section.web_thickness * self.factored_axial_load) / (
                          self.section.area)
-        if self.preference =="Outside+Inside":
+        if self.preference =="Outside + Inside":
             self.flange_plate.Innerheight = round_down(((self.section.flange_width - self.section.web_thickness - (self.section.root_radius * 2)) / 2), 5)
         else:
             self.flange_plate.Innerheight =0
@@ -1702,9 +1733,9 @@ class BeamCoverPlate(MomentConnection):
                 if self.flange_plate.tension_capacity_flange_plate < self.flange_force:
                     if len(self.flange_plate.thickness) >= 2:
                         thk_f = self.flange_plate.thickness_provided
-                        self.flange_check_thk.append(thk_f)
+                        # self.flange_check_thk.append(thk_f)
                         # print(self.previous_size)
-                        self.initial_pt_thk(self, previous_thk_web=self.flange_check_thk)
+                        self.initial_pt_thk(self, previous_thk_flange=  thk_f )
                     else:
                         self.flange_plate_check_status = False
                         self.design_status = False
@@ -1840,9 +1871,9 @@ class BeamCoverPlate(MomentConnection):
                     # self.flange_plate_check_status = False
                     if len(self.flange_plate.thickness) >= 2:
                         thk_f = self.flange_plate.thickness_provided
-                        self.flange_check_thk.append(thk_f)
+                        # self.flange_check_thk.append(thk_f)
                         # print(self.previous_size)
-                        self.initial_pt_thk(self, previous_thk_web=self.flange_check_thk)
+                        self.initial_pt_thk(self, previous_thk_flange= thk_f)
                     else:
                         self.flange_plate_check_status = False
                         self.design_status = False
@@ -2007,9 +2038,11 @@ class BeamCoverPlate(MomentConnection):
                 # self.web_plate_axial_check_status = False
                 if len(self.web_plate.thickness) >= 2:
                     thk = self.web_plate.thickness_provided
-                    self.web_check_thk.append(thk)
+                    # self.web_check_thk =thk
+                    # self.web_check_thk.append(thk)
                     # print(self.previous_size)
-                    self.initial_pt_thk(self,previous_thk_web = self.web_check_thk)
+                    self.initial_pt_thk(self, previous_thk_web=thk)
+                    # self.initial_pt_thk(self,previous_thk_web = self.web_check_thk)
                 else:
                     self.web_plate_axial_check_status = False
                     self.design_status = False
@@ -2086,9 +2119,10 @@ class BeamCoverPlate(MomentConnection):
                 # self.web_shear_plate_check_status = False
                 if len(self.web_plate.thickness) >= 2:
                     thk = self.web_plate.thickness_provided
-                    self.web_check_thk.append(thk)
+
+                    # self.web_check_thk.append(thk)
                     # print(self.previous_size)
-                    self.initial_pt_thk(self, previous_thk_web=self.web_check_thk)
+                    self.initial_pt_thk(self, previous_thk_web=thk)
                 else:
                     self.web_shear_plate_check_status = False
                     self.design_status = False

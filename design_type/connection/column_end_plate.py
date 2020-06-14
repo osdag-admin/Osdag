@@ -1746,26 +1746,26 @@ class ColumnEndPlate(MomentConnection):
                                                                   min_ac=round(self.min_axial_load / 1000, 2)),
              prov_axial_load(axial_input=self.load.axial_force,
                              min_ac=round(self.min_axial_load / 1000, 2),
-                             app_axial_load=round(self.factored_axial_load / 1000, 2)),
+                             app_axial_load=round(self.factored_axial_load / 1000, 2),axial_capacity=round(self.axial_capacity / 1000, 2)),
              get_pass_fail(self.min_axial_load / 1000,
                            self.factored_axial_load / 1000, relation="leq"))
         self.report_check.append(t1)
         t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, min_max_shear_capacity(shear_capacity=round(self.shear_capacity / 1000, 2),
-                                                                 min_sc=round(self.min_shear_load / 1000, 2)),
+                                                                 min_sc=round(self.shear_load1 / 1000, 2)),
              prov_shear_load(shear_input=self.load.shear_force,
-                             min_sc=round( self.min_shear_load / 1000, 2),
-                             app_shear_load=round(self.factored_shear_load / 1000, 2)),
-             get_pass_fail(self.min_shear_load  / 1000,
-                           self.factored_shear_load / 1000, relation="leq"))
+                             min_sc=round( self.shear_load1 / 1000, 2),
+                             app_shear_load=round(self.fact_shear_load / 1000, 2),shear_capacity_1=round(self.shear_capacity / 1000, 2)),
+             get_pass_fail(self.shear_load1  / 1000,
+                           self.fact_shear_load / 1000, relation="leq"))
         self.report_check.append(t1)
 
         t1 = (KEY_DISP_APPLIED_MOMENT_LOAD,
              min_max_moment_capacity(moment_capacity=round(self.section.moment_capacity / 1000000, 2),
-                                     min_mc=round(self.min_moment / 1000000, 2)),
+                                     min_mc=round(self.load_moment_min / 1000000, 2)),
              prov_moment_load(moment_input=self.load.moment,
-                              min_mc=round(self.min_moment / 1000000, 2),
-                              app_moment_load=round(self.factored_moment / 1000000, 2)),
-             get_pass_fail(round(self.min_moment / 1000000, 2),
+                              min_mc=round(self.load_moment_min / 1000000, 2),
+                              app_moment_load=round(self.load_moment / 1000000, 2),moment_capacity=round(self.section.moment_capacity / 1000, 2)),
+             get_pass_fail(round(self.load_moment_min / 1000000, 2),
                            round(self.load.moment / 1000000, 2), relation="leq"))
         self.report_check.append(t1)
 
@@ -1811,13 +1811,13 @@ class ColumnEndPlate(MomentConnection):
              self.report_check.append(t4)
         t1 = (KEY_OUT_BOLT_TENSION_CAPACITY, tension_in_bolt_due_to_axial_load_n_moment(P=round(self.factored_axial_load /1000,2),
                                                                                         n=self.no_bolts,
-                                                                                        M=round(self.factored_moment/1000,2),
+                                                                                        M=round(self.load_moment/1000,2),
                                                                                         y_max=self.y_max,
                                                                                         y_sqr=round(self.y_sqr ,2),T_b=round(self.t_b/1000 ,2)) ,
                tension_capacity_of_bolt(f_ub=self.bolt.bolt_fu,A_nb=self.bolt.bolt_net_area,T_db=round(self.bolt.bolt_tension_capacity /1000 ,2)),
                get_pass_fail(self.t_b,self.bolt.bolt_tension_capacity,relation='leq'))
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_BOLT_SHEAR,shear_force_in_bolts_near_web(V=round(self.factored_shear_load /1000 ,2),n_wb=self.n_bw,V_sb=round(self.v_sb /1000, 2)),
+        t1 = (KEY_OUT_DISP_BOLT_SHEAR,shear_force_in_bolts_near_web(V=round(self.fact_shear_load /1000 ,2),n_wb=self.n_bw_prov*2,V_sb=round(self.v_sb /1000, 2)),
                  round(self.bolt.bolt_capacity /1000,2),
                  get_pass_fail(round(self.v_sb/1000,2) , round(self.bolt.bolt_capacity/1000, 2) , relation='leq'))
         self.report_check.append(t1)

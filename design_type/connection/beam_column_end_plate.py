@@ -478,6 +478,8 @@ class BeamColumnEndPlate(MomentConnection):
         shear force is taken by web welds only = V/(2*lw)
         moment is taken by flange welds only M/(d-tf) / (ltf+lbf)
         """
+        print("Checking the weld size provided assuming axial force is taken by flange and web welds,"
+              " shear force is taken by web welds only and moment is taken by flange welds only")
         # Design forces per unit length of welds due to applied loads
         # Applied axial force acting on unit length of weld group [flange+web welds]
         weld_force_axial = self.load.axial_force / (
@@ -523,6 +525,8 @@ class BeamColumnEndPlate(MomentConnection):
         Total length for web weld = 2* self.web_weld.eff_length
         Weld throat thickness for flange = self.web_weld.throat_tk
         """
+        print("Checking the weld size provided assuming axial force is taken by flange and web welds,"
+              " shear force is taken by web welds only and moment is taken by both flange and web welds")
 
         # Stresses on weld due to applied axial force TODO: Check if this method is correct
         weld_force_axial_stress = self.load.axial_force / (
@@ -578,14 +582,14 @@ class BeamColumnEndPlate(MomentConnection):
         self.web_weld.size = self.web_weld.throat_tk
 
     def weld_design(self):
-        print("Designing weld")
+        print("Designing weld between beam and end plate")
         if self.web_weld.type == KEY_DP_WELD_TYPE_FILLET:
             self.assign_weld_strength()
             self.assign_weld_lengths()
             self.assign_weld_sizes()
             self.check_fillet_weld1()
             while (self.top_flange_weld.design_status and self.bottom_flange_weld.design_status) is False:
-                print("Assigning next available value of weld for flange welds")
+                print("Updating weld size for flange welds")
                 current_flange_weld_size = min(self.top_flange_weld.size, self.bottom_flange_weld.size)
                 next_flange_weld_size = choose_next_value(current_value=current_flange_weld_size,
                                                           available_values=ALL_WELD_SIZES,
@@ -597,7 +601,7 @@ class BeamColumnEndPlate(MomentConnection):
                 self.bottom_flange_weld.set_size(next_flange_weld_size)
                 self.check_fillet_weld1()
             while self.web_weld.design_status is False:
-                print("Assigning next available value of weld for web welds")
+                print("Updating weld size web welds")
                 next_web_weld_size = choose_next_value(current_value=self.web_weld.size,
                                                        available_values=ALL_WELD_SIZES,
                                                        max_value=self.web_weld.max_size)

@@ -179,6 +179,8 @@ class IntermittentWelds():
 
         self.weldsabw = []
         self.weldsblw = []
+        self.weldsabw1 = []
+        self.weldsblw1 = []
         self.plates = []
 
         self.initWeldPlaceParams(plateObj)
@@ -197,6 +199,8 @@ class IntermittentWelds():
         for i in range(self.no_intermitent_connections):
             self.weldsabw.append(FilletWeld(w.h, w.b, w.L))
             self.weldsblw.append(FilletWeld(w.h, w.b, w.L))
+            self.weldsabw1.append(FilletWeld(w.h, w.b, w.L))
+            self.weldsblw1.append(FilletWeld(w.h, w.b, w.L))
             self.plates.append(Plate(p.L, p.W, p.T))
 
     def initWeldPlaceParams(self, plateObj):
@@ -239,13 +243,19 @@ class IntermittentWelds():
             self.plates[index].place(pos0, vDir, uDir)
         for index, pos1 in enumerate(self.weldabwPositions):
             self.weldsabw[index].place(pos1, wDir, uDir)
+            self.weldsabw1[index].place(pos1 + self.intermittentPlate.T * vDir, vDir, uDir)
         for index, pos2 in enumerate(self.weldblwPositions):
             self.weldsblw[index].place(pos2, -wDir, -uDir)
+            self.weldsblw1[index].place(pos2 + self.intermittentPlate.T * vDir, vDir, -uDir)
 
     def create_model(self):
         for weld in self.weldsabw:
             self.weldmodels.append(weld.create_model())
         for weld in self.weldsblw:
+            self.weldmodels.append(weld.create_model())
+        for weld in self.weldsabw1:
+            self.weldmodels.append(weld.create_model())
+        for weld in self.weldsblw1:
             self.weldmodels.append(weld.create_model())
         for plate in self.plates:
             self.platemodels.append(plate.create_model())

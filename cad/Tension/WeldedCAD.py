@@ -8,7 +8,7 @@ import numpy
 import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
-class TensionAngleWeldCAD(object):
+lclass TensionAngleWeldCAD(object):
     def __init__(self, Obj, member, plate, inline_weld, opline_weld):
         """
         :param member: Angle or Channel

@@ -64,7 +64,7 @@ class Member(Main):
             plast_sec_mod_y = ''
             torsional_rigidity = ''
             Type = ''
-            source = ''
+            source = 'Custom'
             m_o_e = "200"
             m_o_r = "76.9"
             p_r = "0.3"
@@ -348,7 +348,7 @@ class Member(Main):
             elast_sec_mod_y = ''
             plast_sec_mod_z = ''
             plast_sec_mod_y = ''
-            source = ''
+            source = 'Custom'
             m_o_e = "200"
             m_o_r = "76.9"
             p_r = "0.3"

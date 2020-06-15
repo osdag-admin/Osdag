@@ -798,6 +798,14 @@ class ColumnCoverPlate(MomentConnection):
         self.design_status = True
 
     def member_capacity(self):
+        """
+        Axial capacity: [Ref: cl.10.7 IS 800:2007]
+        Moment capacity: [Ref: cl.10.7. IS 800:2007]
+        Shear capacity: [Ref: cl.8.4 IS 800:2007]
+        Limit width thickness ratio: [Ref: Table 2, cl. 3.7.2 and 3.7.4 IS 800:2007]
+        Returns:
+
+        """
         self.member_capacity_status = False
         if self.section.type == "Rolled":
             length = self.section.depth
@@ -805,48 +813,42 @@ class ColumnCoverPlate(MomentConnection):
             length = self.section.depth - (
                     2 * self.section.flange_thickness)  # -(2*self.supported_section.root_radius)
         gamma_m0 = 1.1
+
         ############################# Axial Capacity N ############################
         self.axial_capacity = round((self.section.area * self.section.fy) / gamma_m0, 2)  # N
-        self.min_axial_load = 0.3 * self.axial_capacity
-        self.factored_axial_load = round(max(self.load.axial_force * 1000, self.min_axial_load), 2)  # N
-        print("self.factored_axial_load", self.factored_axial_load)
+        self.axial_load_sec_class = round(
+            max(min(self.load.axial_force * 1000, self.axial_capacity), 0.3 * self.axial_capacity), 2)  # N
+
+        # print("self.factored_axial_load", self.factored_axial_load)
 
         ############################# Shear Capacity  # N############################
+        # TODO: Review by anjali. limit shear capacity to 0.6 times
         self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
-                                      self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0),
+                                      self.section.web_thickness * self.section.fy * 0.6) / (
+                                             math.sqrt(3) * gamma_m0),
                                      2)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
-        self.shear_load1 = 0.6 * self.shear_capacity1  # N
-        self.fact_shear_load = round(max(self.shear_load1, self.load.shear_force * 1000), 2)  # N
-        print('shear_force', self.load.shear_force)
+        # TODO: check with sourabh if minimum shear load is min(0.15Vd,40kN)
+        self.shear_load1 = min(0.15 * self.shear_capacity1 / 0.6, 40000.0)  # N
+        # print('shear_force', self.load.shear_force)
 
-        # ###########################################################
-        # if self.factored_axial_load > self.axial_capacity:
-        #     logger.warning(' : Factored axial load is exceeding axial capacity  %2.2f KN' % self.axial_capacity)
-        #     self.member_capacity = False
-        # else:
-        #     if self.fact_shear_load > self.shear_capacity1:
-        #         logger.warning(' : Factored shear load is exceeding shear capacity  %2.2f KN' % self.shear_capacity1)
-        #         self.member_capacity = False
-        #     else:
-        #         self.member_capacity = True
         # #############################################################
-
+        # TODO: to be reviewed by anjali. web section modulus is renamed as Z_wp,Z_we instead of Z_p,Z_e
         self.Z_wp = round(((self.section.web_thickness * (
-                self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4), 2) # mm3
-        print("zpp",self.Z_wp)
-        print("secZp",self.section.plast_sec_mod_z)
+                self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4), 2)  # mm3
         self.Z_we = round(((self.section.web_thickness * (
                 self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 6), 2)  # mm3
+
+        # TODO: To be reviewed by anjali. section modulus is saved in Z_p,Z_e
         self.Z_p = self.section.plast_sec_mod_z
         self.Z_e = self.section.elast_sec_mod_z
-        # if self.member_capacity == True:
+
         if self.section.type == "Rolled":
             self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
                                                                            column_t_w=self.section.web_thickness,
                                                                            D=self.section.depth,
                                                                            column_b=self.section.flange_width,
                                                                            column_fy=self.section.fy,
-                                                                           factored_axial_force=self.factored_axial_load,
+                                                                           factored_axial_force=self.axial_load_sec_class,
                                                                            column_area=self.section.area,
                                                                            compression_element="External",
                                                                            section="Rolled")
@@ -859,7 +861,7 @@ class ColumnCoverPlate(MomentConnection):
                                                                         D=self.section.depth,
                                                                         column_b=self.section.flange_width,
                                                                         column_fy=self.section.fy,
-                                                                        factored_axial_force=self.factored_axial_load,
+                                                                        factored_axial_force=self.axial_load_sec_class,
                                                                         column_area=self.section.area,
                                                                         compression_element="Web of an I-H",
                                                                         section="generally")
@@ -867,6 +869,7 @@ class ColumnCoverPlate(MomentConnection):
             pass
 
         self.class_of_section = int(max(self.limitwidththkratio_flange, self.limitwidththkratio_web))
+        # TODO:Review by anjali. initally Z_w = Z_p and Z_e now changed to Z_wp and Z_we
         if self.class_of_section == 1 or self.class_of_section == 2:
             self.Z_w = self.Z_wp
         elif self.class_of_section == 3:
@@ -877,15 +880,62 @@ class ColumnCoverPlate(MomentConnection):
         elif self.class_of_section == 3:
             self.beta_b = self.Z_e / self.Z_p
         ############################ moment_capacty ############################
+
         self.section.plastic_moment_capacty(beta_b=self.beta_b, Z_p=self.section.plast_sec_mod_z,
-                                            fy=self.section.fy)  # N # for section
+                                            fy=self.section.fy)  # N-mm # for section
+
         self.section.moment_d_deformation_criteria(fy=self.section.fy, Z_e=self.section.elast_sec_mod_z)
-        self.Pmc = self.section.plastic_moment_capactiy
-        self.Mdc = self.section.moment_d_def_criteria
+        self.Pmc = self.section.plastic_moment_capactiy  # N-mm
+        self.Mdc = self.section.moment_d_def_criteria  # N-mm
         self.section.moment_capacity = round(
-            min(self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria), 2)
-        self.load_moment_min = 0.5 * self.section.moment_capacity
+            min(self.section.plastic_moment_capactiy, self.section.moment_d_def_criteria), 2)  # N-mm
+        ###############################################################################
+        #Interaction Ratio
+        ##############################################################################
+        self.IR_axial = self.load.axial_force * 1000 / self.axial_capacity
+        self.IR_shear = self.load.shear_force * 1000 / self.shear_capacity1
+        self.IR_moment = self.load.moment * 1000000 / self.section.moment_capacity
+        self.sum_IR = self.IR_axial + self.IR_moment
+
+        if self.IR_axial < 0.3 and self.IR_moment < 0.5:
+            self.min_axial_load = 0.3 * self.axial_capacity
+            self.load_moment_min = 0.5 * self.section.moment_capacity
+            logger.info( "Loads defined by the user are less than minimun recommendations as per IS 800:2007, Cl.10.7")
+            logger.info("Load values are set at minimun recommendations as per IS 800:2007, Cl.10.7")
+
+
+        elif self.sum_IR <= 1.0 and self.IR_axial < 0.3:
+
+            if (0.3 - self.IR_axial) < (1 - self.sum_IR):
+                self.min_axial_load = 0.3 * self.axial_capacity
+            else:
+                self.min_axial_load = self.load.axial_force * 1000 + ((1 - self.sum_IR) * self.axial_capacity)
+            self.load_moment_min = self.load.moment * 1000000
+            logger.info("Axial force defined by the user is less than minimun recommendation of IS 800:2007, Cl.10.7")
+            logger.info("Axial force is set at {} kN".format(round(self.min_axial_load / 1000, 2)))
+
+        elif self.sum_IR <= 1.0 and self.IR_moment < 0.5:
+
+            if (0.5 - self.IR_moment) < (1 - self.sum_IR):
+                self.load_moment_min = 0.5 * self.section.moment_capacity
+            else:
+                self.load_moment_min = self.load.moment * 1000000 + ((1 - self.sum_IR) * self.section.moment_capacity)
+            self.min_axial_load = self.load.axial_force * 1000
+            logger.info("Moment defined by the user is less than minimun recommendation of IS 800:2007, Cl.10.7")
+            logger.info("Moment value is set at {} kN-m".format(round(self.load_moment_min / 1000000, 2)))
+        else:
+            self.min_axial_load = self.load.axial_force * 1000
+            self.load_moment_min = self.load.moment * 1000000
+
+        ####################
+        """
+        Load Considered
+        """
+        #################
         self.load_moment = round(max(self.load_moment_min, self.load.moment * 1000000), 2)  # N
+        self.factored_axial_load = round(max(self.load.axial_force * 1000, self.min_axial_load), 2)  # N
+        self.fact_shear_load = round(max(self.shear_load1, self.load.shear_force * 1000), 2)  # N
+
         self.moment_web = round((self.Z_w * self.load_moment / (self.section.plast_sec_mod_z)),
                                 2)  # Nm todo add in ddcl # z_w of web & z_p  of section
         self.moment_flange = round(((self.load_moment) - self.moment_web), 2)
@@ -899,38 +949,29 @@ class ColumnCoverPlate(MomentConnection):
 
         ###########################################################
         if self.factored_axial_load > self.axial_capacity:
-            logger.warning(
-                ' : Factored axial load is exceeding axial capacity {} kN.'.format(round(self.axial_capacity/1000, 2)))
+            logger.warning(' : Factored axial load is exceeding axial capacity,  {} kN.'.format(
+                round(self.axial_capacity / 1000, 2)))
             logger.error(" : Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
             self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity1:
-                logger.warning(
-                    ' : Factored shear load is exceeding shear capacity {} kN.'.format(round(self.shear_capacity1/1000, 2)))
-                logger.error(" : Design is not safe. \n ")
+                logger.warning(' : Factored shear load is exceeding 0.6 times shear capacity,  {} kN.'.format(
+                    round(self.shear_capacity1 / 1000, 2)))
+                logger.error(" : High shear cases cannot be designed using Osdag, Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
                 self.member_capacity_status = False
             else:
                 if self.load_moment > self.section.moment_capacity:
                     self.member_capacity_status = False
-                    logger.warning(' : Moment load is exceeding moment capacity  {} kN-m.'.format(round(self.section.moment_capacity/1000000), 2))
+
+                    logger.warning(' : Moment load is exceeding moment capacity  {} kN-m.'.format(
+                        round(self.section.moment_capacity / 1000000), 2))
                     logger.error(" : Design is not safe. \n ")
                     logger.debug(" :=========End Of design===========")
                 else:
                     self.member_capacity_status = True
-
-                    # self.moment_web = (Z_w * self.load_moment / (
-                    #     self.section.plast_sec_mod_z))  # Nm todo add in ddcl # z_w of web & z_p  of section
-                    # self.moment_flange = ((self.load_moment) - self.moment_web)
                     self.initial_pt_thk(self)
-
-        # #############################################################
-        # else :
-        #     self.member_capacity = False
-        #     logger.error(" : Load applied is greater than member capacity. \n ")
-        #     logger.error(" : Design is not safe. \n ")
-        #     logger.debug(" :=========End Of design===========")
 
     def initial_pt_thk(self, previous_thk_flange=None, previous_thk_web=None):
 
@@ -2058,31 +2099,12 @@ class ColumnCoverPlate(MomentConnection):
             else:
                 self.web_shear_plate_check_status = True
                 self.design_status = True
-                if self.load.axial_force * 1000 < self.min_axial_load:
-                    logger.info(
-                        " : Applied axial force is less than minimun axial force carried by the section,the connection design is based on minimun axial force {} kN".format(
-                            round(self.min_axial_load / 1000, 2)))
-                else:
-                    pass
-                if self.load.shear_force * 1000 < self.shear_load1:
-                    logger.info(
-                        " : Applied shear force is less than minimun shear force carried by the section,the connection design is based on minimun shear force {} kN".format(
-                            round(self.shear_load1 / 1000, 2)))
-                else:
-                    pass
-                if self.load.moment * 1000000 < self.load_moment_min:
-                    logger.info(
-                        " : Applied moment is less than minimun moment carried by the section,the connection design is based on minimun moment {} kN-m".format(
-                            round(self.load_moment_min / 1000000, 2)))
-                else:
-                    pass
                 logger.info(": Overall bolted cover plate splice connection design is safe \n")
                 logger.debug(" : =========End Of design===========")
         else:
             self.web_shear_plate_check_status = False
             self.design_status = False
-            logger.warning(
-                ": Block Shear of web plate is less than required fact_shear_load {} kN.".format( self.fact_shear_load))
+            logger.warning(" : Block Shear of web plate is less than required fact_shear_load {} kN.".format( self.fact_shear_load))
             logger.info(": Increase the thickness of the plate")
             logger.error(" : Design is not safe. \n ")
             logger.debug(" : =========End Of design===========")
@@ -2612,110 +2634,114 @@ class ColumnCoverPlate(MomentConnection):
     ################################ Outlist Dict #####################################################################################
 
     def results_to_test(self):
-        test_in_list = {KEY_MODULE: self.module,
-                        KEY_MAIN_MODULE: self.mainmodule,
-                        KEY_DISP_SEC_PROFILE: "ISection",
-                        KEY_DISP_COLSEC: self.section.designation,
-                        KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
-                        KEY_MATERIAL: self.section.material,
-                        KEY_SEC_FU: self.section.fu,
-                        KEY_SEC_FY: self.section.fy,
-                        KEY_D: self.bolt.bolt_diameter,
-                        KEY_GRD: self.bolt.bolt_grade,
-                        KEY_TYP: self.bolt.bolt_type,
-                        KEY_FLANGEPLATE_THICKNESS: self.flange_plate.thickness,
-                        KEY_WEBPLATE_THICKNESS: self.web_plate.thickness,
-                        KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-                        KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
-                        KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-                        KEY_DP_DETAILING_GAP: self.flange_plate.gap,
-                        KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+        # test_in_list = {KEY_MODULE: self.module,
+        #                 KEY_MAIN_MODULE: self.mainmodule,
+        #                 KEY_DISP_SEC_PROFILE: "ISection",
+        #                 KEY_DISP_COLSEC: self.section.designation,
+        #                 KEY_DISP_FLANGESPLATE_PREFERENCES: self.preference,
+        #                 KEY_MATERIAL: self.section.material,
+        #                 KEY_SEC_FU: self.section.fu,
+        #                 KEY_SEC_FY: self.section.fy,
+        #                 KEY_D: self.bolt.bolt_diameter,
+        #                 KEY_GRD: self.bolt.bolt_grade,
+        #                 KEY_TYP: self.bolt.bolt_type,
+        #                 KEY_FLANGEPLATE_THICKNESS: self.flange_plate.thickness,
+        #                 KEY_WEBPLATE_THICKNESS: self.web_plate.thickness,
+        #                 KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+        #                 KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+        #                 KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+        #                 KEY_DP_DETAILING_GAP: self.flange_plate.gap,
+        #                 KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
 
-        test_out_list = {KEY_FLANGE_PITCH: self.flange_plate.pitch_provided,
-                         KEY_ENDDIST_FLANGE: self.flange_plate.end_dist_provided,
-                         KEY_FLANGE_PLATE_GAUGE: self.flange_plate.gauge_provided,
-                         KEY_EDGEDIST_FLANGE: self.flange_plate.edge_dist_provided,
-                         # def webspacing(self, flag):
-                         KEY_WEB_PITCH: self.web_plate.pitch_provided,
-                         KEY_ENDDIST_W: self.web_plate.end_dist_provided,
-                         KEY_WEB_GAUGE: self.web_plate.gauge_provided,
-                         KEY_EDGEDIST_W: self.web_plate.edge_dist_provided,
+        if self.bolt.bolt_type == TYP_BEARING:
+            flange_bolt_bearing_cap_disp = round(self.flange_bolt.bolt_bearing_capacity / 1000, 2)
+            web_bolt_bearing_cap_disp = round(self.web_bolt.bolt_bearing_capacity / 1000, 2)
+        else:
+            flange_bolt_bearing_cap_disp = 'N/A'
+            web_bolt_bearing_cap_disp = 'N/A'
 
-                         # def flangecapacity(self, flag):
-                         KEY_TENSIONYIELDINGCAP_FLANGE: round(self.section.tension_yielding_capacity / 1000, 2),
-                         KEY_TENSIONRUPTURECAP_FLANGE: round(self.section.tension_rupture_capacity / 1000, 2),
-                         KEY_BLOCKSHEARCAP_FLANGE: round(self.section.block_shear_capacity / 1000, 2),
-                         KEY_FLANGE_TEN_CAPACITY: round(self.section.tension_capacity_flange / 1000, 2),
-                         # falnge plate capacities
-                         KEY_TENSIONYIELDINGCAP_FLANGE_PLATE: round(self.flange_plate.tension_yielding_capacity / 1000,
-                                                                    2),
-                         KEY_TENSIONRUPTURECAP_FLANGE_PLATE: round(self.flange_plate.tension_rupture_capacity / 1000,
-                                                                   2),
-                         KEY_BLOCKSHEARCAP_FLANGE_PLATE: round(self.flange_plate.block_shear_capacity / 1000, 2),
-                         KEY_FLANGE_PLATE_TEN_CAP: round(self.flange_plate.tension_capacity_flange_plate / 1000, 2),
+        test_out_list = {  # applied loads
+                                KEY_DISP_APPLIED_AXIAL_FORCE: round(self.factored_axial_load / 1000, 2),
+                                KEY_DISP_APPLIED_SHEAR_LOAD: round(self.fact_shear_load / 1000, 2),
+                                KEY_DISP_APPLIED_MOMENT_LOAD: round(self.load_moment / 1000000, 2),
+                                # Diameter and grade
+                                KEY_OUT_D_PROVIDED: self.bolt.bolt_diameter_provided,
+                                KEY_OUT_GRD_PROVIDED: self.bolt.bolt_grade_provided,
+                                # webplate dimensions
+                                KEY_WEB_PLATE_HEIGHT: self.web_plate.height,
+                                KEY_WEB_PLATE_LENGTH: self.web_plate.length,
+                                KEY_OUT_WEBPLATE_THICKNESS: self.web_plate.thickness_provided,
+                                # Web spacing
+                                KEY_WEB_PITCH: self.web_plate.pitch_provided,
+                                KEY_ENDDIST_W: self.web_plate.end_dist_provided,
+                                KEY_WEB_GAUGE: self.web_plate.gauge_provided,
+                                KEY_EDGEDIST_W: self.web_plate.edge_dist_provided,
 
-                         # def webcapacity(self, flag):
-                         KEY_TENSIONYIELDINGCAP_WEB: round(self.section.tension_yielding_capacity_web / 1000, 2),
-                         KEY_TENSIONRUPTURECAP_WEB: round(self.section.tension_rupture_capacity_web / 1000, 2),
-                         KEY_TENSIONBLOCK_WEB: round(self.section.block_shear_capacity_web / 1000, 2),
-                         KEY_WEB_TEN_CAPACITY: round(self.section.tension_capacity_web / 1000, 2),
-                         # web plate capac in axial
-                         KEY_TEN_YIELDCAPACITY_WEB_PLATE: round(self.web_plate.tension_yielding_capacity / 1000, 2),
-                         KEY_TENSION_RUPTURECAPACITY_WEB_PLATE: round(self.web_plate.tension_rupture_capacity / 1000,
-                                                                      2),
-                         KEY_TENSION_BLOCKSHEARCAPACITY_WEB_PLATE: round(self.web_plate.block_shear_capacity / 1000, 2),
-                         KEY_WEB_PLATE_CAPACITY: round(self.web_plate.tension_capacity_web_plate / 1000, 2),
-                         # shear
-                         KEY_SHEARYIELDINGCAP_WEB_PLATE: round(self.web_plate.shear_yielding_capacity / 1000, 2),
-                         KEY_SHEARRUPTURECAP_WEB_PLATE: round(self.web_plate.shear_rupture_capacity / 1000, 2),
-                         KEY_BLOCKSHEARCAP_WEB_PLATE: round(self.web_plate.block_shear_capacity_shear / 1000, 2),
-                         KEY_WEBPLATE_SHEAR_CAPACITY_PLATE: round(self.web_plate.shear_capacity_web_plate / 1000, 2),
-                         KEY_WEB_PLATE_MOM_DEMAND: round(self.web_plate.moment_demand / 1000000, 2),
+                                # def web_bolt_capacity(self, flag):
+                                KEY_WEB_BOLT_LINE: (self.web_plate.bolt_line),
+                                KEY_WEB_BOLTS_ONE_LINE: (self.web_plate.bolts_one_line),
+                                KEY_WEB_BOLTS_REQ: (self.web_plate.bolts_required),
+                                'WebBolt.ShearCapacity': round(self.web_bolt.bolt_shear_capacity / 1000, 2),
+                                'WebBolt.BearingCapacity': web_bolt_bearing_cap_disp,
+                                'WebBolt.Capacity': round(self.web_bolt.bolt_capacity / 1000, 2),
+                                'WebBolt.Force': round(self.web_plate.bolt_force / 1000, 2),
 
-                         # def member_capacityoutput(self, flag):
-                         KEY_MEMBER_MOM_CAPACITY: round(self.section.moment_capacity / 1000000, 2),
-                         KEY_MEMBER_SHEAR_CAPACITY: round(self.shear_capacity1 / 1000, 2),
-                         KEY_MEMBER_AXIALCAPACITY: round(self.axial_capacity / 1000, 2),
-                         KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY: round(self.Pmc / 1000000, 2),
-                         KEY_OUT_DISP_MOMENT_D_DEFORMATION: round(self.Mdc / 1000000, 2),
-                         # applied loads
-                         KEY_DISP_APPLIED_AXIAL_FORCE: round(self.factored_axial_load / 1000, 2),
-                         KEY_DISP_APPLIED_SHEAR_LOAD: round(self.fact_shear_load / 1000, 2),
-                         KEY_DISP_APPLIED_MOMENT_LOAD: round(self.load_moment / 1000000, 2),
+                                # flange plate_outer
+                                KEY_FLANGE_PLATE_HEIGHT: self.flange_plate.height,
+                                KEY_FLANGE_PLATE_LENGTH: self.plate_out_len,
+                                KEY_OUT_FLANGESPLATE_THICKNESS: self.flange_out_plate_tk,
+                                # flange plate_inner
+                                KEY_INNERFLANGE_PLATE_HEIGHT: self.flange_plate.Innerheight,
+                                KEY_INNERFLANGE_PLATE_LENGTH: self.plate_in_len,
+                                KEY_INNERFLANGEPLATE_THICKNESS: self.flange_in_plate_tk,
+                                # Flange spacing
+                                KEY_FLANGE_PITCH: self.flange_plate.pitch_provided,
+                                KEY_ENDDIST_FLANGE: self.flange_plate.end_dist_provided,
+                                KEY_FLANGE_PLATE_GAUGE: self.flange_plate.gauge_provided,
+                                KEY_EDGEDIST_FLANGE: self.flange_plate.edge_dist_provided,
+                                # def flange_bolt_capacity
+                                KEY_FLANGE_BOLT_LINE: (self.flange_plate.bolt_line),
+                                KEY_FLANGE_BOLTS_ONE_LINE: (self.flange_plate.bolts_one_line),
+                                KEY_FLANGE_BOLTS_REQ: (self.flange_plate.bolts_required),
+                                'FlangeBolt.ShearCapacity': round(self.flange_bolt.bolt_shear_capacity / 1000, 2),
+                                'FlangeBolt.BearingCapacity': flange_bolt_bearing_cap_disp,
+                                'FlangeBolt.Capacity': round(self.flange_bolt.bolt_capacity / 1000, 2),
+                                'FlangeBolt.Force': round(self.flange_plate.bolt_force / 1000, 2),
 
-                         # def flange_bolt_capacity
-                         KEY_FLANGE_BOLT_LINE: (self.flange_plate.bolt_line),
-                         KEY_FLANGE_BOLTS_ONE_LINE: (self.flange_plate.bolts_one_line),
-                         KEY_FLANGE_BOLTS_REQ: (self.flange_plate.bolts_required),
-                         KEY_OUT_BOLT_SHEAR: round(self.flange_bolt.bolt_shear_capacity / 1000, 2),
-                         KEY_OUT_BOLT_BEARING: round(self.flange_bolt.bolt_bearing_capacity / 1000, 2),
-                         KEY_OUT_BOLT_CAPACITY: round(self.flange_bolt.bolt_capacity / 1000, 2),
-                         KEY_OUT_BOLT_FORCE: round(self.flange_plate.bolt_force / 1000, 2),
+                                # def flangecapacity(self, flag):
+                                KEY_TENSIONYIELDINGCAP_FLANGE: round(self.section.tension_yielding_capacity / 1000, 2),
+                                KEY_TENSIONRUPTURECAP_FLANGE: round(self.section.tension_rupture_capacity / 1000, 2),
+                                KEY_BLOCKSHEARCAP_FLANGE: round(self.section.block_shear_capacity / 1000, 2),
+                                KEY_FLANGE_TEN_CAPACITY: round(self.section.tension_capacity_flange / 1000, 2),
+                                # flange plate capacities
+                                KEY_TENSIONYIELDINGCAP_FLANGE_PLATE: round(self.flange_plate.tension_yielding_capacity / 1000, 2),
+                                KEY_TENSIONRUPTURECAP_FLANGE_PLATE: round(self.flange_plate.tension_rupture_capacity / 1000, 2),
+                                KEY_BLOCKSHEARCAP_FLANGE_PLATE: round(self.flange_plate.block_shear_capacity / 1000, 2),
+                                KEY_FLANGE_PLATE_TEN_CAP: round(self.flange_plate.tension_capacity_flange_plate / 1000, 2),
 
-                         # def web_bolt_capacity(self, flag):
-                         KEY_WEB_BOLT_LINE: (self.web_plate.bolt_line),
-                         KEY_WEB_BOLTS_ONE_LINE: (self.web_plate.bolts_one_line),
-                         KEY_WEB_BOLTS_REQ: (self.web_plate.bolts_required),
-                         KEY_OUT_BOLT_SHEAR: round(self.web_bolt.bolt_shear_capacity / 1000, 2),
-                         KEY_OUT_BOLT_BEARING: self.web_bolt.bolt_bearing_capacity,
-                         KEY_OUT_BOLT_CAPACITY: round(self.web_bolt.bolt_capacity / 1000, 2),
-                         KEY_OUT_BOLT_FORCE: round(self.web_plate.bolt_force / 1000, 2),
-
-                         # def output_values(self, flag):
-                         KEY_OUT_D_PROVIDED: self.bolt.bolt_diameter_provided,
-                         KEY_OUT_GRD_PROVIDED: self.bolt.bolt_grade_provided,
-                         # webplate
-                         KEY_WEB_PLATE_HEIGHT: self.web_plate.height,
-                         KEY_WEB_PLATE_LENGTH: self.web_plate.length,
-                         KEY_DISP_WEBPLATE_THICKNESS: self.web_plate.thickness_provided,
-                         # flange plate_outer
-                         KEY_FLANGE_PLATE_HEIGHT: self.flange_plate.height,
-                         KEY_FLANGE_PLATE_LENGTH: self.plate_out_len,
-                         KEY_DISP_FLANGESPLATE_THICKNESS: self.flange_out_plate_tk,
-                         # flange plate_inner
-                         KEY_INNERFLANGE_PLATE_HEIGHT: self.flange_plate.Innerheight,
-                         KEY_INNERFLANGE_PLATE_LENGTH: self.plate_in_len,
-                         KEY_INNERFLANGEPLATE_THICKNESS: self.flange_in_plate_tk}
+                                # def webcapacity(self, flag):
+                                KEY_TENSIONYIELDINGCAP_WEB: round(self.section.tension_yielding_capacity_web / 1000, 2),
+                                KEY_TENSIONRUPTURECAP_WEB: round(self.section.tension_rupture_capacity_web / 1000, 2),
+                                KEY_TENSIONBLOCK_WEB: round(self.section.block_shear_capacity_web / 1000, 2),
+                                KEY_WEB_TEN_CAPACITY: round(self.section.tension_capacity_web / 1000, 2),
+                                # web plate capac in axial
+                                KEY_TEN_YIELDCAPACITY_WEB_PLATE: round(self.web_plate.tension_yielding_capacity / 1000, 2),
+                                KEY_TENSION_RUPTURECAPACITY_WEB_PLATE: round(self.web_plate.tension_rupture_capacity / 1000, 2),
+                                KEY_TENSION_BLOCKSHEARCAPACITY_WEB_PLATE: round(self.web_plate.block_shear_capacity / 1000, 2),
+                                KEY_WEB_PLATE_CAPACITY: round(self.web_plate.tension_capacity_web_plate / 1000, 2),
+                                # shear
+                                KEY_SHEARYIELDINGCAP_WEB_PLATE: round(self.web_plate.shear_yielding_capacity / 1000, 2),
+                                KEY_SHEARRUPTURECAP_WEB_PLATE: round(self.web_plate.shear_rupture_capacity / 1000, 2),
+                                KEY_BLOCKSHEARCAP_WEB_PLATE: round(self.web_plate.block_shear_capacity_shear / 1000, 2),
+                                KEY_WEBPLATE_SHEAR_CAPACITY_PLATE: round(self.web_plate.shear_capacity_web_plate / 1000, 2),
+                                KEY_WEB_PLATE_MOM_DEMAND: round(self.web_plate.moment_demand / 1000000, 2),
+                                # def member_capacityoutput(self, flag):
+                                KEY_MEMBER_MOM_CAPACITY: round(self.section.moment_capacity / 1000000, 2),
+                                KEY_MEMBER_SHEAR_CAPACITY: round(self.shear_capacity1 / 1000, 2),
+                                KEY_MEMBER_AXIALCAPACITY: round(self.axial_capacity / 1000, 2),
+                                KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY: round(self.Pmc / 1000000, 2),
+                                KEY_OUT_DISP_MOMENT_D_DEFORMATION: round(self.Mdc / 1000000, 2)}
+        return test_out_list
 
     ################################ Design Report #####################################################################################
 

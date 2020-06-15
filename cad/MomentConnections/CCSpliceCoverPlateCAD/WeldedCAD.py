@@ -305,7 +305,6 @@ class CCSpliceCoverPlateWeldedCAD(object):
 
         self.webPlateWeldW22Model = self.webPlateWeldW22.create_model()
 
-        # Todo: Add if statement for inner plate condition
         if self.C.preference != 'Outside':
             # innerplate1 (right top)
             innerFlangePlatespacing = self.flangespace + self.column.t / 2 + self.column.R1
@@ -486,7 +485,6 @@ class CCSpliceCoverPlateWeldedCAD(object):
         :return: CAD model for all the plates
         """
 
-        # Todo: Ad an ifelse statement for outer and inner plates
 
         if self.C.preference != 'Outside':
             plates_sec = [self.flangePlate1Model, self.flangePlate2Model, self.innerFlangePlate1Model,
@@ -507,7 +505,6 @@ class CCSpliceCoverPlateWeldedCAD(object):
         """
         :return: CAD model for all the welds
         """
-        # Todo: Add an ifelse statement for outer and inner plate wleds
         if self.C.preference != 'Outside':
             welded_sec = [self.flangePlateWeldL11Model, self.flangePlateWeldL12Model, self.flangePlateWeldL21Model,
                           self.flangePlateWeldL22Model, self.flangePlateWeldW11Model, self.flangePlateWeldW12Model,

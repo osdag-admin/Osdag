@@ -1798,8 +1798,7 @@ class ColumnCoverPlate(MomentConnection):
                       self.flange_plate.thickness_provided
                 # todo add in DDCl and diagram
                 Atn = 2 * ((self.flange_plate.bolts_one_line / 2 - 1) *
-                           self.flange_plate.gauge_provided - ((
-                                                                           self.flange_plate.bolts_one_line / 2 - 0.5) * self.flange_bolt.dia_hole) + self.flange_plate.edge_dist_provided) * \
+                           self.flange_plate.gauge_provided - ((self.flange_plate.bolts_one_line / 2 - 0.5) * self.flange_bolt.dia_hole) + self.flange_plate.edge_dist_provided) * \
                       self.flange_plate.thickness_provided
                 # todo add in DDCl
                 self.flange_plate_block_shear_capacity_inside = self.block_shear_strength_plate(A_vg=Avg, A_vn=Avn,
@@ -1889,14 +1888,15 @@ class ColumnCoverPlate(MomentConnection):
         while design_status_block_shear == False:
             Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
                   self.section.web_thickness
-            Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
-                    self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole + end_dist) * \
+            Avn = 2 * (((self.web_plate.bolt_line - 1) * pitch) - ((
+                    self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole) + end_dist) * \
                   self.section.web_thickness
+            # print("web blockshear avg",Avn)
             Atg = (self.web_plate.edge_dist_provided + (
                     self.web_plate.bolts_one_line - 1) * gauge) * self.section.web_thickness
             Atn = (self.web_plate.edge_dist_provided + (
-                    self.web_plate.bolts_one_line - 1) * gauge - (
-                           self.web_plate.bolts_one_line - 1) * self.web_bolt.dia_hole) * self.section.web_thickness
+                    self.web_plate.bolts_one_line - 1) * gauge - ((
+                           self.web_plate.bolts_one_line - 1) * self.web_bolt.dia_hole)) * self.section.web_thickness
 
             self.section.block_shear_capacity_web = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
                                                                                       A_tn=Atn,
@@ -1970,8 +1970,8 @@ class ColumnCoverPlate(MomentConnection):
         while design_status_block_shear == False:
             Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
                   self.web_plate.thickness_provided
-            Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
-                    self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole + end_dist) * \
+            Avn = 2 * (((self.web_plate.bolt_line - 1) * pitch) - ((
+                    self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole) + end_dist) * \
                   self.web_plate.thickness_provided
             Atg = (self.web_plate.edge_dist_provided + (
                     self.web_plate.bolts_one_line - 1) * gauge) * self.web_plate.thickness_provided
@@ -2057,8 +2057,8 @@ class ColumnCoverPlate(MomentConnection):
         while design_status_block_shear == False:
             Atg = (((
                                 self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
-            Atn = (((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) + ((
-                                                                                               self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
+            Atn = (((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) -
+                   ((self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
             Avg = (self.web_plate.edge_dist_provided + (
                     self.web_plate.bolts_one_line - 1) * self.web_plate.gauge_provided) * self.web_plate.thickness_provided
             Avn = ((((self.web_plate.bolts_one_line - 1) * self.web_plate.gauge_provided)

@@ -1922,7 +1922,7 @@ class BeamCoverPlate(MomentConnection):
         while design_status_block_shear == False:
             Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
                   self.section.web_thickness
-            Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
+            Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch - (
                     self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole + end_dist) * \
                   self.section.web_thickness
             Atg = (self.web_plate.edge_dist_provided + (
@@ -1999,8 +1999,8 @@ class BeamCoverPlate(MomentConnection):
         while design_status_block_shear == False:
             Avg = 2 * ((self.web_plate.bolt_line - 1) * pitch + end_dist) * \
                   self.web_plate.thickness_provided
-            Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch + (
-                    self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole + end_dist) * \
+            Avn = 2 * ((self.web_plate.bolt_line - 1) * pitch - ((
+                    self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole) + end_dist) * \
                   self.web_plate.thickness_provided
             Atg = (self.web_plate.edge_dist_provided + (
                     self.web_plate.bolts_one_line - 1) * gauge) * self.web_plate.thickness_provided
@@ -2084,7 +2084,7 @@ class BeamCoverPlate(MomentConnection):
 
         while design_status_block_shear == False:
             Atg = (((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
-            Atn = (((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) + ((
+            Atn = (((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) - ((
                         self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
             Avg = (self.web_plate.edge_dist_provided + (
                         self.web_plate.bolts_one_line - 1) * self.web_plate.gauge_provided) * self.web_plate.thickness_provided

@@ -31,8 +31,8 @@ for f in files:
 
     module = d['Module']
 
-    if module == KEY_DISP_COLUMNCOVERPLATE:
-        main = ColumnCoverPlate
+    if module == KEY_DISP_BEAMCOVERPLATE:
+        main = BeamCoverPlate
         main.set_osdaglogger(None)
         main.set_input_values(main, d)
         base = os.path.basename(f)
@@ -42,7 +42,7 @@ for f in files:
         # f = open(filename, "w")
         # f.write(str(test_out_list))
         # f.close()
-        workbook_name = 'CCCP.xlsx'
+        workbook_name = 'BBCP.xlsx'
         sheet_name = str(os.path.splitext(base)[0])
         try:
             wb = load_workbook(workbook_name)

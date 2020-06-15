@@ -371,14 +371,14 @@ class Section(Material):
             self.plast_sec_mod_y = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
                                                                                    self.web_thickness,self.flange_thickness)*1000
         else:
-            self.plast_sec_mod_y = row[17] * 1000
+            self.plast_sec_mod_y = row[18] * 1000
 
         self.It = I_sectional_Properties().calc_torsion_const(self.depth,self.flange_width,
                                                                                    self.web_thickness,self.flange_thickness)*10**4\
             if row[19] is None else row[19] * 10**4
         self.Iw = I_sectional_Properties().calc_warping_const(self.depth,self.flange_width,
                                                                                    self.web_thickness,self.flange_thickness)*10**6 \
-            if row[20] is None else row[20] * 10**4
+            if row[20] is None else row[20] * 10**6
         self.source = row[21]
         self.type = 'Rolled' if row[22] is None else row[22]
 
@@ -756,7 +756,7 @@ class Channel(Section):
                                                                   self.web_thickness, self.flange_thickness) * 10 ** 6 \
             if row[21] is None else row[21] * 10 ** 6
         self.source = row[22]
-        self.type = 'Rolled' if row[23] is None else row[24]
+        self.type = 'Rolled' if row[23] is None else row[23]
 
         conn.close()
 

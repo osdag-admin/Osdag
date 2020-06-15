@@ -425,7 +425,7 @@ VALUES_IMG_TENSIONBOLTED_DF02 = ["ResourceFiles/images/unequaldp.png","ResourceF
 
 VALUES_IMG_TENSIONBOLTED_DF03 = ["ResourceFiles/images/Slope_Channel.png","ResourceFiles/images/Parallel_Channel.png","ResourceFiles/images/Slope_BBChannel.png","ResourceFiles/images/Parallel_BBChannel.png"]
 
-VALUES_IMG_BEAM = "ResourceFiles/images/Slope_Beam.png"
+VALUES_IMG_BEAM = ["ResourceFiles/images/Slope_Beam.png","ResourceFiles/images/Parallel_Beam.png"]
 
 VALUES_BEAMSEC = connectdb("Beams")
 VALUES_SECBM = connectdb("Beams")
@@ -524,7 +524,9 @@ DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner plate '
 KEY_DISP_SLENDER = 'Slenderness'
 
 
-KEY_DISP_PLATETHK = 'Thickness(mm)'
+KEY_DISP_PLATETHK = 'Thickness (mm)'
+
+
 
 DISP_TITLE_TENSION = 'Tension Capacity'
 KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
@@ -818,7 +820,7 @@ KEY_DISP_FLANGE_W = 'Flange width, B (mm)*'
 KEY_DISP_FLANGE_T = 'Flange thickness, T (mm)*'
 KEY_DISP_WEB_HEIGHT = 'Web Height, D (mm*)'
 KEY_DISP_WEB_T = 'Web thickness, t (mm)*'
-KEY_DISP_FLANGE_S = 'Flange Slope, a (deg.)*'
+KEY_DISP_FLANGE_S = 'Flange Slope, α (deg.)*'
 KEY_DISP_ROOT_R = 'Root radius, R1 (mm)*'
 KEY_DISP_TOE_R = 'Toe radius, R2 (mm)*'
 KEY_DISP_TYPE = 'Type'
@@ -848,7 +850,7 @@ KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
 KEY_DISP_A= 'A'
 KEY_DISP_B= 'B'
-KEY_DISP_LEG_THK = 'Leg Thickness (mm)'
+KEY_DISP_LEG_THK = 'Leg Thickness, t (mm)*'
 KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
 KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , fy (MPa)'

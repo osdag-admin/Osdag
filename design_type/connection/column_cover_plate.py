@@ -1023,6 +1023,8 @@ class ColumnCoverPlate(MomentConnection):
                                                                                         r_1=self.section.root_radius,
                                                                                         D=self.section.depth,
                                                                                         preference=self.preference)
+                    self.flange_plate.connect_to_database_to_get_fy_fu(self.flange_plate.material,
+                                                                       self.flange_plate.thickness_provided)
                     if self.flange_plate.thickness_provided != 0:
                         if self.preference == "Outside":
                             if self.outerwidth < 50:
@@ -1085,6 +1087,8 @@ class ColumnCoverPlate(MomentConnection):
                                                                                      D=self.section.depth,
                                                                                      preference=None,
                                                                                      fp_thk=self.flange_plate.thickness_provided)
+                    self.web_plate.connect_to_database_to_get_fy_fu(self.web_plate.material,
+                                                                    self.web_plate.thickness_provided)
                     if self.web_plate.thickness_provided != 0:
                         if self.preference == "Outside":
                             if self.webplatewidth < self.min_web_plate_height:
@@ -1450,8 +1454,11 @@ class ColumnCoverPlate(MomentConnection):
         axial_force_w = ((self.section.depth - (2 * self.section.flange_thickness)) *
                          self.section.web_thickness * self.factored_axial_load) / (
                             self.section.area)
-        self.flange_plate.Innerheight = round_down(
-            ((self.section.flange_width - self.section.web_thickness - (self.section.root_radius * 2)) / 2), 5)
+        if self.preference == "Outside":
+            self.flange_plate.Innerheight =0
+        else:
+            self.flange_plate.Innerheight = round_down(
+                ((self.section.flange_width - self.section.web_thickness - (self.section.root_radius * 2)) / 2), 5)
 
         self.web_plate.get_web_plate_details(bolt_dia=self.web_bolt.bolt_diameter_provided,
                                              web_plate_h_min=self.min_web_plate_height,

@@ -880,6 +880,9 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                                                         r_1=self.section.root_radius,
                                                                                         D=self.section.depth,
                                                                                         preference=self.preference)
+                    self.flange_plate.connect_to_database_to_get_fy_fu(self.flange_plate.material,
+                                                                       self.flange_plate.thickness_provided)
+
                     if self.flange_plate.thickness_provided != 0:
                         if self.preference == "Outside":
                             if self.outerwidth < 50:
@@ -942,6 +945,9 @@ class ColumnCoverPlateWeld(MomentConnection):
                                                                                      D=self.section.depth,
                                                                                      preference=None,
                                                                                      fp_thk=None)
+
+                    self.web_plate.connect_to_database_to_get_fy_fu(self.web_plate.material,
+                                                                    self.web_plate.thickness_provided)
                     if self.web_plate.thickness_provided != 0:
                         if self.preference == "Outside":
                             if self.webplatewidth < self.min_web_plate_height:

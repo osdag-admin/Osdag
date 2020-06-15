@@ -321,8 +321,9 @@ class BeamColumnEndPlate(MomentConnection):
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES],
                          bolt_tensioning=design_dictionary[KEY_DP_BOLT_TYPE])
 
-        self.load = Load(shear_force=design_dictionary[KEY_SHEAR],
-                         axial_force=design_dictionary[KEY_AXIAL],moment=design_dictionary[KEY_MOMENT])
+        self.load = Load(shear_force=float(design_dictionary[KEY_SHEAR]),
+                         axial_force=float(design_dictionary[KEY_AXIAL]),
+                         moment=float(design_dictionary[KEY_MOMENT]), unit_kNm=True)
 
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
@@ -428,16 +429,19 @@ class BeamColumnEndPlate(MomentConnection):
         """Assign minimum required weld sizes to flange and web welds and update throat sizes, eff. lengths,
         long joint factors"""
 
-        # Find minimum sizes
-        flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(
-            self.supported_section.flange_thickness, self.plate.thickness_provided)
-        web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(
-            self.supported_section.web_thickness, self.plate.thickness_provided)
+        print("Assigning minimum required weld sizes to flange and web welds")
+        # Find minimum and maximum weld sizes
+        self.top_flange_weld.set_min_max_sizes(part1_thickness=self.supported_section.flange_thickness,
+                                               part2_thickness=self.plate.thickness_provided)
+        self.bottom_flange_weld.set_min_max_sizes(part1_thickness=self.supported_section.flange_thickness,
+                                                  part2_thickness=self.plate.thickness_provided)
+        self.web_weld.set_min_max_sizes(part1_thickness=self.supported_section.web_thickness,
+                                        part2_thickness=self.plate.thickness_provided)
 
         # Assign minimum sizes
-        top_flange_weld_size = choose_higher_value(flange_weld_size_min, ALL_WELD_SIZES)
-        bottom_flange_weld_size = choose_higher_value(flange_weld_size_min, ALL_WELD_SIZES)
-        web_weld_size = choose_higher_value(web_weld_size_min, ALL_WELD_SIZES)
+        top_flange_weld_size = choose_higher_value(self.top_flange_weld.min_size, ALL_WELD_SIZES)
+        bottom_flange_weld_size = choose_higher_value(self.bottom_flange_weld.min_size, ALL_WELD_SIZES)
+        web_weld_size = choose_higher_value(self.web_weld.min_size, ALL_WELD_SIZES)
 
         self.top_flange_weld.set_size(weld_size=top_flange_weld_size)
         self.bottom_flange_weld.set_size(weld_size=bottom_flange_weld_size)
@@ -499,7 +503,6 @@ class BeamColumnEndPlate(MomentConnection):
         # web_weld_throat_reqd = round(math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) /
         #                              self.web_weld.strength, 3)
         # web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
-
         if self.top_flange_weld.strength < flange_weld_stress:
             self.top_flange_weld.design_status = False
         if self.bottom_flange_weld.strength < flange_weld_stress:
@@ -575,22 +578,34 @@ class BeamColumnEndPlate(MomentConnection):
         self.web_weld.size = self.web_weld.throat_tk
 
     def weld_design(self):
-        if self.web_weld.type is KEY_DP_WELD_TYPE_FILLET:
+        print("Designing weld")
+        if self.web_weld.type == KEY_DP_WELD_TYPE_FILLET:
+            self.assign_weld_strength()
             self.assign_weld_lengths()
             self.assign_weld_sizes()
-            self.check_fillet_weld2()
-            while self.top_flange_weld.design_status and self.bottom_flange_weld.design_status is False:
+            self.check_fillet_weld1()
+            while (self.top_flange_weld.design_status and self.bottom_flange_weld.design_status) is False:
+                print("Assigning next available value of weld for flange welds")
                 current_flange_weld_size = min(self.top_flange_weld.size, self.bottom_flange_weld.size)
                 next_flange_weld_size = choose_next_value(current_value=current_flange_weld_size,
-                                                          available_values=ALL_WELD_SIZES)
+                                                          available_values=ALL_WELD_SIZES,
+                                                          max_value=self.top_flange_weld.max_size)
+                if next_flange_weld_size is None:
+                    print("flange weld size can not be attained")
+                    break   # TODO: exit with, design status = False and message "weld size can not be attained"
                 self.top_flange_weld.set_size(next_flange_weld_size)
                 self.bottom_flange_weld.set_size(next_flange_weld_size)
-                self.check_fillet_weld2()
+                self.check_fillet_weld1()
             while self.web_weld.design_status is False:
+                print("Assigning next available value of weld for web welds")
                 next_web_weld_size = choose_next_value(current_value=self.web_weld.size,
-                                                       available_values=ALL_WELD_SIZES)
+                                                       available_values=ALL_WELD_SIZES,
+                                                       max_value=self.web_weld.max_size)
+                if next_web_weld_size is None:
+                    print("web weld size can not be attained")
+                    break   # TODO: exit with, design status = False and message "weld size can not be attained"
                 self.web_weld.set_size(next_web_weld_size)
-                self.check_fillet_weld2()
+                self.check_fillet_weld1()
 
         else:
             pass
@@ -1102,9 +1117,7 @@ class BeamColumnEndPlate(MomentConnection):
         self.check_compatibility()
 
         # Weld design
-        self.assign_weld_sizes()
-        self.assign_weld_lengths()
-        self.assign_weld_strength()
+        self.weld_design()
 
         self.find_bolt_conn_plates_t_fu_fy()
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=bolt_dia,

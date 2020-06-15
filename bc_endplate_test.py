@@ -56,4 +56,3 @@ bcinput.warn_text()
 print(bcinput.endplate_type)
 bcinput.trial_design()
 
-

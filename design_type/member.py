@@ -708,6 +708,7 @@ class Member(Main):
     def get_new_channel_section_properties(self):
         designation = self[0]
         material_grade = self[1]
+        # sl = self[2]
         l = self[2][KEY_LOCATION]
         section_profile = self[2][KEY_SEC_PROFILE]
         Channel_attributes = Channel(designation, material_grade)
@@ -721,7 +722,7 @@ class Member(Main):
         f_t = (Channel_attributes.flange_thickness)
         w_h = (Channel_attributes.depth)
         w_t = (Channel_attributes.web_thickness)
-        flange_slope = str(Channel_attributes.flange_slope)
+        flange_slope = (Channel_attributes.flange_slope)
         root_radius = str(Channel_attributes.root_radius)
         toe_radius = str(Channel_attributes.toe_radius)
         m_o_e = "200"
@@ -952,14 +953,16 @@ class Member(Main):
 
             It = ''
             Iw = ''
+            image =''
 
         else:
             f_w = float(self[0])
             f_t = float(self[1])
             w_h = float(self[2])
             w_t = float(self[3])
-            l = self[4][KEY_LOCATION]
-            p = self[4][KEY_SEC_PROFILE]
+            sl = float(self[4])
+            l = self[5][KEY_LOCATION]
+            p = self[5][KEY_SEC_PROFILE]
 
             if p =="Channels":
                 sec_prop = Single_Channel_Properties()
@@ -978,6 +981,10 @@ class Member(Main):
                 pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t)
                 It = "N/A"
                 Iw = "N/A"
+                if sl != 90:
+                    image = VALUES_IMG_TENSIONBOLTED_DF03[0]
+                else:
+                    image = VALUES_IMG_TENSIONBOLTED_DF03[1]
 
             else:
                 sec_prop = BBChannel_Properties()
@@ -997,6 +1004,10 @@ class Member(Main):
 
                 It = "N/A"
                 Iw = "N/A"
+                if sl != 90:
+                    image = VALUES_IMG_TENSIONBOLTED_DF03[2]
+                else:
+                    image = VALUES_IMG_TENSIONBOLTED_DF03[3]
 
 
         d = {'Label_9': str(mass),
@@ -1012,6 +1023,7 @@ class Member(Main):
              'Label_22': str(pm_y),
              'Label_26': str(It),
              'Label_27': str(Iw),
+             KEY_IMAGE : image
              }
 
         return d

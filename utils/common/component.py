@@ -756,7 +756,7 @@ class Channel(Section):
                                                                   self.web_thickness, self.flange_thickness) * 10 ** 6 \
             if row[21] is None else row[21] * 10 ** 6
         self.source = row[22]
-        self.type = 'Rolled' if row[23] is None else row[24]
+        self.type = 'Rolled' if row[23] is None else row[23]
 
         conn.close()
 

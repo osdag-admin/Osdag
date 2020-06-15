@@ -52,6 +52,7 @@ class MomentConnection(Connection, IS800_2007):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
+            image = VALUES_IMG_BEAM[0]
 
 
         else:
@@ -75,17 +76,22 @@ class MomentConnection(Connection, IS800_2007):
             p_r = "0.3"
             t_e = "12"
             mass = str(I_sec_attributes.mass)
-            area = str(I_sec_attributes.area)
-            mom_inertia_z = str(I_sec_attributes.mom_inertia_z)
-            mom_inertia_y = str(I_sec_attributes.mom_inertia_y)
-            rad_of_gy_z = str(I_sec_attributes.rad_of_gy_z)
-            rad_of_gy_y = str(I_sec_attributes.rad_of_gy_y)
-            elast_sec_mod_z = str(I_sec_attributes.elast_sec_mod_z)
-            elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
-            plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
-            plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
-            torsion_const = str(I_sec_attributes.It)
-            warping_const =  str(I_sec_attributes.Iw)
+            area = str(round((I_sec_attributes.area / 10 ** 2), 2))
+            mom_inertia_z = str(round((I_sec_attributes.mom_inertia_z / 10 ** 4), 2))
+            mom_inertia_y = str(round((I_sec_attributes.mom_inertia_y / 10 ** 4), 2))
+            rad_of_gy_z = str(round((I_sec_attributes.rad_of_gy_z / 10), 2))
+            rad_of_gy_y = str(round((I_sec_attributes.rad_of_gy_y / 10), 2))
+            elast_sec_mod_z = str(round((I_sec_attributes.elast_sec_mod_z / 10 ** 3), 2))
+            elast_sec_mod_y = str(round((I_sec_attributes.elast_sec_mod_y / 10 ** 3), 2))
+            plast_sec_mod_z = str(round((I_sec_attributes.plast_sec_mod_z / 10 ** 3), 2))
+            plast_sec_mod_y = str(round((I_sec_attributes.plast_sec_mod_y / 10 ** 3), 2))
+            torsion_const = str(round((I_sec_attributes.It / 10 ** 4), 2))
+            warping_const = str(round((I_sec_attributes.Iw / 10 ** 6), 2))
+            if flange_slope != 90:
+                image = VALUES_IMG_BEAM[0]
+            else:
+                image = VALUES_IMG_BEAM[1]
+
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
             material_attributes = Material(material_grade)
@@ -184,7 +190,7 @@ class MomentConnection(Connection, IS800_2007):
         t28 = (None, None, TYPE_BREAK, None, None)
         section.append(t28)
 
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, 'ResourceFiles/images/ISection.png')
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
         section.append(t33)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)

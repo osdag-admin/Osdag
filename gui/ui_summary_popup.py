@@ -183,7 +183,10 @@ class Ui_Dialog1(object):
             logfile=open(fname_no_ext+'.log','r')
             logs=logfile.read()
             if('! I can\'t write on file' in logs):
-                QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no pdf is open with same name. If error persists send us the log file created in location you are trying to save.')
+               QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
+            else:
+               print(logs)
+               QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
             logfile.close()
 
     def call_designreport(self, main,fileName, report_summary, folder):

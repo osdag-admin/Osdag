@@ -8,8 +8,8 @@ import numpy
 import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
-lclass TensionAngleWeldCAD(object):
-    def __init__(self, Obj, member, plate, inline_weld, opline_weld):
+class TensionAngleWeldCAD(object):
+    def __init__(self, Obj, member, plate, inline_weld, opline_weld, weld_plate_array):
         """
         :param member: Angle or Channel
         :param plate: Plate
@@ -23,7 +23,7 @@ lclass TensionAngleWeldCAD(object):
         self.plate = plate
         self.inline_weld = inline_weld
         self.opline_weld = opline_weld
-        # self.intermittentConnection = weld_plate_array
+        self.intermittentConnection = weld_plate_array
 
         # self.Obj.loc = 'Long Leg'#'Short Leg'
 
@@ -157,16 +157,17 @@ lclass TensionAngleWeldCAD(object):
 
         self.plate2_Model = self.plate2.create_model()
 
-        # intermittentConnectionOriginL = numpy.array([300, 0.0, 0.0])
-        # intermittentConnection_uDir = numpy.array([1.0, 0.0, 0.0])
-        # intermittentConnection_vDir = numpy.array([0.0, 1.0, 0.0])
-        # intermittentConnection_wDir = numpy.array([0.0, 0.0, 1.0])
-        # self.intermittentConnection.place(intermittentConnectionOriginL, intermittentConnection_uDir,
-        #                                   intermittentConnection_vDir, intermittentConnection_wDir)
-        #
-        # self.intermittentConnection_Model = self.intermittentConnection.create_model()
-        # self.inter_conc_welds = self.intermittentConnection.get_welded_models()
-        # self.inter_conc_plates = self.intermittentConnection.get_plate_models()
+        if self.Obj.sec_profile== 'Back to Back Angles' or self.Obj.sec_profile== 'Back to Back Channels' or self.Obj.sec_profile== 'Star Angles' and self.member.L >=1000:
+            intermittentConnectionOriginL = numpy.array([0, 0.0, 0.0])
+            intermittentConnection_uDir = numpy.array([1.0, 0.0, 0.0])
+            intermittentConnection_vDir = numpy.array([0.0, 1.0, 0.0])
+            intermittentConnection_wDir = numpy.array([0.0, 0.0, 1.0])
+            self.intermittentConnection.place(intermittentConnectionOriginL, intermittentConnection_uDir,
+                                              intermittentConnection_vDir, intermittentConnection_wDir)
+
+            self.intermittentConnection_Model = self.intermittentConnection.create_model()
+            self.inter_conc_welds = self.intermittentConnection.get_welded_models()
+            self.inter_conc_plates = self.intermittentConnection.get_plate_models()
 
     def createWeldGeometry(self):
         if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Angles' or self.Obj.sec_profile == 'Channels' or self.Obj.sec_profile == 'Back to Back Channels':
@@ -357,7 +358,8 @@ lclass TensionAngleWeldCAD(object):
 
     def get_plates_models(self):
         plate = BRepAlgoAPI_Fuse(self.plate1_Model, self.plate2_Model).Shape()
-        # plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
+        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles' and self.member.L >= 1000:
+            plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
         return plate
 
     def get_welded_models(self):
@@ -365,6 +367,11 @@ lclass TensionAngleWeldCAD(object):
         if self.Obj.sec_profile == 'Angles' or self.Obj.sec_profile == 'Channels':
             welded_sec = [self.weldHL11_Model, self.weldHL12_Model, self.weldHR11_Model, self.weldHR12_Model,
                           self.weldVL11_Model, self.weldVR11_Model]
+        elif self.Obj.sec_profile== 'Back to Back Angles' or self.Obj.sec_profile== 'Back to Back Channels' or self.Obj.sec_profile== 'Star Angles' and self.member.L >=1000:
+            welded_sec = [self.weldHL11_Model, self.weldHL12_Model, self.weldHR11_Model, self.weldHR12_Model,
+                          self.weldVL11_Model, self.weldVR11_Model, self.weldHL21_Model, self.weldHL22_Model,
+                          self.weldHR21_Model, self.weldHR22_Model, self.weldVL21_Model, self.weldVR21_Model,
+                          self.inter_conc_welds]
         else:
             welded_sec = [self.weldHL11_Model, self.weldHL12_Model, self.weldHR11_Model, self.weldHR12_Model,
                           self.weldVL11_Model, self.weldVR11_Model, self.weldHL21_Model, self.weldHL22_Model,

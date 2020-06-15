@@ -215,7 +215,7 @@ class IntermittentWelds():
         """
         Calculate the exact position for welds and plates
         """
-        self.origin = self.origin + ( + self.spacing)*self.uDir
+        self.origin = self.origin + (self.spacing)*self.uDir
         for i in range(self.no_intermitent_connections):
             pos = self.origin + i * self.spacing * self.uDir
             pos0 = pos + self.intermittentPlate.T / 2 * self.vDir

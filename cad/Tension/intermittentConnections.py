@@ -169,6 +169,7 @@ class IntermittentWelds():
 
     def __init__(self, plateObj, welds, intermittentPlate):
 
+        self.plateObj = plateObj
         self.welds = welds
         self.intermittentPlate = intermittentPlate
 
@@ -206,10 +207,9 @@ class IntermittentWelds():
     def initWeldPlaceParams(self, plateObj):
 
         self.spacing = plateObj.inter_memb_length  # 300
-        self.no_intermitent_connections = 3  # int(plateObj.inter_conn)  # 2
-        # todo: add member depth here
-        # self.memberdepth = 175
-        if plateObj.sec_profile in ['Back to Back Angles', 'Angles']:
+        self.no_intermitent_connections = int(plateObj.inter_conn)  # 2
+
+        if plateObj.sec_profile in ['Back to Back Angles', 'Angles', 'Star Angles']:
             if plateObj.loc == 'Long Leg':
                 self.memberdepth = float(plateObj.section_size_1.max_leg)
             else:
@@ -221,6 +221,7 @@ class IntermittentWelds():
         """
         Calculate the exact position for welds and plates
         """
+        self.origin = self.origin + (self.spacing) * self.uDir
         for i in range(self.no_intermitent_connections):
             pos = self.origin + i * self.spacing * self.uDir
             pos0 = pos + self.intermittentPlate.T / 2 * self.vDir
@@ -238,15 +239,24 @@ class IntermittentWelds():
         self.wDir = wDir
 
         self.calculatePositions()
-
-        for index, pos0 in enumerate(self.platePostions):
-            self.plates[index].place(pos0, vDir, uDir)
-        for index, pos1 in enumerate(self.weldabwPositions):
-            self.weldsabw[index].place(pos1, wDir, uDir)
-            self.weldsabw1[index].place(pos1 + self.intermittentPlate.T * vDir, vDir, uDir)
-        for index, pos2 in enumerate(self.weldblwPositions):
-            self.weldsblw[index].place(pos2, -wDir, -uDir)
-            self.weldsblw1[index].place(pos2 + self.intermittentPlate.T * vDir, vDir, -uDir)
+        if self.plateObj.sec_profile == 'Star Angles':
+            for index, pos0 in enumerate(self.platePostions):
+                self.plates[index].place(pos0 , vDir, uDir)
+            for index, pos1 in enumerate(self.weldabwPositions):
+                self.weldsabw[index].place(pos1 - self.memberdepth*wDir/2, wDir, uDir)
+                self.weldsabw1[index].place(pos1 + self.intermittentPlate.T * vDir + self.memberdepth*wDir/2, vDir, uDir)
+            for index, pos2 in enumerate(self.weldblwPositions):
+                self.weldsblw[index].place(pos2 - self.memberdepth*wDir/2, -wDir, -uDir)
+                self.weldsblw1[index].place(pos2 + self.intermittentPlate.T * vDir + self.memberdepth*wDir/2, vDir, -uDir)
+        else:
+            for index, pos0 in enumerate(self.platePostions):
+                self.plates[index].place(pos0, vDir, uDir)
+            for index, pos1 in enumerate(self.weldabwPositions):
+                self.weldsabw[index].place(pos1, wDir, uDir)
+                self.weldsabw1[index].place(pos1 + self.intermittentPlate.T * vDir, vDir, uDir)
+            for index, pos2 in enumerate(self.weldblwPositions):
+                self.weldsblw[index].place(pos2, -wDir, -uDir)
+                self.weldsblw1[index].place(pos2 + self.intermittentPlate.T * vDir, vDir, -uDir)
 
     def create_model(self):
         for weld in self.weldsabw:

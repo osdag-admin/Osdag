@@ -59,10 +59,10 @@ from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
 from cad.Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
 from cad.Tension.BoltedCAD import TensionAngleBoltCAD, TensionChannelBoltCAD
 from cad.Tension.nutBoltPlacement import NutBoltArray as TNutBoltArray
+from cad.Tension.intermittentConnections import IntermittentNutBoltPlateArray, IntermittentWelds
 
 from cad.MomentConnections.CCEndPlateCAD.CAD import CCEndPlateCAD
 from cad.MomentConnections.CCEndPlateCAD.nutBoltPlacement import NutBoltArray as CEPNutBoltArray
-# from cad.Tension.intermittentConnections import IntermittentNutBoltPlateArray, IntermittentWelds
 
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.cleat_angle_connection import CleatAngleConnection
@@ -1144,6 +1144,11 @@ class CommonDesignLogic(object):
         else:
             plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
                                 T=float(T.plate.thickness_provided), degree=30)
+
+            intermittentPlates = Plate(L=195, W=80, T=plate.T)
+            intermittentWelds = FilletWeld(h=5, b=5, L=intermittentPlates.W)
+            weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
+
             # intermittentPlates = Plate(L=float(T.inter_plate_length), W=float(T.inter_plate_height),
             #                            T=float(T.plate.thickness_provided))
             #
@@ -1161,8 +1166,8 @@ class CommonDesignLogic(object):
                 inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
                 opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.D))
 
-                # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
-                tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld, opline_weld)
+
+                tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
 
             else:
                 member = Angle(L=float(T.length), A=float(T.section_size_1.max_leg), B=float(T.section_size_1.min_leg),
@@ -1175,7 +1180,7 @@ class CommonDesignLogic(object):
                     opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
 
                 # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
-                tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld, opline_weld)
+                tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
 
         tensionCAD.create_3DModel()
 

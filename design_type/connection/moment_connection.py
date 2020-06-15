@@ -26,7 +26,7 @@ class MomentConnection(Connection, IS800_2007):
                 input_dictionary[KEY_MATERIAL] == 'Select Material':
             designation = ''
             material_grade = ''
-            source = ''
+            source = 'Custom'
             fu = ''
             fy = ''
             depth = ''

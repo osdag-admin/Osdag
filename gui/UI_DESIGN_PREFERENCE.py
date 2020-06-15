@@ -165,7 +165,7 @@ class Window(QDialog):
                         font.setWeight(50)
                         line.setFont(font)
                         if lable in [KEY_DISP_FU, KEY_DISP_FY, KEY_DISP_POISSON_RATIO, KEY_DISP_THERMAL_EXP,
-                                     KEY_DISP_MOD_OF_ELAST, KEY_DISP_MOD_OF_RIGID]:
+                                     KEY_DISP_MOD_OF_ELAST, KEY_DISP_MOD_OF_RIGID, 'Source']:
                             line.setReadOnly(True)
                             self.do_not_clear_list.append(line)
                         r += 1

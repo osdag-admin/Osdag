@@ -449,19 +449,7 @@ class Tension_bolted(Member):
     #     else:
     #         pass
 
-    # def fn_conn_dp_image_initial(self):
     #
-    #     "Function to populate section images based on the type of section "
-    #     sec = self[0]
-    #
-    #     if sec == "Angles":
-    #         return VALUES_IMG_TENSIONBOLTED_DF01[0]
-    #     elif sec == "Back to Back Angles":
-    #         return VALUES_IMG_TENSIONBOLTED_DF01[1]
-    #     elif sec == "Star Angles":
-    #         return VALUES_IMG_TENSIONBOLTED_DF01[3]
-    #     else:
-    #         pass
 
     def out_bolt_bearing(self):
 

@@ -27,7 +27,6 @@ class Member(Main):
             return VALUES_IMG_TENSIONBOLTED[4]
 
 
-
     def tab_angle_section(self, input_dictionary):
 
         "In design preference, it shows other properties of section used "

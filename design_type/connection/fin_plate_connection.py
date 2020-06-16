@@ -1260,7 +1260,7 @@ class FinPlateConnection(ShearConnection):
                 self.report_check.append(t1)
 
                 t1 = (KEY_DISP_IR, IR_req(IR=1),
-                      mom_axial_IR_prov(round(self.plate.moment_demand / 1000000, 2),
+                      IR_prov(round(self.plate.moment_demand / 1000000, 2),
                                         round(a.moment_capacity / 1000000, 2),
                                         self.load.axial_force, round(a.tension_capacity / 1000, 2), a.IR),
                       get_pass_fail(1, a.IR, relation="greater"))

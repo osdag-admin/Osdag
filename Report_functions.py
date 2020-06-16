@@ -1019,7 +1019,7 @@ def height_of_inner_flange_cover_plate(b_fp,B,t_w,r_r,sp):
     return  ht_inner_flange_cover_plate_eqn
 
 
-def mom_axial_IR_prov(M,M_d,N,N_d,IR):
+def IR_prov(M,M_d,N,N_d,IR):
     M = str(M)
     M_d = str(M_d)
     N = str(N)
@@ -2278,10 +2278,10 @@ def tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tens
     tension_in_bolt_due_to_prying.append(
         NoEscape(r'Q &=' + T_e + r'- \frac{'+beta+' *' + eta + '*' + f_o + '*' + b_e +r'*'+ t+r'^4}{27 *'+ l_e+ '*'+ l_v+r'^2}\\'))
     if Q <= 0.0:
-        tension_in_bolt_due_to_prying.append(NoEscape(r'\begin{aligned} Q &= 0.0 \end{aligned}'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= 0.0 \end{aligned}'))
     else:
         Q = str(Q)
-        tension_in_bolt_due_to_prying.append(NoEscape(r'Q= ' + Q + r'\end{aligned}'))
+        tension_in_bolt_due_to_prying.append(NoEscape(r'Q &= ' + Q + r'\end{aligned}'))
     return tension_in_bolt_due_to_prying
 
 def total_bolt_tension_force(T_ba,Q,T_b):

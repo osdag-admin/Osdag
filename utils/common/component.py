@@ -200,7 +200,7 @@ class Bolt:
         else:
             kb = min(e / (3.0 * d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
 
-        return kb
+        return round(kb,2)
 
 
     def calculate_bolt_tension_capacity(self, bolt_diameter_provided, bolt_grade_provided):
@@ -1800,7 +1800,6 @@ class I_sectional_Properties(object):
     def calc_warping_const (self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
         return 0.0
 
-
 class Single_Angle_Properties(object):
 
     "return in cm "
@@ -2198,7 +2197,6 @@ class SAngle_Properties(object):
 
         self.I_t = 2
         return round(self.I_t, 2)
-
 
 class Single_Channel_Properties(object):
 

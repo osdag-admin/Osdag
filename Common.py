@@ -438,9 +438,14 @@ VALUES_PRIBM = connectdb("Beams")
 ############################
 # Display Keys (Input Dock, Output Dock, Design preference, Design report)
 ############################
-KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity (V_dy) (kN)'
+KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity $(V_dy)$ (kN)'
+KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity $(V_dn)$ (kN)'
+KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear $(V_db)$ (kN)'
+KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension $(T_db)$ (kN)'
+KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity $(V_d)$ (kN)'
+
+
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
-KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity (V_dn) (kN)'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
 DISP_MIN_PITCH = 'Min. Pitch (mm)'
@@ -476,9 +481,7 @@ DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Height (mm)'
 DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Height (mm)'
 DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
-KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (V_db) (kN)'
-KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension (T_db) (kN)'
-KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (V_d) (kN)'
+
 KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
 KEY_DISP_FY = 'Yield Strength , fy (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
@@ -811,7 +814,7 @@ KEY_DISP_CORR_INFLUENCES = 'Are the members exposed to corrosive influences'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
 
 KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate'
-
+KEY_DISP_GAP = 'Gap between Members'
 
 KEY_DISP_MECH_PROP = 'Mechanical Properties'
 KEY_DISP_DIMENSIONS = 'Dimensions'

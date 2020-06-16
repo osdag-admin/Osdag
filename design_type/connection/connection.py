@@ -77,7 +77,7 @@ class Connection(Main):
             plast_sec_mod_y = str(round((I_sec_attributes.plast_sec_mod_y/10**3),2))
             torsion_const = str(round((I_sec_attributes.It/10**4),2))
             warping_const = str(round((I_sec_attributes.Iw/10**6),2))
-            if flange_slope != 90:
+            if flange_slope != '90':
                 image = VALUES_IMG_BEAM[0]
             else:
                 image = VALUES_IMG_BEAM[1]

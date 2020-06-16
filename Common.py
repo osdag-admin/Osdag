@@ -567,6 +567,8 @@ KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
 
 # Applied load
+KEY_INTERACTION_RATIO ="Interaction Ratio"
+MIN_LOADS_REQUIRED ="Minimun Required Loads"
 KEY_DISP_APPLIED_SHEAR_LOAD ='Applied Shear Load (kN)'
 KEY_DISP_APPLIED_AXIAL_FORCE='Applied Axial Load (kN)'
 KEY_DISP_APPLIED_MOMENT_LOAD='Applied Moment Load (kNm)'

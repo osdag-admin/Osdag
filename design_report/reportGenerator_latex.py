@@ -226,7 +226,7 @@ class CreateLatex(Document):
                             table.add_hline()
                         count = count + 1
                 else:
-                    table.add_row((check[0], check[1], check[2], check[3]))
+                    table.add_row((NoEscape(check[0]), check[1], check[2], check[3]))
                     table.add_hline()
         # doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
 

@@ -29,6 +29,8 @@ def choose_higher_value(min_value, available_values):
     :param available_values: list
     :return: float
     # TODO: What if the min_value is higher than all values in the list
+    # TODO: if min_value is higher it will return None which should be checked where fuction is called
+    # TODO: write min() only if filter returns some value. else it will throw error: 'min() arg is an empty sequence'
     """
     return min(filter(lambda i: i >= min_value, available_values))
 

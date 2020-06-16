@@ -2157,6 +2157,66 @@ def tension_in_bolt_due_to_axial_load_n_moment(P,n,M,y_max,y_sqr,T_b):
     tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&= ' + T_b + r'\end{aligned}'))
     return tension_in_bolt_due_to_axial_load_n_moment
 
+def tension_in_bolt_due_to_axial(P,n,T_ba):
+    P= str(P)
+    n = str(n)
+    T_ba = str (T_ba)
+    tension_in_bolt_due_to_axial_load_n_moment  = Math(inline=True)
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_{ba} &= \frac{P}{\ n}\\'))
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' +P + '}{' + n + r'}\\'))
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&= ' + T_ba + r'\end{aligned}'))
+    return tension_in_bolt_due_to_axial_load_n_moment
+
+def tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned, beta,Q,l_e,eta=1.5):
+    # beta = 2
+    # if pre_tensioned == 'Pretensioned':
+    #     beta = 1
+    # print(pre_tensioned)
+    # l_e = min(end_dist, 1.1 * t * math.sqrt(beta * f_o / f_y))
+    # if (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2))) <= 0:
+    #     Q = 0.0
+    # else:
+    #     Q = (l_v / 2 / l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
+    # return Q
+    T_e = str(T_e)
+    l_v = str(l_v)
+    f_o = str(f_o)
+    b_e = str(b_e)
+    t= str(t)
+    f_y = str(f_y)
+    l_e = str(l_e)
+    end_dist = str(end_dist)
+    pre_tensioned = str(pre_tensioned)
+    beta = str(beta)
+    eta = str(eta)
+    tension_in_bolt_due_to_prying = Math(inline=True)
+    tension_in_bolt_due_to_prying.append(NoEscape(r'\begin{aligned} Q &= T_e - \frac{\beta * eta * f_o * b_e * t^4}{27 * l_e * l_v^2}\\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'Q &\geq 0\\'))
+    if pre_tensioned == 'Pretensioned':
+        tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 1 (pre-tensioned) \\'))
+    else:
+        tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 2 (Not pre-tensioned) \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min(end_dist, 1.1*t*\sqrt{\frac{\beta *f_o}{f_y}}) \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min('+end_dist+', 1.1*'+t+r'*\sqrt{\frac{'+beta+'*'+f_o+r'}{'+f_y+r'}}) \\'))
+    tension_in_bolt_due_to_prying.append(
+        NoEscape(r'Q &=' + T_e + r'- \frac{'+beta+' *' + eta + '*' + f_o + '*' + b_e +r'*'+ t+r'^4}{27 *'+ l_e+ '*'+ l_v+r'^2}\\'))
+    if Q <= 0.0:
+        tension_in_bolt_due_to_prying.append(NoEscape(r'\begin{aligned} Q &= 0.0 \end{aligned}'))
+    else:
+        Q = str(Q)
+        tension_in_bolt_due_to_prying.append(NoEscape(r'Q= ' + Q + r'\end{aligned}'))
+    return tension_in_bolt_due_to_prying
+
+def total_bolt_tension_force(T_ba,Q,T_b):
+    T_ba = str(T_ba)
+    Q = str(Q)
+    T_b = str(T_b)
+    total_tension_in_bolt = Math(inline = True)
+    total_tension_in_bolt.append(NoEscape(r'\begin{aligned} T_b &= T_{ba} + Q\\'))
+    total_tension_in_bolt.append(NoEscape(r'&=' + T_ba + Q + r'\\'))
+    total_tension_in_bolt.append(NoEscape(r'&='+ T_b + r'\end{aligned}'))
+    return total_tension_in_bolt
+
 def moment_cap(beta,m_d,f_y,gamma_m0,m_fd,mom_cap):
     beta= str(beta)
     m_d= str(m_d)

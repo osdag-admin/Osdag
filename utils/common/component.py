@@ -45,7 +45,8 @@ class Bolt:
 
         self.bolt_shank_area = 0.0
         self.bolt_net_area = 0.0
-
+        self.bolt_tension = 0.0
+        self.bolt_tension_prying = 0.0
         self.bolt_shear_capacity = 0.0
         self.bolt_shear_capacity = 0.0
         self.bolt_shear_capacity = 0.0

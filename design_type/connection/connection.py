@@ -548,6 +548,8 @@ class Connection(Main):
     ########################################
 
     def func_for_validation(self, design_dictionary):
+        print('input dictionary')
+        print(design_dictionary)
         all_errors = []
         self.design_status = False
         flag1 = False

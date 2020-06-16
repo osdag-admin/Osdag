@@ -13,10 +13,11 @@ from cad.items.bolt import Bolt
 from cad.items.nut import Nut
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from cad.items.ModelUtils import getGpPt
+from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 
 class NutBoltArray_AF():
-    def __init__(self, outputobj, nut, bolt, numOfboltsF, nutSpaceF):
+    def __init__(self, Obj, nut, bolt, numOfboltsF, nutSpaceF):
         """
         :param alist: Input values, entered by user
         :param beam_data: Beam dimensions
@@ -37,11 +38,10 @@ class NutBoltArray_AF():
         # self.beamDim = beam_data
         self.bolt = bolt
         self.nut = nut
-        self.outputobj = outputobj
         self.numOfboltsF = numOfboltsF
         self.nutSpaceF = nutSpaceF
 
-        self.initBoltPlaceParams_AF(outputobj)
+        self.initBoltPlaceParams_AF(Obj)
         self.bolts_AF = []
         self.nuts_AF = []
         self.initialiseNutBolts_AF()
@@ -70,42 +70,39 @@ class NutBoltArray_AF():
             self.nuts_AF.append(Nut(n_AF.R, n_AF.T, n_AF.H, n_AF.r1))
             print('Nut', (n_AF.R, n_AF.T, n_AF.H, n_AF.r1))
 
-    def initBoltPlaceParams_AF(self, outputobj):
+    def initBoltPlaceParams_AF(self, Obj):
         '''
         :param outputobj: This is output dictionary for bolt placement parameters
         :return: Edge, end, gauge and pitch distances for placement
         '''
 
-        self.edge_AF = 25  # outputobj.flange_plate.edge_dist_provided     #33
-        self.end_AF = 25  # outputobj.flange_plate.end_dist_provided         #33
-        self.edge_gauge_AF = 25  # outputobj.flange_plate.edge_dist_provided  #33
-        self.pitch_AF = 30  # outputobj.flange_plate.pitch_provided           #50
-        self.midpitch_AF = 60  # outputobj.flange_plate.midpitch
-        self.gauge_AF = 80.4  # outputobj.flange_plate.midgauge
-        self.gauge = 38  # outputobj.flange_plate.gauge_provided
+        self.edge_AF = Obj.flange_plate.edge_dist_provided
+        self.end_AF = Obj.flange_plate.end_dist_provided
+        self.edge_gauge_AF = Obj.flange_plate.edge_dist_provided
+        self.pitch_AF = Obj.flange_plate.pitch_provided
+        self.midpitch_AF = Obj.flange_plate.midpitch  #=(2 * self.flange_plate.end_dist_provided) + self.flange_plate.gap + self.section.web_thickness
+        self.gauge_AF = Obj.flange_plate.midgauge
+        self.gauge = Obj.flange_plate.gauge_provided
 
         # outputobj.flange_plate.gauge_provided   # Revised gauge distance   #0.0
-        self.row_AF = 6  # outputobj.flange_plate.bolt_line             #2
-        self.col_AF = 4  # outputobj.flange_plate.bolts_one_line                  #2
-        self.gap = 10  # outputobj.flange_plate.gap
+        self.row_AF = Obj.flange_plate.bolt_line
+        self.col_AF = Obj.flange_plate.bolts_one_line                  #2
+        self.gap = Obj.flange_plate.gap
         # if self.col_AF ==2:
         #     self.gauge =0
-        #     self.gauge_AF= outputobj.flange_plate.midgauge
+        #     self.gauge_AF= Obj.flange_plate.midgauge
         # else:
-        #     self.gauge =outputobj.flange_plate.gauge_provided
-        #     self.gauge_AF=outputobj.flange_plate.midgauge
-        print('iniBoltPlaceParams_AF', (
-            self.edge_AF, self.end_AF, self.edge_gauge_AF, self.pitch_AF, self.gauge_AF, self.row_AF, self.col_AF,
-            self.gap))
+        #     self.gauge = Obj.flange_plate.gauge_provided
+        #     self.gauge_AF= Obj.flange_plate.midgauge
 
     def calculatePositions_AF(self):
         """
         :return: The positions/coordinates to place the bolts in the form of list, positions_AF = [list of bolting coordinates]
         """
         self.positions_AF = []
-        # self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.gauge_AF / 2) * self.gaugeDirAF
-        self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (
-                (self.plateAbvFlangeL - self.gauge_AF) / 2 - ((self.col_AF / 2 - 1) * self.gauge)) * self.gaugeDirAF
+        self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.edge_AF) * self.gaugeDirAF
+        # self.boltOrigin_AF = self.originAF - (self.row_AF/2 * self.pitch_AF) * self.pitchDirAF  - ((self.col_AF / 2) * self.gauge) * self.gaugeDirAF
+                # + ((self.plateAbvFlangeL - self.gauge_AF) / 2 - ((self.col_AF / 2 - 1) * self.gauge)) * self.gaugeDirAF
 
         for rw_AF in range(self.row_AF):
             for cl_AF in range(self.col_AF):
@@ -158,6 +155,13 @@ class NutBoltArray_AF():
         return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Shape()
 
     def get_modelsAF(self):
+        # nut_bolts = self.models_AF
+        # array = nut_bolts[0]
+        # for comp in nut_bolts:
+        #     array = BRepAlgoAPI_Fuse(comp, array).Shape()
+        #
+        # return array
+        #todo: using for loops is here is slowing down the cad generating process
         return self.models_AF
 
     # Below methods are for creating holes in flange and web

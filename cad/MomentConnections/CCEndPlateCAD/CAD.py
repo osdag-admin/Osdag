@@ -76,10 +76,10 @@ class CCEndPlateCAD(object):
         self.endPlate2Model = self.endPlate2.create_model()
 
     def createNutBoltArray(self):
-        nut_bolt_arrayOrigin = numpy.array([-self.endPlate.W / 2, -self.endPlate.L / 2, -self.endPlate.T])
+        nut_bolt_arrayOrigin = numpy.array([-self.endPlate.W / 2, -self.endPlate.L / 2, self.endPlate.T])
         gaugeDir = numpy.array([0.0, 1.0, 0])
         pitchDir = numpy.array([1.0, 0.0, 0])
-        boltDir = numpy.array([0, 0, 1.0])
+        boltDir = numpy.array([0, 0, -1.0])
         self.nut_bolt_array.place(nut_bolt_arrayOrigin, pitchDir, gaugeDir, boltDir)
 
         self.nut_bolt_arrayModel = self.nut_bolt_array.create_model()

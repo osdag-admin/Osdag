@@ -77,41 +77,47 @@ class Tension_welded(Member):
          """
         change_tab = []
 
-        t1 = (DISP_TITLE_ANGLE, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_section)
+        t1 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+              [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
+               'Label_7', 'Label_8', 'Label_9',
+               'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
+               'Label_18',
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', 'Label_24', KEY_IMAGE], TYPE_TEXTBOX,
+              self.get_new_angle_section_properties)
         change_tab.append(t1)
 
-        t2 = (DISP_TITLE_CHANNEL, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_section)
+        t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3'],
+              ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
+               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23',
+               KEY_IMAGE],
+              TYPE_TEXTBOX, self.get_Angle_sec_properties)
         change_tab.append(t2)
 
-        t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
-                                                      KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
-        change_tab.append(t3)
-
-        t5 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3', KEY_LOCATION, KEY_SEC_PROFILE],
-              ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
-               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'],
-              TYPE_TEXTBOX, self.get_Angle_sec_properties)
-        change_tab.append(t5)
-
-        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL, KEY_LOCATION, KEY_SEC_PROFILE],
-              [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
-               'Label_7', 'Label_8', 'Label_9','Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
-               'Label_18','Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', 'Label_24'], TYPE_TEXTBOX,
-              self.get_new_angle_section_properties)
-        change_tab.append(t6)
-
-        t5 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13'],
-              ['Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22'], TYPE_TEXTBOX, self.get_Channel_sec_properties)
-        change_tab.append(t5)
-
-        t6 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+        t3 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL],
               [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14',
                'Label_4', 'Label_5',
                'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
                'Label_19', 'Label_20', 'Label_21',
-               'Label_22', 'Label_23'], TYPE_TEXTBOX, self.get_new_channel_section_properties)
+               'Label_22', 'Label_23', 'Label_26', 'Label_27', KEY_IMAGE], TYPE_TEXTBOX,
+              self.get_new_channel_section_properties)
+        change_tab.append(t3)
+
+        t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14'],
+              ['Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17', 'Label_19',
+               'Label_20', 'Label_21', 'Label_22', 'Label_26', 'Label_27', KEY_IMAGE], TYPE_TEXTBOX,
+              self.get_Channel_sec_properties)
+
+        change_tab.append(t4)
+
+        t5 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
+                                                      KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
+        change_tab.append(t5)
+
+        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE_SELECTED], ['Label_24'], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t6)
+
+        t7 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE_SELECTED], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t7)
 
         return change_tab
 
@@ -766,7 +772,7 @@ class Tension_welded(Member):
         self.load = Load(shear_force="", axial_force=design_dictionary.get(KEY_AXIAL))
         self.efficiency = 0.0
         self.K = 1
-
+        self.count = 0
         self.plate = Plate(thickness=self.plate_thickness,
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
         self.weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
@@ -932,22 +938,22 @@ class Tension_welded(Member):
         "selection of member based on the yield capacity"
         min_yield = 0
 
-        self.max_section(self, design_dictionary, self.sizelist)
-        # print(area,gyr,"hgsvfsg")
-        # self.max_size = self.select_section(self, design_dictionary, max)
+        if self.count == 0:
+            self.max_section(self, design_dictionary, self.sizelist)
+            [self.force1, self.len1, self.slen1, self.gyr1] = self.max_force_length(self, self.max_area)
+            [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self, self.max_gyr)
+        else:
+            pass
 
-        [self.force1, self.len1, self.slen1, self.gyr1] = self.max_force_length(self, self.max_area)
-        [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self, self.max_gyr)
-
-        "Loop checking each member from sizelist based on yield capacity"
+        self.count = self.count + 1
+        "Loop checking each member from sizelist based on yield capacity on recheck"
         if (previous_size) == None:
             pass
         else:
-            for i in previous_size:
-                if i in self.sizelist:
-                    self.sizelist.remove(i)
-                else:
-                    pass
+            if previous_size in self.sizelist:
+                self.sizelist.remove(previous_size)
+            else:
+                pass
 
         for selectedsize in self.sizelist:
             # print(self.sizelist)
@@ -1168,11 +1174,9 @@ class Tension_welded(Member):
             if tension_capacity < self.max_tension_yield and self.res_force < self.max_tension_yield:
                 # self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
                 if len(self.sizelist) >= 2:
-                    print("recheck")
                     size = self.section_size_1.designation
-                    self.previous_size.append(size)
-                    print(self.previous_size)
-                    self.initial_member_capacity(self, design_dictionary, self.previous_size)
+                    print("recheck", size)
+                    self.initial_member_capacity(self, design_dictionary, size)
                 else:
                     self.design_status = False
                     logger.warning( " : Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
@@ -1311,7 +1315,7 @@ class Tension_welded(Member):
                 self.web_weld = (self.section_size_1.max_leg - 2 * self.weld.size)
             else:
                 self.web_weld = 0.0
-            length_weld = self.section_size_1.angle_weld_length(self.weld.strength,self.web_weld,self.res_force,self.section_size_1.Cy,self.section_size_1.min_leg )
+            length_weld = self.section_size_1.angle_weld_length(self.weld.strength,self.web_weld,self.res_force,self.section_size_1.Cy,self.section_size_1.max_leg )
             self.flange_weld = round_up((length_weld), 1, 50)
             self.weld.length = (self.web_weld + 2 * self.flange_weld)
 
@@ -1408,16 +1412,14 @@ class Tension_welded(Member):
             print("recheck")
             # previous_size = self.section_size_1.designation
             # self.initial_member_capacity(self, design_dictionary, previous_size)
-            if len(self.sizelist)>=2:
-                print("recheck")
+            if len(self.sizelist) >= 2:
                 size = self.section_size_1.designation
-                self.previous_size.append(size)
-                print(self.previous_size)
-                self.initial_member_capacity(self, design_dictionary, self.previous_size)
+                print("recheck", size)
+                self.initial_member_capacity(self, design_dictionary, size)
             else:
                 self.design_status = False
                 logger.warning(" : Tension force of {} kN exceeds tension capacity of {} kN for maximum available member size {}.".format(
-                        round(self.load.axial_force, 2), round(self.force1 / 1000, 2), self.max_area))
+                        round(self.load.axial_force, 2), round(self.section_size_1.tension_rupture_capacity / 1000, 2), self.max_area))
                 logger.info(" : Select Members with higher cross sectional area than the above mentioned Member.")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
@@ -1716,44 +1718,14 @@ class Tension_welded(Member):
                                       'FlangeSlope': round(section_size.flange_slope, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),
                                       'R2(mm)': round(section_size.toe_radius, 2),
-                                      'Iz(mm4)': round((BBChannel.calc_MomentOfAreaZ(section_size.flange_width,
-                                                                                     section_size.flange_thickness,
-                                                                                     section_size.depth,
-                                                                                     section_size.web_thickness) * 10000),
-                                                       2),
-                                      'Iy(mm4)': round((BBChannel.calc_MomentOfAreaY(section_size.flange_width,
-                                                                                     section_size.flange_thickness,
-                                                                                     section_size.depth,
-                                                                                     section_size.web_thickness) * 10000),
-                                                       2),
-                                      'rz(mm)': round((BBChannel.calc_RogZ(section_size.flange_width,
-                                                                           section_size.flange_thickness,
-                                                                           section_size.depth,
-                                                                           section_size.web_thickness) * 10), 2),
-                                      'ry(mm)': round((BBChannel.calc_RogY(section_size.flange_width,
-                                                                           section_size.flange_thickness,
-                                                                           section_size.depth,
-                                                                           section_size.web_thickness) * 10), 2),
-                                      'Zz(mm3)': round((BBChannel.calc_ElasticModulusZz(section_size.flange_width,
-                                                                                        section_size.flange_thickness,
-                                                                                        section_size.depth,
-                                                                                        section_size.web_thickness) * 1000),
-                                                       2),
-                                      'Zy(mm3)': round((BBChannel.calc_ElasticModulusZy(section_size.flange_width,
-                                                                                        section_size.flange_thickness,
-                                                                                        section_size.depth,
-                                                                                        section_size.web_thickness) * 1000),
-                                                       2),
-                                      'Zpz(mm3)': round((BBChannel.calc_PlasticModulusZpz(section_size.flange_width,
-                                                                                          section_size.flange_thickness,
-                                                                                          section_size.depth,
-                                                                                          section_size.web_thickness) * 1000),
-                                                        2),
-                                      'Zpy(mm3)': round((BBChannel.calc_PlasticModulusZpy(section_size.flange_width,
-                                                                                          section_size.flange_thickness,
-                                                                                          section_size.depth,
-                                                                                          section_size.web_thickness) * 1000),
-                                                        2),
+                                      'Iz(mm4)': round((BBChannel.calc_MomentOfAreaZ(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 10000),2),
+                                      'Iy(mm4)': round((BBChannel.calc_MomentOfAreaY(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 10000),2),
+                                      'rz(mm)': round((BBChannel.calc_RogZ(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 10), 2),
+                                      'ry(mm)': round((BBChannel.calc_RogY(section_size.flange_width,section_size.flange_thickness, section_size.depth,section_size.web_thickness) * 10), 2),
+                                      'Zz(mm3)': round((BBChannel.calc_ElasticModulusZz(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 1000),2),
+                                      'Zy(mm3)': round((BBChannel.calc_ElasticModulusZy(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 1000),2),
+                                      'Zpz(mm3)': round((BBChannel.calc_PlasticModulusZpz(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 1000),2),
+                                      'Zpy(mm3)': round((BBChannel.calc_PlasticModulusZpy(section_size.flange_width,section_size.flange_thickness,section_size.depth,section_size.web_thickness) * 1000),2),
                                       'r(mm)': round(gyration, 2)}
             thickness = section_size.web_thickness
             text = "C"
@@ -1971,11 +1943,11 @@ class Tension_welded(Member):
             else:
                 pass
 
-        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
+        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
         self.report_check.append(t1)
 
         if self.member_design_status == True and self.weld_design_status == True and self.thick_design_status == True:
-            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
+            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7.5cm}|p{1cm}|')
             self.report_check.append(t1)
 
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
@@ -2006,7 +1978,7 @@ class Tension_welded(Member):
                                round((section_size.tension_yielding_capacity / 1000), 2)))
             self.report_check.append(t1)
         else:
-            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{8cm}|p{1cm}|')
+            t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7.5cm}|p{1cm}|')
             self.report_check.append(t1)
             t2 = (KEY_DISP_TENSION_YIELDCAPACITY, self.load.axial_force,
                   member_yield_prov(section_size.area, section_size.fy, gamma_m0, member_yield_kn,
@@ -2049,7 +2021,7 @@ class Tension_welded(Member):
 
         if self.thick_design_status == True:
 
-            t7 = ('SubSection', 'Weld Checks', '|p{3cm}|p{7cm}|p{5cm}|p{1cm}|')
+            t7 = ('SubSection', 'Weld Checks', '|p{3cm}|p{6.5 cm}|p{5cm}|p{1cm}|')
             self.report_check.append(t7)
 
             t1 = (DISP_MIN_WELD_SIZE, min_weld_size_req_01(self.weld_connecting_plates, self.weld.red, self.weld.min_weld), self.weld.size,

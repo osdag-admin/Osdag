@@ -45,6 +45,7 @@ from .ui_design_preferences import Ui_Dialog
 
 from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
+from .ui_OsdagSectionModeller import Ui_OsdagSectionModeller
 #from .ui_design_preferences import DesignPreferences
 from .UI_DESIGN_PREFERENCE import DesignPreferences
 from design_type.connection.shear_connection import ShearConnection
@@ -239,7 +240,7 @@ class Window(QMainWindow):
                                                   '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
-            reportsummary = yaml.load(outfile)
+            reportsummary = yaml.safe_load(outfile)
             self.new_ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
             self.new_ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
             self.new_ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
@@ -423,6 +424,9 @@ class Window(QMainWindow):
         self.menuGraphics = QtWidgets.QMenu(self.menubar)
 
         self.menuGraphics.setObjectName("menuGraphics")
+        self.menuDB = QtWidgets.QMenu(self.menubar)
+
+        self.menuDB.setObjectName("menuDB")
         MainWindow.setMenuBar(self.menubar)
 
         ####################################################################
@@ -1044,6 +1048,24 @@ class Window(QMainWindow):
         font.setFamily("DejaVu Sans")
         self.actionRotate_3D_model.setFont(font)
         self.actionRotate_3D_model.setObjectName("actionRotate_3D_model")
+        self.submenuDownload_db = QtWidgets.QMenu(MainWindow)
+        self.submenuDownload_db.setFont(font)
+        self.submenuDownload_db.setObjectName("submenuDownload_db")
+        self.actionDownload_column = QtWidgets.QAction(MainWindow)
+        self.actionDownload_column.setFont(font)
+        self.actionDownload_column.setObjectName("actionDownload_column")
+        self.actionDownload_beam = QtWidgets.QAction(MainWindow)
+        self.actionDownload_beam.setFont(font)
+        self.actionDownload_beam.setObjectName("actionDownload_beam")
+        self.actionDownload_channel = QtWidgets.QAction(MainWindow)
+        self.actionDownload_channel.setFont(font)
+        self.actionDownload_channel.setObjectName("actionDownload_channel")
+        self.actionDownload_angle = QtWidgets.QAction(MainWindow)
+        self.actionDownload_angle.setFont(font)
+        self.actionDownload_angle.setObjectName("actionDownload_angle")
+        self.actionReset_db = QtWidgets.QAction(MainWindow)
+        self.actionReset_db.setFont(font)
+        self.actionReset_db.setObjectName("actionReset_db")
         self.actionView_2D_on_XY = QtWidgets.QAction(MainWindow)
         self.actionView_2D_on_XY.setObjectName("actionView_2D_on_XY")
         self.actionView_2D_on_YZ = QtWidgets.QAction(MainWindow)
@@ -1153,8 +1175,11 @@ class Window(QMainWindow):
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
         self.actionDesign_Preferences.triggered.connect(self.design_preferences)
-        self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
+        self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
 
+        self.actionOsdagSectionModeller=QtWidgets.QAction(MainWindow)
+        self.actionOsdagSectionModeller.setObjectName("actionDesign_Preferences")
+        self.actionOsdagSectionModeller.triggered.connect(self.osdag_section_modeller)
         # self.designPrefDialog.rejected.connect(lambda: self.design_preferences('rejected'))
         self.actionfinPlate_quit = QtWidgets.QAction(MainWindow)
         self.actionfinPlate_quit.setObjectName("actionfinPlate_quit")
@@ -1178,6 +1203,7 @@ class Window(QMainWindow):
         # self.menuEdit.addAction(self.actionCopy)
         # self.menuEdit.addAction(self.actionPaste)
         self.menuEdit.addAction(self.actionDesign_Preferences)
+        self.menuEdit.addAction(self.actionOsdagSectionModeller)
         self.menuView.addAction(self.actionEnlarge_font_size)
         self.menuView.addSeparator()
         self.menuHelp.addAction(self.actionSample_Tutorials)
@@ -1199,10 +1225,18 @@ class Window(QMainWindow):
             self.menuGraphics.addAction(action)
         self.menuGraphics.addSeparator()
         self.menuGraphics.addAction(self.actionChange_background)
+        self.menuDB.addMenu(self.submenuDownload_db)
+        self.submenuDownload_db.addAction(self.actionDownload_column)
+        self.submenuDownload_db.addAction(self.actionDownload_beam)
+        self.submenuDownload_db.addAction(self.actionDownload_angle)
+        self.submenuDownload_db.addAction(self.actionDownload_channel)
+        self.menuDB.addSeparator()
+        self.menuDB.addAction(self.actionReset_db)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuEdit.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuGraphics.menuAction())
+        self.menubar.addAction(self.menuDB.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi()
@@ -1219,6 +1253,12 @@ class Window(QMainWindow):
         self.actionCreate_design_report.triggered.connect(lambda:self.open_summary_popup(main))
         self.actionZoom_out.triggered.connect(lambda: self.zoom_model(zoom_type="out"))
         self.actionZoom_in.triggered.connect(lambda: self.zoom_model(zoom_type="in"))
+        self.actionDownload_column.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Columns"))
+        self.actionDownload_beam.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Beams"))
+        self.actionDownload_channel.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Channels"))
+        self.actionDownload_angle.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Angles"))
+        self.actionReset_db.triggered.connect(self.database_reset)
+
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -1546,7 +1586,7 @@ class Window(QMainWindow):
         try:
             in_file = str(fileName)
             with open(in_file, 'r') as fileObject:
-                uiObj = yaml.load(fileObject)
+                uiObj = yaml.safe_load(fileObject)
             module = uiObj[KEY_MODULE]
 
             # module_class = self.return_class(module)
@@ -1619,7 +1659,7 @@ class Window(QMainWindow):
         elif trigger_type == "Design_Pref":
 
             if self.prev_inputs != self.input_dock_inputs:
-                self.designPrefDialog = DesignPreferences(main, input_dictionary=self.input_dock_inputs)
+                self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
 
                 if 'Select Section' in self.input_dock_inputs.values():
                     self.designPrefDialog.flag = False
@@ -1655,7 +1695,7 @@ class Window(QMainWindow):
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
-                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
+                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
                                                   KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
@@ -2045,13 +2085,13 @@ class Window(QMainWindow):
                     arg_list.append(key.text())
 
             arg_list.append(self.input_dock_inputs)
-            try:
-                tab1 = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
-                key1 = tab.findChild(QtWidgets.QWidget, KEY_SECSIZE_SELECTED)
-                value1 = key1.text()
-                arg_list.append({KEY_SECSIZE_SELECTED: value1})
-            except:
-                pass
+            # try:
+            #     tab1 = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
+            #     key1 = tab.findChild(QtWidgets.QWidget, KEY_SECSIZE_SELECTED)
+            #     value1 = key1.text()
+            #     arg_list.append({KEY_SECSIZE_SELECTED: value1})
+            # except:
+            #     pass
             val = f(arg_list)
 
             for k2_key_name in k2_key_list:
@@ -2254,6 +2294,7 @@ class Window(QMainWindow):
         self.menuView.setTitle(_translate("MainWindow", "View"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.menuGraphics.setTitle(_translate("MainWindow", "Graphics"))
+        self.menuDB.setTitle(_translate("MainWindow", "Database"))
         self.inputDock.setWindowTitle(_translate("MainWindow", "Input dock"))
         #self.pushButton.setText(_translate("MainWindow", "PushButton"))
         self.btn_Reset.setToolTip(_translate("MainWindow", "Alt+R"))
@@ -2296,6 +2337,12 @@ class Window(QMainWindow):
         self.actionZoom_out.setShortcut(_translate("MainWindow", "Ctrl+O"))
         self.actionPan.setText(_translate("MainWindow", "Pan"))
         self.actionRotate_3D_model.setText(_translate("MainWindow", "Rotate 3D model"))
+        self.submenuDownload_db.setTitle(_translate("MainWindow", "Download"))
+        self.actionDownload_column.setText(_translate("MainWindow", "\n\u2022 Column"))
+        self.actionDownload_beam.setText(_translate("MainWindow", "\n\u2022 Beam"))
+        self.actionDownload_channel.setText(_translate("MainWindow", "\n\u2022 Channel"))
+        self.actionDownload_angle.setText(_translate("MainWindow", "\n\u2022 Angle"))
+        self.actionReset_db.setText(_translate("MainWindow", "Reset"))
         self.actionView_2D_on_XY.setText(_translate("MainWindow", "View 2D on XY"))
         self.actionView_2D_on_YZ.setText(_translate("MainWindow", "View 2D on YZ"))
         self.actionView_2D_on_ZX.setText(_translate("MainWindow", "View 2D on ZX"))
@@ -2328,6 +2375,8 @@ class Window(QMainWindow):
         self.actionFAQ.setText(_translate("MainWindow", "FAQ"))
         self.actionDesign_Preferences.setText(_translate("MainWindow", "Design Preferences"))
         self.actionDesign_Preferences.setShortcut(_translate("MainWindow", "Alt+P"))
+        self.actionOsdagSectionModeller.setText(_translate("MainWindow", "Section Modeller"))
+        self.actionOsdagSectionModeller.setShortcut(_translate("MainWindow", "Alt+S"))
         self.actionfinPlate_quit.setText(_translate("MainWindow", "Quit"))
         self.actionfinPlate_quit.setShortcut(_translate("MainWindow", "Shift+Q"))
         self.actio_load_input.setText(_translate("MainWindow", "Load input"))
@@ -2347,9 +2396,31 @@ class Window(QMainWindow):
         else:
             widget.hide()
 
+    def database_reset(self):
 
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        tables = ["Columns", "Beams", "Angles", "Channels"]
+        text = ""
+        for table in tables:
+            query = "DELETE FROM "+str(table)+" WHERE Source = ?"
+            cursor = conn.execute(query, ('Custom',))
+            text += str(table)+": "+str(cursor.rowcount)+" rows deleted. \n"
+            conn.commit()
+            cursor.close()
+        conn.close()
+        message = QMessageBox()
+        message.setWindowTitle('Successful')
+        message.addButton(message.Ok)
+        message.setText(text)
+        message.exec()
 
+# Function for showing Osdag Section Modeller popup
 
+    def osdag_section_modeller(self):
+        self.OsdagSectionModeller=Ui_OsdagSectionModeller()
+        dialog=QtWidgets.QDialog()
+        self.OsdagSectionModeller.setupUi(dialog)
+        dialog.exec()
 
 from . import icons_rc
 if __name__ == '__main__':

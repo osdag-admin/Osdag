@@ -525,7 +525,7 @@ KEY_DISP_SLENDER = 'Slenderness'
 
 
 KEY_DISP_PLATETHK = 'Thickness (mm)'
-
+KEY_DISP_DPPLATETHK = 'Plate thickness (mm)'
 
 
 DISP_TITLE_TENSION = 'Tension Capacity'

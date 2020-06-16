@@ -1145,17 +1145,10 @@ class CommonDesignLogic(object):
             plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
                                 T=float(T.plate.thickness_provided), degree=30)
 
-            intermittentPlates = Plate(L=195, W=80, T=plate.T)
-            intermittentWelds = FilletWeld(h=5, b=5, L=intermittentPlates.W)
+            intermittentPlates = Plate(L=float(T.inter_plate_height), W=float(T.inter_plate_length), T=plate.T)
+            intermittentWelds = FilletWeld(h=float(T.inter_weld_size), b=float(T.inter_weld_size), L=intermittentPlates.W)
             weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
 
-            # intermittentPlates = Plate(L=float(T.inter_plate_length), W=float(T.inter_plate_height),
-            #                            T=float(T.plate.thickness_provided))
-            #
-            # # intermittentWelds = FilletWeld(h=float(T.inter_weld_size), b=float(T.inter_weld_size),
-            # #                                L=intermittentPlates.W)
-            # intermittentWelds = FilletWeld(h= 5, b= 5,
-            #                                L=intermittentPlates.W)
             s = max(15, float(T.weld.size))
             plate_intercept = plate.L - s - 50
             if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':

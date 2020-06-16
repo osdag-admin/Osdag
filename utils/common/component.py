@@ -590,31 +590,31 @@ class Section(Material):
             min_rad = min(rad_y, rad_z)
 
         elif key == 'Back to Back Channels' and subkey == "Web":
-            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
             Izz = 2 * mom_inertia_z
             I = min(Iyy, Izz)
             min_rad= math.sqrt(I / (2*area))
 
         elif key == "Back to Back Angles" and subkey == 'Long Leg':
-            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
             Izz = 2 * mom_inertia_z
             I = min(Iyy, Izz)
             min_rad= math.sqrt(I / (2*area))
 
         elif key == 'Back to Back Angles' and subkey == 'Short Leg':
-            Izz = (mom_inertia_z + (area * (Cg_2 + thickness) * (Cg_2 + thickness))) * 2
+            Izz = (mom_inertia_z + (area * (Cg_2 + thickness/2) * (Cg_2 + thickness/2))) * 2
             Iyy = 2 * mom_inertia_y
             I = min(Iyy, Izz)
             min_rad= math.sqrt(I / (2*area))
 
         elif key == 'Star Angles' and subkey == 'Long Leg':
-            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
             Izz = (mom_inertia_z + (area * Cg_2 * Cg_2)) * 2
             I = min(Iyy, Izz)
             min_rad= math.sqrt(I / (2*area))
 
         elif key == 'Star Angles' and subkey == 'Short Leg':
-            Izz = (mom_inertia_z + (area * (Cg_2 + thickness) * (Cg_2 + thickness))) * 2
+            Izz = (mom_inertia_z + (area * (Cg_2 + thickness/2) * (Cg_2 + thickness/2))) * 2
             Iyy = (mom_inertia_y + (area * Cg_1 * Cg_1)) * 2
             I = min(Iyy, Izz)
             min_rad= math.sqrt(I / (2*area))
@@ -1955,7 +1955,7 @@ class BBAngle_Properties():
             self.Cz = self.Angle_attributes.Cz
         return round(self.Cz / 10, 2)
 
-    def calc_MomentOfAreaZ(self,a,b,t,l):
+    def calc_MomentOfAreaZ(self,a,b,t,l,thickness = 0.0):
         if self.db == False:
             if l == "Long Leg":
                 self.I_zz = 2* Single_Angle_Properties.calc_MomentOfAreaZ(self,a,b,t,l) *10000
@@ -1963,8 +1963,7 @@ class BBAngle_Properties():
                 mom_inertia_z = Single_Angle_Properties.calc_MomentOfAreaZ(self,a,b,t,l) *10000
                 area = Single_Angle_Properties.calc_Area(self,a,b,t,l)*100
                 Cg_1 = self.calc_Cz(a,b,t,l)*10
-                thickness = 0
-                self.I_zz = (mom_inertia_z + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+                self.I_zz = (mom_inertia_z + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
         else:
             if l == "Long Leg":
                 self.I_zz =  2 * self.Angle_attributes.mom_inertia_z
@@ -1972,17 +1971,15 @@ class BBAngle_Properties():
                 mom_inertia_z = self.Angle_attributes.mom_inertia_z
                 area = self.Angle_attributes.area
                 Cg_1 = self.calc_Cz(a,b,t,l)*10
-                thickness = 0
-                self.I_zz = (mom_inertia_z + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+                self.I_zz = (mom_inertia_z + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
         return round(self.I_zz/10000, 2)
 
-    def calc_MomentOfAreaY(self,a,b,t,l):
+    def calc_MomentOfAreaY(self,a,b,t,l,thickness = 0.0):
         if self.db == False:
             if l == "Long Leg":
                 mom_inertia_y = Single_Angle_Properties.calc_MomentOfAreaY(self,a, b, t, l) * 10000
                 area = Single_Angle_Properties.calc_Area(self,a, b, t, l) * 100
                 Cg_1 = self.calc_Cy(a, b, t, l) * 10
-                thickness = 0
                 self.I_yy= (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
             else:
                 self.I_yy = 2 * Single_Angle_Properties.calc_MomentOfAreaY(self, a, b, t, l) * 10000
@@ -1992,8 +1989,7 @@ class BBAngle_Properties():
                 mom_inertia_y = self.Angle_attributes.mom_inertia_y
                 area = self.Angle_attributes.area
                 Cg_1 = self.Angle_attributes.Cy
-                thickness = 0
-                self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+                self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
             else:
                 self.I_yy = 2* self.Angle_attributes.mom_inertia_y
         return round(self.I_yy/10000, 2)
@@ -2013,23 +2009,23 @@ class BBAngle_Properties():
 
         return round(self.r_y , 2)
 
-    def calc_ElasticModulusZz(self,a,b,t,l):
+    def calc_ElasticModulusZz(self,a,b,t,l,thickness = 0):
         mom_inertia_z = self.calc_MomentOfAreaZ(a, b, t, l)
         if l == "Long Leg":
             self.Z_zz = 1000
         else:
-            self.Z_zz = mom_inertia_z/(a/10)
+            self.Z_zz = mom_inertia_z/((a+thickness/2)/10)
         return round(self.Z_zz, 2)
 
-    def calc_ElasticModulusZy(self,a,b,t,l):
+    def calc_ElasticModulusZy(self,a,b,t,l,thickness = 0):
         mom_inertia_y = self.calc_MomentOfAreaY(a, b, t, l)
         if l == "Long Leg":
-            self.Z_yy = mom_inertia_y/(b/10)
+            self.Z_yy = mom_inertia_y/((b+thickness/2)/10)
         else:
             self.Z_yy = 1000
         return round(self.Z_yy, 2)
 
-    def calc_PlasticModulusZpz(self,a,b,t,l):
+    def calc_PlasticModulusZpz(self,a,b,t,l,thickness = 0):
         Aa = self.calc_Area(a, b, t,l)
         self.Z_pz = 1
         # self.Z_pz = t * (b-t) * (a- 0.5* Aa/t-0.5*t)
@@ -2037,7 +2033,7 @@ class BBAngle_Properties():
         # self.Z_pz = 1.000
         return round(self.Z_pz, 2)
 
-    def calc_PlasticModulusZpy(self,a,b,t,l):
+    def calc_PlasticModulusZpy(self,a,b,t,l,thickness = 0):
         Aa = self.calc_Area(a, b, t,l)
         self.Z_py = 1
         # self.Z_py = t * (a - t) * (b - 0.5 * Aa / t - 0.5 * t)
@@ -2088,7 +2084,7 @@ class SAngle_Properties(object):
             self.Cz = self.Angle_attributes.Cz
         return round(self.Cz / 10, 2)
 
-    def calc_MomentOfAreaZ(self, a, b, t, l):
+    def calc_MomentOfAreaZ(self, a, b, t, l,thickness = 0.0):
         if self.db == False:
             if l == "Long Leg":
                 mom_inertia_z = Single_Angle_Properties.calc_MomentOfAreaZ(self, a, b, t, l) * 10000
@@ -2098,9 +2094,8 @@ class SAngle_Properties(object):
             else:
                 mom_inertia_z = Single_Angle_Properties.calc_MomentOfAreaZ(self, a, b, t, l) * 10000
                 area = Single_Angle_Properties.calc_Area(self, a, b, t, l) * 100
-                Cg_1 = self.calc_Cz(a, b, t, l) * 10
-                thickness = 0
-                self.I_zz = (mom_inertia_z + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+                Cg_1 = self.calc_Cz(a, b, t, l) * 1
+                self.I_zz = (mom_inertia_z + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
 
         else:
             if l == "Long Leg":
@@ -2112,18 +2107,16 @@ class SAngle_Properties(object):
                 mom_inertia_z = self.Angle_attributes.mom_inertia_z
                 area = self.Angle_attributes.area
                 Cg_1 = self.calc_Cz(a, b, t, l) * 10
-                thickness = 0
-                self.I_zz = (mom_inertia_z + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+                self.I_zz = (mom_inertia_z + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
         return round(self.I_zz / 10000, 2)
 
-    def calc_MomentOfAreaY(self,a,b,t,l):
+    def calc_MomentOfAreaY(self,a,b,t,l,thickness = 0.0):
         if self.db == False:
             if l == "Long Leg":
                 mom_inertia_y = Single_Angle_Properties.calc_MomentOfAreaY(self, a, b, t, l) * 10000
                 area = Single_Angle_Properties.calc_Area(self, a, b, t, l) * 100
                 Cg_1 = self.calc_Cy(a, b, t, l) * 10
-                thickness = 0
-                self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+                self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
             else:
                 mom_inertia_y = Single_Angle_Properties.calc_MomentOfAreaY(self, a, b, t, l) * 10000
                 area = Single_Angle_Properties.calc_Area(self, a, b, t, l) * 100
@@ -2135,8 +2128,7 @@ class SAngle_Properties(object):
                 mom_inertia_y = self.Angle_attributes.mom_inertia_y
                 area = self.Angle_attributes.area
                 Cg_1 = self.calc_Cy(a, b, t, l) * 10
-                thickness = 0
-                self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+                self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
 
             else:
                 mom_inertia_y = self.Angle_attributes.mom_inertia_y
@@ -2160,24 +2152,24 @@ class SAngle_Properties(object):
 
         return round(self.r_y, 2)
 
-    def calc_ElasticModulusZz(self,a,b,t,l):
+    def calc_ElasticModulusZz(self,a,b,t,l,thickness = 0):
         mom_inertia_z = self.calc_MomentOfAreaZ(a, b, t, l)
         # if l == "Long Leg":
-        self.Z_zz = mom_inertia_z / (a / 10)
+        self.Z_zz = mom_inertia_z / ((a+thickness/2) / 10)
         # else:
         #     self.Z_zz = mom_inertia_z / (a / 10)
         return round(self.Z_zz, 2)
 
 
-    def calc_ElasticModulusZy(self,a,b,t,l):
+    def calc_ElasticModulusZy(self,a,b,t,l,thickness = 0):
         mom_inertia_y = self.calc_MomentOfAreaY(a, b, t, l)
         # if l == "Long Leg":
-        self.Z_yy = mom_inertia_y / (b / 10)
+        self.Z_yy = mom_inertia_y / ((b+thickness/2) / 10)
         # else:
         #     self.Z_zz = mom_inertia_z / (a / 10)
         return round(self.Z_yy, 2)
 
-    def calc_PlasticModulusZpz(self,a,b,t,l):
+    def calc_PlasticModulusZpz(self,a,b,t,l,thickness = 0):
         Aa = self.calc_Area(a, b, t,l)
         self.Z_pz = 2
         # self.Z_pz = t * (b-t) * (a- 0.5* Aa/t-0.5*t)
@@ -2185,7 +2177,7 @@ class SAngle_Properties(object):
         # self.Z_pz = 1.000
         return round(self.Z_pz, 2)
 
-    def calc_PlasticModulusZpy(self,a,b,t,l):
+    def calc_PlasticModulusZpy(self,a,b,t,l,thickness = 0):
         Aa = self.calc_Area(a, b, t,l)
         self.Z_py = 2
         # self.Z_py = t * (a - t) * (b - 0.5 * Aa / t - 0.5 * t)
@@ -2300,7 +2292,7 @@ class BBChannel_Properties(object):
             self.Cy = self.Channel_attributes.Cy
         return round(self.Cy / 10, 2)
 
-    def calc_MomentOfAreaZ(self,f_w,f_t,w_h,w_t):
+    def calc_MomentOfAreaZ(self,f_w,f_t,w_h,w_t,thickness = 0):
         if self.db == False:
             self.I_zz = 2* Single_Channel_Properties.calc_MomentOfAreaZ(self,f_w, f_t, w_h, w_t) * 10000
         else:
@@ -2308,19 +2300,17 @@ class BBChannel_Properties(object):
 
         return round(self.I_zz / 10000, 2)
 
-    def calc_MomentOfAreaY(self,f_w,f_t,w_h,w_t):
+    def calc_MomentOfAreaY(self,f_w,f_t,w_h,w_t,thickness = 0):
         if self.db == False:
             mom_inertia_y = Single_Channel_Properties.calc_MomentOfAreaY(self,f_w, f_t, w_h, w_t)
             area = Single_Channel_Properties.calc_Area(self,f_w, f_t, w_h, w_t)
             Cg_1 = self.calc_C_y(f_w,f_t,w_h,w_t)
-            thickness = 0
-            self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+            self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
         else:
             mom_inertia_y = self.Channel_attributes.mom_inertia_y/10000
             area = self.Channel_attributes.area/100
             Cg_1 = self.calc_C_y(f_w,f_t,w_h,w_t)
-            thickness = 0
-            self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness) * (Cg_1 + thickness))) * 2
+            self.I_yy = (mom_inertia_y + (area * (Cg_1 + thickness/2) * (Cg_1 + thickness/2))) * 2
 
         return round(self.I_yy, 2)
 
@@ -2339,21 +2329,21 @@ class BBChannel_Properties(object):
 
         return round(self.r_y, 2)
 
-    def calc_ElasticModulusZz(self,f_w,f_t,w_h,w_t):
+    def calc_ElasticModulusZz(self,f_w,f_t,w_h,w_t,thickness = 0):
         I_zzc = self.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t)
         self.Z_zz = I_zzc / (0.5 * (w_h/10))
         return round(self.Z_zz, 2)
 
-    def calc_ElasticModulusZy(self,f_w,f_t,w_h,w_t):
+    def calc_ElasticModulusZy(self,f_w,f_t,w_h,w_t,thickness = 0):
         I_yyc = self.calc_MomentOfAreaY(f_w, f_t, w_h, w_t)
-        self.Z_yy = I_yyc / (f_w/10)
+        self.Z_yy = I_yyc / ((f_w+ thickness/2)/10)
         return round(self.Z_yy, 2)
 
-    def calc_PlasticModulusZpz(self,f_w,f_t,w_h,w_t):
+    def calc_PlasticModulusZpz(self,f_w,f_t,w_h,w_t,thickness = 0):
         self.Z_pz = 2*f_w * (w_h ** 2) / 4 - 2*((f_w - w_t) * ((w_h - 2 * f_t) ** 2) / 4)
         return round(self.Z_pz / 1000, 2)
 
-    def calc_PlasticModulusZpy(self,f_w,f_t,w_h,w_t):
+    def calc_PlasticModulusZpy(self,f_w,f_t,w_h,w_t,thickness = 0):
         self.Z_py = 2 * w_h * ((2*f_w) ** 2) / 4 - 2 * ((w_h - 2 * f_t) * ((f_w - w_t) ** 2)/4)
         return round(self.Z_py / 1000, 2)
 

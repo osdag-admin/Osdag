@@ -58,7 +58,7 @@ class Connection(Main):
             flange_width = str(I_sec_attributes.flange_width)
             flange_thickness = str(I_sec_attributes.flange_thickness)
             web_thickness = str(I_sec_attributes.web_thickness)
-            flange_slope = str(I_sec_attributes.flange_slope)
+            flange_slope = float(I_sec_attributes.flange_slope)
             root_radius = str(I_sec_attributes.root_radius)
             toe_radius = str(I_sec_attributes.toe_radius)
             m_o_e = "200"
@@ -251,7 +251,7 @@ class Connection(Main):
             flange_width = str(I_sec_attributes.flange_width)
             flange_thickness = str(I_sec_attributes.flange_thickness)
             web_thickness = str(I_sec_attributes.web_thickness)
-            flange_slope = str(I_sec_attributes.flange_slope)
+            flange_slope = float(I_sec_attributes.flange_slope)
             root_radius = str(I_sec_attributes.root_radius)
             toe_radius = str(I_sec_attributes.toe_radius)
             m_o_e = "200"

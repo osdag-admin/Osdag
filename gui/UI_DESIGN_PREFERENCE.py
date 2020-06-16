@@ -155,7 +155,7 @@ class Window(QDialog):
                         if lable == 'Designation':
                             line.textChanged.connect(self.manage_designation_size(line))
                         line.setFixedSize(91,22)
-                        if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4']:
+                        if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5','Label_6','Label_7','Label_13','Label_14']:
                             line.setValidator(QDoubleValidator())
                         if input_dictionary:
                             line.setText(str(element[4]))
@@ -165,7 +165,7 @@ class Window(QDialog):
                         font.setWeight(50)
                         line.setFont(font)
                         if lable in [KEY_DISP_FU, KEY_DISP_FY, KEY_DISP_POISSON_RATIO, KEY_DISP_THERMAL_EXP,
-                                     KEY_DISP_MOD_OF_ELAST, KEY_DISP_MOD_OF_RIGID]:
+                                     KEY_DISP_MOD_OF_ELAST, KEY_DISP_MOD_OF_RIGID, 'Source']:
                             line.setReadOnly(True)
                             self.do_not_clear_list.append(line)
                         r += 1
@@ -557,7 +557,7 @@ class Window(QDialog):
                 QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
                 # add_col = tab_Column.findChild(QtWidgets.QWidget, 'pushButton_Add_'+KEY_DISP_COLSEC)
                 # add_col.setDisabled(True)
-                break
+                return
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
                 if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC:
                     Designation_c = ch.text()
@@ -662,7 +662,7 @@ class Window(QDialog):
                 QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
                 add_bm = tab_Beam.findChild(QtWidgets.QWidget, 'pushButton_Add_'+KEY_DISP_BEAMSEC)
                 add_bm.setDisabled(True)
-                break
+                return
 
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
 
@@ -766,7 +766,7 @@ class Window(QDialog):
                 QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
                 add_bm = tab_Angle.findChild(QtWidgets.QWidget, 'pushButton_Add_'+tab_name)
                 add_bm.setDisabled(True)
-                break
+                return
 
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
 
@@ -871,7 +871,7 @@ class Window(QDialog):
                 QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
                 add_bm = tab_Channel.findChild(QtWidgets.QWidget, 'pushButton_Add_'+DISP_TITLE_ANGLE)
                 add_bm.setDisabled(True)
-                break
+                return
 
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
 
@@ -926,6 +926,14 @@ class Window(QDialog):
                     if ch.text() == "":
                         ch.setText("0")
                     zpy = ch.text()
+                elif ch.objectName() == 'Label_26':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    It = ch.text()
+                elif ch.objectName() == 'Label_27':
+                    if ch.text() == "":
+                        ch.setText("0")
+                    Iw = ch.text()
 
                 else:
                     pass
@@ -942,9 +950,9 @@ class Window(QDialog):
             data = c.fetchone()[0]
             if data == 0:
                 c.execute('''INSERT INTO Channels (Designation,Mass, Area,D,B,tw,T,FlangeSlope, R1, R2,Cy,Iz,Iy,
-                 rz, ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                 rz, ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                           (Designation_c, Mass, Area,D,B,t_w,T,
-                           Flange_Slope, R1, R2,cy,I_z,I_y, rz, ry,zz,zy,zpz,zpy,Source,Type))
+                           Flange_Slope, R1, R2,cy,I_z,I_y, rz, ry,zz,zy,zpz,zpy,It, Iw,Source,Type))
                 conn.commit()
                 c.close()
                 conn.close()

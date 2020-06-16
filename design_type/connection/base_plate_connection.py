@@ -1387,10 +1387,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # self.load_shear = float(design_dictionary[KEY_SHEAR_BP])
         # self.load_shear = self.load_shear * 10 ** 3  # N
 
-        self.load_shear_major = float(design_dictionary[KEY_SHEAR_MAJOR])  # shear force acting along the major axis
+        self.load_shear_major = float(design_dictionary[KEY_SHEAR_MAJOR])  # shear force acting along the major axis (i.e. depth of the column)
         self.load_shear_major = self.load_shear_major * 10 ** 3  # N
 
-        self.load_shear_minor = float(design_dictionary[KEY_SHEAR_MINOR])  # shear force acting along the minor axis
+        self.load_shear_minor = float(design_dictionary[KEY_SHEAR_MINOR])  # shear force acting along the minor axis (i.e. width of the column)
         self.load_shear_minor = self.load_shear_minor * 10 ** 3  # N
 
         # TODO: check the condition given below
@@ -1900,6 +1900,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # updating the anchor area (provided outside flange), if the diameter is updated in tension check
         self.anchor_area = self.bolt_area(self.anchor_dia_provided)  # list of areas [shank area, thread area] mm^2
         self.anchor_grade_tension = self.anchor_grade
+        self.grout_thk = 50  # mm
 
         if self.connectivity == 'Moment Base Plate':
 
@@ -2135,12 +2136,67 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.shear_key_depth_ColDepth = self.load_shear_major / ((self.bearing_strength_concrete / 0.45) *
                                                                                  self.shear_key_len_ColDepth)  # mm
                         self.shear_key_depth_ColDepth = max(self.shear_key_depth_ColDepth, self.grout_thk + 150)  # mm
-                    else:
+
+                        # check for bearing of the shear key on concrete (along major axis)
+                        self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm^2
+
+                        if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
+                            key_dimensions = [self.shear_key_len_ColDepth, self.shear_key_depth_ColDepth]
+
+                            n = 1
+                            while self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
+                                key_update_dimensions = [key_dimensions[-1]]  # updating the depth only
+
+                                for i in key_update_dimensions:
+                                    i += 25
+                                    key_dimensions.append(i)
+                                    i += 1
+
+                                key_area_provided = key_dimensions[0] * key_dimensions[-1]  # mm^2
+                                n += 1
+
+                                self.shear_key_len_ColDepth = key_dimensions[0]  # mm, keeping the length umchanged
+                                self.shear_key_depth_ColDepth = key_dimensions[-1]  # mm, updated depth if while loop is True
+                                key_area_provided = self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth  # mm^2, update area if while loop is True
+
+                                # actual bearing pressure acting on the provided area of the base plate
+                                self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm
+                        else:
+                            pass
+
+                    if self.load_shear_minor > 0:
                         self.shear_key_along_ColWidth = 'Yes'
                         self.shear_key_len_ColWidth = self.column_bf  # mm
                         self.shear_key_depth_ColWidth = self.load_shear_minor / ((self.bearing_strength_concrete / 0.45) *
                                                                                  self.shear_key_len_ColWidth)  # mm
                         self.shear_key_depth_ColWidth = max(self.shear_key_depth_ColWidth, self.grout_thk + 150)  # mm
+
+                        # check for bearing of the shear key on concrete (along minor axis)
+                        self.shear_key_stress_ColWidth = self.load_shear_major / (self.shear_key_len_ColWidth * self.shear_key_depth_ColWidth)  # N/mm^2
+
+                        if self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
+
+                            key_dimensions = [self.shear_key_len_ColWidth, self.shear_key_depth_ColWidth]
+                            n = 1
+                            while self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
+                                key_update_dimensions = [key_dimensions[-1]]  # updating the depth only
+
+                                for i in key_update_dimensions:
+                                    i += 25
+                                    key_dimensions.append(i)
+                                    i += 1
+
+                                key_area_provided = key_dimensions[0] * key_dimensions[-1]  # mm^2
+                                n += 1
+
+                                self.shear_key_len_ColWidth = key_dimensions[0]  # mm, keeping the length umchanged
+                                self.shear_key_depth_ColWidth = key_dimensions[-1]  # mm, updated depth if while loop is True
+                                key_area_provided = self.shear_key_len_ColWidth * self.shear_key_depth_ColWidth  # mm^2, update area if while loop is True
+
+                                # actual bearing pressure acting on the provided area of the base plate
+                                self.shear_key_stress_ColWidth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm
+                        else:
+                            pass
 
                 else:
                     self.shear_key_required = 'No'
@@ -2190,7 +2246,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
         # updating anchor length (adding the length above the concrete pedestal)
-        self.grout_thk = 50  # mm
         if self.connectivity == 'Moment Base Plate':
             self.plate_washer_thk = IS6649.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_uplift))[
                 'washer_thk']  # washer thickness, mm
@@ -2787,6 +2842,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             print(self.shear_capa_stiffener_across_web)
             print(self.moment_on_stiffener_across_web)
             print(self.moment_capa_stiffener_across_web)
+        else:
+            pass
+
+        # shear key details
+        if (self.load_shear_major or self.load_shear_minor) > 0:
+            if self.shear_key_required == 'Yes':
+                print(self.shear_key_thk)
+
+                if self.load_shear_major > 0:
+                    print(self.shear_key_len_ColDepth)
+                    print(self.shear_key_depth_ColDepth)
+                else:
+                    print(self.shear_key_len_ColWidth)
+                    print(self.shear_key_depth_ColWidth)
+            else:
+                pass
         else:
             pass
 

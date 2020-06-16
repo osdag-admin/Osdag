@@ -58,31 +58,36 @@ class IntermittentNutBoltPlateArray():
 
     def initBoltPlaceParams(self):
 
-        self.pitch = 35
+        self.pitch = 30
         self.spacing = 200
-        self.gauge = 35
-        self.edge = 35
-        self.end = 35
+        self.gauge = 20
+        self.edge = 15.5
+        self.end = 15
         self.row = 2
         self.col = 1
-        self.no_intermitent_connections = 1
+        self.no_intermitent_connections = 3
+        self.memberdeepth = 75
+        self.member_thickness = 6
+        self.member_web_thickness = 5
+        self.root_radius = 6
 
     def calculatePositions(self):
         """
         Calculate the exact position for nut, bolts and plates.
         """
         self.positions = []
+        self.origin = self.origin + (self.spacing - self.end)*self.pitchDir
         for connec in range(self.no_intermitent_connections):
             pltpos = self.origin
             pltpos = pltpos + (connec * self.spacing) * self.pitchDir
-            pltpos = pltpos + (self.gap - self.intermittentPlate.T) * self.boltDir
-            pltpos = pltpos + self.intermittentPlate.L / 2 * self.gaugeDir
+            pltpos = pltpos + (self.gap - self.member_web_thickness/2 - self.intermittentPlate.T) * self.boltDir
+            pltpos = pltpos
 
             self.platePositions.append(pltpos)
             for rw in range(self.row):
                 for col in range(self.col):
-                    pos = self.origin
-                    pos = pos + 5 * self.gaugeDir
+                    pos = self.origin +(self.member_thickness + self.root_radius - self.memberdeepth/2) * self.gaugeDir
+                    # pos = pos + 5 * self.gaugeDir
                     pos = pos + self.edge * self.gaugeDir
                     pos = pos + col * self.pitch * self.pitchDir
                     pos = pos + self.end * self.pitchDir
@@ -116,20 +121,20 @@ class IntermittentNutBoltPlateArray():
 
         for plate in self.plates:
             self.platemodels.append(plate.create_model())
-
-        nut_bolts = self.models
-        nbarray = nut_bolts[0]
-        for comp in nut_bolts:
-            nbarray = BRepAlgoAPI_Fuse(comp, nbarray).Shape()
-
-        plates = self.platemodels
-        parray = plates[0]
-        for comp in plates:
-            parray = BRepAlgoAPI_Fuse(comp, parray).Shape()
-
-        array = BRepAlgoAPI_Fuse(nbarray, parray).Shape()
-
-        return array
+        #
+        # nut_bolts = self.models
+        # nbarray = nut_bolts[0]
+        # for comp in nut_bolts:
+        #     nbarray = BRepAlgoAPI_Fuse(comp, nbarray).Shape()
+        #
+        # plates = self.platemodels
+        # parray = plates[0]
+        # for comp in plates:
+        #     parray = BRepAlgoAPI_Fuse(comp, parray).Shape()
+        #
+        # array = BRepAlgoAPI_Fuse(nbarray, parray).Shape()
+        #
+        # return array
 
     def get_nut_bolt_models(self):
         nut_bolts = self.models
@@ -328,29 +333,29 @@ if __name__ == '__main__':
 
     bolt = Bolt(R=6, T=5, H=6, r=3)
     nut = Nut(R=bolt.R, T=bolt.T, H=bolt.T + 1, innerR1=bolt.r)
-    nut_space = 10 + 5 + nut.T  # member.T + plate.T + nut.T
+    nut_space = 2*5 + 5 + nut.T  # 2*member.T + plate.T + nut.T
     Obj = 'Star Angles'  #'Back to Back Channels'  # ''Channels'  #'  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
 
     # nut_bolt_array = NutBoltArray(Obj, nut, bolt, nut_space)
 
-    intermittentPlate = Plate(L= 180, W=35 + 35, T=10)
-    # nut_bolt_array = IntermittentNutBoltPlateArray(Obj, nut, bolt, intermittentPlate, nut_space)
-    #
-    # place = nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
-    # nut_bolt_array_Model = nut_bolt_array.create_model()
+    intermittentPlate = Plate(L= 75, W=30, T=10)
+    nut_bolt_array = IntermittentNutBoltPlateArray(Obj, nut, bolt, intermittentPlate, nut_space)
 
-    welds = FilletWeld(h=5, b=5, L=intermittentPlate.W)
-    weld_plate_array = IntermittentWelds(Obj, welds, intermittentPlate)
-    place = weld_plate_array.place(nutboltArrayOrigin, pitchDir, gaugeDir, boltDir)
+    place = nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
+    nut_bolt_array_Model = nut_bolt_array.create_model()
 
-    weld_plate_array.create_model()
+    # welds = FilletWeld(h=5, b=5, L=intermittentPlate.W)
+    # weld_plate_array = IntermittentWelds(Obj, welds, intermittentPlate)
+    # place = weld_plate_array.place(nutboltArrayOrigin, pitchDir, gaugeDir, boltDir)
 
-    welds = weld_plate_array.get_welded_models()
-    plates = weld_plate_array.get_plate_models()
+    # weld_plate_array.create_model()
 
-    # array = nut_bolt_array.get_models()
-    # nbarray = nut_bolt_array.get_nut_bolt_models()
-    # parray = nut_bolt_array.get_plate_models()
+    # welds = weld_plate_array.get_welded_models()
+    # plates = weld_plate_array.get_plate_models()
+
+    array = nut_bolt_array.get_models()
+    nbarray = nut_bolt_array.get_nut_bolt_models()
+    parray = nut_bolt_array.get_plate_models()
     # array = nut_bolts[0]
     # for comp in nut_bolts:
     #     array = BRepAlgoAPI_Fuse(comp, array).Shape()
@@ -358,9 +363,9 @@ if __name__ == '__main__':
     Point = gp_Pnt(0.0, 0.0, 0.0)
     display.DisplayMessage(Point, "Origin")
 
-    # display.DisplayShape(nbarray, color= 'YELLOW' ,update=True)
-    # display.DisplayShape(parray, color= 'BLUE', update=True)
-    display.DisplayShape(welds, color='RED', update=True)
-    display.DisplayShape(plates, color='BLUE', update=True)
+    display.DisplayShape(nbarray, color= 'YELLOW' ,update=True)
+    display.DisplayShape(parray, color= 'BLUE', update=True)
+    # display.DisplayShape(welds, color='RED', update=True)
+    # display.DisplayShape(plates, color='BLUE', update=True)
     display.DisableAntiAliasing()
     start_display()

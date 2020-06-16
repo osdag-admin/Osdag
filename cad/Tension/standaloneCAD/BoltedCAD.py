@@ -10,7 +10,7 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 
 class TensionAngleBoltCAD(object):
-    def __init__(self, Obj, member, plate, nut_bolt_array):
+    def __init__(self, Obj, member, plate, nut_bolt_array, intermittentConnection):
         """
         :param member: Angle or Channel
         :param plate: Plate
@@ -18,11 +18,13 @@ class TensionAngleBoltCAD(object):
         :param memb_data: data of the members
         """
 
+
         self.Obj = Obj  # 'Star Angles'  # 'Back to Back Channels'  #'Channels'  #'  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
         self.loc = 'Long Leg'
         self.member = member
         self.plate = plate
         self.nut_bolt_array = nut_bolt_array
+        self.intermittentConnection = intermittentConnection
 
         self.plate1 = copy.deepcopy(self.plate)
         self.plate2 = copy.deepcopy(self.plate)
@@ -144,6 +146,18 @@ class TensionAngleBoltCAD(object):
 
         self.plate2_Model = self.plate2.create_model()
 
+        if self.Obj == 'Back to Back Angles' or self.Obj == 'Back to Back Channels' or self.Obj == 'Star Angles' and self.member.L >=1000:
+            intermittentConnectionOriginL = numpy.array([0, 0.0, 0.0])
+            intermittentConnection_uDir = numpy.array([1.0, 0.0, 0.0])
+            intermittentConnection_vDir = numpy.array([0.0, 1.0, 0.0])
+            intermittentConnection_wDir = numpy.array([0.0, 0.0, 1.0])
+            self.intermittentConnection.place(intermittentConnectionOriginL, intermittentConnection_uDir,
+                                              intermittentConnection_vDir, intermittentConnection_wDir)
+
+            self.intermittentConnection_Model = self.intermittentConnection.create_model()
+            self.inter_conc_bolts = self.intermittentConnection.get_nut_bolt_models()
+            self.inter_conc_plates = self.intermittentConnection.get_plate_models()
+
     def create_nut_bolt_array(self):
         """
 
@@ -221,6 +235,8 @@ class TensionAngleBoltCAD(object):
 
     def get_plates_models(self):
         plate = BRepAlgoAPI_Fuse(self.plate1_Model, self.plate2_Model).Shape()
+        if self.Obj == 'Back to Back Angles' or self.Obj == 'Back to Back Channels' or self.Obj == 'Star Angles' and self.member.L >= 1000:
+            plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
         return plate
 
     def get_nut_bolt_array_models(self):
@@ -236,6 +252,9 @@ class TensionAngleBoltCAD(object):
         # array = nut_bolts[0]
         # for comp in nut_bolts:
         #     array = BRepAlgoAPI_Fuse(comp, array).Shape()
+
+        if self.Obj == 'Back to Back Angles' or self.Obj == 'Back to Back Channels' or self.Obj == 'Star Angles' and self.member.L >= 1000:
+            array = BRepAlgoAPI_Fuse(array, self.inter_conc_bolts)
 
         return array
 
@@ -290,6 +309,7 @@ if __name__ == '__main__':
     from cad.items.stiffener_plate import StiffenerPlate
     from cad.items.Gasset_plate import GassetPlate
     from cad.Tension.standaloneCAD.nutBoltPlacement import NutBoltArray
+    from cad.Tension.standaloneCAD.IntermittentConnections import IntermittentNutBoltPlateArray
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
@@ -309,6 +329,7 @@ if __name__ == '__main__':
 
     bolt = Bolt(R=8, T=5, H=6, r=3)
     nut = Nut(R=bolt.R, T=bolt.T, H=bolt.T + 1, innerR1=bolt.r)
+    intermittentPlate = Plate(L= 75, W=30, T=10)
 
     if Obj == 'Channels' or Obj == 'Back to Back Channels':
         member = Channel(B=50, T=6.6, D=125, t=3, R1=6.0, R2=2.4, L=4000)
@@ -321,8 +342,9 @@ if __name__ == '__main__':
         # plateObj = 0.0
 
         nut_bolt_array = NutBoltArray(Obj, nut, bolt, nut_space)
+        intermittentConnection = IntermittentNutBoltPlateArray(Obj, nut, bolt, intermittentPlate, nut_space)
 
-        tensionCAD = TensionChannelBoltCAD(Obj, member, plate, nut_bolt_array)
+        tensionCAD = TensionChannelBoltCAD(Obj, member, plate, nut_bolt_array, intermittentConnection)
 
 
     else:
@@ -337,8 +359,9 @@ if __name__ == '__main__':
         plateObj = 0.0
 
         nut_bolt_array = NutBoltArray(plateObj, nut, bolt, nut_space)
+        intermittentConnection = IntermittentNutBoltPlateArray(Obj, nut, bolt, intermittentPlate, nut_space)
 
-        tensionCAD = TensionAngleBoltCAD(member, plate, nut_bolt_array, Obj)
+        tensionCAD = TensionAngleBoltCAD(Obj, member, plate, nut_bolt_array, intermittentConnection)
 
     tensionCAD.create_3DModel()
     plate = tensionCAD.get_plates_models()

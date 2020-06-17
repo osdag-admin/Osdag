@@ -509,7 +509,7 @@ class Member(Main):
         t12 = ('Label_5', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         section.append(t12)
 
-        t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, plate_thk)
+        t12 = ('Label_0', KEY_DISP_DPPLATETHK01, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, plate_thk)
         section.append(t12)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)

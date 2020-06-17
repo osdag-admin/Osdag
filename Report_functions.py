@@ -23,15 +23,22 @@ from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
 from pylatex.utils import bold
 
 
-def min_pitch(d):
+def min_pitch(d,cond = None):
     min_pitch = 2.5*d
     d = str(d)
     min_pitch = str(min_pitch)
 
     min_pitch_eqn = Math(inline=True)
-    min_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{min}&= 2.5 ~ d&\\'))
-    min_pitch_eqn.append(NoEscape(r'=&2.5*' + d + r'&=' + min_pitch + r'\end{aligned}'))
+    if cond == None:
+        min_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{min}&= 2.5 ~ d&\\'))
+        min_pitch_eqn.append(NoEscape(r'=&2.5*' + d + r'&=' + min_pitch + r'\end{aligned}'))
+    else:
+        min_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{min}&= 2.5 ~ d&\\'))
+        min_pitch_eqn.append(NoEscape(r'=&2.5*' + d + r'=' + min_pitch + r'\\'))
+        min_pitch_eqn.append(NoEscape(r'&' + cond + r'\end{aligned}'))
     return min_pitch_eqn
+
+
 
 
 

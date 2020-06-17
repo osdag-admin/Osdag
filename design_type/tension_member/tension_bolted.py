@@ -2053,7 +2053,7 @@ class Tension_bolted(Member):
                 else:
                     image = "Slope_Channel"
             min_gauge = self.pitch_round
-            row_limit = "Row Limit (rl) = 2"
+            row_limit = "Row~Limit~(rl)~=~2"
             row = 2
             depth =  2 * self.edge_dist_min_round + self.pitch_round
         elif section_size.max_leg == section_size.min_leg:
@@ -2074,7 +2074,7 @@ class Tension_bolted(Member):
                 connecting_plates = [self.plate.thickness_provided, section_size.thickness]
 
             min_gauge = 0.0
-            row_limit = "Row Limit (rl) = 1"
+            row_limit = "Row~Limit~(rl)~=~1"
             row = 1
             # if self.loc == "Long Leg":
             depth = 2 * self.edge_dist_min_round
@@ -2097,7 +2097,7 @@ class Tension_bolted(Member):
                 connecting_plates = [self.plate.thickness_provided, section_size.thickness]
 
             min_gauge = 0.0
-            row_limit = "Row Limit (rl) = 1"
+            row_limit = "Row~Limit~(rl)~=~1"
             row = 1
             # if self.loc == "Long Leg":
             depth = 2 * self.edge_dist_min_round
@@ -2155,7 +2155,7 @@ class Tension_bolted(Member):
                                       KEY_DISP_FU: round(section_size.fu,2),
                                       KEY_DISP_FY: round(section_size.fy,2),
                                       'Mass': round(section_size.mass,2),
-                                      'Area(mm2) - A': round(section_size.area,2),
+                                      'Area(mm2) - Ag': round(section_size.area,2),
                                       'D(mm)': round(section_size.depth,2),
                                       'B(mm)': round(section_size.flange_width,2),
                                       't(mm)': round(section_size.web_thickness,2),
@@ -2185,7 +2185,7 @@ class Tension_bolted(Member):
                                       KEY_DISP_FU: round(section_size.fu, 2),
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
-                                      'Area(mm2) - A': round(section_size.area, 2),
+                                      'Area(mm2) - Ag': round(section_size.area, 2),
                                       'D(mm)': round(section_size.depth, 2),
                                       'B(mm)': round(section_size.flange_width, 2),
                                       't(mm)': round(section_size.web_thickness, 2),
@@ -2214,9 +2214,9 @@ class Tension_bolted(Member):
                                       KEY_DISP_FU: round(section_size.fu,2),
                                       KEY_DISP_FY: round(section_size.fy,2),
                                       'Mass': round(section_size.mass,2),
-                                      'Area(mm2) - A': round((section_size.area),2),
-                                      'a(mm)': round(section_size.max_leg,2),
-                                      'b(mm)': round(section_size.min_leg,2),
+                                      'Area(mm2) - Ag': round((section_size.area),2),
+                                      'A(mm)': round(section_size.max_leg,2),
+                                      'B(mm)': round(section_size.min_leg,2),
                                       't(mm)': round(section_size.thickness,2),
                                       'R1(mm)': round(section_size.root_radius,2),
                                       'R2(mm)': round(section_size.toe_radius,2),
@@ -2255,11 +2255,11 @@ class Tension_bolted(Member):
                                       KEY_DISP_FU: round(section_size.fu,2),
                                       KEY_DISP_FY: round(section_size.fy,2),
                                       'Mass': round(section_size.mass,2),
-                                      'Area(mm2) - A': round((section_size.area),2),
-                                      'a(mm)': round(section_size.max_leg,2),
-                                      'b(mm)': round(section_size.min_leg,2),
+                                      'Area(mm2) - Ag': round((section_size.area),2),
+                                      'A(mm)': round(section_size.max_leg,2),
+                                      'B(mm)': round(section_size.min_leg,2),
                                       't(mm)': round(section_size.thickness,2),
-                                      'Tp(mm)': round(self.plate.thickness_provided, 2),
+                                      'T(mm)': round(self.plate.thickness_provided, 2),
                                       'R1(mm)': round(section_size.root_radius,2),
                                       'R2(mm)': round(section_size.toe_radius,2),
                                       'Cy(mm)': Cy,
@@ -2286,11 +2286,11 @@ class Tension_bolted(Member):
                                       KEY_DISP_FU: round(section_size.fu, 2),
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
-                                      'Area(mm2) - A': round((section_size.area), 2),
-                                      'a(mm)': round(section_size.max_leg, 2),
-                                      'b(mm)': round(section_size.min_leg, 2),
+                                      'Area(mm2) - Ag': round((section_size.area), 2),
+                                      'A(mm)': round(section_size.max_leg, 2),
+                                      'B(mm)': round(section_size.min_leg, 2),
                                       't(mm)': round(section_size.thickness, 2),
-                                      'Tp(mm)': round(self.plate.thickness_provided, 2),
+                                      'T(mm)': round(self.plate.thickness_provided, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),
                                       'R2(mm)': round(section_size.toe_radius, 2),
                                       'Iz(mm4)': round((Angle_attributes.calc_MomentOfAreaZ(section_size.max_leg,section_size.min_leg,section_size.thickness,self.loc) * 10000), 2),
@@ -2401,10 +2401,10 @@ class Tension_bolted(Member):
             self.report_check.append(t8)
             # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
             # self.report_check.append(t2)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided), self.bolt.min_gauge_round, row_limit)
+            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided,row_limit), self.bolt.min_gauge_round, get_pass_fail(self.bolt.min_gauge, self.bolt.min_gauge_round, relation="leq"))
             self.report_check.append(t2)
             t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
-                  self.bolt.min_edge_dist_round, "")
+                  self.bolt.min_edge_dist_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
             self.report_check.append(t3)
             t3 = (
             KEY_SPACING, depth_req(self.bolt.min_edge_dist_round, self.bolt.min_pitch_round, row, text), depth_max,
@@ -2420,10 +2420,10 @@ class Tension_bolted(Member):
             self.report_check.append(t8)
             # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
             # self.report_check.append(t2)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min), min_gauge, row_limit)
+            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min, row_limit), min_gauge, get_pass_fail(self.bolt.min_gauge, min_gauge, relation="leq"))
             self.report_check.append(t2)
             t3 = (DISP_MIN_EDGE, min_edge_end(self.d_0_min, self.bolt.edge_type),
-                  self.edge_dist_min_round, "")
+                  self.edge_dist_min_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
             self.report_check.append(t3)
             t3 = (KEY_SPACING, depth_req(self.edge_dist_min_round, self.pitch_round, row, text), depth_max,
                   get_pass_fail(depth, depth_max, relation="lesser"))
@@ -2628,8 +2628,13 @@ class Tension_bolted(Member):
                   gusset_lt_b_prov(self.plate.bolt_line, self.plate.pitch_provided,self.plate.end_dist_provided,int(self.plate.length))
                   , get_pass_fail(self.length, self.plate.length, relation="geq"))
             self.report_check.append(t4)
-            t5 = (KEY_OUT_DISP_PLATETHK_REP, '',display_prov(self.plate.thickness_provided,"t_p"), "")
-            self.report_check.append(t5)
+            if self.sec_profile in ["Channels", "Back to Back Channels"]:
+                t5 = (KEY_OUT_DISP_PLATETHK_REP, '',display_prov(self.plate.thickness_provided,"T_p"), "")
+                self.report_check.append(t5)
+            else:
+                t5 = (KEY_OUT_DISP_PLATETHK_REP, '', display_prov(self.plate.thickness_provided, "T"), "")
+                self.report_check.append(t5)
+
 
             self.report_check.append(t2)
 

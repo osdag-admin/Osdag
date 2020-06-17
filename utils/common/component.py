@@ -711,6 +711,14 @@ class RHS(Section):
         self.connect_to_database_update_other_attributes("RHS", designation, material_grade)
 
 
+class CHS(Section):
+
+    def __init__(self, designation, material_grade):
+        super(CHS, self).__init__(designation, material_grade)
+
+        self.connect_to_database_update_other_attributes("CHS", designation, material_grade)
+
+
 class Channel(Section):
 
     def __init__(self, designation, material_grade):

@@ -184,6 +184,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.column_tw = 0.0
         self.column_r1 = 0.0
         self.column_r2 = 0.0
+        self.column_B = 0.0
+        self.column_t = 0.0
+        self.column_OD = 0.0
 
         self.bearing_strength_concrete = 0.0
         self.w = 0.0
@@ -1454,15 +1457,30 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # properties of the column sections
 
         # Rolled sections
-        self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
-        self.column_D = self.column_properties.depth
-        self.column_bf = self.column_properties.flange_width
-        self.column_tf = self.column_properties.flange_thickness
-        self.column_tw = self.column_properties.web_thickness
-        self.column_r1 = self.column_properties.root_radius
-        self.column_r2 = self.column_properties.toe_radius
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                self.column_properties = SHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+                self.column_D = self.column_properties.depth
+                self.column_B = self.column_properties.depth
+                self.column_t = self.column_properties.flange_thickness
+            elif self.dp_column_designation[1:4] == 'RHS':
+                self.column_properties = RHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+                self.column_D = self.column_properties.depth
+                self.column_B = self.column_properties.depth
+                self.column_t = self.column_properties.flange_thickness
+            elif self.dp_column_designation[1:4] == 'SHS':
+                self.column_properties = CHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+                self.column_OD = self.column_properties.depth
+                self.column_t = self.column_properties.flange_thickness
 
-        # Hollow sections
+        else:
+            self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+            self.column_D = self.column_properties.depth
+            self.column_bf = self.column_properties.flange_width
+            self.column_tf = self.column_properties.flange_thickness
+            self.column_tw = self.column_properties.web_thickness
+            self.column_r1 = self.column_properties.root_radius
+            self.column_r2 = self.column_properties.toe_radius
 
         # other attributes
         self.gamma_m0 = self.cl_5_4_1_Table_5["gamma_m0"]["yielding"]  # gamma_mo = 1.10
@@ -1613,9 +1631,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
             self.bp_width_min = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
 
-        elif self.connectivity == 'Welded+Bolted Column Base':
-            pass
-
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
+                self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
+                self.bp_width_min = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
+            else:
+                self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
+                self.bp_width_min = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
         else:
             pass
 

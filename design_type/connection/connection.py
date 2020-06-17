@@ -684,6 +684,82 @@ class Connection(Main):
         else:
             return False
 
+    def save_design(self):
+        self.report_supporting = {KEY_DISP_SEC_PROFILE:"ISection",
+                                  KEY_DISP_SUPTNGSEC: self.supporting_section.designation,
+                                  KEY_DISP_MATERIAL: self.supporting_section.material,
+                                  KEY_DISP_FU: self.supporting_section.fu,
+                                  KEY_DISP_FY: self.supporting_section.fy,
+                                  'Mass': self.supporting_section.mass,
+                                  'Area(cm2) - A': round(self.supporting_section.area/100,2),
+                                  'D(mm)': self.supporting_section.depth,
+                                  'B(mm)': self.supporting_section.flange_width,
+                                  't(mm)': self.supporting_section.web_thickness,
+                                  'T(mm)': self.supporting_section.flange_thickness,
+                                  'FlangeSlope': self.supporting_section.flange_slope,
+                                  'R1(mm)': self.supporting_section.root_radius,
+                                  'R2(mm)': self.supporting_section.toe_radius,
+                                  'Iz(cm4)': round(self.supporting_section.mom_inertia_z/10000,2),
+                                  'Iy(cm4)': round(self.supporting_section.mom_inertia_y/10000,2),
+                                  'rz(cm)': round(self.supporting_section.rad_of_gy_z/10,2),
+                                  'ry(cm)': round(self.supporting_section.rad_of_gy_y/10,2),
+                                  'Zz(cm3)': round(self.supporting_section.elast_sec_mod_z/1000,2),
+                                  'Zy(cm3)': round(self.supporting_section.elast_sec_mod_y/1000,2),
+                                  'Zpz(cm3)': round(self.supporting_section.plast_sec_mod_z/1000,2),
+                                  'Zpy(cm3)': round(self.supporting_section.elast_sec_mod_y/1000,2)}
+
+        self.report_supported = {
+            KEY_DISP_SEC_PROFILE:"ISection", #Image shall be save with this name.png in resource files
+            KEY_DISP_SUPTDSEC: self.supported_section.designation,
+            KEY_DISP_MATERIAL: self.supported_section.material,
+            KEY_DISP_FU: self.supported_section.fu,
+            KEY_DISP_FY: self.supported_section.fy,
+            'Mass': self.supported_section.mass,
+            'Area(cm2) - A': round(self.supported_section.area/100, 2),
+            'D(mm)': self.supported_section.depth,
+            'B(mm)': self.supported_section.flange_width,
+            't(mm)': self.supported_section.web_thickness,
+            'T(mm)': self.supported_section.flange_thickness,
+            'FlangeSlope': self.supported_section.flange_slope,
+            'R1(mm)': self.supported_section.root_radius,
+            'R2(mm)': self.supported_section.toe_radius,
+            'Iz(cm4)': round(self.supported_section.mom_inertia_z/10000,2),
+            'Iy(cm4)': round(self.supported_section.mom_inertia_y/10000,2),
+            'rz(cm)': round(self.supported_section.rad_of_gy_z/10,2),
+            'ry(cm)': round(self.supported_section.rad_of_gy_y/10,2),
+            'Zz(cm3)': round(self.supported_section.elast_sec_mod_z/1000,2),
+            'Zy(cm3)': round(self.supported_section.elast_sec_mod_y/1000,2),
+            'Zpz(cm3)': round(self.supported_section.plast_sec_mod_z/1000,2),
+            'Zpy(cm3)': round(self.supported_section.elast_sec_mod_y/1000,2)}
+
+        self.report_input = \
+            {KEY_MODULE: self.module,
+             KEY_MAIN_MODULE: self.mainmodule,
+             KEY_CONN: self.connectivity,
+             KEY_DISP_SHEAR: self.load.shear_force,
+             "Supporting Section": "TITLE",
+             "Supporting Section Details": self.report_supporting,
+             "Supported Section": "TITLE",
+             "Supported Section Details": self.report_supported,
+             "Bolt Details": "TITLE",
+             KEY_DISP_D: str(self.bolt.bolt_diameter),
+             KEY_DISP_GRD: str(self.bolt.bolt_grade),
+             KEY_DISP_TYP: self.bolt.bolt_type,
+             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+             KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+             KEY_DISP_GAP: self.plate.gap,
+             KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
+             "Plate Details": "TITLE",
+             KEY_DISP_PLATETHK: str(self.plate.thickness),
+             KEY_DISP_MATERIAL: self.plate.material,
+             KEY_DISP_FU: self.plate.fu,
+             KEY_DISP_FY: self.plate.fy,
+             "Weld Details": "TITLE",
+             KEY_DISP_DP_WELD_TYPE: "Fillet",
+             KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
+             KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
+
 if __name__ == "__main__":
     connection = Connection()
     connection.test()

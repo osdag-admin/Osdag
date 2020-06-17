@@ -2339,7 +2339,7 @@ class BeamCoverPlate(MomentConnection):
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         # A_vn = (height- bolts_one_line * dia_hole) * thickness
-        T_dn = 0.9 * A_vn * fu / (math.sqrt(3) *gamma_m1)
+        T_dn = 0.75 * A_vn * fu / (math.sqrt(3) *gamma_m1)
         return T_dn
     #
     # def web_force(column_d, column_f_t, column_t_w, axial_force, column_area):

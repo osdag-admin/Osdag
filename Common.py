@@ -1110,7 +1110,7 @@ KEY_BLOCKSHEARCAP_WEB_PLATE='web_plate.block_shear_capacity'
 KEY_DISP_BLOCKSHEARCAP_WEB_PLATE='Block Shear Capacity (kN)'
 KEY_SHEARRUPTURECAP_WEB_PLATE= 'web_plate.shear_rupture_capacity'
 KEY_DISP_SHEARRUPTURECAP_WEB_PLATE= 'Shear Rupture Capacity (kN)'
-KEY_WEBPLATE_SHEAR_CAPACITY_PLATE ="Section.shear_capacity_web_plate"
+KEY_WEBPLATE_SHEAR_CAPACITY_PLATE ="web_plate.shear_capacity_web_plate"
 KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE ="Web Plate Shear Capacity (kN)"
 
 

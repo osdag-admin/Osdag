@@ -551,7 +551,7 @@ class EndPlateConnection(ShearConnection):
 
                                 ##### O U T P U T   D I C T I O N A R Y   F O R M A T #####
                                 row = [int(bolt_rows),                                                  # 0-Rows of Bolts
-                                       str(int(self.bolt.bolt_diameter_provided)),                      #1-Bolt Diameter
+                                       int(self.bolt.bolt_diameter_provided),                      #1-Bolt Diameter
                                        self.bolt.bolt_grade_provided,                                   #2-Bolt Grade
                                        int(self.plate.thickness_provided),                              #3-Plate Thickness
                                        int(self.plate.height),                                          #4-Plate Height
@@ -611,7 +611,6 @@ class EndPlateConnection(ShearConnection):
                 #   ": For given members and %2.2f mm thick plate, weld sizes should be of range %2.2f mm and  %2.2f mm "
                 #   % self.plate.thickness_provided % weld_size_min % weld_size_max)#
                 logger.info(": Cannot design weld with available welds ")
-
         else:
             # self.get_design_status(self)
             self.output.sort(key=lambda x: (x[3], x[0], x[1], x[2]))
@@ -627,6 +626,7 @@ class EndPlateConnection(ShearConnection):
     def set_values_to_class(self):
         self.plate.bolt_line = 2  # only one line of bolts provided on each side of web
         self.plate.bolts_one_line = self.output[0][0]
+        self.plate.bolts_required = self.plate.bolt_line * self.plate.bolts_one_line
         self.bolt.bolt_diameter_provided = self.output[0][1]
         self.bolt.bolt_grade_provided = self.output[0][2]
 
@@ -800,9 +800,9 @@ class EndPlateConnection(ShearConnection):
 
     def get_plate_capacity(self, p_th, p_h, p_h_max, pitch, bolt_dist, end, n_row, bolt_hole_dia):
         # plate_moment = min_edge_dist * bolt_tension
-        Z_p = (min(pitch, 2 * bolt_dist)) * p_th **2 /4
-        Z_e = (min(pitch, 2 * bolt_dist)) * p_th **2 /6
-        plate_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(Z_e, Z_p, self.plate.fy, 'plastic')
+        self.plate.Z_p = (min(pitch, 2 * bolt_dist)) * p_th **2 /4
+        self.plate.Z_e = (min(pitch, 2 * bolt_dist)) * p_th **2 /6
+        plate_moment_capacity = IS800_2007.cl_8_2_1_2_design_moment_strength(self.plate.Z_e, self.plate.Z_p, self.plate.fy, 'plastic')
         A_v = p_h* p_th
         plate_shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_v, self.plate.fy)
 
@@ -817,9 +817,11 @@ class EndPlateConnection(ShearConnection):
         return plate_moment_capacity, plate_shear_capacity, plate_block_shear_capacity
 
     def get_available_welds(self, connecting_members=[]):
-        weld_size_max = min(connecting_members)
-        weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(connecting_members[0], connecting_members[1])
+        weld_size_max = math.ceil(min(connecting_members))
+        weld_size_min = math.ceil(IS800_2007.cl_10_5_2_3_min_weld_size(connecting_members[0], connecting_members[1]))
         available_welds = list([x for x in ALL_WELD_SIZES if (weld_size_min <= x <= weld_size_max)])
+        # if available_welds == [] and weld_size_min < max(ALL_WELD_SIZES):
+        #     available_welds = [weld_size_min]
         return available_welds,weld_size_min,weld_size_max
 
     def design_weld(self,available_welds):
@@ -827,19 +829,19 @@ class EndPlateConnection(ShearConnection):
         self.weld.size = available_welds[0]
         while self.plate.height <= self.max_plate_height:
             self.weld.length = self.plate.height
-            weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            self.weld.throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
                 fillet_size=self.weld.size, fusion_face_angle=90)
-            weld_eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            self.weld.eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
                 fillet_size=self.weld.size, available_length=self.weld.length)
-            self.weld.get_weld_strength(connecting_fu=[self.supporting_section.fu, self.weld.fu],
+            self.weld.get_weld_strength(connecting_fu=[self.plate.fu, self.supported_section.fu,self.weld.fu],
                                                 weld_fabrication=self.weld.fabrication,
                                                 t_weld=self.weld.size, weld_angle=90)
-            beta_lw = IS800_2007.cl_10_5_7_3_weld_long_joint(weld_eff_length, weld_throat)
+            beta_lw = IS800_2007.cl_10_5_7_3_weld_long_joint(self.weld.eff_length, self.weld.throat_tk)
             self.weld.strength = self.weld.strength * beta_lw
             force_h = self.load.shear_force * 1000
             force_l = self.load.axial_force * 1000
             # force_t = self.plate.moment_demand
-            self.weld.get_weld_stress(force_h, force_l, l_weld=2*weld_eff_length, weld_twist= 0.0, Ip_weld=0.0, y_max=0.0,
+            self.weld.get_weld_stress(force_h, force_l, l_weld=2*self.weld.eff_length, weld_twist= 0.0, Ip_weld=0.0, y_max=0.0,
                                                         x_max=0.0)
             if self.weld.strength > self.weld.stress:
                 break
@@ -885,109 +887,6 @@ class EndPlateConnection(ShearConnection):
                 self.plate.design_status = True
         else:
             self.plate.design_status = True
-
-    # @staticmethod
-    # def pltthk_customized():
-    #     a = VALUES_PLATETHK_CUSTOMIZED
-    #     return a
-
-
-    # @staticmethod
-    # def grdval_customized():
-    #     b = VALUES_GRD_CUSTOMIZED
-    #     return b
-
-    # @staticmethod
-    # def diam_bolt_customized():
-    #     c = connectdb1()
-    #     return c
-
-    def customized_input(self):
-
-        list1 = []
-        t1 = (KEY_GRD, self.grdval_customized)
-        list1.append(t1)
-        t2 = (KEY_PLATETHK, self.pltthk_customized)
-        list1.append(t2)
-        t3 = (KEY_D, self.diam_bolt_customized)
-        list1.append(t3)
-        return list1
-
-    def fn_conn_suptngsec_lbl(self):
-
-        conn = self[0]
-        if conn in VALUES_CONN_1:
-            return KEY_DISP_COLSEC
-        elif conn in VALUES_CONN_2:
-            return KEY_DISP_PRIBM
-        else:
-            return ''
-
-    def fn_conn_suptdsec_lbl(self):
-
-        conn = self[0]
-        if conn in VALUES_CONN_1:
-            return KEY_DISP_BEAMSEC
-        elif conn in VALUES_CONN_2:
-            return KEY_DISP_SECBM
-        else:
-            return ''
-
-    def fn_conn_suptngsec(self):
-
-        conn = self[0]
-        if conn in VALUES_CONN_1:
-            return VALUES_COLSEC
-        elif conn in VALUES_CONN_2:
-            return VALUES_PRIBM
-        else:
-            return []
-
-    def fn_conn_suptdsec(self):
-
-        conn = self[0]
-        if conn in VALUES_CONN_1:
-            return VALUES_BEAMSEC
-        elif conn in VALUES_CONN_2:
-            return VALUES_SECBM
-        else:
-            return []
-
-    def fn_conn_image(self):
-
-        conn = self[0]
-        if conn == VALUES_CONN[0]:
-            return './ResourceFiles/images/fin_cf_bw.png'
-        elif conn == VALUES_CONN[1]:
-            return './ResourceFiles/images/fin_cw_bw.png'
-        elif conn in VALUES_CONN_2:
-            return './ResourceFiles/images/fin_beam_beam.png'
-        else:
-            return ''
-
-    def input_value_changed(self):
-
-        lst = []
-
-        t1 = ([KEY_CONN], KEY_SUPTNGSEC, TYPE_LABEL, self.fn_conn_suptngsec_lbl)
-        lst.append(t1)
-
-        t2 = ([KEY_CONN], KEY_SUPTNGSEC, TYPE_COMBOBOX, self.fn_conn_suptngsec)
-        lst.append(t2)
-
-        t3 = ([KEY_CONN], KEY_SUPTDSEC, TYPE_LABEL, self.fn_conn_suptdsec_lbl)
-        lst.append(t3)
-
-        t4 = ([KEY_CONN], KEY_SUPTDSEC, TYPE_COMBOBOX, self.fn_conn_suptdsec)
-        lst.append(t4)
-
-        t5 = ([KEY_CONN], KEY_IMAGE, TYPE_IMAGE, self.fn_conn_image)
-        lst.append(t5)
-
-        t6 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
-        lst.append(t6)
-
-        return lst
 
     def get_3d_components(self):
         components = []
@@ -1142,202 +1041,143 @@ class EndPlateConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self, popup_summary):
-        # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
-        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
-                                  KEY_DISP_SUPTNGSEC: self.supporting_section.designation,
-                                  KEY_DISP_MATERIAL: self.supporting_section.material,
-                                  KEY_DISP_FU: self.supporting_section.fu,
-                                  KEY_DISP_FY: self.supporting_section.fy,
-                                  'Mass': self.supporting_section.mass,
-                                  'Area(cm2) - A': self.supporting_section.area,
-                                  'D(mm)': self.supporting_section.depth,
-                                  'B(mm)': self.supporting_section.flange_width,
-                                  't(mm)': self.supporting_section.web_thickness,
-                                  'T(mm)': self.supporting_section.flange_thickness,
-                                  'FlangeSlope': self.supporting_section.flange_slope,
-                                  'R1(mm)': self.supporting_section.root_radius,
-                                  'R2(mm)': self.supporting_section.toe_radius,
-                                  'Iz(cm4)': self.supporting_section.mom_inertia_z,
-                                  'Iy(cm4)': self.supporting_section.mom_inertia_y,
-                                  'rz(cm)': self.supporting_section.rad_of_gy_z,
-                                  'ry(cm)': self.supporting_section.rad_of_gy_y,
-                                  'Zz(cm3)': self.supporting_section.elast_sec_mod_z,
-                                  'Zy(cm3)': self.supporting_section.elast_sec_mod_y,
-                                  'Zpz(cm3)': self.supporting_section.plast_sec_mod_z,
-                                  'Zpy(cm3)': self.supporting_section.elast_sec_mod_y}
-
-        self.report_supported = {
-            KEY_DISP_SEC_PROFILE: "ISection",  # Image shall be save with this name.png in resource files
-            KEY_DISP_SUPTDSEC: self.supported_section.designation,
-            KEY_DISP_MATERIAL: self.supported_section.material,
-            KEY_DISP_FU: self.supported_section.fu,
-            KEY_DISP_FY: self.supported_section.fy,
-            'Mass': self.supported_section.mass,
-            'Area(cm2) - A': round(self.supported_section.area, 2),
-            'D(mm)': self.supported_section.depth,
-            'B(mm)': self.supported_section.flange_width,
-            't(mm)': self.supported_section.web_thickness,
-            'T(mm)': self.supported_section.flange_thickness,
-            'FlangeSlope': self.supported_section.flange_slope,
-            'R1(mm)': self.supported_section.root_radius,
-            'R2(mm)': self.supported_section.toe_radius,
-            'Iz(cm4)': self.supported_section.mom_inertia_z,
-            'Iy(cm4)': self.supported_section.mom_inertia_y,
-            'rz(cm)': self.supported_section.rad_of_gy_z,
-            'ry(cm)': self.supported_section.rad_of_gy_y,
-            'Zz(cm3)': self.supported_section.elast_sec_mod_z,
-            'Zy(cm3)': self.supported_section.elast_sec_mod_y,
-            'Zpz(cm3)': self.supported_section.plast_sec_mod_z,
-            'Zpy(cm3)': self.supported_section.elast_sec_mod_y}
-
-        self.report_input = \
-            {KEY_MODULE: self.module,
-             KEY_MAIN_MODULE: self.mainmodule,
-             KEY_CONN: self.connectivity,
-             KEY_DISP_SHEAR: self.load.shear_force,
-             "Supporting Section": "TITLE",
-             "Supporting Section Details": self.report_supporting,
-             "Supported Section": "TITLE",
-             "Supported Section Details": self.report_supported,
-             "Bolt Details": "TITLE",
-             KEY_DISP_D: str(self.bolt.bolt_diameter),
-             KEY_DISP_GRD: str(self.bolt.bolt_grade),
-             KEY_DISP_TYP: self.bolt.bolt_type,
-             KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-             KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
-             KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-             KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
-             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences,
-             "Plate Details": "TITLE",
-             KEY_DISP_PLATETHK: str(self.plate.thickness),
-             KEY_DISP_MATERIAL: self.plate.material,
-             KEY_DISP_FU: self.plate.fu,
-             KEY_DISP_FY: self.plate.fy}
+        super(EndPlateConnection, self).save_design(self)
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
         self.report_check = []
         if self.plate.design_status is True:
-            # connecting_plates = [self.plate.thickness_provided, self.supported_section.web_thickness]
-            # bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
-            #
-            # bolt_force_kn = round(self.plate.bolt_force / 1000, 2)
-            # bolt_capacity_red_kn = round(self.plate.bolt_capacity_red / 1000, 2)
-            #
-            # t1 = ('SubSection', 'Bolt Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-            # self.report_check.append(t1)
-            # t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
-            # self.report_check.append(t1)
-            # t1 = (KEY_DISP_GRD, '', self.bolt.bolt_grade_provided, '')
-            # self.report_check.append(t1)
-            # t1 = (KEY_DISP_PLTHICK, min_plate_thk_req(self.supported_section.web_thickness),
-            #       self.plate.thickness_provided,
-            #       get_pass_fail(self.supported_section.web_thickness, self.plate.thickness_provided,
-            #                     relation="lesser"))
-            # self.report_check.append(t1)
-            # t6 = (DISP_NUM_OF_COLUMNS, '', self.plate.bolt_line, '')
-            # self.report_check.append(t6)
-            # t7 = (DISP_NUM_OF_ROWS, '', self.plate.bolts_one_line, '')
-            # self.report_check.append(t7)
-            # t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
-            #       self.plate.gauge_provided,
-            #       get_pass_fail(self.bolt.min_pitch, self.plate.gauge_provided, relation='lesser'))
-            # self.report_check.append(t1)
-            # t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
-            #       self.plate.gauge_provided,
-            #       get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided, relation='greater'))
-            # self.report_check.append(t1)
-            # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
-            #       self.plate.pitch_provided,
-            #       get_pass_fail(self.bolt.min_gauge, self.plate.pitch_provided, relation="lesser"))
-            # self.report_check.append(t2)
-            # t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
-            #       self.plate.pitch_provided,
-            #       get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided, relation="greater"))
-            # self.report_check.append(t2)
-            # t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
-            #       self.plate.edge_dist_provided,
-            #       get_pass_fail(self.bolt.min_end_dist, self.plate.edge_dist_provided, relation='lesser'))
-            # self.report_check.append(t3)
-            # t4 = (DISP_MAX_END, max_edge_end_new(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
-            #       self.plate.edge_dist_provided,
-            #       get_pass_fail(self.bolt.max_end_dist, self.plate.edge_dist_provided, relation='greater'))
-            # self.report_check.append(t4)
-            # t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
-            #       self.plate.end_dist_provided,
-            #       get_pass_fail(self.bolt.min_edge_dist, self.plate.end_dist_provided, relation='lesser'))
-            # self.report_check.append(t3)
-            # t4 = (DISP_MAX_EDGE, max_edge_end_new(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
-            #       self.plate.end_dist_provided,
-            #       get_pass_fail(self.bolt.max_edge_dist, self.plate.end_dist_provided, relation="greater"))
-            # self.report_check.append(t4)
-            #
-            # t10 = (KEY_OUT_REQ_MOMENT_DEMAND_BOLT, '', moment_demand_req_bolt_force(
-            #     shear_load=round(self.load.shear_force, 2),
-            #     web_moment=0.0, ecc=self.plate.ecc,
-            #     moment_demand=round(self.plate.moment_demand / 1000000, 2)), '')
-            #
-            # self.report_check.append(t10)
-            #
-            # t10 = (KEY_OUT_REQ_PARA_BOLT, parameter_req_bolt_force(bolts_one_line=self.plate.bolts_one_line
-            #                                                        , gauge=self.plate.gauge_provided,
-            #                                                        ymax=round(self.plate.ymax, 2),
-            #                                                        xmax=round(self.plate.xmax, 2),
-            #                                                        bolt_line=self.plate.bolt_line,
-            #                                                        pitch=self.plate.pitch_provided,
-            #                                                        length_avail=self.plate.length_avail,
-            #                                                        conn='fin'), '', '')
-            # self.report_check.append(t10)
-            #
-            # t10 = (KEY_OUT_BOLT_FORCE, Vres_bolts(bolts_one_line=self.plate.bolts_one_line,
-            #                                       ymax=round(self.plate.ymax, 2),
-            #                                       xmax=round(self.plate.xmax, 2),
-            #                                       bolt_line=self.plate.bolt_line,
-            #                                       shear_load=round(self.load.shear_force, 2),
-            #                                       axial_load=round(self.load.axial_force, 2),
-            #                                       moment_demand=round(self.plate.moment_demand / 1000000, 2),
-            #                                       r=round(self.plate.sigma_r_sq / 1000, 2),
-            #                                       vbv=round(self.plate.vbv / 1000, 2),
-            #                                       tmv=round(self.plate.tmv / 1000, 2),
-            #                                       tmh=round(self.plate.tmh / 1000, 2),
-            #                                       abh=round(self.plate.abh / 1000, 2),
-            #                                       vres=round(self.plate.bolt_force / 1000, 2)), '', '')
-            # self.report_check.append(t10)
-            # if self.bolt.bolt_type == TYP_BEARING:
-            #     bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
-            #     bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
-            #     t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, 1, self.bolt.bolt_net_area,
-            #                                                        self.bolt.gamma_mb, bolt_shear_capacity_kn), '')
-            #     self.report_check.append(t1)
-            #     t8 = (KEY_DISP_KB, " ",
-            #           kb_prov(self.plate.edge_dist_provided, self.plate.gauge_provided, self.bolt.dia_hole,
-            #                   self.bolt.bolt_fu, self.bolt.fu_considered), '')
-            #     self.report_check.append(t8)
-            #     t2 = (
-            #     KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(self.bolt.kb, self.bolt.bolt_diameter_provided,
-            #                                                      self.bolt_conn_plates_t_fu_fy, self.bolt.gamma_mb,
-            #                                                      bolt_bearing_capacity_kn), '')
-            #     self.report_check.append(t2)
-            #     t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '',
-            #           bolt_capacity_prov(bolt_shear_capacity_kn, bolt_bearing_capacity_kn, bolt_capacity_kn),
-            #           '')
-            #     self.report_check.append(t3)
-            # else:
-            #     kh_disp = round(self.bolt.kh, 2)
-            #     t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
-            #           HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.bolt.bolt_fu,
-            #                                   Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
-            #                                   capacity=bolt_capacity_kn), '')
-            #     self.report_check.append(t4)
-            #
-            # t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
-            #        long_joint_bolted_prov(self.plate.bolt_line, self.plate.bolts_one_line,
-            #                               self.plate.pitch_provided, self.plate.gauge_provided,
-            #                               self.bolt.bolt_diameter_provided, bolt_capacity_kn, bolt_capacity_red_kn),
-            #        "")
-            # self.report_check.append(t10)
-            #
-            # t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn, bolt_capacity_red_kn,
-            #       get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="lesser"))
-            # self.report_check.append(t5)
+
+            t1 = ('SubSection', 'Bolt Design Checks', '|p{3cm}|p{5cm}|p{6.3cm}|p{1.2cm}|')
+            self.report_check.append(t1)
+            t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
+            self.report_check.append(t1)
+            t1 = (KEY_DISP_GRD, '', self.bolt.bolt_grade_provided, '')
+            self.report_check.append(t1)
+            t1 = (KEY_DISP_PLTHICK, '', self.plate.thickness_provided,'')
+            self.report_check.append(t1)
+            t6 = (DISP_NUM_OF_COLUMNS, 2, self.plate.bolt_line, get_pass_fail(2, self.plate.bolt_line, relation='leq'))
+            self.report_check.append(t6)
+            t7 = (DISP_NUM_OF_ROWS, 2, self.plate.bolts_one_line, get_pass_fail(2, self.plate.bolts_one_line, relation='leq'))
+            self.report_check.append(t7)
+            t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+                  self.plate.gauge_provided,
+                  get_pass_fail(self.bolt.min_pitch, self.plate.gauge_provided, relation='lesser'))
+            self.report_check.append(t1)
+            t1 = (DISP_MAX_PITCH, max_pitch(self.connecting_plates_tk),self.plate.gauge_provided,
+                  get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided, relation='greater'))
+            self.report_check.append(t1)
+            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+                  self.plate.pitch_provided,
+                  get_pass_fail(self.bolt.min_gauge, self.plate.pitch_provided, relation="lesser"))
+            self.report_check.append(t2)
+            t2 = (DISP_MAX_GAUGE, max_pitch(self.connecting_plates_tk),self.plate.pitch_provided,
+                  get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided, relation="greater"))
+            self.report_check.append(t2)
+            t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),self.plate.edge_dist_provided,
+                  get_pass_fail(self.bolt.min_end_dist, self.plate.edge_dist_provided, relation='lesser'))
+            self.report_check.append(t3)
+            t4 = (DISP_MAX_END, max_edge_end_new(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
+                  self.plate.edge_dist_provided,
+                  get_pass_fail(self.bolt.max_end_dist, self.plate.edge_dist_provided, relation='greater'))
+            self.report_check.append(t4)
+            t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+                  self.plate.end_dist_provided,
+                  get_pass_fail(self.bolt.min_edge_dist, self.plate.end_dist_provided, relation='lesser'))
+            self.report_check.append(t3)
+            t4 = (DISP_MAX_EDGE, max_edge_end_new(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
+                  self.plate.end_dist_provided,
+                  get_pass_fail(self.bolt.max_edge_dist, self.plate.end_dist_provided, relation="greater"))
+            self.report_check.append(t4)
+
+            if self.bolt.bolt_type == TYP_BEARING:
+                t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, 1, self.bolt.bolt_net_area,
+                                                                   self.bolt.gamma_mb, self.bolt.bolt_shear_capacity), '')
+                self.report_check.append(t1)
+                t8 = (KEY_DISP_KB, " ",
+                      kb_prov(self.plate.end_dist_provided, self.plate.pitch_provided, self.bolt.dia_hole,
+                              self.bolt.bolt_fu, self.bolt.fu_considered), '')
+                self.report_check.append(t8)
+                kb = self.bolt.calculate_kb(self.plate.end_dist_provided, self.plate.pitch_provided, self.bolt.dia_hole,
+                              self.bolt.bolt_fu, self.bolt.fu_considered)
+                bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+                t2 = (
+                KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(kb, self.bolt.bolt_diameter_provided,
+                                                                 self.bolt_conn_plates_t_fu_fy, self.bolt.gamma_mb,
+                                                                 bolt_bearing_capacity_disp), '')
+                self.report_check.append(t2)
+                t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '',
+                      bolt_capacity_prov(self.bolt.bolt_shear_capacity, bolt_bearing_capacity_disp, self.bolt.bolt_capacity),
+                      '')
+                self.report_check.append(t3)
+            else:
+                kh_disp = round(self.bolt.kh, 2)
+                t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
+                      HSFG_bolt_capacity_prov(mu_f=self.bolt.mu_f, n_e=1, K_h=kh_disp, fub=self.bolt.bolt_fu,
+                                              Anb=self.bolt.bolt_net_area, gamma_mf=self.bolt.gamma_mf,
+                                              capacity=self.bolt.bolt_capacity), '')
+                self.report_check.append(t4)
+
+            l_j = self.plate.pitch_provided * (self.plate.bolts_one_line - 1)
+            beta_lj = IS800_2007.cl_10_3_3_1_bolt_long_joint(self.bolt.bolt_diameter_provided, l_j)
+            bolt_capacity_red = round(self.bolt.bolt_capacity * beta_lj,2)
+
+            t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),
+                   long_joint_bolted_prov(self.plate.bolt_line, self.plate.bolts_one_line,
+                                          self.plate.gauge_provided, self.plate.pitch_provided,
+                                          self.bolt.bolt_diameter_provided, self.bolt.bolt_capacity, bolt_capacity_red),
+                   "")
+            self.report_check.append(t10)
+
+            T_e = round(self.bolt.bolt_tension,2)
+
+            t1 = (KEY_OUT_DISP_BOLT_TENSION_FORCE+r',~$T_{ba}$',tension_in_bolt_due_to_axial(P=round(self.load.axial_force, 2),
+                                                             n=self.plate.bolts_required, T_ba=T_e),
+                  '','')
+            self.report_check.append(t1)
+
+
+            if self.bolt.bolt_tensioning == 'Pretensioned':
+                beta = 1
+            else:
+                beta = 2
+            t = self.plate.thickness_provided
+            f_o = 0.7 * self.bolt.bolt_fu
+
+            l_e = round(min(self.plate.end_dist_provided, 1.1 * t * math.sqrt(beta * f_o / self.plate.fy)),2)
+            col_g = (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius + self.plate.end_dist_provided)
+            beam_g = (self.supported_section.web_thickness / 2 + self.weld.size + self.plate.end_dist_provided)
+            if col_g > beam_g:
+                l_v = col_g - (self.supported_section.web_thickness / 2 + self.weld.size)
+            else:
+                l_v = self.bolt.min_edge_dist_round
+            b_e = min(self.plate.pitch_provided, 2 * l_v)
+            Q = round(self.bolt.bolt_tension_prying,2)
+
+            t1 = (KEY_OUT_DISP_BOLT_PRYING_FORCE+',~Q', tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, self.plate.fy,
+                                                                                self.bolt.min_end_dist_round,
+                                                                                self.bolt.bolt_tensioning,
+                                                                                beta,Q,l_e,eta=1.5),'','')
+            self.report_check.append(t1)
+
+            T_b = round(self.bolt.bolt_tension + self.bolt.bolt_tension_prying,2)
+            V_b = round(self.bolt.bolt_shear,2)
+            t1 = (KEY_OUT_DISP_BOLT_TENSION_FORCE+r',~$T_b$', total_bolt_tension_force(T_ba=self.bolt.bolt_tension,
+                                                                            Q=self.bolt.bolt_tension_prying,
+                                                                            T_b = T_b),
+                  tension_capacity_of_bolt(f_ub=self.bolt.bolt_fu, A_nb=self.bolt.bolt_net_area,
+                                           T_db=self.bolt.bolt_tension_capacity),
+                  get_pass_fail(T_b, self.bolt.bolt_tension_capacity, relation='leq'))
+            self.report_check.append(t1)
+
+            comb_bolt_ir = round((self.bolt.bolt_shear / bolt_capacity_red) ** 2 + \
+                           ((self.bolt.bolt_tension + self.bolt.bolt_tension_prying) / self.bolt.bolt_tension_capacity) ** 2,2)
+
+            t1 = (KEY_DISP_IR, IR_req(IR=1),
+                  IR_prov(V_b,bolt_capacity_red,T_b,self.bolt.bolt_tension_capacity,comb_bolt_ir,'squared'),
+                  get_pass_fail(1, comb_bolt_ir, relation="greater"))
+            self.report_check.append(t1)
+
             #
             t1 = ('SubSection', 'Plate Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
@@ -1367,40 +1207,86 @@ class EndPlateConnection(ShearConnection):
             # self.report_check.append(t1)
 
             #######################
-            # Section Capacities
-            #######################
-            for a in [self.plate, self.supported_section]:
-            # for a in [self.supported_section]:
-                gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-                gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-                if a == self.plate:
-                    h = a.height
-                    t = a.thickness_provided
-                else:
-                    t1 = ('SubSection', 'Section Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-                    self.report_check.append(t1)
-                    h = a.length
-                    t = a.web_thickness
-
-                t1 = (KEY_DISP_SHEAR_YLD, '', shear_yield_prov(h, t, a.fy, gamma_m0, a.shear_capacity), '')
-                self.report_check.append(t1)
-
-                t1 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force,
-                      shear_capacity_prov(a.shear_capacity, 0.00, 0.00),
-                      get_pass_fail(self.load.shear_force, a.shear_capacity, relation="lesser"))
-                self.report_check.append(t1)
-
-                # t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY, self.plate.plate_moment, a.moment_capacity,
-                #       get_pass_fail(self.plate.plate_moment, a.moment_capacity, relation="lesser"))
-                # self.report_check.append(t1)
-
-            #######################
             # Plate Capacities
             #######################
-                if a == self.plate:
-                    t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY, self.plate.plate_moment, self.plate.plate_moment_capacity,
-                          get_pass_fail(self.plate.plate_moment, self.plate.plate_moment_capacity, relation="lesser"))
-                    self.report_check.append(t1)
+
+            a = self.plate
+            h = a.height
+            t = a.thickness_provided
+
+            t1 = (KEY_DISP_SHEAR_YLD, '', shear_yield_prov(h, t, a.fy, gamma_m0, a.shear_capacity), '')
+            self.report_check.append(t1)
+            t1 = (
+            KEY_DISP_PLATE_BLK_SHEAR_SHEAR, '', blockshear_prov(Tdb=round(a.plate_block_shear_capacity, 2)), '')
+            self.report_check.append(t1)
+            t1 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force,
+                  shear_capacity_prov(a.shear_capacity, 0.0, a.plate_block_shear_capacity),
+                  get_pass_fail(self.load.shear_force, a.shear_capacity, relation="lesser"))
+            self.report_check.append(t1)
+
+            ecc = round(self.bolt_dist_to_weld, 2)
+            T_w = self.supporting_section.web_thickness
+            R_r = self.supporting_section.root_radius
+            e = self.bolt.min_edge_dist_round
+            t_w = self.supported_section.web_thickness
+            s = self.weld.size
+            M = self.plate.plate_moment
+
+            t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY, end_plate_moment_demand(T_w, R_r, e, t_w, s, T_e, M),
+                  plastic_moment_capacty(beta_b=1.0, Z_p=round(self.plate.Z_p, 2), f_y=self.plate.fy,
+                                         gamma_m0=gamma_m0, Pmc=self.plate.plate_moment_capacity),
+                  get_pass_fail(self.plate.plate_moment, self.plate.plate_moment_capacity, relation="lesser"))
+            self.report_check.append(t1)
+
+            #######################
+            # Section Capacities
+            #######################
+
+            t1 = ('SubSection', 'Section Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            a = self.supported_section
+            h = a.length
+            t = a.web_thickness
+
+            t1 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force,
+                  shear_yield_prov(h, t, a.fy, gamma_m0, a.shear_capacity),
+                  get_pass_fail(self.load.shear_force, a.shear_capacity, relation="lesser"))
+            self.report_check.append(t1)
+
+            t1 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force,
+                  tension_yield_prov(h, t, a.fy, gamma_m0, round(a.tension_yielding_capacity, 2)),
+                  get_pass_fail(self.load.axial_force, round(a.tension_yielding_capacity, 2), relation="lesser"))
+            self.report_check.append(t1)
+
+            ##################
+            # Weld Checks
+            ##################
+            weld_conn_plates_fu = [self.plate.fu, self.supported_section.fu, self.weld.fu]
+            weld_conn_plates_tk = [self.plate.thickness_provided,self.supported_section.web_thickness]
+            [available_welds,weld_min,weld_max] = self.get_available_welds(self,weld_conn_plates_tk)
+            t1 = ('SubSection', 'Weld Checks', '|p{4cm}|p{7.0cm}|p{3.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t1 = (DISP_MIN_WELD_SIZE, min_weld_size_req(weld_conn_plates_tk, weld_min),
+                  self.weld.size,
+                  get_pass_fail(weld_min, self.weld.size, relation="leq"))
+            self.report_check.append(t1)
+            t1 = (DISP_MAX_WELD_SIZE, max_weld_size_req(weld_conn_plates_tk, weld_max),
+                  self.weld.size,
+                  get_pass_fail(weld_max, self.weld.size, relation="geq"))
+            self.report_check.append(t1)
+
+            gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.weld.fabrication]
+            t1 = (DISP_WELD_STRENGTH,
+                  weld_strength_req(V=self.load.shear_force * 1000, A=self.load.axial_force * 1000,
+                                    M=0.0, Ip_w=0.0,
+                                    y_max=self.weld.eff_length / 2, x_max=0.0, l_w=2 * self.weld.eff_length,
+                                    R_w=self.weld.stress),
+                  weld_strength_prov(weld_conn_plates_fu, gamma_mw, self.weld.throat_tk,
+                                     self.weld.strength),
+                  get_pass_fail(self.weld.stress, self.weld.strength, relation="lesser"))
+            self.report_check.append(t1)
 
         Disp_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])

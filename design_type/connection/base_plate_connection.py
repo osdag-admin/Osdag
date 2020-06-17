@@ -1633,11 +1633,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         elif self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
-                self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
-                self.bp_width_min = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
+                self.bp_length_min = round_up(self.column_D + (2 * (2 * self.end_distance)), 5)  # mm
+                self.bp_width_min = round_up(self.column_B + (2 * (2 * self.end_distance)), 5)  # mm
             else:
-                self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
-                self.bp_width_min = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
+                self.bp_length_min = round_up(self.column_OD + (2 * (2 * self.end_distance)), 5)  # mm
+                self.bp_width_min = round_up(self.column_OD + (2 * (2 * self.end_distance)), 5)  # mm
+
         else:
             pass
 
@@ -1654,7 +1655,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.bearing_strength_concrete = self.cl_7_4_1_bearing_strength_concrete(self.footing_grade)  # N/mm^2 or MPa
 
         # slab base analyses (pinned connection)
-        if self.connectivity == 'Welded Column Base':
+        if self.connectivity == 'Welded Column Base' or 'Hollow/Tubular Column Base':
 
             # minimum required area for the base plate [bearing stress = axial force / area of the base]
             self.min_area_req = self.load_axial_compression / self.bearing_strength_concrete  # mm^2
@@ -1662,12 +1663,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # calculate projection by the 'Effective Area Method' [Reference: Clause 7.4.1.1, IS 800:2007]
             # the calculated projection is added by half times the hole dia on each side to avoid stress concentration near holes
             if self.dp_column_type == 'Rolled' or 'Welded':
-                self.projection = self.calculate_c(self.column_bf, self.column_D, self.column_tw, self.column_tf, self.min_area_req,
-                                                   self.anchor_hole_dia)  # mm
-                self.projection = max(self.projection, self.end_distance)  # projection should at-least be equal to the end distance
 
+                if self.connectivity == 'Welded Column Base':
+                    self.projection = self.calculate_c(self.column_bf, self.column_D, self.column_tw, self.column_tf, self.min_area_req,
+                                                       self.anchor_hole_dia, section_type='I-section')  # mm
+                else:
+                    if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
+                        self.projection = self.calculate_c(self.column_B, self.column_D, 0, 0, self.min_area_req, self.anchor_hole_dia,
+                                                           section_type='SHS')  # mm
+                    elif self.dp_column_designation[1:4] == 'CHS':
+                        self.projection = self.calculate_c(0, self.column_OD, 0, 0, self.min_area_req, self.anchor_hole_dia, section_type='CHS')  # mm
+                    else:
+                        logger.error("Cannot find section type")
             else:
                 pass
+
+            self.projection = max(self.projection, self.end_distance)  # projection should at-least be equal to the end distance
 
             if self.projection <= 0:
                 self.safe = False

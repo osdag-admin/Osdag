@@ -694,8 +694,37 @@ class Column(Section):
         clear_depth = self.depth - 2*self.flange_thickness - 2*self.root_radius
         return clear_depth
 
+class HollowSection(Section):
 
-class SHS(Section):
+    def __init__(self, designation, material_grade):
+        super(HollowSection, self).__init__(designation, material_grade)
+
+    def connect_to_database_update_other_attributes(self, table, designation, material_grade=""):
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
+        cur = conn.cursor()
+        cur.execute(db_query, (designation,))
+        row = cur.fetchone()
+        self.mass = row[5]
+        self.area = row[6]
+        self.depth = row[2]
+        self.flange_width = row[3]
+        self.flange_thickness = row[4]
+        self.mom_inertia_z = row[7]
+        self.mom_inertia_y = row[8]
+        self.rad_of_gy_z = row[9]
+        self.rad_of_gy_y = row[10]
+        self.elast_sec_mod_z = row[11]
+        self.elast_sec_mod_y = row[12]
+        self.plast_sec_mod_z = row[13]
+
+        self.plast_sec_mod_y = row[14]
+        self.source = row[15]
+
+        conn.close()
+
+
+class SHS(HollowSection):
 
     def __init__(self, designation, material_grade):
         super(SHS, self).__init__(designation, material_grade)
@@ -703,7 +732,7 @@ class SHS(Section):
         self.connect_to_database_update_other_attributes("SHS", designation, material_grade)
 
 
-class RHS(Section):
+class RHS(HollowSection):
 
     def __init__(self, designation, material_grade):
         super(RHS, self).__init__(designation, material_grade)
@@ -716,7 +745,25 @@ class CHS(Section):
     def __init__(self, designation, material_grade):
         super(CHS, self).__init__(designation, material_grade)
 
-        self.connect_to_database_update_other_attributes("CHS", designation, material_grade)
+        self.connect_to_database_update_other_attributes_chs(designation, material_grade)
+
+    def connect_to_database_update_other_attributes_chs(self, designation, material_grade=""):
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        db_query = "SELECT * FROM CHS WHERE Designation = ?"
+        cur = conn.cursor()
+        cur.execute(db_query, (designation,))
+        row = cur.fetchone()
+        self.mass = row[5]
+        self.area = row[6]  # * 100
+        self.nominal_bore = row[2]
+        self.out_diameter = row[3]
+        self.flange_thickness = row[4]
+        self.internal_vol = row[7]
+        self.mom_inertia = row[10]
+        self.elast_sec_mod = row[11]
+        self.rad_of_gy = row[12]
+        self.source = row[14]
+        conn.close()
 
 
 class Channel(Section):

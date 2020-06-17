@@ -1241,6 +1241,7 @@ class SeatedAngleConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self, popup_summary):
+        super(SeatedAngleConnection, self).save_design(self)
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
         self.report_input = \
             {KEY_MODULE: self.module,

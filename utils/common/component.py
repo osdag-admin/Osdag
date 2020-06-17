@@ -45,7 +45,8 @@ class Bolt:
 
         self.bolt_shank_area = 0.0
         self.bolt_net_area = 0.0
-
+        self.bolt_tension = 0.0
+        self.bolt_tension_prying = 0.0
         self.bolt_shear_capacity = 0.0
         self.bolt_shear_capacity = 0.0
         self.bolt_shear_capacity = 0.0
@@ -199,7 +200,7 @@ class Bolt:
         else:
             kb = min(e / (3.0 * d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
 
-        return kb
+        return round(kb,2)
 
 
     def calculate_bolt_tension_capacity(self, bolt_diameter_provided, bolt_grade_provided):
@@ -351,34 +352,34 @@ class Section(Material):
         max_thickness = max(self.flange_thickness,self.web_thickness)
         super(Section, self).__init__(material_grade,max_thickness)
         self.flange_slope = row[8]
-        self.root_radius = row[9]
-        self.toe_radius = row[10]
-        self.mom_inertia_z = row[11] * 10000
-        self.mom_inertia_y = row[12] * 10000
-        self.rad_of_gy_z = row[13] * 10
-        self.rad_of_gy_y = row[14] * 10
-        self.elast_sec_mod_z = row[15] * 1000
-        self.elast_sec_mod_y = row[16] * 1000
-        self.plast_sec_mod_z = row[17]
+        self.root_radius = round(row[9],2)
+        self.toe_radius = round(row[10],2)
+        self.mom_inertia_z = round(row[11] * 10000,2)
+        self.mom_inertia_y = round(row[12] * 10000,2)
+        self.rad_of_gy_z = round(row[13] * 10,2)
+        self.rad_of_gy_y = round(row[14] * 10,2)
+        self.elast_sec_mod_z = round(row[15] * 1000,2)
+        self.elast_sec_mod_y = round(row[16] * 1000,2)
+        self.plast_sec_mod_z = round(row[17],2)
         if self.plast_sec_mod_z is None:  # Todo: add in database
-            self.plast_sec_mod_z = I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,
-                                                                                   self.web_thickness,self.flange_thickness)*1000
+            self.plast_sec_mod_z = round(I_sectional_Properties().calc_PlasticModulusZpz(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)*1000,2)
         else:
-            self.plast_sec_mod_z = row[17] *1000
+            self.plast_sec_mod_z = round(row[17] *1000,2)
 
-        self.plast_sec_mod_y = row[18]
+        self.plast_sec_mod_y = round(row[18]*1000,2)
         if self.plast_sec_mod_y is None:  # Todo: add in database
-            self.plast_sec_mod_y = I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
-                                                                                   self.web_thickness,self.flange_thickness)*1000
+            self.plast_sec_mod_y = round(I_sectional_Properties().calc_PlasticModulusZpy(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)*1000,2)
         else:
-            self.plast_sec_mod_y = row[18] * 1000
+            self.plast_sec_mod_y = round(row[18] * 1000,2)
 
-        self.It = I_sectional_Properties().calc_torsion_const(self.depth,self.flange_width,
-                                                                                   self.web_thickness,self.flange_thickness)*10**4\
-            if row[19] is None else row[19] * 10**4
+        self.It = round(I_sectional_Properties().calc_torsion_const(self.depth,self.flange_width,
+                                                                                   self.web_thickness,self.flange_thickness)*10**4,2)\
+            if row[19] is None else round(row[19] * 10**4,2)
         self.Iw = I_sectional_Properties().calc_warping_const(self.depth,self.flange_width,
                                                                                    self.web_thickness,self.flange_thickness)*10**6 \
-            if row[20] is None else row[20] * 10**6
+            if row[20] is None else round(row[20] * 10**6,2)
         self.source = row[21]
         self.type = 'Rolled' if row[22] is None else row[22]
 
@@ -1799,7 +1800,6 @@ class I_sectional_Properties(object):
     def calc_warping_const (self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
         return 0.0
 
-
 class Single_Angle_Properties(object):
 
     "return in cm "
@@ -2189,7 +2189,6 @@ class SAngle_Properties(object):
 
         self.I_t = 2
         return round(self.I_t, 2)
-
 
 class Single_Channel_Properties(object):
 

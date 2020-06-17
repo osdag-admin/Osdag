@@ -1468,7 +1468,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.column_D = self.column_properties.depth
                 self.column_B = self.column_properties.depth
                 self.column_t = self.column_properties.flange_thickness
-            elif self.dp_column_designation[1:4] == 'SHS':
+            elif self.dp_column_designation[1:4] == 'CHS':
                 self.column_properties = CHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
                 self.column_OD = self.column_properties.depth
                 self.column_t = self.column_properties.flange_thickness

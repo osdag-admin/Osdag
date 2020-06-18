@@ -425,7 +425,7 @@ VALUES_IMG_TENSIONBOLTED_DF02 = ["ResourceFiles/images/unequaldp.png","ResourceF
 
 VALUES_IMG_TENSIONBOLTED_DF03 = ["ResourceFiles/images/Slope_Channel.png","ResourceFiles/images/Parallel_Channel.png","ResourceFiles/images/Slope_BBChannel.png","ResourceFiles/images/Parallel_BBChannel.png"]
 
-VALUES_IMG_BEAM = "ResourceFiles/images/Slope_Beam.png"
+VALUES_IMG_BEAM = ["ResourceFiles/images/Slope_Beam.png","ResourceFiles/images/Parallel_Beam.png"]
 
 VALUES_BEAMSEC = connectdb("Beams")
 VALUES_SECBM = connectdb("Beams")
@@ -438,9 +438,14 @@ VALUES_PRIBM = connectdb("Beams")
 ############################
 # Display Keys (Input Dock, Output Dock, Design preference, Design report)
 ############################
-KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity (V_dy) (kN)'
+KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity $(V_{dy})$ (kN)'
+KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity $(V_{dn})$ (kN)'
+KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear $(V_{db})$ (kN)'
+KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension $(T_{db})$ (kN)'
+KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity $(V_d)$ (kN)'
+
+
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
-KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity (V_dn) (kN)'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
 DISP_MIN_PITCH = 'Min. Pitch (mm)'
@@ -455,6 +460,8 @@ DISP_MAX_END = 'Max. End Distance (mm)'
 DISP_MIN_PLATE_HEIGHT = 'Min. Plate Height (mm)'
 DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
 DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
+DISP_MAX_PLATE_WIDTH = 'Max. Plate Width (mm)'
+DISP_MIN_PLATE_WIDTH = 'Min. Plate Width (mm)'
 DISP_MIN_PLATE_THICK = 'Min. Plate Thickness (mm)'
 
 ######### Minimun for Flange####
@@ -476,9 +483,7 @@ DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Height (mm)'
 DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Height (mm)'
 DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
-KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (V_db) (kN)'
-KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension (T_db) (kN)'
-KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (V_d) (kN)'
+
 KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
 KEY_DISP_FY = 'Yield Strength , fy (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
@@ -524,7 +529,9 @@ DISP_TITLE_FLANGESPLICEPLATE_INNER = 'Inner plate '
 KEY_DISP_SLENDER = 'Slenderness'
 
 
-KEY_DISP_PLATETHK = 'Thickness(mm)'
+KEY_DISP_PLATETHK = 'Thickness (mm)'
+KEY_DISP_DPPLATETHK = 'Endplate thickness, T (mm)'
+KEY_DISP_DPPLATETHK01 = 'Endplate thickness, Tp (mm)'
 
 DISP_TITLE_TENSION = 'Tension Capacity'
 KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
@@ -809,7 +816,7 @@ KEY_DISP_CORR_INFLUENCES = 'Are the members exposed to corrosive influences'
 KEY_DISP_DP_DESIGN_METHOD = 'Design Method'
 
 KEY_DISP_DP_DESIGN_BASE_PLATE = 'Base Plate'
-
+KEY_DISP_GAP = 'Gap between Members'
 
 KEY_DISP_MECH_PROP = 'Mechanical Properties'
 KEY_DISP_DIMENSIONS = 'Dimensions'
@@ -818,7 +825,7 @@ KEY_DISP_FLANGE_W = 'Flange width, B (mm)*'
 KEY_DISP_FLANGE_T = 'Flange thickness, T (mm)*'
 KEY_DISP_WEB_HEIGHT = 'Web Height, D (mm*)'
 KEY_DISP_WEB_T = 'Web thickness, t (mm)*'
-KEY_DISP_FLANGE_S = 'Flange Slope, a (deg.)*'
+KEY_DISP_FLANGE_S = 'Flange Slope, α (deg.)*'
 KEY_DISP_ROOT_R = 'Root radius, R1 (mm)*'
 KEY_DISP_TOE_R = 'Toe radius, R2 (mm)*'
 KEY_DISP_TYPE = 'Type'
@@ -846,9 +853,9 @@ KEY_DISP_Iw = 'Warping Constant, I<sub>w</sub> (cm<sup>6</sup>)'
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
-KEY_DISP_A= 'A'
-KEY_DISP_B= 'B'
-KEY_DISP_LEG_THK = 'Leg Thickness (mm)'
+KEY_DISP_A= 'Long Leg, A (mm)*'
+KEY_DISP_B= 'Short Leg, B (mm)*'
+KEY_DISP_LEG_THK = 'Leg Thickness, t (mm)*'
 KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
 KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , fy (MPa)'

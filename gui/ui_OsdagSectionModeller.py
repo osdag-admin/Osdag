@@ -851,6 +851,7 @@ class Ui_OsdagSectionModeller(object):
                 self.RG_text_2.setText(str(Ryy))
                 self.ESM_text_1.setText(str(Zzz))
                 self.ESM_text_2.setText(str(Zyy))
+
         elif(index_type==2):
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Channels where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                 ChannelArea,B,T,t,Dc=map(float,cursor.fetchall()[0])

@@ -12,7 +12,7 @@ from pylatex.utils import italic, bold
 import sys
 import datetime
 import pylatex as pyl
-
+from pylatex.basic import TextColor
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic
@@ -53,7 +53,8 @@ class CreateLatex(Document):
         doc.append(pyl.Command('selectfont'))
 
         doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
-
+        doc.add_color('PassColor','HTML', '4D6E28')
+        doc.add_color('FailColor','HTML','933A16')
         header = PageStyle("header")
         # Create center header
         with header.create(Head("C")):
@@ -164,7 +165,7 @@ class CreateLatex(Document):
                                     table.add_hline()
 
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
-        # doc.append(NewPage())
+        doc.append(NewPage())
         count = 0
         with doc.create(Section('Design Checks')):
             for check in Design_Check:
@@ -203,7 +204,7 @@ class CreateLatex(Document):
                                         merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 1)
                                     print('Hi', len(sectiondetails) / 2, round_up(len(sectiondetails), 2) / 2,
                                           merge_rows)
-                                    if merge_rows % 2 == 0:
+                                    if (len(sectiondetails)) % 2 == 0:
                                         sectiondetails[''] = ''
                                     a = list(sectiondetails.keys())
                                     # index=0
@@ -226,7 +227,11 @@ class CreateLatex(Document):
                             table.add_hline()
                         count = count + 1
                 else:
-                    table.add_row((check[0], check[1], check[2], check[3]))
+
+                    if check[3] == 'Fail':
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("FailColor", bold(check[3])))
+                    else:
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("PassColor", bold(check[3])))
                     table.add_hline()
         # doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
 

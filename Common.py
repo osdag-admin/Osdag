@@ -460,6 +460,8 @@ DISP_MAX_END = 'Max. End Distance (mm)'
 DISP_MIN_PLATE_HEIGHT = 'Min. Plate Height (mm)'
 DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
 DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
+DISP_MAX_PLATE_WIDTH = 'Max. Plate Width (mm)'
+DISP_MIN_PLATE_WIDTH = 'Min. Plate Width (mm)'
 DISP_MIN_PLATE_THICK = 'Min. Plate Thickness (mm)'
 
 ######### Minimun for Flange####

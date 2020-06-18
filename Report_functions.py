@@ -626,6 +626,37 @@ def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_pla
     return max_plate_ht_eqn
 
 
+def ep_min_plate_width_req(s,g,e_min,t_w,wp_min):
+    s = str(s)
+    g= str(g)
+    e_min = str(e_min)
+    t_w = str(t_w)
+    wp_min = str(wp_min)
+    ep_min_plate_w_eqn = Math(inline=True)
+    ep_min_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{min}} &= s * 2 + g` * 2 + e`_{min}*2 + t_w\\'))
+    ep_min_plate_w_eqn.append(NoEscape(r'&='+ s +'* 2 +'+ g +' * 2 +'+ e_min +'*2 +'+ t_w+r'\\'))
+    ep_min_plate_w_eqn.append(NoEscape(r'&='+wp_min +r'\end{aligned}'))
+    return ep_min_plate_w_eqn
+
+def ep_max_plate_width_avail(conn,D,T_w,R_r,T_f,wp_max):
+    conn = str(conn)
+    D = str(D)
+    T_w = str(T_w)
+    R_r = str(R_r)
+    T_f = str(T_f)
+    wp_max = str(wp_max)
+    ep_max_plate_w_eqn = Math(inline=True)
+    if conn == VALUES_CONN_1[0]:
+        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{max}} &= T_f \\'))
+        ep_max_plate_w_eqn.append(NoEscape(r'&=' + wp_max + '\end{aligned}'))
+    elif conn == VALUES_CONN_1[1]:
+        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{max}} &= D - 2*T_f - 2*R_r \\'))
+        ep_max_plate_w_eqn.append(NoEscape(r'&=' + D + '-2*' + T_f + '-2*' + R_r +  r'\\'))
+        ep_max_plate_w_eqn.append(NoEscape(r'&=' + wp_max + '\end{aligned}'))
+    else:
+        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} N/A \end{aligned}\\'))
+    return ep_max_plate_w_eqn
+
 def end_plate_ht_req(D,e,h_p):
     D = str(D)
     h_p = str(h_p)
@@ -1342,7 +1373,7 @@ def end_plate_moment_demand(T_w,R_r,e,t_w,s,T_e,M):
     EP_Mom.append(NoEscape(r'\begin{aligned}M &= T_e * ecc \\'))
     EP_Mom.append(NoEscape(r'ecc &=\frac{T_w}{2}+R_r+e`-\frac{t_w}{2}-s\\'))
     EP_Mom.append(NoEscape(r'&=\frac{'+T_w+'}{2}+'+R_r+'+'+e+r'-\frac{'+t_w+'}{2}-'+s+r'\\'))
-    EP_Mom.append(NoEscape(r'M&='+T_e+'*'+ecc+'='+M+r'*10^{-6}\end{aligned}'))
+    EP_Mom.append(NoEscape(r'M&='+T_e+'*'+ecc+'*10^{-3}='+M+r'\end{aligned}'))
     return EP_Mom
 
 def plastic_moment_capacty(beta_b, Z_p, f_y, gamma_m0 ,Pmc):  # same as #todo anjali
@@ -1476,10 +1507,9 @@ def shear_capacity_prov(V_dy, V_dn, V_db = 0.0):
 
 
 def get_pass_fail(required, provided,relation='greater'):
-    required = float(required)
-    provided = float(provided)
-    if provided==0:
-        return 'N/A'
+
+    if provided == 0 or required == 'N/A' or provided == 'N/A' or required == 0:
+        return ''
     else:
         if relation == 'greater':
             if required > provided:

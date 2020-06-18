@@ -1111,12 +1111,14 @@ class FinPlateConnection(ShearConnection):
             t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.min_plate_height), self.plate.height,
                   get_pass_fail(self.min_plate_height, self.plate.height,relation="lesser"))
             self.report_check.append(t1)
+
             t1 = (DISP_MAX_PLATE_HEIGHT, max_plate_ht_req(self.connectivity,self.supported_section.depth,
                                                           self.supported_section.flange_thickness,
                                                           self.supported_section.root_radius, self.supported_section.notch_ht,
                                                           self.max_plate_height), self.plate.height,
                   get_pass_fail(self.max_plate_height, self.plate.height,relation="greater"))
             self.report_check.append(t1)
+
             min_plate_length = self.plate.gap +2*self.bolt.min_end_dist+(self.plate.bolt_line-1)*self.bolt.min_pitch
             t1 = (DISP_MIN_PLATE_LENGTH, min_plate_length_req(self.bolt.min_pitch, self.bolt.min_end_dist,
                                                           self.plate.bolt_line,min_plate_length), self.plate.length,

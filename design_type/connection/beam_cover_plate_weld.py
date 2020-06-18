@@ -1616,8 +1616,7 @@ class BeamCoverPlateWeld(MomentConnection):
         print("class_of_section1", class_of_section1)
 
     def min_thick_based_on_area(self, tk, width, list_of_pt_tk, t_w, r_1, D,
-                                preference=None,fp_thk=None):  # area of flange plate should be greater than 1.05 times area of flange
-        # 20 is the maximum spacing either side of the plate
+                                preference=None,fp_thk=None):
 
         """
 

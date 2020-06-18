@@ -249,15 +249,6 @@ class Window(QMainWindow):
         else:
             pass
 
-    def zoom_model(self, zoom_type="in"):
-        if zoom_type == "in":
-            self.display.ZoomFactor(3)
-        elif zoom_type == "out":
-            self.display.ZoomFactor(1/3)
-        else:
-            self.display.ZoomFactor(0)
-
-
     def get_validator(self, validator):
         if validator == 'Int Validator':
             return QIntValidator()
@@ -272,6 +263,9 @@ class Window(QMainWindow):
         self.input_dock_inputs = {}
         self.design_pref_inputs = {}
         self.folder = folder
+        self.display_mode = 'Normal'
+        self.display_x = 90
+        self.display_y = 90
         main.design_status = False
         main.design_button_status = False
         MainWindow.setObjectName("MainWindow")
@@ -1251,8 +1245,10 @@ class Window(QMainWindow):
         self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
         self.actionCreate_design_report.triggered.connect(lambda:self.open_summary_popup(main))
-        self.actionZoom_out.triggered.connect(lambda: self.zoom_model(zoom_type="out"))
-        self.actionZoom_in.triggered.connect(lambda: self.zoom_model(zoom_type="in"))
+        self.actionZoom_out.triggered.connect(lambda: self.display.ZoomFactor(1/1.1))
+        self.actionZoom_in.triggered.connect(lambda: self.display.ZoomFactor(1.1))
+        self.actionPan.triggered.connect(lambda: self.assign_display_mode(mode="pan"))
+        self.actionRotate_3D_model.triggered.connect(lambda: self.assign_display_mode(mode="rotate"))
         self.actionDownload_column.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Columns"))
         self.actionDownload_beam.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Beams"))
         self.actionDownload_channel.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Channels"))
@@ -1701,6 +1697,8 @@ class Window(QMainWindow):
                 status = main.design_status
                 module_class = self.return_class(main.module)
                 self.commLogicObj.call_3DModel(status, module_class)
+                self.display_x = 90
+                self.display_y = 90
                 for chkbox in main.get_3d_components(main):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(True)
                 for action in self.menugraphics_component_list:
@@ -2182,6 +2180,11 @@ class Window(QMainWindow):
 
         self.modelTab.InitDriver()
         display = self.modelTab._display
+        key_function = {Qt.Key_Up: lambda: self.Pan_Rotate_model("Up"),
+                        Qt.Key_Down: lambda: self.Pan_Rotate_model("Down"),
+                        Qt.Key_Right: lambda: self.Pan_Rotate_model("Right"),
+                        Qt.Key_Left: lambda: self.Pan_Rotate_model("Left")}
+        self.modelTab._key_map.update(key_function)
 
         # background gradient
         # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
@@ -2277,6 +2280,43 @@ class Window(QMainWindow):
             # self.actionSave_3D_model.setEnabled(False)
             QMessageBox.about(self,'Information', 'Design Unsafe: 3D Model cannot be saved')
 
+    def assign_display_mode(self, mode):
+
+        self.modelTab.setFocus()
+        if mode == "pan":
+            self.display_mode = 'Pan'
+        elif mode == "rotate":
+            self.display_mode = 'Rotate'
+        else:
+            self.display_mode = 'Normal'
+
+    def Pan_Rotate_model(self, direction):
+
+        if self.display_mode == 'Pan':
+            if direction == 'Up':
+                self.display.Pan(0, 10)
+            elif direction == 'Down':
+                self.display.Pan(0, -10)
+            elif direction == 'Left':
+                self.display.Pan(-10, 0)
+            elif direction == 'Right':
+                self.display.Pan(10, 0)
+        elif self.display_mode == 'Rotate':
+            if direction == 'Up':
+                self.display_y += 10
+                self.display.Rotation(self.display_x, self.display_y)
+            elif direction == 'Down':
+                self.display_y -= 10
+                self.display.Rotation(self.display_x, self.display_y)
+            elif direction == 'Left':
+                self.display_x -= 10
+                self.display.Rotation(self.display_x, self.display_y)
+            elif direction == 'Right':
+                self.display_x += 10
+                self.display.Rotation(self.display_x, self.display_y)
+        else:
+            pass
+
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.btnInput.setToolTip(_translate("MainWindow", "Left Dock"))
@@ -2336,7 +2376,9 @@ class Window(QMainWindow):
         self.actionZoom_out.setText(_translate("MainWindow", "Zoom out"))
         self.actionZoom_out.setShortcut(_translate("MainWindow", "Ctrl+O"))
         self.actionPan.setText(_translate("MainWindow", "Pan"))
+        self.actionPan.setShortcut(_translate("MainWindow", "Ctrl+P"))
         self.actionRotate_3D_model.setText(_translate("MainWindow", "Rotate 3D model"))
+        self.actionRotate_3D_model.setShortcut(_translate("MainWindow", "Ctrl+R"))
         self.submenuDownload_db.setTitle(_translate("MainWindow", "Download"))
         self.actionDownload_column.setText(_translate("MainWindow", "\n\u2022 Column"))
         self.actionDownload_beam.setText(_translate("MainWindow", "\n\u2022 Beam"))

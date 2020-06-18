@@ -132,8 +132,8 @@ class Member(Main):
                             image = VALUES_IMG_TENSIONBOLTED_DF01[2]
                         else:
                             image = VALUES_IMG_TENSIONBOLTED_DF02[2]
-                        Cy = str(Angle_attributes.calc_Cy(a, b,thickness, l))
-                        Cz = "N/A"
+                        Cy =  "N/A"
+                        Cz = str(Angle_attributes.calc_Cz(a, b,thickness, l))
                 elif section_profile == "Star Angles":
                     Angle_attributes = SAngle_Properties()
                     Angle_attributes.data(designation, material_grade)
@@ -163,7 +163,7 @@ class Member(Main):
                 elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l,plate_thk))
                 plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l,plate_thk))
                 plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l,plate_thk))
-                torsional_rigidity = "N/A"
+                torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
 
         # if KEY_SEC_MATERIAL in input_dictionary.keys():
         #     material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -422,7 +422,7 @@ class Member(Main):
                     image = VALUES_IMG_TENSIONBOLTED_DF03[2]
                 else:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[3]
-                It = "N/A"
+                It = str(Channel_attributes.calc_torsion_const_It(f_w, f_t, w_h, w_t))
                 Iw = "N/A"
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
@@ -647,8 +647,8 @@ class Member(Main):
                         image = VALUES_IMG_TENSIONBOLTED_DF01[2]
                     else:
                         image = VALUES_IMG_TENSIONBOLTED_DF02[2]
-                    Cy = str(Angle_attributes.calc_Cy(a, b, thickness, l))
-                    Cz = "N/A"
+                    Cy = "N/A"
+                    Cz = str(Angle_attributes.calc_Cz(a, b, thickness, l))
             elif section_profile == "Star Angles":
                 Angle_attributes = SAngle_Properties()
                 Angle_attributes.data(designation, material_grade)
@@ -679,7 +679,7 @@ class Member(Main):
             elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
             plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
             plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
-            torsional_rigidity = "N/A"
+            torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
 
         d = {
              KEY_SECSIZE_SELECTED:designation,
@@ -875,8 +875,8 @@ class Member(Main):
                     Cz = sec_prop.calc_Cz(a, b, t, l)
                     Cy = "N/A"
                 else:
-                    Cz = "N/A"
-                    Cy = sec_prop.calc_Cy(a, b, t, l)
+                    Cz = sec_prop.calc_Cz(a, b, t, l)
+                    Cy = "N/A"
                 moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l,plate_thk)
                 moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l,plate_thk)
                 moa_u = "N/A"

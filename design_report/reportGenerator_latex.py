@@ -204,7 +204,7 @@ class CreateLatex(Document):
                                         merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 1)
                                     print('Hi', len(sectiondetails) / 2, round_up(len(sectiondetails), 2) / 2,
                                           merge_rows)
-                                    if merge_rows % 2 == 0:
+                                    if (len(sectiondetails)) % 2 == 0:
                                         sectiondetails[''] = ''
                                     a = list(sectiondetails.keys())
                                     # index=0

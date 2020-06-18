@@ -528,8 +528,8 @@ KEY_DISP_SLENDER = 'Slenderness'
 
 
 KEY_DISP_PLATETHK = 'Thickness (mm)'
-KEY_DISP_DPPLATETHK = 'Plate thickness (mm)'
-
+KEY_DISP_DPPLATETHK = 'Endplate thickness, T (mm)'
+KEY_DISP_DPPLATETHK01 = 'Endplate thickness, Tp (mm)'
 
 DISP_TITLE_TENSION = 'Tension Capacity'
 KEY_DISP_FLANGESPLATE_PREFERENCES = 'Preferences'
@@ -851,8 +851,8 @@ KEY_DISP_Iw = 'Warping Constant, I<sub>w</sub> (cm<sup>6</sup>)'
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
-KEY_DISP_A= 'A'
-KEY_DISP_B= 'B'
+KEY_DISP_A= 'Long Leg, A (mm)*'
+KEY_DISP_B= 'Short Leg, B (mm)*'
 KEY_DISP_LEG_THK = 'Leg Thickness, t (mm)*'
 KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'

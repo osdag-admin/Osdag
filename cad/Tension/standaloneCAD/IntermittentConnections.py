@@ -177,8 +177,11 @@ class IntermittentWelds():
         self.pitchDir = None
         self.boltDir = None
 
+
         self.weldsabw = []
         self.weldsblw = []
+        self.weldsabw1 = []
+        self.weldsblw1 = []
         self.plates = []
 
         self.initWeldPlaceParams()
@@ -197,19 +200,22 @@ class IntermittentWelds():
         for i in range(self.no_intermitent_connections):
             self.weldsabw.append(FilletWeld(w.h, w.b, w.L))
             self.weldsblw.append(FilletWeld(w.h, w.b, w.L))
+            self.weldsabw1.append(FilletWeld(w.h, w.b, w.L))
+            self.weldsblw1.append(FilletWeld(w.h, w.b, w.L))
             self.plates.append(Plate(p.L, p.W, p.T))
 
     def initWeldPlaceParams(self):
 
         self.spacing = 300
-        # todo: add member depth here
-        self.memberdepth = 175
+        # todo: use if else statement to introduce long leg and short leg and channel and angle member depth
+        self.memberdepth = 70
         self.no_intermitent_connections = 2
 
     def calculatePositions(self):
         """
         Calculate the exact position for welds and plates
         """
+        self.origin = self.origin + (self.spacing)*self.uDir
         for i in range(self.no_intermitent_connections):
             pos = self.origin + i * self.spacing * self.uDir
             pos0 = pos + self.intermittentPlate.T / 2 * self.vDir
@@ -227,18 +233,33 @@ class IntermittentWelds():
         self.wDir = wDir
 
         self.calculatePositions()
-
-        for index, pos0 in enumerate(self.platePostions):
-            self.plates[index].place(pos0, vDir, uDir)
-        for index, pos1 in enumerate(self.weldabwPositions):
-            self.weldsabw[index].place(pos1, wDir, uDir)
-        for index, pos2 in enumerate(self.weldblwPositions):
-            self.weldsblw[index].place(pos2, -wDir, -uDir)
+        if self.Obj == 'Star Angles':
+            for index, pos0 in enumerate(self.platePostions):
+                self.plates[index].place(pos0 , vDir, uDir)
+            for index, pos1 in enumerate(self.weldabwPositions):
+                self.weldsabw[index].place(pos1 - self.memberdepth*wDir/2, wDir, uDir)
+                self.weldsabw1[index].place(pos1 + self.intermittentPlate.T * vDir + self.memberdepth*wDir/2, vDir, uDir)
+            for index, pos2 in enumerate(self.weldblwPositions):
+                self.weldsblw[index].place(pos2 - self.memberdepth*wDir/2, -wDir, -uDir)
+                self.weldsblw1[index].place(pos2 + self.intermittentPlate.T * vDir + self.memberdepth*wDir/2, vDir, -uDir)
+        else:
+            for index, pos0 in enumerate(self.platePostions):
+                self.plates[index].place(pos0, vDir, uDir)
+            for index, pos1 in enumerate(self.weldabwPositions):
+                self.weldsabw[index].place(pos1, wDir, uDir)
+                self.weldsabw1[index].place(pos1 + self.intermittentPlate.T * vDir, vDir, uDir)
+            for index, pos2 in enumerate(self.weldblwPositions):
+                self.weldsblw[index].place(pos2, -wDir, -uDir)
+                self.weldsblw1[index].place(pos2 + self.intermittentPlate.T * vDir, vDir, -uDir)
 
     def create_model(self):
         for weld in self.weldsabw:
             self.weldmodels.append(weld.create_model())
         for weld in self.weldsblw:
+            self.weldmodels.append(weld.create_model())
+        for weld in self.weldsabw1:
+            self.weldmodels.append(weld.create_model())
+        for weld in self.weldsblw1:
             self.weldmodels.append(weld.create_model())
         for plate in self.plates:
             self.platemodels.append(plate.create_model())
@@ -308,11 +329,11 @@ if __name__ == '__main__':
     bolt = Bolt(R=6, T=5, H=6, r=3)
     nut = Nut(R=bolt.R, T=bolt.T, H=bolt.T + 1, innerR1=bolt.r)
     nut_space = 10 + 5 + nut.T  # member.T + plate.T + nut.T
-    Obj = 'Star Angles'  # 'Back to Back Channels'  #'Channels'  #'  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
+    Obj = 'Star Angles'  #'Back to Back Channels'  # ''Channels'  #'  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
 
     # nut_bolt_array = NutBoltArray(Obj, nut, bolt, nut_space)
 
-    intermittentPlate = Plate(L=35 + 35 + 35, W=35 + 35, T=10)
+    intermittentPlate = Plate(L= 180, W=35 + 35, T=10)
     # nut_bolt_array = IntermittentNutBoltPlateArray(Obj, nut, bolt, intermittentPlate, nut_space)
     #
     # place = nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)

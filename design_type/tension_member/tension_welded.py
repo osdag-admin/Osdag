@@ -1005,34 +1005,38 @@ class Tension_welded(Member):
 
             "condition for yield and slenderness check "
 
-            if (self.section_size.tension_yielding_capacity >=self.load.axial_force *1000) and self.section_size.slenderness < 400:
+            if (self.section_size.tension_yielding_capacity >= self.load.axial_force * 1000) and self.section_size.slenderness < 400:
                 min_yield_current = self.section_size.tension_yielding_capacity
                 self.member_design_status = True
                 if min_yield == 0:
                     min_yield = min_yield_current
                     self.section_size_1 = self.select_section(self, design_dictionary, selectedsize)
                     self.section_size_1.tension_member_yielding(A_g=self.cross_area, F_y=self.section_size.fy)
-
                     if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-                        self.section_size_1.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],subkey = design_dictionary[KEY_LOCATION],
-                                                                mom_inertia_y=self.section_size_1.mom_inertia_y,
-                                                                mom_inertia_z=self.section_size_1.mom_inertia_z,
-                                                                  rad_y=self.section_size_1.rad_of_gy_y,rad_z= self.section_size_1.rad_of_gy_z,rad_u=self.section_size_1.rad_of_gy_u,rad_v= self.section_size_1.rad_of_gy_v,
-                                                                area=self.section_size_1.area,
-                                                                Cg_1=self.section_size_1.Cy, Cg_2=self.section_size_1.Cz, thickness=0.0)
+                        self.section_size_1.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+                                                                  subkey=design_dictionary[KEY_LOCATION],
+                                                                  mom_inertia_y=self.section_size_1.mom_inertia_y,
+                                                                  mom_inertia_z=self.section_size_1.mom_inertia_z,
+                                                                  rad_y=self.section_size_1.rad_of_gy_y,
+                                                                  rad_z=self.section_size_1.rad_of_gy_z,
+                                                                  rad_u=self.section_size_1.rad_of_gy_u,
+                                                                  rad_v=self.section_size_1.rad_of_gy_v,
+                                                                  area=self.section_size_1.area,
+                                                                  Cg_1=self.section_size_1.Cy,
+                                                                  Cg_2=self.section_size_1.Cz, thickness=0.0)
                     else:
-                        self.section_size.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
-                                                                subkey=design_dictionary[KEY_LOCATION],
-                                                                mom_inertia_y=self.section_size.mom_inertia_y,
-                                                                mom_inertia_z=self.section_size.mom_inertia_z,
-                                                                rad_y=self.section_size.rad_of_gy_y,
-                                                                rad_z=self.section_size.rad_of_gy_z,
-                                                                area=self.section_size.area,
-                                                                Cg_1=self.section_size.Cy, Cg_2=0,
-                                                                thickness=0.0)
+                        self.section_size_1.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+                                                                  subkey=design_dictionary[KEY_LOCATION],
+                                                                  mom_inertia_y=self.section_size_1.mom_inertia_y,
+                                                                  mom_inertia_z=self.section_size_1.mom_inertia_z,
+                                                                  rad_y=self.section_size_1.rad_of_gy_y,
+                                                                  rad_z=self.section_size_1.rad_of_gy_z,
+                                                                  area=self.section_size_1.area,
+                                                                  Cg_1=self.section_size_1.Cy, Cg_2=0,
+                                                                  thickness=0.0)
 
                     self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
-                                                               r=self.section_size_1.min_radius_gyration)
+                                                                     r=self.section_size_1.min_radius_gyration)
 
                 elif min_yield_current < min_yield:
                     min_yield = min_yield_current
@@ -1051,15 +1055,15 @@ class Tension_welded(Member):
                                                                   Cg_1=self.section_size_1.Cy,
                                                                   Cg_2=self.section_size_1.Cz, thickness=0.0)
                     else:
-                        self.section_size.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
-                                                                subkey=design_dictionary[KEY_LOCATION],
-                                                                mom_inertia_y=self.section_size.mom_inertia_y,
-                                                                mom_inertia_z=self.section_size.mom_inertia_z,
-                                                                rad_y=self.section_size.rad_of_gy_y,
-                                                                rad_z=self.section_size.rad_of_gy_z,
-                                                                area=self.section_size.area,
-                                                                Cg_1=self.section_size.Cy, Cg_2=0,
-                                                                thickness=0.0)
+                        self.section_size_1.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+                                                                  subkey=design_dictionary[KEY_LOCATION],
+                                                                  mom_inertia_y=self.section_size_1.mom_inertia_y,
+                                                                  mom_inertia_z=self.section_size_1.mom_inertia_z,
+                                                                  rad_y=self.section_size_1.rad_of_gy_y,
+                                                                  rad_z=self.section_size_1.rad_of_gy_z,
+                                                                  area=self.section_size_1.area,
+                                                                  Cg_1=self.section_size_1.Cy, Cg_2=0,
+                                                                  thickness=0.0)
                 self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
                                                                  r=self.section_size_1.min_radius_gyration)
 
@@ -1499,6 +1503,32 @@ class Tension_welded(Member):
                 logger.info(self.weld.reason)
                 logger.info(": Overall bolted tension member design is safe. \n")
                 logger.debug(" :=========End Of design===========")
+                if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
+                    self.section_size_1.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+                                                              subkey=design_dictionary[KEY_LOCATION],
+                                                              mom_inertia_y=self.section_size_1.mom_inertia_y,
+                                                              mom_inertia_z=self.section_size_1.mom_inertia_z,
+                                                              rad_y=self.section_size_1.rad_of_gy_y,
+                                                              rad_z=self.section_size_1.rad_of_gy_z,
+                                                              rad_u=self.section_size_1.rad_of_gy_u,
+                                                              rad_v=self.section_size_1.rad_of_gy_v,
+                                                              area=self.section_size_1.area,
+                                                              Cg_1=self.section_size_1.Cy,
+                                                              Cg_2=self.section_size_1.Cz,
+                                                              thickness=self.plate.thickness_provided)
+                else:
+                    self.section_size_1.min_rad_gyration_calc(key=design_dictionary[KEY_SEC_PROFILE],
+                                                              subkey=design_dictionary[KEY_LOCATION],
+                                                              mom_inertia_y=self.section_size_1.mom_inertia_y,
+                                                              mom_inertia_z=self.section_size_1.mom_inertia_z,
+                                                              rad_y=self.section_size_1.rad_of_gy_y,
+                                                              rad_z=self.section_size_1.rad_of_gy_z,
+                                                              area=self.section_size_1.area,
+                                                              Cg_1=self.section_size_1.Cy, Cg_2=0,
+                                                              thickness=self.plate.thickness_provided)
+
+                self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+                                                                 r=self.section_size_1.min_radius_gyration)
 
         else:
             self.design_status = False
@@ -1680,7 +1710,7 @@ class Tension_welded(Member):
                                       KEY_DISP_FU: round(section_size.fu, 2),
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
-                                      'Area(mm2) - A': round(section_size.area, 2),
+                                      'Area(mm2) - Ag': round(section_size.area, 2),
                                       'D(mm)': round(section_size.depth, 2),
                                       'B(mm)': round(section_size.flange_width, 2),
                                       't(mm)': round(section_size.web_thickness, 2),
@@ -1710,11 +1740,12 @@ class Tension_welded(Member):
                                       KEY_DISP_FU: round(section_size.fu, 2),
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
-                                      'Area(mm2) - A': round(section_size.area, 2),
+                                      'Area(mm2) - Ag': round(section_size.area, 2),
                                       'D(mm)': round(section_size.depth, 2),
                                       'B(mm)': round(section_size.flange_width, 2),
                                       't(mm)': round(section_size.web_thickness, 2),
                                       'T(mm)': round(section_size.flange_thickness, 2),
+                                      'Tp(mm)': round(self.plate.thickness_provided, 2),
                                       'FlangeSlope': round(section_size.flange_slope, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),
                                       'R2(mm)': round(section_size.toe_radius, 2),
@@ -1738,7 +1769,7 @@ class Tension_welded(Member):
                                       KEY_DISP_FU: round(section_size.fu, 2),
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
-                                      'Area(mm2) - A': round((section_size.area), 2),
+                                      'Area(mm2) - Ag': round((section_size.area), 2),
                                       'a(mm)': round(section_size.max_leg, 2),
                                       'b(mm)': round(section_size.min_leg, 2),
                                       't(mm)': round(section_size.thickness, 2),
@@ -1781,10 +1812,11 @@ class Tension_welded(Member):
                                       KEY_DISP_FU: round(section_size.fu, 2),
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
-                                      'Area(mm2) - A': round((section_size.area), 2),
+                                      'Area(mm2) - Ag': round((section_size.area), 2),
                                       'a(mm)': round(section_size.max_leg, 2),
                                       'b(mm)': round(section_size.min_leg, 2),
                                       't(mm)': round(section_size.thickness, 2),
+                                      'T(mm)': round(self.plate.thickness_provided, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),
                                       'R2(mm)': round(section_size.toe_radius, 2),
                                       'Cy(mm)': Cy,
@@ -1835,10 +1867,11 @@ class Tension_welded(Member):
                                       KEY_DISP_FU: round(section_size.fu, 2),
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
-                                      'Area(mm2) - A': round((section_size.area), 2),
+                                      'Area(mm2) - Ag': round((section_size.area), 2),
                                       'a(mm)': round(section_size.max_leg, 2),
                                       'b(mm)': round(section_size.min_leg, 2),
                                       't(mm)': round(section_size.thickness, 2),
+                                      'T(mm)': round(self.plate.thickness_provided, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),
                                       'R2(mm)': round(section_size.toe_radius, 2),
                                       'Iz(mm4)': round((Angle_attributes.calc_MomentOfAreaZ(section_size.max_leg,
@@ -2165,8 +2198,12 @@ class Tension_welded(Member):
                       gusset_lt_w_prov(self.flange_weld, self.clearance,self.plate.length), get_pass_fail(self.length, self.plate.length, relation="greater"))
                 self.report_check.append(t4)
 
-                t5 = (KEY_OUT_DISP_PLATETHK_REP, '', display_prov(self.plate.thickness_provided, "t_p"), "")
-                self.report_check.append(t5)
+                if self.sec_profile in ["Channels", "Back to Back Channels"]:
+                    t5 = (KEY_OUT_DISP_PLATETHK_REP, '', display_prov(self.plate.thickness_provided, "T_p"), "")
+                    self.report_check.append(t5)
+                else:
+                    t5 = (KEY_OUT_DISP_PLATETHK_REP, '', display_prov(self.plate.thickness_provided, "T"), "")
+                    self.report_check.append(t5)
 
                 # self.report_check.append(t2)
                 self.report_check.append(t1)

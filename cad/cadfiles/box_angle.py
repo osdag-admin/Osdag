@@ -1,7 +1,7 @@
 import numpy
 from cad.items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from cad.items.angle import Angle
+from cad.cadfiles.anglebar import Angle
 from cad.items.plate import Plate
 
 class BoxAngle(object):
@@ -54,13 +54,10 @@ class BoxAngle(object):
         self.angle1.computeParams()
         self.angle2.computeParams()
         self.angle2.points = self.rotate(self.angle1.points)
-        self.update_points(self.angle2, self.angle2.points)
         self.angle3.computeParams()
         self.angle3.points = self.rotate(self.angle2.points)
-        self.update_points(self.angle3, self.angle3.points)
         self.angle4.computeParams()
         self.angle4.points = self.rotate(self.angle3.points)
-        self.update_points(self.angle4, self.angle4.points)
 
         self.plate1.compute_params()
         self.plate2.compute_params()
@@ -95,10 +92,6 @@ class BoxAngle(object):
             point = numpy.matmul(rmatrix, point)
             rotated_points.append(point)
         return rotated_points
-
-    def update_points(self, angle, points):
-        angle.a1,angle.a2,angle.a3,angle.a4,angle.a5,angle.a6, \
-            angle.a7,angle.a8,angle.a9,angle.a10,angle.a11, angle.a12 = points
 
 
 

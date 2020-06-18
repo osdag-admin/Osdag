@@ -24,6 +24,7 @@ class IntermittentNutBoltPlateArray():
         self.bolt = bolt
         self.intermittentPlate = intermittentPlate
         self.gap = nut_space
+        self.plateObj = plateObj
 
         self.origin = None
         self.gaugeDir = None
@@ -34,6 +35,8 @@ class IntermittentNutBoltPlateArray():
 
         self.bolts = []
         self.nuts = []
+        self.boltsabv = []
+        self.nutsabv = []
         self.plates = []
         self.initialiseNutBolts()
 
@@ -53,6 +56,8 @@ class IntermittentNutBoltPlateArray():
             b.H = bolt_len_required + 10
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
+            self.boltsabv.append(Bolt(b.R, b.T, b.H, b.r))
+            self.nutsabv.append(Nut(n.R, n.T, n.H, n.r1))
         for i in range(self.no_intermitent_connections):
             self.plates.append(Plate(p.L, p.W, p.T))
 
@@ -115,19 +120,38 @@ class IntermittentNutBoltPlateArray():
 
         self.calculatePositions()
 
-        for index, pos in enumerate(self.positions):
-            self.bolts[index].place(pos, gaugeDir, boltDir)
-            self.nuts[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)
+        if self.plateObj.sec_profile == 'Star Angles':
+            for index, pos in enumerate(self.positions):
+                self.bolts[index].place(pos + self.memberdeepth/2 * self.gaugeDir , self.gaugeDir, self.boltDir)
+                self.nuts[index].place((pos + (self.gap) * self.boltDir + self.memberdeepth/2 * self.gaugeDir), self.gaugeDir, -self.boltDir)
+                self.boltsabv[index].place(pos + (self.gap - self.nut.T + self.bolt.T) * self.boltDir - self.memberdeepth/2 * self.gaugeDir, self.gaugeDir, -self.boltDir)
+                self.nutsabv[index].place((pos - self.memberdeepth/2 * self.gaugeDir), self.gaugeDir, self.boltDir)
 
-        for index, pltpos in enumerate(self.platePositions):
-            self.plates[index].place(pltpos, boltDir, pitchDir)
+            for index, pltpos in enumerate(self.platePositions):
+                self.plates[index].place(pltpos, self.boltDir, self.pitchDir)
+
+        else:
+            for index, pos in enumerate(self.positions):
+                self.bolts[index].place(pos, gaugeDir, boltDir)
+                self.nuts[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)
+
+            for index, pltpos in enumerate(self.platePositions):
+                self.plates[index].place(pltpos, boltDir, pitchDir)
 
     def create_model(self):
         for bolt in self.bolts:
             self.models.append(bolt.create_model())
 
         for nut in self.nuts:
+
             self.models.append(nut.create_model())
+
+        if self.plateObj.sec_profile == 'Star Angles':
+            for bolt in self.boltsabv:
+                self.models.append(bolt.create_model())
+
+            for nut in self.nutsabv:
+                self.models.append(nut.create_model())
 
         for plate in self.plates:
             self.platemodels.append(plate.create_model())

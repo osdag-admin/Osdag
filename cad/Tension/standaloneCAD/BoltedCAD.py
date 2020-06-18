@@ -323,15 +323,15 @@ if __name__ == '__main__':
 
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    Obj = 'Back to Back Channels'  #'Star Angles'  # 'Channels'  #'  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
+    Obj = 'Star Angles'  #'Back to Back Channels'  # 'Channels'  #'  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
 
     # weld_size = 6
     # s = max(15, weld_size)
 
-    plate = GassetPlate(L=360 + 50, H=205.0, T=16, degree=30)
+    plate = GassetPlate(L=360 + 50, H=205.0, T=10, degree=30)
     bolt = Bolt(R=8, T=5, H=6, r=3)
     nut = Nut(R=bolt.R, T=bolt.T, H=bolt.T + 1, innerR1=bolt.r)
-    intermittentPlate = Plate(L= 125 , W=70, T=plate.T)
+    intermittentPlate = Plate(L= 2*125 , W=70, T=plate.T)
 
     if Obj == 'Channels' or Obj == 'Back to Back Channels':
         member = Channel(B=50, T=6.6, D=125, t=3, R1=6.0, R2=2.4, L=4000)

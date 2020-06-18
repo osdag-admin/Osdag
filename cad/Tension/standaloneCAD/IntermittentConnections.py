@@ -34,6 +34,8 @@ class IntermittentNutBoltPlateArray():
 
         self.bolts = []
         self.nuts = []
+        self.boltsabv = []
+        self.nutsabv = []
         self.plates = []
         self.initialiseNutBolts()
 
@@ -53,6 +55,8 @@ class IntermittentNutBoltPlateArray():
             b.H = bolt_len_required + 10
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
+            self.boltsabv.append(Bolt(b.R, b.T, b.H, b.r))
+            self.nutsabv.append(Nut(n.R, n.T, n.H, n.r1))
         for i in range(self.no_intermitent_connections):
             self.plates.append(Plate(p.L, p.W, p.T))
 
@@ -66,9 +70,9 @@ class IntermittentNutBoltPlateArray():
         self.row = 2
         self.col = 1
         self.no_intermitent_connections = 3
-        self.memberdeepth = 125
-        self.member_thickness = 6.6
-        self.member_web_thickness = 3
+        self.memberdeepth = 90
+        self.member_thickness = 10
+        self.member_web_thickness = 10
         self.root_radius = 6
 
     def calculatePositions(self):
@@ -80,7 +84,7 @@ class IntermittentNutBoltPlateArray():
         for connec in range(self.no_intermitent_connections):
             pltpos = self.origin
             pltpos = pltpos + (connec * self.spacing) * self.pitchDir
-            pltpos = pltpos + (self.bolt.T+self.member_web_thickness) * self.boltDir
+            pltpos = pltpos + (self.intermittentPlate.T/2) * self.boltDir
             pltpos = pltpos
 
             self.platePositions.append(pltpos)
@@ -106,12 +110,23 @@ class IntermittentNutBoltPlateArray():
 
         self.calculatePositions()
 
-        for index, pos in enumerate(self.positions):
-            self.bolts[index].place(pos, gaugeDir, boltDir)
-            self.nuts[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)
+        if self.Obj == 'Star Angles':
+            for index, pos in enumerate(self.positions):
+                self.bolts[index].place(pos + self.memberdeepth/2 * self.gaugeDir , self.gaugeDir, self.boltDir)
+                self.nuts[index].place((pos + (self.gap) * self.boltDir + self.memberdeepth/2 * self.gaugeDir), self.gaugeDir, -self.boltDir)
+                self.boltsabv[index].place(pos + (self.gap + self.bolt.T) * self.boltDir - self.memberdeepth/2 * self.gaugeDir, self.gaugeDir, -self.boltDir)
+                self.nutsabv[index].place((pos + (self.bolt.T) * self.boltDir- self.memberdeepth/2 * self.gaugeDir), self.gaugeDir, self.boltDir)
 
-        for index, pltpos in enumerate(self.platePositions):
-            self.plates[index].place(pltpos, boltDir, pitchDir)
+            for index, pltpos in enumerate(self.platePositions):
+                self.plates[index].place(pltpos, self.boltDir, self.pitchDir)
+
+        else:
+            for index, pos in enumerate(self.positions):
+                self.bolts[index].place(pos, gaugeDir, boltDir)
+                self.nuts[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)
+
+            for index, pltpos in enumerate(self.platePositions):
+                self.plates[index].place(pltpos, boltDir, pitchDir)
 
     def create_model(self):
         for bolt in self.bolts:
@@ -119,6 +134,14 @@ class IntermittentNutBoltPlateArray():
 
         for nut in self.nuts:
             self.models.append(nut.create_model())
+
+
+        if self.Obj == 'Star Angles':
+            for bolt in self.boltsabv:
+                self.models.append(bolt.create_model())
+
+            for nut in self.nutsabv:
+                self.models.append(nut.create_model())
 
         for plate in self.plates:
             self.platemodels.append(plate.create_model())
@@ -335,11 +358,11 @@ if __name__ == '__main__':
     bolt = Bolt(R=6, T=5, H=6, r=3)
     nut = Nut(R=bolt.R, T=bolt.T, H=bolt.T + 1, innerR1=bolt.r)
     nut_space = 2*5 + 5 + nut.T  # 2*member.T + plate.T + nut.T
-    Obj = 'Star Angles'  #'Back to Back Channels'  # ''Channels'  #'  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
+    Obj = 'Star Angles'  #'Channels'  #'Back to Back Channels'  # ''  #'Angles'  #      or 'Back to Back Angles' 'Channels' or
 
     # nut_bolt_array = NutBoltArray(Obj, nut, bolt, nut_space)
 
-    intermittentPlate = Plate(L= 125, W=70, T=10)
+    intermittentPlate = Plate(L= 2*125, W=70, T=10)
     nut_bolt_array = IntermittentNutBoltPlateArray(Obj, nut, bolt, intermittentPlate, nut_space)
 
     place = nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)

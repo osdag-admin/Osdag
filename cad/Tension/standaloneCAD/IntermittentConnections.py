@@ -58,17 +58,17 @@ class IntermittentNutBoltPlateArray():
 
     def initBoltPlaceParams(self):
 
-        self.pitch = 30
+        self.pitch = 45
         self.spacing = 200
-        self.gauge = 20
-        self.edge = 15.5
-        self.end = 15
+        self.gauge = 35
+        self.edge = 35
+        self.end = 35
         self.row = 2
         self.col = 1
         self.no_intermitent_connections = 3
-        self.memberdeepth = 75
-        self.member_thickness = 6
-        self.member_web_thickness = 5
+        self.memberdeepth = 125
+        self.member_thickness = 6.6
+        self.member_web_thickness = 3
         self.root_radius = 6
 
     def calculatePositions(self):
@@ -76,11 +76,11 @@ class IntermittentNutBoltPlateArray():
         Calculate the exact position for nut, bolts and plates.
         """
         self.positions = []
-        self.origin = self.origin + (self.spacing - self.end)*self.pitchDir
+        self.origin = self.origin + (self.spacing - 2*self.end)*self.pitchDir
         for connec in range(self.no_intermitent_connections):
             pltpos = self.origin
             pltpos = pltpos + (connec * self.spacing) * self.pitchDir
-            pltpos = pltpos + (self.gap - self.member_web_thickness/2 - self.intermittentPlate.T) * self.boltDir
+            pltpos = pltpos + (self.bolt.T+self.member_web_thickness) * self.boltDir
             pltpos = pltpos
 
             self.platePositions.append(pltpos)
@@ -93,6 +93,7 @@ class IntermittentNutBoltPlateArray():
                     pos = pos + self.end * self.pitchDir
                     pos = pos + rw * self.gauge * self.gaugeDir
                     pos = pos + connec * self.spacing * self.pitchDir
+                    pos = pos - self.member_web_thickness * self.boltDir
 
                     self.positions.append(pos)
 
@@ -338,7 +339,7 @@ if __name__ == '__main__':
 
     # nut_bolt_array = NutBoltArray(Obj, nut, bolt, nut_space)
 
-    intermittentPlate = Plate(L= 75, W=30, T=10)
+    intermittentPlate = Plate(L= 125, W=70, T=10)
     nut_bolt_array = IntermittentNutBoltPlateArray(Obj, nut, bolt, intermittentPlate, nut_space)
 
     place = nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)

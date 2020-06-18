@@ -43,14 +43,14 @@ def min_pitch(d,cond = None):
     min_pitch_eqn = Math(inline=True)
 
     if cond == None:
-        min_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{min}&= 2.5 ~ d&\\'))
-        min_pitch_eqn.append(NoEscape(r'=&2.5*' + d + r'&=' + min_pitch + r'\\'))
-        min_pitch_eqn.append(NoEscape(r'&[Ref~IS~800:2007,~Cl.~10.2.2]&\end{aligned}\\'))
+        min_pitch_eqn.append(NoEscape(r'&\begin{aligned}p/g_{min}&= 2.5 ~ d\\'))
+        min_pitch_eqn.append(NoEscape(r'&=2.5*' + d + r'&=' + min_pitch + r'\\'))
+        min_pitch_eqn.append(NoEscape(r'&[Ref~IS~800:2007,~Cl.~10.2.2]\end{aligned}\\'))
     else:
-        min_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{min}&= 2.5 ~ d&\\'))
-        min_pitch_eqn.append(NoEscape(r'=&2.5*' + d + r'=' + min_pitch + r'\\'))
+        min_pitch_eqn.append(NoEscape(r'&\begin{aligned}p/g_{min}&= 2.5 ~ d\\'))
+        min_pitch_eqn.append(NoEscape(r'=&2.5*' + d + r'=&' + min_pitch + r'\\'))
         min_pitch_eqn.append(NoEscape(r'&' + cond + r'\\'))
-        min_pitch_eqn.append(NoEscape(r'&[Ref~IS~800:2007,~Cl.~10.2.2]&\end{aligned}\\'))
+        min_pitch_eqn.append(NoEscape(r'&[Ref~IS~800:2007,~Cl.~10.2.2]\end{aligned}\\'))
     return min_pitch_eqn
 
 def cl_10_2_2_min_spacing(d, parameter='pitch'):
@@ -71,9 +71,8 @@ def cl_10_2_2_min_spacing(d, parameter='pitch'):
         min_spacing_eqn.append(NoEscape(r'\begin{aligned}Pitch~Distance~_{min} = 2.5 ~ d\\'))
     else:
         min_spacing_eqn.append(NoEscape(r'\begin{aligned}Gauge~Distance~_{min} = 2.5 ~ d\\'))
-    min_spacing_eqn.append(NoEscape(r'= &2.5*' + d + r'&=' + min_spacing + r'\end{aligned}'))
+    min_spacing_eqn.append(NoEscape(r'= &2.5*' + d + r'&=' + min_spacing + r'\\'))
     min_spacing_eqn.append(NoEscape(r'&[Ref.Cl.10.2.2.2, IS 800:2007] &\end{aligned}'))
-    #Todo:add reference
     return min_spacing_eqn
 
 

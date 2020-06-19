@@ -534,8 +534,7 @@ class Tension_bolted(Member):
 
         spacing = []
 
-        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/pitch.png')
-        spacing.append(t99)
+
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
         spacing.append(t9)
@@ -548,6 +547,9 @@ class Tension_bolted(Member):
 
         t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
         spacing.append(t12)
+
+        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/pitch.png')
+        spacing.append(t99)
 
         return spacing
 

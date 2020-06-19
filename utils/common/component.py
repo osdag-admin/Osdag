@@ -2242,7 +2242,7 @@ class SAngle_Properties(object):
                 area = self.Angle_attributes.area
                 Cg_1 = self.Angle_attributes.Cy
                 a = math.sqrt(2)
-                self.I_uu = (mom_inertia_v + (area * (a * Cg_1 + a * thickness / 2) * (a * Cg_1git  + a * thickness / 2))) * 2
+                self.I_uu = (mom_inertia_v + (area * (a * Cg_1 + a * thickness / 2) * (a * Cg_1  + a * thickness / 2))) * 2
 
 
             else:

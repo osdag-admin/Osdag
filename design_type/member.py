@@ -132,8 +132,23 @@ class Member(Main):
                             image = VALUES_IMG_TENSIONBOLTED_DF01[2]
                         else:
                             image = VALUES_IMG_TENSIONBOLTED_DF02[2]
-                        Cy = str(Angle_attributes.calc_Cy(a, b,thickness, l))
-                        Cz = "N/A"
+                        Cy =  "N/A"
+                        Cz = str(Angle_attributes.calc_Cz(a, b,thickness, l))
+                    mass = str(Angle_attributes.calc_Mass(a, b, thickness, l))
+                    area = str(Angle_attributes.calc_Area(a, b, thickness, l))
+                    mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
+                    mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                    mom_inertia_u = "N/A"
+                    mom_inertia_v = "N/A"
+                    rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
+                    rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                    rad_of_gy_u = "N/A"
+                    rad_of_gy_v = "N/A"
+                    elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l, plate_thk))
+                    elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
+                    plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
+                    plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
+                    torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
                 elif section_profile == "Star Angles":
                     Angle_attributes = SAngle_Properties()
                     Angle_attributes.data(designation, material_grade)
@@ -149,21 +164,21 @@ class Member(Main):
                             image = VALUES_IMG_TENSIONBOLTED_DF02[4]
                     Cz = "N/A"
                     Cy = "N/A"
-                mass = str(Angle_attributes.calc_Mass(a, b,thickness, l))
-                area = str(Angle_attributes.calc_Area(a, b, thickness, l))
-                mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
-                mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
-                mom_inertia_u = "N/A"
-                mom_inertia_v = "N/A"
-                rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l))
-                rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l))
-                rad_of_gy_u = "N/A"
-                rad_of_gy_v = "N/A"
-                elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l,plate_thk))
-                elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l,plate_thk))
-                plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l,plate_thk))
-                plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l,plate_thk))
-                torsional_rigidity = "N/A"
+                    mass = str(Angle_attributes.calc_Mass(a, b,thickness, l))
+                    area = str(Angle_attributes.calc_Area(a, b, thickness, l))
+                    mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
+                    mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                    mom_inertia_u = str(Angle_attributes.calc_MomentOfAreaU(a, b, thickness, l, plate_thk))
+                    mom_inertia_v = str(Angle_attributes.calc_MomentOfAreaV(a, b, thickness, l, plate_thk))
+                    rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
+                    rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                    rad_of_gy_u = str(Angle_attributes.calc_RogU(a, b, thickness, l, plate_thk))
+                    rad_of_gy_v = str(Angle_attributes.calc_RogV(a, b, thickness, l, plate_thk))
+                    elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l,plate_thk))
+                    elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l,plate_thk))
+                    plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l,plate_thk))
+                    plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l,plate_thk))
+                    torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
 
         # if KEY_SEC_MATERIAL in input_dictionary.keys():
         #     material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -412,8 +427,8 @@ class Member(Main):
                 C_y = "N/A"
                 mom_inertia_z = str(round(Channel_attributes.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t,plate_thk), 2))
                 mom_inertia_y = str(Channel_attributes.calc_MomentOfAreaY(f_w, f_t, w_h, w_t,plate_thk))
-                rad_of_gy_z = str(Channel_attributes.calc_RogZ(f_w, f_t, w_h, w_t))
-                rad_of_gy_y = str(Channel_attributes.calc_RogY(f_w, f_t, w_h, w_t))
+                rad_of_gy_z = str(Channel_attributes.calc_RogZ(f_w, f_t, w_h, w_t, plate_thk))
+                rad_of_gy_y = str(Channel_attributes.calc_RogY(f_w, f_t, w_h, w_t, plate_thk))
                 elast_sec_mod_z = str(Channel_attributes.calc_ElasticModulusZz(f_w, f_t, w_h, w_t,plate_thk))
                 elast_sec_mod_y = str(Channel_attributes.calc_ElasticModulusZy(f_w, f_t, w_h, w_t,plate_thk))
                 plast_sec_mod_z = str(Channel_attributes.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t,plate_thk))
@@ -422,7 +437,7 @@ class Member(Main):
                     image = VALUES_IMG_TENSIONBOLTED_DF03[2]
                 else:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[3]
-                It = "N/A"
+                It = str(Channel_attributes.calc_torsion_const_It(f_w, f_t, w_h, w_t))
                 Iw = "N/A"
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
@@ -647,8 +662,24 @@ class Member(Main):
                         image = VALUES_IMG_TENSIONBOLTED_DF01[2]
                     else:
                         image = VALUES_IMG_TENSIONBOLTED_DF02[2]
-                    Cy = str(Angle_attributes.calc_Cy(a, b, thickness, l))
-                    Cz = "N/A"
+                    Cy = "N/A"
+                    Cz = str(Angle_attributes.calc_Cz(a, b, thickness, l))
+                mass = str(Angle_attributes.calc_Mass(a, b, thickness, l))
+                area = str(Angle_attributes.calc_Area(a, b, thickness, l))
+
+                mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
+                mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                mom_inertia_u = "N/A"
+                mom_inertia_v = "N/A"
+                rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
+                rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                rad_of_gy_u = "N/A"
+                rad_of_gy_v = "N/A"
+                elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l, plate_thk))
+                elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
+                plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
+                plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
+                torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
             elif section_profile == "Star Angles":
                 Angle_attributes = SAngle_Properties()
                 Angle_attributes.data(designation, material_grade)
@@ -664,22 +695,22 @@ class Member(Main):
                         image = VALUES_IMG_TENSIONBOLTED_DF02[4]
                 Cz = "N/A"
                 Cy = "N/A"
-            mass = str(Angle_attributes.calc_Mass(a, b, thickness, l))
-            area = str(Angle_attributes.calc_Area(a, b,thickness, l))
+                mass = str(Angle_attributes.calc_Mass(a, b, thickness, l))
+                area = str(Angle_attributes.calc_Area(a, b,thickness, l))
 
-            mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
-            mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
-            mom_inertia_u = "N/A"
-            mom_inertia_v = "N/A"
-            rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l))
-            rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l))
-            rad_of_gy_u = "N/A"
-            rad_of_gy_v = "N/A"
-            elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l, plate_thk))
-            elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
-            plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
-            plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
-            torsional_rigidity = "N/A"
+                mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
+                mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                mom_inertia_u = str(Angle_attributes.calc_MomentOfAreaU(a, b, thickness, l, plate_thk))
+                mom_inertia_v = str(Angle_attributes.calc_MomentOfAreaV(a, b, thickness, l, plate_thk))
+                rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
+                rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                rad_of_gy_u = str(Angle_attributes.calc_RogU(a, b, thickness, l, plate_thk))
+                rad_of_gy_v = str(Angle_attributes.calc_RogV(a, b, thickness, l, plate_thk))
+                elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l, plate_thk))
+                elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
+                plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
+                plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
+                torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
 
         d = {
              KEY_SECSIZE_SELECTED:designation,
@@ -770,8 +801,8 @@ class Member(Main):
             C_y = "N/A"
             mom_inertia_z = str(Channel_attributes.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t,plate_thk))
             mom_inertia_y = str(Channel_attributes.calc_MomentOfAreaY(f_w, f_t, w_h, w_t,plate_thk))
-            rad_of_gy_z = str(Channel_attributes.calc_RogZ(f_w, f_t, w_h, w_t))
-            rad_of_gy_y = str(Channel_attributes.calc_RogY(f_w, f_t, w_h, w_t))
+            rad_of_gy_z = str(Channel_attributes.calc_RogZ(f_w, f_t, w_h, w_t,plate_thk))
+            rad_of_gy_y = str(Channel_attributes.calc_RogY(f_w, f_t, w_h, w_t,plate_thk))
             elast_sec_mod_z = str(Channel_attributes.calc_ElasticModulusZz(f_w, f_t, w_h, w_t,plate_thk))
             elast_sec_mod_y = str(Channel_attributes.calc_ElasticModulusZy(f_w, f_t, w_h, w_t,plate_thk))
             plast_sec_mod_z = str(Channel_attributes.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t,plate_thk))
@@ -780,7 +811,7 @@ class Member(Main):
                 image = VALUES_IMG_TENSIONBOLTED_DF03[2]
             else:
                 image = VALUES_IMG_TENSIONBOLTED_DF03[3]
-            It = "N/A"
+            It = str(Channel_attributes.calc_torsion_const_It(f_w, f_t, w_h, w_t))
             Iw = "N/A"
 
         d = {
@@ -875,14 +906,14 @@ class Member(Main):
                     Cz = sec_prop.calc_Cz(a, b, t, l)
                     Cy = "N/A"
                 else:
-                    Cz = "N/A"
-                    Cy = sec_prop.calc_Cy(a, b, t, l)
+                    Cz = sec_prop.calc_Cz(a, b, t, l)
+                    Cy = "N/A"
                 moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l,plate_thk)
                 moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l,plate_thk)
                 moa_u = "N/A"
                 moa_v = "N/A"
-                rog_z = sec_prop.calc_RogZ(a, b, t, l)
-                rog_y = sec_prop.calc_RogY(a, b, t, l)
+                rog_z = sec_prop.calc_RogZ(a, b, t, l, plate_thk)
+                rog_y = sec_prop.calc_RogY(a, b, t, l, plate_thk)
                 rog_u = "N/A"
                 rog_v = "N/A"
                 em_z = sec_prop.calc_ElasticModulusZz(a, b, t, l,plate_thk)
@@ -908,12 +939,12 @@ class Member(Main):
                 Cy = "N/A"
                 moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l,plate_thk)
                 moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l,plate_thk)
-                moa_u = "N/A"
-                moa_v = "N/A"
-                rog_z = sec_prop.calc_RogZ(a, b, t, l)
-                rog_y = sec_prop.calc_RogY(a, b, t, l)
-                rog_u = "N/A"
-                rog_v = "N/A"
+                moa_u = sec_prop.calc_MomentOfAreaU(a, b, t, l,plate_thk)
+                moa_v = sec_prop.calc_MomentOfAreaV(a, b, t, l,plate_thk)
+                rog_z = sec_prop.calc_RogZ(a, b, t, l,plate_thk)
+                rog_y = sec_prop.calc_RogY(a, b, t, l,plate_thk)
+                rog_u = sec_prop.calc_RogU(a, b, t, l,plate_thk)
+                rog_v = sec_prop.calc_RogV(a, b, t, l,plate_thk)
                 em_z = sec_prop.calc_ElasticModulusZz(a, b, t, l,plate_thk)
                 em_y = sec_prop.calc_ElasticModulusZy(a, b, t, l,plate_thk)
                 pm_z = sec_prop.calc_PlasticModulusZpz(a, b, t, l,plate_thk)
@@ -998,7 +1029,7 @@ class Member(Main):
                 em_y = sec_prop.calc_ElasticModulusZy(f_w, f_t, w_h, w_t)
                 pm_z = sec_prop.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t)
                 pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t)
-                It = 0
+                It = sec_prop.calc_torsion_const_It(f_w, f_t, w_h, w_t)
                 Iw = 0
                 if sl != 90:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[0]
@@ -1013,16 +1044,16 @@ class Member(Main):
                 moa_z = sec_prop.calc_MomentOfAreaZ(f_w, f_t, w_h, w_t, plate_thk)
                 moa_y = sec_prop.calc_MomentOfAreaY(f_w, f_t, w_h, w_t, plate_thk)
 
-                rog_z = sec_prop.calc_RogZ(f_w, f_t, w_h, w_t)
-                rog_y = sec_prop.calc_RogY(f_w, f_t, w_h, w_t)
+                rog_z = sec_prop.calc_RogZ(f_w, f_t, w_h, w_t,plate_thk)
+                rog_y = sec_prop.calc_RogY(f_w, f_t, w_h, w_t,plate_thk)
 
                 em_z = sec_prop.calc_ElasticModulusZz(f_w, f_t, w_h, w_t, plate_thk)
                 em_y = sec_prop.calc_ElasticModulusZy(f_w, f_t, w_h, w_t, plate_thk)
                 pm_z = sec_prop.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t, plate_thk)
                 pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t, plate_thk)
 
-                It = "N/A"
-                Iw = "N/A"
+                It = sec_prop.calc_torsion_const_It(f_w, f_t, w_h, w_t)
+                Iw = 0
                 if sl != 90:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[2]
                 else:

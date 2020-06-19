@@ -219,7 +219,7 @@ class Main():
             pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
             pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
             I_t = sec_prop.calc_torsion_const(D,B,t_w,t_f)
-            I_w = sec_prop.calc_torsion_const(D,B,t_w, t_f)
+            I_w = sec_prop.calc_warping_const(D,B,t_w, t_f)
             if sl != 90:
                 image = VALUES_IMG_BEAM[0]
             else:

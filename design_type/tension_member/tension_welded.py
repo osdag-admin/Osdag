@@ -1661,8 +1661,8 @@ class Tension_welded(Member):
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
                                       'Area(mm2) - Ag': round((section_size.area), 2),
-                                      'a(mm)': round(section_size.max_leg, 2),
-                                      'b(mm)': round(section_size.min_leg, 2),
+                                      'A(mm)': round(section_size.max_leg, 2),
+                                      'B(mm)': round(section_size.min_leg, 2),
                                       't(mm)': round(section_size.thickness, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),
                                       'R2(mm)': round(section_size.toe_radius, 2),
@@ -1692,9 +1692,9 @@ class Tension_welded(Member):
                                                      self.loc) * 10), 2)
                 Cy = "N/A"
             else:
-                Cy = round((Angle_attributes.calc_Cy(section_size.max_leg, section_size.min_leg, section_size.thickness,
+                Cz = round((Angle_attributes.calc_Cy(section_size.max_leg, section_size.min_leg, section_size.thickness,
                                                      self.loc) * 10), 2)
-                Cz = "N/A"
+                Cy = "N/A"
 
             self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
                                       # Image shall be save with this name.png in resource files
@@ -1704,8 +1704,8 @@ class Tension_welded(Member):
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
                                       'Area(mm2) - Ag': round((section_size.area), 2),
-                                      'a(mm)': round(section_size.max_leg, 2),
-                                      'b(mm)': round(section_size.min_leg, 2),
+                                      'A(mm)': round(section_size.max_leg, 2),
+                                      'B(mm)': round(section_size.min_leg, 2),
                                       't(mm)': round(section_size.thickness, 2),
                                       'T(mm)': round(self.plate.thickness_provided, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),
@@ -1759,8 +1759,8 @@ class Tension_welded(Member):
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
                                       'Area(mm2) - Ag': round((section_size.area), 2),
-                                      'a(mm)': round(section_size.max_leg, 2),
-                                      'b(mm)': round(section_size.min_leg, 2),
+                                      'A(mm)': round(section_size.max_leg, 2),
+                                      'B(mm)': round(section_size.min_leg, 2),
                                       't(mm)': round(section_size.thickness, 2),
                                       'T(mm)': round(self.plate.thickness_provided, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),

@@ -375,6 +375,9 @@ class BeamCoverPlate(MomentConnection):
     def flangecapacity(self, flag):
 
         flangecapacity = []
+        t99 = (None, "Block Shear in Flange & Flange plate in Axial ", TYPE_SECTION,
+               './ResourceFiles/images/beam_failure_pattern_images.png')
+        flangecapacity.append(t99)
 
         t30 =(KEY_FLANGE_TEN_CAPACITY,KEY_DISP_FLANGE_TEN_CAPACITY,TYPE_TEXTBOX,
                round(self.section.tension_capacity_flange/1000, 2) if flag else '')
@@ -394,8 +397,11 @@ class BeamCoverPlate(MomentConnection):
         return flangecapacity
 
     def webcapacity(self, flag):
-
         webcapacity = []
+        t99 = (None, "Block Shear in Web & web plate in Axial & Shear", TYPE_SECTION,
+               './ResourceFiles/images/beam_web_failure_images.png')
+        webcapacity.append(t99)
+
         t30 = (KEY_WEB_TEN_CAPACITY, KEY_DISP_WEB_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_web / 1000, 2) if flag else '')
         webcapacity.append(t30)
@@ -446,7 +452,7 @@ class BeamCoverPlate(MomentConnection):
     def flange_bolt_capacity(self,flag):
         flange_bolt_capacity =[]
 
-        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/block_shear_2.png')
+        t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/beam_spacing_flange_bolted.png')
         flange_bolt_capacity.append(t99)
         t16 = (KEY_FLANGE_BOLT_LINE, KEY_FLANGE_DISP_BOLT_LINE, TYPE_TEXTBOX,
                (self.flange_plate.bolt_line) if flag else '')
@@ -488,7 +494,8 @@ class BeamCoverPlate(MomentConnection):
 
     def web_bolt_capacity(self,flag):
         web_bolt_capacity =[]
-
+        t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/beam_spacing_web_bolted.png')
+        web_bolt_capacity.append(t99)
         t16 = (KEY_WEB_BOLT_LINE, KEY_WEB_DISP_BOLT_LINE, TYPE_TEXTBOX,
                (self.web_plate.bolt_line) if flag else '')
         web_bolt_capacity.append(t16)
@@ -2972,7 +2979,7 @@ class BeamCoverPlate(MomentConnection):
                         self.report_check.append(t2)
 
             if self.member_capacity_status == True and (self.section.tension_yielding_capacity > self.flange_force) and (len(self.flange_plate_thickness_possible) != 0):
-                t1 = ('SubSection', 'Initial web plate height check', '|p{4.5cm}|p{2.5cm}|p{7cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Initial web plate height check', '|p{3cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.preference == "Outside":
 
@@ -3541,7 +3548,7 @@ class BeamCoverPlate(MomentConnection):
                   plate_recheck_area_weld(outerwidth=self.web_plate.height, innerwidth=None,
                                           f_tp=None, t_wp=self.web_plate.thickness_provided, conn="web",
                                           pref=None),
-                  get_pass_fail(self.Ap, self.Recheck_web_pt_area_o, relation="leq"))
+                  get_pass_fail(self.Wp, self.Recheck_web_pt_area_o, relation="leq"))
             self.report_check.append(t2)
 
 

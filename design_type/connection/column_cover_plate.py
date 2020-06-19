@@ -344,7 +344,9 @@ class ColumnCoverPlate(MomentConnection):
     def flangecapacity(self, flag):
 
         flangecapacity = []
-
+        t99 = (None, "Block Shear in Flange & Flange plate in Axial ", TYPE_SECTION,
+               './ResourceFiles/images/column_flange_failure.png')
+        flangecapacity.append(t99)
         t30 = (KEY_FLANGE_TEN_CAPACITY, KEY_DISP_FLANGE_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_flange / 1000, 2) if flag else '')
         flangecapacity.append(t30)
@@ -366,18 +368,18 @@ class ColumnCoverPlate(MomentConnection):
 
         webcapacity = []
 
-        t99 = (None,"Block Shear in Web in Axial", TYPE_SECTION, './ResourceFiles/images/webblockaxial.png')
+        t99 = (None,"Block Shear in Web & web plate in Axial & Shear", TYPE_SECTION, './ResourceFiles/images/column_web_failure.png')
         webcapacity.append(t99)
         t30 = (KEY_WEB_TEN_CAPACITY, KEY_DISP_WEB_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_web / 1000, 2) if flag else '')
         webcapacity.append(t30)
-        t99 = (None,"Block Shear in Web Plate in Axial", TYPE_SECTION, './ResourceFiles/images/webplateblockaxial.png')
-        webcapacity.append(t99)
+        # t99 = (None,"Block Shear in Web Plate in Axial", TYPE_SECTION, './ResourceFiles/images/webplateblockaxial.png')
+        # webcapacity.append(t99)
         t30 = (KEY_WEB_PLATE_CAPACITY, KEY_DISP_WEB_PLATE_CAPACITY, TYPE_TEXTBOX,
                round(self.web_plate.tension_capacity_web_plate / 1000, 2) if flag else '')
         webcapacity.append(t30)
-        t99 = (None,"Block Shear in Web Plate in Shear",  TYPE_SECTION, './ResourceFiles/images/webplateblockshearshear.png')
-        webcapacity.append(t99)
+        # t99 = (None,"Block Shear in Web Plate in Shear",  TYPE_SECTION, './ResourceFiles/images/webplateblockshearshear.png')
+        # webcapacity.append(t99)
         t30 = (KEY_WEBPLATE_SHEAR_CAPACITY_PLATE, KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, TYPE_TEXTBOX,
                round(self.web_plate.shear_capacity_web_plate / 1000, 2) if flag else '')
         webcapacity.append(t30)
@@ -3044,7 +3046,7 @@ class ColumnCoverPlate(MomentConnection):
             if self.member_capacity_status == True and (
                     self.section.tension_yielding_capacity > self.flange_force) and (
                     len(self.flange_plate_thickness_possible) != 0):
-                t1 = ('SubSection', 'Initial web plate height check', '|p{4.5cm}|p{2.5cm}|p{7cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Initial web plate height check', '|p{3cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.preference == "Outside":
 
@@ -3573,7 +3575,7 @@ class ColumnCoverPlate(MomentConnection):
                   plate_recheck_area_weld(outerwidth=self.web_plate.height, innerwidth=None,
                                           f_tp=None, t_wp=self.web_plate.thickness_provided, conn="web",
                                           pref=None),
-                  get_pass_fail(self.Ap, self.Recheck_web_pt_area_o, relation="leq"))
+                  get_pass_fail(self.Wp, self.Recheck_web_pt_area_o, relation="leq"))
             self.report_check.append(t2)
 
         ###################

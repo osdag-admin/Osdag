@@ -309,7 +309,8 @@ class BeamCoverPlateWeld(MomentConnection):
         # t15 = (KEY_WEB_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,(self.l_req_weblength) if flag else '')
         # web_weld_details.append(t15)
 
-
+        t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/beamweb_weld.png')
+        web_weld_details.append(t99)
         t14 = (KEY_WEB_WELD_SIZE, KEY_WEB_DISP_WELD_SIZE, TYPE_TEXTBOX, self.web_weld.size if flag else '')
         web_weld_details.append(t14)
 
@@ -331,7 +332,8 @@ class BeamCoverPlateWeld(MomentConnection):
         # t15 = (KEY_FLANGE_WELD_HEIGHT, KEY_DISP_FLANGE_WELD_HEIGHT, TYPE_TEXTBOX,
         #        (self.flange_weld.height) if flag else '')
         # flange_weld_details.append(t15)
-
+        t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/beamflange_weld.png')
+        flange_weld_details.append(t99)
         t14 = (KEY_FLANGE_WELD_SIZE, KEY_FLANGE_DISP_WELD_SIZE, TYPE_TEXTBOX, self.flange_weld.size if flag else '')
         flange_weld_details.append(t14)
 
@@ -2125,7 +2127,7 @@ class BeamCoverPlateWeld(MomentConnection):
                 # if (self.flange_plate_crs_sec_area >= (1.05 * self.flange_crs_sec_area)) and len(self.flange_plate_thickness_possible) != 0 and len(self.web_plate_thickness_possible) != 0 :
             if self.member_capacity_status == True and (self.section.tension_yielding_capacity > self.flange_force) and (
                     len(self.flange_plate_thickness_possible) != 0):
-                t1 = ('SubSection', 'Initial web plate height check', '|p{3cm}|p{3cm}|p{8cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Initial web plate height check', '|p{3cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 t1 = (KEY_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
                       web_width_chk_weld(D=self.section.depth,

@@ -1347,7 +1347,12 @@ class CommonDesignLogic(object):
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 nutbolt = self.TObj.get_nut_bolt_array_models()
-                if self.component == "Model":  # Todo: change this into key
+                if self.component == "Member":  # Todo: change this into key
+                    osdag_display_shape(self.display, member, update=True)
+                elif self.component == "Plate":
+                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
+                    osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
+                else:
                     osdag_display_shape(self.display, member, update=True)
                     osdag_display_shape(self.display, plate, color='BLUE', update=True)
                     osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
@@ -1364,10 +1369,16 @@ class CommonDesignLogic(object):
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 welds = self.TObj.get_welded_models()
-                if self.component == "Model":  # Todo: change this into key
+                if self.component == "Member":  # Todo: change this into key
+                    osdag_display_shape(self.display, member, update=True)
+                elif self.component == "Plate":
+                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
+                    osdag_display_shape(self.display, welds, color='RED', update=True)
+                else:
                     osdag_display_shape(self.display, member, update=True)
                     osdag_display_shape(self.display, plate, color='BLUE', update=True)
                     osdag_display_shape(self.display, welds, color='RED', update=True)
+
 
                 # elif self.component == "end bolt":
                 #     pass

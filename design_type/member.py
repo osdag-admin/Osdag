@@ -6,7 +6,7 @@ from design_type.main import Main
 class Member(Main):
 
     def __init__(self):
-        pass
+        super(Member, self).__init__()
 
     ########################################
     # Design Preference Functions Start
@@ -1315,4 +1315,41 @@ class Member(Main):
             return True
         else:
             return False
+
+    ######################################
+    # Function for individual component calls in 3D view
+    ######################################
+    def get_3d_components(self):
+        components = []
+
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t1 = ('Member', self.call_3DMember)
+        components.append(t1)
+
+        t2 = ('Plate', self.call_3DPlate)
+        components.append(t2)
+
+        return components
+
+    def call_3DPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Plate", bgcolor)
+
+    def call_3DMember(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Member':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Member", bgcolor)
 

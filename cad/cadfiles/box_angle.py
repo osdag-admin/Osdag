@@ -53,6 +53,7 @@ class BoxAngle(object):
     def compute_params(self):
         self.angle1.computeParams()
         self.angle2.computeParams()
+
         self.angle2.points = self.rotate(self.angle2.points, numpy.pi/2)
         self.angle3.computeParams()
         self.angle3.points = self.rotate(self.angle3.points, numpy.pi)

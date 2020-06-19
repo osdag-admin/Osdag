@@ -59,8 +59,8 @@ class NutBoltArray_BF():
         b_BF = self.bolt
         n_BF = self.nut
         for j in range(self.numOfboltsF):
-            bolt_length_required = float(b_BF.T + self.nutSpaceF)
-            b_BF.H = 1.5 * bolt_length_required
+            bolt_length_required = float(n_BF.H + self.nutSpaceF)
+            b_BF.H = bolt_length_required + 10
             self.bolts_BF.append(Bolt(b_BF.R, b_BF.T, b_BF.H, b_BF.r))
             self.nuts_BF.append(Nut(n_BF.R, n_BF.T, n_BF.H, n_BF.r1))
 
@@ -80,17 +80,19 @@ class NutBoltArray_BF():
         self.col_BF = outputobj.flange_plate.bolts_one_line
         self.gap = outputobj.flange_plate.gap
 
+
     def calculatePositions_BF(self):
         """
         :return: The positions/coordinates to place the bolts in the form of list, positions_BF = [list of bolting coordinates] 
         """
         self.positions_BF = []
-        self.boltOrigin_BF = self.originBF + self.edge_gauge_BF * self.pitchDirBF + ((self.plateBelwFlangeL - self.gauge_BF) / 2 -((self.col_BF/2-1)*self.gauge)) * self.gaugeDirBF
+        self.boltOrigin_BF = self.originBF + self.end_BF * self.pitchDirBF + ((self.plateBelwFlangeL - self.gauge_BF) / 2 -((self.col_BF/2-1)*self.gauge)) * self.gaugeDirBF
+
         for rw_BF in range(self.row_BF):
             for cl_BF in range(self.col_BF):
                 pos_BF = self.boltOrigin_BF
                 if self.row_BF / 2 < rw_BF or self.row_BF / 2 == rw_BF:
-                    self.pitch_new_BF = 2 * self.edge_gauge_BF + self.gap
+                    self.pitch_new_BF = 2 * self.end_BF + self.gap
                     pos_BF = pos_BF + ((rw_BF - 1) * self.pitch_BF + self.pitch_new_BF) * self.pitchDirBF
                     if self.col_BF / 2 > cl_BF:
                         pos_BF = pos_BF + cl_BF * self.gauge * self.gaugeDirBF
@@ -106,6 +108,8 @@ class NutBoltArray_BF():
                         pos_BF = pos_BF + (
                                     cl_BF - 1) * self.gauge * self.gaugeDirBF + 1 * self.gauge_BF * self.gaugeDirBF
                     self.positions_BF.append(pos_BF)
+
+
                 # pos_BF = self.boltOrigin_BF
         #                 # if self.row_BF / 2 < rw_BF or self.row_BF / 2 == rw_BF:
         #                 #     self.pitch_new_BF = 2 * self.edge_gauge_BF + self.gap

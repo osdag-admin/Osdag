@@ -46,17 +46,6 @@ class Ui_Submodule_Page(object):
         font.setWeight(75)
         self.StartButton.setFont(font)
         self.StartButton.setFocusPolicy(QtCore.Qt.TabFocus)
-        self.StartButton.setStyleSheet("QPushButton::hover\n"
-"{\n"
-"   background-color: #d97f7f;\n"
-"   color:#000000 ;\n"
-"}\n"
-"\n"
-"QPushButton\n"
-"{\n"
-"background-color: #925a5b;\n"
-"color:#ffffff;\n"
-"}")
         self.StartButton.setCheckable(False)
         self.StartButton.setAutoExclusive(False)
         self.StartButton.setAutoDefault(True)

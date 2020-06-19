@@ -2,7 +2,6 @@
 Created on 16-May-2019
 
 @author: Anand Swaroop
-@author: Anand Swaroop
 '''
 import numpy
 from cad.items.ModelUtils import *
@@ -86,3 +85,24 @@ class StiffenerPlate(object):
         prism = makePrismFromFace(aFace, extrudeDir)
 
         return prism
+
+if __name__ == '__main__':
+    from OCC.Display.SimpleGui import init_display
+
+    display, start_display, add_menu, add_function_to_menu = init_display()
+    
+    L = 10
+    W = 10
+    T = 1
+
+    origin = numpy.array([0.,0.,0.])
+    uDir = numpy.array([1.,0.,0.])
+    wDir = numpy.array([0.,0.,1.])
+
+    SPlate = StiffenerPlate(L, W, T, 2,2,2,2,2,2,2,2)
+    _place = SPlate.place(origin, uDir, wDir)
+    point = SPlate.compute_params()
+    prism = SPlate.create_model()
+    display.DisplayShape(prism, update=True)
+    display.DisableAntiAliasing()
+    start_display()

@@ -646,15 +646,7 @@ class Connection(Main):
         return information
 
 
-    def call_3DModel(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Model':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Model", bgcolor)
+
 
     def call_3DColumn(self, ui, bgcolor):
         from PyQt5.QtWidgets import QCheckBox

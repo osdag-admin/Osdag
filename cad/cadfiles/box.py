@@ -1,7 +1,9 @@
 import numpy
 from cad.items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from cad.items.angle import Angle
+
+from cad.cadfiles.anglebar import Angle
+
 from cad.items.plate import Plate
 
 class Box(object):
@@ -25,14 +27,14 @@ class Box(object):
         self.sec_origin = secOrigin
         self.uDir = uDir
         self.wDir = wDir
-    
-        origin5 = numpy.array([-self.L//2, self.T/2, 0.])
+        origin5 = numpy.array([0.,0.,0.])
+        origin5 = numpy.array([-self.L//2-self.T//2, 0., 0.])
         self.plate1.place(origin5, self.uDir, self.wDir)
-        origin6 = numpy.array([-self.T/2, -self.B//2., 0.])
+        origin6 = numpy.array([0., -self.B//2+self.T//2., 0.])
         self.plate2.place(origin6, self.uDir, self.wDir)
-        origin7 = numpy.array([self.L//2., -self.T/2, 0.])
+        origin7 = numpy.array([self.L//2+self.T//2., 0., 0.])
         self.plate3.place(origin7, self.uDir, self.wDir)
-        origin8 = numpy.array([self.T/2, self.B//2., 0.])
+        origin8 = numpy.array([0., self.B//2-self.T//2, 0.])
         self.plate4.place(origin8, self.uDir, self.wDir)
 
     def compute_params(self):

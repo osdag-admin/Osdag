@@ -8,18 +8,18 @@ from cad.items.ISection import ISection
 
 class cross_isection(object):
 
-    def __init__(self, B, T, D, t, R1, R2, alpha, length):
+    def __init__(self, B, T, D, t, length, R1=0, R2=0):
         self.B = B
         self.T = T
         self.D = D
         self.t = t
         self.R1 = R1
         self.R2 = R2
-        self.alpha = alpha
+        #self.alpha = alpha
         self.length = length
         self.clearDist = 20
-        self.Isection1 = ISection(B, T, D, t, R1, R2, alpha, length, None)
-        self.Isection2 = ISection(B, T, D, t, R1, R2, alpha, length, None)
+        self.Isection1 = ISection(D-2*T, T, B, t, R1, R2, None, length, None)
+        self.Isection2 = ISection(B-2*T, T, D-2*T, t, R1, R2, None, length, None)
     
         
     def place(self, sec_origin, uDir, wDir):
@@ -61,28 +61,17 @@ if __name__ == '__main__':
     T = 3
     D = 50
     t = 2
-    R1 = 5
-    R2 = 5
-    alpha = 1
     length = 100
-#    width = 10
-#    hight = 10
-#    d = 10
-#    L = 3
-#    W = 200
-#    H = 90
-    
-    ISecPlate = cross_isection(B, T, D, t, R1, R2, alpha, length)
+
+    CrossISec = cross_isection(B, T, D, t, length)
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])
 
-    #iseccover = IsectionCoverPlate(Isec1, Isec2, plate1, plate2)
-    ISecPlate.place(origin, uDir, shaftDir)
-    ISecPlate.compute_params()
-    prism = ISecPlate.create_model()
+    CrossISec.place(origin, uDir, shaftDir)
+    CrossISec.compute_params()
+    prism = CrossISec.create_model()
     display.DisplayShape(prism, update=True)
     display.DisableAntiAliasing()
     start_display()
-    #print(prism.Orientation())

@@ -7,7 +7,7 @@ from cad.items.ISection import ISection
 
 class IsectionCoverPlate(object):
 
-    def __init__(self, B, T, D, t, R1, R2, alpha, length, d, t2, W):
+    def __init__(self, B, T, D, t, length, d, t2, W=None, R1=0, R2=0, alpha=0):
         self.B = B
         self.T = T
         self.D = D
@@ -18,12 +18,15 @@ class IsectionCoverPlate(object):
         self.length = length
         self.d = d
         self.t2 = t2
-        self.W = W
+        if W is None:
+            self.W = 2*B+d
+        else:
+            self.W = W
         self.clearDist = 20
         self.Isection1 = ISection(B, T, D, t, R1, R2, alpha, length, None)
         self.Isection2 = ISection(B, T, D, t, R1, R2, alpha, length, None)
-        self.Plate1 = Plate(t2, length, W)
-        self.Plate2 = Plate(t2, length, W)
+        self.Plate1 = Plate(t2, length, self.W)
+        self.Plate2 = Plate(t2, length, self.W)
         
     def place(self, sec_origin, uDir, wDir):
         self.sec_origin = sec_origin
@@ -56,7 +59,6 @@ class IsectionCoverPlate(object):
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
         prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
         prism = BRepAlgoAPI_Fuse(prism, prism4).Shape()
-        print(prism.Location())
         return prism
 
 if __name__ == '__main__':
@@ -76,16 +78,14 @@ if __name__ == '__main__':
     t2 = 3
     W = 100
     
-    ISecPlate = IsectionCoverPlate(B, T, D, t, R1, R2, alpha, length, d, t2, W)
+    ISecPlate = IsectionCoverPlate(B, T, D, t, length, d, t2)
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])
 
-    #iseccover = IsectionCoverPlate(Isec1, Isec2, plate1, plate2)
     ISecPlate.place(origin, uDir, shaftDir)
     prism = ISecPlate.create_model()
     display.DisplayShape(prism, update=True)
     display.DisableAntiAliasing()
     start_display()
-    #print(prism.Orientation())

@@ -6,59 +6,62 @@ from cad.cadfiles.anglebar import Angle
 from cad.items.plate import Plate
 
 class StarAngle2(object):
-    def __init__(self, L, A, B, T, R1, R2, W, t):
+    def __init__(self, L, A, B, T, t, W=None, R1=0, R2=0):
         self.L = L
         self.A = A
         self.B = B
         self.T = T
         self.t = t
-        #self.R1 = R1
-        self.R1 = 0.0
-        #self.R2 = R2
-        self.R2 = 0.0
+        if W is None:
+            self.W = 2*B
+        else:
+            self.W = W
+        self.R1 = R1
+        self.R2 = R2
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
         self.vDir = self.wDir * self.uDir
         self.angle1 = Angle(L, A, B, T, R1, R2)
         self.angle2 = Angle(L, A, B, T, R1, R2)
-        self.plate1 = Plate(W, L, t)
-        self.plate2 = Plate(t, L, W)
+        self.plate1 = Plate(self.W, L, t)
+        #self.plate2 = Plate(t, L, W)
 
     def place(self, secOrigin, uDir, wDir):
         self.sec_origin = secOrigin
         self.uDir = uDir
         self.wDir = wDir
-        origin1 = numpy.array([self.t/2, self.t/2, 0.])
+        origin1 = numpy.array([self.t/2, 0., 0.])
         self.angle1.place(origin1, self.uDir, self.wDir)
-        origin2 = numpy.array([-self.t/2., -self.t/2., 0.])
+        origin2 = numpy.array([self.t/2, 0., 0.])
         self.angle2.place(origin2, self.uDir, self.wDir)
         self.plate1.place(self.sec_origin, self.uDir, self.wDir)
-        self.plate2.place(self.sec_origin, self.uDir, self.wDir)
+        #self.plate2.place(self.sec_origin, self.uDir, self.wDir)
 
     def compute_params(self):
         self.angle1.computeParams()
         self.angle2.computeParams()
-        self.angle2.points = self.rotate(self.angle1.points)
-        self.angle2.points = self.rotate(self.angle2.points)
+        self.angle2.points = self.rotate(self.angle2.points, numpy.pi)
         self.plate1.compute_params()
-        self.plate2.compute_params()
+        #self.plate2.compute_params()
 
     def create_model(self):
         prism1 = self.angle1.create_model()
         prism2 = self.angle2.create_model()
 
         prism3 = self.plate1.create_model()
-        prism4 = self.plate2.create_model()
+        #prism4 = self.plate2.create_model()
 
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
         prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism4).Shape()        
+        #prism = BRepAlgoAPI_Fuse(prism, prism4).Shape()        
         return prism
 
-    def rotate(self, points):
+    def rotate(self, points, x):
         rotated_points = []
-        rmatrix = numpy.array([[0, -1, 0],[1, 0, 0],[0, 0, 1]]) 
+        rmatrix = numpy.array([[numpy.cos(x), -numpy.sin(x), 0],
+                              [numpy.sin(x), numpy.cos(x), 0],
+                              [0, 0, 1]]) 
         for point in points:
             point = numpy.matmul(rmatrix, point)
             rotated_points.append(point)
@@ -74,8 +77,6 @@ if __name__ == '__main__':
     A = 15
     B = 15
     T = 2
-    R1 = 8
-    R2 = 5
     W = 40
     t = 2
 
@@ -83,7 +84,7 @@ if __name__ == '__main__':
     uDir = numpy.array([1.,0.,0.])
     wDir = numpy.array([0.,0.,1.])
 
-    star_angle = StarAngle2(L, A, B, T, R1, R2, W, t)
+    star_angle = StarAngle2(L, A, B, T, t)
     _place = star_angle.place(origin, uDir, wDir)
     point = star_angle.compute_params()
     prism = star_angle.create_model()

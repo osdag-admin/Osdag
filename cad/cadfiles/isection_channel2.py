@@ -7,7 +7,7 @@ from cad.items.ISection import ISection
 
 class ISectionChannel2(object):
 
-    def __init__(self, B, T, D, t, R1, R2, L, l, W, H, b, d):
+    def __init__(self, B, T, D, t, L, d, b=None, R1=0, R2=0):
         self.B = B
         self.T = T
         self.D = D
@@ -15,17 +15,18 @@ class ISectionChannel2(object):
         self.R1 = R1
         self.R2 = R2
         self.L = L
-        self.l = l
-        self.W = W
-        self.H = H
         self.d = d
+        if b is None:
+            self.b = D-2*t
+        else:
+            self.b = b
         self.clearDist = 20
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
         self.channel1 = Channel(B, t, D, t, 0, 0, L)
         self.channel2 = Channel(B, t, D, t, 0, 0, L)
-        self.isection = ISection(b, T, d, T, R1, R2, 0, L, None)
+        self.isection = ISection(self.b, T, d, T, R1, R2, 0, L, None)
         #self.compute_params()
 
     def place(self, sec_origin, uDir, wDir):
@@ -83,16 +84,15 @@ if __name__ == '__main__':
     t = 2
     L = 100
     l = 4
-    W = 100
     H = 60
-    b = 25
+    b = D-2*t
     d = 50
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])
 
-    isection_channel = ISectionChannel2(B, T, D, t, 0, 0, L, l, W, H, b, d)
+    isection_channel = ISectionChannel2(B, T, D, t, L, d)
     _place = isection_channel.place(origin, uDir, shaftDir)
     point = isection_channel.compute_params()
     prism = isection_channel.create_model()

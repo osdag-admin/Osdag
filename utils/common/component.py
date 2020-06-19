@@ -705,21 +705,20 @@ class HollowSection(Section):
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
         row = cur.fetchone()
-        self.mass = row[5]
-        self.area = row[6]
-        self.depth = row[2]
-        self.flange_width = row[3]
-        self.flange_thickness = row[4]
-        self.mom_inertia_z = row[7]
-        self.mom_inertia_y = row[8]
-        self.rad_of_gy_z = row[9]
-        self.rad_of_gy_y = row[10]
-        self.elast_sec_mod_z = row[11]
-        self.elast_sec_mod_y = row[12]
-        self.plast_sec_mod_z = row[13]
-
-        self.plast_sec_mod_y = row[14]
-        self.source = row[15]
+        self.mass = row[5]  # kg/m
+        self.area = row[6] * 100  # mm^2
+        self.depth = row[2]  # mm
+        self.flange_width = row[3]  # mm (width is referred as flange width)
+        self.flange_thickness = row[4]  # mm (thickness of the section is referred as flange thickness)
+        self.mom_inertia_z = row[7] * 10000  # mm^4
+        self.mom_inertia_y = row[8] * 10000  # mm^4
+        self.rad_of_gy_z = row[9] * 10  # mm
+        self.rad_of_gy_y = row[10] * 10  # mm
+        self.elast_sec_mod_z = row[11] * 1000  # mm^3
+        self.elast_sec_mod_y = row[12] * 1000  # mm^3
+        self.plast_sec_mod_z = row[13] * 1000  # mm^3
+        self.plast_sec_mod_y = row[14] * 1000  # mm^3
+        self.source = row[15]  # IS 4923:1997
 
         conn.close()
 
@@ -753,16 +752,17 @@ class CHS(Section):
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
         row = cur.fetchone()
-        self.mass = row[5]
-        self.area = row[6]  # * 100
-        self.nominal_bore = row[2]
-        self.out_diameter = row[3]
-        self.flange_thickness = row[4]
-        self.internal_vol = row[7]
-        self.mom_inertia = row[10]
-        self.elast_sec_mod = row[11]
-        self.rad_of_gy = row[12]
-        self.source = row[14]
+        self.mass = row[5]  # kg/m
+        self.area = row[6] * 100  # mm^2
+        self.nominal_bore = row[2]  # mm
+        self.out_diameter = row[3]  # mm
+        self.flange_thickness = row[4]  # mm, thickness of the CHS is referred as flange thickness
+        self.internal_vol = row[7]  # cm^3/m
+        self.mom_inertia = row[10]  # cm^4/m
+        self.elast_sec_mod = row[11] * 1000  # mm^3
+        self.rad_of_gy = row[12] * 10  # mm
+        self.source = row[14]  # IS 1161:2014
+
         conn.close()
 
 

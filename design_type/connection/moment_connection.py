@@ -315,9 +315,9 @@ class MomentConnection(Connection, IS800_2007):
             flange_thickness (float) - flange thickness of the column section (tf)
             min_area_req (float) - minimum effective bearing area (A_bc)
             anchor_hole_dia (int) - diameter of the anchor hole
-            section_type (str) - type of section used for the column ['I-section' or 'SHS' or 'RHS' or 'CHS']
+            section_type (str) - type of section used as column ['I-section' or 'SHS' or 'RHS' or 'CHS']
 
-        Returns: projection in 'mm' (float)
+        Returns: effective projection from the face of the column in 'mm' (float)
 
         Note: 1) The following expression is used to calculate a, b and c [Ref: Design of Steel Structures,
                  N. Subramanian, 2nd. edition 2018, Example 15.2]:
@@ -328,8 +328,8 @@ class MomentConnection(Connection, IS800_2007):
 
                     c is the effective projection from the outer face of the respective column section
 
-              2) Adding anchor hole diameter (half on each side) to the value of the projection to avoid punching
-                 of the hole in the effective area which in turn shall avoid any stress concentration at holes
+              2) Adding anchor hole diameter (half on each side) to the value of the projection to avoid punching of the hole
+                 (for anchor bolts) in the effective area which in turn shall avoid any stress concentration at holes
         """
         a = 4
         if section_type == 'I-section':

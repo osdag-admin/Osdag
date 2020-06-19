@@ -184,9 +184,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.column_tw = 0.0
         self.column_r1 = 0.0
         self.column_r2 = 0.0
-        self.column_B = 0.0
         self.column_t = 0.0
-        self.column_OD = 0.0
 
         self.bearing_strength_concrete = 0.0
         self.w = 0.0
@@ -863,6 +861,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             secsize = []
             secsize.extend(connectdb("RHS"))
             secsize.extend(connectdb("SHS", call_type="popup"))
+            secsize.extend(connectdb("CHS", call_type="popup"))
             return secsize
         else:
             return connectdb("Columns")
@@ -1460,18 +1459,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS':
                 self.column_properties = SHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
-                self.column_D = self.column_properties.depth
-                self.column_B = self.column_properties.depth
-                self.column_t = self.column_properties.flange_thickness
+                self.column_D = self.column_properties.depth  # depth of SHS
+                self.column_bf = self.column_properties.flange_width  # width of SHS
+                self.column_t = self.column_properties.flange_thickness  # thickness of the section
             elif self.dp_column_designation[1:4] == 'RHS':
                 self.column_properties = RHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
-                self.column_D = self.column_properties.depth
-                self.column_B = self.column_properties.depth
-                self.column_t = self.column_properties.flange_thickness
+                self.column_D = self.column_properties.depth  # depth of RHS
+                self.column_bf = self.column_properties.flange_width  # width of RHS
+                self.column_t = self.column_properties.flange_thickness  # thickness of the section
             elif self.dp_column_designation[1:4] == 'CHS':
                 self.column_properties = CHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
-                self.column_OD = self.column_properties.depth
-                self.column_t = self.column_properties.flange_thickness
+                self.column_D = self.column_properties.out_diameter  # outer diameter of the CHS
+                self.column_bf = self.column_D  # b_f initialised as diameter for reducing the attributes
+                self.column_t = self.column_properties.flange_thickness  # thickness of the section
 
         else:
             self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
@@ -1627,18 +1627,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # minimum required dimensions of the base plate [as per the detailing criteria]
         # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
+        self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
+
         if self.connectivity == 'Welded Column Base' or 'Moment Base Plate':
-            self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
             self.bp_width_min = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
-
         elif self.connectivity == 'Hollow/Tubular Column Base':
-            if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
-                self.bp_length_min = round_up(self.column_D + (2 * (2 * self.end_distance)), 5)  # mm
-                self.bp_width_min = round_up(self.column_B + (2 * (2 * self.end_distance)), 5)  # mm
-            else:
-                self.bp_length_min = round_up(self.column_OD + (2 * (2 * self.end_distance)), 5)  # mm
-                self.bp_width_min = round_up(self.column_OD + (2 * (2 * self.end_distance)), 5)  # mm
-
+            self.bp_width_min = round_up(self.column_bf + (2 * (2 * self.end_distance)), 5)  # mm
         else:
             pass
 
@@ -1669,10 +1663,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                        self.anchor_hole_dia, section_type='I-section')  # mm
                 else:
                     if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
-                        self.projection = self.calculate_c(self.column_B, self.column_D, 0, 0, self.min_area_req, self.anchor_hole_dia,
+                        self.projection = self.calculate_c(self.column_bf, self.column_D, 0, 0, self.min_area_req, self.anchor_hole_dia,
                                                            section_type='SHS')  # mm
                     elif self.dp_column_designation[1:4] == 'CHS':
-                        self.projection = self.calculate_c(0, self.column_OD, 0, 0, self.min_area_req, self.anchor_hole_dia, section_type='CHS')  # mm
+                        self.projection = self.calculate_c(0, self.column_D, 0, 0, self.min_area_req, self.anchor_hole_dia, section_type='CHS')  # mm
                     else:
                         logger.error("Cannot find section type")
             else:
@@ -1709,7 +1703,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     bp_dimensions.append(i)
                     i += 1
 
-                self.bp_area_provided = bp_dimensions[-2] * bp_dimensions[-1]  # mm^2, area according to the desired length and width
+                self.bp_area_provided = bp_dimensions[-2] * bp_dimensions[-1]  # mm^2, area according to the updated length and width
                 n += 1
 
             self.bp_length_provided = bp_dimensions[-2]  # mm, updated length if while loop is True
@@ -1909,12 +1903,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         elif self.connectivity == "Hollow/Tubular Column Base":
             pass
 
-        # assign appropriate plate thickness
+        # assign appropriate plate thickness according to available sizes in the marked
 
         self.plate_thk = max(self.plate_thk, self.column_tf)  # base plate thickness should be larger than the flange thickness
 
         # assigning plate thickness according to the available standard sizes
         # the thicknesses of the flats (in mm) listed below is obtained from SAIL's product brochure
+        # TODO: The below list should be updated if a new standard size of plate is available in the market
         standard_plate_thk = [8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40, 45, 50, 56, 63, 75, 80, 90, 100, 110, 120]
 
         sort_plate = filter(lambda x: self.plate_thk <= x <= 120, standard_plate_thk)
@@ -1935,9 +1930,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_grade_tension = self.anchor_grade
         self.grout_thk = 50  # mm
 
+        # design of anchor bolts to resist axial tension/uplift force
         if self.connectivity == 'Moment Base Plate':
 
-            # design of anchor bolts to resist axial tension/uplift force
             if self.load_axial_tension > 0:
                 self.anchor_inside_flange = 'Yes'
 
@@ -1980,14 +1975,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             else:
                 self.anchor_inside_flange = 'No'
                 self.anchor_nos_uplift = 0
-                self.anchor_dia_uplift = self.anchor_dia_provided
-                self.tension_capacity_anchor_uplift = self.tension_capacity_anchor
-                self.anchor_nos_uplift = 0
+                self.anchor_dia_uplift = 'N/A'
+                self.tension_capacity_anchor_uplift = 'N/A'
 
         else:
             pass
 
-        # design strength of the anchor bolt for shear [Reference: Clause 10.3.2, IS 800:2007; Section 3, IS 5624:1993]
+        # design strength of the anchor bolt [Reference: Clause 10.3.2, IS 800:2007; Section 3, IS 5624:1993]
         # Assumption: number of shear planes passing through - the thread is 1 (n_n) and through the shank is 0 (n_s)
 
         self.shear_capacity_anchor = self.cl_10_3_3_bolt_shear_capacity(self.dp_anchor_fu_overwrite, self.anchor_area[1],
@@ -2009,22 +2003,36 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
         # Design for shear acting along any axis
-
         if self.load_shear_major or self.load_shear_minor > 0:
-            # The shear transfer follows the following load transfer mechanism:
 
+            # The shear transfer follows the following load transfer mechanism:
             # Check 1: The shear is transferred through the anchor bolts. The bolts on the tension side are critical and
             # are checked for combined shear + tension
             # Check 2: The shear is then resisted by the friction between the base plate and the grout material
+            # If the anchor bolts fails in shear, then a shear key is provided
             # Check 3: If the shear is still high, then a shear key is provided. The shear key resists shear by bearing
             # on the concrete surface
 
-            if self.connectivity == 'Moment Base Plate':
-
-                if self.moment_bp_case == 'Case1':
+            if self.connectivity == 'Welded Column Base' or 'Moment Base Plate':
+                if (self.connectivity == 'Welded Column Base') or (self.moment_bp_case == 'Case1'):
                     self.combined_capacity_anchor = 'N/A'
 
-                else:
+                    # Only Check 2 and 3 are applicable to these cases
+                    # Check 2: Friction between base plate and the grout material [Reference: AISC Design Guide, section 3.5]
+                    # The coefficient of friction between steel and the grout is 0.55, whereas between steel and concrete is 0.7
+                    self.shear_resistance = 0.55 * self.load_axial_compression  # N
+                    self.shear_resistance = min(self.shear_resistance, 0.2 * (self.bearing_strength_concrete / 0.45) * self.bp_area_provided)  # N
+
+                    self.shear_resistance = min(self.shear_resistance, (self.anchor_nos_provided * self.anchor_capacity * 1000))
+
+                    if self.shear_resistance < min(self.load_shear_major, self.load_shear_minor):
+                        self.shear_key_required = 'Yes'
+                    else:
+                        self.shear_key_required = 'No'
+
+            elif self.connectivity == 'Moment Base Plate':
+
+                if self.moment_bp_case == 'Case2':
                     # Check 1: Combined shear + Tension [Reference: cl.10.3.6, IS 800:2007]
                     # v_sb is calculated considering shear distribution in bolts only on the tension side (outside flange), this is the critical case
                     self.v_sb = (max(self.load_shear_major, self.load_shear_minor) * 10 ** -3) / (self.anchor_nos_provided / 2)  # kN
@@ -2034,13 +2042,20 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db)
                     self.combined_capacity_anchor = round(self.combined_capacity_anchor, 3)
 
+                    # Providing shear key if the UR exceeds 0.7, the value is purely adopted based on experience for a conservative design
+                    if self.combined_capacity_anchor > 0.7:
+                        self.shear_key_required = 'Yes'
+                    else:
+                        self.shear_key_required = 'No'
+
+                    # Check for bolts
                     if self.combined_capacity_anchor > 1.0:
                         logger.error(": [Large Shear Force] The shear force acting on the base plate is large.")
                         logger.info(": [Large Shear Force] Provide shear key to safely transfer the shear force.")
                         logger.error(": [Anchor Bolt] The anchor bolt fails due to combined shear + tension [Reference: Clause 10.3.6, "
                                      "IS 800:2007].")
 
-                        # re-design anchor bolts if it fails in combined shear + tension check
+                        # re-design anchor bolts if it fails in combined shear + tension check for this case only
                         # Algorithm:
                         # Step 1: Try with higher diameter bolt,
                         # Step 2: If the check still fails, try with more number of bolts
@@ -2149,105 +2164,94 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                             logger.error("Cannot compute anchor bolt for resisting the uplift force")
                     else:
                         pass
+            else:
+                pass
+
+            if self.shear_key_required == 'Yes':
+                # Check 3: Provide shear key
+                # Note: The shear key thickness shall be at-least equal to the base plate thickness to avoid bending
+                self.shear_key_thk = self.plate_thk  # mm
+
+                if self.load_shear_major > 0:
+                    self.shear_key_along_ColDepth = 'Yes'
+                    self.shear_key_len_ColDepth = self.column_D  # mm
+                    self.shear_key_depth_ColDepth = self.load_shear_major / ((self.bearing_strength_concrete / 0.45) *
+                                                                             self.shear_key_len_ColDepth)  # mm
+                    self.shear_key_depth_ColDepth = max(self.shear_key_depth_ColDepth, self.grout_thk + 150)  # mm
+
+                    # check for bearing of the shear key on concrete (along major axis)
+                    self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm^2
+
+                    if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
+                        key_dimensions = [self.shear_key_len_ColDepth, self.shear_key_depth_ColDepth]
+
+                        n = 1
+                        while self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
+                            key_update_dimensions = [key_dimensions[-1]]  # updating the depth only
+
+                            for i in key_update_dimensions:
+                                i += 25
+                                key_dimensions.append(i)
+                                i += 1
+
+                            key_area_provided = key_dimensions[0] * key_dimensions[-1]  # mm^2
+                            n += 1
+
+                            self.shear_key_len_ColDepth = key_dimensions[0]  # mm, keeping the length umchanged
+                            self.shear_key_depth_ColDepth = key_dimensions[-1]  # mm, updated depth if while loop is True
+                            key_area_provided = self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth  # mm^2, update area if while loop is True
+
+                            # actual bearing pressure acting on the provided area of the base plate
+                            self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm
+
+                if self.load_shear_minor > 0:
+                    self.shear_key_along_ColWidth = 'Yes'
+                    self.shear_key_len_ColWidth = self.column_bf  # mm
+                    self.shear_key_depth_ColWidth = self.load_shear_minor / ((self.bearing_strength_concrete / 0.45) *
+                                                                             self.shear_key_len_ColWidth)  # mm
+                    self.shear_key_depth_ColWidth = max(self.shear_key_depth_ColWidth, self.grout_thk + 150)  # mm
+
+                    # check for bearing of the shear key on concrete (along minor axis)
+                    self.shear_key_stress_ColWidth = self.load_shear_major / (self.shear_key_len_ColWidth * self.shear_key_depth_ColWidth)  # N/mm^2
+
+                    if self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
+
+                        key_dimensions = [self.shear_key_len_ColWidth, self.shear_key_depth_ColWidth]
+                        n = 1
+                        while self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
+                            key_update_dimensions = [key_dimensions[-1]]  # updating the depth only
+
+                            for i in key_update_dimensions:
+                                i += 25
+                                key_dimensions.append(i)
+                                i += 1
+
+                            key_area_provided = key_dimensions[0] * key_dimensions[-1]  # mm^2
+                            n += 1
+
+                            self.shear_key_len_ColWidth = key_dimensions[0]  # mm, keeping the length umchanged
+                            self.shear_key_depth_ColWidth = key_dimensions[-1]  # mm, updated depth if while loop is True
+                            key_area_provided = self.shear_key_len_ColWidth * self.shear_key_depth_ColWidth  # mm^2, update area if while loop is True
+
+                            # actual bearing pressure acting on the provided area of the base plate
+                            self.shear_key_stress_ColWidth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm
 
             else:
-                # Check 2: Friction between base plate and the grout material [Reference: AISC Design Guide, section 3.5]
-                # The coefficient of friction between steel and the grout is 0.55, whereas between steel and concrete is 0.7
-                self.shear_resistance = 0.55 * self.load_axial_compression  # N
-                self.shear_resistance = min(self.shear_resistance, 0.2 * (self.bearing_strength_concrete / 0.45) * self.bp_area_provided)  # N
+                self.shear_key_along_ColDepth = 'No'
+                self.shear_key_len_ColDepth = 'N/A'
+                self.shear_key_depth_ColDepth = 'N/A'
+                self.shear_key_stress_ColDepth = 'N/A'
 
-                if self.shear_resistance < max(self.load_shear_major, self.load_shear_minor):
-                    self.shear_key_required = 'Yes'
+                self.shear_key_along_ColWidth = 'No'
+                self.shear_key_len_ColWidth = 'N/A'
+                self.shear_key_depth_ColWidth = 'N/A'
+                self.shear_key_stress_ColWidth = 'N/A'
 
-                    # Check 3: Provide shear key
-                    # Note: The shear key thickness shall be at-least equal to the base plate thickness to avoid bending
-                    self.shear_key_thk = self.plate_thk  # mm
-
-                    if self.load_shear_major > 0:
-                        self.shear_key_along_ColDepth = 'Yes'
-                        self.shear_key_len_ColDepth = self.column_D  # mm
-                        self.shear_key_depth_ColDepth = self.load_shear_major / ((self.bearing_strength_concrete / 0.45) *
-                                                                                 self.shear_key_len_ColDepth)  # mm
-                        self.shear_key_depth_ColDepth = max(self.shear_key_depth_ColDepth, self.grout_thk + 150)  # mm
-
-                        # check for bearing of the shear key on concrete (along major axis)
-                        self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm^2
-
-                        if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
-                            key_dimensions = [self.shear_key_len_ColDepth, self.shear_key_depth_ColDepth]
-
-                            n = 1
-                            while self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
-                                key_update_dimensions = [key_dimensions[-1]]  # updating the depth only
-
-                                for i in key_update_dimensions:
-                                    i += 25
-                                    key_dimensions.append(i)
-                                    i += 1
-
-                                key_area_provided = key_dimensions[0] * key_dimensions[-1]  # mm^2
-                                n += 1
-
-                                self.shear_key_len_ColDepth = key_dimensions[0]  # mm, keeping the length umchanged
-                                self.shear_key_depth_ColDepth = key_dimensions[-1]  # mm, updated depth if while loop is True
-                                key_area_provided = self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth  # mm^2, update area if while loop is True
-
-                                # actual bearing pressure acting on the provided area of the base plate
-                                self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm
-                        else:
-                            pass
-
-                    if self.load_shear_minor > 0:
-                        self.shear_key_along_ColWidth = 'Yes'
-                        self.shear_key_len_ColWidth = self.column_bf  # mm
-                        self.shear_key_depth_ColWidth = self.load_shear_minor / ((self.bearing_strength_concrete / 0.45) *
-                                                                                 self.shear_key_len_ColWidth)  # mm
-                        self.shear_key_depth_ColWidth = max(self.shear_key_depth_ColWidth, self.grout_thk + 150)  # mm
-
-                        # check for bearing of the shear key on concrete (along minor axis)
-                        self.shear_key_stress_ColWidth = self.load_shear_major / (self.shear_key_len_ColWidth * self.shear_key_depth_ColWidth)  # N/mm^2
-
-                        if self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
-
-                            key_dimensions = [self.shear_key_len_ColWidth, self.shear_key_depth_ColWidth]
-                            n = 1
-                            while self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
-                                key_update_dimensions = [key_dimensions[-1]]  # updating the depth only
-
-                                for i in key_update_dimensions:
-                                    i += 25
-                                    key_dimensions.append(i)
-                                    i += 1
-
-                                key_area_provided = key_dimensions[0] * key_dimensions[-1]  # mm^2
-                                n += 1
-
-                                self.shear_key_len_ColWidth = key_dimensions[0]  # mm, keeping the length umchanged
-                                self.shear_key_depth_ColWidth = key_dimensions[-1]  # mm, updated depth if while loop is True
-                                key_area_provided = self.shear_key_len_ColWidth * self.shear_key_depth_ColWidth  # mm^2, update area if while loop is True
-
-                                # actual bearing pressure acting on the provided area of the base plate
-                                self.shear_key_stress_ColWidth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm
-                        else:
-                            pass
-
-                else:
-                    self.shear_key_required = 'No'
-
-                # Check 1: Not applicable
-                self.combined_capacity_anchor = 'N/A'
         else:
             # TODO
             self.combined_capacity_anchor = 'N/A'
             logger.info("There is no shear force acting on the anchor bolts")
             logger.info("No combined shear-tension check is required")
-
-        # if self.safe:
-        #     pass
-        # else:
-        #     logger.error(": [Anchor Bolt] Unexpected failure occurred.")
-        #     logger.error(": [Anchor Bolt] Cannot compute capacity checks for the anchor bolt.")
-        #     logger.info(": [Anchor Bolt] Check the input values and re-design the connection.")
 
         # validation of anchor bolt length [Reference: IS 5624:1993, Table 1]
         self.anchor_length_min = self.table1(self.anchor_bolt)[1]

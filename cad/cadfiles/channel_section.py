@@ -6,7 +6,7 @@ from cad.items.plate import Plate
 
 class ChannelSection(object):
 
-    def __init__(self, B, T, D, t, R1, R2, L, l, W, H, d):
+    def __init__(self, B, T, D, t, L, l, W, d, H=None, R1=0, R2=0):
         self.B = B
         self.T = T
         self.D = D
@@ -16,16 +16,19 @@ class ChannelSection(object):
         self.L = L
         self.l = l
         self.W = W
-        self.H = H
         self.d = d
+        if H is None:
+            self.H = 2*B+d
+        else:
+            self.H = H
         self.clearDist = 20
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
-        self.Plate1 = Plate(l, W, H)
-        self.Plate2 = Plate(l, W, H)
-        self.channel1 = Channel(B, T, D, t, 0, 0, L)
-        self.channel2 = Channel(B, T, D, t, 0, 0, L)
+        self.Plate1 = Plate(l, W, self.H)
+        self.Plate2 = Plate(l, W, self.H)
+        self.channel1 = Channel(B, T, D, t, R1, R2, L)
+        self.channel2 = Channel(B, T, D, t, R1, R2, L)
         #self.compute_params()
 
     def place(self, sec_origin, uDir, wDir):
@@ -76,20 +79,20 @@ if __name__ == '__main__':
     display, start_display, add_menu, add_function_to_menu = init_display()
     
     B = 20
-    T = 2
+    T = 4
     D = 40
-    t = 2
+    t = 4
     L = 100
     l = 4
     W = 100
-    H = 60
     d = 10
+    H = 2*B+d
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])
 
-    channel_section = ChannelSection(B, T, D, t, 0, 0, L, l, W, H, d)
+    channel_section = ChannelSection(B, T, D, t, L, l, W, d)
     _place = channel_section.place(origin, uDir, shaftDir)
     point = channel_section.compute_params()
     prism = channel_section.create_model()

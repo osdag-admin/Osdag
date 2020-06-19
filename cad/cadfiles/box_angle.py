@@ -5,15 +5,15 @@ from cad.cadfiles.anglebar import Angle
 from cad.items.plate import Plate
 
 class BoxAngle(object):
-    def __init__(self, L, A, B, T, R1, R2, W, t):
+    def __init__(self, L, A, B, T, W, t, R1=0, R2=0):
         self.L = L
         self.A = A
         self.B = B
         self.T = T
         self.W = W
         self.t = t
-        self.R1 = 0.0
-        self.R2 = 0.0
+        self.R1 = R1
+        self.R2 = R2
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
@@ -33,31 +33,31 @@ class BoxAngle(object):
         self.wDir = wDir
         width = self.W/2
         t = self.t/2
-        origin1 = numpy.array([-width+t, -width+t, 0.])
+        origin1 = numpy.array([-width, -width+t*2, 0.])
         self.angle1.place(origin1, self.uDir, self.wDir)
-        origin2 = numpy.array([width-t, width-t, 0.])
+        origin2 = numpy.array([-width+2*t, -width, 0.])
         self.angle2.place(origin2, self.uDir, self.wDir)
-        origin3 = numpy.array([width-t, -width+t, 0.])
+        origin3 = numpy.array([-width, -width+2*t, 0.])
         self.angle3.place(origin3, self.uDir, self.wDir)
-        origin4 = numpy.array([-width+t, width-t, 0.])
+        origin4 = numpy.array([-width+2*t, -width, 0.])
         self.angle4.place(origin4, self.uDir, self.wDir)
-        origin5 = numpy.array([-width, t, 0.])
+        origin5 = numpy.array([-width-t, 0., 0.])
         self.plate1.place(origin5, self.uDir, self.wDir)
-        origin6 = numpy.array([-t, -width, 0.])
+        origin6 = numpy.array([0., -width+t, 0.])
         self.plate2.place(origin6, self.uDir, self.wDir)
-        origin7 = numpy.array([width, -t, 0.])
+        origin7 = numpy.array([width+t, 0., 0.])
         self.plate3.place(origin7, self.uDir, self.wDir)
-        origin8 = numpy.array([t, width, 0.])
+        origin8 = numpy.array([0., width-t, 0.])
         self.plate4.place(origin8, self.uDir, self.wDir)
 
     def compute_params(self):
         self.angle1.computeParams()
         self.angle2.computeParams()
-        self.angle2.points = self.rotate(self.angle1.points)
+        self.angle2.points = self.rotate(self.angle2.points, numpy.pi/2)
         self.angle3.computeParams()
-        self.angle3.points = self.rotate(self.angle2.points)
+        self.angle3.points = self.rotate(self.angle3.points, numpy.pi)
         self.angle4.computeParams()
-        self.angle4.points = self.rotate(self.angle3.points)
+        self.angle4.points = self.rotate(self.angle4.points, 3*numpy.pi/2)
 
         self.plate1.compute_params()
         self.plate2.compute_params()
@@ -85,9 +85,11 @@ class BoxAngle(object):
         prism = BRepAlgoAPI_Fuse(prism, prism8).Shape()        
         return prism
 
-    def rotate(self, points):
+    def rotate(self, points, x):
         rotated_points = []
-        rmatrix = numpy.array([[0, -1, 0],[1, 0, 0],[0, 0, 1]]) 
+        rmatrix = numpy.array([[numpy.cos(x), -numpy.sin(x), 0],
+                              [numpy.sin(x), numpy.cos(x), 0],
+                              [0, 0, 1]]) 
         for point in points:
             point = numpy.matmul(rmatrix, point)
             rotated_points.append(point)
@@ -114,7 +116,7 @@ if __name__ == '__main__':
     uDir = numpy.array([1.,0.,0.])
     wDir = numpy.array([0.,0.,1.])
 
-    box_angle = BoxAngle(L, A, B, T, R1, R2, W, t)
+    box_angle = BoxAngle(L, A, B, T, W, t)
     _place = box_angle.place(origin, uDir, wDir)
     point = box_angle.compute_params()
     prism = box_angle.create_model()

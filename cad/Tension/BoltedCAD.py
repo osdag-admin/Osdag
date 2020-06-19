@@ -10,7 +10,7 @@ from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 
 class TensionAngleBoltCAD(object):
-    def __init__(self, Obj, member, plate, nut_bolt_array):
+    def __init__(self, Obj, member, plate, nut_bolt_array, intermittentConnection):
         """
         :param member: Angle or Channel
         :param plate: Plate
@@ -22,7 +22,7 @@ class TensionAngleBoltCAD(object):
         self.member = member
         self.plate = plate
         self.nut_bolt_array = nut_bolt_array
-        # self.inter_array = inter_array
+        self.intermittentConnection = intermittentConnection
 
         self.plate1 = copy.deepcopy(self.plate)
         self.plate2 = copy.deepcopy(self.plate)
@@ -144,6 +144,18 @@ class TensionAngleBoltCAD(object):
 
         self.plate2_Model = self.plate2.create_model()
 
+        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles' and self.member.L >=1000:
+            intermittentConnectionOriginL = numpy.array([0, 0.0, 0.0])
+            intermittentConnection_uDir = numpy.array([0.0, 0.0, -1.0])
+            intermittentConnection_vDir = numpy.array([1.0, 0.0, 0.0])
+            intermittentConnection_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.intermittentConnection.place(intermittentConnectionOriginL, intermittentConnection_uDir,
+                                              intermittentConnection_vDir, intermittentConnection_wDir)
+
+            self.intermittentConnection_Model = self.intermittentConnection.create_model()
+            self.inter_conc_bolts = self.intermittentConnection.get_nut_bolt_models()
+            self.inter_conc_plates = self.intermittentConnection.get_plate_models()
+
     def create_nut_bolt_array(self):
         """
 
@@ -225,6 +237,8 @@ class TensionAngleBoltCAD(object):
 
     def get_plates_models(self):
         plate = BRepAlgoAPI_Fuse(self.plate1_Model, self.plate2_Model).Shape()
+        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles' and self.member.L >=1000:
+            plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
         return plate
 
     def get_nut_bolt_array_models(self):
@@ -240,6 +254,9 @@ class TensionAngleBoltCAD(object):
         # array = nut_bolts[0]
         # for comp in nut_bolts:
         #     array = BRepAlgoAPI_Fuse(comp, array).Shape()
+
+        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles' and self.member.L >= 1000:
+            array = BRepAlgoAPI_Fuse(array, self.inter_conc_bolts).Shape()
 
         return array
 

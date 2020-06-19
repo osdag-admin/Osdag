@@ -1255,6 +1255,17 @@ class Window(QMainWindow):
         self.actionDownload_angle.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Angles"))
         self.actionReset_db.triggered.connect(self.database_reset)
 
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+        if not os.path.isdir(last_design_folder):
+            os.mkdir(last_design_folder)
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+        if isinstance(last_design_dictionary, dict):
+            self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -1674,6 +1685,14 @@ class Window(QMainWindow):
             if error is not None:
                 self.show_error_msg(error)
                 return
+            last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+            if not os.path.isdir(last_design_folder):
+                os.mkdir(last_design_folder)
+            last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
+            last_design_file = os.path.join(last_design_folder, last_design_file)
+            with open(str(last_design_file), 'w') as last_design:
+                yaml.dump(self.design_inputs, last_design)
+
             out_list = main.output_values(main, status)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:

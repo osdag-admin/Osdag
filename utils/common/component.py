@@ -2404,9 +2404,6 @@ class Single_Channel_Properties(object):
 
     def calc_PlasticModulusZpy(self,f_w,f_t,w_h,w_t):
 
-        # Ac = self.calc_Area(f_w, f_t, w_h, w_t) * 100
-        # self.Z_py = f_t * (Ac/4 * f_t)**2 + f_t * (f_w - w_t -(Ac/4*f_t))**2 + w_h * w_t * (f_w - 0.5 * w_t - Ac/4 * f_t)**2
-        # return round(self.Z_py/1000, 2)
         A_w = w_h * w_t
         A_f = 2 * (f_w - w_t) * f_t
         if A_w > A_f:

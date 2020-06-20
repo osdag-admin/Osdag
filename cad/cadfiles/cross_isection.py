@@ -8,18 +8,17 @@ from cad.items.ISection import ISection
 
 class cross_isection(object):
 
-    def __init__(self, B, T, D, t, length, R1=0, R2=0):
+    def __init__(self, D, B, T, t, H, s, d):
         self.B = B
         self.T = T
         self.D = D
         self.t = t
-        self.R1 = R1
-        self.R2 = R2
-        #self.alpha = alpha
-        self.length = length
-        self.clearDist = 20
-        self.Isection1 = ISection(D-2*T, T, B, t, R1, R2, None, length, None)
-        self.Isection2 = ISection(B-2*T, T, D-2*T, t, R1, R2, None, length, None)
+        self.H = H
+        self.s = s
+        self.d = d
+
+        self.Isection1 = ISection(2*s+t+2*T, T, 2*d+2*T+t, t, 0, 0, None, H, None)
+        self.Isection2 = ISection(2*d+t, T, 2*s+t+2*T, t, 0, 0, None, H, None)
     
         
     def place(self, sec_origin, uDir, wDir):
@@ -57,13 +56,15 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    B = 45
+    B = 50
     T = 3
-    D = 50
+    D = 70
     t = 2
-    length = 100
-
-    CrossISec = cross_isection(B, T, D, t, length)
+    H = 100
+    d = (B - 2*T - t)/2
+    s = (D - t)/2
+    
+    CrossISec = cross_isection(D, B, T, t, H, s, d)
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])

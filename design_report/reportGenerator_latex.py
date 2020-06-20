@@ -84,7 +84,7 @@ class CreateLatex(Document):
         doc.preamble.append(header)
         doc.change_document_style("header")
 
-        with doc.create(Section('Input Parameters')):
+        with doc.create(ISection('Input Parameters')):
             with doc.create(LongTable('|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4.5cm}|', row_height=1.2)) as table:
                 table.add_hline()
                 for i in uiObj:
@@ -167,7 +167,7 @@ class CreateLatex(Document):
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
         doc.append(NewPage())
         count = 0
-        with doc.create(Section('Design Checks')):
+        with doc.create(ISection('Design Checks')):
             for check in Design_Check:
                 if check[0] == 'SubSection':
                     if count >=1:
@@ -239,7 +239,7 @@ class CreateLatex(Document):
 
 
         if (not 'TRAVIS' in os.environ) and (does_design_exist):
-            with doc.create(Section('3D View')):
+            with doc.create(ISection('3D View')):
                 with doc.create(Figure(position='h!')) as view_3D:
                     view_3dimg_path = rel_path + Disp_3d_image
                     # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))

@@ -86,7 +86,7 @@ class Tension_welded(Member):
               self.get_new_angle_section_properties)
         change_tab.append(t1)
 
-        t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3'],
+        t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3','Label_0'],
               ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
                'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23',
                KEY_IMAGE],
@@ -102,7 +102,7 @@ class Tension_welded(Member):
               self.get_new_channel_section_properties)
         change_tab.append(t3)
 
-        t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14'],
+        t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14','Label_0'],
               ['Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17', 'Label_19',
                'Label_20', 'Label_21', 'Label_22', 'Label_26', 'Label_27', KEY_IMAGE], TYPE_TEXTBOX,
               self.get_Channel_sec_properties)

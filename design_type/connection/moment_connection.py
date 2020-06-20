@@ -1,5 +1,5 @@
 from design_type.connection.connection import Connection
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, Section
+from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection
 from Common import *
 from utils.common.load import Load
 from utils.common.material import Material
@@ -58,7 +58,7 @@ class MomentConnection(Connection, IS800_2007):
         else:
             designation = str(input_dictionary[KEY_SECSIZE])
             material_grade = str(input_dictionary[KEY_MATERIAL])
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             source = str(I_sec_attributes.source)
@@ -223,7 +223,7 @@ class MomentConnection(Connection, IS800_2007):
         fy = ''
         if material_grade != "Select Material" and designation != "Select Section":
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             fu = str(I_sec_attributes.fu)
             fy = str(I_sec_attributes.fy)

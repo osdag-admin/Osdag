@@ -7,7 +7,7 @@ from Common import *
 from utils.common.load import Load
 from design_type.member import Member
 import logging
-
+from utils.common.Section_Properties_Calculator import *
 from design_type.main import Main
 
 

@@ -1102,23 +1102,24 @@ class Ui_OsdagSectionModeller(object):
                         # Cz=Yleft
                         from utils.common.Section_Properties_Calculator import BBAngle_Properties
                         designation = self.SectionParameters.parameterText_1.currentText()
+                        spacing = float(self.SectionParameters.parameterText_7.text())
                         BBAngle_attributes = BBAngle_Properties()
                         BBAngle_attributes.data(designation)
                         A = BBAngle_attributes.calc_Area()
                         Izz = BBAngle_attributes.calc_MomentOfAreaZ()
-                        Iyy = BBAngle_attributes.calc_MomentOfAreaY(b=BBAngle_attributes.Angle_attributes.b)
+                        Iyy = BBAngle_attributes.calc_MomentOfAreaY(thickness=spacing)
                         Iu = "N/A"
                         Iv = "N/A"
                         Rzz = str(BBAngle_attributes.calc_RogZ())
-                        Ryy = str(BBAngle_attributes.calc_RogY())
+                        Ryy = str(BBAngle_attributes.calc_RogY(thickness=spacing))
                         Ru = "N/A"
                         Rv = "N/A"
                         Cy = BBAngle_attributes.calc_Cy()
                         Cz = BBAngle_attributes.calc_Cz()
                         Zzz = str(BBAngle_attributes.calc_ElasticModulusZz())
-                        Zyy = str(BBAngle_attributes.calc_ElasticModulusZy(b=BBAngle_attributes.Angle_attributes.b))
+                        Zyy = str(BBAngle_attributes.calc_ElasticModulusZy(thickness=spacing))
                         Zpz= str(BBAngle_attributes.calc_PlasticModulusZpz())
-                        Zpy = str(BBAngle_attributes.calc_PlasticModulusZpy(b=BBAngle_attributes.Angle_attributes.b))
+                        Zpy = str(BBAngle_attributes.calc_PlasticModulusZpy(thickness=spacing))
                         It = str(BBAngle_attributes.calc_TorsionConstantIt())
                         self.C_text_1.setText(str(Cy))
                         self.C_text_2.setText(str(Cz))
@@ -1131,8 +1132,8 @@ class Ui_OsdagSectionModeller(object):
                         self.RG_text_2.setText(str(Ryy))
                         self.ESM_text_1.setText(str(Zzz))
                         self.ESM_text_2.setText(str(Zyy))
-                        self.PSM_text_1.setText(str(Zpz))
-                        self.PSM_text_2.setText(str(Zpy))
+                        self.PSM_text_1.setText(str(Zpy))
+                        self.PSM_text_2.setText(str(Zpz))
                 elif(index_template==4):
                         cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         a,b = cursor.fetchall()[0]
@@ -1422,7 +1423,7 @@ class Ui_OsdagSectionModeller(object):
                 self.MI_text_2.setText(str(Iyy))
                 self.RG_text_1.setText(str(Rzz))
                 self.RG_text_2.setText(str(Ryy))
-                self.ESM_text_1.setText(str(Zzy))
+                self.ESM_text_1.setText(str(Zzz))
                 self.ESM_text_2.setText(str(Zzz))
 
 

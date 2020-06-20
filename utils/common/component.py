@@ -1538,19 +1538,10 @@ class Channel(Material):
         self.rad_of_gy_y = row[15] * 10
         self.elast_sec_mod_z = row[16] * 1000
         self.elast_sec_mod_y = row[17] * 1000
-        try:
-            self.plast_sec_mod_z = row[18] * 1000
-            self.plast_sec_mod_y = row[19] * 1000
-        except:
-            self.plast_sec_mod_z = self.elast_sec_mod_z
-            self.plast_sec_mod_y = self.elast_sec_mod_y
-        from utils.common.Section_Properties_Calculator import Single_Channel_Properties
-        self.It = Single_Channel_Properties().calc_TorsionConstantIt(self.depth, self.flange_width,
-                                                                    self.web_thickness, self.flange_thickness) * 10 ** 4 \
-            if row[20] is None else row[20] * 10 ** 4
-        self.Iw = Single_Channel_Properties().calc_WarpingConstantIw(self.depth, self.flange_width,
-                                                                    self.web_thickness, self.flange_thickness) * 10 ** 6 \
-            if row[21] is None else row[21] * 10 ** 6
+        self.plast_sec_mod_z = row[18] * 1000
+        self.plast_sec_mod_y = row[19] * 1000
+        self.It = row[20] * 10 ** 4
+        self.Iw =  row[21] * 10 ** 6
         self.source = row[22]
         self.type = 'Rolled' if row[23] is None else row[23]
 
@@ -1799,10 +1790,7 @@ class Angle(Material):
         self.elast_sec_mod_y = row[21] * 1000
         self.plast_sec_mod_z = row[22] * 1000
         self.plast_sec_mod_y = row[23] * 1000
-        from utils.common.Section_Properties_Calculator import Single_Angle_Properties
-        self.It = Single_Angle_Properties().calc_TorsionConstantIt(self.leg_a_length, self.leg_b_length,
-                                                                   self.thickness) * 10 ** 4 \
-            if row[24] is None else row[24] * 10 ** 4
+        self.It = row[24] * 10 ** 4
         self.source = row[25]
         self.type = 'Rolled' if row[26] is None else row[26]
 

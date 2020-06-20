@@ -5,7 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 from Common import *
-from utils.common.component import Section,I_sectional_Properties
+from utils.common.Section_Properties_Calculator import *
 from utils.common.component import *
 from utils.common.other_standards import *
 from design_type.connection.fin_plate_connection import FinPlateConnection

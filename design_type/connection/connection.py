@@ -1,4 +1,5 @@
-from utils.common.component import Section,I_sectional_Properties, Material, Beam
+from utils.common.component import ISection, Material, Beam
+from utils.common.Section_Properties_Calculator import I_sectional_Properties
 from design_type.main import Main
 from Common import *
 import numpy as np
@@ -48,9 +49,7 @@ class Connection(Main):
         else:
             designation = str(input_dictionary[KEY_SUPTNGSEC])
             material_grade = str(input_dictionary[KEY_MATERIAL])
-            I_sec_attributes = Section(designation, material_grade)
-            table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            Section.connect_to_database_update_other_attributes(I_sec_attributes, table, designation,material_grade)
+            I_sec_attributes = ISection(designation, material_grade)
             source = str(I_sec_attributes.source)
             fu = str(I_sec_attributes.fu)
             fy = str(I_sec_attributes.fy)
@@ -240,7 +239,7 @@ class Connection(Main):
         else:
             designation = str(input_dictionary[KEY_SUPTDSEC])
             material_grade = str(input_dictionary[KEY_MATERIAL])
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
 
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation,material_grade)
@@ -403,7 +402,7 @@ class Connection(Main):
         fy = ''
         if material_grade != "Select Material" and designation != "Select Section":
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             fu = str(I_sec_attributes.fu)
             fy = str(I_sec_attributes.fy)
@@ -422,7 +421,7 @@ class Connection(Main):
         fy = ''
         if material_grade != "Select Material" and designation != "Select Section":
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             fu = str(I_sec_attributes.fu)
             fy = str(I_sec_attributes.fy)
@@ -646,15 +645,7 @@ class Connection(Main):
         return information
 
 
-    def call_3DModel(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Model':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Model", bgcolor)
+
 
     def call_3DColumn(self, ui, bgcolor):
         from PyQt5.QtWidgets import QCheckBox

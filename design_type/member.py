@@ -1,12 +1,13 @@
 from Common import *
 from utils.common.load import Load
 from utils.common.component import *
+from utils.common.Section_Properties_Calculator import *
 from design_type.main import Main
 
 class Member(Main):
 
     def __init__(self):
-        pass
+        super(Member, self).__init__()
 
     ########################################
     # Design Preference Functions Start
@@ -76,7 +77,6 @@ class Member(Main):
             section_profile = str(input_dictionary[KEY_SEC_PROFILE])
             l = str(input_dictionary[KEY_LOCATION])
             Angle_attributes = Angle(designation,material_grade)
-            Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
             source = str(Angle_attributes.source)
             fu = str(Angle_attributes.fu)
             fy = str(Angle_attributes.fy)
@@ -138,20 +138,20 @@ class Member(Main):
                     area = str(Angle_attributes.calc_Area(a, b, thickness, l))
                     mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
                     mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
-                    mom_inertia_u = "N/A"
-                    mom_inertia_v = "N/A"
+                    mom_inertia_u = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                    mom_inertia_v = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
                     rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
                     rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
-                    rad_of_gy_u = "N/A"
-                    rad_of_gy_v = "N/A"
+                    rad_of_gy_u = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                    rad_of_gy_v = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
                     elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l, plate_thk))
                     elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
                     plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
                     plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
                     torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
-                elif section_profile == "Star Angles":
+                else:  # "Star Angles":
                     Angle_attributes = SAngle_Properties()
-                    Angle_attributes.data(designation, material_grade)
+                    # Angle_attributes.data(designation, material_grade)
                     if l == "Long Leg":
                         if a == b:
                             image = VALUES_IMG_TENSIONBOLTED_DF01[3]
@@ -384,7 +384,6 @@ class Member(Main):
             section_profile = str(input_dictionary[KEY_SEC_PROFILE])
             l = str(input_dictionary[KEY_LOCATION])
             Channel_attributes = Channel(designation,material_grade)
-            Channel_attributes.connect_to_database_update_other_attributes_channels(designation, material_grade)
             source = str(Channel_attributes.source)
             fu = str(Channel_attributes.fu)
             fy = str(Channel_attributes.fy)
@@ -437,7 +436,7 @@ class Member(Main):
                     image = VALUES_IMG_TENSIONBOLTED_DF03[2]
                 else:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[3]
-                It = str(Channel_attributes.calc_torsion_const_It(f_w, f_t, w_h, w_t))
+                It = str(Channel_attributes.calc_TorsionConstantIt(f_w, f_t, w_h, w_t))
                 Iw = "N/A"
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
@@ -601,14 +600,12 @@ class Member(Main):
 
     def get_new_angle_section_properties(self):
 
-        print(self[2],'vvvvv')
         designation = self[0]
         material_grade = self[1]
         l = self[2][KEY_LOCATION]
         section_profile = self[2][KEY_SEC_PROFILE]
         plate_thk = float(self[2][KEY_PLATETHK][0])
         Angle_attributes = Angle(designation, material_grade)
-        Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
         source = str(Angle_attributes.source)
         fu = str(Angle_attributes.fu)
         fy = str(Angle_attributes.fy)
@@ -669,20 +666,20 @@ class Member(Main):
 
                 mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
                 mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
-                mom_inertia_u = "N/A"
-                mom_inertia_v = "N/A"
+                mom_inertia_u = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                mom_inertia_v = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
                 rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
                 rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
-                rad_of_gy_u = "N/A"
-                rad_of_gy_v = "N/A"
+                rad_of_gy_u = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                rad_of_gy_v = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
                 elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l, plate_thk))
                 elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
                 plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
                 plast_sec_mod_y = str(Angle_attributes.calc_PlasticModulusZpy(a, b, thickness, l, plate_thk))
                 torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
-            elif section_profile == "Star Angles":
+            else:  #  "Star Angles":
                 Angle_attributes = SAngle_Properties()
-                Angle_attributes.data(designation, material_grade)
+                # Angle_attributes.data(designation, material_grade)
                 if l == "Long Leg":
                     if a == b:
                         image = VALUES_IMG_TENSIONBOLTED_DF01[3]
@@ -746,7 +743,6 @@ class Member(Main):
         }
         return d
 
-
     def get_new_channel_section_properties(self):
         designation = self[0]
         material_grade = self[1]
@@ -755,8 +751,6 @@ class Member(Main):
         section_profile = self[2][KEY_SEC_PROFILE]
         plate_thk = float(self[2][KEY_PLATETHK][0])
         Channel_attributes = Channel(designation, material_grade)
-        Channel_attributes.connect_to_database_update_other_attributes_channels(designation, material_grade)
-
         source = str(Channel_attributes.source)
         Type = str(Channel_attributes.type)
         fu = str(Channel_attributes.fu)
@@ -811,7 +805,7 @@ class Member(Main):
                 image = VALUES_IMG_TENSIONBOLTED_DF03[2]
             else:
                 image = VALUES_IMG_TENSIONBOLTED_DF03[3]
-            It = str(Channel_attributes.calc_torsion_const_It(f_w, f_t, w_h, w_t))
+            It = str(Channel_attributes.calc_TorsionConstantIt(f_w, f_t, w_h, w_t))
             Iw = "N/A"
 
         d = {
@@ -910,12 +904,12 @@ class Member(Main):
                     Cy = "N/A"
                 moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l,plate_thk)
                 moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l,plate_thk)
-                moa_u = "N/A"
-                moa_v = "N/A"
+                moa_u = sec_prop.calc_MomentOfAreaY(a, b, t, l,plate_thk)
+                moa_v = sec_prop.calc_MomentOfAreaZ(a, b, t, l,plate_thk)
                 rog_z = sec_prop.calc_RogZ(a, b, t, l, plate_thk)
                 rog_y = sec_prop.calc_RogY(a, b, t, l, plate_thk)
-                rog_u = "N/A"
-                rog_v = "N/A"
+                rog_u = sec_prop.calc_RogY(a, b, t, l, plate_thk)
+                rog_v = sec_prop.calc_RogZ(a, b, t, l, plate_thk)
                 em_z = sec_prop.calc_ElasticModulusZz(a, b, t, l,plate_thk)
                 em_y = sec_prop.calc_ElasticModulusZy(a, b, t, l,plate_thk)
                 pm_z = sec_prop.calc_PlasticModulusZpz(a, b, t, l,plate_thk)
@@ -1029,7 +1023,7 @@ class Member(Main):
                 em_y = sec_prop.calc_ElasticModulusZy(f_w, f_t, w_h, w_t)
                 pm_z = sec_prop.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t)
                 pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t)
-                It = sec_prop.calc_torsion_const_It(f_w, f_t, w_h, w_t)
+                It = sec_prop.calc_TorsionConstantIt(f_w, f_t, w_h, w_t)
                 Iw = 0
                 if sl != 90:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[0]
@@ -1052,7 +1046,7 @@ class Member(Main):
                 pm_z = sec_prop.calc_PlasticModulusZpz(f_w, f_t, w_h, w_t, plate_thk)
                 pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t, plate_thk)
 
-                It = sec_prop.calc_torsion_const_It(f_w, f_t, w_h, w_t)
+                It = sec_prop.calc_TorsionConstantIt(f_w, f_t, w_h, w_t)
                 Iw = 0
                 if sl != 90:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[2]
@@ -1077,6 +1071,7 @@ class Member(Main):
              }
 
         return d
+
     def get_fu_fy_section(self):
         material_grade = self[0]
         designation = self[2][KEY_SECSIZE_SELECTED]
@@ -1096,13 +1091,13 @@ class Member(Main):
                 fy = str(Channel_Attributes.fy)
             elif profile in ['Beams']:
                 table = "Beams"
-                I_sec_attributes = Section(designation)
+                I_sec_attributes = ISection(designation)
                 I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
                 fu = str(I_sec_attributes.fu)
                 fy = str(I_sec_attributes.fy)
             else:
                 table = "Columns"
-                I_sec_attributes = Section(designation)
+                I_sec_attributes = ISection(designation)
                 I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
                 fu = str(I_sec_attributes.fu)
                 fy = str(I_sec_attributes.fy)
@@ -1315,4 +1310,41 @@ class Member(Main):
             return True
         else:
             return False
+
+    ######################################
+    # Function for individual component calls in 3D view
+    ######################################
+    def get_3d_components(self):
+        components = []
+
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t1 = ('Member', self.call_3DMember)
+        components.append(t1)
+
+        t2 = ('Plate', self.call_3DPlate)
+        components.append(t2)
+
+        return components
+
+    def call_3DPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Plate", bgcolor)
+
+    def call_3DMember(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Member':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Member", bgcolor)
 

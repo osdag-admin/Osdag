@@ -97,6 +97,9 @@ def connectdb(table_name, call_type="dropdown"):
     elif table_name == "SHS":
         cursor = conn.execute("SELECT Designation FROM SHS")
 
+    elif table_name == "CHS":
+        cursor = conn.execute("SELECT Designation FROM CHS")
+
     else:
         cursor = conn.execute("SELECT Designation FROM Columns")
     rows = cursor.fetchall()

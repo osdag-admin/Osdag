@@ -1,6 +1,6 @@
 from builtins import str
 import time
-from pylatex import Document, Section,Figure,Head,Foot,NewPage,Command,NoEscape,Tabularx,PageStyle,Package,simple_page_number
+from pylatex import Document, Section,Figure,Head,Foot,NewPage,Command,NoEscape,Tabularx,PageStyle,Package
 from pylatex.utils import bold
 import sys
 import datetime
@@ -35,7 +35,7 @@ class CreateLatex(Document):
                 table.add_hline()
         # Create right footer
         with header.create(Foot("R")):
-            header.append(simple_page_number())
+            header.append(NoEscape(r'Page \thepage'))
         
         geometry_options = {"top": "1.2in", "bottom": "1in", "left": "0.6in", "right": "0.6in", "headsep": "0.8in"}
         doc = Document(geometry_options=geometry_options, indent=False)
@@ -82,4 +82,16 @@ class CreateLatex(Document):
                             table.add_hline()
                             table.add_row((sub_ppty,reportsummary['Section Properties'][ppty][sub_ppty]))
                 table.add_hline()
+        doc.append(NewPage())
+
+
+        if (not 'TRAVIS' in os.environ):
+            with doc.create(Section('3D View')):
+                with doc.create(Figure(position='h!')) as view_3D:
+                    view_3dimg_path = rel_path + Disp_3d_image
+                    # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
+                    view_3D.add_image(filename=view_3dimg_path)
+
+                    view_3D.add_caption('3D View')
+            
         doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)

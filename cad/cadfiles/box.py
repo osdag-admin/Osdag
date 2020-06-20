@@ -1,7 +1,7 @@
 import numpy
 from cad.items.ModelUtils import *
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from cad.items.angle_new import Angle
+from cad.items.angle import Angle
 from cad.items.plate import Plate
 
 class Box(object):

@@ -710,6 +710,7 @@ class HollowSection(Section):
         self.depth = row[2]  # mm
         self.flange_width = row[3]  # mm (width is referred as flange width)
         self.flange_thickness = row[4]  # mm (thickness of the section is referred as flange thickness)
+        self.web_thickness = self.flange_thickness
         self.mom_inertia_z = row[7] * 10000  # mm^4
         self.mom_inertia_y = row[8] * 10000  # mm^4
         self.rad_of_gy_z = row[9] * 10  # mm
@@ -718,6 +719,8 @@ class HollowSection(Section):
         self.elast_sec_mod_y = row[12] * 1000  # mm^3
         self.plast_sec_mod_z = row[13] * 1000  # mm^3
         self.plast_sec_mod_y = row[14] * 1000  # mm^3
+        self.root_radius = 0
+        self.toe_radius = 0
         self.source = row[15]  # IS 4923:1997
 
         conn.close()
@@ -757,10 +760,13 @@ class CHS(Section):
         self.nominal_bore = row[2]  # mm
         self.out_diameter = row[3]  # mm
         self.flange_thickness = row[4]  # mm, thickness of the CHS is referred as flange thickness
+        self.web_thickness = self.flange_thickness
         self.internal_vol = row[7]  # cm^3/m
         self.mom_inertia = row[10]  # cm^4/m
         self.elast_sec_mod = row[11] * 1000  # mm^3
         self.rad_of_gy = row[12] * 10  # mm
+        self.root_radius = 0
+        self.toe_radius = 0
         self.source = row[14]  # IS 1161:2014
 
         conn.close()

@@ -852,6 +852,7 @@ class Plate(Material):
                       bolt_capacity_red, "no. of bolts:", bolt_line * bolts_one_line, "height", web_plate_h)
                 self.design_status = True
 
+
             self.length = gap + end_dist * 2 + pitch * (bolt_line - 1)
             self.height = web_plate_h
             self.bolt_line = bolt_line
@@ -885,10 +886,10 @@ class Plate(Material):
         :return: web_plate_h, bolt_line, bolts_one_line, bolts_required, bolt_capacity_red, vres, moment_demand, \
                pitch, gauge, edge_dist, end_dist, a.min_edge_dist_round, a.min_pitch_round, a.max_spacing_round, a.max_edge_dist_round
         """
-
         # initialising values to start the loop
         res_force = math.sqrt(shear_load ** 2 + axial_load ** 2)
         bolts_required = max(int(math.ceil(res_force / bolt_capacity)), 2)
+
 
         [bolt_line, bolts_one_line, flange_plate_h] = self.get_flange_plate_l_bolts_one_line(flange_plate_h_max,
                                                                                              flange_plate_h_min,
@@ -1471,42 +1472,6 @@ class Column(ISection):
         clear_depth = self.depth - 2 * self.flange_thickness - 2 * self.root_radius
         return clear_depth
 
-
-class SHS(Material):
-
-    def __init__(self, designation, material_grade):
-        super(SHS, self).__init__(designation, material_grade)
-        self.connect_to_database_update_other_attributes("SHS", designation, material_grade)
-
-    def connect_to_database_update_other_attributes(self, table, designation, material_grade=""):
-        conn = sqlite3.connect(PATH_TO_DATABASE)
-        db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
-        cur = conn.cursor()
-        cur.execute(db_query, (designation,))
-        row = cur.fetchone()
-        #TODO: Update attributes of SHS
-        self.mass = row[2]
-        self.area = row[3] * 100
-
-
-class RHS(Material):
-
-    def __init__(self, designation, material_grade):
-        super(RHS, self).__init__(designation, material_grade)
-
-        self.connect_to_database_update_other_attributes("RHS", designation, material_grade)
-
-    def connect_to_database_update_other_attributes(self, table, designation, material_grade=""):
-        conn = sqlite3.connect(PATH_TO_DATABASE)
-        db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
-        cur = conn.cursor()
-        cur.execute(db_query, (designation,))
-        row = cur.fetchone()
-        #TODO: Update attributes of RHS
-        self.mass = row[2]
-        self.area = row[3] * 100
-
-
 class Channel(Material):
 
     def __init__(self, designation, material_grade):
@@ -2019,3 +1984,72 @@ class Angle(Material):
         repr += "Designation: {}\n".format(self.designation)
         repr += "rad: {}\n".format(self.rad_of_gy_z)
         return repr
+
+
+class HollowSection(Material):
+
+    def __init__(self, designation, material_grade,table):
+        self.connect_to_database_update_other_attributes(table, designation, material_grade)
+        super(HollowSection, self).__init__(designation, material_grade)
+
+    def connect_to_database_update_other_attributes(self, table, designation, material_grade=""):
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        db_query = "SELECT * FROM " + table + " WHERE Designation = ?"
+        cur = conn.cursor()
+        cur.execute(db_query, (designation,))
+        row = cur.fetchone()
+        self.mass = row[5]  # kg/m
+        self.area = row[6] * 100  # mm^2
+        self.depth = row[2]  # mm
+        self.flange_width = row[3]  # mm (width is referred as flange width)
+        self.flange_thickness = row[4]  # mm (thickness of the section is referred as flange thickness)
+        super(HollowSection, self).__init__(material_grade, self.flange_thickness)
+        self.mom_inertia_z = row[7] * 10000  # mm^4
+        self.mom_inertia_y = row[8] * 10000  # mm^4
+        self.rad_of_gy_z = row[9] * 10  # mm
+        self.rad_of_gy_y = row[10] * 10  # mm
+        self.elast_sec_mod_z = row[11] * 1000  # mm^3
+        self.elast_sec_mod_y = row[12] * 1000  # mm^3
+        self.plast_sec_mod_z = row[13] * 1000  # mm^3
+        self.plast_sec_mod_y = row[14] * 1000  # mm^3
+        self.source = row[15]  # IS 4923:1997
+
+        conn.close()
+
+
+class SHS(HollowSection):
+
+    def __init__(self, designation, material_grade):
+        super(SHS, self).__init__(designation, material_grade,"SHS")
+
+
+class RHS(HollowSection):
+
+    def __init__(self, designation, material_grade):
+        super(RHS, self).__init__(designation, material_grade,"RHS")
+
+
+class CHS(Material):
+
+    def __init__(self, designation, material_grade):
+        self.connect_to_database_update_other_attributes(designation, material_grade)
+
+    def connect_to_database_update_other_attributes(self, designation, material_grade=""):
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        db_query = "SELECT * FROM CHS WHERE Designation = ?"
+        cur = conn.cursor()
+        cur.execute(db_query, (designation,))
+        row = cur.fetchone()
+        self.mass = row[5]  # kg/m
+        self.area = row[6] * 100  # mm^2
+        self.nominal_bore = row[2]  # mm
+        self.out_diameter = row[3]  # mm
+        self.flange_thickness = row[4]  # mm, thickness of the CHS is referred as flange thickness
+        super(CHS, self).__init__(material_grade, self.flange_thickness)
+        self.internal_vol = row[7]  # cm^3/m
+        self.mom_inertia = row[10]  # cm^4/m
+        self.elast_sec_mod = row[11] * 1000  # mm^3
+        self.rad_of_gy = row[12] * 10  # mm
+        self.source = row[14]  # IS 1161:2014
+
+        conn.close()

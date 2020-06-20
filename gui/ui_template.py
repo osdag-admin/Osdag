@@ -2194,7 +2194,7 @@ class Window(QMainWindow):
         self.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag Fin Plate")
-        self.mytabWidget.resize(size[0], size[1])
+        #self.mytabWidget.resize(size[0], size[1])
         self.mytabWidget.addTab(self.modelTab, "")
 
         self.modelTab.InitDriver()
@@ -2479,9 +2479,23 @@ class Window(QMainWindow):
 
     def osdag_section_modeller(self):
         self.OsdagSectionModeller=Ui_OsdagSectionModeller()
-        dialog=QtWidgets.QDialog()
+        dialog = Dialog1()
         self.OsdagSectionModeller.setupUi(dialog)
-        dialog.exec()
+        dialog.dialogShown.connect(self.set_dialog_size(dialog))
+        dialog.exec_()
+
+    def set_dialog_size(self,dialog):
+        def set_size():
+            dialog.resize(900,900) 
+            self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)  
+            self.OsdagSectionModeller.OCCWindow.setFocus()
+        return set_size
+
+class Dialog1(QtWidgets.QDialog):
+    dialogShown = QtCore.pyqtSignal()
+    def showEvent(self, event):
+        super(Dialog1, self).showEvent(event)
+        self.dialogShown.emit()
 
 from . import icons_rc
 if __name__ == '__main__':

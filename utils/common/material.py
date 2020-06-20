@@ -38,19 +38,20 @@ class Material(object):
         cur = conn.cursor()
         cur.execute(db_query,(grade,))
         row = cur.fetchone()
-        self.fy_20 = row[1]
-        self.fy_20_40 = row[2]
-        self.fy_40 = row[3]
-        if thickness != '':
-            if thickness <= 20:
-                self.fy = self.fy_20
-            elif 20 < thickness <=40:
-                self.fy = self.fy_20_40
+        if row:
+            self.fy_20 = row[1]
+            self.fy_20_40 = row[2]
+            self.fy_40 = row[3]
+            if thickness != '':
+                if thickness <= 20:
+                    self.fy = self.fy_20
+                elif 20 < thickness <=40:
+                    self.fy = self.fy_20_40
+                else:
+                    self.fy = self.fy_40
             else:
-                self.fy = self.fy_40
-        else:
-            self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
-        self.fu = row[4]
+                self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
+            self.fu = row[4]
         conn.close()
 
     # def tension_member_yielding(self, A_g, F_y):

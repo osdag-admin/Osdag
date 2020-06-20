@@ -1,5 +1,6 @@
 from design_type.connection.connection import Connection
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, Section, Single_Angle_Properties
+from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection
+from utils.common.Section_Properties_Calculator import Single_Angle_Properties
 from Common import *
 from utils.common.load import Load
 from utils.common.material import Material

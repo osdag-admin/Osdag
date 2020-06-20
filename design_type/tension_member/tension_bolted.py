@@ -6,7 +6,7 @@ from utils.common.component import *
 from utils.common.material import *
 from Report_functions import *
 from utils.common.load import Load
-
+from utils.common.Section_Properties_Calculator import *
 
 import logging
 

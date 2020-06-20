@@ -37,8 +37,8 @@ import cairosvg
 
 
 from Common import *
-from utils.common.component import Section,I_sectional_Properties
 from utils.common.component import *
+from utils.common.Section_Properties_Calculator import *
 from .customized_popup import Ui_Popup
 # from .ui_summary_popup import Ui_Dialog1
 from .ui_design_preferences import Ui_Dialog

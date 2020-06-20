@@ -6,33 +6,29 @@ from cad.cadfiles.anglebar import Angle
 from cad.items.plate import Plate
 
 class StarAngleSame(object):
-    def __init__(self, L, A, B, T, t, W=None, R1=0, R2=0):
-        self.L = L
-        self.A = A
-        self.B = B
-        self.T = T
+    def __init__(self, a, b, t, l, t1, H):
+        self.l = l
+        self.a = a
+        self.b = b
         self.t = t
-        if W is None:
-            self.W = 2*B
-        else:
-            self.W = W
-        self.R1 = R1
-        self.R2 = R2
+        self.t1 = t1
+        self.H = H
+
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
         self.vDir = self.wDir * self.uDir
-        self.angle1 = Angle(L, A, B, T, R1, R2)
-        self.angle2 = Angle(L, A, B, T, R1, R2)
-        self.plate1 = Plate(self.W, L, t)
+        self.angle1 = Angle(H, a, b, t, 0, 0)
+        self.angle2 = Angle(H, b, a, t, 0, 0)
+        self.plate1 = Plate(l, H, t1)
 
     def place(self, secOrigin, uDir, wDir):
         self.sec_origin = secOrigin
         self.uDir = uDir
         self.wDir = wDir
-        origin1 = numpy.array([self.t/2., 0., 0.])
+        origin1 = numpy.array([self.t1/2., 0., 0.])
         self.angle1.place(origin1, self.uDir, self.wDir)
-        origin2 = numpy.array([0., self.t/2., 0])
+        origin2 = numpy.array([0., self.t1/2., 0])
         self.angle2.place(origin2, self.uDir, self.wDir)
         self.plate1.place(self.sec_origin, self.uDir, self.wDir)
 
@@ -68,20 +64,19 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    L = 50
-    A = 15
-    B = 15
-    T = 2
-    R1 = 8
-    R2 = 5
-    W = 40
+
+    a = 15
+    b = 15
+    l = 2*a
     t = 2
+    t1 = 2
+    H = 50
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
     wDir = numpy.array([0.,0.,1.])
 
-    star_angle_same = StarAngleSame(L, A, B, T, t)
+    star_angle_same = StarAngleSame(a, b, t, l, t1, H)
     _place = star_angle_same.place(origin, uDir, wDir)
     point = star_angle_same.compute_params()
     prism = star_angle_same.create_model()

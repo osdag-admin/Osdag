@@ -1,21 +1,20 @@
 
 import numpy
 from cad.items.ModelUtils import *
-from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 
 class TISection(object):
    
 
-    def __init__(self, B, T, D, t, d, b, length):
+    def __init__(self, D, B, T, t, P, Q, H):
         self.B = B
         self.T = T
         self.D = D
         self.t = t
-        self.d = d
-        self.b = b
-        self.length = length
-        self.clearDist = 20
+        self.d = P
+        self.b = Q
+        self.length = H
+        
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
@@ -76,15 +75,15 @@ if __name__ == '__main__':
     T = 3
     D = 50
     t = 2
-    d = 8
-    b = 4
-    length = 100
+    P = 8
+    Q = 4
+    H = 100
     
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])
 
-    TISec = TISection(B, T, D, t, d, b, length)
+    TISec = TISection(D, B, T, t, P, Q, H)
     _place = TISec.place(origin, uDir, shaftDir)
     point = TISec.compute_params()
     prism = TISec.create_model()

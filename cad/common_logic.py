@@ -48,6 +48,10 @@ from cad.BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 from cad.MomentConnections.BBSpliceCoverlateCAD.WeldedCAD import BBSpliceCoverPlateWeldedCAD
 
 from cad.MomentConnections.CCSpliceCoverPlateCAD.WeldedCAD import CCSpliceCoverPlateWeldedCAD
+from cad.MomentConnections.CCSpliceCoverPlateCAD.BoltedCAD import CCSpliceCoverPlateBoltedCAD
+from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_AF import NutBoltArray_AF as CCSpliceNutBolt_AF
+from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_BF import NutBoltArray_BF as CCSpliceNutBolt_BF
+from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_Web import NutBoltArray_Web as CCSpliceNutBolt_Web
 
 from cad.BasePlateCad.baseplateconnection import BasePlateCad
 from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
@@ -55,10 +59,10 @@ from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
 from cad.Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
 from cad.Tension.BoltedCAD import TensionAngleBoltCAD, TensionChannelBoltCAD
 from cad.Tension.nutBoltPlacement import NutBoltArray as TNutBoltArray
+from cad.Tension.intermittentConnections import IntermittentNutBoltPlateArray, IntermittentWelds
 
 from cad.MomentConnections.CCEndPlateCAD.CAD import CCEndPlateCAD
 from cad.MomentConnections.CCEndPlateCAD.nutBoltPlacement import NutBoltArray as CEPNutBoltArray
-# from cad.Tension.intermittentConnections import IntermittentNutBoltPlateArray, IntermittentWelds
 
 # from design_type.connection.fin_plate_connection import FinPlateConnection
 # from design_type.connection.cleat_angle_connection import CleatAngleConnection
@@ -718,7 +722,7 @@ class CommonDesignLogic(object):
             beam_R1 = float(B.section.root_radius)
             beam_R2 = float(B.section.toe_radius)
             beam_alpha = float(B.section.flange_slope)
-            beam_length = 800.0
+            beam_length = B.flange_plate.length/2+300
 
             beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
                                  R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
@@ -826,7 +830,56 @@ class CommonDesignLogic(object):
     def createCCCoverPlateCAD(self):
 
         if self.connection == KEY_DISP_COLUMNCOVERPLATE:
-            pass
+            C = self.module_class()
+            columnLenght = (max(float(C.flange_plate.length), float(C.web_plate.length)) + 600) / 2
+            # column = ISection(B=206.4, T=17.3, D=215.8, t=10, R1=15, R2=75, alpha=94, length=1000, notchObj=None)
+            # flangePlate = Plate(L=240, W=203.6, T=10)
+            # innerFlangePlate = Plate(L=240, W=85, T=10)
+            # webPlate = Plate(L=600, W=120, T=8)
+            # gap = 10
+            column = ISection(B=float(C.section.flange_width), T=float(C.section.flange_thickness),
+                              D=float(C.section.depth), t=float(C.section.web_thickness),
+                              R1=float(C.section.root_radius),
+                              R2=float(C.section.toe_radius), alpha=float(C.section.flange_slope), length=columnLenght,
+                              notchObj=None)
+            flangePlate = Plate(L=float(C.flange_plate.length), W=float(C.flange_plate.height),
+                                T=float(C.flange_plate.thickness_provided))
+            innerFlangePlate = Plate(L=float(C.flange_plate.Innerlength), W=float(C.flange_plate.Innerheight),
+                                     T=float(C.flange_plate.thickness_provided))
+            webPlate = Plate(L=float(C.web_plate.length), W=float(C.web_plate.height),
+                             T=float(C.web_plate.thickness_provided))
+
+            bolt_d = float(C.bolt.bolt_diameter_provided)  # Bolt diameter (shank part), entered by user
+            bolt_r = bolt_d / 2  # Bolt radius (Shank part)
+            bolt_T = self.boltHeadThick_Calculation(bolt_d)  # Bolt head thickness
+            bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
+            bolt_Ht = self.boltLength_Calculation(bolt_d)  # Bolt head height
+
+            bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component directory
+            nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
+            nut_Ht = nut_T
+            nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+            if C.preference != 'Outside':
+                nut_space = 2 * flangePlate.T + column.T
+                nut_spaceW = 2 * webPlate.T + column.t
+            else:
+                nut_space = flangePlate.T + column.T
+                nut_spaceW = webPlate.T + column.t
+
+            numOfboltsF = C.flange_plate.bolts_required
+            numOfboltsW = C.web_plate.bolts_required
+
+            nut_bolt_array_AF = CCSpliceNutBolt_AF(C, nut, bolt, numOfboltsF, nut_space)
+            nut_bolt_array_BF = CCSpliceNutBolt_BF(C, nut, bolt, numOfboltsF, nut_space)
+            nut_bolt_array_Web = CCSpliceNutBolt_Web(C, nut, bolt, numOfboltsW, nut_spaceW)
+
+            ccCoverPlateCAD = CCSpliceCoverPlateBoltedCAD(C, column, flangePlate, innerFlangePlate, webPlate,
+                                                                nut_bolt_array_AF, nut_bolt_array_BF,
+                                                                nut_bolt_array_Web)
+
+            ccCoverPlateCAD.create_3DModel()
+
+
         elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
 
             C = self.module_class()
@@ -983,8 +1036,8 @@ class CommonDesignLogic(object):
 
             plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
                                 T=float(T.plate.thickness_provided), degree=30)
-            # intermittentPlates = Plate(L=float(T.inter_plate_length), W=float(T.inter_plate_height),
-            #                            T=float(T.plate.thickness_provided))
+            intermittentPlates = Plate(L=float(T.inter_plate_height), W=float(T.inter_plate_length), T=plate.T)
+
 
             if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
                 member = Channel(B=float(T.section_size_1.flange_width), T=float(T.section_size_1.flange_thickness),
@@ -996,9 +1049,9 @@ class CommonDesignLogic(object):
                 else:
                     nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
 
-                # inter_array = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlate, nut_space)
+                intermittentConnection = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlates, nut_space)
                 nut_bolt_array = TNutBoltArray(T, nut, bolt, nut_space)
-                tensionCAD = TensionChannelBoltCAD(T, member, plate, nut_bolt_array)
+                tensionCAD = TensionChannelBoltCAD(T, member, plate, nut_bolt_array, intermittentConnection)
 
             else:
                 member = Angle(L=float(T.length), A=float(T.section_size_1.max_leg), B=float(T.section_size_1.min_leg),
@@ -1009,20 +1062,18 @@ class CommonDesignLogic(object):
                 else:
                     nut_space = member.T + plate.T + nut.T
 
-                # inter_array = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlates, nut_space)
+                intermittentConnection = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlates, nut_space)
                 nut_bolt_array = TNutBoltArray(T, nut, bolt, nut_space)
-                tensionCAD = TensionAngleBoltCAD(T, member, plate, nut_bolt_array)
+                tensionCAD = TensionAngleBoltCAD(T, member, plate, nut_bolt_array, intermittentConnection)
 
         else:
             plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
                                 T=float(T.plate.thickness_provided), degree=30)
-            # intermittentPlates = Plate(L=float(T.inter_plate_length), W=float(T.inter_plate_height),
-            #                            T=float(T.plate.thickness_provided))
-            #
-            # # intermittentWelds = FilletWeld(h=float(T.inter_weld_size), b=float(T.inter_weld_size),
-            # #                                L=intermittentPlates.W)
-            # intermittentWelds = FilletWeld(h= 5, b= 5,
-            #                                L=intermittentPlates.W)
+
+            intermittentPlates = Plate(L=float(T.inter_plate_height), W=float(T.inter_plate_length), T=plate.T)
+            intermittentWelds = FilletWeld(h=float(T.inter_weld_size), b=float(T.inter_weld_size), L=intermittentPlates.W)
+            weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
+
             s = max(15, float(T.weld.size))
             plate_intercept = plate.L - s - 50
             if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
@@ -1033,8 +1084,8 @@ class CommonDesignLogic(object):
                 inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
                 opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.D))
 
-                # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
-                tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld, opline_weld)
+
+                tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
 
             else:
                 member = Angle(L=float(T.length), A=float(T.section_size_1.max_leg), B=float(T.section_size_1.min_leg),
@@ -1047,7 +1098,7 @@ class CommonDesignLogic(object):
                     opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
 
                 # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
-                tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld, opline_weld)
+                tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
 
         tensionCAD.create_3DModel()
 
@@ -1157,7 +1208,7 @@ class CommonDesignLogic(object):
                 self.CPObj = self.createBBCoverPlateCAD()  # CPBoltedObj is an object which gets all the calculated values of CAD models
                 if self.component == "Beam":
                     # Displays both beams
-                    osdag_display_shape(self.display, self.CPObj.get_beamsModel(), update=True)
+                    osdag_display_shape(self.display, self.CPObj.get_only_beams_Models(), update=True)
 
                 elif self.component == "Connector":
                     osdag_display_shape(self.display, self.CPObj.get_flangewebplatesModel(), update=True,
@@ -1202,7 +1253,24 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, welds, update=True, color='Red')
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE:
-                pass
+                self.C = self.module_class()
+                self.CPObj = self.createCCCoverPlateCAD()
+                columns = self.CPObj.get_column_models()
+                plates = self.CPObj.get_plate_models()
+                nutbolt = self.CPObj.get_nut_bolt_models()
+                onlycolumn = self.CPObj.get_only_column_models()
+
+                if self.component == "Column":
+                    # Displays both beams
+                    osdag_display_shape(self.display, onlycolumn, update=True)
+                elif self.component == "Cover Plate":
+                    osdag_display_shape(self.display, plates, update=True, color='Blue')
+                    osdag_display_shape(self.display, nutbolt, update=True, color='YELLOW')
+                elif self.component == "Model":
+                    osdag_display_shape(self.display, columns, update=True)
+                    osdag_display_shape(self.display, plates, update=True, color='Blue')
+                    osdag_display_shape(self.display, nutbolt, update=True, color='YELLOW')
+
             elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
                 self.C = self.module_class()
                 self.CPObj = self.createCCCoverPlateCAD()
@@ -1210,10 +1278,10 @@ class CommonDesignLogic(object):
                 plates = self.CPObj.get_plate_models()
                 welds = self.CPObj.get_welded_modules()
 
-                if self.component == "Beam":
+                if self.component == "Column":
                     # Displays both beams
                     osdag_display_shape(self.display, columns, update=True)
-                elif self.component == "Connector":
+                elif self.component == "Cover Plate":
                     osdag_display_shape(self.display, plates, update=True, color='Blue')
                     osdag_display_shape(self.display, welds, update=True, color='Red')
                 elif self.component == "Model":
@@ -1279,7 +1347,12 @@ class CommonDesignLogic(object):
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 nutbolt = self.TObj.get_nut_bolt_array_models()
-                if self.component == "Model":  # Todo: change this into key
+                if self.component == "Member":  # Todo: change this into key
+                    osdag_display_shape(self.display, member, update=True)
+                elif self.component == "Plate":
+                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
+                    osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
+                else:
                     osdag_display_shape(self.display, member, update=True)
                     osdag_display_shape(self.display, plate, color='BLUE', update=True)
                     osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
@@ -1296,10 +1369,16 @@ class CommonDesignLogic(object):
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 welds = self.TObj.get_welded_models()
-                if self.component == "Model":  # Todo: change this into key
+                if self.component == "Member":  # Todo: change this into key
+                    osdag_display_shape(self.display, member, update=True)
+                elif self.component == "Plate":
+                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
+                    osdag_display_shape(self.display, welds, color='RED', update=True)
+                else:
                     osdag_display_shape(self.display, member, update=True)
                     osdag_display_shape(self.display, plate, color='BLUE', update=True)
                     osdag_display_shape(self.display, welds, color='RED', update=True)
+
 
                 # elif self.component == "end bolt":
                 #     pass

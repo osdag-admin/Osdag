@@ -112,32 +112,58 @@ class SeatedAngleConnection(ShearConnection):
               TYPE_TEXTBOX, self.get_fu_fy_I_section_suptd)
         change_tab.append(t2)
 
-        t5 = (KEY_DISP_SEATED_ANGLE, ['Label_1', 'Label_2','Label_3'],
-              ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14',
-               'Label_15',
-               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22'],
+        t5 = (KEY_DISP_SEATED_ANGLE, ['Label_1', 'Label_2', 'Label_3'],
+              ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
+               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23',
+               KEY_IMAGE],
               TYPE_TEXTBOX, self.get_Angle_sec_properties)
         change_tab.append(t5)
 
         t6 = (KEY_DISP_SEATED_ANGLE, [KEY_ANGLE_LIST, KEY_CONNECTOR_MATERIAL],
-              [KEY_ANGLE_SELECTED, KEY_CONNECTOR_FY, KEY_CONNECTOR_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
-               'Label_7',
-               'Label_8', 'Label_9',
-               'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
-               'Label_18',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', 'Label_24'], TYPE_TEXTBOX,
+              [KEY_ANGLE_SELECTED, KEY_CONNECTOR_FY, KEY_CONNECTOR_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4',
+               'Label_5', 'Label_7',
+               'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16',
+               'Label_17',
+               'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', 'Label_24', KEY_IMAGE],
+              TYPE_TEXTBOX,
               self.get_new_angle_section_properties)
         change_tab.append(t6)
 
-        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+        # t5 = (KEY_DISP_SEATED_ANGLE, ['Label_1', 'Label_2','Label_3'],
+        #       ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14',
+        #        'Label_15',
+        #        'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22'],
+        #       TYPE_TEXTBOX, self.get_Angle_sec_properties)
+        # change_tab.append(t5)
+        #
+        # t6 = (KEY_DISP_SEATED_ANGLE, [KEY_ANGLE_LIST, KEY_CONNECTOR_MATERIAL],
+        #       [KEY_ANGLE_SELECTED, KEY_CONNECTOR_FY, KEY_CONNECTOR_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
+        #        'Label_7',
+        #        'Label_8', 'Label_9',
+        #        'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
+        #        'Label_18',
+        #        'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', 'Label_24'], TYPE_TEXTBOX,
+        #       self.get_new_angle_section_properties)
+        # change_tab.append(t6)
+
+        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t4)
 
-        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
+
+        t6 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t6)
+
+        t7 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t7)
+
+        t8 = (KEY_DISP_SEATED_ANGLE, [KEY_ANGLE_SELECTED], ['Label_24'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t8)
 
         return change_tab
 
@@ -288,22 +314,22 @@ class SeatedAngleConnection(ShearConnection):
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t9)
 
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ALL_CUSTOMIZED, True, 'No Validator')
         options_list.append(t10)
 
         t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, VALUES_TYP, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_GRD, KEY_DISP_PC, TYPE_COMBOBOX_CUSTOMIZED, VALUES_GRD, True, 'No Validator')
+        t12 = (KEY_GRD, KEY_DISP_PC, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ALL_CUSTOMIZED, True, 'No Validator')
         options_list.append(t12)
 
         t13 = (None,DISP_TITLE_ANGLE, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t13)
 
-        t14 = (KEY_ANGLE_LIST, KEY_DISP_SEATEDANGLE, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ANGLESEC, True, 'No Validator')
+        t14 = (KEY_ANGLE_LIST, KEY_DISP_SEATEDANGLE, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ALL_CUSTOMIZED, True, 'No Validator')
         options_list.append(t14)
 
-        t15 = (KEY_TOPANGLE, KEY_DISP_TOPANGLE, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ANGLESEC, True, 'No Validator')
+        t15 = (KEY_TOPANGLE, KEY_DISP_TOPANGLE, TYPE_COMBOBOX_CUSTOMIZED, VALUES_ALL_CUSTOMIZED, True, 'No Validator')
         options_list.append(t15)
 
         return options_list
@@ -360,7 +386,7 @@ class SeatedAngleConnection(ShearConnection):
 
     def select_angle_thickness(self):
         self. plate.thickness = []
-        self.seated_angle.width = self.supported_section.flange_width
+        self.seated_angle.width = self.supported_section.flange_width + 20.0
 
         for designation in self.seated_list:
             # print(self.seated_list)
@@ -393,13 +419,14 @@ class SeatedAngleConnection(ShearConnection):
                                                         self.supported_section.root_radius,
                                                         self.supported_section.fy)
         # Distance from the end of bearing on seated angle horizontal leg to root angle OR A TO B in Fig 5.31 in Prof N. Subramanian's book
-        self.b2 = max(self.b1 + self.plate.gap - seated.thickness - seated.root_radius,
-                      self.supported_section.flange_thickness + self.supported_section.root_radius)
+        self.b2 = max(self.b1 + self.plate.gap - seated.thickness - seated.root_radius, 0.0)
 
-        if self.b1 <= self.b2:
-            self.plate.moment_demand = round(float(self.load.shear_force) * (self.b2 - self.b1 / 2) / 1E3, 3)
+        if self.b2 == 0.0:
+            self.plate.moment_demand = 0.0
+        elif self.b2 <= self.b1:
+            self.plate.moment_demand = round(float(self.load.shear_force) * (self.b2 / self.b1) * (self.b2 / 2) / 1E3,3)
         else:
-            self.plate.moment_demand = round(float(self.load.shear_force) * (self.b2 / self.b1) * (self.b2 / 2) / 1E3, 3)
+            self.plate.moment_demand = round(float(self.load.shear_force) * (self.b2 - self.b1 / 2) / 1E3, 3)
 
         Z_p = self.seated_angle.width * seated.thickness ** 2 / 4
         Z_e = self.seated_angle.width * seated.thickness ** 2 / 6
@@ -1214,54 +1241,8 @@ class SeatedAngleConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self, popup_summary):
+        super(SeatedAngleConnection, self).save_design(self)
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
-        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
-                                  KEY_DISP_SUPTNGSEC: self.supporting_section.designation,
-                                  KEY_DISP_MATERIAL: self.supporting_section.material,
-                                  KEY_DISP_FU: self.supporting_section.fu,
-                                  KEY_DISP_FY: self.supporting_section.fy,
-                                  'Mass': self.supporting_section.mass,
-                                  'Area(cm2) - A': self.supporting_section.area,
-                                  'D(mm)': self.supporting_section.depth,
-                                  'B(mm)': self.supporting_section.flange_width,
-                                  't(mm)': self.supporting_section.web_thickness,
-                                  'T(mm)': self.supporting_section.flange_thickness,
-                                  'FlangeSlope': self.supporting_section.flange_slope,
-                                  'R1(mm)': self.supporting_section.root_radius,
-                                  'R2(mm)': self.supporting_section.toe_radius,
-                                  'Iz(cm4)': self.supporting_section.mom_inertia_z,
-                                  'Iy(cm4)': self.supporting_section.mom_inertia_y,
-                                  'rz(cm)': self.supporting_section.rad_of_gy_z,
-                                  'ry(cm)': self.supporting_section.rad_of_gy_y,
-                                  'Zz(cm3)': self.supporting_section.elast_sec_mod_z,
-                                  'Zy(cm3)': self.supporting_section.elast_sec_mod_y,
-                                  'Zpz(cm3)': self.supporting_section.plast_sec_mod_z,
-                                  'Zpy(cm3)': self.supporting_section.elast_sec_mod_y}
-
-        self.report_supported = {
-            KEY_DISP_SEC_PROFILE: "ISection",  # Image shall be save with this name.png in resource files
-            KEY_DISP_SUPTDSEC: self.supported_section.designation,
-            KEY_DISP_MATERIAL: self.supported_section.material,
-            KEY_DISP_FU: self.supported_section.fu,
-            KEY_DISP_FY: self.supported_section.fy,
-            'Mass': self.supported_section.mass,
-            'Area(cm2) - A': round(self.supported_section.area, 2),
-            'D(mm)': self.supported_section.depth,
-            'B(mm)': self.supported_section.flange_width,
-            't(mm)': self.supported_section.web_thickness,
-            'T(mm)': self.supported_section.flange_thickness,
-            'FlangeSlope': self.supported_section.flange_slope,
-            'R1(mm)': self.supported_section.root_radius,
-            'R2(mm)': self.supported_section.toe_radius,
-            'Iz(cm4)': self.supported_section.mom_inertia_z,
-            'Iy(cm4)': self.supported_section.mom_inertia_y,
-            'rz(cm)': self.supported_section.rad_of_gy_z,
-            'ry(cm)': self.supported_section.rad_of_gy_y,
-            'Zz(cm3)': self.supported_section.elast_sec_mod_z,
-            'Zy(cm3)': self.supported_section.elast_sec_mod_y,
-            'Zpz(cm3)': self.supported_section.plast_sec_mod_z,
-            'Zpy(cm3)': self.supported_section.elast_sec_mod_y}
-
         self.report_input = \
             {KEY_MODULE: self.module,
              KEY_MAIN_MODULE: self.mainmodule,
@@ -1278,14 +1259,10 @@ class SeatedAngleConnection(ShearConnection):
              KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
              KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-             KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
-             KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences,
-             "Seated Angle Details": "TITLE",
+             KEY_DISP_GAP: self.plate.gap,
+             KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
+             "Seated and Top Angle Details": "TITLE",
              KEY_DISP_SEATEDANGLE: str(self.seated_list),
-             KEY_DISP_MATERIAL: self.plate.material,
-             KEY_DISP_FU: self.plate.fu,
-             KEY_DISP_FY: self.plate.fy,
-             "Top Angle Details": "TITLE",
              KEY_DISP_TOP_ANGLE: str(self.topangle_list),
              KEY_DISP_MATERIAL: self.plate.material,
              KEY_DISP_FU: self.plate.fu,

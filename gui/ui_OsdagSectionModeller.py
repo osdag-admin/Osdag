@@ -835,6 +835,7 @@ class Ui_OsdagSectionModeller(object):
                 self.RG_text_2.setText(str(Ryy))
                 self.ESM_text_1.setText(str(Zzz))
                 self.ESM_text_2.setText(str(Zyy))
+
         elif(index_type==2):
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Channels where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                 ChannelArea,B,T,t,Dc=map(float,cursor.fetchall()[0])
@@ -1000,44 +1001,120 @@ class Ui_OsdagSectionModeller(object):
                         self.ESM_text_2.setText(str(Zyy))
                 
                 elif(index_template==3):
-                        cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                        a,b = cursor.fetchall()[0]
-                        a/=10
-                        b/=10
-                        cursor = conn.execute("SELECT Area,Iz,Cy,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                        Area,Iz,Cy,t=map(float,cursor.fetchall()[0])
-                        t/=10
-                        ti=float(self.SectionParameters.parameterText_7.text())/10
-                        l=float(self.SectionParameters.parameterText_6.text())/10
-                        A=round((2*Area)+(l*ti),4)
-                        D=a-t
-                        Ytop=Ybottom=l/2
-                        Yleft=Yright=round(((2*b)+ti)/2,4)
-                        Izz=round(2*(Iz+(A*((Cz+(ti/2))**2))),4)
-                        Iyy=round((
-                                (((t*(b**3)/12)+((b*t)*((Yleft-(b/2))**2))))+
-                                (((D*(t**3)/12)+((D*t)*((Yleft+(t/2)-b)**2))))+
-                                (((l*((ti/2)**3)/12)+(((ti/2)*l)*((Yleft-(t/4)-b)**2))))+                        
-                                (((t*(b**3)/12)+((b*t)*((Yright-(b/2))**2))))+
-                                (((D*(t**3)/12)+((D*t)*((Yright+(t/2)-b)**2))))+
-                                (((l*((ti/2)**3)/12)+(((ti/2)*l)*((Yright-(t/4)-b)**2))))
-                        ),4)
-                        Ryy=round(math.sqrt(Iyy/A),4)
-                        Rzz=round(math.sqrt(Izz/A),4)
-                        Zzz=round((A/2)*(Ytop+Ybottom),4)
-                        Zyy=round((A/2)*(Yleft+Yright),4)
-                        Cy=Ybottom
-                        Cz=Yleft
+                        # cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        # a,b = cursor.fetchall()[0]
+                        # cursor = conn.execute("SELECT Area,t FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
+                        # Area,t=map(float,cursor.fetchall()[0])
+                        # ti=float(self.SectionParameters.parameterText_7.text())
+                        # l=float(self.SectionParameters.parameterText_6.text())
+                        # A=round((2*Area)+(l*ti),4)
+                        # D=a-t
+                        # Ybottom=round((
+                        #         (l*ti*l/2)+
+                        #         (D*t*D/2)+
+                        #         (b*t*(D+(t/2)))+
+                        #         (b*t*(t+D+(t/2)))+
+                        #         (D*t*((2*t)+(D/2)+D))
+                        # )/((l*ti)+(2*D*t)+(2*b*t)),4)
+                        # Ytop=Ybottom
+                        # Yleft=round((
+                        #         (b*t*b/2)+
+                        #         (D*t*b/2)+
+                        #         (l*ti*(b+(ti/2)))+
+                        #         (D*t*(ti+b+(t/2)))+
+                        #         (b*t*(ti+b+(b/2)))
+                        # )/((2*b*t)+(2*D*t)+(l*ti)),4)
+                        # Yright=Yleft
+                        # Izz=round((
+                        #         (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+
+                        #         (((t*(D**3)/12)+((D*t)*((Ybottom-(D/2))**2))))+
+                        #         (((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-D)**2))))+
+                        #         (((b*(t**3)/12)+((b*t)*((Ytop-(t/2)-D)**2))))+
+                        #         (((t*(D**3)/12)+((D*t)*((Ytop-(D/2))**2))))+
+                        #         (((ti*((l/2)**3)/12)+(((l/2)*ti)*((Ytop-(l/4))**2))))
+                        #
+                        # ),4)
+                        # Iyy=round((
+                        #         (((b*(t**3)/12)+((b*t)*((Yleft-(b/2))**2))))+
+                        #         (((t*(D**3)/12)+((D*t)*((Yleft+(t/2)-b)**2))))+
+                        #         (((ti*(l**3)/12)+((l*t)*((Yleft-(t/2)-b)**2))))+
+                        #         (((t*(D**3)/12)+((D*t)*((Yright+(t/2)-b)**2))))+
+                        #         (((b*(t**3)/12)+((b*t)*((Yleft-(b/2))**2))))
+                        # ),4)
+                        # Ryy=round(math.sqrt(Iyy/A),4)
+                        # Rzz=round(math.sqrt(Izz/A),4)
+                        # Zzz=round((A/2)*(Ytop+Ybottom),4)
+                        # Zyy=round((A/2)*(Yleft+Yright),4)
+                        # Cy=Ybottom
+                        # Cz=Yleft
+
+                        # == == == =
+                        # cursor = conn.execute("SELECT a,b FROM Angles where Designation=" + repr(
+                        #         self.SectionParameters.parameterText_1.currentText()))
+                        # a, b = cursor.fetchall()[0]
+                        # a /= 10
+                        # b /= 10
+                        # cursor = conn.execute("SELECT Area,Iz,Cy,t FROM Angles where Designation=" + repr(
+                        #         self.SectionParameters.parameterText_1.currentText()))
+                        # Area, Iz, Cy, t = map(float, cursor.fetchall()[0])
+                        # t /= 10
+                        # ti = float(self.SectionParameters.parameterText_7.text()) / 10
+                        # l = float(self.SectionParameters.parameterText_6.text()) / 10
+                        # A = round((2 * Area) + (l * ti), 4)
+                        # D = a - t
+                        # Ytop = Ybottom = l / 2
+                        # Yleft = Yright = round(((2 * b) + ti) / 2, 4)
+                        # Izz = round(2 * (Iz + (A * ((Cz + (ti / 2)) ** 2))), 4)
+                        # Iyy = round((
+                        #         (((t * (b ** 3) / 12) + ((b * t) * ((Yleft - (b / 2)) ** 2)))) +
+                        #         (((D * (t ** 3) / 12) + ((D * t) * ((Yleft + (t / 2) - b) ** 2)))) +
+                        #         (((l * ((ti / 2) ** 3) / 12) + (((ti / 2) * l) * ((Yleft - (t / 4) - b) ** 2)))) +
+                        #         (((t * (b ** 3) / 12) + ((b * t) * ((Yright - (b / 2)) ** 2)))) +
+                        #         (((D * (t ** 3) / 12) + ((D * t) * ((Yright + (t / 2) - b) ** 2)))) +
+                        #         (((l * ((ti / 2) ** 3) / 12) + (((ti / 2) * l) * ((Yright - (t / 4) - b) ** 2))))
+                        # ), 4)
+                        # Ryy = round(math.sqrt(Iyy / A), 4)
+                        # Rzz = round(math.sqrt(Izz / A), 4)
+                        # Zzz = round((A / 2) * (Ytop + Ybottom), 4)
+                        # Zyy = round((A / 2) * (Yleft + Yright), 4)
+                        # Cy = Ybottom
+                        # Cz = Yleft
+                        #
+                        from utils.common.Section_Properties_Calculator import BBAngle_Properties
+                        designation = self.SectionParameters.parameterText_1.currentText()
+                        spacing = float(self.SectionParameters.parameterText_7.text())
+                        BBAngle_attributes = BBAngle_Properties()
+                        BBAngle_attributes.data(designation)
+                        A = BBAngle_attributes.calc_Area()
+                        Izz = BBAngle_attributes.calc_MomentOfAreaZ()
+                        Iyy = BBAngle_attributes.calc_MomentOfAreaY(thickness=spacing)
+                        Iu = "N/A"
+                        Iv = "N/A"
+                        Rzz = str(BBAngle_attributes.calc_RogZ())
+                        Ryy = str(BBAngle_attributes.calc_RogY(thickness=spacing))
+                        Ru = "N/A"
+                        Rv = "N/A"
+                        Cy = BBAngle_attributes.calc_Cy()
+                        Cz = BBAngle_attributes.calc_Cz()
+                        Zzz = str(BBAngle_attributes.calc_ElasticModulusZz())
+                        Zyy = str(BBAngle_attributes.calc_ElasticModulusZy(thickness=spacing))
+                        Zpz= str(BBAngle_attributes.calc_PlasticModulusZpz())
+                        Zpy = str(BBAngle_attributes.calc_PlasticModulusZpy(thickness=spacing))
+                        It = str(BBAngle_attributes.calc_TorsionConstantIt())
+
                         self.C_text_1.setText(str(Cy))
                         self.C_text_2.setText(str(Cz))
                         self.Area_text.setText(str(A))
                         self.MI_text_1.setText(str(Izz))
                         self.MI_text_2.setText(str(Iyy))
+                        self.MI_text_5.setText(str(Iu))
+                        self.MI_text_6.setText(str(Iv))
                         self.RG_text_1.setText(str(Rzz))
                         self.RG_text_2.setText(str(Ryy))
                         self.ESM_text_1.setText(str(Zzz))
                         self.ESM_text_2.setText(str(Zyy))
-        
+                        self.PSM_text_1.setText(str(Zpy))
+                        self.PSM_text_2.setText(str(Zpz))
                 elif(index_template==4):
                         cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         a,b = cursor.fetchall()[0]
@@ -1347,7 +1424,7 @@ class Ui_OsdagSectionModeller(object):
                 self.MI_text_2.setText(str(Iyy))
                 self.RG_text_1.setText(str(Rzz))
                 self.RG_text_2.setText(str(Ryy))
-                self.ESM_text_1.setText(str(Zzy))
+                self.ESM_text_1.setText(str(Zzz))
                 self.ESM_text_2.setText(str(Zzz))
         
         display.EraseAll()

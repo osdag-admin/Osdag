@@ -1,5 +1,5 @@
 from design_type.connection.connection import Connection
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, Section
+from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection
 from Common import *
 from utils.common.load import Load
 from utils.common.material import Material
@@ -26,7 +26,7 @@ class MomentConnection(Connection, IS800_2007):
                 input_dictionary[KEY_MATERIAL] == 'Select Material':
             designation = ''
             material_grade = ''
-            source = ''
+            source = 'Custom'
             fu = ''
             fy = ''
             depth = ''
@@ -50,11 +50,15 @@ class MomentConnection(Connection, IS800_2007):
             elast_sec_mod_y = ''
             plast_sec_mod_z = ''
             plast_sec_mod_y = ''
+            torsion_const = ''
+            warping_const = ''
+            image = VALUES_IMG_BEAM[0]
+
 
         else:
             designation = str(input_dictionary[KEY_SECSIZE])
             material_grade = str(input_dictionary[KEY_MATERIAL])
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             source = str(I_sec_attributes.source)
@@ -64,7 +68,7 @@ class MomentConnection(Connection, IS800_2007):
             flange_width = str(I_sec_attributes.flange_width)
             flange_thickness = str(I_sec_attributes.flange_thickness)
             web_thickness = str(I_sec_attributes.web_thickness)
-            flange_slope = str(I_sec_attributes.flange_slope)
+            flange_slope = float(I_sec_attributes.flange_slope)
             root_radius = str(I_sec_attributes.root_radius)
             toe_radius = str(I_sec_attributes.toe_radius)
             m_o_e = "200"
@@ -72,15 +76,21 @@ class MomentConnection(Connection, IS800_2007):
             p_r = "0.3"
             t_e = "12"
             mass = str(I_sec_attributes.mass)
-            area = str(I_sec_attributes.area)
-            mom_inertia_z = str(I_sec_attributes.mom_inertia_z)
-            mom_inertia_y = str(I_sec_attributes.mom_inertia_y)
-            rad_of_gy_z = str(I_sec_attributes.rad_of_gy_z)
-            rad_of_gy_y = str(I_sec_attributes.rad_of_gy_y)
-            elast_sec_mod_z = str(I_sec_attributes.elast_sec_mod_z)
-            elast_sec_mod_y = str(I_sec_attributes.elast_sec_mod_y)
-            plast_sec_mod_z = str(I_sec_attributes.plast_sec_mod_z)
-            plast_sec_mod_y = str(I_sec_attributes.plast_sec_mod_y)
+            area = str(round((I_sec_attributes.area / 10 ** 2), 2))
+            mom_inertia_z = str(round((I_sec_attributes.mom_inertia_z / 10 ** 4), 2))
+            mom_inertia_y = str(round((I_sec_attributes.mom_inertia_y / 10 ** 4), 2))
+            rad_of_gy_z = str(round((I_sec_attributes.rad_of_gy_z / 10), 2))
+            rad_of_gy_y = str(round((I_sec_attributes.rad_of_gy_y / 10), 2))
+            elast_sec_mod_z = str(round((I_sec_attributes.elast_sec_mod_z / 10 ** 3), 2))
+            elast_sec_mod_y = str(round((I_sec_attributes.elast_sec_mod_y / 10 ** 3), 2))
+            plast_sec_mod_z = str(round((I_sec_attributes.plast_sec_mod_z / 10 ** 3), 2))
+            plast_sec_mod_y = str(round((I_sec_attributes.plast_sec_mod_y / 10 ** 3), 2))
+            torsion_const = str(round((I_sec_attributes.It / 10 ** 4), 2))
+            warping_const = str(round((I_sec_attributes.Iw / 10 ** 6), 2))
+            if flange_slope != 90:
+                image = VALUES_IMG_BEAM[0]
+            else:
+                image = VALUES_IMG_BEAM[1]
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -105,6 +115,27 @@ class MomentConnection(Connection, IS800_2007):
         t4 = (KEY_SEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         section.append(t4)
 
+        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
+        section.append(t15)
+
+        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
+        section.append(t16)
+
+        t31 = ('Label_22', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        section.append(t31)
+
+        t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
+        section.append(t32)
+
+        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
+        section.append(t14)
+
+        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
+        section.append(t29)
+
+        t13 = (None, None, TYPE_BREAK, None, None)
+        section.append(t13)
+
         t5 = (None, KEY_DISP_DIMENSIONS, TYPE_TITLE, None, None)
         section.append(t5)
 
@@ -128,24 +159,6 @@ class MomentConnection(Connection, IS800_2007):
 
         t12 = ('Label_7', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         section.append(t12)
-
-        t13 = (None, None, TYPE_BREAK, None, None)
-        section.append(t13)
-
-        t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
-        section.append(t14)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
-
-        t18 = (None, None, TYPE_ENTER, None, None)
-        section.append(t18)
-
-        t15 = ('Label_9', KEY_DISP_MOD_OF_ELAST, TYPE_TEXTBOX, None, m_o_e)
-        section.append(t15)
-
-        t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
-        section.append(t16)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
         section.append(t17)
@@ -174,32 +187,28 @@ class MomentConnection(Connection, IS800_2007):
         t25 = ('Label_18', KEY_DISP_EM_ZY, TYPE_TEXTBOX, None, elast_sec_mod_y)
         section.append(t25)
 
+        t28 = (None, None, TYPE_BREAK, None, None)
+        section.append(t28)
+
+        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, image)
+        section.append(t33)
+
+        t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
+        section.append(t17)
+
         t26 = ('Label_19', KEY_DISP_PM_ZPZ, TYPE_TEXTBOX, None, plast_sec_mod_z)
         section.append(t26)
 
         t27 = ('Label_20', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
         section.append(t27)
 
-        t28 = (None, None, TYPE_BREAK, None, None)
-        section.append(t28)
+        t26 = ('Label_21', KEY_DISP_It, TYPE_TEXTBOX, None, torsion_const)
+        section.append(t26)
 
-        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
-        section.append(t29)
+        t27 = ('Label_22', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
+        section.append(t27)
 
-        t30 = (None, None, TYPE_ENTER, None, None)
-        section.append(t30)
 
-        t30 = (None, None, TYPE_ENTER, None, None)
-        section.append(t30)
-
-        t31 = ('Label_22', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
-        section.append(t31)
-
-        t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
-        section.append(t32)
-
-        t33 = (KEY_IMAGE, None, TYPE_IMAGE, None, None, VALUES_IMG_BEAM)
-        section.append(t33)
 
         return section
 
@@ -214,7 +223,7 @@ class MomentConnection(Connection, IS800_2007):
         fy = ''
         if material_grade != "Select Material" and designation != "Select Section":
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             fu = str(I_sec_attributes.fu)
             fy = str(I_sec_attributes.fy)

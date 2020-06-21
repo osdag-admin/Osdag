@@ -1326,8 +1326,9 @@ class BeamCoverPlateWeld(MomentConnection):
         # for self.web_plate.thickness_provided in available_web_thickness:
         design_status_block_shear = False
         while design_status_block_shear == False:
-            Avg = 2 * (self.available_long_web_length) * self.section.web_thickness
-            Avn = 2 * (self.available_long_web_length) * self.section.web_thickness
+            #TODO: To be reviewed by anjali. Added 2*s to get length of plate
+            Avg = round_up(2 * (self.available_long_web_length+(2 * self.web_weld.size)),5) * self.section.web_thickness
+            Avn = round_up(2 * (self.available_long_web_length+(2 * self.web_weld.size)),5) * self.section.web_thickness
             Atg = self.web_plate.height * self.section.web_thickness
             Atn = self.web_plate.height * self.section.web_thickness
             self.section.block_shear_capacity_web = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn,

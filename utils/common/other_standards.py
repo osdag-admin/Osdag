@@ -156,7 +156,7 @@ class IS1367_Part3_2002(object):
             return
 
         conn = sqlite3.connect(PATH_TO_DATABASE)
-        db_query = "SELECT * FROM Bolt_fy_fu WHERE Property_Class = ? AND Diameter_min <= ? AND Diameter_max > ?"
+        db_query = "SELECT * FROM Bolt_fy_fu WHERE Property_Class = ? AND Diameter_min < ? AND Diameter_max >= ?"
         cur = conn.cursor()
         cur.execute(db_query, (bolt_PC, bolt_diameter, bolt_diameter,))
         row = cur.fetchone()

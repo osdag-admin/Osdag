@@ -773,7 +773,7 @@ class Plate(Material):
 
             if shear_ecc is True:
                 # If check for shear eccentricity is true, resultant force in bolt is calculated
-                ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
+                ecc = (pitch * max((bolt_line - 1)/2, 0)) + end_dist + gap
                 moment_demand = shear_load * ecc + web_moment
                 vres = self.get_vres(bolts_one_line, pitch,
                                      gauge, bolt_line, shear_load, axial_load, ecc, web_moment)
@@ -825,15 +825,17 @@ class Plate(Material):
                 else:
                     pitch = min_gauge
 
+
                 if shear_ecc is True:
                     # If check for shear eccentricity is true, resultant force in bolt is calculated
-                    ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
+                    ecc = (pitch * max((bolt_line - 1)/2, 0)) + end_dist + gap
                     moment_demand = shear_load * ecc + web_moment
                     vres = self.get_vres(bolts_one_line, pitch,
                                          gauge, bolt_line, shear_load, axial_load, ecc, web_moment)
                 else:
                     moment_demand = 0.0
                     vres = resultant_force / (bolt_line * bolts_one_line)
+
 
                 if joint == None:
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
@@ -1416,9 +1418,11 @@ class ISection(Material):
 
         self.slenderness = round(slender, 2)
 
+
     def plastic_moment_capacty(self, beta_b, Z_p, fy):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         self.plastic_moment_capactiy = beta_b * Z_p * fy / (gamma_m0)  # Nm # for section
+
 
     def moment_d_deformation_criteria(self, fy, Z_e):
         """
@@ -1450,6 +1454,7 @@ class Beam(ISection):
 
     def min_plate_height(self):
         return 0.6 * self.depth
+
 
     def max_plate_height(self, connectivity=None, notch_height=0.0):
         if connectivity in VALUES_CONN_1 or connectivity == None:

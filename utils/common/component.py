@@ -852,7 +852,6 @@ class Plate(Material):
                       bolt_capacity_red, "no. of bolts:", bolt_line * bolts_one_line, "height", web_plate_h)
                 self.design_status = True
 
-
             self.length = gap + end_dist * 2 + pitch * (bolt_line - 1)
             self.height = web_plate_h
             self.bolt_line = bolt_line

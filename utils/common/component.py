@@ -1452,20 +1452,9 @@ class Beam(ISection):
     def __init__(self, designation, material_grade):
         super(Beam, self).__init__(designation, material_grade,"Beams")
 
-<<<<<<< HEAD
-                if shear_ecc is True:
-                    # If check for shear eccentricity is true, resultant force in bolt is calculated
-                    ecc = (pitch * max((bolt_line/2 - 0.5), 0)) + end_dist + gap
-                    moment_demand = shear_load * ecc + web_moment
-                    vres = self.get_vres(bolts_one_line, pitch,
-                                         gauge, bolt_line, shear_load, axial_load, ecc,web_moment)
-                else:
-                    moment_demand = 0.0
-                    vres = resultant_force / (bolt_line * bolts_one_line)
-=======
     def min_plate_height(self):
         return 0.6 * self.depth
->>>>>>> cf192e61ee86d0b1bc0463d7855023337255a80d
+
 
     def max_plate_height(self, connectivity=None, notch_height=0.0):
         if connectivity in VALUES_CONN_1 or connectivity == None:

@@ -1098,6 +1098,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
     def get_values_for_design_pref(self, key, design_dictionary):
 
         section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        # if self.connectivity == 'Hollow/Tubular Column Base':
+        #     if self.dp_column_designation[1:4] == 'SHS':
+        #         section = SHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        #     elif self.dp_column_designation[1:4] == 'RHS':
+        #         section = RHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        #     elif self.dp_column_designation[1:4] == 'CHS':
+        #         section = CHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        #     else:
+        #         pass
+        # else:
+        #     section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+
         length = str(self.anchor_length_provided if self.design_button_status else 0)
         fu = Material(design_dictionary[KEY_MATERIAL]).fu
 

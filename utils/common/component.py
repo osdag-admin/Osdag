@@ -2002,6 +2002,7 @@ class HollowSection(Material):
         self.depth = row[2]  # mm
         self.flange_width = row[3]  # mm (width is referred as flange width)
         self.flange_thickness = row[4]  # mm (thickness of the section is referred as flange thickness)
+        self.web_thickness = self.flange_thickness
         super(HollowSection, self).__init__(material_grade, self.flange_thickness)
         self.mom_inertia_z = row[7] * 10000  # mm^4
         self.mom_inertia_y = row[8] * 10000  # mm^4
@@ -2011,6 +2012,8 @@ class HollowSection(Material):
         self.elast_sec_mod_y = row[12] * 1000  # mm^3
         self.plast_sec_mod_z = row[13] * 1000  # mm^3
         self.plast_sec_mod_y = row[14] * 1000  # mm^3
+        self.root_radius = 0.0
+        self.toe_radius = 0.0
         self.source = row[15]  # IS 4923:1997
 
         conn.close()

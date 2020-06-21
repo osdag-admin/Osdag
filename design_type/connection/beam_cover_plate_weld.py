@@ -1837,11 +1837,11 @@ class BeamCoverPlateWeld(MomentConnection):
                         # webplate
                         KEY_WEB_PLATE_HEIGHT: self.web_plate.height,
                         KEY_WEB_PLATE_LENGTH: self.web_plate.length,
-                        KEY_DISP_WEBPLATE_THICKNESS: self.web_plate.thickness_provided,
+                        KEY_OUT_WEBPLATE_THICKNESS: self.web_plate.thickness_provided,
                         # flange plate_outer
                         KEY_FLANGE_PLATE_HEIGHT: self.flange_plate.height,
                         KEY_FLANGE_PLATE_LENGTH: self.plate_out_len,
-                        KEY_DISP_FLANGESPLATE_THICKNESS: self.flange_out_plate_tk,
+                        KEY_OUT_FLANGESPLATE_THICKNESS: self.flange_out_plate_tk,
                         # flange plate_inner
                         KEY_INNERFLANGE_PLATE_HEIGHT: self.flange_plate.Innerheight,
                         KEY_INNERFLANGE_PLATE_LENGTH: self.plate_in_len,

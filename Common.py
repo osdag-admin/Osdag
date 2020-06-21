@@ -97,6 +97,9 @@ def connectdb(table_name, call_type="dropdown"):
     elif table_name == "SHS":
         cursor = conn.execute("SELECT Designation FROM SHS")
 
+    elif table_name == "CHS":
+        cursor = conn.execute("SELECT Designation FROM CHS")
+
     else:
         cursor = conn.execute("SELECT Designation FROM Columns")
     rows = cursor.fetchall()
@@ -227,6 +230,60 @@ def get_source(table_name, designation):
     source = cursor.fetchone()[0]
     return str(source)
 
+
+class MaterialValidator(object):
+    def __init__(self, material):
+        self.material = str(material)
+        self.typ = "Unknown"
+        self.fy_20 = 0
+        self.fy_20_40 = 0
+        self.fy_40 = 0
+        self.fu = 0
+        self.custom_format_flag = False
+        self.invalid_value = ""
+        self.notations = ["Fy_20", "Fy_20_40", "Fy_40", "Fu"]
+        material = self.material.split("_")
+        if len(material) == 5:
+            self.typ = material[0]
+            self.fy_20 = material[1]
+            self.fy_20_40 = material[2]
+            self.fy_40 = material[3]
+            self.fu = material[4]
+        self.values = [self.fy_20, self.fy_20_40, self.fy_40, self.fu]
+        if self.typ == "Cus":
+            for i in self.values:
+                if str(i) != "" and str(i).isdigit():
+                    self.custom_format_flag = True
+                else:
+                    self.custom_format_flag = False
+                    break
+
+    def is_already_in_db(self):
+        if self.material in connectdb("Material", call_type="popup"):
+            return True
+        else:
+            return False
+
+    def is_format_custom(self):
+        return self.custom_format_flag
+
+    def is_valid_custom(self):
+
+        min_allowed = [165, 165, 165, 165]
+        max_allowed = [1500, 1500, 1500, 1500]
+        for i in range(4):
+            if self.values[i] == "":
+                continue
+            if min_allowed[i] <= int(self.values[i]) <= max_allowed[i]:
+                pass
+            else:
+                self.invalid_value = self.notations[i]
+                break
+
+        if self.invalid_value:
+            return False
+        else:
+            return self.custom_format_flag
 
 ##########################
 # Type Keys (Type of input field, tab type etc.)
@@ -1386,6 +1443,7 @@ KEY_OUT_WELD_SIZE_WEB = 'Weld.Size_web'
 KEY_OUT_DISP_WELD_SIZE_WEB = 'Size at Web (mm)'
 KEY_OUT_WELD_SIZE_STIFFENER = 'Weld.Size_stiffener'
 KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Gusset/Stiffener (mm)'
+KEY_OUT_DISP_WELD_SIZE_STIFFENER1 = 'Weld Size at Stiffener (mm)'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
 KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
@@ -1420,7 +1478,9 @@ KEY_OUT_DISP_STIFFENER_WIDTH = 'Stiffener Width'
 KEY_OUT_STIFFENER_THICKNESS = 'Stiffener.thickness'
 KEY_OUT_DISP_STIFFENER_THICKNESS = 'Stiffener Thickness'
 KEY_OUT_WELD_TYPE = 'Stiffener.weld'
-KEY_OUT_DISP_WELD_TYPE = 'Weld Type'
+KEY_OUT_WELD_TYPE1 = 'Stiffener.weld_flange'
+KEY_OUT_DISP_WELD_TYPE = 'Weld Between Stiffener and Column flange'
+KEY_OUT_DISP_WELD_TYPE1 = 'Weld Between Stiffener and End plate'
 KEY_OUT_STIFFENER_DETAILS = 'Stiffener.details'
 KEY_OUT_DISP_STIFFENER_DETAILS = 'Stiffener Details'
 KEY_OUT_STIFFENER_TITLE = 'Stiffener.Title'

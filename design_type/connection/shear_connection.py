@@ -1,5 +1,6 @@
 from design_type.connection.connection import Connection
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, Section, Single_Angle_Properties
+from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection
+from utils.common.Section_Properties_Calculator import Single_Angle_Properties
 from Common import *
 from utils.common.load import Load
 from utils.common.material import Material
@@ -324,23 +325,25 @@ class ShearConnection(Connection):
         thickness = str(Angle_attributes.thickness)
         root_radius = str(Angle_attributes.root_radius)
         toe_radius = str(Angle_attributes.toe_radius)
-        mass = str(Angle_attributes.mass)
-        area = str(Angle_attributes.area)
-        Cz = str(Angle_attributes.Cz)
-        Cy = str(Angle_attributes.Cy)
-        mom_inertia_z = str(Angle_attributes.mom_inertia_z)
-        mom_inertia_y = str(Angle_attributes.mom_inertia_y)
-        mom_inertia_u = str(Angle_attributes.mom_inertia_u)
-        mom_inertia_v = str(Angle_attributes.mom_inertia_v)
-        rad_of_gy_z = str(Angle_attributes.rad_of_gy_z)
-        rad_of_gy_y = str(Angle_attributes.rad_of_gy_y)
-        rad_of_gy_u = str(Angle_attributes.rad_of_gy_u)
-        rad_of_gy_v = str(Angle_attributes.rad_of_gy_v)
-        elast_sec_mod_z = str(Angle_attributes.elast_sec_mod_z)
-        elast_sec_mod_y = str(Angle_attributes.elast_sec_mod_y)
-        plast_sec_mod_z = str(Angle_attributes.plast_sec_mod_z)
-        plast_sec_mod_y = str(Angle_attributes.plast_sec_mod_y)
-        torsion_const = str(Angle_attributes.It)
+
+        mass = str(round((Angle_attributes.mass), 2))
+        area = str(round((Angle_attributes.area / 100), 2))
+        Cz = str(round((Angle_attributes.Cz / 10), 2))
+        Cy = str(round((Angle_attributes.Cy / 10), 2))
+        mom_inertia_z = str(round((Angle_attributes.mom_inertia_z) / 10000, 2))
+        mom_inertia_y = str(round((Angle_attributes.mom_inertia_y) / 10000, 2))
+        mom_inertia_u = str(round((Angle_attributes.mom_inertia_u) / 10000, 2))
+        mom_inertia_v = str(round((Angle_attributes.mom_inertia_v) / 10000, 2))
+        rad_of_gy_z = str(round((Angle_attributes.rad_of_gy_z / 10), 2))
+        rad_of_gy_y = str(round((Angle_attributes.rad_of_gy_y / 10), 2))
+        rad_of_gy_u = str(round((Angle_attributes.rad_of_gy_u / 10), 2))
+        rad_of_gy_v = str(round((Angle_attributes.rad_of_gy_v / 10), 2))
+        elast_sec_mod_z = str(round((Angle_attributes.elast_sec_mod_z / 1000), 2))
+        elast_sec_mod_y = str(round((Angle_attributes.elast_sec_mod_y / 1000), 2))
+        plast_sec_mod_z = str(round((Angle_attributes.plast_sec_mod_z / 1000), 2))
+        plast_sec_mod_y = str(round((Angle_attributes.plast_sec_mod_y / 1000), 2))
+        torsion_const = str(round((Angle_attributes.It / 10000), 2))
+
         if a == b:
             image = VALUES_IMG_TENSIONBOLTED_DF01[0]
         else:

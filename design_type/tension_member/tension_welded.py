@@ -7,7 +7,7 @@ from Common import *
 from utils.common.load import Load
 from design_type.member import Member
 import logging
-
+from utils.common.Section_Properties_Calculator import *
 from design_type.main import Main
 
 
@@ -86,7 +86,7 @@ class Tension_welded(Member):
               self.get_new_angle_section_properties)
         change_tab.append(t1)
 
-        t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3'],
+        t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3','Label_0'],
               ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
                'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23',
                KEY_IMAGE],
@@ -102,7 +102,7 @@ class Tension_welded(Member):
               self.get_new_channel_section_properties)
         change_tab.append(t3)
 
-        t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14'],
+        t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14','Label_0'],
               ['Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17', 'Label_19',
                'Label_20', 'Label_21', 'Label_22', 'Label_26', 'Label_27', KEY_IMAGE], TYPE_TEXTBOX,
               self.get_Channel_sec_properties)
@@ -349,9 +349,6 @@ class Tension_welded(Member):
         else:
             return VALUES_IMG_TENSIONWELDED[4]
 
-    def get_3d_components(self):
-        components = []
-        return components
 
     def out_intermittent(self):
 
@@ -551,112 +548,6 @@ class Tension_welded(Member):
         out_list.append(t21)
 
         return out_list
-
-    # def loadDesign_inputs(self, window, op_list, data, new):
-    #     fileName, _ = QFileDialog.getOpenFileName(window, "Open Design", os.path.join(str(' '), ''), "InputFiles(*.osi)")
-    #     if not fileName:
-    #         return
-    #     try:
-    #         in_file = str(fileName)
-    #         with open(in_file, 'r') as fileObject:
-    #             uiObj = yaml.load(fileObject)
-    #         module = uiObj[KEY_MODULE]
-    #
-    #         if module == KEY_DISP_FINPLATE:
-    #             self.setDictToUserInputs(window, uiObj, op_list, data, new)
-    #         else:
-    #             QMessageBox.information(window, "Information",
-    #                                 "Please load the appropriate Input")
-    #
-    #             return
-    #     except IOError:
-    #         QMessageBox.information(window, "Unable to open file",
-    #                                 "There was an error opening \"%s\"" % fileName)
-    #         return
-    #
-    #     # Function for loading inputs from a file to Ui
-    #
-    # '''
-    # @author: Umair
-    # '''
-    #
-    # def setDictToUserInputs(self, uiObj, op_list, data, new):
-    #     for op in op_list:
-    #         key_str = op[0]
-    #         key = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_str)
-    #         if op[2] == TYPE_COMBOBOX:
-    #             index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
-    #             if index >= 0:
-    #                 key.setCurrentIndex(index)
-    #         elif op[2] == TYPE_TEXTBOX:
-    #             key.setText(uiObj[key_str])
-    #         elif op[2] == TYPE_COMBOBOX_CUSTOMIZED:
-    #             for n in new:
-    #                 if n[0] == key_str:
-    #                     if uiObj[key_str] != n[1]():
-    #                         data[key_str + "_customized"] = uiObj[key_str]
-    #                         key.setCurrentIndex(1)
-    #                     else:
-    #                         pass
-    #         else:
-    #             pass
-
-    # def func_for_validation(self, window, design_dictionary):
-    #     self.design_status = False
-    #     flag = False
-    #     flag1 = False
-    #     option_list = self.input_values(self)
-    #     missing_fields_list = []
-    #     for option in option_list:
-    #         if option[2] == TYPE_TEXTBOX:
-    #             if design_dictionary[option[0]] == '':
-    #                 missing_fields_list.append(option[1])
-    #         elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
-    #             val = option[4]
-    #             if design_dictionary[option[0]] == val[0]:
-    #                 missing_fields_list.append(option[1])
-    #         elif option[2] == TYPE_COMBOBOX_CUSTOMIZED:
-    #             if design_dictionary[option[0]] == []:
-    #                 missing_fields_list.append(option[1])
-    #         # elif option[2] == TYPE_MODULE:
-    #         #     if design_dictionary[option[0]] == "Fin Plate":
-    #
-    #     # if design_dictionary[KEY_CONN] == 'Beam-Beam':
-    #     #     primary = design_dictionary[KEY_SUPTNGSEC]
-    #     #     secondary = design_dictionary[KEY_SUPTDSEC]
-    #     #     conn = sqlite3.connect(PATH_TO_DATABASE)
-    #     #     cursor = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? ) ", (primary,))
-    #     #     lst = []
-    #     #     rows = cursor.fetchall()
-    #     #     for row in rows:
-    #     #         lst.append(row)
-    #     #     p_val = lst[0][0]
-    #     #     cursor2 = conn.execute("SELECT D FROM BEAMS WHERE Designation = ( ? )", (secondary,))
-    #     #     lst1 = []
-    #     #     rows1 = cursor2.fetchall()
-    #     #     for row1 in rows1:
-    #     #         lst1.append(row1)
-    #     #     s_val = lst1[0][0]
-    #     #     if p_val <= s_val:
-    #     #         QMessageBox.about(window, 'Information',
-    #     #                           "Secondary beam depth is higher than clear depth of primary beam web "
-    #     #                           "(No provision in Osdag till now)")
-    #     #     else:
-    #     #         flag1 = True
-    #     # else:
-    #     #     flag1 = True
-    #
-    #     if len(missing_fields_list) > 0:
-    #         QMessageBox.information(window, "Information",
-    #                                 self.generate_missing_fields_error_string(self, missing_fields_list))
-    #         # flag = False
-    #     else:
-    #         flag = True
-    #
-    #     if flag and flag1:
-    #         self.set_input_values(self, design_dictionary)
-    #     else:
-    #         pass
 
     def func_for_validation(self, design_dictionary):
 
@@ -1770,8 +1661,8 @@ class Tension_welded(Member):
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
                                       'Area(mm2) - Ag': round((section_size.area), 2),
-                                      'a(mm)': round(section_size.max_leg, 2),
-                                      'b(mm)': round(section_size.min_leg, 2),
+                                      'A(mm)': round(section_size.max_leg, 2),
+                                      'B(mm)': round(section_size.min_leg, 2),
                                       't(mm)': round(section_size.thickness, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),
                                       'R2(mm)': round(section_size.toe_radius, 2),
@@ -1801,9 +1692,9 @@ class Tension_welded(Member):
                                                      self.loc) * 10), 2)
                 Cy = "N/A"
             else:
-                Cy = round((Angle_attributes.calc_Cy(section_size.max_leg, section_size.min_leg, section_size.thickness,
+                Cz = round((Angle_attributes.calc_Cy(section_size.max_leg, section_size.min_leg, section_size.thickness,
                                                      self.loc) * 10), 2)
-                Cz = "N/A"
+                Cy = "N/A"
 
             self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
                                       # Image shall be save with this name.png in resource files
@@ -1813,8 +1704,8 @@ class Tension_welded(Member):
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
                                       'Area(mm2) - Ag': round((section_size.area), 2),
-                                      'a(mm)': round(section_size.max_leg, 2),
-                                      'b(mm)': round(section_size.min_leg, 2),
+                                      'A(mm)': round(section_size.max_leg, 2),
+                                      'B(mm)': round(section_size.min_leg, 2),
                                       't(mm)': round(section_size.thickness, 2),
                                       'T(mm)': round(self.plate.thickness_provided, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),
@@ -1868,8 +1759,8 @@ class Tension_welded(Member):
                                       KEY_DISP_FY: round(section_size.fy, 2),
                                       'Mass': round(section_size.mass, 2),
                                       'Area(mm2) - Ag': round((section_size.area), 2),
-                                      'a(mm)': round(section_size.max_leg, 2),
-                                      'b(mm)': round(section_size.min_leg, 2),
+                                      'A(mm)': round(section_size.max_leg, 2),
+                                      'B(mm)': round(section_size.min_leg, 2),
                                       't(mm)': round(section_size.thickness, 2),
                                       'T(mm)': round(self.plate.thickness_provided, 2),
                                       'R1(mm)': round(section_size.root_radius, 2),

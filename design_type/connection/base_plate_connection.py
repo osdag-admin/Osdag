@@ -2688,13 +2688,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if self.shear_on_stiffener_along_flange > (0.6 * self.shear_capa_stiffener_along_flange):
                         logger.warning("Fails in shear")
                         logger.info("Improvising thk")
-                        self.stiffener_plt_thick_along_flange = (math.sqrt(3) * self.gamma_m0 * self.shear_on_stiffener_along_flange * 1000) / \
-                                                                (self.stiffener_fy * self.stiffener_plt_height_along_flange)
-                        self.stiffener_plt_thick_along_flange = round_up(self.stiffener_plt_thick_along_flange, 2)  # mm
+
+                        n = 1
+                        while self.shear_on_stiffener_along_flange > (0.6 * self.shear_capa_stiffener_along_flange):
+                            self.stiffener_plt_thick_along_flange += 2
+                            self.shear_capa_stiffener_along_flange = IS800_2007.cl_8_4_design_shear_strength((self.stiffener_plt_height_along_flange *
+                                                                                                              self.stiffener_plt_thick_along_flange),
+                                                                                                             self.stiffener_fy)
+                            self.shear_capa_stiffener_along_flange = round((self.shear_capa_stiffener_along_flange / 1000), 3)  # kN
+
+                            n += 1
 
                         # re-calculating the moment capacity by incorporating the improvised stiffener thickness along flange
-                        self.z_e_stiffener_along_flange = (
-                                                                      self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
+                        self.z_e_stiffener_along_flange = (self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
 
                         self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 0,
                                                                                                                self.stiffener_fy,
@@ -2706,9 +2712,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if self.moment_on_stiffener_along_flange > self.moment_capa_stiffener_along_flange:
                         logger.warning("Fails in moment")
                         logger.info("Improvising thk")
-                        self.stiffener_plt_thick_along_flange = (6 * self.gamma_m0 * self.moment_on_stiffener_along_flange * 10 ** 6) / \
-                                                                (self.stiffener_fy * self.stiffener_plt_height_along_flange ** 2)
-                        self.stiffener_plt_thick_along_flange = round_up(self.stiffener_plt_thick_along_flange, 2)  # mm
+
+                        n = 1
+                        while self.moment_on_stiffener_along_flange > self.moment_capa_stiffener_along_flange:
+                            self.stiffener_plt_thick_along_flange += 2
+
+                            # re-calculating the moment capacity by incorporating the improvised stiffener thickness along flange
+                            self.z_e_stiffener_along_flange = (self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
+
+                            self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 0,
+                                                                                                                   self.stiffener_fy,
+                                                                                                                   section_class='semi-compact')
+                            self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kN-m
+                            n += 1
                     else:
                         pass
                 else:
@@ -2721,8 +2737,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                         self.stiffener_plt_height_along_web
                     self.shear_on_stiffener_along_web = round((self.shear_on_stiffener_along_web / 1000), 3)  # kN
 
-                    self.moment_on_stiffener_along_web = (
-                                                                     self.sigma_xx * self.stiffener_plt_height_along_web * self.stiffener_plt_len_along_web ** 2 * 0.5) \
+                    self.moment_on_stiffener_along_web = (self.sigma_xx * self.stiffener_plt_height_along_web * self.stiffener_plt_len_along_web ** 2 * 0.5) \
                                                          + (0.5 * self.stiffener_plt_len_along_web * (self.sigma_max_zz - self.sigma_xx) *
                                                             self.stiffener_plt_height_along_web * (2 / 3) * self.stiffener_plt_len_along_web)
                     self.moment_on_stiffener_along_web = round((self.moment_on_stiffener_along_web * 10 ** -6), 3)  # kN-m
@@ -2743,9 +2758,17 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if self.shear_on_stiffener_along_web > (0.6 * self.shear_capa_stiffener_along_web):
                         logger.warning("Fails in shear")
                         logger.info("Improvising thk")
-                        self.stiffener_plt_thick_along_web = (math.sqrt(3) * self.gamma_m0 * self.shear_on_stiffener_along_web * 1000) / \
-                                                             (self.stiffener_fy * self.stiffener_plt_height_along_web)
-                        self.stiffener_plt_thick_along_web = round_up(self.stiffener_plt_thick_along_web, 2)  # mm
+
+                        n = 1
+                        while self.shear_on_stiffener_along_web > (0.6 * self.shear_capa_stiffener_along_web):
+                            self.stiffener_plt_thick_along_web += 2
+
+                            self.shear_capa_stiffener_along_web = IS800_2007.cl_8_4_design_shear_strength(self.stiffener_plt_height_along_web *
+                                                                                                          self.stiffener_plt_thick_along_web,
+                                                                                                          self.stiffener_fy)
+                            self.shear_capa_stiffener_along_web = round((self.shear_capa_stiffener_along_web / 1000), 3)  # kN
+
+                            n += 1
 
                         # re-calculating the moment capacity by incorporating the improvised stiffener thickness along web
                         self.z_e_stiffener_along_web = (self.stiffener_plt_thick_along_web * self.stiffener_plt_height_along_web ** 2) / 6  # mm^3
@@ -2760,9 +2783,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if self.moment_on_stiffener_along_web > self.moment_capa_stiffener_along_web:
                         logger.warning("Fails in moment")
                         logger.info("Improvising thk")
-                        self.stiffener_plt_thick_along_web = (6 * self.gamma_m0 * self.moment_on_stiffener_along_web * 10 ** 6) / \
-                                                             (self.stiffener_fy * self.stiffener_plt_height_along_web ** 2)
-                        self.stiffener_plt_thick_along_web = round_up(self.stiffener_plt_thick_along_web, 2)  # mm
+
+                        n = 1
+                        while self.moment_on_stiffener_along_web > self.moment_capa_stiffener_along_web:
+                            self.stiffener_plt_thick_along_web += 2
+
+                            # re-calculating the moment capacity by incorporating the improvised stiffener thickness along web
+                            self.z_e_stiffener_along_web = (self.stiffener_plt_thick_along_web * self.stiffener_plt_height_along_web ** 2) / 6  # mm^3
+                            self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_web, 0,
+                                                                                                                self.stiffener_fy,
+                                                                                                                section_class='semi-compact')
+                            self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kN-m
+                            n += 1
                     else:
                         pass
                 else:
@@ -2797,9 +2829,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if self.shear_on_stiffener_across_web > (0.6 * self.shear_capa_stiffener_across_web):
                         logger.warning("Fails in shear")
                         logger.info("Improvising thk")
-                        self.stiffener_plt_thick_across_web = (math.sqrt(3) * self.gamma_m0 * self.shear_on_stiffener_across_web * 1000) / \
-                                                              (self.stiffener_fy * self.stiffener_plt_height_across_web)
-                        self.stiffener_plt_thick_across_web = round_up(self.stiffener_plt_thick_across_web, 2)  # mm
+
+                        n = 1
+                        while self.shear_on_stiffener_across_web > (0.6 * self.shear_capa_stiffener_across_web):
+                            self.stiffener_plt_thick_across_web += 2
+
+                            self.shear_capa_stiffener_across_web = IS800_2007.cl_8_4_design_shear_strength(self.stiffener_plt_height_across_web *
+                                                                                                           self.stiffener_plt_thick_across_web,
+                                                                                                           self.stiffener_fy)
+                            self.shear_capa_stiffener_across_web = round((self.shear_capa_stiffener_across_web / 1000), 3)  # kN
+                            n += 1
 
                         # re-calculating the moment capacity by incorporating the improvised stiffener thickness across web
                         self.z_e_stiffener_across_web = (self.stiffener_plt_thick_across_web * self.stiffener_plt_height_across_web ** 2) / 6  # mm^3
@@ -2813,9 +2852,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if self.moment_on_stiffener_across_web > self.moment_capa_stiffener_across_web:
                         logger.warning("Fails in moment")
                         logger.info("Improvising thk")
-                        self.stiffener_plt_thick_across_web = (6 * self.gamma_m0 * self.moment_on_stiffener_across_web * 10 ** 6) / \
-                                                              (self.stiffener_fy * self.stiffener_plt_height_across_web ** 2)
-                        self.stiffener_plt_thick_across_web = round_up(self.stiffener_plt_thick_across_web, 2)  # mm
+
+                        n = 1
+                        while self.moment_on_stiffener_across_web > self.moment_capa_stiffener_across_web:
+                            self.stiffener_plt_thick_across_web += 2
+
+                            # re-calculating the moment capacity by incorporating the improvised stiffener thickness across web
+                            self.z_e_stiffener_across_web = (self.stiffener_plt_thick_across_web * self.stiffener_plt_height_across_web ** 2) / 6  # mm^3
+                            self.moment_capa_stiffener_across_web = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_across_web, 0,
+                                                                                                                 self.stiffener_fy,
+                                                                                                                 section_class='semi-compact')
+                            self.moment_capa_stiffener_across_web = round((self.moment_capa_stiffener_across_web * 10 ** -6), 3)  # kN-m
+                            n += 1
                     else:
                         pass
                 else:
@@ -2951,9 +2999,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if self.shear_on_stiffener > (0.6 * self.shear_capa_stiffener):
                 logger.warning("Fails in shear")
                 logger.info("Improvising thk")
-                self.stiffener_plt_thk = (math.sqrt(3) * self.gamma_m0 * self.shear_on_stiffener * 1000) / \
-                                                        (self.stiffener_fy * self.stiffener_plt_height)
-                self.stiffener_plt_thk = round_up(self.stiffener_plt_thk, 2)  # mm
+
+                n = 1
+                while self.shear_on_stiffener > (0.6 * self.shear_capa_stiffener):
+                    self.stiffener_plt_thk += 2
+                    self.shear_capa_stiffener = IS800_2007.cl_8_4_design_shear_strength((self.stiffener_plt_height * self.stiffener_plt_thk),
+                                                                                        self.stiffener_fy)
+                    self.shear_capa_stiffener = round((self.shear_capa_stiffener / 1000), 3)  # kN
+
+                    n += 1
 
                 # re-calculating the moment capacity by incorporating the improvised stiffener thickness along flange
                 self.z_e_stiffener = (self.stiffener_plt_thk * self.stiffener_plt_height ** 2) / 6  # mm^3
@@ -2967,9 +3021,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if self.moment_on_stiffener > self.moment_capa_stiffener:
                 logger.warning("Fails in moment")
                 logger.info("Improvising thk")
-                self.stiffener_plt_thk = (6 * self.gamma_m0 * self.moment_on_stiffener * 10 ** 6) / \
-                                                        (self.stiffener_fy * self.stiffener_plt_height ** 2)
-                self.stiffener_plt_thk = round_up(self.stiffener_plt_thk, 2)  # mm
+
+                n = 1
+                while self.moment_on_stiffener > self.moment_capa_stiffener:
+                    self.stiffener_plt_thk += 2
+
+                    self.z_e_stiffener = (self.stiffener_plt_thk * self.stiffener_plt_height ** 2) / 6  # mm^3
+                    self.moment_capa_stiffener = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener, 0, self.stiffener_fy,
+                                                                                              section_class='semi-compact')
+                    self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kN-m
+
+                    n += 1
+
             else:
                 pass
 

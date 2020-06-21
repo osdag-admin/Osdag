@@ -1171,7 +1171,7 @@ def shear_yield_prov(h,t, f_y, gamma, V_dg,multiple=1):
     shear_yield_eqn = Math(inline=True)
     shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{dy} &= \frac{A_v*f_y}{\sqrt{3}*\gamma_{mo}}\\'))
     shear_yield_eqn.append(NoEscape(r'&=\frac{'+multiple+'*'+h+'*'+t+'*'+f_y+'}{\sqrt{3}*'+gamma+r'}\\'))
-    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'}\\'))
+    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\\'))
     shear_yield_eqn.append(NoEscape(r'[Ref.&IS ~800:2007,Cl. 10.4.3]\end{aligned}'))
 
 
@@ -2543,7 +2543,7 @@ def shear_Rupture_prov_weld(h, t,fu,v_dn,gamma_m1,multiple =1):  #weld
     shear_rup_eqn.append(NoEscape(r'\begin{aligned} V_{dn} &= \frac{0.75*A_{vn}*f_u}{\sqrt{3}*\gamma_{m1}}\\'))
     shear_rup_eqn.append(NoEscape(r'&=\frac{'+ multiple+'*0.75*'+h+'*'+t+'*'+f_u+'}{\sqrt{3}*' +gamma_m1+ r'}\\'))
     shear_rup_eqn.append(NoEscape(r'&=' + v_dn + r'\\'))
-    shear_rup_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~6.3}\end{aligned}'))
+    shear_rup_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~6.3]\end{aligned}'))
     return shear_rup_eqn
 
 def shear_capacity_prov(V_dy, V_dn, V_db=0.0):
@@ -3537,7 +3537,7 @@ def plate_area_req(crs_area, flange_web_area):
     plate_crs_sec_area_eqn =Math(inline=True)
     plate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} &pt.area >= \\&connected~member~area * 1.05\\'))
     # plate_crs_sec_area_eqn.append(NoEscape(r'& = '+crs_area+ r' * 1.05 \\'))
-    plate_crs_sec_area_eqn.append(NoEscape(r' &= ' + flange_web_area  +  r'}\\'))
+    plate_crs_sec_area_eqn.append(NoEscape(r' &= ' + flange_web_area  +  r'\\'))
     plate_crs_sec_area_eqn.append(NoEscape(r' &[Ref: Cl.8.6.3.2 IS 800:2007]\end{aligned}'))
     return plate_crs_sec_area_eqn
 

@@ -1411,6 +1411,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.load_shear_minor = float(design_dictionary[KEY_SHEAR_MINOR])  # shear force acting along the minor axis (i.e. width of the column)
         self.load_shear_minor = self.load_shear_minor * 10 ** 3  # N
 
+        # shear load for shear key (designed in both directions)
+        self.load_shear_major = max(self.load_shear_major, self.load_shear_minor)
+        self.load_shear_minor = self.load_shear_major
         # TODO: check the condition given below
         # if self.load_shear_major < self.load_shear_minor:
         #     self.load_shear_major = self.load_shear_minor
@@ -2537,6 +2540,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.weld_size_flange = self.column_tf  # mm
                 self.weld_size_web = self.column_tw  # mm
 
+            # design of weld for the shear key
+            if (self.load_shear_major or self.load_shear_minor) > 0:
+                if self.shear_key_required == 'Yes':
+                    self.weld_size_shear_key = self.shear_key_thk
+            else:
+                pass
+
     def design_stiffeners(self):
         """ design and detail the stiffener plates
 
@@ -3046,16 +3056,24 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if (self.load_shear_major or self.load_shear_minor) > 0:
             if self.shear_key_required == 'Yes':
                 print(self.shear_key_thk)
+                print(self.weld_size_shear_key)
 
                 if self.load_shear_major > 0:
                     print(self.shear_key_len_ColDepth)
                     print(self.shear_key_depth_ColDepth)
+                    print(self.shear_key_stress_ColDepth)
                 else:
                     print(self.shear_key_len_ColWidth)
                     print(self.shear_key_depth_ColWidth)
-                    
+                    print(self.shear_key_stress_ColWidth)
             else:
-                pass
+                self.shear_key_len_ColDepth = 'N/A'
+                self.shear_key_depth_ColDepth = 'N/A'
+                self.shear_key_stress_ColDepth = 'N/A'
+
+                self.shear_key_len_ColWidth = 'N/A'
+                self.shear_key_depth_ColWidth = 'N/A'
+                self.shear_key_stress_ColWidth = 'N/A'
         else:
             pass
 

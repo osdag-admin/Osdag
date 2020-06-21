@@ -1,20 +1,26 @@
 class Load(object):
 
-    def __init__(self, axial_force=0.0, shear_force=0.0, moment=0.0):
+    def __init__(self, axial_force=0.0, shear_force=0.0, moment=0.0, unit_kNm=False):
 
+        force_multiplier = 1.0
+        moment_multiplier = 1.0
+        if unit_kNm is True:
+            force_multiplier = 1e3
+            moment_multiplier = 1e6
         if axial_force is not "":
-            print('hi', axial_force)
-            self.axial_force = float(axial_force)
+            self.axial_force = force_multiplier * float(axial_force)
         else:
             self.axial_force = 0.0
         if shear_force is not "":
-            self.shear_force = float(shear_force)
+            self.shear_force = force_multiplier * float(shear_force)
         else:
             self.shear_force = 0.0
         if moment is not "":
-            self.moment = float(moment)
+            self.moment = moment_multiplier * float(moment)
         else:
             self.moment = 0.0
+        print("setting factored input loads as, axial force = {0} N, shear force = {1} N, moment = {2} Nmm".format(
+            self.axial_force, self.shear_force, self.moment))
 
     def __repr__(self):
         repr = "Load\n"

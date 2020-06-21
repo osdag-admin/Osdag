@@ -66,6 +66,11 @@ class NutBoltArray():
         self.end = 35  # Obj.plate.end_dist_provided
         self.row = 2  # Obj.plate.bolts_one_line
         self.col = 2  # Obj.plate.bolt_line
+        self.memberdeepth = 125
+        self.member_thickness = 6.6
+        self.member_web_thickness = 3
+        self.root_radius = 6
+
 
     def calculatePositions(self):
         """
@@ -75,7 +80,7 @@ class NutBoltArray():
         for rw in range(self.row):
             for col in range(self.col):
                 pos = self.origin
-                pos = pos + 5 * self.gaugeDir
+                pos = pos + (self.member_thickness + self.root_radius) * self.gaugeDir
                 pos = pos + self.edge * self.gaugeDir
                 pos = pos + col * self.pitch * self.pitchDir
                 pos = pos + self.end * self.pitchDir

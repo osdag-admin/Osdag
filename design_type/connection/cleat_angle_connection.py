@@ -54,28 +54,36 @@ class CleatAngleConnection(ShearConnection):
 
         t5 = (DISP_TITLE_CLEAT, ['Label_1', 'Label_2','Label_3'],
               ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
-               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23'],
+               'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23', KEY_IMAGE],
               TYPE_TEXTBOX, self.get_Angle_sec_properties)
         change_tab.append(t5)
 
         t6 = (DISP_TITLE_CLEAT, [KEY_ANGLE_LIST, KEY_CONNECTOR_MATERIAL],
               [KEY_ANGLE_SELECTED, KEY_CONNECTOR_FY, KEY_CONNECTOR_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5', 'Label_7',
-               'Label_8', 'Label_9',
-               'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
-               'Label_18',
-               'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23','Label_24'], TYPE_TEXTBOX,
+               'Label_8', 'Label_9','Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
+               'Label_18','Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23','Label_24', KEY_IMAGE], TYPE_TEXTBOX,
               self.get_new_angle_section_properties)
         change_tab.append(t6)
 
-        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+
+        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20','Label_21','Label_22',KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t4)
 
-        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20','Label_21','Label_22',KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
+
+        t6 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t6)
+
+        t7 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t7)
+
+        t8 = (DISP_TITLE_CLEAT, [KEY_ANGLE_SELECTED], ['Label_24'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t8)
 
         return change_tab
 
@@ -551,21 +559,19 @@ class CleatAngleConnection(ShearConnection):
             logger.error("Cleat Angle should have minimum thickness of %2.2f" % min_thickness)
 
     def member_capacity(self):
-        if self.connectivity in VALUES_CONN_1:
-            if self.supported_section.type == "Rolled":
-                length = self.supported_section.depth
-            else:
-                length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)
-        else:
-            length = self.supported_section.depth - 50.0  # TODO: Subtract notch height for beam-beam connection
+        super(CleatAngleConnection, self).member_capacity(self)
 
-        self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
+        if self.supported_section.shear_yielding_capacity / 1000 > self.load.shear_force and \
+                self.supported_section.tension_yielding_capacity / 1000 > self.load.axial_force:
 
-        print(self.supported_section.shear_yielding_capacity, self.load.shear_force,
-              self.supported_section.tension_yielding_capacity, self.load.axial_force)
+            if self.load.shear_force <= min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
+                                            40.0):
+                logger.warning(" : User input for shear force is very less compared to section capacity. "
+                               "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
+                self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
+                                            40.0)
 
-        if self.supported_section.shear_yielding_capacity > self.load.shear_force:
-            logger.info("preliminary member check is satisfactory. Checking if possible Bolt Diameters are available")
+            print("preliminary member check is satisfactory. Checking available Bolt Diameters")
             self.select_bolt_dia(self)
 
         else:

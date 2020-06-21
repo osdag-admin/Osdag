@@ -488,8 +488,8 @@ class IS800_2007(object):
     def cl_10_2_4_3_max_edge_dist(conn_plates_t_fu_fy, corrosive_influences=False):
         """Calculate maximum end and edge distance
         Args:
-             plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
-             f_y - Yield strength of plate material in MPa (float)
+             conn_plates_t_fu_fy - List of tuples with plate thicknesses in mm, fu in MPa, fy in MPa (list of tuples)
+                                example:- [ (12, 410, 250), (10, 440, 300) ]
              corrosive_influences - Whether the members are exposed to corrosive influences or not (Boolean)
         Returns:
             Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
@@ -935,6 +935,21 @@ class IS800_2007(object):
 
         return K
 
+        # Cl. 10.5.3.3 Effective throat size of groove (butt) welds
+
+    @staticmethod
+    def cl_10_5_3_3_groove_weld_effective_throat_thickness(*args):
+
+        """Calculate effective throat thickness of complete penetration butt welds
+        *args:
+            Thicknesses of each plate element being welded in mm (tuple of float)
+        Returns:
+            Effective throat thickness of CJP butt weld in mm (float)
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.3.3
+        """
+        return min(*args)
 
     @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):
@@ -949,8 +964,10 @@ class IS800_2007(object):
             Reference:
             IS 800:2007,  cl 10.5.4.1
         """
-        # TODO :  if available_length >= 4 * fillet_size
-        effective_length = available_length - 2 * fillet_size
+        if available_length <= 4 * fillet_size:
+            effective_length = 0
+        else:
+            effective_length = available_length - 2 * fillet_size
         return effective_length
 
     # cl. 10.5.7.1.1 Design stresses in fillet welds

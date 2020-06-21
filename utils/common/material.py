@@ -43,9 +43,9 @@ class Material(object):
             self.fy_20_40 = row[2]
             self.fy_40 = row[3]
             if thickness != '':
-                if thickness <= 20:
+                if thickness < 20:
                     self.fy = self.fy_20
-                elif 20 < thickness <=40:
+                elif 20 <= thickness <=40:
                     self.fy = self.fy_20_40
                 else:
                     self.fy = self.fy_40

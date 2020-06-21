@@ -1,6 +1,6 @@
 Bolt.Bolt_Hole_Type: Standard
 Bolt.Diameter:
-- '12'
+- '24'
 Bolt.Grade:
 - '3.6'
 - '4.6'
@@ -12,12 +12,12 @@ Bolt.Grade:
 - '9.8'
 - '10.9'
 - '12.9'
-Bolt.Material_Grade_OverWrite: '570'
+Bolt.Material_Grade_OverWrite: '490'
 Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
-Bolt.Type: Friction Grip Bolt
-Connectivity: Column flange-Beam web
-Connector.Material: E 450 (Fe 570)D
+Bolt.Type: Bearing Bolt
+Connectivity: Beam-Beam
+Connector.Material: E 350 (Fe 490)
 Connector.Plate.Thickness_List:
 - '3'
 - '4'
@@ -39,13 +39,13 @@ Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
-Load.Axial: '60'
-Load.Shear: '150'
+Load.Axial: '45'
+Load.Shear: '50'
 Material: E 350 (Fe 490)
-Member.Supported_Section.Designation: MB 550
-Member.Supported_Section.Material: E 250 (Fe 410 W)A
-Member.Supporting_Section.Designation: UC 305 x 305 x 97
-Member.Supporting_Section.Material: E 410 (Fe 540)
+Member.Supported_Section.Designation: MB 200
+Member.Supported_Section.Material: E 350 (Fe 490)
+Member.Supporting_Section.Designation: MB 300
+Member.Supporting_Section.Material: E 350 (Fe 490)
 Module: Fin Plate
 Weld.Fab: Shop Weld
-Weld.Material_Grade_OverWrite: '570'
+Weld.Material_Grade_OverWrite: '490'

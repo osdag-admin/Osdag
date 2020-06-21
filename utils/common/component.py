@@ -1271,7 +1271,7 @@ class Plate(Material):
 
             if shear_ecc is True:
                 # If check for shear eccentricity is true, resultant force in bolt is calculated
-                ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
+                ecc = (pitch * max((bolt_line/2 - 0.5), 0)) + end_dist + gap
                 moment_demand = shear_load * ecc + web_moment
                 vres = self.get_vres(bolts_one_line, pitch,
                                      gauge, bolt_line, shear_load, axial_load, ecc,web_moment)
@@ -1323,7 +1323,7 @@ class Plate(Material):
 
                 if shear_ecc is True:
                     # If check for shear eccentricity is true, resultant force in bolt is calculated
-                    ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
+                    ecc = (pitch * max((bolt_line/2 - 0.5), 0)) + end_dist + gap
                     moment_demand = shear_load * ecc + web_moment
                     vres = self.get_vres(bolts_one_line, pitch,
                                          gauge, bolt_line, shear_load, axial_load, ecc,web_moment)

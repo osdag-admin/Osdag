@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from design_report import reportGenerator
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp
+from PyQt5.QtCore import QRegExp,QTimer
 from PyQt5.QtGui import QBrush, QImage
 from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
@@ -21,6 +21,7 @@ from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PyQt5.QtGui import QStandardItem
+from PIL import Image
 import os
 import yaml
 import json
@@ -170,7 +171,7 @@ class Window(QMainWindow):
             return
 
         self.new_window = QtWidgets.QDialog()
-        self.new_ui = Ui_Dialog1(main.design_button_status)
+        self.new_ui = Ui_Dialog1(main.design_button_status,loggermsg=self.textEdit.toPlainText())
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
@@ -1691,7 +1692,6 @@ class Window(QMainWindow):
     def common_function_for_save_and_design(self, main, data, trigger_type):
 
         # @author: Amir
-
         option_list = main.input_values(self)
         self.design_fn(option_list, data, main)
 
@@ -1761,12 +1761,30 @@ class Window(QMainWindow):
 
                 if file_extension == 'png':
                     self.display.ExportToImage(fName)
+                    im = Image.open('./ResourceFiles/images/3d.png')
+                    w,h=im.size
+                    if(w< 640 or h < 360):
+                        print('Re-taking Screenshot')
+                        self.resize(700,500)
+                        self.outputDock.hide()
+                        self.inputDock.hide()
+                        self.textEdit.hide()
+                        QTimer.singleShot(0, lambda:self.retakeScreenshot(fName))
 
             else:
                 for chkbox in main.get_3d_components(main):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(False)
                 for action in self.menugraphics_component_list:
                     action.setEnabled(False)
+    def retakeScreenshot(self,fName):
+        Ww=self.frameGeometry().width()
+        Wh=self.frameGeometry().height()
+        self.display.FitAll()
+        self.display.ExportToImage(fName)
+        self.resize(Ww,Wh)
+        self.outputDock.show()
+        self.inputDock.show()
+        self.textEdit.show()
 
     def show_error_msg(self, error):
         QMessageBox.about(self,'information',error[0])  # show only first error message.

@@ -14,7 +14,7 @@ import datetime
 import pylatex as pyl
 from pylatex.basic import TextColor
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
-from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor
 from pylatex.utils import italic
 #from pdflatex import PDFLaTeX
 import os
@@ -243,9 +243,20 @@ class CreateLatex(Document):
                 with doc.create(Figure(position='h!')) as view_3D:
                     view_3dimg_path = rel_path + Disp_3d_image
                     # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
-                    view_3D.add_image(filename=view_3dimg_path)
+                    view_3D.add_image(filename=view_3dimg_path,width='500px')
 
                     view_3D.add_caption('3D View')
+        
+        with doc.create(Section('Design Log')):
+            logger_msgs=reportsummary['logger_messages'].split('\n')
+            for msg in logger_msgs:
+                if('WARNING' in msg):
+                    colour='blue'
+                elif('INFO' in msg):
+                    colour='green'
+                elif('ERROR' in msg):
+                    colour='red'
+                doc.append(TextColor(colour,'\n'+msg))
         try:
             doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
         except:

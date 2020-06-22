@@ -13,7 +13,8 @@ import sys
 import datetime
 import pylatex as pyl
 from pylatex.basic import TextColor
-from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
+from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu,\
+    MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic
 #from pdflatex import PDFLaTeX
@@ -22,7 +23,6 @@ from pylatex.base_classes import Environment, CommandBase, Arguments
 from pylatex.package import Package
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
     MediumText, LineBreak, simple_page_number, NewPage
-
 
 from pylatex.utils import bold
 
@@ -34,7 +34,8 @@ class CreateLatex(Document):
 
     def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
-        companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
+        # companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
+        companylogo = '/ResourceFiles/images/Osdag_2.jpg'
         groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
         designer = str(reportsummary["ProfileSummary"]['Designer'])
         projecttitle = str(reportsummary['ProjectTitle'])
@@ -58,17 +59,24 @@ class CreateLatex(Document):
         header = PageStyle("header")
         # Create center header
         with header.create(Head("C")):
-            with header.create(Tabularx('|l|p{6cm}|l|X|')) as table:
+            with header.create(Tabularx('|p{2cm}|l|p{4cm}|l|X|')) as table:
                 table.add_hline()
                 # MultiColumn(4)
-                table.add_row(('Company Name', companyname, 'Project Title', projecttitle), color='OsdagGreen')
+                table.add_row((MultiRow(4, data=StandAloneGraphic(image_options="width=2cm,height=2cm",
+                                                             filename=rel_path + companylogo)),
+                                       color_cell('OsdagGreen','Company Name'),color_cell('OsdagGreen',companyname),
+                               color_cell('OsdagGreen','Project Title'),color_cell('OsdagGreen',projecttitle)))
+                table.add_hline(2, 5)
+                table.add_row(('',color_cell('OsdagGreen','Group/Team Name'),color_cell('OsdagGreen',groupteamname),
+                               color_cell('OsdagGreen','Subtitle'),color_cell('OsdagGreen',subtitle)))
+                table.add_hline(2, 5)
+                table.add_row(('',color_cell('OsdagGreen','Designer'),color_cell('OsdagGreen',designer),
+                               color_cell('OsdagGreen','Job Number'),color_cell('OsdagGreen',jobnumber)))
+                table.add_hline(2, 5)
+                table.add_row(('', color_cell('OsdagGreen', 'Date'), color_cell('OsdagGreen', time.strftime("%d /%m /%Y")),
+                               color_cell('OsdagGreen', 'Client'), color_cell('OsdagGreen', client)))
                 table.add_hline()
-                table.add_row(('Group/Team Name', groupteamname, 'Subtitle', subtitle), color='OsdagGreen')
-                table.add_hline()
-                table.add_row(('Designer', designer, 'Job Number', jobnumber), color='OsdagGreen')
-                table.add_hline()
-                table.add_row(('Date', time.strftime("%d /%m /%Y"), 'Client', client), color='OsdagGreen')
-                table.add_hline()
+
 
         # Create right footer
         with header.create(Foot("R")):
@@ -250,4 +258,10 @@ class CreateLatex(Document):
             doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
         except:
             pass
+
+
+def color_cell(cellcolor,celltext):
+    string = NoEscape(r'\cellcolor{'+cellcolor+r'}{'+celltext+r'}')
+    return string
+
 

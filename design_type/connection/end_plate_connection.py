@@ -1216,7 +1216,7 @@ class EndPlateConnection(ShearConnection):
             t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),self.plate.edge_dist_provided,
                   get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided, relation='lesser'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_END, max_edge_end_new(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
+            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_dist_modified(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
                   self.plate.edge_dist_provided,
                   get_pass_fail(self.bolt.max_end_dist, self.plate.end_dist_provided, relation='greater'))
             self.report_check.append(t4)
@@ -1224,7 +1224,7 @@ class EndPlateConnection(ShearConnection):
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided, relation='lesser'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_EDGE, max_edge_end_new(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
+            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_dist_modified(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.max_edge_dist, self.plate.edge_dist_provided, relation="greater"))
             self.report_check.append(t4)

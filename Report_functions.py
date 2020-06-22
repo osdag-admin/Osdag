@@ -122,7 +122,7 @@ def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - S
         # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
         end_edge_multiplier = 1.5
 
-    min_end_edge_dist = end_edge_multiplier * d_0
+    min_end_edge_dist = round(end_edge_multiplier * d_0,2)
 
     d_0 = str(d_0)
     end_edge_multiplier = str(end_edge_multiplier)
@@ -130,16 +130,16 @@ def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - S
 
     end_edge_eqn = Math(inline=True)
     if parameter == 'end_dist':
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}End~Distance~_{min} = ' + end_edge_multiplier + '~d_0 \\'))
+        end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{min} &= ' + end_edge_multiplier + r'*~d_0 \\'))
     else:  # parameter == 'edge_dist'
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}Edge~Distance~_{min} = ' + end_edge_multiplier + '~d_0 \\'))
+        end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{min} &= ' + end_edge_multiplier + r'*~d_0 \\'))
 
-    end_edge_eqn.append(NoEscape(r'\begin = ' + end_edge_multiplier + '~ ' + d_0 + r'\\'))
-    end_edge_eqn.append(NoEscape(r'\begin = ' + min_end_edge_dist + ''))
-    end_edge_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.2.4.2]&\end{aligned}'))
+    end_edge_eqn.append(NoEscape(r'&= ' + end_edge_multiplier + '~* ' + d_0 + r'\\'))
+    end_edge_eqn.append(NoEscape(r'&=' + min_end_edge_dist + r'\\'))
+    end_edge_eqn.append(NoEscape(r'[Ref.~IS~800:2007,~Cl.~10.2.4.2]\end{aligned}'))
     return end_edge_eqn
 
-
+#TODO:Everyone please use modified function (next one)
 def cl_10_2_4_3_max_edge_dist(plate_thicknesses, f_y, corrosive_influences=False, parameter='end_dist'):
     """
     Calculate maximum end and edge distance
@@ -183,6 +183,66 @@ def cl_10_2_4_3_max_edge_dist(plate_thicknesses, f_y, corrosive_influences=False
     end_edge_eqn.append(NoEscape(r'\begin = ' + max_end_edge_dist + ''))
     end_edge_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.2.4.3]&\end{aligned}'))
     return end_edge_eqn
+
+
+def cl_10_2_4_3_max_edge_dist_modified(t_fu_fy,corrosive_influences):
+    """
+    Calculate maximum end and edge distance(new)
+     Args:
+
+         t_fu_fy: Thickness of thinner plate in mm (float)
+         corrosive_influences: Whether the members are exposed to corrosive influences or not (Boolean)
+
+    Returns:
+         Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
+
+    Note:
+            Reference:
+            IS 800:2007, cl. 10.2.4.3
+
+
+    """
+    t_epsilon_considered = t_fu_fy[0][0] * math.sqrt(250 / float(t_fu_fy[0][2]))
+    t_considered = t_fu_fy[0][0]
+    t_min = t_considered
+    for i in t_fu_fy:
+        t = i[0]
+        f_y = i[2]
+        epsilon = math.sqrt(250 / f_y)
+        if t * epsilon <= t_epsilon_considered:
+            t_epsilon_considered = t * epsilon
+            t_considered = t
+        if t < t_min:
+            t_min = t
+
+    if corrosive_influences is True:
+        max_edge_dist =  round(40.0 + 4 * t_min,2)
+    else:
+        max_edge_dist = round(12 * t_epsilon_considered,2)
+
+    max_edge_dist = str(max_edge_dist)
+    t1=str(t_fu_fy[0][0])
+    t2=str(t_fu_fy[1][0])
+    fy1 = str(t_fu_fy[0][2])
+    fy2 = str(t_fu_fy[1][2])
+    max_end_edge_eqn = Math(inline=True)
+    if corrosive_influences is False:
+        max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
+        max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
+        max_end_edge_eqn.append(NoEscape(r'e1 &= 12 ~*' + t1 + r'*\sqrt{\frac{250}{' + fy1 + r'}}\\'))
+        max_end_edge_eqn.append(NoEscape(r'e2 &= 12 ~*' + t2 + r'*\sqrt{\frac{250}{' + fy2 + r'}}\\'))
+        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=min(e1,e2)\\'))
+        max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'\\'))
+        max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
+
+    else:
+        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=40 + 4*t \\'))
+        max_end_edge_eqn.append(NoEscape(r'Where, t&= min(' + t1 +', '+t2+r')\\'))
+        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&='+max_edge_dist+r'\\'))
+        max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
+
+
+    return max_end_edge_eqn
 
 def max_pitch(t):#todo:done
     """
@@ -284,64 +344,7 @@ def max_edge_end(f_y,t):
     return max_end_edge_eqn
 
 
-def max_edge_end_new(t_fu_fy,corrosive_influences):
-    """
-    Calculate maximum end and edge distance(new)
-     Args:
 
-         t_fu_fy: Thickness of thinner plate in mm (float)
-         corrosive_influences: Whether the members are exposed to corrosive influences or not (Boolean)
-
-    Returns:
-         Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
-
-    Note:
-            Reference:
-            IS 800:2007, cl. 10.2.4.3
-
-
-    """
-    t_epsilon_considered = t_fu_fy[0][0] * math.sqrt(250 / float(t_fu_fy[0][2]))
-    t_considered = t_fu_fy[0][0]
-    t_min = t_considered
-    for i in t_fu_fy:
-        t = i[0]
-        f_y = i[2]
-        epsilon = math.sqrt(250 / f_y)
-        if t * epsilon <= t_epsilon_considered:
-            t_epsilon_considered = t * epsilon
-            t_considered = t
-        if t < t_min:
-            t_min = t
-
-    if corrosive_influences is True:
-        max_edge_dist =  40.0 + 4 * t_min
-    else:
-        max_edge_dist = 12 * t_epsilon_considered
-
-    max_edge_dist = str(max_edge_dist)
-    t1=str(t_fu_fy[0][0])
-    t2=str(t_fu_fy[1][0])
-    fy1 = str(t_fu_fy[0][2])
-    fy2 = str(t_fu_fy[1][2])
-    max_end_edge_eqn = Math(inline=True)
-    if corrosive_influences is False:
-        max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
-        max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'e1 &= 12 ~*' + t1 + r'*\sqrt{\frac{250}{' + fy1 + r'}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'e2 &= 12 ~*' + t2 + r'*\sqrt{\frac{250}{' + fy2 + r'}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=min(e1,e2)\\'))
-        max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
-
-    else:
-        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=40 + 4*t \\'))
-        max_end_edge_eqn.append(NoEscape(r'Where, t&= min(' + t1 +', '+t2+r')\\'))
-        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&='+max_edge_dist+r'\\'))
-        max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
-
-
-    return max_end_edge_eqn
 
 
 def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
@@ -1903,15 +1906,15 @@ def weld_strength_req(V,A,M,Ip_w,y_max,x_max,l_w,R_w):
         weld_stress_eqn.append(NoEscape(r'V_{wv}&=\frac{V}{l_w}=\frac{'+V+'}{'+l_w+r'}\\'))
         weld_stress_eqn.append(NoEscape(r'A_{wh}&=\frac{A}{l_w}=\frac{'+A+'}{'+l_w+r'}\\'))
         weld_stress_eqn.append(NoEscape(r'R_w&=\sqrt{('+T_wh+'+'+A_wh+r')^2 + ('+T_wv+'+'+V_wv+r')^2}\\'))
-        weld_stress_eqn.append(NoEscape(r'&='+R_w+r'}\\'))
-        weld_stress_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1]&\end{aligned}'))
+        weld_stress_eqn.append(NoEscape(r'&='+R_w+r'\\'))
+        weld_stress_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1]\end{aligned}'))
     else:
         weld_stress_eqn = Math(inline=True)
         weld_stress_eqn.append(NoEscape(r'\begin{aligned} R_w&=\sqrt{(A_{wh})^2 + (V_{wv})^2}\\'))
         weld_stress_eqn.append(NoEscape(r'V_{wv}&=\frac{V}{l_w}=\frac{' + V + '}{' + l_w + r'}\\'))
         weld_stress_eqn.append(NoEscape(r'A_{wh}&=\frac{A}{l_w}=\frac{' + A + '}{' + l_w + r'}\\'))
         weld_stress_eqn.append(NoEscape(r'R_w&=\sqrt{('+A_wh + r')^2 + (' + V_wv + r')^2}\\'))
-        weld_stress_eqn.append(NoEscape(r'&=' + R_w + r'}\\'))
+        weld_stress_eqn.append(NoEscape(r'&=' + R_w + r'\\'))
         weld_stress_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1]\end{aligned}'))
 
     return weld_stress_eqn

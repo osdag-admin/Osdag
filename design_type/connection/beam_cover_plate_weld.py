@@ -309,7 +309,8 @@ class BeamCoverPlateWeld(MomentConnection):
         # t15 = (KEY_WEB_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,(self.l_req_weblength) if flag else '')
         # web_weld_details.append(t15)
 
-
+        t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/beamweb_weld.png')
+        web_weld_details.append(t99)
         t14 = (KEY_WEB_WELD_SIZE, KEY_WEB_DISP_WELD_SIZE, TYPE_TEXTBOX, self.web_weld.size if flag else '')
         web_weld_details.append(t14)
 
@@ -331,7 +332,8 @@ class BeamCoverPlateWeld(MomentConnection):
         # t15 = (KEY_FLANGE_WELD_HEIGHT, KEY_DISP_FLANGE_WELD_HEIGHT, TYPE_TEXTBOX,
         #        (self.flange_weld.height) if flag else '')
         # flange_weld_details.append(t15)
-
+        t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/beamflange_weld.png')
+        flange_weld_details.append(t99)
         t14 = (KEY_FLANGE_WELD_SIZE, KEY_FLANGE_DISP_WELD_SIZE, TYPE_TEXTBOX, self.flange_weld.size if flag else '')
         flange_weld_details.append(t14)
 
@@ -1324,8 +1326,9 @@ class BeamCoverPlateWeld(MomentConnection):
         # for self.web_plate.thickness_provided in available_web_thickness:
         design_status_block_shear = False
         while design_status_block_shear == False:
-            Avg = 2 * (self.available_long_web_length) * self.section.web_thickness
-            Avn = 2 * (self.available_long_web_length) * self.section.web_thickness
+            #TODO: To be reviewed by anjali. Added 2*s to get length of plate
+            Avg = round_up(2 * (self.available_long_web_length+(2 * self.web_weld.size)),5) * self.section.web_thickness
+            Avn = round_up(2 * (self.available_long_web_length+(2 * self.web_weld.size)),5) * self.section.web_thickness
             Atg = self.web_plate.height * self.section.web_thickness
             Atn = self.web_plate.height * self.section.web_thickness
             self.section.block_shear_capacity_web = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn,
@@ -1509,7 +1512,7 @@ class BeamCoverPlateWeld(MomentConnection):
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         # A_vn = (height- bolts_one_line * dia_hole) * thickness
-        T_dn = 0.9 * A_vn * fu / (math.sqrt(3) * gamma_m1)
+        T_dn = 0.75 * A_vn * fu / (math.sqrt(3) * gamma_m1)
         return T_dn
 
 
@@ -1616,8 +1619,7 @@ class BeamCoverPlateWeld(MomentConnection):
         print("class_of_section1", class_of_section1)
 
     def min_thick_based_on_area(self, tk, width, list_of_pt_tk, t_w, r_1, D,
-                                preference=None,fp_thk=None):  # area of flange plate should be greater than 1.05 times area of flange
-        # 20 is the maximum spacing either side of the plate
+                                preference=None,fp_thk=None):
 
         """
 
@@ -1836,11 +1838,11 @@ class BeamCoverPlateWeld(MomentConnection):
                         # webplate
                         KEY_WEB_PLATE_HEIGHT: self.web_plate.height,
                         KEY_WEB_PLATE_LENGTH: self.web_plate.length,
-                        KEY_DISP_WEBPLATE_THICKNESS: self.web_plate.thickness_provided,
+                        KEY_OUT_WEBPLATE_THICKNESS: self.web_plate.thickness_provided,
                         # flange plate_outer
                         KEY_FLANGE_PLATE_HEIGHT: self.flange_plate.height,
                         KEY_FLANGE_PLATE_LENGTH: self.plate_out_len,
-                        KEY_DISP_FLANGESPLATE_THICKNESS: self.flange_out_plate_tk,
+                        KEY_OUT_FLANGESPLATE_THICKNESS: self.flange_out_plate_tk,
                         # flange plate_inner
                         KEY_INNERFLANGE_PLATE_HEIGHT: self.flange_plate.Innerheight,
                         KEY_INNERFLANGE_PLATE_LENGTH: self.plate_in_len,
@@ -2126,7 +2128,7 @@ class BeamCoverPlateWeld(MomentConnection):
                 # if (self.flange_plate_crs_sec_area >= (1.05 * self.flange_crs_sec_area)) and len(self.flange_plate_thickness_possible) != 0 and len(self.web_plate_thickness_possible) != 0 :
             if self.member_capacity_status == True and (self.section.tension_yielding_capacity > self.flange_force) and (
                     len(self.flange_plate_thickness_possible) != 0):
-                t1 = ('SubSection', 'Initial web plate height check', '|p{3cm}|p{3cm}|p{8cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Initial web plate height check', '|p{3cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 t1 = (KEY_WEB_PLATE_HEIGHT, web_width_min(D=self.section.depth, min_req_width=self.min_web_plate_height),
                       web_width_chk_weld(D=self.section.depth,

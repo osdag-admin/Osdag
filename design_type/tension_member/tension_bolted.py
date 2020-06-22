@@ -6,7 +6,7 @@ from utils.common.component import *
 from utils.common.material import *
 from Report_functions import *
 from utils.common.load import Load
-
+from utils.common.Section_Properties_Calculator import *
 
 import logging
 
@@ -212,9 +212,6 @@ class Tension_bolted(Member):
 
         return add_buttons
 
-    def get_3d_components(self):
-        components = []
-        return components
     ####################################
     # Design Preference Functions End
     ####################################
@@ -534,8 +531,7 @@ class Tension_bolted(Member):
 
         spacing = []
 
-        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/pitch.png')
-        spacing.append(t99)
+
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
         spacing.append(t9)
@@ -548,6 +544,9 @@ class Tension_bolted(Member):
 
         t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
         spacing.append(t12)
+
+        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/pitch.png')
+        spacing.append(t99)
 
         return spacing
 
@@ -2414,20 +2413,20 @@ class Tension_bolted(Member):
         else:
             t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{2.5cm}|')
             self.report_check.append(t1)
-            t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt_diameter_min), "d"), '')
-            self.report_check.append(t6)
-            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.d_0_min), "d_0"), '')
-            self.report_check.append(t8)
-            # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
+            # t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt_diameter_min), "d"), '')
+            # self.report_check.append(t6)
+            # t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.d_0_min), "d_0"), '')
+            # self.report_check.append(t8)
+            # # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
+            # # self.report_check.append(t2)
+            # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min, row_limit), min_gauge, get_pass_fail(self.bolt.min_gauge, min_gauge, relation="leq"))
             # self.report_check.append(t2)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min, row_limit), min_gauge, get_pass_fail(self.bolt.min_gauge, min_gauge, relation="leq"))
-            self.report_check.append(t2)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.d_0_min, self.bolt.edge_type),
-                  self.edge_dist_min_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
-            self.report_check.append(t3)
-            t3 = (KEY_SPACING, depth_req(self.edge_dist_min_round, self.pitch_round, row, text), depth_max,
-                  get_pass_fail(depth, depth_max, relation="lesser"))
-            self.report_check.append(t3)
+            # t3 = (DISP_MIN_EDGE, min_edge_end(self.d_0_min, self.bolt.edge_type),
+            #       self.edge_dist_min_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
+            # self.report_check.append(t3)
+            # t3 = (KEY_SPACING, depth_req(self.edge_dist_min_round, self.pitch_round, row, text), depth_max,
+            #       get_pass_fail(depth, depth_max, relation="lesser"))
+            # self.report_check.append(t3)
 
         if self.member_design_status == True and self.bolt_design_status == True:
             t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|')
@@ -2488,7 +2487,7 @@ class Tension_bolted(Member):
             self.report_check.append(t8)
 
 
-            t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area, "A_{nb}"," Ref~IS~1367-3~(2002)"), '')
+            t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area, "A_{nb}"," [Ref~IS~1367-3~(2002)]"), '')
             self.report_check.append(t8)
 
             t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),

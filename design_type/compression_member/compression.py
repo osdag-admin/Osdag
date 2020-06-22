@@ -1,6 +1,7 @@
 from design_type.main import Main
 from Common import *
-from utils.common.component import Section,I_sectional_Properties, Material
+from utils.common.component import ISection, Material
+from utils.common.Section_Properties_Calculator import I_sectional_Properties
 
 
 class Compression(Main):
@@ -881,8 +882,8 @@ class Compression(Main):
 
             designation = str(input_dictionary[KEY_SECSIZE][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
-            col_attributes = Section(designation, material_grade)
-            Section.connect_to_database_update_other_attributes(
+            col_attributes = ISection(designation, material_grade)
+            ISection.connect_to_database_update_other_attributes(
                 col_attributes, "Columns", designation)
             source = str(col_attributes.source)
             fu = str(col_attributes.fu)
@@ -1068,8 +1069,8 @@ class Compression(Main):
 
             designation = str(input_dictionary[KEY_SECSIZE][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
-            col_attributes = Section(designation, material_grade)
-            Section.connect_to_database_update_other_attributes(col_attributes, "Beams", designation,material_grade)
+            col_attributes = ISection(designation, material_grade)
+            ISection.connect_to_database_update_other_attributes(col_attributes, "Beams", designation, material_grade)
             source = str(col_attributes.source)
             fu = str(col_attributes.fu)
             fy = str(col_attributes.fy)
@@ -1465,8 +1466,8 @@ class Compression(Main):
             table = "Beams"
         else:
             table = "Columns"
-        col_attributes = Section(designation, material_grade)
-        Section.connect_to_database_update_other_attributes(
+        col_attributes = ISection(designation, material_grade)
+        ISection.connect_to_database_update_other_attributes(
             col_attributes, table, designation,material_grade)
         source = str(col_attributes.source)
         depth = str(col_attributes.depth)

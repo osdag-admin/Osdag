@@ -1604,24 +1604,27 @@ class ColumnEndPlate(MomentConnection):
 #####################################################################
 
     def results_to_test(self):
-        test_input = {KEY_MODULE : self.module,
-                      KEY_MAIN_MODULE: self.mainmodule,
-                      KEY_DISP_SEC_PROFILE: "ISection",
-                      KEY_DISP_BEAMSEC: self.section.designation,
-                      KEY_MATERIAL: self.section.material,
-                      KEY_SEC_FU: self.section.fu,
-                      KEY_SEC_FY: self.section.fy,
-                      KEY_D: self.bolt.bolt_diameter,
-                      KEY_GRD: self.bolt.bolt_grade,
-                      KEY_TYP: self.bolt.bolt_type,
-                      KEY_PLATETHK: self.plate.thickness,
-                      KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-                      KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
-                      KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-                      KEY_DP_DETAILING_GAP: self.plate.gap,
-                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
-
-        test_output = {KEY_MEMBER_MOM_CAPACITY: round(self.moment_capacity / 1000000, 2),
+        # test_input = {KEY_MODULE : self.module,
+        #               KEY_MAIN_MODULE: self.mainmodule,
+        #               KEY_DISP_SEC_PROFILE: "ISection",
+        #               KEY_DISP_BEAMSEC: self.section.designation,
+        #               KEY_MATERIAL: self.section.material,
+        #               KEY_SEC_FU: self.section.fu,
+        #               KEY_SEC_FY: self.section.fy,
+        #               KEY_D: self.bolt.bolt_diameter,
+        #               KEY_GRD: self.bolt.bolt_grade,
+        #               KEY_TYP: self.bolt.bolt_type,
+        #               KEY_PLATETHK: self.plate.thickness,
+        #               KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+        #               KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+        #               KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+        #               KEY_DP_DETAILING_GAP: self.plate.gap,
+        #               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+        if self.bolt.bolt_type == TYP_BEARING:
+            pass
+        else:
+            self.bolt.bolt_bearing_capacity = 0.0
+        test_output = {KEY_MEMBER_MOM_CAPACITY: round(self.section.moment_capacity / 1000000, 2),
                        KEY_MEMBER_SHEAR_CAPACITY: round(self.shear_capacity / 1000, 2),
                        KEY_MEMBER_AXIALCAPACITY: round(self.axial_capacity / 1000, 2),
 
@@ -1662,7 +1665,7 @@ class ColumnEndPlate(MomentConnection):
                        KEY_OUT_STIFFENER_WIDTH: self.stiff_wt,
                        KEY_OUT_STIFFENER_THICKNESS: self.t_s,
                        KEY_OUT_WELD_TYPE: self.weld_type}
-        return test_input, test_output
+        return test_output
 
     @staticmethod
     def grdval_customized():

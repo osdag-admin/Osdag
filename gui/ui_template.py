@@ -37,8 +37,8 @@ import cairosvg
 
 
 from Common import *
-from utils.common.component import Section,I_sectional_Properties
 from utils.common.component import *
+from utils.common.Section_Properties_Calculator import *
 from .customized_popup import Ui_Popup
 # from .ui_summary_popup import Ui_Dialog1
 from .ui_design_preferences import Ui_Dialog
@@ -1255,6 +1255,17 @@ class Window(QMainWindow):
         self.actionDownload_angle.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Angles"))
         self.actionReset_db.triggered.connect(self.database_reset)
 
+        last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+        last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
+        last_design_file = os.path.join(last_design_folder, last_design_file)
+        last_design_dictionary = {}
+        if not os.path.isdir(last_design_folder):
+            os.mkdir(last_design_folder)
+        if os.path.isfile(last_design_file):
+            with open(str(last_design_file), 'r') as last_design:
+                last_design_dictionary = yaml.safe_load(last_design)
+        if isinstance(last_design_dictionary, dict):
+            self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -1608,7 +1619,31 @@ class Window(QMainWindow):
 
     def setDictToUserInputs(self, uiObj, op_list, data, new):
 
+        self.load_input_error_message = "Invalid Inputs Found! \n"
+
         for uiObj_key in uiObj.keys():
+            if str(uiObj_key) in [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL, KEY_SEC_MATERIAL, KEY_CONNECTOR_MATERIAL,
+                             KEY_BASE_PLATE_MATERIAL]:
+                material = uiObj[uiObj_key]
+                material_validator = MaterialValidator(material)
+                if material_validator.is_already_in_db():
+                    pass
+                elif material_validator.is_format_custom():
+                    if material_validator.is_valid_custom():
+                        self.update_material_db(grade=material, material=material_validator)
+                        input_dock_material = self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_MATERIAL)
+                        input_dock_material.clear()
+                        for item in connectdb("Material"):
+                            input_dock_material.addItem(item)
+                    else:
+                        self.load_input_error_message += \
+                            str(uiObj_key) + ": (" + str(material) + ") - Default Value Considered! \n"
+                        continue
+                else:
+                    self.load_input_error_message += \
+                        str(uiObj_key) + ": (" + str(material) + ") - Default Value Considered! \n"
+                    continue
+
             if uiObj_key not in [i[0] for i in op_list]:
                 self.design_pref_inputs.update({uiObj_key: uiObj[uiObj_key]})
 
@@ -1620,6 +1655,13 @@ class Window(QMainWindow):
                     index = key.findText(uiObj[key_str], QtCore.Qt.MatchFixedString)
                     if index >= 0:
                         key.setCurrentIndex(index)
+                    else:
+                        if key_str in [KEY_SUPTDSEC, KEY_SUPTNGSEC]:
+                            self.load_input_error_message += \
+                                str(key_str) + ": (" + str(uiObj[key_str]) + ") - Select from available Sections! \n"
+                        else:
+                            self.load_input_error_message += \
+                                str(key_str) + ": (" + str(uiObj[key_str]) + ") - Default Value Considered! \n"
             elif op[2] == TYPE_TEXTBOX:
                 if key_str in uiObj.keys():
                     key.setText(uiObj[key_str])
@@ -1642,6 +1684,9 @@ class Window(QMainWindow):
                                 pass
             else:
                 pass
+
+        if self.load_input_error_message != "Invalid Inputs Found! \n":
+            QMessageBox.about(QMessageBox(), "Information", self.load_input_error_message)
 
     def common_function_for_save_and_design(self, main, data, trigger_type):
 
@@ -1674,6 +1719,14 @@ class Window(QMainWindow):
             if error is not None:
                 self.show_error_msg(error)
                 return
+            last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+            if not os.path.isdir(last_design_folder):
+                os.mkdir(last_design_folder)
+            last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
+            last_design_file = os.path.join(last_design_folder, last_design_file)
+            with open(str(last_design_file), 'w') as last_design:
+                yaml.dump(self.design_inputs, last_design)
+
             out_list = main.output_values(main, status)
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
@@ -1691,7 +1744,7 @@ class Window(QMainWindow):
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
-                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
+                                                  KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
                                                   KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
@@ -1869,13 +1922,19 @@ class Window(QMainWindow):
                 dialog.exec()
 
     def new_material_dialog(self):
-        dialog = QtWidgets.QDialog()
+        dialog = QtWidgets.QDialog(self)
+        self.material_popup_message = ''
+        self.invalid_field = ''
         dialog.setWindowTitle('Custom Material')
         layout = QtWidgets.QGridLayout(dialog)
         widget = QtWidgets.QWidget(dialog)
         widget.setLayout(layout)
         _translate = QtCore.QCoreApplication.translate
         textbox_list = ['Grade', 'Fy_20', 'Fy_20_40', 'Fy_40', 'Fu']
+        event_function = ['', self.material_popup_fy_20_event, self.material_popup_fy_20_40_event,
+                          self.material_popup_fy_40_event, self.material_popup_fu_event]
+        self.original_focus_event_functions = {}
+
         i = 0
         for textbox_name in textbox_list:
             label = QtWidgets.QLabel(widget)
@@ -1900,10 +1959,13 @@ class Window(QMainWindow):
             # textbox.resize(120, 30)
             textbox.setFixedSize(200, 24)
             if textbox_name == 'Grade':
-                textbox.setText('Cus____')
                 textbox.setReadOnly(True)
+                textbox.setText("Cus____")
             else:
                 textbox.setValidator(QtGui.QIntValidator())
+                # textbox.mousePressEvent = event_function[textbox_list.index(textbox_name)]
+                self.original_focus_event_functions.update({textbox_name: textbox.focusOutEvent})
+                textbox.focusOutEvent = event_function[textbox_list.index(textbox_name)]
 
             self.connect_change_popup_material(textbox, widget)
             layout.addWidget(textbox, i, 2, 1, 1)
@@ -1913,7 +1975,7 @@ class Window(QMainWindow):
         add_button = QtWidgets.QPushButton(widget)
         add_button.setObjectName("material_add")
         add_button.setText("Add")
-        add_button.clicked.connect(lambda: self.update_material_db(widget))
+        add_button.clicked.connect(lambda: self.update_material_db_validation(widget))
         layout.addWidget(add_button, i, 1, 1, 2)
 
         dialog.setFixedSize(350, 250)
@@ -1923,39 +1985,34 @@ class Window(QMainWindow):
             input_dock_material.clear()
             for item in connectdb("Material"):
                 input_dock_material.addItem(item)
+            input_dock_material.setCurrentIndex(1)
 
-    def update_material_db(self, widget):
+    def update_material_db_validation(self, widget):
 
         material = widget.findChild(QtWidgets.QLineEdit, 'Grade').text()
-        values = material.split("_")
 
-        fy_20 = values[1]
-        fy_20_40 = values[2]
-        fy_40 = values[3]
-        fu = values[4]
+        material_validator = MaterialValidator(material)
+        if material_validator.is_already_in_db():
+            QMessageBox.about(QMessageBox(), "Information", "Material already exists in Database!")
+            return
+        elif not material_validator.is_format_custom():
+            QMessageBox.about(QMessageBox(), "Information", "Please fill all missing parameters!")
+            return
+        elif not material_validator.is_valid_custom():
+            QMessageBox.about(QMessageBox(), "Information",
+                              "Please select "+str(material_validator.invalid_value)+" in valid range!")
+            return
+
+        self.update_material_db(grade=material, material=material_validator)
+        QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+
+    def update_material_db(self, grade, material):
+
+        fy_20 = int(material.fy_20)
+        fy_20_40 = int(material.fy_20_40)
+        fy_40 = int(material.fy_40)
+        fu = int(material.fu)
         elongation = 0
-
-        if "" in [fy_20, fy_40, fy_20_40, fu]:
-            QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
-            return
-
-        fy_20 = int(fy_20)
-        fy_20_40 = int(fy_20_40)
-        fy_40 = int(fy_40)
-        fu = int(fu)
-
-        if not 0 <= fy_20 <= 1000:
-            QMessageBox.information(QMessageBox(), 'Warning', 'Please select Fy_20 in valid range!')
-            return
-        elif not 0 <= fy_20_40 <= 1000:
-            QMessageBox.information(QMessageBox(), 'Warning', 'Please select Fy_20_40 in valid range!')
-            return
-        elif not 0 <= fy_40 <= 1000:
-            QMessageBox.information(QMessageBox(), 'Warning', 'Please select Fy_40 in valid range!')
-            return
-        elif not 0 <= fu <= 1000:
-            QMessageBox.information(QMessageBox(), 'Warning', 'Please select Fu in valid range!')
-            return
 
         if fy_20 > 350:
             elongation = 20
@@ -1966,23 +2023,16 @@ class Window(QMainWindow):
 
         conn = sqlite3.connect(PATH_TO_DATABASE)
         c = conn.cursor()
-        c.execute("SELECT count(*) FROM Material WHERE Grade = ?", (material,))
-        data = c.fetchone()[0]
-
-        if data == 0:
-            c.execute('''INSERT INTO Material (Grade,[Yield Stress (< 20)],[Yield Stress (20 -40)],
-            [Yield Stress (> 40)],[Ultimate Tensile Stress],[Elongation ]) VALUES (?,?,?,?,?,?)''',
-                      (material, fy_20, fy_20_40, fy_40, fu, elongation))
-            conn.commit()
-            c.close()
-            conn.close()
-            QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
-
-        else:
-            QMessageBox.information(QMessageBox(), 'Warning', 'Material already exists in Database!')
+        c.execute('''INSERT INTO Material (Grade,[Yield Stress (< 20)],[Yield Stress (20 -40)],
+        [Yield Stress (> 40)],[Ultimate Tensile Stress],[Elongation ]) VALUES (?,?,?,?,?,?)''',
+                  (grade, fy_20, fy_20_40, fy_40, fu, elongation))
+        conn.commit()
+        c.close()
+        conn.close()
 
     def connect_change_popup_material(self, textbox, widget):
-        textbox.textChanged.connect(lambda: self.change_popup_material(widget))
+        if textbox.objectName() != 'Grade':
+            textbox.textChanged.connect(lambda: self.change_popup_material(widget))
 
     def change_popup_material(self, widget):
 
@@ -1991,8 +2041,48 @@ class Window(QMainWindow):
         fy_20_40 = widget.findChild(QtWidgets.QLineEdit, 'Fy_20_40').text()
         fy_40 = widget.findChild(QtWidgets.QLineEdit, 'Fy_40').text()
         fu = widget.findChild(QtWidgets.QLineEdit, 'Fu').text()
+
         material = str("Cus_"+fy_20+"_"+fy_20_40+"_"+fy_40+"_"+fu)
+        material_validator = MaterialValidator(material)
+        if not material_validator.is_valid_custom():
+            if str(material_validator.invalid_value):
+                self.material_popup_message = "Please select "+str(material_validator.invalid_value)+" in valid range!"
+                self.invalid_field = str(material_validator.invalid_value)
+            else:
+                self.material_popup_message = ''
+                self.invalid_field = ''
+        else:
+            self.material_popup_message = ''
+            self.invalid_field = ''
         grade.setText(material)
+
+    def material_popup_fy_20_event(self, e):
+        self.original_focus_event_functions['Fy_20'](e)
+        if self.invalid_field == 'Fy_20':
+            self.show_material_popup_message()
+
+    def material_popup_fy_20_40_event(self, e):
+        self.original_focus_event_functions['Fy_20_40'](e)
+        if self.invalid_field == 'Fy_20_40':
+            self.show_material_popup_message()
+
+    def material_popup_fy_40_event(self, e):
+        self.original_focus_event_functions['Fy_40'](e)
+        if self.invalid_field == 'Fy_40':
+            self.show_material_popup_message()
+
+    def material_popup_fu_event(self, e):
+        self.original_focus_event_functions['Fu'](e)
+        if self.invalid_field == 'Fu':
+            self.show_material_popup_message()
+
+    def show_material_popup_message(self):
+        invalid_textbox = self.findChild(QtWidgets.QLineEdit, str(self.invalid_field))
+        if self.findChild(QtWidgets.QPushButton, "material_add").hasFocus():
+            return
+        if self.material_popup_message:
+            QMessageBox.about(QMessageBox(), "Information", self.material_popup_message)
+            invalid_textbox.setFocus()
 
     # Function for showing design-preferences popup
 
@@ -2175,7 +2265,7 @@ class Window(QMainWindow):
         self.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag Fin Plate")
-        self.mytabWidget.resize(size[0], size[1])
+        #self.mytabWidget.resize(size[0], size[1])
         self.mytabWidget.addTab(self.modelTab, "")
 
         self.modelTab.InitDriver()
@@ -2460,9 +2550,23 @@ class Window(QMainWindow):
 
     def osdag_section_modeller(self):
         self.OsdagSectionModeller=Ui_OsdagSectionModeller()
-        dialog=QtWidgets.QDialog()
+        dialog = Dialog1()
         self.OsdagSectionModeller.setupUi(dialog)
-        dialog.exec()
+        dialog.dialogShown.connect(self.set_dialog_size(dialog))
+        dialog.exec_()
+
+    def set_dialog_size(self,dialog):
+        def set_size():
+            dialog.resize(900,900) 
+            self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)  
+            self.OsdagSectionModeller.OCCWindow.setFocus()
+        return set_size
+
+class Dialog1(QtWidgets.QDialog):
+    dialogShown = QtCore.pyqtSignal()
+    def showEvent(self, event):
+        super(Dialog1, self).showEvent(event)
+        self.dialogShown.emit()
 
 from . import icons_rc
 if __name__ == '__main__':

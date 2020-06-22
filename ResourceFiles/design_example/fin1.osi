@@ -37,7 +37,7 @@ Connector.Plate.Thickness_List:
 - '30'
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
-Detailing.Edge_type: a - Sheared or hand flame cut
+Detailing.Edge_type: Sheared or hand flame cut
 Detailing.Gap: '10'
 Load.Axial: '40'
 Load.Shear: '60'

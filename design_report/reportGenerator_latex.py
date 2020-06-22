@@ -34,8 +34,7 @@ class CreateLatex(Document):
 
     def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
-        # companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
-        companylogo = '/ResourceFiles/images/Osdag_2.jpg'
+        companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
         groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
         designer = str(reportsummary["ProfileSummary"]['Designer'])
         projecttitle = str(reportsummary['ProjectTitle'])
@@ -44,8 +43,9 @@ class CreateLatex(Document):
         client = str(reportsummary['Client'])
 
         does_design_exist = reportsummary['does_design_exist']
+        osdagheader = '/ResourceFiles/images/OsdagHeader.png'
         # Add document header
-        geometry_options = {"top": "4cm", "hmargin": "2cm", "headheight": "65pt", "footskip": "65pt"}
+        geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt"}
         doc = Document(geometry_options=geometry_options,indent=False)
         doc.packages.append(Package('amsmath'))
         doc.packages.append(Package('graphicx'))
@@ -59,23 +59,24 @@ class CreateLatex(Document):
         header = PageStyle("header")
         # Create center header
         with header.create(Head("C")):
-            with header.create(Tabularx('|p{2cm}|l|p{4cm}|l|X|')) as table:
+            with header.create(Tabularx('|l|p{4cm}|l|X|')) as table:
                 table.add_hline()
                 # MultiColumn(4)
-                table.add_row((MultiRow(4, data=StandAloneGraphic(image_options="width=2cm,height=2cm",
-                                                             filename=rel_path + companylogo)),
-                                       color_cell('OsdagGreen','Company Name'),color_cell('OsdagGreen',companyname),
-                               color_cell('OsdagGreen','Project Title'),color_cell('OsdagGreen',projecttitle)))
-                table.add_hline(2, 5)
-                table.add_row(('',color_cell('OsdagGreen','Group/Team Name'),color_cell('OsdagGreen',groupteamname),
-                               color_cell('OsdagGreen','Subtitle'),color_cell('OsdagGreen',subtitle)))
-                table.add_hline(2, 5)
-                table.add_row(('',color_cell('OsdagGreen','Designer'),color_cell('OsdagGreen',designer),
-                               color_cell('OsdagGreen','Job Number'),color_cell('OsdagGreen',jobnumber)))
-                table.add_hline(2, 5)
-                table.add_row(('', color_cell('OsdagGreen', 'Date'), color_cell('OsdagGreen', time.strftime("%d /%m /%Y")),
-                               color_cell('OsdagGreen', 'Client'), color_cell('OsdagGreen', client)))
+                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is'' else StandAloneGraphic(image_options="width=3.5cm,height=1cm",
+                                                                                 filename=companylogo))),
+                                               MultiColumn(2, align='|c|',
+                                                           data=['Created with',StandAloneGraphic(image_options="width=3.5cm,height=1cm",
+                                                                                 filename=rel_path + osdagheader)]),))
                 table.add_hline()
+                table.add_row(('Company Name', companyname, 'Project Title', projecttitle), color='OsdagGreen')
+                table.add_hline()
+                table.add_row(('Group/Team Name', groupteamname, 'Subtitle', subtitle), color='OsdagGreen')
+                table.add_hline()
+                table.add_row(('Designer', designer, 'Job Number', jobnumber), color='OsdagGreen')
+                table.add_hline()
+                table.add_row(('Date', time.strftime("%d /%m /%Y"), 'Client', client), color='OsdagGreen')
+                table.add_hline()
+
 
 
         # Create right footer
@@ -91,7 +92,6 @@ class CreateLatex(Document):
 
         doc.preamble.append(header)
         doc.change_document_style("header")
-
         with doc.create(Section('Input Parameters')):
             with doc.create(LongTable('|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4.5cm}|', row_height=1.2)) as table:
                 table.add_hline()

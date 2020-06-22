@@ -689,38 +689,11 @@ class EndPlateConnection(ShearConnection):
         if self.design_status_plate_tk is False:
             self.design_status = False
             logger.error(" : Select plate of higher thickness")
-        elif self.design_status_bolt is False:
-            self.design_status = False
-            self.set_values_to_class(self)
-            logger.error(" : Select bolt of lower diameter, sufficient plate width/ height is not available to arrange bolts")
-        # elif count == 0:
-        #     self.design_status = False
-        #     # print(self.design_status)
-        #     # return self.design_status
-        #     self.set_values_to_class(self)
-        #     if self.design_status_plate is False:
-        #         logger.error(" : Select plate of higher thickness")
-        elif self.design_status_plate is False:
-            self.design_status = False
-            self.set_values_to_class(self)
-            logger.error(" : Plate moment/shear capacity is insufficient. Choose higher thickness/grade")
-        elif self.plate.design_status is False:
-            self.design_status = False
-            self.set_values_to_class(self)
-            logger.error(" : Required plate width is greater than available width")
-        elif self.weld.design_status is False:
-            # TODO: Check logger message
-            self.design_status = False
-            self.set_values_to_class(self)
-            logger.error(": Weld thickness is not sufficient [cl. 10.5.7, IS 800:2007]")
-            #logger.warning(": Minimum weld thickness required is %2.2f mm " % self.weld.t_weld_req)
-            logger.info(": Should increase length of weld/End plate")
-            # logger.error(
-            #   ": For given members and %2.2f mm thick plate, weld sizes should be of range %2.2f mm and  %2.2f mm "
-            #   % self.plate.thickness_provided % weld_size_min % weld_size_max)#
-            logger.info(": Cannot design weld with available welds ")
-        else:
-            # self.get_design_status(self)
+        elif len(self.output) > 0:
+            self.design_status = True
+            self.design_status_bolt = True
+            self.design_status_plate= True
+            self.weld.design_status = True
             self.output.sort(key=lambda x: (x[3], x[0], x[1], x[2]))
             self.set_values_to_class(self)
             print("No of effective trials: ", count)
@@ -730,6 +703,61 @@ class EndPlateConnection(ShearConnection):
                             "of thinner connecting plate")
                 logger.info("Thicker plate shall be adequately preheated to prevent cracking of the weld")
             self.get_design_status(self)
+        elif len(self.failed_output_plate) > 0:
+            self.design_status = False
+            self.design_status_bolt = True
+            self.design_status_plate= False
+            self.weld.design_status = False
+            self.set_values_to_class(self)
+            logger.error(" : Plate moment/shear capacity is insufficient. Choose higher thickness/grade")
+            logger.error(" : (Or) Required plate width is greater than available width")
+            logger.error(": (Or) Weld thickness is not sufficient [cl. 10.5.7, IS 800:2007]")
+            # logger.warning(": Minimum weld thickness required is %2.2f mm " % self.weld.t_weld_req)
+            logger.info(": Should increase length of weld/End plate")
+        elif len(self.failed_output_bolt) >0:
+            self.design_status = False
+            self.design_status_bolt = False
+            self.design_status_plate = False
+            self.weld.design_status = False
+            self.set_values_to_class(self)
+            logger.error(" : Select bolt of higher capacity, sufficient plate width/ height is not available to arrange bolts")
+        # elif count == 0:
+        #     self.design_status = False
+        #     # print(self.design_status)
+        #     # return self.design_status
+        #     self.set_values_to_class(self)
+        #     if self.design_status_plate is False:
+        #         logger.error(" : Select plate of higher thickness")
+        # elif self.design_status_plate is False:
+        #     self.design_status = False
+        #     self.set_values_to_class(self)
+        #     logger.error(" : Plate moment/shear capacity is insufficient. Choose higher thickness/grade")
+        # elif self.plate.design_status is False:
+        #     self.design_status = False
+        #     self.set_values_to_class(self)
+        #     logger.error(" : Required plate width is greater than available width")
+        # elif self.weld.design_status is False:
+        #     # TODO: Check logger message
+        #     self.design_status = False
+        #     self.set_values_to_class(self)
+        #     logger.error(": Weld thickness is not sufficient [cl. 10.5.7, IS 800:2007]")
+        #     #logger.warning(": Minimum weld thickness required is %2.2f mm " % self.weld.t_weld_req)
+        #     logger.info(": Should increase length of weld/End plate")
+        #     # logger.error(
+        #     #   ": For given members and %2.2f mm thick plate, weld sizes should be of range %2.2f mm and  %2.2f mm "
+        #     #   % self.plate.thickness_provided % weld_size_min % weld_size_max)#
+        #     logger.info(": Cannot design weld with available welds ")
+        # else:
+        #     # self.get_design_status(self)
+        #     self.output.sort(key=lambda x: (x[3], x[0], x[1], x[2]))
+        #     self.set_values_to_class(self)
+        #     print("No of effective trials: ", count)
+        #     print(self.output[0])
+        #     if self.output[0][26] == self.output[0][27]:
+        #         logger.info("Minimum weld size given in Table 21 of IS800:2007 is greater than or equal to thickness "
+        #                     "of thinner connecting plate")
+        #         logger.info("Thicker plate shall be adequately preheated to prevent cracking of the weld")
+        #     self.get_design_status(self)
 
     def set_values_to_class(self):
         if self.design_status is True:
@@ -935,6 +963,8 @@ class EndPlateConnection(ShearConnection):
     def get_available_welds(self, connecting_members=[]):
         weld_size_max = math.ceil(min(connecting_members))
         weld_size_min = math.ceil(IS800_2007.cl_10_5_2_3_min_weld_size(connecting_members[0], connecting_members[1]))
+        if 7<= weld_size_max < max(ALL_WELD_SIZES) and weld_size_max%2 != 0:
+            weld_size_max = round_up(weld_size_max,2)
         available_welds = list([x for x in ALL_WELD_SIZES if (weld_size_min <= x <= weld_size_max)])
         # if available_welds == [] and weld_size_min < max(ALL_WELD_SIZES):
         #     available_welds = [weld_size_min]
@@ -1205,26 +1235,26 @@ class EndPlateConnection(ShearConnection):
             self.report_check.append(t6)
             t7 = (DISP_NUM_OF_ROWS, 2, self.plate.bolts_one_line, get_pass_fail(2, self.plate.bolts_one_line, relation='leq'))
             self.report_check.append(t7)
-            t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+            t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.plate.gauge_provided,
                   get_pass_fail(self.bolt.min_pitch, self.plate.pitch_provided, relation='lesser'))
             self.report_check.append(t1)
-            t1 = (DISP_MAX_PITCH, max_pitch(self.connecting_plates_tk),self.plate.gauge_provided,
+            t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(self.connecting_plates_tk), self.plate.gauge_provided,
                   get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided, relation='greater'))
             self.report_check.append(t1)
 
-            t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),self.plate.edge_dist_provided,
+            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type), self.plate.edge_dist_provided,
                   get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided, relation='lesser'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_dist_modified(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
+            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
                   self.plate.edge_dist_provided,
                   get_pass_fail(self.bolt.max_end_dist, self.plate.end_dist_provided, relation='greater'))
             self.report_check.append(t4)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided, relation='lesser'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_dist_modified(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
+            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences),
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.max_edge_dist, self.plate.edge_dist_provided, relation="greater"))
             self.report_check.append(t4)

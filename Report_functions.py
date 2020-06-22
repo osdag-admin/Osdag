@@ -23,7 +23,7 @@ from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
 from pylatex.utils import bold
 
 
-def min_pitch(d,cond = None):#Todo:done
+def cl_10_2_2_min_spacing(d, cond = None, parameter='pitch'):#Todo:write condition for pitch and gauge
 
     """
     Calculate the min pitch distance
@@ -54,197 +54,7 @@ def min_pitch(d,cond = None):#Todo:done
 
     return min_pitch_eqn
 
-def cl_10_2_2_min_spacing(d, parameter='pitch'):#Todo:not done
-    """
-    minimum spacing between two adjacent fasteners as per cl.10.2.2, IS 800:2007
-    Args:
-        d: diameter of the fastener (int)
-
-    Returns:
-        equation for the minimum spacing between two adjacent fasteners which is 2.5 * diameter of the fastener
-    """
-    d = str(d)
-    min_spacing = 2.5 * d
-    min_spacing = str(min_spacing)
-
-    min_spacing_eqn = Math(inline=True)
-    if parameter == 'pitch':
-        min_spacing_eqn.append(NoEscape(r'\begin{aligned}Pitch~Distance~_{min} = 2.5 ~ d\\'))
-    else:
-        min_spacing_eqn.append(NoEscape(r'\begin{aligned}Gauge~Distance~_{min} = 2.5 ~ d\\'))
-    min_spacing_eqn.append(NoEscape(r'= &2.5*' + d + r'&=' + min_spacing + r'\\'))
-    min_spacing_eqn.append(NoEscape(r'&[Ref.Cl.10.2.2.2, IS 800:2007] &\end{aligned}'))
-    return min_spacing_eqn
-
-
-def cl_10_2_3_1_max_spacing(t, parameter='pitch'):
-    """
-    maximum spacing between two adjacent fasteners as per cl.10.2.3.1, IS 800:2007
-    Args:
-        t: thickness of the thinner plate (int)
-
-    Returns:
-        equation for the maximum spacing between two adjacent fasteners which is minimum of (32*t, 300mm)
-    """
-    t = str(t)
-    max_spacing = min(32 * t, 300)
-    max_spacing = str(max_spacing)
-
-    max_spacing_eqn = Math(inline=True)
-    if parameter == 'pitch':
-        max_spacing_eqn.append(NoEscape(r'\begin{aligned}Pitch~Distance~_{max} = min~(32 ~ t, ~300~mm)\\'))
-    else:
-        max_spacing_eqn.append(NoEscape(r'\begin{aligned}Gauge~Distance~_{max} = min~(32 ~ t, ~300~mm)\\'))
-    max_spacing_eqn.append(NoEscape(r'= min (&32*' + t + r', 300~mm)&=' + max_spacing +  r'\\'))
-    max_spacing_eqn.append(NoEscape(r'[Ref.Cl.10.2.3.1,& IS 800:2007] \end{aligned}'))
-
-    return max_spacing_eqn
-
-
-def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - Sheared or hand flame cut', parameter='end_dist'):
-    """
-    Calculate minimum end and edge distance
-    Args:
-         d - Nominal diameter of fastener in mm (float)
-         bolt_hole_type - Either 'Standard', 'Over-sized', 'Short Slot' or 'Long Slot' (str)
-         edge_type - Either 'hand_flame_cut' or 'machine_flame_cut' (str)
-         parameter - edge or end distance required to return the specific equation (str)
-    Returns:
-            Equation for minimum end and edge distance from the centre of any hole to the nearest edge of a plate in mm (float)
-    Note:
-        Reference:
-        IS 800:2007, cl. 10.2.4.2
-    """
-    d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
-    if edge_type == 'a - Sheared or hand flame cut':
-        end_edge_multiplier = 1.7
-    else:
-        # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
-        end_edge_multiplier = 1.5
-
-    min_end_edge_dist = round(end_edge_multiplier * d_0,2)
-
-    d_0 = str(d_0)
-    end_edge_multiplier = str(end_edge_multiplier)
-    min_end_edge_dist = str(min_end_edge_dist)
-
-    end_edge_eqn = Math(inline=True)
-    if parameter == 'end_dist':
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{min} &= ' + end_edge_multiplier + r'*~d_0 \\'))
-    else:  # parameter == 'edge_dist'
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{min} &= ' + end_edge_multiplier + r'*~d_0 \\'))
-
-    end_edge_eqn.append(NoEscape(r'&= ' + end_edge_multiplier + '~* ' + d_0 + r'\\'))
-    end_edge_eqn.append(NoEscape(r'&=' + min_end_edge_dist + r'\\'))
-    end_edge_eqn.append(NoEscape(r'[Ref.~IS~800:2007,~Cl.~10.2.4.2]\end{aligned}'))
-    return end_edge_eqn
-
-#TODO:Everyone please use modified function (next one)
-def cl_10_2_4_3_max_edge_dist(plate_thicknesses, f_y, corrosive_influences=False, parameter='end_dist'):
-    """
-    Calculate maximum end and edge distance
-    Args:
-         plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
-         f_y - Yield strength of plate material in MPa (float)
-         corrosive_influences - Whether the members are exposed to corrosive influences or not (Boolean)
-    Returns:
-        Maximum end and edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
-    Note:
-        Reference:
-        IS 800:2007, cl. 10.2.4.3
-    """
-    t = min(plate_thicknesses)
-    epsilon = math.sqrt(250 / f_y)
-
-    if corrosive_influences is True:
-        max_end_edge_dist = 40.0 + 4 * t
-    else:
-        max_end_edge_dist = 12 * t * epsilon
-
-    t = str(t)
-    epsilon = str(epsilon)
-    max_end_edge_dist = str(max_end_edge_dist)
-
-    end_edge_eqn = Math(inline=True)
-    if corrosive_influences is False and parameter == 'end_dist':
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}End~Distance~_{max} = 12~t~\epsilon~-when~members~are~not~exposed~to~corrosive~influences\\'))
-        end_edge_eqn.append(NoEscape(r'\begin = 12' + t + '~' + epsilon + '\\'))
-    else:  # corrosive_influences is True and parameter is 'end_dist'
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}End~Distance~_{max} = 40~mm~+~4~t~-when~members~are~exposed~to~corrosive~influences\\'))
-        end_edge_eqn.append(NoEscape(r'\begin = 40~mm~+~4~' + t + '\\'))
-
-    if corrosive_influences is False and parameter == 'edge_dist':
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}Edge~Distance~_{max} = 12~t~\epsilon~-when~members~are~not~exposed~to~corrosive~influences\\'))
-        end_edge_eqn.append(NoEscape(r'\begin = 12' + t + '~' + epsilon + '\\'))
-    else:  # corrosive_influences is True and parameter is 'edge_dist'
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}Edge~Distance~_{max} = 40~mm~+~4~t~-when~members~are~exposed~to~corrosive~influences\\'))
-        end_edge_eqn.append(NoEscape(r'\begin = 40~mm~+~4~' + t + '\\'))
-
-    end_edge_eqn.append(NoEscape(r'\begin = ' + max_end_edge_dist + ''))
-    end_edge_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.2.4.3]&\end{aligned}'))
-    return end_edge_eqn
-
-
-def cl_10_2_4_3_max_edge_dist_modified(t_fu_fy,corrosive_influences):
-    """
-    Calculate maximum end and edge distance(new)
-     Args:
-
-         t_fu_fy: Thickness of thinner plate in mm (float)
-         corrosive_influences: Whether the members are exposed to corrosive influences or not (Boolean)
-
-    Returns:
-         Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
-
-    Note:
-            Reference:
-            IS 800:2007, cl. 10.2.4.3
-
-
-    """
-    t_epsilon_considered = t_fu_fy[0][0] * math.sqrt(250 / float(t_fu_fy[0][2]))
-    t_considered = t_fu_fy[0][0]
-    t_min = t_considered
-    for i in t_fu_fy:
-        t = i[0]
-        f_y = i[2]
-        epsilon = math.sqrt(250 / f_y)
-        if t * epsilon <= t_epsilon_considered:
-            t_epsilon_considered = t * epsilon
-            t_considered = t
-        if t < t_min:
-            t_min = t
-
-    if corrosive_influences is True:
-        max_edge_dist =  round(40.0 + 4 * t_min,2)
-    else:
-        max_edge_dist = round(12 * t_epsilon_considered,2)
-
-    max_edge_dist = str(max_edge_dist)
-    t1=str(t_fu_fy[0][0])
-    t2=str(t_fu_fy[1][0])
-    fy1 = str(t_fu_fy[0][2])
-    fy2 = str(t_fu_fy[1][2])
-    max_end_edge_eqn = Math(inline=True)
-    if corrosive_influences is False:
-        max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
-        max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'e1 &= 12 ~*' + t1 + r'*\sqrt{\frac{250}{' + fy1 + r'}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'e2 &= 12 ~*' + t2 + r'*\sqrt{\frac{250}{' + fy2 + r'}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=min(e1,e2)\\'))
-        max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'\\'))
-        max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
-
-    else:
-        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=40 + 4*t \\'))
-        max_end_edge_eqn.append(NoEscape(r'Where, t&= min(' + t1 +', '+t2+r')\\'))
-        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&='+max_edge_dist+r'\\'))
-        max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
-
-
-    return max_end_edge_eqn
-
-def max_pitch(t):#todo:done
+def cl_10_2_3_1_max_spacing(t,parameter='pitch'):#TODO:write condition for pitch and gauge
     """
      Calculate the maximum pitch distance
      Args:
@@ -272,79 +82,113 @@ def max_pitch(t):#todo:done
 
     return max_pitch_eqn
 
-def min_edge_end(d_0,edge_type):
+def cl_10_2_4_2_min_edge_end_dist(d_0,edge_type='a - Sheared or hand flame cut', parameter='end_dist'):
     """
     Calculate minimum end and edge distance
-
     Args:
-           d_0:Nominal diameter of fastener in mm (float)
-
-           edge_type: Either 'hand_flame_cut' or 'machine_flame_cut' (str)
-
+         d - Nominal diameter of fastener in mm (float)
+         bolt_hole_type - Either 'Standard', 'Over-sized', 'Short Slot' or 'Long Slot' (str)
+         edge_type - Either 'hand_flame_cut' or 'machine_flame_cut' (str)
+         parameter - edge or end distance required to return the specific equation (str)
     Returns:
-            Minimum edge and end distances from the centre of any hole to the nearest edge of a plate in mm (float)
-
+            Equation for minimum end and edge distance from the centre of any hole to the nearest edge of a plate in mm (float)
     Note:
-            Reference:
-            IS 800:2007, cl. 10.2.4.2
-
+        Reference:
+        IS 800:2007, cl. 10.2.4.2
     """
     if edge_type == 'a - Sheared or hand flame cut':
-        factor = 1.7
+        end_edge_multiplier = 1.7
     else:
-        factor = 1.5
-    min_edge_dist = round(factor * d_0,2)
+        # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
+        end_edge_multiplier = 1.5
 
-    min_edge_dist = str(min_edge_dist)
+    min_end_edge_dist = round(end_edge_multiplier * d_0,2)
 
-    factor = str(factor)
     d_0 = str(d_0)
+    end_edge_multiplier = str(end_edge_multiplier)
+    min_end_edge_dist = str(min_end_edge_dist)
 
-    min_end_edge_eqn = Math(inline=True)
-    min_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\'))
-    min_end_edge_eqn.append(NoEscape(r'&='+factor + r'*' + d_0+r'='+min_edge_dist+r'\\'))
-    min_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.2]&\end{aligned}'))
+    end_edge_eqn = Math(inline=True)
+    if parameter == 'end_dist':
+        end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{min} &= ' + end_edge_multiplier + r'*~d_0 \\'))
+    elif parameter == 'edge_dist':
+        end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{min} &= ' + end_edge_multiplier + r'*~d_0 \\'))
+    else:
+        end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{min} &= ' + end_edge_multiplier + r'*~d_0 \\'))
 
+    end_edge_eqn.append(NoEscape(r'&= ' + end_edge_multiplier + '~* ' + d_0 + r'\\'))
+    end_edge_eqn.append(NoEscape(r'&=' + min_end_edge_dist + r'\\'))
+    end_edge_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.4.2]\end{aligned}'))
+    return end_edge_eqn
 
-    return min_end_edge_eqn
-
-
-#TODO: consider using max_edge_end_new instead of this function in all modules
-def max_edge_end(f_y,t):
+def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter='end_dist'):
     """
-    Calculate maximum end and edge distance
+    Calculate maximum end and edge distance(new)
+     Args:
 
-
-    Args:
-           f_y:Yield strength of plate material in MPa (float)
-
-           t:Thickness of thinner plate in mm (float)
+         t_fu_fy: Thickness of thinner plate in mm (float)
+         corrosive_influences: Whether the members are exposed to corrosive influences or not (Boolean)
 
     Returns:
-            Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
+         Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
+
     Note:
             Reference:
             IS 800:2007, cl. 10.2.4.3
-
     """
+    t_epsilon_considered = t_fu_fy[0][0] * math.sqrt(250 / float(t_fu_fy[0][2]))
+    t_considered = t_fu_fy[0][0]
+    t_min = t_considered
+    for i in t_fu_fy:
+        t = i[0]
+        f_y = i[2]
+        epsilon = math.sqrt(250 / f_y)
+        if t * epsilon <= t_epsilon_considered:
+            t_epsilon_considered = t * epsilon
+            t_considered = t
+        if t < t_min:
+            t_min = t
 
-    epsilon = round(math.sqrt(250/f_y),2)
-    max_edge_dist = round(12*t*epsilon,2)
+    if corrosive_influences is True:
+        max_edge_dist =  round(40.0 + 4 * t_min,2)
+    else:
+        max_edge_dist = round(12 * t_epsilon_considered,2)
+
     max_edge_dist = str(max_edge_dist)
-    t = str(t)
-    f_y = str(f_y)
-
+    t1=str(t_fu_fy[0][0])
+    t2=str(t_fu_fy[1][0])
+    fy1 = str(t_fu_fy[0][2])
+    fy2 = str(t_fu_fy[1][2])
     max_end_edge_eqn = Math(inline=True)
-    max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
-    max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
-    max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=12 ~*'+ t + r'*\sqrt{\frac{250}{'+f_y+r'}}\\ &='+max_edge_dist+r'\\'))
-    max_end_edge_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.4.3]\end{aligned}'))
+    if corrosive_influences is False:
+        if parameter == 'end_dist':
+            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{max} &= 12~ t~ \varepsilon&\\'))
+        else: #'edge_dist'
+            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{max} &= 12~ t~ \varepsilon&\\'))
+        max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
+        max_end_edge_eqn.append(NoEscape(r'e1 &= 12 ~*' + t1 + r'*\sqrt{\frac{250}{' + fy1 + r'}}\\'))
+        max_end_edge_eqn.append(NoEscape(r'e2 &= 12 ~*' + t2 + r'*\sqrt{\frac{250}{' + fy2 + r'}}\\'))
+        if parameter == 'end_dist':
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e1,e2)\\'))
+        else: #'edge_dist'
+            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=min(e1,e2)\\'))
+        max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'\\'))
+        max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
+
+    else:
+        if parameter == 'end_dist':
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&=40 + 4*t\\'))
+        else: #'edge_dist'
+            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=40 + 4*t\\'))
+        max_end_edge_eqn.append(NoEscape(r'Where, t&= min(' + t1 +','+t2+r')\\'))
+        if parameter == 'end_dist':
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&='+max_edge_dist+r'\\'))
+        else: #'edge_dist'
+            max_end_edge_eqn.append(NoEscape(r'e`_{max}&='+max_edge_dist+r'\\'))
+        max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
 
 
     return max_end_edge_eqn
-
-
-
 
 
 def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
@@ -4326,3 +4170,127 @@ def depth_req(e, g, row, sec =None):
 # geometry_options = {"top": "2in", "bottom": "1in", "left": "0.6in", "right": "0.6in", "headsep": "0.8in"}
 # doc = Document(geometry_options=geometry_options, indent=False)
 # report_bolt_shear_check(doc)
+##################3
+# Duplicate functions
+###############
+# def cl_10_2_3_1_max_spacing(t, parameter='pitch'):
+#     """
+#     maximum spacing between two adjacent fasteners as per cl.10.2.3.1, IS 800:2007
+#     Args:
+#         t: thickness of the thinner plate (int)
+#
+#     Returns:
+#         equation for the maximum spacing between two adjacent fasteners which is minimum of (32*t, 300mm)
+#     """
+#     t = str(t)
+#     max_spacing = min(32 * t, 300)
+#     max_spacing = str(max_spacing)
+#
+#     max_spacing_eqn = Math(inline=True)
+#     if parameter == 'pitch':
+#         max_spacing_eqn.append(NoEscape(r'\begin{aligned}Pitch~Distance~_{max} = min~(32 ~ t, ~300~mm)\\'))
+#     else:
+#         max_spacing_eqn.append(NoEscape(r'\begin{aligned}Gauge~Distance~_{max} = min~(32 ~ t, ~300~mm)\\'))
+#     max_spacing_eqn.append(NoEscape(r'= min (&32*' + t + r', 300~mm)&=' + max_spacing +  r'\\'))
+#     max_spacing_eqn.append(NoEscape(r'[Ref.Cl.10.2.3.1,& IS 800:2007] \end{aligned}'))
+#
+#     return max_spacing_eqn
+
+# def cl_10_2_4_3_max_edge_dist_old(plate_thicknesses, f_y, corrosive_influences=False, parameter='end_dist'):
+#     """
+#     Calculate maximum end and edge distance
+#     Args:
+#          plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
+#          f_y - Yield strength of plate material in MPa (float)
+#          corrosive_influences - Whether the members are exposed to corrosive influences or not (Boolean)
+#     Returns:
+#         Maximum end and edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
+#     Note:
+#         Reference:
+#         IS 800:2007, cl. 10.2.4.3
+#     """
+#     t = min(plate_thicknesses)
+#     epsilon = math.sqrt(250 / f_y)
+#
+#     if corrosive_influences is True:
+#         max_end_edge_dist = 40.0 + 4 * t
+#     else:
+#         max_end_edge_dist = 12 * t * epsilon
+#
+#     t = str(t)
+#     epsilon = str(epsilon)
+#     max_end_edge_dist = str(max_end_edge_dist)
+#
+#     end_edge_eqn = Math(inline=True)
+#     if corrosive_influences is False and parameter == 'end_dist':
+#         end_edge_eqn.append(NoEscape(r'\begin{aligned}End~Distance~_{max} = 12~t~\epsilon~-when~members~are~not~exposed~to~corrosive~influences\\'))
+#         end_edge_eqn.append(NoEscape(r'\begin = 12' + t + '~' + epsilon + '\\'))
+#     else:  # corrosive_influences is True and parameter is 'end_dist'
+#         end_edge_eqn.append(NoEscape(r'\begin{aligned}End~Distance~_{max} = 40~mm~+~4~t~-when~members~are~exposed~to~corrosive~influences\\'))
+#         end_edge_eqn.append(NoEscape(r'\begin = 40~mm~+~4~' + t + '\\'))
+#
+#     if corrosive_influences is False and parameter == 'edge_dist':
+#         end_edge_eqn.append(NoEscape(r'\begin{aligned}Edge~Distance~_{max} = 12~t~\epsilon~-when~members~are~not~exposed~to~corrosive~influences\\'))
+#         end_edge_eqn.append(NoEscape(r'\begin = 12' + t + '~' + epsilon + '\\'))
+#     else:  # corrosive_influences is True and parameter is 'edge_dist'
+#         end_edge_eqn.append(NoEscape(r'\begin{aligned}Edge~Distance~_{max} = 40~mm~+~4~t~-when~members~are~exposed~to~corrosive~influences\\'))
+#         end_edge_eqn.append(NoEscape(r'\begin = 40~mm~+~4~' + t + '\\'))
+#
+#     end_edge_eqn.append(NoEscape(r'\begin = ' + max_end_edge_dist + ''))
+#     end_edge_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.2.4.3]&\end{aligned}'))
+#     return end_edge_eqn
+
+# def cl_10_2_2_min_spacing(d, parameter='pitch'):#Todo:not done
+#     """
+#     minimum spacing between two adjacent fasteners as per cl.10.2.2, IS 800:2007
+#     Args:
+#         d: diameter of the fastener (int)
+#
+#     Returns:
+#         equation for the minimum spacing between two adjacent fasteners which is 2.5 * diameter of the fastener
+#     """
+#     d = str(d)
+#     min_spacing = 2.5 * d
+#     min_spacing = str(min_spacing)
+#
+#     min_spacing_eqn = Math(inline=True)
+#     if parameter == 'pitch':
+#         min_spacing_eqn.append(NoEscape(r'\begin{aligned}Pitch~Distance~_{min} = 2.5 ~ d\\'))
+#     else:
+#         min_spacing_eqn.append(NoEscape(r'\begin{aligned}Gauge~Distance~_{min} = 2.5 ~ d\\'))
+#     min_spacing_eqn.append(NoEscape(r'= &2.5*' + d + r'&=' + min_spacing + r'\\'))
+#     min_spacing_eqn.append(NoEscape(r'&[Ref.Cl.10.2.2.2, IS 800:2007] &\end{aligned}'))
+#     return min_spacing_eqn
+#
+# def max_edge_end(f_y,t):
+#     """
+#     Calculate maximum end and edge distance
+#
+#
+#     Args:
+#            f_y:Yield strength of plate material in MPa (float)
+#
+#            t:Thickness of thinner plate in mm (float)
+#
+#     Returns:
+#             Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
+#     Note:
+#             Reference:
+#             IS 800:2007, cl. 10.2.4.3
+#
+#     """
+#
+#     epsilon = round(math.sqrt(250/f_y),2)
+#     max_edge_dist = round(12*t*epsilon,2)
+#     max_edge_dist = str(max_edge_dist)
+#     t = str(t)
+#     f_y = str(f_y)
+#
+#     max_end_edge_eqn = Math(inline=True)
+#     max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
+#     max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
+#     max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=12 ~*'+ t + r'*\sqrt{\frac{250}{'+f_y+r'}}\\ &='+max_edge_dist+r'\\'))
+#     max_end_edge_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.4.3]\end{aligned}'))
+#
+#
+#     return max_end_edge_eqn

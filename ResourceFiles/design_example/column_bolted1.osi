@@ -39,7 +39,7 @@ Connector.Material: E 250 (Fe 410 W)A
 Connector.Web_Plate.Thickness_List: *id001
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
-Detailing.Edge_type: a - Sheared or hand flame cut
+Detailing.Edge_type: Sheared or hand flame cut
 Detailing.Gap: '10'
 Load.Axial: '100'
 Load.Moment: '50'

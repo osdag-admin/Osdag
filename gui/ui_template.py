@@ -22,7 +22,6 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFi
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PyQt5.QtGui import QStandardItem
 from PIL import Image
-import time
 import os
 import yaml
 import json

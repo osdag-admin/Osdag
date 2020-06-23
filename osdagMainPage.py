@@ -664,7 +664,7 @@ class OsdagMainWindow(QMainWindow):
         for html_file in os.listdir(root_path):
             # if html_file.startswith('index'):
             print(os.path.splitext(html_file)[1])
-            if os.path.splitext(html_file)[1] == 'html':
+            if os.path.splitext(html_file)[1] == '.html':
                if sys.platform == ("win32" or "win64"):
                    os.startfile(os.path.join(root_path, html_file))
                else:

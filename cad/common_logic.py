@@ -1109,7 +1109,16 @@ class CommonDesignLogic(object):
         self.component = component
 
         self.display.EraseAll()
+        # if self.view == 'Front View':
+        #     self.display.View_Front()
+        # elif self.view = 'Side View':
+        #     self.display.View_Right()
+        # elif self.view = 'Top View':
+        #     self.display.View_Top()
+        # else:
+        #     self.display.View_Iso()
         self.display.View_Iso()
+
         self.display.FitAll()
 
         self.display.DisableAntiAliasing()

@@ -1356,8 +1356,9 @@ class CommonDesignLogic(object):
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 nutbolt = self.TObj.get_nut_bolt_array_models()
+                onlymember = self.TObj.get_only_members_models()
                 if self.component == "Member":  # Todo: change this into key
-                    osdag_display_shape(self.display, member, update=True)
+                    osdag_display_shape(self.display, onlymember, update=True)
                 elif self.component == "Plate":
                     osdag_display_shape(self.display, plate, color='BLUE', update=True)
                     osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
@@ -1581,16 +1582,19 @@ class CommonDesignLogic(object):
             Obj = self.connectivityObj
         elif self.mainmodule == "Moment Connection":
             if self.connection == KEY_DISP_BEAMCOVERPLATE or self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
-                Obj = self.CPObj
-            if self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
-                Obj = self.CPObj
+                Obj = self.createBBCoverPlateCAD()
+            elif self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
+                Obj = self.createCCCoverPlateCAD()
             elif self.connection == KEY_DISP_COLUMNENDPLATE:
-                Obh = self.CEPObj
+                Obj = self.createCCEndPlateCAD()
             elif self.connection == KEY_DISP_BASE_PLATE:
                 Obj = self.BPObj
 
-            #Todo: add tension module
+        else: #Tension
+            Obj = self.createTensionCAD()
 
+
+        #TODO: Adjust bellow beam column and plate to new models i.e for Moment and tension
         if self.component == "Beam":
             # final_model = self.connectivityObj.get_beamModel()
             final_model = Obj.get_beamModel()
@@ -1612,10 +1616,15 @@ class CommonDesignLogic(object):
         else:
             # cadlist = self.connectivityObj.get_models()
             cadlist = Obj.get_models()
-            if self.connection == KEY_DISP_BASE_PLATE:
-                return cadlist
-            final_model = cadlist[0]
-            for model in cadlist[1:]:
-                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
+            if self.connection == KEY_DISP_BEAMCOVERPLATEWELD or self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD or self.connection == KEY_DISP_COLUMNENDPLATE or self.connection == KEY_DISP_BASE_PLATE  or self.connection == KEY_DISP_TENSION_BOLTED  or self.connection == KEY_DISP_TENSION_WELDED:
+                final_model = cadlist
+
+            # if self.connection == KEY_DISP_BASE_PLATE:
+            #     return cadlist
+            else:
+                final_model = cadlist[0]
+                for model in cadlist[1:]:
+                    final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
 
         return final_model

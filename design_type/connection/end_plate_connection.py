@@ -729,6 +729,10 @@ class EndPlateConnection(ShearConnection):
                 logger.info("Minimum weld size given in Table 21 of IS800:2007 is greater than or equal to thickness "
                             "of thinner connecting plate")
                 logger.info("Thicker plate shall be adequately preheated to prevent cracking of the weld")
+            if self.output[0][23] in (3,4):
+                logger.info(": Minimum recommended weld throat thickness suggested by IS 800:2007 is 3 mm, as per " +
+                            "cl. 10.5.3.1. Weld throat thickness is not considered as per cl. 10.5.3.2. Please take " +
+                            "necessary detailing precautions at site accordingly.")
             self.get_design_status(self)
 
     def set_values_to_class(self):

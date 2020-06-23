@@ -576,16 +576,20 @@ class CleatAngleConnection(ShearConnection):
 
         else:
             self.design_status = False
-            logger.error(" : shear yielding capacity {} is less "
-                         "than applied loads, Please select larger sections or decrease loads"
-                            .format(self.supported_section.shear_yielding_capacity))
+            if self.supported_section.shear_yielding_capacity / 1000 < self.load.shear_force:
+                logger.error(" : Shear yielding capacity, {} kN is less "
+                             "than shear force, Please select larger sections or decrease loads"
+                             .format(round(self.supported_section.shear_yielding_capacity/1000, 2)))
+            else:
+                logger.error(" : Tension yielding capacity, {} kN is less "
+                             "than axial force, Please select larger sections or decrease loads"
+                             .format(round(self.supported_section.tension_yielding_capacity/1000, 2)))
             print("failed in preliminary member checks. Select larger sections or decrease loads")
 
     def select_bolt_dia(self):
 
         self.min_plate_height = self.supported_section.min_plate_height()
         self.max_plate_height = self.supported_section.max_plate_height(self.connectivity, 50.0)
-
 
         self.sptd_leg.thickness_provided = min(self.sptd_leg.thickness)
 

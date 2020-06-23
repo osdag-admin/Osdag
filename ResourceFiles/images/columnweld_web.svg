@@ -494,7 +494,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -503,7 +503,9 @@
      inkscape:groupmode="layer"
      id="layer1">
     <g
-       id="g10380">
+       id="g10380"
+       inkscape:export-xdpi="52.592701"
+       inkscape:export-ydpi="52.592701">
       <g
          inkscape:export-ydpi="96"
          inkscape:export-xdpi="96"
@@ -977,5 +979,5 @@
            height="1624.3253"
            x="-581.84784"
            y="-416.95279" /></flowRegion><flowPara
-         id="flowPara10298"></flowPara></flowRoot>  </g>
+         id="flowPara10298" /></flowRoot>  </g>
 </svg>

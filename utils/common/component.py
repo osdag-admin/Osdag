@@ -773,7 +773,7 @@ class Plate(Material):
 
             if shear_ecc is True:
                 # If check for shear eccentricity is true, resultant force in bolt is calculated
-                ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
+                ecc = (pitch * max((bolt_line - 1)/2, 0)) + end_dist + gap
                 moment_demand = shear_load * ecc + web_moment
                 vres = self.get_vres(bolts_one_line, pitch,
                                      gauge, bolt_line, shear_load, axial_load, ecc, web_moment)
@@ -825,15 +825,17 @@ class Plate(Material):
                 else:
                     pitch = min_gauge
 
+
                 if shear_ecc is True:
                     # If check for shear eccentricity is true, resultant force in bolt is calculated
-                    ecc = (pitch * max((bolt_line - 1.5), 0)) + end_dist + gap
+                    ecc = (pitch * max((bolt_line - 1)/2, 0)) + end_dist + gap
                     moment_demand = shear_load * ecc + web_moment
                     vres = self.get_vres(bolts_one_line, pitch,
                                          gauge, bolt_line, shear_load, axial_load, ecc, web_moment)
                 else:
                     moment_demand = 0.0
                     vres = resultant_force / (bolt_line * bolts_one_line)
+
 
                 if joint == None:
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
@@ -1416,9 +1418,11 @@ class ISection(Material):
 
         self.slenderness = round(slender, 2)
 
+
     def plastic_moment_capacty(self, beta_b, Z_p, fy):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         self.plastic_moment_capactiy = beta_b * Z_p * fy / (gamma_m0)  # Nm # for section
+
 
     def moment_d_deformation_criteria(self, fy, Z_e):
         """
@@ -1450,6 +1454,7 @@ class Beam(ISection):
 
     def min_plate_height(self):
         return 0.6 * self.depth
+
 
     def max_plate_height(self, connectivity=None, notch_height=0.0):
         if connectivity in VALUES_CONN_1 or connectivity == None:
@@ -2002,6 +2007,7 @@ class HollowSection(Material):
         self.depth = row[2]  # mm
         self.flange_width = row[3]  # mm (width is referred as flange width)
         self.flange_thickness = row[4]  # mm (thickness of the section is referred as flange thickness)
+        self.web_thickness = self.flange_thickness
         super(HollowSection, self).__init__(material_grade, self.flange_thickness)
         self.mom_inertia_z = row[7] * 10000  # mm^4
         self.mom_inertia_y = row[8] * 10000  # mm^4
@@ -2011,6 +2017,8 @@ class HollowSection(Material):
         self.elast_sec_mod_y = row[12] * 1000  # mm^3
         self.plast_sec_mod_z = row[13] * 1000  # mm^3
         self.plast_sec_mod_y = row[14] * 1000  # mm^3
+        self.root_radius = 0.0
+        self.toe_radius = 0.0
         self.source = row[15]  # IS 4923:1997
 
         conn.close()

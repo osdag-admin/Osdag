@@ -23,7 +23,7 @@ from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
 from pylatex.utils import bold
 
 
-def min_pitch(d,cond = None):#Todo:done
+def cl_10_2_2_min_spacing(d, parameter='pitch'):#Todo:write condition for pitch and gauge
 
     """
     Calculate the min pitch distance
@@ -42,66 +42,50 @@ def min_pitch(d,cond = None):#Todo:done
 
     min_pitch_eqn = Math(inline=True)
 
-    if cond == None:
-        min_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{min}&= 2.5 ~ d\\'))
-        min_pitch_eqn.append(NoEscape(r'&=2.5*' + d + r'\\&=' + min_pitch + r'\\'))
-        min_pitch_eqn.append(NoEscape(r'[Ref~I&S~800:2007,~Cl.~10.2.2]\end{aligned}'))
+    if parameter == 'pitch':
+        min_pitch_eqn.append(NoEscape(r'\begin{aligned}p_{min}&= 2.5 ~ d\\'))
+    elif parameter == 'gauge':
+        min_pitch_eqn.append(NoEscape(r'\begin{aligned} g_{min}&= 2.5 ~ d\\'))
     else:
         min_pitch_eqn.append(NoEscape(r'\begin{aligned} p/g_{min}&= 2.5 ~ d\\'))
-        min_pitch_eqn.append(NoEscape(r'&=2.5*' + d + r'\\&=' + min_pitch + r'\\'))
-        min_pitch_eqn.append(NoEscape(r'&=' + cond + r'\\'))
-        min_pitch_eqn.append(NoEscape(r'[Ref~I&S~800:2007,~Cl.~10.2.2]\end{aligned}'))
+    min_pitch_eqn.append(NoEscape(r'&=2.5*' + d + r'\\&=' + min_pitch + r'\\'))
+    min_pitch_eqn.append(NoEscape(r'[Ref~I&S~800:2007,~Cl.~10.2.2]\end{aligned}'))
 
     return min_pitch_eqn
 
-def cl_10_2_2_min_spacing(d, parameter='pitch'):#Todo:not done
+def cl_10_2_3_1_max_spacing(t,parameter='pitch'):#TODO:write condition for pitch and gauge
     """
-    minimum spacing between two adjacent fasteners as per cl.10.2.2, IS 800:2007
-    Args:
-        d: diameter of the fastener (int)
-
-    Returns:
-        equation for the minimum spacing between two adjacent fasteners which is 2.5 * diameter of the fastener
+     Calculate the maximum pitch distance
+     Args:
+         t: Thickness of thinner plate in mm (float)
+     Returns:
+           Max pitch in mm (float)
+     Note:
+            Reference:
+            IS 800:2007,  cl. 10.2.3
     """
-    d = str(d)
-    min_spacing = 2.5 * d
-    min_spacing = str(min_spacing)
+    t1 = str(t[0])
+    t2 = str(t[1])
+    max_pitch_1 = 32*min(t)
+    max_pitch_2 = 300
+    max_pitch = min(max_pitch_1,max_pitch_2)
+    t = str(min(t))
+    max_pitch = str(max_pitch)
 
-    min_spacing_eqn = Math(inline=True)
-    if parameter == 'pitch':
-        min_spacing_eqn.append(NoEscape(r'\begin{aligned}Pitch~Distance~_{min} = 2.5 ~ d\\'))
+
+    max_pitch_eqn = Math(inline=True)
+    if parameter=='pitch':
+        max_pitch_eqn.append(NoEscape(r'\begin{aligned}p_{max}&=\min(32~t,~300~mm)\\'))
+    elif parameter == 'gauge':
+        max_pitch_eqn.append(NoEscape(r'\begin{aligned}g_{max}&=\min(32~t,~300~mm)\\'))
     else:
-        min_spacing_eqn.append(NoEscape(r'\begin{aligned}Gauge~Distance~_{min} = 2.5 ~ d\\'))
-    min_spacing_eqn.append(NoEscape(r'= &2.5*' + d + r'&=' + min_spacing + r'\\'))
-    min_spacing_eqn.append(NoEscape(r'&[Ref.Cl.10.2.2.2, IS 800:2007] &\end{aligned}'))
-    return min_spacing_eqn
+        max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
+        max_pitch_eqn.append(NoEscape(r'Where,~t &= min('+t1+','+t2+r')\\'))
+    max_pitch_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.3]\end{aligned}'))
 
+    return max_pitch_eqn
 
-def cl_10_2_3_1_max_spacing(t, parameter='pitch'):
-    """
-    maximum spacing between two adjacent fasteners as per cl.10.2.3.1, IS 800:2007
-    Args:
-        t: thickness of the thinner plate (int)
-
-    Returns:
-        equation for the maximum spacing between two adjacent fasteners which is minimum of (32*t, 300mm)
-    """
-    t = str(t)
-    max_spacing = min(32 * t, 300)
-    max_spacing = str(max_spacing)
-
-    max_spacing_eqn = Math(inline=True)
-    if parameter == 'pitch':
-        max_spacing_eqn.append(NoEscape(r'\begin{aligned}Pitch~Distance~_{max} = min~(32 ~ t, ~300~mm)\\'))
-    else:
-        max_spacing_eqn.append(NoEscape(r'\begin{aligned}Gauge~Distance~_{max} = min~(32 ~ t, ~300~mm)\\'))
-    max_spacing_eqn.append(NoEscape(r'= min (&32*' + t + r', 300~mm)&=' + max_spacing +  r'\\'))
-    max_spacing_eqn.append(NoEscape(r'[Ref.Cl.10.2.3.1,& IS 800:2007] \end{aligned}'))
-
-    return max_spacing_eqn
-
-
-def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - Sheared or hand flame cut', parameter='end_dist'):
+def cl_10_2_4_2_min_edge_end_dist(d_0,edge_type='a - Sheared or hand flame cut', parameter='end_dist'):
     """
     Calculate minimum end and edge distance
     Args:
@@ -115,14 +99,13 @@ def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - S
         Reference:
         IS 800:2007, cl. 10.2.4.2
     """
-    d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
     if edge_type == 'a - Sheared or hand flame cut':
         end_edge_multiplier = 1.7
     else:
         # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
         end_edge_multiplier = 1.5
 
-    min_end_edge_dist = end_edge_multiplier * d_0
+    min_end_edge_dist = round(end_edge_multiplier * d_0,2)
 
     d_0 = str(d_0)
     end_edge_multiplier = str(end_edge_multiplier)
@@ -130,161 +113,18 @@ def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - S
 
     end_edge_eqn = Math(inline=True)
     if parameter == 'end_dist':
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}End~Distance~_{min} = ' + end_edge_multiplier + '~d_0 \\'))
-    else:  # parameter == 'edge_dist'
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}Edge~Distance~_{min} = ' + end_edge_multiplier + '~d_0 \\'))
+        end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{min} &= ' + end_edge_multiplier + r'*~d_0 \\'))
+    elif parameter == 'edge_dist':
+        end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{min} &= ' + end_edge_multiplier + r'*~d_0 \\'))
+    else:
+        end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{min} &= ' + end_edge_multiplier + r'*~d_0 \\'))
 
-    end_edge_eqn.append(NoEscape(r'\begin = ' + end_edge_multiplier + '~ ' + d_0 + r'\\'))
-    end_edge_eqn.append(NoEscape(r'\begin = ' + min_end_edge_dist + ''))
-    end_edge_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.2.4.2]&\end{aligned}'))
+    end_edge_eqn.append(NoEscape(r'&= ' + end_edge_multiplier + '~* ' + d_0 + r'\\'))
+    end_edge_eqn.append(NoEscape(r'&=' + min_end_edge_dist + r'\\'))
+    end_edge_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.4.2]\end{aligned}'))
     return end_edge_eqn
 
-
-def cl_10_2_4_3_max_edge_dist(plate_thicknesses, f_y, corrosive_influences=False, parameter='end_dist'):
-    """
-    Calculate maximum end and edge distance
-    Args:
-         plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
-         f_y - Yield strength of plate material in MPa (float)
-         corrosive_influences - Whether the members are exposed to corrosive influences or not (Boolean)
-    Returns:
-        Maximum end and edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
-    Note:
-        Reference:
-        IS 800:2007, cl. 10.2.4.3
-    """
-    t = min(plate_thicknesses)
-    epsilon = math.sqrt(250 / f_y)
-
-    if corrosive_influences is True:
-        max_end_edge_dist = 40.0 + 4 * t
-    else:
-        max_end_edge_dist = 12 * t * epsilon
-
-    t = str(t)
-    epsilon = str(epsilon)
-    max_end_edge_dist = str(max_end_edge_dist)
-
-    end_edge_eqn = Math(inline=True)
-    if corrosive_influences is False and parameter == 'end_dist':
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}End~Distance~_{max} = 12~t~\epsilon~-when~members~are~not~exposed~to~corrosive~influences\\'))
-        end_edge_eqn.append(NoEscape(r'\begin = 12' + t + '~' + epsilon + '\\'))
-    else:  # corrosive_influences is True and parameter is 'end_dist'
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}End~Distance~_{max} = 40~mm~+~4~t~-when~members~are~exposed~to~corrosive~influences\\'))
-        end_edge_eqn.append(NoEscape(r'\begin = 40~mm~+~4~' + t + '\\'))
-
-    if corrosive_influences is False and parameter == 'edge_dist':
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}Edge~Distance~_{max} = 12~t~\epsilon~-when~members~are~not~exposed~to~corrosive~influences\\'))
-        end_edge_eqn.append(NoEscape(r'\begin = 12' + t + '~' + epsilon + '\\'))
-    else:  # corrosive_influences is True and parameter is 'edge_dist'
-        end_edge_eqn.append(NoEscape(r'\begin{aligned}Edge~Distance~_{max} = 40~mm~+~4~t~-when~members~are~exposed~to~corrosive~influences\\'))
-        end_edge_eqn.append(NoEscape(r'\begin = 40~mm~+~4~' + t + '\\'))
-
-    end_edge_eqn.append(NoEscape(r'\begin = ' + max_end_edge_dist + ''))
-    end_edge_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.2.4.3]&\end{aligned}'))
-    return end_edge_eqn
-
-def max_pitch(t):#todo:done
-    """
-     Calculate the maximum pitch distance
-     Args:
-         t: Thickness of thinner plate in mm (float)
-     Returns:
-           Max pitch in mm (float)
-     Note:
-            Reference:
-            IS 800:2007,  cl. 10.2.3
-    """
-    t1 = str(t[0])
-    t2 = str(t[0])
-    max_pitch_1 = 32*min(t)
-    max_pitch_2 = 300
-    max_pitch = min(max_pitch_1,max_pitch_2)
-    t = str(min(t))
-    max_pitch = str(max_pitch)
-
-
-    max_pitch_eqn = Math(inline=True)
-    max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max}&=\min(32~t,~300~mm)\\'))
-    max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
-    max_pitch_eqn.append(NoEscape(r'&t = min('+t1+','+t2+r'\\'))
-    max_pitch_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.3]\end{aligned}'))
-
-    return max_pitch_eqn
-
-def min_edge_end(d_0,edge_type):
-    """
-    Calculate minimum end and edge distance
-
-    Args:
-           d_0:Nominal diameter of fastener in mm (float)
-
-           edge_type: Either 'hand_flame_cut' or 'machine_flame_cut' (str)
-
-    Returns:
-            Minimum edge and end distances from the centre of any hole to the nearest edge of a plate in mm (float)
-
-    Note:
-            Reference:
-            IS 800:2007, cl. 10.2.4.2
-
-    """
-    if edge_type == 'a - Sheared or hand flame cut':
-        factor = 1.7
-    else:
-        factor = 1.5
-    min_edge_dist = round(factor * d_0,2)
-
-    min_edge_dist = str(min_edge_dist)
-
-    factor = str(factor)
-    d_0 = str(d_0)
-
-    min_end_edge_eqn = Math(inline=True)
-    min_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{min} &=[1.5~or~ 1.7] * d_0\\'))
-    min_end_edge_eqn.append(NoEscape(r'&='+factor + r'*' + d_0+r'='+min_edge_dist+r'\\'))
-    min_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.2]&\end{aligned}'))
-
-
-    return min_end_edge_eqn
-
-
-#TODO: consider using max_edge_end_new instead of this function in all modules
-def max_edge_end(f_y,t):
-    """
-    Calculate maximum end and edge distance
-
-
-    Args:
-           f_y:Yield strength of plate material in MPa (float)
-
-           t:Thickness of thinner plate in mm (float)
-
-    Returns:
-            Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
-    Note:
-            Reference:
-            IS 800:2007, cl. 10.2.4.3
-
-    """
-
-    epsilon = round(math.sqrt(250/f_y),2)
-    max_edge_dist = round(12*t*epsilon,2)
-    max_edge_dist = str(max_edge_dist)
-    t = str(t)
-    f_y = str(f_y)
-
-    max_end_edge_eqn = Math(inline=True)
-    max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
-    max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
-    max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=12 ~*'+ t + r'*\sqrt{\frac{250}{'+f_y+r'}}\\ &='+max_edge_dist+r'\\'))
-    max_end_edge_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.4.3]\end{aligned}'))
-
-
-    return max_end_edge_eqn
-
-
-def max_edge_end_new(t_fu_fy,corrosive_influences):
+def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter='end_dist'):
     """
     Calculate maximum end and edge distance(new)
      Args:
@@ -298,8 +138,6 @@ def max_edge_end_new(t_fu_fy,corrosive_influences):
     Note:
             Reference:
             IS 800:2007, cl. 10.2.4.3
-
-
     """
     t_epsilon_considered = t_fu_fy[0][0] * math.sqrt(250 / float(t_fu_fy[0][2]))
     t_considered = t_fu_fy[0][0]
@@ -315,9 +153,9 @@ def max_edge_end_new(t_fu_fy,corrosive_influences):
             t_min = t
 
     if corrosive_influences is True:
-        max_edge_dist =  40.0 + 4 * t_min
+        max_edge_dist =  round(40.0 + 4 * t_min,2)
     else:
-        max_edge_dist = 12 * t_epsilon_considered
+        max_edge_dist = round(12 * t_epsilon_considered,2)
 
     max_edge_dist = str(max_edge_dist)
     t1=str(t_fu_fy[0][0])
@@ -326,18 +164,30 @@ def max_edge_end_new(t_fu_fy,corrosive_influences):
     fy2 = str(t_fu_fy[1][2])
     max_end_edge_eqn = Math(inline=True)
     if corrosive_influences is False:
-        max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
+        if parameter == 'end_dist':
+            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{max} &= 12~ t~ \varepsilon&\\'))
+        else: #'edge_dist'
+            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e`_{max} &= 12~ t~ \varepsilon&\\'))
         max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
         max_end_edge_eqn.append(NoEscape(r'e1 &= 12 ~*' + t1 + r'*\sqrt{\frac{250}{' + fy1 + r'}}\\'))
         max_end_edge_eqn.append(NoEscape(r'e2 &= 12 ~*' + t2 + r'*\sqrt{\frac{250}{' + fy2 + r'}}\\'))
-        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=min(e1,e2)\\'))
-        max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'}}\\'))
+        if parameter == 'end_dist':
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&=min(e1,e2)\\'))
+        else: #'edge_dist'
+            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=min(e1,e2)\\'))
+        max_end_edge_eqn.append(NoEscape(r' &=' + max_edge_dist + r'\\'))
         max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
 
     else:
-        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=40 + 4*t \\'))
-        max_end_edge_eqn.append(NoEscape(r'Where, t&= min(' + t1 +', '+t2+r')\\'))
-        max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&='+max_edge_dist+r'\\'))
+        if parameter == 'end_dist':
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&=40 + 4*t\\'))
+        else: #'edge_dist'
+            max_end_edge_eqn.append(NoEscape(r'e`_{max}&=40 + 4*t\\'))
+        max_end_edge_eqn.append(NoEscape(r'Where, t&= min(' + t1 +','+t2+r')\\'))
+        if parameter == 'end_dist':
+            max_end_edge_eqn.append(NoEscape(r'e_{max}&='+max_edge_dist+r'\\'))
+        else: #'edge_dist'
+            max_end_edge_eqn.append(NoEscape(r'e`_{max}&='+max_edge_dist+r'\\'))
         max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
 
 
@@ -376,6 +226,34 @@ def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
 
     return bolt_shear_eqn
 
+def end_plate_gauge(connection,e_min,s,t_w,T_w,R_r):
+    g1 = round(2*(e_min+s)+t_w,2)
+    g2 = round(2*(e_min+R_r)+T_w,2)
+    g_min = round(max(g1,g2),2)
+    g1 = str(g1)
+    g2 =str(g2)
+    g_min=str(g_min)
+    e_min=str(e_min)
+    s=str(s)
+    t_w=str(t_w)
+    T_w = str(T_w)
+    R_r = str(R_r)
+    end_plate_gauge = Math(inline=True)
+    if connection == VALUES_CONN_1[0]:
+        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_1 &= 2*(e`_{min}+s)+t_w\\'))
+        end_plate_gauge.append(NoEscape(r'&= 2*(' + e_min + '+' + s + ')+' + t_w + r'\\'))
+        end_plate_gauge.append(NoEscape(r'&=' + g1 + r'\\'))
+        end_plate_gauge.append(NoEscape(r'g_2 &= 2*(e`_{min}+R_r)+T_w\\'))
+        end_plate_gauge.append(NoEscape(r'&= 2*(' + e_min + '+' + R_r + ')+' + T_w + r'\\'))
+        end_plate_gauge.append(NoEscape(r'&='+g2+r'\\'))
+        end_plate_gauge.append(NoEscape(r'g_{min}&= max(g_1,g_2)\\'))
+        end_plate_gauge.append(NoEscape(r'&='+g_min+r' \end{aligned}'))
+    else:
+        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_{min} &= 2*(e`_{min}+s)+t_w\\'))
+        end_plate_gauge.append(NoEscape(r'&= 2*(' + e_min + '+' + s + ')+' + t_w + r'\\'))
+        end_plate_gauge.append(NoEscape(r'&=' + g1 + r' \end{aligned}'))
+
+    return end_plate_gauge
 
 def bolt_bearing_prov(k_b,d,conn_plates_t_fu_fy,gamma_mb,bolt_bearing_capacity):
     """
@@ -945,28 +823,14 @@ def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_pla
     return max_plate_ht_eqn
 
 
-def disp_clause(disp,clause):
-    """
-    Find plate height and plate height clause
-    Args:
-        disp:Plate height in mm (float)
-        clause:Plate height clause in mm (float)
-    Returns:
-         plate height and plate height clause
-    """
+def ep_min_plate_width_req(g,e_min,wp_min):
 
-    disp_clause_eqn = Math(inline=True)
-
-
-def ep_min_plate_width_req(s,g,e_min,t_w,wp_min):
-    s = str(s)
     g= str(g)
     e_min = str(e_min)
-    t_w = str(t_w)
     wp_min = str(wp_min)
     ep_min_plate_w_eqn = Math(inline=True)
-    ep_min_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{min}} &= s * 2 + g` * 2 + e`_{min}*2 + t_w\\'))
-    ep_min_plate_w_eqn.append(NoEscape(r'&='+ s +'* 2 +'+ g +' * 2 +'+ e_min +'*2 +'+ t_w+r'\\'))
+    ep_min_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{min}} &= g` + e`_{min}*2 \\'))
+    ep_min_plate_w_eqn.append(NoEscape(r'&='+ g +'+'+ e_min +r'*2\\'))
     ep_min_plate_w_eqn.append(NoEscape(r'&='+wp_min +r'\end{aligned}'))
     return ep_min_plate_w_eqn
 
@@ -1781,7 +1645,7 @@ def min_weld_size_req(conn_plates_weld,min_weld_size):
     min_weld_size_eqn.append(NoEscape(r'\noindent &=max('+t1+','+t2+r')\\'))
     min_weld_size_eqn.append(NoEscape(r'&='+tmax+r'\\'))
     min_weld_size_eqn.append(NoEscape(r'&[Ref.IS~800:2007~Cl.10.5.2.3~Table ~21],\\'))
-    min_weld_size_eqn.append(NoEscape(r' &t_{w_{min}}=' + weld_min + r'\\'))
+    min_weld_size_eqn.append(NoEscape(r' &s_{min}=' + weld_min + r'\\'))
     min_weld_size_eqn.append(NoEscape(r'& [Ref.~IS~800:2007,~Table ~21~ (Cl. 10.5.2.3)]\end{aligned}'))
 
 
@@ -1818,7 +1682,7 @@ def min_weld_size_req_01(conn_plates_weld, red, min_weld_size):
     min_weld_size_eqn.append(NoEscape(r'\begin{aligned} & t_{w_{min}}~based~on~thinner~part\\'))
     min_weld_size_eqn.append(NoEscape(r'& ='+tmax+ '~or~' +tmin+ r'\\'))
     min_weld_size_eqn.append(NoEscape(r'& IS800:2007~cl.10.5.2.3~Table 21\\' ))
-    min_weld_size_eqn.append(NoEscape(r'& t_{w_{min}}~based~on~thicker~part=' + weld_min + r'\\'))
+    min_weld_size_eqn.append(NoEscape(r'& s_{min}~based~on~thicker~part=' + weld_min + r'\\'))
     min_weld_size_eqn.append(NoEscape(r'& [Ref~IS~800:2007,Table ~21 ~(Cl 10.5.2.3)]\end{aligned}'))
     return min_weld_size_eqn
 
@@ -1848,7 +1712,7 @@ def max_weld_size_req(conn_plates_weld,max_weld_size):
     max_weld_size_eqn = Math(inline=True)
     max_weld_size_eqn.append(NoEscape(r'\begin{aligned} & Thickness~of~Thinner~part\\'))
     max_weld_size_eqn.append(NoEscape(r'&=min('+t1+','+t2+r')='+t_min+r'\\'))
-    max_weld_size_eqn.append(NoEscape(r'&t_{w_{max}} =' + weld_max + r'\\'))
+    max_weld_size_eqn.append(NoEscape(r'&s_{max} =' + weld_max + r'\\'))
     max_weld_size_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.5.3.1]\end{aligned}'))
 
     return max_weld_size_eqn
@@ -1903,15 +1767,15 @@ def weld_strength_req(V,A,M,Ip_w,y_max,x_max,l_w,R_w):
         weld_stress_eqn.append(NoEscape(r'V_{wv}&=\frac{V}{l_w}=\frac{'+V+'}{'+l_w+r'}\\'))
         weld_stress_eqn.append(NoEscape(r'A_{wh}&=\frac{A}{l_w}=\frac{'+A+'}{'+l_w+r'}\\'))
         weld_stress_eqn.append(NoEscape(r'R_w&=\sqrt{('+T_wh+'+'+A_wh+r')^2 + ('+T_wv+'+'+V_wv+r')^2}\\'))
-        weld_stress_eqn.append(NoEscape(r'&='+R_w+r'}\\'))
-        weld_stress_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1]&\end{aligned}'))
+        weld_stress_eqn.append(NoEscape(r'&='+R_w+r'\\'))
+        weld_stress_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1]\end{aligned}'))
     else:
         weld_stress_eqn = Math(inline=True)
         weld_stress_eqn.append(NoEscape(r'\begin{aligned} R_w&=\sqrt{(A_{wh})^2 + (V_{wv})^2}\\'))
         weld_stress_eqn.append(NoEscape(r'V_{wv}&=\frac{V}{l_w}=\frac{' + V + '}{' + l_w + r'}\\'))
         weld_stress_eqn.append(NoEscape(r'A_{wh}&=\frac{A}{l_w}=\frac{' + A + '}{' + l_w + r'}\\'))
         weld_stress_eqn.append(NoEscape(r'R_w&=\sqrt{('+A_wh + r')^2 + (' + V_wv + r')^2}\\'))
-        weld_stress_eqn.append(NoEscape(r'&=' + R_w + r'}\\'))
+        weld_stress_eqn.append(NoEscape(r'&=' + R_w + r'\\'))
         weld_stress_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.5.7.1.1]\end{aligned}'))
 
     return weld_stress_eqn
@@ -2313,21 +2177,26 @@ def prov_shear_load(shear_input,min_sc,app_shear_load,shear_capacity_1):
 
     return app_shear_load_eqn
 
-def end_plate_moment_demand(T_w,R_r,e,t_w,s,T_e,M):
-    ecc = T_w/2+R_r+e-t_w/2-s
+def end_plate_moment_demand(connectivity,g,T_w,R_r,t_w,s,T_e,M):
+    ecc1 = round(g/2-t_w/2-s,2)
+    ecc2 = round(g/2-T_w/2-R_r,2)
+    ecc = max(ecc1,ecc2)
     T_e = str(T_e)
     M = str(M)
+    ecc1 = str(ecc1)
+    ecc2 = str(ecc2)
     ecc = str(ecc)
-    R_r = str(R_r)
-    e = str(e)
-    t_w = str(t_w)
-    T_w = str(T_w)
-    s = str(s)
+
+
     EP_Mom = Math(inline=True)
     EP_Mom.append(NoEscape(r'\begin{aligned}M &= T_e * ecc \\'))
-    EP_Mom.append(NoEscape(r'ecc &=\frac{T_w}{2}+R_r+e`-\frac{t_w}{2}-s\\'))
-    EP_Mom.append(NoEscape(r'&=\frac{'+T_w+'}{2}+'+R_r+'+'+e+r'-\frac{'+t_w+'}{2}-'+s+r'\\'))
-    EP_Mom.append(NoEscape(r'M&='+T_e+'*'+ecc+'*10^{-3}='+M+r'\end{aligned}'))
+    if connectivity == VALUES_CONN_1[0]:
+        EP_Mom.append(NoEscape(r'ecc_1 &=\frac{g}{2}-\frac{t_w}{2}-s &='+ecc1+r'\\'))
+        EP_Mom.append(NoEscape(r'ecc_2 &=\frac{g}{2}-\frac{T_w}{2}-R_r &=' + ecc2 + r'\\'))
+        EP_Mom.append(NoEscape(r'&max(ecc_1,ecc_2) &='+ecc+r'\\'))
+    else:
+        EP_Mom.append(NoEscape(r'ecc &=\frac{g}{2}-\frac{t_w}{2}-s &=' + ecc1 + r'\\'))
+    EP_Mom.append(NoEscape(r'M&='+T_e+'*'+ecc+'*10^{-3} &='+M+r'\end{aligned}'))
     return EP_Mom
 
 def plastic_moment_capacty(beta_b, Z_p, f_y, gamma_m0 ,Pmc):  # same as #todo anjali
@@ -2853,14 +2722,14 @@ def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u 
 
 
     if stress == "shear":
-        member_block_eqn.append(NoEscape(r'\begin{aligned}V_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
-        member_block_eqn.append(NoEscape(r'V_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
-        member_block_eqn.append(NoEscape(r'V_{db} &= min(V_{db1}, V_{db2})= ' + Tdb +  r'\\'))
+        member_block_eqn.append(NoEscape(r'\begin{aligned}V_{dbl1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
+        member_block_eqn.append(NoEscape(r'V_{dbl2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+        member_block_eqn.append(NoEscape(r'V_{dbl} &= min(V_{db1}, V_{db2})= ' + Tdb +  r'\\'))
         member_block_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.4]\end{aligned}'))
     else:
-        member_block_eqn.append(NoEscape(r'\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
-        member_block_eqn.append(NoEscape(r'T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
-        member_block_eqn.append(NoEscape(r'T_{db} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\\'))
+        member_block_eqn.append(NoEscape(r'\begin{aligned}T_{dbl1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
+        member_block_eqn.append(NoEscape(r'T_{dbl2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+        member_block_eqn.append(NoEscape(r'T_{dbl} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\\'))
         member_block_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.4]\end{aligned}'))
 
     return member_block_eqn
@@ -3031,7 +2900,7 @@ def long_joint_bolted_req():
     return long_joint_bolted_eqn
 
 
-def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr):
+def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr,direction=None):
     """
     Calculate reduced bolt capacity in case of long joint
 
@@ -3078,22 +2947,21 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr):
     long_joint_bolted_eqn = Math(inline=True)
     # long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
     # long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
-    if l < (lt):
-        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= ((nc~or~nr) - 1) * (p~or~g) \\'))
-        long_joint_bolted_eqn.append(NoEscape(r' &= ('+nc+' - 1) * '+p+ '='+lc_str+ r'\\'))
+
+    if direction == 'n_r':
+        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= (n_r - 1) * p \\'))
         long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + ' - 1) * ' + g + '=' + lr_str + r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r' l&= '+ l_str + r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * '+d+' = '+lt_str +r' \\'))
+    else:
+        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= ((n_c~or~n_r) - 1) * (p~or~g) \\'))
+        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nc + ' - 1) * ' + p + '=' + lc_str + r'\\'))
+        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + ' - 1) * ' + g + '=' + lr_str + r'\\'))
+    long_joint_bolted_eqn.append(NoEscape(r' l&= ' + l_str + r'\\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
+    if l < (lt):
         long_joint_bolted_eqn.append(NoEscape(r'& since,~l < 15 * d~then~V_{rd} = V_{db} \\'))
         long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+Tc+r' \\'))
         long_joint_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.1]\end{aligned}'))
-
     else:
-        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= ((nc~or~nr) - 1) * (p~or~g) \\'))
-        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nc + ' - 1) * ' + p + '=' + lc_str + r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + ' - 1) * ' + g + '=' + lr_str + r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r' l&= ' + l_str + r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
         long_joint_bolted_eqn.append(NoEscape(r'& since,~l \geq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
         long_joint_bolted_eqn.append(NoEscape(r'& \beta_{ij} = 1.075 - '+ l_str +'/(200*'+d+') ='+Bi+r'\\'))
         long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \\'))
@@ -3337,7 +3205,7 @@ def long_joint_welded_beam_prov(plate_height,l_w,t_w,gap,t_t,Tc,Tr):
     return long_joint_welded_beam_prov
 
 
-def long_joint_welded_prov(h,l,t_t,ws,wsr):
+def long_joint_welded_prov(h,l,t_t,ws,wsr,direction=None):
     """
     Calculate Reduced flange weld strength  in case of long joint (welded connection)
 
@@ -3375,23 +3243,23 @@ def long_joint_welded_prov(h,l,t_t,ws,wsr):
 
     long_joint_welded_prov = Math(inline=True)
     # if conn =="web":
-    if lj < lt:
-        long_joint_welded_prov.append(NoEscape(r'\begin{aligned} l ~&= pt.length ~ or ~ pt.height \\'))
-        long_joint_welded_prov.append(NoEscape(r' l_l &= max('+h +','+l+r') \\'))
-        long_joint_welded_prov.append(NoEscape(r' &='+ ljs + r' \\'))
-        long_joint_welded_prov.append(NoEscape(r'& 150 * t_t =150 * '+t_t+' = '+lt_str +r' \\'))
-        long_joint_welded_prov.append(NoEscape(r'& since,~l < 150 * t_t~\\&then~V_{rd} = V_{db} \\'))
-        long_joint_welded_prov.append(NoEscape(r' V_{rd} &= ' + ws + r' \\'))
-        long_joint_welded_prov.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.5.7.3]\end{aligned}'))
 
+    if direction=='height':
+        long_joint_welded_prov.append(NoEscape(r'\begin{aligned} l_w ~&= h\\'))
+        long_joint_welded_prov.append(NoEscape(r' &='+ h+r'\\'))
     else:
-        long_joint_welded_prov.append(NoEscape(r'\begin{aligned} l~&= pt.length ~or ~pt.height \\'))
+        long_joint_welded_prov.append(NoEscape(r'\begin{aligned} l ~&= pt.length ~ or ~ pt.height \\'))
         long_joint_welded_prov.append(NoEscape(r' l_l &= max(' + h + ',' + l + r') \\'))
         long_joint_welded_prov.append(NoEscape(r' &=' + ljs + r' \\'))
-        long_joint_welded_prov.append(NoEscape(r'& 150 * t_t =150 * ' + t_t + ' = ' + lt_str + r' \\'))
+    long_joint_welded_prov.append(NoEscape(r'& 150 * t_t =150 * ' + t_t + ' = ' + lt_str + r' \\'))
+    if lj < lt:
+        long_joint_welded_prov.append(NoEscape(r'& since,~l < 150 * t_t~\\&then~f_{wrd} = f_{w} \\'))
+        long_joint_welded_prov.append(NoEscape(r' f_{wrd} &= ' + ws + r' \\'))
+        long_joint_welded_prov.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.5.7.3]\end{aligned}'))
+    else:
         long_joint_welded_prov.append(NoEscape(r'&since,~l \geq 150 * t_t~ \\&then~V_{rd} = \beta_{lw} * V_{db} \\'))
         long_joint_welded_prov.append(NoEscape(r'\beta_{l_w}& = 1.2 - (0.2*' + lj + ')/(150*' + t_t+ r')\\& =' + Bi + r'\\'))
-        long_joint_welded_prov.append(NoEscape(r' V_{rd}& = ' + Bi + ' * ' + ws + '=' + wsr + r' \\'))
+        long_joint_welded_prov.append(NoEscape(r' f_{wrd}& = ' + Bi + ' * ' + ws + '=' + wsr + r' \\'))
         long_joint_welded_prov.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.5.7.3]\end{aligned}'))
 
     return long_joint_welded_prov
@@ -3889,13 +3757,17 @@ def tension_in_bolt_due_to_axial_load_n_moment(P,n,M,y_max,y_sqr,T_b):
     tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&= ' + T_b + r'\end{aligned}'))
     return tension_in_bolt_due_to_axial_load_n_moment
 
-def tension_in_bolt_due_to_axial(P,n,T_ba):
+def force_in_bolt_due_to_load(P,n,T_ba,load='tension'):
     P= str(P)
     n = str(n)
     T_ba = str (T_ba)
     tension_in_bolt_due_to_axial_load_n_moment  = Math(inline=True)
-    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_{ba} &= \frac{P}{\ n}\\'))
-    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' +P + '}{' + n + r'}\\'))
+    if load == 'tension':
+        tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_{ba} &= \frac{P}{\ n}\\'))
+        tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' +P + '}{' + n + r'}\\'))
+    else:
+        tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} V_{bv} &= \frac{V}{\ n}\\'))
+        tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' + P + '}{' + n + r'}\\'))
     tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&= ' + T_ba + r'\end{aligned}'))
     return tension_in_bolt_due_to_axial_load_n_moment
 
@@ -3922,13 +3794,13 @@ def tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tens
     beta = str(beta)
     eta = str(eta)
     tension_in_bolt_due_to_prying = Math(inline=True)
-    tension_in_bolt_due_to_prying.append(NoEscape(r'\begin{aligned} Q &= \frac{l_v}{2*l_e} * [T_e - \frac{\beta * eta * f_o * b_e * t^4}{27 * l_e * l_v^2}]\\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'\begin{aligned} Q &= \frac{l_v}{2*l_e} * [T_e - \frac{\beta * \eta * f_o * b_e * t^4}{27 * l_e * l_v^2}]\\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r'Q &\geq 0\\'))
     if pre_tensioned == 'Pretensioned':
         tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 1 (pre-tensioned) \\'))
     else:
         tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 2 (Not pre-tensioned) \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min(end_dist, 1.1*t*\sqrt{\frac{\beta *f_o}{f_y}}) \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min(e, 1.1*t*\sqrt{\frac{\beta *f_o}{f_y}}) \\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min('+end_dist+', 1.1*'+t+r'*\sqrt{\frac{'+beta+'*'+f_o+r'}{'+f_y+r'}}) \\'))
     tension_in_bolt_due_to_prying.append(
         NoEscape(r'Q &=\frac{'+l_v+'}{2*'+l_e+r'}*\\'))
@@ -4323,3 +4195,127 @@ def depth_req(e, g, row, sec =None):
 # geometry_options = {"top": "2in", "bottom": "1in", "left": "0.6in", "right": "0.6in", "headsep": "0.8in"}
 # doc = Document(geometry_options=geometry_options, indent=False)
 # report_bolt_shear_check(doc)
+##################3
+# Duplicate functions
+###############
+# def cl_10_2_3_1_max_spacing(t, parameter='pitch'):
+#     """
+#     maximum spacing between two adjacent fasteners as per cl.10.2.3.1, IS 800:2007
+#     Args:
+#         t: thickness of the thinner plate (int)
+#
+#     Returns:
+#         equation for the maximum spacing between two adjacent fasteners which is minimum of (32*t, 300mm)
+#     """
+#     t = str(t)
+#     max_spacing = min(32 * t, 300)
+#     max_spacing = str(max_spacing)
+#
+#     max_spacing_eqn = Math(inline=True)
+#     if parameter == 'pitch':
+#         max_spacing_eqn.append(NoEscape(r'\begin{aligned}Pitch~Distance~_{max} = min~(32 ~ t, ~300~mm)\\'))
+#     else:
+#         max_spacing_eqn.append(NoEscape(r'\begin{aligned}Gauge~Distance~_{max} = min~(32 ~ t, ~300~mm)\\'))
+#     max_spacing_eqn.append(NoEscape(r'= min (&32*' + t + r', 300~mm)&=' + max_spacing +  r'\\'))
+#     max_spacing_eqn.append(NoEscape(r'[Ref.Cl.10.2.3.1,& IS 800:2007] \end{aligned}'))
+#
+#     return max_spacing_eqn
+
+# def cl_10_2_4_3_max_edge_dist_old(plate_thicknesses, f_y, corrosive_influences=False, parameter='end_dist'):
+#     """
+#     Calculate maximum end and edge distance
+#     Args:
+#          plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
+#          f_y - Yield strength of plate material in MPa (float)
+#          corrosive_influences - Whether the members are exposed to corrosive influences or not (Boolean)
+#     Returns:
+#         Maximum end and edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
+#     Note:
+#         Reference:
+#         IS 800:2007, cl. 10.2.4.3
+#     """
+#     t = min(plate_thicknesses)
+#     epsilon = math.sqrt(250 / f_y)
+#
+#     if corrosive_influences is True:
+#         max_end_edge_dist = 40.0 + 4 * t
+#     else:
+#         max_end_edge_dist = 12 * t * epsilon
+#
+#     t = str(t)
+#     epsilon = str(epsilon)
+#     max_end_edge_dist = str(max_end_edge_dist)
+#
+#     end_edge_eqn = Math(inline=True)
+#     if corrosive_influences is False and parameter == 'end_dist':
+#         end_edge_eqn.append(NoEscape(r'\begin{aligned}End~Distance~_{max} = 12~t~\epsilon~-when~members~are~not~exposed~to~corrosive~influences\\'))
+#         end_edge_eqn.append(NoEscape(r'\begin = 12' + t + '~' + epsilon + '\\'))
+#     else:  # corrosive_influences is True and parameter is 'end_dist'
+#         end_edge_eqn.append(NoEscape(r'\begin{aligned}End~Distance~_{max} = 40~mm~+~4~t~-when~members~are~exposed~to~corrosive~influences\\'))
+#         end_edge_eqn.append(NoEscape(r'\begin = 40~mm~+~4~' + t + '\\'))
+#
+#     if corrosive_influences is False and parameter == 'edge_dist':
+#         end_edge_eqn.append(NoEscape(r'\begin{aligned}Edge~Distance~_{max} = 12~t~\epsilon~-when~members~are~not~exposed~to~corrosive~influences\\'))
+#         end_edge_eqn.append(NoEscape(r'\begin = 12' + t + '~' + epsilon + '\\'))
+#     else:  # corrosive_influences is True and parameter is 'edge_dist'
+#         end_edge_eqn.append(NoEscape(r'\begin{aligned}Edge~Distance~_{max} = 40~mm~+~4~t~-when~members~are~exposed~to~corrosive~influences\\'))
+#         end_edge_eqn.append(NoEscape(r'\begin = 40~mm~+~4~' + t + '\\'))
+#
+#     end_edge_eqn.append(NoEscape(r'\begin = ' + max_end_edge_dist + ''))
+#     end_edge_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.2.4.3]&\end{aligned}'))
+#     return end_edge_eqn
+
+# def cl_10_2_2_min_spacing(d, parameter='pitch'):#Todo:not done
+#     """
+#     minimum spacing between two adjacent fasteners as per cl.10.2.2, IS 800:2007
+#     Args:
+#         d: diameter of the fastener (int)
+#
+#     Returns:
+#         equation for the minimum spacing between two adjacent fasteners which is 2.5 * diameter of the fastener
+#     """
+#     d = str(d)
+#     min_spacing = 2.5 * d
+#     min_spacing = str(min_spacing)
+#
+#     min_spacing_eqn = Math(inline=True)
+#     if parameter == 'pitch':
+#         min_spacing_eqn.append(NoEscape(r'\begin{aligned}Pitch~Distance~_{min} = 2.5 ~ d\\'))
+#     else:
+#         min_spacing_eqn.append(NoEscape(r'\begin{aligned}Gauge~Distance~_{min} = 2.5 ~ d\\'))
+#     min_spacing_eqn.append(NoEscape(r'= &2.5*' + d + r'&=' + min_spacing + r'\\'))
+#     min_spacing_eqn.append(NoEscape(r'&[Ref.Cl.10.2.2.2, IS 800:2007] &\end{aligned}'))
+#     return min_spacing_eqn
+#
+# def max_edge_end(f_y,t):
+#     """
+#     Calculate maximum end and edge distance
+#
+#
+#     Args:
+#            f_y:Yield strength of plate material in MPa (float)
+#
+#            t:Thickness of thinner plate in mm (float)
+#
+#     Returns:
+#             Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
+#     Note:
+#             Reference:
+#             IS 800:2007, cl. 10.2.4.3
+#
+#     """
+#
+#     epsilon = round(math.sqrt(250/f_y),2)
+#     max_edge_dist = round(12*t*epsilon,2)
+#     max_edge_dist = str(max_edge_dist)
+#     t = str(t)
+#     f_y = str(f_y)
+#
+#     max_end_edge_eqn = Math(inline=True)
+#     max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e/e`_{max} &= 12~ t~ \varepsilon&\\'))
+#     max_end_edge_eqn.append(NoEscape(r'\varepsilon &= \sqrt{\frac{250}{f_y}}\\'))
+#     max_end_edge_eqn.append(NoEscape(r'e/e`_{max}&=12 ~*'+ t + r'*\sqrt{\frac{250}{'+f_y+r'}}\\ &='+max_edge_dist+r'\\'))
+#     max_end_edge_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.4.3]\end{aligned}'))
+#
+#
+#     return max_end_edge_eqn

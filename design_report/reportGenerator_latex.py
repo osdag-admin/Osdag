@@ -13,7 +13,8 @@ import sys
 import datetime
 import pylatex as pyl
 from pylatex.basic import TextColor
-from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
+from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu,\
+    MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic
 #from pdflatex import PDFLaTeX
@@ -22,7 +23,6 @@ from pylatex.base_classes import Environment, CommandBase, Arguments
 from pylatex.package import Package
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
     MediumText, LineBreak, simple_page_number, NewPage
-
 
 from pylatex.utils import bold
 
@@ -43,8 +43,9 @@ class CreateLatex(Document):
         client = str(reportsummary['Client'])
 
         does_design_exist = reportsummary['does_design_exist']
+        osdagheader = '/ResourceFiles/images/OsdagHeader.png'
         # Add document header
-        geometry_options = {"top": "4cm", "hmargin": "2cm", "headheight": "65pt", "footskip": "65pt"}
+        geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt"}
         doc = Document(geometry_options=geometry_options,indent=False)
         doc.packages.append(Package('amsmath'))
         doc.packages.append(Package('graphicx'))
@@ -58,9 +59,15 @@ class CreateLatex(Document):
         header = PageStyle("header")
         # Create center header
         with header.create(Head("C")):
-            with header.create(Tabularx('|l|p{6cm}|l|X|')) as table:
+            with header.create(Tabularx('|l|p{4cm}|l|X|')) as table:
                 table.add_hline()
                 # MultiColumn(4)
+                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is'' else StandAloneGraphic(image_options="width=3.5cm,height=1cm",
+                                                                                 filename=companylogo))),
+                                               MultiColumn(2, align='|c|',
+                                                           data=['Created with',StandAloneGraphic(image_options="width=3.5cm,height=1cm",
+                                                                                 filename=rel_path + osdagheader)]),))
+                table.add_hline()
                 table.add_row(('Company Name', companyname, 'Project Title', projecttitle), color='OsdagGreen')
                 table.add_hline()
                 table.add_row(('Group/Team Name', groupteamname, 'Subtitle', subtitle), color='OsdagGreen')
@@ -69,6 +76,8 @@ class CreateLatex(Document):
                 table.add_hline()
                 table.add_row(('Date', time.strftime("%d /%m /%Y"), 'Client', client), color='OsdagGreen')
                 table.add_hline()
+
+
 
         # Create right footer
         with header.create(Foot("R")):
@@ -83,7 +92,6 @@ class CreateLatex(Document):
 
         doc.preamble.append(header)
         doc.change_document_style("header")
-
         with doc.create(Section('Input Parameters')):
             with doc.create(LongTable('|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4.5cm}|', row_height=1.2)) as table:
                 table.add_hline()
@@ -250,4 +258,10 @@ class CreateLatex(Document):
             doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
         except:
             pass
+
+
+def color_cell(cellcolor,celltext):
+    string = NoEscape(r'\cellcolor{'+cellcolor+r'}{'+celltext+r'}')
+    return string
+
 

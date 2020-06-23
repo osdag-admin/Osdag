@@ -2365,8 +2365,17 @@ class Window(QMainWindow):
 
     def set_dialog_size(self,dialog):
         def set_size():
-            dialog.resize(900,900) 
-            self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)  
+            screen_resolution=QtWidgets.QDesktopWidget().screenGeometry()
+            if(screen_resolution.width()<1025):
+                measure=screen_resolution.height()-120
+                dialog.resize(measure*45//39,measure)
+                
+            else:
+                dialog.resize(900,700)
+            mysize = dialog.geometry()
+            hpos = (screen_resolution.width() - mysize.width() ) / 2
+            vpos = (screen_resolution.height() - mysize.height() ) / 2
+            dialog.move(hpos, vpos)
             self.OsdagSectionModeller.OCCWindow.setFocus()
         return set_size
 

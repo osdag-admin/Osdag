@@ -19,6 +19,9 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
+from gui.ui_tutorial import Ui_Tutorial
+from gui.ui_aboutosdag import Ui_AboutOsdag
+from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PyQt5.QtGui import QStandardItem
 import os
@@ -72,7 +75,30 @@ from design_type.connection.base_plate_connection import BasePlateConnection
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 import logging
+import subprocess
 from cad.cad3dconnection import cadconnection
+
+
+class MyTutorials(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Tutorial()
+        self.ui.setupUi(self)
+
+
+class MyAboutOsdag(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_AboutOsdag()
+        self.ui.setupUi(self)
+
+
+class MyAskQuestion(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+
 
 class Ui_ModuleWindow(QtWidgets.QMainWindow):
     resized = QtCore.pyqtSignal()
@@ -248,6 +274,18 @@ class Window(QMainWindow):
 
         else:
             pass
+
+    def design_examples(self):
+        root_path = os.path.join('ResourceFiles', 'design_example', '_build', 'html')
+        for html_file in os.listdir(root_path):
+            # if html_file.startswith('index'):
+            print(os.path.splitext(html_file)[1])
+            if os.path.splitext(html_file)[1] == '.html':
+                if sys.platform == ("win32" or "win64"):
+                    os.startfile(os.path.join(root_path, html_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, html_file)])
 
     def get_validator(self, validator):
         if validator == 'Int Validator':
@@ -1198,8 +1236,8 @@ class Window(QMainWindow):
         # self.menuEdit.addAction(self.actionPaste)
         self.menuEdit.addAction(self.actionDesign_Preferences)
         self.menuEdit.addAction(self.actionOsdagSectionModeller)
-        self.menuView.addAction(self.actionEnlarge_font_size)
-        self.menuView.addSeparator()
+        # self.menuView.addAction(self.actionEnlarge_font_size)
+        # self.menuView.addSeparator()
         self.menuHelp.addAction(self.actionSample_Tutorials)
         self.menuHelp.addAction(self.actionDesign_examples)
         self.menuHelp.addSeparator()
@@ -1228,7 +1266,7 @@ class Window(QMainWindow):
         self.menuDB.addAction(self.actionReset_db)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuEdit.menuAction())
-        self.menubar.addAction(self.menuView.menuAction())
+        # self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuGraphics.menuAction())
         self.menubar.addAction(self.menuDB.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
@@ -1254,6 +1292,11 @@ class Window(QMainWindow):
         self.actionDownload_channel.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Channels"))
         self.actionDownload_angle.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Angles"))
         self.actionReset_db.triggered.connect(self.database_reset)
+        self.actionSample_Tutorials.triggered.connect(lambda: MyTutorials(self).exec())
+        self.actionAbout_Osdag_2.triggered.connect(lambda: MyAboutOsdag(self).exec())
+        self.actionAsk_Us_a_Question.triggered.connect(lambda: MyAskQuestion(self).exec())
+        self.actionDesign_examples.triggered.connect(self.design_examples)
+
 
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
         last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
@@ -2319,9 +2362,13 @@ class Window(QMainWindow):
 
     def save3DcadImages(self, main):
 
+        if not main.design_button_status:
+            QMessageBox.warning(self, 'Warning', 'No design created!')
+            return
+
         if main.design_status:
             if self.fuse_model is None:
-                self.fuse_model = CommonDesignLogic.create2Dcad(self.commLogicObj)
+                self.fuse_model = self.commLogicObj.create2Dcad()
             shape = self.fuse_model
 
             files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
@@ -2330,11 +2377,7 @@ class Window(QMainWindow):
                                                       files_types)
             fName = str(fileName)
 
-            flag = True
-            if fName == '':
-                flag = False
-                return flag
-            else:
+            if fName and self.fuse_model:
                 file_extension = fName.split(".")[-1]
 
                 if file_extension == 'igs':
@@ -2366,9 +2409,12 @@ class Window(QMainWindow):
                 self.fuse_model = None
 
                 QMessageBox.about(self, 'Information', "File saved")
+
+            else:
+                QMessageBox.about(self, 'Error', "File not saved")
         else:
             # self.actionSave_3D_model.setEnabled(False)
-            QMessageBox.about(self,'Information', 'Design Unsafe: 3D Model cannot be saved')
+            QMessageBox.about(self, 'Warning', 'Design Unsafe: 3D Model cannot be saved')
 
     def assign_display_mode(self, mode):
 

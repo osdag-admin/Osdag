@@ -34,6 +34,7 @@ import pdfkit
 import configparser
 import pickle
 import cairosvg
+from update import Update
 
 
 from Common import *
@@ -1157,6 +1158,8 @@ class Window(QMainWindow):
         self.actionOsdag_Manual.setObjectName("actionOsdag_Manual")
         self.actionAsk_Us_a_Question = QtWidgets.QAction(MainWindow)
         self.actionAsk_Us_a_Question.setObjectName("actionAsk_Us_a_Question")
+        self.check_for_update=QtWidgets.QAction(MainWindow)
+        self.check_for_update.setObjectName("check_for_update")
         self.actionFAQ = QtWidgets.QAction(MainWindow)
         self.actionFAQ.setObjectName("actionFAQ")
 
@@ -1205,6 +1208,8 @@ class Window(QMainWindow):
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAsk_Us_a_Question)
         self.menuHelp.addAction(self.actionAbout_Osdag_2)
+        self.menuHelp.addSeparator()
+        self.menuHelp.addAction(self.check_for_update)
         self.menuGraphics.addSeparator()
         self.menuGraphics.addAction(self.actionZoom_in)
         self.menuGraphics.addAction(self.actionZoom_out)
@@ -1245,6 +1250,8 @@ class Window(QMainWindow):
         self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
         self.actionCreate_design_report.triggered.connect(lambda:self.open_summary_popup(main))
+
+        self.check_for_update.triggered.connect(lambda: self.notification())
         self.actionZoom_out.triggered.connect(lambda: self.display.ZoomFactor(1/1.1))
         self.actionZoom_in.triggered.connect(lambda: self.display.ZoomFactor(1.1))
         self.actionPan.triggered.connect(lambda: self.assign_display_mode(mode="pan"))
@@ -1266,11 +1273,22 @@ class Window(QMainWindow):
                 last_design_dictionary = yaml.safe_load(last_design)
         if isinstance(last_design_dictionary, dict):
             self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
-
+            
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
         self.fuse_model = None
+
+    def notification(self):
+        check=Update(0)
+        print(check.notifi())
+        if check.notifi()==True:
+            msg = QMessageBox.information(self, 'Update available',
+                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
+        elif check.notifi()=="no internet":
+            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
+        else:
+            msg = QMessageBox.information(self, 'Update', 'No Update Available')
 
     def save_output_to_txt(self, main):
         def save_fun():
@@ -2504,6 +2522,7 @@ class Window(QMainWindow):
         self.actionAbout_Osdag_2.setText(_translate("MainWindow", "About Osdag"))
         self.actionOsdag_Manual.setText(_translate("MainWindow", "Osdag Manual"))
         self.actionAsk_Us_a_Question.setText(_translate("MainWindow", "Ask Us a Question"))
+        self.check_for_update.setText(_translate("MainWindow", "Check For Update"))
         self.actionFAQ.setText(_translate("MainWindow", "FAQ"))
         self.actionDesign_Preferences.setText(_translate("MainWindow", "Design Preferences"))
         self.actionDesign_Preferences.setShortcut(_translate("MainWindow", "Alt+P"))

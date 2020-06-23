@@ -23,7 +23,7 @@ from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
 from pylatex.utils import bold
 
 
-def cl_10_2_2_min_spacing(d, cond = None, parameter='pitch'):#Todo:write condition for pitch and gauge
+def cl_10_2_2_min_spacing(d, parameter='pitch'):#Todo:write condition for pitch and gauge
 
     """
     Calculate the min pitch distance
@@ -42,15 +42,14 @@ def cl_10_2_2_min_spacing(d, cond = None, parameter='pitch'):#Todo:write conditi
 
     min_pitch_eqn = Math(inline=True)
 
-    if cond == None:
-        min_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{min}&= 2.5 ~ d\\'))
-        min_pitch_eqn.append(NoEscape(r'&=2.5*' + d + r'\\&=' + min_pitch + r'\\'))
-        min_pitch_eqn.append(NoEscape(r'[Ref~I&S~800:2007,~Cl.~10.2.2]\end{aligned}'))
+    if parameter == 'pitch':
+        min_pitch_eqn.append(NoEscape(r'\begin{aligned}p_{min}&= 2.5 ~ d\\'))
+    elif parameter == 'gauge':
+        min_pitch_eqn.append(NoEscape(r'\begin{aligned} g_{min}&= 2.5 ~ d\\'))
     else:
         min_pitch_eqn.append(NoEscape(r'\begin{aligned} p/g_{min}&= 2.5 ~ d\\'))
-        min_pitch_eqn.append(NoEscape(r'&=2.5*' + d + r'\\&=' + min_pitch + r'\\'))
-        min_pitch_eqn.append(NoEscape(r'&=' + cond + r'\\'))
-        min_pitch_eqn.append(NoEscape(r'[Ref~I&S~800:2007,~Cl.~10.2.2]\end{aligned}'))
+    min_pitch_eqn.append(NoEscape(r'&=2.5*' + d + r'\\&=' + min_pitch + r'\\'))
+    min_pitch_eqn.append(NoEscape(r'[Ref~I&S~800:2007,~Cl.~10.2.2]\end{aligned}'))
 
     return min_pitch_eqn
 
@@ -66,7 +65,7 @@ def cl_10_2_3_1_max_spacing(t,parameter='pitch'):#TODO:write condition for pitch
             IS 800:2007,  cl. 10.2.3
     """
     t1 = str(t[0])
-    t2 = str(t[0])
+    t2 = str(t[1])
     max_pitch_1 = 32*min(t)
     max_pitch_2 = 300
     max_pitch = min(max_pitch_1,max_pitch_2)
@@ -75,9 +74,13 @@ def cl_10_2_3_1_max_spacing(t,parameter='pitch'):#TODO:write condition for pitch
 
 
     max_pitch_eqn = Math(inline=True)
-    max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max}&=\min(32~t,~300~mm)\\'))
-    max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
-    max_pitch_eqn.append(NoEscape(r'&t = min('+t1+','+t2+r'\\'))
+    if parameter=='pitch':
+        max_pitch_eqn.append(NoEscape(r'\begin{aligned}p_{max}&=\min(32~t,~300~mm)\\'))
+    elif parameter == 'gauge':
+        max_pitch_eqn.append(NoEscape(r'\begin{aligned}g_{max}&=\min(32~t,~300~mm)\\'))
+    else:
+        max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
+        max_pitch_eqn.append(NoEscape(r'Where,~t &= min('+t1+','+t2+r')\\'))
     max_pitch_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.3]\end{aligned}'))
 
     return max_pitch_eqn
@@ -223,6 +226,34 @@ def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
 
     return bolt_shear_eqn
 
+def end_plate_gauge(connection,e_min,s,t_w,T_w,R_r):
+    g1 = round(2*(e_min+s)+t_w,2)
+    g2 = round(2*(e_min+R_r)+T_w,2)
+    g_min = round(max(g1,g2),2)
+    g1 = str(g1)
+    g2 =str(g2)
+    g_min=str(g_min)
+    e_min=str(e_min)
+    s=str(s)
+    t_w=str(t_w)
+    T_w = str(T_w)
+    R_r = str(R_r)
+    end_plate_gauge = Math(inline=True)
+    if connection == VALUES_CONN_1[0]:
+        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_1 &= 2*(e`_{min}+s)+t_w\\'))
+        end_plate_gauge.append(NoEscape(r'&= 2*(' + e_min + '+' + s + ')+' + t_w + r'\\'))
+        end_plate_gauge.append(NoEscape(r'&=' + g1 + r'\\'))
+        end_plate_gauge.append(NoEscape(r'g_2 &= 2*(e`_{min}+R_r)+T_w\\'))
+        end_plate_gauge.append(NoEscape(r'&= 2*(' + e_min + '+' + R_r + ')+' + T_w + r'\\'))
+        end_plate_gauge.append(NoEscape(r'&='+g2+r'\\'))
+        end_plate_gauge.append(NoEscape(r'g_{min}&= max(g_1,g_2)\\'))
+        end_plate_gauge.append(NoEscape(r'&='+g_min+r' \end{aligned}'))
+    else:
+        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_{min} &= 2*(e`_{min}+s)+t_w\\'))
+        end_plate_gauge.append(NoEscape(r'&= 2*(' + e_min + '+' + s + ')+' + t_w + r'\\'))
+        end_plate_gauge.append(NoEscape(r'&=' + g1 + r' \end{aligned}'))
+
+    return end_plate_gauge
 
 def bolt_bearing_prov(k_b,d,conn_plates_t_fu_fy,gamma_mb,bolt_bearing_capacity):
     """
@@ -792,28 +823,14 @@ def max_plate_ht_req(connectivity,beam_depth, beam_f_t, beam_r_r, notch, max_pla
     return max_plate_ht_eqn
 
 
-def disp_clause(disp,clause):
-    """
-    Find plate height and plate height clause
-    Args:
-        disp:Plate height in mm (float)
-        clause:Plate height clause in mm (float)
-    Returns:
-         plate height and plate height clause
-    """
+def ep_min_plate_width_req(g,e_min,wp_min):
 
-    disp_clause_eqn = Math(inline=True)
-
-
-def ep_min_plate_width_req(s,g,e_min,t_w,wp_min):
-    s = str(s)
     g= str(g)
     e_min = str(e_min)
-    t_w = str(t_w)
     wp_min = str(wp_min)
     ep_min_plate_w_eqn = Math(inline=True)
-    ep_min_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{min}} &= s * 2 + g` * 2 + e`_{min}*2 + t_w\\'))
-    ep_min_plate_w_eqn.append(NoEscape(r'&='+ s +'* 2 +'+ g +' * 2 +'+ e_min +'*2 +'+ t_w+r'\\'))
+    ep_min_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{min}} &= g` + e`_{min}*2 \\'))
+    ep_min_plate_w_eqn.append(NoEscape(r'&='+ g +'+'+ e_min +r'*2\\'))
     ep_min_plate_w_eqn.append(NoEscape(r'&='+wp_min +r'\end{aligned}'))
     return ep_min_plate_w_eqn
 
@@ -1628,7 +1645,7 @@ def min_weld_size_req(conn_plates_weld,min_weld_size):
     min_weld_size_eqn.append(NoEscape(r'\noindent &=max('+t1+','+t2+r')\\'))
     min_weld_size_eqn.append(NoEscape(r'&='+tmax+r'\\'))
     min_weld_size_eqn.append(NoEscape(r'&[Ref.IS~800:2007~Cl.10.5.2.3~Table ~21],\\'))
-    min_weld_size_eqn.append(NoEscape(r' &t_{w_{min}}=' + weld_min + r'\\'))
+    min_weld_size_eqn.append(NoEscape(r' &s_{min}=' + weld_min + r'\\'))
     min_weld_size_eqn.append(NoEscape(r'& [Ref.~IS~800:2007,~Table ~21~ (Cl. 10.5.2.3)]\end{aligned}'))
 
 
@@ -1665,7 +1682,7 @@ def min_weld_size_req_01(conn_plates_weld, red, min_weld_size):
     min_weld_size_eqn.append(NoEscape(r'\begin{aligned} & t_{w_{min}}~based~on~thinner~part\\'))
     min_weld_size_eqn.append(NoEscape(r'& ='+tmax+ '~or~' +tmin+ r'\\'))
     min_weld_size_eqn.append(NoEscape(r'& IS800:2007~cl.10.5.2.3~Table 21\\' ))
-    min_weld_size_eqn.append(NoEscape(r'& t_{w_{min}}~based~on~thicker~part=' + weld_min + r'\\'))
+    min_weld_size_eqn.append(NoEscape(r'& s_{min}~based~on~thicker~part=' + weld_min + r'\\'))
     min_weld_size_eqn.append(NoEscape(r'& [Ref~IS~800:2007,Table ~21 ~(Cl 10.5.2.3)]\end{aligned}'))
     return min_weld_size_eqn
 
@@ -1695,7 +1712,7 @@ def max_weld_size_req(conn_plates_weld,max_weld_size):
     max_weld_size_eqn = Math(inline=True)
     max_weld_size_eqn.append(NoEscape(r'\begin{aligned} & Thickness~of~Thinner~part\\'))
     max_weld_size_eqn.append(NoEscape(r'&=min('+t1+','+t2+r')='+t_min+r'\\'))
-    max_weld_size_eqn.append(NoEscape(r'&t_{w_{max}} =' + weld_max + r'\\'))
+    max_weld_size_eqn.append(NoEscape(r'&s_{max} =' + weld_max + r'\\'))
     max_weld_size_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.5.3.1]\end{aligned}'))
 
     return max_weld_size_eqn
@@ -2160,21 +2177,26 @@ def prov_shear_load(shear_input,min_sc,app_shear_load,shear_capacity_1):
 
     return app_shear_load_eqn
 
-def end_plate_moment_demand(T_w,R_r,e,t_w,s,T_e,M):
-    ecc = T_w/2+R_r+e-t_w/2-s
+def end_plate_moment_demand(connectivity,g,T_w,R_r,t_w,s,T_e,M):
+    ecc1 = round(g/2-t_w/2-s,2)
+    ecc2 = round(g/2-T_w/2-R_r,2)
+    ecc = max(ecc1,ecc2)
     T_e = str(T_e)
     M = str(M)
+    ecc1 = str(ecc1)
+    ecc2 = str(ecc2)
     ecc = str(ecc)
-    R_r = str(R_r)
-    e = str(e)
-    t_w = str(t_w)
-    T_w = str(T_w)
-    s = str(s)
+
+
     EP_Mom = Math(inline=True)
     EP_Mom.append(NoEscape(r'\begin{aligned}M &= T_e * ecc \\'))
-    EP_Mom.append(NoEscape(r'ecc &=\frac{T_w}{2}+R_r+e`-\frac{t_w}{2}-s\\'))
-    EP_Mom.append(NoEscape(r'&=\frac{'+T_w+'}{2}+'+R_r+'+'+e+r'-\frac{'+t_w+'}{2}-'+s+r'\\'))
-    EP_Mom.append(NoEscape(r'M&='+T_e+'*'+ecc+'*10^{-3}='+M+r'\end{aligned}'))
+    if connectivity == VALUES_CONN_1[0]:
+        EP_Mom.append(NoEscape(r'ecc_1 &=\frac{g}{2}-\frac{t_w}{2}-s &='+ecc1+r'\\'))
+        EP_Mom.append(NoEscape(r'ecc_2 &=\frac{g}{2}-\frac{T_w}{2}-R_r &=' + ecc2 + r'\\'))
+        EP_Mom.append(NoEscape(r'&max(ecc_1,ecc_2) &='+ecc+r'\\'))
+    else:
+        EP_Mom.append(NoEscape(r'ecc &=\frac{g}{2}-\frac{t_w}{2}-s &=' + ecc1 + r'\\'))
+    EP_Mom.append(NoEscape(r'M&='+T_e+'*'+ecc+'*10^{-3} &='+M+r'\end{aligned}'))
     return EP_Mom
 
 def plastic_moment_capacty(beta_b, Z_p, f_y, gamma_m0 ,Pmc):  # same as #todo anjali
@@ -2700,14 +2722,14 @@ def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u 
 
 
     if stress == "shear":
-        member_block_eqn.append(NoEscape(r'\begin{aligned}V_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
-        member_block_eqn.append(NoEscape(r'V_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
-        member_block_eqn.append(NoEscape(r'V_{db} &= min(V_{db1}, V_{db2})= ' + Tdb +  r'\\'))
+        member_block_eqn.append(NoEscape(r'\begin{aligned}V_{dbl1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
+        member_block_eqn.append(NoEscape(r'V_{dbl2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+        member_block_eqn.append(NoEscape(r'V_{dbl} &= min(V_{db1}, V_{db2})= ' + Tdb +  r'\\'))
         member_block_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.4]\end{aligned}'))
     else:
-        member_block_eqn.append(NoEscape(r'\begin{aligned}T_{db1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
-        member_block_eqn.append(NoEscape(r'T_{db2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
-        member_block_eqn.append(NoEscape(r'T_{db} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\\'))
+        member_block_eqn.append(NoEscape(r'\begin{aligned}T_{dbl1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
+        member_block_eqn.append(NoEscape(r'T_{dbl2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+        member_block_eqn.append(NoEscape(r'T_{dbl} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\\'))
         member_block_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.4]\end{aligned}'))
 
     return member_block_eqn
@@ -2878,7 +2900,7 @@ def long_joint_bolted_req():
     return long_joint_bolted_eqn
 
 
-def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr):
+def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr,direction=None):
     """
     Calculate reduced bolt capacity in case of long joint
 
@@ -2925,22 +2947,21 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr):
     long_joint_bolted_eqn = Math(inline=True)
     # long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} &if~l\leq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
     # long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
-    if l < (lt):
-        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= ((nc~or~nr) - 1) * (p~or~g) \\'))
-        long_joint_bolted_eqn.append(NoEscape(r' &= ('+nc+' - 1) * '+p+ '='+lc_str+ r'\\'))
+
+    if direction == 'n_r':
+        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= (n_r - 1) * p \\'))
         long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + ' - 1) * ' + g + '=' + lr_str + r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r' l&= '+ l_str + r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * '+d+' = '+lt_str +r' \\'))
+    else:
+        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= ((n_c~or~n_r) - 1) * (p~or~g) \\'))
+        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nc + ' - 1) * ' + p + '=' + lc_str + r'\\'))
+        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + ' - 1) * ' + g + '=' + lr_str + r'\\'))
+    long_joint_bolted_eqn.append(NoEscape(r' l&= ' + l_str + r'\\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
+    if l < (lt):
         long_joint_bolted_eqn.append(NoEscape(r'& since,~l < 15 * d~then~V_{rd} = V_{db} \\'))
         long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+Tc+r' \\'))
         long_joint_bolted_eqn.append(NoEscape(r'&[Ref.~IS~800:2007,~Cl.~10.3.3.1]\end{aligned}'))
-
     else:
-        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l&= ((nc~or~nr) - 1) * (p~or~g) \\'))
-        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nc + ' - 1) * ' + p + '=' + lc_str + r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + ' - 1) * ' + g + '=' + lr_str + r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r' l&= ' + l_str + r'\\'))
-        long_joint_bolted_eqn.append(NoEscape(r'& 15 * d = 15 * ' + d + ' = ' + lt_str + r' \\'))
         long_joint_bolted_eqn.append(NoEscape(r'& since,~l \geq 15 * d~then~V_{rd} = \beta_{ij} * V_{db} \\'))
         long_joint_bolted_eqn.append(NoEscape(r'& \beta_{ij} = 1.075 - '+ l_str +'/(200*'+d+') ='+Bi+r'\\'))
         long_joint_bolted_eqn.append(NoEscape(r'& V_{rd} = '+B+' * '+Tc+'='+Tr+ r' \\'))
@@ -3184,7 +3205,7 @@ def long_joint_welded_beam_prov(plate_height,l_w,t_w,gap,t_t,Tc,Tr):
     return long_joint_welded_beam_prov
 
 
-def long_joint_welded_prov(h,l,t_t,ws,wsr):
+def long_joint_welded_prov(h,l,t_t,ws,wsr,direction=None):
     """
     Calculate Reduced flange weld strength  in case of long joint (welded connection)
 
@@ -3222,23 +3243,23 @@ def long_joint_welded_prov(h,l,t_t,ws,wsr):
 
     long_joint_welded_prov = Math(inline=True)
     # if conn =="web":
-    if lj < lt:
-        long_joint_welded_prov.append(NoEscape(r'\begin{aligned} l ~&= pt.length ~ or ~ pt.height \\'))
-        long_joint_welded_prov.append(NoEscape(r' l_l &= max('+h +','+l+r') \\'))
-        long_joint_welded_prov.append(NoEscape(r' &='+ ljs + r' \\'))
-        long_joint_welded_prov.append(NoEscape(r'& 150 * t_t =150 * '+t_t+' = '+lt_str +r' \\'))
-        long_joint_welded_prov.append(NoEscape(r'& since,~l < 150 * t_t~\\&then~V_{rd} = V_{db} \\'))
-        long_joint_welded_prov.append(NoEscape(r' V_{rd} &= ' + ws + r' \\'))
-        long_joint_welded_prov.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.5.7.3]\end{aligned}'))
 
+    if direction=='height':
+        long_joint_welded_prov.append(NoEscape(r'\begin{aligned} l_w ~&= h\\'))
+        long_joint_welded_prov.append(NoEscape(r' &='+ h+r'\\'))
     else:
-        long_joint_welded_prov.append(NoEscape(r'\begin{aligned} l~&= pt.length ~or ~pt.height \\'))
+        long_joint_welded_prov.append(NoEscape(r'\begin{aligned} l ~&= pt.length ~ or ~ pt.height \\'))
         long_joint_welded_prov.append(NoEscape(r' l_l &= max(' + h + ',' + l + r') \\'))
         long_joint_welded_prov.append(NoEscape(r' &=' + ljs + r' \\'))
-        long_joint_welded_prov.append(NoEscape(r'& 150 * t_t =150 * ' + t_t + ' = ' + lt_str + r' \\'))
+    long_joint_welded_prov.append(NoEscape(r'& 150 * t_t =150 * ' + t_t + ' = ' + lt_str + r' \\'))
+    if lj < lt:
+        long_joint_welded_prov.append(NoEscape(r'& since,~l < 150 * t_t~\\&then~f_{wrd} = f_{w} \\'))
+        long_joint_welded_prov.append(NoEscape(r' f_{wrd} &= ' + ws + r' \\'))
+        long_joint_welded_prov.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.5.7.3]\end{aligned}'))
+    else:
         long_joint_welded_prov.append(NoEscape(r'&since,~l \geq 150 * t_t~ \\&then~V_{rd} = \beta_{lw} * V_{db} \\'))
         long_joint_welded_prov.append(NoEscape(r'\beta_{l_w}& = 1.2 - (0.2*' + lj + ')/(150*' + t_t+ r')\\& =' + Bi + r'\\'))
-        long_joint_welded_prov.append(NoEscape(r' V_{rd}& = ' + Bi + ' * ' + ws + '=' + wsr + r' \\'))
+        long_joint_welded_prov.append(NoEscape(r' f_{wrd}& = ' + Bi + ' * ' + ws + '=' + wsr + r' \\'))
         long_joint_welded_prov.append(NoEscape(r'[Ref.~&IS~800:2007,~Cl.~10.5.7.3]\end{aligned}'))
 
     return long_joint_welded_prov
@@ -3736,13 +3757,17 @@ def tension_in_bolt_due_to_axial_load_n_moment(P,n,M,y_max,y_sqr,T_b):
     tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&= ' + T_b + r'\end{aligned}'))
     return tension_in_bolt_due_to_axial_load_n_moment
 
-def tension_in_bolt_due_to_axial(P,n,T_ba):
+def force_in_bolt_due_to_load(P,n,T_ba,load='tension'):
     P= str(P)
     n = str(n)
     T_ba = str (T_ba)
     tension_in_bolt_due_to_axial_load_n_moment  = Math(inline=True)
-    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_{ba} &= \frac{P}{\ n}\\'))
-    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' +P + '}{' + n + r'}\\'))
+    if load == 'tension':
+        tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_{ba} &= \frac{P}{\ n}\\'))
+        tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' +P + '}{' + n + r'}\\'))
+    else:
+        tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} V_{bv} &= \frac{V}{\ n}\\'))
+        tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' + P + '}{' + n + r'}\\'))
     tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&= ' + T_ba + r'\end{aligned}'))
     return tension_in_bolt_due_to_axial_load_n_moment
 
@@ -3769,13 +3794,13 @@ def tension_in_bolt_due_to_prying(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tens
     beta = str(beta)
     eta = str(eta)
     tension_in_bolt_due_to_prying = Math(inline=True)
-    tension_in_bolt_due_to_prying.append(NoEscape(r'\begin{aligned} Q &= \frac{l_v}{2*l_e} * [T_e - \frac{\beta * eta * f_o * b_e * t^4}{27 * l_e * l_v^2}]\\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'\begin{aligned} Q &= \frac{l_v}{2*l_e} * [T_e - \frac{\beta * \eta * f_o * b_e * t^4}{27 * l_e * l_v^2}]\\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r'Q &\geq 0\\'))
     if pre_tensioned == 'Pretensioned':
         tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 1 (pre-tensioned) \\'))
     else:
         tension_in_bolt_due_to_prying.append(NoEscape(r'\beta &= 2 (Not pre-tensioned) \\'))
-    tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min(end_dist, 1.1*t*\sqrt{\frac{\beta *f_o}{f_y}}) \\'))
+    tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min(e, 1.1*t*\sqrt{\frac{\beta *f_o}{f_y}}) \\'))
     tension_in_bolt_due_to_prying.append(NoEscape(r'l_e &= min('+end_dist+', 1.1*'+t+r'*\sqrt{\frac{'+beta+'*'+f_o+r'}{'+f_y+r'}}) \\'))
     tension_in_bolt_due_to_prying.append(
         NoEscape(r'Q &=\frac{'+l_v+'}{2*'+l_e+r'}*\\'))

@@ -801,7 +801,7 @@ KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficien
 KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction coefficient between <br>concrete and anchor bolt'
 
 
-KEY_DISP_DP_BOLT_TYPE = 'Bolt type'
+KEY_DISP_DP_BOLT_TYPE = 'Bolt tensioning type'
 
 ###################################
 # Key for Storing Shear sub-key of Load

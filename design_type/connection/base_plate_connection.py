@@ -128,7 +128,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.shear_key_required = 'No'
         self.plate_thk = 0.0
 
-
         self.shear_key_along_ColDepth = 'No'
 
         self.shear_key_depth_ColDepth = 0.0
@@ -143,8 +142,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_fu_fy = []
 
         self.footing_grade = 0.0
-
-
 
         # attributes for design preferences
         self.dp_column_designation = ""  # dp for column
@@ -187,6 +184,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.column_tw = 0.0
         self.column_r1 = 0.0
         self.column_r2 = 0.0
+        self.column_t = 0.0
 
         self.bearing_strength_concrete = 0.0
         self.w = 0.0
@@ -241,6 +239,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_fu = 0.0
         self.weld_size_flange_max = 0.0
         self.weld_size_web_max = 0.0
+        self.weld_size_hollow = 0.0
 
         self.weld_size_flange = 0.0
         self.weld_size_web = 0.0
@@ -278,6 +277,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.stiffener_plt_len_btwn_D = 0.0
         self.stiffener_plt_height_btwn_D = 0.0
 
+        self.stiffener_along_D = ''
+        self.stiffener_along_B = ''
+        self.stiffener_plt_len_along_D = 0
+        self.stiffener_plt_len_along_B = 0.0
+        self.stiffener_plt_len_across_D = 0.0
+        self.stiffener_plt_thk = 0.0
+        self.stiffener_plt_height = 0.0
+        self.stiffener_nos = 0
+
         self.shear_on_gusset = 0.0
         self.moment_on_gusset = 0.0
         self.shear_capacity_gusset = 0.0
@@ -301,6 +309,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.moment_on_stiffener_across_web = 0.0
         self.moment_capa_stiffener_across_web = 0.0
         self.z_e_stiffener_across_web = 0.0
+
+        self.sigma_max = 0.0
+        self.shear_on_stiffener = 0.0
+        self.shear_capa_stiffener = 0.0
+        self.moment_on_stiffener = 0.0
+        self.moment_capa_stiffener = 0.0
 
         self.weld_size_gusset = 0.0
         self.weld_size_stiffener = 0.0
@@ -410,19 +424,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t8 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t8)
 
-        t9 = (KEY_AXIAL_BP, KEY_DISP_AXIAL_BP, TYPE_TEXTBOX, None,True,'Int Validator')
+        t9 = (KEY_AXIAL_BP, KEY_DISP_AXIAL_BP, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t9)
 
-        t22 = (KEY_AXIAL_TENSION_BP, KEY_DISP_AXIAL_TENSION_BP, TYPE_TEXTBOX,  None,True,'Int Validator')
+        t22 = (KEY_AXIAL_TENSION_BP, KEY_DISP_AXIAL_TENSION_BP, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t22)
 
-        t10 = (KEY_SHEAR_BP, KEY_DISP_SHEAR_BP, '',  None,True,'Int Validator')
+        t10 = (KEY_SHEAR_BP, KEY_DISP_SHEAR_BP, '', None, True, 'Int Validator')
         options_list.append(t10)
 
-        t10 = (KEY_SHEAR_MAJOR, KEY_DISP_SHEAR_MAJOR, TYPE_TEXTBOX,  None,True,'Int Validator')
+        t10 = (KEY_SHEAR_MAJOR, KEY_DISP_SHEAR_MAJOR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t10)
 
-        t10 = (KEY_SHEAR_MINOR, KEY_DISP_SHEAR_MINOR, TYPE_TEXTBOX, None,True,'Int Validator')
+        t10 = (KEY_SHEAR_MINOR, KEY_DISP_SHEAR_MINOR, TYPE_TEXTBOX, None, True, 'Int Validator')
         options_list.append(t10)
 
         t11 = (KEY_MOMENT, KEY_DISP_MOMENT, '', None, True, 'No Validator')
@@ -452,7 +466,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t19 = (KEY_GRD_FOOTING, KEY_DISP_GRD_FOOTING, TYPE_COMBOBOX, VALUES_GRD_FOOTING, True, 'No Validator')
         options_list.append(t19)
 
-        t20 = (None, DISP_TITLE_WELD, TYPE_TITLE, True, 'No Validator')
+        t20 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t20)
 
         t21 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, VALUES_WELD_TYPE, True, 'No Validator')
@@ -478,14 +492,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t1 = (None, DISP_TITLE_ANCHOR_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
 
-        t2 = (KEY_OUT_DIA_ANCHOR, KEY_DISP_OUT_DIA_ANCHOR, TYPE_TEXTBOX, self.anchor_dia_provided if flag else '',True)
+        t2 = (KEY_OUT_DIA_ANCHOR, KEY_DISP_OUT_DIA_ANCHOR, TYPE_TEXTBOX, self.anchor_dia_provided if flag else '', True)
         out_list.append(t2)
 
-        t3 = (KEY_OUT_GRD_ANCHOR, KEY_DISP_OUT_GRD_ANCHOR, TYPE_TEXTBOX, self.anchor_grade if flag else '',True)
+        t3 = (KEY_OUT_GRD_ANCHOR, KEY_DISP_OUT_GRD_ANCHOR, TYPE_TEXTBOX, self.anchor_grade if flag else '', True)
         out_list.append(t3)
 
         t4 = (KEY_OUT_ANCHOR_BOLT_LENGTH, KEY_DISP_OUT_ANCHOR_BOLT_LENGTH, TYPE_TEXTBOX,
-              self.anchor_length_provided if flag else '',True)
+              self.anchor_length_provided if flag else '', True)
         out_list.append(t4)
 
         t5 = (KEY_OUT_ANCHOR_BOLT_SHEAR, KEY_OUT_DISP_ANCHOR_BOLT_SHEAR, TYPE_TEXTBOX,
@@ -505,33 +519,33 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t8)
 
         t20 = (KEY_OUT_ANCHOR_BOLT_TENSION, KEY_OUT_DISP_ANCHOR_BOLT_TENSION, TYPE_TEXTBOX,
-               self.tension_capacity_anchor if flag and self.connectivity == 'Moment Base Plate' else '',True)
+               self.tension_capacity_anchor if flag and self.connectivity == 'Moment Base Plate' else '', True)
         out_list.append(t20)
 
-        t101 = (None, DISP_TITLE_ANCHOR_BOLT_UPLIFT, TYPE_TITLE, None,True)
+        t101 = (None, DISP_TITLE_ANCHOR_BOLT_UPLIFT, TYPE_TITLE, None, True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_DIA_ANCHOR_UPLIFT, KEY_DISP_OUT_DIA_ANCHOR_UPLIFT, TYPE_TEXTBOX,
                 self.anchor_dia_uplift if flag and self.connectivity ==
-                'Moment Base Plate' and self.load_axial_tension > 0 else '',True)
+                                          'Moment Base Plate' and self.load_axial_tension > 0 else '', True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_GRD_ANCHOR_UPLIFT, KEY_DISP_OUT_GRD_ANCHOR_UPLIFT, TYPE_TEXTBOX,
                 self.anchor_grade_tension if flag and self.connectivity ==
-                'Moment Base Plate' and self.load_axial_tension > 0 else '',True)
+                                             'Moment Base Plate' and self.load_axial_tension > 0 else '', True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT, TYPE_TEXTBOX,
                 self.anchor_length_provided if flag and self.connectivity ==
-                'Moment Base Plate' and self.load_axial_tension > 0 else '',True)
+                                               'Moment Base Plate' and self.load_axial_tension > 0 else '', True)
         out_list.append(t101)
 
         t101 = (KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT, KEY_OUT_DISP_ANCHOR_BOLT_TENSION_UPLIFT, TYPE_TEXTBOX,
                 self.tension_capacity_anchor_uplift if flag and self.connectivity ==
-                'Moment Base Plate' and self.load_axial_tension > 0 else '',True)
+                                                       'Moment Base Plate' and self.load_axial_tension > 0 else '', True)
         out_list.append(t101)
 
-        t9 = (None, KEY_DISP_BASE_PLATE, TYPE_TITLE, None,True)
+        t9 = (None, KEY_DISP_BASE_PLATE, TYPE_TITLE, None, True)
         out_list.append(t9)
 
         t10 = (KEY_OUT_BASEPLATE_THICKNNESS, KEY_OUT_DISP_BASEPLATE_THICKNNESS, TYPE_TEXTBOX,
@@ -554,11 +568,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t14)
 
         t21 = (KEY_OUT_DETAILING_PITCH_DISTANCE, KEY_OUT_DISP_DETAILING_PITCH_DISTANCE, TYPE_TEXTBOX,
-               self.pitch_distance if flag else '',True)
+               self.pitch_distance if flag else '', True)
         out_list.append(t21)
 
         t22 = (KEY_OUT_DETAILING_GAUGE_DISTANCE, KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, TYPE_TEXTBOX,
-               self.gauge_distance if flag else '',True)
+               self.gauge_distance if flag else '', True)
         out_list.append(t22)
 
         t15 = (KEY_OUT_DETAILING_END_DISTANCE, KEY_OUT_DISP_DETAILING_END_DISTANCE, TYPE_TEXTBOX,
@@ -570,14 +584,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         out_list.append(t16)
 
         t17 = (KEY_OUT_DETAILING_PROJECTION, KEY_OUT_DISP_DETAILING_PROJECTION, TYPE_TEXTBOX,
-               self.projection if flag and self.connectivity == 'Welded Column Base' else '',True)
+               self.projection if flag and self.connectivity == 'Welded Column Base' else '', True)
         out_list.append(t17)
 
-        t23 = (None, DISP_TITLE_STIFFENER_PLATE_FLANGE, TYPE_TITLE, None,True)
+        t23 = (None, DISP_TITLE_STIFFENER_PLATE_FLANGE, TYPE_TITLE, None, True)
         out_list.append(t23)
 
         t24 = (KEY_OUT_STIFFENER_PLATE_FLANGE, KEY_DISP_OUT_STIFFENER_PLATE_FLANGE, TYPE_OUT_BUTTON,
-               ['Stiffener Details', self.stiffener_flange_details],True)
+               ['Stiffener Details', self.stiffener_flange_details], True)
         out_list.append(t24)
 
         # t24 = (KEY_OUT_STIFFENER_PLATE_FLANGE_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_THICKNESS, TYPE_TEXTBOX,
@@ -623,18 +637,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         #        self.moment_capacity_gusset if flag and self.stiffener_along_flange == 'Yes' else '')
         # out_list.append(t28)
 
-        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ALONG_WEB, TYPE_TITLE, None,True)
+        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ALONG_WEB, TYPE_TITLE, None, True)
         out_list.append(t29)
 
         t30 = (KEY_OUT_STIFFENER_PLATE_ALONG_WEB, KEY_DISP_OUT_STIFFENER_PLATE_ALONG_WEB, TYPE_OUT_BUTTON,
-               ['Stiffener Details', self.stiffener_along_web_details],True)
+               ['Stiffener Details', self.stiffener_along_web_details], True)
         out_list.append(t30)
 
-        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ACROSS_WEB, TYPE_TITLE, None,True)
+        t29 = (None, DISP_TITLE_STIFFENER_PLATE_ACROSS_WEB, TYPE_TITLE, None, True)
         out_list.append(t29)
 
         t30 = (KEY_OUT_STIFFENER_PLATE_ACROSS_WEB, KEY_DISP_OUT_STIFFENER_PLATE_ACROSS_WEB, TYPE_OUT_BUTTON,
-               ['Stiffener Details', self.stiffener_across_web_details],True)
+               ['Stiffener Details', self.stiffener_across_web_details], True)
         out_list.append(t30)
 
         # t30 = (KEY_OUT_STIFFENER_PLATE_WEB_THICKNNESS, KEY_OUT_DISP_STIFFENER_PLATE_WEB_THICKNESS, TYPE_TEXTBOX,
@@ -702,7 +716,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                self.weld_size_stiffener if flag and self.weld_type != 'Butt Weld' else '', True)
         out_list.append(t22)
 
-        t19 = (KEY_OUT_WELD_SIZE, DISP_TITLE_WELD, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details],True)
+        t19 = (KEY_OUT_WELD_SIZE, DISP_TITLE_WELD, TYPE_OUT_BUTTON, ['Weld Details', self.weld_details], True)
         out_list.append(t19)
 
         return out_list
@@ -829,7 +843,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             weld = []
             weld.append(VALUES_WELD_TYPE[0])
-            weld.append(VALUES_WELD_TYPE[2])
+            weld.append(VALUES_WELD_TYPE[1])
             return weld
 
     def out_weld(self):
@@ -857,6 +871,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             return True
         else:
             return False
+
+    def secsize_for_hollow(self):
+        if self[0] == 'Hollow/Tubular Column Base':
+            secsize = []
+            secsize.extend(connectdb("RHS"))
+            secsize.extend(connectdb("SHS", call_type="popup"))
+            secsize.extend(connectdb("CHS", call_type="popup"))
+            return secsize
+        else:
+            return connectdb("Columns")
 
     def input_value_changed(self):
 
@@ -947,6 +971,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t19 = ([KEY_CONN], KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT, TYPE_OUT_LABEL, self.out_anchor_tension)
         lst.append(t19)
+
+        t20 = ([KEY_CONN], KEY_SECSIZE, TYPE_COMBOBOX, self.secsize_for_hollow)
+        lst.append(t20)
         return lst
 
     @staticmethod
@@ -980,15 +1007,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             design_dictionary[KEY_MOMENT_MINOR] = 'Disabled'
         if design_dictionary[KEY_CONN] != 'Moment Base Plate' or design_dictionary[KEY_AXIAL_TENSION_BP] == '':
             design_dictionary[KEY_AXIAL_TENSION_BP] = 'Disabled'
-        if design_dictionary[KEY_SHEAR_MAJOR] == '':
-            design_dictionary[KEY_SHEAR_MAJOR] = '0'
-        if design_dictionary[KEY_SHEAR_MINOR] == '':
-            design_dictionary[KEY_SHEAR_MINOR] = '0'
+        # if design_dictionary[KEY_SHEAR_MAJOR] == '':
+        #     design_dictionary[KEY_SHEAR_MAJOR] = '0'
+        # if design_dictionary[KEY_SHEAR_MINOR] == '':
+        #     design_dictionary[KEY_SHEAR_MINOR] = '0'
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:
                 if design_dictionary[option[0]] == '':
-                    missing_fields_list.append(option[1])
-            elif option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
+                    design_dictionary[option[0]] = '0'
+                    # missing_fields_list.append(option[1])
+            elif option[2] == TYPE_COMBOBOX and option[0] in [KEY_SECSIZE, KEY_GRD_FOOTING]:
                 val = option[3]
                 if design_dictionary[option[0]] == val[0]:
                     missing_fields_list.append(option[1])
@@ -997,7 +1025,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     missing_fields_list.append(option[1])
 
         if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self,missing_fields_list)
+            error = self.generate_missing_fields_error_string(self, missing_fields_list)
             all_errors.append(error)
             # flag = False
         else:
@@ -1069,7 +1097,28 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def get_values_for_design_pref(self, key, design_dictionary):
 
-        section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        # section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        if (design_dictionary[KEY_SECSIZE])[1:4] == 'SHS':
+            section = SHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        elif (design_dictionary[KEY_SECSIZE])[1:4] == 'RHS':
+            section = RHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        elif (design_dictionary[KEY_SECSIZE])[1:4] == 'CHS':
+            section = CHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        else:
+            section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+
+        # if self.connectivity == 'Hollow/Tubular Column Base':
+        #     if self.dp_column_designation[1:4] == 'SHS':
+        #         section = SHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        #     elif self.dp_column_designation[1:4] == 'RHS':
+        #         section = RHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        #     elif self.dp_column_designation[1:4] == 'CHS':
+        #         section = CHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        #     else:
+        #         pass
+        # else:
+        #     section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+
         length = str(self.anchor_length_provided if self.design_button_status else 0)
         fu = Material(design_dictionary[KEY_MATERIAL]).fu
 
@@ -1117,12 +1166,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         t2 = ("Base Plate", [KEY_BASE_PLATE_MATERIAL], [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY], TYPE_TEXTBOX,
               self.get_fu_fy)
+        change_tab.append(t2)
 
         t3 = ("Anchor Bolt", [KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_GALVANIZED],
               [KEY_DP_ANCHOR_BOLT_DESIGNATION], TYPE_TEXTBOX, self.anchor_bolt_designation)
         change_tab.append(t3)
 
-        change_tab.append(t2)
+        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
+              ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t4)
+
+        t6 = (KEY_DISP_COLSEC, [KEY_SECSIZE], ['Label_21'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t6)
 
         return change_tab
 
@@ -1135,12 +1191,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             d = ''
         else:
             d = input_dictionary[KEY_DIA_ANCHOR][0]
-        new_des = str(d)+'X'
+        new_des = str(d) + 'X'
 
         if galvanized == 'Yes':
-            new_des = str(new_des)+str(length)+' IS5624 '+'GALV'
+            new_des = str(new_des) + str(length) + ' IS5624 ' + 'GALV'
         elif galvanized == 'No':
-            new_des = str(new_des)+str(length)+' IS5624'
+            new_des = str(new_des) + str(length) + ' IS5624'
         else:
             new_des = ''
 
@@ -1346,7 +1402,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 chkbox.setChecked(Qt.Unchecked)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
 
-
     # def dia_to_len(self, d):
     #
     #     ob = IS_5624_1993()
@@ -1378,12 +1433,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # self.load_shear = float(design_dictionary[KEY_SHEAR_BP])
         # self.load_shear = self.load_shear * 10 ** 3  # N
 
-        self.load_shear_major = float(design_dictionary[KEY_SHEAR_MAJOR])  # shear force acting along the major axis
+        self.load_shear_major = float(design_dictionary[KEY_SHEAR_MAJOR])  # shear force acting along the major axis (i.e. depth of the column)
         self.load_shear_major = self.load_shear_major * 10 ** 3  # N
 
-        self.load_shear_minor = float(design_dictionary[KEY_SHEAR_MINOR])  # shear force acting along the minor axis
+        self.load_shear_minor = float(design_dictionary[KEY_SHEAR_MINOR])  # shear force acting along the minor axis (i.e. width of the column)
         self.load_shear_minor = self.load_shear_minor * 10 ** 3  # N
 
+        # shear load for shear key (designed in both directions)
+        self.load_shear_major = max(self.load_shear_major, self.load_shear_minor)
+        self.load_shear_minor = self.load_shear_major
         # TODO: check the condition given below
         # if self.load_shear_major < self.load_shear_minor:
         #     self.load_shear_major = self.load_shear_minor
@@ -1395,7 +1453,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.load_moment_major = self.load_moment_major * 10 ** 6  # N-mm
 
         self.load_moment_minor = float(design_dictionary[KEY_MOMENT_MINOR]
-                                       if design_dictionary[KEY_MOMENT_MINOR] != 'Disabled' else 0) # bending moment acting about the minor axis
+                                       if design_dictionary[KEY_MOMENT_MINOR] != 'Disabled' else 0)  # bending moment acting about the minor axis
         self.load_moment_minor = self.load_moment_minor * 10 ** 6  # N-mm
 
         # checking if the user input for minor axis moment exceeds the major axis moment (practically, it shouldn't)
@@ -1445,15 +1503,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # properties of the column sections
 
         # Rolled sections
-        self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS':
+                self.column_properties = SHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+            elif self.dp_column_designation[1:4] == 'RHS':
+                self.column_properties = RHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+            elif self.dp_column_designation[1:4] == 'CHS':
+                self.column_properties = CHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+        else:
+            self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+
         self.column_D = self.column_properties.depth
         self.column_bf = self.column_properties.flange_width
         self.column_tf = self.column_properties.flange_thickness
         self.column_tw = self.column_properties.web_thickness
         self.column_r1 = self.column_properties.root_radius
         self.column_r2 = self.column_properties.toe_radius
-
-        # Hollow sections
 
         # other attributes
         self.gamma_m0 = self.cl_5_4_1_Table_5["gamma_m0"]["yielding"]  # gamma_mo = 1.10
@@ -1515,7 +1580,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.bp_analyses_parameters(self)
         print('bp_analyses_parameters done')
         self.bp_analyses(self)
-
         print('bp_analyses done')
         self.anchor_bolt_design(self)
         print('anchor_bolt_design done')
@@ -1556,11 +1620,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.anchor_grade = i
             break
 
-        self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade, self.anchor_dia_provided)  # returns a list with strength values - [bolt_fu, bolt_fy]
+        self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade,
+                                                self.anchor_dia_provided)  # returns a list with strength values - [bolt_fu, bolt_fy]
 
         # TODO add condition for number of anchor bolts depending on col depth and force
         # number of anchor bolts outside the column flange
         self.anchor_nos_provided = 4
+
+        # initialize the stiffener length
 
         # perform detailing checks
         # Note: end distance is along the depth, whereas, the edge distance is along the flange, of the column section
@@ -1598,15 +1665,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # minimum required dimensions of the base plate [as per the detailing criteria]
         # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
-        if self.connectivity == 'Welded Column Base' or 'Moment Base Plate':
-            self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
+        self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
+
+        if self.connectivity == ('Welded Column Base' or 'Moment Base Plate'):
             self.bp_width_min = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
-
-        elif self.connectivity == 'Welded+Bolted Column Base':
-            pass
-
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            self.bp_width_min = round_up(self.column_bf + (2 * (2 * self.end_distance)), 5)  # mm
         else:
             pass
+
+        # define parameters for the stiffener plates
+        self.stiffener_fy = self.dp_column_fy  # MPa
+        self.epsilon = math.sqrt(250 / self.stiffener_fy)
 
     def bp_analyses(self):
         """ perform analyses of the base plate
@@ -1621,7 +1691,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.bearing_strength_concrete = self.cl_7_4_1_bearing_strength_concrete(self.footing_grade)  # N/mm^2 or MPa
 
         # slab base analyses (pinned connection)
-        if self.connectivity == 'Welded Column Base':
+        if self.connectivity == 'Welded Column Base' or 'Hollow/Tubular Column Base':
 
             # minimum required area for the base plate [bearing stress = axial force / area of the base]
             self.min_area_req = self.load_axial_compression / self.bearing_strength_concrete  # mm^2
@@ -1629,12 +1699,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # calculate projection by the 'Effective Area Method' [Reference: Clause 7.4.1.1, IS 800:2007]
             # the calculated projection is added by half times the hole dia on each side to avoid stress concentration near holes
             if self.dp_column_type == 'Rolled' or 'Welded':
-                self.projection = self.calculate_c(self.column_bf, self.column_D, self.column_tw, self.column_tf, self.min_area_req,
-                                                   self.anchor_hole_dia)  # mm
-                self.projection = max(self.projection, self.end_distance)  # projection should at-least be equal to the end distance
 
+                if self.connectivity == 'Welded Column Base':
+                    self.projection = self.calculate_c(self.column_bf, self.column_D, self.column_tw, self.column_tf, self.min_area_req,
+                                                       self.anchor_hole_dia, section_type='I-section')  # mm
+                else:
+                    if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
+                        self.projection = self.calculate_c(self.column_bf, self.column_D, 0, 0, self.min_area_req, self.anchor_hole_dia,
+                                                           section_type='SHS')  # mm
+                    elif self.dp_column_designation[1:4] == 'CHS':
+                        self.projection = self.calculate_c(0, self.column_D, 0, 0, self.min_area_req, self.anchor_hole_dia, section_type='CHS')  # mm
+                    else:
+                        logger.error("Cannot find section type")
             else:
                 pass
+
+            self.projection = max(self.projection, self.end_distance)  # projection should at-least be equal to the end distance
 
             if self.projection <= 0:
                 self.safe = False
@@ -1647,8 +1727,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 pass
 
             # updating the length and the width by incorporating the vaue of projection
-            self.bp_length_provided = self.column_D + 2 * self.projection + 2 * self.end_distance  # mm
-            self.bp_width_provided = self.column_bf + 2 * self.projection + 2 * self.edge_distance  # mm
+            self.bp_length_provided = self.column_D + (2 * self.projection) + (2 * self.end_distance)  # mm
+            self.bp_width_provided = self.column_bf + (2 * self.projection) + (2 * self.edge_distance)  # mm
 
             # check for the provided area against the minimum required area
             self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
@@ -1665,7 +1745,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     bp_dimensions.append(i)
                     i += 1
 
-                self.bp_area_provided = bp_dimensions[-2] * bp_dimensions[-1]  # mm^2, area according to the desired length and width
+                self.bp_area_provided = bp_dimensions[-2] * bp_dimensions[-1]  # mm^2, area according to the updated length and width
                 n += 1
 
             self.bp_length_provided = bp_dimensions[-2]  # mm, updated length if while loop is True
@@ -1865,12 +1945,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         elif self.connectivity == "Hollow/Tubular Column Base":
             pass
 
-        # assign appropriate plate thickness
+        # assign appropriate plate thickness according to available sizes in the marked
 
         self.plate_thk = max(self.plate_thk, self.column_tf)  # base plate thickness should be larger than the flange thickness
 
         # assigning plate thickness according to the available standard sizes
         # the thicknesses of the flats (in mm) listed below is obtained from SAIL's product brochure
+        # TODO: The below list should be updated if a new standard size of plate is available in the market
         standard_plate_thk = [8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40, 45, 50, 56, 63, 75, 80, 90, 100, 110, 120]
 
         sort_plate = filter(lambda x: self.plate_thk <= x <= 120, standard_plate_thk)
@@ -1889,10 +1970,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # updating the anchor area (provided outside flange), if the diameter is updated in tension check
         self.anchor_area = self.bolt_area(self.anchor_dia_provided)  # list of areas [shank area, thread area] mm^2
         self.anchor_grade_tension = self.anchor_grade
+        self.grout_thk = 50  # mm
 
+        # design of anchor bolts to resist axial tension/uplift force
         if self.connectivity == 'Moment Base Plate':
 
-            # design of anchor bolts to resist axial tension/uplift force
             if self.load_axial_tension > 0:
                 self.anchor_inside_flange = 'Yes'
 
@@ -1934,14 +2016,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             else:
                 self.anchor_inside_flange = 'No'
                 self.anchor_nos_uplift = 0
-                self.anchor_dia_uplift = self.anchor_dia_provided
-                self.tension_capacity_anchor_uplift = self.tension_capacity_anchor
-                self.anchor_nos_uplift = 0
+                self.anchor_dia_uplift = 'N/A'
+                self.tension_capacity_anchor_uplift = 'N/A'
 
         else:
             pass
 
-        # design strength of the anchor bolt for shear [Reference: Clause 10.3.2, IS 800:2007; Section 3, IS 5624:1993]
+        # design strength of the anchor bolt [Reference: Clause 10.3.2, IS 800:2007; Section 3, IS 5624:1993]
         # Assumption: number of shear planes passing through - the thread is 1 (n_n) and through the shank is 0 (n_s)
 
         self.shear_capacity_anchor = self.cl_10_3_3_bolt_shear_capacity(self.dp_anchor_fu_overwrite, self.anchor_area[1],
@@ -1962,23 +2043,43 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             pass
 
-        # Design for shear acting along any axis
+        # design for shear acting along any axis
+        if (self.load_shear_major or self.load_shear_minor) > 0:
 
-        if self.load_shear_major or self.load_shear_minor > 0:
             # The shear transfer follows the following load transfer mechanism:
-
             # Check 1: The shear is transferred through the anchor bolts. The bolts on the tension side are critical and
             # are checked for combined shear + tension
             # Check 2: The shear is then resisted by the friction between the base plate and the grout material
+            # If the anchor bolts fails in shear, then a shear key is provided
             # Check 3: If the shear is still high, then a shear key is provided. The shear key resists shear by bearing
             # on the concrete surface
+            if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+                self.moment_bp_case = 'None'
+            else:
+                self.moment_bp_case = self.moment_bp_case
 
-            if self.connectivity == 'Moment Base Plate':
-
-                if self.moment_bp_case == 'Case1':
+            if self.connectivity == 'Welded Column Base' or 'Moment Base Plate' or 'Hollow/Tubular Column Base':
+                if (self.moment_bp_case == 'None') or (self.moment_bp_case == 'Case1'):
                     self.combined_capacity_anchor = 'N/A'
 
+                    # Only Check 2 and 3 are applicable to these cases
+                    # Check 2: Friction between base plate and the grout material [Reference: AISC Design Guide, section 3.5]
+                    # The coefficient of friction between steel and the grout is 0.55, whereas between steel and concrete is 0.7
+                    self.shear_resistance = 0.55 * self.load_axial_compression  # N
+                    self.shear_resistance = min(self.shear_resistance, 0.2 * (self.bearing_strength_concrete / 0.45) * self.bp_area_provided)  # N
+
+                    self.shear_resistance = min(self.shear_resistance, (self.anchor_nos_provided * self.anchor_capacity * 1000))
+
+                    if self.shear_resistance < min(self.load_shear_major, self.load_shear_minor):
+                        self.shear_key_required = 'Yes'
+                    else:
+                        self.shear_key_required = 'No'
                 else:
+                    pass
+
+            elif self.connectivity == 'Moment Base Plate':
+
+                if self.moment_bp_case == 'Case2':
                     # Check 1: Combined shear + Tension [Reference: cl.10.3.6, IS 800:2007]
                     # v_sb is calculated considering shear distribution in bolts only on the tension side (outside flange), this is the critical case
                     self.v_sb = (max(self.load_shear_major, self.load_shear_minor) * 10 ** -3) / (self.anchor_nos_provided / 2)  # kN
@@ -1988,13 +2089,20 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.combined_capacity_anchor = self.cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db)
                     self.combined_capacity_anchor = round(self.combined_capacity_anchor, 3)
 
+                    # Providing shear key if the UR exceeds 0.7, the value is purely adopted based on experience for a conservative design
+                    if self.combined_capacity_anchor > 0.7:
+                        self.shear_key_required = 'Yes'
+                    else:
+                        self.shear_key_required = 'No'
+
+                    # Check for bolts
                     if self.combined_capacity_anchor > 1.0:
                         logger.error(": [Large Shear Force] The shear force acting on the base plate is large.")
                         logger.info(": [Large Shear Force] Provide shear key to safely transfer the shear force.")
                         logger.error(": [Anchor Bolt] The anchor bolt fails due to combined shear + tension [Reference: Clause 10.3.6, "
                                      "IS 800:2007].")
 
-                        # re-design anchor bolts if it fails in combined shear + tension check
+                        # re-design anchor bolts if it fails in combined shear + tension check for this case only
                         # Algorithm:
                         # Step 1: Try with higher diameter bolt,
                         # Step 2: If the check still fails, try with more number of bolts
@@ -2085,7 +2193,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                         self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
 
                                         self.v_sb = (max(self.load_shear_major, self.load_shear_minor) * 10 ** -3) / (
-                                                    self.anchor_nos_provided / 2)  # kN
+                                                self.anchor_nos_provided / 2)  # kN
                                         self.v_db = self.anchor_capacity  # kN
                                         self.t_b = self.tension_demand_anchor / self.tension_bolts_req  # kN
                                         self.t_db = self.tension_capacity_anchor  # kN
@@ -2103,57 +2211,101 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                             logger.error("Cannot compute anchor bolt for resisting the uplift force")
                     else:
                         pass
+            else:
+                pass
+
+            if self.shear_key_required == 'Yes':
+                # Check 3: Provide shear key
+                # Note: The shear key thickness shall be at-least equal to the base plate thickness to avoid bending
+                self.shear_key_thk = self.plate_thk  # mm
+
+                if self.load_shear_major > 0:
+                    self.shear_key_along_ColDepth = 'Yes'
+                    self.shear_key_len_ColDepth = self.column_D  # mm
+                    self.shear_key_depth_ColDepth = self.load_shear_major / ((self.bearing_strength_concrete / 0.45) *
+                                                                             self.shear_key_len_ColDepth)  # mm
+                    self.shear_key_depth_ColDepth = max(self.shear_key_depth_ColDepth, self.grout_thk + 150)  # mm
+
+                    # check for bearing of the shear key on concrete (along major axis)
+                    self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm^2
+
+                    if self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
+                        key_dimensions = [self.shear_key_len_ColDepth, self.shear_key_depth_ColDepth]
+
+                        n = 1
+                        while self.shear_key_stress_ColDepth > self.bearing_strength_concrete:
+                            key_update_dimensions = [key_dimensions[-1]]  # updating the depth only
+
+                            for i in key_update_dimensions:
+                                i += 25
+                                key_dimensions.append(i)
+                                i += 1
+
+                            key_area_provided = key_dimensions[0] * key_dimensions[-1]  # mm^2
+                            n += 1
+
+                            self.shear_key_len_ColDepth = key_dimensions[0]  # mm, keeping the length umchanged
+                            self.shear_key_depth_ColDepth = key_dimensions[-1]  # mm, updated depth if while loop is True
+                            key_area_provided = self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth  # mm^2, update area if while loop is True
+
+                            # actual bearing pressure acting on the provided area of the base plate
+                            self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm
+
+                if self.load_shear_minor > 0:
+                    self.shear_key_along_ColWidth = 'Yes'
+                    self.shear_key_len_ColWidth = self.column_bf  # mm
+                    self.shear_key_depth_ColWidth = self.load_shear_minor / ((self.bearing_strength_concrete / 0.45) *
+                                                                             self.shear_key_len_ColWidth)  # mm
+                    self.shear_key_depth_ColWidth = max(self.shear_key_depth_ColWidth, self.grout_thk + 150)  # mm
+
+                    # check for bearing of the shear key on concrete (along minor axis)
+                    self.shear_key_stress_ColWidth = self.load_shear_major / (self.shear_key_len_ColWidth * self.shear_key_depth_ColWidth)  # N/mm^2
+
+                    if self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
+
+                        key_dimensions = [self.shear_key_len_ColWidth, self.shear_key_depth_ColWidth]
+                        n = 1
+                        while self.shear_key_stress_ColWidth > self.bearing_strength_concrete:
+                            key_update_dimensions = [key_dimensions[-1]]  # updating the depth only
+
+                            for i in key_update_dimensions:
+                                i += 25
+                                key_dimensions.append(i)
+                                i += 1
+
+                            key_area_provided = key_dimensions[0] * key_dimensions[-1]  # mm^2
+                            n += 1
+
+                            self.shear_key_len_ColWidth = key_dimensions[0]  # mm, keeping the length umchanged
+                            self.shear_key_depth_ColWidth = key_dimensions[-1]  # mm, updated depth if while loop is True
+                            key_area_provided = self.shear_key_len_ColWidth * self.shear_key_depth_ColWidth  # mm^2, update area if while loop is True
+
+                            # actual bearing pressure acting on the provided area of the base plate
+                            self.shear_key_stress_ColWidth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm
 
             else:
-                # Check 2: Friction between base plate and the grout material [Reference: AISC Design Guide, section 3.5]
-                # The coefficient of friction between steel and the grout is 0.55, whereas between steel and concrete is 0.7
-                self.shear_resistance = 0.55 * self.load_axial_compression  # N
-                self.shear_resistance = min(self.shear_resistance, 0.2 * (self.bearing_strength_concrete / 0.45) * self.bp_area_provided)  # N
+                self.shear_key_along_ColDepth = 'No'
+                self.shear_key_len_ColDepth = 'N/A'
+                self.shear_key_depth_ColDepth = 'N/A'
+                self.shear_key_stress_ColDepth = 'N/A'
 
-                if self.shear_resistance < max(self.load_shear_major, self.load_shear_minor):
-                    self.shear_key_required = 'Yes'
+                self.shear_key_along_ColWidth = 'No'
+                self.shear_key_len_ColWidth = 'N/A'
+                self.shear_key_depth_ColWidth = 'N/A'
+                self.shear_key_stress_ColWidth = 'N/A'
 
-                    # Check 3: Provide shear key
-                    # Note: The shear key thickness shall be at-least equal to the base plate thickness to avoid bending
-                    self.shear_key_thk = self.plate_thk  # mm
-
-                    if self.load_shear_major > 0:
-                        self.shear_key_along_ColDepth= 'Yes'
-                        self.shear_key_len_ColDepth = self.column_D  # mm
-                        self.shear_key_depth_ColDepth = self.load_shear_major / ((self.bearing_strength_concrete / 0.45) *
-                                                                                 self.shear_key_len_ColDepth)  # mm
-                        self.shear_key_depth_ColDepth = max(self.shear_key_depth_ColDepth, self.grout_thk + 150)  # mm
-                    else:
-                        self.shear_key_along_ColWidth = 'Yes'
-                        self.shear_key_len_ColWidth = self.column_bf  # mm
-                        self.shear_key_depth_ColWidth = self.load_shear_minor / ((self.bearing_strength_concrete / 0.45) *
-                                                                                 self.shear_key_len_ColWidth)  # mm
-                        self.shear_key_depth_ColWidth = max(self.shear_key_depth_ColWidth, self.grout_thk + 150)  # mm
-
-                else:
-                    self.shear_key_required = 'No'
-
-                # Check 1: Not applicable
-                self.combined_capacity_anchor = 'N/A'
         else:
             # TODO
             self.combined_capacity_anchor = 'N/A'
             logger.info("There is no shear force acting on the anchor bolts")
             logger.info("No combined shear-tension check is required")
 
-        # if self.safe:
-        #     pass
-        # else:
-        #     logger.error(": [Anchor Bolt] Unexpected failure occurred.")
-        #     logger.error(": [Anchor Bolt] Cannot compute capacity checks for the anchor bolt.")
-        #     logger.info(": [Anchor Bolt] Check the input values and re-design the connection.")
-
         # validation of anchor bolt length [Reference: IS 5624:1993, Table 1]
         self.anchor_length_min = self.table1(self.anchor_bolt)[1]
         self.anchor_length_max = self.table1(self.anchor_bolt)[2]
 
         # design of anchor length [Reference: Design of Steel Structures by N. Subramanian 2nd. edition 2018, Example 15.5]
-        if self.connectivity == 'Welded Column Base':
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
             self.anchor_length_provided = self.anchor_length_min  # mm
 
         # Equation: T_b = k * sqrt(fck) * (anchor_length_req)^1.5
@@ -2178,13 +2330,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
         # updating anchor length (adding the length above the concrete pedestal)
-        self.grout_thk = 50  # mm
         if self.connectivity == 'Moment Base Plate':
-            self.plate_washer_thk = self.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_uplift))['washer_thk']  # washer thickness, mm
-            self.nut_thk = self.nutThick_Calculation(max(self.anchor_dia_provided, self.anchor_dia_uplift))  # nut thickness, mm
-        elif self.connectivity == 'Welded Column Base':
-            self.plate_washer_thk = self.square_washer_dimensions(self.anchor_dia_provided)['washer_thk']  # washer thickness, mm
-            self.nut_thk = self.nutThick_Calculation(self.anchor_dia_provided)  # nut thickness, mm
+            self.plate_washer_thk = IS6649.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_uplift))[
+                'washer_thk']  # washer thickness, mm
+            self.nut_thk = IS1364.nut_thick((max(self.anchor_dia_provided, self.anchor_dia_uplift)))  # nut thickness, mm
+
+        elif (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+            self.plate_washer_thk = IS6649.square_washer_dimensions(self.anchor_dia_provided)['washer_thk']  # washer thickness, mm
+            self.nut_thk = IS1364.nut_thick(self.anchor_dia_provided)  # nut thickness, mm
 
         self.anchor_len_below_footing = self.anchor_length_provided  # mm
         self.anchor_len_above_footing = self.grout_thk + self.plate_thk + self.plate_washer_thk + self.nut_thk + 20  # mm, 20 mm is extra len
@@ -2197,7 +2350,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             self.anchor_length_provided = self.dp_anchor_length
 
-        if self.anchor_length_provided < self.anchor_length_min or self.anchor_length_provided > self.anchor_length_max:
+        if (self.anchor_length_provided < self.anchor_length_min) or (self.anchor_length_provided > self.anchor_length_max):
             self.safe = False
             logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
 
@@ -2219,7 +2372,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         Returns:
         """
         # design the weld connecting the column and the stiffeners to the base plate
-
         self.weld_fu = min(self.dp_weld_fu_overwrite, self.dp_column_fu)
 
         # length of the stiffener plate available in case of stiffener requirement/or extra welding
@@ -2229,14 +2381,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # design of fillet weld
         if self.weld_type == 'Fillet Weld':
+            # defining the maximum limit of weld size that can be provided, which is equal to/less than the flange/web thickness
+            self.weld_size_flange_max = round_down(self.column_tf, 2)  # mm
+            self.weld_size_web_max = round_down(self.column_tw, 2)  # mm
 
             if self.connectivity == 'Welded Column Base':
 
                 if self.dp_column_type == 'Rolled' or 'Welded':
-
-                    # defining the maximum limit of weld size that can be provided, which is equal to/less than the flange/web thickness
-                    self.weld_size_flange_max = round_down(self.column_tf, 2)  # mm
-                    self.weld_size_web_max = round_down(self.column_tw, 2)  # mm
 
                     # available length for welding along the flange and web of the column, without the stiffeners
                     length_available_flange = 2 * (self.column_bf + (self.column_bf - self.column_tw - (2 * self.column_r1)))  # mm
@@ -2274,8 +2425,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         # relative strength of weld per unit weld length and weld size including stiffeners along the flange
                         self.strength_unit_len = self.load_axial_compression / self.total_eff_len_available  # N/mm
                         self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
-                                                                                               [self.dp_weld_fu_overwrite, self.dp_column_fu],
-                                                                                               [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
+                                                                                        [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                        [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
 
                         self.weld_size_web = self.weld_size  # mm
 
@@ -2284,7 +2435,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         # Case 2: Adding stiffeners along web of the column (total two in number)
                         self.stiffener_along_web = 'Yes'
 
-                        self.eff_stiffener_plt_len_along_web = (self.stiffener_plt_len_along_web * 2) - (0.02 * self.stiffener_plt_len_along_web)  # mm
+                        self.eff_stiffener_plt_len_along_web = (self.stiffener_plt_len_along_web * 2) - (
+                                    0.02 * self.stiffener_plt_len_along_web)  # mm
 
                         # TODO: deduce notch size
                         # total effective len available including four stiffeners along flange and two along the web
@@ -2293,8 +2445,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         # relative strength of weld per unit weld length and weld size, including stiffeners along the flange and the web
                         self.strength_unit_len = self.load_axial_compression / self.total_eff_len_available  # N/mm
                         self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
-                                                                                               [self.dp_weld_fu_overwrite, self.dp_column_fu],
-                                                                                               [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
+                                                                                        [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                        [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
 
                         self.weld_size_web = self.weld_size  # mm
 
@@ -2303,7 +2455,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             # Case 3: Adding stiffeners across the web of the column, between the column depth (total two in number)
                             self.stiffener_across_web = 'Yes'
 
-                            len_required = (self.load_axial_compression * math.sqrt(3) * self.gamma_mw) / (0.7 * self.weld_size_web_max * self.weld_fu)  # mm
+                            len_required = (self.load_axial_compression * math.sqrt(3) * self.gamma_mw) / (
+                                        0.7 * self.weld_size_web_max * self.weld_fu)  # mm
                             # Adding 16% of the total length to incorporate end returns (total 16 end returns in this case)
                             len_required = len_required + (0.16 * len_required)  # mm
 
@@ -2346,22 +2499,83 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 else:  # TODO: add checks for other type(s) of column section here (Example: built-up, star shaped etc.)
                     pass
 
-            elif self.connectivity == 'Hollow/Tubular Column Base':  # TODO: add calculations for hollow sections
-                pass
+            elif self.connectivity == 'Hollow/Tubular Column Base':
+                if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
+                    length_available = 2 * (self.column_D + self.column_bf)  # mm, provide weld along the perimeter of the hollow section
+                else:
+                    length_available = self.column_D  # mm
+
+                self.strength_unit_len = self.load_axial_compression / length_available  # N/mm
+                self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
+                                                                                [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
+
+                self.weld_size_hollow = self.weld_size  # mm
+
+                # check for weld size
+                if self.weld_size_hollow > self.weld_size_flange_max:
+                    # provide stiffeners for extra welding
+                    self.stiffener_along_D = 'Yes'  # stiffener along the longer side of RHS or any side of CHS
+                    self.stiffener_along_B = 'Yes'  # stiffener along the shorter side of RHS or SHS
+
+                    # weld design including stiffeners
+                    if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
+                        self.stiffener_plt_len_along_D = (self.bp_length_provided - self.column_D) / 2  # mm
+                        self.stiffener_plt_len_along_B = (self.bp_width_provided - self.column_bf) / 2  # mm
+                        self.stiffener_plt_thk = min(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) / (8.4 * self.epsilon)  # mm
+                        self.stiffener_plt_thk = round_up(self.stiffener_plt_thk, 2, self.column_tf)
+                        self.stiffener_plt_height = max(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) + 50  # mm
+
+                        self.stiffener_nos = 4
+                        effective_length_available = (2 * (self.column_D + self.column_bf)) - (4 * self.stiffener_plt_thk) + \
+                                                     (2 * (4 * min(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B)))  # mm
+
+                    else:
+                        self.stiffener_plt_len_across_D = (self.bp_length_provided - self.column_D) / 2  # mm
+                        self.stiffener_plt_thk = self.stiffener_plt_len_across_D / (8.4 * self.epsilon)  # mm
+                        self.stiffener_plt_thk = round_up(self.stiffener_plt_thk, 2, self.column_tf)
+                        self.stiffener_plt_height = self.stiffener_plt_len_across_D + 50  # mm
+
+                        self.stiffener_nos = 4
+                        effective_length_available = self.column_D - (4 * self.stiffener_plt_thk) + (2 * (4 * self.stiffener_plt_len_across_D))  # mm
+
+                    # weld size after providing stiffeners
+                    self.strength_unit_len = self.load_axial_compression / effective_length_available  # N/mm
+                    self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
+                                                                                    [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                    [self.plate_thk, self.column_tf], self.dp_weld_fab)  # mm
+
+                    self.weld_size_hollow = self.weld_size  # mm
+
+                    # TODO: check if the weld size still exceeds the max allowable value
+            else:
+                self.stiffener_along_D = 'No'
+                self.stiffener_along_B = 'No'
 
         # design of butt/groove weld
         else:
-            if self.connectivity == 'Welded Column Base':
-                self.stiffener_along_flange = 'No'
-                self.stiffener_along_web = 'No'
+            if self.connectivity == 'Hollow/Tubular Column Base':
+                self.stiffener_along_D = 'No'
+                self.stiffener_along_B = 'No'
+            else:
+                if self.connectivity == 'Welded Column Base':
+                    self.stiffener_along_flange = 'No'
+                    self.stiffener_along_web = 'No'
 
-            elif self.connectivity == 'Moment Base Plate':
-                self.stiffener_along_flange = 'Yes'
-                self.stiffener_along_web = 'Yes'
-                self.stiffener_across_web = 'No'
+                elif self.connectivity == 'Moment Base Plate':
+                    self.stiffener_along_flange = 'Yes'
+                    self.stiffener_along_web = 'Yes'
+                    self.stiffener_across_web = 'No'
 
-            self.weld_size_flange = self.column_tf  # mm
-            self.weld_size_web = self.column_tw  # mm
+                self.weld_size_flange = self.column_tf  # mm
+                self.weld_size_web = self.column_tw  # mm
+
+            # design of weld for the shear key
+            if (self.load_shear_major or self.load_shear_minor) > 0:
+                if self.shear_key_required == 'Yes':
+                    self.weld_size_shear_key = self.shear_key_thk
+            else:
+                pass
 
     def design_stiffeners(self):
         """ design and detail the stiffener plates
@@ -2370,47 +2584,49 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         Returns:
         """
-        # define material parameters
-        self.stiffener_fy = self.dp_column_fy  # MPa
-        self.epsilon = math.sqrt(250 / self.stiffener_fy)
-
         # check for the limiting width to the thickness ratio of the column web [Reference: Cl. 3.7.2 and 3.7.4, Table 2, IS 800:2007]
         # if the web does not classify as 'Plastic' section, stiffener shall be provided across the web to limit the effective width
-        ratio = (self.column_D - (2 * self.column_tf)) / self.column_tw  # d/t_w
+        if self.connectivity == ('Welded Column Base' or 'Moment Base Plate'):
+            check = self.Table2_web_OfI_H_box_section((self.column_D - (2 * self.column_tf)), self.column_tw, self.dp_column_fy,
+                                                      self.load_axial_compression, load_type='Compression', section_class='Plastic')
+            # check returns a list
+            # check[0]: Neutral axis at mid depth of the column
+            # check[1]: Generally (when there is axial tension/uplift force acting on the column)
+            # check[2]: Axial compression
 
-        # Check 1: Axial compression
-        if self.connectivity == 'Welded Column Base':
-            if ratio > (42 * self.epsilon):
+            if (check[0] or check[1] or check[2]) == 'Fail':
                 self.stiffener_across_web = 'Yes'
             else:
                 self.stiffener_across_web = 'No'
 
-        # Check 2: Neutral axis at mid depth of the column
-        elif self.connectivity == 'Moment Base Plate':
-            if ratio > (84 * self.epsilon):
-                self.stiffener_across_web = 'Yes'
-            else:
-                self.stiffener_across_web = 'No'
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
+                check = self.Table2_web_OfI_H_box_section((min(self.column_D, self.column_bf) - self.column_tf), self.column_tw, self.dp_column_fy,
+                                                          self.load_axial_compression, load_type='Compression', section_class='Plastic')
+                if check[0] or check[1] or check[2] == 'Fail':
+                    self.stiffener_along_D = 'Yes'
+                    self.stiffener_along_B = 'Yes'
+                else:
+                    pass
 
-        # Check 3: Generally (when there is axial tension/uplift force acting on the column)
-        if self.load_axial_tension > 0:
-            actual_stress = self.load_axial_tension / ((self.column_D - (2 * self.column_tf)) * self.column_tw)
-            r_1 = - (actual_stress / self.dp_column_fy)  # r_1 is negative for axial tension
-
-            if ratio > (((84 * self.epsilon) / (1 + r_1)) or (42 * self.epsilon)):
-                self.stiffener_across_web = 'Yes'
             else:
-                self.stiffener_across_web = 'No'
+                check = self.Table2_hollow_tube(self.column_D, self.column_tf, self.dp_column_fy, load='Axial Compression', section_class='Plastic')
+                if check == 'Fail':
+                    self.stiffener_along_D = 'Yes'
+                else:
+                    pass
+        else:
+            pass
 
         # design of stiffener
-        if self.connectivity == 'Welded Column Base' or 'Moment Base Plate':
+        if self.connectivity == ('Welded Column Base' or 'Moment Base Plate'):
             self.stiffener_across_web = 'Yes'
             if (self.stiffener_along_flange or self.stiffener_along_web or self.stiffener_across_web) == 'Yes':
 
-                # thickness of the stiffener plate as per Table 2 of IS 800:2007 [b/t_f <= 13.6 * epsilon]
-                thk_req_stiffener_along_flange = self.stiffener_plt_len_along_flange / (13.6 * self.epsilon)  # mm
-                thk_req_stiffener_along_web = self.stiffener_plt_len_along_web / (13.6 * self.epsilon)  # mm
-                thk_req_stiffener_across_web = self.stiffener_plt_len_across_web / (13.6 * self.epsilon)  # mm
+                # thickness of the stiffener plate as per Table 2 of IS 800:2007 [b/t_f <= 8.4 * epsilon]
+                thk_req_stiffener_along_flange = self.stiffener_plt_len_along_flange / (8.4 * self.epsilon)  # mm
+                thk_req_stiffener_along_web = self.stiffener_plt_len_along_web / (8.4 * self.epsilon)  # mm
+                thk_req_stiffener_across_web = self.stiffener_plt_len_across_web / (8.4 * self.epsilon)  # mm
 
                 # stiffener plate should be at-least equal to the flange thickness along the flange and web thickness along the web
                 self.stiffener_plt_thick_along_flange = round_up(thk_req_stiffener_along_flange, 2, self.column_tf)  # mm
@@ -2457,13 +2673,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     # shear and moment capacity calculations
                     self.shear_capa_stiffener_along_flange = IS800_2007.cl_8_4_design_shear_strength((self.stiffener_plt_height_along_flange *
-                                                                                                self.stiffener_plt_thick_along_flange), self.stiffener_fy)
+                                                                                                      self.stiffener_plt_thick_along_flange),
+                                                                                                     self.stiffener_fy)
                     self.shear_capa_stiffener_along_flange = round((self.shear_capa_stiffener_along_flange / 1000), 3)  # kN
 
                     self.z_e_stiffener_along_flange = (self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
 
                     self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 0,
-                                                                                                        self.stiffener_fy, section_class='semi-compact')
+                                                                                                           self.stiffener_fy,
+                                                                                                           section_class='semi-compact')
                     self.moment_capa_stiffener_along_flange = round((self.moment_capa_stiffener_along_flange * 10 ** -6), 3)  # kN-m
 
                     # checks
@@ -2475,7 +2693,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.stiffener_plt_thick_along_flange = round_up(self.stiffener_plt_thick_along_flange, 2)  # mm
 
                         # re-calculating the moment capacity by incorporating the improvised stiffener thickness along flange
-                        self.z_e_stiffener_along_flange = (self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
+                        self.z_e_stiffener_along_flange = (
+                                                                      self.stiffener_plt_thick_along_flange * self.stiffener_plt_height_along_flange ** 2) / 6  # mm^3
 
                         self.moment_capa_stiffener_along_flange = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_flange, 0,
                                                                                                                self.stiffener_fy,
@@ -2488,7 +2707,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         logger.warning("Fails in moment")
                         logger.info("Improvising thk")
                         self.stiffener_plt_thick_along_flange = (6 * self.gamma_m0 * self.moment_on_stiffener_along_flange * 10 ** 6) / \
-                                                             (self.stiffener_fy * self.stiffener_plt_height_along_flange ** 2)
+                                                                (self.stiffener_fy * self.stiffener_plt_height_along_flange ** 2)
                         self.stiffener_plt_thick_along_flange = round_up(self.stiffener_plt_thick_along_flange, 2)  # mm
                     else:
                         pass
@@ -2502,19 +2721,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                                         self.stiffener_plt_height_along_web
                     self.shear_on_stiffener_along_web = round((self.shear_on_stiffener_along_web / 1000), 3)  # kN
 
-                    self.moment_on_stiffener_along_web = (self.sigma_xx * self.stiffener_plt_height_along_web * self.stiffener_plt_len_along_web ** 2 * 0.5) \
+                    self.moment_on_stiffener_along_web = (
+                                                                     self.sigma_xx * self.stiffener_plt_height_along_web * self.stiffener_plt_len_along_web ** 2 * 0.5) \
                                                          + (0.5 * self.stiffener_plt_len_along_web * (self.sigma_max_zz - self.sigma_xx) *
                                                             self.stiffener_plt_height_along_web * (2 / 3) * self.stiffener_plt_len_along_web)
                     self.moment_on_stiffener_along_web = round((self.moment_on_stiffener_along_web * 10 ** -6), 3)  # kN-m
 
                     # shear and moment capacity calculations
                     self.shear_capa_stiffener_along_web = IS800_2007.cl_8_4_design_shear_strength(self.stiffener_plt_height_along_web *
-                                                                                                  self.stiffener_plt_thick_along_web, self.stiffener_fy)
+                                                                                                  self.stiffener_plt_thick_along_web,
+                                                                                                  self.stiffener_fy)
                     self.shear_capa_stiffener_along_web = round((self.shear_capa_stiffener_along_web / 1000), 3)  # kN
 
                     self.z_e_stiffener_along_web = (self.stiffener_plt_thick_along_web * self.stiffener_plt_height_along_web ** 2) / 6  # mm^3
                     self.moment_capa_stiffener_along_web = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_along_web, 0,
-                                                                                                        self.stiffener_fy, section_class='semi-compact')
+                                                                                                        self.stiffener_fy,
+                                                                                                        section_class='semi-compact')
                     self.moment_capa_stiffener_along_web = round((self.moment_capa_stiffener_along_web * 10 ** -6), 3)  # kN-m
 
                     # checks
@@ -2522,7 +2744,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         logger.warning("Fails in shear")
                         logger.info("Improvising thk")
                         self.stiffener_plt_thick_along_web = (math.sqrt(3) * self.gamma_m0 * self.shear_on_stiffener_along_web * 1000) / \
-                                                                (self.stiffener_fy * self.stiffener_plt_height_along_web)
+                                                             (self.stiffener_fy * self.stiffener_plt_height_along_web)
                         self.stiffener_plt_thick_along_web = round_up(self.stiffener_plt_thick_along_web, 2)  # mm
 
                         # re-calculating the moment capacity by incorporating the improvised stiffener thickness along web
@@ -2539,7 +2761,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         logger.warning("Fails in moment")
                         logger.info("Improvising thk")
                         self.stiffener_plt_thick_along_web = (6 * self.gamma_m0 * self.moment_on_stiffener_along_web * 10 ** 6) / \
-                                                              (self.stiffener_fy * self.stiffener_plt_height_along_web ** 2)
+                                                             (self.stiffener_fy * self.stiffener_plt_height_along_web ** 2)
                         self.stiffener_plt_thick_along_web = round_up(self.stiffener_plt_thick_along_web, 2)  # mm
                     else:
                         pass
@@ -2550,24 +2772,25 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 if self.stiffener_across_web == 'Yes':
                     # shear and moment demand calculations
                     self.shear_on_stiffener_across_web = ((self.sigma_max_zz + self.sigma_xx) / 2) * self.stiffener_plt_len_across_web * \
-                                                        self.stiffener_plt_height_across_web
+                                                         self.stiffener_plt_height_across_web
                     self.shear_on_stiffener_across_web = round((self.shear_on_stiffener_across_web / 1000), 3)  # kN
 
-                    self.moment_on_stiffener_across_web = (self.sigma_xx * self.stiffener_plt_height_across_web * self.stiffener_plt_len_across_web ** 2 * 0.5) \
-                                                         + (0.5 * self.stiffener_plt_len_across_web * (self.sigma_max_zz - self.sigma_xx) *
-                                                            self.stiffener_plt_height_across_web * (2 / 3) * self.stiffener_plt_len_across_web)
+                    self.moment_on_stiffener_across_web = (
+                                                                      self.sigma_xx * self.stiffener_plt_height_across_web * self.stiffener_plt_len_across_web ** 2 * 0.5) \
+                                                          + (0.5 * self.stiffener_plt_len_across_web * (self.sigma_max_zz - self.sigma_xx) *
+                                                             self.stiffener_plt_height_across_web * (2 / 3) * self.stiffener_plt_len_across_web)
                     self.moment_on_stiffener_across_web = round((self.moment_on_stiffener_across_web * 10 ** -6), 3)  # kN-m
 
                     # shear and moment capacity calculations
                     self.shear_capa_stiffener_across_web = IS800_2007.cl_8_4_design_shear_strength(self.stiffener_plt_height_across_web *
-                                                                                                  self.stiffener_plt_thick_across_web,
-                                                                                                  self.stiffener_fy)
+                                                                                                   self.stiffener_plt_thick_across_web,
+                                                                                                   self.stiffener_fy)
                     self.shear_capa_stiffener_across_web = round((self.shear_capa_stiffener_across_web / 1000), 3)  # kN
 
                     self.z_e_stiffener_across_web = (self.stiffener_plt_thick_across_web * self.stiffener_plt_height_across_web ** 2) / 6  # mm^3
                     self.moment_capa_stiffener_across_web = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener_across_web, 0,
-                                                                                                        self.stiffener_fy,
-                                                                                                        section_class='semi-compact')
+                                                                                                         self.stiffener_fy,
+                                                                                                         section_class='semi-compact')
                     self.moment_capa_stiffener_across_web = round((self.moment_capa_stiffener_across_web * 10 ** -6), 3)  # kN-m
 
                     # checks
@@ -2575,7 +2798,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         logger.warning("Fails in shear")
                         logger.info("Improvising thk")
                         self.stiffener_plt_thick_across_web = (math.sqrt(3) * self.gamma_m0 * self.shear_on_stiffener_across_web * 1000) / \
-                                                             (self.stiffener_fy * self.stiffener_plt_height_across_web)
+                                                              (self.stiffener_fy * self.stiffener_plt_height_across_web)
                         self.stiffener_plt_thick_across_web = round_up(self.stiffener_plt_thick_across_web, 2)  # mm
 
                         # re-calculating the moment capacity by incorporating the improvised stiffener thickness across web
@@ -2633,7 +2856,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if self.stiffener_along_flange == 'Yes':
                 # Stiffener along flange - weld connecting stiffener to the base plate
                 # the weld will have shear due to the bearing force and axial force due to in-plane bending of the stiffener
-                f_a = (self.shear_on_stiffener_along_flange * 1000 / 2) / (0.7 * self.weld_size_stiffener * self.stiffener_plt_len_along_flange)  # MPa
+                f_a = (self.shear_on_stiffener_along_flange * 1000 / 2) / (
+                            0.7 * self.weld_size_stiffener * self.stiffener_plt_len_along_flange)  # MPa
                 q = (self.moment_on_stiffener_along_flange * 10 ** 6 / self.stiffener_plt_height_along_flange) \
                     / (0.7 * self.weld_size_stiffener * self.stiffener_plt_len_along_flange)  # MPa
                 f_e = math.sqrt(f_a ** 2 + (3 * q ** 2))  # MPa
@@ -2693,7 +2917,63 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         logger.error("Cannot compute weld size")
                         break
 
-        elif self.connectivity == 'Hollow/Tubular Column Base':  # TODO: add condition when required
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            self.sigma_max = self.w  # N/mm^2
+
+            if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
+                if (self.stiffener_along_D == 'Yes') or (self.stiffener_along_B == 'Yes'):
+                    stiffener_len = min(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B)
+            else:
+                if self.stiffener_along_D == 'Yes':
+                    stiffener_len = self.stiffener_plt_len_along_D
+
+            # shear yielding and moment capacity checks for the stiffener
+
+            # shear and moment demand calculations
+            self.shear_on_stiffener = self.sigma_max * stiffener_len * self.stiffener_plt_height
+            self.shear_on_stiffener = round((self.shear_on_stiffener / 1000), 3)  # kN
+
+            self.moment_on_stiffener = self.sigma_max * self.stiffener_plt_height * stiffener_len ** 2 * 0.5
+            self.moment_on_stiffener = round((self.moment_on_stiffener * 10 ** -6), 3)  # kN-m
+
+            # shear and moment capacity calculations
+            self.shear_capa_stiffener = IS800_2007.cl_8_4_design_shear_strength((self.stiffener_plt_height * self.stiffener_plt_thk),
+                                                                                self.stiffener_fy)
+            self.shear_capa_stiffener = round((self.shear_capa_stiffener / 1000), 3)  # kN
+
+            self.z_e_stiffener = (self.stiffener_plt_thk * self.stiffener_plt_height ** 2) / 6  # mm^3
+
+            self.moment_capa_stiffener = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener, 0, self.stiffener_fy,
+                                                                                      section_class='semi-compact')
+            self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kN-m
+
+            # checks
+            if self.shear_on_stiffener > (0.6 * self.shear_capa_stiffener):
+                logger.warning("Fails in shear")
+                logger.info("Improvising thk")
+                self.stiffener_plt_thk = (math.sqrt(3) * self.gamma_m0 * self.shear_on_stiffener * 1000) / \
+                                                        (self.stiffener_fy * self.stiffener_plt_height)
+                self.stiffener_plt_thk = round_up(self.stiffener_plt_thk, 2)  # mm
+
+                # re-calculating the moment capacity by incorporating the improvised stiffener thickness along flange
+                self.z_e_stiffener = (self.stiffener_plt_thk * self.stiffener_plt_height ** 2) / 6  # mm^3
+
+                self.moment_capa_stiffener = IS800_2007.cl_8_2_1_2_design_moment_strength(self.z_e_stiffener, 0, self.stiffener_fy,
+                                                                                          section_class='semi-compact')
+                self.moment_capa_stiffener = round((self.moment_capa_stiffener * 10 ** -6), 3)  # kN-m
+            else:
+                pass
+
+            if self.moment_on_stiffener > self.moment_capa_stiffener:
+                logger.warning("Fails in moment")
+                logger.info("Improvising thk")
+                self.stiffener_plt_thk = (6 * self.gamma_m0 * self.moment_on_stiffener * 10 ** 6) / \
+                                                        (self.stiffener_fy * self.stiffener_plt_height ** 2)
+                self.stiffener_plt_thk = round_up(self.stiffener_plt_thk, 2)  # mm
+            else:
+                pass
+
+        else:
             pass
 
         # end of calculation
@@ -2741,7 +3021,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print(self.gauge_distance)  # Gauge Distance (mm) mm (show only when this value is not 'Null')
         print(self.end_distance)  # mm
         print(self.edge_distance)  # mm
-        if self.connectivity == 'Welded Column Base':
+        if self.connectivity == 'Welded Column Base' or 'Hollow/Tubular Column Base':
             print(self.projection)  # mm (show only for 'Welded-Slab Base' connectivity)
         else:
             pass
@@ -2749,49 +3029,100 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # Gusset/Stiffener Plate
         # Details tab (this is supposed to be taken from Osdag 2 - details to be given soon)
 
-        # Stiffener plate along flange
-        if self.stiffener_along_flange == 'Yes':
-            print(self.stiffener_plt_thick_along_flange)
-            print(self.shear_on_stiffener_along_flange)
-            print(self.shear_capa_stiffener_along_flange)
-            print(self.moment_on_stiffener_along_flange)
-            print(self.moment_capa_stiffener_along_flange)
-        else:
-            pass
+        if self.connectivity == 'Hollow/Tubular Column Base':
 
-        # Stiffener plate along web
-        if self.stiffener_along_web == 'Yes':
-            print(self.stiffener_plt_thick_along_web)
-            print(self.shear_on_stiffener_along_web)
-            print(self.shear_capa_stiffener_along_web)
-            print(self.moment_on_stiffener_along_web)
-            print(self.moment_capa_stiffener_along_web)
-        else:
-            pass
+            if (self.stiffener_along_D == 'Yes') or (self.stiffener_along_B == 'Yes'):
 
-        # Stiffener across web
-        if self.stiffener_across_web == 'Yes':
-            print(self.stiffener_plt_thick_across_web)
-            print(self.shear_on_stiffener_across_web)
-            print(self.shear_capa_stiffener_across_web)
-            print(self.moment_on_stiffener_across_web)
-            print(self.moment_capa_stiffener_across_web)
+                print(self.stiffener_nos)
+                print(self.stiffener_plt_thk)
+                print(self.stiffener_plt_height)
+
+                if (self.dp_column_designation[1:4] =='SHS') or (self.dp_column_designation[1:4] == 'RHS'):
+                    print(self.stiffener_plt_len_along_D)
+                    print(self.stiffener_plt_len_along_B)
+                else:
+                    print(self.stiffener_plt_len_across_D)
+
+                print(self.shear_on_stiffener)
+                print(self.shear_capa_stiffener)
+                print(self.moment_on_stiffener)
+                print(self.moment_capa_stiffener)
+
+            else:
+                pass
+
+        else:
+            # Stiffener plate along flange
+            if self.stiffener_along_flange == 'Yes':
+                print(self.stiffener_plt_thick_along_flange)
+                print(self.shear_on_stiffener_along_flange)
+                print(self.shear_capa_stiffener_along_flange)
+                print(self.moment_on_stiffener_along_flange)
+                print(self.moment_capa_stiffener_along_flange)
+            else:
+                pass
+
+            # Stiffener plate along web
+            if self.stiffener_along_web == 'Yes':
+                print(self.stiffener_plt_thick_along_web)
+                print(self.shear_on_stiffener_along_web)
+                print(self.shear_capa_stiffener_along_web)
+                print(self.moment_on_stiffener_along_web)
+                print(self.moment_capa_stiffener_along_web)
+            else:
+                pass
+
+            # Stiffener across web
+            if self.stiffener_across_web == 'Yes':
+                print(self.stiffener_plt_thick_across_web)
+                print(self.shear_on_stiffener_across_web)
+                print(self.shear_capa_stiffener_across_web)
+                print(self.moment_on_stiffener_across_web)
+                print(self.moment_capa_stiffener_across_web)
+            else:
+                pass
+
+        # shear key details
+        if (self.load_shear_major or self.load_shear_minor) > 0:
+            if self.shear_key_required == 'Yes':
+                print(self.shear_key_thk)
+                print(self.weld_size_shear_key)
+
+                if self.load_shear_major > 0:
+                    print(self.shear_key_len_ColDepth)
+                    print(self.shear_key_depth_ColDepth)
+                    print(self.shear_key_stress_ColDepth)
+                else:
+                    print(self.shear_key_len_ColWidth)
+                    print(self.shear_key_depth_ColWidth)
+                    print(self.shear_key_stress_ColWidth)
+            else:
+                self.shear_key_len_ColDepth = 'N/A'
+                self.shear_key_depth_ColDepth = 'N/A'
+                self.shear_key_stress_ColDepth = 'N/A'
+
+                self.shear_key_len_ColWidth = 'N/A'
+                self.shear_key_depth_ColWidth = 'N/A'
+                self.shear_key_stress_ColWidth = 'N/A'
         else:
             pass
 
         # Weld
 
-        print(self.weld_size_flange if self.weld_type != 'Butt Weld' else '')  # Size at Flange (mm)
-        print(self.weld_size_web if self.weld_type != 'Butt Weld' else '')  # Size at Web (mm)
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            print(self.weld_size_hollow)
+        else:
+            print(self.weld_size_flange if self.weld_type != 'Butt Weld' else '')  # Size at Flange (mm)
+            print(self.weld_size_web if self.weld_type != 'Butt Weld' else '')  # Size at Web (mm)
 
-        if self.stiffener_along_flange == 'Yes':
-            print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along flange (mm)
+            if self.stiffener_along_flange == 'Yes':
+                print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along flange (mm)
 
-        if self.stiffener_along_web == 'Yes':
-            print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
+            if self.stiffener_along_web == 'Yes':
+                print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
 
-        if self.stiffener_across_web == 'Yes':
-            print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
+            if self.stiffener_across_web == 'Yes':
+                print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
 
         # this might not be required
         # print(self.weld_size if self.weld_type != 'Butt Weld' else '')  # Weld size (mm)

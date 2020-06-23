@@ -705,7 +705,7 @@ if __name__ == '__main__':
     # app.exec_()
     # sys.exit(app.exec_())
     try:
-        window.notification2()
+        # window.notification2()
         QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)

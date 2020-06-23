@@ -382,9 +382,15 @@ class TensionAngleWeldCAD(object):
         return welds
 
     def get_models(self):
-        pass
+        mem = self.get_welded_models()
+        plts = self.get_plates_models()
+        wlds = self.get_welded_models()
 
+        array = BRepAlgoAPI_Fuse(mem, plts).Shape()
 
+        array = BRepAlgoAPI_Fuse(array, wlds).Shape()
+
+        return array
 class TensionChannelWeldCAD(TensionAngleWeldCAD):
 
     def createMemberGeometry(self):

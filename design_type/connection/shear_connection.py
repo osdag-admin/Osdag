@@ -59,7 +59,7 @@ class ShearConnection(Connection):
             designation = str(input_dictionary[KEY_ANGLE_LIST][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
             Angle_attributes = Angle(designation,material_grade)
-            Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
+            Angle_attributes.connect_to_database_update_other_attributes(designation, material_grade)
             source = str(Angle_attributes.source)
             fu = str(Angle_attributes.fu)
             fy = str(Angle_attributes.fy)
@@ -315,7 +315,7 @@ class ShearConnection(Connection):
 
 
         Angle_attributes = Angle(designation, material_grade)
-        Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
+        Angle_attributes.connect_to_database_update_other_attributes(designation, material_grade)
         source = str(Angle_attributes.source)
         Type= str(Angle_attributes.type)
         fu = str(Angle_attributes.fu)

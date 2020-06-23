@@ -2400,9 +2400,9 @@ class Tension_bolted(Member):
             self.report_check.append(t8)
             # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
             # self.report_check.append(t2)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided,row_limit), self.bolt.min_gauge_round, get_pass_fail(self.bolt.min_gauge, self.bolt.min_gauge_round, relation="leq"))
+            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided, row_limit), self.bolt.min_gauge_round, get_pass_fail(self.bolt.min_gauge, self.bolt.min_gauge_round, relation="leq"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
                   self.bolt.min_edge_dist_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
             self.report_check.append(t3)
             t3 = (
@@ -2490,35 +2490,40 @@ class Tension_bolted(Member):
             t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area, "A_{nb}"," [Ref~IS~1367-3~(2002)]"), '')
             self.report_check.append(t8)
 
-            t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+            t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.plate.pitch_provided,
                   get_pass_fail(self.bolt.min_pitch, self.plate.pitch_provided, relation='leq'))
             self.report_check.append(t1)
-            t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
+            t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(connecting_plates),
                   self.plate.pitch_provided,
                   get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided, relation='geq'))
             self.report_check.append(t1)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.plate.gauge_provided,
                   get_pass_fail(self.bolt.min_gauge, self.plate.gauge_provided, relation="leq"))
             self.report_check.append(t2)
-            t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
+            t2 = (DISP_MAX_GAUGE, cl_10_2_3_1_max_spacing(connecting_plates),
                   self.plate.gauge_provided,
                   get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided, relation="geq"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided, relation='leq'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_END, max_edge_end(self.plate.fy,  min(connecting_plates)),
+
+            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences,
+                                                              parameter='end_dist'),
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.max_end_dist, self.plate.end_dist_provided, relation='geq'))
             self.report_check.append(t4)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
                   self.plate.edge_dist_provided,
                   get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided, relation='leq'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_EDGE, max_edge_end(self.plate.fy, min(connecting_plates)),
+            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences,
+                                                              parameter='end_dist'),
                   self.plate.edge_dist_provided,
                   get_pass_fail(self.bolt.max_edge_dist, self.plate.edge_dist_provided, relation="geq"))
             self.report_check.append(t4)

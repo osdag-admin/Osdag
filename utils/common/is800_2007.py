@@ -46,7 +46,7 @@ class IS800_2007(object):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         epsilon = math.sqrt(f_y / 250)
 
-        ratio = depth / web_thickness  # ratio of the web
+        ratio = depth / web_thickness  # ratio of the web/component
 
         # Check 1: Neutral axis at mid-depth
         if section_class == 'Plastic':
@@ -107,6 +107,64 @@ class IS800_2007(object):
             check_3 = 'Pass'  # Not-applicable to Plastic and Compact sections (hence, Pass)
 
         return [check_1, check_2, check_3]
+
+    @staticmethod
+    def Table2_hollow_tube(diameter, thickness, f_y, load='Axial Compression', section_class='Plastic'):
+        """ Calculate the limiting width to thickness ratio; for a hollow tube section in accordance to Table 2
+
+        Args:
+            diameter: diameter of the tube in mm (float or int)
+            thickness: thickness of the tube in mm (float or int)
+            f_y: yield stress of the section material in N/MPa (float or int)
+            load: Type of load ('Axial Compression' or 'Moment') (string)
+            section_class: Class of the section (Class1 - Plastic, Class2 - Compact or Class3 - Semi-compact) (string)
+
+        Returns:
+            Results of the section classification check(s)
+            'Pass', if the section qualifies as the required section_class, 'Fail' if it does not
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        epsilon = math.sqrt(f_y / 250)
+
+        ratio = diameter / thickness  # ratio of the web/component
+
+        # Check 1: If the load acting is Moment
+        if load == 'Moment':
+
+            if section_class == 'Plastic':
+                if ratio <= (42 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+            elif section_class == 'Compact':
+                if ratio <= (52 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+            else:
+                if ratio <= (146 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+
+        # Check 1: If the load acting is Axial Compression
+        elif load == 'Axial Compression':
+
+            if section_class == 'Plastic':
+                check = 'Pass'
+            elif section_class == 'Compact':
+                check = 'Pass'
+            else:
+                if ratio <= (88 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+        else:
+            pass
+
+        return check
 
     # ==========================================================================
     """    SECTION  3     GENERAL DESIGN REQUIREMENTS   """

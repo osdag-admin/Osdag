@@ -189,20 +189,27 @@ class SaveDesignBP(BasePlateConnection):
         t5 = (KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, cl_10_2_3_1_max_spacing(self.plate_thk, parameter='gauge'), 'N/A', '')
         self.report_check.append(t5)
 
-        t6 = (KEY_OUT_DISP_DETAILING_END_DISTANCE, cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
-                                                                                 self.dp_detail_edge_type, parameter='end_dist'), self.end_distance, '')
+        bolt_hole = d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided, self.dp_anchor_hole)
+        t6 = (KEY_OUT_DISP_DETAILING_END_DISTANCE, cl_10_2_4_2_min_edge_end_dist(bolt_hole, self.dp_detail_edge_type,
+                                                                                 parameter='end_dist'), self.end_distance, '')
         self.report_check.append(t6)
 
-        t7 = (KEY_OUT_DISP_DETAILING_END_DISTANCE, cl_10_2_4_3_max_edge_dist([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive,
-                                                                             parameter='end_dist'), 'N/A', '')
+        # t7 = (KEY_OUT_DISP_DETAILING_END_DISTANCE, cl_10_2_4_3_max_edge_dist_old([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive,
+        #                                                                          parameter='end_dist'), 'N/A', '')
+
+        t_fu_fy = [(self.plate_thk, self.dp_bp_fu,self.dp_bp_fy)]
+        t7 = (KEY_OUT_DISP_DETAILING_END_DISTANCE, cl_10_2_4_3_max_edge_end_dist(t_fu_fy, self.dp_detail_is_corrosive,
+                                                                                 parameter='end_dist'), 'N/A', '')
         self.report_check.append(t7)
 
-        t8 = (KEY_OUT_DISP_DETAILING_EDGE_DISTANCE, cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
-                                                                                 self.dp_detail_edge_type, parameter='edge_dist'), self.end_distance, '')
+        t8 = (KEY_OUT_DISP_DETAILING_EDGE_DISTANCE, cl_10_2_4_2_min_edge_end_dist(bolt_hole,self.dp_detail_edge_type,
+                                                                                  parameter='edge_dist'), self.end_distance, '')
         self.report_check.append(t8)
 
-        t9 = (KEY_OUT_DISP_DETAILING_EDGE_DISTANCE, cl_10_2_4_3_max_edge_dist([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive,
-                                                                             parameter='edge_dist'), 'N/A', '')
+        # t9 = (KEY_OUT_DISP_DETAILING_EDGE_DISTANCE, cl_10_2_4_3_max_edge_dist_old([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive,
+        #                                                                           parameter='edge_dist'), 'N/A', '')
+        t9 = (KEY_OUT_DISP_DETAILING_EDGE_DISTANCE, cl_10_2_4_3_max_edge_end_dist(t_fu_Fy, self.dp_detail_is_corrosive,
+                                                                                  parameter='edge_dist'), 'N/A', '')
         self.report_check.append(t9)
 
         if self.connectivity == 'Welded-Slab Base':

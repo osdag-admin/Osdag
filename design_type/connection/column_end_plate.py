@@ -130,9 +130,6 @@ class ColumnEndPlate(MomentConnection):
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
         design_input.append(t3)
 
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
-        design_input.append(t3)
-
         t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
         design_input.append(t4)
 
@@ -1604,24 +1601,27 @@ class ColumnEndPlate(MomentConnection):
 #####################################################################
 
     def results_to_test(self):
-        test_input = {KEY_MODULE : self.module,
-                      KEY_MAIN_MODULE: self.mainmodule,
-                      KEY_DISP_SEC_PROFILE: "ISection",
-                      KEY_DISP_BEAMSEC: self.section.designation,
-                      KEY_MATERIAL: self.section.material,
-                      KEY_SEC_FU: self.section.fu,
-                      KEY_SEC_FY: self.section.fy,
-                      KEY_D: self.bolt.bolt_diameter,
-                      KEY_GRD: self.bolt.bolt_grade,
-                      KEY_TYP: self.bolt.bolt_type,
-                      KEY_PLATETHK: self.plate.thickness,
-                      KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-                      KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
-                      KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-                      KEY_DP_DETAILING_GAP: self.plate.gap,
-                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
-
-        test_output = {KEY_MEMBER_MOM_CAPACITY: round(self.moment_capacity / 1000000, 2),
+        # test_input = {KEY_MODULE : self.module,
+        #               KEY_MAIN_MODULE: self.mainmodule,
+        #               KEY_DISP_SEC_PROFILE: "ISection",
+        #               KEY_DISP_BEAMSEC: self.section.designation,
+        #               KEY_MATERIAL: self.section.material,
+        #               KEY_SEC_FU: self.section.fu,
+        #               KEY_SEC_FY: self.section.fy,
+        #               KEY_D: self.bolt.bolt_diameter,
+        #               KEY_GRD: self.bolt.bolt_grade,
+        #               KEY_TYP: self.bolt.bolt_type,
+        #               KEY_PLATETHK: self.plate.thickness,
+        #               KEY_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+        #               KEY_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
+        #               KEY_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+        #               KEY_DP_DETAILING_GAP: self.plate.gap,
+        #               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences}
+        if self.bolt.bolt_type == TYP_BEARING:
+            pass
+        else:
+            self.bolt.bolt_bearing_capacity = 0.0
+        test_output = {KEY_MEMBER_MOM_CAPACITY: round(self.section.moment_capacity / 1000000, 2),
                        KEY_MEMBER_SHEAR_CAPACITY: round(self.shear_capacity / 1000, 2),
                        KEY_MEMBER_AXIALCAPACITY: round(self.axial_capacity / 1000, 2),
 
@@ -1662,7 +1662,7 @@ class ColumnEndPlate(MomentConnection):
                        KEY_OUT_STIFFENER_WIDTH: self.stiff_wt,
                        KEY_OUT_STIFFENER_THICKNESS: self.t_s,
                        KEY_OUT_WELD_TYPE: self.weld_type}
-        return test_input, test_output
+        return test_output
 
     @staticmethod
     def grdval_customized():
@@ -1958,20 +1958,21 @@ class ColumnEndPlate(MomentConnection):
               get_pass_fail(self.n_bf, self.n_bf, relation='leq'))
         self.report_check.append(t1)
 
-        t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+        t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
               self.pitch,
               get_pass_fail(self.bolt.min_pitch, self.pitch, relation='lesser'))
         self.report_check.append(t1)
-        t1 = (DISP_MAX_PITCH ,max_pitch(self.plate.thickness),
+        t1 = (DISP_MAX_PITCH , cl_10_2_3_1_max_spacing(self.plate.thickness),
               self.pitch,
               get_pass_fail(self.bolt.max_spacing, self.pitch, relation='greater'))
         self.report_check.append(t1)
-        t3 = (DISP_MIN_END, min_edge_end(self.bolt.dia_hole, self.bolt.edge_type),
+        t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.dia_hole, self.bolt.edge_type),
               self.end_dist,
               get_pass_fail(self.bolt.min_end_dist, self.end_dist,
                             relation='lesser'))
         self.report_check.append(t3)
-        t4 = (DISP_MAX_END, max_edge_end(self.plate.fy, self.plate_thickness_provided),
+        t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences),
               self.end_dist,
               get_pass_fail(self.bolt.max_end_dist, self.end_dist,
                             relation='greater'))

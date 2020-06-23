@@ -3,7 +3,7 @@ from design_type.connection.connection import Connection
 import sqlite3
 import logging
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog, QMessageBox
 import sys
 from gui.ui_template import Ui_ModuleWindow
 from utils.common.component import Bolt
@@ -151,6 +151,20 @@ KEY_PLATE_FY = 'Plate.Yield_Strength'
 KEY_DISP_PLATE_FY = 'Yield Strength , fy (MPa)'
 
 
+# Keys for output_dock
+KEY_OUT_D_PROVIDED = 'Bolt.Diameter'
+KEY_OUT_DISP_D_PROVIDED = 'Diameter (mm)'
+KEY_OUT_GRD_PROVIDED = 'Bolt.Grade_Provided'
+KEY_OUT_DISP_GRD_PROVIDED = 'Grade'
+KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
+KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
+KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
+KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
+KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
+KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity (kN)'
+VALUE_NOT_APPLICABLE = 'N/A'
+
+
 TYPE_COMBOBOX = 'ComboBox'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
@@ -229,39 +243,38 @@ class GussetConnection(Connection):
 
         options_list = []
 
-        t16 = (KEY_MODULE, KEY_DISP_GUSSET, TYPE_MODULE, None, None)
+        t16 = (KEY_MODULE, KEY_DISP_GUSSET, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
-        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t1)
 
-        t2 = (KEY_MEMBER_COUNT, KEY_DISP_MEMBER_COUNT, TYPE_COMBOBOX, None, VALUES_MEM_COUNT)
+        t2 = (KEY_MEMBER_COUNT, KEY_DISP_MEMBER_COUNT, TYPE_COMBOBOX, VALUES_MEM_COUNT, True, 'No Validator')
         options_list.append(t2)
 
-        t3 = (KEY_IMAGE, None, TYPE_IMAGE, None, "./ResourceFiles/images/sample_gusset.png")
+        t3 = (KEY_IMAGE, None, TYPE_IMAGE, "./ResourceFiles/images/sample_gusset.png", True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, None, VALUES_SEC_PROFILE)
+        t4 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE, True, 'No Validator')
         options_list.append(t4)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, None, VALUES_SECSIZE)
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, VALUES_SECSIZE, True, 'No Validator')
         options_list.append(t4)
 
-        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, None, VALUES_MATERIAL)
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
 
-        t6 = (None, DISP_TITLE_LOADS, TYPE_TITLE, None, None)
+        t6 = (None, DISP_TITLE_LOADS, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t6)
 
-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, VALUES_AXIAL)
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, VALUES_AXIAL, True, 'Int Validator')
         options_list.append(t8)
 
-        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
+        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t9)
 
-        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, None, VALUES_D)
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX_CUSTOMIZED, VALUES_D, True, 'No Validator')
         options_list.append(t10)
-
 
         return options_list
 
@@ -378,6 +391,48 @@ class GussetConnection(Connection):
             'grade': 8.8,
             'number of bolts': 4}
 
+    def output_values(self, flag):
+        '''
+        Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
+        '''
+
+        # @author: Umair
+
+        out_list = []
+
+        t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
+        out_list.append(t1)
+
+        t2 = (
+        KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '',
+        True)
+        out_list.append(t2)
+
+        t3 = (
+        KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_GRD_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_grade_provided if flag else '',
+        True)
+
+        out_list.append(t3)
+
+        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
+              round(self.bolt.bolt_shear_capacity / 1000, 2) if flag else '', True)
+        out_list.append(t4)
+
+        bolt_bearing_capacity_disp = ''
+        if flag is True:
+            if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
+                bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+
+        t5 = (
+        KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '', True)
+        out_list.append(t5)
+
+        t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX,
+              round(self.bolt.bolt_capacity / 1000, 2) if flag else '', True)
+        out_list.append(t6)
+
+        return out_list
+
     def save_design(self,popup_summary):
 
         self.report_input = \
@@ -413,6 +468,9 @@ class GussetConnection(Connection):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_3D_image)
+
+    def show_error_message(self):
+        QMessageBox.about(self, 'information', "Your message!")
 
 class MainController(QMainWindow):
     closed = pyqtSignal()

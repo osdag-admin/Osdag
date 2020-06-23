@@ -1,6 +1,7 @@
 from Common import *
 from utils.common.load import Load
 from utils.common.component import *
+from utils.common.Section_Properties_Calculator import *
 
 class Main():
 
@@ -218,8 +219,8 @@ class Main():
             em_y = sec_prop.calc_ElasticModulusZy(D, B, t_w, t_f)
             pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
             pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
-            I_t = sec_prop.calc_torsion_const(D,B,t_w,t_f)
-            I_w = sec_prop.calc_warping_const(D,B,t_w, t_f)
+            I_t = sec_prop.calc_TorsionConstantIt(D,B,t_w,t_f)
+            I_w = sec_prop.calc_WarpingConstantIw(D,B,t_w, t_f)
             if sl != 90:
                 image = VALUES_IMG_BEAM[0]
             else:

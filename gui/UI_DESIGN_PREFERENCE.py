@@ -168,6 +168,11 @@ class Window(QDialog):
                                      KEY_DISP_MOD_OF_ELAST, KEY_DISP_MOD_OF_RIGID, 'Source']:
                             line.setReadOnly(True)
                             self.do_not_clear_list.append(line)
+                        if main.module_name(main) in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED] and lable in \
+                                [KEY_DISP_LOCATION, KEY_DISP_SEC_PROFILE]:
+                            line.setReadOnly(True)
+                            self.do_not_clear_list.append(line)
+
                         r += 1
 
                     if type == TYPE_COMBOBOX:

@@ -154,5 +154,6 @@ class Ui_MainWindow(object):
         self.comboBox_help.setItemText(1, _translate("MainWindow", "Video Tutorials"))
         self.comboBox_help.setItemText(2, _translate("MainWindow", "Design Examples"))
         self.comboBox_help.setItemText(3, _translate("MainWindow", "Ask Us a Question"))
-        self.comboBox_help.setItemText(4, _translate("MainWindow", "About Osdag"))
+        self.comboBox_help.setItemText(4, _translate("MainWindow", "Check for Update"))
+        self.comboBox_help.setItemText(5, _translate("MainWindow", "About Osdag"))
 import gui.osdagMainPageIcons_rc

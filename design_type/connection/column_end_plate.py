@@ -130,9 +130,6 @@ class ColumnEndPlate(MomentConnection):
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
         design_input.append(t3)
 
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
-        design_input.append(t3)
-
         t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
         design_input.append(t4)
 
@@ -1961,20 +1958,21 @@ class ColumnEndPlate(MomentConnection):
               get_pass_fail(self.n_bf, self.n_bf, relation='leq'))
         self.report_check.append(t1)
 
-        t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+        t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
               self.pitch,
               get_pass_fail(self.bolt.min_pitch, self.pitch, relation='lesser'))
         self.report_check.append(t1)
-        t1 = (DISP_MAX_PITCH ,max_pitch(self.plate.thickness),
+        t1 = (DISP_MAX_PITCH , cl_10_2_3_1_max_spacing(self.plate.thickness),
               self.pitch,
               get_pass_fail(self.bolt.max_spacing, self.pitch, relation='greater'))
         self.report_check.append(t1)
-        t3 = (DISP_MIN_END, min_edge_end(self.bolt.dia_hole, self.bolt.edge_type),
+        t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.dia_hole, self.bolt.edge_type),
               self.end_dist,
               get_pass_fail(self.bolt.min_end_dist, self.end_dist,
                             relation='lesser'))
         self.report_check.append(t3)
-        t4 = (DISP_MAX_END, max_edge_end(self.plate.fy, self.plate_thickness_provided),
+        t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences),
               self.end_dist,
               get_pass_fail(self.bolt.max_end_dist, self.end_dist,
                             relation='greater'))

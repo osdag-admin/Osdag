@@ -1,10 +1,31 @@
-# -*- coding: utf-8 -*-
+'''
+Section Type and Template Description:
+1) I-Section
+        1.1) Side by Side
+2) Channels Section
+        2.1) Face to Face
+        2.2) Back to Back
+3) Angles Section
+        3.1) Star Configuration with 4 Angles
+        3.2) Star Configuration with 2 Angles
+        3.3) Two angles on same side
+        3.4) Two angles on opposite sides
+        3.5) Box with 4 Angles
+4) Built-up Section
+        4.1) I-Section with stiffening
+        4.2) I-Section from Plates
+        4.3) Built-up SHS.RHS
+5) Compound Section
+        5.1) I-Section on one flange
 
-# Form implementation generated from reading ui file '.\ui_OsdagSectionModeller.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
+# Integers are Section Types
+# Floating-Points are Section Templates
+#For Example:
+Two angles on opposite side will be:
+-Section_Type_Index =3
+-Section_Template_Index =4
+
+'''
 
 
 import math
@@ -439,6 +460,9 @@ class Ui_OsdagSectionModeller(object):
                 self.importBtn.clicked.connect(self.import_to_modeller)
         
         def set_validations(self):
+                '''
+                Mehtod to set Validations for Section Properties and Section Designation
+                '''
                 self.section_designation_lineEdit.setValidator(QtGui.QRegExpValidator(
             QtCore.QRegExp("[a-zA-Z0-9@_]*"), self.section_designation_lineEdit
         ))
@@ -494,7 +518,7 @@ class Ui_OsdagSectionModeller(object):
         
         def disable_usability(self,toggle):
                 '''
-                Method to Disable/Enable Section Properties and Buttons
+                Method to Disable/Enable Section Properties and Save and Export Buttons
                 '''
                 self.section_properties.setDisabled(toggle)
                 self.saveBtn.setDisabled(toggle)
@@ -506,15 +530,18 @@ class Ui_OsdagSectionModeller(object):
                 and retrieve saved values for section parameters
                 '''
                 self.Parameters={}
+                self.section_designation_lineEdit.clear()
                 self.clear_properties()
                 display.EraseAll()
                 self.disable_usability(True)
         
         def type_change(self):
                 '''
-                Method to handle Section Type change
+                Method to handle Section Type change 
+                and change Section Template Combobox accordingly
                 '''
                 index_type=self.section_type_combobox.currentIndex()
+                self.section_designation_lineEdit.clear()
                 self.clear_properties()
                 display.EraseAll()
                 self.disable_usability(True)                
@@ -540,6 +567,8 @@ class Ui_OsdagSectionModeller(object):
                 self.section_template_combobox.clear()
                 self.section_template_combobox.addItem('--------Select Template--------')
                 self.section_template_combobox.addItems(templates)
+
+                ########################## Loading Tooltip on hover over template ####################################
                 if(index_type==1):
                         self.section_template_combobox.setItemData(1, "<img src='./ResourceFiles/images/SectionModeller/Main/1.1.png'>",QtCore.Qt.ToolTipRole)
                 elif(index_type==2):
@@ -557,9 +586,13 @@ class Ui_OsdagSectionModeller(object):
                         self.section_template_combobox.setItemData(3, "<img src='./ResourceFiles/images/SectionModeller/Main/4.3.png'>",QtCore.Qt.ToolTipRole)
                 elif(index_type==5):
                         self.section_template_combobox.setItemData(1, "<img src='./ResourceFiles/images/SectionModeller/Main/5.1.png'>",QtCore.Qt.ToolTipRole)
+                ##########################################################################################################
                 self.section_template_combobox.blockSignals(False)
         
         def open_section_parameters(self):
+                '''
+                Method to handle Enter/Edit Parameters button
+                '''
                 index_type=self.section_type_combobox.currentIndex()
                 index_template=self.section_template_combobox.currentIndex()
                 self.SectionParameters=Ui_SectionParameters(index_type,index_template)
@@ -576,7 +609,7 @@ class Ui_OsdagSectionModeller(object):
                         self.SectionParameters.parameterText_1.clear()
                         self.SectionParameters.parameterText_1.addItems(connectdb('Angles'))
 
-
+                ########################## Retrieving Section Parameters on Dialog close and reopen ###################
                 if(self.Parameters!={}):
                         for child in self.Parameters:
                                 self.SectionParameters.textBoxVisible[child]=self.Parameters[child]
@@ -585,7 +618,7 @@ class Ui_OsdagSectionModeller(object):
                                 else:
                                         exec('self.SectionParameters.'+child+'.setText('+repr(self.Parameters[child][1])+')')
                 
-                
+                #############################################################################################################
                 if(index_type!=0 and index_template!=0):
                         self.SectionParameters.exec()
                         self.Parameters=self.SectionParameters.textBoxVisible
@@ -599,6 +632,9 @@ class Ui_OsdagSectionModeller(object):
                         
         
         def create_cad_model(self,index_type,index_template,parameters):
+                '''
+                Method to Specify and create CAD model template-wise
+                '''
                 origin = numpy.array([0.,0.,0.])
                 uDir = numpy.array([1.,0.,0.])
                 shaftDir = wDir = numpy.array([0.,0.,1.])
@@ -1281,6 +1317,9 @@ class Ui_OsdagSectionModeller(object):
                 self.create_cad_model(index_type,index_template,parameters)
         
         def init_display(self):
+                '''
+                Method to initialize the OCC Display
+                '''
                 from OCC.Display.backend import load_backend, get_qt_modules
                 global display
                 from OCC.Display.qtDisplay import qtViewer3d
@@ -1310,6 +1349,11 @@ class Ui_OsdagSectionModeller(object):
                 return(Properties) 
         
         def import_to_modeller(self):
+                '''
+                Method to Handle Import button click. 
+                This file helps select .osm files in the system and import them directly into the 
+                modeller and automatically creates run all processes from the .osm file.
+                '''
                 fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Open Section Design",None, "InputFiles(*.osm)")
                 if(fileName==''):
                         return
@@ -1350,6 +1394,10 @@ class Ui_OsdagSectionModeller(object):
 
 
         def save_to_osm(self):
+                '''
+                Method to save Section Modeller Design data to .osm file 
+                of desired location.
+                '''
                 designation=str(self.section_designation_lineEdit.text())
                 if(designation==''):
                         QtWidgets.QMessageBox.critical(QtWidgets.QMessageBox(),'Error','Please provide a Section Designation for the designed section and try again.')

@@ -213,6 +213,7 @@ TYPE_TAB_2 = "TYPE_TAB_2"
 TYPE_TAB_3 = "TYPE_TAB_3"
 TYPE_SECTION = 'Popup_Section'
 TYPE_CUSTOM_MATERIAL = 'New_Material_Popup'
+TYPE_CUSTOM_SECTION = 'New_Section_Popup'
 TYPE_ENABLE_DISABLE = 'Enable/Disable'
 TYPE_CHANGE_TAB_NAME = 'Change tab_name'
 TYPE_REMOVE_TAB = 'Remove tab'

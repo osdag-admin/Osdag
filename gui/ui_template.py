@@ -1350,6 +1350,9 @@ class Window(QMainWindow):
             elif typ == TYPE_CUSTOM_MATERIAL:
                 if val:
                     self.new_material_dialog()
+            elif typ == TYPE_CUSTOM_SECTION:
+                if val:
+                    self.import_custom_section()
 
             elif typ == TYPE_LABEL:
                 k2.setText(val)
@@ -1834,6 +1837,19 @@ class Window(QMainWindow):
                     dialog.resize(350, 300)
                 #dialog.setFixedSize(dialog.size())
                 dialog.exec()
+    
+    def import_custom_section(self):
+        '''
+        Custom Section Importing
+        Fetches data from osm file and returns as a dictionary
+        '''
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Open Section Design",None, "InputFiles(*.osm)")
+        if(fileName==''):
+            return
+        with open(fileName,'r') as file:
+            parameters=eval(file.read())
+        SecProfile=self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText()
+        return parameters
 
     def new_material_dialog(self):
         dialog = QtWidgets.QDialog()

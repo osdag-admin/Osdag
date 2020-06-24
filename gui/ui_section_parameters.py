@@ -174,9 +174,9 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         QtCore.QMetaObject.connectSlotsByName(self)
         self.update_parameters(index_type,index_template)
         self.saveBtn.clicked.connect(lambda:self.save_parameters(index_type,index_template))
-        self.textBoxVisible={}
-        #self.setFixedSize(self.sizeHint())    
-        self.apply_character_validations()   
+        self.textBoxVisible={} 
+        self.apply_character_validations()  
+        self.set_image_tooltip(index_type,index_template) 
 
     def apply_character_validations(self):
         '''
@@ -217,15 +217,34 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.textBoxVisible['parameterText_6']=[self.findChild(QtWidgets.QLabel,"parameterLabel_6").text().strip()[:-1],self.findChild(QtWidgets.QLineEdit,'parameterText_6').text()]
         if(self.findChild(QtWidgets.QLabel,"parameterLabel_7").isVisible()):
             self.textBoxVisible['parameterText_7']=[self.findChild(QtWidgets.QLabel,"parameterLabel_7").text().strip()[:-1],self.findChild(QtWidgets.QLineEdit,'parameterText_7').text()]
-        flag=False
+        flag="ErrorType"
         for parameter in self.textBoxVisible: 
             if(self.textBoxVisible[parameter][1]=='' or 'Select' in self.textBoxVisible[parameter][1] or 'select' in self.textBoxVisible[parameter][1]):
-                flag=True
-        if(flag):
+                flag='Nopara'
+            elif(self.textBoxVisible[parameter][1].count('.')>1 or '.' == self.textBoxVisible[parameter][1][-1]):
+                flag='DecimalProb'
+            
+        if(flag=='NoPara'):
             QtWidgets.QMessageBox.critical(self,'Save Error','All Parameters not entered/selected')
             self.textBoxVisible={}
             return
-############################ Validations ##############################
+        elif(flag=='DecimalProb'):
+            QtWidgets.QMessageBox.critical(self,'Save Error','Ill-positioned or extra decimals found.')
+            self.textBoxVisible={}
+            return
+
+        error,string=self.func_for_numerical_validations(index_type,index_template)
+        if(error==True):
+            QtWidgets.QMessageBox.critical(self, "Error", f"Following condition(s) is/are not satisfied:\n\n{string}") 
+            self.textBoxVisible={}     
+            return  
+
+        self.close()
+    
+    def func_for_numerical_validations(self,index_type,index_template):
+        '''
+        Method to validate template-wise Section Parameters
+        '''
         error=False
         string=""
         conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -352,13 +371,57 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             if(s>=comp):
                 error=True
                 string+='S < '+str(comp)+'\n'
-        if(error==True):
-            QtWidgets.QMessageBox.critical(self, "Error", f"Following condition(s) is/are not satisfied:\n\n{string}") 
-            self.textBoxVisible={}     
-            return  
-
-        self.close()
+        return error,string
     
+    def set_image_tooltip(self,index_type,index_template):
+        '''
+        Method to set Tooltip Image for each Section Parameter(Template-wise)
+        '''
+        if(index_type==1):
+            self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/1.1(1).png'>")
+            self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/1.1(2).png'>")
+            self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/1.1(3).png'>")
+        elif(index_type==2):
+            if(index_template==1):
+                self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/2.1(1).png'>")
+                self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/2.1(2).png'>")
+                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/2.1(3).png'>")
+            elif(index_template==2):
+                self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/2.2(1).png'>")
+                self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/2.2(2).png'>")
+                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/2.2(3).png'>")
+        elif(index_type==3):
+            if(index_template==1):
+                self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.1(2).png'>")
+                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.1(1).png'>")
+            elif(index_template==2):
+                self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.2(1).png'>")
+                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.2(2).png'>")
+            elif(index_template==3):
+                self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.3(1).png'>")
+                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.3(2).png'>")
+            elif(index_template==4):
+                self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.4(1).png'>")
+                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.4(2).png'>")
+            elif(index_template==5):
+                self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.5(1).png'>")
+                self.parameterText_4.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.5(2).png'>")
+                self.parameterText_5.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.5(4).png'>")
+                self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.5(3).png'>")
+                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.5(5).png'>")
+        elif(index_type==4):
+            if(index_template==1):
+                self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.1.1(1).png'>")
+                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.1.1(2).png'>")
+            elif(index_template==2):
+                self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.1.2(2).png'>")
+                self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.1.2(1).png'>")
+            elif(index_template==3):
+                self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.2.1(1).png'>")
+                self.parameterText_4.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.2.1(2).png'>")
+        elif(index_type==5):
+            self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/5.1.1(1).png'>")
+
     def update_parameters(self,index_type,index_template):
         '''
         Method for Updation of field in Section Parameters Dialog

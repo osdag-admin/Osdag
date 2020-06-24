@@ -234,32 +234,37 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             t,B=map(float,cursor.fetchall()[0])
             s=float(self.parameterText_3.text())
             l=float(self.parameterText_6.text())
-            comp=(s+(2*((B/2)+(2*(t/2)))))         
-            if(s>=l/2):
+            comp1=round(l/2,1)
+            comp2=round((s+(2*((B/2)+(2*(t/2))))),1)
+            if(s>=comp1):
                 error=True
-                string+='S < '+str(l/2)+'\n'
-            if(l!=comp):
+                string+='S < '+str(comp1)+'\n'
+            if(l!=comp2):
                 error=True
-                string+='l = '+str(comp)+'\n\n ** Try changing l to the value suggested'
+                string+='l = '+str(comp2)+'\n\n ** Try changing l to the value suggested'
         elif(index_type==2):
             cursor = conn.execute("SELECT tw,B FROM Channels where Designation="+repr(self.parameterText_1.currentText()))
             t,B=map(float,cursor.fetchall()[0])
             s=float(self.parameterText_3.text())
-            l=float(self.parameterText_6.text())
+            l=float(self.parameterText_6.text())            
             if(index_template==1):
-                if(s>l-(2*t)):
+                comp1=round(l-(2*t),1)
+                comp2=round(s+(2*t),1)
+                if(s>comp1):
                     error=True
-                    string+='S <= '+str(l-(2*t))+'\n'
-                if(l!=s+(2*t)):
+                    string+='S <= '+str(comp1)+'\n'
+                if(l!=comp2):
                     error=True
-                    string+='l = '+str(s+(2*t))+'\n\n ** Try changing l to the value suggested'
+                    string+='l = '+str(comp2)+'\n\n ** Try changing l to the value suggested'
             elif(index_template==2):
-                if(s>l-(2*B)):
+                comp1=round(l-(2*B),1)
+                comp2=round(s+(2*B),1)
+                if(s>comp1):
                     error=True
-                    string+='S <= '+str(l-(2*B))+'\n'
-                if(l!=s+(2*B)):
+                    string+='S <= '+str(comp1)+'\n'
+                if(l!=comp2):
                     error=True
-                    string+='l = '+str(s+(2*B))+'\n\n ** Try changing l to the value suggested'
+                    string+='l = '+str(comp2)+'\n\n ** Try changing l to the value suggested'
         elif(index_type==3):
             if(index_template<5):
                 cursor = conn.execute("SELECT a FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
@@ -304,9 +309,10 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 P=float(self.parameterText_6.text())
                 Q=float(self.parameterText_7.text())
                 Db=D-(2*T)
-                if(P>=Db/2):
+                comp=round(Db/2,1)
+                if(P>=comp):
                     error=True
-                    string+='P < '+str(Db/2)+'\n'
+                    string+='P < '+str(comp)+'\n'
                 if(Q<t):
                     error=True
                     string+=str(T)+' => Q >= '+str(t)+'\n'
@@ -319,13 +325,14 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 s=float(self.parameterText_3.text())
                 d=float(self.parameterText_6.text())
                 Db=D-(2*T)
-                comp=round((B-(2*T)-t)/2,1)
-                if(s!=(Db-t)/2):
+                comp1=round((Db-t)/2,1)
+                comp2=round((B-(2*T)-t)/2,1)
+                if(s!=comp1):
                     error=True
-                    string+='S = '+str((Db-t)/2)+'\n'
-                if(d!=comp):
+                    string+='S = '+str(comp1)+'\n'
+                if(d!=comp2):
                     error=True
-                    string+='d = '+str(comp)+'\n'
+                    string+='d = '+str(comp2)+'\n'
             elif(index_template==3):
                 cursor = conn.execute("SELECT B FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
                 B=float(cursor.fetchone()[0])
@@ -341,9 +348,10 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             cursor = conn.execute("SELECT D FROM Channels where Designation="+repr(self.parameterText_2.currentText()))
             d=float(cursor.fetchone()[0])
             s=float(self.parameterText_3.text())
-            if(s>=d/2):
+            comp=round(d/2,1)
+            if(s>=comp):
                 error=True
-                string+='S < '+str(d/2)+'\n'
+                string+='S < '+str(comp)+'\n'
         if(error==True):
             QtWidgets.QMessageBox.critical(self, "Error", f"Following condition(s) is/are not satisfied:\n\n{string}") 
             self.textBoxVisible={}     

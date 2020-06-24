@@ -11,6 +11,7 @@ import math
 import numpy
 import sys
 import os
+import pprint
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Common import *
 from gui.ui_section_parameters import Ui_SectionParameters
@@ -401,6 +402,13 @@ class Ui_OsdagSectionModeller(object):
                 self.horizontalLayout_25.setObjectName("horizontalLayout_25")
                 spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
                 self.horizontalLayout_25.addItem(spacerItem3)
+                self.importBtn = QtWidgets.QPushButton(Dialog)
+                font = QtGui.QFont()
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.importBtn.setFont(font)
+                self.importBtn.setObjectName("importBtn")
+                self.horizontalLayout_25.addWidget(self.importBtn)
                 self.saveBtn = QtWidgets.QPushButton(Dialog)
                 font = QtGui.QFont()
                 font.setFamily("Segoe UI")
@@ -427,6 +435,8 @@ class Ui_OsdagSectionModeller(object):
                 self.disable_usability(True)
                 self.parametersBtn.clicked.connect(self.open_section_parameters)
                 self.exportBtn.clicked.connect(self.export_to_pdf)
+                self.saveBtn.clicked.connect(self.save_to_osm)
+                self.importBtn.clicked.connect(self.import_to_modeller)
         
         def set_validations(self):
                 self.section_designation_lineEdit.setValidator(QtGui.QRegExpValidator(
@@ -1292,47 +1302,81 @@ class Ui_OsdagSectionModeller(object):
                 for the currently selected Type and Template,
                 in a dictionary
                 '''
-                children=[]
-                labels=[
-                        'Area, a(cm²)',
-                        'Moment of Inertia',
-                        'I_zz(cm4)',
-                        'I_yy(cm4)',
-                        'Radius of Gyration',
-                        'r_zz(cm)',
-                        'r_yy(cm)',
-                        'Centriod',
-                        'c_z(cm)',
-                        'c_y(cm)',
-                        'Plastic Section modulus',
-                        'Z_pz(cm³)',
-                        'Z_py(cm³)',
-                        'Elastic Section modulus',
-                        'Z_zz(cm³)',
-                        'Z_yy(cm³)',
-                        ]
-                for child in self.section_properties.findChildren(QtWidgets.QLineEdit):
-                        children.append(child.text())
-                Properties=[
-                        (labels[0],children[0]),
-                        (labels[1],""),
-                        (labels[2],children[1]),
-                        (labels[3],children[2]),
-                        (labels[4],""),
-                        (labels[5],children[3]),
-                        (labels[6],children[4]),
-                        (labels[7],""),
-                        (labels[8],children[5]),
-                        (labels[9],children[6]),
-                        (labels[10],""),
-                        (labels[11],children[7]),
-                        (labels[12],children[8]),
-                        (labels[13],""),
-                        (labels[14],children[9]),
-                        (labels[15],children[10]),
-
-                ]
+                symbols=['A','Izz','Iyy','Rzz','Ryy','Cz','Cy','Zpz','Zpy','Zzz','Zyy']
+                Properties={}
+                
+                for child,symbol in zip(self.section_properties.findChildren(QtWidgets.QLineEdit),symbols):
+                        Properties[symbol]=child.text()                
                 return(Properties) 
+        
+        def import_to_modeller(self):
+                fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Open Section Design",None, "InputFiles(*.osm)")
+                if(fileName==''):
+                        return
+                reply=QtWidgets.QMessageBox.question(QtWidgets.QMessageBox(),'Alert!','Further proceedings will lead to a loss of the current unsaved data. Do you wish to continue?',QtWidgets.QMessageBox.Yes,QtWidgets.QMessageBox.No)
+                if(reply==QtWidgets.QMessageBox.No):
+                        return
+                with open(fileName,'r') as file:
+                        parameters=eval(file.read())
+                index_type,index_template=parameters['Section_Type'],parameters['Section_Template']
+                self.section_type_combobox.setCurrentIndex(index_type)
+                self.section_template_combobox.setCurrentIndex(index_template)
+                self.section_designation_lineEdit.setText(parameters['Section_Designation'])
+                self.Parameters=parameters['Section_Parameters']
+                self.SectionParameters=Ui_SectionParameters(index_type,index_template)
+
+                if(index_type in [1,4,5]):
+                        self.SectionParameters.parameterText_1.clear()
+                        self.SectionParameters.parameterText_1.addItems(connectdb('Columns'))
+                if(index_type==5):
+                        self.SectionParameters.parameterText_2.clear()
+                        self.SectionParameters.parameterText_2.addItems(connectdb('Channels'))
+                elif(index_type==2):
+                        self.SectionParameters.parameterText_1.clear()
+                        self.SectionParameters.parameterText_1.addItems(connectdb('Channels'))
+                elif(index_type==3):
+                        self.SectionParameters.parameterText_1.clear()
+                        self.SectionParameters.parameterText_1.addItems(connectdb('Angles'))
+
+                for child in self.Parameters:
+                        self.SectionParameters.textBoxVisible[child]=self.Parameters[child]                        
+                        if(child=='parameterText_1' or child=='parameterText_2'):
+                                exec('self.SectionParameters.'+child+'.setCurrentText('+repr(self.Parameters[child][1])+')')
+                        else:
+                                exec('self.SectionParameters.'+child+'.setText('+repr(self.Parameters[child][1])+')')
+
+                self.update_section_properties(index_type,index_template)
+                self.disable_usability(False)
+
+
+        def save_to_osm(self):
+                designation=str(self.section_designation_lineEdit.text())
+                if(designation==''):
+                        QtWidgets.QMessageBox.critical(QtWidgets.QMessageBox(),'Error','Please provide a Section Designation for the designed section and try again.')
+                        return
+                else:
+                        reply=QtWidgets.QMessageBox.question(QtWidgets.QMessageBox(),'INFO','The File saves by the same name as the Section Designation.Click Yes to Continue or No and change the Section Designation.',QtWidgets.QMessageBox.Yes,QtWidgets.QMessageBox.No)
+                if(reply==QtWidgets.QMessageBox.No):
+                        return
+                else:
+                        folder = QtWidgets.QFileDialog.getExistingDirectory(None, "Select a Folder")
+                        if(os.path.isfile(folder+'/'+designation+'.osm')):
+                                QtWidgets.QMessageBox.critical(QtWidgets.QMessageBox(),'Error','A file with the same name exists in the provided folder.')
+                                return
+                        else:
+                                parameters={}
+                                parameters['Section_Type']=self.section_type_combobox.currentIndex()
+                                parameters['Section_Template']=self.section_template_combobox.currentIndex()
+                                parameters['Section_Parameters']=self.Parameters
+                                parameters['Section_Designation']=designation
+                                parameters['Section_Properties']=self.get_section_properties()
+                                
+                                with open(folder+'/'+designation+'.osm','w') as file:
+                                        file.write(pprint.pformat(parameters))    
+                                QtWidgets.QMessageBox.information(QtWidgets.QMessageBox(),'INFO','File Succesfully saved.')
+                                                                                          
+
+
         
         def export_to_pdf(self):
                 '''
@@ -1401,6 +1445,7 @@ class Ui_OsdagSectionModeller(object):
                 self.PSM_label2.setText(_translate("Dialog", "<html><head/><body><p>Plastic Section modulus, Z_py(cm<span style=\" vertical-align:super;\">3</span>):</p></body></html>"))
                 self.ESM_label1.setText(_translate("Dialog", "<html><head/><body><p>Elastic Section modulus, Z_zz(cm<span style=\" vertical-align:super;\">3</span>):</p></body></html>"))
                 self.ESM_label2.setText(_translate("Dialog", "<html><head/><body><p>Elastic Section modulus, Z_yy(cm<span style=\" vertical-align:super;\">3</span>):</p></body></html>"))
+                self.importBtn.setText(_translate("Dialog","Import"))
                 self.saveBtn.setText(_translate("Dialog", "Save"))
                 self.exportBtn.setText(_translate("Dialog", "Export"))
 

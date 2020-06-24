@@ -70,9 +70,49 @@ class CreateLatex(Document):
                     table.add_hline()
                     table.add_row((bold(para[0]),para[1]))
                 table.add_hline()
+
+        labels=[
+                        'Area, a(cm²)',
+                        'Moment of Inertia',
+                        'I_zz(cm4)',
+                        'I_yy(cm4)',
+                        'Radius of Gyration',
+                        'r_zz(cm)',
+                        'r_yy(cm)',
+                        'Centriod',
+                        'c_z(cm)',
+                        'c_y(cm)',
+                        'Plastic Section modulus',
+                        'Z_pz(cm³)',
+                        'Z_py(cm³)',
+                        'Elastic Section modulus',
+                        'Z_zz(cm³)',
+                        'Z_yy(cm³)',
+                        ]
+        values=list(reportsummary['Section Properties'].values())
+        Properties=[
+                        (labels[0],values[0]),
+                        (labels[1],""),
+                        (labels[2],values[1]),
+                        (labels[3],values[2]),
+                        (labels[4],""),
+                        (labels[5],values[3]),
+                        (labels[6],values[4]),
+                        (labels[7],""),
+                        (labels[8],values[5]),
+                        (labels[9],values[6]),
+                        (labels[10],""),
+                        (labels[11],values[7]),
+                        (labels[12],values[8]),
+                        (labels[13],""),
+                        (labels[14],values[9]),
+                        (labels[15],values[10]),
+
+                ]
+
         with doc.create(Section('Section Properties')):
             with doc.create(Tabularx('|X|X|',row_height=1.2)) as table:
-                for ppty in reportsummary['Section Properties']:
+                for ppty in Properties:
                     table.add_hline()
                     table.add_row((bold(ppty[0]),ppty[1]))
                 table.add_hline()

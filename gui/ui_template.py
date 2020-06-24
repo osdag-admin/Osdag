@@ -1877,6 +1877,9 @@ class Window(QMainWindow):
                 os.mkdir(last_design_folder)
             last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
             last_design_file = os.path.join(last_design_folder, last_design_file)
+            for design_key in self.design_inputs.keys():
+                if self.design_inputs[design_key] == 'Disabled':
+                    self.design_inputs[design_key] = '0'
             with open(str(last_design_file), 'w') as last_design:
                 yaml.dump(self.design_inputs, last_design)
 

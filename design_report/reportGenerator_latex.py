@@ -97,7 +97,8 @@ class CreateLatex(Document):
                 table.add_hline()
                 for i in uiObj:
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
-                    if i == "Selected Section Details":
+                    if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST:
+                    # if type(uiObj[i]) == list:
                         continue
                     if type(uiObj[i]) == dict:
                         table.add_hline()
@@ -156,7 +157,7 @@ class CreateLatex(Document):
                         table.add_row((MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
                         table.add_hline()
             for i in uiObj:
-                if i == 'Section Size*':
+                if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST:
                     with doc.create(Subsection("List of Input Section")):
                         with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
                                 str_len = len(uiObj[i])

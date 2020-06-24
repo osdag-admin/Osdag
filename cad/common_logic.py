@@ -505,16 +505,16 @@ class CommonDesignLogic(object):
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
         nut_Ht = bolt_dia
-        notch_height = A.supported_section.notch_ht
-        notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
+        # notch_height = A.supported_section.notch_ht
+        # notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
 
         if self.connection == KEY_DISP_CLEATANGLE:
             gap = A.cleat.gap
-            notchObj = Notch(R1=notch_R1,
-                             height=notch_height,
-                             width=(A.supporting_section.flange_width / 2.0 - (
-                                     A.supporting_section.web_thickness / 2.0 + gap)) + gap,
-                             length=A.supported_section.flange_width)
+            # notchObj = Notch(R1=notch_R1,
+            #                  height=notch_height,
+            #                  width=(A.supporting_section.flange_width / 2.0 - (
+            #                          A.supporting_section.web_thickness / 2.0 + gap)) + gap,
+            #                  length=A.supported_section.flange_width)
             # print(notch_R1, notch_height, (A.supporting_section.flange_width / 2.0 -
             #                                (A.supporting_section.web_thickness / 2.0 + gap)) + gap,
             #       A.supported_section.flange_width)
@@ -610,16 +610,16 @@ class CommonDesignLogic(object):
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
         nut_Ht = bolt_dia
         # gap = A.plate.gap
-        notch_height = A.supported_section.notch_ht
-        notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
+        # notch_height = A.supported_section.notch_ht
+        # notch_R1 = max([A.supporting_section.root_radius, A.supported_section.root_radius, 10])
 
         if self.connection == KEY_DISP_CLEATANGLE:
             gap = A.cleat.gap
-            notchObj = Notch(R1=notch_R1,
-                             height=notch_height,
-                             width=(A.supporting_section.flange_width / 2.0 - (
-                                     A.supporting_section.web_thickness / 2.0 + gap)) + gap,
-                             length=A.supported_section.flange_width)
+            # notchObj = Notch(R1=notch_R1,
+            #                  height=notch_height,
+            #                  width=(A.supporting_section.flange_width / 2.0 - (
+            #                          A.supporting_section.web_thickness / 2.0 + gap)) + gap,
+            #                  length=A.supported_section.flange_width)
             # print(notch_R1, notch_height, (A.supporting_section.flange_width / 2.0 -
             #                                (A.supporting_section.web_thickness / 2.0 + gap)) + gap,
             #       A.supported_section.flange_width)

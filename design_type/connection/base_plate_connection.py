@@ -2333,6 +2333,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                             # actual bearing pressure acting on the provided area of the base plate
                             self.shear_key_stress_ColDepth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm
+                            self.shear_key_stress_ColDepth = round(self.shear_key_stress_ColDepth, 3)
 
                 if self.load_shear_minor > 0:
                     self.shear_key_along_ColWidth = 'Yes'
@@ -2365,8 +2366,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                             # actual bearing pressure acting on the provided area of the base plate
                             self.shear_key_stress_ColWidth = self.load_shear_major / (self.shear_key_len_ColDepth * self.shear_key_depth_ColDepth)  # N/mm
+                            self.shear_key_stress_ColWidth = round(self.shear_key_stress_ColWidth, 3)
 
             else:
+                self.weld_size_shear_key = 'N/A'
+
                 self.shear_key_along_ColDepth = 'No'
                 self.shear_key_len_ColDepth = 'N/A'
                 self.shear_key_depth_ColDepth = 'N/A'
@@ -2378,10 +2382,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.shear_key_stress_ColWidth = 'N/A'
 
         else:
-            # TODO
             self.combined_capacity_anchor = 'N/A'
             logger.info("There is no shear force acting on the anchor bolts")
             logger.info("No combined shear-tension check is required")
+
+            self.shear_key_required = 'No'
+            self.weld_size_shear_key = 'N/A'
+
+            self.shear_key_along_ColDepth = 'No'
+            self.shear_key_len_ColDepth = 'N/A'
+            self.shear_key_depth_ColDepth = 'N/A'
+            self.shear_key_stress_ColDepth = 'N/A'
+
+            self.shear_key_along_ColWidth = 'No'
+            self.shear_key_len_ColWidth = 'N/A'
+            self.shear_key_depth_ColWidth = 'N/A'
+            self.shear_key_stress_ColWidth = 'N/A'
 
         # validation of anchor bolt length [Reference: IS 5624:1993, Table 1]
         self.anchor_length_min = self.table1(self.anchor_bolt)[1]

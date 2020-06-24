@@ -910,12 +910,13 @@ class SeatedAngleConnection(ShearConnection):
             count = 1
             self.bolt_placement_check(self)
             self.get_bolt_capacity_updated(self)
-
             if self.bolt.bolt_capacity < self.bolt.bolt_force * 1000 and count >= 1:
                 self.bolt.bolt_PC_provided = bolt_PC_previous
+                self.get_bolt_capacity_updated(self)
                 break
             bolt_PC_previous = self.bolt.bolt_PC_provided
             count += 1
+
 
     def get_seated_width_min_max(self):
         """This function sets the max and min limits of seated angle length"""

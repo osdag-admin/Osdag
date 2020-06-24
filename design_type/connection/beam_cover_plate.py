@@ -124,9 +124,6 @@ class BeamCoverPlate(MomentConnection):
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
         design_input.append(t3)
 
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
-        design_input.append(t3)
-
         t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
         design_input.append(t5)
 
@@ -375,6 +372,9 @@ class BeamCoverPlate(MomentConnection):
     def flangecapacity(self, flag):
 
         flangecapacity = []
+        t99 = (None, "Block Shear in Flange & Flange plate in Axial ", TYPE_SECTION,
+               './ResourceFiles/images/beam_failure_pattern_images.png')
+        flangecapacity.append(t99)
 
         t30 =(KEY_FLANGE_TEN_CAPACITY,KEY_DISP_FLANGE_TEN_CAPACITY,TYPE_TEXTBOX,
                round(self.section.tension_capacity_flange/1000, 2) if flag else '')
@@ -394,8 +394,11 @@ class BeamCoverPlate(MomentConnection):
         return flangecapacity
 
     def webcapacity(self, flag):
-
         webcapacity = []
+        t99 = (None, "Block Shear in Web & web plate in Axial & Shear", TYPE_SECTION,
+               './ResourceFiles/images/beam_web_failure_images.png')
+        webcapacity.append(t99)
+
         t30 = (KEY_WEB_TEN_CAPACITY, KEY_DISP_WEB_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_web / 1000, 2) if flag else '')
         webcapacity.append(t30)
@@ -446,7 +449,7 @@ class BeamCoverPlate(MomentConnection):
     def flange_bolt_capacity(self,flag):
         flange_bolt_capacity =[]
 
-        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/block_shear_2.png')
+        t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/beam_spacing_flange_bolted.png')
         flange_bolt_capacity.append(t99)
         t16 = (KEY_FLANGE_BOLT_LINE, KEY_FLANGE_DISP_BOLT_LINE, TYPE_TEXTBOX,
                (self.flange_plate.bolt_line) if flag else '')
@@ -488,7 +491,8 @@ class BeamCoverPlate(MomentConnection):
 
     def web_bolt_capacity(self,flag):
         web_bolt_capacity =[]
-
+        t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/beam_spacing_web_bolted.png')
+        web_bolt_capacity.append(t99)
         t16 = (KEY_WEB_BOLT_LINE, KEY_WEB_DISP_BOLT_LINE, TYPE_TEXTBOX,
                (self.web_plate.bolt_line) if flag else '')
         web_bolt_capacity.append(t16)
@@ -2339,7 +2343,7 @@ class BeamCoverPlate(MomentConnection):
 
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         # A_vn = (height- bolts_one_line * dia_hole) * thickness
-        T_dn = 0.9 * A_vn * fu / (math.sqrt(3) *gamma_m1)
+        T_dn = 0.75 * A_vn * fu / (math.sqrt(3) *gamma_m1)
         return T_dn
     #
     # def web_force(column_d, column_f_t, column_t_w, axial_force, column_area):
@@ -2972,7 +2976,7 @@ class BeamCoverPlate(MomentConnection):
                         self.report_check.append(t2)
 
             if self.member_capacity_status == True and (self.section.tension_yielding_capacity > self.flange_force) and (len(self.flange_plate_thickness_possible) != 0):
-                t1 = ('SubSection', 'Initial web plate height check', '|p{4.5cm}|p{2.5cm}|p{7cm}|p{1.5cm}|')
+                t1 = ('SubSection', 'Initial web plate height check', '|p{3cm}|p{4.5cm}|p{5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
                 if self.preference == "Outside":
 
@@ -3022,9 +3026,9 @@ class BeamCoverPlate(MomentConnection):
 
                 t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(self.bolt_diameter_min, "d"), '')
                 self.report_check.append(t6)
-                t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min), display_prov(min_gauge, "g", row_limit), "")
+                t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt_diameter_min), display_prov(min_gauge, "g", row_limit), "")
                 self.report_check.append(t2)
-                t3 = (DISP_MIN_EDGE, min_edge_end(self.d_0_min, self.bolt.edge_type),
+                t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.d_0_min, self.bolt.edge_type),
                       self.web_bolt.min_edge_dist_round, "")
                 self.report_check.append(t3)
                 t3 = (KEY_SPACING, depth_req(self.web_bolt.min_edge_dist_round, min_gauge, row,sec ="beam"), depth_max,
@@ -3045,9 +3049,9 @@ class BeamCoverPlate(MomentConnection):
 
                 t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(self.bolt_diameter_min, "d"), '')
                 self.report_check.append(t6)
-                t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min), display_prov(min_gauge, "g", row_limit), "")
+                t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt_diameter_min), display_prov(min_gauge, "g", row_limit), "")
                 self.report_check.append(t2)
-                t3 = (DISP_MIN_EDGE, min_edge_end(self.d_0_min, self.bolt.edge_type),
+                t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.d_0_min, self.bolt.edge_type),
                       self.flange_bolt.min_edge_dist_round, "")
                 self.report_check.append(t3)
                 t3 = (KEY_SPACING, depth_req(self.flange_bolt.min_edge_dist_round, self.flange_bolt.min_pitch_round, row,sec ="beam"), depth_max,
@@ -3121,35 +3125,39 @@ class BeamCoverPlate(MomentConnection):
             self.report_check.append(t6)
             t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.flange_plate.bolts_one_line, "n_r"), '')
             self.report_check.append(t7)
-            t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+            t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.flange_plate.pitch_provided,
                   get_pass_fail(self.flange_bolt.min_pitch, self.flange_plate.pitch_provided, relation='leq'))
             self.report_check.append(t1)
-            t1 = (DISP_MAX_PITCH, max_pitch(flange_connecting_plates),
+            t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(flange_connecting_plates),
                   self.flange_plate.pitch_provided,
                   get_pass_fail(self.flange_bolt.max_spacing, self.flange_plate.pitch_provided, relation='geq'))
             self.report_check.append(t1)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.flange_plate.gauge_provided,
                   get_pass_fail(self.flange_bolt.min_gauge, self.flange_plate.gauge_provided, relation="leq"))
             self.report_check.append(t2)
-            t2 = (DISP_MAX_GAUGE, max_pitch(flange_connecting_plates),
+            t2 = (DISP_MAX_GAUGE, cl_10_2_3_1_max_spacing(flange_connecting_plates),
                   self.flange_plate.gauge_provided,
                   get_pass_fail(self.flange_bolt.max_spacing, self.flange_plate.gauge_provided, relation="geq"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_END, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
+            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.flange_bolt.dia_hole, self.bolt.edge_type),
                   self.flange_plate.end_dist_provided,
                   get_pass_fail(self.flange_bolt.min_end_dist, self.flange_plate.end_dist_provided, relation='leq'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_END, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
+            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences,
+                                                              parameter='end_dist'),
                   self.flange_plate.end_dist_provided,
                   get_pass_fail(self.flange_bolt.max_end_dist, self.flange_plate.end_dist_provided, relation='geq'))
             self.report_check.append(t4)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.flange_bolt.dia_hole, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.flange_bolt.dia_hole, self.bolt.edge_type),
                   self.flange_plate.edge_dist_provided,
                   get_pass_fail(self.flange_bolt.min_edge_dist, self.flange_plate.edge_dist_provided, relation='leq'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_EDGE, max_edge_end(self.flange_plate.fy, self.flange_plate.thickness_provided),
+            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences,
+                                                              parameter='edge_dist'),
                   self.flange_plate.edge_dist_provided,
                   get_pass_fail(self.flange_bolt.max_edge_dist, self.flange_plate.edge_dist_provided, relation="geq"))
             self.report_check.append(t4)
@@ -3253,7 +3261,6 @@ class BeamCoverPlate(MomentConnection):
 
             ############web variables###
             web_connecting_plates = [self.web_plate.thickness_provided, self.section.web_thickness]
-
             web_bolt_shear_capacity_kn = round(self.web_bolt.bolt_shear_capacity / 1000, 2)
             # web_bolt_bearing_capacity_kn = round(self.web_bolt.bolt_bearing_capacity / 1000, 2)
             web_bolt_capacity_kn = round(self.web_bolt.bolt_capacity / 1000, 2)
@@ -3283,40 +3290,44 @@ class BeamCoverPlate(MomentConnection):
             t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.web_plate.bolts_one_line, "n_r"), '')
             self.report_check.append(t7)
 
-            t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+            t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.web_plate.pitch_provided,
                   get_pass_fail(self.web_bolt.min_pitch, self.web_plate.pitch_provided, relation='leq'))
             self.report_check.append(t1)
-            t1 = (DISP_MAX_PITCH, max_pitch(web_connecting_plates),
+            t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(web_connecting_plates),
                   self.web_plate.pitch_provided,
                   get_pass_fail(self.web_bolt.max_spacing, self.web_plate.pitch_provided,
                                 relation='geq'))
             self.report_check.append(t1)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.web_plate.gauge_provided,
                   get_pass_fail(self.web_bolt.min_gauge, self.web_plate.gauge_provided, relation="leq"))
             self.report_check.append(t2)
-            t2 = (DISP_MAX_GAUGE, max_pitch(web_connecting_plates),
+            t2 = (DISP_MAX_GAUGE, cl_10_2_3_1_max_spacing(web_connecting_plates),
                   self.web_plate.gauge_provided,
                   get_pass_fail(self.flange_bolt.max_spacing, self.web_plate.gauge_provided,
                                 relation="geq"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_END, min_edge_end(self.web_bolt.dia_hole, self.bolt.edge_type),
+            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.web_bolt.dia_hole, self.bolt.edge_type),
                   self.web_plate.end_dist_provided,
                   get_pass_fail(self.web_bolt.min_end_dist, self.web_plate.end_dist_provided,
                                 relation='leq'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_END, max_edge_end(self.web_plate.fy, self.web_plate.thickness_provided),
+            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_web_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences,
+                                                              parameter='end_dist'),
                   self.web_plate.end_dist_provided,
                   get_pass_fail(self.web_bolt.max_end_dist, self.web_plate.end_dist_provided,
                                 relation='geq'))
             self.report_check.append(t4)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.web_bolt.dia_hole, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.web_bolt.dia_hole, self.bolt.edge_type),
                   self.web_plate.edge_dist_provided,
                   get_pass_fail(self.web_bolt.min_edge_dist, self.web_plate.edge_dist_provided,
                                 relation='leq'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_EDGE, max_edge_end(self.web_plate.fy, self.web_plate.thickness_provided),
+            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_web_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences,
+                                                              parameter='edge_dist'),
                   self.web_plate.edge_dist_provided,
                   get_pass_fail(self.web_bolt.max_edge_dist, self.web_plate.edge_dist_provided,
                                 relation="geq"))
@@ -3541,7 +3552,7 @@ class BeamCoverPlate(MomentConnection):
                   plate_recheck_area_weld(outerwidth=self.web_plate.height, innerwidth=None,
                                           f_tp=None, t_wp=self.web_plate.thickness_provided, conn="web",
                                           pref=None),
-                  get_pass_fail(self.Ap, self.Recheck_web_pt_area_o, relation="leq"))
+                  get_pass_fail(self.Wp, self.Recheck_web_pt_area_o, relation="leq"))
             self.report_check.append(t2)
 
 

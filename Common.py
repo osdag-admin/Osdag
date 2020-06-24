@@ -97,6 +97,9 @@ def connectdb(table_name, call_type="dropdown"):
     elif table_name == "SHS":
         cursor = conn.execute("SELECT Designation FROM SHS")
 
+    elif table_name == "CHS":
+        cursor = conn.execute("SELECT Designation FROM CHS")
+
     else:
         cursor = conn.execute("SELECT Designation FROM Columns")
     rows = cursor.fetchall()
@@ -227,6 +230,60 @@ def get_source(table_name, designation):
     source = cursor.fetchone()[0]
     return str(source)
 
+
+class MaterialValidator(object):
+    def __init__(self, material):
+        self.material = str(material)
+        self.typ = "Unknown"
+        self.fy_20 = 0
+        self.fy_20_40 = 0
+        self.fy_40 = 0
+        self.fu = 0
+        self.custom_format_flag = False
+        self.invalid_value = ""
+        self.notations = ["Fy_20", "Fy_20_40", "Fy_40", "Fu"]
+        material = self.material.split("_")
+        if len(material) == 5:
+            self.typ = material[0]
+            self.fy_20 = material[1]
+            self.fy_20_40 = material[2]
+            self.fy_40 = material[3]
+            self.fu = material[4]
+        self.values = [self.fy_20, self.fy_20_40, self.fy_40, self.fu]
+        if self.typ == "Cus":
+            for i in self.values:
+                if str(i) != "" and str(i).isdigit():
+                    self.custom_format_flag = True
+                else:
+                    self.custom_format_flag = False
+                    break
+
+    def is_already_in_db(self):
+        if self.material in connectdb("Material", call_type="popup"):
+            return True
+        else:
+            return False
+
+    def is_format_custom(self):
+        return self.custom_format_flag
+
+    def is_valid_custom(self):
+
+        min_allowed = [165, 165, 165, 165]
+        max_allowed = [1500, 1500, 1500, 1500]
+        for i in range(4):
+            if self.values[i] == "":
+                continue
+            if min_allowed[i] <= int(self.values[i]) <= max_allowed[i]:
+                pass
+            else:
+                self.invalid_value = self.notations[i]
+                break
+
+        if self.invalid_value:
+            return False
+        else:
+            return self.custom_format_flag
 
 ##########################
 # Type Keys (Type of input field, tab type etc.)
@@ -744,7 +801,7 @@ KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficien
 KEY_DISP_DP_ANCHOR_BOLT_FRICTION = 'Friction coefficient between <br>concrete and anchor bolt'
 
 
-KEY_DISP_DP_BOLT_TYPE = 'Bolt type'
+KEY_DISP_DP_BOLT_TYPE = 'Bolt tensioning type'
 
 ###################################
 # Key for Storing Shear sub-key of Load
@@ -1117,7 +1174,7 @@ KEY_BLOCKSHEARCAP_WEB_PLATE='web_plate.block_shear_capacity'
 KEY_DISP_BLOCKSHEARCAP_WEB_PLATE='Block Shear Capacity (kN)'
 KEY_SHEARRUPTURECAP_WEB_PLATE= 'web_plate.shear_rupture_capacity'
 KEY_DISP_SHEARRUPTURECAP_WEB_PLATE= 'Shear Rupture Capacity (kN)'
-KEY_WEBPLATE_SHEAR_CAPACITY_PLATE ="Section.shear_capacity_web_plate"
+KEY_WEBPLATE_SHEAR_CAPACITY_PLATE ="web_plate.shear_capacity_web_plate"
 KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE ="Web Plate Shear Capacity (kN)"
 
 
@@ -1702,7 +1759,7 @@ DETAILING_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" 
                "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
                "p, li { white-space: pre-wrap; }\n"
                "</style></head><body style=\" font-family:\'Arial\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[a- sheared or hand flame cut edges] </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">and </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[b - Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
+               "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[sheared or hand flame cut edges] </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">and </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:600;\">[Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
                "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">This gap should include the tolerance value of 5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5 mm{tolerance})</span></p>\n"
                "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"

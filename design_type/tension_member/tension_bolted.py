@@ -6,7 +6,7 @@ from utils.common.component import *
 from utils.common.material import *
 from Report_functions import *
 from utils.common.load import Load
-
+from utils.common.Section_Properties_Calculator import *
 
 import logging
 
@@ -81,7 +81,7 @@ class Tension_bolted(Member):
          """
         change_tab = []
 
-        t1 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+        t1 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL, 'Label_0'],
               [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
                'Label_7', 'Label_8', 'Label_9',
                'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
@@ -90,14 +90,14 @@ class Tension_bolted(Member):
               self.get_new_angle_section_properties)
         change_tab.append(t1)
 
-        t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3', 'Label_0'],
+        t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3'],
               ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
                'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23',
                KEY_IMAGE],
               TYPE_TEXTBOX, self.get_Angle_sec_properties)
         change_tab.append(t2)
 
-        t3 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+        t3 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE, KEY_SEC_MATERIAL,'Label_0'],
               [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_13', 'Label_14',
                'Label_4', 'Label_5',
                'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17',
@@ -106,7 +106,7 @@ class Tension_bolted(Member):
         change_tab.append(t3)
 
 
-        t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13','Label_14','Label_0'],
+        t4 = (DISP_TITLE_CHANNEL, ['Label_1', 'Label_2', 'Label_3', 'Label_13','Label_14'],
               ['Label_9', 'Label_10','Label_11', 'Label_12', 'Label_15', 'Label_16', 'Label_17','Label_19', 'Label_20', 'Label_21', 'Label_22','Label_26','Label_27', KEY_IMAGE], TYPE_TEXTBOX, self.get_Channel_sec_properties)
 
         change_tab.append(t4)
@@ -212,9 +212,6 @@ class Tension_bolted(Member):
 
         return add_buttons
 
-    def get_3d_components(self):
-        components = []
-        return components
     ####################################
     # Design Preference Functions End
     ####################################
@@ -2403,9 +2400,9 @@ class Tension_bolted(Member):
             self.report_check.append(t8)
             # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
             # self.report_check.append(t2)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided,row_limit), self.bolt.min_gauge_round, get_pass_fail(self.bolt.min_gauge, self.bolt.min_gauge_round, relation="leq"))
+            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided, row_limit), self.bolt.min_gauge_round, get_pass_fail(self.bolt.min_gauge, self.bolt.min_gauge_round, relation="leq"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
                   self.bolt.min_edge_dist_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
             self.report_check.append(t3)
             t3 = (
@@ -2416,20 +2413,20 @@ class Tension_bolted(Member):
         else:
             t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{2.5cm}|')
             self.report_check.append(t1)
-            t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt_diameter_min), "d"), '')
-            self.report_check.append(t6)
-            t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.d_0_min), "d_0"), '')
-            self.report_check.append(t8)
-            # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
+            # t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt_diameter_min), "d"), '')
+            # self.report_check.append(t6)
+            # t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.d_0_min), "d_0"), '')
+            # self.report_check.append(t8)
+            # # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
+            # # self.report_check.append(t2)
+            # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min, row_limit), min_gauge, get_pass_fail(self.bolt.min_gauge, min_gauge, relation="leq"))
             # self.report_check.append(t2)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min, row_limit), min_gauge, get_pass_fail(self.bolt.min_gauge, min_gauge, relation="leq"))
-            self.report_check.append(t2)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.d_0_min, self.bolt.edge_type),
-                  self.edge_dist_min_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
-            self.report_check.append(t3)
-            t3 = (KEY_SPACING, depth_req(self.edge_dist_min_round, self.pitch_round, row, text), depth_max,
-                  get_pass_fail(depth, depth_max, relation="lesser"))
-            self.report_check.append(t3)
+            # t3 = (DISP_MIN_EDGE, min_edge_end(self.d_0_min, self.bolt.edge_type),
+            #       self.edge_dist_min_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
+            # self.report_check.append(t3)
+            # t3 = (KEY_SPACING, depth_req(self.edge_dist_min_round, self.pitch_round, row, text), depth_max,
+            #       get_pass_fail(depth, depth_max, relation="lesser"))
+            # self.report_check.append(t3)
 
         if self.member_design_status == True and self.bolt_design_status == True:
             t1 = ('SubSection', 'Member Checks', '|p{2.5cm}|p{4.5cm}|p{7cm}|p{1.5cm}|')
@@ -2490,38 +2487,43 @@ class Tension_bolted(Member):
             self.report_check.append(t8)
 
 
-            t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area, "A_{nb}"," Ref~IS~1367-3~(2002)"), '')
+            t8 = (KEY_DISP_BOLT_AREA, " ", display_prov(self.bolt.bolt_net_area, "A_{nb}"," [Ref~IS~1367-3~(2002)]"), '')
             self.report_check.append(t8)
 
-            t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+            t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.plate.pitch_provided,
                   get_pass_fail(self.bolt.min_pitch, self.plate.pitch_provided, relation='leq'))
             self.report_check.append(t1)
-            t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
+            t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(connecting_plates),
                   self.plate.pitch_provided,
                   get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided, relation='geq'))
             self.report_check.append(t1)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.plate.gauge_provided,
                   get_pass_fail(self.bolt.min_gauge, self.plate.gauge_provided, relation="leq"))
             self.report_check.append(t2)
-            t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
+            t2 = (DISP_MAX_GAUGE, cl_10_2_3_1_max_spacing(connecting_plates),
                   self.plate.gauge_provided,
                   get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided, relation="geq"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided, relation='leq'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_END, max_edge_end(self.plate.fy,  min(connecting_plates)),
+
+            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences,
+                                                              parameter='end_dist'),
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.max_end_dist, self.plate.end_dist_provided, relation='geq'))
             self.report_check.append(t4)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
                   self.plate.edge_dist_provided,
                   get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided, relation='leq'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_EDGE, max_edge_end(self.plate.fy, min(connecting_plates)),
+            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences,
+                                                              parameter='end_dist'),
                   self.plate.edge_dist_provided,
                   get_pass_fail(self.bolt.max_edge_dist, self.plate.edge_dist_provided, relation="geq"))
             self.report_check.append(t4)

@@ -1,5 +1,6 @@
 from design_type.connection.connection import Connection
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, Section, Single_Angle_Properties
+from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection
+from utils.common.Section_Properties_Calculator import Single_Angle_Properties
 from Common import *
 from utils.common.load import Load
 from utils.common.material import Material
@@ -58,7 +59,7 @@ class ShearConnection(Connection):
             designation = str(input_dictionary[KEY_ANGLE_LIST][0])
             material_grade = str(input_dictionary[KEY_MATERIAL])
             Angle_attributes = Angle(designation,material_grade)
-            Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
+            Angle_attributes.connect_to_database_update_other_attributes(designation, material_grade)
             source = str(Angle_attributes.source)
             fu = str(Angle_attributes.fu)
             fy = str(Angle_attributes.fy)
@@ -314,7 +315,7 @@ class ShearConnection(Connection):
 
 
         Angle_attributes = Angle(designation, material_grade)
-        Angle_attributes.connect_to_database_update_other_attributes_angles(designation, material_grade)
+        Angle_attributes.connect_to_database_update_other_attributes(designation, material_grade)
         source = str(Angle_attributes.source)
         Type= str(Angle_attributes.type)
         fu = str(Angle_attributes.fu)

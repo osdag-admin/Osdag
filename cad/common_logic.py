@@ -1109,7 +1109,16 @@ class CommonDesignLogic(object):
         self.component = component
 
         self.display.EraseAll()
+        # if self.view == 'Front View':
+        #     self.display.View_Front()
+        # elif self.view = 'Side View':
+        #     self.display.View_Right()
+        # elif self.view = 'Top View':
+        #     self.display.View_Top()
+        # else:
+        #     self.display.View_Iso()
         self.display.View_Iso()
+
         self.display.FitAll()
 
         self.display.DisableAntiAliasing()
@@ -1347,7 +1356,15 @@ class CommonDesignLogic(object):
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 nutbolt = self.TObj.get_nut_bolt_array_models()
-                if self.component == "Model":  # Todo: change this into key
+                if self.component == "Member":  # Todo: change this into key
+                    osdag_display_shape(self.display, member, update=True)
+                elif self.component == "Plate":
+                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
+                    osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
+                else:
+                    connector = BRepAlgoAPI_Fuse(nutbolt, plate).Shape()
+                    shape = BRepAlgoAPI_Fuse(connector, member).Shape()
+                    self.TObj.shape = shape
                     osdag_display_shape(self.display, member, update=True)
                     osdag_display_shape(self.display, plate, color='BLUE', update=True)
                     osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)
@@ -1364,7 +1381,15 @@ class CommonDesignLogic(object):
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 welds = self.TObj.get_welded_models()
-                if self.component == "Model":  # Todo: change this into key
+                if self.component == "Member":  # Todo: change this into key
+                    osdag_display_shape(self.display, member, update=True)
+                elif self.component == "Plate":
+                    osdag_display_shape(self.display, plate, color='BLUE', update=True)
+                    osdag_display_shape(self.display, welds, color='RED', update=True)
+                else:
+                    connector = BRepAlgoAPI_Fuse(welds, plate).Shape()
+                    shape = BRepAlgoAPI_Fuse(connector, member).Shape()
+                    self.TObj.shape = shape
                     osdag_display_shape(self.display, member, update=True)
                     osdag_display_shape(self.display, plate, color='BLUE', update=True)
                     osdag_display_shape(self.display, welds, color='RED', update=True)
@@ -1555,47 +1580,124 @@ class CommonDesignLogic(object):
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component
         '''
-        # TODO: changed for saving 3dmodels for different modules, add conditions for "connector",
-        #         "cleatAngle", "seatedAngle" etc.
+
+        final_model = None
+        cadlist = []
+
         if self.mainmodule == "Shear Connection":
-            Obj = self.connectivityObj
+            if self.component == "Beam":
+                final_model = self.connectivityObj.get_beamModel()
+            elif self.component == "Column":
+                final_model = self.connectivityObj.get_columnModel()
+            elif self.component == "Plate":
+                cadlist = [self.connectivityObj.weldModelLeft, self.connectivityObj.weldModelRight,
+                           self.connectivityObj.plateModel] + self.connectivityObj.nut_bolt_array.get_models()
+            elif self.component == "cleatAngle":
+                cadlist = [self.connectivityObj.angleModel, self.connectivityObj.angleLeftModel] + \
+                          self.connectivityObj.nut_bolt_array.get_models()
+            elif self.component == "SeatAngle":
+                cadlist = [self.connectivityObj.topclipangleModel, self.connectivityObj.angleModel] + \
+                          self.connectivityObj.nut_bolt_array.get_models()
+            else:
+                cadlist = self.connectivityObj.get_models()
+
         elif self.mainmodule == "Moment Connection":
             if self.connection == KEY_DISP_BEAMCOVERPLATE or self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
-                Obj = self.CPObj
-            if self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
-                Obj = self.CPObj
+                if self.component == "Beam":
+                    if self.connection == KEY_DISP_BEAMCOVERPLATE:
+                        final_model = self.CPObj.get_only_beams_Models()
+                    else:
+                        final_model = self.CPObj.get_beam_models()
+                elif self.component == "Connector":
+                    if self.connection == KEY_DISP_BEAMCOVERPLATE:
+                        cadlist = [self.CPObj.get_flangewebplatesModel(), self.CPObj.get_nut_bolt_arrayModels()]
+                        if self.B.preference != 'Outside':
+                            cadlist.insert(1, self.CPObj.get_innetplatesModels())
+                    else:
+                        cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_welded_modules()]
+                else:
+                    cadlist = self.CPObj.get_models()
+
+            elif self.connection == KEY_DISP_COLUMNCOVERPLATE or self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
+                if self.component == "Column":
+                    if self.connection == KEY_DISP_COLUMNCOVERPLATE:
+                        final_model = self.CPObj.get_only_column_models()
+                    else:
+                        final_model = self.CPObj.get_column_models()
+                elif self.component == "Cover Plate":
+                    if self.connection == KEY_DISP_COLUMNCOVERPLATE:
+                        cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_nut_bolt_models()]
+                    else:
+                        cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_welded_modules()]
+                else:
+                    cadlist = self.CPObj.get_models()
+
             elif self.connection == KEY_DISP_COLUMNENDPLATE:
-                Obh = self.CEPObj
+                if self.component == "Column":
+                    final_model = self.CEPObj.get_column_models()
+                elif self.component == "Connector":
+                    plates = self.CEPObj.get_plate_models()
+                    welds = self.CEPObj.get_weld_models()
+                    nutBolts = self.CEPObj.get_nut_bolt_models()
+                    cadlist = [plates, welds, nutBolts]
+                else:
+                    final_model = self.CEPObj.get_models()
+
             elif self.connection == KEY_DISP_BASE_PLATE:
-                Obj = self.BPObj
+                if self.component == "Column":
+                    final_model = self.BPObj.get_column_model()
+                elif self.component == "Connector":
+                    plate = self.BPObj.get_plate_connector_models()
+                    weld = self.BPObj.get_welded_models()
+                    nut_bolt = self.BPObj.get_nut_bolt_array_models()
+                    cadlist = [plate, weld, nut_bolt]
+                else:
+                    final_model = self.BPObj.get_models()
 
-            #Todo: add tension module
+        elif self.mainmodule == "Member":
+            if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
+                if self.component == "Member":
+                    final_model = self.TObj.get_members_models()
+                elif self.component == "Plate":
+                    if self.connection == KEY_DISP_TENSION_BOLTED:
+                        cadlist = [self.TObj.get_plates_models(), self.TObj.get_nut_bolt_array_models()]
+                    else:
+                        cadlist = [self.TObj.get_plates_models(), self.TObj.get_welded_models()]
+                else:
+                    # print(type(self.TObj.shape))
+                    final_model = self.TObj.shape
+                    # cadlist = self.TObj.get_models() #TODO: get_models() in BoltedCAD.py and WeldedCAD.py is not returning anything right now.
 
-        if self.component == "Beam":
-            # final_model = self.connectivityObj.get_beamModel()
-            final_model = Obj.get_beamModel()
-
-        elif self.component == "Column":
-            # final_model = self.connectivityObj.columnModel
-            final_model = Obj.columnModel
-
-        elif self.component == "Plate":
-            # cadlist = [self.connectivityObj.weldModelLeft,
-            #            self.connectivityObj.weldModelRight,
-            #            self.connectivityObj.plateModel] + self.connectivityObj.nut_bolt_array.get_models()
-            cadlist = [Obj.weldModelLeft,
-                       Obj.weldModelRight,
-                       Obj.plateModel] + Obj.nut_bolt_array.get_models()
-            final_model = cadlist[0]
-            for model in cadlist[1:]:
-                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-        else:
-            # cadlist = self.connectivityObj.get_models()
-            cadlist = Obj.get_models()
-            if self.connection == KEY_DISP_BASE_PLATE:
-                return cadlist
+        if cadlist and len(cadlist) > 1:
             final_model = cadlist[0]
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
 
         return final_model
+
+        # if self.component == "Beam":
+        #     # final_model = self.connectivityObj.get_beamModel()
+        #     final_model = Obj.get_beamModel()
+        #
+        # elif self.component == "Column":
+        #     # final_model = self.connectivityObj.columnModel
+        #     final_model = Obj.columnModel
+        #
+        # elif self.component == "Plate":
+        #     # cadlist = [self.connectivityObj.weldModelLeft,
+        #     #            self.connectivityObj.weldModelRight,
+        #     #            self.connectivityObj.plateModel] + self.connectivityObj.nut_bolt_array.get_models()
+        #     cadlist = [Obj.weldModelLeft,
+        #                Obj.weldModelRight,
+        #                Obj.plateModel] + Obj.nut_bolt_array.get_models()
+        #     final_model = cadlist[0]
+        #     for model in cadlist[1:]:
+        #         final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        # else:
+        #     # cadlist = self.connectivityObj.get_models()
+        #     cadlist = Obj.get_models()
+        #     if self.connection == KEY_DISP_BASE_PLATE:
+        #         return cadlist
+        #     final_model = cadlist[0]
+        #     for model in cadlist[1:]:
+        #         final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()

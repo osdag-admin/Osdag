@@ -1,5 +1,5 @@
 from design_type.connection.connection import Connection
-from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, Section
+from utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column, ISection
 from Common import *
 from utils.common.load import Load
 from utils.common.material import Material
@@ -58,7 +58,7 @@ class MomentConnection(Connection, IS800_2007):
         else:
             designation = str(input_dictionary[KEY_SECSIZE])
             material_grade = str(input_dictionary[KEY_MATERIAL])
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             source = str(I_sec_attributes.source)
@@ -223,7 +223,7 @@ class MomentConnection(Connection, IS800_2007):
         fy = ''
         if material_grade != "Select Material" and designation != "Select Section":
             table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
-            I_sec_attributes = Section(designation)
+            I_sec_attributes = ISection(designation)
             I_sec_attributes.connect_to_database_update_other_attributes(table, designation, material_grade)
             fu = str(I_sec_attributes.fu)
             fy = str(I_sec_attributes.fy)
@@ -314,7 +314,7 @@ class MomentConnection(Connection, IS800_2007):
 
     # Base Plate module
     @staticmethod
-    def calculate_c(flange_width, depth, web_thickness, flange_thickness, min_area_req, anchor_hole_dia):
+    def calculate_c(flange_width, depth, web_thickness, flange_thickness, min_area_req, anchor_hole_dia, section_type='I-section'):
         """ calculate the 'projection' based on the Effective Area Method for rolled and welded columns only.
 
         Args:
@@ -324,20 +324,35 @@ class MomentConnection(Connection, IS800_2007):
             flange_thickness (float) - flange thickness of the column section (tf)
             min_area_req (float) - minimum effective bearing area (A_bc)
             anchor_hole_dia (int) - diameter of the anchor hole
+            section_type (str) - type of section used as column ['I-section' or 'SHS' or 'RHS' or 'CHS']
 
-        Returns: projection in 'mm' (float)
+        Returns: effective projection from the face of the column in 'mm' (float)
 
         Note: 1) The following expression is used to calculate a, b and c [Ref: Design of Steel Structures,
                  N. Subramanian, 2nd. edition 2018, Example 15.2]:
-                 A_bc = (bf + 2c) (h + 2c) - [{h - 2(tf + c)}(bf - tw)]
 
-              2) Adding anchor hole diameter (half on each side) to the value of the projection to avoid punching
-                 of the hole in the effective area which in turn shall avoid any stress concentration
+                    For I -section: A_bc = (bf + 2c) (h + 2c) - [{h - 2(tf + c)}(bf - tw)]
+                    For Hollow SHS & RHS: A_bc = (D + 2c) (B + 2c)  [D = Depth, B = Width]
+                    For Hollow SHS: A_bc = (3.14/4) * (OD + 2c)^2  [OD = outside diameter of the tube]
+
+                    c is the effective projection from the outer face of the respective column section
+
+              2) Adding anchor hole diameter (half on each side) to the value of the projection to avoid punching of the hole
+                 (for anchor bolts) in the effective area which in turn shall avoid any stress concentration at holes
         """
         a = 4
-        b = (4 * flange_width) + (2 * depth) - (2 * web_thickness)
-        c = (2 * flange_thickness * flange_width) + (depth * web_thickness) + (2 * flange_thickness * web_thickness) \
-            - min_area_req
+        if section_type == 'I-section':
+            b = (4 * flange_width) + (2 * depth) - (2 * web_thickness)
+            c = (2 * flange_thickness * flange_width) + (depth * web_thickness) + (2 * flange_thickness * web_thickness) \
+                - min_area_req
+
+        elif section_type == 'SHS' or 'RHS':
+            b = 2 * (depth * flange_width)  # for SHS & RHS, depth = D and flange_width = B
+            c = (depth * flange_width) - min_area_req
+
+        else:
+            b = 4 * depth  # for CHS, depth = OD (outside diameter)
+            c = depth ** 2 - ((4 * min_area_req) / math.pi)
 
         roots = np.roots([a, b, c])  # finding roots of the equation
         r_1 = roots[0]

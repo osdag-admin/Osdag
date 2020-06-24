@@ -106,9 +106,6 @@ class CleatAngleConnection(ShearConnection):
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
         design_input.append(t3)
 
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
-        design_input.append(t3)
-
         t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
         design_input.append(t5)
 
@@ -559,21 +556,19 @@ class CleatAngleConnection(ShearConnection):
             logger.error("Cleat Angle should have minimum thickness of %2.2f" % min_thickness)
 
     def member_capacity(self):
-        if self.connectivity in VALUES_CONN_1:
-            if self.supported_section.type == "Rolled":
-                length = self.supported_section.depth
-            else:
-                length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # -(2*self.supported_section.root_radius)
-        else:
-            length = self.supported_section.depth - 50.0  # TODO: Subtract notch height for beam-beam connection
+        super(CleatAngleConnection, self).member_capacity(self)
 
-        self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
+        if self.supported_section.shear_yielding_capacity / 1000 > self.load.shear_force and \
+                self.supported_section.tension_yielding_capacity / 1000 > self.load.axial_force:
 
-        print(self.supported_section.shear_yielding_capacity, self.load.shear_force,
-              self.supported_section.tension_yielding_capacity, self.load.axial_force)
+            if self.load.shear_force <= min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
+                                            40.0):
+                logger.warning(" : User input for shear force is very less compared to section capacity. "
+                               "Setting Shear Force value to 15% of supported beam shear capacity or 40kN, whichever is less.")
+                self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
+                                            40.0)
 
-        if self.supported_section.shear_yielding_capacity > self.load.shear_force:
-            logger.info("preliminary member check is satisfactory. Checking if possible Bolt Diameters are available")
+            print("preliminary member check is satisfactory. Checking available Bolt Diameters")
             self.select_bolt_dia(self)
 
         else:

@@ -151,8 +151,8 @@ class Tension_bolted(Member):
         # t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
         # design_input.append(t4)
         #
-        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
-        design_input.append(t5)
+        # t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        # design_input.append(t5)
 
         t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_CORROSIVE_INFLUENCES,KEY_DP_DETAILING_EDGE_TYPE])
         design_input.append(t5)
@@ -181,7 +181,7 @@ class Tension_bolted(Member):
         design_input.append(t1)
 
         t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
-                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP, KEY_DP_DETAILING_EDGE_TYPE,
+                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
 

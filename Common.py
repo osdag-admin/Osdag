@@ -439,7 +439,8 @@ VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
 VALUES_CONN_3 = ['Flush End Plate','Extended Both Ways']
 VALUES_ENDPLATE_TYPE = ['Flush End Plate','Extended One Way','Extended Both Ways']
-VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
+# VALUES_CONN_BP = ['Welded Column Base', 'Welded+Bolted Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
+VALUES_CONN_BP = ['Welded Column Base', 'Moment Base Plate', 'Hollow/Tubular Column Base']
 VALUES_LOCATION = ['Select Location','Long Leg', 'Short Leg', 'Web']
 
 # TODO: Every one is requested to use VALUES_ALL_CUSTOMIZED key instead of all other keys
@@ -730,6 +731,10 @@ KEY_DISP_INNERFLANGE_PLATE_LENGTH ='Length (mm)'
 KEY_OUT_STIFFENER_PLATE_FLANGE = 'Stiffener_Plate.Column_flange'
 KEY_DISP_OUT_STIFFENER_PLATE_FLANGE = 'Stiffener Plate'
 DISP_TITLE_STIFFENER_PLATE_FLANGE = 'Stiffener Plate along Column flange'
+KEY_OUT_STIFFENER_PLATE_FLANGE_LENGTH = 'Stiffener_Plate_Flange.Length'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_LENGTH = 'Length (mm)'
+KEY_OUT_STIFFENER_PLATE_FLANGE_HEIGHT = 'Stiffener_Plate_Flange.Height'
+KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_HEIGHT = 'Height (mm)'
 KEY_OUT_STIFFENER_PLATE_FLANGE_THICKNNESS = 'Stiffener_Plate_Flange.Thickness'
 KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_THICKNESS = 'Thickness (mm)'
 KEY_OUT_STIFFENER_PLATE_FLANGE_SHEAR_DEMAND = 'Stiffener_Plate_Flange.Shear_Demand'
@@ -744,6 +749,10 @@ KEY_OUT_DISP_STIFFENER_PLATE_FLANGE_MOMENT = 'Moment Capacity (kN-m)'
 KEY_OUT_STIFFENER_PLATE_ALONG_WEB = 'Stiffener_Plate.Along_Column_web'
 KEY_DISP_OUT_STIFFENER_PLATE_ALONG_WEB = 'Stiffener Plate'
 DISP_TITLE_STIFFENER_PLATE_ALONG_WEB = 'Stiffener Plate along Column web'
+KEY_OUT_STIFFENER_PLATE_ALONG_WEB_LENGTH = 'Stiffener_Plate_along_Web.Length'
+KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_LENGTH = 'Length (mm)'
+KEY_OUT_STIFFENER_PLATE_ALONG_WEB_HEIGHT = 'Stiffener_Plate_along_Web.Height'
+KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_HEIGHT = 'Height (mm)'
 KEY_OUT_STIFFENER_PLATE_ALONG_WEB_THICKNNESS = 'Stiffener_Plate_along_Web.Thickness'
 KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_THICKNESS = 'Thickness (mm)'
 KEY_OUT_STIFFENER_PLATE_ALONG_WEB_SHEAR_DEMAND = 'Stiffener_Plate_along_Web.Shear_Demand'
@@ -758,6 +767,10 @@ KEY_OUT_DISP_STIFFENER_PLATE_ALONG_WEB_MOMENT = 'Moment Capacity (kN-m)'
 KEY_OUT_STIFFENER_PLATE_ACROSS_WEB = 'Stiffener_Plate.Across_Column_web'
 KEY_DISP_OUT_STIFFENER_PLATE_ACROSS_WEB = 'Stiffener Plate'
 DISP_TITLE_STIFFENER_PLATE_ACROSS_WEB = 'Stiffener Plate across Column web'
+KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_LENGTH = 'Stiffener_Plate_across_Web.Length'
+KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_LENGTH = 'Length (mm)'
+KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_HEIGHT = 'Stiffener_Plate_across_Web.Height'
+KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_HEIGHT = 'Height (mm)'
 KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_THICKNNESS = 'Stiffener_Plate_across_Web.Thickness'
 KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_THICKNESS = 'Thickness (mm)'
 KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_SHEAR_DEMAND = 'Stiffener_Plate_across_Web.Shear_Demand'
@@ -768,6 +781,19 @@ KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND = 'Stiffener_Plate_across_Web.M
 KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT_DEMAND = 'Moment Demand (kN-m)'
 KEY_OUT_STIFFENER_PLATE_ACROSS_WEB_MOMENT = 'Stiffener_Plate_across_Web.Moment'
 KEY_OUT_DISP_STIFFENER_PLATE_ACROSS_WEB_MOMENT = 'Moment Capacity (kN-m)'
+
+
+KEY_OUT_SHEAR_KEY = 'Shear Key.Along_both_direction'
+KEY_DISP_OUT_SHEAR_KEY = 'Shear Key'
+DISP_TITLE_SHEAR_KEY = 'Shear Key along both direction'
+KEY_OUT_SHEAR_KEY_LENGTH = 'Shear_key.Length'
+KEY_OUT_DISP_SHEAR_KEY_LENGTH = 'Length (mm)'
+KEY_OUT_SHEAR_KEY_DEPTH = 'Shear_key.Depth'
+KEY_OUT_DISP_SHEAR_KEY_DEPTH = 'Depth (mm)'
+KEY_OUT_SHEAR_KEY_THICKNESS = 'Shear_key.Thickness'
+KEY_OUT_DISP_SHEAR_KEY_THICKNESS = 'Thickness (mm)'
+KEY_OUT_SHEAR_KEY_STRESS = 'Shear_key.Stress'
+KEY_OUT_DISP_SHEAR_KEY_STRESS = 'Stress (N/mm2)'
 
 #
 # DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'

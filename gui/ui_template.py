@@ -764,7 +764,7 @@ class Window(QMainWindow):
             for t in updated_list:
                 for key_name in t[0]:
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
-                    self.on_change_connect(key_changed, updated_list, data)
+                    self.on_change_connect(key_changed, updated_list, data, main)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
         self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 30))
@@ -840,6 +840,11 @@ class Window(QMainWindow):
         j = 1
         button_list = []
         maxi_width_left, maxi_width_right = -1, -1
+        self.output_title_fields = {}
+        key = None
+        current_key = None
+        fields = 0
+        title_repeat = 1
         for option in out_list:
             lable = option[1]
             output_type = option[2]
@@ -877,6 +882,8 @@ class Window(QMainWindow):
                 #r.setFixedSize(r.size())
                 out_layout2.addWidget(r, j, 2, 1, 1)
                 r.setVisible(True if option[4] else False)
+                fields += 1
+                self.output_title_fields[current_key][1] = fields
                 maxi_width_right = max(maxi_width_right, 100)    # predefined minimum width of 110 for textboxes
                 #r.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
                 # if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
@@ -897,6 +904,8 @@ class Window(QMainWindow):
                 b.resize(b.sizeHint().width(), b.sizeHint().height())
                 b.setText(v[0])
                 b.setDisabled(True)
+                fields += 1
+                self.output_title_fields[current_key][1] = fields
                 #b.setFixedSize(b.size())
                 button_list.append(option)
                 out_layout2.addWidget(b, j, 2, 1, 1)
@@ -904,6 +913,8 @@ class Window(QMainWindow):
                 #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if output_type == TYPE_TITLE:
+                key = lable
+
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
 
                 #q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
@@ -917,6 +928,14 @@ class Window(QMainWindow):
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
                 q.resize(q.sizeHint().width(), q.sizeHint().height())
+                if key:
+                    fields = 0
+                    current_key = key
+                    if key in self.output_title_fields.keys():
+                        self.output_title_fields.update({key+str(title_repeat): [q, fields]})
+                        title_repeat +=1
+                    else:
+                        self.output_title_fields.update({key: [q, fields]})
                 out_layout2.addWidget(q, j, 1, 2, 2)
                 j = j + 1
             i = i + 30
@@ -1403,10 +1422,10 @@ class Window(QMainWindow):
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
-    def on_change_connect(self, key_changed, updated_list, data):
-        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data))
+    def on_change_connect(self, key_changed, updated_list, data, main):
+        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data, main))
 
-    def change(self, k1, new, data):
+    def change(self, k1, new, data, main):
 
         """
         @author: Umair
@@ -1476,6 +1495,79 @@ class Window(QMainWindow):
                     k2.setVisible(True)
             else:
                 pass
+
+            self.output_title_change(main)
+
+    def output_title_change(self, main):
+
+        status = main.design_status
+        out_list = main.output_values(main, status)
+        key = None
+        no_field_titles = []
+        titles = []
+        title_repeat = 1
+        visible_fields = 0
+        for option in out_list:
+            if option[2] == TYPE_TITLE:
+                if key:
+                    if visible_fields == 0:
+                        if key in titles:
+                            self.output_title_fields[key+str(title_repeat)][0].setVisible(False)
+                            title_repeat += 1
+                        else:
+                            self.output_title_fields[key][0].setVisible(False)
+                    else:
+                        if key in titles:
+                            self.output_title_fields[key+str(title_repeat)][0].setVisible(True)
+                            title_repeat += 1
+                        else:
+                            self.output_title_fields[key][0].setVisible(True)
+                    titles.append(key)
+
+                key = option[1]
+                if self.output_title_fields[key][1] == 0:
+                    no_field_titles.append(key)
+                if key in no_field_titles:
+                    visible_fields = 1
+                else:
+                    visible_fields = 0
+
+            if option[2] == TYPE_TEXTBOX:
+                if self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).isVisible():
+                    visible_fields += 1
+
+            elif option[2] == TYPE_OUT_BUTTON:
+                visible_fields += 1
+
+        if visible_fields == 0:
+            if key in titles:
+                self.output_title_fields[key + str(title_repeat)][0].setVisible(False)
+                title_repeat += 1
+            else:
+                self.output_title_fields[key][0].setVisible(False)
+        else:
+            if key in titles:
+                self.output_title_fields[key + str(title_repeat)][0].setVisible(True)
+                title_repeat += 1
+            else:
+                self.output_title_fields[key][0].setVisible(True)
+
+        no_field_title = ""
+        for title in self.output_title_fields.keys():
+            if title in no_field_titles:
+                no_field_title = title
+            elif self.output_title_fields[title][0].isVisible():
+                if no_field_title in no_field_titles:
+                    no_field_titles.remove(no_field_title)
+
+        for no_field_title in no_field_titles:
+            self.output_title_fields[no_field_title][0].setVisible(False)
+
+
+
+
+
+
 
     # Function for Reset Button
     '''
@@ -1801,6 +1893,7 @@ class Window(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
+            self.output_title_change(main)
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,

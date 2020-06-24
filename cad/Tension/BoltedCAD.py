@@ -7,6 +7,7 @@ Comenced on
 import numpy
 import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 
 class TensionAngleBoltCAD(object):
@@ -262,8 +263,24 @@ class TensionAngleBoltCAD(object):
 
         return array
 
+    def get_only_members_models(self):
+        mem = self.get_members_models()
+        nut_bolts = self.get_nut_bolt_array_models()
+
+        array = BRepAlgoAPI_Cut(mem, nut_bolts).Shape()
+
+        return array
+
     def get_models(self):
-        pass
+        mem = self.get_members_models()
+        plts = self.get_plates_models()
+        nut_bolts = self.get_nut_bolt_array_models()
+
+        array = BRepAlgoAPI_Fuse(mem, plts).Shape()
+
+        array = BRepAlgoAPI_Fuse(array, nut_bolts).Shape()
+
+        return array
 
 
 class TensionChannelBoltCAD(TensionAngleBoltCAD):

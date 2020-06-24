@@ -1454,12 +1454,11 @@ class Beam(ISection):
     def min_plate_height(self):
         return 0.6 * self.depth
 
-
     def max_plate_height(self, connectivity=None, notch_height=0.0):
         if connectivity in VALUES_CONN_1 or connectivity == None:
             clear_depth = self.depth - 2 * self.flange_thickness - 2 * self.root_radius
         else:
-            clear_depth = self.depth - notch_height
+            clear_depth = self.depth - notch_height - self.flange_thickness - self.root_radius
         return clear_depth
 
 

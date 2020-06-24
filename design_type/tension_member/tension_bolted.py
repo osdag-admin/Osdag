@@ -145,10 +145,6 @@ class Tension_bolted(Member):
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
         design_input.append(t3)
 
-        # t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
-        # design_input.append(t3)
-
-
         # t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
         # design_input.append(t4)
         #
@@ -166,7 +162,7 @@ class Tension_bolted(Member):
 
         t7 = ("Connector", TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
         design_input.append(t7)
-        #
+
         return design_input
 
     def input_dictionary_without_design_pref(self):
@@ -184,7 +180,7 @@ class Tension_bolted(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
                      KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP, KEY_DP_DETAILING_EDGE_TYPE,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)

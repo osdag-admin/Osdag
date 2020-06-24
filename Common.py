@@ -409,7 +409,8 @@ KEY_ANGLE_LIST='Connector.Angle_List'
 KEY_ANGLE_SELECTED = 'Connector.Angle_Selected'
 KEY_SEATEDANGLE = 'Connector.Seated_Angle_List'
 KEY_TOPANGLE = 'Connector.Top_Angle'
-
+KEY_DISP_ANGLE_LIST = 'Seated Angle List'
+KEY_DISP_TOPANGLE_LIST = 'Top Angle List'
 
 KEY_MOMENT_MAJOR = 'Load.Moment.Major'
 KEY_MOMENT_MINOR = 'Load.Moment.Minor'
@@ -519,6 +520,8 @@ DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
 DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
 DISP_MAX_PLATE_WIDTH = 'Max. Plate Width (mm)'
 DISP_MIN_PLATE_WIDTH = 'Min. Plate Width (mm)'
+DISP_MIN_LEG_LENGTH = 'Min. Leg Length (mm)'
+DISP_MIN_WIDTH = 'Minimum Width (mm)'
 DISP_MIN_PLATE_THICK = 'Min. Plate Thickness (mm)'
 
 ######### Minimun for Flange####
@@ -623,7 +626,7 @@ KEY_DISP_TYP = 'Type'
 KEY_DISP_TYP_ANCHOR = 'Type*'
 KEY_DISP_GRD_ANCHOR = 'Grade*'
 KEY_DISP_GRD_FOOTING = 'Grade*'
-KEY_DISP_GRD = 'Grade'
+KEY_DISP_GRD = 'Property Class'
 
 KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'

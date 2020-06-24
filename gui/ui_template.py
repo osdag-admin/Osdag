@@ -1379,6 +1379,8 @@ class Window(QMainWindow):
                 for values in val:
                     k2.addItem(values)
                     k2.setCurrentIndex(0)
+                if VALUES_WELD_TYPE[1] in val:
+                    k2.setCurrentText(VALUES_WELD_TYPE[1])
                 if k2_key in RED_LIST:
                     red_list_set = set(red_list_function())
                     current_list_set = set(val)

@@ -1933,14 +1933,14 @@ class ColumnEndPlate(MomentConnection):
                                                                                  capacity=bolt_capacity_kn), '')
              self.report_check.append(t4)
         t1 = (KEY_OUT_BOLT_TENSION_CAPACITY, tension_in_bolt_due_to_axial_load_n_moment(P=round(self.factored_axial_load /1000,2),
-                                                                                        n=self.no_bolts_prov,
+                                                                                        n=self.no_bolts,
                                                                                         M=round(self.load_moment/1000,2),
                                                                                         y_max=self.y_max,
                                                                                         y_sqr=round(self.y_sqr ,2),T_b=round(self.t_b/1000 ,2)) ,
                tension_capacity_of_bolt(f_ub=self.bolt.bolt_fu,A_nb=self.bolt.bolt_net_area,T_db=round(self.bolt.bolt_tension_capacity /1000 ,2)),
                get_pass_fail(self.t_b,self.bolt.bolt_tension_capacity,relation='leq'))
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_BOLT_SHEAR,shear_force_in_bolts_near_web(V=round(self.fact_shear_load /1000 ,2),n_wb=self.n_bw_prov*2,V_sb=round(self.v_sb /1000, 2)),
+        t1 = (KEY_OUT_DISP_BOLT_SHEAR,shear_force_in_bolts_near_web(V=round(self.fact_shear_load /1000 ,2),n_wb=self.n_bw*2,V_sb=round(self.v_sb /1000, 2)),
                  round(self.bolt.bolt_capacity /1000,2),
                  get_pass_fail(round(self.v_sb/1000,2) , round(self.bolt.bolt_capacity/1000, 2) , relation='leq'))
         self.report_check.append(t1)

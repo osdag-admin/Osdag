@@ -1818,6 +1818,7 @@ class Angle(Material):
         # self.member_yield_eqn = member_yield_eqn
         # logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
 
+
     def tension_member_design_due_to_rupture_of_critical_section(self, A_nc, A_go, F_u, F_y, L_c, w, b_s, t):
         "design strength,T_dn,as governed by rupture at net section"
         "A_n = net area of the total cross-section"
@@ -1832,6 +1833,7 @@ class Angle(Material):
         "L_c = length of the end connection"
         "gamma_m0 = partial safety factor for failure in tension by yielding"
         "F_y = yield stress of the material"
+
 
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
@@ -1888,6 +1890,7 @@ class Angle(Material):
         Return:
             block shear strength of bolted connection in N (float)
 
+
         Note:
             Reference:
             IS 800:2007, cl. 6.4.1
@@ -1907,13 +1910,12 @@ class Angle(Material):
         # f_u = str(f_u)
         # gamma_m1 = str(gamma_m1)
         # gamma_m0 = str(gamma_m0)
-
         # member_block_eqn = Math(inline=True)
         # member_block_eqn.append(NoEscape(r'\begin{aligned}T_{db1} &= \frac{A_{vg} f_y}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_u}{\gamma_{m1}} \end{aligned}'))
 
+
         # member_block_eqn.append(NoEscape(r'&= \frac{' + A_vg + '*' + f_y + '}{" 1.732*' + gamma_m0 + 'r'} + &+ +'\frac{"0.9*" + A_vn + '*' + f_u + '}{'+1.732+'*' + gamma_m0 + r'} '\\'))
         # member_block_eqn.append(NoEscape(r'&= ' + memb_yield + r'\end{aligned}'))
-
         # self.member_block_eqn =member_block_eqn
         self.block_shear_capacity_axial = round(Tdb, 2)
 
@@ -1967,14 +1969,14 @@ class Angle(Material):
     def design_check_for_slenderness(self, K, L, r):
         "KL= effective length of member"
         "r = radius of gyration of member"
-
         slender = (float(K) * float(L)) / float(r)
-
         self.slenderness = round(slender, 2)
+
 
     def plastic_moment_capacty(self, beta_b, Z_p, fy):
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         self.plastic_moment_capactiy = beta_b * Z_p * fy / (gamma_m0)  # Nm # for section
+
 
     def moment_d_deformation_criteria(self, fy, Z_e):
         """
@@ -2020,7 +2022,6 @@ class HollowSection(Material):
         self.root_radius = 0.0
         self.toe_radius = 0.0
         self.source = row[15]  # IS 4923:1997
-
         conn.close()
 
 

@@ -2638,6 +2638,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if (self.load_shear_major or self.load_shear_minor) > 0:
             if self.shear_key_required == 'Yes':
                 self.weld_size_shear_key = self.shear_key_thk
+            else:
+                self.weld_size_shear_key = 'N/A'
         else:
             pass
 
@@ -3234,30 +3236,38 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 print(self.moment_capa_stiffener_across_web == 'N/A')
 
         # shear key details
-        if (self.load_shear_major or self.load_shear_minor) > 0:
-            if self.shear_key_required == 'Yes':
-                print(self.weld_size_shear_key)
+        print("Shear key details start")
 
-                if self.load_shear_major > 0:
-                    print(self.shear_key_len_ColDepth)
-                    print(self.shear_key_depth_ColDepth)
-                    print(self.shear_key_thk)
-                    print(self.shear_key_stress_ColDepth)
-                else:
-                    print(self.shear_key_len_ColWidth)
-                    print(self.shear_key_depth_ColWidth)
-                    print(self.shear_key_thk)
-                    print(self.shear_key_stress_ColWidth)
-            else:
-                self.shear_key_len_ColDepth = 'N/A'
-                self.shear_key_depth_ColDepth = 'N/A'
-                self.shear_key_stress_ColDepth = 'N/A'
+        if self.shear_key_required == 'Yes':
 
-                self.shear_key_len_ColWidth = 'N/A'
-                self.shear_key_depth_ColWidth = 'N/A'
-                self.shear_key_stress_ColWidth = 'N/A'
+            if self.load_shear_major > 0:
+                print(self.shear_key_along_ColDepth)
+                print(self.shear_key_len_ColDepth)
+                print(self.shear_key_depth_ColDepth)
+                print(self.shear_key_thk)
+                print(self.shear_key_stress_ColDepth)
+
+            if self.load_shear_minor > 0:
+                print(self.shear_key_along_ColWidth)
+                print(self.shear_key_len_ColWidth)
+                print(self.shear_key_depth_ColWidth)
+                print(self.shear_key_thk)
+                print(self.shear_key_stress_ColWidth)
+
+            print(self.weld_size_shear_key)
         else:
-            pass
+            print(self.shear_key_along_ColDepth)
+            self.shear_key_len_ColDepth = 'N/A'
+            self.shear_key_depth_ColDepth = 'N/A'
+            self.shear_key_stress_ColDepth = 'N/A'
+
+            print(self.shear_key_along_ColWidth)
+            self.shear_key_len_ColWidth = 'N/A'
+            self.shear_key_depth_ColWidth = 'N/A'
+            self.shear_key_stress_ColWidth = 'N/A'
+            print(self.weld_size_shear_key)
+
+        print("Shear key details end")
 
         # Weld
 

@@ -12,7 +12,6 @@ from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic, NoEscape
 import math
 import numpy as np
-
 from utils.common.common_calculation import *
 
 
@@ -1369,46 +1368,46 @@ class ISection(Material):
 
         self.tension_capacity = Tc
 
-    def min_rad_gyration_calc(self, key, subkey, mom_inertia_y, mom_inertia_z, area, rad_y, rad_z, rad_u=0.0, rad_v=0.0,
-                              Cg_1=0, Cg_2=0, thickness=0.0):
-
-        if key == "Channels" and subkey == "Web":
-            min_rad = min(rad_y, rad_z)
-
-        elif key == 'Back to Back Channels' and subkey == "Web":
-            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness / 2) * (Cg_1 + thickness / 2))) * 2
-            Izz = 2 * mom_inertia_z
-            I = min(Iyy, Izz)
-            min_rad = math.sqrt(I / (2 * area))
-
-        elif key == "Back to Back Angles" and subkey == 'Long Leg':
-            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness / 2) * (Cg_1 + thickness / 2))) * 2
-            Izz = 2 * mom_inertia_z
-            I = min(Iyy, Izz)
-            min_rad = math.sqrt(I / (2 * area))
-
-        elif key == 'Back to Back Angles' and subkey == 'Short Leg':
-            Izz = (mom_inertia_z + (area * (Cg_2 + thickness / 2) * (Cg_2 + thickness / 2))) * 2
-            Iyy = 2 * mom_inertia_y
-            I = min(Iyy, Izz)
-            min_rad = math.sqrt(I / (2 * area))
-
-        elif key == 'Star Angles' and subkey == 'Long Leg':
-            Iyy = (mom_inertia_y + (area * (Cg_1 + thickness / 2) * (Cg_1 + thickness / 2))) * 2
-            Izz = (mom_inertia_z + (area * Cg_2 * Cg_2)) * 2
-            I = min(Iyy, Izz)
-            min_rad = math.sqrt(I / (2 * area))
-
-        elif key == 'Star Angles' and subkey == 'Short Leg':
-            Izz = (mom_inertia_z + (area * (Cg_2 + thickness / 2) * (Cg_2 + thickness / 2))) * 2
-            Iyy = (mom_inertia_y + (area * Cg_1 * Cg_1)) * 2
-            I = min(Iyy, Izz)
-            min_rad = math.sqrt(I / (2 * area))
-
-        elif key == 'Angles' and (subkey == 'Long Leg' or subkey == 'Short Leg'):
-            min_rad = min(rad_u, rad_v)
-
-        self.min_radius_gyration = min_rad
+    # def min_rad_gyration_calc(self, key, subkey, mom_inertia_y, mom_inertia_z, area, rad_y, rad_z, rad_u=0.0, rad_v=0.0,
+    #                           Cg_1=0, Cg_2=0, thickness=0.0):
+    #
+    #     if key == "Channels" and subkey == "Web":
+    #         min_rad = min(rad_y, rad_z)
+    #
+    #     elif key == 'Back to Back Channels' and subkey == "Web":
+    #         Iyy = (mom_inertia_y + (area * (Cg_1 + thickness / 2) * (Cg_1 + thickness / 2))) * 2
+    #         Izz = 2 * mom_inertia_z
+    #         I = min(Iyy, Izz)
+    #         min_rad = math.sqrt(I / (2 * area))
+    #
+    #     elif key == "Back to Back Angles" and subkey == 'Long Leg':
+    #         Iyy = (mom_inertia_y + (area * (Cg_1 + thickness / 2) * (Cg_1 + thickness / 2))) * 2
+    #         Izz = 2 * mom_inertia_z
+    #         I = min(Iyy, Izz)
+    #         min_rad = math.sqrt(I / (2 * area))
+    #
+    #     elif key == 'Back to Back Angles' and subkey == 'Short Leg':
+    #         Izz = (mom_inertia_z + (area * (Cg_2 + thickness / 2) * (Cg_2 + thickness / 2))) * 2
+    #         Iyy = 2 * mom_inertia_y
+    #         I = min(Iyy, Izz)
+    #         min_rad = math.sqrt(I / (2 * area))
+    #
+    #     elif key == 'Star Angles' and subkey == 'Long Leg':
+    #         Iyy = (mom_inertia_y + (area * (Cg_1 + thickness / 2) * (Cg_1 + thickness / 2))) * 2
+    #         Izz = (mom_inertia_z + (area * Cg_2 * Cg_2)) * 2
+    #         I = min(Iyy, Izz)
+    #         min_rad = math.sqrt(I / (2 * area))
+    #
+    #     elif key == 'Star Angles' and subkey == 'Short Leg':
+    #         Izz = (mom_inertia_z + (area * (Cg_2 + thickness / 2) * (Cg_2 + thickness / 2))) * 2
+    #         Iyy = (mom_inertia_y + (area * Cg_1 * Cg_1)) * 2
+    #         I = min(Iyy, Izz)
+    #         min_rad = math.sqrt(I / (2 * area))
+    #
+    #     elif key == 'Angles' and (subkey == 'Long Leg' or subkey == 'Short Leg'):
+    #         min_rad = min(rad_u, rad_v)
+    #
+    #     self.min_radius_gyration = min_rad
 
     def design_check_for_slenderness(self, K, L, r):
         "KL= effective length of member"

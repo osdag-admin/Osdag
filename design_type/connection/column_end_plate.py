@@ -1,3 +1,6 @@
+"""
+Author: Yash Lokhande
+"""
 from design_type.connection.moment_connection import MomentConnection
 from design_report.reportGenerator_latex import CreateLatex
 
@@ -128,9 +131,6 @@ class ColumnEndPlate(MomentConnection):
         # design_input.append(t2)
 
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
-        design_input.append(t3)
-
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
         design_input.append(t3)
 
         t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
@@ -349,7 +349,9 @@ class ColumnEndPlate(MomentConnection):
             pass
 
     def output_values(self, flag):
-
+        """
+        return: output values in output dock
+        """
         out_list = []
 
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
@@ -417,35 +419,6 @@ class ColumnEndPlate(MomentConnection):
         t17 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.m_dp/1000000,2) if flag else '', True)
         out_list.append(t17)
 
-        # if 2*self.end_dist < 50 and self.h_s < 100:
-        #     pass
-        # elif 2*self.end_dist >= 50 and self.h_s >= 100:
-
-        # if flag is True:
-        #     if self.connection == "Extended Both Ways":
-        #         t33 = (None, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, True)
-        #         out_list.append(t33)
-        #
-        #         t21 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.stiff_ht if flag else '', True)
-        #         out_list.append(t21)
-        #         t22 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
-        #         out_list.append(t22)
-        #         t23 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
-        #         out_list.append(t23)
-        #         t24 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
-        #         out_list.append(t24)
-        #     else:
-        #         t33 = (None, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, False)
-        #         out_list.append(t33)
-        #         t21 = (KEY_OUT_STIFFENER_HEIGHT, KEY_OUT_DISP_STIFFENER_HEIGHT, TYPE_TEXTBOX, self.stiff_ht if flag else '',False)
-        #         out_list.append(t21)
-        #         t22 = (KEY_OUT_STIFFENER_WIDTH, KEY_OUT_DISP_STIFFENER_WIDTH, TYPE_TEXTBOX, self.stiff_wt if flag else '',False)
-        #         out_list.append(t22)
-        #         t23 = (KEY_OUT_STIFFENER_THICKNESS, KEY_OUT_DISP_STIFFENER_THICKNESS, TYPE_TEXTBOX, self.t_s if flag else '',False)
-        #         out_list.append(t23)
-        #         t24 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, self.weld_type if flag else '', False)
-        #         out_list.append(t24)
-        #         pass
 
         t33 = (KEY_OUT_STIFFENER_TITLE, KEY_OUT_DISP_STIFFENER_DETAILS, TYPE_TITLE, None, True)
         out_list.append(t33)
@@ -467,6 +440,9 @@ class ColumnEndPlate(MomentConnection):
         return out_list
 
     def input_value_changed(self):
+        """
+        Used to help hide stiffener details depending upon connectivity
+        """
         lst = []
         # t6 = ([KEY_CONN], KEY_OUT_STIFFENER_TITLE, TYPE_LABEL, self.out_stiffener)
         # lst.append(t6)
@@ -571,21 +547,6 @@ class ColumnEndPlate(MomentConnection):
         # self.min_axial_load = 0.3 * self.axial_capacity
         self.axial_load_sec_class = round(max(min(self.load.axial_force * 1000, self.axial_capacity), 0.3 * self.axial_capacity), 2)  # N
 
-        # self.factored_axial_load = max(self.load.axial_force * 1000, self.min_axial_load)
-        # if self.load.axial_force * 1e3 < self.min_axial_load:
-        #     self.factored_axial_load = self.min_axial_load
-        #     self.design_status = True
-        # elif self.load.axial_force * 1e3> self.min_axial_load and self.load.axial_force * 1e3 < self.axial_capacity:
-        #     self.factored_axial_load = self.load.axial_force * 1e3
-        #     self.design_status = True
-        # else:
-        #     self.design_status = False
-        #     logger.error(":The axial force {} acting is higher than axial capacity {} of member".format(self.load.axial_force,self.axial_capacity/1000))
-        #     logger.error(" : Design is not safe. \n ")
-        #     logger.info("Increase member size or decrease axial load")
-        #     logger.debug(" :=========End Of design===========")
-        # # self.load.axial_force = self.factored_axial_load  # N
-        # print("factored_axial_load", self.factored_axial_load)
     ###############################################################
 
     ##################   Shear Capacity  ######################
@@ -593,21 +554,6 @@ class ColumnEndPlate(MomentConnection):
                                  math.sqrt(3) * gamma_m0)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
         self.shear_load1 = min(0.15 * self.shear_capacity / 0.6, 40000.0)  # N
 
-        # self.min_shear_load = 0.15 * self.shear_capacity  # N
-        # self.fact_shear_load = max(self.min_shear_load, self.load.shear_force * 1000)  # N
-        # if self.load.shear_force * 1e3 < self.min_shear_load:
-        #     self.factored_shear_load = self.min_shear_load
-        #     self.design_status = True
-        # elif self.load.shear_force * 1e3 > self.min_shear_load and self.load.shear_force * 1e3 < self.shear_capacity:
-        #     self.factored_shear_load = self.load.shear_force * 1e3
-        #     self.design_status = True
-        # else:
-        #     self.design_status = False
-        #     logger.error(":The shear force {} acting is higher than shear capacity {} of member".format(self.load.shear_force,self.shear_capacity/1000))
-        #     logger.error(" : Design is not safe. \n ")
-        #     logger.info("Increase member size or decrease shear load")
-        #     logger.debug(" :=========End Of design===========")
-        # print("factored_shear_load", self.factored_shear_load)
     ###############################################################
 
     ################  Moment Capacity  ############################
@@ -721,20 +667,7 @@ class ColumnEndPlate(MomentConnection):
         self.factored_axial_load = round(max(self.load.axial_force * 1000, self.min_axial_load), 2)  # N
         self.fact_shear_load = round(max(self.shear_load1, self.load.shear_force * 1000), 2)  # N
 
-        # self.min_moment = 0.5 * self.section.moment_capacity
-        # if self.load.moment * 1e6 < float(self.min_moment):
-        #     self.factored_moment = self.min_moment
-        #     self.design_status = True
-        # elif self.load.moment * 1e6 > self.min_moment and self.load.moment * 1e6 < self.section.moment_capacity:
-        #     self.factored_moment = self.load.moment * 1e6
-        #     self.design_status = True
-        # else:
-        #     self.design_status = False
-        #     logger.error(":The moment {} acting is higher than moment capacity {} of member".format(self.load.moment, self.section.moment_capacity))
-        #     logger.error(" : Design is not safe. \n ")
-        #     logger.info("Increase member size or decrease shear load")
-        #     logger.debug(" :=========End Of design===========")
-        # print("factored_moment", self.factored_moment)
+
         if self.factored_axial_load > self.axial_capacity:
             logger.warning(' : Factored axial load is exceeding axial capacity,  {} kN.'.format(
                 round(self.axial_capacity / 1000, 2)))
@@ -764,23 +697,6 @@ class ColumnEndPlate(MomentConnection):
 
                     self.get_bolt_diam(self)
 
-        # if self.factored_axial_load > self.axial_capacity:
-        #     logger.warning(' : Factored axial load is exceeding axial capacity,  {} kN.'.format(
-        #         round(self.axial_capacity / 1000, 2)))
-        #     logger.error(" : Design is not safe. \n ")
-        #     logger.debug(" :=========End Of design===========")
-        #     self.design_status = False
-        # if self.fact_shear_load > self.shear_capacity:
-        #     logger.warning(' : Factored shear load is exceeding 0.6 times shear capacity,  {} kN.'.format(round(self.shear_capacity / 1000, 2)))
-        #     logger.error(" : High shear cases cannot be designed using Osdag, Design is not safe. \n ")
-        #     logger.debug(" :=========End Of design===========")
-        #     self.design_status = False
-        # if self.load_moment > self.section.moment_capacity:
-        #     self.design_status = False
-        #     logger.warning(' : Moment load is exceeding moment capacity  {} kN-m.'.format(round(self.section.moment_capacity / 1000000), 2))
-        #     logger.error(" : Design is not safe. \n ")
-        #     logger.debug(" :=========End Of design===========")
-        #
         # ###############################
         # if self.design_status == True:
         #     print("Preliminary member check is satisfactory. Doing bolt checks")
@@ -816,6 +732,15 @@ class ColumnEndPlate(MomentConnection):
             print("Bolt diam: ", x,"Pitch: ",self.pitch,"End-dist: ",self.end_dist)
 
         ########## no of bolts along each side of web and flange  ##################
+            """
+            nbw = no of bolts along web on each side
+            nbw * 2 = total no of bolts along web
+            
+            nbf = no of bolts along flange on one side of a flange
+            nbf * 4 = total no of bolts along flange ------ for flush
+            nbf * 8 = total no of bolts along flange ------ for extended
+            
+            """
             self.n_bw = int(math.floor(((self.section.depth - (2 * self.section.flange_thickness + (2 * self.end_dist))) / self.pitch) + 1))
 
             if ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) < (2 * self.end_dist):
@@ -841,12 +766,7 @@ class ColumnEndPlate(MomentConnection):
             if self.n_bw == 1:
                 continue
 
-            # if self.n_bf <= 0:
-            #     self.n_bf = 1
-            # elif self.n_bf > 0:
-            #     self.n_bf = self.n_bf
-
-            print("no bolts web",self.n_bw, "no bolts flange",self.n_bf)
+            print("no bolts web: ",self.n_bw, "no bolts flange: ",self.n_bf)
 
             if self.connection == 'Flush End Plate':
                 # if self.n_bf == 1:
@@ -858,7 +778,7 @@ class ColumnEndPlate(MomentConnection):
                 self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4 + self.n_bf*4
                 # elif self.n_bf > 1:
                 #     self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4 + self.n_bf*4
-            print("no of bolts", self.no_bolts)
+            print("no of bolts: ", self.no_bolts)
 
         ######### pitch 2 along web  ##################
             if self.n_bw % 2 == 0:
@@ -874,17 +794,12 @@ class ColumnEndPlate(MomentConnection):
                 else:
                     self.p_2_web = (self.section.depth - (2 * self.section.flange_thickness) - (
                             2 * self.end_dist) - ((self.n_bw - 3) * self.pitch)) / 2
-            print("p_2_web", self.p_2_web)
-        ######### pitch 2 along flange  ################
-
-            # if self.p_2_flange < 0:
-            #     self.p_2_flange = 0.0
-            # else:
-            #     pass
-            print("p_2_flange",self.p_2_flange)
-            # self.x = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - self.end_dist - (self.n_bf * self.pitch)
+            print("p_2_web: ", self.p_2_web,"p_2_flange: ",self.p_2_flange)
 
         ############# y_max and y square ################
+            """
+            y_sqr is calculated as square of distance from center of bottom flange to each bolt centre
+            """
             if self.connection == 'Flush End Plate':
                 self.y_max = self.section.depth - 3/2 * self.section.flange_thickness - self.end_dist
             else:
@@ -1012,15 +927,15 @@ class ColumnEndPlate(MomentConnection):
                         for i in range(1, int(self.n_bw / 2 - 0.5)):
                             self.y_sq2 = (self.section.flange_thickness / 2 + self.end_dist + i * self.pitch) ** 2
                             self.y_sqr2 = self.y_sqr2 + self.y_sq2
-                        # print("y_sqr2", self.y_sqr2)
+                        print("y_sqr2", self.y_sqr2)
 
                         self.y_sqr3 = (self.section.flange_thickness / 2 + self.end_dist + (
                                     (self.n_bw / 2) - 1.5) * self.pitch + self.p_2_web) ** 2
-                        # print("y_sqr3", self.y_sqr3)
+                        print("y_sqr3", self.y_sqr3)
 
                         self.y_sqr4 = (self.section.flange_thickness / 2 + self.end_dist + (
                                     (self.n_bw / 2) - 1.5) * self.pitch + 2 * self.p_2_web) ** 2
-                        # print("y_sqr4", self.y_sqr4)
+                        print("y_sqr4", self.y_sqr4)
 
                         self.y_sqr5 = 0
                         for i in range(1, int(self.n_bw / 2 - 0.5)):
@@ -1065,13 +980,6 @@ class ColumnEndPlate(MomentConnection):
             else:
                 pass
 
-                # if self.t_b > self.bolt.bolt_tension_capacity:
-                #     self.design_status = False
-                #     logger.error("tension capacity and moment capacity of member is less than applied axial force and momemt")
-                # elif self.v_sb > self.bolt.bolt_capacity:
-                #     self.design_status = False
-                #     logger.error("shear capacity of member is less than applied shear")
-
         if len(self.lst1) != 0:
             self.key_min = min(self.res, key=self.res.get)
             self.bolt_diam_provided = self.key_min
@@ -1093,6 +1001,13 @@ class ColumnEndPlate(MomentConnection):
             elif self.connection == "Flush End Plate":
                 self.design_status = False
                 logger.error("Try Different material or Try Extended both ways Connection")
+
+            else:
+                self.design_status = False
+                logger.error("The number of bolt rows are not sufficient to cater for the given section and loads combination.\\"
+                             "Please do a manual check with increased number of rows. Osdag is not currently equipped to design such cases.")
+                logger.info("Else you can try with cover plate connection.")
+
 
     #############################################################################################################
     ## Function to get Bolt grade ##
@@ -1137,7 +1052,6 @@ class ColumnEndPlate(MomentConnection):
                     else:
                         self.p_2_flange = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 3) * self.pitch)) / 2
 
-                print("p_2_flange_prov", self.p_2_flange)
 
             if self.connection == 'Flush End Plate':
                 self.n_bf_output = self.n_bf * 4
@@ -1146,16 +1060,7 @@ class ColumnEndPlate(MomentConnection):
 
             # print("n_bf",self.n_bf)
             print("In bolt grade loop, grade = ", x)
-            # if self.n_bf_prov <= 0:
-            #     self.n_bf_prov = 1
-            # # elif self.n_bf == 0:
-            # #     self.n_bf = 1
-            # elif self.n_bf_prov > 0:
-            #     self.n_bf_prov = self.n_bf_prov + 2
-            # if self.n_bf <= 0:
-            #     self.n_bf = 1
-            # elif self.n_bf > 0:
-            #     self.n_bf = self.n_bf
+
             print("no bolts web", self.n_bw, "no bolts flange", self.n_bf)
 
             if self.connection == 'Flush End Plate':
@@ -1181,28 +1086,14 @@ class ColumnEndPlate(MomentConnection):
                     self.p_2_web = ((self.section.depth) - (2 * self.section.flange_thickness) - (2 * self.end_dist)) / 2
                 else:
                     self.p_2_web = (self.section.depth - (2 * self.section.flange_thickness) - (2 * self.end_dist) - ((self.n_bw - 3) * self.pitch)) / 2
-            print("p_2_web_prov", self.p_2_web)
+            print("p_2_web_prov", self.p_2_web, "p_2_flange_prov", self.p_2_flange)
 
-            ######### pitch 2 along flange  ################
-            # if self.n_bf % 2 == 0:
-            #     if self.n_bf == 2:
-            #         self.p_2_flange = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist)
-            #     else:
-            #         self.p_2_flange = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 2) * self.pitch)
-            # else:
-            #     if self.n_bf == 3:
-            #         self.p_2_flange = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist)) / 2
-            #     else:
-            #         self.p_2_flange = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 3) * self.pitch)) / 2
-            #
-            # if self.p_2_flange < 0:
-            #     self.p_2_flange = 0.0
-            # else:
-            #     pass
-            # print("p_2_flange_prov", self.p_2_flange)
-            # self.x = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - self.end_dist - (self.n_bf_prov * self.pitch)
 
             ############# y_max and y square ################
+            """
+            This part is repeated for bolt diam selected, otherwise it will take valve 
+            of y_sqr as for max bolt in bolt list provided by user
+            """
             if self.connection == 'Flush End Plate':
                 self.y_max = self.section.depth - 3 / 2 * self.section.flange_thickness - self.end_dist
             else:
@@ -1365,11 +1256,6 @@ class ColumnEndPlate(MomentConnection):
 
             self.t_b = round((self.factored_axial_load / self.no_bolts) + (self.load_moment * self.y_max) / self.y_sqr,2)
 
-            # self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt_diam_provided,
-            #                                   bolt_grade_provided=x,
-            #                                   # bolt_grade_provided=12.9,
-            #                                   conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-            #                                   n_planes=1)
             self.bolt.calculate_bolt_tension_capacity(bolt_diameter_provided=self.bolt_diam_provided,bolt_grade_provided=x)
         #
         #     if self.design_status:
@@ -1498,30 +1384,6 @@ class ColumnEndPlate(MomentConnection):
             # self.design_status = False
             # logger.error("Plate thickness provided is not satisfied")
 
-    def get_3d_components(self):
-        components = []
-
-        t1 = ('Model', self.call_3DModel)
-        components.append(t1)
-
-        t3 = ('Column', self.call_3DColumn)
-        components.append(t3)
-
-        t4 = ('End Plate', self.call_3DPlate)
-        components.append(t4)
-
-        return components
-
-    def call_3DPlate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'End Plate':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Connector", bgcolor)
-
 ##########################################################################################
              ####   Stiffener details   ####
 ##########################################################################################
@@ -1554,16 +1416,13 @@ class ColumnEndPlate(MomentConnection):
         self.weld_length_avail = 2 * self.h_s - 2 * self.n
 
         self.weld_force_shear = (self.fact_shear_load)/(2 * flange_weld_throat_size * self.weld_length_avail)
-
         self.weld_force_moment = (self.load_moment)/(2*((self.weld_length_avail / 2) ** 2 * flange_weld_throat_size)/6)
-
         # capacity_unit_flange is the capacity of weld of unit throat thickness
         capacity_unit_flange = (k * self.section.fu) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
 
         self.resultant = math.sqrt(self.weld_force_shear ** 2 + self.weld_force_moment ** 2)
 
         self.weld_size = self.resultant/capacity_unit_flange
-
 
         if 2*self.end_dist < 50:
             self.stiff_ht = 0.0
@@ -1598,6 +1457,31 @@ class ColumnEndPlate(MomentConnection):
         else:
             logger.error(": Design is not safe \n ")
             logger.debug(" :=========End Of design===========")
+
+########################################################
+    def get_3d_components(self):
+        components = []
+
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t3 = ('Column', self.call_3DColumn)
+        components.append(t3)
+
+        t4 = ('End Plate', self.call_3DPlate)
+        components.append(t4)
+
+        return components
+
+    def call_3DPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'End Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Connector", bgcolor)
 
 #####################################################################
     ###   Output Dict   ###
@@ -1840,64 +1724,91 @@ class ColumnEndPlate(MomentConnection):
         bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
         bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
         kb_disp = round(self.bolt.kb, 2)
+        self.Pmc = self.section.plastic_moment_capactiy
+        self.Mdc = self.section.moment_d_def_criteria
+        h = self.section.depth - (2 * self.section.flange_thickness)
+        self.bolt.calculate_bolt_tension_capacity(bolt_diameter_provided=self.bolt_diam_provided,bolt_grade_provided=self.bolt_grade_provided)
+        self.bolt_conn_plates_t_fu_fy.append((self.plate_thickness_provided, self.plate.fu, self.plate.fy))
+        self.bolt_conn_plates_t_fu_fy.append((self.plate_thickness_provided, self.plate.fu, self.plate.fy))
 
-        t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{4cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', 'Member Capacity', '|p{4cm}|p{3.5cm}|p{6.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, '', axial_capacity(area=self.section.area,
-                                                              fy=self.section.fy,
-                                                              gamma_m0=gamma_m0,
-                                                              axial_capacity=round(self.axial_capacity / 1000, 2)), '')
+        t1 = (SECTION_CLASSIFICATION, "", section_classification(class_of_section=self.class_of_section), "")
         self.report_check.append(t1)
-        h = (self.section.depth - (2 * self.section.flange_thickness))
-        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '', shear_capacity(h=h, t=self.section.web_thickness,
-                                                              f_y=self.section.fy, gamma_m0=gamma_m0,
-                                                              shear_capacity=round(self.shear_capacity / 1000 ,2)), '')
-        self.report_check.append(t1)
-        if self.class_of_section == 1 or self.class_of_section == 2:
-
-            t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, '', moment_cap(beta=1,m_d=round(self.section.moment_capacity /1000,2),f_y=self.section.fy,
-                                                           gamma_m0=gamma_m0,m_fd=round(self.load_moment/1000,2),
-                                                           mom_cap=round(self.section.moment_capacity/1000,2)),'')
-            self.report_check.append(t1)
-        else:
-            t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, '', moment_CAP( m_d=round(self.section.moment_capacity/1000,2), f_y=self.section.fy,
-                                                               gamma_m0=gamma_m0,Z_e=self.Z_e,
-                                                                mom_cap=round(self.section.moment_capacity/1000,2)), '')
-            self.report_check.append(t1)
-
-        t1 = ('SubSection', 'Load Considered', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, min_max_axial_capacity(axial_capacity=round(self.axial_capacity / 1000, 2),
-                                                                  min_ac=round(self.min_axial_load / 1000, 2)),
-             prov_axial_load(axial_input=self.load.axial_force,
-                             min_ac=round(self.min_axial_load / 1000, 2),
-                             app_axial_load=round(self.factored_axial_load / 1000, 2),axial_capacity=round(self.axial_capacity / 1000, 2)),
-             get_pass_fail(self.min_axial_load / 1000,
-                           self.factored_axial_load / 1000, relation="leq"))
-        self.report_check.append(t1)
-        t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, min_max_shear_capacity(shear_capacity=round(self.shear_capacity / 1000, 2),
-                                                                 min_sc=round(self.shear_load1 / 1000, 2)),
-             prov_shear_load(shear_input=self.load.shear_force,
-                             min_sc=round( self.shear_load1 / 1000, 2),
-                             app_shear_load=round(self.fact_shear_load / 1000, 2),shear_capacity_1=round(self.shear_capacity / 1000, 2)),
-             get_pass_fail(self.shear_load1  / 1000,
-                           self.fact_shear_load / 1000, relation="leq"))
+        t1 = (KEY_OUT_DISP_AXIAL_CAPACITY, self.load.axial_force, axial_capacity(area=round(self.section.area, 2),
+                                                                                 fy=self.section.fy,
+                                                                                 gamma_m0=gamma_m0,
+                                                                                 axial_capacity=round(
+                                                                                     self.axial_capacity / 1000, 2)),
+              '')
         self.report_check.append(t1)
 
-        t1 = (KEY_DISP_APPLIED_MOMENT_LOAD,
-             min_max_moment_capacity(moment_capacity=round(self.section.moment_capacity / 1000000, 2),
-                                     min_mc=round(self.load_moment_min / 1000000, 2)),
-             prov_moment_load(moment_input=self.load.moment,
-                              min_mc=round(self.load_moment_min / 1000000, 2),
-                              app_moment_load=round(self.load_moment / 1000000, 2),moment_capacity=round(self.section.moment_capacity / 1000, 2)),
-             get_pass_fail(round(self.load_moment_min / 1000000, 2),
-                           round(self.load.moment / 1000000, 2), relation="leq"))
+        # self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
+        #                               self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0), 2)
+
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, self.load.shear_force, shear_capacity(h=h, t=self.section.web_thickness,
+                                                                                 f_y=self.section.fy, gamma_m0=gamma_m0,
+                                                                                 shear_capacity=round(
+                                                                                     self.shear_capacity / 1000, 2)),
+              'Restricted to low shear')
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', plastic_moment_capacty(beta_b=round(self.beta_b, 2),
+                                                                               Z_p=round(self.Z_p, 2),
+                                                                               f_y=self.section.fy,
+                                                                               gamma_m0=gamma_m0,
+                                                                               Pmc=round(self.Pmc / 1000000, 2)), '')
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_MOMENT_D_DEFORMATION, '', moment_d_deformation_criteria(fy=self.section.fy,
+                                                                                   Z_e=round(
+                                                                                       self.section.elast_sec_mod_z, 2),
+                                                                                   Mdc=round(self.Mdc / 1000000, 2)),
+              '')
+        self.report_check.append(t1)
+        t1 = (KEY_OUT_DISP_MOMENT_CAPACITY, self.load.moment, moment_capacity(Pmc=round(self.Pmc / 1000000, 2),
+                                                                              Mdc=round(self.Mdc / 1000000, 2),
+                                                                              M_c=round(
+                                                                                  self.section.moment_capacity / 1000000,
+                                                                                  2)),
+              '')
+        self.report_check.append(t1)
+        t1 = ('SubSection', 'Load Consideration', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+        #####INTERACTION RATIO#######
+
+        t1 = (KEY_INTERACTION_RATIO, '', ir_sum_bb_cc(Al=self.load.axial_force, M=self.load.moment,
+                                                      A_c=round(self.axial_capacity / 1000, 2),
+                                                      M_c=round(self.section.moment_capacity / 1000000, 2),
+                                                      IR_axial=self.IR_axial, IR_moment=self.IR_moment,
+                                                      sum_IR=self.sum_IR), '')
+        self.report_check.append(t1)
+        #############################
+        #### Min load Required ###############
+        t2 = (MIN_LOADS_REQUIRED, min_loads_required(conn="beam_beam"),
+              min_loads_provided(min_ac=round(self.min_axial_load / 1000, 2),
+                                 min_mc=round(self.load_moment_min / 1000000, 2),
+                                 conn="beam_beam"), '')
+        self.report_check.append(t2)
+
+        #############################
+        t1 = (KEY_DISP_APPLIED_AXIAL_FORCE, self.load.axial_force,
+              prov_axial_load(axial_input=self.load.axial_force, min_ac=round(self.min_axial_load / 1000, 2),
+                              app_axial_load=round(self.factored_axial_load / 1000, 2),
+                              axial_capacity=round(self.axial_capacity / 1000, 2)), '')
+
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, self.load.shear_force,
+              prov_shear_load(shear_input=self.load.shear_force, min_sc=round(self.shear_load1 / 1000, 2),
+                              app_shear_load=round(self.fact_shear_load / 1000, 2),
+                              shear_capacity_1=round(self.shear_capacity / 1000, 2)), "")
+        self.report_check.append(t1)
+        t1 = (KEY_DISP_APPLIED_MOMENT_LOAD, self.load.moment,
+              prov_moment_load(moment_input=self.load.moment, min_mc=round(self.load_moment_min / 1000000, 2),
+                               app_moment_load=round(self.load_moment / 1000000, 2),
+                               moment_capacity=round(self.section.moment_capacity / 1000000, 2)), "")
         self.report_check.append(t1)
 
-
-
-        t1 = ('SubSection', ' Bolt Checks', '|p{4cm}|p{6.5cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', ' Bolt Checks', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation", display_prov(self.bolt_diam_provided, "d"), '')
         self.report_check.append(t1)
@@ -1935,18 +1846,19 @@ class ColumnEndPlate(MomentConnection):
                                                                                  gamma_mf=self.bolt.gamma_mf,
                                                                                  capacity=bolt_capacity_kn), '')
              self.report_check.append(t4)
-        t1 = (KEY_OUT_BOLT_TENSION_CAPACITY, tension_in_bolt_due_to_axial_load_n_moment(P=round(self.factored_axial_load /1000,2),
-                                                                                        n=self.no_bolts_prov,
-                                                                                        M=round(self.load_moment/1000,2),
+        t1 = (KEY_OUT_BOLT_TENSION_CAPACITY1, tension_in_bolt_due_to_axial_load_n_moment(P=round(self.factored_axial_load /1000,2),
+                                                                                        n=self.no_bolts,
+                                                                                        M=round(self.load_moment/1000000,2),
                                                                                         y_max=self.y_max,
                                                                                         y_sqr=round(self.y_sqr ,2),T_b=round(self.t_b/1000 ,2)) ,
                tension_capacity_of_bolt(f_ub=self.bolt.bolt_fu,A_nb=self.bolt.bolt_net_area,T_db=round(self.bolt.bolt_tension_capacity /1000 ,2)),
                get_pass_fail(self.t_b,self.bolt.bolt_tension_capacity,relation='leq'))
         self.report_check.append(t1)
-        t1 = (KEY_OUT_DISP_BOLT_SHEAR,shear_force_in_bolts_near_web(V=round(self.fact_shear_load /1000 ,2),n_wb=self.n_bw_prov*2,V_sb=round(self.v_sb /1000, 2)),
+        t1 = (KEY_OUT_DISP_BOLT_SHEAR,shear_force_in_bolts_near_web(V=round(self.fact_shear_load /1000 ,2),n_wb=self.n_bw*2,V_sb=round(self.v_sb /1000, 2)),
                  round(self.bolt.bolt_capacity /1000,2),
                  get_pass_fail(round(self.v_sb/1000,2) , round(self.bolt.bolt_capacity/1000, 2) , relation='leq'))
         self.report_check.append(t1)
+
         t1 = (KEY_OUT_DISP_NO_BOLTS_WEB, no_of_bolts_along_web(D=self.section.depth,T_f=self.section.flange_thickness,e=self.end_dist,
                                                                p=self.pitch,n_bw=self.n_bw),
                 self.n_bw,
@@ -1961,25 +1873,26 @@ class ColumnEndPlate(MomentConnection):
               get_pass_fail(self.n_bf, self.n_bf, relation='leq'))
         self.report_check.append(t1)
 
-        t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+        t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
               self.pitch,
               get_pass_fail(self.bolt.min_pitch, self.pitch, relation='lesser'))
         self.report_check.append(t1)
-        t1 = (DISP_MAX_PITCH ,max_pitch(self.plate.thickness),
+        t1 = (DISP_MAX_PITCH , cl_10_2_3_1_max_spacing(self.plate.thickness),
               self.pitch,
               get_pass_fail(self.bolt.max_spacing, self.pitch, relation='greater'))
         self.report_check.append(t1)
-        t3 = (DISP_MIN_END, min_edge_end(self.bolt.dia_hole, self.bolt.edge_type),
+        t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.dia_hole, self.bolt.edge_type),
               self.end_dist,
               get_pass_fail(self.bolt.min_end_dist, self.end_dist,
                             relation='lesser'))
         self.report_check.append(t3)
-        t4 = (DISP_MAX_END, max_edge_end(self.plate.fy, self.plate_thickness_provided),
+        t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy,
+                                                              corrosive_influences=self.bolt.corrosive_influences),
               self.end_dist,
               get_pass_fail(self.bolt.max_end_dist, self.end_dist,
                             relation='greater'))
         self.report_check.append(t4)
-        t1 = ('SubSection', '  End plate Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+        t1 = ('SubSection', '  End Plate Checks', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
         if self.connection == "Flush End Plate":
@@ -2004,18 +1917,18 @@ class ColumnEndPlate(MomentConnection):
         self.report_check.append(t1)
         if self.pitch >= 2*self.end_dist:
 
-            t1=(KEY_OUT_DISP_PLATE_MOM_CAPACITY,moment_acting_on_end_plate(M_ep=round(self.m_ep, 2), b_eff=2*self.end_dist, f_y=self.plate.fy, gamma_m0=gamma_m0,
+            t1=(KEY_OUT_DISP_PLATE_MOM_CAPACITY,moment_acting_on_end_plate(M_ep=round(self.m_ep/1000000, 2), b_eff=2*self.end_dist, f_y=self.plate.fy, gamma_m0=gamma_m0,
                               t_p=self.plate_thickness_provided),
-              design_capacity_of_end_plate(M_dp=round(self.m_dp, 2), b_eff=self.b_eff, f_y=self.plate.fy, gamma_m0=gamma_m0,
+              design_capacity_of_end_plate(M_dp=round(self.m_dp/1000000, 2), b_eff=self.b_eff, f_y=self.plate.fy, gamma_m0=gamma_m0,
                               t_p=self.plate_thickness_provided),
                 get_pass_fail(self.m_ep, self.m_dp, relation="leq"))
 
 
             self.report_check.append(t1)
         else:
-            t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY,moment_acting_on_end_plate(M_ep=round(self.m_ep, 2), b_eff=self.pitch, f_y=self.plate.fy, gamma_m0=gamma_m0,
+            t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY,moment_acting_on_end_plate(M_ep=round(self.m_ep/1000000, 2), b_eff=self.pitch, f_y=self.plate.fy, gamma_m0=gamma_m0,
                               t_p=self.plate_thickness_provided),
-              design_capacity_of_end_plate(M_dp=round(self.m_dp, 2), b_eff=self.b_eff, f_y=self.plate.fy, gamma_m0=gamma_m0,
+              design_capacity_of_end_plate(M_dp=round(self.m_dp/1000000, 2), b_eff=self.b_eff, f_y=self.plate.fy, gamma_m0=gamma_m0,
                               t_p=self.plate_thickness_provided),
                 get_pass_fail(self.m_ep, self.m_dp, relation="leq"))
 
@@ -2023,7 +1936,7 @@ class ColumnEndPlate(MomentConnection):
 
         if self.connection == "Extended Both Ways":
 
-               t1 = ('SubSection', '   Stiffener Checks', '|p{4cm}|p{6cm}|p{5.5cm}|p{1.5cm}|')
+               t1 = ('SubSection', '   Stiffener Checks', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
                self.report_check.append(t1)
                t1 = (KEY_OUT_DISP_STIFFENER_HEIGHT,self.section.depth,
                        self.stiff_ht,

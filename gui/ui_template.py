@@ -19,6 +19,9 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
+from gui.ui_tutorial import Ui_Tutorial
+from gui.ui_aboutosdag import Ui_AboutOsdag
+from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PyQt5.QtGui import QStandardItem
 import os
@@ -34,6 +37,7 @@ import pdfkit
 import configparser
 import pickle
 import cairosvg
+from update import Update
 
 
 from Common import *
@@ -72,7 +76,30 @@ from design_type.connection.base_plate_connection import BasePlateConnection
 from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 import logging
+import subprocess
 from cad.cad3dconnection import cadconnection
+
+
+class MyTutorials(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Tutorial()
+        self.ui.setupUi(self)
+
+
+class MyAboutOsdag(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_AboutOsdag()
+        self.ui.setupUi(self)
+
+
+class MyAskQuestion(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+
 
 class Ui_ModuleWindow(QtWidgets.QMainWindow):
     resized = QtCore.pyqtSignal()
@@ -249,6 +276,18 @@ class Window(QMainWindow):
         else:
             pass
 
+    def design_examples(self):
+        root_path = os.path.join('ResourceFiles', 'design_example', '_build', 'html')
+        for html_file in os.listdir(root_path):
+            # if html_file.startswith('index'):
+            print(os.path.splitext(html_file)[1])
+            if os.path.splitext(html_file)[1] == '.html':
+                if sys.platform == ("win32" or "win64"):
+                    os.startfile(os.path.join(root_path, html_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, html_file)])
+
     def get_validator(self, validator):
         if validator == 'Int Validator':
             return QIntValidator()
@@ -266,6 +305,7 @@ class Window(QMainWindow):
         self.display_mode = 'Normal'
         self.display_x = 90
         self.display_y = 90
+        self.ui_loaded = False
         main.design_status = False
         main.design_button_status = False
         MainWindow.setObjectName("MainWindow")
@@ -597,7 +637,7 @@ class Window(QMainWindow):
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
-                im.setGeometry(QtCore.QRect(190, 10 + i, 70, 57))
+                im.setGeometry(QtCore.QRect(190, 10 + i, 100, 100))
                 im.setObjectName(option[0])
                 im.setScaledContents(True)
                 pixmap = QPixmap(option[3])
@@ -725,7 +765,7 @@ class Window(QMainWindow):
             for t in updated_list:
                 for key_name in t[0]:
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
-                    self.on_change_connect(key_changed, updated_list, data)
+                    self.on_change_connect(key_changed, updated_list, data, main)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
         self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 30))
@@ -801,6 +841,11 @@ class Window(QMainWindow):
         j = 1
         button_list = []
         maxi_width_left, maxi_width_right = -1, -1
+        self.output_title_fields = {}
+        key = None
+        current_key = None
+        fields = 0
+        title_repeat = 1
         for option in out_list:
             lable = option[1]
             output_type = option[2]
@@ -838,6 +883,8 @@ class Window(QMainWindow):
                 #r.setFixedSize(r.size())
                 out_layout2.addWidget(r, j, 2, 1, 1)
                 r.setVisible(True if option[4] else False)
+                fields += 1
+                self.output_title_fields[current_key][1] = fields
                 maxi_width_right = max(maxi_width_right, 100)    # predefined minimum width of 110 for textboxes
                 #r.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
                 # if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
@@ -858,6 +905,8 @@ class Window(QMainWindow):
                 b.resize(b.sizeHint().width(), b.sizeHint().height())
                 b.setText(v[0])
                 b.setDisabled(True)
+                fields += 1
+                self.output_title_fields[current_key][1] = fields
                 #b.setFixedSize(b.size())
                 button_list.append(option)
                 out_layout2.addWidget(b, j, 2, 1, 1)
@@ -865,6 +914,8 @@ class Window(QMainWindow):
                 #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if output_type == TYPE_TITLE:
+                key = lable
+
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
 
                 #q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
@@ -873,11 +924,20 @@ class Window(QMainWindow):
                 font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")
-                # q.setVisible(True if option[4] else False)
+                q.setVisible(True if option[4] else False)
                 #q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
                 q.resize(q.sizeHint().width(), q.sizeHint().height())
+                # q.setVisible(True if option[4] else False)
+                if key:
+                    fields = 0
+                    current_key = key
+                    if key in self.output_title_fields.keys():
+                        self.output_title_fields.update({key+str(title_repeat): [q, fields]})
+                        title_repeat +=1
+                    else:
+                        self.output_title_fields.update({key: [q, fields]})
                 out_layout2.addWidget(q, j, 1, 2, 2)
                 j = j + 1
             i = i + 30
@@ -1157,6 +1217,8 @@ class Window(QMainWindow):
         self.actionOsdag_Manual.setObjectName("actionOsdag_Manual")
         self.actionAsk_Us_a_Question = QtWidgets.QAction(MainWindow)
         self.actionAsk_Us_a_Question.setObjectName("actionAsk_Us_a_Question")
+        self.check_for_update=QtWidgets.QAction(MainWindow)
+        self.check_for_update.setObjectName("check_for_update")
         self.actionFAQ = QtWidgets.QAction(MainWindow)
         self.actionFAQ.setObjectName("actionFAQ")
 
@@ -1198,13 +1260,15 @@ class Window(QMainWindow):
         # self.menuEdit.addAction(self.actionPaste)
         self.menuEdit.addAction(self.actionDesign_Preferences)
         self.menuEdit.addAction(self.actionOsdagSectionModeller)
-        self.menuView.addAction(self.actionEnlarge_font_size)
-        self.menuView.addSeparator()
+        # self.menuView.addAction(self.actionEnlarge_font_size)
+        # self.menuView.addSeparator()
         self.menuHelp.addAction(self.actionSample_Tutorials)
         self.menuHelp.addAction(self.actionDesign_examples)
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAsk_Us_a_Question)
         self.menuHelp.addAction(self.actionAbout_Osdag_2)
+        self.menuHelp.addSeparator()
+        self.menuHelp.addAction(self.check_for_update)
         self.menuGraphics.addSeparator()
         self.menuGraphics.addAction(self.actionZoom_in)
         self.menuGraphics.addAction(self.actionZoom_out)
@@ -1228,7 +1292,7 @@ class Window(QMainWindow):
         self.menuDB.addAction(self.actionReset_db)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuEdit.menuAction())
-        self.menubar.addAction(self.menuView.menuAction())
+        # self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuGraphics.menuAction())
         self.menubar.addAction(self.menuDB.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
@@ -1245,6 +1309,8 @@ class Window(QMainWindow):
         self.btn_CreateDesign.clicked.connect(lambda:self.open_summary_popup(main))
         self.actionSave_current_image.triggered.connect(lambda: self.save_cadImages(main))
         self.actionCreate_design_report.triggered.connect(lambda:self.open_summary_popup(main))
+
+        self.check_for_update.triggered.connect(lambda: self.notification())
         self.actionZoom_out.triggered.connect(lambda: self.display.ZoomFactor(1/1.1))
         self.actionZoom_in.triggered.connect(lambda: self.display.ZoomFactor(1.1))
         self.actionPan.triggered.connect(lambda: self.assign_display_mode(mode="pan"))
@@ -1254,6 +1320,11 @@ class Window(QMainWindow):
         self.actionDownload_channel.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Channels"))
         self.actionDownload_angle.triggered.connect(lambda: self.designPrefDialog.ui.download_Database(table="Angles"))
         self.actionReset_db.triggered.connect(self.database_reset)
+        self.actionSample_Tutorials.triggered.connect(lambda: MyTutorials(self).exec())
+        self.actionAbout_Osdag_2.triggered.connect(lambda: MyAboutOsdag(self).exec())
+        self.actionAsk_Us_a_Question.triggered.connect(lambda: MyAskQuestion(self).exec())
+        self.actionDesign_examples.triggered.connect(self.design_examples)
+
 
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
         last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
@@ -1266,11 +1337,39 @@ class Window(QMainWindow):
                 last_design_dictionary = yaml.safe_load(last_design)
         if isinstance(last_design_dictionary, dict):
             self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
+            if "out_titles_status" in last_design_dictionary.keys():
+                title_status = last_design_dictionary["out_titles_status"]
+                print("titles", title_status)
+                title_count = 0
+                out_titles = []
+                title_repeat = 1
+                for out_field in out_list:
+                    if out_field[2] == TYPE_TITLE:
+                        title_name = out_field[1]
+                        if title_name in out_titles:
+                            title_name += str(title_repeat)
+                            title_repeat += 1
+                        if title_status[title_count] == 0:
+                            self.output_title_fields[title_name][0].setVisible(False)
+                        title_count += 1
+                        out_titles.append(title_name)
+        self.ui_loaded = True
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
         self.fuse_model = None
+
+    def notification(self):
+        check=Update(0)
+        print(check.notifi())
+        if check.notifi()==True:
+            msg = QMessageBox.information(self, 'Update available',
+                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
+        elif check.notifi()=="no internet":
+            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
+        else:
+            msg = QMessageBox.information(self, 'Update', 'No Update Available')
 
     def save_output_to_txt(self, main):
         def save_fun():
@@ -1342,10 +1441,10 @@ class Window(QMainWindow):
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
-    def on_change_connect(self, key_changed, updated_list, data):
-        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data))
+    def on_change_connect(self, key_changed, updated_list, data, main):
+        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data, main))
 
-    def change(self, k1, new, data):
+    def change(self, k1, new, data, main):
 
         """
         @author: Umair
@@ -1415,6 +1514,72 @@ class Window(QMainWindow):
                     k2.setVisible(True)
             else:
                 pass
+
+        if self.ui_loaded:
+            self.output_title_change(main)
+
+    def output_title_change(self, main):
+
+        status = main.design_status
+        out_list = main.output_values(main, status)
+        key = None
+        no_field_titles = []
+        titles = []
+        title_repeat = 1
+        visible_fields = 0
+        for option in out_list:
+            if option[2] == TYPE_TITLE:
+                if key:
+                    title_repeat = self.output_title_visiblity(visible_fields, key, titles, title_repeat)
+                    titles.append(key)
+
+                key = option[1]
+                if self.output_title_fields[key][1] == 0:
+                    no_field_titles.append(key)
+                if key in no_field_titles:
+                    visible_fields = 1
+                else:
+                    visible_fields = 0
+
+            if option[2] == TYPE_TEXTBOX:
+                if self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).isVisible():
+                    visible_fields += 1
+
+            elif option[2] == TYPE_OUT_BUTTON:
+                visible_fields += 1
+
+        self.output_title_visiblity(visible_fields, key, titles, title_repeat)
+
+        no_field_title = ""
+        for title in self.output_title_fields.keys():
+            if title in no_field_titles:
+                no_field_title = title
+            elif self.output_title_fields[title][0].isVisible():
+                if no_field_title in no_field_titles:
+                    no_field_titles.remove(no_field_title)
+
+        for no_field_title in no_field_titles:
+            self.output_title_fields[no_field_title][0].setVisible(False)
+
+    def output_title_visiblity(self, visible_fields, key, titles, title_repeat):
+
+        if visible_fields == 0:
+            if key in titles:
+                self.output_title_fields[key + str(title_repeat)][0].setVisible(False)
+                title_repeat += 1
+            else:
+                self.output_title_fields[key][0].setVisible(False)
+        else:
+            if key in titles:
+                self.output_title_fields[key + str(title_repeat)][0].setVisible(True)
+                title_repeat += 1
+            else:
+                self.output_title_fields[key][0].setVisible(True)
+
+        return title_repeat
+
+
+
 
     # Function for Reset Button
     '''
@@ -1719,13 +1884,6 @@ class Window(QMainWindow):
             if error is not None:
                 self.show_error_msg(error)
                 return
-            last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-            if not os.path.isdir(last_design_folder):
-                os.mkdir(last_design_folder)
-            last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
-            last_design_file = os.path.join(last_design_folder, last_design_file)
-            with open(str(last_design_file), 'w') as last_design:
-                yaml.dump(self.design_inputs, last_design)
 
             out_list = main.output_values(main, status)
             for option in out_list:
@@ -1740,6 +1898,30 @@ class Window(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
+            self.output_title_change(main)
+
+            last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+            if not os.path.isdir(last_design_folder):
+                os.mkdir(last_design_folder)
+            last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
+            last_design_file = os.path.join(last_design_folder, last_design_file)
+            out_titles_status = []
+            out_titles = []
+            title_repeat = 1
+            for option in out_list:
+                if option[2] == TYPE_TITLE:
+                    title_name = option[1]
+                    if title_name in out_titles:
+                        title_name += str(title_repeat)
+                        title_repeat += 1
+                    if self.output_title_fields[title_name][0].isVisible():
+                        out_titles_status.append(1)
+                    else:
+                        out_titles_status.append(0)
+                    out_titles.append(title_name)
+            self.design_inputs.update({"out_titles_status": out_titles_status})
+            with open(str(last_design_file), 'w') as last_design:
+                yaml.dump(self.design_inputs, last_design)
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
@@ -2319,9 +2501,13 @@ class Window(QMainWindow):
 
     def save3DcadImages(self, main):
 
+        if not main.design_button_status:
+            QMessageBox.warning(self, 'Warning', 'No design created!')
+            return
+
         if main.design_status:
             if self.fuse_model is None:
-                self.fuse_model = CommonDesignLogic.create2Dcad(self.commLogicObj)
+                self.fuse_model = self.commLogicObj.create2Dcad()
             shape = self.fuse_model
 
             files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
@@ -2330,11 +2516,7 @@ class Window(QMainWindow):
                                                       files_types)
             fName = str(fileName)
 
-            flag = True
-            if fName == '':
-                flag = False
-                return flag
-            else:
+            if fName and self.fuse_model:
                 file_extension = fName.split(".")[-1]
 
                 if file_extension == 'igs':
@@ -2366,9 +2548,12 @@ class Window(QMainWindow):
                 self.fuse_model = None
 
                 QMessageBox.about(self, 'Information', "File saved")
+
+            else:
+                QMessageBox.about(self, 'Error', "File not saved")
         else:
             # self.actionSave_3D_model.setEnabled(False)
-            QMessageBox.about(self,'Information', 'Design Unsafe: 3D Model cannot be saved')
+            QMessageBox.about(self, 'Warning', 'Design Unsafe: 3D Model cannot be saved')
 
     def assign_display_mode(self, mode):
 
@@ -2504,6 +2689,7 @@ class Window(QMainWindow):
         self.actionAbout_Osdag_2.setText(_translate("MainWindow", "About Osdag"))
         self.actionOsdag_Manual.setText(_translate("MainWindow", "Osdag Manual"))
         self.actionAsk_Us_a_Question.setText(_translate("MainWindow", "Ask Us a Question"))
+        self.check_for_update.setText(_translate("MainWindow", "Check For Update"))
         self.actionFAQ.setText(_translate("MainWindow", "FAQ"))
         self.actionDesign_Preferences.setText(_translate("MainWindow", "Design Preferences"))
         self.actionDesign_Preferences.setShortcut(_translate("MainWindow", "Alt+P"))

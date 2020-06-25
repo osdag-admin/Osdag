@@ -91,9 +91,6 @@ class FinPlateConnection(ShearConnection):
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
         design_input.append(t3)
 
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
-        design_input.append(t3)
-
         t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
         design_input.append(t4)
 
@@ -119,7 +116,7 @@ class FinPlateConnection(ShearConnection):
         t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
                      KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
@@ -249,7 +246,7 @@ class FinPlateConnection(ShearConnection):
 
         capacities = []
 
-        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/block_shear.png')
+        t99 = (None, 'Shear Capacities', TYPE_SECTION, './ResourceFiles/images/block_shear.png')
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity/1000,2) if status else '')
@@ -261,7 +258,7 @@ class FinPlateConnection(ShearConnection):
         t17 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity_shear/1000,2) if status else '')
         capacities.append(t17)
 
-        t99 = (None, 'Section2', TYPE_SECTION, './ResourceFiles/images/block_shear_axial.png')
+        t99 = (None, 'Tension Capacities', TYPE_SECTION, './ResourceFiles/images/block_shear_axial.png')
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
@@ -894,7 +891,8 @@ class FinPlateConnection(ShearConnection):
 
         if self.weld.strength < self.weld.stress:
             self.weld.design_status = False
-            logger.warning('weld stress is guiding plate height, current length {} mm'.format(self.plate.height))
+            logger.info('weld stress is guiding plate dimensions, current length {} mm, thickness {} mm,'
+                           ' weld size {} mm'.format(self.plate.height,self.plate.thickness_provided,self.weld.size))
 
     def get_design_status(self):
         if self.plate.design_status is True and self.weld.design_status is True:
@@ -997,7 +995,7 @@ class FinPlateConnection(ShearConnection):
             bolt_capacity_red_kn=round(self.plate.bolt_capacity_red/1000,2)
 
 
-            t1 = ('SubSection', 'Bolt Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Bolt Design Checks','|p{4cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
             self.report_check.append(t1)
@@ -1011,28 +1009,32 @@ class FinPlateConnection(ShearConnection):
             self.report_check.append(t6)
             t7 = (DISP_NUM_OF_ROWS, '', self.plate.bolts_one_line, '')
             self.report_check.append(t7)
-            t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+            t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.plate.gauge_provided, get_pass_fail(self.bolt.min_pitch, self.plate.gauge_provided,relation='lesser'))
             self.report_check.append(t1)
-            t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
+            t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(connecting_plates),
                   self.plate.gauge_provided, get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided,relation='greater'))
             self.report_check.append(t1)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.plate.pitch_provided, get_pass_fail(self.bolt.min_gauge, self.plate.pitch_provided,relation="lesser"))
             self.report_check.append(t2)
-            t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
+            t2 = (DISP_MAX_GAUGE, cl_10_2_3_1_max_spacing(connecting_plates),
                   self.plate.pitch_provided, get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided,relation="greater"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(d_0=self.bolt.dia_hole,
+                                                               edge_type=self.bolt.edge_type, parameter='end_dist'),
                   self.plate.edge_dist_provided, get_pass_fail(self.bolt.min_end_dist, self.plate.edge_dist_provided,relation='lesser'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_END, max_edge_end_new(self.bolt_conn_plates_t_fu_fy,self.bolt.corrosive_influences),
+            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences,
+                                                              parameter='end_dist'),
                   self.plate.edge_dist_provided, get_pass_fail(self.bolt.max_end_dist, self.plate.edge_dist_provided,relation='greater'))
             self.report_check.append(t4)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(d_0=self.bolt.dia_hole,
+                                                               edge_type=self.bolt.edge_type, parameter='edge_dist'),
                   self.plate.end_dist_provided, get_pass_fail(self.bolt.min_edge_dist, self.plate.end_dist_provided,relation='lesser'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_EDGE, max_edge_end_new(self.bolt_conn_plates_t_fu_fy,self.bolt.corrosive_influences),
+            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences,
+                                                               parameter='edge_dist'),
                   self.plate.end_dist_provided, get_pass_fail(self.bolt.max_edge_dist, self.plate.end_dist_provided,relation="greater"))
             self.report_check.append(t4)
 

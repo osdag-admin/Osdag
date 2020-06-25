@@ -138,12 +138,12 @@ class Member(Main):
                     area = str(Angle_attributes.calc_Area(a, b, thickness, l))
                     mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
                     mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
-                    mom_inertia_u = "N/A"
-                    mom_inertia_v = "N/A"
+                    mom_inertia_u = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                    mom_inertia_v = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
                     rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
                     rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
-                    rad_of_gy_u = "N/A"
-                    rad_of_gy_v = "N/A"
+                    rad_of_gy_u = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                    rad_of_gy_v = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
                     elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l, plate_thk))
                     elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
                     plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
@@ -602,9 +602,9 @@ class Member(Main):
 
         designation = self[0]
         material_grade = self[1]
-        l = self[2][KEY_LOCATION]
-        section_profile = self[2][KEY_SEC_PROFILE]
-        plate_thk = float(self[2][KEY_PLATETHK][0])
+        l = self[3][KEY_LOCATION]
+        section_profile = self[3][KEY_SEC_PROFILE]
+        plate_thk = float(self[2])
         Angle_attributes = Angle(designation, material_grade)
         source = str(Angle_attributes.source)
         fu = str(Angle_attributes.fu)
@@ -666,12 +666,12 @@ class Member(Main):
 
                 mom_inertia_z = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
                 mom_inertia_y = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
-                mom_inertia_u = "N/A"
-                mom_inertia_v = "N/A"
+                mom_inertia_u = str(Angle_attributes.calc_MomentOfAreaY(a, b, thickness, l, plate_thk))
+                mom_inertia_v = str(Angle_attributes.calc_MomentOfAreaZ(a, b, thickness, l, plate_thk))
                 rad_of_gy_z = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
                 rad_of_gy_y = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
-                rad_of_gy_u = "N/A"
-                rad_of_gy_v = "N/A"
+                rad_of_gy_u = str(Angle_attributes.calc_RogY(a, b, thickness, l, plate_thk))
+                rad_of_gy_v = str(Angle_attributes.calc_RogZ(a, b, thickness, l, plate_thk))
                 elast_sec_mod_z = str(Angle_attributes.calc_ElasticModulusZz(a, b, thickness, l, plate_thk))
                 elast_sec_mod_y = str(Angle_attributes.calc_ElasticModulusZy(a, b, thickness, l, plate_thk))
                 plast_sec_mod_z = str(Angle_attributes.calc_PlasticModulusZpz(a, b, thickness, l, plate_thk))
@@ -679,7 +679,7 @@ class Member(Main):
                 torsional_rigidity = str(Angle_attributes.calc_TorsionConstantIt(a, b, thickness, l))
             else:  #  "Star Angles":
                 Angle_attributes = SAngle_Properties()
-                # Angle_attributes.data(designation, material_grade)
+                Angle_attributes.data(designation, material_grade)
                 if l == "Long Leg":
                     if a == b:
                         image = VALUES_IMG_TENSIONBOLTED_DF01[3]
@@ -747,9 +747,9 @@ class Member(Main):
         designation = self[0]
         material_grade = self[1]
         # sl = self[2]
-        l = self[2][KEY_LOCATION]
-        section_profile = self[2][KEY_SEC_PROFILE]
-        plate_thk = float(self[2][KEY_PLATETHK][0])
+        l = self[3][KEY_LOCATION]
+        section_profile = self[3][KEY_SEC_PROFILE]
+        plate_thk = float(self[2])
         Channel_attributes = Channel(designation, material_grade)
         source = str(Channel_attributes.source)
         Type = str(Channel_attributes.type)
@@ -806,7 +806,7 @@ class Member(Main):
             else:
                 image = VALUES_IMG_TENSIONBOLTED_DF03[3]
             It = str(Channel_attributes.calc_TorsionConstantIt(f_w, f_t, w_h, w_t))
-            Iw = "N/A"
+            Iw = 0
 
         d = {
             KEY_SECSIZE_SELECTED: designation,
@@ -864,9 +864,9 @@ class Member(Main):
             a = float(self[0])
             b = float(self[1])
             t = float(self[2])
-            plate_thk = float(self[3])
-            l = self[4][KEY_LOCATION]
-            p = self[4][KEY_SEC_PROFILE]
+            plate_thk = float(self[3][KEY_PLATETHK][0])
+            l = self[3][KEY_LOCATION]
+            p = self[3][KEY_SEC_PROFILE]
 
             if p == "Angles":
                 sec_prop = Single_Angle_Properties()
@@ -904,12 +904,12 @@ class Member(Main):
                     Cy = "N/A"
                 moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l,plate_thk)
                 moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l,plate_thk)
-                moa_u = "N/A"
-                moa_v = "N/A"
+                moa_u = sec_prop.calc_MomentOfAreaY(a, b, t, l,plate_thk)
+                moa_v = sec_prop.calc_MomentOfAreaZ(a, b, t, l,plate_thk)
                 rog_z = sec_prop.calc_RogZ(a, b, t, l, plate_thk)
                 rog_y = sec_prop.calc_RogY(a, b, t, l, plate_thk)
-                rog_u = "N/A"
-                rog_v = "N/A"
+                rog_u = sec_prop.calc_RogY(a, b, t, l, plate_thk)
+                rog_v = sec_prop.calc_RogZ(a, b, t, l, plate_thk)
                 em_z = sec_prop.calc_ElasticModulusZz(a, b, t, l,plate_thk)
                 em_y = sec_prop.calc_ElasticModulusZy(a, b, t, l,plate_thk)
                 pm_z = sec_prop.calc_PlasticModulusZpz(a, b, t, l,plate_thk)
@@ -1004,9 +1004,9 @@ class Member(Main):
             w_h = float(self[2])
             w_t = float(self[3])
             sl = float(self[4])
-            plate_thk = float(self[5])
-            l = self[6][KEY_LOCATION]
-            p = self[6][KEY_SEC_PROFILE]
+            plate_thk = float(self[5][KEY_PLATETHK][0])
+            l = self[5][KEY_LOCATION]
+            p = self[5][KEY_SEC_PROFILE]
 
             if p =="Channels":
                 sec_prop = Single_Channel_Properties()
@@ -1215,11 +1215,10 @@ class Member(Main):
 
         val = {KEY_DP_BOLT_TYPE: "Pretensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
-               KEY_DP_BOLT_MATERIAL_G_O: str(fu),
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
                KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
                KEY_DP_WELD_MATERIAL_G_O: str(fu),
-               KEY_DP_DETAILING_EDGE_TYPE: "a - Sheared or hand flame cut",
+               KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
                KEY_DP_DETAILING_GAP: '10',
                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
                KEY_DP_DESIGN_METHOD: "Limit State Design",

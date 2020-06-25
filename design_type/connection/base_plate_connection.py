@@ -1171,7 +1171,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def get_values_for_design_pref(self, key, design_dictionary):
 
-        section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        # section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
 
         # if (design_dictionary[KEY_SECSIZE])[1:4] == 'SHS':
         #     section = SHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
@@ -2169,12 +2169,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.shear_key_required = 'Yes'
                     else:
                         self.shear_key_required = 'No'
-                else:
-                    pass
 
-            elif self.connectivity == 'Moment Base Plate':
+            if self.connectivity == 'Moment Base Plate':
 
-                if self.moment_bp_case == 'Case2':
+                if self.moment_bp_case == 'Case2&3':
                     # Check 1: Combined shear + Tension [Reference: cl.10.3.6, IS 800:2007]
                     # v_sb is calculated considering shear distribution in bolts only on the tension side (outside flange), this is the critical case
                     self.v_sb = (max(self.load_shear_major, self.load_shear_minor) * 10 ** -3) / \
@@ -2465,10 +2463,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             self.anchor_length_provided = self.dp_anchor_length
 
-        if (self.anchor_length_provided < self.anchor_length_min) or (self.anchor_length_provided > self.anchor_length_max):
-            self.safe = False
+        if self.anchor_len_below_footing < self.anchor_length_min:
             logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
-
+            logger.info(": [Anchor Bolt] The minimum length of the anchor recommended is ....")
+            logger.info(": [Anchor Bolt] Updating length of anchor bolt.")
+        elif self.anchor_len_below_footing > self.anchor_length_max:
+            logger.error(": [Anchor Bolt] The length of the anchor bolt provided occurred out of the preferred range.")
+            logger.info(": [Anchor Bolt] The minimum length of the anchor recommended is ....")
+            logger.info(": [Anchor Bolt] Updating length of anchor bolt.")
         else:
             logger.info(": [Anchor Bolt] The preferred range of length for the anchor bolt of thread size {} is as follows:"
                         .format(self.anchor_dia_provided))
@@ -3037,7 +3039,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 f_e = math.sqrt(f_a ** 2 + (3 * q ** 2))  # MPa
 
                 if f_e > ((min(self.dp_column_fu, self.dp_weld_fu_overwrite)) / (math.sqrt(3) * self.gamma_mw)):
-                    self.safe = False
                     logger.warning("The weld fails in the comb check")
                     logger.info("Updating the weld size")
                 else:
@@ -3065,32 +3066,37 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 while f_e > ((min(self.dp_column_fu, self.dp_weld_fu_overwrite)) / (math.sqrt(3) * self.gamma_mw)):
                     stiffener_plate_thick = min(self.stiffener_plt_thick_along_flange, self.stiffener_plt_thick_along_web,
                                                 self.stiffener_plt_thick_across_web)
-                    weld_list = list(range(self.weld_size_stiffener, stiffener_plate_thick, 2))
-                    weld_list = weld_list + [self.stiffener_plate_thick]
+                    weld_list = list(range(round_up(self.weld_size_stiffener, 2), stiffener_plate_thick, 2))
+                    weld_list = weld_list + [stiffener_plate_thick]
                     weld_list = weld_list[n - 1:]
 
                     for i in weld_list:
                         self.weld_size_stiffener = i
                         break
 
-                    # choosing maximum force and minimum length and height combination for a conservative weld size
-                    max_shear = max(self.shear_capa_stiffener_along_flange, self.shear_on_stiffener_along_web)
-                    max_moment = max(self.moment_on_stiffener_along_flange, self.moment_on_stiffener_along_web)
-                    min_len = min(self.stiffener_plt_len_along_flange, self.stiffener_plt_len_along_web)
-                    min_height = min(self.stiffener_plt_height_along_flange, self.stiffener_plt_height_along_web)
+                    if self.weld_size_stiffener <= 0:
+                        logger.error("The weld fails in combined stress check")
+                        logger.info("Cannot design with fillet weld. Provide groove weld")
 
-                    f_a = (max_shear * 1000 / 2) / (0.7 * self.weld_size_stiffener * min_len)  # MPa
-                    q = (max_moment * 10 ** 6 / min_height) / (0.7 * self.weld_size_stiffener * min_len)  # MPa
-                    f_e = math.sqrt(f_a ** 2 + (3 * q ** 2))  # MPa
+                    else:
+                        # choosing maximum force and minimum length and height combination for a conservative weld size
+                        max_shear = max(self.shear_capa_stiffener_along_flange, self.shear_on_stiffener_along_web)
+                        max_moment = max(self.moment_on_stiffener_along_flange, self.moment_on_stiffener_along_web)
+                        min_len = min(self.stiffener_plt_len_along_flange, self.stiffener_plt_len_along_web)
+                        min_height = min(self.stiffener_plt_height_along_flange, self.stiffener_plt_height_along_web)
 
-                    n += 1
+                        f_a = (max_shear * 1000 / 2) / (0.7 * self.weld_size_stiffener * min_len)  # MPa
+                        q = (max_moment * 10 ** 6 / min_height) / (0.7 * self.weld_size_stiffener * min_len)  # MPa
+                        f_e = math.sqrt(f_a ** 2 + (3 * q ** 2))  # MPa
 
-                    self.weld_size_stiffener = i
+                        n += 1
 
-                    if n > len(weld_list):
-                        logger.warning("The max weld size is ")
-                        logger.error("Cannot compute weld size. Provide groove weld")
-                        break
+                        self.weld_size_stiffener = i
+
+                        if n > len(weld_list):
+                            logger.warning("The max weld size is ")
+                            logger.error("Cannot compute weld size. Provide groove weld")
+                            break
 
         elif self.connectivity == 'Hollow/Tubular Column Base':
             self.sigma_max = self.w  # N/mm^2
@@ -3163,6 +3169,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             else:
                 pass
 
+        else:
+            pass
+
+        # update detailing parameters
+        self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole, self.dp_detail_edge_type)
+        self.end_distance = round_up(1.5 * self.end_distance, 5)  # mm, adding 50% extra to end distance to incorporate weld etc.
+        self.edge_distance = self.end_distance
+
+        # minimum required dimensions (L X B) of the base plate [as per the detailing criteria]
+        self.bp_length_provided = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
+
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
+            # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
+            self.bp_width_provided = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
+        elif self.connectivity == 'Hollow/Tubular Column Base':
+            self.bp_width_provided = round_up(self.column_bf + (2 * (2 * self.end_distance)), 5)  # mm
         else:
             pass
 

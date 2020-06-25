@@ -1303,7 +1303,7 @@ class Member(Main):
     def new_material(self):
 
         selected_material = self[0]
-        if selected_material == "Custom":
+        if selected_material in ["Custom","Custom Section"]:
             return True
         else:
             return False

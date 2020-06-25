@@ -28,11 +28,11 @@ Bolt.Grade:
 Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
-Bolt.Type: Friction Grip Bolt
-Connector.Flange_Plate.Preferences: Outside
+Bolt.Type: Bearing Bolt
+Connector.Flange_Plate.Preferences: Outside + Inside
 Connector.Flange_Plate.Thickness_list:
-- '16'
-Connector.Material: E 250 (Fe 410 W)B
+- '10'
+Connector.Material: E 250 (Fe 410 W)A
 Connector.Web_Plate.Thickness_List:
 - '6'
 - '8'
@@ -44,14 +44,10 @@ Connector.Web_Plate.Thickness_List:
 - '20'
 - '22'
 - '24'
+- '25'
 - '26'
 - '28'
 - '30'
-- '32'
-- '36'
-- '40'
-- '25'
-- '28'
 - '32'
 - '36'
 - '40'
@@ -64,10 +60,10 @@ Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
-Load.Axial: '1'
-Load.Moment: '1'
-Load.Shear: '1'
-Material: E 250 (Fe 410 W)B
-Member.Designation: MB 300
-Member.Material: E 250 (Fe 410 W)B
+Load.Axial: '100'
+Load.Moment: '25'
+Load.Shear: '50'
+Material: E 250 (Fe 410 W)A
+Member.Designation: WPB 200 X 200 X 34.65
+Member.Material: E 250 (Fe 410 W)A
 Module: Beam Coverplate Connection

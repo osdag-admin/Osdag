@@ -30,7 +30,10 @@ Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
 Bolt.Type: Bearing Bolt
 Connector.Flange_Plate.Preferences: Outside + Inside
-Connector.Flange_Plate.Thickness_list: &id001
+Connector.Flange_Plate.Thickness_list:
+- '18'
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Web_Plate.Thickness_List:
 - '6'
 - '8'
 - '10'
@@ -53,16 +56,14 @@ Connector.Flange_Plate.Thickness_list: &id001
 - '56'
 - '63'
 - '80'
-Connector.Material: E 250 (Fe 410 W)A
-Connector.Web_Plate.Thickness_List: *id001
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
 Load.Axial: '100'
-Load.Moment: '25'
-Load.Shear: '50'
+Load.Moment: '5'
+Load.Shear: '100'
 Material: E 250 (Fe 410 W)A
-Member.Designation: WPB 200 X 200 X 34.65
+Member.Designation: PBP 320 X 184.1
 Member.Material: E 250 (Fe 410 W)A
-Module: Beam Coverplate Connection
+Module: Column Coverplate Connection

@@ -1513,7 +1513,7 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg,multiple =1):
     tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\'))
     tension_yield_eqn.append(NoEscape(r'&=\frac{'+multiple+'*'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
 
-    tension_yield_eqn.append(NoEscape(r'&=' + T_dg +r')\\'))
+    tension_yield_eqn.append(NoEscape(r'&=' + T_dg +r'\\'))
     tension_yield_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~6.2]\end{aligned}'))
     return tension_yield_eqn
 
@@ -3538,7 +3538,7 @@ def plate_area_req(crs_area, flange_web_area):
     plate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} &pt.area >= \\&connected~member~area * 1.05\\'))
     # plate_crs_sec_area_eqn.append(NoEscape(r'& = '+crs_area+ r' * 1.05 \\'))
     plate_crs_sec_area_eqn.append(NoEscape(r' &= ' + flange_web_area  +  r'\\'))
-    plate_crs_sec_area_eqn.append(NoEscape(r' &[Ref: Cl.8.6.3.2 IS 800:2007]\end{aligned}'))
+    plate_crs_sec_area_eqn.append(NoEscape(r' &[Ref: Cl.8.6.3.2 ~IS ~800:2007]\end{aligned}'))
     return plate_crs_sec_area_eqn
 
 

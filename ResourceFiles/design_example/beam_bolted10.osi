@@ -29,8 +29,11 @@ Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
 Bolt.Type: Bearing Bolt
-Connector.Flange_Plate.Preferences: Outside + Inside
-Connector.Flange_Plate.Thickness_list: &id001
+Connector.Flange_Plate.Preferences: Outside
+Connector.Flange_Plate.Thickness_list:
+- '28'
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Web_Plate.Thickness_List:
 - '6'
 - '8'
 - '10'
@@ -53,8 +56,6 @@ Connector.Flange_Plate.Thickness_list: &id001
 - '56'
 - '63'
 - '80'
-Connector.Material: E 250 (Fe 410 W)A
-Connector.Web_Plate.Thickness_List: *id001
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: a - Sheared or hand flame cut

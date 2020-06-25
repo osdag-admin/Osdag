@@ -4029,8 +4029,64 @@ def web_plate_area_prov_bolt(D, y, webwidth, wp_area, T, r_1):
 #     diahole_eqn = Math(inline=True)
 #     diahole_eqn.append(NoEscape(r'\begin{aligned} d &=' + d0 + r' \end{aligned}'))
 
+def bearing_length(V,t_w,t_f,r_r,f_y,gamma_m0,t,r_ra):
+
+    bearing_length = round((float(V) * 1000) * gamma_m0 / t_w / f_y, 3)
+    b1_req = bearing_length - (t_f + r_r)
+    k = t_f + r_r
+    b1 = max(b1_req, k)
+
+    b1_req = str(b1_req)
+    k = str(k)
+    b1 = str(b1)
+    V = str(V)
+    t_w=str(t_w)
+    t_f =str(t_f)
+    gamma_m0 = str(gamma_m0)
+    r_r = str(r_r)
+    self.b2 = max(self.b1 + self.plate.gap - seated.thickness - seated.root_radius, 0.0)
+    bearing_length = Math(inline=True)
+    bearing_length.append(NoEscape(r'\begin{aligned} b_{lreq} &= \frac{V* \gamma_m0}{t_w * f_y} - t_f - r_r \\'))
+    bearing_length.append(NoEscape(r'&= \frac{'+V+ '*'+ gamma_m0+'}{'+t_w+'*'+ f_y+'} - '+t_f+'-'+ r_r+r' \\'))
+    bearing_length.append(NoEscape(r'&=' +b1_req+r' \\'))
+    bearing_length.append(NoEscape(r'k &= t_f +r_r \\'))
+    bearing_length.append(NoEscape(r'k &='+ t_f + r_r +'='+k+r'\\'))
+    bearing_length.append(NoEscape(r'b_1&= max(b_{1req},k)&='+b1+r'\\'))
+    bearing_length.append(NoEscape(r'b_2 &= b_1+gap-t-r_{ra}\\'))
+    bearing_length.append(NoEscape(r'b_2 &='+ b1+'+'+gap+'-'+t+'-'+r_ra+r'\\'))
+    bearing_length.append(NoEscape(r'b_2&= max(b_2,0)&=' + b2 + r'\end{aligned}'))
+    return bearing_length
 
 
+
+def moment_demand_SA(b_1,b_2,V,M):
+    if self.b2 == 0.0:
+        self.plate.moment_demand = 0.0
+    elif self.b2 <= self.b1:
+        self.plate.moment_demand = round(
+            float(self.load.shear_force) * (self.b2 / self.b1) * (self.b2 / 2) / 1E3, 3)
+    else:
+        self.plate.moment_demand = round(float(self.load.shear_force) * (self.b2 - self.b1 / 2) / 1E3, 3)
+
+    ecc = round(b_1+gap+t,2)
+    V = str(V)
+    b_1 = str(b_1)
+    gap = str(gap)
+    t = str(t)
+    M= str(M)
+    ecc = str(ecc)
+    moment_demand_SA = Math(inline=True)
+    if b_2 == 0.0:
+        moment_demand_SA.append(NoEscape(r'\begin{aligned} if b_2 = 0, M = 0.0 \end{aligned}'))
+    if b_2 <= b_1:
+        moment_demand_SA.append(NoEscape(r'\begin{aligned} M &= V * ecc\\'))
+        moment_demand_SA.append(NoEscape(r'ecc &= \frac{b_2/b_1}{b_2/2}\\'))
+        moment_demand_SA.append(NoEscape(r'ecc &= \frac{'+b_2+r'/'+b_1+r'}{'+b_2 +r'}{2} * 10^_{-3}\\'))
+        moment_demand_SA.append(NoEscape(r'&=' + ecc + r'\\'))
+        moment_demand_SA.append(NoEscape(r'&=' + ecc +r' \\'))
+    moment_demand_SA.append(NoEscape(r'M &='+ V+'*'+ecc + r'\\'))
+    moment_demand_SA.append(NoEscape(r' &='+ M+r'\end{aligned}'))
+    return moment_demand_SA
 
 def display_prov(v,t, ref = None):
     """

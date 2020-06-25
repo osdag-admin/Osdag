@@ -1920,6 +1920,7 @@ class Window(QMainWindow):
                     self.display.ExportToImage(fName)
 
             else:
+                self.display.EraseAll()
                 for chkbox in main.get_3d_components(main):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(False)
                 for action in self.menugraphics_component_list:

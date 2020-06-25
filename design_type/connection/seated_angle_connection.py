@@ -202,7 +202,7 @@ class SeatedAngleConnection(ShearConnection):
         t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
                      KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
@@ -1410,7 +1410,7 @@ class SeatedAngleConnection(ShearConnection):
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
             self.report_check.append(t1)
-            t1 = (KEY_DISP_GRD, '', self.bolt.bolt_grade_provided, '')
+            t1 = (KEY_DISP_GRD, '', self.bolt.bolt_PC_provided, '')
             self.report_check.append(t1)
             t1 = (KEY_DISP_PLTHICK, '', self.plate.thickness_provided, '')
             self.report_check.append(t1)
@@ -1543,12 +1543,44 @@ class SeatedAngleConnection(ShearConnection):
             self.report_check.append(t2)
 
         if self.design_status is True:
+            self.b1 = IS800_2007.cl_8_7_1_3_stiff_bearing_length(self.load.shear_force,
+                                                                 self.supported_section.web_thickness,
+                                                                 self.supported_section.flange_thickness,
+                                                                 self.supported_section.root_radius,
+                                                                 self.supported_section.fy)
+            # Distance from the end of bearing on seated angle horizontal leg to root angle OR A TO B in Fig 5.31 in Prof N. Subramanian's book
+            self.b2 = max(self.b1 + self.plate.gap - seated.thickness - seated.root_radius, 0.0)
+
+            if self.b2 == 0.0:
+                self.plate.moment_demand = 0.0
+            elif self.b2 <= self.b1:
+                self.plate.moment_demand = round(
+                    float(self.load.shear_force) * (self.b2 / self.b1) * (self.b2 / 2) / 1E3, 3)
+            else:
+                self.plate.moment_demand = round(float(self.load.shear_force) * (self.b2 - self.b1 / 2) / 1E3, 3)
+
+            Z_p = self.seated_angle.width * seated.thickness ** 2 / 4
+            Z_e = self.seated_angle.width * seated.thickness ** 2 / 6
+            self.plate.moment_capacity = round(
+                float(IS800_2007.cl_8_2_1_2_design_moment_strength(Z_e, Z_p, seated.fy, 'plastic')) / 1E6, 3)
+
+            area = self.seated_angle.width * seated.thickness
+            self.plate.shear_capacity = round(float(IS800_2007.cl_8_4_design_shear_strength(area, seated.fy)) / 1E3, 3)
+
+
             t1 = ('SubSection', 'Seated Angle Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t2 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force, self.plate.shear_capacity,
                   get_pass_fail(self.load.shear_force, self.plate.shear_capacity, relation='lesser'))
             self.report_check.append(t2)
-            t2 = (KEY_DISP_MOM_CAPACITY, self.plate.moment_demand, self.plate.moment_capacity,
+            t2 = (KEY_DISP_BEARING_LENGTH, '',bearing_length(self.load.shear_force,
+                                                                 self.supported_section.web_thickness,
+                                                                 self.supported_section.flange_thickness,
+                                                                 self.supported_section.root_radius,
+                                                                 self.supported_section.fy,gamma_m0),'')
+            self.report_check.append(t2)
+
+            t2 = (KEY_DISP_MOM_CAPACITY, moment_demand_SA(self.b1,self.b2,self.load.shear_force,self.plate.moment_demand), self.plate.moment_capacity,
                   get_pass_fail(self.plate.moment_demand, self.plate.moment_capacity, relation='lesser'))
             self.report_check.append(t2)
 

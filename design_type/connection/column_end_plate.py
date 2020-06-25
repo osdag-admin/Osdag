@@ -171,7 +171,7 @@ class ColumnEndPlate(MomentConnection):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
                      KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
@@ -1274,6 +1274,7 @@ class ColumnEndPlate(MomentConnection):
             print("bolt grade", self.bolt_grade_provided)
             # self.get_bolt_grade(self)
             self.design_status = True
+            print("1",self.bolt.bolt_tension_capacity)
             self.plate_details(self)
 
         else:
@@ -1673,6 +1674,7 @@ class ColumnEndPlate(MomentConnection):
 
 # def save_design(self, popup_summary):
     def save_design(self, popup_summary):
+        print("2",self.bolt.bolt_tension_capacity)
 
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
                                   KEY_DISP_BEAMSEC: self.section.designation,

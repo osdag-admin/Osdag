@@ -487,6 +487,9 @@ class Tension_bolted(Member):
 
         spacing = []
 
+        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/spacing.png')
+        spacing.append(t99)
+
 
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
@@ -501,8 +504,7 @@ class Tension_bolted(Member):
         t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
         spacing.append(t12)
 
-        # t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/pitch.png')
-        # spacing.append(t99)
+
 
         return spacing
 
@@ -599,9 +601,20 @@ class Tension_bolted(Member):
         t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX, int(round(self.plate.length,0)) if flag else '', True)
         out_list.append(t21)
 
+        t21 = (KEY_OUT_PLATE_YIELD, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.tension_yielding_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_PLATE_RUPTURE, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.tension_rupture_capacity/ 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.block_shear_capacity/ 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
         t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
                (round(self.plate_tension_capacity/1000, 2)) if flag else '', True)
-
         out_list.append(t21)
 
         # if KEY_SEC_PROFILE in ['Back to Back Angles', 'Star Angles','Back to Back Channels']:
@@ -652,7 +665,7 @@ class Tension_bolted(Member):
 
         all_errors = []
         "check valid inputs and empty inputs in input dock"
-        print(design_dictionary,'djsgggggggggggggggggggggggggggggggggggggggggggggggggggggggg')
+        # print(design_dictionary,'djsgggggggggggggggggggggggggggggggggggggggggggggggggggggggg')
         self.design_status = False
 
         flag = False

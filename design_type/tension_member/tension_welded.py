@@ -511,6 +511,18 @@ class Tension_welded(Member):
 
         out_list.append(t21)
 
+        t21 = (KEY_OUT_PLATE_YIELD, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.tension_yielding_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_PLATE_RUPTURE, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.tension_rupture_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.block_shear_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
         t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
                (round(self.plate_tension_capacity / 1000, 2)) if flag else '', True)
 

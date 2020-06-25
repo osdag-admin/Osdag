@@ -52,35 +52,69 @@ class CreateLatex(Document):
                 table.add_hline()
                 table.add_row(('Section Designation','Remarks'),color='OsdagGreen')
                 table.add_hline()
-                table.add_row((reportsummary['Design Section']['Section Designation'],'Pass'))
+                table.add_row((reportsummary['Define Section']['Section Designation'],'Pass'))
                 table.add_hline()
 
         with doc.create(Section('Section Details')):
             with doc.create(Tabularx('|X|X|', row_height=1.2)) as table:
                 table.add_hline()
-                table.add_row((bold('Section Type'),reportsummary['Design Section']['Section Type']))
+                table.add_row((bold('Section Type'),reportsummary['Define Section']['Section Type']))
                 table.add_hline()
-                table.add_row((bold('Section Template'),reportsummary['Design Section']['Section Template']))
+                table.add_row((bold('Section Template'),reportsummary['Define Section']['Section Template']))
                 table.add_hline()
 
         with doc.create(Section('Section Parameters')):
             with doc.create(Tabularx('|X|X|', row_height=1.2)) as table:
-                for parameter in reportsummary['Design Section']['Section Parameters']:
-                    para=reportsummary['Design Section']['Section Parameters'][parameter]
+                for parameter in reportsummary['Define Section']['Section Parameters']:
+                    para=reportsummary['Define Section']['Section Parameters'][parameter]
                     table.add_hline()
                     table.add_row((bold(para[0]),para[1]))
                 table.add_hline()
+
+        labels=[
+                        'Area, a(cm²)',
+                        'Moment of Inertia',
+                        'I_zz(cm4)',
+                        'I_yy(cm4)',
+                        'Radius of Gyration',
+                        'r_zz(cm)',
+                        'r_yy(cm)',
+                        'Centriod',
+                        'c_z(cm)',
+                        'c_y(cm)',
+                        'Plastic Section modulus',
+                        'Z_pz(cm³)',
+                        'Z_py(cm³)',
+                        'Elastic Section modulus',
+                        'Z_zz(cm³)',
+                        'Z_yy(cm³)',
+                        ]
+        values=list(reportsummary['Section Properties'].values())
+        Properties=[
+                        (labels[0],values[0]),
+                        (labels[1],""),
+                        (labels[2],values[1]),
+                        (labels[3],values[2]),
+                        (labels[4],""),
+                        (labels[5],values[3]),
+                        (labels[6],values[4]),
+                        (labels[7],""),
+                        (labels[8],values[5]),
+                        (labels[9],values[6]),
+                        (labels[10],""),
+                        (labels[11],values[7]),
+                        (labels[12],values[8]),
+                        (labels[13],""),
+                        (labels[14],values[9]),
+                        (labels[15],values[10]),
+
+                ]
+
         with doc.create(Section('Section Properties')):
             with doc.create(Tabularx('|X|X|',row_height=1.2)) as table:
-                for ppty in reportsummary['Section Properties']:
+                for ppty in Properties:
                     table.add_hline()
-                    if(type(reportsummary['Section Properties'][ppty])==str):
-                        table.add_row((bold(ppty),reportsummary['Section Properties'][ppty]))
-                    else:
-                        table.add_row((bold(ppty),""))
-                        for sub_ppty in reportsummary['Section Properties'][ppty]:
-                            table.add_hline()
-                            table.add_row((sub_ppty,reportsummary['Section Properties'][ppty][sub_ppty]))
+                    table.add_row((bold(ppty[0]),ppty[1]))
                 table.add_hline()
         doc.append(NewPage())
 
@@ -92,6 +126,8 @@ class CreateLatex(Document):
                     # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
                     view_3D.add_image(filename=view_3dimg_path)
 
-                    view_3D.add_caption('3D View')
-            
-        doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+                    view_3D.add_caption('3D View')   
+        try:            
+            doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+        except:
+            pass

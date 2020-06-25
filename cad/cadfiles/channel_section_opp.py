@@ -6,39 +6,38 @@ from cad.items.plate import Plate
 
 class ChannelSectionOpposite(object):
 
-    def __init__(self, B, T, D, t, R1, R2, L, l, W, H, d):
+    def __init__(self, D, B, T, t, s, l, t1, H):
         self.B = B
         self.T = T
         self.D = D
         self.t = t
-        self.R1 = R1
-        self.R2 = R2
-        self.L = L
         self.l = l
-        self.W = W
+        self.s = s
+        self.t1 = t1
         self.H = H
-        self.d = d
-        self.clearDist = 20
+
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
-        self.Plate1 = Plate(l, W, H)
-        self.Plate2 = Plate(l, W, H)
-        self.channel1 = Channel(B, T, D, t, 0, 0, L)
-        self.channel2 = Channel(B, T, D, t, 0, 0, L)
+
+        self.Plate1 = Plate(t1, H, l)
+        self.Plate2 = Plate(t1, H, l)
+        self.channel1 = Channel(B, T, D, t, 0, 0, H)
+        self.channel2 = Channel(B, T, D, t, 0, 0, H)
         #self.compute_params()
 
     def place(self, sec_origin, uDir, wDir):
         self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir
-        origin = numpy.array([self.B,0.,0.])
+        space = self.s/2+self.B
+        origin = numpy.array([space,0.,0.])
         self.channel1.place(origin, self.uDir, self.wDir)
-        origin1 = numpy.array([self.B,0.,0.])
+        origin1 = numpy.array([space,0.,0.])
         self.channel2.place(origin1, self.uDir, self.wDir)
-        origin2 = numpy.array([0.,-self.l/2,0.])
+        origin2 = numpy.array([0., -self.t1/2,0.])
         self.Plate1.place(origin2, self.uDir, self.wDir)
-        origin3 = numpy.array([0.,self.D+self.l/2,0.])
+        origin3 = numpy.array([0.,self.D+self.t1/2,0.])
         self.Plate2.place(origin3, self.uDir, self.wDir)
         #self.compute_params()
 
@@ -76,20 +75,19 @@ if __name__ == '__main__':
     display, start_display, add_menu, add_function_to_menu = init_display()
     
     B = 20
-    T = 2
+    T = 4
     D = 40
-    t = 2
-    L = 100
-    l = 4
-    W = 100
-    H = 60
-    d = 0
+    t = 4
+    t1 = 4
+    s = 10
+    l = s + 2*B
+    H = 50
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])
 
-    channel_section = ChannelSectionOpposite(B, T, D, t, 0, 0, L, l, W, H, d)
+    channel_section = ChannelSectionOpposite(D, B, T, t, s, l, t1, H)
     _place = channel_section.place(origin, uDir, shaftDir)
     point = channel_section.compute_params()
     prism = channel_section.create_model()

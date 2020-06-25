@@ -12,8 +12,9 @@ from pylatex.utils import italic, bold
 import sys
 import datetime
 import pylatex as pyl
-
-from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
+from pylatex.basic import TextColor
+from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu,\
+    MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic
 #from pdflatex import PDFLaTeX
@@ -22,7 +23,6 @@ from pylatex.base_classes import Environment, CommandBase, Arguments
 from pylatex.package import Package
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, \
     MediumText, LineBreak, simple_page_number, NewPage
-
 
 from pylatex.utils import bold
 
@@ -43,8 +43,9 @@ class CreateLatex(Document):
         client = str(reportsummary['Client'])
 
         does_design_exist = reportsummary['does_design_exist']
+        osdagheader = '/ResourceFiles/images/OsdagHeader.png'
         # Add document header
-        geometry_options = {"top": "4cm", "hmargin": "2cm", "headheight": "65pt", "footskip": "65pt"}
+        geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt"}
         doc = Document(geometry_options=geometry_options,indent=False)
         doc.packages.append(Package('amsmath'))
         doc.packages.append(Package('graphicx'))
@@ -53,13 +54,20 @@ class CreateLatex(Document):
         doc.append(pyl.Command('selectfont'))
 
         doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
-
+        doc.add_color('PassColor','HTML', '4D6E28')
+        doc.add_color('FailColor','HTML','933A16')
         header = PageStyle("header")
         # Create center header
         with header.create(Head("C")):
-            with header.create(Tabularx('|l|p{6cm}|l|X|')) as table:
+            with header.create(Tabularx('|l|p{4cm}|l|X|')) as table:
                 table.add_hline()
                 # MultiColumn(4)
+                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is'' else StandAloneGraphic(image_options="width=3.5cm,height=1cm",
+                                                                                 filename=companylogo))),
+                                               MultiColumn(2, align='|c|',
+                                                           data=['Created with',StandAloneGraphic(image_options="width=3.5cm,height=1cm",
+                                                                                 filename=rel_path + osdagheader)]),))
+                table.add_hline()
                 table.add_row(('Company Name', companyname, 'Project Title', projecttitle), color='OsdagGreen')
                 table.add_hline()
                 table.add_row(('Group/Team Name', groupteamname, 'Subtitle', subtitle), color='OsdagGreen')
@@ -68,6 +76,8 @@ class CreateLatex(Document):
                 table.add_hline()
                 table.add_row(('Date', time.strftime("%d /%m /%Y"), 'Client', client), color='OsdagGreen')
                 table.add_hline()
+
+
 
         # Create right footer
         with header.create(Foot("R")):
@@ -82,13 +92,13 @@ class CreateLatex(Document):
 
         doc.preamble.append(header)
         doc.change_document_style("header")
-
         with doc.create(Section('Input Parameters')):
             with doc.create(LongTable('|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4.5cm}|', row_height=1.2)) as table:
                 table.add_hline()
                 for i in uiObj:
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
-                    if i == "Selected Section Details":
+                    if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST:
+                    # if type(uiObj[i]) == list:
                         continue
                     if type(uiObj[i]) == dict:
                         table.add_hline()
@@ -147,7 +157,7 @@ class CreateLatex(Document):
                         table.add_row((MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
                         table.add_hline()
             for i in uiObj:
-                if i == 'Section Size*':
+                if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST:
                     with doc.create(Subsection("List of Input Section")):
                         with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
                                 str_len = len(uiObj[i])
@@ -164,7 +174,7 @@ class CreateLatex(Document):
                                     table.add_hline()
 
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
-        # doc.append(NewPage())
+        doc.append(NewPage())
         count = 0
         with doc.create(Section('Design Checks')):
             for check in Design_Check:
@@ -203,7 +213,7 @@ class CreateLatex(Document):
                                         merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 1)
                                     print('Hi', len(sectiondetails) / 2, round_up(len(sectiondetails), 2) / 2,
                                           merge_rows)
-                                    if merge_rows % 2 == 0:
+                                    if (len(sectiondetails)) % 2 == 0:
                                         sectiondetails[''] = ''
                                     a = list(sectiondetails.keys())
                                     # index=0
@@ -226,7 +236,11 @@ class CreateLatex(Document):
                             table.add_hline()
                         count = count + 1
                 else:
-                    table.add_row((check[0], check[1], check[2], check[3]))
+
+                    if check[3] == 'Fail':
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("FailColor", bold(check[3])))
+                    else:
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("PassColor", bold(check[3])))
                     table.add_hline()
         # doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
 
@@ -241,6 +255,14 @@ class CreateLatex(Document):
                     view_3D.add_image(filename=view_3dimg_path)
 
                     view_3D.add_caption('3D View')
+        try:
+            doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+        except:
+            pass
 
-        doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+
+def color_cell(cellcolor,celltext):
+    string = NoEscape(r'\cellcolor{'+cellcolor+r'}{'+celltext+r'}')
+    return string
+
 

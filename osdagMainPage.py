@@ -82,6 +82,10 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 
 import os
 from pathlib import Path
+from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
+import urllib.request
+from update import Update
+#from Thread import timer
 
 
 ############################ Pre-Build Database Updation/Creation #################
@@ -257,7 +261,7 @@ class OsdagMainWindow(QMainWindow):
                                                     'Column to Column' :[
                                                                 ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
                                                                 ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
-                                                                ('End Plate Connection','ResourceFiles/images/column_end_plate.jpg','C2C_End_Plate_Connection'),
+                                                                ('End Plate Connection','ResourceFiles/images/ccep_flush.png','C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
                                                     'PEB' : self.Under_Development,
@@ -437,8 +441,28 @@ class OsdagMainWindow(QMainWindow):
             self.about_osdag()
         elif loc == "Ask Us a Question":
             self.ask_question()
+        elif loc == "Check for Update":
+            self.notification()
         # elif loc == "FAQ":
         #     pass
+
+    def notification(self):
+        check=Update(0)
+        print(check.notifi())
+        if check.notifi()==True:
+            msg = QMessageBox.information(self, 'Update available',
+                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
+        elif check.notifi()=="no internet":
+            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
+        else:
+            msg = QMessageBox.information(self, 'Update', 'No Update Available')
+
+    def notification2(self):
+        check=Update(0)
+        if check.notifi()==True:
+            msg = QMessageBox.information(self, 'Update available',
+                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
+
 
     def select_workspace_folder(self):
         # This function prompts the user to select the workspace folder and returns the name of the workspace folder
@@ -636,11 +660,13 @@ class OsdagMainWindow(QMainWindow):
         self.ask_question()
 
     def design_examples(self):
-        root_path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'design_example', '_build', 'html')
+        root_path = os.path.join('ResourceFiles', 'design_example', '_build', 'html')
         for html_file in os.listdir(root_path):
-           if html_file.startswith('index'):
+            # if html_file.startswith('index'):
+            print(os.path.splitext(html_file)[1])
+            if os.path.splitext(html_file)[1] == '.html':
                if sys.platform == ("win32" or "win64"):
-                   os.startfile("%s/%7s" % (root_path, html_file))
+                   os.startfile(os.path.join(root_path, html_file))
                else:
                    opener ="open" if sys.platform == "darwin" else "xdg-open"
                    subprocess.call([opener, "%s/%s" % (root_path, html_file)])
@@ -679,6 +705,7 @@ if __name__ == '__main__':
     # app.exec_()
     # sys.exit(app.exec_())
     try:
+        # window.notification2()
         QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)

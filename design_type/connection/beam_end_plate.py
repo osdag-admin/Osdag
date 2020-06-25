@@ -73,10 +73,13 @@ class BeamEndPlate(MomentConnection):
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t3)
 
-        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
+
+        t6 = (KEY_DISP_BEAMSEC, [KEY_SECSIZE], ['Label_21'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t6)
 
         return change_tab
 
@@ -118,9 +121,6 @@ class BeamEndPlate(MomentConnection):
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
         design_input.append(t3)
 
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
-        design_input.append(t3)
-
         t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
         design_input.append(t4)
 
@@ -159,7 +159,7 @@ class BeamEndPlate(MomentConnection):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
                      KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
@@ -180,6 +180,26 @@ class BeamEndPlate(MomentConnection):
         add_buttons.append(t2)
 
         return add_buttons
+
+    def get_values_for_design_pref(self, key, design_dictionary):
+
+        if design_dictionary[KEY_MATERIAL] != 'Select Material':
+            fu = Material(design_dictionary[KEY_MATERIAL],41).fu
+        else:
+            fu = ''
+
+        val = {KEY_DP_BOLT_TYPE: "Pretensioned",
+               KEY_DP_BOLT_HOLE_TYPE: "Standard",
+               KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
+               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
+               KEY_DP_DETAILING_GAP: '0',
+               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
+               KEY_DP_DESIGN_METHOD: "Limit State Design",
+               KEY_CONNECTOR_MATERIAL: str(design_dictionary[KEY_MATERIAL])
+               }[key]
+
+        return val
 
     ####################################
     # Design Preference Functions End

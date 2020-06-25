@@ -62,15 +62,21 @@ class FinPlateConnection(ShearConnection):
 
         change_tab.append(t3)
 
-        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+        t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20','Label_21','Label_22',KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t4)
 
-        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4'],
+        t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4','Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
-               'Label_19', 'Label_20','Label_21','Label_22'], TYPE_TEXTBOX, self.get_I_sec_properties)
+               'Label_19', 'Label_20','Label_21','Label_22',KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
+
+        t6 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t6)
+
+        t7 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        change_tab.append(t7)
 
         return change_tab
 
@@ -83,9 +89,6 @@ class FinPlateConnection(ShearConnection):
         design_input.append(t2)
 
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
-        design_input.append(t3)
-
-        t3 = ("Bolt", TYPE_TEXTBOX, [KEY_DP_BOLT_MATERIAL_G_O])
         design_input.append(t3)
 
         t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
@@ -113,7 +116,7 @@ class FinPlateConnection(ShearConnection):
         t1 = (KEY_MATERIAL, [KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
                      KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
@@ -243,7 +246,7 @@ class FinPlateConnection(ShearConnection):
 
         capacities = []
 
-        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/block_shear.png')
+        t99 = (None, 'Shear Capacities', TYPE_SECTION, './ResourceFiles/images/block_shear.png')
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity/1000,2) if status else '')
@@ -255,7 +258,7 @@ class FinPlateConnection(ShearConnection):
         t17 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity_shear/1000,2) if status else '')
         capacities.append(t17)
 
-        t99 = (None, 'Section2', TYPE_SECTION, './ResourceFiles/images/block_shear_axial.png')
+        t99 = (None, 'Tension Capacities', TYPE_SECTION, './ResourceFiles/images/block_shear_axial.png')
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
@@ -888,7 +891,8 @@ class FinPlateConnection(ShearConnection):
 
         if self.weld.strength < self.weld.stress:
             self.weld.design_status = False
-            logger.warning('weld stress is guiding plate height, current length {} mm'.format(self.plate.height))
+            logger.info('weld stress is guiding plate dimensions, current length {} mm, thickness {} mm,'
+                           ' weld size {} mm'.format(self.plate.height,self.plate.thickness_provided,self.weld.size))
 
     def get_design_status(self):
         if self.plate.design_status is True and self.weld.design_status is True:
@@ -978,82 +982,8 @@ class FinPlateConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self,popup_summary):
+        super(FinPlateConnection,self).save_design(self)
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
-        self.report_supporting = {KEY_DISP_SEC_PROFILE:"ISection",
-                                  KEY_DISP_SUPTNGSEC: self.supporting_section.designation,
-                                  KEY_DISP_MATERIAL: self.supporting_section.material,
-                                  KEY_DISP_FU: self.supporting_section.fu,
-                                  KEY_DISP_FY: self.supporting_section.fy,
-                                  'Mass': self.supporting_section.mass,
-                                  'Area(cm2) - A': self.supporting_section.area,
-                                  'D(mm)': self.supporting_section.depth,
-                                  'B(mm)': self.supporting_section.flange_width,
-                                  't(mm)': self.supporting_section.web_thickness,
-                                  'T(mm)': self.supporting_section.flange_thickness,
-                                  'FlangeSlope': self.supporting_section.flange_slope,
-                                  'R1(mm)': self.supporting_section.root_radius,
-                                  'R2(mm)': self.supporting_section.toe_radius,
-                                  'Iz(cm4)': self.supporting_section.mom_inertia_z,
-                                  'Iy(cm4)': self.supporting_section.mom_inertia_y,
-                                  'rz(cm)': self.supporting_section.rad_of_gy_z,
-                                  'ry(cm)': self.supporting_section.rad_of_gy_y,
-                                  'Zz(cm3)': self.supporting_section.elast_sec_mod_z,
-                                  'Zy(cm3)': self.supporting_section.elast_sec_mod_y,
-                                  'Zpz(cm3)': self.supporting_section.plast_sec_mod_z,
-                                  'Zpy(cm3)': self.supporting_section.elast_sec_mod_y}
-
-        self.report_supported = {
-            KEY_DISP_SEC_PROFILE:"ISection", #Image shall be save with this name.png in resource files
-            KEY_DISP_SUPTDSEC: self.supported_section.designation,
-            KEY_DISP_MATERIAL: self.supported_section.material,
-            KEY_DISP_FU: self.supported_section.fu,
-            KEY_DISP_FY: self.supported_section.fy,
-            'Mass': self.supported_section.mass,
-            'Area(cm2) - A': round(self.supported_section.area, 2),
-            'D(mm)': self.supported_section.depth,
-            'B(mm)': self.supported_section.flange_width,
-            't(mm)': self.supported_section.web_thickness,
-            'T(mm)': self.supported_section.flange_thickness,
-            'FlangeSlope': self.supported_section.flange_slope,
-            'R1(mm)': self.supported_section.root_radius,
-            'R2(mm)': self.supported_section.toe_radius,
-            'Iz(cm4)': self.supported_section.mom_inertia_z,
-            'Iy(cm4)': self.supported_section.mom_inertia_y,
-            'rz(cm)': self.supported_section.rad_of_gy_z,
-            'ry(cm)': self.supported_section.rad_of_gy_y,
-            'Zz(cm3)': self.supported_section.elast_sec_mod_z,
-            'Zy(cm3)': self.supported_section.elast_sec_mod_y,
-            'Zpz(cm3)': self.supported_section.plast_sec_mod_z,
-            'Zpy(cm3)': self.supported_section.elast_sec_mod_y}
-
-        self.report_input = \
-            {KEY_MODULE: self.module,
-            KEY_MAIN_MODULE: self.mainmodule,
-            KEY_CONN: self.connectivity,
-            KEY_DISP_SHEAR: self.load.shear_force,
-            "Supporting Section":"TITLE",
-            "Supporting Section Details": self.report_supporting,
-            "Supported Section":"TITLE",
-            "Supported Section Details": self.report_supported,
-            "Bolt Details":"TITLE",
-            KEY_DISP_D: str(self.bolt.bolt_diameter),
-            KEY_DISP_GRD: str(self.bolt.bolt_grade),
-            KEY_DISP_TYP: self.bolt.bolt_type,
-            KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-            KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
-            KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-            KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
-            KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES: self.bolt.corrosive_influences,
-            "Plate Details": "TITLE",
-            KEY_DISP_PLATETHK: str(self.plate.thickness),
-            KEY_DISP_MATERIAL: self.plate.material,
-            KEY_DISP_FU: self.plate.fu,
-            KEY_DISP_FY: self.plate.fy,
-            "Weld Details":"TITLE",
-            KEY_DISP_DP_WELD_TYPE: "Fillet",
-            KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
-            KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
-
 
         self.report_check = []
         if self.plate.design_status is True:
@@ -1065,7 +995,7 @@ class FinPlateConnection(ShearConnection):
             bolt_capacity_red_kn=round(self.plate.bolt_capacity_red/1000,2)
 
 
-            t1 = ('SubSection', 'Bolt Design Checks','|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Bolt Design Checks','|p{4cm}|p{5.5cm}|p{5cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
             self.report_check.append(t1)
@@ -1079,28 +1009,32 @@ class FinPlateConnection(ShearConnection):
             self.report_check.append(t6)
             t7 = (DISP_NUM_OF_ROWS, '', self.plate.bolts_one_line, '')
             self.report_check.append(t7)
-            t1 = (DISP_MIN_PITCH, min_pitch(self.bolt.bolt_diameter_provided),
+            t1 = (DISP_MIN_PITCH, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.plate.gauge_provided, get_pass_fail(self.bolt.min_pitch, self.plate.gauge_provided,relation='lesser'))
             self.report_check.append(t1)
-            t1 = (DISP_MAX_PITCH, max_pitch(connecting_plates),
+            t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(connecting_plates),
                   self.plate.gauge_provided, get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided,relation='greater'))
             self.report_check.append(t1)
-            t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt.bolt_diameter_provided),
+            t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided),
                   self.plate.pitch_provided, get_pass_fail(self.bolt.min_gauge, self.plate.pitch_provided,relation="lesser"))
             self.report_check.append(t2)
-            t2 = (DISP_MAX_GAUGE, max_pitch(connecting_plates),
+            t2 = (DISP_MAX_GAUGE, cl_10_2_3_1_max_spacing(connecting_plates),
                   self.plate.pitch_provided, get_pass_fail(self.bolt.max_spacing, self.plate.pitch_provided,relation="greater"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_END, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(d_0=self.bolt.dia_hole,
+                                                               edge_type=self.bolt.edge_type, parameter='end_dist'),
                   self.plate.edge_dist_provided, get_pass_fail(self.bolt.min_end_dist, self.plate.edge_dist_provided,relation='lesser'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_END, max_edge_end_new(self.bolt_conn_plates_t_fu_fy,self.bolt.corrosive_influences),
+            t4 = (DISP_MAX_END, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences,
+                                                              parameter='end_dist'),
                   self.plate.edge_dist_provided, get_pass_fail(self.bolt.max_end_dist, self.plate.edge_dist_provided,relation='greater'))
             self.report_check.append(t4)
-            t3 = (DISP_MIN_EDGE, min_edge_end(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(d_0=self.bolt.dia_hole,
+                                                               edge_type=self.bolt.edge_type, parameter='edge_dist'),
                   self.plate.end_dist_provided, get_pass_fail(self.bolt.min_edge_dist, self.plate.end_dist_provided,relation='lesser'))
             self.report_check.append(t3)
-            t4 = (DISP_MAX_EDGE, max_edge_end_new(self.bolt_conn_plates_t_fu_fy,self.bolt.corrosive_influences),
+            t4 = (DISP_MAX_EDGE, cl_10_2_4_3_max_edge_end_dist(self.bolt_conn_plates_t_fu_fy, self.bolt.corrosive_influences,
+                                                               parameter='edge_dist'),
                   self.plate.end_dist_provided, get_pass_fail(self.bolt.max_edge_dist, self.plate.end_dist_provided,relation="greater"))
             self.report_check.append(t4)
 
@@ -1179,14 +1113,14 @@ class FinPlateConnection(ShearConnection):
             t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth,self.min_plate_height), self.plate.height,
                   get_pass_fail(self.min_plate_height, self.plate.height,relation="lesser"))
             self.report_check.append(t1)
-            pl_ht = 'Maximum~plate~height~(h_{plate})'
-            plate_ht_clause = '[cl.10.2.3]'
-            t1 = (disp_clause(pl_ht,plate_ht_clause), max_plate_ht_req(self.connectivity,self.supported_section.depth,
+
+            t1 = (DISP_MAX_PLATE_HEIGHT, max_plate_ht_req(self.connectivity,self.supported_section.depth,
                                                           self.supported_section.flange_thickness,
                                                           self.supported_section.root_radius, self.supported_section.notch_ht,
                                                           self.max_plate_height), self.plate.height,
                   get_pass_fail(self.max_plate_height, self.plate.height,relation="greater"))
             self.report_check.append(t1)
+
             min_plate_length = self.plate.gap +2*self.bolt.min_end_dist+(self.plate.bolt_line-1)*self.bolt.min_pitch
             t1 = (DISP_MIN_PLATE_LENGTH, min_plate_length_req(self.bolt.min_pitch, self.bolt.min_end_dist,
                                                           self.plate.bolt_line,min_plate_length), self.plate.length,
@@ -1254,7 +1188,7 @@ class FinPlateConnection(ShearConnection):
                 self.report_check.append(t1)
 
                 t1 = (KEY_DISP_IR, IR_req(IR=1),
-                      mom_axial_IR_prov(round(self.plate.moment_demand / 1000000, 2),
+                      IR_prov(round(self.plate.moment_demand / 1000000, 2),
                                         round(a.moment_capacity / 1000000, 2),
                                         self.load.axial_force, round(a.tension_capacity / 1000, 2), a.IR),
                       get_pass_fail(1, a.IR, relation="greater"))

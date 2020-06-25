@@ -1315,6 +1315,7 @@ class Ui_OsdagSectionModeller(object):
                 self.ESM_text2.setText(str(round(Zyy,4)))
                 display.EraseAll()
                 self.create_cad_model(index_type,index_template,parameters)
+
         
         def init_display(self):
                 '''

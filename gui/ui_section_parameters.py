@@ -198,7 +198,6 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             QtCore.QRegExp("[0-9.]*"), self.parameterText_7
         ))
 
-
     def save_parameters(self,index_type,index_template):
         '''
         Save Section Parameters for further use

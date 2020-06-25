@@ -6,6 +6,7 @@ from design_type.connection.beam_cover_plate import BeamCoverPlate
 from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
+from design_type.connection.column_end_plate import ColumnEndPlate
 import yaml
 from utils.common.component import Bolt, Plate, Weld
 from Common import *
@@ -31,18 +32,22 @@ for f in files:
 
     module = d['Module']
 
-    if module == KEY_DISP_BEAMCOVERPLATE:
-        main = BeamCoverPlate
+
+    if module == KEY_DISP_COLUMNENDPLATE:
+        main = ColumnEndPlate
         main.set_osdaglogger(None)
         main.set_input_values(main, d)
         base = os.path.basename(f)
+        #TODO:comment below line for fin check
         test_in_list = d
         # filename = str(os.path.splitext(base)[0])+".txt"
         # test_out_list = main.results_to_test(main)
         # f = open(filename, "w")
         # f.write(str(test_out_list))
         # f.close()
-        workbook_name = 'BBCP.xlsx'
+
+        workbook_name = 'CCEP.xlsx'
+
         sheet_name = str(os.path.splitext(base)[0])
         try:
             wb = load_workbook(workbook_name)
@@ -57,6 +62,8 @@ for f in files:
         # writer = ExcelWriter(workbook_name, engine='openpyxl')
         # writer.book = wb
         test_out_list = main.results_to_test(main)
+        # TODO:uncomment below line for fin check
+        # [test_in_list,test_out_list] = main.results_to_test(main)
 
         # df = pd.DataFrame.from_records(list(test_out_list.items()), columns=['Check', 'Value'])
 

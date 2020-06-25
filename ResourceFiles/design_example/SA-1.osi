@@ -15,7 +15,7 @@ Connector.Top_Angle:
 - 90 x 90 x 8
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
-Detailing.Edge_type: a - Sheared or hand flame cut
+Detailing.Edge_type: Sheared or hand flame cut
 Detailing.Gap: '10'
 Load.Shear: '120'
 Material: E 250 (Fe 410 W)A

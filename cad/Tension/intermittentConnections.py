@@ -11,6 +11,7 @@ from cad.items.ModelUtils import getGpPt
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 from cad.items.filletweld import FilletWeld
 from cad.items.plate import Plate
+import numpy as np
 
 
 class IntermittentNutBoltPlateArray():
@@ -24,6 +25,7 @@ class IntermittentNutBoltPlateArray():
         self.bolt = bolt
         self.intermittentPlate = intermittentPlate
         self.gap = nut_space
+        self.plateObj = plateObj
 
         self.origin = None
         self.gaugeDir = None
@@ -34,6 +36,8 @@ class IntermittentNutBoltPlateArray():
 
         self.bolts = []
         self.nuts = []
+        self.boltsabv = []
+        self.nutsabv = []
         self.plates = []
         self.initialiseNutBolts()
 
@@ -48,12 +52,14 @@ class IntermittentNutBoltPlateArray():
         b = self.bolt
         n = self.nut
         p = self.intermittentPlate
-        for i in range(self.row * self.no_intermitent_connections):
+        for i in np.arange(self.row * self.no_intermitent_connections):
             bolt_len_required = float(self.gap)
             b.H = bolt_len_required + 10
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
-        for i in range(self.no_intermitent_connections):
+            self.boltsabv.append(Bolt(b.R, b.T, b.H, b.r))
+            self.nutsabv.append(Nut(n.R, n.T, n.H, n.r1))
+        for i in np.arange(self.no_intermitent_connections):
             self.plates.append(Plate(p.L, p.W, p.T))
 
     def initBoltPlaceParams(self, plateObj):
@@ -67,27 +73,42 @@ class IntermittentNutBoltPlateArray():
         self.col = plateObj.inter_bolt_line  # 1
         self.no_intermitent_connections = plateObj.inter_conn
 
+        self.root_radius = float(plateObj.section_size_1.root_radius)
+        if plateObj.sec_profile in ['Back to Back Angles', 'Angles', 'Star Angles']:
+            self.member_thickness = float(plateObj.section_size_1.thickness)
+            self.member_web_thickness = self.member_thickness
+            if plateObj.loc == 'Long Leg':
+                self.memberdeepth= float(plateObj.section_size_1.max_leg)
+            else:
+                self.memberdeepth = float(plateObj.section_size_1.min_leg)
+        else:
+            self.memberdeepth = float(plateObj.section_size_1.depth)
+            self.member_thickness = float(plateObj.section_size_1.flange_thickness)
+            self.member_web_thickness = float(plateObj.section_size_1.web_thickness)
+
     def calculatePositions(self):
         """
         Calculate the exact position for nut, bolts and plates.
         """
         self.positions = []
-        for connec in range(self.no_intermitent_connections):
+        self.origin = self.origin + (self.spacing - 2*self.end)*self.pitchDir
+        for connec in np.arange(self.no_intermitent_connections):
             pltpos = self.origin
             pltpos = pltpos + (connec * self.spacing) * self.pitchDir
-            pltpos = pltpos + (self.gap - self.intermittentPlate.T) * self.boltDir
-            pltpos = pltpos + self.intermittentPlate.L / 2 * self.gaugeDir
+            pltpos = pltpos + (self.intermittentPlate.T/2) * self.boltDir
+            pltpos = pltpos
 
             self.platePositions.append(pltpos)
-            for rw in range(self.row):
-                for col in range(self.col):
-                    pos = self.origin
-                    pos = pos + 5 * self.gaugeDir
+            for rw in np.arange(self.row):
+                for col in np.arange(self.col):
+                    pos = self.origin +(self.member_thickness + self.root_radius - self.memberdeepth/2) * self.gaugeDir
+                    # pos = pos + 5 * self.gaugeDir
                     pos = pos + self.edge * self.gaugeDir
                     pos = pos + col * self.pitch * self.pitchDir
                     pos = pos + self.end * self.pitchDir
                     pos = pos + rw * self.gauge * self.gaugeDir
                     pos = pos + connec * self.spacing * self.pitchDir
+                    pos = pos - self.member_web_thickness * self.boltDir
 
                     self.positions.append(pos)
 
@@ -100,36 +121,55 @@ class IntermittentNutBoltPlateArray():
 
         self.calculatePositions()
 
-        for index, pos in enumerate(self.positions):
-            self.bolts[index].place(pos, gaugeDir, boltDir)
-            self.nuts[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)
+        if self.plateObj.sec_profile == 'Star Angles':
+            for index, pos in enumerate(self.positions):
+                self.bolts[index].place(pos + self.memberdeepth/2 * self.gaugeDir , self.gaugeDir, self.boltDir)
+                self.nuts[index].place((pos + (self.gap) * self.boltDir + self.memberdeepth/2 * self.gaugeDir), self.gaugeDir, -self.boltDir)
+                self.boltsabv[index].place(pos + (self.gap - self.nut.T + self.bolt.T) * self.boltDir - self.memberdeepth/2 * self.gaugeDir, self.gaugeDir, -self.boltDir)
+                self.nutsabv[index].place((pos - self.memberdeepth/2 * self.gaugeDir), self.gaugeDir, self.boltDir)
 
-        for index, pltpos in enumerate(self.platePositions):
-            self.plates[index].place(pltpos, boltDir, pitchDir)
+            for index, pltpos in enumerate(self.platePositions):
+                self.plates[index].place(pltpos, self.boltDir, self.pitchDir)
+
+        else:
+            for index, pos in enumerate(self.positions):
+                self.bolts[index].place(pos, gaugeDir, boltDir)
+                self.nuts[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)
+
+            for index, pltpos in enumerate(self.platePositions):
+                self.plates[index].place(pltpos, boltDir, pitchDir)
 
     def create_model(self):
         for bolt in self.bolts:
             self.models.append(bolt.create_model())
 
         for nut in self.nuts:
+
             self.models.append(nut.create_model())
+
+        if self.plateObj.sec_profile == 'Star Angles':
+            for bolt in self.boltsabv:
+                self.models.append(bolt.create_model())
+
+            for nut in self.nutsabv:
+                self.models.append(nut.create_model())
 
         for plate in self.plates:
             self.platemodels.append(plate.create_model())
-
-        nut_bolts = self.models
-        nbarray = nut_bolts[0]
-        for comp in nut_bolts:
-            nbarray = BRepAlgoAPI_Fuse(comp, nbarray).Shape()
-
-        plates = self.platemodels
-        parray = plates[0]
-        for comp in plates:
-            parray = BRepAlgoAPI_Fuse(comp, parray).Shape()
-
-        array = BRepAlgoAPI_Fuse(nbarray, parray).Shape()
-
-        return array
+        #
+        # nut_bolts = self.models
+        # nbarray = nut_bolts[0]
+        # for comp in nut_bolts:
+        #     nbarray = BRepAlgoAPI_Fuse(comp, nbarray).Shape()
+        #
+        # plates = self.platemodels
+        # parray = plates[0]
+        # for comp in plates:
+        #     parray = BRepAlgoAPI_Fuse(comp, parray).Shape()
+        #
+        # array = BRepAlgoAPI_Fuse(nbarray, parray).Shape()
+        #
+        # return array
 
     def get_nut_bolt_models(self):
         nut_bolts = self.models
@@ -169,6 +209,7 @@ class IntermittentWelds():
 
     def __init__(self, plateObj, welds, intermittentPlate):
 
+        self.plateObj = plateObj
         self.welds = welds
         self.intermittentPlate = intermittentPlate
 
@@ -179,6 +220,8 @@ class IntermittentWelds():
 
         self.weldsabw = []
         self.weldsblw = []
+        self.weldsabw1 = []
+        self.weldsblw1 = []
         self.plates = []
 
         self.initWeldPlaceParams(plateObj)
@@ -194,18 +237,19 @@ class IntermittentWelds():
     def initialiseWelds(self):
         w = self.welds
         p = self.intermittentPlate
-        for i in range(self.no_intermitent_connections):
+        for i in np.arange(self.no_intermitent_connections):
             self.weldsabw.append(FilletWeld(w.h, w.b, w.L))
             self.weldsblw.append(FilletWeld(w.h, w.b, w.L))
+            self.weldsabw1.append(FilletWeld(w.h, w.b, w.L))
+            self.weldsblw1.append(FilletWeld(w.h, w.b, w.L))
             self.plates.append(Plate(p.L, p.W, p.T))
 
     def initWeldPlaceParams(self, plateObj):
 
         self.spacing = plateObj.inter_memb_length  # 300
-        self.no_intermitent_connections = 3  # int(plateObj.inter_conn)  # 2
-        # todo: add member depth here
-        # self.memberdepth = 175
-        if plateObj.sec_profile in ['Back to Back Angles', 'Angles']:
+        self.no_intermitent_connections = int(plateObj.inter_conn)  # 2
+
+        if plateObj.sec_profile in ['Back to Back Angles', 'Angles', 'Star Angles']:
             if plateObj.loc == 'Long Leg':
                 self.memberdepth = float(plateObj.section_size_1.max_leg)
             else:
@@ -217,7 +261,8 @@ class IntermittentWelds():
         """
         Calculate the exact position for welds and plates
         """
-        for i in range(self.no_intermitent_connections):
+        self.origin = self.origin + (self.spacing) * self.uDir
+        for i in np.arange(self.no_intermitent_connections):
             pos = self.origin + i * self.spacing * self.uDir
             pos0 = pos + self.intermittentPlate.T / 2 * self.vDir
             pos1 = pos + self.memberdepth / 2 * self.wDir
@@ -234,18 +279,33 @@ class IntermittentWelds():
         self.wDir = wDir
 
         self.calculatePositions()
-
-        for index, pos0 in enumerate(self.platePostions):
-            self.plates[index].place(pos0, vDir, uDir)
-        for index, pos1 in enumerate(self.weldabwPositions):
-            self.weldsabw[index].place(pos1, wDir, uDir)
-        for index, pos2 in enumerate(self.weldblwPositions):
-            self.weldsblw[index].place(pos2, -wDir, -uDir)
+        if self.plateObj.sec_profile == 'Star Angles':
+            for index, pos0 in enumerate(self.platePostions):
+                self.plates[index].place(pos0 , vDir, uDir)
+            for index, pos1 in enumerate(self.weldabwPositions):
+                self.weldsabw[index].place(pos1 - self.memberdepth*wDir/2, wDir, uDir)
+                self.weldsabw1[index].place(pos1 + self.intermittentPlate.T * vDir + self.memberdepth*wDir/2, vDir, uDir)
+            for index, pos2 in enumerate(self.weldblwPositions):
+                self.weldsblw[index].place(pos2 - self.memberdepth*wDir/2, -wDir, -uDir)
+                self.weldsblw1[index].place(pos2 + self.intermittentPlate.T * vDir + self.memberdepth*wDir/2, vDir, -uDir)
+        else:
+            for index, pos0 in enumerate(self.platePostions):
+                self.plates[index].place(pos0, vDir, uDir)
+            for index, pos1 in enumerate(self.weldabwPositions):
+                self.weldsabw[index].place(pos1, wDir, uDir)
+                self.weldsabw1[index].place(pos1 + self.intermittentPlate.T * vDir, vDir, uDir)
+            for index, pos2 in enumerate(self.weldblwPositions):
+                self.weldsblw[index].place(pos2, -wDir, -uDir)
+                self.weldsblw1[index].place(pos2 + self.intermittentPlate.T * vDir, vDir, -uDir)
 
     def create_model(self):
         for weld in self.weldsabw:
             self.weldmodels.append(weld.create_model())
         for weld in self.weldsblw:
+            self.weldmodels.append(weld.create_model())
+        for weld in self.weldsabw1:
+            self.weldmodels.append(weld.create_model())
+        for weld in self.weldsblw1:
             self.weldmodels.append(weld.create_model())
         for plate in self.plates:
             self.platemodels.append(plate.create_model())

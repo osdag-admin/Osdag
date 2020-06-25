@@ -151,8 +151,8 @@ class Tension_bolted(Member):
         # t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
         # design_input.append(t4)
         #
-        t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
-        design_input.append(t5)
+        # t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
+        # design_input.append(t5)
 
         t5 = ("Detailing", TYPE_COMBOBOX, [KEY_DP_DETAILING_CORROSIVE_INFLUENCES,KEY_DP_DETAILING_EDGE_TYPE])
         design_input.append(t5)
@@ -181,7 +181,7 @@ class Tension_bolted(Member):
         design_input.append(t1)
 
         t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
-                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP, KEY_DP_DETAILING_EDGE_TYPE,
+                     KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
 
@@ -354,6 +354,9 @@ class Tension_bolted(Member):
         t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
         lst.append(t8)
 
+        t9 = ([KEY_SECSIZE],KEY_SECSIZE,TYPE_CUSTOM_SECTION,self.new_material)
+        lst.append(t9)
+
         # t5 = ([KEY_SEC_PROFILE], DISP_TITLE_INTERMITTENT , TYPE_OUT_DOCK, self.out_intermittent)
         # lst.append(t5)
         #
@@ -448,7 +451,7 @@ class Tension_bolted(Member):
         t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, VALUES_LOCATION_1, True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator')
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized','Custom Section'], True, 'No Validator')
         options_list.append(t4)
 
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')

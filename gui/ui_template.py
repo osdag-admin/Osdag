@@ -310,7 +310,7 @@ class Window(QMainWindow):
         MainWindow.setObjectName("MainWindow")
 
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/finwindow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/Osdag.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setIconSize(QtCore.QSize(20, 2))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -2025,7 +2025,7 @@ class Window(QMainWindow):
 
                         pmap = QPixmap(option[3])
                         #im.setScaledContents(1)
-                        im.setPixmap(pmap.scaled(170,340,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+                        im.setPixmap(pmap.scaled(250,250,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
                         #im.setPixmap(pmap)
                         image_layout.addWidget(im)
                         j += 1

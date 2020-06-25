@@ -637,7 +637,7 @@ class Window(QMainWindow):
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
-                im.setGeometry(QtCore.QRect(190, 10 + i, 70, 57))
+                im.setGeometry(QtCore.QRect(190, 10 + i, 100, 100))
                 im.setObjectName(option[0])
                 im.setScaledContents(True)
                 pixmap = QPixmap(option[3])

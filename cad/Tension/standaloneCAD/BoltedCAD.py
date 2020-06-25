@@ -146,7 +146,7 @@ class TensionAngleBoltCAD(object):
 
         self.plate2_Model = self.plate2.create_model()
 
-        if self.Obj == 'Back to Back Angles' or self.Obj == 'Back to Back Channels' or self.Obj == 'Star Angles' and self.member.L >=1000:
+        if self.Obj == 'Back to Back Angles' or self.Obj == 'Back to Back Channels' or self.Obj == 'Star Angles' and self.member.L >1000:
             intermittentConnectionOriginL = numpy.array([0, 0.0, 0.0])
             intermittentConnection_uDir = numpy.array([0.0, 0.0, -1.0])
             intermittentConnection_vDir = numpy.array([1.0, 0.0, 0.0])

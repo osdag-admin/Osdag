@@ -89,7 +89,7 @@ available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDE
                     KEY_DISP_TENSION_BOLTED:Tension_bolted,KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
                     KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
                     KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate, KEY_DISP_ENDPLATE:EndPlateConnection,
-                    KEY_DISP_SEATED_ANGLE:SeatedAngleConnection}
+                    KEY_DISP_SEATED_ANGLE:SeatedAngleConnection, KEY_DISP_COLUMNENDPLATE:ColumnEndPlate}
 
 # available_module = {KEY_DISP_TENSION_WELDED:Tension_welded,
 #                     KEY_DISP_TENSION_BOLTED:Tension_bolted}

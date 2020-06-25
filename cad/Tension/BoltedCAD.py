@@ -43,6 +43,8 @@ class TensionAngleBoltCAD(object):
         self.end = self.Obj.plate.end_dist_provided
         self.pitch = self.Obj.plate.pitch_provided
         self.plate_intercept = 2 * self.end + (self.col - 1) * self.pitch
+        self.inter_length = self.member.L - 2*(self.end + (self.col -1) * self.pitch)
+        # print(self.inter_length)
 
     def create_3DModel(self):
 
@@ -145,7 +147,7 @@ class TensionAngleBoltCAD(object):
 
         self.plate2_Model = self.plate2.create_model()
 
-        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles' and self.member.L >=1000:
+        if (self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles') and self.inter_length > 1000:
             intermittentConnectionOriginL = numpy.array([0, 0.0, 0.0])
             intermittentConnection_uDir = numpy.array([0.0, 0.0, -1.0])
             intermittentConnection_vDir = numpy.array([1.0, 0.0, 0.0])
@@ -238,7 +240,7 @@ class TensionAngleBoltCAD(object):
 
     def get_plates_models(self):
         plate = BRepAlgoAPI_Fuse(self.plate1_Model, self.plate2_Model).Shape()
-        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles' and self.member.L >=1000:
+        if (self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles') and self.inter_length > 1000:
             plate = BRepAlgoAPI_Fuse(plate, self.inter_conc_plates).Shape()
         return plate
 
@@ -256,7 +258,7 @@ class TensionAngleBoltCAD(object):
         # for comp in nut_bolts:
         #     array = BRepAlgoAPI_Fuse(comp, array).Shape()
 
-        if self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles' and self.member.L >= 1000:
+        if (self.Obj.sec_profile == 'Back to Back Angles' or self.Obj.sec_profile == 'Back to Back Channels' or self.Obj.sec_profile == 'Star Angles') and self.inter_length > 1000:
             array = BRepAlgoAPI_Fuse(array, self.inter_conc_bolts).Shape()
 
         return array

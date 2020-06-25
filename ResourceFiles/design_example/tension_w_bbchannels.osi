@@ -1,5 +1,15 @@
 Conn_Location: Web
 Connector.Material: E 250 (Fe 410 W)B
+Connector.Plate.Thickness_List:
+- '30'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '80'
 Design.Design_Method: Limit State Design
 Detailing.Gap: '10'
 Load.Axial: '500'

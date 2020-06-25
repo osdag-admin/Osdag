@@ -383,6 +383,27 @@ class ShearConnection(Connection):
         }
         return d
 
+
+    def get_values_for_design_pref(self, key, design_dictionary):
+
+        if design_dictionary[KEY_MATERIAL] != 'Select Material':
+            fu = Material(design_dictionary[KEY_MATERIAL],41).fu
+        else:
+            fu = ''
+
+        val = {KEY_DP_BOLT_TYPE: "Pretensioned",
+               KEY_DP_BOLT_HOLE_TYPE: "Standard",
+               KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
+               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
+               KEY_DP_DETAILING_GAP: '10',
+               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
+               KEY_DP_DESIGN_METHOD: "Limit State Design",
+               KEY_CONNECTOR_MATERIAL: str(design_dictionary[KEY_MATERIAL])
+               }[key]
+
+        return val
+
     @staticmethod
     def pltthk_customized():
         a = VALUES_PLATETHK_CUSTOMIZED

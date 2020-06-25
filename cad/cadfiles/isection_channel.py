@@ -7,34 +7,36 @@ from cad.items.ISection import ISection
 
 class ISectionChannel(object):
 
-    def __init__(self, B, T, D, t, R1, R2, L, l, W, H, b, d):
+    def __init__(self, D, B, T, t, T1, t1, d, b, H, s):
         self.B = B
         self.T = T
         self.D = D
         self.t = t
-        self.R1 = R1
-        self.R2 = R2
-        self.L = L
-        self.l = l
-        self.W = W
-        self.H = H
+        self.T1 = T1
+        self.t1 = t1
         self.d = d
-        self.clearDist = 20
+        self.b = b
+        self.H = H
+        self.s = s
+        self.B = 2*self.s-2*T1
+        self.d = 2*self.s
+
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
-        self.channel1 = Channel(B, t, D, t, 0, 0, L)
-        self.isection = ISection(b, T, d, T, R1, R2, 0, L, None)
+        
+        self.channel1 = Channel(b, T1, self.d, t1, 0, 0, H)
+        self.isection = ISection(self.B, T, D, t, 0, 0, 0, H, None)
         #self.compute_params()
 
     def place(self, sec_origin, uDir, wDir):
         self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir
-        d = self.d/2 
-        origin = numpy.array([-d+self.B-self.t,0.,0.])
+        D = self.D/2 
+        origin = numpy.array([-D+self.b-self.t1,0.,0.])
         self.channel1.place(origin , self.uDir, self.wDir)
-        origin1 = numpy.array([self.D/2.,0.,0.])
+        origin1 = numpy.array([self.s,0.,0.])
         self.isection.place(origin1, self.uDir, self.wDir)
 
     def compute_params(self):
@@ -66,18 +68,19 @@ if __name__ == '__main__':
     T = 2
     D = 40
     t = 1.5
-    L = 100
-    l = 4
-    W = 100
+    T1 = 2
+    t1 = 2
     H = 60
-    b = 25
+    b = 20
     d = 50
+    s = 15
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])
     shaftDir = numpy.array([0.,0.,1.])
 
-    isection_channel = ISectionChannel(B, T, D, t, 0, 0, L, l, W, H, b, d)
+    isection_channel = ISectionChannel(D, B, T, t, T1, t1, d, b, H, s)
+    print(isection_channel.B)
     _place = isection_channel.place(origin, uDir, shaftDir)
     point = isection_channel.compute_params()
     prism = isection_channel.create_model()

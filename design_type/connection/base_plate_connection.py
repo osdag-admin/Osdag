@@ -393,6 +393,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         self.module = KEY_DISP_BASE_PLATE
 
+        self.design_button_status = False
+
         options_list = []
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
@@ -468,7 +470,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t20 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True, 'No Validator')
         options_list.append(t20)
 
-        t21 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, VALUES_WELD_TYPE, True, 'No Validator')
+        t21 = (KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX, [VALUES_WELD_TYPE[0]], True, 'No Validator')
         options_list.append(t21)
 
         # t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
@@ -912,12 +914,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             return False
 
     def conn_weld_type(self):
-        if self[0] in ['Welded+Bolted Column Base', 'Hollow/Tubular Column Base']:
+        if self[0] in ['Welded+Bolted Column Base', 'Hollow/Tubular Column Base', 'Moment Base Plate']:
             return VALUES_WELD_TYPE
         else:
             weld = []
             weld.append(VALUES_WELD_TYPE[0])
-            weld.append(VALUES_WELD_TYPE[1])
             return weld
 
     def out_weld(self):
@@ -1160,8 +1161,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t2 = (KEY_TYP_ANCHOR, [KEY_DP_ANCHOR_BOLT_TYPE], 'Input Dock')
         design_input.append(t2)
 
-        t3 = (None, ['Label_8', 'Label_21', KEY_SEC_FU, KEY_BASE_PLATE_FU,
-                     KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_SEC_FY, KEY_BASE_PLATE_FY,
+        t3 = (None, [KEY_BASE_PLATE_FU, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O, KEY_BASE_PLATE_FY,
                      KEY_DP_ANCHOR_BOLT_DESIGNATION, KEY_DP_ANCHOR_BOLT_LENGTH, KEY_DP_ANCHOR_BOLT_HOLE_TYPE,
                      KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O, KEY_DP_DETAILING_EDGE_TYPE,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_BASE_PLATE], '')
@@ -1171,15 +1171,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
     def get_values_for_design_pref(self, key, design_dictionary):
 
-        # section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-        if (design_dictionary[KEY_SECSIZE])[1:4] == 'SHS':
-            section = SHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-        elif (design_dictionary[KEY_SECSIZE])[1:4] == 'RHS':
-            section = RHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-        elif (design_dictionary[KEY_SECSIZE])[1:4] == 'CHS':
-            section = CHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
-        else:
-            section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+
+        # if (design_dictionary[KEY_SECSIZE])[1:4] == 'SHS':
+        #     section = SHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        # elif (design_dictionary[KEY_SECSIZE])[1:4] == 'RHS':
+        #     section = RHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        # elif (design_dictionary[KEY_SECSIZE])[1:4] == 'CHS':
+        #     section = CHS(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
+        # else:
+        #     section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
 
         # if self.connectivity == 'Hollow/Tubular Column Base':
         #     if self.dp_column_designation[1:4] == 'SHS':
@@ -1193,16 +1194,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # else:
         #     section = Column(design_dictionary[KEY_SECSIZE], design_dictionary[KEY_SEC_MATERIAL])
 
-        length = str(self.anchor_length_provided if self.design_button_status else 0)
-        fu = Material(design_dictionary[KEY_MATERIAL]).fu
+        if design_dictionary[KEY_MATERIAL] != 'Select Material':
+            material = Material(design_dictionary[KEY_MATERIAL], 41)
+            fu = material.fu
+            fy = material.fy
+        else:
+            fu = ''
+            fy = ''
 
-        val = {'Label_8': "Rolled",
-               'Label_21': str(section.source),
-               KEY_SEC_FU: str(section.fu),
-               KEY_BASE_PLATE_FU: str(section.fu),
-               KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(section.fu),
-               KEY_SEC_FY: str(section.fy),
-               KEY_BASE_PLATE_FY: str(section.fy),
+        length = str(self.anchor_length_provided if self.design_button_status else 0)
+
+        val = {KEY_BASE_PLATE_FU: str(fu),
+               KEY_DP_ANCHOR_BOLT_MATERIAL_G_O: str(fu),
+               KEY_BASE_PLATE_FY: str(fy),
                KEY_DP_ANCHOR_BOLT_DESIGNATION:
                    str(str(design_dictionary[KEY_DIA_ANCHOR][0]) + "X" + length + " IS5624 GALV"),
                KEY_DP_ANCHOR_BOLT_LENGTH: str(length),
@@ -1547,11 +1551,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # attributes of design preferences
         self.dp_column_designation = str(design_dictionary[KEY_SECSIZE])
-        self.dp_column_type = str(design_dictionary['Label_8'])
-        self.dp_column_source = str(design_dictionary['Label_21'])
         self.dp_column_material = str(design_dictionary[KEY_SEC_MATERIAL])
-        self.dp_column_fu = float(design_dictionary[KEY_SEC_FU])
-        self.dp_column_fy = float(design_dictionary[KEY_SEC_FY])
+        # self.dp_column_type = str(design_dictionary['Label_8'])
+        # self.dp_column_source = str(design_dictionary['Label_21'])
+        # self.dp_column_fu = float(design_dictionary[KEY_SEC_FU])
+        # self.dp_column_fy = float(design_dictionary[KEY_SEC_FY])
 
         self.dp_bp_material = str(design_dictionary[KEY_BASE_PLATE_MATERIAL])
         self.dp_bp_fu = float(design_dictionary[KEY_BASE_PLATE_FU])
@@ -1580,14 +1584,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.connectivity == 'Hollow/Tubular Column Base':
             if self.dp_column_designation[1:4] == 'SHS':
                 self.column_properties = SHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+                self.dp_column_type = "Rolled"
             elif self.dp_column_designation[1:4] == 'RHS':
                 self.column_properties = RHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+                self.dp_column_type = "Rolled"
             elif self.dp_column_designation[1:4] == 'CHS':
                 self.column_properties = CHS(designation=self.dp_column_designation, material_grade=self.dp_column_material)
+                self.dp_column_type = "Rolled"
         else:
             self.column_properties = Column(designation=self.dp_column_designation, material_grade=self.dp_column_material)
             self.column_Z_pz = self.column_properties.plast_sec_mod_z  # mm^3
             self.column_Z_py = self.column_properties.plast_sec_mod_y  # mm^3
+            self.dp_column_type = str(self.column_properties.type)
+
+        self.dp_column_source = str(self.column_properties.source)
+        self.dp_column_fu = float(self.column_properties.fu)
+        self.dp_column_fy = float(self.column_properties.fy)
 
         self.column_D = self.column_properties.depth  # mm
         self.column_bf = self.column_properties.flange_width  # mm
@@ -1738,7 +1750,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # minimum required dimensions (L X B) of the base plate [as per the detailing criteria]
         self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
 
-        if self.connectivity == ('Welded Column Base' or 'Moment Base Plate'):
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
             # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
             self.bp_width_min = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
         elif self.connectivity == 'Hollow/Tubular Column Base':
@@ -1766,7 +1778,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.bearing_strength_concrete = self.cl_7_4_1_bearing_strength_concrete(self.footing_grade)  # N/mm^2 or MPa
 
         # welded column base (pinned connection) and column base for hollow sections (fixed connection)
-        if self.connectivity == 'Welded Column Base' or 'Hollow/Tubular Column Base':
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
 
             # minimum required area for the base plate [bearing stress = axial force / area of the base]
             self.min_area_req = self.load_axial_compression / self.bearing_strength_concrete  # mm^2
@@ -1938,7 +1950,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 r = max(r_1, r_2, r_3)
                 r = r.real  # separating the imaginary part
 
-                self.y = round(r, 3)  # mm
+                self.y = round(r)  # mm
 
                 # finding maximum tension in the bolts for maximum permissible bearing stress (0.45*f_ck)
                 self.tension_demand_anchor = ((self.bearing_strength_concrete * self.anchor_area_tension * self.n) / self.y) * \
@@ -2097,6 +2109,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             else:
                 self.anchor_inside_flange = 'No'
+                self.anchor_nos_provided = self.anchor_nos_provided
                 self.anchor_nos_uplift = 0
                 self.anchor_dia_uplift = 'N/A'
                 self.tension_capacity_anchor_uplift = 'N/A'
@@ -2430,6 +2443,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # updating anchor length (adding the length above the concrete pedestal)
         if self.connectivity == 'Moment Base Plate':
+            if self.anchor_dia_uplift == 'N/A':
+                self.anchor_dia_uplift = 0
+
             self.plate_washer_thk = IS6649.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_uplift))[
                 'washer_thk']  # washer thickness, mm
             self.nut_thk = IS1364.nut_thick((max(self.anchor_dia_provided, self.anchor_dia_uplift)))  # nut thickness, mm
@@ -2697,7 +2713,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         """
         # check for the limiting width to the thickness ratio of the column web [Reference: Cl. 3.7.2 and 3.7.4, Table 2, IS 800:2007]
         # if the web does not classify as 'Plastic' section, stiffener shall be provided across the web to limit the effective width
-        if self.connectivity == ('Welded Column Base' or 'Moment Base Plate'):
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
             check = self.Table2_web_OfI_H_box_section((self.column_D - (2 * self.column_tf)), self.column_tw, self.dp_column_fy,
                                                       self.load_axial_compression, load_type='Compression', section_class='Plastic')
             # check returns a list
@@ -2730,7 +2746,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
         # design of stiffener
-        if self.connectivity == ('Welded Column Base' or 'Moment Base Plate'):
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
             # self.stiffener_across_web = 'Yes'
             if (self.stiffener_along_flange == 'Yes') or (self.stiffener_along_web == 'Yes') or (self.stiffener_across_web == 'Yes'):
 
@@ -3190,12 +3206,23 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # details coming soon...
 
         # detailing
+        # total number of bolts (outside + inside)
         print(self.anchor_nos_provided)
+
+        # bolts inside the flange
+        if self.connectivity == 'Moment Base Plate':
+            if self.load_axial_tension > 0:
+                if self.anchor_inside_flange == 'Yes':
+                    print(self.anchor_dia_uplift)
+                    print(self.anchor_nos_uplift)
+                else:
+                    pass
+
         print(self.pitch_distance)  # Pitch Distance (mm) (show only when this value is not 'Null')
         print(self.gauge_distance)  # Gauge Distance (mm) mm (show only when this value is not 'Null')
         print(self.end_distance)  # mm
         print(self.edge_distance)  # mm
-        if self.connectivity == 'Welded Column Base' or 'Hollow/Tubular Column Base':
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
             print(self.projection)  # mm (show only for 'Welded-Slab Base' connectivity)
         else:
             pass

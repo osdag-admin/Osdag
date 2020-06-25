@@ -305,6 +305,7 @@ class Window(QMainWindow):
         self.display_mode = 'Normal'
         self.display_x = 90
         self.display_y = 90
+        self.ui_loaded = False
         main.design_status = False
         main.design_button_status = False
         MainWindow.setObjectName("MainWindow")
@@ -923,11 +924,12 @@ class Window(QMainWindow):
                 font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")
-                # q.setVisible(True if option[4] else False)
+                q.setVisible(True if option[4] else False)
                 #q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
                 q.resize(q.sizeHint().width(), q.sizeHint().height())
+                # q.setVisible(True if option[4] else False)
                 if key:
                     fields = 0
                     current_key = key
@@ -1335,7 +1337,24 @@ class Window(QMainWindow):
                 last_design_dictionary = yaml.safe_load(last_design)
         if isinstance(last_design_dictionary, dict):
             self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
-            
+            if "out_titles_status" in last_design_dictionary.keys():
+                title_status = last_design_dictionary["out_titles_status"]
+                print("titles", title_status)
+                title_count = 0
+                out_titles = []
+                title_repeat = 1
+                for out_field in out_list:
+                    if out_field[2] == TYPE_TITLE:
+                        title_name = out_field[1]
+                        if title_name in out_titles:
+                            title_name += str(title_repeat)
+                            title_repeat += 1
+                        if title_status[title_count] == 0:
+                            self.output_title_fields[title_name][0].setVisible(False)
+                        title_count += 1
+                        out_titles.append(title_name)
+        self.ui_loaded = True
+
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
@@ -1496,6 +1515,7 @@ class Window(QMainWindow):
             else:
                 pass
 
+        if self.ui_loaded:
             self.output_title_change(main)
 
     def output_title_change(self, main):
@@ -1510,18 +1530,7 @@ class Window(QMainWindow):
         for option in out_list:
             if option[2] == TYPE_TITLE:
                 if key:
-                    if visible_fields == 0:
-                        if key in titles:
-                            self.output_title_fields[key+str(title_repeat)][0].setVisible(False)
-                            title_repeat += 1
-                        else:
-                            self.output_title_fields[key][0].setVisible(False)
-                    else:
-                        if key in titles:
-                            self.output_title_fields[key+str(title_repeat)][0].setVisible(True)
-                            title_repeat += 1
-                        else:
-                            self.output_title_fields[key][0].setVisible(True)
+                    title_repeat = self.output_title_visiblity(visible_fields, key, titles, title_repeat)
                     titles.append(key)
 
                 key = option[1]
@@ -1539,6 +1548,21 @@ class Window(QMainWindow):
             elif option[2] == TYPE_OUT_BUTTON:
                 visible_fields += 1
 
+        self.output_title_visiblity(visible_fields, key, titles, title_repeat)
+
+        no_field_title = ""
+        for title in self.output_title_fields.keys():
+            if title in no_field_titles:
+                no_field_title = title
+            elif self.output_title_fields[title][0].isVisible():
+                if no_field_title in no_field_titles:
+                    no_field_titles.remove(no_field_title)
+
+        for no_field_title in no_field_titles:
+            self.output_title_fields[no_field_title][0].setVisible(False)
+
+    def output_title_visiblity(self, visible_fields, key, titles, title_repeat):
+
         if visible_fields == 0:
             if key in titles:
                 self.output_title_fields[key + str(title_repeat)][0].setVisible(False)
@@ -1552,19 +1576,7 @@ class Window(QMainWindow):
             else:
                 self.output_title_fields[key][0].setVisible(True)
 
-        no_field_title = ""
-        for title in self.output_title_fields.keys():
-            if title in no_field_titles:
-                no_field_title = title
-            elif self.output_title_fields[title][0].isVisible():
-                if no_field_title in no_field_titles:
-                    no_field_titles.remove(no_field_title)
-
-        for no_field_title in no_field_titles:
-            self.output_title_fields[no_field_title][0].setVisible(False)
-
-
-
+        return title_repeat
 
 
 
@@ -1872,16 +1884,6 @@ class Window(QMainWindow):
             if error is not None:
                 self.show_error_msg(error)
                 return
-            last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-            if not os.path.isdir(last_design_folder):
-                os.mkdir(last_design_folder)
-            last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
-            last_design_file = os.path.join(last_design_folder, last_design_file)
-            for design_key in self.design_inputs.keys():
-                if self.design_inputs[design_key] == 'Disabled':
-                    self.design_inputs[design_key] = '0'
-            with open(str(last_design_file), 'w') as last_design:
-                yaml.dump(self.design_inputs, last_design)
 
             out_list = main.output_values(main, status)
             for option in out_list:
@@ -1897,6 +1899,29 @@ class Window(QMainWindow):
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
             self.output_title_change(main)
+
+            last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+            if not os.path.isdir(last_design_folder):
+                os.mkdir(last_design_folder)
+            last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
+            last_design_file = os.path.join(last_design_folder, last_design_file)
+            out_titles_status = []
+            out_titles = []
+            title_repeat = 1
+            for option in out_list:
+                if option[2] == TYPE_TITLE:
+                    title_name = option[1]
+                    if title_name in out_titles:
+                        title_name += str(title_repeat)
+                        title_repeat += 1
+                    if self.output_title_fields[title_name][0].isVisible():
+                        out_titles_status.append(1)
+                    else:
+                        out_titles_status.append(0)
+                    out_titles.append(title_name)
+            self.design_inputs.update({"out_titles_status": out_titles_status})
+            with open(str(last_design_file), 'w') as last_design:
+                yaml.dump(self.design_inputs, last_design)
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,

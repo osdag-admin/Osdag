@@ -180,7 +180,7 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
 
     else:
         if parameter == 'end_dist':
-            max_end_edge_eqn.append(NoEscape(r'e_{max}&=40 + 4*t\\'))
+            max_end_edge_eqn.append(NoEscape(r'\begin{aligned}e_{max}&=40 + 4*t\\'))
         else: #'edge_dist'
             max_end_edge_eqn.append(NoEscape(r'e`_{max}&=40 + 4*t\\'))
         max_end_edge_eqn.append(NoEscape(r'Where, t&= min(' + t1 +','+t2+r')\\'))
@@ -903,7 +903,7 @@ def end_plate_thk_req(M_ep,b_eff,f_y,gamma_m0,t_p):
 
 
 
-def moment_acting_on_end_plate(M_ep,b_eff,f_y,gamma_m0,t_p):
+def moment_acting_on_end_plate(M_ep,t_b,e):
     """  Calculate moment acting on the  end plate
     Args:
          M_ep:  moment acting on the  end plate in N-mm (float)
@@ -917,17 +917,17 @@ def moment_acting_on_end_plate(M_ep,b_eff,f_y,gamma_m0,t_p):
     """
 
     M_ep= str(M_ep)
-    t_p = str(t_p)
-    b_eff= str(b_eff)
-    f_y= str(f_y)
+    t_b = str(t_b)
+    e = str(e)
 
-    gamma_m0= str(gamma_m0)
+    # gamma_m0= str(gamma_m0)
 
     moment_acting_on_end_plate= Math(inline=True)
 
-    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= {\frac{b_{eff} *t_p^2 *f_y}{ 4*\gamma_{m0}}}\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= Tension~ in~ Bolt * End~ dist\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'&= T_b * e\\'))
 
-    moment_acting_on_end_plate.append(NoEscape(r'&={\frac{' + b_eff +'*'+t_p+'^2'+' *'+f_y + '}{4*'+gamma_m0 + r'}}\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'&=' + t_b +'*'+  e + r'\\'))
     moment_acting_on_end_plate.append(NoEscape(r'&=' +M_ep + '\end{aligned}'))
     return moment_acting_on_end_plate
 
@@ -3753,7 +3753,7 @@ def tension_in_bolt_due_to_axial_load_n_moment(P,n,M,y_max,y_sqr,T_b):
     T_b = str (T_b)
     tension_in_bolt_due_to_axial_load_n_moment  = Math(inline=True)
     tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_b &= \frac{P}{\ n} + \frac{M * y_{max}}{\ y_{sqr}}\\'))
-    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' +P + '}{' + n + r'} + \frac{' +M + '*' +  y_max+ r'}{' + y_sqr + r'}\\'))
+    tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' +P + '* 10^3}{' + n + r'} + \frac{' +M + '* 10^6*' +  y_max+ r'}{' + y_sqr + r'}\\'))
     tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&= ' + T_b + r'\end{aligned}'))
     return tension_in_bolt_due_to_axial_load_n_moment
 
@@ -3900,8 +3900,8 @@ def no_of_bolts_along_web(D,T_f,e,p,n_bw):
     T_f = str(T_f)
     n_bw = str(n_bw)
     no_of_bolts_along_web = Math(inline=True)
-    no_of_bolts_along_web.append(NoEscape(r'\begin{aligned} n_{bw} &=  \frac{D -(2*T_f) -(2*e)}{\ p}  + 1 \\'))
-    no_of_bolts_along_web.append(NoEscape(r'&= \frac{' + D + ' -(2*'+T_f +')-(2*'+e + r')}{' + p + r'} +1 \\'))
+    no_of_bolts_along_web.append(NoEscape(r'\begin{aligned} n_{bw} &= 2 * ( \frac{D -(2*T_f) -(2*e)}{\ p}  + 1 )\\'))
+    no_of_bolts_along_web.append(NoEscape(r'&= 2 * (\frac{' + D + ' -(2*'+T_f +')-(2*'+e + r')}{' + p + r'} +1 ) \\'))
     no_of_bolts_along_web.append(NoEscape(r'&= ' + n_bw + r'\end{aligned}'))
     return no_of_bolts_along_web
 
@@ -3924,8 +3924,8 @@ def no_of_bolts_along_flange(b,T_w,e,p,n_bf):
     T_w = str(T_w)
     n_bf = str(n_bf)
     no_of_bolts_along_flange = Math(inline=True)
-    no_of_bolts_along_flange.append(NoEscape(r'\begin{aligned} n_{bf} &=  \frac{b/2 -(T_w / 2) -(2*e)}{\ p}  + 1 \\'))
-    no_of_bolts_along_flange.append(NoEscape(r'&= \frac{0.5*' + b + ' -(0.5*'+T_w +')-(2*'+e + r')}{' + p + r'} +1 \\'))
+    no_of_bolts_along_flange.append(NoEscape(r'\begin{aligned} n_{bf} &= 2 * ( \frac{b/2 -(T_w / 2) -(2*e)}{\ p}  + 1 )\\'))
+    no_of_bolts_along_flange.append(NoEscape(r'&= 2 * (\frac{' + b + '/2 -(0.5*'+T_w +')-(2*'+e + r')}{' + p + r'} +1 )\\'))
     no_of_bolts_along_flange.append(NoEscape(r'&= ' + n_bf + r'\end{aligned}'))
     return no_of_bolts_along_flange
 
@@ -3950,7 +3950,7 @@ def shear_force_in_bolts_near_web(V,n_wb,V_sb):
     shear_force_in_bolts_near_web.append(NoEscape(r'&= ' + V_sb + r'\end{aligned}'))
     return shear_force_in_bolts_near_web
 
-def tension_capacity_of_bolt(f_ub,A_nb,T_db):
+def tension_capacity_of_bolt(f_ub,A_nb,T_db,gamma_mf):
      """
      Calculate tensile capacity of bolt
 
@@ -3967,9 +3967,10 @@ def tension_capacity_of_bolt(f_ub,A_nb,T_db):
      f_ub= str(f_ub)
      A_nb= str(A_nb)
      T_db= str(T_db)
+     gamma_mf = str(gamma_mf)
      tension_capacity_of_bolt =  Math(inline=True)
-     tension_capacity_of_bolt.append(NoEscape(r'\begin{aligned} T_{db} &= 0.9*A_{nb}*f_{ub}\\'))
-     tension_capacity_of_bolt.append(NoEscape(r'&=0.9*'+A_nb+ r'*'+f_ub+ r'\\'))
+     tension_capacity_of_bolt.append(NoEscape(r'\begin{aligned} T_{db} &= \frac{0.9*A_{nb}*f_{ub}}{\gamma_{mf}}\\'))
+     tension_capacity_of_bolt.append(NoEscape(r'&=\frac{0.9*'+A_nb+ r'*'+f_ub+ '}{'+ gamma_mf+r'}\\'))
      tension_capacity_of_bolt.append(NoEscape(r'&= ' + T_db+ r'\\'))
      tension_capacity_of_bolt.append(NoEscape(r'[Ref&: Cl.10.3.5 IS 800:2007]\end{aligned}'))
 

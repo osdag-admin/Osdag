@@ -432,10 +432,10 @@ class BBAngle_Properties(Section_Properties):
     def calc_PlasticModulusZpy(self, a=0.0, b=0.0, t=0.0, l='Long Leg', thickness=0):
         A = self.calc_Area(a, b, t, l)
         if l == "Long Leg":
-            Cy = self.calc_Cy(a, b, t, l)
+            Cy =  Single_Angle_Properties().calc_Cy(a, b, t, l)
             self.Z_py = A * (Cy + Cy + thickness/10) / 2
         else:
-            Cz = self.calc_Cz(a, b, t, l)
+            Cz =  Single_Angle_Properties().calc_Cz(a, b, t, l)
             self.Z_py = A * (Cz + Cz + thickness/10) / 2
 
         return round(self.Z_py, 2)
@@ -553,13 +553,13 @@ class SAngle_Properties(Section_Properties):
 
         return round(self.I_yy / 10000, 2)
 
-    def calc_MomentOfAreaYZ(self, a, b, t, l):
-        Cza = self.calc_Cz(a, b, t, l) * 10
-        Cya = self.calc_Cy(a, b, t, l) * 10
-        self.I_yz = a * b * (a / 2 - Cya) * (b / 2 - Cza) - (
-                (a - t) * (b - t) * (0.5 * (a + t) - Cya) * (0.5 * (b + t) - Cza))
-        # self.I_yz = 1.000
-        return round(self.I_yz / 10000, 2)
+    # def calc_MomentOfAreaYZ(self, a, b, t, l):
+    #     Cza = self.calc_Cz(a, b, t, l) * 10
+    #     Cya = self.calc_Cy(a, b, t, l) * 10
+    #     self.I_yz = a * b * (a / 2 - Cya) * (b / 2 - Cza) - (
+    #             (a - t) * (b - t) * (0.5 * (a + t) - Cya) * (0.5 * (b + t) - Cza))
+    #     # self.I_yz = 1.000
+    #     return round(self.I_yz / 10000, 2)
 
     def calc_MomentOfAreaV(self, a, b, t, l, thickness=0.0):
         "min MI will always have subscript v"

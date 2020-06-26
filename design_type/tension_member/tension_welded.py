@@ -177,7 +177,7 @@ class Tension_welded(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O,
+        t2 = (None, [KEY_DP_WELD_FAB,KEY_DP_WELD_MATERIAL_G_O,
                      KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
 
@@ -661,6 +661,7 @@ class Tension_welded(Member):
         "initialisation of components required to design a tension member along with connection"
 
         super(Tension_welded,self).set_input_values(self, design_dictionary)
+        print(design_dictionary,"input values are set. Doing preliminary member checks")
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]

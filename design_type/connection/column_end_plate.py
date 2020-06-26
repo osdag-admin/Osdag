@@ -435,7 +435,7 @@ class ColumnEndPlate(MomentConnection):
         t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, self.plate_width if flag else '', True)
         out_list.append(t16)
 
-        t17 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.m_dp/1000000,2) if flag else '', True)
+        t17 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, round(self.m_dp_prov/1000000,2) if flag else '', True)
         out_list.append(t17)
 
 
@@ -765,7 +765,8 @@ class ColumnEndPlate(MomentConnection):
             if ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) < (2 * self.end_dist):
                 continue
 
-            elif ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) >= (2 * self.end_dist) and ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) < (2 * self.end_dist + self.pitch):
+            elif ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) >= (2 * self.end_dist) and \
+                    ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) < (2 * self.end_dist + self.pitch):
                 self.n_bf = 1
                 self.p_2_flange = (self.section.flange_width / 2 - self.section.web_thickness / 2 - self.end_dist)
 
@@ -1370,6 +1371,7 @@ class ColumnEndPlate(MomentConnection):
 
         if len(self.lst_4) != 0:
             self.plate_thickness_provided = min(self.lst_4)
+            self.m_dp_prov = self.b_eff * self.plate_thickness_provided ** 2 * self.plate.fy / (4 * gamma_m0)
             # return self.bolt_diam_provided
             print("Plate thickness prov", self.plate_thickness_provided)
             # self.get_bolt_grade(self)
@@ -1434,6 +1436,10 @@ class ColumnEndPlate(MomentConnection):
 
         self.t_s = np.roots(coeff)
         self.t_s = math.ceil(np.amax(self.t_s))
+        if self.t_s < 6:
+            self.t_s = 6
+        else:
+            pass
 
         self.h_s = 14 * self.t_s
 
@@ -1794,7 +1800,7 @@ class ColumnEndPlate(MomentConnection):
         t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, self.load.shear_force, shear_capacity(h=h, t=self.section.web_thickness,
                                                                                  f_y=self.section.fy, gamma_m0=gamma_m0,
                                                                                  shear_capacity=round(
-                                                                                     self.shear_capacity / 1000, 2)),
+                                                                                     0.6*self.shear_capacity / 1000, 2)),
               'Restricted to low shear')
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', plastic_moment_capacty(beta_b=round(self.beta_b, 2),
@@ -1962,6 +1968,7 @@ class ColumnEndPlate(MomentConnection):
                                             self.plate_width,
               get_pass_fail(self.section.flange_width, self.plate_width, relation="leq"))
         self.report_check.append(t1)
+
         t1 = (DISP_MIN_PLATE_THICK,end_plate_thk_req(M_ep=round(self.m_ep ,2),b_eff=self.b_eff,f_y=self.plate.fy,gamma_m0=gamma_m0,t_p=self.plate_thickness_provided),
                self.plate_thickness_provided,
                get_pass_fail(self.plate.thickness_provided,  self.plate_thickness_provided, relation="leq"))
@@ -1977,14 +1984,29 @@ class ColumnEndPlate(MomentConnection):
 
         #     self.report_check.append(t1)
         # else:
-        t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY,moment_acting_on_end_plate(M_ep=round(self.m_ep/1000000, 2), t_b=round(self.t_b,2), e=self.end_dist),design_capacity_of_end_plate(M_dp=round(self.m_dp/1000000, 2), b_eff=self.b_eff, f_y=self.plate.fy, gamma_m0=gamma_m0,t_p=self.plate_thickness_provided),
-                get_pass_fail(self.m_ep, self.m_dp, relation="leq"))
+        if self.connection == "Flush End Plate":
+            if self.n_bf == 1:
+                t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY,moment_acting_on_end_plate_flush(M_ep=round(self.m_ep/1000000, 2), t_b=round(self.t_b,2), e=self.end_dist, tb_2=self.t_b2),design_capacity_of_end_plate(M_dp=round(self.m_dp_prov/1000000, 2), b_eff=self.b_eff, f_y=self.plate.fy, gamma_m0=gamma_m0,t_p=self.plate_thickness_provided),
+                    get_pass_fail(self.m_ep, self.m_dp, relation="leq"))
+                self.report_check.append(t1)
+            else:
+                t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY,
+                      moment_acting_on_end_plate(M_ep=round(self.m_ep / 1000000, 2), t_b=round(self.t_b, 2),
+                                                 e=self.end_dist),
+                      design_capacity_of_end_plate(M_dp=round(self.m_dp_prov / 1000000, 2), b_eff=self.b_eff,
+                                                   f_y=self.plate.fy, gamma_m0=gamma_m0,
+                                                   t_p=self.plate_thickness_provided),
+                      get_pass_fail(self.m_ep, self.m_dp, relation="leq"))
+                self.report_check.append(t1)
+        else:
+            t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY,moment_acting_on_end_plate(M_ep=round(self.m_ep/1000000, 2), t_b=round(self.t_b,2), e=self.end_dist),design_capacity_of_end_plate(M_dp=round(self.m_dp_prov/1000000, 2), b_eff=self.b_eff, f_y=self.plate.fy, gamma_m0=gamma_m0,t_p=self.plate_thickness_provided),
+                    get_pass_fail(self.m_ep, self.m_dp, relation="leq"))
+            self.report_check.append(t1)
 
-        self.report_check.append(t1)
 
         if self.connection == "Extended Both Ways":
 
-               t1 = ('SubSection', '   Stiffener Checks', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
+               t1 = ('SubSection', '   Stiffener Details', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
                self.report_check.append(t1)
                t1 = (KEY_OUT_DISP_STIFFENER_HEIGHT,self.section.depth,
                        self.stiff_ht,
@@ -1998,6 +2020,13 @@ class ColumnEndPlate(MomentConnection):
                t1 = ( KEY_OUT_DISP_STIFFENER_THICKNESS, '',  self.t_s,'')
                self.report_check.append(t1)
                t1 = (KEY_OUT_DISP_WELD_TYPE, '', self.weld_type, '')
+               self.report_check.append(t1)
+               if self.weld_type == 'Fillet Weld':
+                   t1 = (KEY_OUT_WELD_SIZE, '', self.weld_size, '')
+                   self.report_check.append(t1)
+               else:
+                   pass
+               t1 = (KEY_OUT_DISP_WELD_TYPE1,'','Groove Weld','')
                self.report_check.append(t1)
 
         else:

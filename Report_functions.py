@@ -931,6 +931,35 @@ def moment_acting_on_end_plate(M_ep,t_b,e):
     moment_acting_on_end_plate.append(NoEscape(r'&=' +M_ep + '\end{aligned}'))
     return moment_acting_on_end_plate
 
+def moment_acting_on_end_plate_flush(M_ep,t_b,e,tb_2):
+    """  Calculate moment acting on the  end plate
+    Args:
+         M_ep:  moment acting on the  end plate in N-mm (float)
+         b_eff:Effective width for load dispersion
+         f_y:Yeild strength of  plate material in N/mm square (float)
+         gamma_m0: IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']  (float)
+         t_p:Thickness of end plate
+    Returns:
+         moment acting on the end plate
+
+    """
+
+    M_ep= str(M_ep)
+    t_b = str(t_b)
+    tb_2 = str(tb_2)
+    e = str(e)
+
+    # gamma_m0= str(gamma_m0)
+
+    moment_acting_on_end_plate= Math(inline=True)
+
+    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= max (0.5 *Tension~ in~ First~ Bolt * End~ \\'))
+    moment_acting_on_end_plate.append(NoEscape(r'& dist, Tension~ in~ Second~ Bolt * End~ dist)\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'&= max(0.5* T_b1 * e, T_b2 * e)\\'))
+
+    moment_acting_on_end_plate.append(NoEscape(r'&= max(0.5 * ' + t_b +'*'+  e + ','+tb_2+'*'+e+r'\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'&=' +M_ep + '\end{aligned}'))
+    return moment_acting_on_end_plate
 
 def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     """
@@ -1964,20 +1993,20 @@ def min_loads_required(conn):
         min_loads_required_eqn.append(NoEscape(r'&~~~~~~Mc_{min} = 0.5 * M_c\\'))
         min_loads_required_eqn.append(NoEscape(r'& ~~~else\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~~~~Mc_{min} = M + ((1 - sum ~IR) * M_c)\\'))
-        min_loads_required_eqn.append(NoEscape(r'&~~~Ac_{min} = Al \\'))
+        min_loads_required_eqn.append(NoEscape(r'&~~~Ac_{min} = AL \\'))
 
         min_loads_required_eqn.append(NoEscape(r'&elif~~ sum ~IR <= 1.0~ and~ IR ~axial < 0.3\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~if~~ (0.3 - IR ~axial) < (1 -  sum ~IR)\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~~~~Ac_{min} = 0.3 * A_c\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~else~~\\'))
-        min_loads_required_eqn.append(NoEscape(r'&~~~~~~Ac_{min} = Al + ((1 - sum ~IR) * A_c)\\'))
+        min_loads_required_eqn.append(NoEscape(r'&~~~~~~Ac_{min} = AL + ((1 - sum ~IR) * A_c)\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~Mc_{min} = M \\'))
     else:
         min_loads_required_eqn.append(NoEscape(r'&elif~~ sum ~IR <= 1.0~ and~ IR ~axial < 0.3\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~if~~ (0.3 - IR ~axial) < (1 -  sum ~IR)\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~~~~Ac_{min} = 0.3 * A_c\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~else~~\\'))
-        min_loads_required_eqn.append(NoEscape(r'&~~~~~~Ac_{min} = Al + ((1 - sum ~IR) * A_c)\\'))
+        min_loads_required_eqn.append(NoEscape(r'&~~~~~~Ac_{min} = AL + ((1 - sum ~IR) * A_c)\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~Mc_{min} = M \\'))
 
         min_loads_required_eqn.append(NoEscape(r' &elif~~ sum ~IR <= 1.0 ~and~ IR ~moment < 0.5\\'))
@@ -1985,11 +2014,12 @@ def min_loads_required(conn):
         min_loads_required_eqn.append(NoEscape(r'&~~~~~~Mc_{min} = 0.5 * M_c\\'))
         min_loads_required_eqn.append(NoEscape(r'& ~~~else\\'))
         min_loads_required_eqn.append(NoEscape(r'&~~~~~~Mc_{min} = M + ((1 - sum ~IR) * M_c)\\'))
-        min_loads_required_eqn.append(NoEscape(r'&~~~Ac_{min} = Al \\'))
+        min_loads_required_eqn.append(NoEscape(r'&~~~Ac_{min} = AL \\'))
 
     min_loads_required_eqn.append(NoEscape(r'&else~~\\'))
-    min_loads_required_eqn.append(NoEscape(r'&~~~Ac_{min} = Al\\'))
-    min_loads_required_eqn.append(NoEscape(r'&~~~Mc_{min} = M \end{aligned}'))
+    min_loads_required_eqn.append(NoEscape(r'&~~~Ac_{min} = AL\\'))
+    min_loads_required_eqn.append(NoEscape(r'&~~~Mc_{min} = M \\'))
+    min_loads_required_eqn.append(NoEscape(r'&~Note:~AL=~User~Applied~Load\end{aligned}'))
     return min_loads_required_eqn
 
 def min_loads_provided(min_ac,min_mc,conn):

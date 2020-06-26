@@ -28,9 +28,9 @@ Bolt.Grade:
 Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
-Bolt.Type: Friction Grip Bolt
-Connector.Flange_Plate.Preferences: Outside
-Connector.Flange_Plate.Thickness_list: &id001
+Bolt.Type: Bearing Bolt
+Connector.Flange_Plate.Preferences: Outside + Inside
+Connector.Flange_Plate.Thickness_list:
 - '6'
 - '8'
 - '10'
@@ -54,10 +54,11 @@ Connector.Flange_Plate.Thickness_list: &id001
 - '63'
 - '80'
 Connector.Material: E 250 (Fe 410 W)A
-Connector.Web_Plate.Thickness_List: *id001
+Connector.Web_Plate.Thickness_List:
+- '10'
 Design.Design_Method: Limit State Design
 Detailing.Corrosive_Influences: 'No'
-Detailing.Edge_type: Sheared or hand flame cut
+Detailing.Edge_type: a - Sheared or hand flame cut
 Detailing.Gap: '10'
 Load.Axial: '100'
 Load.Moment: '25'

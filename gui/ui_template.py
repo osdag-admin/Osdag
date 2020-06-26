@@ -310,7 +310,7 @@ class Window(QMainWindow):
         MainWindow.setObjectName("MainWindow")
 
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/finwindow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/Osdag.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setIconSize(QtCore.QSize(20, 2))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -1474,6 +1474,9 @@ class Window(QMainWindow):
             elif typ == TYPE_CUSTOM_MATERIAL:
                 if val:
                     self.new_material_dialog()
+            elif typ == TYPE_CUSTOM_SECTION:
+                if val:
+                    self.import_custom_section()
 
             elif typ == TYPE_LABEL:
                 k2.setText(val)
@@ -2022,7 +2025,7 @@ class Window(QMainWindow):
 
                         pmap = QPixmap(option[3])
                         #im.setScaledContents(1)
-                        im.setPixmap(pmap.scaled(170,340,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+                        im.setPixmap(pmap.scaled(250,250,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
                         #im.setPixmap(pmap)
                         image_layout.addWidget(im)
                         j += 1
@@ -2079,6 +2082,19 @@ class Window(QMainWindow):
                     dialog.resize(350, 300)
                 #dialog.setFixedSize(dialog.size())
                 dialog.exec()
+    
+    def import_custom_section(self):
+        '''
+        Custom Section Importing
+        Fetches data from osm file and returns as a dictionary
+        '''
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Open Section Design",None, "InputFiles(*.osm)")
+        if(fileName==''):
+            return
+        with open(fileName,'r') as file:
+            parameters=eval(file.read())
+        SecProfile=self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText()
+        return parameters
 
     def new_material_dialog(self):
         dialog = QtWidgets.QDialog(self)
@@ -2720,8 +2736,17 @@ class Window(QMainWindow):
 
     def set_dialog_size(self,dialog):
         def set_size():
-            dialog.resize(900,900) 
-            self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)  
+            screen_resolution=QtWidgets.QDesktopWidget().screenGeometry()
+            if(screen_resolution.width()<1025):
+                measure=screen_resolution.height()-120
+                dialog.resize(measure*45//39,measure)
+                
+            else:
+                dialog.resize(900,700)
+            mysize = dialog.geometry()
+            hpos = (screen_resolution.width() - mysize.width() ) / 2
+            vpos = (screen_resolution.height() - mysize.height() ) / 2
+            dialog.move(hpos, vpos)
             self.OsdagSectionModeller.OCCWindow.setFocus()
         return set_size
 

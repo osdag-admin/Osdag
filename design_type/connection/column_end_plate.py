@@ -1294,6 +1294,7 @@ class ColumnEndPlate(MomentConnection):
             print("bolt grade", self.bolt_grade_provided)
             # self.get_bolt_grade(self)
             self.design_status = True
+            print("1",self.bolt.bolt_tension_capacity)
             self.plate_details(self)
 
         else:
@@ -1719,6 +1720,7 @@ class ColumnEndPlate(MomentConnection):
 
 # def save_design(self, popup_summary):
     def save_design(self, popup_summary):
+        print("2",self.bolt.bolt_tension_capacity)
 
         self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
                                   KEY_DISP_BEAMSEC: self.section.designation,

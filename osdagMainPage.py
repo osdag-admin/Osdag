@@ -816,6 +816,17 @@ if __name__ == '__main__':
     appcrash.install_backend(appcrash.backends.GithubBackend(GITHUB_OWNER, GITHUB_REPO))
     appcrash.install_backend(appcrash.backends.EmailBackend(EMAIL, 'Osdag'))
 
+    #my_settings = QtCore.QSettings('FOSSEE','osdag')
+    #appcrash.set_qsettings(my_settings)
+    '''
+    If you want to save your github username and password across each sessions, so that you dont have to enter it each time you report an issue .
+    Simply uncomment above two line. To use QSetings we need to give an organisation name and the application name(Compulsory).
+
+    As an example 'FOSSEE' is organisation name and 'osdag' is the application name in the above QSettings. Feel free to change it accordingly, but try to keep it fix
+    don't change it frequently.
+
+    '''
+
     ############################     Exception Dialog and Error Reporting  ###################
 
     trayIcon.show()

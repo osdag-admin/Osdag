@@ -149,12 +149,10 @@ class GithubBackend(BaseBackend):
         auth = gh.get_user()
         try:
             QtWidgets.qApp.setOverrideCursor(QtCore.Qt.WaitCursor)
-            _logger().warn('lmao')
-            ret = auth.create_gist(True, {"logging_text.log": github.InputFileContent(log_content)},"Gist created by me")
-            _logger().warn('failed to upl')
+            ret = auth.create_gist(True, {"Osdag_crash_log.log": github.InputFileContent(log_content)},"Osdag crash report.")
+            _logger().warn('failed to create gist')
             QtWidgets.qApp.restoreOverrideCursor()
         except:
-            _logger().warn('testing here')
             return '"testing error"'
         else:
             url = 'gist.github.com/'+username+'/'+str(ret.id)

@@ -531,7 +531,7 @@ class BeamCoverPlate(MomentConnection):
             key height is assigned as width
             key Length: length
         for web plate:
-            key length is termed as width
+            key length is assigned as width
             key height: height
         Returns:
         """

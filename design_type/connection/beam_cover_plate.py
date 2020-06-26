@@ -93,18 +93,7 @@ class BeamCoverPlate(MomentConnection):
                 Not required for this module but empty list should be passed"""
         return []
 
-    # def list_for_fu_fy_validation(self):
-    #     """ This function is no longer required"""
-    #
-    #     fu_fy_list = []
-    #
-    #     t2 = (KEY_SEC_MATERIAL, KEY_SEC_FU, KEY_SEC_FY)
-    #     fu_fy_list.append(t2)
-    #
-    #     t3 = (KEY_CONNECTOR_MATERIAL, KEY_CONNECTOR_FU, KEY_CONNECTOR_FY)
-    #     fu_fy_list.append(t3)
-    #
-    #     return fu_fy_list
+
 
     def input_dictionary_design_pref(self):
         """
@@ -271,10 +260,6 @@ class BeamCoverPlate(MomentConnection):
         t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGEPLATE_THICKNESS, TYPE_OUT_LABEL, self.preference_type)
         lst.append(t8)
 
-        # t8 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_DOCK, self.out_bolt_bearing)
-        # lst.append(t8)
-        # t8 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_LABEL, self.out_bolt_bearing)
-        # lst.append(t8)
 
         return lst
 
@@ -438,20 +423,7 @@ class BeamCoverPlate(MomentConnection):
         # webcapacity.append(t16)
         return webcapacity
 
-    # def boltdetails(self,flag):
-    #
-    #     boltdetails = []
 
-
-        #
-        # return  boltdetails
-
-    # def Innerplate(self, flag):
-    #     Innerplate = []
-    #
-    #
-    #
-    #     return Innerplate
 
     def member_capacityoutput(self,flag):
         member_capacityoutput = []

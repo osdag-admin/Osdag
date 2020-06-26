@@ -182,24 +182,24 @@ class Ui_Dialog1(object):
         Same is the case when we'll select 'Load Input' option. We can't control the behaviour of QFileDialog because it's native and hence
         OS and system dependent.
         '''
-        fname_no_ext = filename.split(".")[0]
-        input_summary['filename'] = fname_no_ext
-        input_summary['does_design_exist'] = self.design_exist
-        input_summary['logger_messages']=self.loggermsg
-        main.save_design(main,input_summary)
-        if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
-            self.Dialog.accept()
-            QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
-        else:
-            self.Dialog.accept()
-            logfile=open(fname_no_ext+'.log','r')
-            logs=logfile.read()
-            if('! I can\'t write on file' in logs):
-               QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
+        if filename:
+            fname_no_ext = filename.split(".")[0]
+            input_summary['filename'] = fname_no_ext
+            input_summary['does_design_exist'] = self.design_exist
+            input_summary['logger_messages']=self.loggermsg
+            main.save_design(main,input_summary)
+            if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
+                self.Dialog.accept()
+                QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
             else:
-               print(logs)
-               QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
-            logfile.close()
+                logfile=open(fname_no_ext+'.log','r')
+                logs=logfile.read()
+                if('! I can\'t write on file' in logs):
+                   QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
+                else:
+                   print(logs)
+                   QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
+                logfile.close()
 
     def call_designreport(self, main,fileName, report_summary, folder):
         self.alist = main.report_input
@@ -227,9 +227,9 @@ class Ui_Dialog1(object):
 
         return input_summary
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.Dialog.setWindowTitle(_translate("Dialog", "Design Report Summary"))
         self.lbl_companyName.setText(_translate("Dialog", "Company Name :"))
         self.lbl_comapnyLogo.setText(_translate("Dialog", "Company Logo :"))
         self.btn_browse.setText(_translate("Dialog", "Browse..."))

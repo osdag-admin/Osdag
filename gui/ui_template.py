@@ -161,7 +161,7 @@ class Window(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
 
-        self.new_window = QtWidgets.QDialog()
+        self.new_window = QtWidgets.QDialog(self)
         self.new_ui = Ui_Dialog1(main.design_button_status,loggermsg=self.textEdit.toPlainText())
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))

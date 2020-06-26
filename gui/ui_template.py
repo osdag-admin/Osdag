@@ -305,12 +305,13 @@ class Window(QMainWindow):
         self.display_mode = 'Normal'
         self.display_x = 90
         self.display_y = 90
+        self.ui_loaded = False
         main.design_status = False
         main.design_button_status = False
         MainWindow.setObjectName("MainWindow")
 
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/finwindow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/Osdag.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setIconSize(QtCore.QSize(20, 2))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -636,7 +637,7 @@ class Window(QMainWindow):
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
-                im.setGeometry(QtCore.QRect(190, 10 + i, 70, 57))
+                im.setGeometry(QtCore.QRect(190, 10 + i, 100, 100))
                 im.setObjectName(option[0])
                 im.setScaledContents(True)
                 pixmap = QPixmap(option[3])
@@ -764,7 +765,7 @@ class Window(QMainWindow):
             for t in updated_list:
                 for key_name in t[0]:
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
-                    self.on_change_connect(key_changed, updated_list, data)
+                    self.on_change_connect(key_changed, updated_list, data, main)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
         self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 30))
@@ -840,6 +841,11 @@ class Window(QMainWindow):
         j = 1
         button_list = []
         maxi_width_left, maxi_width_right = -1, -1
+        self.output_title_fields = {}
+        key = None
+        current_key = None
+        fields = 0
+        title_repeat = 1
         for option in out_list:
             lable = option[1]
             output_type = option[2]
@@ -877,6 +883,8 @@ class Window(QMainWindow):
                 #r.setFixedSize(r.size())
                 out_layout2.addWidget(r, j, 2, 1, 1)
                 r.setVisible(True if option[4] else False)
+                fields += 1
+                self.output_title_fields[current_key][1] = fields
                 maxi_width_right = max(maxi_width_right, 100)    # predefined minimum width of 110 for textboxes
                 #r.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
                 # if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
@@ -897,6 +905,8 @@ class Window(QMainWindow):
                 b.resize(b.sizeHint().width(), b.sizeHint().height())
                 b.setText(v[0])
                 b.setDisabled(True)
+                fields += 1
+                self.output_title_fields[current_key][1] = fields
                 #b.setFixedSize(b.size())
                 button_list.append(option)
                 out_layout2.addWidget(b, j, 2, 1, 1)
@@ -904,6 +914,8 @@ class Window(QMainWindow):
                 #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if output_type == TYPE_TITLE:
+                key = lable
+
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
 
                 #q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
@@ -912,11 +924,20 @@ class Window(QMainWindow):
                 font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")
-                # q.setVisible(True if option[4] else False)
+                q.setVisible(True if option[4] else False)
                 #q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
                 q.resize(q.sizeHint().width(), q.sizeHint().height())
+                # q.setVisible(True if option[4] else False)
+                if key:
+                    fields = 0
+                    current_key = key
+                    if key in self.output_title_fields.keys():
+                        self.output_title_fields.update({key+str(title_repeat): [q, fields]})
+                        title_repeat +=1
+                    else:
+                        self.output_title_fields.update({key: [q, fields]})
                 out_layout2.addWidget(q, j, 1, 2, 2)
                 j = j + 1
             i = i + 30
@@ -1316,7 +1337,24 @@ class Window(QMainWindow):
                 last_design_dictionary = yaml.safe_load(last_design)
         if isinstance(last_design_dictionary, dict):
             self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
-            
+            if "out_titles_status" in last_design_dictionary.keys():
+                title_status = last_design_dictionary["out_titles_status"]
+                print("titles", title_status)
+                title_count = 0
+                out_titles = []
+                title_repeat = 1
+                for out_field in out_list:
+                    if out_field[2] == TYPE_TITLE:
+                        title_name = out_field[1]
+                        if title_name in out_titles:
+                            title_name += str(title_repeat)
+                            title_repeat += 1
+                        if title_status[title_count] == 0:
+                            self.output_title_fields[title_name][0].setVisible(False)
+                        title_count += 1
+                        out_titles.append(title_name)
+        self.ui_loaded = True
+
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
@@ -1403,10 +1441,10 @@ class Window(QMainWindow):
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
-    def on_change_connect(self, key_changed, updated_list, data):
-        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data))
+    def on_change_connect(self, key_changed, updated_list, data, main):
+        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data, main))
 
-    def change(self, k1, new, data):
+    def change(self, k1, new, data, main):
 
         """
         @author: Umair
@@ -1440,6 +1478,8 @@ class Window(QMainWindow):
                 for values in val:
                     k2.addItem(values)
                     k2.setCurrentIndex(0)
+                if VALUES_WELD_TYPE[1] in val:
+                    k2.setCurrentText(VALUES_WELD_TYPE[1])
                 if k2_key in RED_LIST:
                     red_list_set = set(red_list_function())
                     current_list_set = set(val)
@@ -1453,6 +1493,9 @@ class Window(QMainWindow):
             elif typ == TYPE_CUSTOM_MATERIAL:
                 if val:
                     self.new_material_dialog()
+            elif typ == TYPE_CUSTOM_SECTION:
+                if val:
+                    self.import_custom_section()
 
             elif typ == TYPE_LABEL:
                 k2.setText(val)
@@ -1476,6 +1519,72 @@ class Window(QMainWindow):
                     k2.setVisible(True)
             else:
                 pass
+
+        if self.ui_loaded:
+            self.output_title_change(main)
+
+    def output_title_change(self, main):
+
+        status = main.design_status
+        out_list = main.output_values(main, status)
+        key = None
+        no_field_titles = []
+        titles = []
+        title_repeat = 1
+        visible_fields = 0
+        for option in out_list:
+            if option[2] == TYPE_TITLE:
+                if key:
+                    title_repeat = self.output_title_visiblity(visible_fields, key, titles, title_repeat)
+                    titles.append(key)
+
+                key = option[1]
+                if self.output_title_fields[key][1] == 0:
+                    no_field_titles.append(key)
+                if key in no_field_titles:
+                    visible_fields = 1
+                else:
+                    visible_fields = 0
+
+            if option[2] == TYPE_TEXTBOX:
+                if self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).isVisible():
+                    visible_fields += 1
+
+            elif option[2] == TYPE_OUT_BUTTON:
+                visible_fields += 1
+
+        self.output_title_visiblity(visible_fields, key, titles, title_repeat)
+
+        no_field_title = ""
+        for title in self.output_title_fields.keys():
+            if title in no_field_titles:
+                no_field_title = title
+            elif self.output_title_fields[title][0].isVisible():
+                if no_field_title in no_field_titles:
+                    no_field_titles.remove(no_field_title)
+
+        for no_field_title in no_field_titles:
+            self.output_title_fields[no_field_title][0].setVisible(False)
+
+    def output_title_visiblity(self, visible_fields, key, titles, title_repeat):
+
+        if visible_fields == 0:
+            if key in titles:
+                self.output_title_fields[key + str(title_repeat)][0].setVisible(False)
+                title_repeat += 1
+            else:
+                self.output_title_fields[key][0].setVisible(False)
+        else:
+            if key in titles:
+                self.output_title_fields[key + str(title_repeat)][0].setVisible(True)
+                title_repeat += 1
+            else:
+                self.output_title_fields[key][0].setVisible(True)
+
+        return title_repeat
+
+
+
 
     # Function for Reset Button
     '''
@@ -1780,16 +1889,6 @@ class Window(QMainWindow):
             if error is not None:
                 self.show_error_msg(error)
                 return
-            last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-            if not os.path.isdir(last_design_folder):
-                os.mkdir(last_design_folder)
-            last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
-            last_design_file = os.path.join(last_design_folder, last_design_file)
-            for design_key in self.design_inputs.keys():
-                if self.design_inputs[design_key] == 'Disabled':
-                    self.design_inputs[design_key] = '0'
-            with open(str(last_design_file), 'w') as last_design:
-                yaml.dump(self.design_inputs, last_design)
 
             out_list = main.output_values(main, status)
             for option in out_list:
@@ -1804,6 +1903,30 @@ class Window(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
+            self.output_title_change(main)
+
+            last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+            if not os.path.isdir(last_design_folder):
+                os.mkdir(last_design_folder)
+            last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
+            last_design_file = os.path.join(last_design_folder, last_design_file)
+            out_titles_status = []
+            out_titles = []
+            title_repeat = 1
+            for option in out_list:
+                if option[2] == TYPE_TITLE:
+                    title_name = option[1]
+                    if title_name in out_titles:
+                        title_name += str(title_repeat)
+                        title_repeat += 1
+                    if self.output_title_fields[title_name][0].isVisible():
+                        out_titles_status.append(1)
+                    else:
+                        out_titles_status.append(0)
+                    out_titles.append(title_name)
+            self.design_inputs.update({"out_titles_status": out_titles_status})
+            with open(str(last_design_file), 'w') as last_design:
+                yaml.dump(self.design_inputs, last_design)
 
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
@@ -1927,7 +2050,7 @@ class Window(QMainWindow):
 
                         pmap = QPixmap(option[3])
                         #im.setScaledContents(1)
-                        im.setPixmap(pmap.scaled(170,340,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+                        im.setPixmap(pmap.scaled(250,250,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
                         #im.setPixmap(pmap)
                         image_layout.addWidget(im)
                         j += 1
@@ -1984,6 +2107,19 @@ class Window(QMainWindow):
                     dialog.resize(350, 300)
                 #dialog.setFixedSize(dialog.size())
                 dialog.exec()
+    
+    def import_custom_section(self):
+        '''
+        Custom Section Importing
+        Fetches data from osm file and returns as a dictionary
+        '''
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Open Section Design",None, "InputFiles(*.osm)")
+        if(fileName==''):
+            return
+        with open(fileName,'r') as file:
+            parameters=eval(file.read())
+        SecProfile=self.dockWidgetContents.findChild(QtWidgets.QWidget, KEY_SEC_PROFILE).currentText()
+        return parameters
 
     def new_material_dialog(self):
         dialog = QtWidgets.QDialog(self)
@@ -2625,8 +2761,17 @@ class Window(QMainWindow):
 
     def set_dialog_size(self,dialog):
         def set_size():
-            dialog.resize(900,900) 
-            self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)  
+            screen_resolution=QtWidgets.QDesktopWidget().screenGeometry()
+            if(screen_resolution.width()<1025):
+                measure=screen_resolution.height()-120
+                dialog.resize(measure*45//39,measure)
+                
+            else:
+                dialog.resize(900,700)
+            mysize = dialog.geometry()
+            hpos = (screen_resolution.width() - mysize.width() ) / 2
+            vpos = (screen_resolution.height() - mysize.height() ) / 2
+            dialog.move(hpos, vpos)
             self.OsdagSectionModeller.OCCWindow.setFocus()
         return set_size
 

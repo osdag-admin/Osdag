@@ -1,0 +1,38 @@
+Connector.Flange_Plate.Preferences: Outside + Inside
+Connector.Flange_Plate.Thickness_list: &id001
+- '6'
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '24'
+- '25'
+- '26'
+- '28'
+- '30'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '80'
+Connector.Material: E 410 (Fe 540)
+Connector.Web_Plate.Thickness_List: *id001
+Design.Design_Method: Limit State Design
+Detailing.Gap: '10'
+Load.Axial: '1'
+Load.Moment: '1'
+Load.Shear: '1'
+Material: E 165 (Fe 290)
+Member.Designation: UB 914 x 419 x 343
+Member.Material: E 410 (Fe 540)
+Module: Beam Coverplate Weld Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '540'
+Weld.Type: Fillet Weld

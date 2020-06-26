@@ -310,6 +310,7 @@ TYPE_TAB_2 = "TYPE_TAB_2"
 TYPE_TAB_3 = "TYPE_TAB_3"
 TYPE_SECTION = 'Popup_Section'
 TYPE_CUSTOM_MATERIAL = 'New_Material_Popup'
+TYPE_CUSTOM_SECTION = 'New_Section_Popup'
 TYPE_ENABLE_DISABLE = 'Enable/Disable'
 TYPE_CHANGE_TAB_NAME = 'Change tab_name'
 TYPE_REMOVE_TAB = 'Remove tab'
@@ -409,7 +410,8 @@ KEY_ANGLE_LIST='Connector.Angle_List'
 KEY_ANGLE_SELECTED = 'Connector.Angle_Selected'
 KEY_SEATEDANGLE = 'Connector.Seated_Angle_List'
 KEY_TOPANGLE = 'Connector.Top_Angle'
-
+KEY_DISP_ANGLE_LIST = 'Seated Angle List'
+KEY_DISP_TOPANGLE_LIST = 'Top Angle List'
 
 KEY_MOMENT_MAJOR = 'Load.Moment.Major'
 KEY_MOMENT_MINOR = 'Load.Moment.Minor'
@@ -520,6 +522,8 @@ DISP_MAX_PLATE_HEIGHT = 'Max. Plate Height (mm)'
 DISP_MIN_PLATE_LENGTH = 'Min. Plate Length (mm)'
 DISP_MAX_PLATE_WIDTH = 'Max. Plate Width (mm)'
 DISP_MIN_PLATE_WIDTH = 'Min. Plate Width (mm)'
+DISP_MIN_LEG_LENGTH = 'Min. Leg Length (mm)'
+DISP_MIN_WIDTH = 'Minimum Width (mm)'
 DISP_MIN_PLATE_THICK = 'Min. Plate Thickness (mm)'
 
 ######### Minimun for Flange####
@@ -537,8 +541,8 @@ DISP_MIN_WEB_PLATE_THICK = 'Min. Web Plate Thickness (mm)'
 
 
 
-DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Height (mm)'
-DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Height (mm)'
+DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Width (mm)'
+DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Width (mm)'
 DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
 
@@ -624,7 +628,7 @@ KEY_DISP_TYP = 'Type'
 KEY_DISP_TYP_ANCHOR = 'Type*'
 KEY_DISP_GRD_ANCHOR = 'Grade*'
 KEY_DISP_GRD_FOOTING = 'Grade*'
-KEY_DISP_GRD = 'Grade'
+KEY_DISP_GRD = 'Property Class'
 
 KEY_DISP_MOMENT_MAJOR = ' - Major axis (M<sub>z-z</sub>)'
 KEY_DISP_MOMENT_MINOR = ' - Minor axis (M<sub>y-y</sub>)'
@@ -1113,6 +1117,9 @@ KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
+
+KEY_REDUCTION_FACTOR_FLANGE ='flange_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_FLANGE ="Red.factor"
 KEY_OUT_FLANGE_BOLT_SHEAR ='flange_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity (kN)"
 KEY_OUT_FLANGE_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'
@@ -1176,6 +1183,8 @@ KEY_WEB_CAPACITY ='section.web_capacities'
 KEY_DISP_WEB_CAPACITY ='Capacity'
 
 # Web plate
+KEY_REDUCTION_FACTOR_WEB ='web_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_WEB ="Red.factor"
 KEY_WEB_PLATE_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_PLATE_CAPACITY= 'Web Plate Tension Capacity (kN)'
 KEY_TEN_YIELDCAPACITY_WEB_PLATE = "Web_plate.tension_yielding"
@@ -1302,6 +1311,7 @@ KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
 KEY_OUT_BOLT_PRYING_FORCE = 'Bolt.PryingForce'
 KEY_OUT_DISP_BOLT_PRYING_FORCE = 'Bolt Prying Force (kN)'
 KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
+KEY_OUT_BOLT_TENSION_CAPACITY1 = 'Bolt Tension Capacity (kN)'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 KEY_OUT_LONG_JOINT = 'Bolt Capacity post Long Joint (kN)'

@@ -7,23 +7,6 @@ from pathlib import Path
 import ast
 import logging
 is_travis = 'TRAVIS' in os.environ
-from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.connection.cleat_angle_connection import CleatAngleConnection
-from design_type.connection.seated_angle_connection import SeatedAngleConnection
-from design_type.connection.end_plate_connection import EndPlateConnection
-from design_type.connection.base_plate_connection import BasePlateConnection
-
-from design_type.connection.beam_cover_plate import BeamCoverPlate
-from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
-
-from design_type.tension_member.tension_bolted import Tension_bolted
-from design_type.tension_member.tension_welded import Tension_welded
-from design_type.connection.beam_end_plate import BeamEndPlate
-from design_type.connection.column_cover_plate import ColumnCoverPlate
-from design_type.connection.column_end_plate import ColumnEndPlate
-from design_type.compression_member.compression import Compression
-from Common import *
 ############################ Pre-Build Database Updation/Creation #################
 sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
 sqlitepath = Path('ResourceFiles/Database/Intg_osdag.sqlite')
@@ -54,6 +37,24 @@ if sqlpath.exists():
             print('Error: ', e)
 
 #########################################################################################
+from design_type.connection.fin_plate_connection import FinPlateConnection
+from design_type.connection.cleat_angle_connection import CleatAngleConnection
+from design_type.connection.seated_angle_connection import SeatedAngleConnection
+from design_type.connection.end_plate_connection import EndPlateConnection
+from design_type.connection.base_plate_connection import BasePlateConnection
+
+from design_type.connection.beam_cover_plate import BeamCoverPlate
+from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
+from design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
+
+from design_type.tension_member.tension_bolted import Tension_bolted
+from design_type.tension_member.tension_welded import Tension_welded
+from design_type.connection.beam_end_plate import BeamEndPlate
+from design_type.connection.column_cover_plate import ColumnCoverPlate
+from design_type.connection.column_end_plate import ColumnEndPlate
+from design_type.compression_member.compression import Compression
+from Common import *
+
 
 if not is_travis:
     from cad.common_logic import CommonDesignLogic

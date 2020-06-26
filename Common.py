@@ -7,7 +7,7 @@ import math
 from utils.common.other_standards import *
 import os
 
-PATH_TO_DATABASE = PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
+PATH_TO_DATABASE = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'Database', 'Intg_osdag.sqlite')
 
 
 import sqlite3

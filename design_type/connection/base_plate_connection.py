@@ -1954,7 +1954,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 k1 = 3 * (self.eccentricity_zz - self.bp_length_provided / 2)
                 k2 = (6 * self.n * self.anchor_area_tension / self.bp_width_provided) * (self.f + self.eccentricity_zz)
                 k3 = (self.bp_length_provided / 2 + self.f) * -k2
-
+                
                 # equation for finding 'y' is: y^3 + k1*y^2 + k2*y + k3 = 0
                 roots = np.roots([1, k1, k2, k3])  # finding roots of the equation
                 r_1 = roots[0]

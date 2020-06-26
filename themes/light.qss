@@ -16,25 +16,25 @@ QWidget {
 	background-color: transparent;
 	font-weight:600;
 	font-family:Arial;
-	
+
 }
 #TitleBar QToolButton#report_issue {
 	background-color: transparent;
 	font-weight:600;
 	font-family:Arial;
-	
+
 }
 #TitleBar QToolButton#report_issue:hover {
 	background-color: cadetblue;
 	font-weight:600;
 	font-family:Arial;
-	
+
 }
 #TitleBar QToolButton#save_log:hover {
 	background-color: limegreen;
 	font-weight:600;
 	font-family:Arial;
-	
+
 }
 #TitleBar {
     background-color: lightgray;
@@ -494,7 +494,7 @@ QDialog#DesignPreferences QTabBar::tab {
                 width: 122px;
 				background: lightgray;
                 font-size: 14px;
-		
+
 				color: black;
 				border: 0.5px inset #abc250;
                }
@@ -512,7 +512,7 @@ QDialog#DesignPreferences QPushButton{
 		color: black;
 		background:lightgray;
 		border: 1.2px inset #abc250;
-		
+
 		padding-left: 7px;
 		padding-right: 7px;
 		font-family: Arial;
@@ -533,7 +533,7 @@ QDialog#DesignPreferences QTabBar::tab:selected
 	border:none;
 }
 QTabBar::tab {
-              
+
                 height: 35px;
                 width: 200px;
 

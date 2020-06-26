@@ -758,6 +758,39 @@ def send_crash_report():
     appcrash.get_system_information = get_system_info
     appcrash.show_report_dialog()
 
+class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
+
+    def __init__(self, icon, parent=None):
+        QtWidgets.QSystemTrayIcon.__init__(self, icon, parent)
+        self.parent = parent
+        menu = QtWidgets.QMenu(self.parent)
+        self.setContextMenu(menu)
+        menu.addAction("Exit", self.exit)
+
+
+    def exit(self):
+        QCoreApplication.exit()
+
+######################### UpDateNotifi ################
+
+class Update(QMainWindow):
+    def __init__(self, old_version):
+        super().__init__()
+        self.old_version=old_version
+    def notifi(self):
+        try:
+            url = "https://anshulsingh-py.github.io/test/version.txt"
+            file = urllib.request.urlopen(url)
+            for line in file:
+                decoded_line = line.decode("utf-8")
+            new_version = decoded_line.split("=")[1]
+            if int(new_version) > self.old_version:
+                print("update")
+                msg = QMessageBox.information(self, 'Update available','<a href=https://google.com>Click to downlaod<a/>')
+        except:
+            print("No internet connection")
+
+
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)

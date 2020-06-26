@@ -1262,9 +1262,6 @@ class Window(QMainWindow):
         self.connectivity = None
         self.fuse_model = None
 
-        self.__threads = []
-        self.thread_count = 0
-
     def save_output_to_txt(self, main):
         def save_fun():
             status = main.design_status

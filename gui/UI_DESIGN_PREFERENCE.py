@@ -1056,7 +1056,7 @@ class Window(QDialog):
                             values['Source'] = 'Custom'
                             if tab_name == 'Columns':
                                 c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,
-                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES 
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                                           (values['Designation'], values['Mass'], values['Area'], values['D'],
                                            values['B'], values['tw'], values['T'], values['FlangeSlope'],

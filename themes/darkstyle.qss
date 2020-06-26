@@ -1074,7 +1074,7 @@ https://doc.qt.io/qt-5/stylesheet-examples.html#customizing-qcombobox
 
 --------------------------------------------------------------------------- */
 QComboBox {
-    
+
     background-color: #1D282F;
     border: 1px solid #37495b;
     border-radius: 0;

@@ -33,8 +33,8 @@ for f in files:
     module = d['Module']
 
 
-    if module == KEY_DISP_COLUMNENDPLATE:
-        main = ColumnEndPlate
+    if module == KEY_DISP_COLUMNCOVERPLATEWELD:
+        main = ColumnCoverPlateWeld
         main.set_osdaglogger(None)
         main.set_input_values(main, d)
         base = os.path.basename(f)
@@ -46,7 +46,7 @@ for f in files:
         # f.write(str(test_out_list))
         # f.close()
 
-        workbook_name = 'CCEP.xlsx'
+        workbook_name = 'CCWP.xlsx'
 
         sheet_name = str(os.path.splitext(base)[0])
         try:

@@ -1,8 +1,5 @@
 Connector.Flange_Plate.Preferences: Outside
 Connector.Flange_Plate.Thickness_list:
-- '30'
-Connector.Material: E 410 (Fe 540)
-Connector.Web_Plate.Thickness_List:
 - '6'
 - '8'
 - '10'
@@ -25,13 +22,16 @@ Connector.Web_Plate.Thickness_List:
 - '56'
 - '63'
 - '80'
+Connector.Material: E 410 (Fe 540)
+Connector.Web_Plate.Thickness_List:
+- '14'
 Design.Design_Method: Limit State Design
 Detailing.Gap: '10'
-Load.Axial: '5'
-Load.Moment: '1'
-Load.Shear: '5'
-Material: E 410 (Fe 540)
-Member.Designation: NPB 750 X 270 X 174.54
+Load.Axial: '250'
+Load.Moment: '105'
+Load.Shear: '190'
+Material: E 450 (Fe 570)D
+Member.Designation: WPB 340 X 300 X 78.9
 Member.Material: E 410 (Fe 540)
 Module: Beam Coverplate Weld Connection
 Weld.Fab: Shop Weld

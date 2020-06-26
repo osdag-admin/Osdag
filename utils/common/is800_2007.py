@@ -6,6 +6,8 @@ Started on 01 - Nov - 2018
 """
 import math
 from Common import *
+# from Common import KEY_DP_WELD_FAB_SHOP
+
 
 class IS800_2007(object):
     """Perform calculations on steel design as per IS 800:2007
@@ -16,6 +18,154 @@ class IS800_2007(object):
     """    SECTION  1     GENERAL   """
     # ==========================================================================
     """    SECTION  2     MATERIALS   """
+    # -------------------------------------------------------------
+    #   5.4 Strength
+    # -------------------------------------------------------------
+
+    # Clause 3.7 - Classification of cross-section, Table 2, Limiting width to thickness ratio
+    @staticmethod
+    def Table2_web_OfI_H_box_section(depth, web_thickness, f_y, axial_load, load_type='Compression', section_class='Plastic'):
+        """ Calculate the limiting width to thickness ratio; for web of an I, H or Box section in accordance to Table 2
+
+        Args:
+            depth: depth of the web in mm (float or int)
+            web_thickness: thickness of the web in mm (float or int)
+            f_y: yield stress of the section material in N/MPa (float or int)
+            axial_load: Axial load (Tension or Compression) acting on the member (i.e. web) in N (float or int)
+            load_type: Type of axial load (Tension or Compression) (string)
+            section_class: Class of the section (Class1 - Plastic, Class2 - Compact or Class3 - Semi-compact) (string)
+
+        Returns:
+            Results of the checks; 1. Neutral axis at mid-depth, 2. Generally (when there is axial tension or compression force acting on the section),
+            and 3. Axial compression, in the form of (list)
+            'Pass', if the section qualifies as the required section_class, 'Fail' if it does not
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        epsilon = math.sqrt(f_y / 250)
+
+        ratio = depth / web_thickness  # ratio of the web/component
+
+        # Check 1: Neutral axis at mid-depth
+        if section_class == 'Plastic':
+            if ratio <= (84 * epsilon):
+                check_1 = 'Pass'
+            else:
+                check_1 = 'Fail'
+        elif section_class == 'Compact':
+            if ratio <= (105 * epsilon):
+                check_1 = 'Pass'
+            else:
+                check_1 = 'Fail'
+        else:  # 'Semi-compact'
+            if ratio <= (126 * epsilon):
+                check_1 = 'Pass'
+            else:
+                check_1 = 'Fail'
+
+        # Check 2: Generally (when there is axial tension or compression force acting on the section)
+        actual_avg_stress = axial_load / (depth * web_thickness)  # N/mm^2 or MPa
+        design_compressive_stress = f_y / gamma_m0  # N/mm^2 or MPa, design compressive stress only of web (cl. 7.1.2.1, IS 800:2007)
+        r_1 = actual_avg_stress / design_compressive_stress  # stress ratio
+
+        if load_type == 'Compression':
+            r_1 = r_1
+        else:
+            r_1 = - r_1  # r_1 is negative for axial tension
+
+        if section_class == 'Plastic':
+            if ratio <= (min(((84 * epsilon) / (1 + r_1)), 42 * epsilon)):
+                check_2 = 'Pass'
+            else:
+                check_2 = 'Fail'
+        elif section_class == 'Compact':
+            if r_1 < 0:
+                if ratio <= ((105 * epsilon) / (1 + r_1)):
+                    check_2 = 'Pass'
+                else:
+                    check_2 = 'Fail'
+            else:
+                if ratio <= (min(((105 * epsilon) / (1 + (1.5 * r_1))), 42 * epsilon)):
+                    check_2 = 'Pass'
+                else:
+                    check_2 = 'Fail'
+        else:  # 'Semi-compact'
+            if ratio <= (min(((126 * epsilon) / (1 + (2 * r_1))), 42 * epsilon)):
+                check_2 = 'Pass'
+            else:
+                check_2 = 'Fail'
+
+        # Check 3: Axial compression
+        if section_class == 'Semi-compact':
+            if ratio <= (42 * epsilon):
+                check_3 = 'Pass'
+            else:
+                check_3 = 'Fail'
+        else:
+            check_3 = 'Pass'  # Not-applicable to Plastic and Compact sections (hence, Pass)
+
+        return [check_1, check_2, check_3]
+
+    @staticmethod
+    def Table2_hollow_tube(diameter, thickness, f_y, load='Axial Compression', section_class='Plastic'):
+        """ Calculate the limiting width to thickness ratio; for a hollow tube section in accordance to Table 2
+
+        Args:
+            diameter: diameter of the tube in mm (float or int)
+            thickness: thickness of the tube in mm (float or int)
+            f_y: yield stress of the section material in N/MPa (float or int)
+            load: Type of load ('Axial Compression' or 'Moment') (string)
+            section_class: Class of the section (Class1 - Plastic, Class2 - Compact or Class3 - Semi-compact) (string)
+
+        Returns:
+            Results of the section classification check(s)
+            'Pass', if the section qualifies as the required section_class, 'Fail' if it does not
+
+        Reference: Table 2 and Cl.3.7.2, IS 800:2007
+
+        """
+        epsilon = math.sqrt(f_y / 250)
+
+        ratio = diameter / thickness  # ratio of the web/component
+
+        # Check 1: If the load acting is Moment
+        if load == 'Moment':
+
+            if section_class == 'Plastic':
+                if ratio <= (42 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+            elif section_class == 'Compact':
+                if ratio <= (52 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+            else:
+                if ratio <= (146 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+
+        # Check 1: If the load acting is Axial Compression
+        elif load == 'Axial Compression':
+
+            if section_class == 'Plastic':
+                check = 'Pass'
+            elif section_class == 'Compact':
+                check = 'Pass'
+            else:
+                if ratio <= (88 * epsilon ** 2):
+                    check = 'Pass'
+                else:
+                    check = 'Fail'
+        else:
+            pass
+
+        return check
+
     # ==========================================================================
     """    SECTION  3     GENERAL DESIGN REQUIREMENTS   """
     # ==========================================================================
@@ -37,7 +187,36 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  6     DESIGN OF TENSION MEMBERS   """
+
+    # ------------------------------------------------------------
+    #   6.2 Design Strength Due to Yielding of Gross Section
     # -------------------------------------------------------------
+
+    @staticmethod
+    def cl_6_2_tension_yielding_strength(A_g, f_y):
+        """Calcualte the tension rupture capacity of plate as per clause 6.3.1
+        :param A_g: gross area of cross section
+        :param f_y: yield stress of the material
+        :return: design strength in tension yielding
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        T_dg = A_g * f_y / gamma_m0
+        return T_dg
+    # ------------------------------------------------------------
+    #   6.3 Design Strength Due to Rupture of Critical Section
+    # -------------------------------------------------------------
+
+    # cl.6.3.1 Plates
+    @staticmethod
+    def cl_6_3_1_tension_rupture_strength(A_n,f_u):
+        """Calcualte the tension rupture capacity of plate as per clause 6.3.1
+        :param A_n: net effective area of member
+        :param f_u: ultimate stress of the material
+        :return: design strength in tension rupture
+        """
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_dn = 0.9*A_n*f_u/gamma_m1
+        return T_dn
     #   6.4 Design Strength Due to Block Shear
     # -------------------------------------------------------------
 
@@ -72,6 +251,7 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  7     DESIGN OF COMPRESS1ON MEMBERS   """
+
     # -------------------------------------------------------------
     #   7.4 Column Bases
     # -------------------------------------------------------------
@@ -81,10 +261,10 @@ class IS800_2007(object):
     def cl_7_4_1_bearing_strength_concrete(concrete_grade):
         """
         Args:
-            concrete_grade: grade of concrete used for pedestal/footing.
+            concrete_grade: grade of concrete used for pedestal/footing (str).
 
         Returns:
-            maximum permissible bearing strength of concrete pedestal/footing.
+            maximum permissible bearing strength of concrete pedestal/footing (float).
 
         Note:
             cl 7.4.1 suggests the maximum bearing strength equal to 0.60 times f_ck,
@@ -108,6 +288,7 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  8     DESIGN OF MEMBERS SUBJECTED TO BENDING   """
+
     # -------------------------------------------------------------
     #   8.4 Shear
     # -------------------------------------------------------------
@@ -134,16 +315,13 @@ class IS800_2007(object):
     @staticmethod
     def cl_8_2_1_2_design_moment_strength(Z_e, Z_p, f_y, section_class='semi-compact'):
         """ Calculate the design bending strength as per cl. 8.2.1.2
-
         Args:
             Z_e: Elastic section modulus of the cross-section in cubic mm (float)
             Z_p: Plastic section modulus of the cross-section in cubic mm (float)
             f_y: Yield stress of the component material in MPa (float)
             section_class: Classification of the section (plastic, compact or semi-compact) as per Table 2 (str)
-
         Returns:
             Design bending strength of the cross-section in N-mm (float)
-
         """
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
@@ -176,13 +354,14 @@ class IS800_2007(object):
         bearing_length = round((float(shear_force) * 1000) * gamma_m0 / web_thickness / fy, 3)
         b1_req = bearing_length - (flange_thickness + root_radius)
         k = flange_thickness + root_radius
-        b1 = min(b1_req, k)
+        b1 = max(b1_req, k)
         return b1
 
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
     # ==========================================================================
     """   SECTION  10    CONNECTIONS    """
+
     # -------------------------------------------------------------
     #   10.1 General
     # -------------------------------------------------------------
@@ -194,26 +373,21 @@ class IS800_2007(object):
     @staticmethod
     def cl_10_2_1_bolt_hole_size(d, bolt_hole_type='Standard'):
         """Calculate bolt hole diameter as per Table 19 of IS 800:2007
-
         Args:
              d - Nominal diameter of fastener in mm (float)
              bolt_hole_type - Either 'Standard' or 'Over-sized' or 'short_slot' or 'long_slot' (str)
-
         Returns:
             bolt_hole_size -  Diameter of the bolt hole in mm (float)
-
         Note:
             Reference:
             IS 800, Table 19 (Cl 10.2.1)
-
         TODO:ADD KEY_DISP for for Standard/oversize etc and replace these strings
-
         """
         table_19 = {
             "12-14": {'Standard': 1.0, 'Over-sized': 3.0, 'short_slot': 4.0, 'long_slot': 2.5},
             "16-22": {'Standard': 2.0, 'Over-sized': 4.0, 'short_slot': 6.0, 'long_slot': 2.5},
-            "24"   : {'Standard': 2.0, 'Over-sized': 6.0, 'short_slot': 8.0, 'long_slot': 2.5},
-            "24+"  : {'Standard': 3.0, 'Over-sized': 8.0, 'short_slot': 10.0, 'long_slot': 2.5}
+            "24": {'Standard': 2.0, 'Over-sized': 6.0, 'short_slot': 8.0, 'long_slot': 2.5},
+            "24+": {'Standard': 3.0, 'Over-sized': 8.0, 'short_slot': 10.0, 'long_slot': 2.5}
         }
         import re
         # d = str(re.sub("[^0-9]", "", str(d)))
@@ -239,17 +413,13 @@ class IS800_2007(object):
     @staticmethod
     def cl_10_2_2_min_spacing(d):
         """Calculate minimum distance between centre of fasteners
-
         Args:
              d - Nominal diameter of fastener in mm (float)
-
         Returns:
             Minimum distance between centre of fasteners in mm (float)
-
         Note:
             Reference:
             IS 800:2007, cl. 10.2.2
-
         """
         return 2.5 * d
 
@@ -257,44 +427,37 @@ class IS800_2007(object):
     @staticmethod
     def cl_10_2_3_1_max_spacing(plate_thicknesses):
         """Calculate maximum distance between centre of fasteners
-
         Args:
              plate_thicknesses- List of thicknesses in mm of connected plates (list or tuple)
-
         Returns:
             Maximum distance between centres of adjacent fasteners in mm (float)
-
         Note:
             Reference:
             IS 800:2007, cl. 10.2.3.1
-
         """
+        # print(plate_thicknesses)
         t = min(plate_thicknesses)
-        return min(32*t, 300.0)
+        return min(32 * t, 300.0)
 
     # cl. 10.2.3.2 Maximum pitch in tension and compression members
     @staticmethod
     def cl_10_2_3_2_max_pitch_tension_compression(d, plate_thicknesses, member_type):
         """Calculate maximum pitch between centre of fasteners lying in the direction of stress
-
         Args:
              d - Nominal diameter of fastener in mm (float)
              plate_thicknesses - List of thicknesses in mm of connected plates (list or tuple)
              member_type - Either 'tension' or 'compression' or 'compression_butting' (str)
-
         Returns:
             Maximum distance between centres of adjacent fasteners in mm (float)
-
         Note:
             Reference:
             IS 800:2007, cl. 10.2.3.2
-
         """
         t = min(plate_thicknesses)
         if member_type == 'tension':
-            return min(16*t, 200.0)
+            return min(16 * t, 200.0)
         elif member_type == 'compression':
-            return min(12*t, 200.0)
+            return min(12 * t, 200.0)
         else:
             # TODO compression members wherein forces are transferred through butting faces is given in else
             return 4.5 * d
@@ -303,18 +466,14 @@ class IS800_2007(object):
     @staticmethod
     def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - Sheared or hand flame cut'):
         """Calculate minimum end and edge distance
-
         Args:
              d - Nominal diameter of fastener in mm (float)
              edge_type - Either 'hand_flame_cut' or 'machine_flame_cut' (str)
-
         Returns:
                 Minimum edge and end distances from the centre of any hole to the nearest edge of a plate in mm (float)
-
         Note:
             Reference:
             IS 800:2007, cl. 10.2.4.2
-self
         """
 
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
@@ -326,29 +485,38 @@ self
 
     # cl. 10.2.4.3  Maximum Edge Distance
     @staticmethod
-    def cl_10_2_4_3_max_edge_dist(plate_thicknesses, f_y, corrosive_influences=False):
+    def cl_10_2_4_3_max_edge_dist(conn_plates_t_fu_fy, corrosive_influences=False):
         """Calculate maximum end and edge distance
-
         Args:
-             plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
-             f_y - Yield strength of plate material in MPa (float)
+             conn_plates_t_fu_fy - List of tuples with plate thicknesses in mm, fu in MPa, fy in MPa (list of tuples)
+                                example:- [ (12, 410, 250), (10, 440, 300) ]
              corrosive_influences - Whether the members are exposed to corrosive influences or not (Boolean)
-
         Returns:
             Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
-
         Note:
             Reference:
             IS 800:2007, cl. 10.2.4.3
-
         """
         # TODO : Differentiate outer plates and connected plates.
-        t = min(plate_thicknesses)
-        epsilon = math.sqrt(250 / f_y)
+        t_epsilon_considered = conn_plates_t_fu_fy[0][0] * math.sqrt(250 / float(conn_plates_t_fu_fy[0][2]))
+        t_considered = conn_plates_t_fu_fy[0][0]
+        t_min = t_considered
+        for i in conn_plates_t_fu_fy:
+            t = i[0]
+            f_y = i[2]
+            epsilon = math.sqrt(250 / f_y)
+            if t * epsilon <= t_epsilon_considered:
+                t_epsilon_considered = t * epsilon
+                t_considered = t
+            if t < t_min:
+                t_min = t
+
+         # epsilon = math.sqrt(250 / f_y)
+
         if corrosive_influences is True:
-            return 40.0 + 4 * t
+            return 40.0 + 4 * t_min
         else:
-            return 12 * t * epsilon
+            return 12 * t_epsilon_considered
 
     # -------------------------------------------------------------
     #   10.3 Bearing Type Bolts
@@ -358,18 +526,14 @@ self
     @staticmethod
     def cl_10_3_2_bolt_design_strength(V_dsb, V_dpb):
         """Calculate design strength of bearing type bolt
-
         Args:
             V_dsb - Design shear strength of bearing bolt in N (float)
             V_dpb - Design bearing strength of bolt on the plate in N (float)
-
         Returns:
             V_db - Design strength of bearing bolt in N (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.3.2
-
         """
         V_db = min(V_dsb, V_dpb)
         return V_db
@@ -379,7 +543,6 @@ self
     @staticmethod
     def cl_10_3_3_bolt_shear_capacity(f_ub, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
         """Calculate design shear strength of bearing bolt
-
         Args:
             f_ub - Ultimate tensile strength of the bolt in MPa (float)
             A_nb - Net shear area of the bolt at threads in sq. mm  (float)
@@ -387,35 +550,29 @@ self
             n_n - Number of shear planes with threads intercepting the shear plane (int)
             n_s -  Number of shear planes without threads intercepting the shear plane (int)
             safety_factor_parameter - Either 'field' or 'shop' (str)
-
         return:
             V_dsb - Design shear strength of bearing bolt in N (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.3.3
-
         """
         V_nsb = f_ub / math.sqrt(3) * (n_n * A_nb + n_s * A_sb)
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
-        V_dsb = V_nsb/gamma_mb
+        V_dsb = V_nsb / gamma_mb
         return V_dsb
 
     # cl. 10.3.3.1 Long joints
     @staticmethod
     def cl_10_3_3_1_bolt_long_joint(d, l_j):
         """ Calculate reduction factor for long joints.
-
         Args:
             l_j = Length of joint of a splice or end connection as defined in cl. 10.3.3.1 (float)
             d = Nominal diameter of the fastener (float)
         Return:
             beta_lj  = Reduction factor for long joints (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.3.3.1
-
         """
         beta_lj = 1.075 - 0.005 * l_j / d
         if beta_lj <= 0.75:
@@ -431,17 +588,14 @@ self
     @staticmethod
     def cl_10_3_3_2_bolt_large_grip(d, l_g, l_j=0):
         """ Calculate reduction factor for large grip lengths.
-
         Args:
             l_g = Grip length equal to the total thickness of the connected plates as defined in cl. 10.3.3.2 (float)
             d = Nominal diameter of the fastener (float)
         Return:
             beta_lg = Reduction factor for large grip lengths (float) if applicable
-
         Note:
             Reference:
             IS 800:2007,  cl 10.3.3.2
-
         """
         beta_lg = 8.0 / (3.0 + l_g / d)
         if beta_lg >= IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j):
@@ -454,10 +608,10 @@ self
 
     # cl. 10.3.4 Bearing Capacity of the Bolt
     @staticmethod
-    def cl_10_3_4_bolt_bearing_capacity(f_u, f_ub, t, d, e, p, bolt_hole_type='Standard', safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+    def cl_10_3_4_bolt_bearing_capacity(f_u, f_ub, t, d, e, p, bolt_hole_type='Standard',
+                                        safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
 
         """Calculate design bearing strength of a bolt on any plate.
-
         Args:
             f_u     - Ultimate tensile strength of the plate in MPa (float)
             f_ub    - Ultimate tensile strength of the bolt in MPa (float)
@@ -467,26 +621,23 @@ self
             p       - Pitch distance of the fastener along bearing direction in mm (float)
             bolt_hole_type - Either 'Standard' or 'Over-sized' or 'short_slot' or 'long_slot' (str)
             safety_factor_parameter - Either 'Field' or 'Shop' (str)
-
         return:
             V_dpb - Design bearing strength of bearing bolt in N (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.3.4
-
         """
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
 
         if p > 0.0:
-            k_b = min(e/(3.0*d_0), p/(3.0*d_0)-0.25, f_ub/f_u, 1.0)
+            k_b = min(e / (3.0 * d_0), p / (3.0 * d_0) - 0.25, f_ub / f_u, 1.0)
         else:
             k_b = min(e / (3.0 * d_0), f_ub / f_u, 1.0)  # calculate k_b when there is no pitch (p = 0)
 
-        k_b = round(k_b,2)
+        k_b = round(k_b, 2)
         V_npb = 2.5 * k_b * d * t * f_u
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
-        V_dpb = V_npb/gamma_mb
+        V_dpb = V_npb / gamma_mb
 
         if bolt_hole_type == 'Over-sized' or bolt_hole_type == 'short_slot':
             V_dpb *= 0.7
@@ -498,16 +649,13 @@ self
     @staticmethod
     def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
         """Calculate design tensile strength of bearing bolt
-
         Args:
             f_ub - Ultimate tensile strength of the bolt in MPa (float)
             f_yb - Yield strength of the bolt in MPa (float)
             A_sb - Shank area of bolt in sq. mm  (float)
             A_n - Net tensile stress area of the bolts as per IS 1367 in sq. mm  (float)
-
         return:
             T_db - Design tensile strength of bearing bolt in N (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.3.5
@@ -518,24 +666,21 @@ self
         return T_nb / gamma_mb
 
         # cl. 10.3.6 Bolt subjected to combined shear and tension of bearing bolts
+
     @staticmethod
     def cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb, V_db, T_b, T_db):
         """Check for bolt subjected to combined shear and tension
-
         Args:
             V_sb - factored shear force acting on the bolt,
             V_db - design shear capacity,
             T_b - factored tensile force acting on the bolt,
             T_db - design tension capacity.
-
         return: combined shear and friction value
-
         Note:
             Reference:
             IS 800:2007,  cl 10.3.6
         """
         return (V_sb / V_db) ** 2 + (T_b / T_db) ** 2
-
 
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting
@@ -543,10 +688,9 @@ self
 
     # cl. 10.4.3 Slip Resistance
     @staticmethod
-    def cl_10_4_3_bolt_slip_resistance(f_ub, A_nb, n_e, mu_f, bolt_hole_type='Standard', slip_resistance='service_load'):
+    def cl_10_4_3_bolt_slip_resistance(f_ub, A_nb, n_e, mu_f, bolt_hole_type='Standard', slip_resistance='ultimate_load'):
         # TODO : Ensure default slip_resistance = 'service_load' or 'ultimate_load'
         """Calculate design shear strength of friction grip bolt as governed by slip
-
         Args:
             f_ub - Ultimate tensile strength of the bolt in MPa (float)
             A_nb - Net area of the bolt at threads in sq. mm  (float)
@@ -555,15 +699,12 @@ self
             bolt_hole_type - Either 'Standard' or 'Over-sized' or 'short_slot' or 'long_slot' (str)
             slip_resistance - whether slip resistance is required at service load or ultimate load
                               Either 'service_load' or 'ultimate_load' (str)
-
         return:
             V_dsf - Design shear strength of friction grip bolt as governed by slip in N (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.4.3
             AMENDMENT NO. 1 (JANUARY 2012) to IS 800:2007
-
         """
         f_0 = 0.70 * f_ub
         F_0 = A_nb * f_0
@@ -583,30 +724,27 @@ self
             mu_f = 0.55
         V_nsf = mu_f * n_e * K_h * F_0
         V_dsf = V_nsf / gamma_mf
-        return V_dsf,K_h,gamma_mf
+        return V_dsf, K_h, gamma_mf
 
     # Table 20 Typical Average Values for Coefficient of Friction, mu_f (list)
     cl_10_4_3_Table_20 = [0.20, 0.50, 0.10, 0.25, 0.30, 0.52, 0.30, 0.30, 0.50, 0.33, 0.48, 0.1]
 
     # cl. 10.4.5 Tension Resistance
     @staticmethod
-    def cl_10_4_5_friction_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+    def cl_10_4_5_friction_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n,
+                                                   safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
         """Calculate design tensile strength of friction grip bolt
-
         Args:
             f_ub - Ultimate tensile strength of the bolt in MPa (float)
             f_yb - Yield strength of the bolt in MPa (float)
             A_sb - Shank area of bolt in sq. mm  (float)
             A_n - Net tensile stress area of the bolts as per IS 1367 in sq. mm  (float)
-
         return:
             T_df - Design tensile strength of friction grip bolt in N (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.4.5
             AMENDMENT NO. 1 (JANUARY 2012) to IS 800:2007
-
         """
         gamma_mf = IS800_2007.cl_5_4_1_Table_5['gamma_mf'][safety_factor_parameter]
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
@@ -619,32 +757,22 @@ self
     @staticmethod
     def cl_10_4_6_friction_bolt_combined_shear_and_tension(V_sf, V_df, T_f, T_df):
         """Calculate combined shear and tension of friction grip bolt
-
                 Args:
                    V_sf - applied factored shear at design load
                    V_df - design shear strength
                    T_f - externally applied factored tension at design load
                    T_df - design tension strength
-
                 return:
                     combined shear and friction value
-
                 Note:
                     Reference:
                     IS 800:2007,  cl 10.4.6
         """
         return (V_sf / V_df) ** 2 + (T_f / T_df) ** 2
 
-
-
-
-
-
-
     @staticmethod
     def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned, eta=1.5):
         """Calculate prying force of friction grip bolt
-
                        Args:
                           2 * T_e - Force in 2 bolts on either sides of the web/plate
                           l_v - distance from the bolt centre line to the toe of the fillet weld or to half
@@ -654,14 +782,11 @@ self
                           b_e - effective width of flange per pair of bolts
                           f_o - proof stress in consistent units
                           t - thickness of the end plate
-
                        return:
                            Prying force of friction grip bolt
-
                        Note:
                            Reference:
                            IS 800:2007,  cl 10.4.7
-
         """
         beta = 2
         if pre_tensioned == 'Pretensioned':
@@ -674,10 +799,6 @@ self
             Q = (l_v / 2 / l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
         return Q
 
-
-
-
-
     # -------------------------------------------------------------
     #   10.5 Welds and Welding
     # -------------------------------------------------------------
@@ -686,18 +807,14 @@ self
     @staticmethod
     def cl_10_5_2_3_min_weld_size(part1_thickness, part2_thickness):
         """Calculate minimum size of fillet weld as per Table 21 of IS 800:2007
-
         Args:
             part1_thickness - Thickness of either plate element being welded in mm (float)
             part2_thickness - Thickness of other plate element being welded in mm (float)
-
         Returns:
             min_weld_size - Minimum size of first run or of a single run fillet weld in mm (float)
-
         Note:
             Reference:
             IS 800, Table 21 (Cl 10.5.2.3) : Minimum Size of First Run or of a Single Run Fillet Weld
-
         """
         thicker_part_thickness = max(part1_thickness, part2_thickness)
         thinner_part_thickness = min(part1_thickness, part2_thickness)
@@ -710,7 +827,7 @@ self
             min_weld_size = 6
         else:  # thicker_part_thickness <= 50.0:
             min_weld_size = 10
-        #TODO else:
+        # TODO else:
         if min_weld_size > thinner_part_thickness:
             min_weld_size = thinner_part_thickness
         return min_weld_size
@@ -719,19 +836,15 @@ self
     def cl_10_5_3_1_max_weld_throat_thickness(part1_thickness, part2_thickness, special_circumstance=False):
 
         """Calculate maximum effective throat thickness of fillet weld
-
         Args:
             part1_thickness - Thickness of either plate element being welded in mm (float)
             part2_thickness - Thickness of other plate element being welded in mm (float)
             special_circumstance - (Boolean)
-
         Returns:
             maximum effective throat thickness of fillet weld in mm (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.5.3.1
-
         """
 
         if special_circumstance is True:
@@ -740,20 +853,65 @@ self
             return 0.7 * min(part1_thickness, part2_thickness)
 
     @staticmethod
+    def cl_10_5_3_2_factor_for_throat_thickness (fusion_face_angle = 90):
+
+        table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
+        fusion_face_angle = int(round(fusion_face_angle))
+        if 60 <= fusion_face_angle <= 90:
+            K = table_22['60-90']
+        elif 91 <= fusion_face_angle <= 100:
+            K = table_22['91-100']
+        elif 101 <= fusion_face_angle <= 106:
+            K = table_22['101-106']
+        elif 107 <= fusion_face_angle <= 113:
+            K = table_22['107-113']
+        elif 114 <= fusion_face_angle <= 120:
+            K = table_22['114-120']
+        else:
+            K = "NOT DEFINED"
+        try:
+            K = float(K)
+        except ValueError:
+            return
+
+        return K
+
+
+    @staticmethod
     def cl_10_5_3_2_fillet_weld_effective_throat_thickness(fillet_size, fusion_face_angle=90):
+
+        """Calculate effective throat thickness of fillet weld for stress calculation
+        Args:
+            fillet_size - Size of fillet weld in mm (float)
+            fusion_face_angle - Angle between fusion faces in degrees (int)
+        Returns:
+            Effective throat thickness of fillet weld for stress calculation in mm (float)
+        Note:
+            Reference:
+
+            IS 800:2007,  cl 10.5.3.2
+
+        """
+        K = IS800_2007.cl_10_5_3_2_factor_for_throat_thickness(fusion_face_angle)
+
+        throat = max(round((K * fillet_size),2), 3)
+
+        return throat
+
+    @staticmethod
+    def cl_10_5_3_2_fillet_weld_effective_throat_thickness_constant( fusion_face_angle=90):
 
         """Calculate effective throat thickness of fillet weld for stress calculation
 
         Args:
-            fillet_size - Size of fillet weld in mm (float)
             fusion_face_angle - Angle between fusion faces in degrees (int)
 
         Returns:
-            Effective throat thickness of fillet weld for stress calculation in mm (float)
+            Effective throat thickness of fillet weld constant
 
         Note:
             Reference:
-            IS 800:2007,  cl 10.5.3.2
+            IS 800:2007,  cl 10.5.3.2zzz
 
         """
         table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
@@ -775,30 +933,41 @@ self
         except ValueError:
             return
 
-        throat = max((K * fillet_size),3)
+        return K
 
+        # Cl. 10.5.3.3 Effective throat size of groove (butt) welds
 
-        return throat
+    @staticmethod
+    def cl_10_5_3_3_groove_weld_effective_throat_thickness(*args):
+
+        """Calculate effective throat thickness of complete penetration butt welds
+        *args:
+            Thicknesses of each plate element being welded in mm (tuple of float)
+        Returns:
+            Effective throat thickness of CJP butt weld in mm (float)
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.3.3
+        """
+        return min(*args)
 
     @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):
 
         """Calculate effective length of fillet weld from available length to weld in practice
-
         Args:
-            fillet_size - Size of fillet weld in mm (float)
+            #fillet_size - Size of fillet weld in mm (float)
             available_length - Available length in mm to weld the plates in practice (float)
-
         Returns:
             Effective length of fillet weld in mm (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.5.4.1
-
         """
-        # TODO :  if available_length >= 4 * fillet_size
-        effective_length = available_length - 2 * fillet_size
+        if available_length <= 4 * fillet_size:
+            effective_length = 0
+        else:
+            effective_length = available_length - 2 * fillet_size
         return effective_length
 
     # cl. 10.5.7.1.1 Design stresses in fillet welds
@@ -806,18 +975,14 @@ self
     def cl_10_5_7_1_1_fillet_weld_design_stress(ultimate_stresses, fabrication=KEY_DP_WELD_FAB_SHOP):
 
         """Calculate the design strength of fillet weld
-
         Args:
             ultimate_stresses - Ultimate stresses of weld and parent metal in MPa (list or tuple)
             fabrication - Either 'shop' or 'field' (str)
-
         Returns:
             Design strength of fillet weld in MPa (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.5.7.1.1
-
         """
         f_u = min(ultimate_stresses)
         f_wn = (f_u / math.sqrt(3))
@@ -830,18 +995,14 @@ self
     def cl_10_5_7_3_weld_long_joint(l_j, t_t):
 
         """Calculate the reduction factor for long joints in welds
-
         Args:
             l_j - length of joints in the direction of force transfer in mm (float)
             t_t - throat size of the weld in mm (float)
-
         Returns:
              Reduction factor, beta_lw for long joints in welds (float)
-
         Note:
             Reference:
             IS 800:2007,  cl 10.5.7.3
-
         """
         if l_j <= 150 * t_t:
             return 1.0
@@ -851,6 +1012,7 @@ self
         elif beta_lw <= 0.6:
             beta_lw = 0.6
         return beta_lw
+
 
     # -------------------------------------------------------------
     #   10.6 Design of Connections

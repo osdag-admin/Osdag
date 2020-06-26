@@ -3,8 +3,10 @@ import errno
 import yaml
 import sys
 import unittest
-
-
+from pathlib import Path
+import ast
+import logging
+is_travis = 'TRAVIS' in os.environ
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnection
@@ -21,8 +23,42 @@ from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
+from Common import *
+############################ Pre-Build Database Updation/Creation #################
+sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
+sqlitepath = Path('ResourceFiles/Database/Intg_osdag.sqlite')
 
+if sqlpath.exists():
+    if not sqlitepath.exists():
+        cmd = 'sqlite3 ' + str(sqlitepath) + ' < ' + str(sqlpath)
+        os.system(cmd)
+        sqlpath.touch()
+        print('Database Created')
 
+    elif sqlitepath.stat().st_size == 0 or sqlitepath.stat().st_mtime < sqlpath.stat().st_mtime - 1:
+        try:
+            sqlitenewpath = Path('ResourceFiles/Database/Intg_osdag_new.sqlite')
+            cmd = 'sqlite3 ' + str(sqlitenewpath) + ' < ' + str(sqlpath)
+            error = os.system(cmd)
+            print(error)
+            # if error != 0:
+            #      raise Exception('SQL to SQLite conversion error 1')
+            # if sqlitenewpath.stat().st_size == 0:
+            #      raise Exception('SQL to SQLite conversion error 2')
+            os.remove(sqlitepath)
+            sqlitenewpath.rename(sqlitepath)
+            sqlpath.touch()
+            print('Database Updated', sqlpath.stat().st_mtime, sqlitepath.stat().st_mtime)
+        except Exception as e:
+            sqlitenewpath.unlink()
+            print('Error: ', e)
+
+#########################################################################################
+
+if not is_travis:
+    from cad.common_logic import CommonDesignLogic
+    from texlive .Design_wrapper import init_display
+    display, start_display, add_menu, add_function_to_menu = init_display(backend_str="qt-pyqt5")
 
 
 
@@ -47,25 +83,16 @@ available_module dictionary is used in -
 Make sure to make the necessary changes in above functions/methods if you are changing the name of available_module.
 '''
 
-available_module = {'Fin Plate':FinPlateConnection,'Tension Members Bolted Design':Tension_bolted, 'Column Coverplate Weld Connection': ColumnCoverPlateWeld}
+available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDED:Tension_welded,
+                    KEY_DISP_TENSION_BOLTED:Tension_bolted,KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
+                    KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
+                    KEY_DISP_ENDPLATE:EndPlateConnection, KEY_DISP_SEATED_ANGLE:SeatedAngleConnection,
+                    KEY_DISP_COLUMNENDPLATE:ColumnEndPlate}
 
-
-
-
-
-
-Output_folder_name = 'Output_PDF'
 
 #predefined pop-up summary.
 popup_summary = {'ProfileSummary': {'CompanyName': 'LoremIpsum', 'CompanyLogo': '', 'Group/TeamName': 'LoremIpsum', 'Designer': 'LoremIpsum'},
                 'ProjectTitle': 'Fossee', 'Subtitle': '', 'JobNumber': '123', 'AdditionalComments': 'No comments', 'Client': 'LoremIpsum'}
-
-
-input_file_path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'design_example')   # input folder path
-
-output_folder_path = os.path.join(os.path.dirname(__file__), Output_folder_name)               # output folder path
-
-
 
 
 
@@ -77,7 +104,15 @@ def make_sure_path_exists(path):      # Works on all OS.
         if exception.errno != errno.EEXIST:
             raise
 
-make_sure_path_exists(output_folder_path)   #make sure output folder exists if not then create.
+
+
+input_file_path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'design_example')   # input folder path
+
+output_file_path = os.path.join(os.path.dirname(__file__), 'OUTPUT_FILES', 'Output_PDF')       # output folder path
+
+
+
+make_sure_path_exists(output_file_path)   #make sure output folder exists if not then create.
 
 
 
@@ -102,16 +137,13 @@ def precompute_data():
 
 
 
-
-
-
 class Modules:
 
     def run_test(self,mainWindow,main,file_name, file_data): # FinPlate test function . Similarly make functions for other Modules.
 
         pdf_created = False
         main.set_osdaglogger(None)
-        error = main.func_for_validation(main,self,file_data)  # validating files and setting inputs (although we know files are valid).
+        error = main.func_for_validation(main,file_data)  # validating files and setting inputs (although we know files are valid).
 
         if error is None:  # if ran successfully and all input values are set without any error. Now create pdf
 
@@ -123,7 +155,7 @@ class Modules:
             We are actually not comparing pdf. This is just for testing purpose whether function
             is running fine and creating pdf or not.
 
-            I have made some changes in save_design function. Instead of asking for output file
+            Some changes are made in save_design function. Instead of asking for output file
             location from save_design function it'll ask from 'save_inputSummary' function inside
             ui_summary_popup.py file immediately after getting popup inputs and send it to
             save_design function using the same dictionary in which popup inputs are present
@@ -131,14 +163,70 @@ class Modules:
 
 
             '''
+            file_name = file_name.split(".")[0]
 
-            duplicate = output_folder_path         # Making duplicate so that original path doesn't change.
-            duplicate = duplicate + '/' + file_name  # giving each output file it's corresponding input file name.
-            popup_summary['filename'] = duplicate    # adding this key in popup_summary dict.
+            path =  os.path.join(output_file_path, file_name)
+
+            popup_summary['filename'] = path    # adding this key in popup_summary dict.
+
+            popup_summary['does_design_exist'] = False
+
+            try:
+
+                commLogicObj = CommonDesignLogic(display, ' ', main.module, main.mainmodule)
+
+                status = main.design_status
+
+                commLogicObj.call_3DModel(status, main)
+
+                fName = os.path.join(os.path.dirname(__file__),'ResourceFiles','images','3d.png')
+
+                file_extension = fName.split(".")[-1]
+
+                if file_extension == 'png':
+
+                    display.ExportToImage(fName)
+
+                display.EraseAll()
+
+                popup_summary['does_design_exist'] = True
+
+            except:
+
+                pass
+
+            with open(os.path.join(os.path.dirname(__file__),'logging_text.log'),'r') as LOG: # we are already creating this log file inside each module.
+                to_write = LOG.read()
+
+            popup_summary['logger_messages'] = to_write
+
             main.save_design(main,popup_summary)  # calling the function.
+
             pdf_created = True   # if pdf created
 
-        return pdf_created
+            is_dict_same = True
+            '''
+            path = os.path.join(os.path.dirname(__file__), 'OUTPUT_FILES', 'Command_line_output', file_name + ".txt")
+
+            if os.path.isfile(path):
+
+                with open(path,"r") as file_content:
+
+                    content = file_content.read()
+
+                content = ast.literal_eval(content)   # convert dictionary string to dictionary
+
+                output_dict = main.results_to_test(main)
+
+                if output_dict != content:
+
+                    is_dict_same = False    # if dictionary is not equal.
+            '''
+
+        open(os.path.join(os.path.dirname(__file__),'logging_text.log'), 'w').close() # better to clear the file than removing the handlers. More efficient.
+         # Remove the log handlers also if you don't want to see all the accumulated messages repeating each time.
+
+        return (pdf_created & is_dict_same)
 
 
 
@@ -156,11 +244,9 @@ class TestModules(unittest.TestCase):
 
         file_name = self.input[0]
         file_data = self.input[1]
-        file_class = available_module[file_data['Module']]               # check the class.
-        ans = self.module.run_test(self.module,file_class,file_name, file_data)
+        file_class = available_module[file_data['Module']]              # check the class.
+        ans = self.module.run_test(self.module, file_class,file_name, file_data)
         self.assertTrue(ans is self.output)
-
-
 
 
 
@@ -174,8 +260,6 @@ def suite():
     suite.addTests(TestModules(item, True) for item in files_data if item[1]['Module'] in available_module)
 
     return suite
-
-
 
 
 
@@ -194,16 +278,16 @@ if __name__ == '__main__':
     blockPrint()         # disable printing to avoid printing from unnecessary print statments in each modules. Although log statements can still print.
     precompute_data()    # precompute all data.
 
+    open(os.path.join(os.path.dirname(__file__),'logging_text.log'), 'w').close()   # Clearing the log file for test module.
 
-    log_file = "test_log_file.txt"   # log file in which test results will be written.
+    log_file = "test_log_file.log"   # log file in which test results will be written.
 
 
     with open(log_file, 'w') as TEST_LOG_FILE:
         result = unittest.TextTestRunner(stream = TEST_LOG_FILE,verbosity=2).run(suite())     # Writing results to log file.
 
 
-
-    with open(log_file, 'r') as content_file:
+    with open(os.path.join(os.path.dirname(__file__),log_file), 'r') as content_file:
         content = content_file.read()
 
     '''

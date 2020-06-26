@@ -7,22 +7,22 @@ from utils.common.is800_2007 import IS800_2007
 
 class Material(object):
 
-    def __init__(self, material_grade=''):
+    def __init__(self, material_grade='', thickness = 41):
 
         self.fy_20 = 0.0
         self.fy_20_40 = 0.0
         self.fy_40 = 0.0
         self.fu = 0.0
         self.fy = 0.0
-        if material_grade not in ["Select Section", "Custom"] and "Custom" not in material_grade:
-            self.connect_to_database_to_get_fy_fu(grade=material_grade)
-            self.material=material_grade
-        if material_grade.split(" ")[0] == "Custom":
-            material = material_grade.split(" ")
-            if len(material) == 3:
-                self.material = material[0]
-                self.fu = float(material[1])
-                self.fy = float(material[2])
+        # if material_grade not in ["Select Material", "Custom"] and "Custom" not in material_grade:
+        self.connect_to_database_to_get_fy_fu(grade=material_grade, thickness=thickness)
+        self.material=material_grade
+        # if material_grade.split(" ")[0] == "Custom":
+        #     material = material_grade.split(" ")
+        #     if len(material) == 3:
+        #         self.material = material[0]
+        #         self.fu = float(material[1])
+        #         self.fy = float(material[2])
 
     def __repr__(self):
         repr = "Material:\n"
@@ -32,17 +32,26 @@ class Material(object):
         repr += "fu: {}\n".format(self.fu)
         return repr
 
-    def connect_to_database_to_get_fy_fu(self, grade):
+    def connect_to_database_to_get_fy_fu(self, grade, thickness):
         conn = sqlite3.connect(PATH_TO_DATABASE)
         db_query = "SELECT * FROM Material WHERE Grade = ?"
         cur = conn.cursor()
         cur.execute(db_query,(grade,))
         row = cur.fetchone()
-        self.fy_20 = row[1]
-        self.fy_20_40 = row[2]
-        self.fy_40 = row[3]
-        self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
-        self.fu = row[4]
+        if row:
+            self.fy_20 = row[1]
+            self.fy_20_40 = row[2]
+            self.fy_40 = row[3]
+            if thickness != '':
+                if thickness < 20:
+                    self.fy = self.fy_20
+                elif 20 <= thickness <=40:
+                    self.fy = self.fy_20_40
+                else:
+                    self.fy = self.fy_40
+            else:
+                self.fy = min(self.fy_20,self.fy_20_40,self.fy_40)
+            self.fu = row[4]
         conn.close()
 
     # def tension_member_yielding(self, A_g, F_y):

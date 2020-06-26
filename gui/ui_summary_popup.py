@@ -22,6 +22,11 @@ from design_report.reportGenerator_latex import CreateLatex
 # from design_type.connection.fin_plate_connection import sa
 
 class Ui_Dialog1(object):
+
+    def __init__(self,design_exist,loggermsg):
+        self.design_exist = design_exist
+        self.loggermsg=loggermsg
+
     def setupUi(self, Dialog,main):
         Dialog.setObjectName("Dialog")
         Dialog.resize(539, 595)
@@ -166,11 +171,23 @@ class Ui_Dialog1(object):
     def save_inputSummary(self,main):
         input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
         file_type = "PDF (*.pdf)"
-        filename = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
-        fname_no_ext = filename[0].split(".")[0]
+        filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        fname_no_ext = filename.split(".")[0]
         input_summary['filename'] = fname_no_ext
+        input_summary['does_design_exist'] = self.design_exist
+        input_summary['logger_messages']=self.loggermsg
         main.save_design(main,input_summary)
-
+        if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
+            QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
+        else:
+            logfile=open(fname_no_ext+'.log','r')
+            logs=logfile.read()
+            if('! I can\'t write on file' in logs):
+               QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
+            else:
+               print(logs)
+               QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
+            logfile.close()
 
     def call_designreport(self, main,fileName, report_summary, folder):
         self.alist = main.report_input

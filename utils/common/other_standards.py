@@ -10,8 +10,13 @@ Included standards,
 
 Started on 15 - Nov - 2018
 
-@author: ajmalbabums, Danish Ansari
+@author: ajmalbabums, Danish Ansari, Sourabh Das
 """
+import os
+import sys
+PATH_TO_DATABASE = os.path.join(sys.path[0],'ResourceFiles','Database','Intg_osdag.sqlite')
+
+import sqlite3
 import math
 
 
@@ -124,16 +129,19 @@ class IS1367_Part3_2002(object):
     Bolts, screws and studs
     """
 
-    # Bolt grades available as per Table 1 of IS 1367(Part-3) :2002 (list)
-    bolt_grades = [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]
+    @staticmethod
+    def get_bolt_PC():
+        # Bolt grades available as per Table 1 of IS 1367(Part-3) :2002 (list)
+        bolt_grades = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+        return bolt_grades
 
     # Calculate bolt nominal tensile strength depending upon grade of bolt
     @staticmethod
-    def get_bolt_fu_fy(bolt_grade):
+    def get_bolt_fu_fy(bolt_PC, bolt_diameter):
         """Calculate nominal tensile strength and yield strength of bolt
 
         Args:
-            bolt_grade: Grade of bolt (property class as per the designation)  (float)
+            bolt_PC: Property Class of bolt (property class as per the designation)  (float)
 
         Return:
              Nominal tensile strength of bolt in MPa and Yield strength in MPa (list)
@@ -144,11 +152,25 @@ class IS1367_Part3_2002(object):
 
         """
         try:
-            bolt_grade = float(bolt_grade)
+            bolt_PC = float(bolt_PC)
+            bolt_diameter = int(bolt_diameter)
         except ValueError:
             return
-        bolt_fu = float(int(bolt_grade) * 100)
-        bolt_fy = float((bolt_grade - int(bolt_grade)) * bolt_fu)
+
+        conn = sqlite3.connect(PATH_TO_DATABASE)
+        db_query = "SELECT * FROM Bolt_fy_fu WHERE Property_Class = ? AND Diameter_min < ? AND Diameter_max >= ?"
+        cur = conn.cursor()
+        cur.execute(db_query, (bolt_PC, bolt_diameter, bolt_diameter,))
+        row = cur.fetchone()
+
+        bolt_fy = float(row[3])
+        bolt_fu = float(row[4])
+
+        print(bolt_fu, bolt_fy)
+        # print(type(bolt_fu))
+
+        # bolt_fu = float(int(bolt_grade) * 100)
+        # bolt_fy = float((bolt_grade - int(bolt_grade)) * bolt_fu)
         return [bolt_fu, bolt_fy]
 
     # Returns bolt shank area and nominal stress area depending upon diameter of bolt
@@ -261,7 +283,7 @@ class IS_5624_1993(object):
         The average value is rounded off to a higher multiple of 5.
 
         """
-        anchor_length = {
+        anchor_details = {
             'M8': {'dia': 8, 'min_len': 80, 'max_len': 200, 'avg_len': 140},
             'M10': {'dia': 10, 'min_len': 100, 'max_len': 250, 'avg_len': 175},
             'M12': {'dia': 12, 'min_len': 125, 'max_len': 320, 'avg_len': 225},
@@ -277,7 +299,150 @@ class IS_5624_1993(object):
             'M72': {'dia': 72, 'min_len': 1000, 'max_len': 3200, 'avg_len': 2100},
         }[str(anchor_dia)]
 
-        anchor_details_list = [anchor_length.get('dia'), anchor_length.get('min_len'),
-                               anchor_length.get('max_len'), anchor_length.get('avg_len')]
+        anchor_details_list = [anchor_details.get('dia'), anchor_details.get('min_len'),
+                               anchor_details.get('max_len'), anchor_details.get('avg_len')]
 
         return anchor_details_list
+
+
+class AISC(object):
+    # TODO: This formula based on AISC guidelines, check if this should be included
+    @staticmethod
+    def cl_j_4_2_b_shear_rupture(A_vn, fu):
+        '''
+        Args:
+            A_vn (float) Net area under shear
+            beam_fu (float) Ultimate stress of beam material
+        Returns:
+            Capacity of beam web in shear rupture
+        Note:
+            Reference:
+            J4.2(b) Speciﬁcation for Structural Steel Buildings, June 22, 2010, AISC
+        '''
+        R_n = (0.75 * fu * A_vn)
+        shear_rupture_capacity = round(R_n, 2)
+        return shear_rupture_capacity
+
+
+class IS6649(object):
+    """ IS 6649:1985, Hardened and Tempered Washers for High Strength Structural Bolts and Nuts
+
+    """
+    @staticmethod
+    def circular_washer_dimensions(bolt_dia):
+        """ Calculate the dimensions - diameter (inner and outer) and thickness for circular washer (Type A) confirming to IS 6649:1985.
+        The washers are used for high strength structural bolts and nuts.
+
+        Args:
+            bolt_dia: diameter of the bolt in mm (int)
+
+        Returns:
+            inner and outer diameter of the washer in mm (dictionary)
+            thickness of the washer in mm (dictionary)
+
+        Reference - Table 1, IS 6649:1985
+
+        Note: The IS code does not specify dimensions of washer for bolt sizes of M8, M10, M12, M16, M42, M48, M56, M64 and M72
+              The dimensions of these washers are thus calculated/approximated referring to those specified by the code
+        """
+        washer_dimensions = {
+            8: {'dia_in': 10, 'dia_out': 18, 'washer_thk': 4.6},
+            10: {'dia_in': 12, 'dia_out': 20, 'washer_thk': 4.6},
+            12: {'dia_in': 14, 'dia_out': 25, 'washer_thk': 4.6},
+            16: {'dia_in': 18, 'dia_out': 34, 'washer_thk': 4.6},
+            20: {'dia_in': 22, 'dia_out': 42, 'washer_thk': 4.6},
+            22: {'dia_in': 24, 'dia_out': 44, 'washer_thk': 4.6},
+            24: {'dia_in': 26, 'dia_out': 50, 'washer_thk': 4.6},
+            27: {'dia_in': 30, 'dia_out': 66, 'washer_thk': 4.6},
+            30: {'dia_in': 33, 'dia_out': 60, 'washer_thk': 4.6},
+            36: {'dia_in': 39, 'dia_out': 72, 'washer_thk': 4.6},
+            42: {'dia_in': 45, 'dia_out': 85, 'washer_thk': 6.0},
+            48: {'dia_in': 51, 'dia_out': 100, 'washer_thk': 6.0},
+            56: {'dia_in': 59, 'dia_out': 115, 'washer_thk': 6.0},
+            64: {'dia_in': 67, 'dia_out': 130, 'washer_thk': 6.0},
+            72: {'dia_in': 75, 'dia_out': 145, 'washer_thk': 6.0},
+        }[bolt_dia]
+
+        return washer_dimensions
+
+    @staticmethod
+    def square_washer_dimensions(bolt_dia):
+        """ Calculate the dimensions - diameter (inner and outer) and thickness for circular washer (Type B and C) confirming to IS 6649:1985.
+        The washers are used for high strength structural bolts and nuts.
+
+        Args:
+            bolt_dia: diameter of the bolt in mm (int)
+
+        Returns:
+            inner and outer diameter of the washer in mm (dictionary)
+            thickness of the washer in mm (dictionary)
+
+        Reference - Table 2, IS 6649:1985
+
+        Note: The IS code does not specify dimensions of washer for bolt sizes of M8, M10, M12, M16, M42, M48, M56, M64 and M72
+              The dimensions of these washers are thus calculated/approximated referring to those specified by the code
+
+              Table 2 gives washer thickness for tapered washers, however for non-tapered washers, mean thickness is used.
+        """
+        washer_dimensions = {
+            8: {'dia_in': 10, 'side': 25, 'washer_thk': 6.0},
+            10: {'dia_in': 12, 'side': 25, 'washer_thk': 6.0},
+            12: {'dia_in': 14, 'side': 25, 'washer_thk': 6.0},
+            16: {'dia_in': 18, 'side': 45, 'washer_thk': 8.5},
+            20: {'dia_in': 22, 'side': 45, 'washer_thk': 8.5},
+            22: {'dia_in': 24, 'side': 45, 'washer_thk': 8.5},
+            24: {'dia_in': 26, 'side': 45, 'washer_thk': 8.5},
+            27: {'dia_in': 30, 'side': 58, 'washer_thk': 8.5},
+            30: {'dia_in': 33, 'side': 58, 'washer_thk': 8.5},
+            36: {'dia_in': 39, 'side': 58, 'washer_thk': 8.5},
+            42: {'dia_in': 45, 'side': 80, 'washer_thk': 10.0},
+            48: {'dia_in': 51, 'side': 80, 'washer_thk': 10.0},
+            56: {'dia_in': 59, 'side': 100, 'washer_thk': 12.0},
+            64: {'dia_in': 67, 'side': 100, 'washer_thk': 12.0},
+            72: {'dia_in': 75, 'side': 100, 'washer_thk': 12.0},
+        }[bolt_dia]
+
+        return washer_dimensions
+
+
+class IS1364(object):
+    """ Hexagon Head Bolts, Screws, and Nuts of Product Grade C, Part : Hexagon Nuts (Size Range M5 to M64)
+
+    """
+    @staticmethod
+    def nut_thick(bot_dia):
+        """ Returns the thickness of the hexagon nut (Grade A and B) depending upon the nut diameter as per IS1364-3(2002) - Table 1
+
+        Args:
+            bot_dia: diameter of the bolt in mm (int)
+
+        Returns: the thickness of the hexagon nut (float)
+
+        Note: The nut thk for 72 diameter is not available in IS code, however an approximated value is assumed.
+              72 mm dia bolt is used in the base plate module.
+        """
+        nut_dia = {
+            5: 4.7,
+            6: 5.2,
+            8: 6.8,
+            10: 8.4,
+            12: 10.8,
+            14: 12.8,
+            16: 14.8,
+            18: 15.8,
+            20: 18.0,
+            22: 19.4,
+            24: 21.5,
+            27: 23.8,
+            30: 25.6,
+            33: 28.7,
+            36: 31,
+            39: 33.4,
+            42: 34.0,
+            48: 38.0,
+            56: 45.0,
+            64: 51.0,
+            72: 60.0
+        }[bot_dia]
+
+        return nut_dia

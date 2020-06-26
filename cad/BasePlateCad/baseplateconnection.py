@@ -13,7 +13,8 @@ import copy
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 class BasePlateCad(object):
-    def __init__(self, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb, concrete):
+    def __init__(self, BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+                 concrete, gusset, stiffener, grout):
 
         """
 
@@ -26,6 +27,7 @@ class BasePlateCad(object):
         :param alist: input and output values
         """
 
+        self.BP = BP
         self.column = column
         self.nut_bolt_array = nut_bolt_array
         self.bolthight = bolthight
@@ -34,7 +36,9 @@ class BasePlateCad(object):
         self.weldBelwFlang = weldBelwFlang
         self.weldSideWeb = weldSideWeb
         self.concrete = concrete
-
+        self.gusset = gusset
+        self.stiffener = stiffener
+        self.grout = grout
 
         # self.alist = None #alist
         # self.columnModel = None
@@ -62,6 +66,14 @@ class BasePlateCad(object):
         self.weldSideWeb_11 = weldSideWeb  # column, left of Web
         self.weldSideWeb_12 = copy.deepcopy(weldSideWeb)  # column, right of Web
 
+        self.gusset1 = copy.deepcopy(self.gusset)
+        self.gusset2 = copy.deepcopy(self.gusset)
+
+        self.stiffener1 = copy.deepcopy(self.stiffener)
+        self.stiffener2 = copy.deepcopy(self.stiffener)
+        self.stiffener3 = copy.deepcopy(self.stiffener)
+        self.stiffener4 = copy.deepcopy(self.stiffener)
+
     def create_3DModel(self):
         """
 
@@ -73,24 +85,7 @@ class BasePlateCad(object):
         self.createWeldGeometry()
         self.createConcreteGeometry()
         self.create_nut_bolt_array()
-
-        self.columnModel = self.column.create_model()
-        self.baseplateModel = self.baseplate.create_model()
-        self.nutBoltArrayModels = self,nut_bolt_array.create_model()
-
-        self.weldAbvFlang_11Model = self.weldAbvFlang_11.create_model()
-        self.weldAbvFlang_12Model = self.weldAbvFlang_12.create_model()
-
-        self.weldBelwFlang_11Model = self.weldBelwFlang_11.create_model()
-        self.weldBelwFlang_12Model = self.weldBelwFlang_12.create_model()
-        self.weldBelwFlang_13Model = self.weldBelwFlang_13.create_model()
-        self.weldBelwFlang_14Model = self.weldBelwFlang_14.create_model()
-
-        self.weldSideWeb_11Model = self.weldSideWeb_11.create_model()
-        self.weldSideWeb_12Model = self.weldSideWeb_12.create_model()
-
-        self.concreteModel = self.concrete.create_model()
-
+        self.createGroutGeometry()
 
     def createColumnGeometry(self):
         """
@@ -102,12 +97,69 @@ class BasePlateCad(object):
         columnL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.column.place(columnOriginL, columnL_uDir, columnL_wDir)
 
+        self.columnModel = self.column.create_model()
+
     def createBasePlateGeometry(self):
-        baseplateOriginL = numpy.array([-self.baseplate.W/2, 0.0 , -self.baseplate.T/2])
+        baseplateOriginL = numpy.array([-self.baseplate.W / 2, 0.0, -self.baseplate.T / 2])
         baseplateL_uDir = numpy.array([0.0, 0.0, 1.0])
         baseplateL_wDir = numpy.array([1.0, 0.0, 0.0])
         self.baseplate.place(baseplateOriginL, baseplateL_uDir, baseplateL_wDir)
 
+        self.baseplateModel = self.baseplate.create_model()
+
+        if self.BP.stiffener_along_flange == 'Yes':
+            gusset1OriginL = numpy.array([0.0, self.column.D / 2, self.gusset.W / 2])
+            gusset1L_uDir = numpy.array([-1.0, 0.0, 0.0])
+            gusset1L_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.gusset1.place(gusset1OriginL, gusset1L_uDir, gusset1L_wDir)
+
+            self.gusset1Model = self.gusset1.create_model()
+
+            gusset2OriginL = numpy.array([0.0, -self.column.D / 2 - self.gusset.T, self.gusset.W / 2])
+            gusset2L_uDir = numpy.array([-1.0, 0.0, 0.0])
+            gusset2L_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.gusset2.place(gusset2OriginL, gusset2L_uDir, gusset2L_wDir)
+
+            self.gusset2Model = self.gusset2.create_model()
+
+            stiffener_gap = self.column.B * 0.4
+            stiffener1OriginL = numpy.array(
+                [self.stiffener.T / 2 + stiffener_gap, self.column.D / 2 + self.stiffener.L / 2 + self.gusset.T,
+                 self.stiffener.W / 2])
+            stiffener1L_uDir = numpy.array([0.0, -1.0, 0.0])
+            stiffener1L_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.stiffener1.place(stiffener1OriginL, stiffener1L_uDir, stiffener1L_wDir)
+
+            self.stiffener1Model = self.stiffener1.create_model()
+
+            stiffener2OriginL = numpy.array(
+                [self.stiffener.T / 2 - stiffener_gap, self.column.D / 2 + self.stiffener.L / 2 + self.gusset.T,
+                 self.stiffener.W / 2])
+            stiffener2L_uDir = numpy.array([0.0, -1.0, 0.0])
+            stiffener2L_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.stiffener2.place(stiffener2OriginL, stiffener2L_uDir, stiffener2L_wDir)
+
+            self.stiffener2Model = self.stiffener2.create_model()
+
+            stiffener3OriginL = numpy.array(
+                [-self.stiffener.T / 2 + stiffener_gap, -(self.column.D / 2 + self.stiffener.L / 2 + self.gusset.T),
+                 self.stiffener.W / 2])
+            stiffener3L_uDir = numpy.array([0.0, 1.0, 0.0])
+            stiffener3L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.stiffener3.place(stiffener3OriginL, stiffener3L_uDir, stiffener3L_wDir)
+
+            self.stiffener3Model = self.stiffener3.create_model()
+
+            stiffener4OriginL = numpy.array(
+                [-self.stiffener.T / 2 - stiffener_gap, -(self.column.D / 2 + self.stiffener.L / 2 + self.gusset.T),
+                 self.stiffener.W / 2])
+            stiffener4L_uDir = numpy.array([0.0, 1.0, 0.0])
+            stiffener4L_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.stiffener4.place(stiffener4OriginL, stiffener4L_uDir, stiffener4L_wDir)
+
+            self.stiffener4Model = self.stiffener4.create_model()
+        else:
+            pass
 
     def createWeldGeometry(self):
 
@@ -148,15 +200,26 @@ class BasePlateCad(object):
 
 
         # Weld side web
-        weldSideWebOrigin_11 = numpy.array([-self.column.t / 2, self.weldSideWeb_11.L/2, 0.0])
+        weldSideWebOrigin_11 = numpy.array([-self.column.t / 2, self.weldSideWeb_11.L / 2, 0.0])
         uDirWeb_11 = numpy.array([0, 0.0, 1.0])
         wDirWeb_11 = numpy.array([0, -1.0, 0.0])
         self.weldSideWeb_11.place(weldSideWebOrigin_11, uDirWeb_11, wDirWeb_11)
 
-        weldSideWebOrigin_12 = numpy.array([self.column.t / 2, -self.weldSideWeb_12.L/2,  0.0])
+        weldSideWebOrigin_12 = numpy.array([self.column.t / 2, -self.weldSideWeb_12.L / 2, 0.0])
         uDirWeb_12 = numpy.array([0, 0.0, 1.0])
         wDirWeb_12 = numpy.array([0, 1.0, 0.0])
         self.weldSideWeb_12.place(weldSideWebOrigin_12, uDirWeb_12, wDirWeb_12)
+
+        self.weldAbvFlang_11Model = self.weldAbvFlang_11.create_model()
+        self.weldAbvFlang_12Model = self.weldAbvFlang_12.create_model()
+
+        self.weldBelwFlang_11Model = self.weldBelwFlang_11.create_model()
+        self.weldBelwFlang_12Model = self.weldBelwFlang_12.create_model()
+        self.weldBelwFlang_13Model = self.weldBelwFlang_13.create_model()
+        self.weldBelwFlang_14Model = self.weldBelwFlang_14.create_model()
+
+        self.weldSideWeb_11Model = self.weldSideWeb_11.create_model()
+        self.weldSideWeb_12Model = self.weldSideWeb_12.create_model()
 
     def create_nut_bolt_array(self):
         """
@@ -164,23 +227,39 @@ class BasePlateCad(object):
         :return: Geometric Orientation of this component
         """
         # nutboltArrayOrigin = self.baseplate.sec_origin + numpy.array([0.0, 0.0, self.baseplate.T /2+ 100])
-        nutboltArrayOrigin = numpy.array([ -self.baseplate.W/2 , self.baseplate.L/2, self.bolthight ])
+        nutboltArrayOrigin = numpy.array([-self.baseplate.W / 2, self.baseplate.L / 2, self.bolthight])
         gaugeDir = numpy.array([1.0, 0, 0])
         pitchDir = numpy.array([0, -1.0, 0])
         boltDir = numpy.array([0, 0, 1.0])
         self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
+
+        self.nutBoltArrayModels = self.nut_bolt_array.create_model()
+
+    def createGroutGeometry(self):
+        """
+        :return: Geometric Orientaion of grout
+        """
+        groutOriginL = numpy.array([-self.grout.W / 2, 0.0, -self.baseplate.T - self.grout.T / 2])
+        groutL_uDir = numpy.array([0.0, 0.0, 1.0])
+        groutL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.grout.place(groutOriginL, groutL_uDir, groutL_wDir)
+
+        self.groutModel = self.grout.create_model()
 
     def createConcreteGeometry(self):
         """
 
         :return: Geometric Orientation of concrete
         """
-        concreteOrigin = numpy.array([-self.concrete.W/2, 0.0 , -self.baseplate.T - self.concrete.T/2])
+        concreteOrigin = numpy.array(
+            [-self.concrete.W / 2, 0.0, -self.baseplate.T - self.grout.T - self.concrete.T / 2])
         # concrete_uDir = numpy.array([1.0, 0.0, 0.0])
         # concrete_wDir = numpy.array([0.0, 0.0, 1.0])
         concrete_uDir = numpy.array([0.0, 0.0, 1.0])
         concrete_wDir = numpy.array([1.0, 0.0, 0.0])
         self.concrete.place(concreteOrigin, concrete_uDir, concrete_wDir)
+
+        self.concreteModel = self.concrete.create_model()
 
     def get_column_model(self):
         column = self.columnModel
@@ -210,8 +289,23 @@ class BasePlateCad(object):
         return welds
 
     def get_plate_connector_models(self):
-        plate = self.baseplateModel
+
+        if self.BP.stiffener_along_flange == 'Yes':
+            plate_list = [self.baseplateModel, self.gusset1Model, self.gusset2Model, self.stiffener1Model,
+                          self.stiffener2Model, self.stiffener3Model, self.stiffener4Model]
+            plate = plate_list[0]
+
+            for item in plate_list[1:]:
+                plate = BRepAlgoAPI_Fuse(plate, item).Shape()
+        else:
+            plate = self.baseplateModel
+
         return plate
+
+    def get_grout_models(self):
+        grout = self.groutModel
+
+        return grout
 
     def get_concrete_models(self):
         conc = self.concreteModel
@@ -236,8 +330,9 @@ class BasePlateCad(object):
         welds = self.get_welded_models()
         nut_bolt_array = self.get_nut_bolt_array_models()
         conc = self.get_concrete_models()
+        grt = self.get_grout_models()
 
-        CAD_list = [column, plate_connectors, welds, nut_bolt_array, conc] #, welds, nut_bolt_array]
+        CAD_list = [column, plate_connectors, welds, nut_bolt_array, conc, grt]  # , welds, nut_bolt_array]
         CAD = CAD_list[0]
 
         for model in CAD_list[1:]:
@@ -256,6 +351,8 @@ if __name__ == '__main__':
     from cad.BasePlateCad.nutBoltPlacement import NutBoltArray
     from cad.items.anchor_bolt import *
     from cad.items.nut import Nut
+    from cad.items.stiffener_plate import StiffenerPlate
+    from cad.items.concrete import Concrete
 
     import OCC.Core.V3d
     from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
@@ -264,32 +361,42 @@ if __name__ == '__main__':
     # from cad.common_logic import CommonDesignLogic
 
     from OCC.gp import gp_Pnt
+    from OCC.Core.Graphic3d import Quantity_NOC_GRAY as GRAY
     from OCC.Display.SimpleGui import init_display
+
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    column = ISection(B=250, T=13.7, D=450, t=9.8, R1= 14.0, R2= 7.0, alpha= 94, length= 1500, notchObj= None)
-    baseplate = Plate(L=650, W=500, T=30)
-    weldAbvFlang = FilletWeld(b=3, h=3, L= 250)
-    weldBelwFlang = FilletWeld(b=3, h=3, L= 100)
-    weldSideWeb = FilletWeld(b=3, h=3, L= 420)
+    column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
+    baseplate = Plate(L=650, W=415, T=45)
+    weldAbvFlang = FilletWeld(b=10, h=10, L=250)
+    weldBelwFlang = FilletWeld(b=10, h=10, L=100)
+    weldSideWeb = FilletWeld(b=10, h=10, L=420)
     # concrete = Concrete(L= baseplate.W*1.5, W= baseplate.L*1.5, T= baseplate.T*10)
-    concrete = Plate(L= baseplate.L*1.5, W= baseplate.W*1.5, T= baseplate.T*10)
+    concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=baseplate.T * 10)
+    grout = Concrete(L=baseplate.L + 200, W=baseplate.W + 200, T=50)
 
-    #Todo: Make this class in another file
+    gusset = StiffenerPlate(L=baseplate.W, W=200, T=14, L11=(baseplate.W - (column.B + 100)) / 2, L12=200 - 100,
+                            R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
+    stiffener = StiffenerPlate(L=(baseplate.L - column.D - 2 * gusset.T) / 2, W=gusset.W, T=gusset.T,
+                               L11=(baseplate.L - column.D - 2 * gusset.T) / 2 - 50, L12=gusset.W - 100)
 
+    type = 'gusset'  # 'no_gusset'
+
+    # Todo: Make this class in another file
 
     ex_length = (50 + 24 + baseplate.T)  # nut.T = 24
-    bolt = AnchorBolt_A(l= 250, c= 125, a= 75, r= 12, ex= ex_length)
+    bolt = AnchorBolt_A(l=250, c=125, a=75, r=12, ex=ex_length)
     # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12)
     # bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12)
-    nut = Nut(R= bolt.r*3, T= 24, H= 30, innerR1= bolt.r)
+    nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
     numberOfBolts = 4
     nutSpace = bolt.c + baseplate.T
     bolthight = nut.T + 50
 
     nut_bolt_array = NutBoltArray(column, baseplate,  nut, bolt, numberOfBolts, nutSpace)
 
-    basePlate = BasePlateCad(column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb, concrete)
+    basePlate = BasePlateCad(column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+                             concrete, gusset, stiffener, grout)
 
     basePlate.create_3DModel()
     prism = basePlate.get_models()
@@ -298,6 +405,7 @@ if __name__ == '__main__':
     weld = basePlate.get_welded_models()
     nut_bolt = basePlate.get_nut_bolt_array_models()
     conc = basePlate.get_concrete_models()
+    grt = basePlate.get_grout_models()
 
     Point = gp_Pnt(0.0, 0.0, 0.0)
     display.DisplayMessage(Point, "Origin")
@@ -310,12 +418,11 @@ if __name__ == '__main__':
     display.DisplayColoredShape(plate, color='BLUE', update=True)
     display.DisplayColoredShape(weld, color='RED', update=True)
     display.DisplayColoredShape(nut_bolt, color='YELLOW', update=True)
-    display.DisplayShape(conc, color='CYAN', transparency=0.5,  update=True)
+    display.DisplayShape(conc, color=GRAY, transparency=0.5, update=True)
+    display.DisplayShape(grt, colour=GRAY, update=True)
     display.DisableAntiAliasing()
     start_display()
     # display.ExportToImage("/home/rahul/Osdag_workspace/3DtestbasePlatw.png")
-
-
 
     # display = CommonDesignLogic.display
     # display.EraseAll()

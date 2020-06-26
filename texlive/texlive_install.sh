@@ -1,11 +1,5 @@
 #!/usr/bin/env sh
 
-# Originally from https://github.com/latex3/latex3
-
-# This script is used for testing using Travis
-# It is intended to work on their VM set up: Ubuntu 12.04 LTS
-# A minimal current TL is installed adding only the packages that are
-# required
 
 # See if there is a cached version of TL available
 export PATH=/tmp/texlive/bin/x86_64-linux:$PATH
@@ -30,7 +24,7 @@ tlmgr install l3build
 tlmgr install latex-bin luahbtex platex uplatex tex xetex
 
 # Then get the rest of required LaTeX
-tlmgr install amsmath graphics tools 
+tlmgr install amsmath graphics tools
 
 # Assuming a 'basic' font set up, metafont is required to avoid
 # warnings with some packages and errors with others
@@ -77,7 +71,7 @@ tlmgr install \
   needspace		\
   multirow		\
   fancyhdr
-  
+
 # For the doc target
 tlmgr install \
   atbegshi    \

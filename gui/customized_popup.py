@@ -45,7 +45,7 @@ class Ui_Popup(object):
     def setupUi(self, MainWindow):
 
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(607, 598)
+        MainWindow.resize(607, 450)
         self.label = QtWidgets.QLabel(MainWindow)
         self.label.setGeometry(QtCore.QRect(20, 50, 121, 31))
         font = QtGui.QFont()
@@ -66,6 +66,7 @@ class Ui_Popup(object):
         self.listWidget.setObjectName("listWidget")
         self.listWidget.setSortingEnabled(True)
         self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.listWidget.itemDoubleClicked.connect(self.move_to_selected)
         # self.listWidget_2 = QtWidgets.QListWidget(MainWindow)
         self.listWidget_2 = My_ListWidget(MainWindow)
 
@@ -73,6 +74,7 @@ class Ui_Popup(object):
         self.listWidget_2.setObjectName("listWidget_2")
         self.listWidget_2.setSortingEnabled(True)
         self.listWidget_2.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.listWidget_2.itemDoubleClicked.connect(self.move_to_available)
         self.pushButton = QtWidgets.QPushButton(MainWindow)
         self.pushButton.setGeometry(QtCore.QRect(265, 130, 75, 23))
         self.pushButton.setObjectName("pushButton")
@@ -90,14 +92,13 @@ class Ui_Popup(object):
         self.pushButton_4.setObjectName("pushButton_4")
         self.pushButton_4.setAutoDefault(False)
         self.pushButton_5 = QtWidgets.QPushButton(MainWindow)
-        self.pushButton_5.setGeometry(QtCore.QRect(225, 400, 140, 40))
+        self.pushButton_5.setGeometry(QtCore.QRect(225, 400, 140, 35))
         font = QtGui.QFont()
-        font.setFamily("Myanmar Text")
-        font.setPointSize(14)
+        font.setFamily("Arial")
+        font.setPointSize(11)
         self.pushButton_5.setFont(font)
         self.pushButton_5.setObjectName("pushButton_5")
         self.pushButton_5.setDefault(True)
-        self.pushButton_5.setFocus()
         self.connections(MainWindow)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -222,6 +223,14 @@ class Ui_Popup(object):
             it = self.listWidget_2.item(i)
             r.append(it.text())
         return r
+
+    def move_to_selected(self, item):
+        self.listWidget_2.addItem(item.text())
+        self.listWidget.takeItem(self.listWidget.row(item))
+
+    def move_to_available(self, item):
+        self.listWidget.addItem(item.text())
+        self.listWidget_2.takeItem(self.listWidget_2.row(item))
 
 if __name__ == "__main__":
     import sys

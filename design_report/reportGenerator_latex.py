@@ -5,8 +5,6 @@ import math
 from utils.common.common_calculation import *
 # from Common import *
 import os
-import pdfkit
-import configparser
 # from utils.common import component
 from pylatex import Document, Section, Subsection
 from pylatex.utils import italic, bold
@@ -14,9 +12,9 @@ from pylatex.utils import italic, bold
 import sys
 import datetime
 import pylatex as pyl
-
+from pylatex.basic import TextColor
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
-from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor
 from pylatex.utils import italic
 #from pdflatex import PDFLaTeX
 import os
@@ -33,6 +31,7 @@ class CreateLatex(Document):
     def __init__(self):
         super().__init__()
 
+
     def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
@@ -43,8 +42,19 @@ class CreateLatex(Document):
         jobnumber = str(reportsummary['JobNumber'])
         client = str(reportsummary['Client'])
 
+        does_design_exist = reportsummary['does_design_exist']
         # Add document header
+        geometry_options = {"top": "4cm", "hmargin": "2cm", "headheight": "65pt", "footskip": "65pt"}
+        doc = Document(geometry_options=geometry_options,indent=False)
+        doc.packages.append(Package('amsmath'))
+        doc.packages.append(Package('graphicx'))
+        doc.packages.append(Package('needspace'))
+        doc.append(pyl.Command('fontsize', arguments= [8,12]))
+        doc.append(pyl.Command('selectfont'))
 
+        doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
+        doc.add_color('PassColor','HTML', '4D6E28')
+        doc.add_color('FailColor','HTML','933A16')
         header = PageStyle("header")
         # Create center header
         with header.create(Head("C")):
@@ -62,45 +72,42 @@ class CreateLatex(Document):
 
         # Create right footer
         with header.create(Foot("R")):
-            header.append(simple_page_number())
+            header.append(NoEscape(r'Page \thepage'))
         #
         # doc.preamble.append(header)
         # doc.change_document_style("header")
 
         # Add Heading
         # with doc.create(MiniPage(align='c')):
-        geometry_options = {"top": "1.2in", "bottom": "1in", "left": "0.6in", "right": "0.6in", "headsep": "0.8in"}
-        doc = Document(geometry_options=geometry_options, indent=False)
-        doc.packages.append(Package('amsmath'))
-        doc.packages.append(Package('graphicx'))
-        doc.packages.append(Package('needspace'))
-        doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
+
+
         doc.preamble.append(header)
         doc.change_document_style("header")
 
         with doc.create(Section('Input Parameters')):
-            with doc.create(LongTable('|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|', row_height=1.2)) as table:
+            with doc.create(LongTable('|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4.5cm}|', row_height=1.2)) as table:
                 table.add_hline()
                 for i in uiObj:
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
-
-                    print(i)
+                    if i == "Selected Section Details":
+                        continue
                     if type(uiObj[i]) == dict:
                         table.add_hline()
                         sectiondetails = uiObj[i]
                         image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
+
                         Img_path = '/ResourceFiles/images/'+image_name+'.png'
                         if (len(sectiondetails))% 2 == 0:
                         # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
-                            merge_rows = int(round_up((len(sectiondetails)/2),1,0) + 2)
+                            merge_rows = int((len(sectiondetails)/2)) +2
                         else:
-                            merge_rows = int(round_up((len(sectiondetails)/2),1,0) + 1)
-                        print('Hi', len(sectiondetails)/2,round_up(len(sectiondetails),2)/2, merge_rows)
-                        if merge_rows%2 != 0:
+                            merge_rows = round_up((len(sectiondetails)/2),2)
+                        if (len(sectiondetails))% 2 == 0:
                             sectiondetails['']=''
+
                         a = list(sectiondetails.keys())
                         # index=0
-                        for x in range(1,(merge_rows+1)):
+                        for x in range(1, (merge_rows + 1)):
                             # table.add_row("Col.Det.",i,columndetails[i])
                             if x == 1:
                                 table.add_row(
@@ -119,11 +126,44 @@ class CreateLatex(Document):
                         table.add_hline()
                         table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
                         table.add_hline()
+                    elif i == 'Section Size*':
+                        table.add_hline()
+                        table.add_row((MultiColumn(3, align='|c|', data=i, ),MultiColumn(2, align='|c|', data="Ref List of Input Section"),))
+                        table.add_hline()
+                    elif len(str(uiObj[i])) > 55 and type(uiObj[i]) != pyl.math.Math:
+                        str_len = len(str(uiObj[i]))
+                        loop_len = round_up((str_len / 55), 1, 1)
+                        for j in range(1, loop_len + 1):
+                            b = 55 * j + 1
+                            if j == 1:
+                                table.add_row(
+                                    (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data=i)), MultiColumn(2, align='|c|', data=uiObj[i][0:b]),))
+                            else:
+                                table.add_row(
+                                    (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data="")),
+                                     MultiColumn(2, align='|c|', data=uiObj[i][b - 55:b]),))
+                        table.add_hline()
                     else:
                         table.add_hline()
-                        table.add_row(
-                            (MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
+                        table.add_row((MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
                         table.add_hline()
+            for i in uiObj:
+                if i == 'Section Size*':
+                    with doc.create(Subsection("List of Input Section")):
+                        with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
+                                str_len = len(uiObj[i])
+                                loop_len = round_up((str_len/83),1,1)
+                                for j in range(1,loop_len+1):
+                                    table.add_hline()
+                                    b= 83*j+1
+                                    if j ==1:
+                                        table.add_row((MultiColumn(1, align='|c|', data=i, ),
+                                                       MultiColumn(1, align='|c|', data=uiObj[i][0:b]),))
+                                    else:
+                                        table.add_row((MultiColumn(1, align='|c|', data=" ", ),
+                                                       MultiColumn(1, align='|c|', data=uiObj[i][b-83:b]),))
+                                    table.add_hline()
+
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
         doc.append(NewPage())
         count = 0
@@ -131,26 +171,93 @@ class CreateLatex(Document):
             for check in Design_Check:
                 if check[0] == 'SubSection':
                     if count >=1:
-                        doc.append(NewPage())
+                        # doc.append(NewPage())
+                        doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
                     with doc.create(Subsection(check[1])):
-                        with doc.create(LongTable(check[2], row_height=1.2)) as table: # todo anjali remove
+                        with doc.create(LongTable(check[2], row_height=1.2)) as table:  # todo anjali remove
                             table.add_hline()
                             table.add_row(('Check', 'Required', 'Provided', 'Remarks'), color='OsdagGreen')
                             table.add_hline()
                             table.end_table_header()
                             table.add_hline()
                             count = count + 1
+                elif check[0] == "Selected":
+                    if count >=1:
+                        # doc.append(NewPage())
+                        doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+                    with doc.create(Subsection(check[1])):
+                        with doc.create(LongTable(check[2], row_height=1.2)) as table:
+                            table.add_hline()
+                            for i in uiObj:
+                                # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
+
+                                print(i)
+                                if type(uiObj[i]) == dict:
+                                    table.add_hline()
+                                    sectiondetails = uiObj[i]
+                                    image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
+                                    Img_path = '/ResourceFiles/images/' + image_name + '.png'
+                                    if (len(sectiondetails)) % 2 == 0:
+                                        # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+                                        merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 2)
+                                    else:
+                                        merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 1)
+                                    print('Hi', len(sectiondetails) / 2, round_up(len(sectiondetails), 2) / 2,
+                                          merge_rows)
+                                    if (len(sectiondetails)) % 2 == 0:
+                                        sectiondetails[''] = ''
+                                    a = list(sectiondetails.keys())
+                                    # index=0
+                                    for x in range(1, (merge_rows + 1)):
+                                        # table.add_row("Col.Det.",i,columndetails[i])
+                                        if x == 1:
+                                            table.add_row(
+                                                (MultiRow(merge_rows,
+                                                          data=StandAloneGraphic(image_options="width=5cm,height=5cm",
+                                                                                 filename=rel_path + Img_path)),
+                                                 MultiColumn(2, align='|c|', data=a[x]),
+                                                 MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+                                        elif x <= 4:
+                                            table.add_row(('', MultiColumn(2, align='|c|', data=a[x]),
+                                                           MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+                                        else:
+                                            table.add_row(('', a[x], sectiondetails[a[x]], a[merge_rows + x - 4],
+                                                           sectiondetails[a[merge_rows + x - 4]],))
+                                        table.add_hline(2, 5)
+                            table.add_hline()
+                        count = count + 1
                 else:
-                    table.add_row((check[0], check[1], check[2], check[3]))
+
+                    if check[3] == 'Fail':
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("FailColor", bold(check[3])))
+                    else:
+                        table.add_row((NoEscape(check[0])), check[1], check[2], TextColor("PassColor", bold(check[3])))
                     table.add_hline()
-        doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
+        # doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
 
         doc.append(NewPage())
 
-        with doc.create(Section('3D View')):
-            with doc.create(Figure(position='h!')) as view_3D:
-                view_3dimg_path = rel_path + Disp_3d_image
-                view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
-                view_3D.add_caption('3D View')
 
-        doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+        if does_design_exist:
+            with doc.create(Section('3D View')):
+                with doc.create(Figure(position='h!')) as view_3D:
+                    view_3dimg_path = rel_path + Disp_3d_image
+                    # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
+                    view_3D.add_image(filename=view_3dimg_path,width='500px')
+
+                    view_3D.add_caption('3D View')
+
+        with doc.create(Section('Design Log')):
+            logger_msgs=reportsummary['logger_messages'].split('\n')
+            for msg in logger_msgs:
+                if('WARNING' in msg):
+                    colour='blue'
+                elif('INFO' in msg):
+                    colour='green'
+                elif('ERROR' in msg):
+                    colour='red'
+                doc.append(TextColor(colour,'\n'+msg))
+        try:
+            doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
+        except:
+            pass

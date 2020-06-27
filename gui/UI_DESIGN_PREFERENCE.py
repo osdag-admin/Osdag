@@ -185,7 +185,7 @@ class Window(QDialog):
                         font.setPointSize(9)
                         font.setBold(False)
                         font.setWeight(50)
-                        combo.setFont(font)
+                        #combo.setFont(font)
                         metrices = QtGui.QFontMetrics(font)
                         item_width = 0
                         item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
@@ -1065,7 +1065,7 @@ class Window(QDialog):
                                            values['It'], values['Iw'], values['Source'], values['Type']))
                             elif tab_name == 'Beams':
                                 c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,
-                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES 
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                                           (values['Designation'], values['Mass'], values['Area'], values['D'],
                                            values['B'], values['tw'], values['T'], values['FlangeSlope'],
@@ -1074,7 +1074,7 @@ class Window(QDialog):
                                            values['It'], values['Iw'], values['Source'], values['Type']))
                             elif tab_name == 'Angles':
                                 c.execute('''INSERT INTO Angles (Designation,Mass,Area,a,b,t,R1,R2,Cz,Cy,Iz,Iy,Iumax,
-                                Ivmin,rz,ry,rumax,rvmin,Zz,Zy,Zpz,Zpy,It,Source,Type) VALUES 
+                                Ivmin,rz,ry,rumax,rvmin,Zz,Zy,Zpz,Zpy,It,Source,Type) VALUES
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                                           (values['Designation'], values['Mass'], values['Area'], values['a'],
                                            values['b'], values['t'], values['R1'], values['R2'], values['Cz'],
@@ -1084,7 +1084,7 @@ class Window(QDialog):
                                            values['Type']))
                             elif tab_name == 'Channels':
                                 c.execute('''INSERT INTO Channels (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Cy,
-                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES 
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                                           (values['Designation'], values['Mass'], values['Area'], values['D'],
                                            values['B'], values['tw'], values['T'], values['FlangeSlope'], values['R1'],

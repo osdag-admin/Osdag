@@ -5,22 +5,13 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!\
-from PyQt5.QtWidgets import QMessageBox, qApp, QScrollArea
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from design_report import reportGenerator
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp,QTimer
-from PyQt5.QtGui import QBrush, QImage
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtGui import QTextCharFormat
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
+from PyQt5.QtCore import QRegExp,QTimer, QThread, QFile, pyqtSignal, QTextStream, Qt, QIODevice, pyqtSlot
+from PyQt5.QtGui import QBrush, QImage, QColor, QDoubleValidator, QIntValidator, QPixmap, QPalette, QTextCharFormat, QTextCursor, QStandardItem
+from PyQt5.QtWidgets import *
 from design_type.connection.column_cover_plate import ColumnCoverPlate
-from PyQt5.QtGui import QStandardItem
 from PIL import Image
 import os
 import yaml
@@ -170,7 +161,7 @@ class Window(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
 
-        self.new_window = QtWidgets.QDialog()
+        self.new_window = QtWidgets.QDialog(self)
         self.new_ui = Ui_Dialog1(main.design_button_status,loggermsg=self.textEdit.toPlainText())
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
@@ -541,8 +532,7 @@ class Window(QMainWindow):
                 if lable == 'Material':
                     combo.setCurrentIndex(1)
                     maxi_width_right = max(maxi_width_right, item_width)
-                else:
-                    combo.view().setMinimumWidth(item_width + 25)
+                combo.view().setMinimumWidth(item_width + 25)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
@@ -646,7 +636,6 @@ class Window(QMainWindow):
         in_scroll.setWidget(in_scrollcontent)
 
         maxi_width = maxi_width_left + maxi_width_right
-        print(maxi_width)
         in_scrollcontent.setMinimumSize(maxi_width,in_scrollcontent.sizeHint().height())
         maxi_width += 82
         maxi_width = max(maxi_width, 350)    # In case there is no widget
@@ -729,7 +718,7 @@ class Window(QMainWindow):
                     self.on_change_connect(key_changed, updated_list, data)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 30))
+        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -739,7 +728,7 @@ class Window(QMainWindow):
         self.btn_Reset.setObjectName("btn_Reset")
 
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 30))
+        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -1746,6 +1735,7 @@ class Window(QMainWindow):
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
                                                   KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
                                                   KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
+
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
@@ -1776,6 +1766,7 @@ class Window(QMainWindow):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(False)
                 for action in self.menugraphics_component_list:
                     action.setEnabled(False)
+
     def retakeScreenshot(self,fName):
         Ww=self.frameGeometry().width()
         Wh=self.frameGeometry().height()
@@ -2575,8 +2566,8 @@ class Window(QMainWindow):
 
     def set_dialog_size(self,dialog):
         def set_size():
-            dialog.resize(900,900) 
-            self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)  
+            dialog.resize(900,900)
+            self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)
             self.OsdagSectionModeller.OCCWindow.setFocus()
         return set_size
 

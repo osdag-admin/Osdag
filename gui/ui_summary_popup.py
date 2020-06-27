@@ -171,6 +171,8 @@ class Ui_Dialog1(object):
         input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
         file_type = "PDF (*.pdf)"
         filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        if filename == '':
+            return
         fname_no_ext = filename.split(".")[0]
         input_summary['filename'] = fname_no_ext
         input_summary['does_design_exist'] = self.design_exist

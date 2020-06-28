@@ -341,11 +341,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_inside_flange = 'No'
         self.anchor_tension_capa = 0.0
         self.safe = True
+        self.max_bearing_stress = 0.0
+        self.bolt_columns_outside_flange = 1
 
         self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])  # TODO check if this works
         self.gusset_fy = self.dp_column_fy
         self.stiffener_fy = self.dp_column_fy
         self.tension_capacity_anchor_uplift = self.tension_capacity_anchor
+        self.anchor_dia_outside_flange = self.anchor_dia_provided
         self.anchor_dia_inside_flange = self.anchor_dia_provided
         self.anchor_grade_inside_flange = self.anchor_grade
         self.shear_key_len_ColDepth = self.column_D
@@ -1704,7 +1707,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         # select anchor diameter (outside and inside column flange)
         self.anchor_dia_provided = self.table1(self.anchor_bolt)[0]  # mm, anchor dia provided (int)
-        self.anchor_dia_inside_flange = self.anchor_dia_provided  # mm, anchor dia provided (int)
+        self.anchor_dia_outside_flange = self.anchor_dia_provided  # mm, anchor dia provided outside the column flange (int)
+        self.anchor_dia_inside_flange = self.anchor_dia_provided  # mm, anchor dia provided inside the column flange (int)
 
         self.anchor_area = self.bolt_area(self.anchor_dia_provided)  # list of areas [shank area, thread area] mm^2
 
@@ -1757,14 +1761,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # self.edge_distance_max = self.end_distance_max
 
         # pitch and gauge distance [Reference: Clause 10.2.2 and 10.2.3.1, IS 800:2007]
-        # TODO add pitch and gauge calc for bolts more than 4 nos
         if self.anchors_outside_flange == 4:
             self.pitch_distance = 0.0
             self.gauge_distance = self.pitch_distance
         else:
-            # The maximum bolts that can be accommodated outside the flange is 6 (3 bolts in one column, on each side)
-            # Note: If more bolts are required (>6), provide second column of bolts, in that case add pitch calculation here
-            pass
+            self.pitch_distance = self.cl_10_2_2_min_spacing(self.anchor_dia_outside_flange)  # mm
+            self.gauge_distance = self.pitch_distance
 
         # minimum required dimensions (L X B) of the base plate [as per the detailing criteria]
         self.bp_length_min = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
@@ -1957,9 +1959,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.anchor_area_tension = self.anchor_area[0] * (self.anchor_nos_provided / 2)  # mm^2, area of anchor under tension
                 self.f = (self.bp_length_provided / 2) - self.end_distance  # mm
 
-                k1 = 3 * (self.eccentricity_zz - self.bp_length_provided / 2)
-                k2 = (6 * self.n * self.anchor_area_tension / self.bp_width_provided) * (self.f + self.eccentricity_zz)
-                k3 = (self.bp_length_provided / 2 + self.f) * -k2
+                k1 = 3 * (self.eccentricity_zz - (self.bp_length_provided / 2))
+                k2 = ((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz)
+                k3 = ((self.bp_length_provided / 2) + self.f) * -k2
 
                 # equation for finding 'y' is: y^3 + k1*y^2 + k2*y + k3 = 0
                 roots = np.roots([1, k1, k2, k3])  # finding roots of the equation
@@ -1971,16 +1973,515 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.y = round(r)  # mm
 
-                # finding maximum tension in the bolts for maximum permissible bearing stress (0.45*f_ck)
-                self.tension_demand_anchor = ((self.bearing_strength_concrete * self.anchor_area_tension * self.n) / self.y) * \
-                                             ((self.bp_length_provided / 2) + self.f - self.y)  # N
+                # finding maximum tension in the anchor bolts
+                self.tension_demand_anchor = (- self.load_axial_compression) * (((self.bp_length_provided / 2) - (self.y / 3) - self.eccentricity_zz) /
+                                                                                ((self.bp_length_provided / 2) - (self.y / 3) + self.f))  # N
+                if self.tension_demand_anchor < 0:
+                    self.tension_demand_anchor = (- 1 * self.tension_demand_anchor)
+
                 self.tension_demand_anchor = round(self.tension_demand_anchor / 1000, 2)  # kN
 
-                # computing the actual bending stress at the compression side
-                # TODO: complete this check
-                # self.flange_force_axial = self.dp_bp_fy * (self.column_bf * self.column_tf)  # N, load transferred by the flange
-                # self.flange_force_moment = self.load_moment_major / (self.column_D - self.column_tf)  # N, tension acting at the flange
-                # self.bp_area_compression = self.y * self.bp_width_provided  # mm^2, area of the base plate under compression
+                # design of the anchor bolt(s) required to resist tension due to bending moment only
+                self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                              self.anchor_area[0], self.anchor_area[1],
+                                                                                              safety_factor_parameter=self.dp_weld_fab)  # N
+                self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
+                # design number of anchor bolts required to resist tension (bolts outside the column flange)
+                # Assumption: The minimum number of anchor bolts is 2 (on each side), for stability purpose.
+                self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 2)  # each side
+
+                # if the number of bolts outside the flange exceeds 2, 3, 4 or 6 in number, then the loop will check
+                # for a higher diameter of bolt from the given list of anchor diameters by the user.
+
+                # Check 1: 2 bolts with higher diameter
+                if self.anchors_outside_flange > 2:
+                    check1 = 'Yes'
+
+                    n = 1
+                    while self.anchors_outside_flange > 2:
+                        bolt_list = self.anchor_dia[n - 1:]
+
+                        for i in bolt_list:
+                            self.anchor_dia_provided = i
+                            break
+
+                        self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])
+                        self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                                      self.anchor_area[0], self.anchor_area[1],
+                                                                                                      safety_factor_parameter=self.dp_weld_fab)  # N
+                        self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
+                        self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 2)
+                        n += 1
+
+                        self.anchor_dia_provided = self.table1(i)[0]  # updating the initialised anchor diameter
+
+                        if ((n - 1) >= len(self.anchor_dia)) and (self.anchors_outside_flange > 2):
+                            logger.warning("2 bolts are not sufficient")
+                            logger.info("Checking with 3 bolts")
+                            break
+                else:
+                    check1 = 'N/A'
+
+                # Check 2: Checking for 3 bolts with 1. initial diameter input 2. every possible anchor diameter (if 1 fails)
+                if (self.anchors_outside_flange > 2) and (check1 == 'Yes'):
+                    check2 = 'Yes'
+
+                    self.anchors_outside_flange = 3  # trying with 3 bolts
+                    self.anchor_dia_provided = self.anchor_dia_outside_flange  # starting check with the initial provided diameter
+
+                    self.anchor_area = self.bolt_area(self.anchor_dia_provided)
+                    self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                                  self.anchor_area[0], self.anchor_area[1],
+                                                                                                  safety_factor_parameter=self.dp_weld_fab)  # N
+                    self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
+                    self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 3)
+
+                    # if the check fails with 3 bolts and initial diameter, checking for 3 bolts with higher possible diameters
+                    if self.anchors_outside_flange > 3:
+
+                        n = 1
+                        while self.anchors_outside_flange > 3:
+                            bolt_list = self.anchor_dia[n - 1:]
+
+                            for i in bolt_list:
+                                self.anchor_dia_provided = i
+                                break
+
+                            self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])
+                            self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                                          self.anchor_area[0], self.anchor_area[1],
+                                                                                                          safety_factor_parameter=self.dp_weld_fab)  # N
+                            self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
+                            self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 3)
+                            n += 1
+
+                            self.anchor_dia_provided = self.table1(i)[0]  # updating the initialised anchor diameter
+
+                            if ((n - 1) >= len(self.anchor_dia)) and (self.anchors_outside_flange > 3):
+                                logger.warning("3 bolts are not sufficient")
+                                logger.info("Checking with 4 bolts")
+                                break
+
+                    else:
+                        pass
+
+                else:
+                    check2 = 'N/A'
+
+                # Check 3: Checking for 4 bolts with 1. initial diameter input 2. every possible anchor diameter (if 1 fails)
+                if (self.anchors_outside_flange > 3) and (check2 == 'Yes'):
+                    check3 = 'Yes'
+
+                    self.anchors_outside_flange = 4  # trying with 4 bolts
+                    self.anchor_dia_provided = self.anchor_dia_outside_flange  # starting check with the initial provided diameter
+
+                    self.anchor_area = self.bolt_area(self.anchor_dia_provided)
+                    self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                                  self.anchor_area[0], self.anchor_area[1],
+                                                                                                  safety_factor_parameter=self.dp_weld_fab)  # N
+                    self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
+                    self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 4)
+
+                    # if the check fails with 4 bolts and initial diameter, checking for 4 bolts with higher possible diameters
+                    if self.anchors_outside_flange > 4:
+
+                        n = 1
+                        while self.anchors_outside_flange > 4:
+                            bolt_list = self.anchor_dia[n - 1:]
+
+                            for i in bolt_list:
+                                self.anchor_dia_provided = i
+                                break
+
+                            self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])
+                            self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                                          self.anchor_area[0], self.anchor_area[1],
+                                                                                                          safety_factor_parameter=self.dp_weld_fab)  # N
+                            self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
+                            self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 4)
+                            n += 1
+
+                            self.anchor_dia_provided = self.table1(i)[0]  # updating the initialised anchor diameter
+
+                            if ((n - 1) >= len(self.anchor_dia)) and (self.anchors_outside_flange > 4):
+                                logger.warning("4 bolts are not sufficient")
+                                logger.info("Checking with 6 bolts")
+                                break
+                    else:
+                        pass
+
+                else:
+                    check3 = 'N/A'
+
+                # Check 4: Checking for 6 bolts with 1. initial diameter input 2. every possible anchor diameter (if 1 fails)
+                if (self.anchors_outside_flange > 4) and (check3 == 'Yes'):
+                    check4 = 'Yes'
+
+                    self.anchors_outside_flange = 6  # trying with 6 bolts
+                    self.anchor_dia_provided = self.anchor_dia_outside_flange  # starting check with the initial provided diameter
+
+                    self.anchor_area = self.bolt_area(self.anchor_dia_provided)
+                    self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                                  self.anchor_area[0], self.anchor_area[1],
+                                                                                                  safety_factor_parameter=self.dp_weld_fab)  # N
+                    self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
+                    self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 6)
+
+                    # if the check fails with 6 bolts and initial diameter, checking for 6 bolts with higher possible diameters
+                    if self.anchors_outside_flange > 6:
+
+                        n = 1
+                        while self.anchors_outside_flange > 6:
+                            bolt_list = self.anchor_dia[n - 1:]
+
+                            for i in bolt_list:
+                                self.anchor_dia_provided = i
+                                break
+
+                            self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])
+                            self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                                          self.anchor_area[0], self.anchor_area[1],
+                                                                                                          safety_factor_parameter=self.dp_weld_fab)  # N
+                            self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
+                            self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 6)
+                            n += 1
+
+                            self.anchor_dia_provided = self.table1(i)[0]  # updating the initialised anchor diameter
+
+                            if ((n - 1) >= len(self.anchor_dia)) and (self.anchors_outside_flange > 6):
+                                self.safe = False
+                                logger.warning("BM is very high")
+                                logger.warning("6 bolts are not sufficient")
+                                logger.info("Provision for design with more than 6 bolts not available with this version")
+                                break
+                    else:
+                        pass
+
+                else:
+                    check4 = 'N/A'
+
+                # improvising plate length and width if there are 2 or 3 bolts provided outside the flange
+                if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
+                    self.bolt_columns_outside_flange = 1
+                    self.anchor_nos_provided = self.anchors_outside_flange
+
+                    self.pitch_distance = 0
+                    self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
+                                                                           self.dp_detail_edge_type)
+                    self.end_distance = round_up(self.end_distance, 5)
+
+                    self.bp_length_provided = self.column_D + (2 * (2 * self.end_distance))
+                    self.bp_width_provided = self.bp_width_min
+
+                    if self.anchors_outside_flange == 2:
+                        bp_width = (4 * self.edge_distance) + self.column_tw
+                        bp_width = round_up(bp_width, 5)
+                        self.bp_width_provided = max(self.bp_width_provided, bp_width)
+
+                    if self.anchors_outside_flange == 3:
+                        bp_width = (4 * self.edge_distance) + (0.85 * self.column_bf) + self.column_tw
+                        bp_width = round_up(bp_width, 5)
+                        self.bp_width_provided = max(self.bp_width_provided, bp_width)
+
+                    # recalculating the parameters for bearing check
+                    self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                    self.f = (self.bp_length_provided / 2) - self.end_distance  # mm
+
+                    k1 = 3 * (self.eccentricity_zz - (self.bp_length_provided / 2))
+                    k2 = ((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz)
+                    k3 = ((self.bp_length_provided / 2) + self.f) * -k2
+
+                    # equation for finding 'y' is: y^3 + k1*y^2 + k2*y + k3 = 0
+                    roots = np.roots([1, k1, k2, k3])  # finding roots of the equation
+                    r_1 = roots[0]
+                    r_2 = roots[1]
+                    r_3 = roots[2]
+                    r = max(r_1, r_2, r_3)
+                    r = r.real  # separating the imaginary part
+
+                    self.y = round(r)  # mm
+
+                # improvising plate length and width if there are 4 or 6 bolts provided outside the flange
+                if (self.anchors_outside_flange == 4) or (self.anchors_outside_flange == 6):
+                    self.bolt_columns_outside_flange = 2
+                    self.anchor_nos_provided = self.anchors_outside_flange
+
+                    self.pitch_distance = self.cl_10_2_2_min_spacing(self.anchor_dia_provided)
+                    self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
+                                                                           self.dp_detail_edge_type)
+                    self.end_distance = round_up(self.end_distance, 5)
+
+                    self.bp_length_provided = self.column_D + (2 * (2 * self.end_distance)) + (2 * self.pitch_distance)
+                    self.bp_width_provided = self.bp_width_min
+
+                    if self.anchors_outside_flange == 4:
+                        bp_width = (4 * self.edge_distance) + self.column_tw
+                        bp_width = round_up(bp_width, 5)
+                        self.bp_width_provided = max(self.bp_width_provided, bp_width)
+
+                    if self.anchors_outside_flange == 6:
+                        bp_width = (6 * self.edge_distance) + (0.85 * self.column_bf) + self.column_tw
+                        bp_width = round_up(bp_width, 5)
+                        self.bp_width_provided = max(self.bp_width_provided, bp_width)
+
+                    # recalculating the parameters for bearing check
+                    self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                    self.f = (self.bp_length_provided / 2) - self.end_distance  # mm
+
+                    k1 = 3 * (self.eccentricity_zz - (self.bp_length_provided / 2))
+                    k2 = ((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz)
+                    k3 = ((self.bp_length_provided / 2) + self.f) * -k2
+
+                    # equation for finding 'y' is: y^3 + k1*y^2 + k2*y + k3 = 0
+                    roots = np.roots([1, k1, k2, k3])  # finding roots of the equation
+                    r_1 = roots[0]
+                    r_2 = roots[1]
+                    r_3 = roots[2]
+                    r = max(r_1, r_2, r_3)
+                    r = r.real  # separating the imaginary part
+
+                    self.y = round(r)  # mm
+
+                # computing the actual bearing stress at the compression side
+                self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                          (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+
+                if self.max_bearing_stress > self.bearing_strength_concrete:
+                    bearing_stress_check = 'Fail'
+                else:
+                    bearing_stress_check = 'Pass'
+
+                anchor_bolt_list = [8, 10, 12, 16, 20, 24, 30, 36, 42, 48, 56, 64, 72]
+
+                # revise bolt design if the bearing check fails (increasing the number/area of bolts will reduce the bearing stress)
+
+                # First iteration
+                if (self.anchors_outside_flange == 2) and (bearing_stress_check == 'Fail'):
+                    # self.anchor_area_tension = self.bolt_area(self.anchor_dia_outside_flange)[0] * self.anchors_outside_flange
+
+                    self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                              (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+
+                    n = 1
+                    while self.max_bearing_stress > self.bearing_strength_concrete:
+
+                        sort_bolt = filter(lambda x: self.anchor_dia_provided <= x <= 72, anchor_bolt_list)
+                        for i in sort_bolt:
+                            min_bolt_dia = i
+                            break
+
+                        bolt_index = anchor_bolt_list.index(min_bolt_dia)
+                        bolt_list = anchor_bolt_list[bolt_index:]
+
+                        for i in bolt_list:
+                            self.anchor_dia_provided = i  # updating anchor dia to check for bearing stress
+                            break
+
+                        self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                        self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                                  (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+                        n += 1
+                        sort_bolt = filter(lambda x: self.anchor_dia_provided < x <= 72, anchor_bolt_list)
+                        for i in sort_bolt:
+                            self.anchor_dia_provided = i
+                            break
+
+                        if (self.anchor_dia_provided == 72) and (self.max_bearing_stress > self.bearing_strength_concrete):
+                            bearing_stress_check = 'Fail'
+                            self.anchor_dia_provided = 20  # initialise with 20 mm dia for next iteration
+                            self.anchors_outside_flange = 3  # increase number of bolts if check fails
+                            self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                            logger.warning("Check fails in bearing of concrete on compression side with -- bolts")
+                            logger.info("Checking with more or higher diameter anchor bolts")
+                            break
+
+                # Second iteration
+                if (self.anchors_outside_flange == 3) and (bearing_stress_check == 'Fail'):
+                    # self.anchor_area_tension = self.bolt_area(self.anchor_dia_outside_flange)[0] * self.anchors_outside_flange
+
+                    self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                              (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+
+                    n = 1
+                    while self.max_bearing_stress > self.bearing_strength_concrete:
+
+                        sort_bolt = filter(lambda x: self.anchor_dia_provided <= x <= 72, anchor_bolt_list)
+                        for i in sort_bolt:
+                            min_bolt_dia = i
+                            break
+
+                        bolt_index = anchor_bolt_list.index(min_bolt_dia)
+                        bolt_list = anchor_bolt_list[bolt_index:]
+
+                        for i in bolt_list:
+                            self.anchor_dia_provided = i  # updating anchor dia to check for bearing stress
+                            break
+
+                        self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                        self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                                  (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+                        n += 1
+                        sort_bolt = filter(lambda x: self.anchor_dia_provided < x <= 72, anchor_bolt_list)
+                        for i in sort_bolt:
+                            self.anchor_dia_provided = i
+                            break
+
+                        if (self.anchor_dia_provided == 72) and (self.max_bearing_stress > self.bearing_strength_concrete):
+                            bearing_stress_check = 'Fail'
+                            self.anchor_dia_provided = 20  # initialise with 20 mm dia for next iteration
+                            self.anchors_outside_flange = 4  # increase number of bolts if check fails
+                            self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                            logger.warning("Check fails in bearing of concrete on compression side with -- bolts")
+                            logger.info("Checking with more or higher diameter anchor bolts")
+                            break
+
+                # Third iteration
+                if (self.anchors_outside_flange == 4) and (bearing_stress_check == 'Fail'):
+                    # self.anchor_area_tension = self.bolt_area(self.anchor_dia_outside_flange)[0] * self.anchors_outside_flange
+
+                    self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                              (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+
+                    n = 1
+                    while self.max_bearing_stress > self.bearing_strength_concrete:
+
+                        sort_bolt = filter(lambda x: self.anchor_dia_provided <= x <= 72, anchor_bolt_list)
+                        for i in sort_bolt:
+                            min_bolt_dia = i
+                            break
+
+                        bolt_index = anchor_bolt_list.index(min_bolt_dia)
+                        bolt_list = anchor_bolt_list[bolt_index:]
+
+                        for i in bolt_list:
+                            self.anchor_dia_provided = i  # updating anchor dia to check for bearing stress
+                            break
+
+                        self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                        self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                                  (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+                        n += 1
+                        sort_bolt = filter(lambda x: self.anchor_dia_provided < x <= 72, anchor_bolt_list)
+                        for i in sort_bolt:
+                            self.anchor_dia_provided = i
+                            break
+
+                        if (self.anchor_dia_provided == 72) and (self.max_bearing_stress > self.bearing_strength_concrete):
+                            bearing_stress_check = 'Fail'
+                            self.anchor_dia_provided = 20  # initialise with 20 mm dia for next iteration
+                            self.anchors_outside_flange = 6  # increase number of bolts if check fails
+                            self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                            logger.warning("Check fails in bearing of concrete on compression side with -- bolts")
+                            logger.info("Checking with more or higher diameter anchor bolts")
+                            break
+
+                # Fourth iteration
+                if (self.anchors_outside_flange == 6) and (bearing_stress_check == 'Fail'):
+                    # self.anchor_area_tension = self.bolt_area(self.anchor_dia_outside_flange)[0] * self.anchors_outside_flange
+
+                    self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                              (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+
+                    n = 1
+                    while self.max_bearing_stress > self.bearing_strength_concrete:
+
+                        sort_bolt = filter(lambda x: self.anchor_dia_provided <= x <= 72, anchor_bolt_list)
+                        for i in sort_bolt:
+                            min_bolt_dia = i
+                            break
+
+                        bolt_index = anchor_bolt_list.index(min_bolt_dia)
+                        bolt_list = anchor_bolt_list[bolt_index:]
+
+                        for i in bolt_list:
+                            self.anchor_dia_provided = i  # updating anchor dia to check for bearing stress
+                            break
+
+                        self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                        self.max_bearing_stress = ((self.tension_demand_anchor * 1000 * self.y) / (self.anchor_area_tension * self.n)) * \
+                                                  (1 / ((self.bp_length_provided / 2) + self.f - self.y))  # N/mm^2
+                        n += 1
+                        sort_bolt = filter(lambda x: self.anchor_dia_provided < x <= 72, anchor_bolt_list)
+                        for i in sort_bolt:
+                            self.anchor_dia_provided = i
+                            break
+
+                        if (self.anchor_dia_provided == 72) and (self.max_bearing_stress > self.bearing_strength_concrete):
+                            bearing_stress_check = 'Fail'
+                            self.anchor_dia_provided = 20  # initialise with 20 mm dia for next iteration
+                            self.anchors_outside_flange = 8
+                            self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
+                            logger.warning("Check fails in bearing of concrete on compression side with -- bolts")
+                            logger.info("Checking with more or higher diameter anchor bolts")
+                            break
+
+                # maximum allowed bolts is 6
+                if (self.anchors_outside_flange >= 8) and (bearing_stress_check == 'Fail'):
+                    self.safe = False
+                    logger.error("The check fails i bearing stress")
+                    logger.info("Cannot compute")
+                    logger.error("Fails in bearing")
+                    logger.info("Provide a higher grade of concrete")
+
+                # re-calculating detailing parameters
+                if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
+
+                    self.pitch_distance = 0
+                    self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
+                                                                           self.dp_detail_edge_type)
+                    self.end_distance = round_up(self.end_distance, 5)
+                    self.edge_distance = self.end_distance
+
+                    self.bp_length_provided = self.column_D + (2 * (2 * self.end_distance))
+                    self.bp_width_provided = self.bp_width_min
+
+                    if self.anchors_outside_flange == 2:
+                        bp_width = (4 * self.edge_distance) + self.column_tw
+                        bp_width = round_up(bp_width, 5)
+                        self.bp_width_provided = max(self.bp_width_provided, bp_width)
+
+                    if self.anchors_outside_flange == 3:
+                        bp_width = (6 * self.edge_distance) + (0.85 * self.column_bf) + self.column_tw
+                        bp_width = round_up(bp_width, 5)
+                        self.bp_width_provided = max(self.bp_width_provided, bp_width)
+
+                # re-calculating detailing parameters
+                if (self.anchors_outside_flange == 4) or (self.anchors_outside_flange == 6):
+
+                    self.pitch_distance = self.cl_10_2_2_min_spacing(self.anchor_dia_provided)
+                    self.pitch_distance = round_up(self.pitch_distance, 5)
+                    self.gauge_distance = self.pitch_distance
+                    self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
+                                                                           self.dp_detail_edge_type)
+                    self.end_distance = round_up(self.end_distance, 5)
+                    self.edge_distance = self.end_distance
+
+                    self.bp_length_provided = self.column_D + (2 * (2 * self.end_distance)) + (2 * self.pitch_distance)
+                    self.bp_width_provided = self.bp_width_min
+
+                    if self.anchors_outside_flange == 4:
+                        bp_width = (4 * self.edge_distance) + self.column_tw
+                        bp_width = round_up(bp_width, 5)
+                        self.bp_width_provided = max(self.bp_width_provided, bp_width)
+
+                    if self.anchors_outside_flange == 6:
+                        bp_width = (6 * self.edge_distance) + (0.85 * self.column_bf) + self.column_tw
+                        bp_width = round_up(bp_width, 5)
+                        self.bp_width_provided = max(self.bp_width_provided, bp_width)
+
+                if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
+                    self.bolt_columns_outside_flange = 1
+                elif (self.anchors_outside_flange == 4) or (self.anchors_outside_flange == 6):
+                    self.bolt_columns_outside_flange = 2
 
                 # designing the plate thickness
 
@@ -2012,41 +2513,41 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy * self.bp_width_provided))  # mm
 
-            # design of the anchor bolt(s) required to resist tension due to bending moment only
-            self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
-                                                                                          self.anchor_area[0], self.anchor_area[1],
-                                                                                          safety_factor_parameter=self.dp_weld_fab)  # N
-            self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
-
-            # design number of anchor bolts required to resist tension (bolts outside the column flange)
-            # Assumption: The minimum number of anchor bolts is 2 (on each side), for stability purpose.
-            self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 2)  # each side
-
-            # if the number of bolts required to resist tension exceeds 3 in number, then the loop will check
-            # for a higher diameter of bolt from the given list of anchor diameters by the user.
-            n = 1
-            while self.anchors_outside_flange > 3:  # the maximum number of bolts that can be accommodated is 3 on each side
-                bolt_list = self.anchor_dia[n - 1:]
-
-                for i in bolt_list:
-                    self.anchor_dia_provided = i
-                    break
-
-                self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])
-                self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
-                                                                                              self.anchor_area[0], self.anchor_area[1],
-                                                                                              safety_factor_parameter=self.dp_weld_fab)  # N
-                self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
-
-                self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 2)
-                n += 1
-
-                self.anchor_dia_provided = self.table1(i)[0]  # updating the initialised anchor diameter
-
-                if n > len(self.anchor_dia):
-                    self.safe = False
-                    # TODO: give log errors
-                    logger.error("Cannot compute anchor bolt for resisting the uplift force")
+            # # design of the anchor bolt(s) required to resist tension due to bending moment only
+            # self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+            #                                                                               self.anchor_area[0], self.anchor_area[1],
+            #                                                                               safety_factor_parameter=self.dp_weld_fab)  # N
+            # self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+            #
+            # # design number of anchor bolts required to resist tension (bolts outside the column flange)
+            # # Assumption: The minimum number of anchor bolts is 2 (on each side), for stability purpose.
+            # self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 2)  # each side
+            #
+            # # if the number of bolts required to resist tension exceeds 3 in number, then the loop will check
+            # # for a higher diameter of bolt from the given list of anchor diameters by the user.
+            # n = 1
+            # while self.anchors_outside_flange > 3:  # the maximum number of bolts that can be accommodated is 3 on each side
+            #     bolt_list = self.anchor_dia[n - 1:]
+            #
+            #     for i in bolt_list:
+            #         self.anchor_dia_provided = i
+            #         break
+            #
+            #     self.anchor_area = self.bolt_area(self.table1(self.anchor_dia_provided)[0])
+            #     self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+            #                                                                                   self.anchor_area[0], self.anchor_area[1],
+            #                                                                                   safety_factor_parameter=self.dp_weld_fab)  # N
+            #     self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+            #
+            #     self.anchors_outside_flange = max(self.tension_demand_anchor / self.tension_capacity_anchor, 2)
+            #     n += 1
+            #
+            #     self.anchor_dia_provided = self.table1(i)[0]  # updating the initialised anchor diameter
+            #
+            #     if ((n - 1) >= len(self.anchor_dia)) and (self.anchors_outside_flange > 3):
+            #         self.safe = False
+            #         # TODO: give log errors
+            #         logger.error("Cannot compute anchor bolt for resisting the uplift force")
 
             if self.moment_bp_case == 'Case1':
                 self.anchor_nos_provided = self.anchor_nos_provided
@@ -2073,6 +2574,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         for i in sort_plate:
             self.plate_thk = i  # plate thickness provided (mm)
             break
+
+        # check for maximum plate thickness
+        if self.plate_thk > 120:
+            self.safe = False
+            logger.error("Plate thk exceeds 120 mm")
+            logger.warning("Cannot compute")
 
     def anchor_bolt_design(self):
         """ Perform design checks for the anchor bolt
@@ -2747,9 +3254,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if (self.stiffener_along_flange == 'Yes') or (self.stiffener_along_web == 'Yes') or (self.stiffener_across_web == 'Yes'):
 
                 # thickness of the stiffener plate as per Table 2 of IS 800:2007 [b/t_f <= 8.4 * epsilon]
-                thk_req_stiffener_along_flange = self.stiffener_plt_len_along_flange / (8.4 * self.epsilon)  # mm
-                thk_req_stiffener_along_web = self.stiffener_plt_len_along_web / (8.4 * self.epsilon)  # mm
-                thk_req_stiffener_across_web = self.stiffener_plt_len_across_web / (8.4 * self.epsilon)  # mm
+                if self.bolt_columns_outside_flange == 2:
+                    thk_req_stiffener_along_flange = (self.stiffener_plt_len_along_flange / 2) / (8.4 * self.epsilon)  # mm
+                    thk_req_stiffener_along_web = (self.stiffener_plt_len_along_web / 2) / (8.4 * self.epsilon)  # mm
+                    thk_req_stiffener_across_web = (self.stiffener_plt_len_across_web / 2) / (8.4 * self.epsilon)  # mm
+                else:
+                    thk_req_stiffener_along_flange = self.stiffener_plt_len_along_flange / (8.4 * self.epsilon)  # mm
+                    thk_req_stiffener_along_web = self.stiffener_plt_len_along_web / (8.4 * self.epsilon)  # mm
+                    thk_req_stiffener_across_web = self.stiffener_plt_len_across_web / (8.4 * self.epsilon)  # mm
 
                 # stiffener plate should be at-least equal to the flange thickness along the flange and web thickness along the web
                 self.stiffener_plt_thick_along_flange = round_up(thk_req_stiffener_along_flange, 2, self.column_tf)  # mm
@@ -3176,21 +3688,21 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         else:
             pass
 
-        # update detailing parameters
-        self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole, self.dp_detail_edge_type)
-        self.end_distance = round_up(1.5 * self.end_distance, 5)  # mm, adding 50% extra to end distance to incorporate weld etc.
-        self.edge_distance = self.end_distance
-
-        # minimum required dimensions (L X B) of the base plate [as per the detailing criteria]
-        self.bp_length_provided = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
-
-        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
-            # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
-            self.bp_width_provided = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
-        elif self.connectivity == 'Hollow/Tubular Column Base':
-            self.bp_width_provided = round_up(self.column_bf + (2 * (2 * self.end_distance)), 5)  # mm
-        else:
-            pass
+        # # update detailing parameters
+        # self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole, self.dp_detail_edge_type)
+        # self.end_distance = round_up(1.5 * self.end_distance, 5)  # mm, adding 50% extra to end distance to incorporate weld etc.
+        # self.edge_distance = self.end_distance
+        #
+        # # minimum required dimensions (L X B) of the base plate [as per the detailing criteria]
+        # self.bp_length_provided = round_up(self.column_D + 2 * (2 * self.end_distance), 5)  # mm
+        #
+        # if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
+        #     # considering clearance equal to 1.5 times the edge distance (on each side) along the width of the base plate
+        #     self.bp_width_provided = round_up(self.column_bf + (1.5 * self.edge_distance) + (1.5 * self.edge_distance), 5)  # mm
+        # elif self.connectivity == 'Hollow/Tubular Column Base':
+        #     self.bp_width_provided = round_up(self.column_bf + (2 * (2 * self.end_distance)), 5)  # mm
+        # else:
+        #     pass
 
     def additional_calculations(self):
         """ Perform additional and common checks
@@ -3383,7 +3895,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                 if (self.anchors_inside_flange == 2) or (self.anchors_inside_flange == 4):
                                     break
 
-                            if (self.anchor_dia_inside_flange > 72) and (self.anchors_inside_flange > 4):
+                            if (self.anchor_dia_inside_flange >= 72) and (self.anchors_inside_flange > 4):
                                 self.anchors_inside_flange = round_up(self.anchors_inside_flange, 2)
                                 self.safe = False
                                 logger.error("Cannot compute anchor bolt for resisting the uplift force")

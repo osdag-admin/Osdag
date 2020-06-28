@@ -5,9 +5,7 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!\
-from PyQt5.QtWidgets import QMessageBox, qApp, QScrollArea
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from design_report import reportGenerator
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
@@ -22,8 +20,11 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFi
 from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
+from PyQt5.QtCore import QRegExp,QTimer, QThread, QFile, pyqtSignal, QTextStream, Qt, QIODevice, pyqtSlot
+from PyQt5.QtGui import QBrush, QImage, QColor, QDoubleValidator, QIntValidator, QPixmap, QPalette, QTextCharFormat, QTextCursor, QStandardItem
+from PyQt5.QtWidgets import *
 from design_type.connection.column_cover_plate import ColumnCoverPlate
-from PyQt5.QtGui import QStandardItem
+from PIL import Image
 import os
 import yaml
 import json
@@ -196,8 +197,8 @@ class Window(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
 
-        self.new_window = QtWidgets.QDialog()
-        self.new_ui = Ui_Dialog1(main.design_button_status)
+        self.new_window = QtWidgets.QDialog(self)
+        self.new_ui = Ui_Dialog1(main.design_button_status,loggermsg=self.textEdit.toPlainText())
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
@@ -580,8 +581,7 @@ class Window(QMainWindow):
                 if lable == 'Material':
                     combo.setCurrentIndex(1)
                     maxi_width_right = max(maxi_width_right, item_width)
-                else:
-                    combo.view().setMinimumWidth(item_width + 25)
+                combo.view().setMinimumWidth(item_width + 25)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
@@ -685,7 +685,6 @@ class Window(QMainWindow):
         in_scroll.setWidget(in_scrollcontent)
 
         maxi_width = maxi_width_left + maxi_width_right
-        print(maxi_width)
         in_scrollcontent.setMinimumSize(maxi_width,in_scrollcontent.sizeHint().height())
         maxi_width += 82
         maxi_width = max(maxi_width, 350)    # In case there is no widget
@@ -768,7 +767,7 @@ class Window(QMainWindow):
                     self.on_change_connect(key_changed, updated_list, data, main)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 30))
+        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -778,7 +777,7 @@ class Window(QMainWindow):
         self.btn_Reset.setObjectName("btn_Reset")
 
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 30))
+        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -1861,7 +1860,6 @@ class Window(QMainWindow):
     def common_function_for_save_and_design(self, main, data, trigger_type):
 
         # @author: Amir
-
         option_list = main.input_values(self)
         self.design_fn(option_list, data, main)
 
@@ -1879,6 +1877,11 @@ class Window(QMainWindow):
 
         else:
             main.design_button_status = True
+            for input_field in self.dockWidgetContents.findChildren(QtWidgets.QWidget):
+                if type(input_field) == QtWidgets.QLineEdit:
+                    input_field.textChanged.connect(self.clear_output_fields)
+                elif type(input_field) == QtWidgets.QComboBox:
+                    input_field.currentIndexChanged.connect(self.clear_output_fields)
             self.textEdit.clear()
             with open("logging_text.log", 'w') as log_file:
                 pass
@@ -1927,12 +1930,13 @@ class Window(QMainWindow):
             self.design_inputs.update({"out_titles_status": out_titles_status})
             with open(str(last_design_file), 'w') as last_design:
                 yaml.dump(self.design_inputs, last_design)
-
+            self.design_inputs.pop("out_titles_status")
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
                                                   KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
                                                   KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
+
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
@@ -1948,15 +1952,43 @@ class Window(QMainWindow):
 
                 if file_extension == 'png':
                     self.display.ExportToImage(fName)
+                    im = Image.open('./ResourceFiles/images/3d.png')
+                    w,h=im.size
+                    if(w< 640 or h < 360):
+                        print('Re-taking Screenshot')
+                        self.resize(700,500)
+                        self.outputDock.hide()
+                        self.inputDock.hide()
+                        self.textEdit.hide()
+                        QTimer.singleShot(0, lambda:self.retakeScreenshot(fName))
 
             else:
+                self.display.EraseAll()
                 for chkbox in main.get_3d_components(main):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(False)
                 for action in self.menugraphics_component_list:
                     action.setEnabled(False)
 
+    def retakeScreenshot(self,fName):
+        Ww=self.frameGeometry().width()
+        Wh=self.frameGeometry().height()
+        self.display.FitAll()
+        self.display.ExportToImage(fName)
+        self.resize(Ww,Wh)
+        self.outputDock.show()
+        self.inputDock.show()
+        self.textEdit.show()
+
     def show_error_msg(self, error):
         QMessageBox.about(self,'information',error[0])  # show only first error message.
+
+    def clear_output_fields(self):
+        for output_field in self.dockWidgetContents_out.findChildren(QtWidgets.QLineEdit):
+            output_field.clear()
+        for output_field in self.dockWidgetContents_out.findChildren(QtWidgets.QPushButton):
+            if output_field.objectName() in ["btn_CreateDesign", "save_outputDock"]:
+                continue
+            output_field.setEnabled(False)
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "OsdagHeader.png")))
@@ -2772,6 +2804,8 @@ class Window(QMainWindow):
             hpos = (screen_resolution.width() - mysize.width() ) / 2
             vpos = (screen_resolution.height() - mysize.height() ) / 2
             dialog.move(hpos, vpos)
+            # dialog.resize(900,900)
+            # self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)
             self.OsdagSectionModeller.OCCWindow.setFocus()
         return set_size
 

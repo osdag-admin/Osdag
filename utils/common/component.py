@@ -18,7 +18,7 @@ from utils.common.common_calculation import *
 class Bolt:
 
     def __init__(self, grade=None, diameter=None, bolt_type="", bolt_hole_type="Standard",
-                 edge_type="a - Sheared or hand flame cut", mu_f=0.3, corrosive_influences=True,
+                 edge_type="Sheared or hand flame cut", mu_f=0.3, corrosive_influences=True,
                  bolt_tensioning="Pretensioned"):
 
         if grade is not None:

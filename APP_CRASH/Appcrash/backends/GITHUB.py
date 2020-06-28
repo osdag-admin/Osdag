@@ -3,9 +3,9 @@ This module contains the github backend.
 """
 import logging
 import webbrowser
-import requests
-import keyring
-import json
+#import requests
+#import keyring
+#import json
 from .base import BaseBackend
 from ..formatters.markdown import MardownFormatter
 from PyQt5 import QtGui, QtCore, QtWidgets

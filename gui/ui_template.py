@@ -1877,6 +1877,11 @@ class Window(QMainWindow):
 
         else:
             main.design_button_status = True
+            for input_field in self.dockWidgetContents.findChildren(QtWidgets.QWidget):
+                if type(input_field) == QtWidgets.QLineEdit:
+                    input_field.textChanged.connect(self.clear_output_fields)
+                elif type(input_field) == QtWidgets.QComboBox:
+                    input_field.currentIndexChanged.connect(self.clear_output_fields)
             self.textEdit.clear()
             with open("logging_text.log", 'w') as log_file:
                 pass
@@ -1925,7 +1930,7 @@ class Window(QMainWindow):
             self.design_inputs.update({"out_titles_status": out_titles_status})
             with open(str(last_design_file), 'w') as last_design:
                 yaml.dump(self.design_inputs, last_design)
-
+            self.design_inputs.pop("out_titles_status")
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
@@ -1976,6 +1981,14 @@ class Window(QMainWindow):
 
     def show_error_msg(self, error):
         QMessageBox.about(self,'information',error[0])  # show only first error message.
+
+    def clear_output_fields(self):
+        for output_field in self.dockWidgetContents_out.findChildren(QtWidgets.QLineEdit):
+            output_field.clear()
+        for output_field in self.dockWidgetContents_out.findChildren(QtWidgets.QPushButton):
+            if output_field.objectName() in ["btn_CreateDesign", "save_outputDock"]:
+                continue
+            output_field.setEnabled(False)
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "OsdagHeader.png")))

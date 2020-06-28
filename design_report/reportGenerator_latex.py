@@ -249,12 +249,16 @@ class CreateLatex(Document):
 
         if does_design_exist:
             with doc.create(Section('3D View')):
-                with doc.create(Figure(position='h!')) as view_3D:
+                with doc.create(Tabular('p{15.5cm}', row_height=1.2)) as table:
                     view_3dimg_path = rel_path + Disp_3d_image
-                    # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
-                    view_3D.add_image(filename=view_3dimg_path,width='500px')
-
-                    view_3D.add_caption('3D View')
+                    table.add_row([StandAloneGraphic(image_options="height=6cm",filename=view_3dimg_path)])
+                # with doc.create(Figure(position='h!')) as view_3D:
+                #     view_3dimg_path = rel_path + Disp_3d_image
+                #     # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
+                #
+                #     view_3D.add_image(filename=view_3dimg_path,width=NoEscape(r'\linewidth,height=6.5cm'))
+                #
+                #     view_3D.add_caption('3D View')
 
         with doc.create(Section('Design Log')):
             logger_msgs=reportsummary['logger_messages'].split('\n')

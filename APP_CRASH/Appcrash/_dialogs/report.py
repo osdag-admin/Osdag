@@ -12,7 +12,7 @@ LOG_LIMIT = 100  # keep only the last 100 lines
 
 
 class DlgReport(QtWidgets.QDialog):
-    
+
 
     def __init__(self, backends, window_title='Report an issue...',
                  window_icon=None, traceback=None, issue_title='',
@@ -80,7 +80,8 @@ class DlgReport(QtWidgets.QDialog):
                 return  # user cancelled the review dialog
 
         try:
-            if backend.send_report(title, body, log):
+            if backend.send_report(title, body, log) :
                 self.accept()
         except Exception as e:
-            QtWidgets.QMessageBox.warning(self, "Failed to send report", "Failed to send report.\n\n%r" % e)
+            #QtWidgets.QMessageBox.warning(self, "Failed to send report", "Failed to send report.\n\n%r" % e)
+            pass

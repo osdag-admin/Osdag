@@ -541,8 +541,8 @@ DISP_MIN_WEB_PLATE_THICK = 'Min. Web Plate Thickness (mm)'
 
 
 
-DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Height (mm)'
-DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Height (mm)'
+DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Width (mm)'
+DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Width (mm)'
 DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
 
@@ -1117,6 +1117,9 @@ KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
+
+KEY_REDUCTION_FACTOR_FLANGE ='flange_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_FLANGE ="Red.factor"
 KEY_OUT_FLANGE_BOLT_SHEAR ='flange_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity (kN)"
 KEY_OUT_FLANGE_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'
@@ -1180,6 +1183,8 @@ KEY_WEB_CAPACITY ='section.web_capacities'
 KEY_DISP_WEB_CAPACITY ='Capacity'
 
 # Web plate
+KEY_REDUCTION_FACTOR_WEB ='web_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_WEB ="Red.factor"
 KEY_WEB_PLATE_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_PLATE_CAPACITY= 'Web Plate Tension Capacity (kN)'
 KEY_TEN_YIELDCAPACITY_WEB_PLATE = "Web_plate.tension_yielding"
@@ -1306,7 +1311,7 @@ KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
 KEY_OUT_BOLT_PRYING_FORCE = 'Bolt.PryingForce'
 KEY_OUT_DISP_BOLT_PRYING_FORCE = 'Bolt Prying Force (kN)'
 KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
-KEY_OUT_BOLT_TENSION_CAPACITY1 = 'Bolt Tension Capacity'
+KEY_OUT_BOLT_TENSION_CAPACITY1 = 'Bolt Tension Capacity (kN)'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 KEY_OUT_LONG_JOINT = 'Bolt Capacity post Long Joint (kN)'

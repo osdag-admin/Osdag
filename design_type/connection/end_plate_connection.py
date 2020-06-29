@@ -1387,7 +1387,7 @@ class EndPlateConnection(ShearConnection):
                                                                             Q=self.bolt.bolt_tension_prying,
                                                                             T_b = T_b),
                   tension_capacity_of_bolt(f_ub=self.bolt.bolt_fu, A_nb=self.bolt.bolt_net_area,
-                                           T_db=self.bolt.bolt_tension_capacity),
+                                           T_db=self.bolt.bolt_tension_capacity, gamma_mf= self.bolt.gamma_mf),
                   get_pass_fail(T_b, self.bolt.bolt_tension_capacity, relation='leq'))
             self.report_check.append(t1)
 

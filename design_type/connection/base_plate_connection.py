@@ -336,6 +336,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.f = 0.0
         self.y = 0.0
         self.tension_demand_anchor = 0.0
+        self.tension_demand_anchor_uplift = 0.0
         self.tension_capacity_anchor = 0.0
         self.anchors_outside_flange = 0
         self.anchor_inside_flange = 'No'
@@ -1944,6 +1945,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy))  # mm
 
                 self.tension_demand_anchor = 0  # there will be no tension acting on the anchor bolts in this case
+                self.anchor_nos_provided = 4
+                self.anchors_outside_flange = self.anchor_nos_provided
 
             else:  # Case 2 and Case 3
                 self.moment_bp_case = 'Case2&3'
@@ -2588,7 +2591,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         Returns:
         """
-        # updating the anchor area (provided outside flange), if the diameter is updated in tension check
+        # updating the anchor area (provided outside flange), if the diameter is updated in the previous check(s)
         self.anchor_area = self.bolt_area(self.anchor_dia_provided)  # list of areas [shank area, thread area] mm^2
 
         # design of anchor bolts to resist axial tension/uplift force
@@ -2597,10 +2600,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if self.load_axial_tension > 0:
                 self.anchor_inside_flange = 'Yes'
 
-                self.anchor_dia_inside_flange = self.anchor_dia_provided  # initialise the diameter required equal to the anchor dia provided outside flange
-                self.tension_capacity_anchor_uplift = self.tension_capacity_anchor
+                self.anchor_area = self.bolt_area(self.anchor_dia_inside_flange)  # list of areas [shank area, thread area] mm^2
+                # hole diameter
+                self.anchor_hole_dia = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_inside_flange, self.dp_anchor_hole)  # mm
+                self.anchor_grade_inside_flange = self.anchor_grade
+                self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade,
+                                                        self.anchor_dia_provided)  # returns a list with strength values - [bolt_fu, bolt_fy]
 
-                self.anchors_inside_flange = self.load_axial_tension / (self.tension_capacity_anchor_uplift * 1000)  # number of bolts req to resist uplift
+                self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                              self.anchor_area[0], self.anchor_area[1],
+                                                                                              safety_factor_parameter=self.dp_weld_fab)  # N
+                self.tension_capacity_anchor_uplift = round(self.tension_capacity_anchor_uplift / 1000, 2)  # kN
+
+                self.anchors_inside_flange = self.load_axial_tension / (self.tension_capacity_anchor_uplift * 1000)
                 self.anchors_inside_flange = round_up(self.anchors_inside_flange, 2)
 
                 # updating total number of anchor bolts required (bolts outside flange + inside flange)
@@ -3526,18 +3538,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             else:
                 pass
 
-            # design of the stiffener plate between the column depth to support the outstanding stiffeners, when there are 6 anchor bolts required
+            # design of the stiffener plate between the column depth to support the outstanding stiffeners, when there are 3 or 6 bolts required
             # the governing ratio is D/t_g < 29.30 (Table 2, IS 800:2007)
             if self.connectivity == 'Moment Base Plate':
-                if self.anchors_outside_flange == 6:
+                if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
                     self.stiffener_plt_thick_btwn_D = (self.column_D - (2 * self.column_tf)) / 29.30
                     self.stiffener_plt_thick_btwn_D = round_up(self.stiffener_plt_thick_btwn_D, 2, self.column_tf)  # mm
 
-                    if self.stiffener_plt_thick_btwn_D < self.stiffener_plt_thick_along_flange:
-                        self.stiffener_plt_thick_btwn_D = self.stiffener_plt_thick_along_flange
+                    if self.stiffener_plt_thick_btwn_D < self.stiffener_plt_thick_along_web:
+                        self.stiffener_plt_thick_btwn_D = self.stiffener_plt_thick_along_web
 
                     self.stiffener_plt_len_btwn_D = self.column_D - (2 * self.column_tf)  # mm
-                    self.stiffener_plt_height_btwn_D = self.stiffener_plt_height_along_web - 10  # mm
+                    self.stiffener_plt_width_btwn_D = self.column_bf - self.column_tw - (2 * self.column_r1) - (2 * 5)  # mm
                 else:
                     pass
             else:
@@ -3764,7 +3776,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if end_available < end_required:
 
                         self.anchors_inside_flange = 8  # minimum 8 bolts provided in this case
-                        self.anchor_dia_inside_flange = self.anchor_dia_provided
+                        self.anchor_dia_inside_flange = 20  # trying with 20mm anchor dia
 
                         self.anchor_area = self.bolt_area(self.anchor_dia_inside_flange)
                         self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0],
@@ -3779,7 +3791,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                         if anchors_inside_req > self.anchors_inside_flange:
                             self.anchors_inside_flange = anchors_inside_req
-                            # if the number of bolts exceeds 4 in number, provide a higher diameter of bolt from the given list of anchor diameters
+                            # if the number of bolts exceeds 8 in number, provide a higher diameter of bolt from the given list of anchor diameters
                             n = 1
                             while self.anchors_inside_flange > 8:  # trying for 8 bolts with higher diameter
                                 bolt_list = self.anchor_dia[n - 1:]
@@ -3801,7 +3813,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                                 self.anchor_dia_inside_flange = self.table1(i)[0]  # updating the initialised anchor diameter with the latest one
 
-                                if n > len(self.anchor_dia):  # if 4 bolts with highest diameter is not sufficient
+                                if n > len(self.anchor_dia):  # if 8 bolts with highest diameter is not sufficient
                                     self.safe = False
                                     # TODO: give log errors
                                     logger.error("Cannot compute anchor bolt for resisting the uplift force")
@@ -3901,6 +3913,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                 logger.error("Cannot compute anchor bolt for resisting the uplift force")
                                 break
 
+                # Tension Demand
+                self.tension_demand_anchor_uplift = self.load_axial_tension / self.anchors_inside_flange
+                self.tension_demand_anchor_uplift = round(self.tension_demand_anchor_uplift, 2)
+
                 # updating total number of anchor bolts required (bolts outside flange + inside flange)
                 self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
 
@@ -3914,60 +3930,59 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             logger.debug(": =========End Of design===========")
 
         # printing values for output dock
-        # anchor bolt
-        print(self.anchor_dia_provided)
-        print(self.anchor_grade)
-        print(self.anchor_length_provided)  # Length (mm)
-        print(self.shear_capacity_anchor)
-        print(self.bearing_capacity_anchor)
+
+        # Anchor Bolt - Outside Column Flange
+        print(self.anchor_dia_outside_flange)  # Diameter (mm)
+        print(self.anchor_grade)  # Property Class
+        print(self.anchors_outside_flange)  # No. of Anchor Bolts
+
+        print(self.shear_capacity_anchor)  # Shear Capacity (kN)
+        print(self.bearing_capacity_anchor)  # Bearing Capacity (kN)
         print(self.anchor_capacity)  # Bolt capacity (kN)
-        print(self.combined_capacity_anchor)  # Combined capacity (kN)
+
+        print(self.tension_demand_anchor)  # Tension Demand (kN)
         if self.connectivity == 'Moment Base Plate':
-            print(self.tension_capacity_anchor)  # Tension capacity (kN) (show only for 'Gusseted Base Plate' connectivity)
+            print(self.tension_capacity_anchor)  # Tension capacity (kN)
         else:
             pass
+        print(self.combined_capacity_anchor)  # Combined capacity (kN)
 
-        # anchor bolt for uplift (this case is applicable only when self.load_axial_tension > 0 or when connectivity is gusseted bp)
+        print(self.anchor_length_provided)  # Anchor Length (total) (mm)
+
+        # Anchor Bolt - Outside Column Flange
         if self.connectivity == 'Moment Base Plate':
-            print(self.anchor_dia_inside_flange)
-            print(self.anchor_grade_inside_flange)
-            print(self.anchor_length_provided)
-            print(self.tension_capacity_anchor_uplift)
+            print(self.anchor_dia_inside_flange)  # Diameter (mm)
+            print(self.anchor_grade_inside_flange)  # Property Class
+            print(self.anchors_inside_flange)  # No. of Anchor Bolts
 
-        # base plate
+            print(self.tension_demand_anchor_uplift)  # Tension Demand (kN)
+            if self.connectivity == 'Moment Base Plate':
+                print(self.tension_capacity_anchor_uplift)  # Tension capacity (kN)
+            else:
+                pass
+
+            print(self.anchor_length_provided)  # Anchor Length (total) (mm)
+
+        # Base Plate
         print(self.plate_thk)  # Thickness (mm)
         print(self.bp_length_provided)  # Length (mm)
         print(self.bp_width_provided)  # Width (mm)
 
-        # Gusset Plate (this section and subsection is only for 'Gusseted Base Plate' connectivity)
+        # Detailing
+        print(self.anchor_nos_provided)  # Total No. of Anchor Bolts
 
-        # details coming soon...
+        print(self.end_distance)  # End Distance (mm)
+        print(self.edge_distance)  # Edge Distance (mm)
 
-        # detailing
-        # total number of bolts (outside + inside)
-        print(self.anchor_nos_provided)
+        print(self.pitch_distance)  # Pitch Distance (mm)
+        print(self.gauge_distance)  # Gauge Distance (mm)
 
-        # bolts inside the flange
-        if self.connectivity == 'Moment Base Plate':
-            if self.load_axial_tension > 0:
-                if self.anchor_inside_flange == 'Yes':
-                    print(self.anchor_dia_inside_flange)
-                    print(self.anchors_inside_flange)
-                else:
-                    pass
-
-        print(self.pitch_distance)  # Pitch Distance (mm) (show only when this value is not 'Null')
-        print(self.gauge_distance)  # Gauge Distance (mm) mm (show only when this value is not 'Null')
-        print(self.end_distance)  # mm
-        print(self.edge_distance)  # mm
         if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
-            print(self.projection)  # mm (show only for 'Welded-Slab Base' connectivity)
+            print(self.projection)  # Effective Projection (mm)
         else:
             pass
 
         # Gusset/Stiffener Plate
-        # Details tab (this is supposed to be taken from Osdag 2 - details to be given soon)
-
         if self.connectivity == 'Hollow/Tubular Column Base':
 
             if (self.stiffener_along_D == 'Yes') or (self.stiffener_along_B == 'Yes'):
@@ -3976,7 +3991,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 print(self.stiffener_plt_thk)
                 print(self.stiffener_plt_height)
 
-                if (self.dp_column_designation[1:4] =='SHS') or (self.dp_column_designation[1:4] == 'RHS'):
+                if (self.dp_column_designation[1:4] == 'SHS') or (self.dp_column_designation[1:4] == 'RHS'):
                     print(self.stiffener_plt_len_along_D)
                     print(self.stiffener_plt_len_along_B)
                 else:
@@ -3991,7 +4006,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 pass
 
         else:
-            # Stiffener plate along flange
+            # Stiffener Plate Along Column Flange
             if self.stiffener_along_flange == 'Yes':
                 print(self.stiffener_plt_len_along_flange)
                 print(self.stiffener_plt_height_along_flange)
@@ -4009,7 +4024,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 print(self.moment_on_stiffener_along_flange == 'N/A')
                 print(self.moment_capa_stiffener_along_flange == 'N/A')
 
-            # Stiffener plate along web
+            # Stiffener Plate Along Column Web
             if self.stiffener_along_web == 'Yes':
                 print(self.stiffener_plt_len_along_web)
                 print(self.stiffener_plt_height_along_web)
@@ -4027,7 +4042,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 print(self.moment_on_stiffener_along_web == 'N/A')
                 print(self.moment_capa_stiffener_along_web == 'N/A')
 
-            # Stiffener across web
+            # Stiffener Plate Across Column Web
             if self.stiffener_across_web == 'Yes':
                 print(self.stiffener_plt_len_across_web)
                 print(self.stiffener_plt_height_across_web)
@@ -4045,11 +4060,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 print(self.moment_on_stiffener_across_web == 'N/A')
                 print(self.moment_capa_stiffener_across_web == 'N/A')
 
-        # shear key details
+        # Shear Key Details
         print("Shear key details start")
 
         if self.shear_key_required == 'Yes':
 
+            # Shear Key Along Column Depth
             if self.load_shear_major > 0:
                 print(self.shear_key_along_ColDepth)
                 print(self.shear_key_len_ColDepth)
@@ -4057,6 +4073,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 print(self.shear_key_thk)
                 print(self.shear_key_stress_ColDepth)
 
+            # Shear Key Along Column Width
             if self.load_shear_minor > 0:
                 print(self.shear_key_along_ColWidth)
                 print(self.shear_key_len_ColWidth)
@@ -4080,7 +4097,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print("Shear key details end")
 
         # Weld
-
         if self.connectivity == 'Hollow/Tubular Column Base':
             print(self.weld_size_hollow)
         else:
@@ -4096,8 +4112,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if self.stiffener_across_web == 'Yes':
                 print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
 
-        # this might not be required
-        # print(self.weld_size if self.weld_type != 'Butt Weld' else '')  # Weld size (mm)
 
         # col properties
         print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)

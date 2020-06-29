@@ -876,6 +876,7 @@ class Member(Main):
                 Cy = sec_prop.calc_Cy(a, b, t, l)
                 moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l)
                 moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l)
+                # a = sec_prop.calc_MomentOfAreaYZ(a, b, t, l)
                 moa_u = sec_prop.calc_MomentOfAreaU(a, b, t, l)
                 moa_v = sec_prop.calc_MomentOfAreaV(a, b, t, l)
                 rog_z = sec_prop.calc_RogZ(a, b, t, l)

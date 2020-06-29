@@ -1693,6 +1693,7 @@ class Window(QMainWindow):
                 design_dictionary[dp_key] = self.design_pref_inputs[dp_key]
 
         self.design_inputs = design_dictionary
+        self.design_inputs = design_dictionary
 
     '''
     @author: Umair
@@ -1894,9 +1895,9 @@ class Window(QMainWindow):
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
                     if status:
-                        txt.setVisible(True if option[3] else False)
+                        txt.setVisible(True if option[3] and txt.isVisible() else False)
                         txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
-                        txt_label.setVisible(True if option[3] else False)
+                        txt_label.setVisible(True if option[3] and txt_label.isVisible() else False)
 
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)

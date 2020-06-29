@@ -154,6 +154,7 @@ class Single_Angle_Properties(Section_Properties):
         self.I_yz = a * b * (a / 2 - Cza) * (b / 2 - Cya) - (
                 (a - t) * (b - t) * (0.5 * (a + t) - Cza) * (0.5 * (b + t) - Cya))
         # self.I_yz = 1.000
+        print(self.I_yz)
         return round(self.I_yz / 10000, 2)
 
     def calc_MomentOfAreaU(self, a, b, t, l):

@@ -18,7 +18,7 @@ from utils.common.common_calculation import *
 class Bolt:
 
     def __init__(self, grade=None, diameter=None, bolt_type="", bolt_hole_type="Standard",
-                 edge_type="a - Sheared or hand flame cut", mu_f=0.3, corrosive_influences=True,
+                 edge_type="Sheared or hand flame cut", mu_f=0.3, corrosive_influences=True,
                  bolt_tensioning="Pretensioned"):
 
         if grade is not None:
@@ -476,6 +476,7 @@ class Plate(Material):
         self.tmv = 0.0
         self.vres = 0.0
         self.spacing_status = 0.0
+        self.beta_lj =0.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
         # self.block_shear_capacity_disp = round(self.block_shear_capacity/1000, 2)
@@ -704,15 +705,15 @@ class Plate(Material):
                 length_avail = max((2 * (((bolts_line - 1) * pitch) + end_dist) + (2 * gap)),
                                    (((bolts_one_line / 2 - 1) * gauge) + midgauge))
             if length_avail > 15 * bolt_dia:
-                beta_lj = 1.075 - length_avail / (200 * bolt_dia)
-                if beta_lj > 1:
-                    beta_lj = 1
-                elif beta_lj < 0.75:
-                    beta_lj = 0.75
+                self.beta_lj = 1.075 - length_avail / (200 * bolt_dia)
+                if  self.beta_lj > 1:
+                    self.beta_lj = 1
+                elif  self.beta_lj < 0.75:
+                    self.beta_lj = 0.75
                 else:
-                    beta_lj = beta_lj
-                bolt_capacity_red = round(beta_lj, 2) * bolt_capacity
-                print('beta', round(beta_lj, 2))
+                    self.beta_lj =  self.beta_lj
+                bolt_capacity_red = round( self.beta_lj, 2) * bolt_capacity
+                print('beta', round( self.beta_lj, 2))
             else:
                 bolt_capacity_red = bolt_capacity
 

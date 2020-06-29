@@ -2007,29 +2007,32 @@ class ColumnEndPlate(MomentConnection):
 
 
         if self.connection == "Extended Both Ways":
+            if self.end_dist > 50:
 
-               t1 = ('SubSection', '   Stiffener Details', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
-               self.report_check.append(t1)
-               t1 = (KEY_OUT_DISP_STIFFENER_HEIGHT,self.section.depth,
-                       self.stiff_ht,
-               get_pass_fail(self.section.depth, self.stiff_ht, relation="geq"))
-               self.report_check.append(t1)
-               t1 = (KEY_OUT_DISP_STIFFENER_WIDTH,end_plate_ht_req(D=self.section.depth, e=self.end_dist, h_p=self.plate_height),
-
-                     self.stiff_wt,
-                     get_pass_fail(self.plate_height, self.stiff_wt, relation="geq"))
-               self.report_check.append(t1)
-               t1 = ( KEY_OUT_DISP_STIFFENER_THICKNESS, '',  self.t_s,'')
-               self.report_check.append(t1)
-               t1 = (KEY_OUT_DISP_WELD_TYPE, '', self.weld_type, '')
-               self.report_check.append(t1)
-               if self.weld_type == 'Fillet Weld':
-                   t1 = (KEY_OUT_WELD_SIZE, '', self.weld_size, '')
+                   t1 = ('SubSection', '   Stiffener Details', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
                    self.report_check.append(t1)
-               else:
-                   pass
-               t1 = (KEY_OUT_DISP_WELD_TYPE1,'','Groove Weld','')
-               self.report_check.append(t1)
+                   if self.h_s < 100:
+                       t1 = (KEY_OUT_DISP_STIFFENER_HEIGHT,ht_of_stiff1(t_s=100), self.stiff_ht,'')
+                       self.report_check.append(t1)
+                   else:
+                       t1 = (KEY_OUT_DISP_STIFFENER_HEIGHT, ht_of_stiff(t_s=self.stiff_ht), self.stiff_ht,'')
+                       self.report_check.append(t1)
+
+                   t1 = (KEY_OUT_DISP_STIFFENER_WIDTH, wt_of_stiff(w_s=self.stiff_wt,e=self.end_dist),self.stiff_wt,'')
+                   self.report_check.append(t1)
+                   t1 = ( KEY_OUT_DISP_STIFFENER_THICKNESS, '',  self.t_s,'')
+                   self.report_check.append(t1)
+                   t1 = (KEY_OUT_DISP_WELD_TYPE, '', self.weld_type, '')
+                   self.report_check.append(t1)
+                   if self.weld_type == 'Fillet Weld':
+                       t1 = (KEY_OUT_WELD_SIZE, '', self.weld_size, '')
+                       self.report_check.append(t1)
+                   else:
+                       pass
+                   t1 = (KEY_OUT_DISP_WELD_TYPE1,'','Groove Weld','')
+                   self.report_check.append(t1)
+            else:
+                pass
 
         else:
                pass

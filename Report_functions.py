@@ -961,6 +961,30 @@ def moment_acting_on_end_plate_flush(M_ep,t_b,e,tb_2):
     moment_acting_on_end_plate.append(NoEscape(r'&=' +M_ep + '\end{aligned}'))
     return moment_acting_on_end_plate
 
+def ht_of_stiff(t_s):
+    t_s = str(t_s)
+    stiff_ht = Math(inline=True)
+    stiff_ht.append(NoEscape(r'\begin{aligned}  h_{s}&= 14 * ts \\'))
+    stiff_ht.append(NoEscape(r'&=' + t_s + '\end{aligned}'))
+    return stiff_ht
+
+def ht_of_stiff1(t_s):
+    t_s = str(t_s)
+    stiff_ht = Math(inline=True)
+    stiff_ht.append(NoEscape(r'\begin{aligned}  h_{s}&= 14 * ts \\'))
+    stiff_ht.append(NoEscape(r'& if~<~100~mm\\'))
+    stiff_ht.append(NoEscape(r'&=' + t_s + '\end{aligned}'))
+    return stiff_ht
+
+def wt_of_stiff(w_s,e):
+    w_s = str(w_s)
+    e = str(e)
+    stiff_wt = Math(inline=True)
+    stiff_wt.append(NoEscape(r'\begin{aligned}  w_{s}&= 2 * e \\'))
+    stiff_wt.append(NoEscape(r'&= 2 *' +e+ r'\\'))
+    stiff_wt.append(NoEscape(r'&=' + w_s + '\end{aligned}'))
+    return stiff_wt
+
 def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     """
     Calculate minimum length of fin plate

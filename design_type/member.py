@@ -437,7 +437,7 @@ class Member(Main):
                 else:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[3]
                 It = str(Channel_attributes.calc_TorsionConstantIt(f_w, f_t, w_h, w_t))
-                Iw = "N/A"
+                Iw = "-"
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -806,7 +806,7 @@ class Member(Main):
             else:
                 image = VALUES_IMG_TENSIONBOLTED_DF03[3]
             It = str(Channel_attributes.calc_TorsionConstantIt(f_w, f_t, w_h, w_t))
-            Iw = 0
+            Iw = "-"
 
         d = {
             KEY_SECSIZE_SELECTED: designation,
@@ -864,9 +864,11 @@ class Member(Main):
             a = float(self[0])
             b = float(self[1])
             t = float(self[2])
-            plate_thk = float(self[3][KEY_PLATETHK][0])
-            l = self[3][KEY_LOCATION]
-            p = self[3][KEY_SEC_PROFILE]
+            # plate_thk = float(self[3][KEY_PLATETHK][0])
+            plate_thk = float(self[3])
+
+            l = self[4][KEY_LOCATION]
+            p = self[4][KEY_SEC_PROFILE]
 
             if p == "Angles":
                 sec_prop = Single_Angle_Properties()
@@ -1048,7 +1050,7 @@ class Member(Main):
                 pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t, plate_thk)
 
                 It = sec_prop.calc_TorsionConstantIt(f_w, f_t, w_h, w_t)
-                Iw = 0
+                Iw = "-"
                 if sl != 90:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[2]
                 else:

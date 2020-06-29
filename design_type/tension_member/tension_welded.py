@@ -829,40 +829,40 @@ class Tension_welded(Member):
         elif key == 'Back to Back Channels' and subkey == "Web":
             BBChannel_attributes = BBChannel_Properties()
             BBChannel_attributes.data(designation, material_grade)
-            rad_y = BBChannel_attributes.calc_RogY(B_b, T_t, D_a, t) * 10
-            rad_z = BBChannel_attributes.calc_RogZ(B_b, T_t, D_a, t) * 10
+            rad_y = BBChannel_attributes.calc_RogY(f_w=B_b, f_t=T_t, w_h=D_a, w_t=t) * 10
+            rad_z = BBChannel_attributes.calc_RogZ(f_w=B_b, f_t=T_t, w_h=D_a, w_t=t) * 10
             min_rad = min(rad_y, rad_z)
 
         elif key == "Back to Back Angles" and subkey == 'Long Leg':
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
-            rad_y = BBAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = BBAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = BBAngle_attributes.calc_RogY(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_z = BBAngle_attributes.calc_RogZ(a=D_a, b=B_b, t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z)
 
         elif key == 'Back to Back Angles' and subkey == 'Short Leg':
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
-            rad_y = BBAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = BBAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = BBAngle_attributes.calc_RogY(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_z = BBAngle_attributes.calc_RogZ(a=D_a, b=B_b, t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z)
 
         elif key == 'Star Angles' and subkey == 'Long Leg':
             SAngle_attributes = SAngle_Properties()
             SAngle_attributes.data(designation, material_grade)
-            rad_y = SAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = SAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
-            rad_u = SAngle_attributes.calc_RogU(D_a, B_b, T_t, l=subkey) * 10
-            rad_v = SAngle_attributes.calc_RogV(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = SAngle_attributes.calc_RogY(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_z = SAngle_attributes.calc_RogZ(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_u = SAngle_attributes.calc_RogU(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_v = SAngle_attributes.calc_RogV(a=D_a, b=B_b, t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z, rad_u, rad_v)
 
         elif key == 'Star Angles' and subkey == 'Short Leg':
             SAngle_attributes = SAngle_Properties()
             SAngle_attributes.data(designation, material_grade)
-            rad_y = SAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = SAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
-            rad_u = SAngle_attributes.calc_RogU(D_a, B_b, T_t, l=subkey) * 10
-            rad_v = SAngle_attributes.calc_RogV(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = SAngle_attributes.calc_RogY(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_z = SAngle_attributes.calc_RogZ(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_u = SAngle_attributes.calc_RogU(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_v = SAngle_attributes.calc_RogV(a=D_a, b=B_b, t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z, rad_u, rad_v)
 
         elif key == 'Angles' and (subkey == 'Long Leg' or subkey == 'Short Leg'):

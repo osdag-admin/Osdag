@@ -926,7 +926,7 @@ class Tension_welded(Member):
             # print(design_dictionary[KEY_SEC_PROFILE], design_dictionary[KEY_LOCATION], self.section_size.min_radius_gyration)
             self.section_size.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
                                                            r=self.min_radius_gyration)
-            # print(self.section_size.tension_yielding_capacity)
+
 
             "condition for yield and slenderness check "
 

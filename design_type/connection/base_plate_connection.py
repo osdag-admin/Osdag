@@ -2173,13 +2173,13 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 # improvising plate length and width if there are 2 or 3 bolts provided outside the flange
                 if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
-                    self.bolt_columns_outside_flange = 1
+                    # self.bolt_columns_outside_flange = 1
                     self.anchor_nos_provided = self.anchors_outside_flange
 
                     self.pitch_distance = 0
-                    self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
-                                                                           self.dp_detail_edge_type)
-                    self.end_distance = round_up(self.end_distance, 5)
+                    # self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
+                    #                                                        self.dp_detail_edge_type)
+                    self.end_distance = self.end_distance
 
                     self.bp_length_provided = self.column_D + (2 * (2 * self.end_distance))
                     self.bp_width_provided = self.bp_width_min
@@ -2190,7 +2190,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.bp_width_provided = max(self.bp_width_provided, bp_width)
 
                     if self.anchors_outside_flange == 3:
-                        bp_width = (4 * self.edge_distance) + (0.85 * self.column_bf) + self.column_tw
+                        bp_width = (4 * self.edge_distance) + ((0.85 * self.column_bf) + self.column_tw)
                         bp_width = round_up(bp_width, 5)
                         self.bp_width_provided = max(self.bp_width_provided, bp_width)
 
@@ -2439,10 +2439,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
 
                     self.pitch_distance = 0
-                    self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
-                                                                           self.dp_detail_edge_type)
-                    self.end_distance = round_up(self.end_distance, 5)
-                    self.edge_distance = self.end_distance
+                    # self.end_distance = self.cl_10_2_4_2_min_edge_end_dist(self.anchor_dia_provided, self.dp_anchor_hole,
+                    #                                                        self.dp_detail_edge_type)
+                    self.end_distance = self.end_distance
+                    self.edge_distance = self.edge_distance
 
                     self.bp_length_provided = self.column_D + (2 * (2 * self.end_distance))
                     self.bp_width_provided = self.bp_width_min
@@ -2481,6 +2481,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         bp_width = round_up(bp_width, 5)
                         self.bp_width_provided = max(self.bp_width_provided, bp_width)
 
+                # tension demand - updated
+                self.tension_demand_anchor = self.load_axial_tension / self.anchors_outside_flange
+                self.tension_demand_anchor = round((self.tension_demand_anchor / 1000), 2)  # kN
+
+                # detailing
                 if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
                     self.bolt_columns_outside_flange = 1
                 elif (self.anchors_outside_flange == 4) or (self.anchors_outside_flange == 6):
@@ -2615,11 +2620,16 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.anchors_inside_flange = self.load_axial_tension / (self.tension_capacity_anchor_uplift * 1000)
                 self.anchors_inside_flange = round_up(self.anchors_inside_flange, 2)
 
+                # tension demand
+                self.tension_demand_anchor_uplift = self.load_axial_tension / self.anchors_inside_flange
+                self.tension_demand_anchor_uplift = round(self.tension_demand_anchor_uplift, 2)  # kN
+
                 # updating total number of anchor bolts required (bolts outside flange + inside flange)
                 self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
 
             else:
                 self.anchor_inside_flange = 'No'
+                self.tension_demand_anchor_uplift = 0
                 self.anchors_inside_flange = 0
                 self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
                 self.anchor_dia_inside_flange = 'N/A'
@@ -3940,8 +3950,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         print(self.bearing_capacity_anchor)  # Bearing Capacity (kN)
         print(self.anchor_capacity)  # Bolt capacity (kN)
 
-        print(self.tension_demand_anchor)  # Tension Demand (kN)
         if self.connectivity == 'Moment Base Plate':
+            print(self.tension_demand_anchor)  # Tension Demand (kN)
             print(self.tension_capacity_anchor)  # Tension capacity (kN)
         else:
             pass
@@ -3955,7 +3965,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             print(self.anchor_grade_inside_flange)  # Property Class
             print(self.anchors_inside_flange)  # No. of Anchor Bolts
 
-            print(self.tension_demand_anchor_uplift)  # Tension Demand (kN)
+            if self.load_axial_tension > 0:
+                print(self.tension_demand_anchor_uplift)  # Tension Demand (kN)
+            else:
+                print(self.tension_demand_anchor_uplift)
             if self.connectivity == 'Moment Base Plate':
                 print(self.tension_capacity_anchor_uplift)  # Tension capacity (kN)
             else:

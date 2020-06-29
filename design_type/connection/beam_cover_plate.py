@@ -2071,8 +2071,21 @@ class BeamCoverPlate(MomentConnection):
         A_vn_web = 2 * (self.web_plate.height - (self.web_plate.bolts_one_line * self.web_bolt.dia_hole)) * \
                    self.web_plate.thickness_provided
         A_v_web = 2 * self.web_plate.height * self.web_plate.thickness_provided
-        self.web_plate.shear_yielding_capacity = self.shear_yielding(
-            A_v=A_v_web, fy=self.web_plate.fy)
+        self.web_plate.shear_yielding_capacity = round( 0.6*self.shear_yielding(
+            A_v=A_v_web, fy=self.web_plate.fy),2)
+        if self.web_plate.shear_capacity_web_plate < self.fact_shear_load:
+            if len(self.web_plate.thickness) >= 2:
+                thk = self.web_plate.thickness_provided
+                self.initial_pt_thk(self, previous_thk_web=thk)
+            else:
+                self.web_shear_plate_check_status = False
+                self.design_status = False
+                logger.warning(": Shear capacity of web plate is less than required factored shear load {} kN.".format(
+                    round(self.fact_shear_load / 1000, 2)))
+                logger.info(": Increase the thickness of the web plate or  decrease the applied shear loads")
+                logger.error(" : Design is not safe. \n ")
+                logger.debug(" : =========End Of design===========")
+
         self.web_plate.shear_rupture_capacity = self.shear_rupture_(
             A_vn=A_vn_web, fu=self.web_plate.fu)
         design_status_block_shear = False
@@ -2115,9 +2128,9 @@ class BeamCoverPlate(MomentConnection):
         #     break
 
         if design_status_block_shear is True:
-            self.web_plate.shear_capacity_web_plate = min(self.web_plate.shear_yielding_capacity,
+            self.web_plate.shear_capacity_web_plate = round(0.6*min(self.web_plate.shear_yielding_capacity,
                                                           self.web_plate.shear_rupture_capacity,
-                                                          self.web_plate.block_shear_capacity_shear)
+                                                          self.web_plate.block_shear_capacity_shear),2)
 
             if self.web_plate.shear_capacity_web_plate  < self.fact_shear_load:
                 # self.web_shear_plate_check_status = False

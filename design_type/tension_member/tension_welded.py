@@ -927,7 +927,6 @@ class Tension_welded(Member):
             self.section_size.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
                                                            r=self.min_radius_gyration)
 
-
             "condition for yield and slenderness check "
 
             if (self.section_size.tension_yielding_capacity >= self.load.axial_force * 1000) and self.section_size.slenderness < 400:

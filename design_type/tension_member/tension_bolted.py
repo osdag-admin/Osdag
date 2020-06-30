@@ -500,10 +500,8 @@ class Tension_bolted(Member):
 
         spacing = []
 
-        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/spacing.png')
+        t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
         spacing.append(t99)
-
-
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
         spacing.append(t9)
@@ -520,6 +518,15 @@ class Tension_bolted(Member):
 
 
         return spacing
+
+    def memb_pattern(self, status):
+
+        pattern = []
+
+        t99 = (None, 'Shear Pattern', TYPE_SECTION, './ResourceFiles/images/U.png')
+        pattern.append(t99)
+
+        return pattern
 
     def output_values(self, flag):
         '''
@@ -547,6 +554,9 @@ class Tension_bolted(Member):
         t5 = (KEY_TENSION_BLOCKSHEARCAPACITY, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
               round((self.section_size_1.block_shear_capacity_axial/1000),2) if flag else '', True)
         out_list.append(t5)
+
+        t17 = (KEY_OUT_PATTERN, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.memb_pattern], True)
+        out_list.append(t17)
 
         t6 = (KEY_TENSION_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
               round((self.section_size_1.tension_capacity/1000),2) if flag else '', True)

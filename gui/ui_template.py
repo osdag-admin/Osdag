@@ -2083,7 +2083,7 @@ class Window(QMainWindow):
 
                         pmap = QPixmap(option[3])
                         #im.setScaledContents(1)
-                        im.setPixmap(pmap.scaled(250,250,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+                        im.setPixmap(pmap.scaled(250,200,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
                         #im.setPixmap(pmap)
                         image_layout.addWidget(im)
                         j += 1

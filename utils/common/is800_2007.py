@@ -464,7 +464,7 @@ class IS800_2007(object):
 
     # cl. 10.2.4.2  Minimum Edge and End Distances
     @staticmethod
-    def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - Sheared or hand flame cut'):
+    def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='Sheared or hand flame cut'):
         """Calculate minimum end and edge distance
         Args:
              d - Nominal diameter of fastener in mm (float)
@@ -477,7 +477,7 @@ class IS800_2007(object):
         """
 
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
-        if edge_type == 'a - Sheared or hand flame cut':
+        if edge_type == 'Sheared or hand flame cut':
             return 1.7 * d_0
         else:
             # TODO : bolt_hole_type == 'machine_flame_cut' is given in else

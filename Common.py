@@ -5,9 +5,9 @@
 import operator
 import math
 from utils.common.other_standards import *
+import os
 
-
-PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
+PATH_TO_DATABASE = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'Database', 'Intg_osdag.sqlite')
 
 
 import sqlite3
@@ -314,6 +314,7 @@ TYPE_CUSTOM_SECTION = 'New_Section_Popup'
 TYPE_ENABLE_DISABLE = 'Enable/Disable'
 TYPE_CHANGE_TAB_NAME = 'Change tab_name'
 TYPE_REMOVE_TAB = 'Remove tab'
+TYPE_OVERWRITE_VALIDATION = 'Overwrite_validation'
 KEY_IMAGE = 'Image'
 TYP_BEARING = "Bearing Bolt"
 TYP_FRICTION_GRIP = "Friction Grip Bolt"
@@ -498,11 +499,13 @@ VALUES_PRIBM = connectdb("Beams")
 ############################
 # Display Keys (Input Dock, Output Dock, Design preference, Design report)
 ############################
-KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity $(V_{dy})$ (kN)'
-KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity $(V_{dn})$ (kN)'
-KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear $(V_{db})$ (kN)'
-KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension $(T_{db})$ (kN)'
-KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity $(V_d)$ (kN)'
+
+KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity (kN)'
+KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity (kN)'
+KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (kN)'
+KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension (kN)'
+KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (kN)'
+KEY_DISP_BEARING_LENGTH = 'Bearing Length'
 KEY_DISP_ALLOW_SHEAR = 'Allowable Shear Capacity (kN)'
 DISP_LOWSHEAR = 'Limited to low shear capacity'
 
@@ -548,17 +551,18 @@ DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
 
 KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
-KEY_DISP_FY = 'Yield Strength , fy (MPa)'
+KEY_DISP_FY = 'Yield strength , fy (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
 DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
 DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
 DISP_THROAT = 'Throat Thickness (mm)'
 
 DISP_WELD_STRENGTH = 'Weld Strength (kN/mm)'
-KEY_DISP_FY_20 = 'Yield Strength , fy (MPa) (0-20mm)'
-KEY_DISP_FY_20_40 = 'Yield Strength , fy (MPa) (20-40mm)'
-KEY_DISP_FY_40 = 'Yield Strength , fy (MPa) (>40mm)'
+KEY_DISP_FY_20 = 'Yield strength , fy (MPa) (0-20mm)'
+KEY_DISP_FY_20_40 = 'Yield strength , fy (MPa) (20-40mm)'
+KEY_DISP_FY_40 = 'Yield strength , fy (MPa) (>40mm)'
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
+DISP_TITLE_ANCHOR_BOLT_OUTSIDE_CF = 'Anchor Bolt - Outside Column Flange'
 DISP_TITLE_FOOTING = 'Pedestal/Footing'
 
 KEY_DISP_CONN = 'Connectivity'
@@ -653,52 +657,58 @@ KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
 
 
 KEY_OUT_DIA_ANCHOR = 'Anchor Bolt.Diameter'
-KEY_DISP_OUT_DIA_ANCHOR = 'Diameter(mm)'
+KEY_DISP_OUT_DIA_ANCHOR = 'Diameter (mm)'
 KEY_OUT_GRD_ANCHOR = 'Anchor Bolt.Grade'
-KEY_DISP_OUT_GRD_ANCHOR = 'Grade'
+KEY_DISP_OUT_GRD_ANCHOR = 'Property Class'
 KEY_OUT_ANCHOR_BOLT_LENGTH = 'Anchor Bolt.Length'
-KEY_DISP_OUT_ANCHOR_BOLT_LENGTH = 'Total Length'
+KEY_DISP_OUT_ANCHOR_BOLT_LENGTH = 'Anchor Length (total) (mm)'
+KEY_OUT_ANCHOR_BOLT_NO = 'Anchor Bolt.No of Anchor Bolts'
+KEY_DISP_OUT_ANCHOR_BOLT_NO = 'No. of Anchor Bolts'
 
 
 KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_BEARING = 'Bearing Capacity (kN)'
-KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
-KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity'
+KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity (kN)'
+KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity (kN)'
+KEY_OUT_DISP_ANCHOR_BOLT_TENSION_DEMAND = 'Tension Demand (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
 
 
-DISP_TITLE_ANCHOR_BOLT_UPLIFT = 'Anchor Bolt for Uplift'
+DISP_TITLE_ANCHOR_BOLT_UPLIFT = 'Anchor Bolt - Outside Column Flange'
 KEY_OUT_DIA_ANCHOR_UPLIFT = 'Anchor Bolt.Diameter_Uplift'
-KEY_DISP_OUT_DIA_ANCHOR_UPLIFT = 'Diameter(mm)'
+KEY_DISP_OUT_DIA_ANCHOR_UPLIFT = 'Diameter (mm)'
 KEY_OUT_GRD_ANCHOR_UPLIFT = 'Anchor Bolt.Grade_Uplift'
-KEY_DISP_OUT_GRD_ANCHOR_UPLIFT = 'Grade'
+KEY_DISP_OUT_GRD_ANCHOR_UPLIFT = 'Property Class'
+KEY_OUT_ANCHOR_UPLIFT_BOLT_NO = 'Anchor Bolt.No of Anchor Bolts_Uplift'
+KEY_DISP_OUT_ANCHOR_UPLIFT_BOLT_NO = 'No. of Anchor Bolts'
 KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT = 'Anchor Bolt.Length_Uplift'
-KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT = 'Total Length'
+KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT = 'Anchor Length (total) (mm)'
 KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT = 'Anchor Bolt.Tension_Uplift'
 KEY_OUT_DISP_ANCHOR_BOLT_TENSION_UPLIFT = 'Tension Capacity (kN)'
-
+KEY_OUT_ANCHOR_BOLT_TENSION_DEMAND_UPLIFT = 'Anchor Bolt.Tension_Demand_Uplift'
+KEY_OUT_DISP_ANCHOR_BOLT_TENSION_DEMAND_UPLIFT = 'Tension Demand (kN)'
 
 DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"
 KEY_DISP_MEMBER_CAPACITY = "Member Capacity"
 
 
-KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (wp)'
+KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (mm)'
 KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (mm)'
 KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (mm)'
 DISP_TITLE_DETAILING = 'Detailing'
 
-KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'No. of Anchor bolts'
+KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'Total No. of Anchor Bolts'
 
 KEY_OUT_DISP_DETAILING_PITCH_DISTANCE = 'Pitch Distance (mm)'
 
 KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE = 'Gauge Distance (mm)'
 KEY_OUT_DETAILING_END_DISTANCE = 'Detailing.End Distance'
 
-KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End Distance (e)'
+KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End Distance (mm)'
 
-KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (e')"
+KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (mm)"
 
-KEY_OUT_DISP_DETAILING_PROJECTION = 'Projection (c)'
+KEY_OUT_DISP_DETAILING_PROJECTION = 'Effective Projection (mm)'
 DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'
 KEY_OUT_DISP_STIFFENER_PLATE_THICKNESS = 'Thickness (mm)'
 KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
@@ -825,7 +835,7 @@ KEY_DISP_DP_ANCHOR_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 KEY_DP_ANCHOR_BOLT_SLIP_FACTOR = 'DesignPreferences.Anchor_Bolt.Slip_Factor'
 KEY_DISP_DP_ANCHOR_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 KEY_DP_ANCHOR_BOLT_GALVANIZED = 'DesignPreferences.Anchor_Bolt.Galvanized'
-KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED = 'Is galvanized?'
+KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED = 'Anchor bolt galvanized?'
 KEY_DP_ANCHOR_BOLT_LENGTH = 'DesignPreferences.Anchor_Bolt.Length'
 KEY_DISP_DP_ANCHOR_BOLT_LENGTH = 'Length'
 KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficient'
@@ -866,8 +876,8 @@ KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 
-KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
-KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
+KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate strength (N/mm2)'
+KEY_DISP_DP_BOLT_FY = 'Bolt Yield strength (N/mm2)'
 KEY_DISP_GAMMA_M0 = "Governed by Yielding"
 KEY_DISP_GAMMA_M1 = "Governed by Ultimate Stress"
 KEY_DISP_GAMMA_MB = "Connection Bolts - Bearing Type"
@@ -946,7 +956,7 @@ KEY_DISP_B= 'Short Leg, B (mm)*'
 KEY_DISP_LEG_THK = 'Leg Thickness, t (mm)*'
 KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
-KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , fy (MPa)'
+KEY_DSIP_BASE_PLATE_FY = 'Yield strength , fy (MPa)'
 
 
 ########################
@@ -956,6 +966,7 @@ KEY_OUT_ANCHOR_BOLT_SHEAR = 'Anchor Bolt.Shear'
 KEY_OUT_ANCHOR_BOLT_BEARING = 'Anchor Bolt.Bearing'
 KEY_OUT_ANCHOR_BOLT_CAPACITY = 'Anchor Bolt.Capacity'
 KEY_OUT_ANCHOR_BOLT_COMBINED = 'Anchor Bolt.Combined'
+KEY_OUT_ANCHOR_BOLT_TENSION_DEMAND = 'Anchor Bolt.Tension_Demand'
 KEY_OUT_ANCHOR_BOLT_TENSION = 'Anchor Bolt.Tension'
 KEY_MEMBER_CAPACITY = "section.memcapacity"
 KEY_MEMBER_AXIALCAPACITY='Section.AxialCapacity'
@@ -1479,7 +1490,7 @@ KEY_OUT_DISP_WELD_SIZE_FLANGE = 'Size at Flange (mm)'
 KEY_OUT_WELD_SIZE_WEB = 'Weld.Size_web'
 KEY_OUT_DISP_WELD_SIZE_WEB = 'Size at Web (mm)'
 KEY_OUT_WELD_SIZE_STIFFENER = 'Weld.Size_stiffener'
-KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Gusset/Stiffener (mm)'
+KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Stiffener (mm)'
 KEY_OUT_DISP_WELD_SIZE_STIFFENER1 = 'Weld Size at Stiffener (mm)'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
 KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'

@@ -256,7 +256,7 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             t,B=map(float,cursor.fetchall()[0])
             s=float(self.parameterText_3.text())
             l=float(self.parameterText_6.text())
-            comp=round(B/2,1)
+            comp=round(2*B,1)
             if(s>=comp):
                 error=True
                 string+='S < '+str(comp)+'\n'

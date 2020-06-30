@@ -437,7 +437,7 @@ class Member(Main):
                 else:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[3]
                 It = str(Channel_attributes.calc_TorsionConstantIt(f_w, f_t, w_h, w_t))
-                Iw = "N/A"
+                Iw = "-"
 
         if KEY_SEC_MATERIAL in input_dictionary.keys():
             material_grade = input_dictionary[KEY_SEC_MATERIAL]
@@ -806,7 +806,7 @@ class Member(Main):
             else:
                 image = VALUES_IMG_TENSIONBOLTED_DF03[3]
             It = str(Channel_attributes.calc_TorsionConstantIt(f_w, f_t, w_h, w_t))
-            Iw = 0
+            Iw = "-"
 
         d = {
             KEY_SECSIZE_SELECTED: designation,
@@ -864,9 +864,11 @@ class Member(Main):
             a = float(self[0])
             b = float(self[1])
             t = float(self[2])
-            plate_thk = float(self[3][KEY_PLATETHK][0])
-            l = self[3][KEY_LOCATION]
-            p = self[3][KEY_SEC_PROFILE]
+            # plate_thk = float(self[3][KEY_PLATETHK][0])
+            plate_thk = float(self[3])
+
+            l = self[4][KEY_LOCATION]
+            p = self[4][KEY_SEC_PROFILE]
 
             if p == "Angles":
                 sec_prop = Single_Angle_Properties()
@@ -876,6 +878,7 @@ class Member(Main):
                 Cy = sec_prop.calc_Cy(a, b, t, l)
                 moa_z = sec_prop.calc_MomentOfAreaZ(a, b, t, l)
                 moa_y = sec_prop.calc_MomentOfAreaY(a, b, t, l)
+                # a = sec_prop.calc_MomentOfAreaYZ(a, b, t, l)
                 moa_u = sec_prop.calc_MomentOfAreaU(a, b, t, l)
                 moa_v = sec_prop.calc_MomentOfAreaV(a, b, t, l)
                 rog_z = sec_prop.calc_RogZ(a, b, t, l)
@@ -1047,7 +1050,7 @@ class Member(Main):
                 pm_y = sec_prop.calc_PlasticModulusZpy(f_w, f_t, w_h, w_t, plate_thk)
 
                 It = sec_prop.calc_TorsionConstantIt(f_w, f_t, w_h, w_t)
-                Iw = 0
+                Iw = "-"
                 if sl != 90:
                     image = VALUES_IMG_TENSIONBOLTED_DF03[2]
                 else:
@@ -1216,7 +1219,9 @@ class Member(Main):
         val = {KEY_DP_BOLT_TYPE: "Pretensioned",
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
+               KEY_DP_WELD_MATERIAL_G_O: fu,
                KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_MATERIAL_G_O: str(fu),
                KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
                KEY_DP_DESIGN_METHOD: "Limit State Design",

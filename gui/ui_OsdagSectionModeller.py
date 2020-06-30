@@ -596,6 +596,7 @@ class Ui_OsdagSectionModeller(object):
                 index_type=self.section_type_combobox.currentIndex()
                 index_template=self.section_template_combobox.currentIndex()
                 self.SectionParameters=Ui_SectionParameters(index_type,index_template)
+                self.SectionParameters.parameterText_1.blockSignals(True)
                 if(index_type in [1,4,5]):
                         self.SectionParameters.parameterText_1.clear()
                         self.SectionParameters.parameterText_1.addItems(connectdb('Columns'))
@@ -608,7 +609,7 @@ class Ui_OsdagSectionModeller(object):
                 elif(index_type==3):
                         self.SectionParameters.parameterText_1.clear()
                         self.SectionParameters.parameterText_1.addItems(connectdb('Angles'))
-
+                self.SectionParameters.parameterText_1.blockSignals(False)
                 ########################## Retrieving Section Parameters on Dialog close and reopen ###################
                 if(self.Parameters!={}):
                         for child in self.Parameters:
@@ -1408,21 +1409,27 @@ class Ui_OsdagSectionModeller(object):
                 if(reply==QtWidgets.QMessageBox.No):
                         return
                 else:
+                        flag=False
                         folder = QtWidgets.QFileDialog.getExistingDirectory(None, "Select a Folder")
-                        if(os.path.isfile(folder+'/'+designation+'.osm')):
-                                QtWidgets.QMessageBox.critical(QtWidgets.QMessageBox(),'Error','A file with the same name exists in the provided folder.')
+                        if(folder==''):
                                 return
-                        else:
-                                parameters={}
-                                parameters['Section_Type']=self.section_type_combobox.currentIndex()
-                                parameters['Section_Template']=self.section_template_combobox.currentIndex()
-                                parameters['Section_Parameters']=self.Parameters
-                                parameters['Section_Designation']=designation
-                                parameters['Section_Properties']=self.get_section_properties()
-                                
-                                with open(folder+'/'+designation+'.osm','w') as file:
-                                        file.write(pprint.pformat(parameters))    
-                                QtWidgets.QMessageBox.information(QtWidgets.QMessageBox(),'INFO','File Succesfully saved.')
+                        if(os.path.isfile(folder+'/'+designation+'.osm')):
+                                ans=QtWidgets.QMessageBox.question(QtWidgets.QMessageBox(),'Error','A file with the same name exists in the provided folder.Would you like to overwrite it?',QtWidgets.QMessageBox.Yes,QtWidgets.QMessageBox.No)
+                                if(ans==QtWidgets.QMessageBox.Yes):
+                                        os.remove(folder+'/'+designation+'.osm')
+                                else:
+                                        return
+                        
+                        parameters={}
+                        parameters['Section_Type']=self.section_type_combobox.currentIndex()
+                        parameters['Section_Template']=self.section_template_combobox.currentIndex()
+                        parameters['Section_Parameters']=self.Parameters
+                        parameters['Section_Designation']=designation
+                        parameters['Section_Properties']=self.get_section_properties()
+                        
+                        with open(folder+'/'+designation+'.osm','w') as file:
+                                file.write(pprint.pformat(parameters))    
+                        QtWidgets.QMessageBox.information(QtWidgets.QMessageBox(),'INFO','File Succesfully saved.')
                                                                                           
 
 

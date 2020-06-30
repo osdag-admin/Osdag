@@ -154,6 +154,7 @@ class Single_Angle_Properties(Section_Properties):
         self.I_yz = a * b * (a / 2 - Cza) * (b / 2 - Cya) - (
                 (a - t) * (b - t) * (0.5 * (a + t) - Cza) * (0.5 * (b + t) - Cya))
         # self.I_yz = 1.000
+        print(self.I_yz)
         return round(self.I_yz / 10000, 2)
 
     def calc_MomentOfAreaU(self, a, b, t, l):
@@ -432,10 +433,10 @@ class BBAngle_Properties(Section_Properties):
     def calc_PlasticModulusZpy(self, a=0.0, b=0.0, t=0.0, l='Long Leg', thickness=0):
         A = self.calc_Area(a, b, t, l)
         if l == "Long Leg":
-            Cy = self.calc_Cy(a, b, t, l)
+            Cy =  Single_Angle_Properties().calc_Cy(a, b, t, l)
             self.Z_py = A * (Cy + Cy + thickness/10) / 2
         else:
-            Cz = self.calc_Cz(a, b, t, l)
+            Cz =  Single_Angle_Properties().calc_Cz(a, b, t, l)
             self.Z_py = A * (Cz + Cz + thickness/10) / 2
 
         return round(self.Z_py, 2)
@@ -553,165 +554,210 @@ class SAngle_Properties(Section_Properties):
 
         return round(self.I_yy / 10000, 2)
 
-    def calc_MomentOfAreaYZ(self, a, b, t, l):
-        Cza = self.calc_Cz(a, b, t, l) * 10
-        Cya = self.calc_Cy(a, b, t, l) * 10
-        self.I_yz = a * b * (a / 2 - Cya) * (b / 2 - Cza) - (
-                (a - t) * (b - t) * (0.5 * (a + t) - Cya) * (0.5 * (b + t) - Cza))
-        # self.I_yz = 1.000
-        return round(self.I_yz / 10000, 2)
+    # def calc_MomentOfAreaYZ(self, a, b, t, l):
+    #     Cza = self.calc_Cz(a, b, t, l) * 10
+    #     Cya = self.calc_Cy(a, b, t, l) * 10
+    #     self.I_yz = a * b * (a / 2 - Cya) * (b / 2 - Cza) - (
+    #             (a - t) * (b - t) * (0.5 * (a + t) - Cya) * (0.5 * (b + t) - Cza))
+    #     # self.I_yz = 1.000
+    #     return round(self.I_yz / 10000, 2)
+    def calc_MomentofAreaYZ(self, a, b, t, l, T = 0.0):
+        if l == "Long Leg":
+            x1 = ((b / 2) + (T / 2))
+            y1 = a / 2
+            A1 = a * b
+            x2 = ((b + t) / 2) + T / 2
+            y2 = (a + t) / 2
+            A2 = (a - t) * (b - t)
+            Iyz1 = x1 * y1 * A1
+            Iyz2 = x2 * y2 * A2
+        else:
+            x1 = ((a / 2) + (T / 2))
+            y1 = b / 2
+            A1 = a * b
+            x2 = ((a + t) / 2) + T / 2
+            y2 = (b + t) / 2
+            A2 = (b - t) * (a - t)
+            Iyz1 = x1 * y1 * A1
+            Iyz2 = x2 * y2 * A2
+
+        I_yz = 2 * (Iyz1 - Iyz2)
+        return round(I_yz/10000, 2)
+
+
+    # def calc_MomentOfAreaV(self, a, b, t, l, thickness=0.0):
+    #     "min MI will always have subscript v"
+    #     if self.db == False:
+    #         if a == b:
+    #             self.I_vv = 2 * Single_Angle_Properties().calc_MomentOfAreaU(a, b, t, l) * 10000
+    #
+    #         else:
+    #             if l == 'Long Leg':
+    #                 mom_inertia_u = Single_Angle_Properties().calc_MomentOfAreaU(a, b, t, l) * 10000
+    #                 area = Single_Angle_Properties().calc_Area(a, b, t, l) * 100
+    #                 Cg1 = Single_Angle_Properties().calc_Cy(a, b, t, l) * 10
+    #                 Cg2 = Single_Angle_Properties().calc_Cz(a, b, t, l) * 10
+    #                 diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
+    #                 value = Cg2 / diag_cg
+    #                 angle1 = math.asin(value)
+    #                 angle2 = math.pi - (2 * angle1)
+    #                 Cg = diag_cg * math.cos(angle2)
+    #                 angle3 = math.pi - (math.pi / 2 + angle2)
+    #                 angle4 = angle1 - angle3
+    #                 thk = thickness / 2 * math.sin(angle4)
+    #                 self.I_vv = (mom_inertia_u + (area * (Cg + thk) * (Cg + thk))) * 2
+    #             else:
+    #                 mom_inertia_u = Single_Angle_Properties().calc_MomentOfAreaU(a, b, t, l) * 10000
+    #                 area = Single_Angle_Properties().calc_Area(a, b, t, l) * 100
+    #                 Cg1 = Single_Angle_Properties().calc_Cy(a, b, t, l) * 10
+    #                 Cg2 = Single_Angle_Properties().calc_Cz(a, b, t, l) * 10
+    #                 diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
+    #                 value = Cg2 / diag_cg
+    #                 angle1 = math.asin(value)
+    #                 angle2 = math.pi - (2 * angle1)
+    #                 Cg = diag_cg * math.cos(angle2)
+    #                 angle3 = math.pi - (math.pi / 2 + angle2)
+    #                 angle4 = angle3 + angle2/2
+    #                 thk = thickness / 2 * math.sin(angle4)
+    #                 self.I_vv = (mom_inertia_u + (area * (Cg + thk) * (Cg + thk))) * 2
+    #
+    #     else:
+    #         if a == b:
+    #             self.I_vv = 2 * self.Angle_attributes.mom_inertia_u
+    #         else:
+    #             if l == 'Long Leg':
+    #                 mom_inertia_u = self.Angle_attributes.mom_inertia_u
+    #                 area = self.Angle_attributes.area
+    #                 Cg1 = self.Angle_attributes.Cy
+    #                 Cg2 = self.Angle_attributes.Cz
+    #                 diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
+    #                 value = Cg2 / diag_cg
+    #                 angle1 = math.asin(value)
+    #                 angle2 = math.pi - (2 * angle1)
+    #                 Cg = diag_cg * math.cos(angle2)
+    #                 angle3 = math.pi - (math.pi / 2 + angle2)
+    #                 angle4 = angle1 - angle3
+    #                 thk = thickness / 2 * math.sin(angle4)
+    #                 self.I_vv = (mom_inertia_u + (area * (Cg + thk) * (Cg + thk))) * 2
+    #             else:
+    #                 mom_inertia_u = self.Angle_attributes.mom_inertia_u
+    #                 area = self.Angle_attributes.area
+    #                 Cg1 = self.Angle_attributes.Cy
+    #                 Cg2 = self.Angle_attributes.Cz
+    #                 diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
+    #                 value = Cg2 / diag_cg
+    #                 angle1 = math.asin(value)
+    #                 angle2 = math.pi - (2 * angle1)
+    #                 Cg = diag_cg * math.cos(angle2)
+    #                 angle3 = math.pi - (math.pi / 2 + angle2)
+    #                 angle4 = angle3 + angle2/2
+    #                 thk = thickness / 2 * math.sin(angle4)
+    #                 self.I_vv = (mom_inertia_u + (area * (Cg + thk) * (Cg + thk))) * 2
+    #
+    #     return round(self.I_vv / 10000, 2)
 
     def calc_MomentOfAreaV(self, a, b, t, l, thickness=0.0):
         "min MI will always have subscript v"
-        if self.db == False:
-            if a == b:
-                self.I_vv = 2 * Single_Angle_Properties().calc_MomentOfAreaU(a, b, t, l) * 10000
-            else:
-                if l == 'Long Leg':
-                    mom_inertia_u = Single_Angle_Properties().calc_MomentOfAreaU(a, b, t, l) * 10000
-                    area = Single_Angle_Properties().calc_Area(a, b, t, l) * 100
-                    Cg1 = Single_Angle_Properties().calc_Cy(a, b, t, l) * 10
-                    Cg2 = Single_Angle_Properties().calc_Cz(a, b, t, l) * 10
-                    diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
-                    value = Cg2 / diag_cg
-                    angle1 = math.asin(value)
-                    angle2 = math.pi - (2 * angle1)
-                    Cg = diag_cg * math.cos(angle2)
-                    angle3 = math.pi - (math.pi / 2 + angle2)
-                    angle4 = angle1 - angle3
-                    thk = thickness / 2 * math.sin(angle4)
-                    self.I_vv = (mom_inertia_u + (area * (Cg + thk) * (Cg + thk))) * 2
-                else:
-                    mom_inertia_u = Single_Angle_Properties().calc_MomentOfAreaU(a, b, t, l) * 10000
-                    area = Single_Angle_Properties().calc_Area(a, b, t, l) * 100
-                    Cg1 = Single_Angle_Properties().calc_Cy(a, b, t, l) * 10
-                    Cg2 = Single_Angle_Properties().calc_Cz(a, b, t, l) * 10
-                    diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
-                    value = Cg2 / diag_cg
-                    angle1 = math.asin(value)
-                    angle2 = math.pi - (2 * angle1)
-                    Cg = diag_cg * math.cos(angle2)
-                    angle3 = math.pi - (math.pi / 2 + angle2)
-                    angle4 = angle3 + angle2/2
-                    thk = thickness / 2 * math.sin(angle4)
-                    self.I_vv = (mom_inertia_u + (area * (Cg + thk) * (Cg + thk))) * 2
 
-        else:
-            if a == b:
-                self.I_vv = 2 * self.Angle_attributes.mom_inertia_u
-            else:
-                if l == 'Long Leg':
-                    mom_inertia_u = self.Angle_attributes.mom_inertia_u
-                    area = self.Angle_attributes.area
-                    Cg1 = self.Angle_attributes.Cy
-                    Cg2 = self.Angle_attributes.Cz
-                    diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
-                    value = Cg2 / diag_cg
-                    angle1 = math.asin(value)
-                    angle2 = math.pi - (2 * angle1)
-                    Cg = diag_cg * math.cos(angle2)
-                    angle3 = math.pi - (math.pi / 2 + angle2)
-                    angle4 = angle1 - angle3
-                    thk = thickness / 2 * math.sin(angle4)
-                    self.I_vv = (mom_inertia_u + (area * (Cg + thk) * (Cg + thk))) * 2
-                else:
-                    mom_inertia_u = self.Angle_attributes.mom_inertia_u
-                    area = self.Angle_attributes.area
-                    Cg1 = self.Angle_attributes.Cy
-                    Cg2 = self.Angle_attributes.Cz
-                    diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
-                    value = Cg2 / diag_cg
-                    angle1 = math.asin(value)
-                    angle2 = math.pi - (2 * angle1)
-                    Cg = diag_cg * math.cos(angle2)
-                    angle3 = math.pi - (math.pi / 2 + angle2)
-                    angle4 = angle3 + angle2/2
-                    thk = thickness / 2 * math.sin(angle4)
-                    self.I_vv = (mom_inertia_u + (area * (Cg + thk) * (Cg + thk))) * 2
+        Izz = self.calc_MomentOfAreaZ(a,b,t,l,thickness)
+        Iyy = self.calc_MomentOfAreaY(a,b,t,l,thickness)
+        Iyz = self.calc_MomentofAreaYZ(a,b,t,l,thickness)
+        self.I_vv = ((Izz + Iyy) / 2) - (((Izz - Iyy) / 2) ** 2 + Iyz ** 2) ** (1 / 2)
 
-        return round(self.I_vv / 10000, 2)
+        return round(self.I_vv,2)
 
     def calc_MomentOfAreaU(self, a, b, t, l, thickness=0.0):
-        if self.db == False:
-            if a == b:
-                mom_inertia_v = Single_Angle_Properties().calc_MomentOfAreaV(a, b, t, l) * 10000
-                area = Single_Angle_Properties().calc_Area(a, b, t, l) * 100
-                Cg_1 = Single_Angle_Properties().calc_Cy(a, b, t, l) * 10
-                a = math.sqrt(2)
-                self.I_uu = (mom_inertia_v + (
-                            area * (a * Cg_1 + a * thickness / 2) * (a * Cg_1 + a * thickness / 2))) * 2
-            else:
-                if l == "Long Leg":
-                    mom_inertia_v = Single_Angle_Properties().calc_MomentOfAreaV(a, b, t, l) * 10000
-                    area = Single_Angle_Properties().calc_Area(a, b, t, l) * 100
-                    Cg1 = Single_Angle_Properties().calc_Cy(a, b, t, l) * 10
-                    Cg2 = Single_Angle_Properties().calc_Cz(a, b, t, l) * 10
-                    diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
-                    value = Cg2 / diag_cg
-                    angle1 = math.asin(value)
-                    angle2 = math.pi - (2 * angle1)
-                    Cg = diag_cg * math.sin(angle2)
-                    angle3 = math.pi - (math.pi / 2 + angle2)
-                    angle4 = angle1 - angle3
-                    thk = thickness / 2 * math.cos(angle4)
-                    self.I_uu= (mom_inertia_v + (area * (Cg + thk) * (Cg + thk))) * 2
-                else:
-                    mom_inertia_v = Single_Angle_Properties().calc_MomentOfAreaV(a, b, t, l) * 10000
-                    area = Single_Angle_Properties().calc_Area(a, b, t, l) * 100
-                    Cg1 = Single_Angle_Properties().calc_Cy(a, b, t, l) * 10
-                    Cg2 = Single_Angle_Properties().calc_Cz(a, b, t, l) * 10
-                    diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
-                    value = Cg2 / diag_cg
-                    angle1 = math.asin(value)
-                    angle2 = math.pi - (2 * angle1)
-                    Cg = diag_cg * math.sin(angle2)
-                    angle3 = math.pi - (math.pi / 2 + angle2)
-                    angle4 = angle3 + angle2 / 2
-                    thk = thickness / 2 * math.cos(angle4)
-                    self.I_uu = (mom_inertia_v + (area * (Cg + thk) * (Cg + thk))) * 2
+        "min MI will always have subscript v"
 
-        else:
-            if a == b:
-                mom_inertia_v = self.Angle_attributes.mom_inertia_v
-                area = self.Angle_attributes.area
-                Cg_1 = self.Angle_attributes.Cy
-                a = math.sqrt(2)
-                self.I_uu = (mom_inertia_v + (
-                            area * (a * Cg_1 + a * thickness / 2) * (a * Cg_1 + a * thickness / 2))) * 2
+        Izz = self.calc_MomentOfAreaZ(a, b, t, l, thickness)
+        Iyy = self.calc_MomentOfAreaY(a, b, t, l, thickness)
+        Iyz = self.calc_MomentofAreaYZ(a, b, t, l, thickness)
+        self.I_uu = ((Izz + Iyy) / 2 ) +  (((Izz - Iyy)/2)**2 + Iyz**2)**(1/2)
+
+        return round(self.I_uu,2)
 
 
-            else:
-                if l == "Long Leg":
-                    mom_inertia_v = self.Angle_attributes.mom_inertia_v
-                    area = self.Angle_attributes.area
-                    Cg1 = self.Angle_attributes.Cy
-                    Cg2 = self.Angle_attributes.Cz
-                    diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
-                    value = Cg2 / diag_cg
-                    angle1 = math.asin(value)
-                    angle2 = math.pi - (2 * angle1)
-                    Cg = diag_cg * math.sin(angle2)
-                    angle3 = math.pi - (math.pi / 2 + angle2)
-                    angle4 = angle1 - angle3
-                    thk = thickness / 2 * math.cos(angle4)
-                    self.I_uu = (mom_inertia_v + (area * (Cg + thk) * (Cg + thk))) * 2
-                else:
-                    mom_inertia_v = self.Angle_attributes.mom_inertia_v
-                    area = self.Angle_attributes.area
-                    Cg1 = self.Angle_attributes.Cy
-                    Cg2 = self.Angle_attributes.Cz
-                    diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
-                    value = Cg2 / diag_cg
-                    angle1 = math.asin(value)
-                    angle2 = math.pi - (2 * angle1)
-                    Cg = diag_cg * math.sin(angle2)
-                    angle3 = math.pi - (math.pi / 2 + angle2)
-                    angle4 = angle3 + angle2 / 2
-                    thk = thickness / 2 * math.cos(angle4)
-                    self.I_uu = (mom_inertia_v + (area * (Cg + thk) * (Cg + thk))) * 2
-
-
-        return round(self.I_uu / 10000, 2)
+    # def calc_MomentOfAreaU(self, a, b, t, l, thickness=0.0):
+    #     if self.db == False:
+    #         if a == b:
+    #             mom_inertia_v = Single_Angle_Properties().calc_MomentOfAreaV(a, b, t, l) * 10000
+    #             area = Single_Angle_Properties().calc_Area(a, b, t, l) * 100
+    #             Cg_1 = Single_Angle_Properties().calc_Cy(a, b, t, l) * 10
+    #             a = math.sqrt(2)
+    #             self.I_uu = (mom_inertia_v + (
+    #                         area * (a * Cg_1 + a * thickness / 2) * (a * Cg_1 + a * thickness / 2))) * 2
+    #         else:
+    #             if l == "Long Leg":
+    #                 mom_inertia_v = Single_Angle_Properties().calc_MomentOfAreaV(a, b, t, l) * 10000
+    #                 area = Single_Angle_Properties().calc_Area(a, b, t, l) * 100
+    #                 Cg1 = Single_Angle_Properties().calc_Cy(a, b, t, l) * 10
+    #                 Cg2 = Single_Angle_Properties().calc_Cz(a, b, t, l) * 10
+    #                 diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
+    #                 value = Cg2 / diag_cg
+    #                 angle1 = math.asin(value)
+    #                 angle2 = math.pi - (2 * angle1)
+    #                 Cg = diag_cg * math.sin(angle2)
+    #                 angle3 = math.pi - (math.pi / 2 + angle2)
+    #                 angle4 = angle1 - angle3
+    #                 thk = thickness / 2 * math.cos(angle4)
+    #                 self.I_uu= (mom_inertia_v + (area * (Cg + thk) * (Cg + thk))) * 2
+    #             else:
+    #                 mom_inertia_v = Single_Angle_Properties().calc_MomentOfAreaV(a, b, t, l) * 10000
+    #                 area = Single_Angle_Properties().calc_Area(a, b, t, l) * 100
+    #                 Cg1 = Single_Angle_Properties().calc_Cy(a, b, t, l) * 10
+    #                 Cg2 = Single_Angle_Properties().calc_Cz(a, b, t, l) * 10
+    #                 diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
+    #                 value = Cg2 / diag_cg
+    #                 angle1 = math.asin(value)
+    #                 angle2 = math.pi - (2 * angle1)
+    #                 Cg = diag_cg * math.sin(angle2)
+    #                 angle3 = math.pi - (math.pi / 2 + angle2)
+    #                 angle4 = angle3 + angle2 / 2
+    #                 thk = thickness / 2 * math.cos(angle4)
+    #                 self.I_uu = (mom_inertia_v + (area * (Cg + thk) * (Cg + thk))) * 2
+    #
+    #     else:
+    #         if a == b:
+    #             mom_inertia_v = self.Angle_attributes.mom_inertia_v
+    #             area = self.Angle_attributes.area
+    #             Cg_1 = self.Angle_attributes.Cy
+    #             a = math.sqrt(2)
+    #             self.I_uu = (mom_inertia_v + (
+    #                         area * (a * Cg_1 + a * thickness / 2) * (a * Cg_1 + a * thickness / 2))) * 2
+    #
+    #
+    #         else:
+    #             if l == "Long Leg":
+    #                 mom_inertia_v = self.Angle_attributes.mom_inertia_v
+    #                 area = self.Angle_attributes.area
+    #                 Cg1 = self.Angle_attributes.Cy
+    #                 Cg2 = self.Angle_attributes.Cz
+    #                 diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
+    #                 value = Cg2 / diag_cg
+    #                 angle1 = math.asin(value)
+    #                 angle2 = math.pi - (2 * angle1)
+    #                 Cg = diag_cg * math.sin(angle2)
+    #                 angle3 = math.pi - (math.pi / 2 + angle2)
+    #                 angle4 = angle1 - angle3
+    #                 thk = thickness / 2 * math.cos(angle4)
+    #                 self.I_uu = (mom_inertia_v + (area * (Cg + thk) * (Cg + thk))) * 2
+    #             else:
+    #                 mom_inertia_v = self.Angle_attributes.mom_inertia_v
+    #                 area = self.Angle_attributes.area
+    #                 Cg1 = self.Angle_attributes.Cy
+    #                 Cg2 = self.Angle_attributes.Cz
+    #                 diag_cg = math.sqrt(Cg1 ** 2 + Cg2 ** 2)
+    #                 value = Cg2 / diag_cg
+    #                 angle1 = math.asin(value)
+    #                 angle2 = math.pi - (2 * angle1)
+    #                 Cg = diag_cg * math.sin(angle2)
+    #                 angle3 = math.pi - (math.pi / 2 + angle2)
+    #                 angle4 = angle3 + angle2 / 2
+    #                 thk = thickness / 2 * math.cos(angle4)
+    #                 self.I_uu = (mom_inertia_v + (area * (Cg + thk) * (Cg + thk))) * 2
+    #
+    #
+    #     return round(self.I_uu / 10000, 2)
 
     def calc_RogZ(self, a, b, t, l, thickness=0.0):
         mom_inertia_z = self.calc_MomentOfAreaZ(a, b, t, l, thickness)

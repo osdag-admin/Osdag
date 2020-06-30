@@ -8,7 +8,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from .toggle_button import Switch
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -48,7 +48,7 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.frame)
         self.verticalLayout.setContentsMargins(40, 40, 40, -1)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.frame, 0, 0, 1, 2)
         self.comboBox_help = QtWidgets.QComboBox(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -71,7 +71,19 @@ class Ui_MainWindow(object):
         self.comboBox_help.addItem("")
         self.comboBox_help.addItem("")
         self.comboBox_help.addItem("")
-        self.gridLayout.addWidget(self.comboBox_help, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.comboBox_help, 1, 0)
+        layout = QtWidgets.QHBoxLayout()
+        self.lbl = QtWidgets.QLabel(self.centralwidget)
+        self.gridLayout.setHorizontalSpacing(20)
+        self.lbl.setText('Dark Mode  ')
+        layout.addWidget(self.lbl)
+        self.switch = Switch(self.centralwidget, thumb_radius=14, track_radius=12)
+        layout.addWidget(self.switch)
+        self.gridLayout.addLayout(layout,1,1)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
+        self.lbl.setSizePolicy(sizePolicy)
+        self.lbl.setStyleSheet("font-family:Arial;font-size:10pt;font-weight:600;")
+        self.switch.setSizePolicy(sizePolicy)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.gridLayout.addLayout(self.horizontalLayout, 0, 1, 1, 1)

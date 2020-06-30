@@ -52,7 +52,7 @@ class MomentConnection(Connection, IS800_2007):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
-            image = VALUES_IMG_BEAM[0]
+            image = ''
 
 
         else:

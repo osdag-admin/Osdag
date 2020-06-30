@@ -81,7 +81,7 @@ class Tension_bolted(Member):
          """
         change_tab = []
 
-        t1 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL, 'Label_0'],
+        t1 = (DISP_TITLE_ANGLE, [KEY_SECSIZE, KEY_SEC_MATERIAL,'Label_0'],
               [KEY_SECSIZE_SELECTED, KEY_SEC_FY, KEY_SEC_FU, 'Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5',
                'Label_7', 'Label_8', 'Label_9',
                'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17',
@@ -90,7 +90,7 @@ class Tension_bolted(Member):
               self.get_new_angle_section_properties)
         change_tab.append(t1)
 
-        t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3'],
+        t2 = (DISP_TITLE_ANGLE, ['Label_1', 'Label_2', 'Label_3','Label_0'],
               ['Label_7', 'Label_8', 'Label_9', 'Label_10', 'Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15',
                'Label_16', 'Label_17', 'Label_18', 'Label_19', 'Label_20', 'Label_21', 'Label_22', 'Label_23',
                KEY_IMAGE],
@@ -942,40 +942,40 @@ class Tension_bolted(Member):
         elif key == 'Back to Back Channels' and subkey == "Web":
             BBChannel_attributes = BBChannel_Properties()
             BBChannel_attributes.data(designation, material_grade)
-            rad_y = BBChannel_attributes.calc_RogY(B_b,T_t,D_a,t)*10
-            rad_z = BBChannel_attributes.calc_RogZ(B_b,T_t,D_a,t)*10
+            rad_y = BBChannel_attributes.calc_RogY(f_w=B_b,f_t=T_t,w_h=D_a,w_t=t)*10
+            rad_z = BBChannel_attributes.calc_RogZ(f_w=B_b,f_t=T_t,w_h=D_a,w_t=t)*10
             min_rad = min(rad_y, rad_z)
 
         elif key == "Back to Back Angles" and subkey == 'Long Leg':
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
-            rad_y = BBAngle_attributes.calc_RogY(D_a,B_b,T_t,l=subkey) * 10
-            rad_z = BBAngle_attributes.calc_RogZ(D_a,B_b,T_t,l=subkey) * 10
+            rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t,l=subkey) * 10
+            rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t,l=subkey) * 10
             min_rad = min(rad_y, rad_z)
 
         elif key == 'Back to Back Angles' and subkey == 'Short Leg':
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
-            rad_y = BBAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = BBAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = BBAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t, l=subkey) * 10
+            rad_z = BBAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z)
 
         elif key == 'Star Angles' and subkey == 'Long Leg':
             SAngle_attributes = SAngle_Properties()
             SAngle_attributes.data(designation, material_grade)
-            rad_y = SAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = SAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
-            rad_u = SAngle_attributes.calc_RogU(D_a, B_b, T_t, l=subkey) * 10
-            rad_v = SAngle_attributes.calc_RogV(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = SAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t, l=subkey) * 10
+            rad_z = SAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t, l=subkey) * 10
+            rad_u = SAngle_attributes.calc_RogU(a=D_a,b=B_b,t=T_t, l=subkey) * 10
+            rad_v = SAngle_attributes.calc_RogV(a=D_a,b=B_b,t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z, rad_u, rad_v)
 
         elif key == 'Star Angles' and subkey == 'Short Leg':
             SAngle_attributes = SAngle_Properties()
             SAngle_attributes.data(designation, material_grade)
-            rad_y = SAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = SAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
-            rad_u = SAngle_attributes.calc_RogU(D_a, B_b, T_t, l=subkey) * 10
-            rad_v = SAngle_attributes.calc_RogV(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = SAngle_attributes.calc_RogY(a=D_a,b=B_b,t=T_t, l=subkey) * 10
+            rad_z = SAngle_attributes.calc_RogZ(a=D_a,b=B_b,t=T_t, l=subkey) * 10
+            rad_u = SAngle_attributes.calc_RogU(a=D_a,b=B_b,t=T_t, l=subkey) * 10
+            rad_v = SAngle_attributes.calc_RogV(a=D_a,b=B_b,t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z, rad_u, rad_v)
 
         elif key == 'Angles' and (subkey == 'Long Leg' or subkey == 'Short Leg'):

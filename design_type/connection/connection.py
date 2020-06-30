@@ -45,7 +45,7 @@ class Connection(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
-            image= VALUES_IMG_BEAM[0]
+            image= ''
         else:
             designation = str(input_dictionary[KEY_SUPTNGSEC])
             material_grade = str(input_dictionary[KEY_MATERIAL])
@@ -234,7 +234,7 @@ class Connection(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
-            image = image = VALUES_IMG_BEAM[0]
+            image = ''
 
         else:
             designation = str(input_dictionary[KEY_SUPTDSEC])

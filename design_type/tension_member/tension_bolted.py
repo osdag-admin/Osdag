@@ -22,9 +22,6 @@ from utils.common.load import Load
 from utils.common.Section_Properties_Calculator import *
 
 import logging
-
-
-from design_type.main import Main
 from design_type.member import Member
 
 

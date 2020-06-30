@@ -1504,6 +1504,18 @@ KEY_PITCH_2_FLANGE = 'ColumnEndPlate.p2_flange'
 KEY_DISP_PITCH_2_FLANGE = 'Pitch2 along Flange'
 KEY_PITCH_2_WEB = 'ColumnEndPlate.p2_web'
 KEY_DISP_PITCH_2_WEB = 'Pitch2 along Web'
+
+KEY_PITCH_2_FLANGE1 = 'ColumnEndPlate.p2_flange'
+KEY_DISP_PITCH_2_FLANGE1 = 'Pitch along centre bolt (p2)'
+KEY_PITCH_2_WEB1 = 'ColumnEndPlate.p2_web'
+KEY_DISP_PITCH_2_WEB1 = 'Pitch along centre bolt (p2)'
+KEY_BOLT_FLANGE_SPACING = 'Bolt.flange_bolts'
+KEY_DISP_BOLT_FLANGE_SPACING = 'Flange Bolts Spacing'
+KEY_BOLT_WEB_SPACING = 'Bolt.web_bolts'
+KEY_DISP_BOLT_WEB_SPACING = 'Web Bolts Spacing'
+
+
+
 KEY_CONN_PREFERENCE = 'plate.design_method'
 KEY_DISP_CONN_PREFERENCE = 'Design Method'
 VALUES_CONN_PREFERENCE = ["Select","Plate Oriented", "Bolt Oriented"]

@@ -349,6 +349,38 @@ class ColumnEndPlate(MomentConnection):
 
         return detailing
 
+    def web_bolt_spacing(self, flag):
+        web_bolt_spacing = []
+
+        t1 = (None, 'Web bolts detailing', TYPE_SECTION, self.image_web)
+        web_bolt_spacing.append(t1)
+        t2 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '', True)
+        web_bolt_spacing.append(t2)
+        t3 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.end_dist if flag else '', True)
+        web_bolt_spacing.append(t3)
+        t4 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
+        web_bolt_spacing.append(t4)
+        t5 = (KEY_PITCH_2_WEB1, KEY_DISP_PITCH_2_WEB1, TYPE_TEXTBOX, round(self.p_2_web,2) if flag else '', True)
+        web_bolt_spacing.append(t5)
+
+        return web_bolt_spacing
+
+    def flange_bolt_spacing(self, flag):
+        flange_bolt_spacing = []
+
+        t1 = (None, 'Web bolts detailing', TYPE_SECTION, self.image_flange)
+        flange_bolt_spacing.append(t1)
+        t2 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '', True)
+        flange_bolt_spacing.append(t2)
+        t3 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.end_dist if flag else '', True)
+        flange_bolt_spacing.append(t3)
+        t4 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf_output if flag else '', True)
+        flange_bolt_spacing.append(t4)
+        t5 = (KEY_PITCH_2_FLANGE1, KEY_DISP_PITCH_2_FLANGE1, TYPE_TEXTBOX, round(self.p_2_flange,2) if flag else '', True)
+        flange_bolt_spacing.append(t5)
+
+        return flange_bolt_spacing
+
     def stiffener_details(self, flag):
         stiff_details = []
 
@@ -411,14 +443,20 @@ class ColumnEndPlate(MomentConnection):
         t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.end_dist if flag else '', True)
         out_list.append(t10)
 
-        t8 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
-        out_list.append(t8)
-
-        t9 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf_output if flag else '', True)
-        out_list.append(t9)
+        # t8 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
+        # out_list.append(t8)
+        #
+        # t9 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf_output if flag else '', True)
+        # out_list.append(t9)
 
         t11 = (KEY_OUT_NO_BOLTS, KEY_OUT_DISP_NO_BOLTS, TYPE_TEXTBOX, self.no_bolts if flag else '', True)
         out_list.append(t11)
+
+        t31 = (KEY_BOLT_WEB_SPACING, KEY_DISP_BOLT_WEB_SPACING, TYPE_OUT_BUTTON, ['Detailing', self.web_bolt_spacing], True)
+        out_list.append(t31)
+
+        t32 = (KEY_BOLT_FLANGE_SPACING, KEY_DISP_BOLT_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Detailing', self.flange_bolt_spacing], True)
+        out_list.append(t32)
 
         # t21 = (KEY_BOLT_DETAILS, KEY_DISP_BOLT_DETAILS, TYPE_OUT_BUTTON, ['Bolt detailing', self.detailing])
         # out_list.append(t21)
@@ -794,8 +832,11 @@ class ColumnEndPlate(MomentConnection):
                 # elif self.n_bf > 1:
                 #     self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4
             else:
+                if self.n_bf == 1:
+                    self.no_bolts = self.n_bw * 2 + 4
+                else:
                 # if self.n_bf == 1:
-                self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4 + self.n_bf*4
+                    self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4 + self.n_bf*4
                 # elif self.n_bf > 1:
                 #     self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4 + self.n_bf*4
             print("no of bolts: ", self.no_bolts)
@@ -1057,20 +1098,20 @@ class ColumnEndPlate(MomentConnection):
 
             elif ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) >= (2 * self.end_dist) and ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) < (2 * self.end_dist + self.pitch):
                 self.n_bf = 1
-                self.p_2_flange = (self.section.flange_width / 2 - self.section.web_thickness / 2 - self.end_dist)
+                self.p_2_flange = round((self.section.flange_width / 2 - self.section.web_thickness / 2 - self.end_dist),2)
 
             elif ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) >= (2 * self.end_dist + self.pitch):
                 self.n_bf = int(math.floor((((self.section.flange_width / 2) - ((self.section.web_thickness / 2) + (2 * self.end_dist))) / self.pitch) + 1))
                 if self.n_bf % 2 == 0:
                     if self.n_bf == 2:
-                        self.p_2_flange = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist)
+                        self.p_2_flange = round((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist),2)
                     else:
-                        self.p_2_flange = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 2) * self.pitch)
+                        self.p_2_flange = round((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 2) * self.pitch),2)
                 else:
                     if self.n_bf == 3:
-                        self.p_2_flange = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist)) / 2
+                        self.p_2_flange = round(((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist)) / 2,2)
                     else:
-                        self.p_2_flange = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 3) * self.pitch)) / 2
+                        self.p_2_flange = round(((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 3) * self.pitch)) / 2,2)
 
 
             if self.connection == 'Flush End Plate':
@@ -1083,15 +1124,52 @@ class ColumnEndPlate(MomentConnection):
 
             print("no bolts web", self.n_bw, "no bolts flange", self.n_bf)
 
+            if self.n_bw % 2 == 0:
+                if self.n_bw == 2:
+                    self.image_web = './ResourceFiles/images/flush_2rows.png'
+                else:
+                    self.image_web = './ResourceFiles/images/flush_n_even.png'
+            else:
+                if self.n_bw == 3:
+                    self.image_web = './ResourceFiles/images/flush_3_rows.png'
+                else:
+                    self.image_web = './ResourceFiles/images/flush_n_odd.png'
+
             if self.connection == 'Flush End Plate':
-                if self.n_bf == 1:
-                    self.no_bolts = self.n_bw * 2
-                elif self.n_bf > 1:
-                    self.no_bolts = self.n_bw * 2 + (self.n_bf - 1) * 4
+                if self.n_bf % 2 == 0:
+                    if self.n_bf == 2:
+                        self.image_flange = './ResourceFiles/images/flange_2_bolt_flush.png'
+                    else:
+                        self.image_flange = './ResourceFiles/images/flange_even_bolt_flush.png'
+                else:
+                    if self.n_bf == 1:
+                        self.image_flange = './ResourceFiles/images/flange_1_bolt.png'
+                    elif self.n_bf == 3:
+                        self.image_flange = './ResourceFiles/images/flange_3_bolt_flush.png'
+                    else:
+                        self.image_flange = './ResourceFiles/images/flange_odd_bolt_flush.png'
+            else:
+                if self.n_bf % 2 == 0:
+                    if self.n_bf == 2:
+                        self.image_flange = './ResourceFiles/images/flange_2_bolt_extended.png'
+                    else:
+                        self.image_flange = './ResourceFiles/images/flange_even_bolt_extended.png'
+                else:
+                    if self.n_bf == 1:
+                        self.image_flange = './ResourceFiles/images/flange_1_bolt_extended.png'
+                    elif self.n_bf == 3:
+                        self.image_flange = './ResourceFiles/images/flange_3_bolt_extended.png'
+                    else:
+                        self.image_flange = './ResourceFiles/images/flange_odd_bolt_extended.png'
+
+            if self.connection == 'Flush End Plate':
+                # if self.n_bf == 1:
+                self.no_bolts = self.n_bw * 2 + (self.n_bf - 1) * 4
             else:
                 if self.n_bf == 1:
-                    self.no_bolts = self.n_bw * 2 + 4
-                elif self.n_bf > 1:
+                    self.no_bolts = self.n_bw * 2 +4
+                else:
+                    # if self.n_bf == 1:
                     self.no_bolts = self.n_bw * 2 + (self.n_bf - 1) * 4 + self.n_bf * 4
             print("no of bolts", self.no_bolts)
 

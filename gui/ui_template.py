@@ -2335,9 +2335,9 @@ class Window(QMainWindow):
             for key_name in key_list:
                 key = tab.findChild(QtWidgets.QWidget, key_name)
                 if isinstance(key, QtWidgets.QComboBox):
-                    self.connect_combobox_for_tab(key, tab, on_change_tab_list)
+                    self.connect_combobox_for_tab(key, tab, on_change_tab_list, main)
                 elif isinstance(key, QtWidgets.QLineEdit):
-                    self.connect_textbox_for_tab(key, tab, on_change_tab_list)
+                    self.connect_textbox_for_tab(key, tab, on_change_tab_list, main)
 
         # for fu_fy in main.list_for_fu_fy_validation(main):
         #
@@ -2382,13 +2382,13 @@ class Window(QMainWindow):
                         continue
                 self.refresh_section_connect(add_button, selected, key_name, key_type, tab_key, database_arg,data)
 
-    def connect_textbox_for_tab(self, key, tab, new):
-        key.textChanged.connect(lambda: self.tab_change(key, tab, new))
+    def connect_textbox_for_tab(self, key, tab, new, main):
+        key.textChanged.connect(lambda: self.tab_change(key, tab, new, main))
 
-    def connect_combobox_for_tab(self, key, tab, new):
-        key.currentIndexChanged.connect(lambda: self.tab_change(key, tab, new))
+    def connect_combobox_for_tab(self, key, tab, new, main):
+        key.currentIndexChanged.connect(lambda: self.tab_change(key, tab, new, main))
 
-    def tab_change(self, key, tab, new):
+    def tab_change(self, key, tab, new, main):
 
         for tup in new:
             (tab_name, key_list, k2_key_list, typ, f) = tup
@@ -2405,6 +2405,7 @@ class Window(QMainWindow):
                     arg_list.append(key.text())
 
             arg_list.append(self.input_dock_inputs)
+            arg_list.append(main.design_button_status)
             # try:
             #     tab1 = self.designPrefDialog.ui.tabWidget.findChild(QtWidgets.QWidget, tab_name)
             #     key1 = tab.findChild(QtWidgets.QWidget, KEY_SECSIZE_SELECTED)
@@ -2426,6 +2427,9 @@ class Window(QMainWindow):
                 if isinstance(k2, QtWidgets.QLabel):
                     pixmap1 = QPixmap(val[k2_key_name])
                     k2.setPixmap(pixmap1)
+
+            if typ == TYPE_OVERWRITE_VALIDATION and not val["Validation"][0]:
+                QMessageBox.warning(tab, "Warning", val["Validation"][1])
 
     def refresh_section_connect(self, add_button, prev, key_name, key_type, tab_key, arg,data):
         add_button.clicked.connect(lambda: self.refresh_section(prev, key_name, key_type, tab_key, arg,data))

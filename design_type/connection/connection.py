@@ -448,6 +448,8 @@ class Connection(Main):
             fy_20 = m_conn.fy_20
             fy_20_40 = m_conn.fy_20_40
             fy_40 = m_conn.fy_40
+            fu = m_conn.fu
+            fy = m_conn.fy
         else:
             pass
 

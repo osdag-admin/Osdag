@@ -23,29 +23,31 @@ from design_report.reportGenerator_latex import CreateLatex
 
 class Ui_Dialog1(object):
 
-    def __init__(self,design_exist):
+    def __init__(self,design_exist,loggermsg):
         self.design_exist = design_exist
+        self.loggermsg=loggermsg
 
     def setupUi(self, Dialog,main):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(539, 595)
-        Dialog.setInputMethodHints(QtCore.Qt.ImhNone)
-        self.gridLayout = QtWidgets.QGridLayout(Dialog)
+        self.Dialog = Dialog
+        self.Dialog.setObjectName("Dialog")
+        self.Dialog.resize(539, 595)
+        self.Dialog.setInputMethodHints(QtCore.Qt.ImhNone)
+        self.gridLayout = QtWidgets.QGridLayout(self.Dialog)
         self.gridLayout.setObjectName("gridLayout")
-        self.lbl_companyName = QtWidgets.QLabel(Dialog)
+        self.lbl_companyName = QtWidgets.QLabel(self.Dialog)
         self.lbl_companyName.setObjectName("lbl_companyName")
         self.gridLayout.addWidget(self.lbl_companyName, 0, 0, 1, 1)
-        self.lineEdit_companyName = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_companyName = QtWidgets.QLineEdit(self.Dialog)
         self.lineEdit_companyName.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
         self.lineEdit_companyName.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.lineEdit_companyName.setObjectName("lineEdit_companyName")
         self.gridLayout.addWidget(self.lineEdit_companyName, 0, 1, 1, 1)
-        self.lbl_comapnyLogo = QtWidgets.QLabel(Dialog)
+        self.lbl_comapnyLogo = QtWidgets.QLabel(self.Dialog)
         self.lbl_comapnyLogo.setObjectName("lbl_comapnyLogo")
         self.gridLayout.addWidget(self.lbl_comapnyLogo, 1, 0, 1, 1)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.btn_browse = QtWidgets.QPushButton(Dialog)
+        self.btn_browse = QtWidgets.QPushButton(self.Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -54,32 +56,32 @@ class Ui_Dialog1(object):
         self.btn_browse.setFocusPolicy(QtCore.Qt.TabFocus)
         self.btn_browse.setObjectName("btn_browse")
         self.horizontalLayout.addWidget(self.btn_browse)
-        self.lbl_browse = QtWidgets.QLabel(Dialog)
+        self.lbl_browse = QtWidgets.QLabel(self.Dialog)
         self.lbl_browse.setMouseTracking(True)
         self.lbl_browse.setAcceptDrops(True)
         self.lbl_browse.setText("")
         self.lbl_browse.setObjectName("lbl_browse")
         self.horizontalLayout.addWidget(self.lbl_browse)
         self.gridLayout.addLayout(self.horizontalLayout, 1, 1, 1, 1)
-        self.lbl_groupName = QtWidgets.QLabel(Dialog)
+        self.lbl_groupName = QtWidgets.QLabel(self.Dialog)
         self.lbl_groupName.setObjectName("lbl_groupName")
         self.gridLayout.addWidget(self.lbl_groupName, 2, 0, 1, 1)
-        self.lineEdit_groupName = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_groupName = QtWidgets.QLineEdit(self.Dialog)
         self.lineEdit_groupName.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.lineEdit_groupName.setCursorPosition(0)
         self.lineEdit_groupName.setObjectName("lineEdit_groupName")
         self.gridLayout.addWidget(self.lineEdit_groupName, 2, 1, 1, 1)
-        self.lbl_designer = QtWidgets.QLabel(Dialog)
+        self.lbl_designer = QtWidgets.QLabel(self.Dialog)
         self.lbl_designer.setObjectName("lbl_designer")
         self.gridLayout.addWidget(self.lbl_designer, 3, 0, 1, 1)
-        self.lineEdit_designer = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_designer = QtWidgets.QLineEdit(self.Dialog)
         self.lineEdit_designer.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.lineEdit_designer.setObjectName("lineEdit_designer")
         self.gridLayout.addWidget(self.lineEdit_designer, 3, 1, 1, 1)
         self.formLayout = QtWidgets.QFormLayout()
         self.formLayout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
         self.formLayout.setObjectName("formLayout")
-        self.btn_useProfile = QtWidgets.QPushButton(Dialog)
+        self.btn_useProfile = QtWidgets.QPushButton(self.Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -88,7 +90,7 @@ class Ui_Dialog1(object):
         self.btn_useProfile.setFocusPolicy(QtCore.Qt.TabFocus)
         self.btn_useProfile.setObjectName("btn_useProfile")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.btn_useProfile)
-        self.btn_saveProfile = QtWidgets.QPushButton(Dialog)
+        self.btn_saveProfile = QtWidgets.QPushButton(self.Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -98,39 +100,39 @@ class Ui_Dialog1(object):
         self.btn_saveProfile.setObjectName("btn_saveProfile")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.btn_saveProfile)
         self.gridLayout.addLayout(self.formLayout, 4, 1, 1, 1)
-        self.lbl_projectTitle = QtWidgets.QLabel(Dialog)
+        self.lbl_projectTitle = QtWidgets.QLabel(self.Dialog)
         self.lbl_projectTitle.setObjectName("lbl_projectTitle")
         self.gridLayout.addWidget(self.lbl_projectTitle, 5, 0, 1, 1)
-        self.lineEdit_projectTitle = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_projectTitle = QtWidgets.QLineEdit(self.Dialog)
         self.lineEdit_projectTitle.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.lineEdit_projectTitle.setObjectName("lineEdit_projectTitle")
         self.gridLayout.addWidget(self.lineEdit_projectTitle, 5, 1, 1, 1)
-        self.lbl_subtitle = QtWidgets.QLabel(Dialog)
+        self.lbl_subtitle = QtWidgets.QLabel(self.Dialog)
         self.lbl_subtitle.setObjectName("lbl_subtitle")
         self.gridLayout.addWidget(self.lbl_subtitle, 6, 0, 1, 1)
-        self.lineEdit_subtitle = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_subtitle = QtWidgets.QLineEdit(self.Dialog)
         self.lineEdit_subtitle.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.lineEdit_subtitle.setText("")
         self.lineEdit_subtitle.setObjectName("lineEdit_subtitle")
         self.gridLayout.addWidget(self.lineEdit_subtitle, 6, 1, 1, 1)
-        self.lbl_jobNumber = QtWidgets.QLabel(Dialog)
+        self.lbl_jobNumber = QtWidgets.QLabel(self.Dialog)
         self.lbl_jobNumber.setObjectName("lbl_jobNumber")
         self.gridLayout.addWidget(self.lbl_jobNumber, 7, 0, 1, 1)
-        self.lineEdit_jobNumber = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_jobNumber = QtWidgets.QLineEdit(self.Dialog)
         self.lineEdit_jobNumber.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.lineEdit_jobNumber.setObjectName("lineEdit_jobNumber")
         self.gridLayout.addWidget(self.lineEdit_jobNumber, 7, 1, 1, 1)
-        self.lbl_client = QtWidgets.QLabel(Dialog)
+        self.lbl_client = QtWidgets.QLabel(self.Dialog)
         self.lbl_client.setObjectName("lbl_client")
         self.gridLayout.addWidget(self.lbl_client, 8, 0, 1, 1)
-        self.lineEdit_client = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_client = QtWidgets.QLineEdit(self.Dialog)
         self.lineEdit_client.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.lineEdit_client.setObjectName("lineEdit_client")
         self.gridLayout.addWidget(self.lineEdit_client, 8, 1, 1, 1)
-        self.lbl_addComment = QtWidgets.QLabel(Dialog)
+        self.lbl_addComment = QtWidgets.QLabel(self.Dialog)
         self.lbl_addComment.setObjectName("lbl_addComment")
         self.gridLayout.addWidget(self.lbl_addComment, 9, 0, 1, 1)
-        self.txt_additionalComments = QtWidgets.QTextEdit(Dialog)
+        self.txt_additionalComments = QtWidgets.QTextEdit(self.Dialog)
         self.txt_additionalComments.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.txt_additionalComments.setStyleSheet("  QTextCursor textCursor;\n"
 "  textCursor.setPosistion(0, QTextCursor::MoveAnchor); \n"
@@ -142,44 +144,66 @@ class Ui_Dialog1(object):
         self.txt_additionalComments.setReadOnly(False)
         self.txt_additionalComments.setObjectName("txt_additionalComments")
         self.gridLayout.addWidget(self.txt_additionalComments, 9, 1, 1, 1)
-        self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
+        self.buttonBox = QtWidgets.QDialogButtonBox(self.Dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout.addWidget(self.buttonBox, 10, 1, 1, 1)
 
-        self.retranslateUi(Dialog)
+        self.retranslateUi()
 
-        self.buttonBox.accepted.connect(Dialog.accept)
+        #self.buttonBox.accepted.connect(self.Dialog.accept)
         self.buttonBox.accepted.connect(lambda: self.save_inputSummary(main))
-        self.buttonBox.rejected.connect(Dialog.reject)
+        self.buttonBox.rejected.connect(self.Dialog.reject)
         self.btn_browse.clicked.connect(self.lbl_browse.clear)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
-        Dialog.setTabOrder(self.lineEdit_companyName, self.btn_browse)
-        Dialog.setTabOrder(self.btn_browse, self.lineEdit_groupName)
-        Dialog.setTabOrder(self.lineEdit_groupName, self.lineEdit_designer)
-        Dialog.setTabOrder(self.lineEdit_designer, self.btn_useProfile)
-        Dialog.setTabOrder(self.btn_useProfile, self.btn_saveProfile)
-        Dialog.setTabOrder(self.btn_saveProfile, self.lineEdit_projectTitle)
-        Dialog.setTabOrder(self.lineEdit_projectTitle, self.lineEdit_subtitle)
-        Dialog.setTabOrder(self.lineEdit_subtitle, self.lineEdit_jobNumber)
-        Dialog.setTabOrder(self.lineEdit_jobNumber, self.lineEdit_client)
-        Dialog.setTabOrder(self.lineEdit_client, self.txt_additionalComments)
-        Dialog.setTabOrder(self.txt_additionalComments, self.buttonBox)
+        QtCore.QMetaObject.connectSlotsByName(self.Dialog)
+        self.Dialog.setTabOrder(self.lineEdit_companyName, self.btn_browse)
+        self.Dialog.setTabOrder(self.btn_browse, self.lineEdit_groupName)
+        self.Dialog.setTabOrder(self.lineEdit_groupName, self.lineEdit_designer)
+        self.Dialog.setTabOrder(self.lineEdit_designer, self.btn_useProfile)
+        self.Dialog.setTabOrder(self.btn_useProfile, self.btn_saveProfile)
+        self.Dialog.setTabOrder(self.btn_saveProfile, self.lineEdit_projectTitle)
+        self.Dialog.setTabOrder(self.lineEdit_projectTitle, self.lineEdit_subtitle)
+        self.Dialog.setTabOrder(self.lineEdit_subtitle, self.lineEdit_jobNumber)
+        self.Dialog.setTabOrder(self.lineEdit_jobNumber, self.lineEdit_client)
+        self.Dialog.setTabOrder(self.lineEdit_client, self.txt_additionalComments)
+        self.Dialog.setTabOrder(self.txt_additionalComments, self.buttonBox)
 
     def save_inputSummary(self,main):
         input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
         file_type = "PDF (*.pdf)"
+
         filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        # # filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type, None, QtWidgets.QFileDialog.DontUseNativeDialog)
+        # #filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type)
+        # '''
+        # Comment out the second QFileDialog function if you want to use NativeDialog which will be both system and OS dependent hence
+        # it would be impossible to assign any modal to QFileDialog once it's opened, therefore it'll look like system is hanged.
+        # But if you want to control the behaviour of QFileDialog according to your need then use the first function(QFileDialog provided by Qt which is faster than NativeDialog).
+        #
+        # Same is the case when we'll select 'Load Input' option. We can't control the behaviour of QFileDialog because it's native and hence
+        # OS and system dependent.
+        # '''
+
+        if filename == '':
+            return
         fname_no_ext = filename.split(".")[0]
         input_summary['filename'] = fname_no_ext
         input_summary['does_design_exist'] = self.design_exist
+        input_summary['logger_messages']=self.loggermsg
         main.save_design(main,input_summary)
         if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
+            self.Dialog.accept()
             QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
         else:
-            QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no pdf is open with same name. If error persists send us the log file created in location you are trying to save.')
-
+            logfile=open(fname_no_ext+'.log','r')
+            logs=logfile.read()
+            if('! I can\'t write on file' in logs):
+               QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
+            else:
+               print(logs)
+               QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
+            logfile.close()
 
     def call_designreport(self, main,fileName, report_summary, folder):
         self.alist = main.report_input
@@ -207,9 +231,9 @@ class Ui_Dialog1(object):
 
         return input_summary
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.Dialog.setWindowTitle(_translate("Dialog", "Design Report Summary"))
         self.lbl_companyName.setText(_translate("Dialog", "Company Name :"))
         self.lbl_comapnyLogo.setText(_translate("Dialog", "Company Logo :"))
         self.btn_browse.setText(_translate("Dialog", "Browse..."))

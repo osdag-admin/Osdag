@@ -2057,10 +2057,9 @@ class ColumnCoverPlateWeld(MomentConnection):
               '')
         self.report_check.append(t1)
 
-        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY,display_prov(self.load.shear_force, "V"), shear_capacity(h=h, t=self.section.web_thickness,
-                                                                                 f_y=self.section.fy, gamma_m0=gamma_m0,
-                                                                                 shear_capacity=round(
-                                                                                     self.shear_capacity1 / 1000, 2)),
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, display_prov(self.load.shear_force, "V"), shear_yield_prov(h=h, t=self.section.web_thickness,
+                                                                                                      f_y=self.section.fy, gamma_m0=gamma_m0,
+                                                                                                      V_dg=round(self.shear_capacity1 / 1000, 2)),
               'Restrict to low shear case')
         self.report_check.append(t1)
         t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', plastic_moment_capacty(beta_b=round(self.beta_b, 2),
@@ -2107,10 +2106,11 @@ class ColumnCoverPlateWeld(MomentConnection):
                               axial_capacity=round(self.axial_capacity / 1000, 2)), '')
 
         self.report_check.append(t1)
+        V_dy = round(self.shear_capacity1 / 0.6 / 1000, 2)
         t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, display_prov(self.load.shear_force, "V"),
               prov_shear_load(shear_input=self.load.shear_force, min_sc=round(self.shear_load1 / 1000, 2),
                               app_shear_load=round(self.fact_shear_load / 1000, 2),
-                              shear_capacity_1=round(self.shear_capacity1 / 1000, 2)), "")
+                              shear_capacity_1=V_dy), "")
         self.report_check.append(t1)
         t1 = (KEY_DISP_APPLIED_MOMENT_LOAD, display_prov(self.load.moment, "M"),
               prov_moment_load(moment_input=self.load.moment, min_mc=round(self.load_moment_min / 1000000, 2),

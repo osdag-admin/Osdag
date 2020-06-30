@@ -1,4 +1,15 @@
-# from gui.ui_summary_popup import Ui_Dialog
+"""
+Started on 1st January, 2020.
+
+@author: Darshan Vishwakarma
+
+Module: Tension Member Welded Design
+
+Reference:
+            1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
+            2) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 6)
+
+"""
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
 from utils.common.component import *

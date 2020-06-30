@@ -1,4 +1,17 @@
-# from gui.ui_summary_popup import Ui_Dialog
+"""
+Started on 1st January, 2020.
+
+@author: Darshan Vishwakarma
+
+Module: Tension Member Bolted Design
+
+Reference:
+            1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
+            2) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 6)
+            3) IS 1367 (Part3):2002 - TECHNICAL SUPPLY CONDITIONS FOR THREADED STEEL FASTENERS
+
+"""
+
 from design_report.reportGenerator_latex import CreateLatex
 from utils.common.Section_Properties_Calculator import *
 from utils.common.component import *

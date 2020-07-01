@@ -8,12 +8,10 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from design_report import reportGenerator
-<<<<<<< HEAD
-=======
+
 from PyQt5.QtCore import QRegExp,QTimer, QThread, QFile, pyqtSignal, QTextStream, Qt, QIODevice, pyqtSlot
 from PyQt5.QtGui import QBrush, QImage, QColor, QDoubleValidator, QIntValidator, QPixmap, QPalette, QTextCharFormat, QTextCursor, QStandardItem
 from PyQt5.QtWidgets import *
->>>>>>> 79f143bd8cc270266dc288b7c6d552fd1bc4496c
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp
@@ -26,12 +24,9 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFi
 from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
-<<<<<<< HEAD
 from PyQt5.QtCore import QRegExp,QTimer, QThread, QFile, pyqtSignal, QTextStream, Qt, QIODevice, pyqtSlot
 from PyQt5.QtGui import QBrush, QImage, QColor, QDoubleValidator, QIntValidator, QPixmap, QPalette, QTextCharFormat, QTextCursor, QStandardItem
 from PyQt5.QtWidgets import *
-=======
->>>>>>> 79f143bd8cc270266dc288b7c6d552fd1bc4496c
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PIL import Image
 import os

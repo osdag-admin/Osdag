@@ -1255,7 +1255,7 @@ class Tension_welded(Member):
         elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
             self.plate.height = 2 * self.section_size_1.min_leg + max((4 * self.weld.size),30)
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
-            self.plate.height =  self.section_size_1.min_leg + max((4 * self.weld.size),30)
+            self.plate.height = self.section_size_1.min_leg + max((4 * self.weld.size),30)
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles","Angles"] and design_dictionary[KEY_LOCATION] == "Long Leg":
             self.plate.height = self.section_size_1.max_leg + max((4 * self.weld.size),30)
         else:

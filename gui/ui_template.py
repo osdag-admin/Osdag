@@ -901,7 +901,7 @@ class Window(QMainWindow):
                 b.setFont(font)
                 b.setObjectName(option[0])
                 #b.setFixedSize(b.size())
-                b.resize(b.sizeHint().width(), b.sizeHint().height())
+                b.resize(b.sizeHint().width(), b.sizeHint().height()+100)
                 b.setText(v[0])
                 b.setDisabled(True)
                 fields += 1
@@ -2125,7 +2125,7 @@ class Window(QMainWindow):
                         #im.setScaledContents(True)
                         #im.setFixedSize(im.size())
                         pmap = QPixmap(option[3])
-                        im.setPixmap(pmap.scaled(170,340,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+                        im.setPixmap(pmap.scaled(350,350,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
                         image_layout.addWidget(im)
 
                     j = j + 1
@@ -2137,7 +2137,7 @@ class Window(QMainWindow):
                     outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
                 scroll.setWidget(scrollcontent)
                 if section == 0:
-                    dialog.resize(350, 300)
+                    dialog.resize(375, 375)
                 #dialog.setFixedSize(dialog.size())
                 dialog.exec()
     

@@ -809,8 +809,8 @@ if __name__ == '__main__':
 
     error_box = CriticalExceptionDialog()
 
-    GITHUB_OWNER = 'expectation-hub'    # username of the github account where crash report is to be submitted
-    GITHUB_REPO = 'Test'       # repo name
+    GITHUB_OWNER = 'osdag-admin'    # username of the github account where crash report is to be submitted
+    GITHUB_REPO = 'Osdag'       # repo name
     EMAIL = 'your.email@provider.com'  # Email address of developers
 
     appcrash.install_backend(appcrash.backends.GithubBackend(GITHUB_OWNER, GITHUB_REPO))

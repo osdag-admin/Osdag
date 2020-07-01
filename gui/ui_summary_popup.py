@@ -175,7 +175,7 @@ class Ui_Dialog1(object):
         filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type, None, QtWidgets.QFileDialog.DontUseNativeDialog)
         #filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type)
         '''
-        Comment out the second QFileDialog function if you want to use NativeDialog which will be both system and OS dependent hence
+        Uncomment the second QFileDialog function if you want to use NativeDialog which will be both system and OS dependent hence
         it would be impossible to assign any modal to QFileDialog once it's opened, therefore it'll look like system is hanged.
         But if you want to control the behaviour of QFileDialog according to your need then use the first function(QFileDialog provided by Qt which is faster than NativeDialog).
 

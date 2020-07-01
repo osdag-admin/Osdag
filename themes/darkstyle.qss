@@ -1251,6 +1251,9 @@ QDialog#DesignPreferences QComboBox{
 		min-height: 22px;
 		max-height: 22px;
 }
+QDialog#DesignPreferences QTabWidget::tab-bar{
+    alignment: left;
+}
 QTabWidget#mytabWidget QTabBar::tab {
 
 	background: rgba(19, 27, 33, 1);

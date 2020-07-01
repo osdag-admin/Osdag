@@ -1,6 +1,7 @@
 from Common import *
 from utils.common.load import Load
 from utils.common.component import *
+from utils.common.Section_Properties_Calculator import *
 
 class Main():
 
@@ -14,20 +15,7 @@ class Main():
     def bolt_values(self, input_dictionary):
 
         values = {KEY_DP_BOLT_TYPE: 'Pretensioned', KEY_DP_BOLT_HOLE_TYPE: 'Standard',
-                  KEY_DP_BOLT_MATERIAL_G_O: '', KEY_DP_BOLT_SLIP_FACTOR: '0.3'}
-
-        if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
-            pass
-            # bolt_type = 'Pretensioned'
-            # hole_type = 'Standard'
-            # material_g_o = ''
-            # slip_factor = '0.3'
-        else:
-            values[KEY_DP_BOLT_MATERIAL_G_O] = Material(input_dictionary[KEY_MATERIAL]).fu
-            # bolt_type = 'Pretensioned'
-            # hole_type = 'Standard'
-            # material_g_o = Material(input_dictionary[KEY_MATERIAL]).fu
-            # slip_factor = '0.3'
+                  KEY_DP_BOLT_SLIP_FACTOR: '0.3'}
 
         for key in values.keys():
             if key in input_dictionary.keys():
@@ -40,9 +28,6 @@ class Main():
 
         t2 = (KEY_DP_BOLT_HOLE_TYPE, KEY_DISP_DP_BOLT_HOLE_TYPE, TYPE_COMBOBOX, ['Standard', 'Over-sized'], values[KEY_DP_BOLT_HOLE_TYPE])
         bolt.append(t2)
-
-        t3 = (KEY_DP_BOLT_MATERIAL_G_O, KEY_DISP_DP_BOLT_MATERIAL_G_O, TYPE_TEXTBOX, None, values[KEY_DP_BOLT_MATERIAL_G_O])
-        bolt.append(t3)
 
         t4 = (None, None, TYPE_ENTER, None, None)
         bolt.append(t4)
@@ -95,7 +80,7 @@ class Main():
 
     def detailing_values(self, input_dictionary):
 
-        values = {KEY_DP_DETAILING_EDGE_TYPE: 'a - Sheared or hand flame cut',
+        values = {KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
                   KEY_DP_DETAILING_GAP: '10',
                   KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No'}
 
@@ -106,7 +91,7 @@ class Main():
         detailing = []
 
         t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX,
-              ['a - Sheared or hand flame cut', 'b - Rolled, machine-flame cut, sawn and planed'],
+              ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed'],
               values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
@@ -218,8 +203,8 @@ class Main():
             em_y = sec_prop.calc_ElasticModulusZy(D, B, t_w, t_f)
             pm_z = sec_prop.calc_PlasticModulusZpz(D, B, t_w, t_f)
             pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
-            I_t = sec_prop.calc_torsion_const(D,B,t_w,t_f)
-            I_w = sec_prop.calc_warping_const(D,B,t_w, t_f)
+            I_t = sec_prop.calc_TorsionConstantIt(D,B,t_w,t_f)
+            I_w = sec_prop.calc_WarpingConstantIw(D,B,t_w, t_f)
             if sl != 90:
                 image = VALUES_IMG_BEAM[0]
             else:

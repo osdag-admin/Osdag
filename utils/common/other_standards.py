@@ -193,9 +193,11 @@ class IS1367_Part3_2002(object):
         except ValueError:
             return
 
+        #Note: The area of the bolts for diameter 48, 56, 64 and 72 has been added for base plate design
+        # (these might not be available in IS 1367 (Part-3) : 2002)
         table_6 = {3: 5.03, 3.5: 6.78, 4: 8.78, 5: 14.2, 6: 20.1, 7: 28.9, 8: 36.6, 10: 58,
                    12: 84.3, 14: 115, 16: 157, 18: 192, 20: 245, 22: 303, 24: 353, 27: 459,
-                   30: 561, 33: 694, 36: 817, 39: 976}
+                   30: 561, 33: 694, 36: 817, 39: 976, 42: 1080, 48: 1411, 56: 1921, 64: 2508, 72: 3175}
         try:
             return [shank_area, table_6[bolt_diameter]]
         except KeyError:

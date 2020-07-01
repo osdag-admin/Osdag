@@ -84,6 +84,7 @@ import os
 from pathlib import Path
 from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 import urllib.request
+from update import Update
 #from Thread import timer
 
 
@@ -444,8 +445,28 @@ class OsdagMainWindow(QMainWindow):
             self.about_osdag()
         elif loc == "Ask Us a Question":
             self.ask_question()
+        elif loc == "Check for Update":
+            self.notification()
         # elif loc == "FAQ":
         #     pass
+
+    def notification(self):
+        check=Update(0)
+        print(check.notifi())
+        if check.notifi()==True:
+            msg = QMessageBox.information(self, 'Update available',
+                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
+        elif check.notifi()=="no internet":
+            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
+        else:
+            msg = QMessageBox.information(self, 'Update', 'No Update Available')
+
+    def notification2(self):
+        check=Update(0)
+        if check.notifi()==True:
+            msg = QMessageBox.information(self, 'Update available',
+                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
+
 
     def select_workspace_folder(self):
         # This function prompts the user to select the workspace folder and returns the name of the workspace folder
@@ -647,7 +668,7 @@ class OsdagMainWindow(QMainWindow):
         for html_file in os.listdir(root_path):
             # if html_file.startswith('index'):
             print(os.path.splitext(html_file)[1])
-            if os.path.splitext(html_file)[1] == 'html':
+            if os.path.splitext(html_file)[1] == '.html':
                if sys.platform == ("win32" or "win64"):
                    os.startfile(os.path.join(root_path, html_file))
                else:
@@ -758,6 +779,7 @@ def send_crash_report():
     appcrash.get_system_information = get_system_info
     appcrash.show_report_dialog()
 
+
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
     def __init__(self, icon, parent=None):
@@ -834,7 +856,8 @@ if __name__ == '__main__':
     try:
         #update = Update(0)
         #update.notifi()
-        sys.excepthook = hook_exception
+        #sys.excepthook = hook_exception
+        # window.notification2()
         QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)

@@ -1139,6 +1139,7 @@ class ColumnEndPlate(MomentConnection):
                 else:
                     self.image_web = './ResourceFiles/images/flush_n_odd.png'
 
+
             if self.connection == 'Flush End Plate':
                 if self.n_bf % 2 == 0:
                     if self.n_bf == 2:

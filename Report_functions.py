@@ -2509,14 +2509,14 @@ def shear_capacity_prov(V_dy, V_dn, V_db = 0.0):
         V_dy = str(V_dy)
         V_dn = str(V_dn)
         V_db = str(V_db)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn},V_{db})\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{dn},V_{db})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min('+V_dy+','+V_dn+','+V_db+r')\\'))
 
     elif V_db == 0.0 and V_dn == 0.0:
         V_d = V_dy
         V_d = str(V_d)
         V_dy = str(V_dy)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= V_{dy}\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= S_c\\'))
         # shear_capacity_eqn.append(NoEscape(r'&=' + V_dy + r'\\'))
 
     elif V_db == 0.0 and V_dn != 0.0:
@@ -2524,14 +2524,14 @@ def shear_capacity_prov(V_dy, V_dn, V_db = 0.0):
         V_d = str(V_d)
         V_dy = str(V_dy)
         V_dn = str(V_dn)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn})\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{dn})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_dn + r')\\'))
     elif V_db != 0.0 and V_dn == 0.0:
         V_d = min(V_dy, V_db)
         V_d = str(V_d)
         V_dy = str(V_dy)
         V_db = str(V_db)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{db})\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{db})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_db + r')\\'))
 
     shear_capacity_eqn.append(NoEscape(r'&='+V_d + r'\\'))

@@ -14,6 +14,7 @@ from cad.items.nut import Nut
 class NutBoltArray(object):
     def __init__(self, Obj, column, nut, bolt, nut_space):
 
+        self.Obj = Obj
         self.column = column
         self.nut = nut
         self.bolt = bolt
@@ -246,23 +247,43 @@ class NutBoltArray(object):
         for rw in range(self.row):
             xcol = 0.0
             xrow = xrow.__add__(self.pitchDist[rw])
-            if rw == 0 or rw == self.row - 1:
-                for col in range(self.col):
-                    xcol = xcol.__add__(self.gauge[col])
-                    pos = self.boltOrigin
-                    pos = pos + xrow * self.pitchDir
-                    pos = pos + xcol * self.gaugeDir
+            if self.Obj.connection == "Flush End Plate":
+                if rw == 0 or rw == self.row - 1:
+                    for col in range(self.col):
+                        xcol = xcol.__add__(self.gauge[col])
+                        pos = self.boltOrigin
+                        pos = pos + xrow * self.pitchDir
+                        pos = pos + xcol * self.gaugeDir
 
-                    self.positions.append(pos)
+                        self.positions.append(pos)
+
+                else:
+                    for col in range(self.webcol):
+                        # xcol = xcol.__add__(self.gauge[col])
+                        pos = self.boltOrigin + self.edgeDist * self.gaugeDir
+                        pos = pos + xrow * self.pitchDir
+                        pos = pos + col * (2 * self.endDist + self.column.t) * self.gaugeDir
+
+                        self.positions.append(pos)
 
             else:
-                for col in range(self.webcol):
-                    # xcol = xcol.__add__(self.gauge[col])
-                    pos = self.boltOrigin + self.edgeDist * self.gaugeDir
-                    pos = pos + xrow * self.pitchDir
-                    pos = pos + col * (2 * self.endDist + self.column.t) * self.gaugeDir
+                if rw == 0 or rw == 1 or rw == self.row - 1 or rw == self.row - 2:
+                    for col in range(self.col):
+                        xcol = xcol.__add__(self.gauge[col])
+                        pos = self.boltOrigin
+                        pos = pos + xrow * self.pitchDir
+                        pos = pos + xcol * self.gaugeDir
 
-                    self.positions.append(pos)
+                        self.positions.append(pos)
+
+                else:
+                    for col in range(self.webcol):
+                        # xcol = xcol.__add__(self.gauge[col])
+                        pos = self.boltOrigin + self.edgeDist * self.gaugeDir
+                        pos = pos + xrow * self.pitchDir
+                        pos = pos + col * (2 * self.endDist + self.column.t) * self.gaugeDir
+
+                        self.positions.append(pos)
 
     def place(self, origin, gaugeDir, pitchDir, boltDir):
         """

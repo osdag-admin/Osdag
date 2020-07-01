@@ -1124,6 +1124,10 @@ class ColumnEndPlate(MomentConnection):
 
             print("no bolts web", self.n_bw, "no bolts flange", self.n_bf)
 
+            #############################################################
+            ##  added images to reflect in output dock
+            #############################################################
+
             if self.n_bw % 2 == 0:
                 if self.n_bw == 2:
                     self.image_web = './ResourceFiles/images/flush_2rows.png'

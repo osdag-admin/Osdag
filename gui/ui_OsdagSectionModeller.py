@@ -52,9 +52,7 @@ class Ui_OsdagSectionModeller(object):
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.design_section = QtWidgets.QFrame(Dialog)
-        self.design_section.setStyleSheet("QFrame{\n"
-"background:#ffffff;\n"
-"}")
+
         self.design_section.setFrameShape(QtWidgets.QFrame.Box)
         self.design_section.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.design_section.setLineWidth(3)
@@ -112,7 +110,7 @@ class Ui_OsdagSectionModeller(object):
         self.section_type_combobox.addItem("")
         self.horizontalLayout_2.addWidget(self.section_type_combobox)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed) 
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout_2.addItem(spacerItem1)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -164,9 +162,7 @@ class Ui_OsdagSectionModeller(object):
         font.setPointSize(9)
         self.OCCFrame.setFont(font)
         self.OCCFrame.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.OCCFrame.setStyleSheet("QFrame{\n"
-"background:#ffffff;\n"
-"}")
+
         self.OCCFrame.setFrameShape(QtWidgets.QFrame.Box)
         self.OCCFrame.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.OCCFrame.setLineWidth(3)
@@ -183,9 +179,7 @@ class Ui_OsdagSectionModeller(object):
         self.horizontalLayout.setStretch(1, 1)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.section_properties = QtWidgets.QFrame(Dialog)
-        self.section_properties.setStyleSheet("QFrame{\n"
-"background:#ffffff;\n"
-"}")
+
         self.section_properties.setFrameShape(QtWidgets.QFrame.Box)
         self.section_properties.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.section_properties.setLineWidth(3)
@@ -210,7 +204,7 @@ class Ui_OsdagSectionModeller(object):
         self.label_5.setAlignment(QtCore.Qt.AlignCenter)
         self.label_5.setObjectName("label_5")
         self.verticalLayout_16.addWidget(self.label_5)
-        spacerItem4 = QtWidgets.QSpacerItem(20, 12, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding) 
+        spacerItem4 = QtWidgets.QSpacerItem(20, 12, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
         self.verticalLayout_16.addItem(spacerItem4)
         self.horizontalLayout_15 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_15.setContentsMargins(11, 11, 11, 11)
@@ -355,13 +349,7 @@ class Ui_OsdagSectionModeller(object):
         self.horizontalLayout_8.addLayout(self.horizontalLayout_5)
         self.verticalLayout_14.addLayout(self.horizontalLayout_8)
         self.Centroid_box = QtWidgets.QFrame(self.section_properties)
-        self.Centroid_box.setStyleSheet(
-                '''
-                QFrame{
-                        border-style:none;
-                }
-                '''
-        )
+
         self.Centroid_box.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.Centroid_box.setFrameShadow(QtWidgets.QFrame.Raised)
         self.Centroid_box.setObjectName("Centroid_box")
@@ -683,7 +671,7 @@ class Ui_OsdagSectionModeller(object):
                 i+=1
                 if(Labels[i][0][-1].isdigit()):
                         break
-            return(Properties)       
+            return(Properties)
 
     def export_to_pdf(self):
             '''
@@ -763,7 +751,7 @@ class Ui_OsdagSectionModeller(object):
                 self.PSM_label_3.hide()
                 self.PSM_text_3.hide()
                 self.MI_label_3.setText('Ixy(cm4):')
-        
+
         templates={
                 0:[],
                 1:['Side by Side'],
@@ -926,7 +914,7 @@ class Ui_OsdagSectionModeller(object):
                         Yleft=Yright=round(((2*b)+ti)/2,4)
                         Ytop=Ybottom=l/2
                         Izz=round((
-                              ((((l/2)*(ti**3)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+  
+                              ((((l/2)*(ti**3)/12)+(((l/2)*ti)*((Ybottom-(l/4))**2))))+
                               (2*((t*(D**3)/12)+((D*t)*((Ybottom-(D/2))**2))))+
                               (2*((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-D)**2))))+
                               (2*((t*(D**3)/12)+((D*t)*((Ytop-(D/2))**2))))+
@@ -999,7 +987,7 @@ class Ui_OsdagSectionModeller(object):
                         self.RG_text_2.setText(str(Ryy))
                         self.ESM_text_1.setText(str(Zzz))
                         self.ESM_text_2.setText(str(Zyy))
-                
+
                 elif(index_template==3):
                         # cursor = conn.execute("SELECT a,b FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         # a,b = cursor.fetchall()[0]
@@ -1174,7 +1162,7 @@ class Ui_OsdagSectionModeller(object):
                        l=float(self.SectionParameters.parameterText_5.text())/10
                        lv=float(self.SectionParameters.parameterText_6.text())/10
                        A=round((4*Area)+(2*l*ti)+(2*lv*ti),4)
-                       D=a-t 
+                       D=a-t
                        Ybottom=round((
                                (l*ti*ti/2)+
                                (2*b*t*(ti*t/2))+
@@ -1196,12 +1184,12 @@ class Ui_OsdagSectionModeller(object):
                        )/((4*b*t)+(2*l*t)+(2*lv*ti)+(D*t)),4)
                        Yright=Yleft
                        Izz=round((
-                             ((l*(ti**3)/12)+(l*ti)*((Ybottom-(ti/2))**2))+  
+                             ((l*(ti**3)/12)+(l*ti)*((Ybottom-(ti/2))**2))+
                              (2*((b*(t**3)/12)+(b*t)*((Ybottom-(t/2)-ti)**2)))+
                              (2*((t*(D**3)/12)+(D*t)*((Ybottom-(D/2)-ti-t)**2)))+
                              (2*((t*(D**3)/12)+(D*t)*((Ytop-(D/2)-ti-t)**2)))+
                              ((b*(t**3)/12)+(b*t)*((Ytop-(t/2)-ti)**2))+
-                             ((l*(ti**3)/12)+(l*ti)*((Ybottom-(ti/2))**2))+  
+                             ((l*(ti**3)/12)+(l*ti)*((Ybottom-(ti/2))**2))+
                              (2*((ti*((lv**3)/2)/12)+(((lv/2)*ti)*((Ybottom-(l/4))**2))))+
                              (2*((ti*((lv**3)/2)/12)+(((lv/2)*ti)*((Ytop-(l/4))**2))))
 
@@ -1210,7 +1198,7 @@ class Ui_OsdagSectionModeller(object):
                                ((lv*(ti**3)/12)+(lv*ti)*((Yleft-(ti/2))**2))+
                                (2*((t*(D**3)/12)+(D*t)*((Yleft-(t/2)-ti)**2)))+
                                (2*((b*(t**3)/12)+(b*t)*((Yleft-(b/2)-ti)**2)))+
-                               ((l*(ti**3)/12)+(l*ti)*((Yleft-(l/2))**2))+  
+                               ((l*(ti**3)/12)+(l*ti)*((Yleft-(l/2))**2))+
                                (2*((b*(t**3)/12)+(b*t)*((Yright-(b/2)-ti-t)**2)))+
                                (2*((t*(D**3)/12)+(D*t)*((Yright-(t/2)-ti)**2)))+
                                ((lv*(ti**3)/12)+(lv*ti)*((Yright-(ti/2))**2))
@@ -1369,7 +1357,7 @@ class Ui_OsdagSectionModeller(object):
                         self.RG_text_2.setText(str(Ryy))
                         self.ESM_text_1.setText(str(Zzz))
                         self.ESM_text_2.setText(str(Zyy))
-                        
+
         elif(index_type==5):
                 cursor = conn.execute("SELECT Area,B,T,tw,D FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                 ISectionArea,B,T,t,Di=map(float,cursor.fetchall()[0])
@@ -1426,10 +1414,10 @@ class Ui_OsdagSectionModeller(object):
                 self.RG_text_2.setText(str(Ryy))
                 self.ESM_text_1.setText(str(Zzz))
                 self.ESM_text_2.setText(str(Zzz))
-        
+
         display.EraseAll()
         self.create_cad_model(index_type,index_template)
-        
+
     def init_display(self):
             from OCC.Display.backend import load_backend, get_qt_modules
             global display
@@ -1662,7 +1650,7 @@ class Ui_OsdagSectionModeller(object):
                 elif(index_type==3):
                         self.SectionParameters.parameterText_1.clear()
                         self.SectionParameters.parameterText_1.addItems(connectdb('Angles'))
-        
+
 
                 if(last_index==new_index and self.Parameters!={}):
                         for child in self.Parameters:
@@ -1681,7 +1669,7 @@ class Ui_OsdagSectionModeller(object):
 
         if(index_type==2):
                 if(index_template==1):
-                                self.Centroid_box.hide()                        
+                                self.Centroid_box.hide()
                 elif(index_template==2):
                                 self.Centroid_box.show()
         self.section_template_combobox.setProperty("lastitem",new_index)
@@ -1725,5 +1713,3 @@ class Ui_OsdagSectionModeller(object):
         self.PSM_label_3.setText(_translate("Dialog", "Czp(cm³):"))
         self.saveBtn.setText(_translate("Dialog", "Save"))
         self.exportBtn.setText(_translate("Dialog", "Export"))
-
-

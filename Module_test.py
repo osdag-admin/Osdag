@@ -5,8 +5,8 @@ import sys
 import unittest
 from pathlib import Path
 import ast
+import logging
 is_travis = 'TRAVIS' in os.environ
-
 ############################ Pre-Build Database Updation/Creation #################
 sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
 sqlitepath = Path('ResourceFiles/Database/Intg_osdag.sqlite')
@@ -35,8 +35,8 @@ if sqlpath.exists():
         except Exception as e:
             sqlitenewpath.unlink()
             print('Error: ', e)
-#########################################################################################
 
+#########################################################################################
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
 from design_type.connection.seated_angle_connection import SeatedAngleConnection
@@ -53,10 +53,14 @@ from design_type.connection.beam_end_plate import BeamEndPlate
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
+from Common import *
+
 
 if not is_travis:
     from cad.common_logic import CommonDesignLogic
     from texlive .Design_wrapper import init_display
+    display, start_display, add_menu, add_function_to_menu = init_display(backend_str="qt-pyqt5")
+
 
 
 
@@ -80,19 +84,12 @@ available_module dictionary is used in -
 Make sure to make the necessary changes in above functions/methods if you are changing the name of available_module.
 '''
 
-# available_module = {'Beam Coverplate  Weld Connection':BeamCoverPlateWeld,'Beam Coverplate Connection':BeamCoverPlate,
-#                     'Column Coverplate Weld Connection':ColumnCoverPlateWeld, 'Column Coverplate Connection':ColumnCoverPlate,
-#                     'Fin Plate':FinPlateConnection, 'Tension Members Bolted Design':Tension_bolted,
-#                     'Tension Members Welded Design':Tension_welded}
-from Common import *
 available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDED:Tension_welded,
                     KEY_DISP_TENSION_BOLTED:Tension_bolted,KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
                     KEY_DISP_BEAMCOVERPLATE:BeamCoverPlate, KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld,
                     KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate, KEY_DISP_ENDPLATE:EndPlateConnection,
                     KEY_DISP_SEATED_ANGLE:SeatedAngleConnection, KEY_DISP_COLUMNENDPLATE:ColumnEndPlate}
 
-# available_module = {KEY_DISP_TENSION_WELDED:Tension_welded,
-#                     KEY_DISP_TENSION_BOLTED:Tension_bolted}
 
 #predefined pop-up summary.
 popup_summary = {'ProfileSummary': {'CompanyName': 'LoremIpsum', 'CompanyLogo': '', 'Group/TeamName': 'LoremIpsum', 'Designer': 'LoremIpsum'},
@@ -112,7 +109,7 @@ def make_sure_path_exists(path):      # Works on all OS.
 
 input_file_path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'design_example')   # input folder path
 
-output_file_path = os.path.join(os.path.dirname(__file__), 'OUTPUT_FILES', 'Output_PDF')               # output folder path
+output_file_path = os.path.join(os.path.dirname(__file__), 'OUTPUT_FILES', 'Output_PDF')       # output folder path
 
 
 
@@ -138,9 +135,6 @@ def precompute_data():
             uiObj = yaml.load(fileObject, yaml.Loader)
 
         files_data.append((file, uiObj))
-
-
-
 
 
 
@@ -180,15 +174,13 @@ class Modules:
 
             try:
 
-                display, start_display, add_menu, add_function_to_menu = init_display(backend_str="qt-pyqt5")
-
                 commLogicObj = CommonDesignLogic(display, ' ', main.module, main.mainmodule)
 
                 status = main.design_status
 
                 commLogicObj.call_3DModel(status, main)
 
-                fName = str('./ResourceFiles/images/3d.png')
+                fName = os.path.join(os.path.dirname(__file__),'ResourceFiles','images','3d.png')
 
                 file_extension = fName.split(".")[-1]
 
@@ -196,11 +188,18 @@ class Modules:
 
                     display.ExportToImage(fName)
 
+                display.EraseAll()
+
                 popup_summary['does_design_exist'] = True
 
             except:
 
-                print("Design is not ready.")
+                pass
+
+            with open(os.path.join(os.path.dirname(__file__),'logging_text.log'),'r') as LOG: # we are already creating this log file inside each module.
+                to_write = LOG.read()
+
+            popup_summary['logger_messages'] = to_write
 
             main.save_design(main,popup_summary)  # calling the function.
 
@@ -224,6 +223,10 @@ class Modules:
 
                     is_dict_same = False    # if dictionary is not equal.
             '''
+
+        open(os.path.join(os.path.dirname(__file__),'logging_text.log'), 'w').close() # better to clear the file than removing the handlers. More efficient.
+         # Remove the log handlers also if you don't want to see all the accumulated messages repeating each time.
+
         return (pdf_created & is_dict_same)
 
 
@@ -249,8 +252,6 @@ class TestModules(unittest.TestCase):
 
 
 
-
-
 def suite():
 
     suite = unittest.TestSuite()
@@ -260,8 +261,6 @@ def suite():
     suite.addTests(TestModules(item, True) for item in files_data if item[1]['Module'] in available_module)
 
     return suite
-
-
 
 
 
@@ -280,6 +279,7 @@ if __name__ == '__main__':
     blockPrint()         # disable printing to avoid printing from unnecessary print statments in each modules. Although log statements can still print.
     precompute_data()    # precompute all data.
 
+    open(os.path.join(os.path.dirname(__file__),'logging_text.log'), 'w').close()   # Clearing the log file for test module.
 
     log_file = "test_log_file.log"   # log file in which test results will be written.
 
@@ -288,8 +288,7 @@ if __name__ == '__main__':
         result = unittest.TextTestRunner(stream = TEST_LOG_FILE,verbosity=2).run(suite())     # Writing results to log file.
 
 
-
-    with open(log_file, 'r') as content_file:
+    with open(os.path.join(os.path.dirname(__file__),log_file), 'r') as content_file:
         content = content_file.read()
 
     '''

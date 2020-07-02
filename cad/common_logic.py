@@ -537,7 +537,7 @@ class CommonDesignLogic(object):
                               D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
                               R1=A.supporting_section.root_radius, R2=A.supporting_section.toe_radius,
                               alpha=A.supporting_section.flange_slope,
-                              length=1000, notchObj=None)
+                              length=max(1000, (500 + A.supported_section.depth)), notchObj=None)
         supported = ISection(B=A.supported_section.flange_width, T=A.supported_section.flange_thickness,
                              D=A.supported_section.depth,
                              t=A.supported_section.web_thickness, R1=A.supported_section.root_radius,
@@ -651,7 +651,7 @@ class CommonDesignLogic(object):
                               D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
                               R1=A.supporting_section.root_radius, R2=A.supporting_section.toe_radius,
                               alpha=A.supporting_section.flange_slope,
-                              length=1000, notchObj=None)
+                              length=max(1000, (500 + A.supported_section.depth)), notchObj=None)
 
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)

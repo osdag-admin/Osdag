@@ -454,13 +454,20 @@ class SeatedAngleConnection(ShearConnection):
 
                 self.bolt_placement_check(self)
                 self.bolt_dia_check(self)
+                self.bolt_grip_check(self)
                 if self.bolt.design_status is False:
                     # print("Sufficient space is not available for bolt diameter: ", self.bolt.bolt_diameter_provided)
-                    continue
+                    if self.bolt.plate_thk_status is False:
+                        break
+                    else:
+                        continue
 
                 self.get_bolt_capacity(self)
-
-                self.bolt.number = round_up(float(self.load.shear_force * 1000) / self.bolt.bolt_capacity, 1)
+                t_sum = 0.0
+                for i in self.bolt_conn_plates_t_fu_fy:
+                    t_sum = t_sum + i[0]
+                self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+                self.bolt.number = round_up(float(self.load.shear_force * 1000) / (self.bolt.bolt_capacity * self.beta_lg), 1)
                 if self.connectivity == VALUES_CONN_1[0]:
                     self.bolt.number = round_up(float(self.bolt.number) / n, 1)
 
@@ -477,16 +484,23 @@ class SeatedAngleConnection(ShearConnection):
                     self.seated_angle.width = web_plate_h
                 self.bolt.bolts_required = bolts_one_line*bolt_line*n
 
-                if 2 >= bolt_line >= 1:
+                self.check_leg_size(self, bolt_line)
+
+                if 2 >= bolt_line >= 1 and self.plate.design_status is True:
                     self.bolt.bolt_force = self.load.shear_force / self.bolt.bolts_required
-                    self.bolt_dia_possible.append(self.bolt.bolt_diameter_provided)
+
                     if self.bolt.bolts_required > bolts_required_previous and count >= 1:
                         self.bolt.bolt_diameter_provided = bolt_diameter_previous
                         self.bolt.bolts_required = bolts_required_previous
                         self.bolt.bolt_row = bolt_row_prev
                         self.bolt.bolt_col = bolt_col_prev
+                        # self.bolt_dia_possible.remove(self.bolt.bolt_diameter_provided)
+                        self.bolt_placement_check(self)
+                        self.get_bolt_capacity(self)
                         # self.bolt.bolt_force = bolt_force_previous
                         break
+                    else:
+                        self.bolt_dia_possible.append(self.bolt.bolt_diameter_provided)
                     bolts_required_previous = self.bolt.bolts_required
                     bolt_diameter_previous = self.bolt.bolt_diameter_provided
                     # TODO: set bolt row and column prev value
@@ -498,6 +512,7 @@ class SeatedAngleConnection(ShearConnection):
                     self.bolt.bolt_force = self.load.shear_force / self.bolt.number
                     continue
             if self.bolt_dia_possible:
+                self.bolt.bolt_diameter_provided = min(self.bolt_dia_possible)
                 # print("bolt diameter: ", self.bolt_dia_possible)
                 # print("provided bolt diameter: ", self.bolt.bolt_diameter_provided)
                 self.check_leg_size(self, bolt_line)
@@ -535,9 +550,13 @@ class SeatedAngleConnection(ShearConnection):
             print("No of effective trials: ", trial)
             print(self.output)
             self.select_optimum(self)
-
             self.top_angle_section(self)
             logger.info("=== End Of Design ===")
+        elif self.bolt.design_status is False and self.bolt.plate_thk_status is False:
+            self.design_status = False
+            logger.error("Total thickness of connecting elements is more than 8 times bolt diameter, "
+                         "please select higher bolt diameter")
+            logger.error("It fails in bolt grip length check as per Cl. 10.3.3.2 of IS 800:2007")
         else:
             self.design_status = False
             # logger.error("Decrease bolt diameter")
@@ -587,8 +606,11 @@ class SeatedAngleConnection(ShearConnection):
             count = 1
             self.bolt_placement_check(self)
             self.get_bolt_capacity_updated(self)
-
-            if self.bolt.bolt_capacity < self.bolt.bolt_force * 1000 and count >= 1:
+            t_sum = 0.0
+            for i in self.bolt_conn_plates_t_fu_fy:
+                t_sum = t_sum + i[0]
+            self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+            if self.bolt.bolt_capacity * self.beta_lg < self.bolt.bolt_force * 1000 and count >= 1:
                 self.bolt.bolt_PC_provided = bolt_PC_previous
                 self.get_bolt_capacity_updated(self)
                 break
@@ -599,14 +621,14 @@ class SeatedAngleConnection(ShearConnection):
         """This function sets the max and min limits of seated angle length"""
         if self.connectivity == VALUES_CONN_1[0]:
             if self.supporting_section.flange_width > self.supported_section.flange_width:
-                self.seated_angle.width_min = (self.supported_section.flange_width -
+                self.seated_angle.width_min = (self.supported_section.flange_width + 20 -
                                     self.supporting_section.web_thickness -2 * self.supporting_section.root_radius) / 2
                 self.seated_angle.width_max = (self.supporting_section.flange_width -
                                     self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
             else:
                 self.seated_angle.width_min = (self.supporting_section.flange_width -
                                     self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
-                self.seated_angle.width_max = self.seated_angle.width_min + 20
+                self.seated_angle.width_max = self.seated_angle.width_min + 10
                 # self.seated_angle.width_min = (self.supporting_section.flange_width -
                 #                   self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
                 # self.seated_angle.width_max = (self.supported_section.flange_width -
@@ -627,7 +649,7 @@ class SeatedAngleConnection(ShearConnection):
         # TO GET BOLT BEARING CAPACITY CORRESPONDING TO PLATE THICKNESS AND Fu AND Fy #
         self.bolt_conn_plates_t_fu_fy = []
         self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.seated.fu, self.seated.fy))
-        if self.connectivity == VALUES_CONN_1[1]:
+        if self.connectivity == VALUES_CONN_1[0]:
             self.bolt_conn_plates_t_fu_fy.append(
                 (self.supporting_section.flange_thickness, self.supporting_section.fu, self.supporting_section.fy))
         else:
@@ -647,14 +669,21 @@ class SeatedAngleConnection(ShearConnection):
         self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                           bolt_grade_provided=self.bolt.bolt_PC_provided,
                                           conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy, n_planes=1,
-                                          seatedangle_e= self.bolt_bearing_end_dist)
+                                          seatedangle_e=self.bolt_bearing_end_dist)
         if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
             self.bolt.bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
         else:
             self.bolt.bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
-
-        self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity/1000, 1)
-        self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity/1000, 1)
+        t_sum = 0.0
+        for i in self.bolt_conn_plates_t_fu_fy:
+            t_sum = t_sum + i[0]
+        self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+        print(t_sum)
+        print(self.beta_lg)
+        self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity/1000, 2)
+        self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity/1000, 2)
+        # self.bolt.bolt_shear_capacity_reduced_disp = round(self.bolt.bolt_shear_capacity * self.beta_lg / 1000, 2)
+        self.bolt.bolt_capacity_reduced_disp = round(self.bolt.bolt_capacity * self.beta_lg / 1000, 2)
 
     def get_bolt_capacity_updated(self):
         """This function updates bolt capacities"""
@@ -667,10 +696,16 @@ class SeatedAngleConnection(ShearConnection):
             self.bolt.bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
         else:
             self.bolt.bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
-
-        self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity / 1000, 1)
-        self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity / 1000, 1)
-
+        t_sum = 0.0
+        for i in self.bolt_conn_plates_t_fu_fy:
+            t_sum = t_sum + i[0]
+        self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+        print(t_sum)
+        print(self.beta_lg)
+        self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity / 1000, 2)
+        self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity / 1000, 2)
+        # self.bolt.bolt_shear_capacity_reduced_disp = round(self.bolt.bolt_shear_capacity * self.beta_lg / 1000, 2)
+        self.bolt.bolt_capacity_reduced_disp = round(self.bolt.bolt_capacity * self.beta_lg / 1000, 2)
 
     def bolt_dia_check(self):
         """This function checks if the selected bolt diameter can be placed within the available flange width"""
@@ -689,7 +724,18 @@ class SeatedAngleConnection(ShearConnection):
             else:
                 self.bolt.design_status = False
 
+    def bolt_grip_check(self):
+        '''This functions checks the grip length of bolts'''
+        self.bolt.plate_thk_status = True
+        t_sum = 0.0
+        for i in self.bolt_conn_plates_t_fu_fy:
+            t_sum = t_sum + i[0]
+        if self.bolt.bolt_diameter_provided * 8 < t_sum:
+            self.bolt.design_status = False
+            self.bolt.plate_thk_status = False
+
     def check_leg_size(self, bolt_line):
+        self.bolt_placement_check(self)
         min_leg_length = (2 * self.bolt.min_end_dist_round + (bolt_line - 1) * self.bolt.min_pitch_round)
         min_leg_b_length = (self.bolt.min_end_dist_round + self.plate.gap + self.bolt.min_edge_dist_round)
         # min_leg_length = max(2*self.bolt.min_end_dist_round + (bolts_one_line - 1) * self.bolt.min_pitch_round, self.seated_angle.leg_a_length_min)
@@ -1064,8 +1110,11 @@ class SeatedAngleConnection(ShearConnection):
         t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.bolt.bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)
 
-        t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.bolt.bolt_capacity_disp if flag else '', True)
+        t6 = (KEY_OUT_BETA_LG, KEY_OUT_DISP_BETA_LG, TYPE_TEXTBOX, self.beta_lg if flag else '', True)
         out_list.append(t6)
+
+        t7 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.bolt.bolt_capacity_reduced_disp if flag else '', True)
+        out_list.append(t7)
 
         t21 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_SHEAR_FORCE, TYPE_TEXTBOX, round(self.bolt.bolt_force, 2) if flag else '', True)
         out_list.append(t21)

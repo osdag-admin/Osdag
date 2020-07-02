@@ -71,22 +71,22 @@ class NutBoltArray():
             self.cNuts1.append(Nut(n.R, n.T, n.H, n.r1))
         
     def init_bolt_place_params(self, bolt_place_obj):
-        self.pitch = bolt_place_obj.gauge_sptng
-        self.gauge = bolt_place_obj.pitch_sptng
-        self.edge = bolt_place_obj.edge_sptng
-        self.end = bolt_place_obj.end_sptng
-        self.row = bolt_place_obj.bolt_one_line_sptng
-        self.col = bolt_place_obj.bolt_lines_sptng
+        self.pitch = bolt_place_obj.gauge_spting
+        self.gauge = bolt_place_obj.pitch_spting
+        self.edge = bolt_place_obj.edge_spting
+        self.end = bolt_place_obj.end_spting
+        self.row = bolt_place_obj.bolt_one_line_spting
+        self.col = bolt_place_obj.bolt_lines_spting
 
 
 # ########changes have been made after 3d is integreted with main files####
 
-        self.cPitch = bolt_place_obj.gauge_sptng
-        self.cGauge = bolt_place_obj.pitch_sptng
-        self.cEdge = bolt_place_obj.edge_sptng
-        self.cEnd = bolt_place_obj.end_sptng
-        self.cRow = bolt_place_obj.bolt_one_line_sptng
-        self.cCol = bolt_place_obj.bolt_lines_sptng
+        self.cPitch = bolt_place_obj.gauge_spting
+        self.cGauge = bolt_place_obj.pitch_spting
+        self.cEdge = bolt_place_obj.edge_spting
+        self.cEnd = bolt_place_obj.end_spting
+        self.cRow = bolt_place_obj.bolt_one_line_spting
+        self.cCol = bolt_place_obj.bolt_lines_spting
     
         self.leg = bolt_place_obj.leg_a_length
          

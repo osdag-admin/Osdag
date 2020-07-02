@@ -9,13 +9,28 @@ import copy
 
 
 class CCEndPlateCAD(object):
-    def __init__(self, Obj, column, endPlate, flangeWeld, webWeld, nut_bolt_array):
+    def __init__(self, Obj, column, endPlate, flangeWeld, webWeld, nut_bolt_array, stiffener, weld_stiff_h, weld_stiff_v):
+
+
         self.Obj = Obj
         self.endPlate = endPlate
         self.column = column
         self.flangeWeld = flangeWeld
         self.webWeld = webWeld
         self.nut_bolt_array = nut_bolt_array
+        self.stiffener1 = stiffener
+        self.stiffener2 = copy.deepcopy(self.stiffener1)
+        self.weld_stiff_h1 = weld_stiff_h
+        self.weld_stiff_v11 = weld_stiff_v
+        self.weld_stiff_h2 = copy.deepcopy(self.weld_stiff_h1)
+        self.weld_stiff_v12 = copy.deepcopy(self.weld_stiff_v11)
+        self.weld_stiff_v21 = copy.deepcopy(self.weld_stiff_v11)
+        self.weld_stiff_v22 = copy.deepcopy(self.weld_stiff_v11)
+
+        #condition for stiffener
+        self.stiff_cond = (self.endPlate.L - self.column.D)/2
+        if self.stiff_cond > 50:
+            self.stiff = True
 
         self.column1 = copy.deepcopy(self.column)
         self.column2 = copy.deepcopy(self.column)
@@ -75,6 +90,27 @@ class CCEndPlateCAD(object):
 
         self.endPlate2Model = self.endPlate2.create_model()
 
+        if self.stiff == True:
+            X_Axis = self.stiffener1.T/2
+            if self.Obj.weld_type == "Fillet Weld":
+                Y_Axis = self.column.D / 2 + self.stiffener1.L / 2
+            else:
+                Y_Axis = self.column.D/2 + self.stiffener1.L/2 + self.weld_stiff_h1.h
+            Z_Axis = self.endPlate.T + self.stiffener1.W/2 + self.weld_stiff_h1.h
+            stiffener1Origin = numpy.array([X_Axis, Y_Axis, Z_Axis])
+            stiffener1_uDir = numpy.array([0.0, -1.0, 0.0])
+            stiffener1_wDir = numpy.array([-1.0, 0.0, 0.0])
+            self.stiffener1.place(stiffener1Origin, stiffener1_uDir, stiffener1_wDir)
+
+            self.stiffener1Model = self.stiffener1.create_model()
+
+            stiffener2Origin = numpy.array([-X_Axis, -Y_Axis, Z_Axis])
+            stiffener2_uDir = numpy.array([0.0, 1.0, 0.0])
+            stiffener2_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.stiffener2.place(stiffener2Origin, stiffener2_uDir, stiffener2_wDir)
+
+            self.stiffener2Model = self.stiffener2.create_model()
+
     def createNutBoltArray(self):
         nut_bolt_arrayOrigin = numpy.array([-self.endPlate.W / 2, -self.endPlate.L / 2, self.endPlate.T])
         gaugeDir = numpy.array([0.0, 1.0, 0])
@@ -131,6 +167,88 @@ class CCEndPlateCAD(object):
 
         self.webWeldB1Model = self.webWeldB1.create_model()
 
+        if self.stiff == True:
+            X_Axis = 0.0
+            if self.Obj.weld_type == "Fillet Weld":
+                Y_Axis = self.column.D / 2 + self.stiffener1.R21
+            else:
+                Y_Axis = self.column.D/2 + self.weld_stiff_h1.h + self.stiffener1.R21
+            Z_Axis = self.endPlate.T + self.weld_stiff_h1.h/2
+            weld_stiff_h1Origin = numpy.array([-X_Axis, Y_Axis, Z_Axis])
+            weld_stiff_h1_uDir = numpy.array([1.0, 0.0, 0.0])
+            weld_stiff_h1_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.weld_stiff_h1.place(weld_stiff_h1Origin, weld_stiff_h1_uDir, weld_stiff_h1_wDir)
+
+            self.weld_stiff_h1Model = self.weld_stiff_h1.create_model()
+
+            weld_stiff_h2Origin = numpy.array([X_Axis, -Y_Axis, Z_Axis])
+            weld_stiff_h2_uDir = numpy.array([1.0, 0.0, 0.0])
+            weld_stiff_h2_wDir = numpy.array([0.0, -1.0, 0.0])
+            self.weld_stiff_h2.place(weld_stiff_h2Origin, weld_stiff_h2_uDir, weld_stiff_h2_wDir)
+
+            self.weld_stiff_h2Model = self.weld_stiff_h2.create_model()
+
+
+            if self.Obj.weld_type == "Fillet Weld":
+                X_Axis = self.stiffener1.T/2
+                Y_Axis = self.column.D / 2
+                Z_Axis = self.endPlate.T + self.weld_stiff_h1.h + self.stiffener1.R21
+                udir = numpy.array([1.0, 0.0, 0.0])
+                vdir = numpy.array([0.0, 1.0, 0.0])
+                wdir = numpy.array([0.0, 0.0, 1.0])
+
+                weld_stiff_v11Origin = numpy.array([X_Axis, Y_Axis, Z_Axis])
+                weld_stiff_v11_uDir = udir
+                weld_stiff_v11_wDir = wdir
+                self.weld_stiff_v11.place(weld_stiff_v11Origin, weld_stiff_v11_uDir, weld_stiff_v11_wDir)
+
+                self.weld_stiff_v11Model = self.weld_stiff_v11.create_model()
+
+                weld_stiff_v12Origin = numpy.array([X_Axis, -Y_Axis, Z_Axis + self.weld_stiff_v11.L])
+                weld_stiff_v12_uDir = udir
+                weld_stiff_v12_wDir = -wdir
+                self.weld_stiff_v12.place(weld_stiff_v12Origin, weld_stiff_v12_uDir, weld_stiff_v12_wDir)
+
+                self.weld_stiff_v12Model = self.weld_stiff_v12.create_model()
+
+                weld_stiff_v21Origin = numpy.array([-X_Axis, -Y_Axis, Z_Axis])
+                weld_stiff_v21_uDir = -udir
+                weld_stiff_v21_wDir = wdir
+                self.weld_stiff_v21.place(weld_stiff_v21Origin, weld_stiff_v21_uDir, weld_stiff_v21_wDir)
+
+                self.weld_stiff_v21Model = self.weld_stiff_v21.create_model()
+
+                weld_stiff_v22Origin = numpy.array([-X_Axis, Y_Axis, Z_Axis + self.weld_stiff_v11.L])
+                weld_stiff_v22_uDir = -udir
+                weld_stiff_v22_wDir = -wdir
+                self.weld_stiff_v22.place(weld_stiff_v22Origin, weld_stiff_v22_uDir, weld_stiff_v22_wDir)
+
+                self.weld_stiff_v22Model = self.weld_stiff_v22.create_model()
+
+            else:
+                X_Axis = 0.0
+                Y_Axis = self.column.D/2 + self.weld_stiff_h1.h/2
+                Z_Axis = self.endPlate.T + self.weld_stiff_h1.h + self.stiffener1.R21
+                udir =  numpy.array([1.0, 0.0, 0.0])
+                wdir =  numpy.array([0.0, 0.0, 1.0])
+
+                weld_stiff_v11Origin = numpy.array([X_Axis, Y_Axis, Z_Axis])
+                weld_stiff_v11_uDir = udir
+                weld_stiff_v11_wDir = wdir
+                self.weld_stiff_v11.place(weld_stiff_v11Origin, weld_stiff_v11_uDir, weld_stiff_v11_wDir)
+
+                self.weld_stiff_v11Model = self.weld_stiff_v11.create_model()
+
+                weld_stiff_v12Origin = numpy.array([-X_Axis, -Y_Axis, Z_Axis])
+                weld_stiff_v12_uDir = udir
+                weld_stiff_v12_wDir = wdir
+                self.weld_stiff_v12.place(weld_stiff_v12Origin, weld_stiff_v12_uDir, weld_stiff_v12_wDir)
+
+                self.weld_stiff_v12Model = self.weld_stiff_v12.create_model()
+
+
+
+
     def get_column_models(self):
         """
 
@@ -152,6 +270,9 @@ class CCEndPlateCAD(object):
         #     plates = BRepAlgoAPI_Fuse(comp, plates).Shape()
 
         plates = BRepAlgoAPI_Fuse(self.endPlate1Model, self.endPlate2Model).Shape()
+        if self.stiff == True:
+            plates = BRepAlgoAPI_Fuse(plates, self.stiffener1Model).Shape()
+            plates = BRepAlgoAPI_Fuse(plates, self.stiffener2Model).Shape()
 
         return plates
 
@@ -167,6 +288,16 @@ class CCEndPlateCAD(object):
         """
         welded_sec = [self.flangeWeldT1Model, self.flangeWeldT2Model, self.flangeWeldB1Model, self.flangeWeldB2Model,
                       self.webWeldT1Model, self.webWeldB1Model]
+        if self.stiff == True:
+            if self.Obj.weld_type == "Fillet Weld":
+                sec = [self.weld_stiff_h1Model, self.weld_stiff_h2Model, self.weld_stiff_v11Model,
+                              self.weld_stiff_v12Model, self.weld_stiff_v21Model, self.weld_stiff_v22Model]
+                welded_sec.extend(sec)
+            else:
+                sec = [self.weld_stiff_h1Model, self.weld_stiff_h2Model, self.weld_stiff_v11Model,
+                              self.weld_stiff_v12Model]
+                welded_sec.extend(sec)
+
         welds = welded_sec[0]
         for comp in welded_sec[1:]:
             welds = BRepAlgoAPI_Fuse(comp, welds).Shape()

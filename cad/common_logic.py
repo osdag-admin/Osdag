@@ -903,6 +903,18 @@ class CommonDesignLogic(object):
         nut_Ht = nut_T
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
+        # CEP.stiff_ht_try = CEP.stiff_wt
+        # CEP.stiff_wt = CEP.stiff_ht
+        stiffener =  StiffenerPlate(L= CEP.stiff_ht, W= CEP.stiff_wt, T = CEP.t_s, L11= CEP.stiff_ht/2, L12= CEP.stiff_wt/2, R21= 10, R22= 10)
+
+
+        if CEP.weld_size <= 16:
+            weld_stiff_h = GrooveWeld(b=stiffener.T, h= stiffener.T, L=stiffener.L - stiffener.R22)
+            weld_stiff_v = FilletWeld(b= CEP.weld_size, h= CEP.weld_size, L=stiffener.W - stiffener.R21)
+        else:
+            weld_stiff_h = GrooveWeld(b=stiffener.T, h= stiffener.T, L=stiffener.L - stiffener.R22)
+            weld_stiff_v = GrooveWeld(b=stiffener.T, h= stiffener.T, L=stiffener.W - stiffener.R21)
+
         column = ISection(B=float(CEP.section.flange_width), T=float(CEP.section.flange_thickness),
                           D=float(CEP.section.depth), t=float(CEP.section.web_thickness),
                           R1=float(CEP.section.root_radius), R2=float(CEP.section.toe_radius),
@@ -917,7 +929,7 @@ class CommonDesignLogic(object):
 
         nut_bolt_array = CEPNutBoltArray(CEP, column, nut, bolt, nut_space)
 
-        ccEndPlateCad = CCEndPlateCAD(CEP, column, endPlate, flangeWeld, webWeld, nut_bolt_array)
+        ccEndPlateCad = CCEndPlateCAD(CEP, column, endPlate, flangeWeld, webWeld, nut_bolt_array, stiffener, weld_stiff_h, weld_stiff_v)
 
         ccEndPlateCad.create_3DModel()
 

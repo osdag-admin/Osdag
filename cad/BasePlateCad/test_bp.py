@@ -1145,7 +1145,7 @@ if __name__ == '__main__':
     column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
     baseplate = Plate(L=700, W=500, T=45)
 
-    if filletWeldcolm ==  True:
+    if filletWeldcolm ==  True:U
         weldAbvFlang = FilletWeld(b=10, h=10, L=250)
         weldBelwFlang = FilletWeld(b=10, h=10, L=100)
         weldSideWeb = FilletWeld(b=10, h=10, L=420)

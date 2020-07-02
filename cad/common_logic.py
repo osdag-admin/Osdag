@@ -196,7 +196,7 @@ class CommonDesignLogic(object):
 
     def boltHeadThick_Calculation(self, boltDia):
         '''
-        This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
+        This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989) and IS:1364 (PART-1) : 2002
 
 
        bolt Head Dia
@@ -208,43 +208,16 @@ class CommonDesignLogic(object):
            |  |
            |  |
 
-        '''
-        # boltHeadThick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
+        Note: The head thickness for diameter 72 has been assumed and not taken from the IS code
 
         '''
-        This routine takes the bolt diameter and return bolt head thickness as per IS:1364 (PART-1) : 2002
-
-
-        __________
-        |        | | T = Thickness
-        |________| |
-           |  |
-           |  |
-           |  |
-
-        '''
-        boltHeadThick = {5: 3.5, 6:4, 8: 5.3, 10: 6.4, 12: 7.5, 14: 8.8, 16: 10, 18: 11.5, 20: 12.5, 22: 14, 24: 15,
-                         27: 17, 30: 18.7, 33: 21, 36: 22.5, 39: 25}
+        boltHeadThick = {5: 3.5, 6: 4, 8: 5.3, 10: 6.4, 12: 7.5, 14: 8.8, 16: 10, 18: 11.5, 20: 12.5, 22: 14, 24: 15,
+                         27: 17, 30: 18.7, 33: 21, 36: 22.5, 39: 25, 42: 26, 48: 30, 56: 35, 64: 40, 72: 45}
         return boltHeadThick[boltDia]
 
     def boltHeadDia_Calculation(self, boltDia):
         '''
-        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
-
-       bolt Head Dia
-        <-------->
-        __________
-        |        |
-        |________|
-           |  |
-           |  |
-           |  |
-
-        '''
-        # boltHeadDia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
-
-        '''
-        This routine takes the bolt diameter and return bolt head diameter as per IS:1364 (PART-1) : 2002
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989) and IS:1364 (PART-1) : 2002
 
        bolt Head Dia
         <-------->
@@ -257,7 +230,7 @@ class CommonDesignLogic(object):
 
         '''
         boltHeadDia = {5: 8, 6: 10, 8: 13, 10: 16, 12: 18, 14: 21, 16: 24, 18: 27, 20: 30, 22: 34, 24: 36, 27: 41,
-                       30: 46, 33: 50, 36: 55, 39: 60}
+                       30: 46, 33: 50, 36: 55, 39: 60, 42: 65, 48: 75, 56: 85, 64: 95, 72: 110}
         return boltHeadDia[boltDia]
 
     def boltLength_Calculation(self, boltDia):

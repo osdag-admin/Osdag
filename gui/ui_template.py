@@ -5,11 +5,12 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!\
-from PyQt5.QtWidgets import QMessageBox, qApp, QScrollArea
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice,pyqtSlot
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from design_report import reportGenerator
+from PyQt5.QtCore import QRegExp,QTimer, QThread, QFile, pyqtSignal, QTextStream, Qt, QIODevice, pyqtSlot
+from PyQt5.QtGui import QBrush, QImage, QColor, QDoubleValidator, QIntValidator, QPixmap, QPalette, QTextCharFormat, QTextCursor, QStandardItem
+from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp
@@ -23,7 +24,7 @@ from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.column_cover_plate import ColumnCoverPlate
-from PyQt5.QtGui import QStandardItem
+from PIL import Image
 import os
 import yaml
 import json
@@ -196,8 +197,8 @@ class Window(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
 
-        self.new_window = QtWidgets.QDialog()
-        self.new_ui = Ui_Dialog1(main.design_button_status)
+        self.new_window = QtWidgets.QDialog(self)
+        self.new_ui = Ui_Dialog1(main.design_button_status,loggermsg=self.textEdit.toPlainText())
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
@@ -305,6 +306,7 @@ class Window(QMainWindow):
         self.display_mode = 'Normal'
         self.display_x = 90
         self.display_y = 90
+        self.ui_loaded = False
         main.design_status = False
         main.design_button_status = False
         MainWindow.setObjectName("MainWindow")
@@ -579,8 +581,7 @@ class Window(QMainWindow):
                 if lable == 'Material':
                     combo.setCurrentIndex(1)
                     maxi_width_right = max(maxi_width_right, item_width)
-                else:
-                    combo.view().setMinimumWidth(item_width + 25)
+                combo.view().setMinimumWidth(item_width + 25)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
@@ -636,7 +637,7 @@ class Window(QMainWindow):
 
             if type == TYPE_IMAGE:
                 im = QtWidgets.QLabel(self.dockWidgetContents)
-                im.setGeometry(QtCore.QRect(190, 10 + i, 70, 57))
+                im.setGeometry(QtCore.QRect(190, 10 + i, 100, 100))
                 im.setObjectName(option[0])
                 im.setScaledContents(True)
                 pixmap = QPixmap(option[3])
@@ -684,7 +685,6 @@ class Window(QMainWindow):
         in_scroll.setWidget(in_scrollcontent)
 
         maxi_width = maxi_width_left + maxi_width_right
-        print(maxi_width)
         in_scrollcontent.setMinimumSize(maxi_width,in_scrollcontent.sizeHint().height())
         maxi_width += 82
         maxi_width = max(maxi_width, 350)    # In case there is no widget
@@ -764,10 +764,10 @@ class Window(QMainWindow):
             for t in updated_list:
                 for key_name in t[0]:
                     key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, key_name)
-                    self.on_change_connect(key_changed, updated_list, data)
+                    self.on_change_connect(key_changed, updated_list, data, main)
 
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 30))
+        self.btn_Reset.setGeometry(QtCore.QRect((maxi_width/2)-110, 650, 100, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -777,7 +777,7 @@ class Window(QMainWindow):
         self.btn_Reset.setObjectName("btn_Reset")
 
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 30))
+        self.btn_Design.setGeometry(QtCore.QRect((maxi_width/2)+10, 650, 100, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -840,6 +840,11 @@ class Window(QMainWindow):
         j = 1
         button_list = []
         maxi_width_left, maxi_width_right = -1, -1
+        self.output_title_fields = {}
+        key = None
+        current_key = None
+        fields = 0
+        title_repeat = 1
         for option in out_list:
             lable = option[1]
             output_type = option[2]
@@ -877,6 +882,8 @@ class Window(QMainWindow):
                 #r.setFixedSize(r.size())
                 out_layout2.addWidget(r, j, 2, 1, 1)
                 r.setVisible(True if option[4] else False)
+                fields += 1
+                self.output_title_fields[current_key][1] = fields
                 maxi_width_right = max(maxi_width_right, 100)    # predefined minimum width of 110 for textboxes
                 #r.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
                 # if option[0] == KEY_OUT_ANCHOR_BOLT_TENSION and module == KEY_DISP_BASE_PLATE:
@@ -897,6 +904,8 @@ class Window(QMainWindow):
                 b.resize(b.sizeHint().width(), b.sizeHint().height())
                 b.setText(v[0])
                 b.setDisabled(True)
+                fields += 1
+                self.output_title_fields[current_key][1] = fields
                 #b.setFixedSize(b.size())
                 button_list.append(option)
                 out_layout2.addWidget(b, j, 2, 1, 1)
@@ -904,6 +913,8 @@ class Window(QMainWindow):
                 #b.clicked.connect(lambda: self.output_button_dialog(main, out_list))
 
             if output_type == TYPE_TITLE:
+                key = lable
+
                 q = QtWidgets.QLabel(self.dockWidgetContents_out)
 
                 #q.setGeometry(QtCore.QRect(3, 10 + i, 201, 25))
@@ -912,11 +923,20 @@ class Window(QMainWindow):
                 font.setWeight(65)
                 q.setFont(font)
                 q.setObjectName("_title")
-                # q.setVisible(True if option[4] else False)
+                q.setVisible(True if option[4] else False)
                 #q.setFixedSize(q.size())
                 q.setText(_translate("MainWindow",
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
                 q.resize(q.sizeHint().width(), q.sizeHint().height())
+                # q.setVisible(True if option[4] else False)
+                if key:
+                    fields = 0
+                    current_key = key
+                    if key in self.output_title_fields.keys():
+                        self.output_title_fields.update({key+str(title_repeat): [q, fields]})
+                        title_repeat +=1
+                    else:
+                        self.output_title_fields.update({key: [q, fields]})
                 out_layout2.addWidget(q, j, 1, 2, 2)
                 j = j + 1
             i = i + 30
@@ -1316,7 +1336,24 @@ class Window(QMainWindow):
                 last_design_dictionary = yaml.safe_load(last_design)
         if isinstance(last_design_dictionary, dict):
             self.setDictToUserInputs(last_design_dictionary, option_list, data, new_list)
-            
+            if "out_titles_status" in last_design_dictionary.keys():
+                title_status = last_design_dictionary["out_titles_status"]
+                print("titles", title_status)
+                title_count = 0
+                out_titles = []
+                title_repeat = 1
+                for out_field in out_list:
+                    if out_field[2] == TYPE_TITLE:
+                        title_name = out_field[1]
+                        if title_name in out_titles:
+                            title_name += str(title_repeat)
+                            title_repeat += 1
+                        if title_status[title_count] == 0:
+                            self.output_title_fields[title_name][0].setVisible(False)
+                        title_count += 1
+                        out_titles.append(title_name)
+        self.ui_loaded = True
+
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
         self.connectivity = None
@@ -1403,10 +1440,10 @@ class Window(QMainWindow):
                 else:
                     data[c_tup[0] + "_customized"] = f()
 
-    def on_change_connect(self, key_changed, updated_list, data):
-        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data))
+    def on_change_connect(self, key_changed, updated_list, data, main):
+        key_changed.currentIndexChanged.connect(lambda: self.change(key_changed, updated_list, data, main))
 
-    def change(self, k1, new, data):
+    def change(self, k1, new, data, main):
 
         """
         @author: Umair
@@ -1476,6 +1513,72 @@ class Window(QMainWindow):
                     k2.setVisible(True)
             else:
                 pass
+
+        if self.ui_loaded:
+            self.output_title_change(main)
+
+    def output_title_change(self, main):
+
+        status = main.design_status
+        out_list = main.output_values(main, status)
+        key = None
+        no_field_titles = []
+        titles = []
+        title_repeat = 1
+        visible_fields = 0
+        for option in out_list:
+            if option[2] == TYPE_TITLE:
+                if key:
+                    title_repeat = self.output_title_visiblity(visible_fields, key, titles, title_repeat)
+                    titles.append(key)
+
+                key = option[1]
+                if self.output_title_fields[key][1] == 0:
+                    no_field_titles.append(key)
+                if key in no_field_titles:
+                    visible_fields = 1
+                else:
+                    visible_fields = 0
+
+            if option[2] == TYPE_TEXTBOX:
+                if self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).isVisible():
+                    visible_fields += 1
+
+            elif option[2] == TYPE_OUT_BUTTON:
+                visible_fields += 1
+
+        self.output_title_visiblity(visible_fields, key, titles, title_repeat)
+
+        no_field_title = ""
+        for title in self.output_title_fields.keys():
+            if title in no_field_titles:
+                no_field_title = title
+            elif self.output_title_fields[title][0].isVisible():
+                if no_field_title in no_field_titles:
+                    no_field_titles.remove(no_field_title)
+
+        for no_field_title in no_field_titles:
+            self.output_title_fields[no_field_title][0].setVisible(False)
+
+    def output_title_visiblity(self, visible_fields, key, titles, title_repeat):
+
+        if visible_fields == 0:
+            if key in titles:
+                self.output_title_fields[key + str(title_repeat)][0].setVisible(False)
+                title_repeat += 1
+            else:
+                self.output_title_fields[key][0].setVisible(False)
+        else:
+            if key in titles:
+                self.output_title_fields[key + str(title_repeat)][0].setVisible(True)
+                title_repeat += 1
+            else:
+                self.output_title_fields[key][0].setVisible(True)
+
+        return title_repeat
+
+
+
 
     # Function for Reset Button
     '''
@@ -1752,7 +1855,6 @@ class Window(QMainWindow):
     def common_function_for_save_and_design(self, main, data, trigger_type):
 
         # @author: Amir
-
         option_list = main.input_values(self)
         self.design_fn(option_list, data, main)
 
@@ -1770,6 +1872,11 @@ class Window(QMainWindow):
 
         else:
             main.design_button_status = True
+            for input_field in self.dockWidgetContents.findChildren(QtWidgets.QWidget):
+                if type(input_field) == QtWidgets.QLineEdit:
+                    input_field.textChanged.connect(self.clear_output_fields)
+                elif type(input_field) == QtWidgets.QComboBox:
+                    input_field.currentIndexChanged.connect(self.clear_output_fields)
             self.textEdit.clear()
             with open("logging_text.log", 'w') as log_file:
                 pass
@@ -1780,13 +1887,6 @@ class Window(QMainWindow):
             if error is not None:
                 self.show_error_msg(error)
                 return
-            last_design_folder = os.path.join('ResourceFiles', 'last_designs')
-            if not os.path.isdir(last_design_folder):
-                os.mkdir(last_design_folder)
-            last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
-            last_design_file = os.path.join(last_design_folder, last_design_file)
-            with open(str(last_design_file), 'w') as last_design:
-                yaml.dump(self.design_inputs, last_design)
 
             out_list = main.output_values(main, status)
             for option in out_list:
@@ -1801,12 +1901,37 @@ class Window(QMainWindow):
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
 
+            self.output_title_change(main)
 
+            last_design_folder = os.path.join('ResourceFiles', 'last_designs')
+            if not os.path.isdir(last_design_folder):
+                os.mkdir(last_design_folder)
+            last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
+            last_design_file = os.path.join(last_design_folder, last_design_file)
+            out_titles_status = []
+            out_titles = []
+            title_repeat = 1
+            for option in out_list:
+                if option[2] == TYPE_TITLE:
+                    title_name = option[1]
+                    if title_name in out_titles:
+                        title_name += str(title_repeat)
+                        title_repeat += 1
+                    if self.output_title_fields[title_name][0].isVisible():
+                        out_titles_status.append(1)
+                    else:
+                        out_titles_status.append(0)
+                    out_titles.append(title_name)
+            self.design_inputs.update({"out_titles_status": out_titles_status})
+            with open(str(last_design_file), 'w') as last_design:
+                yaml.dump(self.design_inputs, last_design)
+            self.design_inputs.pop("out_titles_status")
             if status is True and main.module in [KEY_DISP_FINPLATE, KEY_DISP_BEAMCOVERPLATE,
                                                   KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_CLEATANGLE,
                                                   KEY_DISP_ENDPLATE, KEY_DISP_BASE_PLATE, KEY_DISP_SEATED_ANGLE,
                                                   KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,KEY_DISP_COLUMNCOVERPLATE,
                                                   KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE]:
+
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
@@ -1822,15 +1947,43 @@ class Window(QMainWindow):
 
                 if file_extension == 'png':
                     self.display.ExportToImage(fName)
+                    im = Image.open('./ResourceFiles/images/3d.png')
+                    w,h=im.size
+                    if(w< 640 or h < 360):
+                        print('Re-taking Screenshot')
+                        self.resize(700,500)
+                        self.outputDock.hide()
+                        self.inputDock.hide()
+                        self.textEdit.hide()
+                        QTimer.singleShot(0, lambda:self.retakeScreenshot(fName))
 
             else:
+                self.display.EraseAll()
                 for chkbox in main.get_3d_components(main):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(False)
                 for action in self.menugraphics_component_list:
                     action.setEnabled(False)
 
+    def retakeScreenshot(self,fName):
+        Ww=self.frameGeometry().width()
+        Wh=self.frameGeometry().height()
+        self.display.FitAll()
+        self.display.ExportToImage(fName)
+        self.resize(Ww,Wh)
+        self.outputDock.show()
+        self.inputDock.show()
+        self.textEdit.show()
+
     def show_error_msg(self, error):
         QMessageBox.about(self,'information',error[0])  # show only first error message.
+
+    def clear_output_fields(self):
+        for output_field in self.dockWidgetContents_out.findChildren(QtWidgets.QLineEdit):
+            output_field.clear()
+        for output_field in self.dockWidgetContents_out.findChildren(QtWidgets.QPushButton):
+            if output_field.objectName() in ["btn_CreateDesign", "save_outputDock"]:
+                continue
+            output_field.setEnabled(False)
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles\images", "OsdagHeader.png")))
@@ -2622,8 +2775,8 @@ class Window(QMainWindow):
 
     def set_dialog_size(self,dialog):
         def set_size():
-            dialog.resize(900,900) 
-            self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)  
+            dialog.resize(900,900)
+            self.OsdagSectionModeller.OCCFrame.setMinimumSize(490,350)
             self.OsdagSectionModeller.OCCWindow.setFocus()
         return set_size
 

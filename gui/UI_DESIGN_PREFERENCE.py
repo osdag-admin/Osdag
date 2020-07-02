@@ -70,6 +70,7 @@ class Window(QDialog):
         self.btn_save.setFixedSize(160,31)
 
         tab_index = 0
+        last_title = ""
         for tab_details in main.tab_list(main):
             tab_name = tab_details[0]
             tab_elements = tab_details[2]
@@ -155,8 +156,8 @@ class Window(QDialog):
                         if lable == 'Designation':
                             line.textChanged.connect(self.manage_designation_size(line))
                         line.setFixedSize(91,22)
-                        if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5','Label_6','Label_7','Label_13','Label_14']:
-                            line.setValidator(QDoubleValidator())
+                        # if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5','Label_6','Label_7','Label_13','Label_14']:
+                        #     line.setValidator(QDoubleValidator())
                         if input_dictionary:
                             line.setText(str(element[4]))
                         font = QtGui.QFont()
@@ -172,6 +173,15 @@ class Window(QDialog):
                                 [KEY_DISP_LOCATION, KEY_DISP_SEC_PROFILE]:
                             line.setReadOnly(True)
                             self.do_not_clear_list.append(line)
+                        if last_title == KEY_DISP_DIMENSIONS:
+                            if element[1] in [KEY_DISP_ROOT_R, KEY_DISP_TOE_R]:
+                                regex_validator = QtCore.QRegExp("[0-9]*[.][0-9]*|[.][0-9]*|0")
+                            else:
+                                regex_validator = QtCore.QRegExp("[1-9][0-9]*[.][0-9]*|[.][0-9]*")
+                            line.setValidator(QtGui.QRegExpValidator(regex_validator, line))
+                        if last_title == KEY_DISP_SEC_PROP:
+                            regex_validator = QtCore.QRegExp("[1-9][0-9]*[.][0-9]*|[.][0-9]*|N/A|-")
+                            line.setValidator(QtGui.QRegExpValidator(regex_validator, line))
 
                         r += 1
 
@@ -190,7 +200,7 @@ class Window(QDialog):
                         font.setPointSize(9)
                         font.setBold(False)
                         font.setWeight(50)
-                        combo.setFont(font)
+                        #combo.setFont(font)
                         metrices = QtGui.QFontMetrics(font)
                         item_width = 0
                         item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
@@ -209,6 +219,7 @@ class Window(QDialog):
                         font.setPointSize(10)
                         title.setFont(font)
                         title.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
+                        last_title = lable
                         r += 1
 
                     if type == TYPE_IMAGE:
@@ -1070,7 +1081,7 @@ class Window(QDialog):
                                            values['It'], values['Iw'], values['Source'], values['Type']))
                             elif tab_name == 'Beams':
                                 c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,
-                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES 
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                                           (values['Designation'], values['Mass'], values['Area'], values['D'],
                                            values['B'], values['tw'], values['T'], values['FlangeSlope'],
@@ -1079,7 +1090,7 @@ class Window(QDialog):
                                            values['It'], values['Iw'], values['Source'], values['Type']))
                             elif tab_name == 'Angles':
                                 c.execute('''INSERT INTO Angles (Designation,Mass,Area,a,b,t,R1,R2,Cz,Cy,Iz,Iy,Iumax,
-                                Ivmin,rz,ry,rumax,rvmin,Zz,Zy,Zpz,Zpy,It,Source,Type) VALUES 
+                                Ivmin,rz,ry,rumax,rvmin,Zz,Zy,Zpz,Zpy,It,Source,Type) VALUES
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                                           (values['Designation'], values['Mass'], values['Area'], values['a'],
                                            values['b'], values['t'], values['R1'], values['R2'], values['Cz'],
@@ -1089,7 +1100,7 @@ class Window(QDialog):
                                            values['Type']))
                             elif tab_name == 'Channels':
                                 c.execute('''INSERT INTO Channels (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Cy,
-                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES 
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                                           (values['Designation'], values['Mass'], values['Area'], values['D'],
                                            values['B'], values['tw'], values['T'], values['FlangeSlope'], values['R1'],

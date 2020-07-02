@@ -917,7 +917,7 @@ class Compression(Main):
         else:
             designation_list = []
 
-        t1 = (KEY_SUPTNGSEC_DESIGNATION, KEY_DISP_SUPTNGSEC_DESIGNATION, TYPE_TEXTBOX, None, designation)
+        t1 = (KEY_SUPTNGSEC, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
         supporting_section.append(t1)
 
         t0 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, designation_list, designation)
@@ -930,10 +930,10 @@ class Compression(Main):
         t34 = (KEY_SUPTNGSEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         supporting_section.append(t34)
 
-        t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_SUPTNGSEC_FU, TYPE_TEXTBOX, None, fu)
+        t3 = (KEY_SUPTNGSEC_FU, KEY_DISP_FU, TYPE_TEXTBOX, None, fu)
         supporting_section.append(t3)
 
-        t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_SUPTNGSEC_FY, TYPE_TEXTBOX, None, fy)
+        t4 = (KEY_SUPTNGSEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         supporting_section.append(t4)
 
         t5 = (None, 'Dimensions', TYPE_TITLE, None, None)
@@ -1103,7 +1103,7 @@ class Compression(Main):
         else:
             designation_list = []
 
-        t1 = (KEY_SUPTDSEC_DESIGNATION, KEY_DISP_SUPTDSEC_DESIGNATION, TYPE_TEXTBOX, None, designation)
+        t1 = (KEY_SUPTDSEC, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
         supported_section.append(t1)
 
         t0 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, designation_list, designation)
@@ -1116,10 +1116,10 @@ class Compression(Main):
         t34 = (KEY_SUPTDSEC_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, material, material_grade)
         supported_section.append(t34)
 
-        t3 = (KEY_SUPTDSEC_FU, KEY_DISP_SUPTDSEC_FU, TYPE_TEXTBOX, None, fu)
+        t3 = (KEY_SUPTDSEC_FU, KEY_DISP_FU, TYPE_TEXTBOX, None, fu)
         supported_section.append(t3)
 
-        t4 = (KEY_SUPTDSEC_FY, KEY_DISP_SUPTDSEC_FY, TYPE_TEXTBOX, None, fy)
+        t4 = (KEY_SUPTDSEC_FY, KEY_DISP_FY, TYPE_TEXTBOX, None, fy)
         supported_section.append(t4)
 
         t5 = (None, 'Dimensions', TYPE_TITLE, None, None)

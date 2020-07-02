@@ -53,7 +53,7 @@ def cl_10_2_2_min_spacing(d, parameter='pitch'):#Todo:write condition for pitch 
 
     return min_pitch_eqn
 
-def cl_10_2_3_1_max_spacing(t,parameter='pitch'):#TODO:write condition for pitch and gauge
+def cl_10_2_3_1_max_spacing(t,parameter=None):#TODO:write condition for pitch and gauge
     """
      Calculate the maximum pitch distance
      Args:
@@ -71,16 +71,16 @@ def cl_10_2_3_1_max_spacing(t,parameter='pitch'):#TODO:write condition for pitch
     max_pitch = min(max_pitch_1,max_pitch_2)
     t = str(min(t))
     max_pitch = str(max_pitch)
-
-
     max_pitch_eqn = Math(inline=True)
     if parameter=='pitch':
         max_pitch_eqn.append(NoEscape(r'\begin{aligned}p_{max}&=\min(32~t,~300~mm)\\'))
     elif parameter == 'gauge':
         max_pitch_eqn.append(NoEscape(r'\begin{aligned}g_{max}&=\min(32~t,~300~mm)\\'))
     else:
-        max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
-        max_pitch_eqn.append(NoEscape(r'Where,~t &= min('+t1+','+t2+r')\\'))
+        max_pitch_eqn.append(NoEscape(r'\begin{aligned}p/g_{max}&=\min(32~t,~300~mm)\\'))
+
+    max_pitch_eqn.append(NoEscape(r'&=\min(32 *~' + t+ r',~ 300 ~mm)\\&='+max_pitch+r'\\'))
+    max_pitch_eqn.append(NoEscape(r'Where,~t &= min('+t1+','+t2+r')\\'))
     max_pitch_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.3]\end{aligned}'))
 
     return max_pitch_eqn
@@ -226,7 +226,7 @@ def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
 
     return bolt_shear_eqn
 
-def end_plate_gauge(connection,e_min,s,t_w,T_w,R_r):
+def end_plate_gauge(connection,e_min,s,t_w,T_w,R_r,module='None'):
     g1 = round(2*(e_min+s)+t_w,2)
     g2 = round(2*(e_min+R_r)+T_w,2)
     g_min = round(max(g1,g2),2)
@@ -1377,7 +1377,7 @@ def tension_yield_prov(l,t, f_y, gamma, T_dg,multiple =1):
     tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{dg} &= \frac{l*t*f_y}{\gamma_{mo}}\\'))
     tension_yield_eqn.append(NoEscape(r'&=\frac{'+multiple+'*'+l+'*'+t+'*'+f_y+'}{'+gamma+r'}\\'))
 
-    tension_yield_eqn.append(NoEscape(r'&=' + T_dg +r')\\'))
+    tension_yield_eqn.append(NoEscape(r'&=' + T_dg +r'\\'))
     tension_yield_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~6.2]\end{aligned}'))
     return tension_yield_eqn
 
@@ -3406,7 +3406,7 @@ def plate_area_req(crs_area, flange_web_area):
     plate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} &pt.area >= \\&connected~member~area * 1.05\\'))
     # plate_crs_sec_area_eqn.append(NoEscape(r'& = '+crs_area+ r' * 1.05 \\'))
     plate_crs_sec_area_eqn.append(NoEscape(r' &= ' + flange_web_area  +  r'\\'))
-    plate_crs_sec_area_eqn.append(NoEscape(r' &[Ref: Cl.8.6.3.2 IS 800:2007]\end{aligned}'))
+    plate_crs_sec_area_eqn.append(NoEscape(r' &[Ref: Cl.8.6.3.2 ~IS ~800:2007]\end{aligned}'))
     return plate_crs_sec_area_eqn
 
 

@@ -13,6 +13,8 @@ import sys
 import datetime
 import pylatex as pyl
 from pylatex.basic import TextColor
+from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu,\
     MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
@@ -97,7 +99,8 @@ class CreateLatex(Document):
                 table.add_hline()
                 for i in uiObj:
                     # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
-                    if i == "Selected Section Details":
+                    if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST:
+                    # if type(uiObj[i]) == list:
                         continue
                     if type(uiObj[i]) == dict:
                         table.add_hline()
@@ -156,7 +159,7 @@ class CreateLatex(Document):
                         table.add_row((MultiColumn(3, align='|c|', data=i), MultiColumn(2, align='|c|', data=uiObj[i]),))
                         table.add_hline()
             for i in uiObj:
-                if i == 'Section Size*':
+                if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST:
                     with doc.create(Subsection("List of Input Section")):
                         with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
                                 str_len = len(uiObj[i])
@@ -246,22 +249,30 @@ class CreateLatex(Document):
         doc.append(NewPage())
 
 
-        if (not 'TRAVIS' in os.environ) and (does_design_exist):
+        if does_design_exist:
             with doc.create(Section('3D View')):
                 with doc.create(Figure(position='h!')) as view_3D:
                     view_3dimg_path = rel_path + Disp_3d_image
                     # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
-                    view_3D.add_image(filename=view_3dimg_path)
+                    view_3D.add_image(filename=view_3dimg_path,width='500px')
 
                     view_3D.add_caption('3D View')
+
+        with doc.create(Section('Design Log')):
+            logger_msgs=reportsummary['logger_messages'].split('\n')
+            for msg in logger_msgs:
+                if('WARNING' in msg):
+                    colour='blue'
+                elif('INFO' in msg):
+                    colour='green'
+                elif('ERROR' in msg):
+                    colour='red'
+                doc.append(TextColor(colour,'\n'+msg))
         try:
             doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
         except:
             pass
 
-
 def color_cell(cellcolor,celltext):
     string = NoEscape(r'\cellcolor{'+cellcolor+r'}{'+celltext+r'}')
     return string
-
-

@@ -53,76 +53,98 @@ from cad.cadfiles.cross_isection import cross_isection
 
 
 class Ui_OsdagSectionModeller(object):
-
-        def setupUi(self,Dialog):
-                super().__init__()
+        def setupUi(self, Dialog):
                 Dialog.setObjectName("Dialog")
-                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-                sizePolicy.setHorizontalStretch(0)
-                sizePolicy.setVerticalStretch(0)
-                sizePolicy.setHeightForWidth(Dialog.sizePolicy().hasHeightForWidth())
-                Dialog.setSizePolicy(sizePolicy)
-                #self.setMinimumSize(QtCore.QSize(700, 500))
-                #self.setMaximumSize(QtCore.QSize(906, 800))
-                Dialog.setSizeGripEnabled(False)
-                #self.setModal(True)
-                self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
-                self.verticalLayout.setContentsMargins(11, 11, 11, 11)
+                self.Parameters={}
+                self.verticalLayout_56 = QtWidgets.QVBoxLayout(Dialog)
+                self.verticalLayout_56.setContentsMargins(0, 0, 0, 0)
+                self.verticalLayout_56.setObjectName("verticalLayout_56")
+                self.scrollArea = QtWidgets.QScrollArea(Dialog)
+                self.scrollArea.setWidgetResizable(True)
+                self.scrollArea.setObjectName("scrollArea")
+                self.scrollAreaWidgetContents = QtWidgets.QWidget()
+                self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 898, 719))
+                self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+                self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
+                self.verticalLayout.setContentsMargins(0, 0, 0, 0)
                 self.verticalLayout.setSpacing(0)
                 self.verticalLayout.setObjectName("verticalLayout")
-                self.horizontalLayout = QtWidgets.QHBoxLayout()
-                self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-                self.horizontalLayout.setSpacing(0)
-                self.horizontalLayout.setObjectName("horizontalLayout")
-                self.design_section = QtWidgets.QFrame(Dialog)
-
-                self.design_section.setFrameShape(QtWidgets.QFrame.Box)
-                self.design_section.setFrameShadow(QtWidgets.QFrame.Sunken)
-                self.design_section.setLineWidth(3)
-                self.design_section.setObjectName("design_section")
-                self.verticalLayout_17 = QtWidgets.QVBoxLayout(self.design_section)
-                self.verticalLayout_17.setContentsMargins(0, 0, 0, 0)
-                self.verticalLayout_17.setSpacing(0)
-                self.verticalLayout_17.setObjectName("verticalLayout_17")
-                self.label = QtWidgets.QLabel(self.design_section)
-                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-                sizePolicy.setHorizontalStretch(0)
-                sizePolicy.setVerticalStretch(0)
-                sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
-                self.label.setSizePolicy(sizePolicy)
-                self.label.setMinimumSize(QtCore.QSize(0, 40))
-                self.label.setMaximumSize(QtCore.QSize(16777215, 40))
+                self.horizontalLayout_34 = QtWidgets.QHBoxLayout()
+                self.horizontalLayout_34.setSpacing(1)
+                self.horizontalLayout_34.setObjectName("horizontalLayout_34")
+                self.define_section_3 = QtWidgets.QFrame(self.scrollAreaWidgetContents)
+                self.define_section_3.setStyleSheet("QFrame{\n"
+                "    background:#ffffff;\n"
+                "}")
+                self.define_section_3.setFrameShape(QtWidgets.QFrame.Box)
+                self.define_section_3.setFrameShadow(QtWidgets.QFrame.Raised)
+                self.define_section_3.setLineWidth(3)
+                self.define_section_3.setObjectName("define_section_3")
+                self.verticalLayout_52 = QtWidgets.QVBoxLayout(self.define_section_3)
+                self.verticalLayout_52.setContentsMargins(0, 0, 0, 0)
+                self.verticalLayout_52.setSpacing(0)
+                self.verticalLayout_52.setObjectName("verticalLayout_52")
+                self.label_14 = QtWidgets.QLabel(self.define_section_3)
+                self.label_14.setMinimumSize(QtCore.QSize(0, 50))
+                self.label_14.setMaximumSize(QtCore.QSize(16777215, 50))
                 font = QtGui.QFont()
                 font.setPointSize(11)
-                font.setUnderline(False)
-                self.label.setFont(font)
-                self.label.setStyleSheet("QLabel{\n"
-        "background:rgb(135, 135, 135);\n"
-        "color:#ffffff;\n"
-        "}")
-                self.label.setFrameShape(QtWidgets.QFrame.WinPanel)
-                self.label.setFrameShadow(QtWidgets.QFrame.Raised)
-                self.label.setAlignment(QtCore.Qt.AlignCenter)
-                self.label.setObjectName("label")
-                self.verticalLayout_17.addWidget(self.label)
-                spacerItem = QtWidgets.QSpacerItem(75, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-                self.verticalLayout_17.addItem(spacerItem)
-                self.verticalLayout_2 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_2.setContentsMargins(11, 11, 11, 11)
-                self.verticalLayout_2.setObjectName("verticalLayout_2")
-                self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-                self.label_2 = QtWidgets.QLabel(self.design_section)
+                self.label_14.setFont(font)
+                self.label_14.setStyleSheet("QFrame{\n"
+                "    background:rgb(135, 135, 135);\n"
+                "color:#ffffff;\n"
+                "}")
+                self.label_14.setAlignment(QtCore.Qt.AlignCenter)
+                self.label_14.setObjectName("label_14")
+                self.verticalLayout_52.addWidget(self.label_14)
+                spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+                self.verticalLayout_52.addItem(spacerItem1)
+                self.verticalLayout_53 = QtWidgets.QVBoxLayout()
+                self.verticalLayout_53.setSpacing(10)
+                self.verticalLayout_53.setObjectName("verticalLayout_53")
+                self.horizontalLayout_35 = QtWidgets.QHBoxLayout()
+                self.horizontalLayout_35.setContentsMargins(15, 0, 15, -1)
+                self.horizontalLayout_35.setSpacing(10)
+                self.horizontalLayout_35.setObjectName("horizontalLayout_35")
+                self.verticalLayout_54 = QtWidgets.QVBoxLayout()
+                self.verticalLayout_54.setSpacing(15)
+                self.verticalLayout_54.setObjectName("verticalLayout_54")
+                self.label_15 = QtWidgets.QLabel(self.define_section_3)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(True)
-                font.setWeight(75)
-                self.label_2.setFont(font)
-                self.label_2.setObjectName("label_2")
-                self.horizontalLayout_2.addWidget(self.label_2)
-                self.section_type_combobox = QtWidgets.QComboBox(self.design_section)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.label_15.setFont(font)
+                self.label_15.setObjectName("label_15")
+                self.verticalLayout_54.addWidget(self.label_15)
+                self.label_16 = QtWidgets.QLabel(self.define_section_3)
                 font = QtGui.QFont()
-                font.setPointSize(9)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.label_16.setFont(font)
+                self.label_16.setObjectName("label_16")
+                self.verticalLayout_54.addWidget(self.label_16)
+                self.label_17 = QtWidgets.QLabel(self.define_section_3)
+                font = QtGui.QFont()
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.label_17.setFont(font)
+                self.label_17.setObjectName("label_17")
+                self.verticalLayout_54.addWidget(self.label_17)
+                self.label_18 = QtWidgets.QLabel(self.define_section_3)
+                font = QtGui.QFont()
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.label_18.setFont(font)
+                self.label_18.setObjectName("label_18")
+                self.verticalLayout_54.addWidget(self.label_18)
+                self.horizontalLayout_35.addLayout(self.verticalLayout_54)
+                self.verticalLayout_55 = QtWidgets.QVBoxLayout()
+                self.verticalLayout_55.setSpacing(15)
+                self.verticalLayout_55.setObjectName("verticalLayout_55")
+                self.section_type_combobox = QtWidgets.QComboBox(self.define_section_3)
+                font = QtGui.QFont()
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
                 self.section_type_combobox.setFont(font)
                 self.section_type_combobox.setObjectName("section_type_combobox")
                 self.section_type_combobox.addItem("")
@@ -131,543 +153,311 @@ class Ui_OsdagSectionModeller(object):
                 self.section_type_combobox.addItem("")
                 self.section_type_combobox.addItem("")
                 self.section_type_combobox.addItem("")
-                self.horizontalLayout_2.addWidget(self.section_type_combobox)
-                self.verticalLayout_2.addLayout(self.horizontalLayout_2)
-                spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-                self.verticalLayout_2.addItem(spacerItem1)
-                self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-                self.label_3 = QtWidgets.QLabel(self.design_section)
+                self.verticalLayout_55.addWidget(self.section_type_combobox)
+                self.section_template_combobox = QtWidgets.QComboBox(self.define_section_3)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(True)
-                font.setWeight(75)
-                self.label_3.setFont(font)
-                self.label_3.setObjectName("label_3")
-                self.horizontalLayout_3.addWidget(self.label_3)
-                self.section_template_combobox = QtWidgets.QComboBox(self.design_section)
-                font = QtGui.QFont()
-                font.setPointSize(9)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
                 self.section_template_combobox.setFont(font)
                 self.section_template_combobox.setObjectName("section_template_combobox")
-                self.section_template_combobox.addItem("")
-                self.horizontalLayout_3.addWidget(self.section_template_combobox)
-                self.verticalLayout_2.addLayout(self.horizontalLayout_3)
-                spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-                self.verticalLayout_2.addItem(spacerItem2)
-                self.verticalLayout_3 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_3.setSpacing(15)
-                self.verticalLayout_3.setObjectName("verticalLayout_3")
-                self.label_4 = QtWidgets.QLabel(self.design_section)
+                self.verticalLayout_55.addWidget(self.section_template_combobox)
+                self.parametersBtn = QtWidgets.QPushButton(self.define_section_3)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(True)
-                font.setWeight(75)
-                self.label_4.setFont(font)
-                self.label_4.setAlignment(QtCore.Qt.AlignCenter)
-                self.label_4.setObjectName("label_4")
-                self.verticalLayout_3.addWidget(self.label_4)
-                self.section_designation_lineEdit = QtWidgets.QLineEdit(self.design_section)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.parametersBtn.setFont(font)
+                self.parametersBtn.setObjectName("parametersBtn")
+                self.verticalLayout_55.addWidget(self.parametersBtn)
+                self.section_designation_lineEdit = QtWidgets.QLineEdit(self.define_section_3)
                 font = QtGui.QFont()
-                font.setPointSize(9)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
                 self.section_designation_lineEdit.setFont(font)
-                self.section_designation_lineEdit.setInputMask("")
                 self.section_designation_lineEdit.setAlignment(QtCore.Qt.AlignCenter)
                 self.section_designation_lineEdit.setObjectName("section_designation_lineEdit")
-                self.verticalLayout_3.addWidget(self.section_designation_lineEdit)
-                self.verticalLayout_2.addLayout(self.verticalLayout_3)
-                self.verticalLayout_17.addLayout(self.verticalLayout_2)
-                spacerItem3 = QtWidgets.QSpacerItem(20, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-                self.verticalLayout_17.addItem(spacerItem3)
-                self.horizontalLayout.addWidget(self.design_section)
-                self.OCCFrame = QtWidgets.QFrame(Dialog)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.OCCFrame.setFont(font)
-                self.OCCFrame.setLayoutDirection(QtCore.Qt.LeftToRight)
-
-                self.OCCFrame.setFrameShape(QtWidgets.QFrame.Box)
-                self.OCCFrame.setFrameShadow(QtWidgets.QFrame.Sunken)
-                self.OCCFrame.setLineWidth(3)
-                self.OCCFrame.setObjectName("OCCFrame")
-                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
+                self.verticalLayout_55.addWidget(self.section_designation_lineEdit)
+                self.horizontalLayout_35.addLayout(self.verticalLayout_55)
+                self.verticalLayout_53.addLayout(self.horizontalLayout_35)
+                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
                 sizePolicy.setHorizontalStretch(0)
                 sizePolicy.setVerticalStretch(0)
-                sizePolicy.setHeightForWidth(self.OCCFrame.sizePolicy().hasHeightForWidth())
-                self.OCCFrame.setSizePolicy(sizePolicy)
-                #self.OCCFrame.setMinimumSize(QtCore.QSize(300, 200))
-                self.OCCFrame.setMaximumSize(QtCore.QSize(500, 400))
-                self.horizontalLayout.addWidget(self.OCCFrame)
-                self.horizontalLayout.setStretch(0, 1)
-                self.horizontalLayout.setStretch(1, 1)
-                self.verticalLayout.addLayout(self.horizontalLayout)
-                self.section_properties = QtWidgets.QFrame(Dialog)
-
+                self.verticalLayout_52.addLayout(self.verticalLayout_53)
+                spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+                self.verticalLayout_52.addItem(spacerItem2)
+                self.horizontalLayout_34.addWidget(self.define_section_3)
+                self.OCCFrame = QtWidgets.QFrame(self.scrollAreaWidgetContents)
+                self.OCCFrame.setStyleSheet("QFrame{\n"
+                "    background:#ffffff;\n"
+                "}")
+                self.OCCFrame.setFrameShape(QtWidgets.QFrame.Box)
+                self.OCCFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+                self.OCCFrame.setLineWidth(3)
+                self.OCCFrame.setObjectName("OCCFrame")
+                self.horizontalLayout_34.addWidget(self.OCCFrame)
+                self.horizontalLayout_34.setStretch(0, 1)
+                self.horizontalLayout_34.setStretch(1, 1)
+                self.verticalLayout.addLayout(self.horizontalLayout_34)
+                self.section_properties = QtWidgets.QFrame(self.scrollAreaWidgetContents)
+                self.section_properties.setStyleSheet("QFrame{\n"
+                "    background:#ffffff;\n"
+                "}")
                 self.section_properties.setFrameShape(QtWidgets.QFrame.Box)
-                self.section_properties.setFrameShadow(QtWidgets.QFrame.Sunken)
+                self.section_properties.setFrameShadow(QtWidgets.QFrame.Raised)
                 self.section_properties.setLineWidth(3)
                 self.section_properties.setObjectName("section_properties")
-                self.verticalLayout_16 = QtWidgets.QVBoxLayout(self.section_properties)
-                self.verticalLayout_16.setContentsMargins(0, 0, 0, 0)
-                self.verticalLayout_16.setSpacing(10)
-                self.verticalLayout_16.setObjectName("verticalLayout_16")
-                self.label_5 = QtWidgets.QLabel(self.section_properties)
-                self.label_5.setMinimumSize(QtCore.QSize(0, 40))
-                self.label_5.setMaximumSize(QtCore.QSize(16777215, 40))
+                self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.section_properties)
+                self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+                self.verticalLayout_6.setObjectName("verticalLayout_6")
+                self.label_13 = QtWidgets.QLabel(self.section_properties)
+                self.label_13.setMinimumSize(QtCore.QSize(0, 50))
+                self.label_13.setMaximumSize(QtCore.QSize(16777215, 50))
                 font = QtGui.QFont()
                 font.setPointSize(11)
-                font.setUnderline(False)
-                self.label_5.setFont(font)
-                self.label_5.setStyleSheet("QLabel{\n"
-        "background:rgb(135, 135, 135);\n"
-        "color:#ffffff;\n"
-        "}")
-                self.label_5.setFrameShape(QtWidgets.QFrame.WinPanel)
-                self.label_5.setFrameShadow(QtWidgets.QFrame.Raised)
-                self.label_5.setAlignment(QtCore.Qt.AlignCenter)
-                self.label_5.setObjectName("label_5")
-                self.verticalLayout_16.addWidget(self.label_5)
-                spacerItem4 = QtWidgets.QSpacerItem(20, 12, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
-                self.verticalLayout_16.addItem(spacerItem4)
-                self.horizontalLayout_15 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_15.setContentsMargins(11, 11, 11, 11)
-                self.horizontalLayout_15.setSpacing(15)
-                self.horizontalLayout_15.setObjectName("horizontalLayout_15")
-                self.verticalLayout_14 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_14.setObjectName("verticalLayout_14")
-                self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_9.setObjectName("horizontalLayout_9")
-                self.Area = QtWidgets.QLabel(self.section_properties)
+                self.label_13.setFont(font)
+                self.label_13.setStyleSheet("QFrame{\n"
+                "    background:rgb(135, 135, 135);\n"
+                "color:#ffffff;\n"
+                "}")
+                self.label_13.setAlignment(QtCore.Qt.AlignCenter)
+                self.label_13.setObjectName("label_13")
+                self.verticalLayout_6.addWidget(self.label_13)
+                self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+                self.horizontalLayout_3.setContentsMargins(15, 15, 15, 15)
+                self.horizontalLayout_3.setSpacing(15)
+                self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+                self.horizontalLayout = QtWidgets.QHBoxLayout()
+                self.horizontalLayout.setObjectName("horizontalLayout")
+                self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+                self.verticalLayout_2.setObjectName("verticalLayout_2")
+                self.Area_label = QtWidgets.QLabel(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(True)
-                font.setWeight(75)
-                self.Area.setFont(font)
-                self.Area.setObjectName("Area")
-                self.horizontalLayout_9.addWidget(self.Area)
-                spacerItem5 = QtWidgets.QSpacerItem(170, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-                self.horizontalLayout_9.addItem(spacerItem5)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.Area_label.setFont(font)
+                self.Area_label.setObjectName("Area_label")
+                self.verticalLayout_2.addWidget(self.Area_label)
+                self.MI_label1 = QtWidgets.QLabel(self.section_properties)
+                font = QtGui.QFont()
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.MI_label1.setFont(font)
+                self.MI_label1.setObjectName("MI_label1")
+                self.verticalLayout_2.addWidget(self.MI_label1)
+                self.MI_label2 = QtWidgets.QLabel(self.section_properties)
+                font = QtGui.QFont()
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.MI_label2.setFont(font)
+                self.MI_label2.setObjectName("MI_label2")
+                self.verticalLayout_2.addWidget(self.MI_label2)
+                self.RG_label1 = QtWidgets.QLabel(self.section_properties)
+                font = QtGui.QFont()
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.RG_label1.setFont(font)
+                self.RG_label1.setObjectName("RG_label1")
+                self.verticalLayout_2.addWidget(self.RG_label1)
+                self.RG_label2 = QtWidgets.QLabel(self.section_properties)
+                font = QtGui.QFont()
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.RG_label2.setFont(font)
+                self.RG_label2.setObjectName("RG_label2")
+                self.verticalLayout_2.addWidget(self.RG_label2)
+                self.horizontalLayout.addLayout(self.verticalLayout_2)
+                self.verticalLayout_3 = QtWidgets.QVBoxLayout()
+                self.verticalLayout_3.setObjectName("verticalLayout_3")
                 self.Area_text = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
                 self.Area_text.setFont(font)
-                self.Area_text.setInputMask("")
                 self.Area_text.setAlignment(QtCore.Qt.AlignCenter)
                 self.Area_text.setObjectName("Area_text")
-                self.horizontalLayout_9.addWidget(self.Area_text)
-                self.verticalLayout_14.addLayout(self.horizontalLayout_9)
-                self.line_6 = QtWidgets.QFrame(self.section_properties)
-                self.line_6.setFrameShape(QtWidgets.QFrame.HLine)
-                self.line_6.setFrameShadow(QtWidgets.QFrame.Sunken)
-                self.line_6.setObjectName("line_6")
-                self.verticalLayout_14.addWidget(self.line_6)
-                self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-                self.RG = QtWidgets.QLabel(self.section_properties)
+                self.verticalLayout_3.addWidget(self.Area_text)
+                self.MI_text1 = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(True)
-                font.setWeight(75)
-                self.RG.setFont(font)
-                self.RG.setObjectName("RG")
-                self.horizontalLayout_7.addWidget(self.RG)
-                spacerItem6 = QtWidgets.QSpacerItem(24, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-                self.horizontalLayout_7.addItem(spacerItem6)
-                self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-                self.horizontalLayout_4.setSpacing(22)
-                self.verticalLayout_7 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_7.setSpacing(5)
-                self.verticalLayout_7.setObjectName("verticalLayout_7")
-                self.RG_label_1 = QtWidgets.QLabel(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.MI_text1.setFont(font)
+                self.MI_text1.setAlignment(QtCore.Qt.AlignCenter)
+                self.MI_text1.setObjectName("MI_text1")
+                self.verticalLayout_3.addWidget(self.MI_text1)
+                self.MI_text2 = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.RG_label_1.setFont(font)
-                self.RG_label_1.setObjectName("RG_label_1")
-                self.verticalLayout_7.addWidget(self.RG_label_1)
-                self.RG_label_2 = QtWidgets.QLabel(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.MI_text2.setFont(font)
+                self.MI_text2.setAlignment(QtCore.Qt.AlignCenter)
+                self.MI_text2.setObjectName("MI_text2")
+                self.verticalLayout_3.addWidget(self.MI_text2)
+                self.RG_text1 = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.RG_label_2.setFont(font)
-                self.RG_label_2.setObjectName("RG_label_2")
-                self.verticalLayout_7.addWidget(self.RG_label_2)
-                self.horizontalLayout_4.addLayout(self.verticalLayout_7)
-                self.verticalLayout_4 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_4.setSpacing(5)
-                self.verticalLayout_4.setObjectName("verticalLayout_4")
-                self.RG_text_1 = QtWidgets.QLineEdit(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.RG_text1.setFont(font)
+                self.RG_text1.setAlignment(QtCore.Qt.AlignCenter)
+                self.RG_text1.setObjectName("RG_text1")
+                self.verticalLayout_3.addWidget(self.RG_text1)
+                self.RG_text2 = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.RG_text_1.setFont(font)
-                self.RG_text_1.setInputMask("")
-                self.RG_text_1.setAlignment(QtCore.Qt.AlignCenter)
-                self.RG_text_1.setObjectName("RG_text_1")
-                self.verticalLayout_4.addWidget(self.RG_text_1)
-                self.RG_text_2 = QtWidgets.QLineEdit(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.RG_text_2.setFont(font)
-                self.RG_text_2.setInputMask("")
-                self.RG_text_2.setAlignment(QtCore.Qt.AlignCenter)
-                self.RG_text_2.setObjectName("RG_text_2")
-                self.verticalLayout_4.addWidget(self.RG_text_2)
-                self.horizontalLayout_4.addLayout(self.verticalLayout_4)
-                self.horizontalLayout_7.addLayout(self.horizontalLayout_4)
-                self.verticalLayout_14.addLayout(self.horizontalLayout_7)
-                self.line_5 = QtWidgets.QFrame(self.section_properties)
-                self.line_5.setFrameShape(QtWidgets.QFrame.HLine)
-                self.line_5.setFrameShadow(QtWidgets.QFrame.Sunken)
-                self.line_5.setObjectName("line_5")
-                self.verticalLayout_14.addWidget(self.line_5)
-                self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_8.setObjectName("horizontalLayout_8")
-                self.ESM = QtWidgets.QLabel(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(True)
-                font.setWeight(75)
-                self.ESM.setFont(font)
-                self.ESM.setObjectName("ESM")
-                self.horizontalLayout_8.addWidget(self.ESM)
-                spacerItem7 = QtWidgets.QSpacerItem(1, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-                self.horizontalLayout_8.addItem(spacerItem7)
-                self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-                self.verticalLayout_8 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_8.setSpacing(5)
-                self.verticalLayout_8.setObjectName("verticalLayout_8")
-                self.ESM_label_1 = QtWidgets.QLabel(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.ESM_label_1.setFont(font)
-                self.ESM_label_1.setObjectName("ESM_label_1")
-                self.verticalLayout_8.addWidget(self.ESM_label_1)
-                self.ESM_label_2 = QtWidgets.QLabel(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.ESM_label_2.setFont(font)
-                self.ESM_label_2.setObjectName("ESM_label_2")
-                self.verticalLayout_8.addWidget(self.ESM_label_2)
-                self.horizontalLayout_5.addLayout(self.verticalLayout_8)
-                self.verticalLayout_5 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_5.setSpacing(5)
-                self.verticalLayout_5.setObjectName("verticalLayout_5")
-                self.ESM_text_1 = QtWidgets.QLineEdit(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.ESM_text_1.setFont(font)
-                self.ESM_text_1.setInputMask("")
-                self.ESM_text_1.setAlignment(QtCore.Qt.AlignCenter)
-                self.ESM_text_1.setObjectName("ESM_text_1")
-                self.verticalLayout_5.addWidget(self.ESM_text_1)
-                self.ESM_text_2 = QtWidgets.QLineEdit(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.ESM_text_2.setFont(font)
-                self.ESM_text_2.setInputMask("")
-                self.ESM_text_2.setAlignment(QtCore.Qt.AlignCenter)
-                self.ESM_text_2.setObjectName("ESM_text_2")
-                self.verticalLayout_5.addWidget(self.ESM_text_2)
-                self.horizontalLayout_5.addLayout(self.verticalLayout_5)
-                self.horizontalLayout_8.addLayout(self.horizontalLayout_5)
-                self.verticalLayout_14.addLayout(self.horizontalLayout_8)
-                self.Centroid_box = QtWidgets.QFrame(self.section_properties)
-
-                self.Centroid_box.setFrameShape(QtWidgets.QFrame.StyledPanel)
-                self.Centroid_box.setFrameShadow(QtWidgets.QFrame.Raised)
-                self.Centroid_box.setObjectName("Centroid_box")
-                self.verticalLayout_18 = QtWidgets.QVBoxLayout(self.Centroid_box)
-                self.verticalLayout_18.setContentsMargins(0, 0, 0, 0)
-                self.verticalLayout_18.setObjectName("verticalLayout_18")
-                self.line_4 = QtWidgets.QFrame(self.Centroid_box)
-                self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
-                self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
-                self.line_4.setObjectName("line_4")
-                self.verticalLayout_18.addWidget(self.line_4)
-                self.horizontalLayout_10 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_10.setObjectName("horizontalLayout_10")
-                self.C = QtWidgets.QLabel(self.Centroid_box)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(True)
-                font.setWeight(75)
-                self.C.setFont(font)
-                self.C.setObjectName("C")
-                self.horizontalLayout_10.addWidget(self.C)
-                spacerItem8 = QtWidgets.QSpacerItem(100, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-                self.horizontalLayout_10.addItem(spacerItem8)
-                self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_6.setSpacing(22)
-                self.horizontalLayout_6.setObjectName("horizontalLayout_6")
-                self.horizontalLayout_6.setSpacing(30)
-                self.verticalLayout_9 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_9.setSpacing(5)
-                self.verticalLayout_9.setObjectName("verticalLayout_9")
-                self.C_label_1 = QtWidgets.QLabel(self.Centroid_box)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.C_label_1.setFont(font)
-                self.C_label_1.setObjectName("C_label_1")
-                self.verticalLayout_9.addWidget(self.C_label_1)
-                self.C_label_2 = QtWidgets.QLabel(self.Centroid_box)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.C_label_2.setFont(font)
-                self.C_label_2.setObjectName("C_label_2")
-                self.verticalLayout_9.addWidget(self.C_label_2)
-                self.horizontalLayout_6.addLayout(self.verticalLayout_9)
-                self.verticalLayout_6 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_6.setSpacing(5)
-                self.verticalLayout_6.setObjectName("verticalLayout_6")
-                self.C_text_1 = QtWidgets.QLineEdit(self.Centroid_box)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.C_text_1.setFont(font)
-                self.C_text_1.setInputMask("")
-                self.C_text_1.setAlignment(QtCore.Qt.AlignCenter)
-                self.C_text_1.setObjectName("C_text_1")
-                self.verticalLayout_6.addWidget(self.C_text_1)
-                self.C_text_2 = QtWidgets.QLineEdit(self.Centroid_box)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.C_text_2.setFont(font)
-                self.C_text_2.setInputMask("")
-                self.C_text_2.setAlignment(QtCore.Qt.AlignCenter)
-                self.C_text_2.setObjectName("C_text_2")
-                self.verticalLayout_6.addWidget(self.C_text_2)
-                self.horizontalLayout_6.addLayout(self.verticalLayout_6)
-                self.horizontalLayout_10.addLayout(self.horizontalLayout_6)
-                self.verticalLayout_18.addLayout(self.horizontalLayout_10)
-                self.verticalLayout_14.addWidget(self.Centroid_box)
-                self.horizontalLayout_15.addLayout(self.verticalLayout_14)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.RG_text2.setFont(font)
+                self.RG_text2.setAlignment(QtCore.Qt.AlignCenter)
+                self.RG_text2.setObjectName("RG_text2")
+                self.verticalLayout_3.addWidget(self.RG_text2)
+                self.horizontalLayout.addLayout(self.verticalLayout_3)
+                self.horizontalLayout_3.addLayout(self.horizontalLayout)
                 self.line = QtWidgets.QFrame(self.section_properties)
-                self.line.setFrameShape(QtWidgets.QFrame.HLine)
+                self.line.setFrameShape(QtWidgets.QFrame.VLine)
                 self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
                 self.line.setObjectName("line")
-                self.horizontalLayout_15.addWidget(self.line)
-                self.line_2 = QtWidgets.QFrame(self.section_properties)
-                self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
-                self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
-                self.line_2.setObjectName("line_2")
-                self.horizontalLayout_15.addWidget(self.line_2)
-                self.verticalLayout_15 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_15.setSpacing(7)
-                self.verticalLayout_15.setObjectName("verticalLayout_15")
-                self.horizontalLayout_14 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_14.setObjectName("horizontalLayout_14")
-                self.MI = QtWidgets.QLabel(self.section_properties)
+                self.horizontalLayout_3.addWidget(self.line)
+                self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+                self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+                self.verticalLayout_4 = QtWidgets.QVBoxLayout()
+                self.verticalLayout_4.setObjectName("verticalLayout_4")
+                self.C_label1 = QtWidgets.QLabel(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(True)
-                font.setWeight(75)
-                self.MI.setFont(font)
-                self.MI.setObjectName("MI")
-                self.horizontalLayout_14.addWidget(self.MI)
-                spacerItem9 = QtWidgets.QSpacerItem(47, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-                self.horizontalLayout_14.addItem(spacerItem9)
-                self.horizontalLayout_13 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_13.setObjectName("horizontalLayout_13")
-                self.verticalLayout_12 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_12.setObjectName("verticalLayout_12")
-                self.MI_label_1 = QtWidgets.QLabel(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.C_label1.setFont(font)
+                self.C_label1.setObjectName("C_label1")
+                self.verticalLayout_4.addWidget(self.C_label1)
+                self.C_label2 = QtWidgets.QLabel(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_label_1.setFont(font)
-                self.MI_label_1.setObjectName("MI_label_1")
-                self.verticalLayout_12.addWidget(self.MI_label_1)
-                self.MI_label_2 = QtWidgets.QLabel(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.C_label2.setFont(font)
+                self.C_label2.setObjectName("C_label2")
+                self.verticalLayout_4.addWidget(self.C_label2)
+                self.PSM_label1 = QtWidgets.QLabel(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_label_2.setFont(font)
-                self.MI_label_2.setObjectName("MI_label_2")
-                self.verticalLayout_12.addWidget(self.MI_label_2)
-                self.MI_label_3 = QtWidgets.QLabel(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.PSM_label1.setFont(font)
+                self.PSM_label1.setObjectName("PSM_label1")
+                self.verticalLayout_4.addWidget(self.PSM_label1)
+                self.PSM_label2 = QtWidgets.QLabel(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_label_3.setFont(font)
-                self.MI_label_3.setObjectName("MI_label_3")
-                self.verticalLayout_12.addWidget(self.MI_label_3)
-                self.MI_label_4 = QtWidgets.QLabel(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.PSM_label2.setFont(font)
+                self.PSM_label2.setObjectName("PSM_label2")
+                self.verticalLayout_4.addWidget(self.PSM_label2)
+                self.ESM_label1 = QtWidgets.QLabel(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_label_4.setFont(font)
-                self.MI_label_4.setObjectName("MI_label_4")
-                self.verticalLayout_12.addWidget(self.MI_label_4)
-                self.MI_label_5 = QtWidgets.QLabel(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.ESM_label1.setFont(font)
+                self.ESM_label1.setObjectName("ESM_label1")
+                self.verticalLayout_4.addWidget(self.ESM_label1)
+                self.ESM_label2 = QtWidgets.QLabel(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_label_5.setFont(font)
-                self.MI_label_5.setObjectName("MI_label_5")
-                self.verticalLayout_12.addWidget(self.MI_label_5)
-                self.MI_label_6 = QtWidgets.QLabel(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.ESM_label2.setFont(font)
+                self.ESM_label2.setObjectName("ESM_label2")
+                self.verticalLayout_4.addWidget(self.ESM_label2)
+                self.horizontalLayout_2.addLayout(self.verticalLayout_4)
+                self.verticalLayout_5 = QtWidgets.QVBoxLayout()
+                self.verticalLayout_5.setObjectName("verticalLayout_5")
+                self.C_text1 = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_label_6.setFont(font)
-                self.MI_label_6.setObjectName("MI_label_6")
-                self.verticalLayout_12.addWidget(self.MI_label_6)
-                self.horizontalLayout_13.addLayout(self.verticalLayout_12)
-                self.verticalLayout_13 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_13.setObjectName("verticalLayout_13")
-                self.MI_text_1 = QtWidgets.QLineEdit(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.C_text1.setFont(font)
+                self.C_text1.setAlignment(QtCore.Qt.AlignCenter)
+                self.C_text1.setObjectName("C_text1")
+                self.verticalLayout_5.addWidget(self.C_text1)
+                self.C_text2 = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_text_1.setFont(font)
-                self.MI_text_1.setInputMask("")
-                self.MI_text_1.setAlignment(QtCore.Qt.AlignCenter)
-                self.MI_text_1.setObjectName("MI_text_1")
-                self.verticalLayout_13.addWidget(self.MI_text_1)
-                self.MI_text_2 = QtWidgets.QLineEdit(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.C_text2.setFont(font)
+                self.C_text2.setAlignment(QtCore.Qt.AlignCenter)
+                self.C_text2.setObjectName("C_text2")
+                self.verticalLayout_5.addWidget(self.C_text2)
+                self.PSM_text1 = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_text_2.setFont(font)
-                self.MI_text_2.setInputMask("")
-                self.MI_text_2.setAlignment(QtCore.Qt.AlignCenter)
-                self.MI_text_2.setObjectName("MI_text_2")
-                self.verticalLayout_13.addWidget(self.MI_text_2)
-                self.MI_text_3 = QtWidgets.QLineEdit(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.PSM_text1.setFont(font)
+                self.PSM_text1.setAlignment(QtCore.Qt.AlignCenter)
+                self.PSM_text1.setObjectName("PSM_text1")
+                self.verticalLayout_5.addWidget(self.PSM_text1)
+                self.PSM_text2 = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_text_3.setFont(font)
-                self.MI_text_3.setInputMask("")
-                self.MI_text_3.setAlignment(QtCore.Qt.AlignCenter)
-                self.MI_text_3.setObjectName("MI_text_3")
-                self.verticalLayout_13.addWidget(self.MI_text_3)
-                self.MI_text_4 = QtWidgets.QLineEdit(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.PSM_text2.setFont(font)
+                self.PSM_text2.setAlignment(QtCore.Qt.AlignCenter)
+                self.PSM_text2.setObjectName("PSM_text2")
+                self.verticalLayout_5.addWidget(self.PSM_text2)
+                self.ESM_text1 = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_text_4.setFont(font)
-                self.MI_text_4.setInputMask("")
-                self.MI_text_4.setAlignment(QtCore.Qt.AlignCenter)
-                self.MI_text_4.setObjectName("MI_text_4")
-                self.verticalLayout_13.addWidget(self.MI_text_4)
-                self.MI_text_5 = QtWidgets.QLineEdit(self.section_properties)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.ESM_text1.setFont(font)
+                self.ESM_text1.setAlignment(QtCore.Qt.AlignCenter)
+                self.ESM_text1.setObjectName("ESM_text1")
+                self.verticalLayout_5.addWidget(self.ESM_text1)
+                self.ESM_text2 = QtWidgets.QLineEdit(self.section_properties)
                 font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_text_5.setFont(font)
-                self.MI_text_5.setInputMask("")
-                self.MI_text_5.setAlignment(QtCore.Qt.AlignCenter)
-                self.MI_text_5.setObjectName("MI_text_5")
-                self.verticalLayout_13.addWidget(self.MI_text_5)
-                self.MI_text_6 = QtWidgets.QLineEdit(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.MI_text_6.setFont(font)
-                self.MI_text_6.setInputMask("")
-                self.MI_text_6.setAlignment(QtCore.Qt.AlignCenter)
-                self.MI_text_6.setObjectName("MI_text_6")
-                self.verticalLayout_13.addWidget(self.MI_text_6)
-                self.horizontalLayout_13.addLayout(self.verticalLayout_13)
-                self.horizontalLayout_14.addLayout(self.horizontalLayout_13)
-                self.verticalLayout_15.addLayout(self.horizontalLayout_14)
-                self.line_3 = QtWidgets.QFrame(self.section_properties)
-                self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
-                self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
-                self.line_3.setObjectName("line_3")
-                self.verticalLayout_15.addWidget(self.line_3)
-                self.horizontalLayout_12 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_12.setObjectName("horizontalLayout_12")
-                self.PSM = QtWidgets.QLabel(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                font.setBold(True)
-                font.setWeight(75)
-                self.PSM.setFont(font)
-                self.PSM.setObjectName("PSM")
-                self.horizontalLayout_12.addWidget(self.PSM)
-                spacerItem10 = QtWidgets.QSpacerItem(15, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-                self.horizontalLayout_12.addItem(spacerItem10)
-                self.horizontalLayout_11 = QtWidgets.QHBoxLayout()
-                self.horizontalLayout_11.setObjectName("horizontalLayout_11")
-                self.verticalLayout_10 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_10.setObjectName("verticalLayout_10")
-                self.PSM_label_1 = QtWidgets.QLabel(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.PSM_label_1.setFont(font)
-                self.PSM_label_1.setObjectName("PSM_label_1")
-                self.verticalLayout_10.addWidget(self.PSM_label_1)
-                self.PSM_label_2 = QtWidgets.QLabel(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.PSM_label_2.setFont(font)
-                self.PSM_label_2.setObjectName("PSM_label_2")
-                self.verticalLayout_10.addWidget(self.PSM_label_2)
-                self.PSM_label_3 = QtWidgets.QLabel(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.PSM_label_3.setFont(font)
-                self.PSM_label_3.setObjectName("PSM_label_3")
-                self.verticalLayout_10.addWidget(self.PSM_label_3)
-                self.horizontalLayout_11.addLayout(self.verticalLayout_10)
-                self.verticalLayout_11 = QtWidgets.QVBoxLayout()
-                self.verticalLayout_11.setObjectName("verticalLayout_11")
-                self.PSM_text_1 = QtWidgets.QLineEdit(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.PSM_text_1.setFont(font)
-                self.PSM_text_1.setInputMask("")
-                self.PSM_text_1.setAlignment(QtCore.Qt.AlignCenter)
-                self.PSM_text_1.setObjectName("PSM_text_1")
-                self.verticalLayout_11.addWidget(self.PSM_text_1)
-                self.PSM_text_2 = QtWidgets.QLineEdit(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.PSM_text_2.setFont(font)
-                self.PSM_text_2.setInputMask("")
-                self.PSM_text_2.setAlignment(QtCore.Qt.AlignCenter)
-                self.PSM_text_2.setObjectName("PSM_text_2")
-                self.verticalLayout_11.addWidget(self.PSM_text_2)
-                self.PSM_text_3 = QtWidgets.QLineEdit(self.section_properties)
-                font = QtGui.QFont()
-                font.setPointSize(9)
-                self.PSM_text_3.setFont(font)
-                self.PSM_text_3.setInputMask("")
-                self.PSM_text_3.setAlignment(QtCore.Qt.AlignCenter)
-                self.PSM_text_3.setObjectName("PSM_text_3")
-                self.verticalLayout_11.addWidget(self.PSM_text_3)
-                self.horizontalLayout_11.addLayout(self.verticalLayout_11)
-                self.horizontalLayout_12.addLayout(self.horizontalLayout_11)
-                self.verticalLayout_15.addLayout(self.horizontalLayout_12)
-                self.horizontalLayout_15.addLayout(self.verticalLayout_15)
-                self.verticalLayout_16.addLayout(self.horizontalLayout_15)
-                spacerItem11 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.MinimumExpanding)
-                self.verticalLayout_16.addItem(spacerItem11)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.ESM_text2.setFont(font)
+                self.ESM_text2.setAlignment(QtCore.Qt.AlignCenter)
+                self.ESM_text2.setObjectName("ESM_text2")
+                self.verticalLayout_5.addWidget(self.ESM_text2)
+                self.horizontalLayout_2.addLayout(self.verticalLayout_5)
+                self.horizontalLayout_3.addLayout(self.horizontalLayout_2)
+                self.verticalLayout_6.addLayout(self.horizontalLayout_3)
                 self.verticalLayout.addWidget(self.section_properties)
-                spacerItem12 = QtWidgets.QSpacerItem(20, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-                self.verticalLayout.addItem(spacerItem12)
-                self.HLayout_Buttons = QtWidgets.QHBoxLayout()
-                self.HLayout_Buttons.setObjectName("HLayout_Buttons")
-                spacerItem13 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-                self.HLayout_Buttons.addItem(spacerItem13)
+                self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+                self.verticalLayout_56.addWidget(self.scrollArea)
+                self.horizontalLayout_25 = QtWidgets.QHBoxLayout()
+                self.horizontalLayout_25.setContentsMargins(0, 10, 0, 10)
+                self.horizontalLayout_25.setSpacing(20)
+                self.horizontalLayout_25.setObjectName("horizontalLayout_25")
+                spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+                self.horizontalLayout_25.addItem(spacerItem3)
+                self.importBtn = QtWidgets.QPushButton(Dialog)
+                font = QtGui.QFont()
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
+                self.importBtn.setFont(font)
+                self.importBtn.setObjectName("importBtn")
+                self.horizontalLayout_25.addWidget(self.importBtn)
                 self.saveBtn = QtWidgets.QPushButton(Dialog)
                 font = QtGui.QFont()
-                font.setPointSize(12)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
                 self.saveBtn.setFont(font)
                 self.saveBtn.setObjectName("saveBtn")
-                self.HLayout_Buttons.addWidget(self.saveBtn)
-                spacerItem14 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-                self.HLayout_Buttons.addItem(spacerItem14)
+                self.horizontalLayout_25.addWidget(self.saveBtn)
                 self.exportBtn = QtWidgets.QPushButton(Dialog)
                 font = QtGui.QFont()
-                font.setPointSize(12)
+                font.setFamily("Segoe UI")
+                font.setPointSize(10)
                 self.exportBtn.setFont(font)
                 self.exportBtn.setObjectName("exportBtn")
-                self.HLayout_Buttons.addWidget(self.exportBtn)
-                spacerItem15 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-                self.HLayout_Buttons.addItem(spacerItem15)
-                self.verticalLayout.addLayout(self.HLayout_Buttons)
-
+                self.horizontalLayout_25.addWidget(self.exportBtn)
+                spacerItem4 = QtWidgets.QSpacerItem(40, 30, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+                self.horizontalLayout_25.addItem(spacerItem4)
+                self.verticalLayout_56.addLayout(self.horizontalLayout_25)
                 self.retranslateUi(Dialog)
                 QtCore.QMetaObject.connectSlotsByName(Dialog)
+                self.init_display()
+                self.set_validations()
                 self.section_type_combobox.currentIndexChanged.connect(self.type_change)
-                self.section_template_combobox.activated[int].connect(self.template_change)
-                self.section_designation_lineEdit.setValidator(QtGui.QRegExpValidator(
-                    QtCore.QRegExp("[a-zA-Z0-9@_]*"), self.section_designation_lineEdit
-                ))
+                self.section_template_combobox.currentIndexChanged.connect(self.template_change)
                 self.disable_usability(True)
+                self.parametersBtn.clicked.connect(self.open_section_parameters)
                 self.exportBtn.clicked.connect(self.export_to_pdf)
-                display=self.init_display()
-                Dialog.setFixedSize(Dialog.sizeHint())
+                self.saveBtn.clicked.connect(self.save_to_osm)
+                self.importBtn.clicked.connect(self.import_to_modeller)
 
         def set_validations(self):
                 '''
@@ -725,7 +515,7 @@ class Ui_OsdagSectionModeller(object):
                 self.ESM_text2.clear()
                 self.PSM_text1.clear()
                 self.PSM_text2.clear()
-        
+
         def disable_usability(self,toggle):
                 '''
                 Method to Disable/Enable Section Properties and Save and Export Buttons
@@ -733,7 +523,7 @@ class Ui_OsdagSectionModeller(object):
                 self.section_properties.setDisabled(toggle)
                 self.saveBtn.setDisabled(toggle)
                 self.exportBtn.setDisabled(toggle)
-        
+
         def template_change(self):
                 '''
                 Method to handle Section Template change
@@ -744,17 +534,17 @@ class Ui_OsdagSectionModeller(object):
                 self.clear_properties()
                 display.EraseAll()
                 self.disable_usability(True)
-        
+
         def type_change(self):
                 '''
-                Method to handle Section Type change 
+                Method to handle Section Type change
                 and change Section Template Combobox accordingly
                 '''
                 index_type=self.section_type_combobox.currentIndex()
                 self.section_designation_lineEdit.clear()
                 self.clear_properties()
                 display.EraseAll()
-                self.disable_usability(True)                
+                self.disable_usability(True)
                 templates={
                         0:[],
                         1:['Side by Side'],
@@ -798,7 +588,7 @@ class Ui_OsdagSectionModeller(object):
                         self.section_template_combobox.setItemData(1, "<img src='./ResourceFiles/images/SectionModeller/Main/5.1.png'>",QtCore.Qt.ToolTipRole)
                 ##########################################################################################################
                 self.section_template_combobox.blockSignals(False)
-        
+
         def open_section_parameters(self):
                 '''
                 Method to handle Enter/Edit Parameters button
@@ -806,6 +596,7 @@ class Ui_OsdagSectionModeller(object):
                 index_type=self.section_type_combobox.currentIndex()
                 index_template=self.section_template_combobox.currentIndex()
                 self.SectionParameters=Ui_SectionParameters(index_type,index_template)
+                self.SectionParameters.parameterText_1.blockSignals(True)
                 if(index_type in [1,4,5]):
                         self.SectionParameters.parameterText_1.clear()
                         self.SectionParameters.parameterText_1.addItems(connectdb('Columns'))
@@ -818,8 +609,7 @@ class Ui_OsdagSectionModeller(object):
                 elif(index_type==3):
                         self.SectionParameters.parameterText_1.clear()
                         self.SectionParameters.parameterText_1.addItems(connectdb('Angles'))
-
-
+                self.SectionParameters.parameterText_1.blockSignals(False)
                 ########################## Retrieving Section Parameters on Dialog close and reopen ###################
                 if(self.Parameters!={}):
                         for child in self.Parameters:
@@ -828,7 +618,7 @@ class Ui_OsdagSectionModeller(object):
                                         exec('self.SectionParameters.'+child+'.setCurrentText('+repr(self.Parameters[child][1])+')')
                                 else:
                                         exec('self.SectionParameters.'+child+'.setText('+repr(self.Parameters[child][1])+')')
-                
+
                 #############################################################################################################
                 if(index_type!=0 and index_template!=0):
                         self.SectionParameters.exec()
@@ -841,6 +631,7 @@ class Ui_OsdagSectionModeller(object):
                         self.disable_usability(False)
                         self.update_section_properties(index_type,index_template)
 
+
         def create_cad_model(self,index_type,index_template,parameters):
                 '''
                 Method to Specify and create CAD model template-wise
@@ -848,7 +639,7 @@ class Ui_OsdagSectionModeller(object):
                 origin = numpy.array([0.,0.,0.])
                 uDir = numpy.array([1.,0.,0.])
                 shaftDir = wDir = numpy.array([0.,0.,1.])
-                if(index_type==1):                        
+                if(index_type==1):
                         ISecPlate = IsectionCoverPlate(*parameters)
                         ISecPlate.place(origin, uDir, shaftDir)
                         prism = ISecPlate.create_model()
@@ -873,7 +664,7 @@ class Ui_OsdagSectionModeller(object):
                                 point = star_angle.compute_params()
                                 prism = star_angle.create_model()
                                 display.DisplayShape(prism, update=True)
-                        
+
                         elif(index_template==2):
                                 star_angle = StarAngle2(*parameters)
                                 _place = star_angle.place(origin, uDir, wDir)
@@ -894,7 +685,7 @@ class Ui_OsdagSectionModeller(object):
                                 point = star_angle_opposite.compute_params()
                                 prism = star_angle_opposite.create_model()
                                 display.DisplayShape(prism, update=True)
-                        
+
                         elif(index_template==5):
                                 l = 40
                                 l1 = 50
@@ -910,7 +701,7 @@ class Ui_OsdagSectionModeller(object):
                                 point = box_angle.compute_params()
                                 prism = box_angle.create_model()
                                 display.DisplayShape(prism, update=True)
-                                
+
                 elif(index_type==4):
                         if(index_template==1):
                                 B = 40
@@ -967,7 +758,7 @@ class Ui_OsdagSectionModeller(object):
                         prism = isection_channel.create_model()
                         display.DisplayShape(prism, update=True)
                 display.ExportToImage("./ResourceFiles/images/3DSectionfromSectionModeller.png")
-        
+
         def update_section_properties(self,index_type,index_template):
                 '''
                 Method to fill output parameters to Section Properties
@@ -1018,8 +809,8 @@ class Ui_OsdagSectionModeller(object):
                         )
                         self.Area_text.setText(str(round(Ai,4)))
                         parameters=[D,B,T,t,s,l,ti,50]
-                                        
-                        
+
+
                 elif(index_type==2):                                                      # Channel Section
                         cursor = conn.execute("SELECT D,B,Area,T,tw FROM Channels where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         D,B,A,T,t=map(float,cursor.fetchall()[0])
@@ -1064,7 +855,7 @@ class Ui_OsdagSectionModeller(object):
                                         (4*B*T*(Yleft-(B/2)))+
                                         (4*(l/2)*tc*(Yleft-(l/4)))
                                 )
-                                
+
                         elif(index_template==2):                                            # Back to Back
                                 Izz=(
                                         (((l*(tc**3))/12)+(l*tc*((Ybottom-(tc/2))**2)))+
@@ -1086,7 +877,7 @@ class Ui_OsdagSectionModeller(object):
                                         (4*B*T*(Yleft-(B/2)))+
                                         (2*Dc*t*(Yleft-B+(t/2)))
                                 )
-                        
+
                         parameters=[D,B,T,t,s,l,tc,50]
                         Rzz=math.sqrt(Izz/Ac)
                         Ryy=math.sqrt(Iyy/Ac)
@@ -1103,12 +894,12 @@ class Ui_OsdagSectionModeller(object):
                                 b/=10
                                 t/=10
                                 l=2*a
-                                Da=a-t                                
+                                Da=a-t
                                 Aa=(4*A)+(l*ta)
                                 Yleft=Yright=((2*b)+ta)/2
                                 Ytop=Ybottom=l/2
                                 Izz=(
-                                (((ta*((l/2)**3))/12)+((l/2)*ta*((Ybottom-(l/4))**2)))+  
+                                (((ta*((l/2)**3))/12)+((l/2)*ta*((Ybottom-(l/4))**2)))+
                                 (2*(((t*(Da**3))/12)+(Da*t*((Ybottom-(Da/2))**2))))+
                                 (2*(((b*(t**3))/12)+(b*t*((Ybottom-(t/2)-Da)**2))))+
                                 (2*(((b*(t**3))/12)+(b*t*((Ytop-(t/2)-Da)**2))))+
@@ -1138,7 +929,7 @@ class Ui_OsdagSectionModeller(object):
                                         (4*Da*t*(Yleft-b+(t/2)))
                                 )
                                 parameters=[a,b,t,l,ta,50]
-                                
+
                         elif(index_template==2):                                                   #Star Configuration 2 Angles
                                 cursor = conn.execute("SELECT a,b,t,Area FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                                 a,b,t,A = map(float,cursor.fetchall()[0])
@@ -1166,7 +957,7 @@ class Ui_OsdagSectionModeller(object):
                                         (((l*((ta/2)**3)/12)+(((ta/2)*l)*((Yright-(t/4)-b)**2))))+
                                         (((Da*(t**3)/12)+((Da*t)*((Yright+(t/2)-b)**2))))+
                                         (((t*(b**3)/12)+((b*t)*((Yright-(b/2))**2))))
-                                )                                
+                                )
                                 Zpz=(
                                         (2*Da*t*(Ybottom-(Da/2)))+
                                         (2*b*t*(Ybottom-Da-(t/2)))+
@@ -1178,7 +969,7 @@ class Ui_OsdagSectionModeller(object):
                                         (2*Da*t*(Yleft-b+(t/2)))
                                 )
                                 parameters=[a,b,t,l,ta,50]
-                        
+
                         elif(index_template==3):                                                        # 2 Angles on Same side
                                 cursor = conn.execute("SELECT a,b,t,Area,Iy,Cy FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                                 a,b,t,A,Iy,Cy = map(float,cursor.fetchall()[0])
@@ -1197,7 +988,7 @@ class Ui_OsdagSectionModeller(object):
                                 )/((l*ta)+(2*b*t)+(2*Da*t)))
                                 Yright=(2*b)+ta-Yleft
                                 Izz=(
-                                        (((ta*((l/2)**3)/12)+(((l/2)*ta)*((Ybottom-(l/4))**2))))+  
+                                        (((ta*((l/2)**3)/12)+(((l/2)*ta)*((Ybottom-(l/4))**2))))+
                                         (((t*(Da**3)/12)+((Da*t)*((Ybottom+(Da/2))**2))))+
                                         (((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-Da)**2))))+
                                         (((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-Da)**2))))+
@@ -1215,7 +1006,7 @@ class Ui_OsdagSectionModeller(object):
                                         (2*b*t*(Yright-(b/2)))+
                                         (2*Da*t*(Yright-b+(t/2)))
                                 )
-                                parameters=[a,b,t,l,ta,50]              
+                                parameters=[a,b,t,l,ta,50]
                         elif(index_template==4):                                                        # 2 Angles on opposite side
                                 cursor = conn.execute("SELECT a,b,t,Area,Iz,Cz FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                                 a,b,t,A,Iz,Cz = map(float,cursor.fetchall()[0])
@@ -1255,7 +1046,7 @@ class Ui_OsdagSectionModeller(object):
                                 parameters=[a,b,t,l,ta,50]
                         elif(index_template==5):                                                        # Box Angle
                                 cursor = conn.execute("SELECT a,b,t,Area FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                                a,b,t,A = map(float,cursor.fetchall()[0])  
+                                a,b,t,A = map(float,cursor.fetchall()[0])
                                 s=float(self.SectionParameters.parameterText_3.text())/10
                                 sa=float(self.SectionParameters.parameterText_4.text())/10
                                 ta=float(self.SectionParameters.parameterText_7.text())/10
@@ -1267,14 +1058,14 @@ class Ui_OsdagSectionModeller(object):
                                 Da=a-t
                                 Aa=(4*A)+(l*ta)+(la*ta)
                                 Ytop=Ybottom=((2*a)+(2*ta))/2
-                                Yleft=Yright=l/2                                
+                                Yleft=Yright=l/2
                                 Izz=(
-                                        ((l*(ta**3)/12)+(l*t)*((Ybottom-(ta/2))**2))+  
+                                        ((l*(ta**3)/12)+(l*t)*((Ybottom-(ta/2))**2))+
                                         (2*((b*(t**3)/12)+(b*t)*((Ybottom-(t/2)-ta)**2)))+
                                         (2*((t*(Da**3)/12)+(Da*t)*((Ybottom-(Da/2)-ta-t)**2)))+
                                         (2*((t*(Da**3)/12)+(Da*t)*((Ytop-(Da/2)-ta-t)**2)))+
                                         (2*((b*(t**3)/12)+(b*t)*((Ytop-(t/2)-ta)**2)))+
-                                        ((l*(ta**3)/12)+(l*ta)*((Ytop-(ta/2))**2))+  
+                                        ((l*(ta**3)/12)+(l*ta)*((Ytop-(ta/2))**2))+
                                         (2*((ta*(((la/2)**3)/12))+(((la/2)*ta)*((Ybottom-(l/4))**2))))+
                                         (2*((ta*(((la/2)**3)/12))+(((la/2)*ta)*((Ybottom-(l/4))**2))))
 
@@ -1283,10 +1074,10 @@ class Ui_OsdagSectionModeller(object):
                                         ((la*(ta**3)/12)+(la*ta)*((Yleft-(ta/2))**2))+
                                         (2*((Da*(t**3)/12)+(Da*t)*((Yleft-(t/2)-ta)**2)))+
                                         (2*((t*(b**3)/12)+(b*t)*((Yleft-(b/2)-ta)**2)))+
-                                        (2*((ta*((l/2)**3)/12)+((l/2)*ta)*((Yleft-(l/4))**2)))+  
+                                        (2*((ta*((l/2)**3)/12)+((l/2)*ta)*((Yleft-(l/4))**2)))+
                                         (2*((t*(b**3)/12)+(b*t)*((Yright-(b/2)-ta)**2)))+
                                         (2*((Da*(t**3)/12)+(Da*t)*((Yright-(t/2)-ta)**2)))+
-                                        (2*((ta*((l/2)**3)/12)+((l/2)*ta)*((Yright-(l/4))**2)))+ 
+                                        (2*((ta*((l/2)**3)/12)+((l/2)*ta)*((Yright-(l/4))**2)))+
                                         ((la*(ta**3)/12)+(la*ta)*((Yright-(ta/2))**2))
                                 )
                                 Zpz=(
@@ -1307,7 +1098,7 @@ class Ui_OsdagSectionModeller(object):
                         Zzz=(Aa/2)*(Ytop+Ybottom)
                         Zyy=(Aa/2)*(Yleft+Yright)
                         self.Area_text.setText(str(round(Aa,4)))
-                                
+
                 elif(index_type==4):                                                    # Built-up Section
                         if(index_template==1):                                                # I-Section with stiffening
                                 cursor = conn.execute("SELECT D,B,T,tw,Area FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
@@ -1317,7 +1108,7 @@ class Ui_OsdagSectionModeller(object):
                                 B/=10
                                 T/=10
                                 t/=10
-                                Db=D-(2*T)                                
+                                Db=D-(2*T)
                                 Ab=A+(2*P*Q)
                                 Ybottom=(
                                         (B*T*T/2)+
@@ -1331,7 +1122,7 @@ class Ui_OsdagSectionModeller(object):
                                         (t*Db*((Db/2)+T))+
                                         (B*T*(Db+T+(T/2)))+
                                         (2*T*P*(T+Db+T-(P/2)))
-                                ) 
+                                )
                                 Ytop=D-Ybottom
                                 Izz=(
                                         ((B*(T**3)/12)+(B*T)*((Ybottom-(T/2))**2))+
@@ -1393,7 +1184,7 @@ class Ui_OsdagSectionModeller(object):
                                         ((Db*((t/2)**3)/12)+((t/2)*Db)*((Yleft-(t/4)-T-d)**2))+
                                         ((Db*((t/2)**3)/12)+((t/2)*Db)*((Yright-(t/4)-T-d)**2))+
                                         ((Db*(T**3)/12)+(Db*T)*((Yright-(T/2))**2))
-                                )                        
+                                )
                                 Zpz=(
                                         (2*B*T*(Ybottom-(T/2)))+
                                         (4*T*(Db/2)*(Ybottom-T-(Db/4)))+
@@ -1443,7 +1234,7 @@ class Ui_OsdagSectionModeller(object):
                         Zzz=(Ab/2)*(Ytop+Ybottom)
                         Zyy=(Ab/2)*(Yleft+Yright)
                         self.Area_text.setText(str(round(Ab,4)))
-                                
+
                 elif(index_type==5):                                            #Compound Section
                         cursor = conn.execute("SELECT D,B,T,tw,Area FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         D,B,T,t,Ai=map(float,cursor.fetchall()[0])
@@ -1494,7 +1285,7 @@ class Ui_OsdagSectionModeller(object):
                         Ryy=math.sqrt(Iyy/A)
                         Zyy=A*(Yleft+Yright)/2
                         Zzz=A*(Ytop+Ybottom)/2
-                        
+
                         Zpz=(
                                 (B*T*(Ybottom-(T/2)))+
                                 (t*(D/2)*(Ybottom-T-(D/4)))+
@@ -1512,7 +1303,7 @@ class Ui_OsdagSectionModeller(object):
                         parameters=[D, B, T, t, Tc, tc, d, b, 50, s]
 
                 Cy=Ybottom
-                Cz=Yleft    
+                Cz=Yleft
                 self.PSM_text1.setText(str(round(Zpz,4)))
                 self.PSM_text2.setText(str(round(Zpy,4)))
                 self.C_text1.setText(str(round(Cz,4)))
@@ -1525,6 +1316,7 @@ class Ui_OsdagSectionModeller(object):
                 self.ESM_text2.setText(str(round(Zyy,4)))
                 display.EraseAll()
                 self.create_cad_model(index_type,index_template,parameters)
+
 
         def init_display(self):
                 '''
@@ -1544,7 +1336,7 @@ class Ui_OsdagSectionModeller(object):
                 layout.setContentsMargins(0, 0, 0, 0)
                 self.OCCFrame.setLayout(layout)
                 return display
-        
+
         def get_section_properties(self):
                 '''
                 Method to get the values and names of the Section properties,
@@ -1553,15 +1345,15 @@ class Ui_OsdagSectionModeller(object):
                 '''
                 symbols=['A','Izz','Iyy','Rzz','Ryy','Cz','Cy','Zpz','Zpy','Zzz','Zyy']
                 Properties={}
-                
+
                 for child,symbol in zip(self.section_properties.findChildren(QtWidgets.QLineEdit),symbols):
-                        Properties[symbol]=child.text()                
-                return(Properties) 
-        
+                        Properties[symbol]=child.text()
+                return(Properties)
+
         def import_to_modeller(self):
                 '''
-                Method to Handle Import button click. 
-                This file helps select .osm files in the system and import them directly into the 
+                Method to Handle Import button click.
+                This file helps select .osm files in the system and import them directly into the
                 modeller and automatically creates run all processes from the .osm file.
                 '''
                 fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Open Section Design",None, "InputFiles(*.osm)")
@@ -1593,7 +1385,7 @@ class Ui_OsdagSectionModeller(object):
                         self.SectionParameters.parameterText_1.addItems(connectdb('Angles'))
 
                 for child in self.Parameters:
-                        self.SectionParameters.textBoxVisible[child]=self.Parameters[child]                        
+                        self.SectionParameters.textBoxVisible[child]=self.Parameters[child]
                         if(child=='parameterText_1' or child=='parameterText_2'):
                                 exec('self.SectionParameters.'+child+'.setCurrentText('+repr(self.Parameters[child][1])+')')
                         else:
@@ -1602,9 +1394,10 @@ class Ui_OsdagSectionModeller(object):
                 self.update_section_properties(index_type,index_template)
                 self.disable_usability(False)
 
+
         def save_to_osm(self):
                 '''
-                Method to save Section Modeller Design data to .osm file 
+                Method to save Section Modeller Design data to .osm file
                 of desired location.
                 '''
                 designation=str(self.section_designation_lineEdit.text())
@@ -1616,21 +1409,30 @@ class Ui_OsdagSectionModeller(object):
                 if(reply==QtWidgets.QMessageBox.No):
                         return
                 else:
+                        flag=False
                         folder = QtWidgets.QFileDialog.getExistingDirectory(None, "Select a Folder")
-                        if(os.path.isfile(folder+'/'+designation+'.osm')):
-                                QtWidgets.QMessageBox.critical(QtWidgets.QMessageBox(),'Error','A file with the same name exists in the provided folder.')
+                        if(folder==''):
                                 return
-                        else:
-                                parameters={}
-                                parameters['Section_Type']=self.section_type_combobox.currentIndex()
-                                parameters['Section_Template']=self.section_template_combobox.currentIndex()
-                                parameters['Section_Parameters']=self.Parameters
-                                parameters['Section_Designation']=designation
-                                parameters['Section_Properties']=self.get_section_properties()
-                                
-                                with open(folder+'/'+designation+'.osm','w') as file:
-                                        file.write(pprint.pformat(parameters))    
-                                QtWidgets.QMessageBox.information(QtWidgets.QMessageBox(),'INFO','File Succesfully saved.')
+                        if(os.path.isfile(folder+'/'+designation+'.osm')):
+                                ans=QtWidgets.QMessageBox.question(QtWidgets.QMessageBox(),'Error','A file with the same name exists in the provided folder.Would you like to overwrite it?',QtWidgets.QMessageBox.Yes,QtWidgets.QMessageBox.No)
+                                if(ans==QtWidgets.QMessageBox.Yes):
+                                        os.remove(folder+'/'+designation+'.osm')
+                                else:
+                                        return
+
+                        parameters={}
+                        parameters['Section_Type']=self.section_type_combobox.currentIndex()
+                        parameters['Section_Template']=self.section_template_combobox.currentIndex()
+                        parameters['Section_Parameters']=self.Parameters
+                        parameters['Section_Designation']=designation
+                        parameters['Section_Properties']=self.get_section_properties()
+
+                        with open(folder+'/'+designation+'.osm','w') as file:
+                                file.write(pprint.pformat(parameters))
+                        QtWidgets.QMessageBox.information(QtWidgets.QMessageBox(),'INFO','File Succesfully saved.')
+
+
+
 
         def export_to_pdf(self):
                 '''
@@ -1659,7 +1461,7 @@ class Ui_OsdagSectionModeller(object):
                         latex=CreateLatex()
                         latex.save_latex(input_summary,input_summary['filename'],rel_path,Disp_3D_image)
                         if os.path.isfile(str(input_summary['filename']+'.pdf')) and not os.path.isfile(input_summary['filename']+'.log'):
-                                QtWidgets.QMessageBox.information(QtWidgets.QMessageBox(), 'Information', 'Design report saved!')            
+                                QtWidgets.QMessageBox.information(QtWidgets.QMessageBox(), 'Information', 'Design report saved!')
                         else:
                                 logfile=open(input_summary['filename']+'.log','r')
                                 logs=logfile.read()
@@ -1668,7 +1470,7 @@ class Ui_OsdagSectionModeller(object):
                                 else:
                                         print(logs)
                                         QtWidgets.QMessageBox.critical(QtWidgets.QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
-                                logfile.close()            
+                                logfile.close()
                 except KeyError:
                         pass
 

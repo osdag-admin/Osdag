@@ -1887,7 +1887,7 @@ class Window(QMainWindow):
             self.saveDesign_inputs()
         elif trigger_type == "Design_Pref":
 
-            if self.prev_inputs != self.input_dock_inputs:
+            if self.prev_inputs != self.input_dock_inputs or self.designPrefDialog.changes != QDialog.Accepted:
                 self.designPrefDialog = DesignPreferences(main, self, input_dictionary=self.input_dock_inputs)
 
                 if 'Select Section' in self.input_dock_inputs.values():
@@ -2027,28 +2027,38 @@ class Window(QMainWindow):
     def output_button_dialog(self, main, button_list, button):
 
         dialog = QtWidgets.QDialog()
-        #dialog.resize(470, 300)
-
         dialog.setObjectName("Dialog")
-        #q.sizeHint().width(), q.sizeHint().height()
-        #sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
-        #dialog.setSizePolicy(sizePolicy)
         layout1 = QtWidgets.QVBoxLayout(dialog)
+
+        note_widget = QWidget(dialog)
+        note_layout = QVBoxLayout(note_widget)
+        layout1.addWidget(note_widget)
+
         scroll = QScrollArea(dialog)
         layout1.addWidget(scroll)
         scroll.setWidgetResizable(True)
         scroll.horizontalScrollBar().setVisible(False)
-        scrollcontent = QtWidgets.QWidget(scroll)
-        outer_grid_layout = QtWidgets.QGridLayout(scrollcontent)
-        inner_grid_widget = QtWidgets.QWidget(scrollcontent)
-        image_widget = QtWidgets.QWidget(scrollcontent)
+        scroll_content = QtWidgets.QWidget(scroll)
+        outer_grid_layout = QtWidgets.QGridLayout(scroll_content)
+        inner_grid_widget = QtWidgets.QWidget(scroll_content)
+        image_widget = QtWidgets.QWidget(scroll_content)
         image_layout = QtWidgets.QVBoxLayout(image_widget)
+        image_layout.setAlignment(Qt.AlignCenter)
         image_widget.setLayout(image_layout)
         inner_grid_layout = QtWidgets.QGridLayout(inner_grid_widget)
         inner_grid_widget.setLayout(inner_grid_layout)
-        scrollcontent.setLayout(outer_grid_layout)
+        scroll_content.setLayout(outer_grid_layout)
+        scroll.setWidget(scroll_content)
+
+        dialog_width = 260
+        dialog_height = 300
+        max_image_width = 0
+        max_label_width = 0
+        max_image_height = 0
+
         section = 0
-        maxi_width = -1
+        no_note = True
+
         for op in button_list:
 
             if op[0] == button.objectName():
@@ -2056,33 +2066,28 @@ class Window(QMainWindow):
                 title = tup[0]
                 fn = tup[1]
                 dialog.setWindowTitle(title)
-                i = 0
                 j = 1
+                _translate = QtCore.QCoreApplication.translate
                 for option in fn(main, main.design_status):
+                    option_type = option[2]
                     lable = option[1]
-                    out_but_type = option[2]
-                    _translate = QtCore.QCoreApplication.translate
-                    if out_but_type not in [TYPE_TITLE, TYPE_IMAGE, TYPE_MODULE, TYPE_SECTION]:
+                    value = option[3]
+                    if option_type in [TYPE_TEXTBOX, TYPE_COMBOBOX]:
                         l = QtWidgets.QLabel(inner_grid_widget)
-                        #l.setGeometry(QtCore.QRect(10, 10 + i, 120, 25))
-
                         font = QtGui.QFont()
                         font.setPointSize(9)
                         font.setBold(False)
                         font.setWeight(50)
                         l.setFont(font)
-                        #l.setFixedSize(l.size())
                         l.setObjectName(option[0] + "_label")
                         l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
                         inner_grid_layout.addWidget(l, j, 1, 1, 1)
-                        #l.resize(l.sizeHint().width() + 8, l.sizeHint().height())
-                        metrices = QtGui.QFontMetrics(font)
-                        l.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
-                        maxi_width = max(maxi_width, metrices.boundingRect(lable).width() + 8)
-
-
-
-                    if out_but_type == TYPE_SECTION:
+                        l.setFixedSize(l.sizeHint().width(), l.sizeHint().height())
+                        max_label_width = max(l.sizeHint().width(), max_label_width)
+                        l.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, 
+                                                              QtWidgets.QSizePolicy.Maximum))
+                        
+                    if option_type == TYPE_SECTION:
                         if section != 0:
                             outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
                             outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
@@ -2091,79 +2096,108 @@ class Window(QMainWindow):
                             j += 1
                             outer_grid_layout.addWidget(hl1, j, 1, 1, 2)
 
-                        inner_grid_widget = QtWidgets.QWidget(scrollcontent)
-                        image_widget = QtWidgets.QWidget(scrollcontent)
+                        inner_grid_widget = QtWidgets.QWidget(scroll_content)
+                        image_widget = QtWidgets.QWidget(scroll_content)
                         image_layout = QtWidgets.QVBoxLayout(image_widget)
+                        image_layout.setAlignment(Qt.AlignCenter)
                         image_widget.setLayout(image_layout)
                         inner_grid_layout = QtWidgets.QGridLayout(inner_grid_widget)
                         inner_grid_widget.setLayout(inner_grid_layout)
-                        im = QtWidgets.QLabel(image_widget)
-                        #im.setGeometry(QtCore.QRect(330, 10, 150, 150))
-                        #im.setFixedSize(im.size())
-                        # im.setGeometry(QtCore.QRect(330, 10, 100, 100))
-                        # im.setScaledContents(True)
-                        # im.setFixedSize(im.size())
-
-                        pmap = QPixmap(option[3])
-                        #im.setScaledContents(1)
-                        im.setPixmap(pmap.scaled(250,250,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
-                        #im.setPixmap(pmap)
-                        image_layout.addWidget(im)
+                        if value is not None and value != "":
+                            im = QtWidgets.QLabel(image_widget)
+                            im.setFixedSize(value[1], value[2])
+                            pmap = QPixmap(value[0])
+                            im.setScaledContents(1)
+                            im.setPixmap(pmap)
+                            image_layout.addWidget(im)
+                            caption = QtWidgets.QLabel(image_widget)
+                            font = QtGui.QFont()
+                            font.setWeight(450)
+                            font.setPointSize(11)
+                            caption.setAlignment(Qt.AlignCenter)
+                            caption.setFont(font)
+                            caption.setText(value[3])
+                            caption.setFixedSize(value[1], 12)
+                            image_layout.addWidget(caption)
+                            max_image_width = max(max_image_width, value[1])
+                            max_image_height = max(max_image_height, value[2])
                         j += 1
-                        #maxi_width = max(maxi_width, im.width())
-                        #im.resize(im.sizeHint().width(), im.sizeHint().height())
 
-                        q = QtWidgets.QLabel(scrollcontent)
-                        #q.setGeometry(QtCore.QRect(30, 10, 201, 30))
-
+                        q = QtWidgets.QLabel(scroll_content)
                         font = QtGui.QFont()
                         font.setWeight(600)
                         font.setPointSize(11)
                         q.setFont(font)
                         q.setObjectName("_title")
                         q.setText(lable)
-                        q.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,QtWidgets.QSizePolicy.Maximum))
-                        #q.setFixedSize(q.size())
-                        #q.resize(q.sizeHint().width(), q.sizeHint().height())
+                        q.setFixedSize(q.sizeHint().width(), q.sizeHint().height())
+                        q.setSizePolicy(
+                            QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum))
                         outer_grid_layout.addWidget(q, j, 1, 1, 2)
-
                         section += 1
-
-                    if out_but_type == TYPE_TEXTBOX:
+                        
+                    if option_type == TYPE_TEXTBOX:
                         r = QtWidgets.QLineEdit(inner_grid_widget)
-                        #r.setGeometry(QtCore.QRect(160, 10 + i, 160, 27))
                         font = QtGui.QFont()
                         font.setPointSize(11)
                         font.setBold(False)
                         font.setWeight(50)
+                        r.setFixedSize(160, 27)
                         r.setFont(font)
-                        #r.setFixedSize(r.size())
                         r.setObjectName(option[0])
-                        r.setText(str(option[3]))
+                        r.setText(str(value))
                         inner_grid_layout.addWidget(r, j, 2, 1, 1)
 
-                    if out_but_type == TYPE_IMAGE:
+                    if option_type == TYPE_IMAGE:
                         im = QtWidgets.QLabel(image_widget)
-                        #im.setGeometry(QtCore.QRect(330, 10, 100, 100))
-                        #im.setScaledContents(True)
-                        #im.setFixedSize(im.size())
-                        pmap = QPixmap(option[3])
-                        im.setPixmap(pmap.scaled(170,340,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+                        im.setScaledContents(True)
+                        im.setFixedSize(value[1], value[2])
+                        pmap = QPixmap(value[0])
+                        im.setPixmap(pmap)
                         image_layout.addWidget(im)
+                        caption = QtWidgets.QLabel(image_widget)
+                        font = QtGui.QFont()
+                        font.setWeight(450)
+                        font.setPointSize(11)
+                        caption.setAlignment(Qt.AlignCenter)
+                        caption.setFont(font)
+                        caption.setText(value[3])
+                        caption.setFixedSize(value[1], 12)
+                        image_layout.addWidget(caption)
+                        max_image_width = max(max_image_width, value[1])
+                        max_image_height = max(max_image_height, value[2])
+
+                    if option_type == TYPE_NOTE:
+                        note = QLabel(note_widget)
+                        font = QtGui.QFont()
+                        font.setWeight(450)
+                        font.setPointSize(11)
+                        note.setFont(font)
+                        note.setText("Note: "+str(value))
+                        note.setFixedSize(note.sizeHint().width(), note.sizeHint().height())
+                        note_layout.addWidget(note)
+                        no_note = False
 
                     j = j + 1
-                    i = i + 30
 
                 if inner_grid_layout.count() > 0:
                     outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
                 if image_layout.count() > 0:
                     outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
-                scroll.setWidget(scrollcontent)
-                if section == 0:
-                    dialog.resize(350, 300)
-                #dialog.setFixedSize(dialog.size())
+
+                dialog_width += max_label_width
+                dialog_width += max_image_width
+                dialog_height = max(dialog_height, max_image_height)
+                if not no_note:
+                    dialog_height += 40
+                dialog.resize(dialog_width, dialog_height)
+                dialog.setMinimumSize(dialog_width, dialog_height)
+
+                if no_note:
+                    layout1.removeWidget(note_widget)
+
                 dialog.exec()
-    
+
     def import_custom_section(self):
         '''
         Custom Section Importing

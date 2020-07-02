@@ -92,8 +92,9 @@ available_module = {KEY_DISP_FINPLATE:FinPlateConnection, KEY_DISP_TENSION_WELDE
 
 
 #predefined pop-up summary.
-popup_summary = {'ProfileSummary': {'CompanyName': 'LoremIpsum', 'CompanyLogo': '', 'Group/TeamName': 'LoremIpsum', 'Designer': 'LoremIpsum'},
-                'ProjectTitle': 'Fossee', 'Subtitle': '', 'JobNumber': '123', 'AdditionalComments': 'No comments', 'Client': 'LoremIpsum'}
+popup_summary = {'ProfileSummary': {'CompanyName': 'LoremIpsum', 'CompanyLogo': '', 'Group/TeamName':
+    'LoremIpsum', 'Designer': 'LoremIpsum'},'ProjectTitle': 'Fossee', 'Subtitle': '', 'JobNumber': '123',
+                 'AdditionalComments': 'No comments', 'Client': 'LoremIpsum'}
 
 
 

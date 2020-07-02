@@ -160,7 +160,7 @@ class ColumnCoverPlate(MomentConnection):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
                      KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
@@ -181,6 +181,26 @@ class ColumnCoverPlate(MomentConnection):
         add_buttons.append(t2)
 
         return add_buttons
+
+    def get_values_for_design_pref(self, key, design_dictionary):
+
+        if design_dictionary[KEY_MATERIAL] != 'Select Material':
+            fu = Material(design_dictionary[KEY_MATERIAL],41).fu
+        else:
+            fu = ''
+
+        val = {KEY_DP_BOLT_TYPE: "Pretensioned",
+               KEY_DP_BOLT_HOLE_TYPE: "Standard",
+               KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
+               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
+               KEY_DP_DETAILING_GAP: '0',
+               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
+               KEY_DP_DESIGN_METHOD: "Limit State Design",
+               KEY_CONNECTOR_MATERIAL: str(design_dictionary[KEY_MATERIAL])
+               }[key]
+
+        return val
 
     ####################################
     # Design Preference Functions End
@@ -2819,9 +2839,9 @@ class ColumnCoverPlate(MomentConnection):
         # self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
         #                               self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0), 2)
 
-        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, display_prov(self.load.shear_force, "V"), shear_capacity(h=h, t=self.section.web_thickness,
-                                                                                 f_y=self.section.fy, gamma_m0=gamma_m0,
-                                                                                 shear_capacity=round(
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, display_prov(self.load.shear_force, "V"), shear_yield_prov(h=h, t=self.section.web_thickness,
+                                                                                                      f_y=self.section.fy, gamma_m0=gamma_m0,
+                                                                                                      V_dg=round(
                                                                                      self.shear_capacity1 / 1000, 2)),
               'Restrict to low shear case')
         self.report_check.append(t1)
@@ -2869,10 +2889,11 @@ class ColumnCoverPlate(MomentConnection):
                               axial_capacity=round(self.axial_capacity / 1000, 2)), '')
 
         self.report_check.append(t1)
+        V_dy = round(self.shear_capacity1 / 0.6 / 1000, 2)
         t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, display_prov(self.load.shear_force, "V"),
               prov_shear_load(shear_input=self.load.shear_force, min_sc=round(self.shear_load1 / 1000, 2),
                               app_shear_load=round(self.fact_shear_load / 1000, 2),
-                              shear_capacity_1=round(self.shear_capacity1 / 1000, 2)), "")
+                              shear_capacity_1=V_dy), "")
         self.report_check.append(t1)
         t1 = (KEY_DISP_APPLIED_MOMENT_LOAD, display_prov(self.load.moment, "M"),
               prov_moment_load(moment_input=self.load.moment, min_mc=round(self.load_moment_min / 1000000, 2),

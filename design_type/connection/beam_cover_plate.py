@@ -93,18 +93,7 @@ class BeamCoverPlate(MomentConnection):
                 Not required for this module but empty list should be passed"""
         return []
 
-    # def list_for_fu_fy_validation(self):
-    #     """ This function is no longer required"""
-    #
-    #     fu_fy_list = []
-    #
-    #     t2 = (KEY_SEC_MATERIAL, KEY_SEC_FU, KEY_SEC_FY)
-    #     fu_fy_list.append(t2)
-    #
-    #     t3 = (KEY_CONNECTOR_MATERIAL, KEY_CONNECTOR_FU, KEY_CONNECTOR_FY)
-    #     fu_fy_list.append(t3)
-    #
-    #     return fu_fy_list
+
 
     def input_dictionary_design_pref(self):
         """
@@ -156,7 +145,7 @@ class BeamCoverPlate(MomentConnection):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_BOLT_SLIP_FACTOR,
+        t2 = (None, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
                      KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_GAP,
                      KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
@@ -180,6 +169,26 @@ class BeamCoverPlate(MomentConnection):
 
         return add_buttons
 
+
+    def get_values_for_design_pref(self, key, design_dictionary):
+
+        if design_dictionary[KEY_MATERIAL] != 'Select Material':
+            fu = Material(design_dictionary[KEY_MATERIAL],41).fu
+        else:
+            fu = ''
+
+        val = {KEY_DP_BOLT_TYPE: "Pretensioned",
+               KEY_DP_BOLT_HOLE_TYPE: "Standard",
+               KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
+               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
+               KEY_DP_DETAILING_GAP: '3',
+               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
+               KEY_DP_DESIGN_METHOD: "Limit State Design",
+               KEY_CONNECTOR_MATERIAL: str(design_dictionary[KEY_MATERIAL])
+               }[key]
+
+        return val
     ####################################
     # Design Preference Functions End
     ####################################
@@ -251,10 +260,6 @@ class BeamCoverPlate(MomentConnection):
         t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGEPLATE_THICKNESS, TYPE_OUT_LABEL, self.preference_type)
         lst.append(t8)
 
-        # t8 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_DOCK, self.out_bolt_bearing)
-        # lst.append(t8)
-        # t8 = ([KEY_TYP], KEY_OUT_BOLT_BEARING, TYPE_OUT_LABEL, self.out_bolt_bearing)
-        # lst.append(t8)
 
         return lst
 
@@ -418,20 +423,7 @@ class BeamCoverPlate(MomentConnection):
         # webcapacity.append(t16)
         return webcapacity
 
-    # def boltdetails(self,flag):
-    #
-    #     boltdetails = []
 
-
-        #
-        # return  boltdetails
-
-    # def Innerplate(self, flag):
-    #     Innerplate = []
-    #
-    #
-    #
-    #     return Innerplate
 
     def member_capacityoutput(self,flag):
         member_capacityoutput = []
@@ -539,7 +531,7 @@ class BeamCoverPlate(MomentConnection):
             key height is assigned as width
             key Length: length
         for web plate:
-            key length is termed as width
+            key length is assigned as width
             key height: height
         Returns:
         """
@@ -2828,10 +2820,17 @@ class BeamCoverPlate(MomentConnection):
         # self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
         #                               self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0), 2)
 
-        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, display_prov(self.load.shear_force, "V"), shear_capacity(h=h, t=self.section.web_thickness,
-                                                              f_y=self.section.fy, gamma_m0=gamma_m0,
-                                                              shear_capacity=round(self.shear_capacity1 / 1000, 2)), 'Restrict to low shear case')
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '', shear_yield_prov(h=h, t=self.section.web_thickness,f_y=self.section.fy, gamma_m0=gamma_m0,
+                                                                V_dg=round(self.shear_capacity1 / 1000, 2)), '')
         self.report_check.append(t1)
+
+        initial_shear_capacity = round(self.shear_capacity1 / 1000 / 0.6, 2)
+        reduced_shear_capacity = round(self.shear_capacity1 / 1000, 2)
+        t1 = (KEY_DISP_ALLOW_SHEAR, display_prov(self.load.shear_force, "V"),
+              allow_shear_capacity(initial_shear_capacity, reduced_shear_capacity),
+              get_pass_fail(self.load.shear_force, reduced_shear_capacity, relation="lesser"))
+        self.report_check.append(t1)
+
         t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', plastic_moment_capacty(beta_b=round(self.beta_b, 2),
                                                                                Z_p=round(self.Z_p,2), f_y=self.section.fy,
                                                                                gamma_m0=gamma_m0,
@@ -2870,9 +2869,10 @@ class BeamCoverPlate(MomentConnection):
                               app_axial_load=round(self.factored_axial_load / 1000, 2),axial_capacity=round(self.axial_capacity/1000,2)),'' )
 
         self.report_check.append(t1)
+        V_dy = round(self.shear_capacity1 / 0.6 / 1000, 2)
         t1 = (KEY_DISP_APPLIED_SHEAR_LOAD,display_prov(self.load.shear_force, "V"),
               prov_shear_load(shear_input=self.load.shear_force,min_sc=round(self.shear_load1 / 1000, 2),
-                              app_shear_load=round(self.fact_shear_load / 1000, 2),shear_capacity_1=round(self.shear_capacity1/1000,2)),"")
+                              app_shear_load=round(self.fact_shear_load / 1000, 2),shear_capacity_1=V_dy),"")
         self.report_check.append(t1)
         t1 = (KEY_DISP_APPLIED_MOMENT_LOAD,display_prov(self.load.moment, "M"),
               prov_moment_load(moment_input=self.load.moment,min_mc=round(self.load_moment_min / 1000000, 2),
@@ -3782,6 +3782,13 @@ class BeamCoverPlate(MomentConnection):
                                                            round(self.web_plate.shear_yielding_capacity / 1000, 2),2), '')
             self.report_check.append(t1)
 
+            initial_shear_capacity = round(self.web_plate.shear_yielding_capacity / 1000 , 2)
+            reduced_shear_capacity = round(0.6*self.web_plate.shear_yielding_capacity / 1000, 2)
+            t1 = (KEY_DISP_ALLOW_SHEAR, display_prov(self.load.shear_force, "V"),
+                  allow_shear_capacity(initial_shear_capacity, reduced_shear_capacity),
+                  get_pass_fail(self.load.shear_force, reduced_shear_capacity, relation="lesser"))
+            self.report_check.append(t1)
+
             t1 = (KEY_DISP_SHEARRUPTURECAP_WEB_PLATE, '', shear_rupture_prov_beam(self.web_plate.height, self.web_plate.thickness_provided,
                                                                   self.web_plate.bolts_one_line ,self.web_bolt.dia_hole,
                                                                   self.web_plate.fu,
@@ -3795,13 +3802,18 @@ class BeamCoverPlate(MomentConnection):
                   blockshear_prov(Tdb=round(self.web_plate.block_shear_capacity_shear / 1000, 2),stress ="shear"), '')
             self.report_check.append(t1)
 
-            t1 = (KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, display_prov(round(self.fact_shear_load / 1000, 2), "V_u"),
+            t1 = (KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, '',
 
                   shear_capacity_prov(round(self.web_plate.shear_yielding_capacity / 1000, 2),
                                       round(self.web_plate.shear_rupture_capacity / 1000, 2),
-                                      round(self.web_plate.block_shear_capacity_shear/ 1000, 2)),
+                                      round(self.web_plate.block_shear_capacity_shear/ 1000, 2)),'')
+            self.report_check.append(t1)
+
+            red_shear_capacity = 0.6 * round(self.web_plate.shear_capacity_web_plate / 1000, 2)
+            t1 = (KEY_DISP_ALLOW_SHEAR,display_prov(round(self.fact_shear_load / 1000, 2), "V_u"),
+                  allow_shear_capacity(round(self.web_plate.shear_capacity_web_plate / 1000, 2), red_shear_capacity),
                   get_pass_fail(round(self.fact_shear_load / 1000, 2),
-                                round(self.web_plate.shear_capacity_web_plate / 1000, 2), relation="lesser"))
+                                round(self.web_plate.shear_capacity_web_plate / 1000, 2),relation="lesser"))
             self.report_check.append(t1)
 
         Disp_3D_image = "/ResourceFiles/images/3d.png"

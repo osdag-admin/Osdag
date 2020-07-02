@@ -8,6 +8,10 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from design_report import reportGenerator
+
+from PyQt5.QtCore import QRegExp,QTimer, QThread, QFile, pyqtSignal, QTextStream, Qt, QIODevice, pyqtSlot
+from PyQt5.QtGui import QBrush, QImage, QColor, QDoubleValidator, QIntValidator, QPixmap, QPalette, QTextCharFormat, QTextCursor, QStandardItem
+from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp
@@ -25,6 +29,7 @@ from PyQt5.QtGui import QBrush, QImage, QColor, QDoubleValidator, QIntValidator,
 from PyQt5.QtWidgets import *
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PIL import Image
+from texlive.Design_wrapper import init_display as init_display_off_screen
 import os
 import yaml
 import json
@@ -197,8 +202,26 @@ class Window(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'No design created!')
             return
 
+        if main.design_status:
+            from osdagMainSettings import backend_name
+            off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
+            self.commLogicObj.display = off_display
+            self.commLogicObj.display_3DModel("Model", "gradient_bg")
+            off_display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
+            off_display.ExportToImage('./ResourceFiles/images/3d.png')
+            off_display.View_Front()
+            off_display.FitAll()
+            off_display.ExportToImage('./ResourceFiles/images/front.png')
+            off_display.View_Top()
+            off_display.FitAll()
+            off_display.ExportToImage('./ResourceFiles/images/top.png')
+            off_display.View_Right()
+            off_display.FitAll()
+            off_display.ExportToImage('./ResourceFiles/images/side.png')
+            self.commLogicObj.display = self.display
+
         self.new_window = QtWidgets.QDialog(self)
-        self.new_ui = Ui_Dialog1(main.design_button_status,loggermsg=self.textEdit.toPlainText())
+        self.new_ui = Ui_Dialog1(main.design_status,loggermsg=self.textEdit.toPlainText())
         self.new_ui.setupUi(self.new_window, main)
         self.new_ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.new_window, self.new_ui.lbl_browse))
         self.new_ui.btn_saveProfile.clicked.connect(lambda: self.saveUserProfile(self.new_window))
@@ -359,7 +382,6 @@ class Window(QMainWindow):
         self.btnTop.setIcon(icon3)
         self.btnTop.setIconSize(QtCore.QSize(22, 22))
         self.btnTop.setObjectName("btnTop")
-        self.btnTop.setEnabled(False)
         self.btnFront = QtWidgets.QToolButton(self.frame)
         self.btnFront.setGeometry(QtCore.QRect(100, 0, 28, 28))
         self.btnFront.setFocusPolicy(QtCore.Qt.TabFocus)
@@ -368,7 +390,6 @@ class Window(QMainWindow):
         self.btnFront.setIcon(icon4)
         self.btnFront.setIconSize(QtCore.QSize(22, 22))
         self.btnFront.setObjectName("btnFront")
-        self.btnFront.setEnabled(False)
         self.btnSide = QtWidgets.QToolButton(self.frame)
         self.btnSide.setGeometry(QtCore.QRect(130, 0, 28, 28))
         self.btnSide.setFocusPolicy(QtCore.Qt.TabFocus)
@@ -377,7 +398,6 @@ class Window(QMainWindow):
         self.btnSide.setIcon(icon5)
         self.btnSide.setIconSize(QtCore.QSize(22, 22))
         self.btnSide.setObjectName("btnSide")
-        self.btnSide.setEnabled(False)
         """
             To get 3d component checkbox details from modules
         """
@@ -1161,19 +1181,16 @@ class Window(QMainWindow):
         font.setFamily("DejaVu Sans")
         self.actionSave_Front_View.setFont(font)
         self.actionSave_Front_View.setObjectName("actionSave_Front_View")
-        self.actionSave_Front_View.setEnabled(False)
         self.actionSave_Top_View = QtWidgets.QAction(MainWindow)
         font = QtGui.QFont()
         font.setFamily("DejaVu Sans")
         self.actionSave_Top_View.setFont(font)
         self.actionSave_Top_View.setObjectName("actionSave_Top_View")
-        self.actionSave_Top_View.setEnabled(False)
         self.actionSave_Side_View = QtWidgets.QAction(MainWindow)
         font = QtGui.QFont()
         font.setFamily("DejaVu Sans")
         self.actionSave_Side_View.setFont(font)
         self.actionSave_Side_View.setObjectName("actionSave_Side_View")
-        self.actionSave_Side_View.setEnabled(False)
         self.actionChange_bg_color = QtWidgets.QAction(MainWindow)
         font = QtGui.QFont()
         font.setFamily("Verdana")
@@ -1324,6 +1341,12 @@ class Window(QMainWindow):
         self.actionAsk_Us_a_Question.triggered.connect(lambda: MyAskQuestion(self).exec())
         self.actionDesign_examples.triggered.connect(self.design_examples)
 
+        self.actionSave_Top_View.triggered.connect(lambda: self.display.View_Top())
+        self.actionSave_Front_View.triggered.connect(lambda: self.display.View_Front())
+        self.actionSave_Side_View.triggered.connect(lambda: self.display.View_Right())
+        self.btnTop.clicked.connect(lambda: self.display.View_Top())
+        self.btnFront.clicked.connect(lambda: self.display.View_Front())
+        self.btnSide.clicked.connect(lambda: self.display.View_Right())
 
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
         last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
@@ -1948,22 +1971,26 @@ class Window(QMainWindow):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(True)
                 for action in self.menugraphics_component_list:
                     action.setEnabled(True)
-                fName = str('./ResourceFiles/images/3d.png')
-                file_extension = fName.split(".")[-1]
-
-                if file_extension == 'png':
-                    self.display.ExportToImage(fName)
-                    im = Image.open('./ResourceFiles/images/3d.png')
-                    w,h=im.size
-                    if(w< 640 or h < 360):
-                        print('Re-taking Screenshot')
-                        self.resize(700,500)
-                        self.outputDock.hide()
-                        self.inputDock.hide()
-                        self.textEdit.hide()
-                        QTimer.singleShot(0, lambda:self.retakeScreenshot(fName))
+                # fName = str('./ResourceFiles/images/3d.png')
+                # file_extension = fName.split(".")[-1]
+                #
+                # if file_extension == 'png':
+                #     self.display.ExportToImage(fName)
+                #     im = Image.open('./ResourceFiles/images/3d.png')
+                #     w,h=im.size
+                #     if(w< 640 or h < 360):
+                #         print('Re-taking Screenshot')
+                #         self.resize(700,500)
+                #         self.outputDock.hide()
+                #         self.inputDock.hide()
+                #         self.textEdit.hide()
+                #         QTimer.singleShot(0, lambda:self.retakeScreenshot(fName))
 
             else:
+                for fName in ['3d.png', 'top.png',
+                              'front.png', 'side.png']:
+                    with open("./ResourceFiles/images/"+fName, 'w'):
+                        pass
                 self.display.EraseAll()
                 for chkbox in main.get_3d_components(main):
                     self.frame.findChild(QtWidgets.QCheckBox, chkbox[0]).setEnabled(False)

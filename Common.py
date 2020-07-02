@@ -1305,10 +1305,18 @@ KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
 KEY_DISP_KB = 'Kb'
 
+KEY_OUT_BOLT_IR_DETAILS = 'Bolt.IRDetails'
+KEY_OUT_DISP_BOLT_IR_DETAILS = 'Capacity Details'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
 KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
+KEY_OUT_BETA_LJ = 'Bolt.Betalj'
+KEY_OUT_DISP_BETA_LJ = 'Beta_lj'
+KEY_OUT_BETA_LG = 'Bolt.Betalg'
+KEY_OUT_DISP_BETA_LG = 'Beta_lg'
+KEY_OUT_BETA_PK = 'Bolt.Betapk'
+KEY_OUT_DISP_BETA_PK = 'Beta_pk'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
 KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity (kN)'
@@ -1320,6 +1328,8 @@ KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
 KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
 KEY_OUT_BOLT_PRYING_FORCE = 'Bolt.PryingForce'
 KEY_OUT_DISP_BOLT_PRYING_FORCE = 'Bolt Prying Force (kN)'
+KEY_OUT_BOLT_TENSION_TOTAL = 'Bolt.TensionTotal'
+KEY_OUT_DISP_BOLT_TENSION_TOTAL = 'Total Bolt Tension (kN)'
 KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_BOLT_TENSION_CAPACITY1 = 'Bolt Tension Capacity (kN)'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
@@ -1330,7 +1340,8 @@ KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
 KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
 KEY_OUT_DISP_INTER_BOLT_LINE = 'Bolt Lines (nos)'
-
+KEY_OUT_BOLT_IR = 'Bolt.IR'
+KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 
 
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
@@ -1368,29 +1379,29 @@ KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
 KEY_OUT_DISP_EDGE_DIST = 'Edge Distance (mm)'
 
 
-KEY_OUT_SPTNG_BOLT_SHEAR = 'Cleat.Sptng_leg.Shear'
-KEY_OUT_SPTNG_BOLT_BEARING = 'Cleat.Sptng_leg.Bearing'
-KEY_OUT_SPTNG_BOLT_CAPACITY = 'Cleat.Sptng_leg.Capacity'
-KEY_OUT_SPTNG_BOLT_FORCE = 'Cleat.Sptng_leg.Force'
-KEY_OUT_SPTNG_BOLT_LINE = 'Cleat.Sptng_leg.Line'
-KEY_OUT_SPTNG_BOLTS_REQUIRED = 'Cleat.Sptng_leg.Required'
+KEY_OUT_SPTING_BOLT_SHEAR = 'Cleat.Spting_leg.Shear'
+KEY_OUT_SPTING_BOLT_BEARING = 'Cleat.Spting_leg.Bearing'
+KEY_OUT_SPTING_BOLT_CAPACITY = 'Cleat.Spting_leg.Capacity'
+KEY_OUT_SPTING_BOLT_FORCE = 'Cleat.Spting_leg.Force'
+KEY_OUT_SPTING_BOLT_LINE = 'Cleat.Spting_leg.Line'
+KEY_OUT_SPTING_BOLTS_REQUIRED = 'Cleat.Spting_leg.Required'
 
-KEY_OUT_SPTNG_BOLT_GRP_CAPACITY = 'Cleat.Sptng_leg.GroupCapacity'
+KEY_OUT_SPTING_BOLT_GRP_CAPACITY = 'Cleat.Spting_leg.GroupCapacity'
 
-KEY_OUT_SPTNG_BOLTS_ONE_LINE = 'Cleat.Sptng_leg.OneLine'
+KEY_OUT_SPTING_BOLTS_ONE_LINE = 'Cleat.Spting_leg.OneLine'
 
-KEY_OUT_SPTNG_SPACING = 'Cleat.Sptng_leg.spacing'
+KEY_OUT_SPTING_SPACING = 'Cleat.Spting_leg.spacing'
 
-KEY_OUT_SPTNG_PITCH = 'Cleat.Sptng_leg.Pitch'
+KEY_OUT_SPTING_PITCH = 'Cleat.Spting_leg.Pitch'
 
-KEY_OUT_SPTNG_MIN_PITCH = 'Cleat.Sptng_leg.MinPitch'
-KEY_OUT_SPTNG_END_DIST = 'Cleat.Sptng_leg.EndDist'
-KEY_OUT_SPTNG_GAUGE = 'Cleat.Sptng_leg.Gauge'
-KEY_OUT_SPTNG_MIN_GAUGE = 'Cleat.Sptng_leg.MinGauge'
-KEY_OUT_SPTNG_MAX_SPACING = 'Cleat.Sptng_leg.MaxGauge'
-KEY_OUT_SPTNG_EDGE_DIST = 'Cleat.Sptng_leg.EdgeDist'
-KEY_OUT_SPTNG_MIN_EDGE_DIST = 'Cleat.Sptng_leg.MinEdgeDist'
-KEY_OUT_SPTNG_MAX_EDGE_DIST = 'Cleat.Sptng_leg.MaxEdgeDist'
+KEY_OUT_SPTING_MIN_PITCH = 'Cleat.Spting_leg.MinPitch'
+KEY_OUT_SPTING_END_DIST = 'Cleat.Spting_leg.EndDist'
+KEY_OUT_SPTING_GAUGE = 'Cleat.Spting_leg.Gauge'
+KEY_OUT_SPTING_MIN_GAUGE = 'Cleat.Spting_leg.MinGauge'
+KEY_OUT_SPTING_MAX_SPACING = 'Cleat.Spting_leg.MaxGauge'
+KEY_OUT_SPTING_EDGE_DIST = 'Cleat.Spting_leg.EdgeDist'
+KEY_OUT_SPTING_MIN_EDGE_DIST = 'Cleat.Spting_leg.MinEdgeDist'
+KEY_OUT_SPTING_MAX_EDGE_DIST = 'Cleat.Spting_leg.MaxEdgeDist'
 
 
 KEY_OUT_DISP_PLATETHK_REP = 'Thickness (mm)'
@@ -1563,7 +1574,7 @@ KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
 
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
-DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"
+DISP_OUT_TITLE_SPTINGLEG = "Supporting Leg"
 DISP_OUT_TITLE_CLEAT = "Cleat Angle"
 KEY_OUT_CLEATTHK = 'Plate.Thickness'
 KEY_OUT_DISP_CLEATTHK = 'Thickness (mm)'
@@ -1571,8 +1582,8 @@ KEY_OUT_CLEAT_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_CLEAT_HEIGHT = 'Height (mm)'
 KEY_OUT_CLEAT_SPTDLEG = 'Cleat.SupportedLength'
 KEY_OUT_DISP_CLEAT_SPTDLEG = 'Length (mm)'
-KEY_OUT_CLEAT_SPTNGLEG = 'Cleat.SupportingLength'
-KEY_OUT_DISP_CLEAT_SPTNGLEG = 'Length (mm)'
+KEY_OUT_CLEAT_SPTINGLEG = 'Cleat.SupportingLength'
+KEY_OUT_DISP_CLEAT_SPTINGLEG = 'Length (mm)'
 
 KEY_OUT_CLEAT_SHEAR = 'Cleat.Shear'
 

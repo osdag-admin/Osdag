@@ -127,8 +127,7 @@ class Bolt:
         return repr
 
     def calculate_bolt_capacity(self, bolt_diameter_provided, bolt_grade_provided, conn_plates_t_fu_fy, n_planes,
-                                e=None,
-                                p=None, seatedangle_e=0.0):
+                                e=None, p=None, seatedangle_e=0.0):
         """
 
         :param bolt_type: bearing or friction grip bolt
@@ -160,8 +159,10 @@ class Bolt:
         t_fu_prev = conn_plates_t_fu_fy[0][0] * conn_plates_t_fu_fy[0][1]
         thk_considered = conn_plates_t_fu_fy[0][0]
         fu_considered = conn_plates_t_fu_fy[0][1]
+        t_sum = 0.0
         for i in conn_plates_t_fu_fy:
             t_fu = i[0] * i[1]
+            t_sum = t_sum + i[0]
             if t_fu <= t_fu_prev:
                 thk_considered = i[0]
                 fu_considered = i[1]

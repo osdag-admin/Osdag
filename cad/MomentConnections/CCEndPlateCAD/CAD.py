@@ -246,7 +246,6 @@ class CCEndPlateCAD(object):
 
                 self.weld_stiff_v12Model = self.weld_stiff_v12.create_model()
 
-        #if fillet weld
 
 
 

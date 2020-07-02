@@ -902,16 +902,14 @@ class CommonDesignLogic(object):
         nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
         nut_Ht = nut_T
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
-
-        # CEP.stiff_ht_try = CEP.stiff_wt
-        # CEP.stiff_wt = CEP.stiff_ht
-        stiffener =  StiffenerPlate(L= CEP.stiff_ht, W= CEP.stiff_wt, T = CEP.t_s, L11= CEP.stiff_ht/2, L12= CEP.stiff_wt/2, R21= 10, R22= 10)
-
-
         if CEP.weld_size <= 16:
+            stiffener = StiffenerPlate(L=CEP.stiff_wt, W=CEP.stiff_ht, T=CEP.t_s, L11=CEP.stiff_wt / 2,
+                                       L12=CEP.stiff_ht / 2, R21=10, R22=10)
             weld_stiff_h = GrooveWeld(b=stiffener.T, h= stiffener.T, L=stiffener.L - stiffener.R22)
             weld_stiff_v = FilletWeld(b= CEP.weld_size, h= CEP.weld_size, L=stiffener.W - stiffener.R21)
         else:
+            stiffener = StiffenerPlate(L=CEP.stiff_wt  - CEP.t_s, W=CEP.stiff_ht, T=CEP.t_s, L11=CEP.stiff_wt / 2,
+                                       L12=CEP.stiff_ht / 2, R21=10, R22=10)
             weld_stiff_h = GrooveWeld(b=stiffener.T, h= stiffener.T, L=stiffener.L - stiffener.R22)
             weld_stiff_v = GrooveWeld(b=stiffener.T, h= stiffener.T, L=stiffener.W - stiffener.R21)
 

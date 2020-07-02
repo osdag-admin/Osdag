@@ -632,6 +632,8 @@ class SeatedAngleConnection(ShearConnection):
         self.module = design_dictionary[KEY_MODULE]
         self.seated_list = design_dictionary[KEY_ANGLE_LIST]
         self.topangle_list = design_dictionary[KEY_TOPANGLE]
+        self.seated_list_initial = design_dictionary[KEY_ANGLE_LIST]
+        self.topangle_list_initial = design_dictionary[KEY_TOPANGLE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.material_grade = design_dictionary[KEY_MATERIAL]

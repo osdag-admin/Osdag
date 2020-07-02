@@ -233,7 +233,7 @@ class NutBoltArray(object):
             self.gauge = [self.endDist, self.pitch, self.pitch, self.p2flange, self.p2flange, self.pitch, self.pitch, 2 * self.endDist + self.column.t,
                           self.pitch, self.pitch, self.p2flange, self.p2flange, self.pitch, self.pitch]
 
-        elif self.col == 12:
+        elif self.col == 16:
             self.gauge = [self.endDist, self.pitch, self.pitch, self.pitch, self.p2flange, self.pitch, self.pitch, self.pitch, 2 * self.endDist + self.column.t,
                           self.pitch, self.pitch, self.pitch, self.p2flange, self.pitch, self.pitch, self.pitch]
 

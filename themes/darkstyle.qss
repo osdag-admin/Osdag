@@ -930,14 +930,14 @@ QPushButton {
     padding: 5px;
     border-radius: 0;
     outline: none;
-    min-height: 16px;
+
 }
 
 QPushButton:disabled {
     background-color: #14232b;
     border: 1px solid #233547;
     padding: 5px;
-    min-height: 16px;
+
     /*border-radius: 2px;*/
     /*color: #454545;*/
 }
@@ -1094,8 +1094,10 @@ QComboBox QAbstractItemView {
     border-radius: 0;
     border: 1px solid #37495b;
     outline: 0;
-	selection-background-color: #148CD2;
-	selection-color:black ;
+  	selection-background-color: #148CD2;
+  	selection-color:black ;
+    text-align:left;
+
 }
 
 QComboBox QAbstractItemView::item {
@@ -1104,11 +1106,13 @@ QComboBox QAbstractItemView::item {
     background-color: #1D282F;
     /* Add horizontal separators between items */
     /* border-bottom: 1px solid #343434; */
+    text-align:left;
 }
 
 QComboBox QAbstractItemView::item::hover,
 QComboBox QAbstractItemView::item::focus {
     background-color: #2e3f46;
+    text-align:left;
 }
 
 QComboBox::drop-down {
@@ -1246,6 +1250,9 @@ QDialog#DesignPreferences QTabBar::tab{
 QDialog#DesignPreferences QComboBox{
 		min-height: 22px;
 		max-height: 22px;
+}
+QDialog#DesignPreferences QTabWidget::tab-bar{
+    alignment: left;
 }
 QTabWidget#mytabWidget QTabBar::tab {
 
@@ -1624,12 +1631,13 @@ https://doc.qt.io/qt-5/stylesheet-examples.html#customizing-qframe
 --------------------------------------------------------------------------- */
 .QFrame {
   border-radius: 4px;
-  border: 1px solid #1D282F;;
+  border: 1px solid #1D282F;
+  background-color: rgba(19, 27, 33, 1);
 }
 
 .QFrame[frameShape="0"] {
   border-radius: 4px;
-  border: 1px transparent #1D282F;;
+  border: 1px transparent #1D282F;
 }
 
 .QFrame[height="3"], .QFrame[width="3"] {

@@ -13,9 +13,13 @@ import sys
 import datetime
 import pylatex as pyl
 from pylatex.basic import TextColor
-
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor
+from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor
+from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu,\
+    MultiRow, StandAloneGraphic
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat
 from pylatex.utils import italic
 #from pdflatex import PDFLaTeX
 import os

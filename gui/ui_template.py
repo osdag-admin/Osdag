@@ -8,6 +8,10 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from design_report import reportGenerator
+
+from PyQt5.QtCore import QRegExp,QTimer, QThread, QFile, pyqtSignal, QTextStream, Qt, QIODevice, pyqtSlot
+from PyQt5.QtGui import QBrush, QImage, QColor, QDoubleValidator, QIntValidator, QPixmap, QPalette, QTextCharFormat, QTextCursor, QStandardItem
+from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp

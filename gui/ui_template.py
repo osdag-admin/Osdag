@@ -9,24 +9,14 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from design_report import reportGenerator
 
-from PyQt5.QtCore import QRegExp,QTimer, QThread, QFile, pyqtSignal, QTextStream, Qt, QIODevice, pyqtSlot
-from PyQt5.QtGui import QBrush, QImage, QColor, QDoubleValidator, QIntValidator, QPixmap, QPalette, QTextCharFormat, QTextCursor, QStandardItem
+
+from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
-from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QBrush, QImage
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtGui import QTextCharFormat
-from PyQt5.QtGui import QTextCursor
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDialogButtonBox
+from PyQt5.QtCore import *   
 from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
-from PyQt5.QtCore import QRegExp,QTimer, QThread, QFile, pyqtSignal, QTextStream, Qt, QIODevice, pyqtSlot
-from PyQt5.QtGui import QBrush, QImage, QColor, QDoubleValidator, QIntValidator, QPixmap, QPalette, QTextCharFormat, QTextCursor, QStandardItem
-from PyQt5.QtWidgets import *
+
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PIL import Image
 from texlive.Design_wrapper import init_display as init_display_off_screen
@@ -44,7 +34,7 @@ import configparser
 import pickle
 import cairosvg
 from update import Update
-
+import pandas as pd
 
 from Common import *
 from utils.common.component import *
@@ -1026,7 +1016,7 @@ class Window(QMainWindow):
         self.save_outputDock.setFont(font)
         self.save_outputDock.setObjectName("save_outputDock")
         self.save_outputDock.setText("Save Output")
-        self.save_outputDock.clicked.connect(self.save_output_to_txt(main))
+        self.save_outputDock.clicked.connect(self.save_output_to_csv(main))
         # self.btn_CreateDesign.clicked.connect(self.createDesignReport(main))
 
         ##################################
@@ -1393,27 +1383,46 @@ class Window(QMainWindow):
         else:
             msg = QMessageBox.information(self, 'Update', 'No Update Available')
 
-    def save_output_to_txt(self, main):
+    def save_output_to_csv(self, main):
         def save_fun():
             status = main.design_status
             out_list = main.output_values(main, status)
+            in_list = main.input_values(main)
             to_Save = {}
             flag = 0
             for option in out_list:
                 if option[0] is not None and option[2] == TYPE_TEXTBOX:
-                    to_Save[option[0]] = str(option[3])
+                    to_Save[option[0]] = option[3]
                     if str(option[3]):
                         flag = 1
+                if option[2] == TYPE_OUT_BUTTON:
+                    tup = option[3]
+                    fn = tup[1]
+                    for item in fn(main, status):
+                        lable = item[0]
+                        value = item[3]
+                        if lable!=None and value!=None:
+                            to_Save[lable] = value
+
+            df = pd.DataFrame(self.design_inputs.items())
+            #df.columns = ['label','value']
+            #columns = [('input values','label'),('input values','value')]
+            #df.columns = pd.MultiIndex.from_tuples(columns)
+
+            df1 = pd.DataFrame(to_Save.items())
+            #df1.columns = ['label','value']
+            #df1.columns = pd.MultiIndex.from_product([["Output Values"], df1.columns])
+
+            bigdata = pd.concat([df, df1], axis=1)
             if not flag:
                 QMessageBox.information(self, "Information",
                                         "Nothing to Save.")
             else:
                 fileName, _ = QFileDialog.getSaveFileName(self,
-                                                          "Save Output", os.path.join(self.folder, "untitled.txt"),
-                                                          "Input Files(*.txt)")
+                                                          "Save Output", os.path.join(self.folder, "untitled.csv"),
+                                                          "Input Files(*.csv)")
                 if fileName:
-                    with open(fileName, 'w') as outfile:
-                        yaml.dump(to_Save, outfile, default_flow_style=False)
+                    bigdata.to_csv(fileName, index=False, header=None)
                     QMessageBox.information(self, "Information",
                                             "Saved successfully.")
         return save_fun
@@ -2167,7 +2176,7 @@ class Window(QMainWindow):
                     dialog.resize(350, 300)
                 #dialog.setFixedSize(dialog.size())
                 dialog.exec()
-    
+
     def import_custom_section(self):
         '''
         Custom Section Importing
@@ -2829,7 +2838,7 @@ class Window(QMainWindow):
             if(screen_resolution.width()<1025):
                 measure=screen_resolution.height()-120
                 dialog.resize(measure*45//39,measure)
-                
+
             else:
                 dialog.resize(900,700)
             mysize = dialog.geometry()

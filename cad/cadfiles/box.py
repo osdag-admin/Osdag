@@ -58,13 +58,61 @@ class Box(object):
         prism = BRepAlgoAPI_Fuse(prism, prism4).Shape()        
         return prism
 
+    def create_marking(self):
+        middel_pnt = []
+        line = []
+        labels = ["z","y","u","v"]
+        offset = 100
+        uvoffset = offset/numpy.sqrt(2)
 
+        z_points = [numpy.array([-offset,0.,self.H/2]), numpy.array([offset,0.,self.H/2])]
+        line.append(makeEdgesFromPoints(z_points))
+
+        y_points = [numpy.array([0.,-offset,self.H/2]), numpy.array([0,offset,self.H/2])]
+        line.append(makeEdgesFromPoints(y_points))
+        
+        u_points = [numpy.array([-uvoffset,uvoffset,self.H/2]), numpy.array([uvoffset,-uvoffset,self.H/2])]
+        line.append(makeEdgesFromPoints(u_points))
+
+        v_points = [numpy.array([-uvoffset,-uvoffset,self.H/2]), numpy.array([uvoffset,uvoffset,self.H/2])]
+        line.append(makeEdgesFromPoints(v_points))
+
+        middel_pnt = [[-offset,0,self.H/2],[0,-offset,self.H/2],[uvoffset,-uvoffset,self.H/2],[uvoffset,uvoffset,self.H/2]]
+
+        return line, middel_pnt, labels
 
 
 if __name__ == '__main__':
 
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
+
+    def display_lines(lines, points, labels):
+        for l,p,n in zip(lines,points, labels):
+            display.DisplayShape(l, update=True)
+            display.DisplayMessage(getGpPt(p), n,message_color=(0,0,0))
+
+    def view_bottom(event=None):
+        display.View_Bottom()
+        display.FitAll()
+
+    def view_front(event=None):
+        display.View_Front()
+        display.FitAll()
+
+    def view_left(event=None):
+        display.View_Left()
+        display.FitAll()
+
+    def view_right(event=None):
+        display.View_Right()
+        display.FitAll()
+
+    add_menu('view')
+    add_function_to_menu('view',view_bottom)
+    add_function_to_menu('view',view_front)
+    add_function_to_menu('view',view_left)
+    add_function_to_menu('view',view_right)
 
     A = 50
     B = 30
@@ -82,6 +130,10 @@ if __name__ == '__main__':
     _place = box.place(origin, uDir, wDir)
     point = box.compute_params()
     prism = box.create_model()
+    lines, m_pnt, labels = box.create_marking()
     display.DisplayShape(prism, update=True)
+    display_lines(lines, m_pnt, labels)
+    display.View_Top()
+    display.FitAll()
     display.DisableAntiAliasing()
     start_display()    

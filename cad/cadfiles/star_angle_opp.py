@@ -57,11 +57,39 @@ class StarAngleOpposite(object):
             rotated_points.append(point)
         return rotated_points
 
+    def create_marking(self):
+        middel_pnt = []
+        line = []
+        labels = ["z","y","u","v"]
+        offset = 100
+        uvoffset = offset/numpy.sqrt(2)
+
+        z_points = [numpy.array([-offset,self.t/2,self.H/2]), numpy.array([offset,self.t/2,self.H/2])]
+        line.append(makeEdgesFromPoints(z_points))
+
+        y_points = [numpy.array([0.,-offset+self.t/2,self.H/2]), numpy.array([0,offset+self.t/2,self.H/2])]
+        line.append(makeEdgesFromPoints(y_points))
+        
+        u_points = [numpy.array([-uvoffset,uvoffset+self.t/2,self.H/2]), numpy.array([uvoffset,-uvoffset+self.t/2,self.H/2])]
+        line.append(makeEdgesFromPoints(u_points))
+
+        v_points = [numpy.array([-uvoffset,-uvoffset+self.t/2,self.H/2]), numpy.array([uvoffset,uvoffset+self.t/2,self.H/2])]
+        line.append(makeEdgesFromPoints(v_points))
+
+        middel_pnt = [[-offset,self.t/2,self.H/2],[0,-offset+self.t/2,self.H/2],[uvoffset,-uvoffset+self.t/2,self.H/2],[uvoffset,uvoffset+self.t/2,self.H/2]]
+
+        return line, middel_pnt, labels
+
 
 if __name__ == '__main__':
 
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
+
+    def display_lines(lines, points, labels):
+        for l,p,n in zip(lines,points, labels):
+            display.DisplayShape(l, update=True)
+            display.DisplayMessage(getGpPt(p), n, height=24,message_color=(0,0,0))
 
     a = 15
     b = 15
@@ -78,6 +106,10 @@ if __name__ == '__main__':
     _place = star_angle_opposite.place(origin, uDir, wDir)
     point = star_angle_opposite.compute_params()
     prism = star_angle_opposite.create_model()
+    lines, m_pnt, labels = star_angle_opposite.create_marking()
     display.DisplayShape(prism, update=True)
+    display_lines(lines, m_pnt, labels)
+    display.View_Top()
+    display.FitAll()
     display.DisableAntiAliasing()
     start_display()    

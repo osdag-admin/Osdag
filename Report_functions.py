@@ -1409,7 +1409,7 @@ def flange_weld_stress(F_f,l_eff,F_ws):
 
 def tension_yield_prov(l,t, f_y, gamma, T_dg,multiple =1):
     """
-    Calculate tension yieldung capacity of provided plate under axial tension
+    Calculate tension yielding capacity of provided plate under axial tension
     Args:
         l: Height of  provided plate in mm (float)
         t: Thickness of  provided plate in mm (float)

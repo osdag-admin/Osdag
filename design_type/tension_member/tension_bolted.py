@@ -720,10 +720,10 @@ class Tension_bolted(Member):
                             all_errors.append(error)
                         else:
                             flag2 = True
-            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_LOCATION, KEY_TYP]:
-                val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    missing_fields_list.append(option[1])
+            # elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_LOCATION, KEY_TYP]:
+            #     val = option[3]
+            #     if design_dictionary[option[0]] == val[0]:
+            #         missing_fields_list.append(option[1])
 
             else:
                 pass

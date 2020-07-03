@@ -33,7 +33,7 @@ import pdfkit
 import configparser
 import pickle
 import cairosvg
-from update import Update
+from update_version_check import Update
 import pandas as pd
 
 from Common import *
@@ -1373,15 +1373,9 @@ class Window(QMainWindow):
         self.fuse_model = None
 
     def notification(self):
-        check=Update(0)
-        print(check.notifi())
-        if check.notifi()==True:
-            msg = QMessageBox.information(self, 'Update available',
-                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
-        elif check.notifi()=="no internet":
-            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
-        else:
-            msg = QMessageBox.information(self, 'Update', 'No Update Available')
+        update_class = Update()
+        msg = update_class.notifi()
+        QMessageBox.information(self, 'Info', msg)
 
     def save_output_to_csv(self, main):
         def save_fun():

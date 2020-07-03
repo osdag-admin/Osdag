@@ -205,6 +205,13 @@ class BeamCoverPlateWeld(MomentConnection):
 
         return add_buttons
 
+    def preference_type(self):
+
+        pref_type = self[0]
+        if pref_type == VALUES_FLANGEPLATE_PREFERENCES[0]:
+            return True
+        else:
+            return False
     ####################################
     # Design Preference Functions End
     ####################################
@@ -236,7 +243,33 @@ class BeamCoverPlateWeld(MomentConnection):
                                           datefmt='%H:%M:%S')
             handler.setFormatter(formatter)
             logger.addHandler(handler)
+    def input_value_changed(self):
 
+        lst = []
+
+        t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t8)
+
+        # t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_PLATE_HEIGHT,TYPE_OUT_DOCK, self.preference_type)
+        # lst.append(t8)
+        # t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_PLATE_HEIGHT, TYPE_OUT_LABEL, self.preference_type)
+        # lst.append(t8)
+        #
+        # t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_PLATE_LENGTH, TYPE_OUT_DOCK, self.preference_type)
+        # lst.append(t8)
+        # t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_PLATE_LENGTH, TYPE_OUT_LABEL, self.preference_type)
+        # lst.append(t8)
+        #
+        # t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGEPLATE_THICKNESS, TYPE_OUT_DOCK, self.preference_type)
+        # lst.append(t8)
+        # t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGEPLATE_THICKNESS, TYPE_OUT_LABEL, self.preference_type)
+        # lst.append(t8)
+        # t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_WELD_DETAILS,TYPE_OUT_DOCK, self.preference_type)
+        # lst.append(t8)
+        # t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_WELD_DETAILS, TYPE_OUT_BUTTON, self.preference_type)
+        # lst.append(t8)
+
+        return lst
     def input_values(self):
 
         options_list = []
@@ -250,8 +283,8 @@ class BeamCoverPlateWeld(MomentConnection):
         t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, connectdb("Beams"), True, 'No Validator')
         options_list.append(t4)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, True, 'No Validator')
-        options_list.append(t15)
+        # t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, True, 'No Validator')
+        # options_list.append(t15)
 
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
@@ -466,26 +499,26 @@ class BeamCoverPlateWeld(MomentConnection):
         KEY_FLANGE_WELD_DETAILS, KEY_DISP_FLANGE_WELD_DETAILS, TYPE_OUT_BUTTON, ['Flange Plate Weld', self.flange_weld_details], True)
         out_list.append(t21)
 
-        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, True)
+        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, False)
 
         out_list.append(t17)
 
         t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-               self.flange_plate.Innerheight if flag else '', True)
+               self.flange_plate.Innerheight if flag else '', False)
         out_list.append(t18)
 
         t19 = (
             KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-            self.plate_in_len if flag else '', True)
+            self.plate_in_len if flag else '', False)
 
         out_list.append(t19)
 
         t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_in_plate_tk if flag else '', True)
+               self.flange_in_plate_tk if flag else '', False)
         out_list.append(t20)
 
         t21 = (KEY_INNERFLANGE_WELD_DETAILS, KEY_DISP_INNERFLANGE_WELD_DETAILS, TYPE_OUT_BUTTON,
-               ['Inner plate Weld', self.Innerflange_weld_details], True)
+               ['Inner plate Weld', self.Innerflange_weld_details], False)
         out_list.append(t21)
 
         # t17 = (None, DISP_EFF, TYPE_TITLE, None, True)

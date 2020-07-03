@@ -1337,6 +1337,12 @@ class Window(QMainWindow):
         self.btnTop.clicked.connect(lambda: self.display.View_Top())
         self.btnFront.clicked.connect(lambda: self.display.View_Front())
         self.btnSide.clicked.connect(lambda: self.display.View_Right())
+        self.actionSave_Top_View.triggered.connect(lambda: self.display.FitAll())
+        self.actionSave_Front_View.triggered.connect(lambda: self.display.FitAll())
+        self.actionSave_Side_View.triggered.connect(lambda: self.display.FitAll())
+        self.btnTop.clicked.connect(lambda: self.display.FitAll())
+        self.btnFront.clicked.connect(lambda: self.display.FitAll())
+        self.btnSide.clicked.connect(lambda: self.display.FitAll())
 
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
         last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"

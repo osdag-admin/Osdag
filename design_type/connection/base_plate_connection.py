@@ -1711,7 +1711,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
 
         # define parameters for the stiffener plates
-        self.stiffener_fy = self.dp_column_fy  # MPa
+        # TODO: call from dp for hollow section
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            self.dp_column_fy = 250
+            self.stiffener_fy = 250
+        else:
+            self.stiffener_fy = self.dp_column_fy  # MPa
         self.epsilon = math.sqrt(250 / self.stiffener_fy)
 
         # other parameters
@@ -1792,7 +1797,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2, update area if while loop is True
 
             # actual bearing pressure acting on the provided area of the base plate
-            self.w = self.load_axial_compression / self.bp_area_provided  # N/mm^2 (MPa)
+            self.w = round((self.load_axial_compression / self.bp_area_provided), 3)  # N/mm^2 (MPa)
 
             # design of plate thickness
             # thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
@@ -2945,9 +2950,18 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.weld_fu = min(self.dp_weld_fu_overwrite, self.dp_column_fu)
 
         # length of the stiffener plate available in case of stiffener requirement/or extra welding
-        self.stiffener_plt_len_along_flange = (self.bp_width_provided - self.column_bf) / 2  # mm (each, along the flange)
-        self.stiffener_plt_len_along_web = (self.bp_length_provided - self.column_D) / 2  # mm (each, along the web)
-        self.stiffener_plt_len_across_web = max(self.stiffener_plt_len_along_flange, self.stiffener_plt_len_along_web)  # mm (each, across the web)
+
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            self.stiffener_plt_len_along_D = (self.bp_length_provided - self.column_D) / 2  # mm, (for SHS & RHS)
+            self.stiffener_plt_len_along_B = (self.bp_width_provided - self.column_bf) / 2  # mm, (for SHS & RHS)
+            self.stiffener_plt_len_across_D = (self.bp_length_provided - self.column_D) / 2  # mm, (for CHS)
+            self.stiffener_plt_thk = min(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) / (8.4 * self.epsilon)  # mm
+            self.stiffener_plt_thk = round_up(self.stiffener_plt_thk, 2, self.column_tf)
+            self.stiffener_plt_height = max(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) + 50  # mm
+        else:
+            self.stiffener_plt_len_along_flange = (self.bp_width_provided - self.column_bf) / 2  # mm (each, along the flange)
+            self.stiffener_plt_len_along_web = (self.bp_length_provided - self.column_D) / 2  # mm (each, along the web)
+            self.stiffener_plt_len_across_web = max(self.stiffener_plt_len_along_flange, self.stiffener_plt_len_along_web)  # mm (each, across the web)
 
         # design of fillet weld
         if self.weld_type == 'Fillet Weld':
@@ -3099,7 +3113,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.stiffener_along_B = 'Yes'  # stiffener along the shorter side of RHS or SHS
 
                     # weld design including stiffeners
-                    if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
+                    if (self.dp_column_designation[1:4] == 'SHS') or (self.dp_column_designation[1:4] == 'RHS'):
                         self.stiffener_plt_len_along_D = (self.bp_length_provided - self.column_D) / 2  # mm
                         self.stiffener_plt_len_along_B = (self.bp_width_provided - self.column_bf) / 2  # mm
                         self.stiffener_plt_thk = min(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B) / (8.4 * self.epsilon)  # mm
@@ -3135,8 +3149,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # design of butt/groove weld
         else:
             if self.connectivity == 'Hollow/Tubular Column Base':
-                self.stiffener_along_D = 'No'
-                self.stiffener_along_B = 'No'
+                self.stiffener_along_D = 'Yes'
+                self.stiffener_along_B = 'Yes'
+                self.stiffener_nos = 4
+                self.weld_size_hollow = self.column_tf
+                self.weld_size_stiffener = self.stiffener_plt_thk
             else:
                 if self.connectivity == 'Welded Column Base':
                     self.stiffener_along_flange = 'No'
@@ -3182,7 +3199,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.stiffener_across_web = 'No'
 
         elif self.connectivity == 'Hollow/Tubular Column Base':
-            if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
+            if (self.dp_column_designation[1:4] == 'SHS') or (self.dp_column_designation[1:4] == 'RHS'):
                 check = self.Table2_web_OfI_H_box_section((min(self.column_D, self.column_bf) - self.column_tf), self.column_tw, self.dp_column_fy,
                                                           self.load_axial_compression, load_type='Compression', section_class='Plastic')
                 if check[0] or check[1] or check[2] == 'Fail':
@@ -3569,7 +3586,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         elif self.connectivity == 'Hollow/Tubular Column Base':
             self.sigma_max = self.w  # N/mm^2
 
-            if self.dp_column_designation[1:4] == 'SHS' or 'RHS':
+            if (self.dp_column_designation[1:4] == 'SHS') or (self.dp_column_designation[1:4] == 'RHS'):
                 if (self.stiffener_along_D == 'Yes') or (self.stiffener_along_B == 'Yes'):
                     stiffener_len = min(self.stiffener_plt_len_along_D, self.stiffener_plt_len_along_B)
             else:
@@ -3860,6 +3877,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # updating total number of anchor bolts required (bolts outside flange + inside flange)
                 self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
 
+        if self.connectivity == 'Hollow/Tubular Column Base':
+            self.end_distance = (self.bp_length_provided - (self.column_D + (2 * self.projection))) / 2  # mm
+            self.edge_distance = self.end_distance  # mm
+        else:
+            pass
+
+        #check for max end/edge distance
+        # self.end_distance_max = self.cl_10_2_4_3_max_edge_dist([self.plate_thk, self.dp_bp_fu, self.dp_bp_fy], self.dp_detail_is_corrosive)
+
         # end of calculation
         if self.safe:
             self.design_status = True
@@ -3889,7 +3915,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
         print(self.anchor_length_provided)  # Anchor Length (total) (mm)
 
-        # Anchor Bolt - Outside Column Flange
+        # Anchor Bolt - Inside Column Flange
         if self.connectivity == 'Moment Base Plate':
             print(self.anchor_dia_inside_flange)  # Diameter (mm)
             print(self.anchor_grade_inside_flange)  # Property Class

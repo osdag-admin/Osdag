@@ -186,15 +186,15 @@ class Ui_Dialog1(object):
             fname_no_ext = filename.split(".")[0]
             input_summary['filename'] = fname_no_ext
             input_summary['does_design_exist'] = self.design_exist
-            input_summary['logger_messages']=self.loggermsg
-            main.save_design(main,input_summary)
-            if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
+            input_summary['logger_messages'] = self.loggermsg
+            main.save_design(main, input_summary)
+            if os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext+'.log'):
                 self.Dialog.accept()
                 QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
             else:
-                logfile=open(fname_no_ext+'.log','r')
-                logs=logfile.read()
-                if('! I can\'t write on file' in logs):
+                logfile = open(fname_no_ext+'.log', 'r')
+                logs = logfile.read()
+                if('! Osdag can\'t write on file' in logs):
                    QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
                 else:
                    print(logs)
@@ -211,6 +211,7 @@ class Ui_Dialog1(object):
         # CreateLatex.\
         #     save_latex(CreateLatex(),main.report_result, main.report_input, main.report_check, main.report_supporting,
         #           main.report_supported, report_summary, fileName, folder)
+
     def getPopUpInputs(self):
         input_summary = {}
         input_summary["ProfileSummary"] = {}

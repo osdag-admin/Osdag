@@ -27,6 +27,9 @@ Osdag_Workspace/*
 OUTPUT_FILES/Output_PDF/*
 Output_PDF/*
 ResourceFiles/images/3d.png
+ResourceFiles/images/front.png
+ResourceFiles/images/side.png
+ResourceFiles/images/top.png
 ResourceFiles/images/3DSectionfromSectionModeller.png
 ResourceFiles/Osi_Files/*
 *.xlsx

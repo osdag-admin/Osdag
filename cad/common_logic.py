@@ -510,7 +510,7 @@ class CommonDesignLogic(object):
                               D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
                               R1=A.supporting_section.root_radius, R2=A.supporting_section.toe_radius,
                               alpha=A.supporting_section.flange_slope,
-                              length=1000, notchObj=None)
+                              length=max(1000, (500 + A.supported_section.depth)), notchObj=None)
         supported = ISection(B=A.supported_section.flange_width, T=A.supported_section.flange_thickness,
                              D=A.supported_section.depth,
                              t=A.supported_section.web_thickness, R1=A.supported_section.root_radius,
@@ -624,7 +624,7 @@ class CommonDesignLogic(object):
                               D=A.supporting_section.depth, t=A.supporting_section.web_thickness,
                               R1=A.supporting_section.root_radius, R2=A.supporting_section.toe_radius,
                               alpha=A.supporting_section.flange_slope,
-                              length=1000, notchObj=None)
+                              length=max(1000, (500 + A.supported_section.depth)), notchObj=None)
 
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
@@ -902,6 +902,16 @@ class CommonDesignLogic(object):
         nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
         nut_Ht = nut_T
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+        if CEP.weld_size <= 16:
+            stiffener = StiffenerPlate(L=CEP.stiff_wt, W=CEP.stiff_ht, T=CEP.t_s, L11=CEP.stiff_wt / 2,
+                                       L12=CEP.stiff_ht / 2, R21=10, R22=10)
+            weld_stiff_h = GrooveWeld(b=stiffener.T, h= stiffener.T, L=stiffener.L - stiffener.R22)
+            weld_stiff_v = FilletWeld(b= CEP.weld_size, h= CEP.weld_size, L=stiffener.W - stiffener.R21)
+        else:
+            stiffener = StiffenerPlate(L=CEP.stiff_wt  - CEP.t_s, W=CEP.stiff_ht, T=CEP.t_s, L11=CEP.stiff_wt / 2,
+                                       L12=CEP.stiff_ht / 2, R21=10, R22=10)
+            weld_stiff_h = GrooveWeld(b=stiffener.T, h= stiffener.T, L=stiffener.L - stiffener.R22)
+            weld_stiff_v = GrooveWeld(b=stiffener.T, h= stiffener.T, L=stiffener.W - stiffener.R21)
 
         column = ISection(B=float(CEP.section.flange_width), T=float(CEP.section.flange_thickness),
                           D=float(CEP.section.depth), t=float(CEP.section.web_thickness),
@@ -917,7 +927,7 @@ class CommonDesignLogic(object):
 
         nut_bolt_array = CEPNutBoltArray(CEP, column, nut, bolt, nut_space)
 
-        ccEndPlateCad = CCEndPlateCAD(CEP, column, endPlate, flangeWeld, webWeld, nut_bolt_array)
+        ccEndPlateCad = CCEndPlateCAD(CEP, column, endPlate, flangeWeld, webWeld, nut_bolt_array, stiffener, weld_stiff_h, weld_stiff_v)
 
         ccEndPlateCad.create_3DModel()
 
@@ -1329,8 +1339,9 @@ class CommonDesignLogic(object):
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
                 nutbolt = self.TObj.get_nut_bolt_array_models()
+                onlymember = self.TObj.get_only_members_models()
                 if self.component == "Member":  # Todo: change this into key
-                    osdag_display_shape(self.display, member, update=True)
+                    osdag_display_shape(self.display, onlymember, update=True)
                 elif self.component == "Plate":
                     osdag_display_shape(self.display, plate, color='BLUE', update=True)
                     osdag_display_shape(self.display, nutbolt, color='YELLOW', update=True)

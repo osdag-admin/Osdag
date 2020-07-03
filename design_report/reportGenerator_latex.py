@@ -13,9 +13,13 @@ import sys
 import datetime
 import pylatex as pyl
 from pylatex.basic import TextColor
-
 from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
 from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor
+from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu, MultiRow, StandAloneGraphic
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor
+from pylatex import Document, Section, Subsection, Tabular, Tabularx,MultiColumn, LongTable, LongTabularx, LongTabu,\
+    MultiRow, StandAloneGraphic
+from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, SubFigure
 from pylatex.utils import italic
 #from pdflatex import PDFLaTeX
 import os
@@ -248,10 +252,28 @@ class CreateLatex(Document):
 
 
         if does_design_exist:
+            Disp_top_image = "/ResourceFiles/images/top.png"
+            Disp_side_image = "/ResourceFiles/images/side.png"
+            Disp_front_image = "/ResourceFiles/images/front.png"
+            view_3dimg_path = rel_path + Disp_3d_image
+            view_topimg_path = rel_path + Disp_top_image
+            view_sideimg_path = rel_path + Disp_side_image
+            view_frontimg_path = rel_path + Disp_front_image
             with doc.create(Section('3D View')):
-                with doc.create(Tabular('p{15.5cm}', row_height=1.2)) as table:
+                with doc.create(Tabular(r'|>{\centering}m{7.75cm}|>{\centering\arraybackslash}m{7.75cm}|', row_height=1.2)) as table:
                     view_3dimg_path = rel_path + Disp_3d_image
-                    table.add_row([StandAloneGraphic(image_options="height=6cm",filename=view_3dimg_path)])
+                    view_topimg_path = rel_path + Disp_top_image
+                    view_sideimg_path = rel_path + Disp_side_image
+                    view_frontimg_path = rel_path + Disp_front_image
+                    table.add_hline()
+                    table.add_row([StandAloneGraphic(image_options="height=4cm",filename=view_3dimg_path),
+                                  StandAloneGraphic(image_options="height=4cm",filename=view_topimg_path)])
+                    table.add_row('(a) 3D View', '(b) Top View')
+                    table.add_hline()
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_sideimg_path),
+                                  StandAloneGraphic(image_options="height=4cm", filename=view_frontimg_path)])
+                    table.add_row('(c) Side View', '(d) Front View')
+                    table.add_hline()
                 # with doc.create(Figure(position='h!')) as view_3D:
                 #     view_3dimg_path = rel_path + Disp_3d_image
                 #     # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))

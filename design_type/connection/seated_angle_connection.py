@@ -1,22 +1,13 @@
 """
 Started on 21st April, 2020.
-
-@author: sourabhdas
-
-
+@author: Sourabh Das
 Module: Seated angle connection
-
 Reference:
             1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
             2) Design of Steel structures by Dr. N Subramanian (chapter 5 and 6)
             3) Fundamentals of Structural steel design by M.L Gambhir
             4) AISC Design Examples V14
-
-
-
 ASCII diagram
-
-
             +-+-------------+-+   +-------------------------+
             | |             | |   |-------------------------|
             | |             | |   |                         |
@@ -37,9 +28,6 @@ ASCII diagram
             | |             | |
             | |             | |
             +-+-------------+-+
-
-
-
 """
 
 from design_type.connection.shear_connection import ShearConnection
@@ -65,7 +53,6 @@ class SeatedAngleConnection(ShearConnection):
     ###############################################
     def tab_list(self):
         """
-
         :return: This function returns the list of tuples. Each tuple will create a tab in design preferences, in the
         order they are appended. Format of the Tuple is:
         [Tab Title, Type of Tab, function for tab content)
@@ -76,7 +63,6 @@ class SeatedAngleConnection(ShearConnection):
             TYPE_TAB_3: This is plain layout
         function for tab content: All the values like labels, input widgets can be passed as list of tuples,
         which will be displayed in chosen tab layout
-
         """
 
         tabs = []
@@ -209,13 +195,10 @@ class SeatedAngleConnection(ShearConnection):
 
         return design_input
 
-
     def refresh_input_dock(self):
         """
-
          :return: This function returns list of tuples which has keys that needs to be updated,
           on changing Keys in design preference (ex: adding a new section to database should reflect in input dock)
-
           [(Tab Name,  Input Dock Key, Input Dock Key type, design preference key, Master key, Value, Database Table Name)]
          """
 
@@ -234,8 +217,6 @@ class SeatedAngleConnection(ShearConnection):
         add_buttons.append(t2)
 
         return add_buttons
-
-
     ####################################
     # Design Preference Functions End
     ####################################
@@ -470,8 +451,11 @@ class SeatedAngleConnection(ShearConnection):
         t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.bolt.bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)
 
-        t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.bolt.bolt_capacity_disp if flag else '', True)
+        t6 = (KEY_OUT_BETA_LG, KEY_OUT_DISP_BETA_LG, TYPE_TEXTBOX, self.beta_lg if flag else '', True)
         out_list.append(t6)
+
+        t7 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.bolt.bolt_capacity_reduced_disp if flag else '', True)
+        out_list.append(t7)
 
         t21 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_SHEAR_FORCE, TYPE_TEXTBOX, round(self.bolt.bolt_force, 2) if flag else '', True)
         out_list.append(t21)
@@ -641,6 +625,24 @@ class SeatedAngleConnection(ShearConnection):
 
         return capacities
 
+    def set_input_values(self, design_dictionary):
+        super(SeatedAngleConnection,self).set_input_values(self, design_dictionary)
+        self.seated_angle = Angle(designation= design_dictionary[KEY_ANGLE_LIST][0], material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
+        self.top_angle = Angle(designation= design_dictionary[KEY_ANGLE_LIST][0], material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
+        self.module = design_dictionary[KEY_MODULE]
+        self.seated_list = design_dictionary[KEY_ANGLE_LIST]
+        self.topangle_list = design_dictionary[KEY_TOPANGLE]
+        self.seated_list_initial = design_dictionary[KEY_ANGLE_LIST]
+        self.topangle_list_initial = design_dictionary[KEY_TOPANGLE]
+        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
+                           material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
+        self.material_grade = design_dictionary[KEY_MATERIAL]
+        self.material_grade_connector = design_dictionary[KEY_CONNECTOR_MATERIAL]
+        # self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL], material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O], fabrication=design_dictionary[KEY_DP_WELD_FAB])
+        # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
+        # print("input values are set. Doing preliminary member checks")
+        self.warn_text(self)
+        self.member_capacity(self)
 
     def warn_text(self):
 
@@ -654,51 +656,28 @@ class SeatedAngleConnection(ShearConnection):
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
             logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
             # logger.info(" : You are using a section (in red color) that is not available in latest version of IS 808")
-
-    def set_input_values(self, design_dictionary):
-        super(SeatedAngleConnection,self).set_input_values(self, design_dictionary)
-        self.seated_angle = Angle(designation= design_dictionary[KEY_ANGLE_LIST][0], material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
-        self.top_angle = Angle(designation= design_dictionary[KEY_ANGLE_LIST][0], material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL])
-        self.module = design_dictionary[KEY_MODULE]
-
-        self.seated_list_initial = design_dictionary[KEY_ANGLE_LIST]
-        self.topangle_list_initial = design_dictionary[KEY_TOPANGLE]
-
-        self.seated_list = design_dictionary[KEY_ANGLE_LIST]
-        self.topangle_list = design_dictionary[KEY_TOPANGLE]
-        self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-                           material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
-        self.material_grade = design_dictionary[KEY_MATERIAL]
-        self.material_grade_connector = design_dictionary[KEY_CONNECTOR_MATERIAL]
-        # self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL], material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O], fabrication=design_dictionary[KEY_DP_WELD_FAB])
-        # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
-        # print("input values are set. Doing preliminary member checks")
-        self.warn_text(self)
-        self.member_capacity(self)
+    ####################################
+    # UI Items Ends here
+    ####################################
 
     def member_capacity(self):
-        # # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
-        # if self.supported_section.type == "Rolled":
-        #     self.supported_section.length = self.supported_section.depth
-        # else:
-        #     self.supported_section.length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # For Built-up section
-        #
-        # # self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
-        # self.supported_section.shear_yielding_capacity = round(IS800_2007.cl_8_4_design_shear_strength(
-        #     self.supported_section.length * self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
+        # print(KEY_CONN,VALUES_CONN_1,self.supported_section.build)
+        if self.supported_section.type == "Rolled":
+            self.supported_section.length = self.supported_section.depth
+        else:
+            self.supported_section.length = self.supported_section.depth - (2*self.supported_section.flange_thickness)    # For Built-up section
 
-        super(SeatedAngleConnection, self).member_capacity(self)
-        self.supported_section.shear_yielding_capacity = round(self.supported_section.shear_yielding_capacity/1000,2)
-        if self.supported_section.shear_yielding_capacity > self.load.shear_force :
+        # self.supported_section.shear_yielding(length=length, thickness=self.supported_section.web_thickness, fy=self.supported_section.fy)
+        self.supported_section.shear_capacity = round(IS800_2007.cl_8_4_design_shear_strength(
+            self.supported_section.length * self.supported_section.web_thickness, self.supported_section.fy) / 1000, 2)
+        if self.supported_section.shear_capacity > self.load.shear_force :
             # print("preliminary member check is satisfactory. Checking available angle thickness")
-            self.supported_section.design_status = True
             self.design_status = True
             self.select_angle_thickness(self)
         else:
-            self.supported_section.design_status = False
             self.design_status = False
             logger.error(" : shear yielding capacity {} is less than applied load, Please select larger sections or decrease loads"
-                         .format(self.supported_section.shear_yielding_capacity))
+                            .format(self.supported_section.shear_capacity))
             # print("failed in preliminary member checks. Select larger sections or decrease loads")
 
     def select_angle_thickness(self):
@@ -723,14 +702,11 @@ class SeatedAngleConnection(ShearConnection):
                 # print("popped", designation)
 
         if self.plate.thickness:
-            self.design_status_availability = True
-            #TODO: Should we say seated angle of required capacity is available?
             logger.info("Required Seated Angle thickness available. Getting angle leg size")
             self.get_bolt_details(self)
         else:
             self.design_status = False
             logger.error("Increase Seated Angle thickness")
-            # TODO:logger.error("(OR) Select angle with moment capacity of ... and shear capacity of...")
 
     def check_capacity(self, seated):
         self.b1 = IS800_2007.cl_8_7_1_3_stiff_bearing_length(self.load.shear_force,
@@ -777,13 +753,20 @@ class SeatedAngleConnection(ShearConnection):
 
                 self.bolt_placement_check(self)
                 self.bolt_dia_check(self)
+                self.bolt_grip_check(self)
                 if self.bolt.design_status is False:
                     # print("Sufficient space is not available for bolt diameter: ", self.bolt.bolt_diameter_provided)
-                    continue
+                    if self.bolt.plate_thk_status is False:
+                        break
+                    else:
+                        continue
 
                 self.get_bolt_capacity(self)
-
-                self.bolt.number = round_up(float(self.load.shear_force * 1000) / self.bolt.bolt_capacity, 1)
+                t_sum = 0.0
+                for i in self.bolt_conn_plates_t_fu_fy:
+                    t_sum = t_sum + i[0]
+                self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+                self.bolt.number = round_up(float(self.load.shear_force * 1000) / (self.bolt.bolt_capacity * self.beta_lg), 1)
                 if self.connectivity == VALUES_CONN_1[0]:
                     self.bolt.number = round_up(float(self.bolt.number) / n, 1)
 
@@ -800,16 +783,23 @@ class SeatedAngleConnection(ShearConnection):
                     self.seated_angle.width = web_plate_h
                 self.bolt.bolts_required = bolts_one_line*bolt_line*n
 
-                if 2 >= bolt_line >= 1:
+                self.check_leg_size(self, bolt_line)
+
+                if 2 >= bolt_line >= 1 and self.plate.design_status is True:
                     self.bolt.bolt_force = self.load.shear_force / self.bolt.bolts_required
-                    self.bolt_dia_possible.append(self.bolt.bolt_diameter_provided)
+
                     if self.bolt.bolts_required > bolts_required_previous and count >= 1:
                         self.bolt.bolt_diameter_provided = bolt_diameter_previous
                         self.bolt.bolts_required = bolts_required_previous
                         self.bolt.bolt_row = bolt_row_prev
                         self.bolt.bolt_col = bolt_col_prev
+                        # self.bolt_dia_possible.remove(self.bolt.bolt_diameter_provided)
+                        self.bolt_placement_check(self)
+                        self.get_bolt_capacity(self)
                         # self.bolt.bolt_force = bolt_force_previous
                         break
+                    else:
+                        self.bolt_dia_possible.append(self.bolt.bolt_diameter_provided)
                     bolts_required_previous = self.bolt.bolts_required
                     bolt_diameter_previous = self.bolt.bolt_diameter_provided
                     # TODO: set bolt row and column prev value
@@ -821,6 +811,7 @@ class SeatedAngleConnection(ShearConnection):
                     self.bolt.bolt_force = self.load.shear_force / self.bolt.number
                     continue
             if self.bolt_dia_possible:
+                self.bolt.bolt_diameter_provided = min(self.bolt_dia_possible)
                 # print("bolt diameter: ", self.bolt_dia_possible)
                 # print("provided bolt diameter: ", self.bolt.bolt_diameter_provided)
                 self.check_leg_size(self, bolt_line)
@@ -858,9 +849,13 @@ class SeatedAngleConnection(ShearConnection):
             print("No of effective trials: ", trial)
             print(self.output)
             self.select_optimum(self)
-
             self.top_angle_section(self)
             logger.info("=== End Of Design ===")
+        elif self.bolt.design_status is False and self.bolt.plate_thk_status is False:
+            self.design_status = False
+            logger.error("Total thickness of connecting elements is more than 8 times bolt diameter, "
+                         "please select higher bolt diameter")
+            logger.error("It fails in bolt grip length check as per Cl. 10.3.3.2 of IS 800:2007")
         else:
             self.design_status = False
             # logger.error("Decrease bolt diameter")
@@ -910,26 +905,29 @@ class SeatedAngleConnection(ShearConnection):
             count = 1
             self.bolt_placement_check(self)
             self.get_bolt_capacity_updated(self)
-            if self.bolt.bolt_capacity < self.bolt.bolt_force * 1000 and count >= 1:
+            t_sum = 0.0
+            for i in self.bolt_conn_plates_t_fu_fy:
+                t_sum = t_sum + i[0]
+            self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+            if self.bolt.bolt_capacity * self.beta_lg < self.bolt.bolt_force * 1000 and count >= 1:
                 self.bolt.bolt_PC_provided = bolt_PC_previous
                 self.get_bolt_capacity_updated(self)
                 break
             bolt_PC_previous = self.bolt.bolt_PC_provided
             count += 1
 
-
     def get_seated_width_min_max(self):
         """This function sets the max and min limits of seated angle length"""
         if self.connectivity == VALUES_CONN_1[0]:
             if self.supporting_section.flange_width > self.supported_section.flange_width:
-                self.seated_angle.width_min = (self.supported_section.flange_width -
+                self.seated_angle.width_min = (self.supported_section.flange_width + 20 -
                                     self.supporting_section.web_thickness -2 * self.supporting_section.root_radius) / 2
                 self.seated_angle.width_max = (self.supporting_section.flange_width -
                                     self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
             else:
                 self.seated_angle.width_min = (self.supporting_section.flange_width -
                                     self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
-                self.seated_angle.width_max = self.seated_angle.width_min + 20
+                self.seated_angle.width_max = self.seated_angle.width_min + 10
                 # self.seated_angle.width_min = (self.supporting_section.flange_width -
                 #                   self.supporting_section.web_thickness - 2 * self.supporting_section.root_radius) / 2
                 # self.seated_angle.width_max = (self.supported_section.flange_width -
@@ -950,7 +948,7 @@ class SeatedAngleConnection(ShearConnection):
         # TO GET BOLT BEARING CAPACITY CORRESPONDING TO PLATE THICKNESS AND Fu AND Fy #
         self.bolt_conn_plates_t_fu_fy = []
         self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.seated.fu, self.seated.fy))
-        if self.connectivity == VALUES_CONN_1[1]:
+        if self.connectivity == VALUES_CONN_1[0]:
             self.bolt_conn_plates_t_fu_fy.append(
                 (self.supporting_section.flange_thickness, self.supporting_section.fu, self.supporting_section.fy))
         else:
@@ -970,14 +968,21 @@ class SeatedAngleConnection(ShearConnection):
         self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                           bolt_grade_provided=self.bolt.bolt_PC_provided,
                                           conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy, n_planes=1,
-                                          seatedangle_e= self.bolt_bearing_end_dist)
+                                          seatedangle_e=self.bolt_bearing_end_dist)
         if self.bolt.bolt_bearing_capacity is not VALUE_NOT_APPLICABLE:
             self.bolt.bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
         else:
             self.bolt.bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
-
-        self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity/1000, 1)
-        self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity/1000, 1)
+        t_sum = 0.0
+        for i in self.bolt_conn_plates_t_fu_fy:
+            t_sum = t_sum + i[0]
+        self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+        print(t_sum)
+        print(self.beta_lg)
+        self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity/1000, 2)
+        self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity/1000, 2)
+        # self.bolt.bolt_shear_capacity_reduced_disp = round(self.bolt.bolt_shear_capacity * self.beta_lg / 1000, 2)
+        self.bolt.bolt_capacity_reduced_disp = round(self.bolt.bolt_capacity * self.beta_lg / 1000, 2)
 
     def get_bolt_capacity_updated(self):
         """This function updates bolt capacities"""
@@ -990,9 +995,16 @@ class SeatedAngleConnection(ShearConnection):
             self.bolt.bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
         else:
             self.bolt.bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
-
-        self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity / 1000, 1)
-        self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity / 1000, 1)
+        t_sum = 0.0
+        for i in self.bolt_conn_plates_t_fu_fy:
+            t_sum = t_sum + i[0]
+        self.beta_lg = round(IS800_2007.cl_10_3_3_2_bolt_large_grip(self.bolt.bolt_diameter_provided, t_sum, 0.0), 3)
+        print(t_sum)
+        print(self.beta_lg)
+        self.bolt.bolt_shear_capacity_disp = round(self.bolt.bolt_shear_capacity / 1000, 2)
+        self.bolt.bolt_capacity_disp = round(self.bolt.bolt_capacity / 1000, 2)
+        # self.bolt.bolt_shear_capacity_reduced_disp = round(self.bolt.bolt_shear_capacity * self.beta_lg / 1000, 2)
+        self.bolt.bolt_capacity_reduced_disp = round(self.bolt.bolt_capacity * self.beta_lg / 1000, 2)
 
     def bolt_dia_check(self):
         """This function checks if the selected bolt diameter can be placed within the available flange width"""
@@ -1011,7 +1023,18 @@ class SeatedAngleConnection(ShearConnection):
             else:
                 self.bolt.design_status = False
 
+    def bolt_grip_check(self):
+        '''This functions checks the grip length of bolts'''
+        self.bolt.plate_thk_status = True
+        t_sum = 0.0
+        for i in self.bolt_conn_plates_t_fu_fy:
+            t_sum = t_sum + i[0]
+        if self.bolt.bolt_diameter_provided * 8 < t_sum:
+            self.bolt.design_status = False
+            self.bolt.plate_thk_status = False
+
     def check_leg_size(self, bolt_line):
+        self.bolt_placement_check(self)
         min_leg_length = (2 * self.bolt.min_end_dist_round + (bolt_line - 1) * self.bolt.min_pitch_round)
         min_leg_b_length = (self.bolt.min_end_dist_round + self.plate.gap + self.bolt.min_edge_dist_round)
         # min_leg_length = max(2*self.bolt.min_end_dist_round + (bolts_one_line - 1) * self.bolt.min_pitch_round, self.seated_angle.leg_a_length_min)
@@ -1247,7 +1270,6 @@ class SeatedAngleConnection(ShearConnection):
         else:
             self.seated_angle.width = max(round_up(self.supported_section.flange_width + 20, 1), self.seated_angle.width)
 
-
     ######################################
     # Function to create design report (LateX/PDF)
     ######################################
@@ -1331,7 +1353,7 @@ class SeatedAngleConnection(ShearConnection):
              KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
              "Seated and Top Angle Details": "TITLE",
              KEY_DISP_ANGLE_LIST: str(self.seated_list_initial),
-             "Selected Seated Angle Details":self.report_seated_angle,
+             "Selected Seated Angle Details": self.report_seated_angle,
              KEY_DISP_TOPANGLE_LIST: str(self.topangle_list_initial),
              "Selected Top Angle Details":self.report_topangle
              }
@@ -1346,6 +1368,7 @@ class SeatedAngleConnection(ShearConnection):
 
         h = self.supported_section.web_height
         t = self.supported_section.web_thickness
+
         initial_shear_capacity = round(self.supported_section.shear_yielding_capacity/0.6,2)
         t1 = (KEY_DISP_SHEAR_CAPACITY, '',
               shear_yield_prov(h, t, self.supported_section.fy, gamma_m0, initial_shear_capacity),'')
@@ -1358,6 +1381,7 @@ class SeatedAngleConnection(ShearConnection):
         if self.supported_section.design_status == True:
             t1 = ('SubSection', 'Load Consideration', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
+
             min_shear_load = min(40,round(0.15*self.supported_section.shear_yielding_capacity / 0.6,2))
             applied_shear_force = max(self.load.shear_force,min_shear_load)
 
@@ -1367,7 +1391,7 @@ class SeatedAngleConnection(ShearConnection):
                                   shear_capacity_1=initial_shear_capacity), "")
             self.report_check.append(t1)
 
-        if self.design_status==False and not self.plate.thickness:
+        if self.design_status == False and not self.plate.thickness:
             t2 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force, self.plate.shear_capacity,
                   get_pass_fail(self.load.shear_force, self.plate.shear_capacity, relation='lesser'))
             self.report_check.append(t2)
@@ -1383,17 +1407,19 @@ class SeatedAngleConnection(ShearConnection):
             self.report_check.append(t1)
             min_width_sptd = self.supported_section.flange_width
             min_width_sptng = self.supporting_section.flange_width
-            min_width_req_sptd = 4*self.bolt.min_end_dist_round+self.supported_section.web_thickness+\
-                                 self.supported_section.root_radius*2
+            min_width_req_sptd = 4 * self.bolt.min_end_dist_round + self.supported_section.web_thickness + \
+                                 self.supported_section.root_radius * 2
             min_width_req_sptng = 4 * self.bolt.min_end_dist_round + self.supporting_section.web_thickness + \
-                                 self.supporting_section.root_radius * 2
-            min_length_req_sptng = (2 * self.bolt.min_end_dist_round + (self.bolt.bolt_row - 1) * self.bolt.min_pitch_round)
+                                  self.supporting_section.root_radius * 2
+            min_length_req_sptng = (
+                        2 * self.bolt.min_end_dist_round + (self.bolt.bolt_row - 1) * self.bolt.min_pitch_round)
             min_length_req_sptd = (self.bolt.min_end_dist_round + self.plate.gap + self.bolt.min_edge_dist_round)
-            min_length_sptng = (self.seated_angle.leg_a_length - self.seated_angle.thickness - self.seated_angle.root_radius)
+            min_length_sptng = (
+                        self.seated_angle.leg_a_length - self.seated_angle.thickness - self.seated_angle.root_radius)
             min_length_sptd = self.seated_angle.leg_a_length
 
-            t2 = (DISP_MIN_WIDTH+'On beam', min_width_req_sptd,min_width_sptd,
-                  get_pass_fail(min_width_req_sptd,min_width_sptd,'leq'))
+            t2 = (DISP_MIN_WIDTH + 'On beam', min_width_req_sptd, min_width_sptd,
+                  get_pass_fail(min_width_req_sptd, min_width_sptd, 'leq'))
             self.report_check.append(t2)
             t2 = (DISP_MIN_LEG_LENGTH + 'On beam', min_length_req_sptd, min_length_sptd,
                   get_pass_fail(min_length_req_sptd, min_length_sptd, 'leq'))
@@ -1407,7 +1433,6 @@ class SeatedAngleConnection(ShearConnection):
             self.report_check.append(t2)
 
         if self.bolt.design_status is True:
-
             t1 = ('SubSection', 'Bolt Design Checks on Column', '|p{3cm}|p{5cm}|p{6.3cm}|p{1.2cm}|')
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
@@ -1427,7 +1452,7 @@ class SeatedAngleConnection(ShearConnection):
                   self.bolt.min_pitch_round,
                   get_pass_fail(self.bolt.min_pitch, self.bolt.min_pitch_round, relation='leq'))
             self.report_check.append(t1)
-            connecting_plates_tk = [self.plate.thickness_provided,self.supporting_section.flange_thickness]
+            connecting_plates_tk = [self.plate.thickness_provided, self.supporting_section.flange_thickness]
             t1 = (DISP_MAX_PITCH, cl_10_2_3_1_max_spacing(connecting_plates_tk), self.bolt.min_pitch_round,
                   get_pass_fail(self.bolt.max_spacing, self.bolt.min_pitch_round, relation='geq'))
             self.report_check.append(t1)
@@ -1469,7 +1494,7 @@ class SeatedAngleConnection(ShearConnection):
             V_b = round(self.bolt.bolt_force, 2)
             bolt_capacity_disp = round(self.bolt.bolt_capacity / 1000, 2)
             if self.bolt.bolt_type == TYP_BEARING:
-                shear_cap_kn = round(self.bolt.bolt_shear_capacity/1000,2)
+                shear_cap_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
                 t1 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.bolt.bolt_fu, 1, self.bolt.bolt_net_area,
                                                                    self.bolt.gamma_mb, shear_cap_kn),
                       '')
@@ -1518,11 +1543,12 @@ class SeatedAngleConnection(ShearConnection):
             t1 = ('SubSection', 'Detailing Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
-
             width_req_sptng = round(4 * self.bolt.min_end_dist_round + self.supporting_section.web_thickness + \
-                                  self.supporting_section.root_radius * 2+(self.bolt.bolt_col/2-1)*self.bolt.min_gauge_round,2)
-            length_req_sptng = round((2 * self.bolt.min_end_dist_round + (self.bolt.bolt_row - 1) * self.bolt.min_pitch_round)+\
-                                   self.seated.thickness + self.seated.root_radius,2)
+                                    self.supporting_section.root_radius * 2 + (
+                                                self.bolt.bolt_col / 2 - 1) * self.bolt.min_gauge_round, 2)
+            length_req_sptng = round(
+                (2 * self.bolt.min_end_dist_round + (self.bolt.bolt_row - 1) * self.bolt.min_pitch_round) + \
+                self.seated.thickness + self.seated.root_radius, 2)
             prov_length_sptng = self.seated_angle.leg_a_length
             prov_width_sptng = self.seated_angle.width
 
@@ -1587,7 +1613,6 @@ class SeatedAngleConnection(ShearConnection):
                                          Pmc=round(self.plate.moment_capacity, 2)),
                   get_pass_fail(self.plate.moment_demand, self.plate.moment_capacity, relation='lesser'))
             self.report_check.append(t2)
-
 
         Disp_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])

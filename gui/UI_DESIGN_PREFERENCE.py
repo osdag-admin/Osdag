@@ -1268,6 +1268,7 @@ class DesignPreferences():
         self.module = main.module_name(main)
         self.main = main
         self.window_close_flag = True
+        self.changes = None
 
     def show(self):
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
@@ -1278,7 +1279,9 @@ class DesignPreferences():
         self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
         self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
         self.ui.center()
-        self.ui.exec()
+        self.changes = self.ui.exec_()
+        if self.changes != QDialog.Accepted:
+            self.flag = False
         self.module_window.prev_inputs = self.module_window.input_dock_inputs
 
     def default_fn(self):
@@ -1484,7 +1487,7 @@ class DesignPreferences():
             event.ignore()
 
     def close_designPref(self):
-        self.ui.close()
+        self.ui.accept()
 
     # def closeEvent(self, QCloseEvent):
     #     self.save_designPref_para()

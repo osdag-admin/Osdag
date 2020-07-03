@@ -246,7 +246,11 @@ class FinPlateConnection(ShearConnection):
 
         capacities = []
 
-        t99 = (None, 'Shear Capacities', TYPE_SECTION, './ResourceFiles/images/block_shear.png')
+        t00 = (None, "", TYPE_NOTE, "This is Note.")
+        capacities.append(t00)
+
+        t99 = (None, 'Shear Capacities', TYPE_SECTION,
+               ['./ResourceFiles/images/block_shear.png', 250, 250, "block_shear"])  #[image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity/1000,2) if status else '')
@@ -258,7 +262,8 @@ class FinPlateConnection(ShearConnection):
         t17 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity_shear/1000,2) if status else '')
         capacities.append(t17)
 
-        t99 = (None, 'Tension Capacities', TYPE_SECTION, './ResourceFiles/images/block_shear_axial.png')
+        t99 = (None, 'Tension Capacities', TYPE_SECTION,
+               ['./ResourceFiles/images/block_shear_axial.png', 170, 170, "block_shear_axial"])
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
@@ -273,7 +278,7 @@ class FinPlateConnection(ShearConnection):
                round(self.plate.block_shear_capacity_axial/1000, 2) if status else '')
         capacities.append(t17)
 
-        t99 = (None, 'Section3', TYPE_SECTION, '')
+        t99 = (None, 'Section3', TYPE_SECTION, None)
         capacities.append(t99)
 
         t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, round(self.plate.moment_demand/1000000,2) if status else '')

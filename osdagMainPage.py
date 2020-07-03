@@ -472,11 +472,11 @@ class OsdagMainWindow(QMainWindow):
         else:
             msg = QMessageBox.information(self, 'Update', 'No Update Available')
 
-    def notification2(self):
-        check=Update(0)
-        if check.notifi()==True:
-            msg = QMessageBox.information(self, 'Update available',
-                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
+    # def notification2(self):
+    #     check=Update(0)
+    #     if check.notifi()==True:
+    #         msg = QMessageBox.information(self, 'Update available',
+    #                                       '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
 
 
     def select_workspace_folder(self):

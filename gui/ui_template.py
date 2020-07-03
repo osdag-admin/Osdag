@@ -34,7 +34,7 @@ import configparser
 import pickle
 import cairosvg
 from update import Update
-import pandas as pd
+# import pandas as pd
 
 from Common import *
 from utils.common.component import *
@@ -911,7 +911,7 @@ class Window(QMainWindow):
                 b.setFont(font)
                 b.setObjectName(option[0])
                 #b.setFixedSize(b.size())
-                b.resize(b.sizeHint().width(), b.sizeHint().height())
+                b.resize(b.sizeHint().width(), b.sizeHint().height()+100)
                 b.setText(v[0])
                 b.setDisabled(True)
                 fields += 1
@@ -2122,6 +2122,20 @@ class Window(QMainWindow):
                         image_widget.setLayout(image_layout)
                         inner_grid_layout = QtWidgets.QGridLayout(inner_grid_widget)
                         inner_grid_widget.setLayout(inner_grid_layout)
+# <<<<<<< HEAD
+#                         im = QtWidgets.QLabel(image_widget)
+#                         #im.setGeometry(QtCore.QRect(330, 10, 150, 150))
+#                         #im.setFixedSize(im.size())
+#                         # im.setGeometry(QtCore.QRect(330, 10, 100, 100))
+#                         # im.setScaledContents(True)
+#                         # im.setFixedSize(im.size())
+#
+#                         pmap = QPixmap(option[3])
+#                         #im.setScaledContents(1)
+#                         im.setPixmap(pmap.scaled(250,200,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+#                         #im.setPixmap(pmap)
+#                         image_layout.addWidget(im)
+# =======
                         if value is not None and value != "":
                             im = QtWidgets.QLabel(image_widget)
                             im.setFixedSize(value[1], value[2])
@@ -2136,10 +2150,11 @@ class Window(QMainWindow):
                             caption.setAlignment(Qt.AlignCenter)
                             caption.setFont(font)
                             caption.setText(value[3])
-                            caption.setFixedSize(value[1], 12)
+                            caption.setFixedSize(value[1], caption.sizeHint().height())
                             image_layout.addWidget(caption)
                             max_image_width = max(max_image_width, value[1])
                             max_image_height = max(max_image_height, value[2])
+# >>>>>>> 69a22ea10dd18e2df58abc6503be8d6354eaa30a
                         j += 1
 
                         q = QtWidgets.QLabel(scroll_content)
@@ -2161,7 +2176,7 @@ class Window(QMainWindow):
                         font.setPointSize(11)
                         font.setBold(False)
                         font.setWeight(50)
-                        r.setFixedSize(160, 27)
+                        r.setFixedSize(100, 27)
                         r.setFont(font)
                         r.setObjectName(option[0])
                         r.setText(str(value))
@@ -2169,10 +2184,18 @@ class Window(QMainWindow):
 
                     if option_type == TYPE_IMAGE:
                         im = QtWidgets.QLabel(image_widget)
+# <<<<<<< HEAD
+#                         #im.setGeometry(QtCore.QRect(330, 10, 100, 100))
+#                         #im.setScaledContents(True)
+#                         #im.setFixedSize(im.size())
+#                         pmap = QPixmap(option[3])
+#                         im.setPixmap(pmap.scaled(350,350,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+# =======
                         im.setScaledContents(True)
                         im.setFixedSize(value[1], value[2])
                         pmap = QPixmap(value[0])
                         im.setPixmap(pmap)
+# >>>>>>> 69a22ea10dd18e2df58abc6503be8d6354eaa30a
                         image_layout.addWidget(im)
                         caption = QtWidgets.QLabel(image_widget)
                         font = QtGui.QFont()
@@ -2203,10 +2226,16 @@ class Window(QMainWindow):
                     outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
                 if image_layout.count() > 0:
                     outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
+# <<<<<<< HEAD
+#                 scroll.setWidget(scrollcontent)
+#                 if section == 0:
+#                     dialog.resize(375, 375)
+#                 #dialog.setFixedSize(dialog.size())
+# =======
 
                 dialog_width += max_label_width
                 dialog_width += max_image_width
-                dialog_height = max(dialog_height, max_image_height)
+                dialog_height = max(dialog_height, max_image_height+125)
                 if not no_note:
                     dialog_height += 40
                 dialog.resize(dialog_width, dialog_height)
@@ -2215,6 +2244,7 @@ class Window(QMainWindow):
                 if no_note:
                     layout1.removeWidget(note_widget)
 
+# >>>>>>> 69a22ea10dd18e2df58abc6503be8d6354eaa30a
                 dialog.exec()
 
     def import_custom_section(self):

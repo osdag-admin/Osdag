@@ -1,4 +1,4 @@
-.. Help_Design_Examples documentation master file, created by
+﻿.. Help_Design_Examples documentation master file, created by
    sphinx-quickstart on Mon Jun 12 15:06:32 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
@@ -11,7 +11,7 @@
 Welcome to Osdag help!
 ================================================
 
-Osdag is a cross-platform free and open-source software for the design and detailing of steel structures, following relevant Indian Standards. Osdag is primarily built upon Python and other Python-based FOSS tools, such as, PyQt, OpenCascade, PythonOCC, SQLite, etc. It is developed by the Osdag team at IIT Bombay. 
+Osdag is a cross-platform free and open-source software for the design and detailing of steel structures, following relevant Indian Standards. Osdag is primarily built upon Python and other Python-based FOSS tools, such as, PyQt, OpenCascade, PythonOCC, SQLite, etc. It is developed by the Darshan in Osdag team at IIT Bombay. 
  
 This beta version of Osdag contains four shear connection modules.
 

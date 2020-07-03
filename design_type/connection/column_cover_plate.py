@@ -320,6 +320,17 @@ class ColumnCoverPlate(MomentConnection):
 
         flangespacing = []
 
+
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
+        flangespacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/spacing_2.png', 400, 352, ""])  # [image, width, height, caption]
+        flangespacing.append(t99)
+
         t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
                self.flange_plate.pitch_provided)
         flangespacing.append(t21)
@@ -341,6 +352,16 @@ class ColumnCoverPlate(MomentConnection):
     def webspacing(self, flag):
 
         webspacing = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
+        webspacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/spacing_2.png', 400, 352, ""])  # [image, width, height, caption]
+        webspacing.append(t99)
 
         t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag else '')
         webspacing.append(t8)
@@ -364,9 +385,21 @@ class ColumnCoverPlate(MomentConnection):
         # t99 = (None, "Block Shear in Flange & Flange plate in Axial ", TYPE_SECTION,
         #        './ResourceFiles/images/column_flange_failure.png')
         # flangecapacity.append(t99)
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)- 2 x 3 Bolts pattern considered")
+        flangecapacity.append(t00)
+
+        t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
+               ['./ResourceFiles/images/L_V.png', 211, 349, "Block Shear Pattern"])  # [image, width, height, caption]
+        flangecapacity.append(t99)
+
         t30 = (KEY_FLANGE_TEN_CAPACITY, KEY_DISP_FLANGE_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_flange / 1000, 2) if flag else '')
         flangecapacity.append(t30)
+
+        t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/2L_V.png', 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
+        flangecapacity.append(t99)
+
         t30 = (KEY_FLANGE_PLATE_TEN_CAP, KEY_DISP_FLANGE_PLATE_TEN_CAP, TYPE_TEXTBOX,
                round(self.flange_plate.tension_capacity_flange_plate / 1000, 2) if flag else '')
         flangecapacity.append(t30)
@@ -377,8 +410,15 @@ class ColumnCoverPlate(MomentConnection):
 
         webcapacity = []
 
-        # t99 = (None,"Block Shear in Web & web plate in Axial & Shear", TYPE_SECTION, './ResourceFiles/images/column_web_failure.png')
-        # webcapacity.append(t99)
+        t00 = (
+        None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate) - 2 x 3 Bolts pattern considered")
+        webcapacity.append(t00)
+
+        t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/U_V.png', 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
+        webcapacity.append(t99)
+
+
         t30 = (KEY_WEB_TEN_CAPACITY, KEY_DISP_WEB_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_web / 1000, 2) if flag else '')
         webcapacity.append(t30)
@@ -386,6 +426,11 @@ class ColumnCoverPlate(MomentConnection):
         t30 = (KEY_WEB_PLATE_CAPACITY, KEY_DISP_WEB_PLATE_CAPACITY, TYPE_TEXTBOX,
                round(self.web_plate.tension_capacity_web_plate / 1000, 2) if flag else '')
         webcapacity.append(t30)
+
+        t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/L_Vshear.png', 239 , 350,
+                "Block Shear Pattern"])  # [image, width, height, caption]
+        webcapacity.append(t99)
 
         t30 = (KEY_WEBPLATE_SHEAR_CAPACITY_PLATE, KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, TYPE_TEXTBOX,
                round(self.web_plate.shear_capacity_web_plate / 1000, 2) if flag else '')

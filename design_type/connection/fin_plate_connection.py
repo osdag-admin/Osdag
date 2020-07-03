@@ -228,6 +228,14 @@ class FinPlateConnection(ShearConnection):
 
         spacing = []
 
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
+        spacing.append(t00)
+
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/spacing_3.png', 400, 277, ""])  # [image, width, height, caption]
+        spacing.append(t99)
+
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
         spacing.append(t9)
 
@@ -246,11 +254,11 @@ class FinPlateConnection(ShearConnection):
 
         capacities = []
 
-        t00 = (None, "", TYPE_NOTE, "This is Note.")
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
         capacities.append(t00)
 
-        t99 = (None, 'Shear Capacities', TYPE_SECTION,
-               ['./ResourceFiles/images/block_shear.png', 250, 250, "block_shear"])  #[image, width, height, caption]
+        t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/L_shear1.png', 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity/1000,2) if status else '')
@@ -262,8 +270,9 @@ class FinPlateConnection(ShearConnection):
         t17 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.plate.block_shear_capacity_shear/1000,2) if status else '')
         capacities.append(t17)
 
-        t99 = (None, 'Tension Capacities', TYPE_SECTION,
-               ['./ResourceFiles/images/block_shear_axial.png', 170, 170, "block_shear_axial"])
+        t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/U.png', 400, 202,
+                "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
@@ -293,7 +302,13 @@ class FinPlateConnection(ShearConnection):
 
         capacities = []
 
-        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/block_shear_2.png')
+        t00 = (
+        None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
+        capacities.append(t00)
+
+        t99 = (None, 'Failure Pattern due to Shear in Member', TYPE_SECTION,
+               ['./ResourceFiles/images/L_shear1.png', 400, 210,
+                "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_SHEAR_YIELDCAPACITY, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.supported_section.shear_yielding_capacity/1000,2) if status else '')
@@ -305,7 +320,9 @@ class FinPlateConnection(ShearConnection):
         t17 = (KEY_SHEAR_BLOCKSHEARCAPACITY, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, round(self.supported_section.block_shear_capacity_shear/1000,2) if status else '')
         capacities.append(t17)
 
-        t99 = (None, 'Section2', TYPE_SECTION, './ResourceFiles/images/block_shear_axial_2.png')
+        t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
+               ['./ResourceFiles/images/U.png', 400, 202,
+                "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_TENSION_YIELDCAPACITY, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,

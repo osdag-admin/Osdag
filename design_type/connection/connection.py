@@ -45,7 +45,7 @@ class Connection(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
-            image= VALUES_IMG_BEAM[0]
+            image= ''
         else:
             designation = str(input_dictionary[KEY_SUPTNGSEC])
             material_grade = str(input_dictionary[KEY_MATERIAL])
@@ -234,7 +234,7 @@ class Connection(Main):
             plast_sec_mod_y = ''
             torsion_const = ''
             warping_const = ''
-            image = image = VALUES_IMG_BEAM[0]
+            image = ''
 
         else:
             designation = str(input_dictionary[KEY_SUPTDSEC])
@@ -448,6 +448,8 @@ class Connection(Main):
             fy_20 = m_conn.fy_20
             fy_20_40 = m_conn.fy_20_40
             fy_40 = m_conn.fy_40
+            fu = m_conn.fu
+            fy = m_conn.fy
         else:
             pass
 
@@ -499,27 +501,6 @@ class Connection(Main):
 
         return fu_fy_list
 
-
-    def get_values_for_design_pref(self, key, design_dictionary):
-
-        if design_dictionary[KEY_MATERIAL] != 'Select Material':
-            fu = Material(design_dictionary[KEY_MATERIAL],41).fu
-        else:
-            fu = ''
-
-        val = {KEY_DP_BOLT_TYPE: "Pretensioned",
-               KEY_DP_BOLT_HOLE_TYPE: "Standard",
-               KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
-               KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
-               KEY_DP_WELD_MATERIAL_G_O: str(fu),
-               KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
-               KEY_DP_DETAILING_GAP: '10',
-               KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
-               KEY_DP_DESIGN_METHOD: "Limit State Design",
-               KEY_CONNECTOR_MATERIAL: str(design_dictionary[KEY_MATERIAL])
-               }[key]
-
-        return val
 
     def refresh_input_dock(self):
 

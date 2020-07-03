@@ -172,8 +172,9 @@ class Ui_Dialog1(object):
     def save_inputSummary(self,main):
         input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
         file_type = "PDF (*.pdf)"
-        filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type, None, QtWidgets.QFileDialog.DontUseNativeDialog)
-        #filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type)
+        filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
+        # filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type, None, QtWidgets.QFileDialog.DontUseNativeDialog)
+        # filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type)
         '''
         Uncomment the second QFileDialog function if you want to use NativeDialog which will be both system and OS dependent hence
         it would be impossible to assign any modal to QFileDialog once it's opened, therefore it'll look like system is hanged.
@@ -182,24 +183,27 @@ class Ui_Dialog1(object):
         Same is the case when we'll select 'Load Input' option. We can't control the behaviour of QFileDialog because it's native and hence
         OS and system dependent.
         '''
-        if filename:
-            fname_no_ext = filename.split(".")[0]
-            input_summary['filename'] = fname_no_ext
-            input_summary['does_design_exist'] = self.design_exist
-            input_summary['logger_messages'] = self.loggermsg
-            main.save_design(main, input_summary)
-            if os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext+'.log'):
-                self.Dialog.accept()
-                QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
+
+        if filename == '':
+            return
+        fname_no_ext = filename.split(".")[0]
+        input_summary['filename'] = fname_no_ext
+        input_summary['does_design_exist'] = self.design_exist
+        input_summary['logger_messages']=self.loggermsg
+        main.save_design(main,input_summary)
+        # if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
+        if os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext+'.log'):
+            self.Dialog.accept()
+            QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
+        else:
+            logfile=open(fname_no_ext+'.log','r')
+            logs=logfile.read()
+            if('! Osdag can\'t write on file' in logs):
+               QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
             else:
-                logfile = open(fname_no_ext+'.log', 'r')
-                logs = logfile.read()
-                if('! Osdag can\'t write on file' in logs):
-                   QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
-                else:
-                   print(logs)
-                   QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
-                logfile.close()
+               print(logs)
+               QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
+            logfile.close()
 
     def call_designreport(self, main,fileName, report_summary, folder):
         self.alist = main.report_input

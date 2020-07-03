@@ -10,7 +10,7 @@ from cad.items.ModelUtils import getGpPt, make_edge, makeWireFromEdges, \
     makeFaceFromWire, makePrismFromFace, makeEdgesFromPoints
 
 class Angle(object):
-    def __init__(self, L, A, B, T, R1, R2):
+    def __init__(self, L, A, B, T, R1=0, R2=0):
         self.L = L
         self.A = A
         self.B = B

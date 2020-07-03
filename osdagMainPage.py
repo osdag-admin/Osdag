@@ -236,6 +236,10 @@ class LeftPanelButton(QWidget):          # Custom Button widget for the Left Pan
 class OsdagMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        width = resolution.width()
+        height = resolution.height()
+        self.resize(width*(0.85),height*(0.75))
         self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.switch.toggled.connect(self.change_theme)
@@ -394,8 +398,15 @@ class OsdagMainWindow(QMainWindow):
 
             else:
                 raise ValueError
-        self.showMaximized()
+        self.center()
+        self.show()
 
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     @pyqtSlot(int)
     def current_changed(self, index):
@@ -502,7 +513,6 @@ class OsdagMainWindow(QMainWindow):
         if self.findChild(QRadioButton,'Fin_Plate').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(FinPlateConnection, ' ')
-            #self.ui2.center()
             self.ui2.show()
             self.ui2.closed.connect(self.show)
         elif self.findChild(QRadioButton,'Cleat_Angle').isChecked():
@@ -679,37 +689,37 @@ class OsdagMainWindow(QMainWindow):
         state = self.ui.switch.isChecked()
         toggle_stylesheet(state)
 
-class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
-
-    def __init__(self, icon, parent=None):
-        QtWidgets.QSystemTrayIcon.__init__(self, icon, parent)
-        self.parent = parent
-        menu = QtWidgets.QMenu(self.parent)
-        self.setContextMenu(menu)
-        menu.addAction("Exit", self.exit)
-
-
-    def exit(self):
-        QCoreApplication.exit()
+# class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
+#
+#     def __init__(self, icon, parent=None):
+#         QtWidgets.QSystemTrayIcon.__init__(self, icon, parent)
+#         self.parent = parent
+#         menu = QtWidgets.QMenu(self.parent)
+#         self.setContextMenu(menu)
+#         menu.addAction("Exit", self.exit)
+#
+#
+#     def exit(self):
+#         QCoreApplication.exit()
 
 ######################### UpDateNotifi ################
 
-class Update(QMainWindow):
-    def __init__(self, old_version):
-        super().__init__()
-        self.old_version=old_version
-    def notifi(self):
-        try:
-            url = "https://anshulsingh-py.github.io/test/version.txt"
-            file = urllib.request.urlopen(url)
-            for line in file:
-                decoded_line = line.decode("utf-8")
-            new_version = decoded_line.split("=")[1]
-            if int(new_version) > self.old_version:
-                print("update")
-                msg = QMessageBox.information(self, 'Update available','<a href=https://google.com>Click to downlaod<a/>')
-        except:
-            print("No internet connection")
+# class Update(QMainWindow):
+#     def __init__(self, old_version):
+#         super().__init__()
+#         self.old_version=old_version
+#     def notifi(self):
+#         try:
+#             url = "https://anshulsingh-py.github.io/test/version.txt"
+#             file = urllib.request.urlopen(url)
+#             for line in file:
+#                 decoded_line = line.decode("utf-8")
+#             new_version = decoded_line.split("=")[1]
+#             if int(new_version) > self.old_version:
+#                 print("update")
+#                 msg = QMessageBox.information(self, 'Update available','<a href=https://google.com>Click to downlaod<a/>')
+#         except:
+#             print("No internet connection")
 
 def toggle_stylesheet(state):
     app = QApplication.instance()
@@ -778,7 +788,6 @@ def send_crash_report():
     appcrash.get_application_log = get_application_log
     appcrash.get_system_information = get_system_info
     appcrash.show_report_dialog()
-
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
@@ -854,10 +863,11 @@ if __name__ == '__main__':
     trayIcon.show()
 
     try:
+        # window.notification2()
         #update = Update(0)
         #update.notifi()
-        #sys.excepthook = hook_exception
-        # window.notification2()
+        sys.excepthook = hook_exception
+
         QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)

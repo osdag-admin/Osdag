@@ -500,7 +500,14 @@ class Tension_bolted(Member):
 
         spacing = []
 
-        t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
+        spacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/spacing_1.png', 400, 278, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
@@ -523,7 +530,14 @@ class Tension_bolted(Member):
 
         pattern = []
 
-        t99 = (None, 'Shear Pattern', TYPE_SECTION, './ResourceFiles/images/U.png')
+        t00 = (None, "", TYPE_NOTE, "Representative image for spacing details - 3 x 3 pattern considered")
+        pattern.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Spacing Details', TYPE_IMAGE,
+               ['./ResourceFiles/images/L.png', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         pattern.append(t99)
 
         return pattern
@@ -1650,6 +1664,8 @@ class Tension_bolted(Member):
 
 
         for self.plate.thickness_provided in self.thickness_possible:
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
                 self.plate.tension_yielding(length = self.section_size_1.depth, thickness = self.plate.thickness_provided, fy = self.plate.fy)
                 self.net_area = (self.section_size_1.depth * self.plate.thickness_provided) - (

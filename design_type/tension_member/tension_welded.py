@@ -1354,6 +1354,8 @@ class Tension_welded(Member):
         self.plate_thick_weld = self.thickness_possible[-1]
 
         for self.plate.thickness_provided in self.thickness_possible:
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
                 self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
                 self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided

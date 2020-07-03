@@ -2144,7 +2144,7 @@ class Window(QMainWindow):
                             caption.setAlignment(Qt.AlignCenter)
                             caption.setFont(font)
                             caption.setText(value[3])
-                            caption.setFixedSize(value[1], 12)
+                            caption.setFixedSize(value[1], caption.sizeHint().height())
                             image_layout.addWidget(caption)
                             max_image_width = max(max_image_width, value[1])
                             max_image_height = max(max_image_height, value[2])
@@ -2170,7 +2170,7 @@ class Window(QMainWindow):
                         font.setPointSize(11)
                         font.setBold(False)
                         font.setWeight(50)
-                        r.setFixedSize(160, 27)
+                        r.setFixedSize(100, 27)
                         r.setFont(font)
                         r.setObjectName(option[0])
                         r.setText(str(value))
@@ -2229,7 +2229,7 @@ class Window(QMainWindow):
 
                 dialog_width += max_label_width
                 dialog_width += max_image_width
-                dialog_height = max(dialog_height, max_image_height)
+                dialog_height = max(dialog_height, max_image_height+125)
                 if not no_note:
                     dialog_height += 40
                 dialog.resize(dialog_width, dialog_height)

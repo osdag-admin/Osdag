@@ -6,14 +6,14 @@ from cad.items.plate import Plate
 
 class BoxAngle(object):
     def __init__(self, a, b, t, l, t1, l1, H, s, s1):
-        self.l = l
+        self.l = s + 2*t1
         self.a = a
         self.b = b
         self.t = t
         self.s = s 
         self.s1 = s1
         self.t1 = t1
-        self.l1 = l1
+        self.l1 = s1 + 2*t1 + 2*t
         self.H = H
 
         self.sec_origin = numpy.array([0, 0, 0])
@@ -25,10 +25,10 @@ class BoxAngle(object):
         self.angle2 = Angle(H, b, a, t, 0, 0)
         self.angle3 = Angle(H, a, b, t, 0, 0)
         self.angle4 = Angle(H, b, a, t, 0, 0)
-        self.plate1 = Plate(l, H, t1)
-        self.plate2 = Plate(t1, H, l1)
-        self.plate3 = Plate(l, H, t1)
-        self.plate4 = Plate(t1, H, l1)
+        self.plate1 = Plate(self.l, H, t1)
+        self.plate2 = Plate(t1, H, self.l1)
+        self.plate3 = Plate(self.l, H, t1)
+        self.plate4 = Plate(t1, H, self.l1)
 
     def place(self, secOrigin, uDir, wDir):
         self.sec_origin = secOrigin
@@ -139,14 +139,14 @@ if __name__ == '__main__':
             display.DisplayMessage(getGpPt(p2), n, height=24, message_color=(0,0,0))
 
 
-    l = 40
-    l1 = 50
     a = 15
     b = 15
     t = 2
     t1 = 2
-    s = l  - 2*t1
-    s1 = l1 - 2*t1 - 2*t
+    s = 40
+    s1 = 50
+    l = s + 2*t1
+    l1 = s1 + 2*t1 + 2*t
     H = 50
 
 

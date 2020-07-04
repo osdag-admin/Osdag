@@ -2051,7 +2051,12 @@ class CHS(Material):
         self.area = row[6] * 100  # mm^2
         self.nominal_bore = row[2]  # mm
         self.out_diameter = row[3]  # mm
+        self.depth = self.out_diameter  # mm, OD is referred as the depth of the CHS
+        self.flange_width = self.out_diameter  # mm, OD is referred as the flange width of the CHS
         self.flange_thickness = row[4]  # mm, thickness of the CHS is referred as flange thickness
+        self.web_thickness = self.flange_thickness  # mm, thickness of the CHS is referred as web thickness
+        self.root_radius = 0
+        self.toe_radius = 0
         super(CHS, self).__init__(material_grade, self.flange_thickness)
         self.internal_vol = row[7]  # cm^3/m
         self.mom_inertia = row[10]  # cm^4/m

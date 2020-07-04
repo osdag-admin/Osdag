@@ -55,7 +55,7 @@ class cross_isection(object):
         middel_pnt = []
         line = []
         labels = ["z","y","u","v"]
-        offset = 80
+        offset = self.D
         uvoffset = offset/numpy.sqrt(2)
 
         z_points = [numpy.array([-offset,0.,self.H/2]), numpy.array([offset,0.,self.H/2])]

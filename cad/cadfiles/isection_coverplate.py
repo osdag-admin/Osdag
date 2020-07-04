@@ -52,15 +52,15 @@ class IsectionCoverPlate(object):
         prism4 = self.Plate2.create_model()
         
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism4).Shape()
-        return prism
+        # prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
+        # prism = BRepAlgoAPI_Fuse(prism, prism4).Shape()
+        return prism, [prism3, prism4]
 
     def create_marking(self):
         middel_pnt = []
         line = []
         labels = ["z","y","u","v"]
-        offset = 80
+        offset = self.B + self.s
         uvoffset = offset/numpy.sqrt(2)
 
         #b = self.B/2+self.s/2
@@ -108,9 +108,11 @@ if __name__ == '__main__':
     shaftDir = numpy.array([0.,0.,1.])
 
     ISecPlate.place(origin, uDir, shaftDir)
-    prism = ISecPlate.create_model()
+    prism, prisms = ISecPlate.create_model()
     lines, pnts, labels = ISecPlate.create_marking()
     display.DisplayShape(prism, update=True)
+    for p in prisms:
+        display.DisplayColoredShape(p, color='BLUE', update=True)
     display_lines(lines, pnts, labels)
     display.View_Top()
     display.FitAll()

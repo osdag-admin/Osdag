@@ -57,9 +57,9 @@ class ChannelSectionOpposite(object):
         prism4 = self.Plate2.create_model()
 
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism4).Shape()
-        return prism
+        # prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
+        # prism = BRepAlgoAPI_Fuse(prism, prism4).Shape()
+        return prism, [prism3, prism4]
 
     def rotateY(self, points):
         rotated_points = []
@@ -73,7 +73,7 @@ class ChannelSectionOpposite(object):
         middel_pnt = []
         line = []
         labels = ["z","y","u","v"]
-        offset = 80
+        offset = self.s + 2*self.B
         uvoffset = offset/numpy.sqrt(2)
 
         z_points = [numpy.array([-offset,self.D/2,self.H/2]), numpy.array([offset,self.D/2,self.H/2])]
@@ -120,9 +120,11 @@ if __name__ == '__main__':
     channel_section_opp = ChannelSectionOpposite(D, B, T, t, s, l, t1, H)
     _place = channel_section_opp.place(origin, uDir, shaftDir)
     point = channel_section_opp.compute_params()
-    prism = channel_section_opp.create_model()
+    prism, prisms = channel_section_opp.create_model()
     lines, pnts, labels = channel_section_opp.create_marking()
     display.DisplayShape(prism, update=True)
+    for p in prisms:
+        display.DisplayColoredShape(p, color='BLUE', update=True)
     display_lines(lines, pnts, labels)
     display.View_Top()
     display.FitAll()

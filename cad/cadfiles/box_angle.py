@@ -86,11 +86,11 @@ class BoxAngle(object):
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
         prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
         prism = BRepAlgoAPI_Fuse(prism, prism4).Shape() 
-        prism = BRepAlgoAPI_Fuse(prism, prism5).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism6).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism7).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism8).Shape()        
-        return prism
+        # prism = BRepAlgoAPI_Fuse(prism, prism5).Shape()
+        # prism = BRepAlgoAPI_Fuse(prism, prism6).Shape()
+        # prism = BRepAlgoAPI_Fuse(prism, prism7).Shape()
+        # prism = BRepAlgoAPI_Fuse(prism, prism8).Shape()        
+        return prism, [prism5, prism6, prism7, prism8]
 
     def rotate(self, points, x):
         rotated_points = []
@@ -106,7 +106,7 @@ class BoxAngle(object):
         middel_pnt = []
         line = []
         labels = ["z","y","u","v"]
-        offset = 50
+        offset = (self.s + self.s1)/2
         uvoffset = offset/numpy.sqrt(2)
 
         z_points = [numpy.array([-offset,0.,self.H/2]), numpy.array([offset,0.,self.H/2])]
@@ -157,9 +157,11 @@ if __name__ == '__main__':
     box_angle = BoxAngle(a, b, t, l, t1, l1, H, s, s1)
     _place = box_angle.place(origin, uDir, wDir)
     point = box_angle.compute_params()
-    prism = box_angle.create_model()
+    prism, prisms = box_angle.create_model()
     lines, pnts, labels = box_angle.create_marking()
     display.DisplayShape(prism, update=True)
+    for p in prisms:
+        display.DisplayColoredShape(p, color='BLUE', update=True)
     display_lines(lines, pnts, labels)
     display.View_Top()
     display.FitAll()

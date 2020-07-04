@@ -69,7 +69,7 @@ class TISection(object):
         middel_pnt = []
         line = []
         labels = ["z","y","u","v"]
-        offset = 50
+        offset = self.D
         uvoffset = offset/numpy.sqrt(2)
 
         z_points = [numpy.array([-offset,0.,self.length/2]), numpy.array([offset,0.,self.length/2])]

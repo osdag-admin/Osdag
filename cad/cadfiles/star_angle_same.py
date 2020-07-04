@@ -47,8 +47,8 @@ class StarAngleSame(object):
         prism3 = self.plate1.create_model()
 
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()      
-        return prism
+        # prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()      
+        return prism, [prism3]
 
     def rotate(self, points):
         rotated_points = []
@@ -62,7 +62,7 @@ class StarAngleSame(object):
         middel_pnt = []
         line = []
         labels = ["z","y","u","v"]
-        offset = 50
+        offset = self.l
         uvoffset = offset/numpy.sqrt(2)
 
         z_points = [numpy.array([-offset,0.,self.H/2]), numpy.array([offset,0.,self.H/2])]
@@ -107,9 +107,11 @@ if __name__ == '__main__':
     star_angle_same = StarAngleSame(a, b, t, l, t1, H)
     _place = star_angle_same.place(origin, uDir, wDir)
     point = star_angle_same.compute_params()
-    prism = star_angle_same.create_model()
+    prism, prisms = star_angle_same.create_model()
     lines, pnts, labels = star_angle_same.create_marking()
     display.DisplayShape(prism, update=True)
+    for p in prisms:
+        display.DisplayColoredShape(p, color='BLUE', update=True)
     display_lines(lines, pnts, labels)
     display.View_Top()
     display.FitAll()

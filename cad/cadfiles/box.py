@@ -62,7 +62,7 @@ class Box(object):
         middel_pnt = []
         line = []
         labels = ["z","y","u","v"]
-        offset = 50
+        offset = (self.s + self.s1)/2
         uvoffset = offset/numpy.sqrt(2)
 
         z_points = [numpy.array([-offset,0.,self.H/2]), numpy.array([offset,0.,self.H/2])]

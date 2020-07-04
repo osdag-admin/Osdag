@@ -50,6 +50,7 @@ from cad.cadfiles.channel_section_opp import ChannelSectionOpposite
 from cad.cadfiles.box import Box
 from cad.cadfiles.box_angle import BoxAngle
 from cad.cadfiles.cross_isection import cross_isection
+from cad.items.ModelUtils import getGpPt
 
 
 class Ui_OsdagSectionModeller(object):
@@ -632,6 +633,12 @@ class Ui_OsdagSectionModeller(object):
                         self.update_section_properties(index_type,index_template)
                         
         
+        def display_lines(self, lines, points, labels):
+                for l,p1,p2,n in zip(lines,points[0],points[1], labels):
+                        display.DisplayShape(l, update=True)
+                        display.DisplayMessage(getGpPt(p1), n, height=24,message_color=(1,1,0))
+                        display.DisplayMessage(getGpPt(p2), n, height=24,message_color=(1,1,0))
+
         def create_cad_model(self,index_type,index_template,parameters):
                 '''
                 Method to Specify and create CAD model template-wise
@@ -643,7 +650,9 @@ class Ui_OsdagSectionModeller(object):
                         ISecPlate = IsectionCoverPlate(*parameters)
                         ISecPlate.place(origin, uDir, shaftDir)
                         prism = ISecPlate.create_model()
+                        lines, pnts, labels = ISecPlate.create_marking()
                         display.DisplayShape(prism, update=True)
+                        self.display_lines(lines, pnts, labels)
                         display.View_Top()
                         display.FitAll()
                 elif(index_type==2):
@@ -652,7 +661,9 @@ class Ui_OsdagSectionModeller(object):
                                 _place = channel_section.place(origin, uDir, shaftDir)
                                 point = channel_section.compute_params()
                                 prism = channel_section.create_model()
+                                lines, pnts, labels = channel_section.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
                         elif(index_template==2):
@@ -660,7 +671,9 @@ class Ui_OsdagSectionModeller(object):
                                 _place = channel_section.place(origin, uDir, shaftDir)
                                 point = channel_section.compute_params()
                                 prism = channel_section.create_model()
+                                lines, pnts, labels = channel_section.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
                 elif(index_type==3):
@@ -669,7 +682,9 @@ class Ui_OsdagSectionModeller(object):
                                 _place = star_angle.place(origin, uDir, wDir)
                                 point = star_angle.compute_params()
                                 prism = star_angle.create_model()
+                                lines, pnts, labels = star_angle.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
 
@@ -678,7 +693,9 @@ class Ui_OsdagSectionModeller(object):
                                 _place = star_angle.place(origin, uDir, wDir)
                                 point = star_angle.compute_params()
                                 prism = star_angle.create_model()
+                                lines, pnts, labels = star_angle.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
 
@@ -687,7 +704,9 @@ class Ui_OsdagSectionModeller(object):
                                 _place = star_angle_same.place(origin, uDir, wDir)
                                 point = star_angle_same.compute_params()
                                 prism = star_angle_same.create_model()
+                                lines, pnts, labels = star_angle_same.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
 
@@ -696,7 +715,9 @@ class Ui_OsdagSectionModeller(object):
                                 _place = star_angle_opposite.place(origin, uDir, wDir)
                                 point = star_angle_opposite.compute_params()
                                 prism = star_angle_opposite.create_model()
+                                lines, pnts, labels = star_angle_opposite.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
                         
@@ -714,7 +735,9 @@ class Ui_OsdagSectionModeller(object):
                                 _place = box_angle.place(origin, uDir, wDir)
                                 point = box_angle.compute_params()
                                 prism = box_angle.create_model()
+                                lines, pnts, labels = box_angle.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
                                 
@@ -731,7 +754,9 @@ class Ui_OsdagSectionModeller(object):
                                 _place = TISec.place(origin, uDir, shaftDir)
                                 point = TISec.compute_params()
                                 prism = TISec.create_model()
+                                lines, pnts, labels = TISec.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
 
@@ -747,7 +772,9 @@ class Ui_OsdagSectionModeller(object):
                                 CrossISec.place(origin, uDir, shaftDir)
                                 CrossISec.compute_params()
                                 prism = CrossISec.create_model()
+                                lines, pnts, labels = CrossISec.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
 
@@ -762,7 +789,9 @@ class Ui_OsdagSectionModeller(object):
                                 _place = box.place(origin, uDir, wDir)
                                 point = box.compute_params()
                                 prism = box.create_model()
+                                lines, pnts, labels = box.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
                                 
@@ -781,7 +810,9 @@ class Ui_OsdagSectionModeller(object):
                         _place = isection_channel.place(origin, uDir, shaftDir)
                         point = isection_channel.compute_params()
                         prism = isection_channel.create_model()
+                        lines, pnts, labels = isection_channel.create_marking()
                         display.DisplayShape(prism, update=True)
+                        self.display_lines(lines, pnts, labels)
                         display.View_Top()
                         display.FitAll()
                 display.ExportToImage("./ResourceFiles/images/3DSectionfromSectionModeller.png")

@@ -55,7 +55,7 @@ class cross_isection(object):
         middel_pnt = []
         line = []
         labels = ["z","y","u","v"]
-        offset = 100
+        offset = 80
         uvoffset = offset/numpy.sqrt(2)
 
         z_points = [numpy.array([-offset,0.,self.H/2]), numpy.array([offset,0.,self.H/2])]
@@ -70,9 +70,10 @@ class cross_isection(object):
         v_points = [numpy.array([-uvoffset,-uvoffset,self.H/2]), numpy.array([uvoffset,uvoffset,self.H/2])]
         line.append(makeEdgesFromPoints(v_points))
 
-        middel_pnt = [[-offset,0,self.H/2],[0,-offset,self.H/2],[uvoffset,-uvoffset,self.H/2],[uvoffset,uvoffset,self.H/2]]
+        start_pnt = [[-offset,0,self.H/2],[0,-offset,self.H/2],[uvoffset,-uvoffset,self.H/2],[uvoffset,uvoffset,self.H/2]]
+        end_pnt = [[offset,0,self.H/2],[0,offset,self.H/2],[-uvoffset,uvoffset,self.H/2],[-uvoffset,-uvoffset,self.H/2]]
 
-        return line, middel_pnt, labels
+        return line, [start_pnt, end_pnt], labels
 
 if __name__ == '__main__':
 
@@ -80,9 +81,10 @@ if __name__ == '__main__':
     display, start_display, add_menu, add_function_to_menu = init_display()
 
     def display_lines(lines, points, labels):
-        for l,p,n in zip(lines,points, labels):
+        for l,p1,p2,n in zip(lines,points[0],points[1], labels):
             display.DisplayShape(l, update=True)
-            display.DisplayMessage(getGpPt(p), n,message_color=(0,0,0))
+            display.DisplayMessage(getGpPt(p1), n, height=24, message_color=(0,0,0))
+            display.DisplayMessage(getGpPt(p2), n, height=24, message_color=(0,0,0))
 
     B = 50
     T = 3
@@ -101,9 +103,9 @@ if __name__ == '__main__':
     CrossISec.place(origin, uDir, shaftDir)
     CrossISec.compute_params()
     prism = CrossISec.create_model()
-    lines, m_pnt, labels = CrossISec.create_marking()
+    lines, pnts, labels = CrossISec.create_marking()
     display.DisplayShape(prism, update=True)
-    display_lines(lines, m_pnt, labels)
+    display_lines(lines, pnts, labels)
     display.View_Top()
     display.FitAll()
     display.DisableAntiAliasing()

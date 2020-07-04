@@ -810,13 +810,6 @@ class Tension_bolted(Member):
         self.main_material = design_dictionary[KEY_MATERIAL]
         self.material = design_dictionary[KEY_SEC_MATERIAL]
 
-        # self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
-        # self.plate.thickness = design_dictionary[KEY_PLATETHK]
-        # print(self.sizelist)
-        # self.plate.thickness = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-        #                        material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
-        #                        gap=design_dictionary[KEY_DP_DETAILING_GAP])
-
         self.length = float(design_dictionary[KEY_LENGTH])
         # print(self.bolt)
         self.load = Load(shear_force="", axial_force=design_dictionary.get(KEY_AXIAL))

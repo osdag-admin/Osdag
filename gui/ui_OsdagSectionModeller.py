@@ -50,6 +50,7 @@ from cad.cadfiles.channel_section_opp import ChannelSectionOpposite
 from cad.cadfiles.box import Box
 from cad.cadfiles.box_angle import BoxAngle
 from cad.cadfiles.cross_isection import cross_isection
+from cad.items.ModelUtils import getGpPt
 
 
 class Ui_OsdagSectionModeller(object):
@@ -632,6 +633,12 @@ class Ui_OsdagSectionModeller(object):
                         self.update_section_properties(index_type,index_template)
                         
         
+        def display_lines(self, lines, points, labels):
+                for l,p1,p2,n in zip(lines,points[0],points[1], labels):
+                        display.DisplayShape(l, update=True)
+                        display.DisplayMessage(getGpPt(p1), n, height=24,message_color=(1,1,0))
+                        display.DisplayMessage(getGpPt(p2), n, height=24,message_color=(1,1,0))
+
         def create_cad_model(self,index_type,index_template,parameters):
                 '''
                 Method to Specify and create CAD model template-wise
@@ -642,49 +649,91 @@ class Ui_OsdagSectionModeller(object):
                 if(index_type==1):                        
                         ISecPlate = IsectionCoverPlate(*parameters)
                         ISecPlate.place(origin, uDir, shaftDir)
-                        prism = ISecPlate.create_model()
+                        prism, prisms = ISecPlate.create_model()
+                        lines, pnts, labels = ISecPlate.create_marking()
                         display.DisplayShape(prism, update=True)
+                        for p in prisms:
+                                display.DisplayColoredShape(p, color='BLUE', update=True)
+                        self.display_lines(lines, pnts, labels)
+                        display.View_Top()
+                        display.FitAll()
                 elif(index_type==2):
                         if(index_template==1):
                                 channel_section = ChannelSection(*parameters)
                                 _place = channel_section.place(origin, uDir, shaftDir)
                                 point = channel_section.compute_params()
-                                prism = channel_section.create_model()
+                                prism, prisms = channel_section.create_model()
+                                lines, pnts, labels = channel_section.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                for p in prisms:
+                                        display.DisplayColoredShape(p, color='BLUE', update=True)
+                                self.display_lines(lines, pnts, labels)
+                                display.View_Top()
+                                display.FitAll()
                         elif(index_template==2):
                                 channel_section = ChannelSectionOpposite(*parameters)
                                 _place = channel_section.place(origin, uDir, shaftDir)
                                 point = channel_section.compute_params()
-                                prism = channel_section.create_model()
+                                prism, prisms = channel_section.create_model()
+                                lines, pnts, labels = channel_section.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                for p in prisms:
+                                        display.DisplayColoredShape(p, color='BLUE', update=True)
+                                self.display_lines(lines, pnts, labels)
+                                display.View_Top()
+                                display.FitAll()
                 elif(index_type==3):
                         if(index_template==1):
                                 star_angle = StarAngle4(*parameters)
                                 _place = star_angle.place(origin, uDir, wDir)
                                 point = star_angle.compute_params()
-                                prism = star_angle.create_model()
+                                prism, prisms = star_angle.create_model()
+                                lines, pnts, labels = star_angle.create_marking()
                                 display.DisplayShape(prism, update=True)
-                        
+                                for p in prisms:
+                                        display.DisplayColoredShape(p, color='BLUE', update=True)
+                                self.display_lines(lines, pnts, labels)
+                                display.View_Top()
+                                display.FitAll()
+
                         elif(index_template==2):
                                 star_angle = StarAngle2(*parameters)
                                 _place = star_angle.place(origin, uDir, wDir)
                                 point = star_angle.compute_params()
-                                prism = star_angle.create_model()
+                                prism, prisms = star_angle.create_model()
+                                lines, pnts, labels = star_angle.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                for p in prisms:
+                                        display.DisplayColoredShape(p, color='BLUE', update=True)
+                                self.display_lines(lines, pnts, labels)
+                                display.View_Top()
+                                display.FitAll()
 
                         elif(index_template==3):
                                 star_angle_same = StarAngleSame(*parameters)
                                 _place = star_angle_same.place(origin, uDir, wDir)
                                 point = star_angle_same.compute_params()
-                                prism = star_angle_same.create_model()
+                                prism, prisms = star_angle_same.create_model()
+                                lines, pnts, labels = star_angle_same.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                for p in prisms:
+                                        display.DisplayColoredShape(p, color='BLUE', update=True)
+                                self.display_lines(lines, pnts, labels)
+                                display.View_Top()
+                                display.FitAll()
 
                         elif(index_template==4):
                                 star_angle_opposite = StarAngleOpposite(*parameters)
                                 _place = star_angle_opposite.place(origin, uDir, wDir)
                                 point = star_angle_opposite.compute_params()
-                                prism = star_angle_opposite.create_model()
+                                prism, prisms = star_angle_opposite.create_model()
+                                lines, pnts, labels = star_angle_opposite.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                for p in prisms:
+                                        display.DisplayColoredShape(p, color='BLUE', update=True)
+                                self.display_lines(lines, pnts, labels)
+                                display.View_Top()
+                                display.FitAll()
                         
                         elif(index_template==5):
                                 l = 40
@@ -699,8 +748,14 @@ class Ui_OsdagSectionModeller(object):
                                 box_angle = BoxAngle(*parameters)
                                 _place = box_angle.place(origin, uDir, wDir)
                                 point = box_angle.compute_params()
-                                prism = box_angle.create_model()
+                                prism, prisms = box_angle.create_model()
+                                lines, pnts, labels = box_angle.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                for p in prisms:
+                                        display.DisplayColoredShape(p, color='BLUE', update=True)
+                                self.display_lines(lines, pnts, labels)
+                                display.View_Top()
+                                display.FitAll()
                                 
                 elif(index_type==4):
                         if(index_template==1):
@@ -715,7 +770,12 @@ class Ui_OsdagSectionModeller(object):
                                 _place = TISec.place(origin, uDir, shaftDir)
                                 point = TISec.compute_params()
                                 prism = TISec.create_model()
+                                lines, pnts, labels = TISec.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
+                                display.View_Top()
+                                display.FitAll()
+
                         elif(index_template==2):
                                 B = 50
                                 T = 3
@@ -728,7 +788,12 @@ class Ui_OsdagSectionModeller(object):
                                 CrossISec.place(origin, uDir, shaftDir)
                                 CrossISec.compute_params()
                                 prism = CrossISec.create_model()
+                                lines, pnts, labels = CrossISec.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
+                                display.View_Top()
+                                display.FitAll()
+
                         elif(index_template==3):
                                 A = 50
                                 B = 30
@@ -740,7 +805,12 @@ class Ui_OsdagSectionModeller(object):
                                 _place = box.place(origin, uDir, wDir)
                                 point = box.compute_params()
                                 prism = box.create_model()
+                                lines, pnts, labels = box.create_marking()
                                 display.DisplayShape(prism, update=True)
+                                self.display_lines(lines, pnts, labels)
+                                display.View_Top()
+                                display.FitAll()
+                                
                 elif(index_type==5):
                         B = 20
                         T = 2
@@ -756,7 +826,11 @@ class Ui_OsdagSectionModeller(object):
                         _place = isection_channel.place(origin, uDir, shaftDir)
                         point = isection_channel.compute_params()
                         prism = isection_channel.create_model()
+                        lines, pnts, labels = isection_channel.create_marking()
                         display.DisplayShape(prism, update=True)
+                        self.display_lines(lines, pnts, labels)
+                        display.View_Top()
+                        display.FitAll()
                 display.ExportToImage("./ResourceFiles/images/3DSectionfromSectionModeller.png")
         
         def update_section_properties(self,index_type,index_template):

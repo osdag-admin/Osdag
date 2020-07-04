@@ -644,6 +644,8 @@ class Ui_OsdagSectionModeller(object):
                         ISecPlate.place(origin, uDir, shaftDir)
                         prism = ISecPlate.create_model()
                         display.DisplayShape(prism, update=True)
+                        display.View_Top()
+                        display.FitAll()
                 elif(index_type==2):
                         if(index_template==1):
                                 channel_section = ChannelSection(*parameters)
@@ -651,12 +653,16 @@ class Ui_OsdagSectionModeller(object):
                                 point = channel_section.compute_params()
                                 prism = channel_section.create_model()
                                 display.DisplayShape(prism, update=True)
+                                display.View_Top()
+                                display.FitAll()
                         elif(index_template==2):
                                 channel_section = ChannelSectionOpposite(*parameters)
                                 _place = channel_section.place(origin, uDir, shaftDir)
                                 point = channel_section.compute_params()
                                 prism = channel_section.create_model()
                                 display.DisplayShape(prism, update=True)
+                                display.View_Top()
+                                display.FitAll()
                 elif(index_type==3):
                         if(index_template==1):
                                 star_angle = StarAngle4(*parameters)
@@ -664,13 +670,17 @@ class Ui_OsdagSectionModeller(object):
                                 point = star_angle.compute_params()
                                 prism = star_angle.create_model()
                                 display.DisplayShape(prism, update=True)
-                        
+                                display.View_Top()
+                                display.FitAll()
+
                         elif(index_template==2):
                                 star_angle = StarAngle2(*parameters)
                                 _place = star_angle.place(origin, uDir, wDir)
                                 point = star_angle.compute_params()
                                 prism = star_angle.create_model()
                                 display.DisplayShape(prism, update=True)
+                                display.View_Top()
+                                display.FitAll()
 
                         elif(index_template==3):
                                 star_angle_same = StarAngleSame(*parameters)
@@ -678,6 +688,8 @@ class Ui_OsdagSectionModeller(object):
                                 point = star_angle_same.compute_params()
                                 prism = star_angle_same.create_model()
                                 display.DisplayShape(prism, update=True)
+                                display.View_Top()
+                                display.FitAll()
 
                         elif(index_template==4):
                                 star_angle_opposite = StarAngleOpposite(*parameters)
@@ -685,6 +697,8 @@ class Ui_OsdagSectionModeller(object):
                                 point = star_angle_opposite.compute_params()
                                 prism = star_angle_opposite.create_model()
                                 display.DisplayShape(prism, update=True)
+                                display.View_Top()
+                                display.FitAll()
                         
                         elif(index_template==5):
                                 l = 40
@@ -701,6 +715,8 @@ class Ui_OsdagSectionModeller(object):
                                 point = box_angle.compute_params()
                                 prism = box_angle.create_model()
                                 display.DisplayShape(prism, update=True)
+                                display.View_Top()
+                                display.FitAll()
                                 
                 elif(index_type==4):
                         if(index_template==1):
@@ -716,6 +732,9 @@ class Ui_OsdagSectionModeller(object):
                                 point = TISec.compute_params()
                                 prism = TISec.create_model()
                                 display.DisplayShape(prism, update=True)
+                                display.View_Top()
+                                display.FitAll()
+
                         elif(index_template==2):
                                 B = 50
                                 T = 3
@@ -729,6 +748,9 @@ class Ui_OsdagSectionModeller(object):
                                 CrossISec.compute_params()
                                 prism = CrossISec.create_model()
                                 display.DisplayShape(prism, update=True)
+                                display.View_Top()
+                                display.FitAll()
+
                         elif(index_template==3):
                                 A = 50
                                 B = 30
@@ -741,6 +763,9 @@ class Ui_OsdagSectionModeller(object):
                                 point = box.compute_params()
                                 prism = box.create_model()
                                 display.DisplayShape(prism, update=True)
+                                display.View_Top()
+                                display.FitAll()
+                                
                 elif(index_type==5):
                         B = 20
                         T = 2
@@ -757,6 +782,8 @@ class Ui_OsdagSectionModeller(object):
                         point = isection_channel.compute_params()
                         prism = isection_channel.create_model()
                         display.DisplayShape(prism, update=True)
+                        display.View_Top()
+                        display.FitAll()
                 display.ExportToImage("./ResourceFiles/images/3DSectionfromSectionModeller.png")
         
         def update_section_properties(self,index_type,index_template):

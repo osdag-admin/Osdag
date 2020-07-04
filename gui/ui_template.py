@@ -33,8 +33,9 @@ import pdfkit
 import configparser
 import pickle
 import cairosvg
-from update import Update
-# import pandas as pd
+from update_version_check import Update
+#import pandas as pd
+
 
 from Common import *
 from utils.common.component import *
@@ -1337,6 +1338,12 @@ class Window(QMainWindow):
         self.btnTop.clicked.connect(lambda: self.display.View_Top())
         self.btnFront.clicked.connect(lambda: self.display.View_Front())
         self.btnSide.clicked.connect(lambda: self.display.View_Right())
+        self.actionSave_Top_View.triggered.connect(lambda: self.display.FitAll())
+        self.actionSave_Front_View.triggered.connect(lambda: self.display.FitAll())
+        self.actionSave_Side_View.triggered.connect(lambda: self.display.FitAll())
+        self.btnTop.clicked.connect(lambda: self.display.FitAll())
+        self.btnFront.clicked.connect(lambda: self.display.FitAll())
+        self.btnSide.clicked.connect(lambda: self.display.FitAll())
 
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
         last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
@@ -1373,15 +1380,9 @@ class Window(QMainWindow):
         self.fuse_model = None
 
     def notification(self):
-        check=Update(0)
-        print(check.notifi())
-        if check.notifi()==True:
-            msg = QMessageBox.information(self, 'Update available',
-                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
-        elif check.notifi()=="no internet":
-            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
-        else:
-            msg = QMessageBox.information(self, 'Update', 'No Update Available')
+        update_class = Update()
+        msg = update_class.notifi()
+        QMessageBox.information(self, 'Info', msg)
 
     def save_output_to_csv(self, main):
         def save_fun():

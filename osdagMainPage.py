@@ -82,9 +82,10 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 
 import os
 from pathlib import Path
+import re
 from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 import urllib.request
-from update import Update
+from update_version_check import Update
 #from Thread import timer
 
 
@@ -457,26 +458,11 @@ class OsdagMainWindow(QMainWindow):
         elif loc == "Ask Us a Question":
             self.ask_question()
         elif loc == "Check for Update":
-            self.notification()
+            update_class = Update()
+            msg = update_class.notifi()
+            QMessageBox.information(self, 'Info',msg)
         # elif loc == "FAQ":
         #     pass
-
-    def notification(self):
-        check=Update(0)
-        print(check.notifi())
-        if check.notifi()==True:
-            msg = QMessageBox.information(self, 'Update available',
-                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
-        elif check.notifi()=="no internet":
-            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
-        else:
-            msg = QMessageBox.information(self, 'Update', 'No Update Available')
-
-    # def notification2(self):
-    #     check=Update(0)
-    #     if check.notifi()==True:
-    #         msg = QMessageBox.information(self, 'Update available',
-    #                                       '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
 
 
     def select_workspace_folder(self):
@@ -802,24 +788,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
     def exit(self):
         QCoreApplication.exit()
 
-######################### UpDateNotifi ################
 
-class Update(QMainWindow):
-    def __init__(self, old_version):
-        super().__init__()
-        self.old_version=old_version
-    def notifi(self):
-        try:
-            url = "https://anshulsingh-py.github.io/test/version.txt"
-            file = urllib.request.urlopen(url)
-            for line in file:
-                decoded_line = line.decode("utf-8")
-            new_version = decoded_line.split("=")[1]
-            if int(new_version) > self.old_version:
-                print("update")
-                msg = QMessageBox.information(self, 'Update available','<a href=https://google.com>Click to downlaod<a/>')
-        except:
-            print("No internet connection")
 
 
 if __name__ == '__main__':
@@ -867,7 +836,6 @@ if __name__ == '__main__':
         #update = Update(0)
         #update.notifi()
         sys.excepthook = hook_exception
-
         QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)

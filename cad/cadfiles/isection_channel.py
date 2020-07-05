@@ -41,8 +41,9 @@ class ISectionChannel(object):
 
     def compute_params(self):
         self.channel1.compute_params()
+        self.channel1.points = self.rotateZ(self.channel1.points)
         self.isection.compute_params()
-        self.isection.points = self.rotateZ(self.isection.points)
+        # self.isection.points = self.rotateZ(self.isection.points)
 
     def create_model(self):
         prism1 = self.channel1.create_model()
@@ -53,7 +54,7 @@ class ISectionChannel(object):
 
     def rotateZ(self, points):
         rotated_points = []
-        rmatrix = numpy.array([[0, -1, 0],[1, 0, 0],[0, 0, 1]]) 
+        rmatrix = numpy.array([[0, 1, 0],[-1, 0, 0],[0, 0, 1]]) 
         for point in points:
             point = numpy.matmul(rmatrix, point)
             rotated_points.append(point)
@@ -66,20 +67,21 @@ class ISectionChannel(object):
         offset = self.D
         uvoffset = offset/numpy.sqrt(2)
 
-        z_points = [numpy.array([-offset,self.d/2,self.H/2]), numpy.array([offset,self.d/2,self.H/2])]
+        x = self.B/2 + self.T1
+        z_points = [numpy.array([-offset+x,0,self.H/2]), numpy.array([offset+x,0,self.H/2])]
         line.append(makeEdgesFromPoints(z_points))
 
-        y_points = [numpy.array([0.,-offset+self.d/2,self.H/2]), numpy.array([0,offset+self.d/2,self.H/2])]
+        y_points = [numpy.array([x,-offset,self.H/2]), numpy.array([x,offset,self.H/2])]
         line.append(makeEdgesFromPoints(y_points))
         
-        u_points = [numpy.array([-uvoffset,uvoffset+self.d/2,self.H/2]), numpy.array([uvoffset,-uvoffset+self.d/2,self.H/2])]
+        u_points = [numpy.array([-uvoffset+x,uvoffset,self.H/2]), numpy.array([uvoffset+x,-uvoffset,self.H/2])]
         line.append(makeEdgesFromPoints(u_points))
 
-        v_points = [numpy.array([-uvoffset,-uvoffset+self.d/2,self.H/2]), numpy.array([uvoffset,uvoffset+self.d/2,self.H/2])]
+        v_points = [numpy.array([-uvoffset+x,-uvoffset,self.H/2]), numpy.array([uvoffset+x,uvoffset,self.H/2])]
         line.append(makeEdgesFromPoints(v_points))
 
-        start_pnt = [[-offset,self.d/2,self.H/2],[0,-offset+self.d/2,self.H/2],[uvoffset,-uvoffset+self.d/2,self.H/2],[uvoffset,uvoffset+self.d/2,self.H/2]]
-        end_pnt = [[offset,self.d/2,self.H/2],[0,offset+self.d/2,self.H/2],[-uvoffset,uvoffset+self.d/2,self.H/2],[-uvoffset,-uvoffset+self.d/2,self.H/2]]
+        start_pnt = [[-offset+x,0,self.H/2],[x,-offset,self.H/2],[uvoffset+x,-uvoffset,self.H/2],[uvoffset+x,uvoffset,self.H/2]]
+        end_pnt = [[offset+x,0,self.H/2],[x,offset,self.H/2],[-uvoffset+x,uvoffset,self.H/2],[-uvoffset+x,-uvoffset,self.H/2]]
 
         return line, [start_pnt, end_pnt], labels
 

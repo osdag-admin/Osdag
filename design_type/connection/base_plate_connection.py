@@ -2417,6 +2417,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.bp_width_provided = max(self.bp_width_provided, bp_width)
 
                 # tension demand - updated
+                #TODO: check the below statements
                 self.tension_demand_anchor = self.load_axial_tension / self.anchors_outside_flange
                 self.tension_demand_anchor = round((self.tension_demand_anchor / 1000), 2)  # kN
 
@@ -3913,6 +3914,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             pass
         print(self.combined_capacity_anchor)  # Combined capacity (kN)
 
+        print(self.anchor_len_above_footing)
+        print(self.anchor_len_below_footing)
         print(self.anchor_length_provided)  # Anchor Length (total) (mm)
 
         # Anchor Bolt - Inside Column Flange
@@ -3930,6 +3933,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             else:
                 pass
 
+            print(self.anchor_len_above_footing)
+            print(self.anchor_len_below_footing)
             print(self.anchor_length_provided)  # Anchor Length (total) (mm)
 
         # Base Plate

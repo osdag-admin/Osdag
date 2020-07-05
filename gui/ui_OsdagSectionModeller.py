@@ -773,7 +773,7 @@ class Ui_OsdagSectionModeller(object):
                                 lines, pnts, labels = TISec.create_marking()
                                 display.DisplayShape(prism, update=True)
                                 self.display_lines(lines, pnts, labels)
-                                display.View_Top()
+                                display.View_Bottom()
                                 display.FitAll()
 
                         elif(index_template==2):

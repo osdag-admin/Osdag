@@ -70,8 +70,8 @@ class cross_isection(object):
         v_points = [numpy.array([-uvoffset,-uvoffset,self.H/2]), numpy.array([uvoffset,uvoffset,self.H/2])]
         line.append(makeEdgesFromPoints(v_points))
 
-        start_pnt = [[-offset,0,self.H/2],[0,-offset,self.H/2],[uvoffset,-uvoffset,self.H/2],[uvoffset,uvoffset,self.H/2]]
-        end_pnt = [[offset,0,self.H/2],[0,offset,self.H/2],[-uvoffset,uvoffset,self.H/2],[-uvoffset,-uvoffset,self.H/2]]
+        start_pnt = [[-offset,0,self.H/2],[0,-offset+1,self.H/2],[uvoffset,-uvoffset,self.H/2],[uvoffset,uvoffset,self.H/2]]
+        end_pnt = [[offset,0,self.H/2],[0,offset-3,self.H/2],[-uvoffset,uvoffset,self.H/2],[-uvoffset,-uvoffset,self.H/2]]
 
         return line, [start_pnt, end_pnt], labels
 

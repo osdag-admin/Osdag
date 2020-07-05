@@ -80,8 +80,8 @@ class ISectionChannel(object):
         v_points = [numpy.array([-uvoffset+x,-uvoffset,self.H/2]), numpy.array([uvoffset+x,uvoffset,self.H/2])]
         line.append(makeEdgesFromPoints(v_points))
 
-        start_pnt = [[-offset+x,0,self.H/2],[x,-offset,self.H/2],[uvoffset+x,-uvoffset,self.H/2],[uvoffset+x,uvoffset,self.H/2]]
-        end_pnt = [[offset+x,0,self.H/2],[x,offset,self.H/2],[-uvoffset+x,uvoffset,self.H/2],[-uvoffset+x,-uvoffset,self.H/2]]
+        start_pnt = [[-offset+x,0,self.H/2],[x,-offset+1,self.H/2],[uvoffset+x,-uvoffset,self.H/2],[uvoffset+x,uvoffset,self.H/2]]
+        end_pnt = [[offset+x,0,self.H/2],[x,offset-2,self.H/2],[-uvoffset+x,uvoffset,self.H/2],[-uvoffset+x,-uvoffset,self.H/2]]
 
         return line, [start_pnt, end_pnt], labels
 

@@ -77,8 +77,8 @@ class Box(object):
         v_points = [numpy.array([-uvoffset,-uvoffset,self.H/2]), numpy.array([uvoffset,uvoffset,self.H/2])]
         line.append(makeEdgesFromPoints(v_points))
 
-        pnt_start = [[-offset,0,self.H/2],[0,-offset,self.H/2],[uvoffset,-uvoffset,self.H/2],[uvoffset,uvoffset,self.H/2]]
-        pnt_end = [[offset,0,self.H/2],[0,offset,self.H/2],[-uvoffset,uvoffset,self.H/2],[-uvoffset,-uvoffset,self.H/2]]
+        pnt_start = [[-offset,0,self.H/2],[0,-offset+1,self.H/2],[uvoffset,-uvoffset,self.H/2],[uvoffset,uvoffset,self.H/2]]
+        pnt_end = [[offset,0,self.H/2],[0,offset-3,self.H/2],[-uvoffset,uvoffset,self.H/2],[-uvoffset,-uvoffset,self.H/2]]
 
         return line, [pnt_start, pnt_end], labels
 

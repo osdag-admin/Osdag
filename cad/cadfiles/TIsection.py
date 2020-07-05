@@ -84,8 +84,8 @@ class TISection(object):
         v_points = [numpy.array([-uvoffset,-uvoffset,self.length/2]), numpy.array([uvoffset,uvoffset,self.length/2])]
         line.append(makeEdgesFromPoints(v_points))
 
-        start_pnt = [[-offset,0,self.length/2],[0,-offset,self.length/2],[uvoffset,-uvoffset,self.length/2],[uvoffset,uvoffset,self.length/2]]
-        end_pnt = [[offset,0,self.length/2],[0,offset,self.length/2],[-uvoffset,uvoffset,self.length/2],[-uvoffset,-uvoffset,self.length/2]]
+        start_pnt = [[-offset,0,self.length/2],[0,-offset+3,self.length/2],[uvoffset,-uvoffset,self.length/2],[uvoffset,uvoffset,self.length/2]]
+        end_pnt = [[offset,0,self.length/2],[0,offset-2,self.length/2],[-uvoffset,uvoffset,self.length/2],[-uvoffset,-uvoffset,self.length/2]]
 
         return line, [start_pnt, end_pnt], labels
 
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     lines, pnts, labels = TISec.create_marking()
     display.DisplayShape(prism, update=True)
     display_lines(lines, pnts, labels)
-    display.View_Top()
+    display.View_Bottom()
     display.FitAll()
     display.DisableAntiAliasing()
     start_display()

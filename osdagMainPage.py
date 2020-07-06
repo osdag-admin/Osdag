@@ -240,7 +240,6 @@ class OsdagMainWindow(QMainWindow):
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
         height = resolution.height()
-        self.resize(width*(0.85),height*(0.75))
         self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.switch.toggled.connect(self.change_theme)
@@ -399,6 +398,7 @@ class OsdagMainWindow(QMainWindow):
 
             else:
                 raise ValueError
+        self.resize(width * (0.85), height * (0.75))
         self.center()
         self.show()
 

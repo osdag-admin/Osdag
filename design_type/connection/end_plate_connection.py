@@ -635,7 +635,7 @@ class EndPlateConnection(ShearConnection):
                                        int(self.bolt.bolt_diameter_provided),  # 1-Bolt Diameter
                                        self.bolt.bolt_grade_provided,  # 2-Bolt Grade
                                        int(self.plate.thickness_provided),  # 3-Plate Thickness
-                                       int(web_plate_h),  # 4-Plate Height
+                                       int(self.plate.height),  # 4-Plate Height
                                        plate_width,  # 5-Plate Width
                                        round(self.bolt.bolt_capacity / 1000, 2),
                                        # 6-Bolt Shear Strength
@@ -679,7 +679,7 @@ class EndPlateConnection(ShearConnection):
                                    int(self.bolt.bolt_diameter_provided),  # 1-Bolt Diameter
                                    self.bolt.bolt_grade_provided,  # 2-Bolt Grade
                                    int(self.plate.thickness_provided),  # 3-Plate Thickness
-                                   int(web_plate_h),  # 4-Plate Height
+                                   int(self.plate.height),  # 4-Plate Height
                                    0.0,  # 5-Plate Width
                                    round(self.bolt.bolt_capacity / 1000, 2),  # 6-Bolt Shear Strength
                                    round(self.bolt.bolt_shear_capacity / 1000, 2),

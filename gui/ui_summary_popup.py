@@ -199,7 +199,7 @@ class Ui_Dialog1(object):
             logfile=open(fname_no_ext+'.log','r')
             logs=logfile.read()
 
-            if('! Osdag can\'t write on file' in logs):
+            if('! I can\'t write on file' in logs):
                 QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
             else:
                 print(logs)

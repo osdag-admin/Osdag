@@ -47,15 +47,16 @@ class CreateLatex(Document):
         client = str(reportsummary['Client'])
 
         does_design_exist = reportsummary['does_design_exist']
-        osdagheader = '/ResourceFiles/images/OsdagHeader.png'
+        osdagheader = '/ResourceFiles/images/OsdagHeaderTM.png'
         # Add document header
-        geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt"}
+        geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
         doc = Document(geometry_options=geometry_options,indent=False)
         doc.packages.append(Package('amsmath'))
         doc.packages.append(Package('graphicx'))
         doc.packages.append(Package('needspace'))
         doc.append(pyl.Command('fontsize', arguments= [8,12]))
         doc.append(pyl.Command('selectfont'))
+
 
         doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
         doc.add_color('PassColor','HTML', '4D6E28')
@@ -66,10 +67,10 @@ class CreateLatex(Document):
             with header.create(Tabularx('|l|p{4cm}|l|X|')) as table:
                 table.add_hline()
                 # MultiColumn(4)
-                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is'' else StandAloneGraphic(image_options="width=3.5cm,height=1cm",
+                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is'' else StandAloneGraphic(image_options="height=0.95cm",
                                                                                  filename=companylogo))),
                                                MultiColumn(2, align='|c|',
-                                                           data=['Created with',StandAloneGraphic(image_options="width=3.5cm,height=1cm",
+                                                           data=['Created with',StandAloneGraphic(image_options="width=4.0cm,height=1cm",
                                                                                  filename=rel_path + osdagheader)]),))
                 table.add_hline()
                 table.add_row(('Company Name', companyname, 'Project Title', projecttitle), color='OsdagGreen')

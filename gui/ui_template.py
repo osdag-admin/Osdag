@@ -34,7 +34,7 @@ import configparser
 import pickle
 import cairosvg
 from update import Update
-import pandas as pd
+# import pandas as pd
 
 from Common import *
 from utils.common.component import *

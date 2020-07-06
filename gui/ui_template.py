@@ -2136,6 +2136,7 @@ class Window(QMainWindow):
                             im.setFixedSize(value[1], value[2])
                             pmap = QPixmap(value[0])
                             im.setScaledContents(1)
+                            im.setStyleSheet("background-color: white;")
                             im.setPixmap(pmap)
                             image_layout.addWidget(im)
                             caption = QtWidgets.QLabel(image_widget)

@@ -399,6 +399,8 @@ class OsdagMainWindow(QMainWindow):
 
             else:
                 raise ValueError
+
+        self.resize(width*(0.85),height*(0.75))
         self.center()
         self.show()
 

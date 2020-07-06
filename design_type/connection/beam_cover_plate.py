@@ -640,6 +640,14 @@ class BeamCoverPlate(MomentConnection):
                self.flange_in_plate_tk if flag else '', False)
         out_list.append(t20)
 
+        # t21 = (KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing],
+        # True)
+        # out_list.append(t21)
+        #
+        # t21 = (
+        # KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
+        # out_list.append(t21)
+
                 # pass
             # else:
             #     t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, False)

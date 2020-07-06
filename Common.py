@@ -555,7 +555,7 @@ DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
 DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
 DISP_THROAT = 'Throat Thickness (mm)'
 
-DISP_WELD_STRENGTH = 'Weld Strength (kN/mm)'
+DISP_WELD_STRENGTH = 'Weld Strength (N/mm)'
 KEY_DISP_FY_20 = 'Yield strength , fy (MPa) (0-20mm)'
 KEY_DISP_FY_20_40 = 'Yield strength , fy (MPa) (20-40mm)'
 KEY_DISP_FY_40 = 'Yield strength , fy (MPa) (>40mm)'
@@ -1014,7 +1014,6 @@ KEY_DISP_AREA_CHECK ="Plate Area check (mm2)"
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
 
 KEY_FLANGE_PITCH = 'Flange_plate.pitch_provided'
-
 KEY_FLANGE_PLATE_GAUGE = "Flange_plate.gauge_provided "
 KEY_ENDDIST_FLANGE= 'Flange_plate.end_dist_provided '
 KEY_EDGEDIST_FLANGE= 'Flange_plate.edge_dist_provided'

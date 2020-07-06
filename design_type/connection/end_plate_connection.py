@@ -813,7 +813,7 @@ class EndPlateConnection(ShearConnection):
         if self.design_status is True:
             a = self.output
         elif self.design_status_bolt is False or self.design_status_plate_tk is False or self.design_status_plate is False:
-            self.failed_output_bolt.sort(key=lambda x: (x[3], x[0], x[1], x[2]))
+            self.failed_output_bolt.sort(key=lambda x: (x[0], x[1], x[2], x[3]))
             a = self.failed_output_bolt
         elif self.plate.design_status is False or self.weld.design_status is False:
             self.failed_output_plate.sort(key=lambda x: (x[3], x[0], x[1], x[2]))
@@ -1510,14 +1510,14 @@ class EndPlateConnection(ShearConnection):
 
             t1 = (DISP_MIN_PLATE_HEIGHT, min_plate_ht_req(self.supported_section.depth, self.min_plate_height),
                   self.plate.height,
-                  get_pass_fail(self.min_plate_height, self.plate.height, relation="lesser"))
+                  get_pass_fail(self.min_plate_height, self.plate.height, relation="leq"))
             self.report_check.append(t1)
             t1 = (DISP_MAX_PLATE_HEIGHT, max_plate_ht_req(self.connectivity, self.supported_section.depth,
                                                           self.supported_section.flange_thickness,
                                                           self.supported_section.root_radius,
                                                           self.supported_section.notch_ht,
                                                           self.max_plate_height), self.plate.height,
-                  get_pass_fail(self.max_plate_height, self.plate.height, relation="greater"))
+                  get_pass_fail(self.max_plate_height, self.plate.height, relation="geq"))
             self.report_check.append(t1)
 
             t1 = (DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness),

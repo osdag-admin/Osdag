@@ -34,7 +34,7 @@ import configparser
 import pickle
 import cairosvg
 from update_version_check import Update
-#import pandas as pd
+import pandas as pd
 
 
 from Common import *
@@ -1631,6 +1631,8 @@ class Window(QMainWindow):
             widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
             if op[2] == TYPE_COMBOBOX or op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 widget.setCurrentIndex(0)
+            if op[2] == TYPE_COMBOBOX and op[0] == KEY_MATERIAL:
+                widget.setCurrentIndex(1)
             elif op[2] == TYPE_TEXTBOX:
                 widget.setText('')
             else:

@@ -499,6 +499,7 @@ VALUES_PRIBM = connectdb("Beams")
 ############################
 # Display Keys (Input Dock, Output Dock, Design preference, Design report)
 ############################
+
 KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity (kN)'
 KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity (kN)'
 KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (kN)'
@@ -507,6 +508,7 @@ KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (kN)'
 KEY_DISP_BEARING_LENGTH = 'Bearing Length'
 KEY_DISP_ALLOW_SHEAR = 'Allowable Shear Capacity (kN)'
 DISP_LOWSHEAR = 'Limited to low shear capacity'
+
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'

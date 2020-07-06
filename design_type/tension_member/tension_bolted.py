@@ -507,7 +507,7 @@ class Tension_bolted(Member):
         # spacing.append(t99)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_1.png', 400, 278, ""])  # [image, width, height, caption]
+               ['./ResourceFiles/images/spacing_1.jpg', 400, 278, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
@@ -530,14 +530,14 @@ class Tension_bolted(Member):
 
         pattern = []
 
-        t00 = (None, "", TYPE_NOTE, "Representative image for spacing details - 3 x 3 pattern considered")
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
         pattern.append(t00)
 
         # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
         # spacing.append(t99)
 
-        t99 = (None, 'Spacing Details', TYPE_IMAGE,
-               ['./ResourceFiles/images/L.png', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+        t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,
+               ['./ResourceFiles/images/L.jpg', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         pattern.append(t99)
 
         return pattern

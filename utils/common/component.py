@@ -331,7 +331,7 @@ class Weld:
         weld_strength = round(f_wd * self.throat_tk, 2)
         self.strength = weld_strength
 
-    def get_weld_strength_lj(self, connecting_fu, weld_fabrication, t_weld, weld_angle, lenght):
+    def get_weld_strength_lj(self, connecting_fu, weld_fabrication, t_weld, weld_angle, length):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         self.throat_tk = \
             round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
@@ -694,7 +694,7 @@ class Plate(Material):
                     beta_lj = 0.75
                 else:
                     beta_lj = beta_lj
-                bolt_capacity_red = round(beta_lj, 2) * bolt_capacity
+                bolt_capacity_red = round(beta_lj, 3) * bolt_capacity
             else:
                 bolt_capacity_red = bolt_capacity
         else:
@@ -765,6 +765,15 @@ class Plate(Material):
 
         if bolts_one_line < min_bolts_one_line:
             self.design_status = False
+            self.bolt_line = min_bolt_line
+            self.bolts_one_line = min_bolts_one_line
+            self.bolts_required = bolt_line * bolts_one_line
+            self.pitch_provided = min_gauge
+            self.gauge_provided = min_gauge
+            self.edge_dist_provided = min_edge_dist
+            self.end_dist_provided = min_edge_dist
+            self.length = gap + self.edge_dist_provided * 2 + self.gauge_provided * (self.bolt_line - 1)
+            self.height = self.get_web_plate_h_req(self.bolts_one_line, self.gauge_provided , self.edge_dist_provided)
             self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line < min_bolt_line:
             self.design_status = False

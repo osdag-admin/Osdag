@@ -1433,7 +1433,7 @@ def flange_weld_stress(F_f,l_eff,F_ws):
 
 def tension_yield_prov(l,t, f_y, gamma, T_dg,multiple =1):
     """
-    Calculate tension yieldung capacity of provided plate under axial tension
+    Calculate tension yielding capacity of provided plate under axial tension
     Args:
         l: Height of  provided plate in mm (float)
         t: Thickness of  provided plate in mm (float)
@@ -2533,14 +2533,14 @@ def shear_capacity_prov(V_dy, V_dn, V_db = 0.0):
         V_dy = str(V_dy)
         V_dn = str(V_dn)
         V_db = str(V_db)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn},V_{db})\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{dn},V_{db})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min('+V_dy+','+V_dn+','+V_db+r')\\'))
 
     elif V_db == 0.0 and V_dn == 0.0:
         V_d = V_dy
         V_d = str(V_d)
         V_dy = str(V_dy)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= V_{dy}\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= S_c\\'))
         # shear_capacity_eqn.append(NoEscape(r'&=' + V_dy + r'\\'))
 
     elif V_db == 0.0 and V_dn != 0.0:
@@ -2548,14 +2548,14 @@ def shear_capacity_prov(V_dy, V_dn, V_db = 0.0):
         V_d = str(V_d)
         V_dy = str(V_dy)
         V_dn = str(V_dn)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn})\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{dn})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_dn + r')\\'))
     elif V_db != 0.0 and V_dn == 0.0:
         V_d = min(V_dy, V_db)
         V_d = str(V_d)
         V_dy = str(V_dy)
         V_db = str(V_db)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{db})\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{db})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_db + r')\\'))
 
     shear_capacity_eqn.append(NoEscape(r'&='+V_d + r'\\'))
@@ -2656,7 +2656,7 @@ def member_yield_prov(Ag, fy, gamma_m0, member_yield,multiple = 1):
     multiple = str(multiple)
     member_yield = str(member_yield)
     member_yield_eqn = Math(inline=True)
-    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg}~or~A_c&= \frac{'+ multiple + r' * A_g ~ f_y}{\gamma_{m0}}\\'))
+    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg}~or~A_c&= \frac{'+ multiple + r' * A_g * f_y}{\gamma_{m0}}\\'))
     member_yield_eqn.append(NoEscape(r'&= \frac{'+ multiple + '*' + Ag + '*' + fy + '}{'+ gamma_m0 + r'}\\'))
     member_yield_eqn.append(NoEscape(r'&= ' + member_yield + r'\\'))
     member_yield_eqn.append(NoEscape(r'[Ref.~IS~800&:2007,~Cl.~6.2]\end{aligned}'))
@@ -2780,13 +2780,13 @@ def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u 
 
     if stress == "shear":
         member_block_eqn.append(NoEscape(r'\begin{aligned}V_{dbl1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
-        member_block_eqn.append(NoEscape(r'V_{dbl2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
-        member_block_eqn.append(NoEscape(r'V_{dbl} &= min(V_{db1}, V_{db2})= ' + Tdb +  r'\\'))
+        member_block_eqn.append(NoEscape(r'V_{dbl2} &= \frac{0.9A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+        member_block_eqn.append(NoEscape(r'V_{db} &= min(V_{db1}, V_{db2})= ' + Tdb +  r'\\'))
         member_block_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.4]\end{aligned}'))
     else:
         member_block_eqn.append(NoEscape(r'\begin{aligned}T_{dbl1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
-        member_block_eqn.append(NoEscape(r'T_{dbl2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
-        member_block_eqn.append(NoEscape(r'T_{dbl} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\\'))
+        member_block_eqn.append(NoEscape(r'T_{dbl2} &= \frac{0.9A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+        member_block_eqn.append(NoEscape(r'T_{db} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\\'))
         member_block_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.4]\end{aligned}'))
 
     return member_block_eqn

@@ -1974,7 +1974,7 @@ class Window(QMainWindow):
                 self.commLogicObj = CommonDesignLogic(self.display, self.folder, main.module, main.mainmodule)
                 status = main.design_status
                 module_class = self.return_class(main.module)
-                self.commLogicObj.call_3DModel(status, module_class)
+                # self.commLogicObj.call_3DModel(status, module_class)
                 self.display_x = 90
                 self.display_y = 90
                 for chkbox in main.get_3d_components(main):

@@ -1,4 +1,15 @@
-# from gui.ui_summary_popup import Ui_Dialog
+"""
+Started on 1st January, 2020.
+
+@author: Darshan Vishwakarma
+
+Module: Tension Member Welded Design
+
+Reference:
+            1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
+            2) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 6)
+
+"""
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
 from utils.common.component import *
@@ -1244,7 +1255,7 @@ class Tension_welded(Member):
         elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
             self.plate.height = 2 * self.section_size_1.min_leg + max((4 * self.weld.size),30)
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
-            self.plate.height =  self.section_size_1.min_leg + max((4 * self.weld.size),30)
+            self.plate.height = self.section_size_1.min_leg + max((4 * self.weld.size),30)
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles","Angles"] and design_dictionary[KEY_LOCATION] == "Long Leg":
             self.plate.height = self.section_size_1.max_leg + max((4 * self.weld.size),30)
         else:
@@ -1343,6 +1354,8 @@ class Tension_welded(Member):
         self.plate_thick_weld = self.thickness_possible[-1]
 
         for self.plate.thickness_provided in self.thickness_possible:
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
                 self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
                 self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided

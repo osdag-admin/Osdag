@@ -1,4 +1,16 @@
-"created by anjali"
+
+"""
+Started on 1st April, 2020.
+
+@author: Kumari Anjali Jatav
+
+Module: Column-Column Cover Plate Welded Connection
+
+Reference:
+            1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
+            2) Design of Steel Structures by N. Subramanian
+
+"""
 
 from design_type.connection.moment_connection import MomentConnection
 from utils.common.component import *

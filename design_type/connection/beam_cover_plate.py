@@ -1,4 +1,16 @@
-"created by anjali"
+"""
+Started on 1st November, 2019.
+
+@author: Kumari Anjali Jatav
+
+Module: Beam-Beam Cover Plate Bolted Connection
+
+Reference:
+            1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
+            2) Design of Steel Structures by N. Subramanian
+            3) IS 1367 (Part3):2002 - TECHNICAL SUPPLY CONDITIONS FOR THREADED STEEL FASTENERS
+
+"""
 
 from design_type.connection.moment_connection import MomentConnection
 from utils.common.component import *
@@ -337,7 +349,15 @@ class BeamCoverPlate(MomentConnection):
     def flangespacing(self, flag):
 
         flangespacing = []
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
+        flangespacing.append(t00)
 
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/spacing_1.png', 400, 352, ""])  # [image, width, height, caption]
+        flangespacing.append(t99)
         t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
                self.flange_plate.pitch_provided )
         flangespacing.append(t21)
@@ -358,6 +378,15 @@ class BeamCoverPlate(MomentConnection):
     def webspacing(self, flag):
 
         webspacing = []
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
+        webspacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/spacing_1.png', 400, 352, ""])  # [image, width, height, caption]
+        webspacing.append(t99)
 
         t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag else '')
         webspacing.append(t8)
@@ -377,13 +406,19 @@ class BeamCoverPlate(MomentConnection):
     def flangecapacity(self, flag):
 
         flangecapacity = []
-        # t99 = (None, "Block Shear in Flange & Flange plate in Axial ", TYPE_SECTION,
-        #        './ResourceFiles/images/beam_failure_pattern_images.png')
-        # flangecapacity.append(t99)
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
+        flangecapacity.append(t00)
 
+        # t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
+        #        ['./ResourceFiles/images/L.png', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+        # flangecapacity.append(t99)
+        t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
+               ['./ResourceFiles/images/2L.jpg', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+        flangecapacity.append(t99)
         t30 =(KEY_FLANGE_TEN_CAPACITY,KEY_DISP_FLANGE_TEN_CAPACITY,TYPE_TEXTBOX,
                round(self.section.tension_capacity_flange/1000, 2) if flag else '')
         flangecapacity.append(t30)
+
         t30 = (KEY_FLANGE_PLATE_TEN_CAP, KEY_DISP_FLANGE_PLATE_TEN_CAP, TYPE_TEXTBOX,
                round(self.flange_plate.tension_capacity_flange_plate / 1000, 2) if flag else '')
         flangecapacity.append(t30)
@@ -400,16 +435,29 @@ class BeamCoverPlate(MomentConnection):
 
     def webcapacity(self, flag):
         webcapacity = []
-        # t99 = (None, "Block Shear in Web & web plate in Axial & Shear", TYPE_SECTION,
-        #        './ResourceFiles/images/beam_web_failure_images.png')
-        # webcapacity.append(t99)
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
+        webcapacity.append(t00)
+
+        t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/U.jpg', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+        webcapacity.append(t99)
 
         t30 = (KEY_WEB_TEN_CAPACITY, KEY_DISP_WEB_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_web / 1000, 2) if flag else '')
         webcapacity.append(t30)
+
+        # t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_SECTION,
+        #        ['./ResourceFiles/images/U.png', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+        # webcapacity.append(t99)
+
         t30 = (KEY_WEB_PLATE_CAPACITY, KEY_DISP_WEB_PLATE_CAPACITY, TYPE_TEXTBOX,
                round(self.web_plate.tension_capacity_web_plate/ 1000, 2) if flag else '')
         webcapacity.append(t30)
+
+        t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/L_shear.jpg', 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
+        webcapacity.append(t99)
+
         t30 = (KEY_WEBPLATE_SHEAR_CAPACITY_PLATE, KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, TYPE_TEXTBOX,
                round(self.web_plate.shear_capacity_web_plate / 1000, 2) if flag else '')
         webcapacity.append(t30)
@@ -631,6 +679,15 @@ class BeamCoverPlate(MomentConnection):
         t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
                self.flange_in_plate_tk if flag else '', False)
         out_list.append(t20)
+
+        # t21 = (
+        # KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing],
+        # True)
+        # out_list.append(t21)
+        #
+        # t21 = (
+        # KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
+        # out_list.append(t21)
 
                 # pass
             # else:

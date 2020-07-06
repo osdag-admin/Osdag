@@ -1354,9 +1354,10 @@ KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
 
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
+KEY_OUT_DISP_PATTERN = 'Pattern'
 KEY_OUT_PITCH = 'Bolt.Pitch'
 KEY_OUT_DISP_PITCH = 'Pitch (mm)'
-
+KEY_OUT_PATTERN = 'pattern'
 
 
 

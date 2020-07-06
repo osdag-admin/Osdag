@@ -1,4 +1,17 @@
-# from gui.ui_summary_popup import Ui_Dialog
+"""
+Started on 1st January, 2020.
+
+@author: Darshan Vishwakarma
+
+Module: Tension Member Bolted Design
+
+Reference:
+            1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
+            2) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 6)
+            3) IS 1367 (Part3):2002 - TECHNICAL SUPPLY CONDITIONS FOR THREADED STEEL FASTENERS
+
+"""
+
 from design_report.reportGenerator_latex import CreateLatex
 from utils.common.Section_Properties_Calculator import *
 from utils.common.component import *
@@ -9,9 +22,6 @@ from utils.common.load import Load
 from utils.common.Section_Properties_Calculator import *
 
 import logging
-
-
-from design_type.main import Main
 from design_type.member import Member
 
 
@@ -490,10 +500,15 @@ class Tension_bolted(Member):
 
         spacing = []
 
-        t99 = (None, 'Section1', TYPE_SECTION, './ResourceFiles/images/spacing.png')
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
+        spacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/spacing_1.jpg', 400, 278, ""])  # [image, width, height, caption]
         spacing.append(t99)
-
-
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
         spacing.append(t9)
@@ -510,6 +525,22 @@ class Tension_bolted(Member):
 
 
         return spacing
+
+    def memb_pattern(self, status):
+
+        pattern = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
+        pattern.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,
+               ['./ResourceFiles/images/L.jpg', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+        pattern.append(t99)
+
+        return pattern
 
     def output_values(self, flag):
         '''
@@ -537,6 +568,9 @@ class Tension_bolted(Member):
         t5 = (KEY_TENSION_BLOCKSHEARCAPACITY, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
               round((self.section_size_1.block_shear_capacity_axial/1000),2) if flag else '', True)
         out_list.append(t5)
+
+        t17 = (KEY_OUT_PATTERN, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.memb_pattern], True)
+        out_list.append(t17)
 
         t6 = (KEY_TENSION_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
               round((self.section_size_1.tension_capacity/1000),2) if flag else '', True)
@@ -700,10 +734,10 @@ class Tension_bolted(Member):
                             all_errors.append(error)
                         else:
                             flag2 = True
-            elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_LOCATION, KEY_TYP]:
-                val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    missing_fields_list.append(option[1])
+            # elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_LOCATION, KEY_TYP]:
+            #     val = option[3]
+            #     if design_dictionary[option[0]] == val[0]:
+            #         missing_fields_list.append(option[1])
 
             else:
                 pass
@@ -775,13 +809,6 @@ class Tension_bolted(Member):
         self.loc = design_dictionary[KEY_LOCATION]
         self.main_material = design_dictionary[KEY_MATERIAL]
         self.material = design_dictionary[KEY_SEC_MATERIAL]
-
-        # self.plate_thickness = [3,4,6,8,10,12,14,16,20,22,24,25,26,28,30,32,36,40,45,50,56,63,80]
-        # self.plate.thickness = design_dictionary[KEY_PLATETHK]
-        # print(self.sizelist)
-        # self.plate.thickness = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
-        #                        material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
-        #                        gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
         self.length = float(design_dictionary[KEY_LENGTH])
         # print(self.bolt)
@@ -1630,6 +1657,8 @@ class Tension_bolted(Member):
 
 
         for self.plate.thickness_provided in self.thickness_possible:
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
                 self.plate.tension_yielding(length = self.section_size_1.depth, thickness = self.plate.thickness_provided, fy = self.plate.fy)
                 self.net_area = (self.section_size_1.depth * self.plate.thickness_provided) - (

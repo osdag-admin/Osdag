@@ -96,7 +96,7 @@ class Ui_OsdagSectionModeller(object):
                 "color:#ffffff;\n"
                 "}")
                 self.label_14.setAlignment(QtCore.Qt.AlignCenter)
-                self.label_14.setObjectName("label_14")                
+                self.label_14.setObjectName("label_14")
                 self.verticalLayout_52.addWidget(self.label_14)
                 spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
                 self.verticalLayout_52.addItem(spacerItem1)
@@ -459,7 +459,7 @@ class Ui_OsdagSectionModeller(object):
                 self.exportBtn.clicked.connect(self.export_to_pdf)
                 self.saveBtn.clicked.connect(self.save_to_osm)
                 self.importBtn.clicked.connect(self.import_to_modeller)
-        
+
         def set_validations(self):
                 '''
                 Mehtod to set Validations for Section Properties and Section Designation
@@ -516,7 +516,7 @@ class Ui_OsdagSectionModeller(object):
                 self.ESM_text2.clear()
                 self.PSM_text1.clear()
                 self.PSM_text2.clear()
-        
+
         def disable_usability(self,toggle):
                 '''
                 Method to Disable/Enable Section Properties and Save and Export Buttons
@@ -524,7 +524,7 @@ class Ui_OsdagSectionModeller(object):
                 self.section_properties.setDisabled(toggle)
                 self.saveBtn.setDisabled(toggle)
                 self.exportBtn.setDisabled(toggle)
-        
+
         def template_change(self):
                 '''
                 Method to handle Section Template change
@@ -535,17 +535,17 @@ class Ui_OsdagSectionModeller(object):
                 self.clear_properties()
                 display.EraseAll()
                 self.disable_usability(True)
-        
+
         def type_change(self):
                 '''
-                Method to handle Section Type change 
+                Method to handle Section Type change
                 and change Section Template Combobox accordingly
                 '''
                 index_type=self.section_type_combobox.currentIndex()
                 self.section_designation_lineEdit.clear()
                 self.clear_properties()
                 display.EraseAll()
-                self.disable_usability(True)                
+                self.disable_usability(True)
                 templates={
                         0:[],
                         1:['Side by Side'],
@@ -589,7 +589,7 @@ class Ui_OsdagSectionModeller(object):
                         self.section_template_combobox.setItemData(1, "<img src='./ResourceFiles/images/SectionModeller/Main/5.1.png'>",QtCore.Qt.ToolTipRole)
                 ##########################################################################################################
                 self.section_template_combobox.blockSignals(False)
-        
+
         def open_section_parameters(self):
                 '''
                 Method to handle Enter/Edit Parameters button
@@ -619,7 +619,7 @@ class Ui_OsdagSectionModeller(object):
                                         exec('self.SectionParameters.'+child+'.setCurrentText('+repr(self.Parameters[child][1])+')')
                                 else:
                                         exec('self.SectionParameters.'+child+'.setText('+repr(self.Parameters[child][1])+')')
-                
+
                 #############################################################################################################
                 if(index_type!=0 and index_template!=0):
                         self.SectionParameters.exec()
@@ -630,8 +630,7 @@ class Ui_OsdagSectionModeller(object):
                         self.disable_usability(True)
                 else:
                         self.disable_usability(False)
-                        self.update_section_properties(index_type,index_template)
-                        
+                        self.update_section_properties(index_type,index_template)                        
         
         def display_lines(self, lines, points, labels):
                 for l,p1,p2,n in zip(lines,points[0],points[1], labels):
@@ -646,7 +645,7 @@ class Ui_OsdagSectionModeller(object):
                 origin = numpy.array([0.,0.,0.])
                 uDir = numpy.array([1.,0.,0.])
                 shaftDir = wDir = numpy.array([0.,0.,1.])
-                if(index_type==1):                        
+                if(index_type==1):
                         ISecPlate = IsectionCoverPlate(*parameters)
                         ISecPlate.place(origin, uDir, shaftDir)
                         prism, prisms = ISecPlate.create_model()
@@ -690,6 +689,7 @@ class Ui_OsdagSectionModeller(object):
                                 prism, prisms = star_angle.create_model()
                                 lines, pnts, labels = star_angle.create_marking()
                                 display.DisplayShape(prism, update=True)
+
                                 for p in prisms:
                                         display.DisplayColoredShape(p, color='BLUE', update=True)
                                 self.display_lines(lines, pnts, labels)
@@ -729,12 +729,14 @@ class Ui_OsdagSectionModeller(object):
                                 prism, prisms = star_angle_opposite.create_model()
                                 lines, pnts, labels = star_angle_opposite.create_marking()
                                 display.DisplayShape(prism, update=True)
+
                                 for p in prisms:
                                         display.DisplayColoredShape(p, color='BLUE', update=True)
                                 self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
                         
+
                         elif(index_template==5):
                                 l = 40
                                 l1 = 50
@@ -751,12 +753,14 @@ class Ui_OsdagSectionModeller(object):
                                 prism, prisms = box_angle.create_model()
                                 lines, pnts, labels = box_angle.create_marking()
                                 display.DisplayShape(prism, update=True)
+
                                 for p in prisms:
                                         display.DisplayColoredShape(p, color='BLUE', update=True)
                                 self.display_lines(lines, pnts, labels)
                                 display.View_Top()
                                 display.FitAll()
                                 
+
                 elif(index_type==4):
                         if(index_template==1):
                                 B = 40
@@ -832,7 +836,7 @@ class Ui_OsdagSectionModeller(object):
                         display.View_Top()
                         display.FitAll()
                 display.ExportToImage("./ResourceFiles/images/3DSectionfromSectionModeller.png")
-        
+
         def update_section_properties(self,index_type,index_template):
                 '''
                 Method to fill output parameters to Section Properties
@@ -883,8 +887,8 @@ class Ui_OsdagSectionModeller(object):
                         )
                         self.Area_text.setText(str(round(Ai,4)))
                         parameters=[D,B,T,t,s,l,ti,50]
-                                        
-                        
+
+
                 elif(index_type==2):                                                      # Channel Section
                         cursor = conn.execute("SELECT D,B,Area,T,tw FROM Channels where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         D,B,A,T,t=map(float,cursor.fetchall()[0])
@@ -929,7 +933,7 @@ class Ui_OsdagSectionModeller(object):
                                         (4*B*T*(Yleft-(B/2)))+
                                         (4*(l/2)*tc*(Yleft-(l/4)))
                                 )
-                                
+
                         elif(index_template==2):                                            # Back to Back
                                 Izz=(
                                         (((l*(tc**3))/12)+(l*tc*((Ybottom-(tc/2))**2)))+
@@ -951,7 +955,7 @@ class Ui_OsdagSectionModeller(object):
                                         (4*B*T*(Yleft-(B/2)))+
                                         (2*Dc*t*(Yleft-B+(t/2)))
                                 )
-                        
+
                         parameters=[D,B,T,t,s,l,tc,50]
                         Rzz=math.sqrt(Izz/Ac)
                         Ryy=math.sqrt(Iyy/Ac)
@@ -968,12 +972,12 @@ class Ui_OsdagSectionModeller(object):
                                 b/=10
                                 t/=10
                                 l=2*a
-                                Da=a-t                                
+                                Da=a-t
                                 Aa=(4*A)+(l*ta)
                                 Yleft=Yright=((2*b)+ta)/2
                                 Ytop=Ybottom=l/2
                                 Izz=(
-                                (((ta*((l/2)**3))/12)+((l/2)*ta*((Ybottom-(l/4))**2)))+  
+                                (((ta*((l/2)**3))/12)+((l/2)*ta*((Ybottom-(l/4))**2)))+
                                 (2*(((t*(Da**3))/12)+(Da*t*((Ybottom-(Da/2))**2))))+
                                 (2*(((b*(t**3))/12)+(b*t*((Ybottom-(t/2)-Da)**2))))+
                                 (2*(((b*(t**3))/12)+(b*t*((Ytop-(t/2)-Da)**2))))+
@@ -1003,7 +1007,7 @@ class Ui_OsdagSectionModeller(object):
                                         (4*Da*t*(Yleft-b+(t/2)))
                                 )
                                 parameters=[a,b,t,l,ta,50]
-                                
+
                         elif(index_template==2):                                                   #Star Configuration 2 Angles
                                 cursor = conn.execute("SELECT a,b,t,Area FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                                 a,b,t,A = map(float,cursor.fetchall()[0])
@@ -1031,7 +1035,7 @@ class Ui_OsdagSectionModeller(object):
                                         (((l*((ta/2)**3)/12)+(((ta/2)*l)*((Yright-(t/4)-b)**2))))+
                                         (((Da*(t**3)/12)+((Da*t)*((Yright+(t/2)-b)**2))))+
                                         (((t*(b**3)/12)+((b*t)*((Yright-(b/2))**2))))
-                                )                                
+                                )
                                 Zpz=(
                                         (2*Da*t*(Ybottom-(Da/2)))+
                                         (2*b*t*(Ybottom-Da-(t/2)))+
@@ -1043,7 +1047,7 @@ class Ui_OsdagSectionModeller(object):
                                         (2*Da*t*(Yleft-b+(t/2)))
                                 )
                                 parameters=[a,b,t,l,ta,50]
-                        
+
                         elif(index_template==3):                                                        # 2 Angles on Same side
                                 cursor = conn.execute("SELECT a,b,t,Area,Iy,Cy FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                                 a,b,t,A,Iy,Cy = map(float,cursor.fetchall()[0])
@@ -1062,7 +1066,7 @@ class Ui_OsdagSectionModeller(object):
                                 )/((l*ta)+(2*b*t)+(2*Da*t)))
                                 Yright=(2*b)+ta-Yleft
                                 Izz=(
-                                        (((ta*((l/2)**3)/12)+(((l/2)*ta)*((Ybottom-(l/4))**2))))+  
+                                        (((ta*((l/2)**3)/12)+(((l/2)*ta)*((Ybottom-(l/4))**2))))+
                                         (((t*(Da**3)/12)+((Da*t)*((Ybottom+(Da/2))**2))))+
                                         (((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-Da)**2))))+
                                         (((b*(t**3)/12)+((b*t)*((Ybottom-(t/2)-Da)**2))))+
@@ -1080,7 +1084,7 @@ class Ui_OsdagSectionModeller(object):
                                         (2*b*t*(Yright-(b/2)))+
                                         (2*Da*t*(Yright-b+(t/2)))
                                 )
-                                parameters=[a,b,t,l,ta,50]              
+                                parameters=[a,b,t,l,ta,50]
                         elif(index_template==4):                                                        # 2 Angles on opposite side
                                 cursor = conn.execute("SELECT a,b,t,Area,Iz,Cz FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                                 a,b,t,A,Iz,Cz = map(float,cursor.fetchall()[0])
@@ -1120,7 +1124,7 @@ class Ui_OsdagSectionModeller(object):
                                 parameters=[a,b,t,l,ta,50]
                         elif(index_template==5):                                                        # Box Angle
                                 cursor = conn.execute("SELECT a,b,t,Area FROM Angles where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                                a,b,t,A = map(float,cursor.fetchall()[0])  
+                                a,b,t,A = map(float,cursor.fetchall()[0])
                                 s=float(self.SectionParameters.parameterText_3.text())/10
                                 sa=float(self.SectionParameters.parameterText_4.text())/10
                                 ta=float(self.SectionParameters.parameterText_7.text())/10
@@ -1132,14 +1136,14 @@ class Ui_OsdagSectionModeller(object):
                                 Da=a-t
                                 Aa=(4*A)+(l*ta)+(la*ta)
                                 Ytop=Ybottom=((2*a)+(2*ta))/2
-                                Yleft=Yright=l/2                                
+                                Yleft=Yright=l/2
                                 Izz=(
-                                        ((l*(ta**3)/12)+(l*t)*((Ybottom-(ta/2))**2))+  
+                                        ((l*(ta**3)/12)+(l*t)*((Ybottom-(ta/2))**2))+
                                         (2*((b*(t**3)/12)+(b*t)*((Ybottom-(t/2)-ta)**2)))+
                                         (2*((t*(Da**3)/12)+(Da*t)*((Ybottom-(Da/2)-ta-t)**2)))+
                                         (2*((t*(Da**3)/12)+(Da*t)*((Ytop-(Da/2)-ta-t)**2)))+
                                         (2*((b*(t**3)/12)+(b*t)*((Ytop-(t/2)-ta)**2)))+
-                                        ((l*(ta**3)/12)+(l*ta)*((Ytop-(ta/2))**2))+  
+                                        ((l*(ta**3)/12)+(l*ta)*((Ytop-(ta/2))**2))+
                                         (2*((ta*(((la/2)**3)/12))+(((la/2)*ta)*((Ybottom-(l/4))**2))))+
                                         (2*((ta*(((la/2)**3)/12))+(((la/2)*ta)*((Ybottom-(l/4))**2))))
 
@@ -1148,10 +1152,10 @@ class Ui_OsdagSectionModeller(object):
                                         ((la*(ta**3)/12)+(la*ta)*((Yleft-(ta/2))**2))+
                                         (2*((Da*(t**3)/12)+(Da*t)*((Yleft-(t/2)-ta)**2)))+
                                         (2*((t*(b**3)/12)+(b*t)*((Yleft-(b/2)-ta)**2)))+
-                                        (2*((ta*((l/2)**3)/12)+((l/2)*ta)*((Yleft-(l/4))**2)))+  
+                                        (2*((ta*((l/2)**3)/12)+((l/2)*ta)*((Yleft-(l/4))**2)))+
                                         (2*((t*(b**3)/12)+(b*t)*((Yright-(b/2)-ta)**2)))+
                                         (2*((Da*(t**3)/12)+(Da*t)*((Yright-(t/2)-ta)**2)))+
-                                        (2*((ta*((l/2)**3)/12)+((l/2)*ta)*((Yright-(l/4))**2)))+ 
+                                        (2*((ta*((l/2)**3)/12)+((l/2)*ta)*((Yright-(l/4))**2)))+
                                         ((la*(ta**3)/12)+(la*ta)*((Yright-(ta/2))**2))
                                 )
                                 Zpz=(
@@ -1172,7 +1176,7 @@ class Ui_OsdagSectionModeller(object):
                         Zzz=(Aa/2)*(Ytop+Ybottom)
                         Zyy=(Aa/2)*(Yleft+Yright)
                         self.Area_text.setText(str(round(Aa,4)))
-                                
+
                 elif(index_type==4):                                                    # Built-up Section
                         if(index_template==1):                                                # I-Section with stiffening
                                 cursor = conn.execute("SELECT D,B,T,tw,Area FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
@@ -1182,7 +1186,7 @@ class Ui_OsdagSectionModeller(object):
                                 B/=10
                                 T/=10
                                 t/=10
-                                Db=D-(2*T)                                
+                                Db=D-(2*T)
                                 Ab=A+(2*P*Q)
                                 Ybottom=(
                                         (B*T*T/2)+
@@ -1196,7 +1200,7 @@ class Ui_OsdagSectionModeller(object):
                                         (t*Db*((Db/2)+T))+
                                         (B*T*(Db+T+(T/2)))+
                                         (2*T*P*(T+Db+T-(P/2)))
-                                ) 
+                                )
                                 Ytop=D-Ybottom
                                 Izz=(
                                         ((B*(T**3)/12)+(B*T)*((Ybottom-(T/2))**2))+
@@ -1258,7 +1262,7 @@ class Ui_OsdagSectionModeller(object):
                                         ((Db*((t/2)**3)/12)+((t/2)*Db)*((Yleft-(t/4)-T-d)**2))+
                                         ((Db*((t/2)**3)/12)+((t/2)*Db)*((Yright-(t/4)-T-d)**2))+
                                         ((Db*(T**3)/12)+(Db*T)*((Yright-(T/2))**2))
-                                )                        
+                                )
                                 Zpz=(
                                         (2*B*T*(Ybottom-(T/2)))+
                                         (4*T*(Db/2)*(Ybottom-T-(Db/4)))+
@@ -1308,7 +1312,7 @@ class Ui_OsdagSectionModeller(object):
                         Zzz=(Ab/2)*(Ytop+Ybottom)
                         Zyy=(Ab/2)*(Yleft+Yright)
                         self.Area_text.setText(str(round(Ab,4)))
-                                
+
                 elif(index_type==5):                                            #Compound Section
                         cursor = conn.execute("SELECT D,B,T,tw,Area FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                         D,B,T,t,Ai=map(float,cursor.fetchall()[0])
@@ -1359,7 +1363,7 @@ class Ui_OsdagSectionModeller(object):
                         Ryy=math.sqrt(Iyy/A)
                         Zyy=A*(Yleft+Yright)/2
                         Zzz=A*(Ytop+Ybottom)/2
-                        
+
                         Zpz=(
                                 (B*T*(Ybottom-(T/2)))+
                                 (t*(D/2)*(Ybottom-T-(D/4)))+
@@ -1377,7 +1381,7 @@ class Ui_OsdagSectionModeller(object):
                         parameters=[D, B, T, t, Tc, tc, d, b, 50, s]
 
                 Cy=Ybottom
-                Cz=Yleft    
+                Cz=Yleft
                 self.PSM_text1.setText(str(round(Zpz,4)))
                 self.PSM_text2.setText(str(round(Zpy,4)))
                 self.C_text1.setText(str(round(Cz,4)))
@@ -1391,7 +1395,7 @@ class Ui_OsdagSectionModeller(object):
                 display.EraseAll()
                 self.create_cad_model(index_type,index_template,parameters)
 
-        
+
         def init_display(self):
                 '''
                 Method to initialize the OCC Display
@@ -1410,7 +1414,7 @@ class Ui_OsdagSectionModeller(object):
                 layout.setContentsMargins(0, 0, 0, 0)
                 self.OCCFrame.setLayout(layout)
                 return display
-        
+
         def get_section_properties(self):
                 '''
                 Method to get the values and names of the Section properties,
@@ -1419,15 +1423,15 @@ class Ui_OsdagSectionModeller(object):
                 '''
                 symbols=['A','Izz','Iyy','Rzz','Ryy','Cz','Cy','Zpz','Zpy','Zzz','Zyy']
                 Properties={}
-                
+
                 for child,symbol in zip(self.section_properties.findChildren(QtWidgets.QLineEdit),symbols):
-                        Properties[symbol]=child.text()                
-                return(Properties) 
-        
+                        Properties[symbol]=child.text()
+                return(Properties)
+
         def import_to_modeller(self):
                 '''
-                Method to Handle Import button click. 
-                This file helps select .osm files in the system and import them directly into the 
+                Method to Handle Import button click.
+                This file helps select .osm files in the system and import them directly into the
                 modeller and automatically creates run all processes from the .osm file.
                 '''
                 fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Open Section Design",None, "InputFiles(*.osm)")
@@ -1459,7 +1463,7 @@ class Ui_OsdagSectionModeller(object):
                         self.SectionParameters.parameterText_1.addItems(connectdb('Angles'))
 
                 for child in self.Parameters:
-                        self.SectionParameters.textBoxVisible[child]=self.Parameters[child]                        
+                        self.SectionParameters.textBoxVisible[child]=self.Parameters[child]
                         if(child=='parameterText_1' or child=='parameterText_2'):
                                 exec('self.SectionParameters.'+child+'.setCurrentText('+repr(self.Parameters[child][1])+')')
                         else:
@@ -1471,7 +1475,7 @@ class Ui_OsdagSectionModeller(object):
 
         def save_to_osm(self):
                 '''
-                Method to save Section Modeller Design data to .osm file 
+                Method to save Section Modeller Design data to .osm file
                 of desired location.
                 '''
                 designation=str(self.section_designation_lineEdit.text())
@@ -1493,7 +1497,7 @@ class Ui_OsdagSectionModeller(object):
                                         os.remove(folder+'/'+designation+'.osm')
                                 else:
                                         return
-                        
+
                         parameters={}
                         parameters['Section_Type']=self.section_type_combobox.currentIndex()
                         parameters['Section_Template']=self.section_template_combobox.currentIndex()
@@ -1507,7 +1511,6 @@ class Ui_OsdagSectionModeller(object):
                                                                                           
 
 
-        
         def export_to_pdf(self):
                 '''
                 Method to send information from section modeller into Latex creator
@@ -1535,7 +1538,7 @@ class Ui_OsdagSectionModeller(object):
                         latex=CreateLatex()
                         latex.save_latex(input_summary,input_summary['filename'],rel_path,Disp_3D_image)
                         if os.path.isfile(str(input_summary['filename']+'.pdf')) and not os.path.isfile(input_summary['filename']+'.log'):
-                                QtWidgets.QMessageBox.information(QtWidgets.QMessageBox(), 'Information', 'Design report saved!')            
+                                QtWidgets.QMessageBox.information(QtWidgets.QMessageBox(), 'Information', 'Design report saved!')
                         else:
                                 logfile=open(input_summary['filename']+'.log','r')
                                 logs=logfile.read()
@@ -1544,7 +1547,7 @@ class Ui_OsdagSectionModeller(object):
                                 else:
                                         print(logs)
                                         QtWidgets.QMessageBox.critical(QtWidgets.QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
-                                logfile.close()            
+                                logfile.close()
                 except KeyError:
                         pass
 

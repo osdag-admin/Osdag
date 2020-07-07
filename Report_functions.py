@@ -298,7 +298,7 @@ def bolt_bearing_prov(k_b,d,conn_plates_t_fu_fy,gamma_mb,bolt_bearing_capacity):
         if t_fu <= t_fu_prev:
             t = i[0]
             f_u = i[1]
-    k_b = str(k_b)
+    k_b = str(round(k_b,2))
     d = str(d)
     t = str(t)
     f_u= str(f_u)
@@ -977,6 +977,30 @@ def moment_acting_on_end_plate_flush(M_ep,t_b,e,tb_2):
     moment_acting_on_end_plate.append(NoEscape(r'&=' +M_ep + '\end{aligned}'))
     return moment_acting_on_end_plate
 
+def ht_of_stiff(t_s):
+    t_s = str(t_s)
+    stiff_ht = Math(inline=True)
+    stiff_ht.append(NoEscape(r'\begin{aligned}  h_{s}&= 14 * ts \\'))
+    stiff_ht.append(NoEscape(r'&=' + t_s + '\end{aligned}'))
+    return stiff_ht
+
+def ht_of_stiff1(t_s):
+    t_s = str(t_s)
+    stiff_ht = Math(inline=True)
+    stiff_ht.append(NoEscape(r'\begin{aligned}  h_{s}&= 14 * ts \\'))
+    stiff_ht.append(NoEscape(r'& if~<~100~mm\\'))
+    stiff_ht.append(NoEscape(r'&=' + t_s + '\end{aligned}'))
+    return stiff_ht
+
+def wt_of_stiff(w_s,e):
+    w_s = str(w_s)
+    e = str(e)
+    stiff_wt = Math(inline=True)
+    stiff_wt.append(NoEscape(r'\begin{aligned}  w_{s}&= 2 * e \\'))
+    stiff_wt.append(NoEscape(r'&= 2 *' +e+ r'\\'))
+    stiff_wt.append(NoEscape(r'&=' + w_s + '\end{aligned}'))
+    return stiff_wt
+
 def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     """
     Calculate minimum length of fin plate
@@ -995,7 +1019,7 @@ def min_plate_length_req(min_pitch, min_end_dist,bolt_line,min_length):
     bolt_line = str(bolt_line)
     min_length = str(min_length)
     min_plate_length_eqn = Math(inline=True)
-    min_plate_length_eqn.append(NoEscape(r'\begin{aligned} &2*e_{min} + (n~c-1) * p_{min})\\'))
+    min_plate_length_eqn.append(NoEscape(r'\begin{aligned} &2*e_{min} + (n_c-1) * p_{min})\\'))
     min_plate_length_eqn.append(NoEscape(r'&=2*' + min_end_dist + '+(' + bolt_line + '-1) * ' + min_pitch + r'\\'))
     min_plate_length_eqn.append(NoEscape(r'&=' + min_length + '\end{aligned}'))
     return min_plate_length_eqn
@@ -1409,7 +1433,7 @@ def flange_weld_stress(F_f,l_eff,F_ws):
 
 def tension_yield_prov(l,t, f_y, gamma, T_dg,multiple =1):
     """
-    Calculate tension yieldung capacity of provided plate under axial tension
+    Calculate tension yielding capacity of provided plate under axial tension
     Args:
         l: Height of  provided plate in mm (float)
         t: Thickness of  provided plate in mm (float)
@@ -2448,44 +2472,6 @@ def shear_Rupture_prov_weld(h, t,fu,v_dn,gamma_m1,multiple =1):  #weld
     shear_rup_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~6.3]\end{aligned}'))
     return shear_rup_eqn
 
-def shear_capacity_prov(V_dy, V_dn, V_db=0.0):
-    """
-    Calculate shear capacity of member
-
-    Args:
-        V_dy: yielding capacity of plate
-        V_dn: rupture capacity of plate
-        V_db: block shear capacity of plate
-    Returns:
-         shear capacity of member
-    Note:
-              Reference:
-              IS 800:2007,  cl 6.1
-
-    """
-
-    shear_capacity_eqn = Math(inline=True)
-    if  V_db !=0.0:
-         V_d = min(V_dy,V_dn,V_db)
-         V_d = str(V_d)
-         V_dy = str(V_dy)
-         V_dn = str(V_dn)
-         V_db = str(V_db)
-         shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn},V_{db})\\'))
-         shear_capacity_eqn.append(NoEscape(r'&= min('+V_dy+','+V_dn+','+V_db+r')\\'))
-    else:
-         V_d = min(V_dy, V_dn)
-         V_d = str(V_d)
-         V_dy = str(V_dy)
-         V_dn = str(V_dn)
-         shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn})\\'))
-         shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_dn + r')\\'))
-
-    shear_capacity_eqn.append(NoEscape(r'&='+V_d + r'\\'))
-    shear_capacity_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.1]&\end{aligned}'))
-
-    return shear_capacity_eqn
-
 
 def shear_capacity_prov(V_dy, V_dn, V_db = 0.0):
     """
@@ -2509,14 +2495,15 @@ def shear_capacity_prov(V_dy, V_dn, V_db = 0.0):
         V_dy = str(V_dy)
         V_dn = str(V_dn)
         V_db = str(V_db)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn},V_{db})\\'))
+
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{dn},V_{db})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min('+V_dy+','+V_dn+','+V_db+r')\\'))
 
     elif V_db == 0.0 and V_dn == 0.0:
         V_d = V_dy
         V_d = str(V_d)
         V_dy = str(V_dy)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= V_{dy}\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= S_c\\'))
         # shear_capacity_eqn.append(NoEscape(r'&=' + V_dy + r'\\'))
 
     elif V_db == 0.0 and V_dn != 0.0:
@@ -2524,14 +2511,14 @@ def shear_capacity_prov(V_dy, V_dn, V_db = 0.0):
         V_d = str(V_d)
         V_dy = str(V_dy)
         V_dn = str(V_dn)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn})\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{dn})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_dn + r')\\'))
     elif V_db != 0.0 and V_dn == 0.0:
         V_d = min(V_dy, V_db)
         V_d = str(V_d)
         V_dy = str(V_dy)
         V_db = str(V_db)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{db})\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(S_c,V_{db})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_db + r')\\'))
 
     shear_capacity_eqn.append(NoEscape(r'&='+V_d + r'\\'))
@@ -2632,7 +2619,7 @@ def member_yield_prov(Ag, fy, gamma_m0, member_yield,multiple = 1):
     multiple = str(multiple)
     member_yield = str(member_yield)
     member_yield_eqn = Math(inline=True)
-    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg}~or~A_c&= \frac{'+ multiple + r' * A_g ~ f_y}{\gamma_{m0}}\\'))
+    member_yield_eqn.append(NoEscape(r'\begin{aligned}T_{dg}~or~A_c&= \frac{'+ multiple + r' * A_g * f_y}{\gamma_{m0}}\\'))
     member_yield_eqn.append(NoEscape(r'&= \frac{'+ multiple + '*' + Ag + '*' + fy + '}{'+ gamma_m0 + r'}\\'))
     member_yield_eqn.append(NoEscape(r'&= ' + member_yield + r'\\'))
     member_yield_eqn.append(NoEscape(r'[Ref.~IS~800&:2007,~Cl.~6.2]\end{aligned}'))
@@ -2756,13 +2743,13 @@ def blockshear_prov(Tdb,A_vg = None, A_vn = None, A_tg = None, A_tn = None, f_u 
 
     if stress == "shear":
         member_block_eqn.append(NoEscape(r'\begin{aligned}V_{dbl1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
-        member_block_eqn.append(NoEscape(r'V_{dbl2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
-        member_block_eqn.append(NoEscape(r'V_{dbl} &= min(V_{db1}, V_{db2})= ' + Tdb +  r'\\'))
+        member_block_eqn.append(NoEscape(r'V_{dbl2} &= \frac{0.9A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+        member_block_eqn.append(NoEscape(r'V_{db} &= min(V_{db1}, V_{db2})= ' + Tdb +  r'\\'))
         member_block_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.4]\end{aligned}'))
     else:
         member_block_eqn.append(NoEscape(r'\begin{aligned}T_{dbl1} &= \frac{A_{vg} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\'))
-        member_block_eqn.append(NoEscape(r'T_{dbl2} &= \frac{0.9*A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
-        member_block_eqn.append(NoEscape(r'T_{dbl} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\\'))
+        member_block_eqn.append(NoEscape(r'T_{dbl2} &= \frac{0.9A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\'))
+        member_block_eqn.append(NoEscape(r'T_{db} &= min(T_{db1}, T_{db2})= ' + Tdb + r'\\'))
         member_block_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.4]\end{aligned}'))
 
     return member_block_eqn
@@ -2945,11 +2932,14 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr,direction=None):
          d:Diameter of the bolt in mm (float)
          Tc:Bolt capacity  in KN (float)
          Tr: Reduced bolt capacity  in KN (float)
+         direction: n_r or None(string)
     Returns:
         Reduced bolt capacity  in KN (float)
     Note:
               Reference:
               IS 800:2007,  cl 10.3.3.1
+              If direction is n_r it will calculate long joint for no. of rows
+              else max of rows and column length will be considered
 
     """
     lc = (nc - 1) * p
@@ -2971,7 +2961,7 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr,direction=None):
         B =1
     else:
         B=B
-    B = str(round(B,2))
+    B = str(round(B,3))
     Bi = str(Bi)
     lc_str = str(lc)
     lr_str = str(lr)
@@ -4418,3 +4408,41 @@ def depth_req(e, g, row, sec =None):
 #
 #
 #     return max_end_edge_eqn
+#
+# def shear_capacity_prov(V_dy, V_dn, V_db=0.0):
+#     """
+#     Calculate shear capacity of member
+#
+#     Args:
+#         V_dy: yielding capacity of plate
+#         V_dn: rupture capacity of plate
+#         V_db: block shear capacity of plate
+#     Returns:
+#          shear capacity of member
+#     Note:
+#               Reference:
+#               IS 800:2007,  cl 6.1
+#
+#     """
+#
+#     shear_capacity_eqn = Math(inline=True)
+#     if  V_db !=0.0:
+#          V_d = min(V_dy,V_dn,V_db)
+#          V_d = str(V_d)
+#          V_dy = str(V_dy)
+#          V_dn = str(V_dn)
+#          V_db = str(V_db)
+#          shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn},V_{db})\\'))
+#          shear_capacity_eqn.append(NoEscape(r'&= min('+V_dy+','+V_dn+','+V_db+r')\\'))
+#     else:
+#          V_d = min(V_dy, V_dn)
+#          V_d = str(V_d)
+#          V_dy = str(V_dy)
+#          V_dn = str(V_dn)
+#          shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= min(V_{dy},V_{dn})\\'))
+#          shear_capacity_eqn.append(NoEscape(r'&= min(' + V_dy + ',' + V_dn + r')\\'))
+#
+#     shear_capacity_eqn.append(NoEscape(r'&='+V_d + r'\\'))
+#     shear_capacity_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.1]&\end{aligned}'))
+#
+#     return shear_capacity_eqn

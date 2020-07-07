@@ -20,6 +20,7 @@ class ColumnEndPlate(MomentConnection):
         super(ColumnEndPlate, self).__init__()
         self.design_status = False
 
+
     ###############################################
     # Design Preference Functions Start
     ###############################################
@@ -349,23 +350,55 @@ class ColumnEndPlate(MomentConnection):
 
         return detailing
 
-    def stiffener_details(self, flag):
-        stiff_details = []
+    def web_bolt_spacing(self, flag):
+        web_bolt_spacing = []
 
-        if 2*self.end_dist < 50 and self.h_s < 100:
-            pass
-        elif 2*self.end_dist >= 50 and self.h_s >= 100:
-            t1 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.t_s if flag else '', True)
-            stiff_details.append(t1)
-            t2 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
-            stiff_details.append(t2)
-            t3 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
-            stiff_details.append(t3)
-            t4 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
-            stiff_details.append(t4)
-            return stiff_details
-        else:
-            pass
+        t1 = (None, 'Web bolts detailing', TYPE_SECTION, self.image_web)
+        web_bolt_spacing.append(t1)
+        t2 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '', True)
+        web_bolt_spacing.append(t2)
+        t3 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.end_dist if flag else '', True)
+        web_bolt_spacing.append(t3)
+        t4 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
+        web_bolt_spacing.append(t4)
+        t5 = (KEY_PITCH_2_WEB1, KEY_DISP_PITCH_2_WEB1, TYPE_TEXTBOX, round(self.p_2_web,2) if flag else '', True)
+        web_bolt_spacing.append(t5)
+
+        return web_bolt_spacing
+
+    def flange_bolt_spacing(self, flag):
+        flange_bolt_spacing = []
+
+        t1 = (None, 'Web bolts detailing', TYPE_SECTION, self.image_flange)
+        flange_bolt_spacing.append(t1)
+        t2 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '', True)
+        flange_bolt_spacing.append(t2)
+        t3 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.end_dist if flag else '', True)
+        flange_bolt_spacing.append(t3)
+        t4 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf_output if flag else '', True)
+        flange_bolt_spacing.append(t4)
+        t5 = (KEY_PITCH_2_FLANGE1, KEY_DISP_PITCH_2_FLANGE1, TYPE_TEXTBOX, round(self.p_2_flange,2) if flag else '', True)
+        flange_bolt_spacing.append(t5)
+
+        return flange_bolt_spacing
+
+    # def stiffener_details(self, flag):
+    #     stiff_details = []
+    #
+    #     if 2*self.end_dist < 50 and self.h_s < 100:
+    #         pass
+    #     elif 2*self.end_dist >= 50 and self.h_s >= 100:
+    #         t1 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.t_s if flag else '', True)
+    #         stiff_details.append(t1)
+    #         t2 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
+    #         stiff_details.append(t2)
+    #         t3 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
+    #         stiff_details.append(t3)
+    #         t4 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
+    #         stiff_details.append(t4)
+    #         return stiff_details
+    #     else:
+    #         pass
 
     def output_values(self, flag):
         """
@@ -411,14 +444,20 @@ class ColumnEndPlate(MomentConnection):
         t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.end_dist if flag else '', True)
         out_list.append(t10)
 
-        t8 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
-        out_list.append(t8)
-
-        t9 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf_output if flag else '', True)
-        out_list.append(t9)
+        # t8 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
+        # out_list.append(t8)
+        #
+        # t9 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf_output if flag else '', True)
+        # out_list.append(t9)
 
         t11 = (KEY_OUT_NO_BOLTS, KEY_OUT_DISP_NO_BOLTS, TYPE_TEXTBOX, self.no_bolts if flag else '', True)
         out_list.append(t11)
+
+        t31 = (KEY_BOLT_WEB_SPACING, KEY_DISP_BOLT_WEB_SPACING, TYPE_OUT_BUTTON, ['Detailing', self.web_bolt_spacing], True)
+        out_list.append(t31)
+
+        t32 = (KEY_BOLT_FLANGE_SPACING, KEY_DISP_BOLT_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Detailing', self.flange_bolt_spacing], True)
+        out_list.append(t32)
 
         # t21 = (KEY_BOLT_DETAILS, KEY_DISP_BOLT_DETAILS, TYPE_OUT_BUTTON, ['Bolt detailing', self.detailing])
         # out_list.append(t21)
@@ -538,6 +577,7 @@ class ColumnEndPlate(MomentConnection):
                          edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
                          mu_f=design_dictionary[KEY_DP_BOLT_SLIP_FACTOR],
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        self.weld_size = 0.0
         # if self.design_status:
         #     self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
         #     status = self.design_status
@@ -794,8 +834,11 @@ class ColumnEndPlate(MomentConnection):
                 # elif self.n_bf > 1:
                 #     self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4
             else:
+                if self.n_bf == 1:
+                    self.no_bolts = self.n_bw * 2 + 4
+                else:
                 # if self.n_bf == 1:
-                self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4 + self.n_bf*4
+                    self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4 + self.n_bf*4
                 # elif self.n_bf > 1:
                 #     self.no_bolts = self.n_bw * 2 + (self.n_bf-1) * 4 + self.n_bf*4
             print("no of bolts: ", self.no_bolts)
@@ -1057,20 +1100,20 @@ class ColumnEndPlate(MomentConnection):
 
             elif ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) >= (2 * self.end_dist) and ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) < (2 * self.end_dist + self.pitch):
                 self.n_bf = 1
-                self.p_2_flange = (self.section.flange_width / 2 - self.section.web_thickness / 2 - self.end_dist)
+                self.p_2_flange = round((self.section.flange_width / 2 - self.section.web_thickness / 2 - self.end_dist),2)
 
             elif ((self.section.flange_width / 2) - (self.section.web_thickness / 2)) >= (2 * self.end_dist + self.pitch):
                 self.n_bf = int(math.floor((((self.section.flange_width / 2) - ((self.section.web_thickness / 2) + (2 * self.end_dist))) / self.pitch) + 1))
                 if self.n_bf % 2 == 0:
                     if self.n_bf == 2:
-                        self.p_2_flange = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist)
+                        self.p_2_flange = round((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist),2)
                     else:
-                        self.p_2_flange = (self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 2) * self.pitch)
+                        self.p_2_flange = round((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 2) * self.pitch),2)
                 else:
                     if self.n_bf == 3:
-                        self.p_2_flange = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist)) / 2
+                        self.p_2_flange = round(((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist)) / 2,2)
                     else:
-                        self.p_2_flange = ((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 3) * self.pitch)) / 2
+                        self.p_2_flange = round(((self.section.flange_width / 2) - (self.section.web_thickness / 2) - (2 * self.end_dist) - ((self.n_bf - 3) * self.pitch)) / 2,2)
 
 
             if self.connection == 'Flush End Plate':
@@ -1083,15 +1126,57 @@ class ColumnEndPlate(MomentConnection):
 
             print("no bolts web", self.n_bw, "no bolts flange", self.n_bf)
 
+            #############################################################
+            ##  added images to reflect in output dock
+            #############################################################
+
+            if self.n_bw % 2 == 0:
+                if self.n_bw == 2:
+                    self.image_web = './ResourceFiles/images/flush_2rows.png'
+                else:
+                    self.image_web = './ResourceFiles/images/flush_n_even.png'
+            else:
+                if self.n_bw == 3:
+                    self.image_web = './ResourceFiles/images/flush_3_rows.png'
+                else:
+                    self.image_web = './ResourceFiles/images/flush_n_odd.png'
+
+
             if self.connection == 'Flush End Plate':
-                if self.n_bf == 1:
-                    self.no_bolts = self.n_bw * 2
-                elif self.n_bf > 1:
-                    self.no_bolts = self.n_bw * 2 + (self.n_bf - 1) * 4
+                if self.n_bf % 2 == 0:
+                    if self.n_bf == 2:
+                        self.image_flange = './ResourceFiles/images/flange_2_bolt_flush.png'
+                    else:
+                        self.image_flange = './ResourceFiles/images/flange_even_bolt_flush.png'
+                else:
+                    if self.n_bf == 1:
+                        self.image_flange = './ResourceFiles/images/flange_1_bolt.png'
+                    elif self.n_bf == 3:
+                        self.image_flange = './ResourceFiles/images/flange_3_bolt_flush.png'
+                    else:
+                        self.image_flange = './ResourceFiles/images/flange_odd_bolt_flush.png'
+            else:
+                if self.n_bf % 2 == 0:
+                    if self.n_bf == 2:
+                        self.image_flange = './ResourceFiles/images/flange_2_bolt_extended.png'
+                    else:
+                        self.image_flange = './ResourceFiles/images/flange_even_bolt_extended.png'
+                else:
+                    if self.n_bf == 1:
+                        self.image_flange = './ResourceFiles/images/flange_1_bolt_extended.png'
+                    elif self.n_bf == 3:
+                        self.image_flange = './ResourceFiles/images/flange_3_bolt_extended.png'
+                    else:
+                        self.image_flange = './ResourceFiles/images/flange_odd_bolt_extended.png'
+
+            if self.connection == 'Flush End Plate':
+                # if self.n_bf == 1:
+                self.no_bolts = self.n_bw * 2 + (self.n_bf - 1) * 4
             else:
                 if self.n_bf == 1:
-                    self.no_bolts = self.n_bw * 2 + 4
-                elif self.n_bf > 1:
+                    self.no_bolts = self.n_bw * 2 +4
+                else:
+                    # if self.n_bf == 1:
                     self.no_bolts = self.n_bw * 2 + (self.n_bf - 1) * 4 + self.n_bf * 4
             print("no of bolts", self.no_bolts)
 
@@ -2008,29 +2093,32 @@ class ColumnEndPlate(MomentConnection):
 
 
         if self.connection == "Extended Both Ways":
+            if self.end_dist > 50:
 
-               t1 = ('SubSection', '   Stiffener Details', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
-               self.report_check.append(t1)
-               t1 = (KEY_OUT_DISP_STIFFENER_HEIGHT,self.section.depth,
-                       self.stiff_ht,
-               get_pass_fail(self.section.depth, self.stiff_ht, relation="geq"))
-               self.report_check.append(t1)
-               t1 = (KEY_OUT_DISP_STIFFENER_WIDTH,end_plate_ht_req(D=self.section.depth, e=self.end_dist, h_p=self.plate_height),
-
-                     self.stiff_wt,
-                     get_pass_fail(self.plate_height, self.stiff_wt, relation="geq"))
-               self.report_check.append(t1)
-               t1 = ( KEY_OUT_DISP_STIFFENER_THICKNESS, '',  self.t_s,'')
-               self.report_check.append(t1)
-               t1 = (KEY_OUT_DISP_WELD_TYPE, '', self.weld_type, '')
-               self.report_check.append(t1)
-               if self.weld_type == 'Fillet Weld':
-                   t1 = (KEY_OUT_WELD_SIZE, '', self.weld_size, '')
+                   t1 = ('SubSection', '   Stiffener Details', '|p{3.5cm}|p{6cm}|p{5cm}|p{1.5cm}|')
                    self.report_check.append(t1)
-               else:
-                   pass
-               t1 = (KEY_OUT_DISP_WELD_TYPE1,'','Groove Weld','')
-               self.report_check.append(t1)
+                   if self.h_s < 100:
+                       t1 = (KEY_OUT_DISP_STIFFENER_HEIGHT,ht_of_stiff1(t_s=100), self.stiff_ht,'')
+                       self.report_check.append(t1)
+                   else:
+                       t1 = (KEY_OUT_DISP_STIFFENER_HEIGHT, ht_of_stiff(t_s=self.stiff_ht), self.stiff_ht,'')
+                       self.report_check.append(t1)
+
+                   t1 = (KEY_OUT_DISP_STIFFENER_WIDTH, wt_of_stiff(w_s=self.stiff_wt,e=self.end_dist),self.stiff_wt,'')
+                   self.report_check.append(t1)
+                   t1 = ( KEY_OUT_DISP_STIFFENER_THICKNESS, '',  self.t_s,'')
+                   self.report_check.append(t1)
+                   t1 = (KEY_OUT_DISP_WELD_TYPE, '', self.weld_type, '')
+                   self.report_check.append(t1)
+                   if self.weld_type == 'Fillet Weld':
+                       t1 = (KEY_OUT_WELD_SIZE, '', self.weld_size, '')
+                       self.report_check.append(t1)
+                   else:
+                       pass
+                   t1 = (KEY_OUT_DISP_WELD_TYPE1,'','Groove Weld','')
+                   self.report_check.append(t1)
+            else:
+                pass
 
         else:
                pass

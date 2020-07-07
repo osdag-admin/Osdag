@@ -1518,9 +1518,9 @@ KEY_OUT_DISP_MEMB_BLK_SHEAR = 'Block Shear Capacity'
 
 
 KEY_OUT_NO_BOLTS_FLANGE = 'ColumnEndPlate.nbf'
-KEY_OUT_DISP_NO_BOLTS_FLANGE = 'No. of bolts along Flange'
+KEY_OUT_DISP_NO_BOLTS_FLANGE = 'No. of bolts along One Side of Flange Overhang (n)'
 KEY_OUT_NO_BOLTS_WEB = 'ColumnEndPlate.nbw'
-KEY_OUT_DISP_NO_BOLTS_WEB = 'No. of bolts along One Side of Web (Nr)'
+KEY_OUT_DISP_NO_BOLTS_WEB = 'No. of bolts along One Side of Web (n)'
 KEY_OUT_NO_BOLTS = 'ColumnEndPlate.nb'
 KEY_OUT_DISP_NO_BOLTS = 'Total no. of Bolts'
 KEY_PITCH_2_FLANGE = 'ColumnEndPlate.p2_flange'

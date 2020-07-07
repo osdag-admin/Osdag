@@ -1,8 +1,10 @@
 {'Section_Designation': 'CompoundSectionOneFlange',
- 'Section_Parameters': {'parameterText_1': ['I-Section Type', 'PBP 300 X 95'],
-                        'parameterText_2': ['Channel Section Type', 'MC 250*'],
-                        'parameterText_3': ['Spacing Between Channel and '
-                                            'I-Section, S(mm)',
+ 'Section_Parameters': {'parameterText_1': ['Type of I-Section',
+                                            'PBP 300 X 95'],
+                        'parameterText_2': ['Type of Channel Section',
+                                            'MC 250*'],
+                        'parameterText_3': ['Spacing between I-Section and '
+                                            'Flange of Channel, S(mm)',
                                             '86']},
  'Section_Properties': {'A': '164.4',
                         'Cy': '17.1905',

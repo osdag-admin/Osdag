@@ -217,9 +217,9 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         if(self.findChild(QtWidgets.QLabel,"parameterLabel_7").isVisible()):
             self.textBoxVisible['parameterText_7']=[self.findChild(QtWidgets.QLabel,"parameterLabel_7").text().strip()[:-1],self.findChild(QtWidgets.QLineEdit,'parameterText_7').text()]
         flag="ErrorType"        
-        for parameter in self.textBoxVisible:      
-            if(self.textBoxVisible[parameter][1]=="" or 'Select' in self.textBoxVisible[parameter][1] or 'select' in self.textBoxVisible[parameter][1]):
-                flag='Nopara'
+        for parameter in self.textBoxVisible:
+            if(self.textBoxVisible[parameter][1]=="" or  'select' in self.textBoxVisible[parameter][1].lower()):
+                flag='NoPara'
             try:
                 if(self.textBoxVisible[parameter][1].count('.')>1 or '.' == self.textBoxVisible[parameter][1][-1]):
                     flag='DecimalProb'
@@ -252,79 +252,36 @@ class Ui_SectionParameters(QtWidgets.QDialog):
         string=""
         conn = sqlite3.connect(PATH_TO_DATABASE)
         if(index_type==1):
-            cursor = conn.execute("SELECT tw,B FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
-            t,B=map(float,cursor.fetchall()[0])
+            cursor = conn.execute("SELECT B FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
+            B=float(cursor.fetchone()[0])
             s=float(self.parameterText_3.text())
-            l=float(self.parameterText_6.text())
-            comp=round(2*B,1)
-            if(s>=comp):
+            if(s<=B):
                 error=True
-                string+='S < '+str(comp)+'\n'
+                string+='S > '+str(B)+'\n'
         elif(index_type==2):
-            cursor = conn.execute("SELECT tw,B FROM Channels where Designation="+repr(self.parameterText_1.currentText()))
-            t,B=map(float,cursor.fetchall()[0])
-            s=float(self.parameterText_3.text())
-            l=float(self.parameterText_6.text())            
+            cursor = conn.execute("SELECT B FROM Channels where Designation="+repr(self.parameterText_1.currentText()))
+            B=float(cursor.fetchone()[0])      
+            s=float(self.parameterText_3.text())  
             if(index_template==1):
-                comp1=round(l-(2*t),1)
-                if(s>comp1):
+                if(s<=2*B):
                     error=True
-                    string+='S <= '+str(comp1)+'\n'
-            elif(index_template==2):
-                comp1=round(l-(2*B),1)
-                if(s>comp1):
-                    error=True
-                    string+='S <= '+str(comp1)+'\n'
-        elif(index_type==3 and index_template==5):
-            cursor = conn.execute("SELECT t,b FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
-            t,b = map(float,cursor.fetchall()[0])
-            s=float(self.parameterText_3.text())
-            l=float(self.parameterText_5.text())
-            ta=float(self.parameterText_7.text())
-            la=float(self.parameterText_6.text())
-            comp=s+(2*ta)+(2*b)
-            if(s!=l-(2*b)-(2*ta)):
-                error=True
-                string+='S = '+str(l-(2*b)-(2*ta))+'\n'
-            if(l<=la):
-                error=True
-                string+='l > l*'+'\n'
+                    string+='S > '+str(2*B)+'\n'
         elif(index_type==4):
             if(index_template==1):
                 cursor = conn.execute("SELECT D,T,tw FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
                 D,T,t=map(float,cursor.fetchall()[0])
+                s=float(self.parameterText_3.text())
                 P=float(self.parameterText_6.text())
-                Q=float(self.parameterText_7.text())
+                ta=float(self.parameterText_7.text())
                 Db=D-(2*T)
                 comp=round(Db/2,1)
                 if(P>=comp):
                     error=True
                     string+='P < '+str(comp)+'\n'
-                if(Q<t):
+                if(ta<t or ta>T):
                     error=True
-                    string+=str(t)+' <= Q <= '+str(T)+'\n'
-                if(Q>T):
-                    error=True
-                    string+=str(t)+' <= Q <= '+str(T)+'\n'
-            elif(index_template==3):
-                cursor = conn.execute("SELECT B FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
-                B=float(cursor.fetchone()[0])
-                s=float(self.parameterText_3.text())
-                sb=float(self.parameterText_4.text())
-                if(s>=B):
-                    error=True
-                    string+='S < '+str(B)+'\n'
-                if(sb>=B):
-                    error=True
-                    string+='S* < '+str(B)+'\n'
-        elif(index_type==5):
-            cursor = conn.execute("SELECT D FROM Channels where Designation="+repr(self.parameterText_2.currentText()))
-            d=float(cursor.fetchone()[0])
-            s=float(self.parameterText_3.text())
-            comp=round(d/2,1)
-            if(s>=comp):
-                error=True
-                string+='S < '+str(comp)+'\n'
+                    string+=str(t)+' <= t* <= '+str(T)+'\n'
+
         return error,string
     
     def set_image_tooltip(self,index_type,index_template):
@@ -365,14 +322,17 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/3.1.5(5).png'>")
         elif(index_type==4):
             if(index_template==1):
+                self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.1.1(2).png'>")
                 self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.1.1(1).png'>")
-                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.1.1(2).png'>")
+                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.1.1(3).png'>")
             elif(index_template==2):
                 self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.1.2(2).png'>")
                 self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.1.2(1).png'>")
             elif(index_template==3):
-                self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.2.1(1).png'>")
-                self.parameterText_4.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.2.1(2).png'>")
+                self.parameterText_5.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.2.1(1).png'>")
+                self.parameterText_6.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.2.1(2).png'>")
+                self.parameterText_7.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/4.2.1(3).png'>")
+
         elif(index_type==5):
             self.parameterText_3.setToolTip("<img src='./ResourceFiles/images/SectionModeller/SectionParameters/5.1.1(1).png'>")
 
@@ -390,6 +350,17 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 t,B=map(float,cursor.fetchall()[0])
                 s=float(self.parameterText_3.text())
                 self.parameterText_6.setText(str(round((s+(2*((B/2)+(2*(t/2))))),1)))          
+            
+            def calc_t():
+                if(self.parameterText_1.currentIndex()==0):
+                        return
+                cursor = conn.execute("SELECT tw FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
+                t=float(cursor.fetchone()[0])
+                if(t%3==0):
+                    ta=t
+                else:
+                    ta=((t//3)+1)*3
+                self.parameterText_7.setText(str(ta))
 
             self.parameterLabel_2.hide()
             self.parameterText_2.hide()
@@ -397,12 +368,14 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.parameterText_4.hide()
             self.parameterLabel_5.hide()
             self.parameterText_5.hide()
-            self.parameterLabel_1.setText('I-Section Type:')
-            self.parameterLabel_3.setText('Spacing between the I-Sections, S(mm):')
-            self.parameterText_3.textChanged.connect(calc_length)
-            self.parameterLabel_6.setText('Cover Plate Length, l(mm):')
+            self.parameterLabel_1.setText('Type of I-Section:')
+            self.parameterLabel_3.setText('Spacing(web-web) between I Sections, S(mm):')
+            self.parameterLabel_6.setText('Length of Cover Plate, l(mm):')
             self.parameterText_6.setDisabled(True)
-            self.parameterLabel_7.setText('Cover Plate Thickness, t*(mm):')
+            self.parameterLabel_7.setText('Thickness of Cover Plate, t*(mm):')
+            self.parameterText_7.setDisabled(True)
+            self.parameterText_3.textChanged.connect(calc_length)
+            self.parameterText_1.currentIndexChanged.connect(calc_t)
             self.parameterText_1.currentIndexChanged.connect(calc_length)
             
         elif(index_type==2):
@@ -413,8 +386,8 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.parameterText_4.hide()
             self.parameterLabel_5.hide()
             self.parameterText_5.hide()
-            self.parameterLabel_1.setText('Channel Section Type:')
-            self.parameterLabel_3.setText('Spacing between the Channel Sections, S(mm):')
+            self.parameterLabel_1.setText('Type of Channel Section:')
+            self.parameterLabel_3.setText('Spacing(web-web) between the Channel sections, S(mm):')
 
             def calc_length():
                 if(self.parameterText_3.text() in ['',None] or self.parameterText_1.currentIndex()==0):
@@ -427,17 +400,32 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 if(index_template==2):
                     comp=round(s+(2*B),1)  
                 self.parameterText_6.setText(str(comp))
+            
+            def calc_t():
+                if(self.parameterText_1.currentIndex()==0):
+                        return
+                cursor = conn.execute("SELECT tw FROM Channels where Designation="+repr(self.parameterText_1.currentText()))
+                t=float(cursor.fetchone()[0])
+                if(t%3==0):
+                    ta=t
+                else:
+                    ta=((t//3)+1)*3
+                self.parameterText_7.setText(str(ta))
+            
+            
 
             self.parameterText_6.setDisabled(True)
             self.parameterText_3.textChanged.connect(calc_length)   
-            self.parameterText_1.currentIndexChanged.connect(calc_length)        
-            self.parameterLabel_6.setText('Cover Plate Length, l(mm):')
-            self.parameterLabel_7.setText('Cover Plate Thickness, t*(mm):')
+            self.parameterText_1.currentIndexChanged.connect(calc_length) 
+            self.parameterText_1.currentIndexChanged.connect(calc_t) 
+            self.parameterLabel_6.setText('Length of Cover Plate, l(mm):')
+            self.parameterLabel_7.setText('Thickness of Cover Plate, t*(mm):')
+            self.parameterText_7.setDisabled(True)
 
         elif(index_type==3):
             self.parameterLabel_2.hide()
             self.parameterText_2.hide()
-            self.parameterLabel_1.setText('Angle Section Type:')
+            self.parameterLabel_1.setText('Type of Angle Section:')
             if(index_template<5):
                 self.parameterLabel_2.hide()
                 self.parameterText_2.hide()
@@ -447,8 +435,8 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.parameterText_3.hide()
                 self.parameterLabel_4.hide()
                 self.parameterText_4.hide()
-                self.parameterLabel_6.setText('Gusset Plate Length, l(mm):')            
-                self.parameterLabel_7.setText('Gusset Plate Thickness, t*(mm):') 
+                self.parameterLabel_6.setText('Length of the Gusset Plate, l(mm):')            
+                self.parameterLabel_7.setText('Thickness of the Gusset Plate, t*(mm):') 
 
                 
 
@@ -466,22 +454,11 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.parameterText_1.currentIndexChanged.connect(calc_length)                    
                 self.parameterText_6.setDisabled(True)
             else:
-                self.parameterLabel_3.setText('Spacing between Sections_Horizontal, S(mm):')
-                self.parameterLabel_4.setText('Spacing between Sections_Vertical, S*(mm):')
-                self.parameterLabel_5.setText('Plate Length(Horizontal), l(mm):')
-                self.parameterLabel_6.setText('Plate Length(Vertical), l*(mm):')
-                self.parameterLabel_7.setText('Plate Thickness, t*(mm):') 
-
-
-                def calc_spacing_v():
-                    if(self.parameterText_1.currentIndex()==0):
-                        self.parameterText_7.setDisabled(True)
-                        return                    
-                    cursor = conn.execute("SELECT a,t FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
-                    a,t = map(float,cursor.fetchall()[0])
-                    Da=a-t
-                    self.parameterText_4.setText(str(2*Da))
-                    self.parameterText_7.setDisabled(False)
+                self.parameterLabel_3.setText('Spacing(Shorter Leg), S(mm):')
+                self.parameterLabel_4.setText('Spacing(Longer Leg), S*(mm):')
+                self.parameterLabel_5.setText('Length of the Gusset Plate(Horizantal), l(mm):')
+                self.parameterLabel_6.setText('Length of the Gusset Plate(Verticle), l*(mm):')
+                self.parameterLabel_7.setText('Thickness of the Gusset Plate, t*(mm):') 
                 def calc_length_h():
                     if(self.parameterText_1.currentIndex()==0 or self.parameterText_3.text() in ['',None] or self.parameterText_7.text() in ['',None]):
                         return
@@ -493,20 +470,18 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 def calc_length_v():
                     if(self.parameterText_4.text() in ['',None] or self.parameterText_1.currentIndex()==0):
                         return
-                    cursor = conn.execute("SELECT t FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
-                    t = float(cursor.fetchone()[0])
+                    cursor = conn.execute("SELECT a FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
+                    a = float(cursor.fetchone()[0])
                     sa=float(self.parameterText_4.text())
-                    self.parameterText_6.setText(str(sa+(2*t)))
-                    
-                self.parameterText_1.currentIndexChanged.connect(calc_spacing_v)
+                    self.parameterText_6.setText(str(sa+(2*a)))
+
+                self.parameterText_1.currentIndexChanged.connect(calc_length_h)
+                self.parameterText_1.currentIndexChanged.connect(calc_length_v)
                 self.parameterText_7.textChanged.connect(calc_length_h)
                 self.parameterText_3.textChanged.connect(calc_length_h)
                 self.parameterText_4.textChanged.connect(calc_length_v)
-                self.parameterText_4.textChanged.connect(calc_length_h)
-                self.parameterText_4.setDisabled(True)
                 self.parameterText_5.setDisabled(True)
                 self.parameterText_6.setDisabled(True)
-                self.parameterText_7.setDisabled(True)
                 
         elif(index_type==4):
             self.parameterLabel_2.hide()
@@ -516,12 +491,11 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.parameterText_4.hide()
                 self.parameterLabel_5.hide()
                 self.parameterText_5.hide()
-                self.parameterLabel_1.setText('I-Section Type:')
-                self.parameterLabel_3.hide()
-                self.parameterText_3.hide()
-                self.parameterLabel_6.setText('Length of Lips, P(mm):')
-                self.parameterLabel_7.setText('Breadth of Lips, Q(mm):')
-                def calc_Q():
+                self.parameterLabel_1.setText('Type of I-Section:')
+                self.parameterLabel_3.setText('Spacing, S(mm):')
+                self.parameterLabel_6.setText('Lip Size, P(mm):')
+                self.parameterLabel_7.setText('Thickness of Lip, t*(mm):')
+                def calc_t():
                     if(self.parameterText_1.currentIndex()==0):
                         return
                     cursor = conn.execute("SELECT T,tw FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
@@ -530,15 +504,32 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                         self.parameterText_7.setText(str(t))
                         self.parameterText_7.setDisabled(True)
                     else:
+                        self.parameterText_7.clear()
                         self.parameterText_7.setDisabled(False)
+                def calc_s():
+                    if(self.parameterText_1.currentIndex()==0 or self.parameterText_7.text() in ['',None]):
+                        return
+                    try:
+                        float(self.parameterText_7.text())
+                    except:
+                        return
+                    cursor = conn.execute("SELECT B,tw FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
+                    B,t=map(float,cursor.fetchall()[0])
+                    ta=float(self.parameterText_7.text())
+                    s=round((B-t-(2*ta))/2,1)
+                    self.parameterText_3.setText(str(s))
 
-                self.parameterText_1.currentIndexChanged.connect(calc_Q)
+
+                self.parameterText_1.currentIndexChanged.connect(calc_t)
+                self.parameterText_3.setDisabled(True)
+                self.parameterText_1.currentIndexChanged.connect(calc_s)
+                self.parameterText_7.textChanged.connect(calc_s)
 
             elif(index_template==2):
                 self.parameterLabel_4.hide()
                 self.parameterText_4.hide()
                 self.parameterLabel_1.setText('I-Section Type:')
-                self.parameterLabel_3.setText('Spacing between flange of T to Web of I, S(mm):')
+                self.parameterLabel_3.setText('Spacing , S(mm):')
                 self.parameterLabel_5.hide()
                 self.parameterText_5.hide()
                 self.parameterLabel_6.setText('Length of Web of T, d(mm):')
@@ -560,15 +551,16 @@ class Ui_SectionParameters(QtWidgets.QDialog):
 
                 
             elif(index_template==3):
-                self.parameterLabel_6.hide()
-                self.parameterText_6.hide()
-                self.parameterLabel_7.hide()
-                self.parameterText_7.hide()
-                self.parameterLabel_5.hide()
-                self.parameterText_5.hide()
-                self.parameterLabel_1.setText('Hollow Section Type:')
-                self.parameterLabel_3.setText('Spacing between the Tubes_Horizontal, S(mm):')
-                self.parameterLabel_4.setText('Spacing between the Tubes_Vertical, S*(mm):')
+                self.parameterLabel_4.hide()
+                self.parameterText_4.hide()
+                self.parameterLabel_3.hide()
+                self.parameterText_3.hide()
+                self.parameterLabel_1.hide()
+                self.parameterText_1.hide()
+                self.parameterLabel_5.setText('Length of Hollow Section, B(mm):')
+                self.parameterLabel_6.setText('Breadth of Hollow Section, L(mm):')
+                self.parameterLabel_7.setText('Thickness of Hollow Section, t(mm):')
+
         elif(index_type==5):
             self.parameterLabel_4.hide()
             self.parameterText_4.hide()
@@ -578,9 +570,17 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.parameterText_6.hide()
             self.parameterLabel_7.hide()
             self.parameterText_7.hide()
-            self.parameterLabel_1.setText('I-Section Type:')
-            self.parameterLabel_2.setText('Channel Section Type:')
-            self.parameterLabel_3.setText('Spacing Between Channel and I-Section, S(mm):')
+            self.parameterLabel_1.setText('Type of I-Section:')
+            self.parameterLabel_2.setText('Type of Channel Section:')
+            self.parameterLabel_3.setText('Spacing between I-Section and Flange of Channel, S(mm):')
+            def calc_s():
+                if(self.parameterText_1.currentIndex()==0):
+                    return
+                cursor = conn.execute("SELECT tw,B FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
+                t,B=map(float,cursor.fetchall()[0])
+                self.parameterText_3.setText(str(round((B-t)/2,1)))
+            self.parameterText_3.setDisabled(True)
+            self.parameterText_1.currentIndexChanged.connect(calc_s)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate

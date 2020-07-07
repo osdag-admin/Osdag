@@ -1103,19 +1103,19 @@ class Ui_OsdagSectionModeller(object):
                         if(index_template==1):                                                # I-Section with stiffening
                                 cursor = conn.execute("SELECT D,B,T,tw,Area FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                                 D,B,T,t,A=map(float,cursor.fetchall()[0])
-                                P,Q=float(self.SectionParameters.parameterText_6.text())/10,float(self.SectionParameters.parameterText_7.text())/10
+                                P,ta=float(self.SectionParameters.parameterText_6.text())/10,float(self.SectionParameters.parameterText_7.text())/10
                                 D/=10
                                 B/=10
                                 T/=10
                                 t/=10
                                 Db=D-(2*T)                                
-                                Ab=A+(2*P*Q)
+                                Ab=A+(2*P*ta)
                                 Ybottom=(
                                         (B*T*T/2)+
                                         (t*D*(D/2)*t)+
                                         (B*T*(B+T+(T/2)))+
-                                        (2*Q*P*((2*T)+D-(P/2)))
-                                )/((B*T)+(t*D)+(B*T)+(2*Q*P))
+                                        (2*ta*P*((2*T)+D-(P/2)))
+                                )/((B*T)+(t*D)+(B*T)+(2*ta*P))
                                 Yleft=Yright=B/2
                                 Ybottom=(
                                         (B*T*(T/2))+
@@ -1128,29 +1128,28 @@ class Ui_OsdagSectionModeller(object):
                                         ((B*(T**3)/12)+(B*T)*((Ybottom-(T/2))**2))+
                                         (2*((t*(Db**3)/12)+(Db*T)*((Db-(Db/2)-Ybottom)**2)))+
                                         ((B*(T**3)/12)+(B*T)*((Ytop-(T/2))**2))+
-                                        (2*((Q*(P**3)/12)+(Q*P)*((Ytop-(P/2))**2)))
+                                        (2*((ta*(P**3)/12)+(ta*P)*((Ytop-(P/2))**2)))
                                         )
                                 Iyy=(
-                                        ((P*(Q**3)/12)+(P*Q)*((Yleft-(Q/2))**2))+
+                                        ((P*(ta**3)/12)+(P*ta)*((Yleft-(ta/2))**2))+
                                         (2*((T*((B/2)**3)/12)+((B/2)*T)*((Yleft-(B/4))**2)))+
                                         (2*((T*((B/2)**3)/12)+((B/2)*T)*((Yright-(B/4))**2)))+
                                         ((Db*((t/2)**3)/12)+(Db*t/2)*((Yleft-(B/2)+(t/4))**2))+
                                         ((Db*((t/2)**3)/12)+(Db*t/2)*((Yright-(B/2)+(t/4))**2))+
-                                        ((P*(Q**3)/12)+(P*Q)*((Yright-(Q/2))**2))
+                                        ((P*(ta**3)/12)+(P*ta)*((Yright-(ta/2))**2))
                                 )
                                 Zpz=(
-                                        (B*T*(Ybottom-(T/2)))+
+                                        (2*(B*T*(Ybottom-(T/2))))+
                                         (t*(Db/2))*(Ybottom-T-(Db/4))+
                                         (t*(Db/2)*(Ytop-T-(Db/4)))+
-                                        (B*T*(Ytop-(T/2)))+
-                                        (P*T*(Ytop-(P/2)))
+                                        (2*(P*ta*(Ytop-(P/2))))
                                 )
                                 Zpy=(
-                                        (P*Q*(Yleft-(Q/2)))+
-                                        (2*B*T*(Yleft-Q-(B/2)))+
-                                        (Db*t*(Yleft-(B/2)))
+                                        (2*(P*ta*(Yleft-(ta/2))))+
+                                        (4*(B/2)*T*(Yleft-ta-(B/4)))+
+                                        (2*(Db*(t/2)*(Yleft-(B/2)-ta)))
                                 )
-                                parameters=[D,B,T,t,P,Q,50]
+                                parameters=[D,B,T,t,P,ta,50]
                         elif(index_template==2):                                                # I-Section from plates
                                 cursor = conn.execute("SELECT D,B,T,tw,Area FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
                                 D,B,T,t,A=map(float,cursor.fetchall()[0])
@@ -1200,35 +1199,33 @@ class Ui_OsdagSectionModeller(object):
                                 parameters=[D, B, T, t,50, s, da]
 
                         elif(index_template==3):                                              # Built-up Box Section
-                                cursor = conn.execute("SELECT B,tw FROM Columns where Designation="+repr(self.SectionParameters.parameterText_1.currentText()))
-                                B,t=map(float,cursor.fetchall()[0])
-                                s=float(self.SectionParameters.parameterText_3.text())/10
-                                sa=float(self.SectionParameters.parameterText_4.text())/10
-                                B/=10
-                                t/=10
-                                A=Ab=4*B*t
-                                Ytop=Ybottom=Yright=Yleft=B/2
+                                B=float(self.SectionParameters.parameterText_5.text())/10
+                                t=float(self.SectionParameters.parameterText_7.text())/10
+                                L=float(self.SectionParameters.parameterText_6.text())/10
+                                A=Ab=(2*B*t)+(2*L*t)
+                                Ytop=Ybottom=(L+(2*t))/2
+                                Yright=Yleft=B/2
                                 Izz=(
                                         ((B*(t**3)/12)+(B*t*((Ybottom-(t/2))**2)))+
                                         ((B*(t**3)/12)+(B*t*((Ytop-(t/2))**2)))+
-                                        (2*(((((B/2)**3)*t/12))+(((B/2)*t)*((Ybottom-t-(B/4))**2))))+
-                                        (2*(((((B/2)**3)*t/12))+(((B/2)*t)*((Ytop-t-(B/4))**2))))
+                                        (2*(((((L/2)**3)*t/12))+(((L/2)*t)*((Ybottom-t-(L/4))**2))))+
+                                        (2*(((((L/2)**3)*t/12))+(((L/2)*t)*((Ytop-t-(L/4))**2))))
                                 )
                                 Iyy=(
-                                        ((B*(t**3)/12)+(B*t*((Yleft-(t/2))**2)))+
-                                        ((B*(t**3)/12)+(B*t*((Yright-(t/2))**2)))+
-                                        (2*(((((B/2)**3)+t)/12)+(((B/2)*t)*((Yleft-t-(B/4))**2))))+
-                                        (2*(((((B/2)**3)+t)/12)+(((B/2)*t)*((Yright-t-(B/4))**2))))
+                                        ((L*(t**3)/12)+(L*t*((Yleft-(t/2))**2)))+
+                                        ((L*(t**3)/12)+(L*t*((Yright-(t/2))**2)))+
+                                        (2*(((((B/2)**3)+t)/12)+(((B/2)*t)*((Yleft-(B/4))**2))))+
+                                        (2*(((((B/2)**3)+t)/12)+(((B/2)*t)*((Yright-(B/4))**2))))
                                 )
                                 Zpz=(
                                         (2*B*t*(Ybottom-(t/2)))+
-                                        (4*t*(B/2)*(Ybottom-(B/4)))
+                                        (4*t*(L/2)*(Ybottom-(L/4)))
                                 )
                                 Zpy=(
-                                        (2*t*(B/2)*(Yleft-(B/4)))+
-                                        (2*B*t*(Yleft-(t/2)))
+                                        (4*t*(B/2)*(Yleft-(B/4)))+
+                                        (2*L*t*(Yleft-(t/2)))
                                 )
-                                parameters=[A, B, t, 50, s, sa]
+                                parameters=[A, B, t, 50, B, L]
                         Rzz=math.sqrt(Izz/Ab)
                         Ryy=math.sqrt(Iyy/Ab)
                         Zzz=(Ab/2)*(Ytop+Ybottom)

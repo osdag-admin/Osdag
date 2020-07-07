@@ -216,14 +216,18 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.textBoxVisible['parameterText_6']=[self.findChild(QtWidgets.QLabel,"parameterLabel_6").text().strip()[:-1],self.findChild(QtWidgets.QLineEdit,'parameterText_6').text()]
         if(self.findChild(QtWidgets.QLabel,"parameterLabel_7").isVisible()):
             self.textBoxVisible['parameterText_7']=[self.findChild(QtWidgets.QLabel,"parameterLabel_7").text().strip()[:-1],self.findChild(QtWidgets.QLineEdit,'parameterText_7').text()]
-        flag="ErrorType"
-        for parameter in self.textBoxVisible: 
-            if(self.textBoxVisible[parameter][1]=='' or 'Select' in self.textBoxVisible[parameter][1] or 'select' in self.textBoxVisible[parameter][1]):
+        flag="ErrorType"        
+        for parameter in self.textBoxVisible:      
+            if(self.textBoxVisible[parameter][1]=="" or 'Select' in self.textBoxVisible[parameter][1] or 'select' in self.textBoxVisible[parameter][1]):
                 flag='Nopara'
-            elif(self.textBoxVisible[parameter][1].count('.')>1 or '.' == self.textBoxVisible[parameter][1][-1]):
-                flag='DecimalProb'
+            try:
+                if(self.textBoxVisible[parameter][1].count('.')>1 or '.' == self.textBoxVisible[parameter][1][-1]):
+                    flag='DecimalProb'
+            except:
+                flag='WrittenandDeleted'        
             
-        if(flag=='NoPara'):
+
+        if(flag in ['NoPara','WrittenandDeleted']):
             QtWidgets.QMessageBox.critical(self,'Save Error','All Parameters not entered/selected')
             self.textBoxVisible={}
             return
@@ -252,14 +256,10 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             t,B=map(float,cursor.fetchall()[0])
             s=float(self.parameterText_3.text())
             l=float(self.parameterText_6.text())
-            comp1=round(l/2,1)
-            comp2=round((s+(2*((B/2)+(2*(t/2))))),1)
-            if(s>=comp1):
+            comp=round(2*B,1)
+            if(s>=comp):
                 error=True
-                string+='S < '+str(comp1)+'\n'
-            if(l!=comp2):
-                error=True
-                string+='l = '+str(comp2)+'\n\n ** Try changing l to the value suggested'
+                string+='S < '+str(comp)+'\n'
         elif(index_type==2):
             cursor = conn.execute("SELECT tw,B FROM Channels where Designation="+repr(self.parameterText_1.currentText()))
             t,B=map(float,cursor.fetchall()[0])
@@ -267,59 +267,28 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             l=float(self.parameterText_6.text())            
             if(index_template==1):
                 comp1=round(l-(2*t),1)
-                comp2=round(s+(2*t),1)
                 if(s>comp1):
                     error=True
                     string+='S <= '+str(comp1)+'\n'
-                if(l!=comp2):
-                    error=True
-                    string+='l = '+str(comp2)+'\n\n ** Try changing l to the value suggested'
             elif(index_template==2):
                 comp1=round(l-(2*B),1)
-                comp2=round(s+(2*B),1)
                 if(s>comp1):
                     error=True
                     string+='S <= '+str(comp1)+'\n'
-                if(l!=comp2):
-                    error=True
-                    string+='l = '+str(comp2)+'\n\n ** Try changing l to the value suggested'
-        elif(index_type==3):
-            if(index_template<5):
-                cursor = conn.execute("SELECT a FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
-                a = float(cursor.fetchone()[0])
-                l=float(self.parameterText_6.text())
-                ta=float(self.parameterText_7.text())
-                if(index_template!=4 and l!=2*a):
-                    error=True
-                    string+='l = '+str(2*a)+'\n\n ** Try changing l to the value suggested'
-                if(index_template==4 and l!=a):
-                    error=True
-                    string+='l = '+str(a)+'\n\n ** Try changing l to the value suggested'
-            elif(index_template==5):
-                cursor = conn.execute("SELECT a,t,b FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
-                a,t,b = map(float,cursor.fetchall()[0])
-                s=float(self.parameterText_3.text())
-                sa=float(self.parameterText_4.text())
-                l=float(self.parameterText_5.text())
-                ta=float(self.parameterText_7.text())
-                la=float(self.parameterText_6.text())
-                comp=s+(2*ta)+(2*b)
-                Da=a-t
-                if(sa!=2*Da):
-                    error=True
-                    string+='S* = '+str(2*Da)+'\n'
-                if(s!=l-(2*b)-(2*ta)):
-                    error=True
-                    string+='S = '+str(l-(2*b)-(2*ta))+'\n'
-                if(l!=comp):
-                    error=True
-                    string+='l = '+str(comp)+'\n'
-                if(la!=sa+(2*t)):
-                    error=True
-                    string+='l* = '+str(sa+(2*t))+'\n'
-                if(l<=la):
-                    error=True
-                    string+='l > l*'+'\n'
+        elif(index_type==3 and index_template==5):
+            cursor = conn.execute("SELECT t,b FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
+            t,b = map(float,cursor.fetchall()[0])
+            s=float(self.parameterText_3.text())
+            l=float(self.parameterText_5.text())
+            ta=float(self.parameterText_7.text())
+            la=float(self.parameterText_6.text())
+            comp=s+(2*ta)+(2*b)
+            if(s!=l-(2*b)-(2*ta)):
+                error=True
+                string+='S = '+str(l-(2*b)-(2*ta))+'\n'
+            if(l<=la):
+                error=True
+                string+='l > l*'+'\n'
         elif(index_type==4):
             if(index_template==1):
                 cursor = conn.execute("SELECT D,T,tw FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
@@ -333,24 +302,10 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                     string+='P < '+str(comp)+'\n'
                 if(Q<t):
                     error=True
-                    string+=str(T)+' => Q >= '+str(t)+'\n'
+                    string+=str(t)+' <= Q <= '+str(T)+'\n'
                 if(Q>T):
                     error=True
                     string+=str(t)+' <= Q <= '+str(T)+'\n'
-            elif(index_template==2):
-                cursor = conn.execute("SELECT D,T,tw,B FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
-                D,T,t,B=map(float,cursor.fetchall()[0])
-                s=float(self.parameterText_3.text())
-                d=float(self.parameterText_6.text())
-                Db=D-(2*T)
-                comp1=round((Db-t)/2,1)
-                comp2=round((B-(2*T)-t)/2,1)
-                if(s!=comp1):
-                    error=True
-                    string+='S = '+str(comp1)+'\n'
-                if(d!=comp2):
-                    error=True
-                    string+='d = '+str(comp2)+'\n'
             elif(index_template==3):
                 cursor = conn.execute("SELECT B FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
                 B=float(cursor.fetchone()[0])
@@ -424,8 +379,18 @@ class Ui_SectionParameters(QtWidgets.QDialog):
     def update_parameters(self,index_type,index_template):
         '''
         Method for Updation of field in Section Parameters Dialog
+        and also contents on some fields based on conditions
         '''
+        conn = sqlite3.connect(PATH_TO_DATABASE)
         if(index_type==1):
+            def calc_length():
+                if(self.parameterText_3.text() in ['',None] or self.parameterText_1.currentIndex()==0):
+                        return
+                cursor = conn.execute("SELECT tw,B FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
+                t,B=map(float,cursor.fetchall()[0])
+                s=float(self.parameterText_3.text())
+                self.parameterText_6.setText(str(round((s+(2*((B/2)+(2*(t/2))))),1)))          
+
             self.parameterLabel_2.hide()
             self.parameterText_2.hide()
             self.parameterLabel_4.hide()
@@ -434,9 +399,14 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.parameterText_5.hide()
             self.parameterLabel_1.setText('I-Section Type:')
             self.parameterLabel_3.setText('Spacing between the I-Sections, S(mm):')
+            self.parameterText_3.textChanged.connect(calc_length)
             self.parameterLabel_6.setText('Cover Plate Length, l(mm):')
+            self.parameterText_6.setDisabled(True)
             self.parameterLabel_7.setText('Cover Plate Thickness, t*(mm):')
+            self.parameterText_1.currentIndexChanged.connect(calc_length)
+            
         elif(index_type==2):
+
             self.parameterLabel_2.hide()
             self.parameterText_2.hide()
             self.parameterLabel_4.hide()
@@ -445,8 +415,25 @@ class Ui_SectionParameters(QtWidgets.QDialog):
             self.parameterText_5.hide()
             self.parameterLabel_1.setText('Channel Section Type:')
             self.parameterLabel_3.setText('Spacing between the Channel Sections, S(mm):')
+
+            def calc_length():
+                if(self.parameterText_3.text() in ['',None] or self.parameterText_1.currentIndex()==0):
+                        return
+                cursor = conn.execute("SELECT tw,B FROM Channels where Designation="+repr(self.parameterText_1.currentText()))
+                t,B=map(float,cursor.fetchall()[0])
+                s=float(self.parameterText_3.text())
+                if(index_template==1):
+                    comp=round(s+(2*t),1)                    
+                if(index_template==2):
+                    comp=round(s+(2*B),1)  
+                self.parameterText_6.setText(str(comp))
+
+            self.parameterText_6.setDisabled(True)
+            self.parameterText_3.textChanged.connect(calc_length)   
+            self.parameterText_1.currentIndexChanged.connect(calc_length)        
             self.parameterLabel_6.setText('Cover Plate Length, l(mm):')
             self.parameterLabel_7.setText('Cover Plate Thickness, t*(mm):')
+
         elif(index_type==3):
             self.parameterLabel_2.hide()
             self.parameterText_2.hide()
@@ -460,14 +447,67 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.parameterText_3.hide()
                 self.parameterLabel_4.hide()
                 self.parameterText_4.hide()
-                self.parameterLabel_6.setText('Gusset Plate Length, l(mm):')
+                self.parameterLabel_6.setText('Gusset Plate Length, l(mm):')            
                 self.parameterLabel_7.setText('Gusset Plate Thickness, t*(mm):') 
-            elif(index_template==5):
+
+                
+
+                def calc_length():
+                    if(self.parameterText_1.currentIndex()==0 or self.parameterText_1.currentIndex()==0):
+                        return
+                    cursor = conn.execute("SELECT a FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
+                    a = float(cursor.fetchone()[0])
+                    if(index_template!=4):
+                        comp=2*a
+                    if(index_template==4):
+                        comp=a
+                    self.parameterText_6.setText(str(comp))
+                
+                self.parameterText_1.currentIndexChanged.connect(calc_length)                    
+                self.parameterText_6.setDisabled(True)
+            else:
                 self.parameterLabel_3.setText('Spacing between Sections_Horizontal, S(mm):')
                 self.parameterLabel_4.setText('Spacing between Sections_Vertical, S*(mm):')
                 self.parameterLabel_5.setText('Plate Length(Horizontal), l(mm):')
                 self.parameterLabel_6.setText('Plate Length(Vertical), l*(mm):')
                 self.parameterLabel_7.setText('Plate Thickness, t*(mm):') 
+
+
+                def calc_spacing_v():
+                    if(self.parameterText_1.currentIndex()==0):
+                        self.parameterText_7.setDisabled(True)
+                        return                    
+                    cursor = conn.execute("SELECT a,t FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
+                    a,t = map(float,cursor.fetchall()[0])
+                    Da=a-t
+                    self.parameterText_4.setText(str(2*Da))
+                    self.parameterText_7.setDisabled(False)
+                def calc_length_h():
+                    if(self.parameterText_1.currentIndex()==0 or self.parameterText_3.text() in ['',None] or self.parameterText_7.text() in ['',None]):
+                        return
+                    cursor = conn.execute("SELECT b FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
+                    b = float(cursor.fetchone()[0])
+                    s=float(self.parameterText_3.text())
+                    ta=float(self.parameterText_7.text())  
+                    self.parameterText_5.setText(str(s+(2*ta)+(2*b)))
+                def calc_length_v():
+                    if(self.parameterText_4.text() in ['',None] or self.parameterText_1.currentIndex()==0):
+                        return
+                    cursor = conn.execute("SELECT t FROM Angles where Designation="+repr(self.parameterText_1.currentText()))
+                    t = float(cursor.fetchone()[0])
+                    sa=float(self.parameterText_4.text())
+                    self.parameterText_6.setText(str(sa+(2*t)))
+                    
+                self.parameterText_1.currentIndexChanged.connect(calc_spacing_v)
+                self.parameterText_7.textChanged.connect(calc_length_h)
+                self.parameterText_3.textChanged.connect(calc_length_h)
+                self.parameterText_4.textChanged.connect(calc_length_v)
+                self.parameterText_4.textChanged.connect(calc_length_h)
+                self.parameterText_4.setDisabled(True)
+                self.parameterText_5.setDisabled(True)
+                self.parameterText_6.setDisabled(True)
+                self.parameterText_7.setDisabled(True)
+                
         elif(index_type==4):
             self.parameterLabel_2.hide()
             self.parameterText_2.hide()
@@ -481,6 +521,19 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.parameterText_3.hide()
                 self.parameterLabel_6.setText('Length of Lips, P(mm):')
                 self.parameterLabel_7.setText('Breadth of Lips, Q(mm):')
+                def calc_Q():
+                    if(self.parameterText_1.currentIndex()==0):
+                        return
+                    cursor = conn.execute("SELECT T,tw FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
+                    T,t=map(float,cursor.fetchall()[0])
+                    if(t==T):
+                        self.parameterText_7.setText(str(t))
+                        self.parameterText_7.setDisabled(True)
+                    else:
+                        self.parameterText_7.setDisabled(False)
+
+                self.parameterText_1.currentIndexChanged.connect(calc_Q)
+
             elif(index_template==2):
                 self.parameterLabel_4.hide()
                 self.parameterText_4.hide()
@@ -491,6 +544,21 @@ class Ui_SectionParameters(QtWidgets.QDialog):
                 self.parameterLabel_6.setText('Length of Web of T, d(mm):')
                 self.parameterLabel_7.hide()
                 self.parameterText_7.hide()
+                def para():
+                    if(self.parameterText_1.currentIndex()==0):
+                        return
+                    cursor = conn.execute("SELECT D,T,tw,B FROM Columns where Designation="+repr(self.parameterText_1.currentText()))
+                    D,T,t,B=map(float,cursor.fetchall()[0])
+                    Db=D-(2*T)
+                    comp1=round((Db-t)/2,1)
+                    comp2=round((B-(2*T)-t)/2,1)
+                    self.parameterText_6.setText(str(comp1))
+                    self.parameterText_7.setText(str(comp2))
+                self.parameterText_1.currentIndexChanged.connect(para)
+                self.parameterText_6.setDisabled(True)
+                self.parameterText_7.setDisabled(True)
+
+                
             elif(index_template==3):
                 self.parameterLabel_6.hide()
                 self.parameterText_6.hide()

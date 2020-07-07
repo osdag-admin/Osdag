@@ -240,7 +240,6 @@ class OsdagMainWindow(QMainWindow):
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
         height = resolution.height()
-        self.resize(width*(0.85),height*(0.75))
         self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.switch.toggled.connect(self.change_theme)
@@ -399,6 +398,7 @@ class OsdagMainWindow(QMainWindow):
 
             else:
                 raise ValueError
+        self.resize(width * (0.85), height * (0.75))
         self.center()
         self.show()
 
@@ -801,9 +801,9 @@ if __name__ == '__main__':
     app.setStyleSheet(stream.readAll())
     app.setStyle('Fusion')
 
-    path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
+    # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
     window = OsdagMainWindow()
-    trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
+    # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
 
     ############################     Exception Dialog and Error Reporting  ###################
 
@@ -829,7 +829,7 @@ if __name__ == '__main__':
 
     ############################     Exception Dialog and Error Reporting  ###################
 
-    trayIcon.show()
+    # trayIcon.show()
 
     try:
         # window.notification2()

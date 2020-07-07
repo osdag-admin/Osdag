@@ -331,7 +331,7 @@ class Weld:
         weld_strength = round(f_wd * self.throat_tk, 2)
         self.strength = weld_strength
 
-    def get_weld_strength_lj(self, connecting_fu, weld_fabrication, t_weld, weld_angle, lenght):
+    def get_weld_strength_lj(self, connecting_fu, weld_fabrication, t_weld, weld_angle, length):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         self.throat_tk = \
             round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
@@ -694,7 +694,7 @@ class Plate(Material):
                     beta_lj = 0.75
                 else:
                     beta_lj = beta_lj
-                bolt_capacity_red = round(beta_lj, 2) * bolt_capacity
+                bolt_capacity_red = round(beta_lj, 3) * bolt_capacity
             else:
                 bolt_capacity_red = bolt_capacity
         else:
@@ -765,6 +765,15 @@ class Plate(Material):
 
         if bolts_one_line < min_bolts_one_line:
             self.design_status = False
+            self.bolt_line = min_bolt_line
+            self.bolts_one_line = min_bolts_one_line
+            self.bolts_required = bolt_line * bolts_one_line
+            self.pitch_provided = min_gauge
+            self.gauge_provided = min_gauge
+            self.edge_dist_provided = min_edge_dist
+            self.end_dist_provided = min_edge_dist
+            self.length = gap + self.edge_dist_provided * 2 + self.gauge_provided * (self.bolt_line - 1)
+            self.height = self.get_web_plate_h_req(self.bolts_one_line, self.gauge_provided , self.edge_dist_provided)
             self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line < min_bolt_line:
             self.design_status = False
@@ -2064,7 +2073,12 @@ class CHS(Material):
         self.area = row[6] * 100  # mm^2
         self.nominal_bore = row[2]  # mm
         self.out_diameter = row[3]  # mm
+        self.depth = self.out_diameter  # mm, OD is referred as the depth of the CHS
+        self.flange_width = self.out_diameter  # mm, OD is referred as the flange width of the CHS
         self.flange_thickness = row[4]  # mm, thickness of the CHS is referred as flange thickness
+        self.web_thickness = self.flange_thickness  # mm, thickness of the CHS is referred as web thickness
+        self.root_radius = 0
+        self.toe_radius = 0
         super(CHS, self).__init__(material_grade, self.flange_thickness)
         self.internal_vol = row[7]  # cm^3/m
         self.mom_inertia = row[10]  # cm^4/m

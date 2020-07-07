@@ -499,6 +499,7 @@ VALUES_PRIBM = connectdb("Beams")
 ############################
 # Display Keys (Input Dock, Output Dock, Design preference, Design report)
 ############################
+
 KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity (kN)'
 KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity (kN)'
 KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (kN)'
@@ -507,6 +508,7 @@ KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (kN)'
 KEY_DISP_BEARING_LENGTH = 'Bearing Length'
 KEY_DISP_ALLOW_SHEAR = 'Allowable Shear Capacity (kN)'
 DISP_LOWSHEAR = 'Limited to low shear capacity'
+
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
 KEY_DISP_MOM_CAPACITY = 'Moment Capacity'
@@ -555,7 +557,7 @@ DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
 DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
 DISP_THROAT = 'Throat Thickness (mm)'
 
-DISP_WELD_STRENGTH = 'Weld Strength (kN/mm)'
+DISP_WELD_STRENGTH = 'Weld Strength (N/mm)'
 KEY_DISP_FY_20 = 'Yield strength , fy (MPa) (0-20mm)'
 KEY_DISP_FY_20_40 = 'Yield strength , fy (MPa) (20-40mm)'
 KEY_DISP_FY_40 = 'Yield strength , fy (MPa) (>40mm)'
@@ -1014,7 +1016,6 @@ KEY_DISP_AREA_CHECK ="Plate Area check (mm2)"
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
 
 KEY_FLANGE_PITCH = 'Flange_plate.pitch_provided'
-
 KEY_FLANGE_PLATE_GAUGE = "Flange_plate.gauge_provided "
 KEY_ENDDIST_FLANGE= 'Flange_plate.end_dist_provided '
 KEY_EDGEDIST_FLANGE= 'Flange_plate.edge_dist_provided'
@@ -1312,11 +1313,11 @@ KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
 KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
 KEY_OUT_BETA_LJ = 'Bolt.Betalj'
-KEY_OUT_DISP_BETA_LJ = 'Beta_lj'
+KEY_OUT_DISP_BETA_LJ = 'β<sub>lj</sub>'
 KEY_OUT_BETA_LG = 'Bolt.Betalg'
-KEY_OUT_DISP_BETA_LG = 'Beta_lg'
+KEY_OUT_DISP_BETA_LG = 'β<sub>lg</sub>'
 KEY_OUT_BETA_PK = 'Bolt.Betapk'
-KEY_OUT_DISP_BETA_PK = 'Beta_pk'
+KEY_OUT_DISP_BETA_PK = 'β<sub>pk</sub>'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
 KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity (kN)'

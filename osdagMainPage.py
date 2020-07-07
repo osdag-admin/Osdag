@@ -240,7 +240,6 @@ class OsdagMainWindow(QMainWindow):
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
         height = resolution.height()
-        self.resize(width*(0.85),height*(0.75))
         self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.switch.toggled.connect(self.change_theme)
@@ -268,8 +267,8 @@ class OsdagMainWindow(QMainWindow):
                                                                 self.show_moment_connection_bc
                                                                     ],
                                                     'Column to Column' :[
-                                                                ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
+                                                                ('Cover Plate Bolted','ResourceFiles/images/cccoverplatebolted.png','C2C_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded','ResourceFiles/images/cccoverplatewelded.png','C2C_Cover_Plate_Welded'),
                                                                 ('End Plate Connection','ResourceFiles/images/ccep_flush.png','C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
@@ -400,7 +399,8 @@ class OsdagMainWindow(QMainWindow):
             else:
                 raise ValueError
 
-        self.resize(width*(0.85),height*(0.75))
+        self.resize(width * (0.85), height * (0.75))
+
         self.center()
         self.show()
 
@@ -803,9 +803,9 @@ if __name__ == '__main__':
     app.setStyleSheet(stream.readAll())
     app.setStyle('Fusion')
 
-    path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
+    # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
     window = OsdagMainWindow()
-    trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
+    # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
 
     ############################     Exception Dialog and Error Reporting  ###################
 
@@ -831,7 +831,7 @@ if __name__ == '__main__':
 
     ############################     Exception Dialog and Error Reporting  ###################
 
-    trayIcon.show()
+    # trayIcon.show()
 
     try:
         # window.notification2()

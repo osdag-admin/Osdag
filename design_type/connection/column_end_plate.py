@@ -20,6 +20,7 @@ class ColumnEndPlate(MomentConnection):
         super(ColumnEndPlate, self).__init__()
         self.design_status = False
 
+
     ###############################################
     # Design Preference Functions Start
     ###############################################
@@ -413,23 +414,23 @@ class ColumnEndPlate(MomentConnection):
 
         return flange_bolt_spacing
 
-    def stiffener_details(self, flag):
-        stiff_details = []
-
-        if 2*self.end_dist < 50 and self.h_s < 100:
-            pass
-        elif 2*self.end_dist >= 50 and self.h_s >= 100:
-            t1 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.t_s if flag else '', True)
-            stiff_details.append(t1)
-            t2 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
-            stiff_details.append(t2)
-            t3 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
-            stiff_details.append(t3)
-            t4 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
-            stiff_details.append(t4)
-            return stiff_details
-        else:
-            pass
+    # def stiffener_details(self, flag):
+    #     stiff_details = []
+    #
+    #     if 2*self.end_dist < 50 and self.h_s < 100:
+    #         pass
+    #     elif 2*self.end_dist >= 50 and self.h_s >= 100:
+    #         t1 = (KEY_OUT_STIFFENER_HEIGHT,KEY_OUT_DISP_STIFFENER_HEIGHT,TYPE_TEXTBOX,self.t_s if flag else '', True)
+    #         stiff_details.append(t1)
+    #         t2 = (KEY_OUT_STIFFENER_WIDTH,KEY_OUT_DISP_STIFFENER_WIDTH,TYPE_TEXTBOX,self.stiff_wt if flag else '', True)
+    #         stiff_details.append(t2)
+    #         t3 = (KEY_OUT_STIFFENER_THICKNESS,KEY_OUT_DISP_STIFFENER_THICKNESS,TYPE_TEXTBOX,self.t_s if flag else '',True)
+    #         stiff_details.append(t3)
+    #         t4 = (KEY_OUT_WELD_TYPE,KEY_OUT_DISP_WELD_TYPE,TYPE_TEXTBOX,self.weld_type if flag else '', True)
+    #         stiff_details.append(t4)
+    #         return stiff_details
+    #     else:
+    #         pass
 
     def output_values(self, flag):
         """
@@ -608,6 +609,7 @@ class ColumnEndPlate(MomentConnection):
                          edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
                          mu_f=design_dictionary[KEY_DP_BOLT_SLIP_FACTOR],
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        self.weld_size = 0.0
         # if self.design_status:
         #     self.commLogicObj = CommonDesignLogic(window.display, window.folder, self.module, self.mainmodule)
         #     status = self.design_status

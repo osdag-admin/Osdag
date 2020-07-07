@@ -70,8 +70,8 @@ class Window(QDialog):
         self.btn_save.setFixedSize(160,31)
 
         tab_index = 0
-        last_title = ""
         for tab_details in main.tab_list(main):
+            last_title = ""
             tab_name = tab_details[0]
             tab_elements = tab_details[2]
             tab_type = tab_details[1]
@@ -580,7 +580,7 @@ class Window(QDialog):
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
                 if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC:
                     Designation_c = ch.text()
-                elif ch.objectName() == 'Label_23':
+                elif ch.objectName() == KEY_SOURCE:
                     Source_c = ch.text()
                 elif ch.objectName() == 'Label_1':
                     D_c = float(ch.text())
@@ -687,7 +687,7 @@ class Window(QDialog):
 
                 if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTDSEC:
                     Designation_b = ch.text()
-                elif ch.objectName() == 'Label_23':
+                elif ch.objectName() == KEY_SOURCE:
                     Source_b = ch.text()
                 elif ch.objectName() == 'Label_1':
                     D_b = float(ch.text())
@@ -791,7 +791,7 @@ class Window(QDialog):
 
                 if ch.objectName() == KEY_SECSIZE_SELECTED or ch.objectName() == KEY_ANGLE_SELECTED:
                     Designation_a = ch.text()
-                elif ch.objectName() == 'Label_24':
+                elif ch.objectName() == KEY_SOURCE:
                     Source = ch.text()
                 elif ch.objectName() == 'Label_1':
                     a = ch.text()
@@ -896,7 +896,7 @@ class Window(QDialog):
 
                 if ch.objectName() == KEY_SECSIZE_SELECTED:
                     Designation_c = ch.text()
-                elif ch.objectName() == 'Label_23':
+                elif ch.objectName() == KEY_SOURCE:
                     Source = ch.text()
                 elif ch.objectName() == 'Label_1':
                     B = float(ch.text())

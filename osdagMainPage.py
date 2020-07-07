@@ -82,9 +82,10 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 
 import os
 from pathlib import Path
+import re
 from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 import urllib.request
-from update import Update
+from update_version_check import Update
 #from Thread import timer
 
 
@@ -236,6 +237,9 @@ class LeftPanelButton(QWidget):          # Custom Button widget for the Left Pan
 class OsdagMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        width = resolution.width()
+        height = resolution.height()
         self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.switch.toggled.connect(self.change_theme)
@@ -263,8 +267,8 @@ class OsdagMainWindow(QMainWindow):
                                                                 self.show_moment_connection_bc
                                                                     ],
                                                     'Column to Column' :[
-                                                                ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
+                                                                ('Cover Plate Bolted','ResourceFiles/images/cccoverplatebolted.png','C2C_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded','ResourceFiles/images/cccoverplatewelded.png','C2C_Cover_Plate_Welded'),
                                                                 ('End Plate Connection','ResourceFiles/images/ccep_flush.png','C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
@@ -394,8 +398,16 @@ class OsdagMainWindow(QMainWindow):
 
             else:
                 raise ValueError
-        self.showMaximized()
+        self.resize(width * (0.85), height * (0.75))
+        self.center()
+        self.show()
 
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     @pyqtSlot(int)
     def current_changed(self, index):
@@ -446,26 +458,11 @@ class OsdagMainWindow(QMainWindow):
         elif loc == "Ask Us a Question":
             self.ask_question()
         elif loc == "Check for Update":
-            self.notification()
+            update_class = Update()
+            msg = update_class.notifi()
+            QMessageBox.information(self, 'Info',msg)
         # elif loc == "FAQ":
         #     pass
-
-    def notification(self):
-        check=Update(0)
-        print(check.notifi())
-        if check.notifi()==True:
-            msg = QMessageBox.information(self, 'Update available',
-                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
-        elif check.notifi()=="no internet":
-            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
-        else:
-            msg = QMessageBox.information(self, 'Update', 'No Update Available')
-
-    def notification2(self):
-        check=Update(0)
-        if check.notifi()==True:
-            msg = QMessageBox.information(self, 'Update available',
-                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
 
 
     def select_workspace_folder(self):
@@ -502,7 +499,6 @@ class OsdagMainWindow(QMainWindow):
         if self.findChild(QRadioButton,'Fin_Plate').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(FinPlateConnection, ' ')
-            #self.ui2.center()
             self.ui2.show()
             self.ui2.closed.connect(self.show)
         elif self.findChild(QRadioButton,'Cleat_Angle').isChecked():
@@ -692,7 +688,6 @@ class OsdagMainWindow(QMainWindow):
 #     def exit(self):
 #         QCoreApplication.exit()
 
-
 ######################### UpDateNotifi ################
 
 # class Update(QMainWindow):
@@ -793,24 +788,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
     def exit(self):
         QCoreApplication.exit()
 
-######################### UpDateNotifi ################
 
-class Update(QMainWindow):
-    def __init__(self, old_version):
-        super().__init__()
-        self.old_version=old_version
-    def notifi(self):
-        try:
-            url = "https://anshulsingh-py.github.io/test/version.txt"
-            file = urllib.request.urlopen(url)
-            for line in file:
-                decoded_line = line.decode("utf-8")
-            new_version = decoded_line.split("=")[1]
-            if int(new_version) > self.old_version:
-                print("update")
-                msg = QMessageBox.information(self, 'Update available','<a href=https://google.com>Click to downlaod<a/>')
-        except:
-            print("No internet connection")
 
 
 if __name__ == '__main__':
@@ -823,16 +801,16 @@ if __name__ == '__main__':
     app.setStyleSheet(stream.readAll())
     app.setStyle('Fusion')
 
-    path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
+    # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
     window = OsdagMainWindow()
-    trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
+    # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
 
     ############################     Exception Dialog and Error Reporting  ###################
 
     error_box = CriticalExceptionDialog()
 
-    GITHUB_OWNER = 'expectation-hub'    # username of the repo where crash report is to be submitted
-    GITHUB_REPO = 'Test'       # repo name
+    GITHUB_OWNER = 'osdag-admin'    # username of the github account where crash report is to be submitted
+    GITHUB_REPO = 'Osdag'       # repo name
     EMAIL = 'your.email@provider.com'  # Email address of developers
 
     appcrash.install_backend(appcrash.backends.GithubBackend(GITHUB_OWNER, GITHUB_REPO))
@@ -851,7 +829,7 @@ if __name__ == '__main__':
 
     ############################     Exception Dialog and Error Reporting  ###################
 
-    trayIcon.show()
+    # trayIcon.show()
 
     try:
         # window.notification2()

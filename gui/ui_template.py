@@ -1913,6 +1913,9 @@ class Window(QMainWindow):
                 else:
                     self.designPrefDialog.flag = True
 
+                if self.prev_inputs != {}:
+                    self.design_pref_inputs = {}
+
         else:
             main.design_button_status = True
             for input_field in self.dockWidgetContents.findChildren(QtWidgets.QWidget):

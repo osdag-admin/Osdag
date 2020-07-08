@@ -233,7 +233,7 @@ class Member(Main):
         t14 = ('Label_6', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], Type)
         section.append(t14)
 
-        t29 = ('Label_24', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = (KEY_SOURCE, KEY_DISP_SOURCE, TYPE_TEXTBOX, None, source)
         section.append(t29)
 
         t13 = (None, None, TYPE_BREAK, None, None)
@@ -492,7 +492,7 @@ class Member(Main):
         t14 = ('Label_6', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], Type)
         section.append(t14)
 
-        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = (KEY_SOURCE, KEY_DISP_SOURCE, TYPE_TEXTBOX, None, source)
         section.append(t29)
 
         t28 = (None, None, TYPE_BREAK, None, None)

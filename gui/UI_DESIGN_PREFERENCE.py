@@ -70,8 +70,8 @@ class Window(QDialog):
         self.btn_save.setFixedSize(160,31)
 
         tab_index = 0
-        last_title = ""
         for tab_details in main.tab_list(main):
+            last_title = ""
             tab_name = tab_details[0]
             tab_elements = tab_details[2]
             tab_type = tab_details[1]
@@ -580,7 +580,7 @@ class Window(QDialog):
             elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
                 if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC:
                     Designation_c = ch.text()
-                elif ch.objectName() == 'Label_23':
+                elif ch.objectName() == KEY_SOURCE:
                     Source_c = ch.text()
                 elif ch.objectName() == 'Label_1':
                     D_c = float(ch.text())
@@ -687,7 +687,7 @@ class Window(QDialog):
 
                 if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTDSEC:
                     Designation_b = ch.text()
-                elif ch.objectName() == 'Label_23':
+                elif ch.objectName() == KEY_SOURCE:
                     Source_b = ch.text()
                 elif ch.objectName() == 'Label_1':
                     D_b = float(ch.text())
@@ -768,6 +768,10 @@ class Window(QDialog):
         @author: Umair
         '''
         tab_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, DISP_TITLE_ANGLE)
+
+        if self.add_compound_section(tab_Angle):
+            return
+
         tab_name = DISP_TITLE_ANGLE
         if tab_Angle == None:
             tab_Angle = self.tabWidget.tabs.findChild(QtWidgets.QWidget, DISP_TITLE_CLEAT)
@@ -791,7 +795,7 @@ class Window(QDialog):
 
                 if ch.objectName() == KEY_SECSIZE_SELECTED or ch.objectName() == KEY_ANGLE_SELECTED:
                     Designation_a = ch.text()
-                elif ch.objectName() == 'Label_24':
+                elif ch.objectName() == KEY_SOURCE:
                     Source = ch.text()
                 elif ch.objectName() == 'Label_1':
                     a = ch.text()
@@ -884,6 +888,10 @@ class Window(QDialog):
         @author: Umair
         '''
         tab_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, DISP_TITLE_CHANNEL)
+
+        if self.add_compound_section(tab_Channel):
+            return
+
         name = self.tabWidget.tabs.tabText(self.tabWidget.tabs.indexOf(tab_Channel))
         for ch in tab_Channel.findChildren(QtWidgets.QWidget):
             if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
@@ -896,7 +904,7 @@ class Window(QDialog):
 
                 if ch.objectName() == KEY_SECSIZE_SELECTED:
                     Designation_c = ch.text()
-                elif ch.objectName() == 'Label_23':
+                elif ch.objectName() == KEY_SOURCE:
                     Source = ch.text()
                 elif ch.objectName() == 'Label_1':
                     B = float(ch.text())
@@ -978,6 +986,12 @@ class Window(QDialog):
                 QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
             else:
                 QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+
+    def add_compound_section(self, tab):
+        if tab.findChild(QWidget, KEY_SEC_PROFILE).text() in ['Back to Back Angles', 'Star Angles', 'Back to Back Channels']:
+            QMessageBox.information(QMessageBox(), "Information", "To create new compound section please add as single section")
+            return True
+        return False
 
     def download_Database(self, table, call_type="database"):
 

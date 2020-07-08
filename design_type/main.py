@@ -240,9 +240,7 @@ class Main():
         elif designation in connectdb("Channels", call_type="dropdown"):
             source = get_source("Channels", designation)
 
-        d = {'Label_23': str(source),
-             'Label_24': str(source),
-             'Label_21': str(source)}
+        d = {KEY_SOURCE: str(source)}
         return d
 
 

@@ -45,7 +45,7 @@ from utils.common.component import *
 from utils.common.Section_Properties_Calculator import *
 from .customized_popup import Ui_Popup
 # from .ui_summary_popup import Ui_Dialog1
-from .ui_design_preferences import Ui_Dialog
+#from .ui_design_preferences import Ui_Dialog
 
 from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
@@ -1913,6 +1913,9 @@ class Window(QMainWindow):
                     self.designPrefDialog.flag = False
                 else:
                     self.designPrefDialog.flag = True
+
+                if self.prev_inputs != {}:
+                    self.design_pref_inputs = {}
 
         else:
             main.design_button_status = True

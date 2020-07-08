@@ -126,10 +126,10 @@ class Tension_bolted(Member):
 
         change_tab.append(t5)
 
-        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE_SELECTED], ['Label_24'], TYPE_TEXTBOX, self.change_source)
+        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t6)
 
-        t7 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE_SELECTED], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        t7 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t7)
 
         return change_tab
@@ -461,7 +461,8 @@ class Tension_bolted(Member):
         t3 = (KEY_LOCATION, KEY_DISP_LOCATION, TYPE_COMBOBOX, VALUES_LOCATION_1, True, 'No Validator')
         options_list.append(t3)
 
-        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized','Custom Section'], True, 'No Validator')
+        # t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized','Custom Section'], True, 'No Validator')
+        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All','Customized'], True, 'No Validator')
         options_list.append(t4)
 
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')

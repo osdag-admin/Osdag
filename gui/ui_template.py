@@ -2195,6 +2195,7 @@ class Window(QMainWindow):
                         im.setScaledContents(True)
                         im.setFixedSize(value[1], value[2])
                         pmap = QPixmap(value[0])
+                        im.setStyleSheet("background-color: white;")
                         im.setPixmap(pmap)
 # >>>>>>> 69a22ea10dd18e2df58abc6503be8d6354eaa30a
                         image_layout.addWidget(im)

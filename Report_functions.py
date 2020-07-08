@@ -2961,7 +2961,7 @@ def long_joint_bolted_prov(nc,nr,p,g,d,Tc,Tr,direction=None):
         B =1
     else:
         B=B
-    B = str(round(B,3))
+    B = str(round(B,2))
     Bi = str(Bi)
     lc_str = str(lc)
     lr_str = str(lr)

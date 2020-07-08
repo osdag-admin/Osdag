@@ -1974,7 +1974,11 @@ class BeamCoverPlateWeld(MomentConnection):
     def save_design(self, popup_summary):
         self.gamma_mw_flange = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.flange_weld.fabrication]
         self.gamma_mw_web = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][self.web_weld.fabrication]
-        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
+        if self.section.flange_slope == 90:
+            image = "Parallel_Beam"
+        else:
+            image = "Slope_Beam"
+        self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
                                   KEY_DISP_BEAMSEC: self.section.designation,
                                   KEY_DISP_MATERIAL: self.section.material,
                                   KEY_DISP_FU: self.section.fu,

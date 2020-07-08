@@ -2843,7 +2843,11 @@ class ColumnCoverPlate(MomentConnection):
 
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
-        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
+        if self.section.flange_slope == 90:
+            image = "Parallel_Beam"
+        else:
+            image = "Slope_Beam"
+        self.report_supporting = {KEY_DISP_SEC_PROFILE:image,
                                   KEY_DISP_COLSEC: self.section.designation,
                                   KEY_DISP_MATERIAL: self.section.material,
                                   KEY_DISP_FU: self.section.fu,

@@ -501,15 +501,21 @@ class Tension_bolted(Member):
 
         spacing = []
 
-        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - (root radius not included in edge distance)")
         spacing.append(t00)
 
         # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
         # spacing.append(t99)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_1.jpg', 400, 278, ""])  # [image, width, height, caption]
+               ['./ResourceFiles/images/spacing_1.png', 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
         spacing.append(t99)
+
+        t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if status else '',True)
+        spacing.append(t16)
+
+        t15 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if status else '', True)
+        spacing.append(t15)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
         spacing.append(t9)
@@ -523,22 +529,39 @@ class Tension_bolted(Member):
         t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
         spacing.append(t12)
 
-
-
         return spacing
 
     def memb_pattern(self, status):
+
+        if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
+            image = './ResourceFiles/images/L.png'
+            x, y = 400, 202
+
+        else:
+            image = './ResourceFiles/images/U.png'
+            x, y = 400, 202
+
 
         pattern = []
 
         t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
         pattern.append(t00)
 
-        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
-        # spacing.append(t99)
+        t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_IMAGE,
+               [image, x, y, "Member Block Shear Pattern"])  # [image, width, height, caption]
+        pattern.append(t99)
+
+        return pattern
+
+    def plate_pattern(self, status):
+
+        pattern = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
+        pattern.append(t00)
 
         t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,
-               ['./ResourceFiles/images/L.jpg', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+               ['./ResourceFiles/images/L.png',400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
         pattern.append(t99)
 
         return pattern
@@ -549,6 +572,7 @@ class Tension_bolted(Member):
         '''
 
         # @author: Umair
+        # print(round(self.plate.beta_lj, 2),"hcbvhg")
 
         out_list = []
 
@@ -570,7 +594,7 @@ class Tension_bolted(Member):
               round((self.section_size_1.block_shear_capacity_axial/1000),2) if flag else '', True)
         out_list.append(t5)
 
-        t17 = (KEY_OUT_PATTERN, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.memb_pattern], True)
+        t17 = (KEY_OUT_PATTERN_1, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.memb_pattern], True)
         out_list.append(t17)
 
         t6 = (KEY_TENSION_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
@@ -612,17 +636,16 @@ class Tension_bolted(Member):
         t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX,  bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)
 
-        t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.bolt.bolt_capacity/1000,2) if flag else '', True)
+        t5 = (KEY_REDUCTION_FACTOR_FLANGE, KEY_DISP_REDUCTION_FACTOR_FLANGE, TYPE_TEXTBOX, round(self.plate.beta_lj, 2) if flag else '', True)
+        out_list.append(t5)
+
+        t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.plate.bolt_capacity_red/1000,2) if flag else '', True)
         out_list.append(t13)
 
         t14 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_FORCE, TYPE_TEXTBOX, round(self.plate.bolt_force / 1000, 2) if flag else '', True)
         out_list.append(t14)
 
-        t15 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if flag else '', True)
-        out_list.append(t15)
 
-        t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if flag else '', True)
-        out_list.append(t16)
 
         t17 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
         out_list.append(t17)
@@ -650,6 +673,9 @@ class Tension_bolted(Member):
         t21 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
                (round(self.plate.block_shear_capacity/ 1000, 2)) if flag else '', True)
         out_list.append(t21)
+
+        t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.plate_pattern], True)
+        out_list.append(t17)
 
         t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
                (round(self.plate_tension_capacity/1000, 2)) if flag else '', True)
@@ -1797,6 +1823,7 @@ class Tension_bolted(Member):
 
 
     def intermittent_bolt(self, design_dictionary):
+        # print(round(self.plate.beta_lj, 2), "hcbvhg")
         print(self.bolt.max_edge_dist,"ghxvjhshd")
         self.inter_length = self.length - 2 * (self.plate.end_dist_provided + (self.plate.bolt_line -1)*self.plate.pitch_provided)
         if design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:

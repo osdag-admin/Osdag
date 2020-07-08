@@ -353,29 +353,93 @@ class ColumnEndPlate(MomentConnection):
     def web_bolt_spacing(self, flag):
         web_bolt_spacing = []
 
-        t1 = (None, 'Web bolts detailing', TYPE_SECTION, self.image_web)
-        web_bolt_spacing.append(t1)
-        t2 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '', True)
-        web_bolt_spacing.append(t2)
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Web Bolt Spacing Details (4 bolts common in flange)")
+        web_bolt_spacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/spacing_4.png', 400, 411, "Web Bolt Spacing for (n) Bolts"])  # [image, width, height, caption]
+        web_bolt_spacing.append(t99)
+        # t2 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '', True)
+        # web_bolt_spacing.append(t2)
+        for i in range(1,self.n_bw):
+            if (self.n_bw)%2==0:
+                if i!=(self.n_bw)/2:
+                    t2 = (KEY_OUT_PITCH, "Pitch {}-{}".format(i,i+1), TYPE_TEXTBOX, self.pitch if flag else '', True)
+                    web_bolt_spacing.append(t2)
+                else:
+                    t2 = (KEY_OUT_PITCH, "Pitch {}-{}".format(i, i + 1), TYPE_TEXTBOX, round(self.p_2_web,2) if flag else '', True)
+                    web_bolt_spacing.append(t2)
+            else:
+                if i != int((self.n_bw) / 2) and i != int((self.n_bw)/ 2) + 1:
+                    t2 = (KEY_OUT_PITCH, "Pitch {}-{}".format(i, i + 1), TYPE_TEXTBOX, self.pitch if flag else '', True)
+                    web_bolt_spacing.append(t2)
+                else:
+
+                    t2 = (KEY_OUT_PITCH, "Pitch {}-{}".format(i, i + 1), TYPE_TEXTBOX, round(self.p_2_web, 2) if flag else '',
+                    True)
+                    web_bolt_spacing.append(t2)
+
         t3 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.end_dist if flag else '', True)
         web_bolt_spacing.append(t3)
-        t4 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
+        t4 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw if flag else '', True)
         web_bolt_spacing.append(t4)
-        t5 = (KEY_PITCH_2_WEB1, KEY_DISP_PITCH_2_WEB1, TYPE_TEXTBOX, round(self.p_2_web,2) if flag else '', True)
-        web_bolt_spacing.append(t5)
+        t4 = (KEY_OUT_NO_BOLTS_WEB_TOTAL, KEY_OUT_DISP_NO_BOLTS_WEB_TOTAL, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
+        web_bolt_spacing.append(t4)
+        # t5 = (KEY_PITCH_2_WEB1, KEY_DISP_PITCH_2_WEB1, TYPE_TEXTBOX, round(self.p_2_web,2) if flag else '', True)
+        # web_bolt_spacing.append(t5)
 
         return web_bolt_spacing
 
     def flange_bolt_spacing(self, flag):
         flange_bolt_spacing = []
 
-        t1 = (None, 'Web bolts detailing', TYPE_SECTION, self.image_flange)
-        flange_bolt_spacing.append(t1)
-        t2 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '', True)
-        flange_bolt_spacing.append(t2)
+        if self.connection == 'Flush End Plate':
+            image = './ResourceFiles/images/spacing_5.png'
+            x,y = 401,248
+            bolts = int(self.n_bf_output/4)
+        else:
+            image = './ResourceFiles/images/spacing_6.png'
+            x, y = 401, 321
+            bolts = int(self.n_bf_output / 8)
+
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Flange Bolt Spacing Details")
+        flange_bolt_spacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               [image, x, y, "Top Half Flange Bolt Spacing for (n) Bolts"])  # [image, width, height, caption]
+        flange_bolt_spacing.append(t99)
+        # t2 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '', True)
+        # flange_bolt_spacing.append(t2)
+        for i in range(1, bolts):
+            if (bolts) % 2 == 0:
+                if i != (bolts) / 2:
+                    t2 = (KEY_OUT_PITCH, "Pitch {}-{}".format(i, i + 1), TYPE_TEXTBOX, self.pitch if flag else '', True)
+                    flange_bolt_spacing.append(t2)
+                else:
+                    t2 = (KEY_OUT_PITCH, "Pitch {}-{}".format(i, i + 1), TYPE_TEXTBOX, round(self.p_2_flange,2) if flag else '',
+                    True)
+                    flange_bolt_spacing.append(t2)
+            else:
+                if i != int((bolts) / 2) and i != int((bolts) / 2) + 1:
+                    t2 = (KEY_OUT_PITCH, "Pitch {}-{}".format(i, i + 1), TYPE_TEXTBOX, self.pitch if flag else '', True)
+                    flange_bolt_spacing.append(t2)
+                else:
+
+                    t2 = (
+                    KEY_OUT_PITCH, "Pitch {}-{}".format(i, i + 1), TYPE_TEXTBOX, round(self.p_2_flange,2) if flag else '',
+                    True)
+                    flange_bolt_spacing.append(t2)
+
         t3 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.end_dist if flag else '', True)
         flange_bolt_spacing.append(t3)
-        t4 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf_output if flag else '', True)
+        t4 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, bolts if flag else '', True)
+        flange_bolt_spacing.append(t4)
+        t4 = (KEY_OUT_NO_BOLTS_FLANGE_TOTAL, KEY_OUT_DISP_NO_BOLTS_FLANGE_TOTAL, TYPE_TEXTBOX, self.n_bf_output if flag else '', True)
         flange_bolt_spacing.append(t4)
         t5 = (KEY_PITCH_2_FLANGE1, KEY_DISP_PITCH_2_FLANGE1, TYPE_TEXTBOX, round(self.p_2_flange,2) if flag else '', True)
         flange_bolt_spacing.append(t5)

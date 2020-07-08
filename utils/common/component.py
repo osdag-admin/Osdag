@@ -295,6 +295,8 @@ class Weld:
         self.fu = float(material_g_o)
         self.throat_tk = 0.0
         self.reason = 0.0
+        self.beta_lw = 1.0
+
 
     def __repr__(self):
         repr = "Weld\n"
@@ -477,7 +479,7 @@ class Plate(Material):
         self.tmv = 0.0
         self.vres = 0.0
         self.spacing_status = 0.0
-        self.beta_lj =0.0
+        self.beta_lj = 1.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
         # self.block_shear_capacity_disp = round(self.block_shear_capacity/1000, 2)
@@ -686,15 +688,15 @@ class Plate(Material):
         if end_dist == 0.0 and gap == 0.0:
             self.length_avail = max(((bolts_one_line - 1) * gauge), ((bolts_line - 1) * pitch))
             if self.length_avail > 15 * bolt_dia:
-                beta_lj = 1.075 - self.length_avail / (200 * bolt_dia)
+                self.beta_lj = 1.075 - self.length_avail / (200 * bolt_dia)
                 print('long joint case')
-                if beta_lj > 1:
-                    beta_lj = 1
-                elif beta_lj < 0.75:
-                    beta_lj = 0.75
+                if self.beta_lj > 1:
+                    self.beta_lj = 1
+                elif self.beta_lj < 0.75:
+                    self.beta_lj = 0.75
                 else:
-                    beta_lj = beta_lj
-                bolt_capacity_red = round(beta_lj, 3) * bolt_capacity
+                    self.beta_lj = self.beta_lj
+                bolt_capacity_red = round(self.beta_lj, 2) * bolt_capacity
             else:
                 bolt_capacity_red = bolt_capacity
         else:

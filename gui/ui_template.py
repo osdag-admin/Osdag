@@ -20,6 +20,7 @@ from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PIL import Image
 from texlive.Design_wrapper import init_display as init_display_off_screen
+# from OCC.Display.backend import off
 import os
 import yaml
 import json
@@ -201,7 +202,7 @@ class Window(QMainWindow):
             off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
             self.commLogicObj.display = off_display
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
-            off_display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
+            # off_display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
             off_display.ExportToImage('./ResourceFiles/images/3d.png')
             off_display.View_Front()
             off_display.FitAll()
@@ -2145,6 +2146,7 @@ class Window(QMainWindow):
                             im.setFixedSize(value[1], value[2])
                             pmap = QPixmap(value[0])
                             im.setScaledContents(1)
+                            im.setStyleSheet("background-color: white;")
                             im.setPixmap(pmap)
                             image_layout.addWidget(im)
                             caption = QtWidgets.QLabel(image_widget)
@@ -2198,6 +2200,7 @@ class Window(QMainWindow):
                         im.setScaledContents(True)
                         im.setFixedSize(value[1], value[2])
                         pmap = QPixmap(value[0])
+                        im.setStyleSheet("background-color: white;")
                         im.setPixmap(pmap)
 # >>>>>>> 69a22ea10dd18e2df58abc6503be8d6354eaa30a
                         image_layout.addWidget(im)

@@ -76,6 +76,7 @@ from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 import logging
 import subprocess
+from get_DPI_scale import scale
 from cad.cad3dconnection import cadconnection
 
 
@@ -593,7 +594,7 @@ class Window(QMainWindow):
 
                 if lable == 'Material':
                     combo.setCurrentIndex(1)
-                    maxi_width_right = max(maxi_width_right, item_width)
+                    maxi_width_right = max(maxi_width_right+8, item_width)
                 combo.view().setMinimumWidth(item_width + 25)
 
             if type == TYPE_TEXTBOX:
@@ -700,7 +701,8 @@ class Window(QMainWindow):
         maxi_width = maxi_width_left + maxi_width_right
         in_scrollcontent.setMinimumSize(maxi_width,in_scrollcontent.sizeHint().height())
         maxi_width += 82
-        maxi_width = max(maxi_width, 350)    # In case there is no widget
+        print('maxiwidth',maxi_width)
+        maxi_width = max(maxi_width, scale*350)    # In case there is no widget
         self.inputDock.setFixedWidth(maxi_width)
         self.in_widget.setFixedWidth( maxi_width)
         for option in option_list:
@@ -959,7 +961,7 @@ class Window(QMainWindow):
         maxi_width = maxi_width_left + maxi_width_right
 
         maxi_width += 80    # +73 coz of whitespaces
-        maxi_width = max(maxi_width, 350) # in case no widget
+        maxi_width = max(maxi_width, scale*350) # in case no widget
         out_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         out_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 

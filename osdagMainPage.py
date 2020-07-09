@@ -87,7 +87,7 @@ from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 import urllib.request
 from update_version_check import Update
 #from Thread import timer
-
+from get_DPI_scale import scale
 
 ############################ Pre-Build Database Updation/Creation #################
 sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
@@ -208,13 +208,13 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         self.rdbtn=QRadioButton()
         self.rdbtn.setObjectName(Object_Name)
         self.rdbtn.setIcon(QIcon(Image_Path))
-        self.rdbtn.setIconSize(QSize(300,300))
+        self.rdbtn.setIconSize(QSize(scale*300, scale*200))
         layout.addWidget(self.rdbtn)
         self.setStyleSheet(
                     '''
                         QLabel{
                             font-family: "Arial", Helvetica, sans-serif;
-                            font-size: 20px;
+                            font-size: 12pt;
                             font-weight: bold;
                               }
                     '''
@@ -232,14 +232,17 @@ class LeftPanelButton(QWidget):          # Custom Button widget for the Left Pan
     def __init__(self,text):
         super().__init__()
         self.ui=Ui_LPButton()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self,scale)
         self.ui.LP_Button.setText(text)  #LP_Button is the QPushButton widget inside the LeftPanelButton Widget
+
+
 class OsdagMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
         height = resolution.height()
+
         self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.switch.toggled.connect(self.change_theme)
@@ -478,7 +481,7 @@ class OsdagMainWindow(QMainWindow):
     @staticmethod
     def UnderDevelopmentModule():
         Page= ModulePage()
-        label=QLabel('This Module is Currently Under Devopment')
+        label=QLabel('This Module is Currently Under Development')
         Page.layout.addWidget(label)
         label.setAlignment(Qt.AlignCenter)
         Page.setStyleSheet(
@@ -795,11 +798,17 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
 if __name__ == '__main__':
 
-    app = QApplication(sys.argv)
+    # app = QApplication(sys.argv)
+    # screen = app.screens()[0]
+    # dpi = screen.physicalDotsPerInch()
+    # scale = round(dpi/140.0,1)
+    #
+    # print('scale', dpi, scale,scale*300)
     path = os.path.join(os.path.dirname(__file__), 'themes', 'light.qss')
     file = QFile(path)
     file.open(QFile.ReadOnly | QFile.Text)
     stream = QTextStream(file)
+    app = QApplication(sys.argv)
     app.setStyleSheet(stream.readAll())
     app.setStyle('Fusion')
 
@@ -837,6 +846,7 @@ if __name__ == '__main__':
         # window.notification2()
         #update = Update(0)
         #update.notifi()
+
         sys.excepthook = hook_exception
         QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:

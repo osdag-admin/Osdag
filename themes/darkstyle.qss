@@ -1076,7 +1076,7 @@ QComboBox {
     border: 1px solid #37495b;
     border-radius: 0;
     /*padding: 3px;*/
-    font: 16px "Arial";
+    font: 10pt "Arial";
     min-height: 25px;
 }
 
@@ -1087,7 +1087,7 @@ QComboBox:hover{
 QComboBox QAbstractItemView {
     /*background-color: #242424;*/
     color: #bbbbbb;
-    font: 16px "Arial";
+    font: 10pt "Arial";
     border-radius: 0;
     border: 1px solid #37495b;
     outline: 0;
@@ -1274,7 +1274,7 @@ QTabBar::tab{
 	height: 35px;
 	width: 200px;
     margin-bottom: 0px;
-    font-size: 16px;
+    font-size: 12pt;
     background: rgba(19, 27, 33, 1);
 }
 

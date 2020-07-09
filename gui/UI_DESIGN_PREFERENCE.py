@@ -17,6 +17,7 @@ import sys
 import sqlite3
 import shutil
 import openpyxl
+from get_DPI_scale import scale,width,height
 
 
 class MyTableWidget(QWidget):
@@ -38,8 +39,10 @@ class Window(QDialog):
 
     def __init__(self, main, input_dictionary):
         super().__init__()
+
         self.do_not_clear_list = []
         self.initUI(main,input_dictionary)
+
 
     def center(self):
         frameGm = self.frameGeometry()
@@ -50,6 +53,8 @@ class Window(QDialog):
 
     def initUI(self,main,input_dictionary):
 
+        button_size_x = scale*190
+        button_size_y = scale*30
         #self.statusBar().showMessage('')
         #self.setGeometry(300, 300, 1170, 710)
         self.setObjectName("DesignPreferences")
@@ -66,8 +71,8 @@ class Window(QDialog):
         hlayout.addWidget(self.btn_save)
         self.btn_defaults.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
         self.btn_save.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-        self.btn_defaults.setFixedSize(160,31)
-        self.btn_save.setFixedSize(160,31)
+        self.btn_defaults.setFixedSize(button_size_x,button_size_y)
+        self.btn_save.setFixedSize(button_size_x,button_size_y)
 
         tab_index = 0
         for tab_details in main.tab_list(main):
@@ -116,13 +121,13 @@ class Window(QDialog):
                     horizontal.addWidget(button)
                     button.setObjectName(object_name)
                     button.setText(btn_text)
-                    button.setFixedSize(160, 27)
+                    button.setFixedSize(button_size_x,button_size_y)
 
-                    font = QtGui.QFont()
-                    font.setPointSize(9)
-                    font.setBold(False)
-                    font.setWeight(50)
-                    button.setFont(font)
+                    # font = QtGui.QFont()
+                    # font.setPointSize(9)
+                    # font.setBold(False)
+                    # font.setWeight(50)
+                    # button.setFont(font)
 
                 r = 1
                 grid = QGridLayout()
@@ -153,18 +158,20 @@ class Window(QDialog):
                         grid.addWidget(line,r,2)
                         line.setObjectName(element[0])
                         line.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
-                        if lable == 'Designation':
+                        font = QtGui.QFont()
+                        font.setPointSize(8)
+                        font.setBold(False)
+                        font.setWeight(50)
+                        line.setFont(font)
+                        line.setFixedSize(85, 20)
+                        if lable == 'Designation' or lable == KEY_DISP_SEC_PROFILE:
                             line.textChanged.connect(self.manage_designation_size(line))
-                        line.setFixedSize(91,22)
+
                         # if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5','Label_6','Label_7','Label_13','Label_14']:
                         #     line.setValidator(QDoubleValidator())
                         if input_dictionary:
                             line.setText(str(element[4]))
-                        font = QtGui.QFont()
-                        font.setPointSize(9)
-                        font.setBold(False)
-                        font.setWeight(50)
-                        line.setFont(font)
+
                         if lable in [KEY_DISP_FU, KEY_DISP_FY, KEY_DISP_POISSON_RATIO, KEY_DISP_THERMAL_EXP,
                                      KEY_DISP_MOD_OF_ELAST, KEY_DISP_MOD_OF_RIGID, 'Source']:
                             line.setReadOnly(True)
@@ -188,26 +195,31 @@ class Window(QDialog):
                     if type == TYPE_COMBOBOX:
                         combo = QComboBox(tab)
                         grid.addWidget(combo,r,2)
-                        combo.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
+                        # combo.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         combo.setMaxVisibleItems(5)
-                        combo.setFixedSize(91, 22)
                         combo.setObjectName(element[0])
                         combo.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
                         combo.addItems(element[3])
                         if input_dictionary:
                             combo.setCurrentText(str(element[4]))
                         font = QtGui.QFont()
-                        font.setPointSize(9)
+                        font.setPointSize(8)
                         font.setBold(False)
                         font.setWeight(50)
-                        #combo.setFont(font)
+                        combo.setFont(font)
+
                         metrices = QtGui.QFontMetrics(font)
                         item_width = 0
                         item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
                         combo.view().setMinimumWidth(item_width + 30)
+
                         combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
+
                         if lable == KEY_DISP_MATERIAL:
+                            combo.setFixedSize(115, 20)
                             self.do_not_clear_list.append(combo)
+                        else:
+                            combo.setFixedSize(85,20)
                         r += 1
 
                     if type == TYPE_TITLE:
@@ -216,7 +228,7 @@ class Window(QDialog):
                         grid.addWidget(title,r,1,1,2)
                         title.setObjectName("_title")
                         font = QtGui.QFont()
-                        font.setPointSize(10)
+                        font.setPointSize(9)
                         title.setFont(font)
                         title.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
                         last_title = lable
@@ -227,7 +239,7 @@ class Window(QDialog):
                         img.setObjectName(element[0])
                         grid.addWidget(img,r,1,10,2)
                         pmap = QPixmap(element[4])
-                        img.setPixmap(pmap.scaled(300,300,Qt.KeepAspectRatio, Qt.FastTransformation)) # you can also use IgnoreAspectRatio
+                        img.setPixmap(pmap.scaled(scale*300,scale*300,Qt.KeepAspectRatio, Qt.FastTransformation)) # you can also use IgnoreAspectRatio
                         r += 10
 
                     if type == TYPE_BREAK:
@@ -528,6 +540,9 @@ class Window(QDialog):
             pushButton_Import_Channel.clicked.connect(lambda: self.import_section("Channels"))
             pushButton_Download_Channel = self.tabWidget.tabs.findChild(QtWidgets.QWidget, "pushButton_Download_" + DISP_TITLE_CHANNEL)
             pushButton_Download_Channel.clicked.connect(lambda: self.download_Database(table="Channels", call_type="header"))
+
+
+
 
     def manage_designation_size(self,line_edit):
         def change_size():
@@ -1288,7 +1303,9 @@ class DesignPreferences():
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
         height = resolution.height()
-        self.ui.resize(width*(0.67),height*(0.60))
+        # self.ui.resize(width*(0.67),height*(0.60))
+        self.ui.resize(width * 0.6, height * 0.6)
+        # self.ui.center()
         # self.ui.tabWidget.resize(width * (0.67), height * (0.60))
         self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
         self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)

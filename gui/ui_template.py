@@ -1236,9 +1236,9 @@ class Window(QMainWindow):
 
 
         self.actionDesign_Preferences = QtWidgets.QAction(MainWindow)
-        font = QtGui.QFont()
-        font.setFamily("DejaVu Serif")
-        self.actionDesign_Preferences.setFont(font)
+        # font = QtGui.QFont()
+        # font.setFamily("DejaVu Serif")
+        # self.actionDesign_Preferences.setFont(font)
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))

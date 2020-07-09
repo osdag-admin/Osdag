@@ -20,7 +20,7 @@ from design_report.reportGenerator_latex import CreateLatex
 
 
 # from design_type.connection.fin_plate_connection import sa
-
+from get_DPI_scale import scale
 class Ui_Dialog1(object):
 
     def __init__(self,design_exist,loggermsg):
@@ -30,7 +30,7 @@ class Ui_Dialog1(object):
     def setupUi(self, Dialog,main):
         self.Dialog = Dialog
         self.Dialog.setObjectName("Dialog")
-        self.Dialog.resize(539, 595)
+        self.Dialog.resize(scale*600, scale*550)
         self.Dialog.setInputMethodHints(QtCore.Qt.ImhNone)
         self.gridLayout = QtWidgets.QGridLayout(self.Dialog)
         self.gridLayout.setObjectName("gridLayout")

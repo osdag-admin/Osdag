@@ -431,8 +431,8 @@ class ColumnCoverPlateWeld(MomentConnection):
         web_weld_details = []
         # t15 = (KEY_WEB_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,(self.l_req_weblength) if flag else '')
         # web_weld_details.append(t15)
-        t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/columnweld_web.png')
-        web_weld_details.append(t99)
+        # t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/UV_w.png')
+        # web_weld_details.append(t99)
 
         t14 = (KEY_WEB_WELD_SIZE, KEY_WEB_DISP_WELD_SIZE, TYPE_TEXTBOX, self.web_weld.size if flag else '')
         web_weld_details.append(t14)
@@ -446,6 +446,24 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         return web_weld_details
 
+    def web_pattern(self, status):
+
+        pattern = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)")
+        pattern.append(t00)
+
+        t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
+               ['./ResourceFiles/images/U_Vw.png', 202, 400, "Web Block Shear Pattern"])  # [image, width, height, caption]
+        pattern.append(t99)
+
+        t9 = (KEY_OUT_Lw, KEY_OUT_DISP_Lw, TYPE_TEXTBOX, round(int((self.web_plate.length-self.flange_plate.gap - (4 *self.web_weld.size))/2),2) if status else '')
+        pattern.append(t9)
+
+        t10 = (KEY_OUT_Hw, KEY_OUT_DISP_Hw, TYPE_TEXTBOX, round(int(self.web_plate.height-(2 * self.web_weld.size)),2) if status else '')
+        pattern.append(t10)
+
+        return pattern
     def flange_weld_details(self, flag):
         flange_weld_details = []
         # t15 = (KEY_FLANGE_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,
@@ -455,8 +473,8 @@ class ColumnCoverPlateWeld(MomentConnection):
         # t15 = (KEY_FLANGE_WELD_HEIGHT, KEY_DISP_FLANGE_WELD_HEIGHT, TYPE_TEXTBOX,
         #        (self.flange_weld.height) if flag else '')
         # flange_weld_details.append(t15)
-        t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/columnweld_flange.png')
-        flange_weld_details.append(t99)
+        # t99 = (None, None, TYPE_SECTION, './ResourceFiles/images/columnweld_flange.png')
+        # flange_weld_details.append(t99)
 
         t14 = (KEY_FLANGE_WELD_SIZE, KEY_FLANGE_DISP_WELD_SIZE, TYPE_TEXTBOX, self.flange_weld.size if flag else '')
         flange_weld_details.append(t14)
@@ -539,7 +557,8 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON, ['Web Capacity', self.webcapacity], True)
         out_list.append(t21)
-
+        t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Block Shear Pattern ', self.web_pattern], True)
+        out_list.append(t17)
         t21 = (
         KEY_WEB_WELD_DETAILS, KEY_DISP_WEB_WELD_DETAILS, TYPE_OUT_BUTTON, ['Web Plate Weld', self.web_weld_details],
         True)

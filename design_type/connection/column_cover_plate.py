@@ -445,7 +445,7 @@ class ColumnCoverPlate(MomentConnection):
         t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)- 2 x 3 Bolts pattern considered")
         flangecapacity.append(t00)
         t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
-               ['./ResourceFiles/images/2L_V.jpg', 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
+               ['./ResourceFiles/images/2L_V.png', 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
         flangecapacity.append(t99)
         # t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
         #        ['./ResourceFiles/images/L_V.jpg', 211, 349, "Block Shear Pattern"])  # [image, width, height, caption]
@@ -470,7 +470,7 @@ class ColumnCoverPlate(MomentConnection):
         webcapacity.append(t00)
 
         t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/U_V.jpg', 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
+               ['./ResourceFiles/images/U_V.png', 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 
 
@@ -483,7 +483,7 @@ class ColumnCoverPlate(MomentConnection):
         webcapacity.append(t30)
 
         t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/L_Vshear.jpg', 239 , 350,
+               ['./ResourceFiles/images/L_Vshear.png', 239 , 350,
                 "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 

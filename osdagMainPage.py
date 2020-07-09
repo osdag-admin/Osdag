@@ -481,7 +481,7 @@ class OsdagMainWindow(QMainWindow):
     @staticmethod
     def UnderDevelopmentModule():
         Page= ModulePage()
-        label=QLabel('This Module is Currently Under Devopment')
+        label=QLabel('This Module is Currently Under Development')
         Page.layout.addWidget(label)
         label.setAlignment(Qt.AlignCenter)
         Page.setStyleSheet(

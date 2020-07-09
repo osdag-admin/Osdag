@@ -492,6 +492,13 @@ class Tension_welded(Member):
         t10 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, round(self.weld.strength,2) if flag else '', True)
         out_list.append(t10)
 
+        t5 = (KEY_REDUCTION_FACTOR_FLANGE, KEY_DISP_REDUCTION, TYPE_TEXTBOX,round(self.weld.beta_lw, 2) if flag else '', True)
+        out_list.append(t5)
+
+        t10 = (KEY_OUT_WELD_STRENGTH_RED, KEY_OUT_DISP_WELD_STRENGTH_RED, TYPE_TEXTBOX, round(self.weld.strength_red, 2) if flag else '',
+        True)
+        out_list.append(t10)
+
         t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, round(self.weld.stress,2) if flag else '', True)
         out_list.append(t11)
 
@@ -534,6 +541,9 @@ class Tension_welded(Member):
                (round(self.plate.block_shear_capacity / 1000, 2)) if flag else '', True)
         out_list.append(t21)
 
+        t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.plate_pattern], True)
+        out_list.append(t17)
+
         t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
                (round(self.plate_tension_capacity / 1000, 2)) if flag else '', True)
 
@@ -571,6 +581,25 @@ class Tension_welded(Member):
         out_list.append(t21)
 
         return out_list
+
+    def plate_pattern(self, status):
+
+        pattern = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern ")
+        pattern.append(t00)
+
+        t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/Lw.png', 400, 202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
+        pattern.append(t99)
+
+        t9 = (KEY_OUT_Lw, KEY_OUT_DISP_Lw, TYPE_TEXTBOX, round(int(self.plate.length-max((2 * self.weld.size),15)),2) if status else '')
+        pattern.append(t9)
+
+        t10 = (KEY_OUT_Hw, KEY_OUT_DISP_Hw, TYPE_TEXTBOX, round(int(self.plate.height-max((2 * self.weld.size),15)),2) if status else '')
+        pattern.append(t10)
+
+        return pattern
 
     def func_for_validation(self, design_dictionary):
 

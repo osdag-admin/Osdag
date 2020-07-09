@@ -679,9 +679,8 @@ class FinPlateConnection(ShearConnection):
             if self.plate.moment_capacity < self.plate.moment_demand:
                 break
 
-            if self.supported_section.design_status is True and self.plate.design_status_capacity is True and self.weld.design_status is True:
-                self.get_design_status(self)
-                break
+        if self.supported_section.design_status is True and self.plate.design_status_capacity is True and self.weld.design_status is True:
+            self.get_design_status(self)
 
         if self.load.shear_force*1000 > self.plate.shear_capacity:
             self.design_status = False

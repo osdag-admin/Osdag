@@ -626,7 +626,7 @@ QDialog#Dialog QPushButton{
 }
 QFrame#frame{
 
- background: #abc250;
+ background: #91B014;
 
  }
 

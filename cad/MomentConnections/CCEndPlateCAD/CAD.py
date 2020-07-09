@@ -31,6 +31,8 @@ class CCEndPlateCAD(object):
         self.stiff_cond = (self.endPlate.L - self.column.D)/2
         if self.stiff_cond > 50:
             self.stiff = True
+        else:
+            self.stiff = False
 
         self.column1 = copy.deepcopy(self.column)
         self.column2 = copy.deepcopy(self.column)

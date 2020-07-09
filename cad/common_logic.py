@@ -1099,7 +1099,7 @@ class CommonDesignLogic(object):
         # elif self.view = 'Top View':
         #     self.display.View_Top()
         # else:
-        #     self.display.View_Iso()
+        #     self.display.View_Iso()createCCEndPlateCAD
         self.display.View_Iso()
 
         self.display.FitAll()

@@ -130,7 +130,7 @@ class MomentConnection(Connection, IS800_2007):
         t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
         section.append(t14)
 
-        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = (KEY_SOURCE, KEY_DISP_SOURCE, TYPE_TEXTBOX, None, source)
         section.append(t29)
 
         t13 = (None, None, TYPE_BREAK, None, None)
@@ -333,7 +333,7 @@ class MomentConnection(Connection, IS800_2007):
 
                     For I -section: A_bc = (bf + 2c) (h + 2c) - [{h - 2(tf + c)}(bf - tw)]
                     For Hollow SHS & RHS: A_bc = (D + 2c) (B + 2c)  [D = Depth, B = Width]
-                    For Hollow SHS: A_bc = (3.14/4) * (OD + 2c)^2  [OD = outside diameter of the tube]
+                    For Hollow CHS: A_bc = (3.14/4) * (OD + 2c)^2  [OD = outside diameter of the tube]
 
                     c is the effective projection from the outer face of the respective column section
 

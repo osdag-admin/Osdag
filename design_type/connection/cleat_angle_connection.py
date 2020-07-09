@@ -76,13 +76,13 @@ class CleatAngleConnection(ShearConnection):
                'Label_19', 'Label_20','Label_21','Label_22',KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
 
-        t6 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        t6 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t6)
 
-        t7 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        t7 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t7)
 
-        t8 = (DISP_TITLE_CLEAT, [KEY_ANGLE_SELECTED], ['Label_24'], TYPE_TEXTBOX, self.change_source)
+        t8 = (DISP_TITLE_CLEAT, [KEY_ANGLE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t8)
 
         return change_tab
@@ -216,11 +216,11 @@ class CleatAngleConnection(ShearConnection):
         a = VALUES_CLEAT_CUSTOMIZED
         return a
 
-    @staticmethod
-    def diam_bolt_customized():
-        c = connectdb1()
-        if "36" in c: c.remove("36")
-        return c
+    # @staticmethod
+    # def diam_bolt_customized():
+    #     c = connectdb1()
+    #     if "36" in c: c.remove("36")
+    #     return c
 
     def customized_input(self):
 
@@ -229,8 +229,8 @@ class CleatAngleConnection(ShearConnection):
         list1.append(t1)
         t2 = (KEY_ANGLE_LIST, self.cleatsec_customized)
         list1.append(t2)
-        t3 = (KEY_D, self.diam_bolt_customized)
-        list1.append(t3)
+        # t3 = (KEY_D, self.diam_bolt_customized)
+        # list1.append(t3)
         return list1
 
     def fn_conn_suptngsec_lbl(self):

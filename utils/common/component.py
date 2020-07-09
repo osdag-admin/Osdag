@@ -295,6 +295,8 @@ class Weld:
         self.fu = float(material_g_o)
         self.throat_tk = 0.0
         self.reason = 0.0
+        self.beta_lw = 1.0
+
 
     def __repr__(self):
         repr = "Weld\n"
@@ -331,7 +333,7 @@ class Weld:
         weld_strength = round(f_wd * self.throat_tk, 2)
         self.strength = weld_strength
 
-    def get_weld_strength_lj(self, connecting_fu, weld_fabrication, t_weld, weld_angle, lenght):
+    def get_weld_strength_lj(self, connecting_fu, weld_fabrication, t_weld, weld_angle, length):
         f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
         self.throat_tk = \
             round(IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness \
@@ -477,7 +479,7 @@ class Plate(Material):
         self.tmv = 0.0
         self.vres = 0.0
         self.spacing_status = 0.0
-        self.beta_lj =0.0
+        self.beta_lj = 1.0
 
         # self.moment_demand_disp = round(self.moment_demand/1000000, 2)
         # self.block_shear_capacity_disp = round(self.block_shear_capacity/1000, 2)
@@ -684,29 +686,29 @@ class Plate(Material):
         :return: reduced bolt capacity if long joint condition is met
         """
         if end_dist == 0.0 and gap == 0.0:
-            length_avail = max(((bolts_one_line - 1) * gauge), ((bolts_line - 1) * pitch))
-            if length_avail > 15 * bolt_dia:
-                beta_lj = 1.075 - length_avail / (200 * bolt_dia)
+            self.length_avail = max(((bolts_one_line - 1) * gauge), ((bolts_line - 1) * pitch))
+            if self.length_avail > 15 * bolt_dia:
+                self.beta_lj = 1.075 - self.length_avail / (200 * bolt_dia)
                 print('long joint case')
-                if beta_lj > 1:
-                    beta_lj = 1
-                elif beta_lj < 0.75:
-                    beta_lj = 0.75
+                if self.beta_lj > 1:
+                    self.beta_lj = 1
+                elif self.beta_lj < 0.75:
+                    self.beta_lj = 0.75
                 else:
-                    beta_lj = beta_lj
-                bolt_capacity_red = round(beta_lj, 2) * bolt_capacity
+                    self.beta_lj = self.beta_lj
+                bolt_capacity_red = round(self.beta_lj, 2) * bolt_capacity
             else:
                 bolt_capacity_red = bolt_capacity
         else:
             if web_thickness == 0.0:
-                length_avail = max((2 * (((bolts_line - 1) * pitch) + end_dist) + (2 * gap)),
+                self.length_avail = max((2 * (((bolts_line - 1) * pitch) + end_dist) + (2 * gap)),
                                    ((bolts_one_line - 1) * gauge))
             else:
                 midgauge = 2 * (edge_dist + root_radius) + web_thickness
-                length_avail = max((2 * (((bolts_line - 1) * pitch) + end_dist) + (2 * gap)),
+                self.length_avail = max((2 * (((bolts_line - 1) * pitch) + end_dist) + (2 * gap)),
                                    (((bolts_one_line / 2 - 1) * gauge) + midgauge))
-            if length_avail > 15 * bolt_dia:
-                self.beta_lj = 1.075 - length_avail / (200 * bolt_dia)
+            if self.length_avail > 15 * bolt_dia:
+                self.beta_lj = 1.075 - self.length_avail / (200 * bolt_dia)
                 if  self.beta_lj > 1:
                     self.beta_lj = 1
                 elif  self.beta_lj < 0.75:
@@ -719,6 +721,17 @@ class Plate(Material):
                 bolt_capacity_red = bolt_capacity
 
         return bolt_capacity_red
+
+    # def length_grip_bolt_cap_red(self, plate_quantity, parent_tk, plate_tk, diameter, bolt_capacity,vres):
+    #     length_grip_l_g = (plate_quantity * plate_tk) + parent_tk
+    #     self.beta_lg = IS800_2007.cl_10_3_3_2_bolt_large_grip(d=diameter, l_g=length_grip_l_g, l_j=self.length_avail)
+    #     bolt_capacity_red =self.beta_lg * bolt_capacity
+    #     if vres > bolt_capacity_red:
+    #         self.design_status = False
+    #         self.reason = " Select higher grade/Diameter or choose different connection"
+    #     else:
+    #         self.design_status = True
+    #     return bolt_capacity_red
 
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge,
                               max_spacing, max_edge_dist, shear_load=0.0, axial_load=0.0, web_moment=0.0, gap=0.0,
@@ -754,6 +767,15 @@ class Plate(Material):
 
         if bolts_one_line < min_bolts_one_line:
             self.design_status = False
+            self.bolt_line = min_bolt_line
+            self.bolts_one_line = min_bolts_one_line
+            self.bolts_required = bolt_line * bolts_one_line
+            self.pitch_provided = min_gauge
+            self.gauge_provided = min_gauge
+            self.edge_dist_provided = min_edge_dist
+            self.end_dist_provided = min_edge_dist
+            self.length = gap + self.edge_dist_provided * 2 + self.gauge_provided * (self.bolt_line - 1)
+            self.height = self.get_web_plate_h_req(self.bolts_one_line, self.gauge_provided , self.edge_dist_provided)
             self.reason = "Can't fit two bolts in one line. Select lower diameter."
         elif bolt_line < min_bolt_line:
             self.design_status = False
@@ -998,7 +1020,8 @@ class Plate(Material):
             self.edge_dist_provided = edge_dist
             self.end_dist_provided = end_dist
 
-    # Function for block shear capacity calculation
+
+    # Function for block shear capacity calculation l_g =length_g
     def blockshear(self, numrow, numcol, pitch, gauge, thk, end_dist, edge_dist, dia_hole, fy, fu):
         '''
 
@@ -2052,7 +2075,12 @@ class CHS(Material):
         self.area = row[6] * 100  # mm^2
         self.nominal_bore = row[2]  # mm
         self.out_diameter = row[3]  # mm
+        self.depth = self.out_diameter  # mm, OD is referred as the depth of the CHS
+        self.flange_width = self.out_diameter  # mm, OD is referred as the flange width of the CHS
         self.flange_thickness = row[4]  # mm, thickness of the CHS is referred as flange thickness
+        self.web_thickness = self.flange_thickness  # mm, thickness of the CHS is referred as web thickness
+        self.root_radius = 0
+        self.toe_radius = 0
         super(CHS, self).__init__(material_grade, self.flange_thickness)
         self.internal_vol = row[7]  # cm^3/m
         self.mom_inertia = row[10]  # cm^4/m

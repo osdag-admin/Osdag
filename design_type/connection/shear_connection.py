@@ -143,7 +143,7 @@ class ShearConnection(Connection):
         t14 = ('Label_6', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
         section.append(t14)
 
-        t29 = ('Label_24', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = (KEY_SOURCE, KEY_DISP_SOURCE, TYPE_TEXTBOX, None, source)
         section.append(t29)
 
         t13 = (None, None, TYPE_BREAK, None, None)
@@ -573,7 +573,7 @@ class ShearConnection(Connection):
 
         A_g = self.supported_section.web_height * self.supported_section.web_thickness
         # 0.6 is multiplied for shear yielding capacity to keep the section in low shear
-        self.supported_section.shear_yielding_capacity = 0.6 * IS800_2007.cl_8_4_design_shear_strength(A_g,
+        self.supported_section.shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_g,
                                                                                                        self.supported_section.fy)
         self.supported_section.tension_yielding_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g,
                                                                                                        self.supported_section.fy)

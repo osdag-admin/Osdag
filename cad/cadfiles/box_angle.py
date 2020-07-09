@@ -6,14 +6,14 @@ from cad.items.plate import Plate
 
 class BoxAngle(object):
     def __init__(self, a, b, t, l, t1, l1, H, s, s1):
-        self.l = l
+        self.l = s + 2*t1
         self.a = a
         self.b = b
         self.t = t
         self.s = s 
         self.s1 = s1
         self.t1 = t1
-        self.l1 = l1
+        self.l1 = s1 + 2*t1 + 2*t
         self.H = H
 
         self.sec_origin = numpy.array([0, 0, 0])
@@ -25,10 +25,10 @@ class BoxAngle(object):
         self.angle2 = Angle(H, b, a, t, 0, 0)
         self.angle3 = Angle(H, a, b, t, 0, 0)
         self.angle4 = Angle(H, b, a, t, 0, 0)
-        self.plate1 = Plate(l, H, t1)
-        self.plate2 = Plate(t1, H, l1)
-        self.plate3 = Plate(l, H, t1)
-        self.plate4 = Plate(t1, H, l1)
+        self.plate1 = Plate(self.l, H, t1)
+        self.plate2 = Plate(t1, H, self.l1)
+        self.plate3 = Plate(self.l, H, t1)
+        self.plate4 = Plate(t1, H, self.l1)
 
     def place(self, secOrigin, uDir, wDir):
         self.sec_origin = secOrigin
@@ -86,11 +86,11 @@ class BoxAngle(object):
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
         prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
         prism = BRepAlgoAPI_Fuse(prism, prism4).Shape() 
-        prism = BRepAlgoAPI_Fuse(prism, prism5).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism6).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism7).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism8).Shape()        
-        return prism
+        # prism = BRepAlgoAPI_Fuse(prism, prism5).Shape()
+        # prism = BRepAlgoAPI_Fuse(prism, prism6).Shape()
+        # prism = BRepAlgoAPI_Fuse(prism, prism7).Shape()
+        # prism = BRepAlgoAPI_Fuse(prism, prism8).Shape()        
+        return prism, [prism5, prism6, prism7, prism8]
 
     def rotate(self, points, x):
         rotated_points = []
@@ -102,7 +102,29 @@ class BoxAngle(object):
             rotated_points.append(point)
         return rotated_points
 
+    def create_marking(self):
+        middel_pnt = []
+        line = []
+        labels = ["z","y","u","v"]
+        offset = (self.s + self.s1)/2
+        uvoffset = offset/numpy.sqrt(2)
 
+        z_points = [numpy.array([-offset,0.,self.H/2]), numpy.array([offset,0.,self.H/2])]
+        line.append(makeEdgesFromPoints(z_points))
+
+        y_points = [numpy.array([0.,-offset,self.H/2]), numpy.array([0,offset,self.H/2])]
+        line.append(makeEdgesFromPoints(y_points))
+        
+        u_points = [numpy.array([-uvoffset,uvoffset,self.H/2]), numpy.array([uvoffset,-uvoffset,self.H/2])]
+        line.append(makeEdgesFromPoints(u_points))
+
+        v_points = [numpy.array([-uvoffset,-uvoffset,self.H/2]), numpy.array([uvoffset,uvoffset,self.H/2])]
+        line.append(makeEdgesFromPoints(v_points))
+
+        start_pnt = [[-offset,0,self.H/2],[0,-offset+1,self.H/2],[uvoffset,-uvoffset,self.H/2],[uvoffset,uvoffset,self.H/2]]
+        end_pnt = [[offset,0,self.H/2],[0,offset-2,self.H/2],[-uvoffset,uvoffset,self.H/2],[-uvoffset,-uvoffset,self.H/2]]
+
+        return line, [start_pnt, end_pnt], labels
 
 
 if __name__ == '__main__':
@@ -110,14 +132,21 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    l = 40
-    l1 = 50
+    def display_lines(lines, points, labels):
+        for l,p1,p2,n in zip(lines,points[0],points[1], labels):
+            display.DisplayShape(l, update=True)
+            display.DisplayMessage(getGpPt(p1), n, height=24, message_color=(0,0,0))
+            display.DisplayMessage(getGpPt(p2), n, height=24, message_color=(0,0,0))
+
+
     a = 15
     b = 15
     t = 2
     t1 = 2
-    s = l  - 2*t1
-    s1 = l1 - 2*t1 - 2*t
+    s = 40
+    s1 = 50
+    l = s + 2*t1
+    l1 = s1 + 2*t1 + 2*t
     H = 50
 
 
@@ -128,7 +157,13 @@ if __name__ == '__main__':
     box_angle = BoxAngle(a, b, t, l, t1, l1, H, s, s1)
     _place = box_angle.place(origin, uDir, wDir)
     point = box_angle.compute_params()
-    prism = box_angle.create_model()
+    prism, prisms = box_angle.create_model()
+    lines, pnts, labels = box_angle.create_marking()
     display.DisplayShape(prism, update=True)
+    for p in prisms:
+        display.DisplayColoredShape(p, color='BLUE', update=True)
+    display_lines(lines, pnts, labels)
+    display.View_Top()
+    display.FitAll()
     display.DisableAntiAliasing()
     start_display()    

@@ -1062,6 +1062,10 @@ class ColumnEndPlate(MomentConnection):
             elif self.connection == "Flush End Plate":
                 self.design_status = False
                 logger.error("Try Different material or Try Extended both ways Connection")
+            #
+            # elif self.load_moment > self.section.moment_capacity and self.factored_axial_load > self.axial_capacity:
+            #     self.design_status = False
+            #     logger.error("change given load combi")
 
             else:
                 self.design_status = False

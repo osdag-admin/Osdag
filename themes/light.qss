@@ -534,10 +534,10 @@ QDialog#DesignPreferences QTabBar::tab:selected
 }
 QTabBar::tab {
 
-                height: 35px;
-                width: 200px;
-
-                font-size: 18px;
+                height: 30px;
+                width: 150px;
+                font-size: 11pt;
+                font-family:Arial
 
 
                         }

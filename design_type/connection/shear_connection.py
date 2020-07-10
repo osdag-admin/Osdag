@@ -395,6 +395,7 @@ class ShearConnection(Connection):
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
                KEY_DP_WELD_FAB: KEY_DP_WELD_FAB_SHOP,
+               KEY_DP_WELD_MATERIAL_G_O: str(fu),
                KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",
                KEY_DP_DETAILING_GAP: '10',
                KEY_DP_DETAILING_CORROSIVE_INFLUENCES: 'No',
@@ -572,7 +573,7 @@ class ShearConnection(Connection):
 
         A_g = self.supported_section.web_height * self.supported_section.web_thickness
         # 0.6 is multiplied for shear yielding capacity to keep the section in low shear
-        self.supported_section.shear_yielding_capacity = 0.6 * IS800_2007.cl_8_4_design_shear_strength(A_g,
+        self.supported_section.shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_g,
                                                                                                        self.supported_section.fy)
         self.supported_section.tension_yielding_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g,
                                                                                                        self.supported_section.fy)

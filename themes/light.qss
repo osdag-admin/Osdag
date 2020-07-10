@@ -3,6 +3,54 @@ QWidget {
 
 }
 
+#TitleBar QToolButton#close_button {
+    background-color: transparent;
+    image: url("themes/rc/titlebar_close.png");
+}
+
+#TitleBar QToolButton#close_button:hover {
+    background-color: #FF3333;
+    image: url("themes/rc/titlebar_close_hover.png");
+}
+#TitleBar QToolButton#save_log {
+	background-color: transparent;
+	font-weight:600;
+	font-family:Arial;
+
+}
+#TitleBar QToolButton#report_issue {
+	background-color: transparent;
+	font-weight:600;
+	font-family:Arial;
+
+}
+#TitleBar QToolButton#report_issue:hover {
+	background-color: cadetblue;
+	font-weight:600;
+	font-family:Arial;
+
+}
+#TitleBar QToolButton#save_log:hover {
+	background-color: limegreen;
+	font-weight:600;
+	font-family:Arial;
+
+}
+#TitleBar {
+    background-color: lightgray;
+    /*background-color: rgba(22, 31, 38, 1);*/
+}
+#TitleBar QLabel{
+	font-family: Arial;
+	font-size: 10pt;
+	}
+#CriticalExceptionDialog {
+	background-color: lightgray;
+}
+#CriticalExceptionDialog QTextEdit{
+	font-family: Georgia;
+	font-size: 9pt;
+}
 QTextEdit {
 	border-width: 1px;
 	border-style: solid;
@@ -446,7 +494,7 @@ QDialog#DesignPreferences QTabBar::tab {
                 width: 122px;
 				background: lightgray;
                 font-size: 14px;
-		
+
 				color: black;
 				border: 0.5px inset #abc250;
                }
@@ -464,7 +512,7 @@ QDialog#DesignPreferences QPushButton{
 		color: black;
 		background:lightgray;
 		border: 1.2px inset #abc250;
-		
+
 		padding-left: 7px;
 		padding-right: 7px;
 		font-family: Arial;
@@ -485,11 +533,7 @@ QDialog#DesignPreferences QTabBar::tab:selected
 	border:none;
 }
 QTabBar::tab {
-                margin-right: 10;
-                border-top-left-radius: 2px ;
-                border-top-right-radius: 2px ;
-                border-bottom-left-radius: 0px ;
-                border-bottom-right-radius: 0px ;
+
                 height: 35px;
                 width: 200px;
 

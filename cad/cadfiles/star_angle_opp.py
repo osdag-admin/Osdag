@@ -46,8 +46,8 @@ class StarAngleOpposite(object):
         prism3 = self.plate1.create_model()
 
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
-        prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()      
-        return prism
+        # prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()      
+        return prism, [prism3]
 
     def rotate(self, points):
         rotated_points = []
@@ -57,11 +57,41 @@ class StarAngleOpposite(object):
             rotated_points.append(point)
         return rotated_points
 
+    def create_marking(self):
+        middel_pnt = []
+        line = []
+        labels = ["z","y","u","v"]
+        offset = 2*self.l
+        uvoffset = offset/numpy.sqrt(2)
+
+        z_points = [numpy.array([-offset,self.t/2,self.H/2]), numpy.array([offset,self.t/2,self.H/2])]
+        line.append(makeEdgesFromPoints(z_points))
+
+        y_points = [numpy.array([0.,-offset+self.t/2,self.H/2]), numpy.array([0,offset+self.t/2,self.H/2])]
+        line.append(makeEdgesFromPoints(y_points))
+        
+        u_points = [numpy.array([-uvoffset,uvoffset+self.t/2,self.H/2]), numpy.array([uvoffset,-uvoffset+self.t/2,self.H/2])]
+        line.append(makeEdgesFromPoints(u_points))
+
+        v_points = [numpy.array([-uvoffset,-uvoffset+self.t/2,self.H/2]), numpy.array([uvoffset,uvoffset+self.t/2,self.H/2])]
+        line.append(makeEdgesFromPoints(v_points))
+
+        start_pnt = [[-offset,self.t/2,self.H/2],[0,-offset+self.t/2+1,self.H/2],[uvoffset,-uvoffset+self.t/2,self.H/2],[uvoffset,uvoffset+self.t/2,self.H/2]]
+        end_pnt = [[offset,self.t/2,self.H/2],[0,offset+self.t/2-1,self.H/2],[-uvoffset,uvoffset+self.t/2,self.H/2],[-uvoffset,-uvoffset+self.t/2,self.H/2]]
+
+        return line, [start_pnt, end_pnt], labels
+
 
 if __name__ == '__main__':
 
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
+
+    def display_lines(lines, points, labels):
+        for l,p1,p2,n in zip(lines,points[0],points[1], labels):
+            display.DisplayShape(l, update=True)
+            display.DisplayMessage(getGpPt(p1), n, height=24,message_color=(0,0,0))
+            display.DisplayMessage(getGpPt(p2), n, height=24,message_color=(0,0,0))
 
     a = 15
     b = 15
@@ -77,7 +107,13 @@ if __name__ == '__main__':
     star_angle_opposite = StarAngleOpposite(a, b, t, l, t1, H)
     _place = star_angle_opposite.place(origin, uDir, wDir)
     point = star_angle_opposite.compute_params()
-    prism = star_angle_opposite.create_model()
+    prism, prisms = star_angle_opposite.create_model()
+    lines, pnts, labels = star_angle_opposite.create_marking()
     display.DisplayShape(prism, update=True)
+    for p in prisms:
+        display.DisplayColoredShape(p, color='BLUE', update=True)
+    display_lines(lines, pnts, labels)
+    display.View_Top()
+    display.FitAll()
     display.DisableAntiAliasing()
     start_display()    

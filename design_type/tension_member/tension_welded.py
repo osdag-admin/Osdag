@@ -1,4 +1,15 @@
-# from gui.ui_summary_popup import Ui_Dialog
+"""
+Started on 1st January, 2020.
+
+@author: Darshan Vishwakarma
+
+Module: Tension Member Welded Design
+
+Reference:
+            1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
+            2) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 6)
+
+"""
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
 from utils.common.component import *
@@ -177,7 +188,7 @@ class Tension_welded(Member):
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O,
+        t2 = (None, [KEY_DP_WELD_FAB,KEY_DP_WELD_MATERIAL_G_O,
                      KEY_DP_DESIGN_METHOD, KEY_CONNECTOR_MATERIAL], '')
         design_input.append(t2)
 
@@ -511,6 +522,18 @@ class Tension_welded(Member):
 
         out_list.append(t21)
 
+        t21 = (KEY_OUT_PLATE_YIELD, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.tension_yielding_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_PLATE_RUPTURE, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.tension_rupture_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.block_shear_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
         t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
                (round(self.plate_tension_capacity / 1000, 2)) if flag else '', True)
 
@@ -649,6 +672,7 @@ class Tension_welded(Member):
         "initialisation of components required to design a tension member along with connection"
 
         super(Tension_welded,self).set_input_values(self, design_dictionary)
+        print(design_dictionary,"input values are set. Doing preliminary member checks")
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
         self.sec_profile = design_dictionary[KEY_SEC_PROFILE]
@@ -816,40 +840,40 @@ class Tension_welded(Member):
         elif key == 'Back to Back Channels' and subkey == "Web":
             BBChannel_attributes = BBChannel_Properties()
             BBChannel_attributes.data(designation, material_grade)
-            rad_y = BBChannel_attributes.calc_RogY(B_b, T_t, D_a, t) * 10
-            rad_z = BBChannel_attributes.calc_RogZ(B_b, T_t, D_a, t) * 10
+            rad_y = BBChannel_attributes.calc_RogY(f_w=B_b, f_t=T_t, w_h=D_a, w_t=t) * 10
+            rad_z = BBChannel_attributes.calc_RogZ(f_w=B_b, f_t=T_t, w_h=D_a, w_t=t) * 10
             min_rad = min(rad_y, rad_z)
 
         elif key == "Back to Back Angles" and subkey == 'Long Leg':
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
-            rad_y = BBAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = BBAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = BBAngle_attributes.calc_RogY(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_z = BBAngle_attributes.calc_RogZ(a=D_a, b=B_b, t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z)
 
         elif key == 'Back to Back Angles' and subkey == 'Short Leg':
             BBAngle_attributes = BBAngle_Properties()
             BBAngle_attributes.data(designation, material_grade)
-            rad_y = BBAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = BBAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = BBAngle_attributes.calc_RogY(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_z = BBAngle_attributes.calc_RogZ(a=D_a, b=B_b, t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z)
 
         elif key == 'Star Angles' and subkey == 'Long Leg':
             SAngle_attributes = SAngle_Properties()
             SAngle_attributes.data(designation, material_grade)
-            rad_y = SAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = SAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
-            rad_u = SAngle_attributes.calc_RogU(D_a, B_b, T_t, l=subkey) * 10
-            rad_v = SAngle_attributes.calc_RogV(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = SAngle_attributes.calc_RogY(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_z = SAngle_attributes.calc_RogZ(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_u = SAngle_attributes.calc_RogU(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_v = SAngle_attributes.calc_RogV(a=D_a, b=B_b, t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z, rad_u, rad_v)
 
         elif key == 'Star Angles' and subkey == 'Short Leg':
             SAngle_attributes = SAngle_Properties()
             SAngle_attributes.data(designation, material_grade)
-            rad_y = SAngle_attributes.calc_RogY(D_a, B_b, T_t, l=subkey) * 10
-            rad_z = SAngle_attributes.calc_RogZ(D_a, B_b, T_t, l=subkey) * 10
-            rad_u = SAngle_attributes.calc_RogU(D_a, B_b, T_t, l=subkey) * 10
-            rad_v = SAngle_attributes.calc_RogV(D_a, B_b, T_t, l=subkey) * 10
+            rad_y = SAngle_attributes.calc_RogY(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_z = SAngle_attributes.calc_RogZ(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_u = SAngle_attributes.calc_RogU(a=D_a, b=B_b, t=T_t, l=subkey) * 10
+            rad_v = SAngle_attributes.calc_RogV(a=D_a, b=B_b, t=T_t, l=subkey) * 10
             min_rad = min(rad_y, rad_z, rad_u, rad_v)
 
         elif key == 'Angles' and (subkey == 'Long Leg' or subkey == 'Short Leg'):
@@ -913,7 +937,6 @@ class Tension_welded(Member):
             # print(design_dictionary[KEY_SEC_PROFILE], design_dictionary[KEY_LOCATION], self.section_size.min_radius_gyration)
             self.section_size.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
                                                            r=self.min_radius_gyration)
-            # print(self.section_size.tension_yielding_capacity)
 
             "condition for yield and slenderness check "
 
@@ -1232,7 +1255,7 @@ class Tension_welded(Member):
         elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
             self.plate.height = 2 * self.section_size_1.min_leg + max((4 * self.weld.size),30)
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
-            self.plate.height =  self.section_size_1.min_leg + max((4 * self.weld.size),30)
+            self.plate.height = self.section_size_1.min_leg + max((4 * self.weld.size),30)
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles","Angles"] and design_dictionary[KEY_LOCATION] == "Long Leg":
             self.plate.height = self.section_size_1.max_leg + max((4 * self.weld.size),30)
         else:
@@ -1331,6 +1354,8 @@ class Tension_welded(Member):
         self.plate_thick_weld = self.thickness_possible[-1]
 
         for self.plate.thickness_provided in self.thickness_possible:
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
                 self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
                 self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided

@@ -38,6 +38,7 @@ class Window(QDialog):
 
     def __init__(self, main, input_dictionary):
         super().__init__()
+        self.input_dictionary = input_dictionary
         self.do_not_clear_list = []
         self.initUI(main,input_dictionary)
 
@@ -70,6 +71,7 @@ class Window(QDialog):
         self.btn_save.setFixedSize(160,31)
 
         tab_index = 0
+        last_title = ""
         for tab_details in main.tab_list(main):
             tab_name = tab_details[0]
             tab_elements = tab_details[2]
@@ -155,8 +157,8 @@ class Window(QDialog):
                         if lable == 'Designation':
                             line.textChanged.connect(self.manage_designation_size(line))
                         line.setFixedSize(91,22)
-                        if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5','Label_6','Label_7','Label_13','Label_14']:
-                            line.setValidator(QDoubleValidator())
+                        # if element[0] in ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5','Label_6','Label_7','Label_13','Label_14']:
+                        #     line.setValidator(QDoubleValidator())
                         if input_dictionary:
                             line.setText(str(element[4]))
                         font = QtGui.QFont()
@@ -172,6 +174,15 @@ class Window(QDialog):
                                 [KEY_DISP_LOCATION, KEY_DISP_SEC_PROFILE]:
                             line.setReadOnly(True)
                             self.do_not_clear_list.append(line)
+                        if last_title == KEY_DISP_DIMENSIONS:
+                            if element[1] in [KEY_DISP_ROOT_R, KEY_DISP_TOE_R]:
+                                regex_validator = QtCore.QRegExp("[0-9]*[.][0-9]*|[.][0-9]*|0")
+                            else:
+                                regex_validator = QtCore.QRegExp("[1-9][0-9]*[.][0-9]*|[.][0-9]*")
+                            line.setValidator(QtGui.QRegExpValidator(regex_validator, line))
+                        if last_title == KEY_DISP_SEC_PROP:
+                            regex_validator = QtCore.QRegExp("[1-9][0-9]*[.][0-9]*|[.][0-9]*|N/A|-")
+                            line.setValidator(QtGui.QRegExpValidator(regex_validator, line))
 
                         r += 1
 
@@ -190,7 +201,7 @@ class Window(QDialog):
                         font.setPointSize(9)
                         font.setBold(False)
                         font.setWeight(50)
-                        combo.setFont(font)
+                        #combo.setFont(font)
                         metrices = QtGui.QFontMetrics(font)
                         item_width = 0
                         item_width = max([metrices.boundingRect(item).width() for item in element[3]],default = 0)
@@ -209,6 +220,7 @@ class Window(QDialog):
                         font.setPointSize(10)
                         title.setFont(font)
                         title.setSizePolicy(QSizePolicy(QSizePolicy.Maximum,QSizePolicy.Maximum))
+                        last_title = lable
                         r += 1
 
                     if type == TYPE_IMAGE:
@@ -298,6 +310,9 @@ class Window(QDialog):
                         if element[0] in [KEY_DP_BOLT_MATERIAL_G_O, KEY_DP_WELD_MATERIAL_G_O]:
                             line.setValidator(dbl_validator)
                             line.setMaxLength(7)
+                        if element[0] in [KEY_BASE_PLATE_FU, KEY_BASE_PLATE_FY, KEY_DP_ANCHOR_BOLT_DESIGNATION,
+                                          KEY_DP_ANCHOR_BOLT_MATERIAL_G_O]:
+                            line.setReadOnly(True)
                         if input_dictionary:
                             line.setText(str(element[4]))
                         r += 1
@@ -543,6 +558,108 @@ class Window(QDialog):
                     c.setCurrentIndex(0)
                 elif isinstance(c, QtWidgets.QLineEdit):
                     c.clear()
+
+    def add_baseplate_tab_column(self):
+        '''
+        @author: Umair
+        '''
+        tab_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+        rhs = connectdb("RHS", call_type="popup")
+        shs = connectdb("SHS", call_type="popup")
+        chs = connectdb("CHS", call_type="popup")
+        hs = rhs + shs
+        input_section = self.input_dictionary[KEY_SECSIZE]
+
+        if input_section in hs:
+            table = "RHS" if input_section in rhs else "SHS"
+            values = {KEY_SECSIZE: '', 'Label_21': ''}
+            for i in [1, 2, 3, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]:
+                key = "Label_HS_"+str(i)
+                values.update({key: ''})
+        elif input_section in chs:
+            table = "CHS"
+            values = {KEY_SECSIZE: '', 'Label_21': ''}
+            for i in [1, 2, 3, 11, 12, 13, 14, 15, 16]:
+                key = "Label_CHS_" + str(i)
+                values.update({key: ''})
+        else:
+            table = "Columns"
+            values = {KEY_SECSIZE: '', 'Label_8': '', 'Label_21': ''}
+            for i in [1, 2, 3, 11, 12, 13, 14, 15, 16]:
+                key = "Label_" + str(i)
+                values.update({key: ''})
+
+        keys_to_add = values.keys()
+
+        for ch in tab_Column.findChildren(QtWidgets.QWidget):
+            if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                return
+            elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
+                if ch.objectName() in keys_to_add:
+                    values[ch.objectName()] = ch.text()
+            elif isinstance(ch, QtWidgets.QComboBox):
+                if ch.objectName() in keys_to_add:
+                    values[ch.objectName()] = ch.currentText()
+
+        for k in keys_to_add:
+            if k in [KEY_SECSIZE, "Label_21", "Label_8"]:
+                continue
+            else:
+                values[key] = float(values[key])
+
+        if ch:
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            c = conn.cursor()
+            query = "SELECT count(*) FROM "+table+" WHERE Designation = ?"
+            c.execute(query, (values[KEY_SECSIZE],))
+            data = c.fetchone()[0]
+            if data == 0:
+                if table == "RHS":
+                    c.execute('''INSERT INTO RHS (Designation,D,B,T,W,A,Izz,Iyy,Rzz,Ryy,
+                        Zzz,Zyy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (values[KEY_SECSIZE], values["Label_HS_1"], values["Label_HS_2"],
+                               values["Label_HS_3"], values["Label_HS_11"], values["Label_HS_12"],
+                               values["Label_HS_13"], values["Label_HS_14"], values["Label_HS_15"],
+                               values["Label_HS_16"], values["Label_HS_17"], values["Label_HS_18"],
+                               values["Label_HS_19"], values["Label_HS_20"], values["Label_HS_21"],
+                               ))
+                    conn.commit()
+                elif table == "SHS":
+                    c.execute('''INSERT INTO SHS (Designation,D,B,T,W,A,Izz,Iyy,Rzz,Ryy,
+                        Zzz,Zyy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (values[KEY_SECSIZE], values["Label_HS_1"], values["Label_HS_2"],
+                               values["Label_HS_3"], values["Label_HS_11"], values["Label_HS_12"],
+                               values["Label_HS_13"], values["Label_HS_14"], values["Label_HS_15"],
+                               values["Label_HS_16"], values["Label_HS_17"], values["Label_HS_18"],
+                               values["Label_HS_19"], values["Label_HS_20"], values["Label_HS_21"],
+                               ))
+                    conn.commit()
+                elif table == "CHS":
+                    c.execute('''INSERT INTO CHS (Designation,NB,OD,T,W,A,V,Ves,Vis,I,
+                        Z,R,Rsq,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (values[KEY_SECSIZE], values["Label_CHS_1"], values["Label_CHS_2"],
+                               values["Label_CHS_3"], values["Label_HS_11"], values["Label_HS_12"],
+                               values["Label_HS_13"], values["Label_HS_14"], values["Label_HS_15"],
+                               values["Label_HS_16"], values["Label_HS_17"], values["Label_HS_18"],
+                               values["Label_HS_19"], values["Label_HS_20"], values["Label_HS_21"],
+                               ))
+                    conn.commit()
+                else:
+                    c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+                        Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (Designation_c, Mass_c, Area_c,
+                               D_c, B_c, tw_c, T_c,FlangeSlope_c,
+                               R1_c, R2_c, Iz_c, Iy_c, rz_c,
+                               ry_c, Zz_c, Zy_c,
+                               Zpz_c, Zpy_c, It_c,Iw_c,Source_c, Type))
+                    conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
+
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
 
     def add_tab_column(self):
         '''
@@ -1070,7 +1187,7 @@ class Window(QDialog):
                                            values['It'], values['Iw'], values['Source'], values['Type']))
                             elif tab_name == 'Beams':
                                 c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,
-                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES 
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                                           (values['Designation'], values['Mass'], values['Area'], values['D'],
                                            values['B'], values['tw'], values['T'], values['FlangeSlope'],
@@ -1079,7 +1196,7 @@ class Window(QDialog):
                                            values['It'], values['Iw'], values['Source'], values['Type']))
                             elif tab_name == 'Angles':
                                 c.execute('''INSERT INTO Angles (Designation,Mass,Area,a,b,t,R1,R2,Cz,Cy,Iz,Iy,Iumax,
-                                Ivmin,rz,ry,rumax,rvmin,Zz,Zy,Zpz,Zpy,It,Source,Type) VALUES 
+                                Ivmin,rz,ry,rumax,rvmin,Zz,Zy,Zpz,Zpy,It,Source,Type) VALUES
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                                           (values['Designation'], values['Mass'], values['Area'], values['a'],
                                            values['b'], values['t'], values['R1'], values['R2'], values['Cz'],
@@ -1089,7 +1206,7 @@ class Window(QDialog):
                                            values['Type']))
                             elif tab_name == 'Channels':
                                 c.execute('''INSERT INTO Channels (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Cy,
-                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES 
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES
                                 (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                                           (values['Designation'], values['Mass'], values['Area'], values['D'],
                                            values['B'], values['tw'], values['T'], values['FlangeSlope'], values['R1'],
@@ -1254,6 +1371,7 @@ class DesignPreferences():
         self.module = main.module_name(main)
         self.main = main
         self.window_close_flag = True
+        self.changes = None
 
     def show(self):
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
@@ -1264,7 +1382,9 @@ class DesignPreferences():
         self.ui.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
         self.ui.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
         self.ui.center()
-        self.ui.exec()
+        self.changes = self.ui.exec_()
+        if self.changes != QDialog.Accepted:
+            self.flag = False
         self.module_window.prev_inputs = self.module_window.input_dock_inputs
 
     def default_fn(self):
@@ -1470,7 +1590,7 @@ class DesignPreferences():
             event.ignore()
 
     def close_designPref(self):
-        self.ui.close()
+        self.ui.accept()
 
     # def closeEvent(self, QCloseEvent):
     #     self.save_designPref_para()

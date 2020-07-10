@@ -5,9 +5,9 @@
 import operator
 import math
 from utils.common.other_standards import *
+import os
 
-
-PATH_TO_DATABASE = "ResourceFiles/Database/Intg_osdag.sqlite"
+PATH_TO_DATABASE = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'Database', 'Intg_osdag.sqlite')
 
 
 import sqlite3
@@ -314,6 +314,7 @@ TYPE_CUSTOM_SECTION = 'New_Section_Popup'
 TYPE_ENABLE_DISABLE = 'Enable/Disable'
 TYPE_CHANGE_TAB_NAME = 'Change tab_name'
 TYPE_REMOVE_TAB = 'Remove tab'
+TYPE_OVERWRITE_VALIDATION = 'Overwrite_validation'
 KEY_IMAGE = 'Image'
 TYP_BEARING = "Bearing Bolt"
 TYP_FRICTION_GRIP = "Friction Grip Bolt"
@@ -498,12 +499,15 @@ VALUES_PRIBM = connectdb("Beams")
 ############################
 # Display Keys (Input Dock, Output Dock, Design preference, Design report)
 ############################
-KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity $(V_{dy})$ (kN)'
-KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity $(V_{dn})$ (kN)'
-KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear $(V_{db})$ (kN)'
-KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension $(T_{db})$ (kN)'
-KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity $(V_d)$ (kN)'
 
+KEY_DISP_SHEAR_YLD= 'Shear yielding Capacity (kN)'
+KEY_DISP_SHEAR_RUP = 'Shear Rupture Capacity (kN)'
+KEY_DISP_PLATE_BLK_SHEAR_SHEAR = 'Block Shear Capacity in Shear (kN)'
+KEY_DISP_PLATE_BLK_SHEAR_TENSION = 'Block Shear Capacity in Tension (kN)'
+KEY_DISP_SHEAR_CAPACITY = 'Shear Capacity (kN)'
+KEY_DISP_BEARING_LENGTH = 'Bearing Length'
+KEY_DISP_ALLOW_SHEAR = 'Allowable Shear Capacity (kN)'
+DISP_LOWSHEAR = 'Limited to low shear capacity'
 
 KEY_DISP_BLK_SHEAR = 'Block Shear Capacity'
 KEY_DISP_MOM_DEMAND = 'Moment Demand'
@@ -541,23 +545,24 @@ DISP_MIN_WEB_PLATE_THICK = 'Min. Web Plate Thickness (mm)'
 
 
 
-DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Height (mm)'
-DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Height (mm)'
+DISP_MIN_PLATE_INNERHEIGHT = 'Min. Inner Plate Width (mm)'
+DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Width (mm)'
 DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
 
 KEY_DISP_FU = 'Ultimate strength, fu (MPa)'
-KEY_DISP_FY = 'Yield Strength , fy (MPa)'
+KEY_DISP_FY = 'Yield strength , fy (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
 DISP_MIN_WELD_SIZE = 'Min Weld Size (mm)'
 DISP_MAX_WELD_SIZE = 'Max Weld Size (mm)'
 DISP_THROAT = 'Throat Thickness (mm)'
 
-DISP_WELD_STRENGTH = 'Weld Strength (kN/mm)'
-KEY_DISP_FY_20 = 'Yield Strength , fy (MPa) (0-20mm)'
-KEY_DISP_FY_20_40 = 'Yield Strength , fy (MPa) (20-40mm)'
-KEY_DISP_FY_40 = 'Yield Strength , fy (MPa) (>40mm)'
+DISP_WELD_STRENGTH = 'Weld Strength (N/mm)'
+KEY_DISP_FY_20 = 'Yield strength , fy (MPa) (0-20mm)'
+KEY_DISP_FY_20_40 = 'Yield strength , fy (MPa) (20-40mm)'
+KEY_DISP_FY_40 = 'Yield strength , fy (MPa) (>40mm)'
 DISP_TITLE_ANCHOR_BOLT = 'Anchor Bolt'
+DISP_TITLE_ANCHOR_BOLT_OUTSIDE_CF = 'Anchor Bolt - Outside Column Flange'
 DISP_TITLE_FOOTING = 'Pedestal/Footing'
 
 KEY_DISP_CONN = 'Connectivity'
@@ -652,52 +657,58 @@ KEY_OUT_DISP_MOMENT_D_DEFORMATION= 'Moment Deformation Criteria (kNm)'
 
 
 KEY_OUT_DIA_ANCHOR = 'Anchor Bolt.Diameter'
-KEY_DISP_OUT_DIA_ANCHOR = 'Diameter(mm)'
+KEY_DISP_OUT_DIA_ANCHOR = 'Diameter (mm)'
 KEY_OUT_GRD_ANCHOR = 'Anchor Bolt.Grade'
-KEY_DISP_OUT_GRD_ANCHOR = 'Grade'
+KEY_DISP_OUT_GRD_ANCHOR = 'Property Class'
 KEY_OUT_ANCHOR_BOLT_LENGTH = 'Anchor Bolt.Length'
-KEY_DISP_OUT_ANCHOR_BOLT_LENGTH = 'Total Length'
+KEY_DISP_OUT_ANCHOR_BOLT_LENGTH = 'Anchor Length (total) (mm)'
+KEY_OUT_ANCHOR_BOLT_NO = 'Anchor Bolt.No of Anchor Bolts'
+KEY_DISP_OUT_ANCHOR_BOLT_NO = 'No. of Anchor Bolts'
 
 
 KEY_OUT_DISP_ANCHOR_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_BEARING = 'Bearing Capacity (kN)'
-KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity'
-KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity'
+KEY_OUT_DISP_ANCHOR_BOLT_CAPACITY = 'Bolt Capacity (kN)'
+KEY_OUT_DISP_ANCHOR_BOLT_COMBINED = 'Combined Capacity (kN)'
+KEY_OUT_DISP_ANCHOR_BOLT_TENSION_DEMAND = 'Tension Demand (kN)'
 KEY_OUT_DISP_ANCHOR_BOLT_TENSION = 'Tension Capacity (kN)'
 
 
-DISP_TITLE_ANCHOR_BOLT_UPLIFT = 'Anchor Bolt for Uplift'
+DISP_TITLE_ANCHOR_BOLT_UPLIFT = 'Anchor Bolt - Outside Column Flange'
 KEY_OUT_DIA_ANCHOR_UPLIFT = 'Anchor Bolt.Diameter_Uplift'
-KEY_DISP_OUT_DIA_ANCHOR_UPLIFT = 'Diameter(mm)'
+KEY_DISP_OUT_DIA_ANCHOR_UPLIFT = 'Diameter (mm)'
 KEY_OUT_GRD_ANCHOR_UPLIFT = 'Anchor Bolt.Grade_Uplift'
-KEY_DISP_OUT_GRD_ANCHOR_UPLIFT = 'Grade'
+KEY_DISP_OUT_GRD_ANCHOR_UPLIFT = 'Property Class'
+KEY_OUT_ANCHOR_UPLIFT_BOLT_NO = 'Anchor Bolt.No of Anchor Bolts_Uplift'
+KEY_DISP_OUT_ANCHOR_UPLIFT_BOLT_NO = 'No. of Anchor Bolts'
 KEY_OUT_ANCHOR_BOLT_LENGTH_UPLIFT = 'Anchor Bolt.Length_Uplift'
-KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT = 'Total Length'
+KEY_DISP_OUT_ANCHOR_BOLT_LENGTH_UPLIFT = 'Anchor Length (total) (mm)'
 KEY_OUT_ANCHOR_BOLT_TENSION_UPLIFT = 'Anchor Bolt.Tension_Uplift'
 KEY_OUT_DISP_ANCHOR_BOLT_TENSION_UPLIFT = 'Tension Capacity (kN)'
-
+KEY_OUT_ANCHOR_BOLT_TENSION_DEMAND_UPLIFT = 'Anchor Bolt.Tension_Demand_Uplift'
+KEY_OUT_DISP_ANCHOR_BOLT_TENSION_DEMAND_UPLIFT = 'Tension Demand (kN)'
 
 DISP_TITLE_MEMBER_CAPACITY ="Member Capacity"
 KEY_DISP_MEMBER_CAPACITY = "Member Capacity"
 
 
-KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (wp)'
+KEY_OUT_DISP_BASEPLATE_WIDTH = 'Width (mm)'
 KEY_OUT_DISP_BASEPLATE_LENGTH = 'Length (mm)'
 KEY_OUT_DISP_BASEPLATE_THICKNNESS = 'Thickness (mm)'
 DISP_TITLE_DETAILING = 'Detailing'
 
-KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'No. of Anchor bolts'
+KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT = 'Total No. of Anchor Bolts'
 
 KEY_OUT_DISP_DETAILING_PITCH_DISTANCE = 'Pitch Distance (mm)'
 
 KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE = 'Gauge Distance (mm)'
 KEY_OUT_DETAILING_END_DISTANCE = 'Detailing.End Distance'
 
-KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End Distance (e)'
+KEY_OUT_DISP_DETAILING_END_DISTANCE = 'End Distance (mm)'
 
-KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (e')"
+KEY_OUT_DISP_DETAILING_EDGE_DISTANCE = "Edge Distance (mm)"
 
-KEY_OUT_DISP_DETAILING_PROJECTION = 'Projection (c)'
+KEY_OUT_DISP_DETAILING_PROJECTION = 'Effective Projection (mm)'
 DISP_TITLE_STIFFENER_PLATE = 'Stiffener Plate'
 KEY_OUT_DISP_STIFFENER_PLATE_THICKNESS = 'Thickness (mm)'
 KEY_OUT_DISP_STIFFENER_PLATE_SHEAR_DEMAND = 'Shear Demand (kN)'
@@ -824,7 +835,7 @@ KEY_DISP_DP_ANCHOR_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 KEY_DP_ANCHOR_BOLT_SLIP_FACTOR = 'DesignPreferences.Anchor_Bolt.Slip_Factor'
 KEY_DISP_DP_ANCHOR_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 KEY_DP_ANCHOR_BOLT_GALVANIZED = 'DesignPreferences.Anchor_Bolt.Galvanized'
-KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED = 'Is galvanized?'
+KEY_DISP_DP_ANCHOR_BOLT_GALVANIZED = 'Anchor bolt galvanized?'
 KEY_DP_ANCHOR_BOLT_LENGTH = 'DesignPreferences.Anchor_Bolt.Length'
 KEY_DISP_DP_ANCHOR_BOLT_LENGTH = 'Length'
 KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficient'
@@ -865,8 +876,8 @@ KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG bolt design parameters:'
 
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip factor (µ_f)'
 
-KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
-KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
+KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate strength (N/mm2)'
+KEY_DISP_DP_BOLT_FY = 'Bolt Yield strength (N/mm2)'
 KEY_DISP_GAMMA_M0 = "Governed by Yielding"
 KEY_DISP_GAMMA_M1 = "Governed by Ultimate Stress"
 KEY_DISP_GAMMA_MB = "Connection Bolts - Bearing Type"
@@ -908,6 +919,10 @@ KEY_DISP_GAP = 'Gap between Members'
 KEY_DISP_MECH_PROP = 'Mechanical Properties'
 KEY_DISP_DIMENSIONS = 'Dimensions'
 KEY_DISP_DEPTH = 'Depth, D (mm)*'
+KEY_DISP_WIDTH = 'Width, B (mm)*'
+KEY_DISP_THICKNESS = 'Thickness, T (mm)*'
+KEY_DISP_NB = 'Nominal bore, NB (mm)*'
+KEY_DISP_OD = 'Outside diameter, OD (mm)*'
 KEY_DISP_FLANGE_W = 'Flange width, B (mm)*'
 KEY_DISP_FLANGE_T = 'Flange thickness, T (mm)*'
 KEY_DISP_WEB_HEIGHT = 'Web Height, D (mm*)'
@@ -923,20 +938,25 @@ KEY_DISP_MASS = 'Mass, M (Kg/m)'
 KEY_DISP_Cz = 'Cz (cm)'
 KEY_DISP_Cy = 'Cy (cm)'
 KEY_DISP_AREA = 'Sectional area, a (cm<sup>2</sup>)'
+KEY_DISP_MOA = '2nd Moment of area, I (cm<sup>4</sup>/m)*'
 KEY_DISP_MOA_IZ = '2nd Moment of area, I<sub>z</sub> (cm<sup>4</sup>)'
 KEY_DISP_MOA_IY = '2nd Moment of area, I<sub>y</sub> (cm<sup>4</sup>)'
 KEY_DISP_MOA_IU = '2nd Moment of area, I<sub>u</sub> (cm<sup>4</sup>)'
 KEY_DISP_MOA_IV = '2nd Moment of area, I<sub>v</sub> (cm<sup>4</sup>)'
+KEY_DISP_ROG = 'Radius of gyration, r (cm)*'
 KEY_DISP_ROG_RZ = 'Radius of gyration, r<sub>z</sub> (cm)'
 KEY_DISP_ROG_RY = 'Radius of gyration, r<sub>y</sub> (cm)'
 KEY_DISP_ROG_RU = 'Radius of gyration, r<sub>u</sub> (cm)'
 KEY_DISP_ROG_RV = 'Radius of gyration, r<sub>v</sub> (cm)'
+KEY_DISP_SM = 'Modulus of section, Z (cm<sup>3</sup>)*'
 KEY_DISP_EM_ZZ = 'Elastic modulus, Z<sub>z</sub> (cm<sup>3</sup>)'
 KEY_DISP_EM_ZY = 'Elastic modulus, Z<sub>y</sub> (ccm<sup>3</sup>)'
 KEY_DISP_PM_ZPZ = 'Plastic modulus, Z<sub>pz</sub> (cm<sup>3</sup>)'
 KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (cm<sup>3</sup>)'
 KEY_DISP_It = 'Torsion Constant, I<sub>t</sub> (cm<sup>4</sup>)'
 KEY_DISP_Iw = 'Warping Constant, I<sub>w</sub> (cm<sup>6</sup>)'
+KEY_DISP_IV = 'Internal volume (cm<sup>3</sup>/m)*'
+
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
@@ -945,7 +965,7 @@ KEY_DISP_B= 'Short Leg, B (mm)*'
 KEY_DISP_LEG_THK = 'Leg Thickness, t (mm)*'
 KEY_DISP_BASE_PLATE_MATERIAL = 'Material'
 KEY_DISP_BASE_PLATE_FU = 'Ultimate strength, fu (MPa)'
-KEY_DSIP_BASE_PLATE_FY = 'Yield Strength , fy (MPa)'
+KEY_DSIP_BASE_PLATE_FY = 'Yield strength , fy (MPa)'
 
 
 ########################
@@ -955,6 +975,7 @@ KEY_OUT_ANCHOR_BOLT_SHEAR = 'Anchor Bolt.Shear'
 KEY_OUT_ANCHOR_BOLT_BEARING = 'Anchor Bolt.Bearing'
 KEY_OUT_ANCHOR_BOLT_CAPACITY = 'Anchor Bolt.Capacity'
 KEY_OUT_ANCHOR_BOLT_COMBINED = 'Anchor Bolt.Combined'
+KEY_OUT_ANCHOR_BOLT_TENSION_DEMAND = 'Anchor Bolt.Tension_Demand'
 KEY_OUT_ANCHOR_BOLT_TENSION = 'Anchor Bolt.Tension'
 KEY_MEMBER_CAPACITY = "section.memcapacity"
 KEY_MEMBER_AXIALCAPACITY='Section.AxialCapacity'
@@ -1004,7 +1025,6 @@ KEY_DISP_AREA_CHECK ="Plate Area check (mm2)"
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
 
 KEY_FLANGE_PITCH = 'Flange_plate.pitch_provided'
-
 KEY_FLANGE_PLATE_GAUGE = "Flange_plate.gauge_provided "
 KEY_ENDDIST_FLANGE= 'Flange_plate.end_dist_provided '
 KEY_EDGEDIST_FLANGE= 'Flange_plate.edge_dist_provided'
@@ -1117,6 +1137,9 @@ KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
+
+KEY_REDUCTION_FACTOR_FLANGE ='flange_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_FLANGE ="Red.factor"
 KEY_OUT_FLANGE_BOLT_SHEAR ='flange_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity (kN)"
 KEY_OUT_FLANGE_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'
@@ -1180,6 +1203,8 @@ KEY_WEB_CAPACITY ='section.web_capacities'
 KEY_DISP_WEB_CAPACITY ='Capacity'
 
 # Web plate
+KEY_REDUCTION_FACTOR_WEB ='web_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_WEB ="Red.factor"
 KEY_WEB_PLATE_CAPACITY ="Web_plate.capacity"
 KEY_DISP_WEB_PLATE_CAPACITY= 'Web Plate Tension Capacity (kN)'
 KEY_TEN_YIELDCAPACITY_WEB_PLATE = "Web_plate.tension_yielding"
@@ -1290,10 +1315,18 @@ KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
 KEY_DISP_KB = 'Kb'
 
+KEY_OUT_BOLT_IR_DETAILS = 'Bolt.IRDetails'
+KEY_OUT_DISP_BOLT_IR_DETAILS = 'Capacity Details'
 KEY_OUT_BOLT_SHEAR = 'Bolt.Shear'
 KEY_OUT_DISP_BOLT_SHEAR = 'Shear Capacity (kN)'
 KEY_OUT_BOLT_BEARING = 'Bolt.Bearing'
 KEY_OUT_DISP_BOLT_BEARING = 'Bearing Capacity (kN)'
+KEY_OUT_BETA_LJ = 'Bolt.Betalj'
+KEY_OUT_DISP_BETA_LJ = 'β<sub>lj</sub>'
+KEY_OUT_BETA_LG = 'Bolt.Betalg'
+KEY_OUT_DISP_BETA_LG = 'β<sub>lg</sub>'
+KEY_OUT_BETA_PK = 'Bolt.Betapk'
+KEY_OUT_DISP_BETA_PK = 'β<sub>pk</sub>'
 KEY_OUT_DISP_BOLT_SLIP= 'Slip Resistance'
 KEY_OUT_BOLT_CAPACITY = 'Bolt.Capacity'
 KEY_OUT_DISP_BOLT_CAPACITY = 'Capacity (kN)'
@@ -1305,8 +1338,10 @@ KEY_OUT_BOLT_TENSION_FORCE = 'Bolt.TensionForce'
 KEY_OUT_DISP_BOLT_TENSION_FORCE = 'Bolt Tension Force (kN)'
 KEY_OUT_BOLT_PRYING_FORCE = 'Bolt.PryingForce'
 KEY_OUT_DISP_BOLT_PRYING_FORCE = 'Bolt Prying Force (kN)'
+KEY_OUT_BOLT_TENSION_TOTAL = 'Bolt.TensionTotal'
+KEY_OUT_DISP_BOLT_TENSION_TOTAL = 'Total Bolt Tension (kN)'
 KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
-KEY_OUT_BOLT_TENSION_CAPACITY1 = 'Bolt Tension Capacity'
+KEY_OUT_BOLT_TENSION_CAPACITY1 = 'Bolt Tension Capacity (kN)'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 KEY_OUT_LONG_JOINT = 'Bolt Capacity post Long Joint (kN)'
@@ -1315,7 +1350,8 @@ KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
 KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
 KEY_OUT_DISP_INTER_BOLT_LINE = 'Bolt Lines (nos)'
-
+KEY_OUT_BOLT_IR = 'Bolt.IR'
+KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 
 
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
@@ -1326,9 +1362,10 @@ KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
 
 KEY_OUT_SPACING = 'spacing'
 KEY_OUT_DISP_SPACING = 'Spacing'
+KEY_OUT_DISP_PATTERN = 'Pattern'
 KEY_OUT_PITCH = 'Bolt.Pitch'
 KEY_OUT_DISP_PITCH = 'Pitch (mm)'
-
+KEY_OUT_PATTERN = 'pattern'
 
 
 
@@ -1353,29 +1390,29 @@ KEY_OUT_MAX_EDGE_DIST = 'Bolt.MaxEdgeDist'
 KEY_OUT_DISP_EDGE_DIST = 'Edge Distance (mm)'
 
 
-KEY_OUT_SPTNG_BOLT_SHEAR = 'Cleat.Sptng_leg.Shear'
-KEY_OUT_SPTNG_BOLT_BEARING = 'Cleat.Sptng_leg.Bearing'
-KEY_OUT_SPTNG_BOLT_CAPACITY = 'Cleat.Sptng_leg.Capacity'
-KEY_OUT_SPTNG_BOLT_FORCE = 'Cleat.Sptng_leg.Force'
-KEY_OUT_SPTNG_BOLT_LINE = 'Cleat.Sptng_leg.Line'
-KEY_OUT_SPTNG_BOLTS_REQUIRED = 'Cleat.Sptng_leg.Required'
+KEY_OUT_SPTING_BOLT_SHEAR = 'Cleat.Spting_leg.Shear'
+KEY_OUT_SPTING_BOLT_BEARING = 'Cleat.Spting_leg.Bearing'
+KEY_OUT_SPTING_BOLT_CAPACITY = 'Cleat.Spting_leg.Capacity'
+KEY_OUT_SPTING_BOLT_FORCE = 'Cleat.Spting_leg.Force'
+KEY_OUT_SPTING_BOLT_LINE = 'Cleat.Spting_leg.Line'
+KEY_OUT_SPTING_BOLTS_REQUIRED = 'Cleat.Spting_leg.Required'
 
-KEY_OUT_SPTNG_BOLT_GRP_CAPACITY = 'Cleat.Sptng_leg.GroupCapacity'
+KEY_OUT_SPTING_BOLT_GRP_CAPACITY = 'Cleat.Spting_leg.GroupCapacity'
 
-KEY_OUT_SPTNG_BOLTS_ONE_LINE = 'Cleat.Sptng_leg.OneLine'
+KEY_OUT_SPTING_BOLTS_ONE_LINE = 'Cleat.Spting_leg.OneLine'
 
-KEY_OUT_SPTNG_SPACING = 'Cleat.Sptng_leg.spacing'
+KEY_OUT_SPTING_SPACING = 'Cleat.Spting_leg.spacing'
 
-KEY_OUT_SPTNG_PITCH = 'Cleat.Sptng_leg.Pitch'
+KEY_OUT_SPTING_PITCH = 'Cleat.Spting_leg.Pitch'
 
-KEY_OUT_SPTNG_MIN_PITCH = 'Cleat.Sptng_leg.MinPitch'
-KEY_OUT_SPTNG_END_DIST = 'Cleat.Sptng_leg.EndDist'
-KEY_OUT_SPTNG_GAUGE = 'Cleat.Sptng_leg.Gauge'
-KEY_OUT_SPTNG_MIN_GAUGE = 'Cleat.Sptng_leg.MinGauge'
-KEY_OUT_SPTNG_MAX_SPACING = 'Cleat.Sptng_leg.MaxGauge'
-KEY_OUT_SPTNG_EDGE_DIST = 'Cleat.Sptng_leg.EdgeDist'
-KEY_OUT_SPTNG_MIN_EDGE_DIST = 'Cleat.Sptng_leg.MinEdgeDist'
-KEY_OUT_SPTNG_MAX_EDGE_DIST = 'Cleat.Sptng_leg.MaxEdgeDist'
+KEY_OUT_SPTING_MIN_PITCH = 'Cleat.Spting_leg.MinPitch'
+KEY_OUT_SPTING_END_DIST = 'Cleat.Spting_leg.EndDist'
+KEY_OUT_SPTING_GAUGE = 'Cleat.Spting_leg.Gauge'
+KEY_OUT_SPTING_MIN_GAUGE = 'Cleat.Spting_leg.MinGauge'
+KEY_OUT_SPTING_MAX_SPACING = 'Cleat.Spting_leg.MaxGauge'
+KEY_OUT_SPTING_EDGE_DIST = 'Cleat.Spting_leg.EdgeDist'
+KEY_OUT_SPTING_MIN_EDGE_DIST = 'Cleat.Spting_leg.MinEdgeDist'
+KEY_OUT_SPTING_MAX_EDGE_DIST = 'Cleat.Spting_leg.MaxEdgeDist'
 
 
 KEY_OUT_DISP_PLATETHK_REP = 'Thickness (mm)'
@@ -1473,7 +1510,7 @@ KEY_OUT_DISP_WELD_SIZE_FLANGE = 'Size at Flange (mm)'
 KEY_OUT_WELD_SIZE_WEB = 'Weld.Size_web'
 KEY_OUT_DISP_WELD_SIZE_WEB = 'Size at Web (mm)'
 KEY_OUT_WELD_SIZE_STIFFENER = 'Weld.Size_stiffener'
-KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Gusset/Stiffener (mm)'
+KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Stiffener (mm)'
 KEY_OUT_DISP_WELD_SIZE_STIFFENER1 = 'Weld Size at Stiffener (mm)'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
 KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
@@ -1499,6 +1536,18 @@ KEY_PITCH_2_FLANGE = 'ColumnEndPlate.p2_flange'
 KEY_DISP_PITCH_2_FLANGE = 'Pitch2 along Flange'
 KEY_PITCH_2_WEB = 'ColumnEndPlate.p2_web'
 KEY_DISP_PITCH_2_WEB = 'Pitch2 along Web'
+
+KEY_PITCH_2_FLANGE1 = 'ColumnEndPlate.p2_flange'
+KEY_DISP_PITCH_2_FLANGE1 = 'Pitch along centre bolt (p2)'
+KEY_PITCH_2_WEB1 = 'ColumnEndPlate.p2_web'
+KEY_DISP_PITCH_2_WEB1 = 'Pitch along centre bolt (p2)'
+KEY_BOLT_FLANGE_SPACING = 'Bolt.flange_bolts'
+KEY_DISP_BOLT_FLANGE_SPACING = 'Flange Bolts Spacing'
+KEY_BOLT_WEB_SPACING = 'Bolt.web_bolts'
+KEY_DISP_BOLT_WEB_SPACING = 'Web Bolts Spacing'
+
+
+
 KEY_CONN_PREFERENCE = 'plate.design_method'
 KEY_DISP_CONN_PREFERENCE = 'Design Method'
 VALUES_CONN_PREFERENCE = ["Select","Plate Oriented", "Bolt Oriented"]
@@ -1536,7 +1585,7 @@ KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
 
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
-DISP_OUT_TITLE_SPTNGLEG = "Supporting Leg"
+DISP_OUT_TITLE_SPTINGLEG = "Supporting Leg"
 DISP_OUT_TITLE_CLEAT = "Cleat Angle"
 KEY_OUT_CLEATTHK = 'Plate.Thickness'
 KEY_OUT_DISP_CLEATTHK = 'Thickness (mm)'
@@ -1544,8 +1593,8 @@ KEY_OUT_CLEAT_HEIGHT = 'Plate.Height'
 KEY_OUT_DISP_CLEAT_HEIGHT = 'Height (mm)'
 KEY_OUT_CLEAT_SPTDLEG = 'Cleat.SupportedLength'
 KEY_OUT_DISP_CLEAT_SPTDLEG = 'Length (mm)'
-KEY_OUT_CLEAT_SPTNGLEG = 'Cleat.SupportingLength'
-KEY_OUT_DISP_CLEAT_SPTNGLEG = 'Length (mm)'
+KEY_OUT_CLEAT_SPTINGLEG = 'Cleat.SupportingLength'
+KEY_OUT_DISP_CLEAT_SPTINGLEG = 'Length (mm)'
 
 KEY_OUT_CLEAT_SHEAR = 'Cleat.Shear'
 

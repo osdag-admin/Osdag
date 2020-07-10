@@ -67,9 +67,9 @@ class StarAngle4(object):
         prism = BRepAlgoAPI_Fuse(prism1, prism2).Shape()
         prism = BRepAlgoAPI_Fuse(prism, prism3).Shape()
         prism = BRepAlgoAPI_Fuse(prism, prism4).Shape() 
-        prism = BRepAlgoAPI_Fuse(prism, prism5).Shape()
+        # prism = BRepAlgoAPI_Fuse(prism, prism5).Shape()
         #prism = BRepAlgoAPI_Fuse(prism, prism6).Shape()        
-        return prism
+        return prism, [prism5]
 
 
     def rotate(self, points, x):
@@ -82,11 +82,40 @@ class StarAngle4(object):
             rotated_points.append(point)
         return rotated_points
 
+    def create_marking(self):
+        middel_pnt = []
+        line = []
+        labels = ["z","y","u","v"]
+        offset = self.l
+        uvoffset = offset/numpy.sqrt(2)
+
+        z_points = [numpy.array([-offset,0.,self.H/2]), numpy.array([offset,0.,self.H/2])]
+        line.append(makeEdgesFromPoints(z_points))
+
+        y_points = [numpy.array([0.,-offset,self.H/2]), numpy.array([0,offset,self.H/2])]
+        line.append(makeEdgesFromPoints(y_points))
+        
+        u_points = [numpy.array([-uvoffset,uvoffset,self.H/2]), numpy.array([uvoffset,-uvoffset,self.H/2])]
+        line.append(makeEdgesFromPoints(u_points))
+
+        v_points = [numpy.array([-uvoffset,-uvoffset,self.H/2]), numpy.array([uvoffset,uvoffset,self.H/2])]
+        line.append(makeEdgesFromPoints(v_points))
+
+        start_pnt = [[-offset,0.,self.H/2],[0,-offset+1,self.H/2],[uvoffset,-uvoffset,self.H/2],[uvoffset,uvoffset,self.H/2]]
+        end_pnt = [[offset,0.,self.H/2],[0,offset-1,self.H/2],[-uvoffset,uvoffset,self.H/2],[-uvoffset,-uvoffset,self.H/2]]
+
+        return line, [start_pnt, end_pnt], labels
 
 if __name__ == '__main__':
 
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
+
+    def display_lines(lines, points, labels):
+        for l,p1,p2,n in zip(lines,points[0],points[1], labels):
+            display.DisplayShape(l, update=True)
+            display.DisplayMessage(getGpPt(p1), n, height=24,message_color=(0,0,0))
+            display.DisplayMessage(getGpPt(p2), n, height=24,message_color=(0,0,0))
 
     a = 15
     b = 15
@@ -102,7 +131,13 @@ if __name__ == '__main__':
     star_angle = StarAngle4(a, b, t, l, t1, H)
     _place = star_angle.place(origin, uDir, wDir)
     point = star_angle.compute_params()
-    prism = star_angle.create_model()
+    prism, prisms = star_angle.create_model()
+    lines, pnts, labels = star_angle.create_marking()
     display.DisplayShape(prism, update=True)
+    for p in prisms:
+        display.DisplayColoredShape(p, color='BLUE', update=True)
+    display_lines(lines, pnts, labels)
+    display.View_Top()
+    display.FitAll()
     display.DisableAntiAliasing()
     start_display()    

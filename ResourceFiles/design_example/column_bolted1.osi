@@ -1,13 +1,26 @@
 Bolt.Bolt_Hole_Type: Standard
 Bolt.Diameter:
 - '12'
+- '16'
+- '20'
+- '24'
+- '30'
+- '36'
+- '39'
+- 08
+- '10'
+- '14'
+- '18'
+- '22'
+- '27'
+- '33'
 Bolt.Grade:
 - '3.6'
 Bolt.Material_Grade_OverWrite: '410'
 Bolt.Slip_Factor: '0.3'
 Bolt.TensionType: Pretensioned
 Bolt.Type: Bearing Bolt
-Connector.Flange_Plate.Preferences: Outside
+Connector.Flange_Plate.Preferences: Outside + Inside
 Connector.Flange_Plate.Thickness_list: &id001
 - '6'
 - '8'
@@ -42,9 +55,9 @@ Detailing.Corrosive_Influences: 'No'
 Detailing.Edge_type: Sheared or hand flame cut
 Detailing.Gap: '10'
 Load.Axial: '100'
-Load.Moment: '50'
+Load.Moment: '5'
 Load.Shear: '100'
 Material: E 250 (Fe 410 W)A
-Member.Designation: PBP 360 X 174.2
+Member.Designation: UC 305 x 305 x 97
 Member.Material: E 250 (Fe 410 W)A
 Module: Column Coverplate Connection

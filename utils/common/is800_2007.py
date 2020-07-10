@@ -464,7 +464,7 @@ class IS800_2007(object):
 
     # cl. 10.2.4.2  Minimum Edge and End Distances
     @staticmethod
-    def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='a - Sheared or hand flame cut'):
+    def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='Standard', edge_type='Sheared or hand flame cut'):
         """Calculate minimum end and edge distance
         Args:
              d - Nominal diameter of fastener in mm (float)
@@ -477,7 +477,7 @@ class IS800_2007(object):
         """
 
         d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
-        if edge_type == 'a - Sheared or hand flame cut':
+        if edge_type == 'Sheared or hand flame cut':
             return 1.7 * d_0
         else:
             # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
@@ -586,7 +586,7 @@ class IS800_2007(object):
 
     # 10.3.3.2 Large grip lengths
     @staticmethod
-    def cl_10_3_3_2_bolt_large_grip(d, l_g, l_j=0):
+    def cl_10_3_3_2_bolt_large_grip(d, l_g, l_j=0.0):
         """ Calculate reduction factor for large grip lengths.
         Args:
             l_g = Grip length equal to the total thickness of the connected plates as defined in cl. 10.3.3.2 (float)
@@ -601,10 +601,29 @@ class IS800_2007(object):
         if beta_lg >= IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j):
             beta_lg = IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j)
         if l_g <= 5.0 * d:
-            beta_lg = 1
-        elif l_g > 8.0 * d:
-            return "GRIP LENGTH TOO LARGE"
+            beta_lg = 1.0
+        # TODO: Check the maximum limit of 8d in each individual modules
+        # elif l_g > 8.0 * d:
+        #     return "GRIP LENGTH TOO LARGE"
         return beta_lg
+
+    # 10.3.3.3 Packing Plates
+    @staticmethod
+    def cl_10_3_3_3_packing_plates(t=0.0):
+        """ Calculate reduction factor for packing plates.
+        Args:
+            t = thickness of the thickest packing plate, in mm
+        Return:
+            beta_pk = Reduction factor for packing plates (float) if applicable
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.3.3.3
+        """
+        if t > 6.0:
+            beta_pk = (1.0 - 0.0125 * t)
+        else:
+            beta_pk = 1.0
+        return beta_pk
 
     # cl. 10.3.4 Bearing Capacity of the Bolt
     @staticmethod

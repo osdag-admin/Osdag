@@ -82,9 +82,10 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 
 import os
 from pathlib import Path
+import re
 from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 import urllib.request
-from update import Update
+from update_version_check import Update
 #from Thread import timer
 
 
@@ -132,6 +133,7 @@ from gui.ui_design_summary import Ui_DesignReport
 from gui.LeftPanel_Button import Ui_LPButton
 from gui.Submodule_Page import Ui_Submodule_Page
 from gui.ui_OsdagMainPage import Ui_MainWindow
+from gui.ExceptionDialog import CriticalExceptionDialog
 # from design_type.connection.fin_plate_connection import design_report_show
 # from design_type.connection.fin_plate_connection import DesignReportDialog
 from design_type.connection.fin_plate_connection import FinPlateConnection
@@ -152,12 +154,14 @@ from design_type.connection.column_end_plate import ColumnEndPlate
 from design_type.compression_member.compression import Compression
 #from design_type.tension_member.tension import Tension
 # from cad.cad_common import call_3DBeam
-
+import APP_CRASH.Appcrash.api as appcrash
 import configparser
 import os.path
 import subprocess
 from gui.ui_template import Ui_ModuleWindow
-
+import io
+import traceback
+import time
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -233,8 +237,12 @@ class LeftPanelButton(QWidget):          # Custom Button widget for the Left Pan
 class OsdagMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        width = resolution.width()
+        height = resolution.height()
         self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.switch.toggled.connect(self.change_theme)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
         self.ui.myStackedWidget.currentChanged.connect(self.current_changed)
         self.Under_Development='UNDER DEVELOPMENT'
@@ -259,8 +267,8 @@ class OsdagMainWindow(QMainWindow):
                                                                 self.show_moment_connection_bc
                                                                     ],
                                                     'Column to Column' :[
-                                                                ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
+                                                                ('Cover Plate Bolted','ResourceFiles/images/cccoverplatebolted.png','C2C_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded','ResourceFiles/images/cccoverplatewelded.png','C2C_Cover_Plate_Welded'),
                                                                 ('End Plate Connection','ResourceFiles/images/ccep_flush.png','C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
@@ -390,8 +398,16 @@ class OsdagMainWindow(QMainWindow):
 
             else:
                 raise ValueError
-        self.showMaximized()
+        self.resize(width * (0.85), height * (0.75))
+        self.center()
+        self.show()
 
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     @pyqtSlot(int)
     def current_changed(self, index):
@@ -442,26 +458,11 @@ class OsdagMainWindow(QMainWindow):
         elif loc == "Ask Us a Question":
             self.ask_question()
         elif loc == "Check for Update":
-            self.notification()
+            update_class = Update()
+            msg = update_class.notifi()
+            QMessageBox.information(self, 'Info',msg)
         # elif loc == "FAQ":
         #     pass
-
-    def notification(self):
-        check=Update(0)
-        print(check.notifi())
-        if check.notifi()==True:
-            msg = QMessageBox.information(self, 'Update available',
-                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
-        elif check.notifi()=="no internet":
-            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
-        else:
-            msg = QMessageBox.information(self, 'Update', 'No Update Available')
-
-    def notification2(self):
-        check=Update(0)
-        if check.notifi()==True:
-            msg = QMessageBox.information(self, 'Update available',
-                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
 
 
     def select_workspace_folder(self):
@@ -498,7 +499,6 @@ class OsdagMainWindow(QMainWindow):
         if self.findChild(QRadioButton,'Fin_Plate').isChecked():
             self.hide()
             self.ui2 = Ui_ModuleWindow(FinPlateConnection, ' ')
-            #self.ui2.center()
             self.ui2.show()
             self.ui2.closed.connect(self.show)
         elif self.findChild(QRadioButton,'Cleat_Angle').isChecked():
@@ -671,6 +671,109 @@ class OsdagMainWindow(QMainWindow):
                    opener ="open" if sys.platform == "darwin" else "xdg-open"
                    subprocess.call([opener, "%s/%s" % (root_path, html_file)])
 
+    def change_theme(self):
+        state = self.ui.switch.isChecked()
+        toggle_stylesheet(state)
+
+# class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
+#
+#     def __init__(self, icon, parent=None):
+#         QtWidgets.QSystemTrayIcon.__init__(self, icon, parent)
+#         self.parent = parent
+#         menu = QtWidgets.QMenu(self.parent)
+#         self.setContextMenu(menu)
+#         menu.addAction("Exit", self.exit)
+#
+#
+#     def exit(self):
+#         QCoreApplication.exit()
+
+######################### UpDateNotifi ################
+
+# class Update(QMainWindow):
+#     def __init__(self, old_version):
+#         super().__init__()
+#         self.old_version=old_version
+#     def notifi(self):
+#         try:
+#             url = "https://anshulsingh-py.github.io/test/version.txt"
+#             file = urllib.request.urlopen(url)
+#             for line in file:
+#                 decoded_line = line.decode("utf-8")
+#             new_version = decoded_line.split("=")[1]
+#             if int(new_version) > self.old_version:
+#                 print("update")
+#                 msg = QMessageBox.information(self, 'Update available','<a href=https://google.com>Click to downlaod<a/>')
+#         except:
+#             print("No internet connection")
+
+def toggle_stylesheet(state):
+    app = QApplication.instance()
+    if app is None:
+        raise RuntimeError("No Qt Application found.")
+    if state:
+        path = 'darkstyle.qss'
+    else:
+        path = 'light.qss'
+    theme_path = os.path.join(os.path.dirname(__file__), 'themes', path)
+    file = QFile(theme_path)
+    file.open(QFile.ReadOnly | QFile.Text)
+    stream = QTextStream(file)
+    app.setStyleSheet(stream.readAll())
+
+def hook_exception(exc_type, exc_value, tracebackobj):
+
+    instance = QApplication.instance()
+    # KeyboardInterrupt is a special case.
+    # We don't raise the error dialog when it occurs.
+    if issubclass(exc_type, KeyboardInterrupt):
+        if instance:
+            instance.closeAllWindows()
+        return
+
+    separator = '-' * 80
+    notice = \
+        """An unhandled exception occurred. Please report the problem\n""" \
+        """using the error reporting dialog or raise the issue to {}.\n""" \
+        """\n\nError information:\n""".format('github.com/osdag-admin/Osdag')
+    time_string = time.strftime("%Y-%m-%d, %H:%M:%S")
+
+    tbinfofile = io.StringIO()
+    traceback.print_tb(tracebackobj, None, tbinfofile)
+    tbinfofile.seek(0)
+    tbinfo = tbinfofile.read()
+    errmsg = '%s: \n%s' % (str(exc_type), str(exc_value))
+
+    sections = [separator, time_string, separator, errmsg, separator, tbinfo]
+    msg = '\n'.join(sections)
+    error_box.text_edit.setText(str(notice) + str(msg))
+    error_box.titlebar.save_log.clicked.connect(save_log(str(notice)+str(msg)))
+    error_box.titlebar.report_issue.clicked.connect(send_crash_report)
+
+    error_box.setWindowModality(QtCore.Qt.ApplicationModal)
+    if not error_box.exec_():
+        instance.quit()
+
+def save_log(log):
+    def save_():
+        file_type = "log (*.log)"
+        filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", '', file_type)
+        if filename:
+            with open(filename,'w') as file:
+                file.write(log)
+            QMessageBox.information(QMessageBox(), "Information", "Log saved successfully.")
+    return save_
+
+def get_system_info():
+    return 'OS: %s\nPython: %r' % (sys.platform, sys.version_info)
+
+def get_application_log():
+    return error_box.text_edit.toPlainText()
+
+def send_crash_report():
+    appcrash.get_application_log = get_application_log
+    appcrash.get_system_information = get_system_info
+    appcrash.show_report_dialog()
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
@@ -686,26 +789,53 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         QCoreApplication.exit()
 
 
+
+
 if __name__ == '__main__':
-
-
 
     app = QApplication(sys.argv)
     path = os.path.join(os.path.dirname(__file__), 'themes', 'light.qss')
-    file = open(path,'r')
-    file = file.read()
-    app.setStyleSheet(file)
+    file = QFile(path)
+    file.open(QFile.ReadOnly | QFile.Text)
+    stream = QTextStream(file)
+    app.setStyleSheet(stream.readAll())
     app.setStyle('Fusion')
 
-    path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
+    # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
     window = OsdagMainWindow()
-    trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
+    # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
 
-    trayIcon.show()
-    # app.exec_()
-    # sys.exit(app.exec_())
+    ############################     Exception Dialog and Error Reporting  ###################
+
+    error_box = CriticalExceptionDialog()
+
+    GITHUB_OWNER = 'osdag-admin'    # username of the github account where crash report is to be submitted
+    GITHUB_REPO = 'Osdag'       # repo name
+    EMAIL = 'your.email@provider.com'  # Email address of developers
+
+    appcrash.install_backend(appcrash.backends.GithubBackend(GITHUB_OWNER, GITHUB_REPO))
+    appcrash.install_backend(appcrash.backends.EmailBackend(EMAIL, 'Osdag'))
+
+    #my_settings = QtCore.QSettings('FOSSEE','osdag')
+    #appcrash.set_qsettings(my_settings)
+    '''
+    If you want to save your github username and password across each sessions, so that you dont have to enter it each time you report an issue .
+    Simply uncomment above two line. To use QSetings we need to give an organisation name and the application name(Compulsory).
+
+    As an example 'FOSSEE' is organisation name and 'osdag' is the application name in the above QSettings. Feel free to change it accordingly, but try to keep it fix
+    don't change it frequently.
+
+    '''
+
+    ############################     Exception Dialog and Error Reporting  ###################
+
+    # trayIcon.show()
+
     try:
         # window.notification2()
+        #update = Update(0)
+        #update.notifi()
+        sys.excepthook = hook_exception
         QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)

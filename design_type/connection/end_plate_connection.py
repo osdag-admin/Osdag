@@ -1473,9 +1473,9 @@ class EndPlateConnection(ShearConnection):
             col_g = (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius + self.plate.end_dist_provided)
             beam_g = (self.supported_section.web_thickness / 2 + self.weld.size + self.plate.end_dist_provided)
             if col_g > beam_g:
-                l_v = col_g - (self.supported_section.web_thickness / 2 + self.weld.size)
+                l_v = round(col_g - (self.supported_section.web_thickness / 2 + self.weld.size),2)
             else:
-                l_v = self.bolt.min_edge_dist_round
+                l_v = round(self.bolt.min_edge_dist_round,2)
             b_e = min(self.plate.pitch_provided, 2 * l_v)
             Q = round(self.bolt.bolt_tension_prying,2)
 

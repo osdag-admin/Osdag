@@ -866,7 +866,7 @@ def ep_max_plate_width_avail(conn,D,T_w,R_r,T_f,wp_max):
         ep_max_plate_w_eqn.append(NoEscape(r'&=' + D + '-2*' + T_f + '-2*' + R_r +  r'\\'))
         ep_max_plate_w_eqn.append(NoEscape(r'&=' + wp_max + '\end{aligned}'))
     else:
-        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} N/A \end{aligned}\\'))
+        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} N/A \end{aligned}'))
     return ep_max_plate_w_eqn
 
 def end_plate_ht_req(D,e,h_p):

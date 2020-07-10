@@ -1244,7 +1244,7 @@ https://doc.qt.io/qt-5/stylesheet-examples.html#customizing-qtabwidget-and-qtabb
 
 QDialog#DesignPreferences QTabBar::tab{
             height: 28px;
-            width: 130px;
+            width: 120px;
 }
 QDialog#DesignPreferences QComboBox{
 		min-height: 22px;

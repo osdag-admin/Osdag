@@ -20,6 +20,7 @@ from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PIL import Image
 from texlive.Design_wrapper import init_display as init_display_off_screen
+# from OCC.Display.backend import off
 import os
 import yaml
 import json
@@ -44,7 +45,7 @@ from utils.common.component import *
 from utils.common.Section_Properties_Calculator import *
 from .customized_popup import Ui_Popup
 # from .ui_summary_popup import Ui_Dialog1
-from .ui_design_preferences import Ui_Dialog
+#from .ui_design_preferences import Ui_Dialog
 
 from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
@@ -76,6 +77,7 @@ from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 import logging
 import subprocess
+from get_DPI_scale import scale
 from cad.cad3dconnection import cadconnection
 
 
@@ -200,7 +202,7 @@ class Window(QMainWindow):
             off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
             self.commLogicObj.display = off_display
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
-            off_display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
+            # off_display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
             off_display.ExportToImage('./ResourceFiles/images/3d.png')
             off_display.View_Front()
             off_display.FitAll()
@@ -593,7 +595,7 @@ class Window(QMainWindow):
 
                 if lable == 'Material':
                     combo.setCurrentIndex(1)
-                    maxi_width_right = max(maxi_width_right, item_width)
+                    maxi_width_right = max(maxi_width_right+8, item_width)
                 combo.view().setMinimumWidth(item_width + 25)
 
             if type == TYPE_TEXTBOX:
@@ -700,7 +702,8 @@ class Window(QMainWindow):
         maxi_width = maxi_width_left + maxi_width_right
         in_scrollcontent.setMinimumSize(maxi_width,in_scrollcontent.sizeHint().height())
         maxi_width += 82
-        maxi_width = max(maxi_width, 350)    # In case there is no widget
+        print('maxiwidth',maxi_width)
+        maxi_width = max(maxi_width, scale*350)    # In case there is no widget
         self.inputDock.setFixedWidth(maxi_width)
         self.in_widget.setFixedWidth( maxi_width)
         for option in option_list:
@@ -959,7 +962,7 @@ class Window(QMainWindow):
         maxi_width = maxi_width_left + maxi_width_right
 
         maxi_width += 80    # +73 coz of whitespaces
-        maxi_width = max(maxi_width, 350) # in case no widget
+        maxi_width = max(maxi_width, scale*350) # in case no widget
         out_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         out_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
@@ -1233,9 +1236,9 @@ class Window(QMainWindow):
 
 
         self.actionDesign_Preferences = QtWidgets.QAction(MainWindow)
-        font = QtGui.QFont()
-        font.setFamily("DejaVu Serif")
-        self.actionDesign_Preferences.setFont(font)
+        # font = QtGui.QFont()
+        # font.setFamily("DejaVu Serif")
+        # self.actionDesign_Preferences.setFont(font)
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
@@ -1370,8 +1373,7 @@ class Window(QMainWindow):
                         if title_name in out_titles:
                             title_name += str(title_repeat)
                             title_repeat += 1
-                        if title_status[title_count] == 0:
-                            self.output_title_fields[title_name][0].setVisible(False)
+                        self.output_title_fields[title_name][0].setVisible(title_status[title_count])
                         title_count += 1
                         out_titles.append(title_name)
         self.ui_loaded = True
@@ -1913,6 +1915,9 @@ class Window(QMainWindow):
                 else:
                     self.designPrefDialog.flag = True
 
+                if self.prev_inputs != {}:
+                    self.design_pref_inputs = {}
+
         else:
             main.design_button_status = True
             for input_field in self.dockWidgetContents.findChildren(QtWidgets.QWidget):
@@ -1937,9 +1942,9 @@ class Window(QMainWindow):
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
                     if status:
-                        txt.setVisible(True if option[3] and txt.isVisible() else False)
+                        txt.setVisible(True if option[3] != "" and txt.isVisible() else False)
                         txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
-                        txt_label.setVisible(True if option[3] and txt_label.isVisible() else False)
+                        txt_label.setVisible(True if option[3] != "" and txt_label.isVisible() else False)
 
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
@@ -2140,6 +2145,7 @@ class Window(QMainWindow):
                             im.setFixedSize(value[1], value[2])
                             pmap = QPixmap(value[0])
                             im.setScaledContents(1)
+                            im.setStyleSheet("background-color: white;")
                             im.setPixmap(pmap)
                             image_layout.addWidget(im)
                             caption = QtWidgets.QLabel(image_widget)
@@ -2193,6 +2199,7 @@ class Window(QMainWindow):
                         im.setScaledContents(True)
                         im.setFixedSize(value[1], value[2])
                         pmap = QPixmap(value[0])
+                        im.setStyleSheet("background-color: white;")
                         im.setPixmap(pmap)
 # >>>>>>> 69a22ea10dd18e2df58abc6503be8d6354eaa30a
                         image_layout.addWidget(im)

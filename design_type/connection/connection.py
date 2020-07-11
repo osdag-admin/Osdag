@@ -120,7 +120,7 @@ class Connection(Main):
         t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
         supporting_section.append(t14)
 
-        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = (KEY_SOURCE, KEY_DISP_SOURCE, TYPE_TEXTBOX, None, source)
         supporting_section.append(t29)
 
         t28 = (None, None, TYPE_BREAK, None, None)
@@ -312,7 +312,7 @@ class Connection(Main):
         t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
         supporting_section.append(t14)
 
-        t29 = ('Label_23', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = (KEY_SOURCE, KEY_DISP_SOURCE, TYPE_TEXTBOX, None, source)
         supporting_section.append(t29)
 
         t28 = (None, None, TYPE_BREAK, None, None)

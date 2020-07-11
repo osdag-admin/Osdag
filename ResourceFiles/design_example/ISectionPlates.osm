@@ -1,8 +1,6 @@
 {'Section_Designation': 'ISectionPlates',
  'Section_Parameters': {'parameterText_1': ['I-Section Type', 'PBP 300 X 95'],
-                        'parameterText_3': ['Spacing between flange of T to '
-                                            'Web of I, S(mm)',
-                                            '100'],
+                        'parameterText_3': ['Spacing , S(mm)', '100'],
                         'parameterText_6': ['Length of Web of T, d(mm)',
                                             '132.0']},
  'Section_Properties': {'A': '240.2311',

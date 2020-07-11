@@ -95,7 +95,7 @@ class BeamCoverPlate(MomentConnection):
                'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
 
-        t6 = (KEY_DISP_BEAMSEC, [KEY_SECSIZE], ['Label_21'], TYPE_TEXTBOX, self.change_source)
+        t6 = (KEY_DISP_BEAMSEC, [KEY_SECSIZE], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t6)
 
         return change_tab
@@ -356,7 +356,7 @@ class BeamCoverPlate(MomentConnection):
         # spacing.append(t99)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_1.png', 400, 352, ""])  # [image, width, height, caption]
+               ['./ResourceFiles/images/spacing_1.png', 400, 278, ""])  # [image, width, height, caption]
         flangespacing.append(t99)
         t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
                self.flange_plate.pitch_provided )
@@ -385,7 +385,7 @@ class BeamCoverPlate(MomentConnection):
         # spacing.append(t99)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               ['./ResourceFiles/images/spacing_1.png', 400, 352, ""])  # [image, width, height, caption]
+               ['./ResourceFiles/images/spacing_1.png', 400, 278, ""])  # [image, width, height, caption]
         webspacing.append(t99)
 
         t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag else '')
@@ -413,7 +413,7 @@ class BeamCoverPlate(MomentConnection):
         #        ['./ResourceFiles/images/L.png', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         # flangecapacity.append(t99)
         t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
-               ['./ResourceFiles/images/2L.jpg', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+               ['./ResourceFiles/images/2L.png', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         flangecapacity.append(t99)
         t30 =(KEY_FLANGE_TEN_CAPACITY,KEY_DISP_FLANGE_TEN_CAPACITY,TYPE_TEXTBOX,
                round(self.section.tension_capacity_flange/1000, 2) if flag else '')
@@ -439,7 +439,7 @@ class BeamCoverPlate(MomentConnection):
         webcapacity.append(t00)
 
         t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/U.jpg', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+               ['./ResourceFiles/images/U.png', 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 
         t30 = (KEY_WEB_TEN_CAPACITY, KEY_DISP_WEB_TEN_CAPACITY, TYPE_TEXTBOX,
@@ -455,7 +455,7 @@ class BeamCoverPlate(MomentConnection):
         webcapacity.append(t30)
 
         t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/L_shear.jpg', 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
+               ['./ResourceFiles/images/L_shear.png', 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 
         t30 = (KEY_WEBPLATE_SHEAR_CAPACITY_PLATE, KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, TYPE_TEXTBOX,
@@ -680,8 +680,12 @@ class BeamCoverPlate(MomentConnection):
                self.flange_in_plate_tk if flag else '', False)
         out_list.append(t20)
 
+
+        # t21 = (KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing],
+
         # t21 = (
         # KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing],
+
         # True)
         # out_list.append(t21)
         #
@@ -2839,7 +2843,12 @@ class BeamCoverPlate(MomentConnection):
 
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
-        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
+
+        if self.section.flange_slope == 90:
+            image = "Parallel_Beam"
+        else:
+            image = "Slope_Beam"
+        self.report_supporting = {KEY_DISP_SEC_PROFILE: image,
                                   KEY_DISP_BEAMSEC: self.section.designation,
                                   KEY_DISP_MATERIAL: self.section.material,
                                   KEY_DISP_FU: self.section.fu,
@@ -2888,7 +2897,8 @@ class BeamCoverPlate(MomentConnection):
              KEY_DISP_FU: self.flange_plate.fu,
              KEY_DISP_FY: self.flange_plate.fy,
              KEY_DISP_MATERIAL: self.flange_plate.material,
-             KEY_DISP_PLATETHK: str(self.flange_plate.thickness),
+             KEY_DISP_FLANGESPLATE_THICKNESS: str(self.flange_plate.thickness),
+             KEY_DISP_WEBPLATE_THICKNESS: str(self.web_plate.thickness),
              }
 
 

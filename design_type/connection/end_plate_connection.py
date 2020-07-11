@@ -114,10 +114,10 @@ class EndPlateConnection(ShearConnection):
                'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t5)
 
-        t6 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        t6 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t6)
 
-        t7 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        t7 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t7)
 
         return change_tab
@@ -1473,9 +1473,9 @@ class EndPlateConnection(ShearConnection):
             col_g = (self.supporting_section.web_thickness / 2 + self.supporting_section.root_radius + self.plate.end_dist_provided)
             beam_g = (self.supported_section.web_thickness / 2 + self.weld.size + self.plate.end_dist_provided)
             if col_g > beam_g:
-                l_v = col_g - (self.supported_section.web_thickness / 2 + self.weld.size)
+                l_v = round(col_g - (self.supported_section.web_thickness / 2 + self.weld.size),2)
             else:
-                l_v = self.bolt.min_edge_dist_round
+                l_v = round(self.bolt.min_edge_dist_round,2)
             b_e = min(self.plate.pitch_provided, 2 * l_v)
             Q = round(self.bolt.bolt_tension_prying,2)
 

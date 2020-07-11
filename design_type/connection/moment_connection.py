@@ -182,7 +182,7 @@ class MomentConnection(Connection, IS800_2007):
         t14 = ('Label_8', KEY_DISP_TYPE, TYPE_COMBOBOX, ['Rolled', 'Welded'], 'Rolled')
         section.append(t14)
 
-        t29 = ('Label_21', 'Source', TYPE_TEXTBOX, None, source)
+        t29 = (KEY_SOURCE, KEY_DISP_SOURCE, TYPE_TEXTBOX, None, source)
         section.append(t29)
 
         t13 = (None, None, TYPE_BREAK, None, None)

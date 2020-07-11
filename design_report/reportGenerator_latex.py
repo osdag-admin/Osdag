@@ -47,7 +47,7 @@ class CreateLatex(Document):
         client = str(reportsummary['Client'])
 
         does_design_exist = reportsummary['does_design_exist']
-        osdagheader = '/ResourceFiles/images/OsdagHeaderTM.png'
+        osdagheader = '/ResourceFiles/images/OsdagHeader.png'
         # Add document header
         geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
         doc = Document(geometry_options=geometry_options,indent=False)
@@ -58,8 +58,8 @@ class CreateLatex(Document):
         doc.append(pyl.Command('selectfont'))
 
 
-        doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
-        doc.add_color('PassColor','HTML', '4D6E28')
+        doc.add_color('OsdagGreen', 'RGB', '145,176,20')
+        doc.add_color('PassColor','RGB', '145,176,20')
         doc.add_color('FailColor','HTML','933A16')
         header = PageStyle("header")
         # Create center header

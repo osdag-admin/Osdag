@@ -39,7 +39,7 @@ class Window(QDialog):
 
     def __init__(self, main, input_dictionary):
         super().__init__()
-
+        self.input_dictionary = input_dictionary
         self.do_not_clear_list = []
         self.initUI(main,input_dictionary)
 
@@ -572,6 +572,108 @@ class Window(QDialog):
                     c.setCurrentIndex(0)
                 elif isinstance(c, QtWidgets.QLineEdit):
                     c.clear()
+
+    def add_baseplate_tab_column(self):
+        '''
+        @author: Umair
+        '''
+        tab_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+        rhs = connectdb("RHS", call_type="popup")
+        shs = connectdb("SHS", call_type="popup")
+        chs = connectdb("CHS", call_type="popup")
+        hs = rhs + shs
+        input_section = self.input_dictionary[KEY_SECSIZE]
+
+        if input_section in hs:
+            table = "RHS" if input_section in rhs else "SHS"
+            values = {KEY_SECSIZE: '', 'Label_21': ''}
+            for i in [1, 2, 3, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]:
+                key = "Label_HS_"+str(i)
+                values.update({key: ''})
+        elif input_section in chs:
+            table = "CHS"
+            values = {KEY_SECSIZE: '', 'Label_21': ''}
+            for i in [1, 2, 3, 11, 12, 13, 14, 15, 16]:
+                key = "Label_CHS_" + str(i)
+                values.update({key: ''})
+        else:
+            table = "Columns"
+            values = {KEY_SECSIZE: '', 'Label_8': '', 'Label_21': ''}
+            for i in [1, 2, 3, 11, 12, 13, 14, 15, 16]:
+                key = "Label_" + str(i)
+                values.update({key: ''})
+
+        keys_to_add = values.keys()
+
+        for ch in tab_Column.findChildren(QtWidgets.QWidget):
+            if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                return
+            elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
+                if ch.objectName() in keys_to_add:
+                    values[ch.objectName()] = ch.text()
+            elif isinstance(ch, QtWidgets.QComboBox):
+                if ch.objectName() in keys_to_add:
+                    values[ch.objectName()] = ch.currentText()
+
+        for k in keys_to_add:
+            if k in [KEY_SECSIZE, "Label_21", "Label_8"]:
+                continue
+            else:
+                values[key] = float(values[key])
+
+        if ch:
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            c = conn.cursor()
+            query = "SELECT count(*) FROM "+table+" WHERE Designation = ?"
+            c.execute(query, (values[KEY_SECSIZE],))
+            data = c.fetchone()[0]
+            if data == 0:
+                if table == "RHS":
+                    c.execute('''INSERT INTO RHS (Designation,D,B,T,W,A,Izz,Iyy,Rzz,Ryy,
+                        Zzz,Zyy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (values[KEY_SECSIZE], values["Label_HS_1"], values["Label_HS_2"],
+                               values["Label_HS_3"], values["Label_HS_11"], values["Label_HS_12"],
+                               values["Label_HS_13"], values["Label_HS_14"], values["Label_HS_15"],
+                               values["Label_HS_16"], values["Label_HS_17"], values["Label_HS_18"],
+                               values["Label_HS_19"], values["Label_HS_20"], values["Label_HS_21"],
+                               ))
+                    conn.commit()
+                elif table == "SHS":
+                    c.execute('''INSERT INTO SHS (Designation,D,B,T,W,A,Izz,Iyy,Rzz,Ryy,
+                        Zzz,Zyy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (values[KEY_SECSIZE], values["Label_HS_1"], values["Label_HS_2"],
+                               values["Label_HS_3"], values["Label_HS_11"], values["Label_HS_12"],
+                               values["Label_HS_13"], values["Label_HS_14"], values["Label_HS_15"],
+                               values["Label_HS_16"], values["Label_HS_17"], values["Label_HS_18"],
+                               values["Label_HS_19"], values["Label_HS_20"], values["Label_HS_21"],
+                               ))
+                    conn.commit()
+                elif table == "CHS":
+                    c.execute('''INSERT INTO CHS (Designation,NB,OD,T,W,A,V,Ves,Vis,I,
+                        Z,R,Rsq,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (values[KEY_SECSIZE], values["Label_CHS_1"], values["Label_CHS_2"],
+                               values["Label_CHS_3"], values["Label_HS_11"], values["Label_HS_12"],
+                               values["Label_HS_13"], values["Label_HS_14"], values["Label_HS_15"],
+                               values["Label_HS_16"], values["Label_HS_17"], values["Label_HS_18"],
+                               values["Label_HS_19"], values["Label_HS_20"], values["Label_HS_21"],
+                               ))
+                    conn.commit()
+                else:
+                    c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+                        Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (Designation_c, Mass_c, Area_c,
+                               D_c, B_c, tw_c, T_c,FlangeSlope_c,
+                               R1_c, R2_c, Iz_c, Iy_c, rz_c,
+                               ry_c, Zz_c, Zy_c,
+                               Zpz_c, Zpy_c, It_c,Iw_c,Source_c, Type))
+                    conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
+
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
 
     def add_tab_column(self):
         '''

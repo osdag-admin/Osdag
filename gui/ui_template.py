@@ -1236,9 +1236,9 @@ class Window(QMainWindow):
 
 
         self.actionDesign_Preferences = QtWidgets.QAction(MainWindow)
-        font = QtGui.QFont()
-        font.setFamily("DejaVu Serif")
-        self.actionDesign_Preferences.setFont(font)
+        # font = QtGui.QFont()
+        # font.setFamily("DejaVu Serif")
+        # self.actionDesign_Preferences.setFont(font)
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
@@ -1373,8 +1373,7 @@ class Window(QMainWindow):
                         if title_name in out_titles:
                             title_name += str(title_repeat)
                             title_repeat += 1
-                        if title_status[title_count] == 0:
-                            self.output_title_fields[title_name][0].setVisible(False)
+                        self.output_title_fields[title_name][0].setVisible(title_status[title_count])
                         title_count += 1
                         out_titles.append(title_name)
         self.ui_loaded = True
@@ -1943,9 +1942,9 @@ class Window(QMainWindow):
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
                     if status:
-                        txt.setVisible(True if option[3] and txt.isVisible() else False)
+                        txt.setVisible(True if option[3] != "" and txt.isVisible() else False)
                         txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
-                        txt_label.setVisible(True if option[3] and txt_label.isVisible() else False)
+                        txt_label.setVisible(True if option[3] != "" and txt_label.isVisible() else False)
 
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)

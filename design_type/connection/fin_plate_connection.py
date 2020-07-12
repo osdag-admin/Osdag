@@ -528,7 +528,7 @@ class FinPlateConnection(ShearConnection):
                                              max_edge_dist=self.bolt.max_edge_dist_round,
                                              shear_load=self.load.shear_force * 1000,
                                              axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
-                                             shear_ecc=True, bolt_line_limit=2)
+                                             shear_ecc=True, bolt_line_limit=2, beta_lg= self.bolt.beta_lg)
             self.long_joint_factor = self.plate.bolt_capacity_red/self.bolt.bolt_capacity
 
             if self.plate.design_status is True:
@@ -597,7 +597,7 @@ class FinPlateConnection(ShearConnection):
                                          max_edge_dist=self.bolt.max_edge_dist_round,
                                          shear_load=self.load.shear_force * 1000,
                                          axial_load=self.load.axial_force * 1000, gap=self.plate.gap,
-                                         shear_ecc=True, bolt_line_limit=2)
+                                         shear_ecc=True, bolt_line_limit=2,beta_lg= self.bolt.beta_lg)
         initial_plate_height = self.plate.height
         initial_edge_dist = self.plate.edge_dist_provided
         initial_gauge = self.plate.gauge_provided
@@ -623,7 +623,7 @@ class FinPlateConnection(ShearConnection):
                                              self.plate.gauge_provided, self.plate.edge_dist_provided,
                                              self.load.shear_force * 1000, self.load.axial_force * 1000, 0,
                                              self.plate.gap, True, 2,
-                                             self.plate.bolts_one_line, self.plate.bolt_line, None, self.plate.pitch_provided)
+                                             self.plate.bolts_one_line, self.plate.bolt_line, None, self.plate.pitch_provided,beta_lg= self.bolt.beta_lg)
             if self.connectivity in VALUES_CONN_1:
                 self.weld_connecting_plates = [self.supporting_section.flange_thickness, self.plate.thickness_provided]
             else:
@@ -650,7 +650,7 @@ class FinPlateConnection(ShearConnection):
                                                              self.bolt.bolt_capacity,self.plate.edge_dist_provided, self.plate.gauge_provided,
                                                              self.plate.gauge_provided,self.plate.edge_dist_provided,
                                                              self.load.shear_force*1000,self.load.axial_force*1000,0,self.plate.gap,True,2,
-                                                             self.plate.bolts_one_line, self.plate.bolt_line,None)
+                                                             self.plate.bolts_one_line, self.plate.bolt_line,None,beta_lg= self.bolt.beta_lg)
 
                             if self.plate.design_status is False:
                                 break

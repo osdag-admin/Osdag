@@ -1220,9 +1220,18 @@ class Tension_bolted(Member):
             logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
 
-    def select_bolt_dia(self,design_dictionary):
+    def select_bolt_dia(self,design_dictionary,dia_remove =None):
 
         "Selection of bolt (dia) from te available list of bolts based on the spacing limits and capacity"
+        "Loop checking each member from sizelist based on yield capacity"
+        if (dia_remove) == None:
+            pass
+        else:
+            if dia_remove in self.bolt.bolt_diameter:
+                self.bolt.bolt_diameter.remove(dia_remove)
+            else:
+                pass
+
 
         print(self.section_size_1.designation)
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
@@ -1282,29 +1291,34 @@ class Tension_bolted(Member):
         # bolts_one_line = 1
         bolt_design_status_1 = False
 
-        for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
-            # print(self.bolt.bolt_diameter_provided)
-            self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                    conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
-
-            self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                              bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                              conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-                                              n_planes=self.planes)
-
-            if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
-                self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
-                                                 web_plate_h_min=self.min_plate_height,
-                                                 web_plate_h_max=self.max_plate_height,
-                                                 bolt_capacity=self.bolt.bolt_capacity,
-                                                 min_edge_dist=self.bolt.min_edge_dist_round,
-                                                 min_gauge=self.bolt.min_gauge_round,
-                                                 max_spacing=self.bolt.max_spacing_round,
-                                                 max_edge_dist=self.bolt.max_edge_dist_round,
-                                                 shear_load=0, axial_load=self.res_force, gap=self.plate.gap,
-                                                 shear_ecc=False,min_bolts_one_line=2,min_bolt_line=2)
+        self.bolt_diameter_possible=[]
+        for d in self.bolt.bolt_diameter:
+            if 8 * d < (self.plate.thickness_provided + self.thick):
+                continue
             else:
-                if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
+                self.bolt_diameter_possible.append(d)
+
+        if len(self.bolt_diameter_possible) ==0.0:
+            self.design_status = False
+            logger.warning(" :Combined thickness of {} mm exceeds Large grip limit of {} mm for bolt miniumum bolt diameter {} mm (IS 800:2007 - Cl.10.3.3.2)". format((self.plate.thickness_provided + self.thick),(8*self.bolt.bolt_diameter[-1]),self.bolt.bolt_diameter[-1]))
+            # logger.error(": Design is not safe. \n ")
+            # logger.debug(" :=========End Of design===========")
+        else:
+            for self.bolt.bolt_diameter_provided in reversed(self.bolt_diameter_possible):
+
+                # print(self.bolt.bolt_diameter_provided)
+                self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                        conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+
+                self.bolt.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type,
+                                                             'machine_flame_cut'), 2)
+
+                self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                  bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                                  conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                                  n_planes=self.planes)
+
+                if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
                     self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
                                                      web_plate_h_min=self.min_plate_height,
                                                      web_plate_h_max=self.max_plate_height,
@@ -1313,39 +1327,51 @@ class Tension_bolted(Member):
                                                      min_gauge=self.bolt.min_gauge_round,
                                                      max_spacing=self.bolt.max_spacing_round,
                                                      max_edge_dist=self.bolt.max_edge_dist_round,
-                                                     shear_load=0, axial_load=self.res_force/2,
-                                                     gap=self.plate.gap,
-                                                     shear_ecc=False, min_bolts_one_line=1,min_bolt_line=2)
+                                                     shear_load=0, axial_load=self.res_force, gap=self.plate.gap,
+                                                     shear_ecc=False,min_bolts_one_line=2,min_bolt_line=2, beta_lg=self.bolt.beta_lg)
                 else:
-                    self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
-                                                     web_plate_h_min=self.min_plate_height,
-                                                     web_plate_h_max=self.max_plate_height,
-                                                     bolt_capacity=self.bolt.bolt_capacity,
-                                                     min_edge_dist=self.bolt.min_edge_dist_round,
-                                                     min_gauge=self.bolt.min_gauge_round,
-                                                     max_spacing=self.bolt.max_spacing_round,
-                                                     max_edge_dist=self.bolt.max_edge_dist_round,
-                                                     shear_load=0, axial_load=self.res_force,
-                                                     gap=self.plate.gap,
-                                                     shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2)
+                    if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
+                        self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                                         web_plate_h_min=self.min_plate_height,
+                                                         web_plate_h_max=self.max_plate_height,
+                                                         bolt_capacity=self.bolt.bolt_capacity,
+                                                         min_edge_dist=self.bolt.min_edge_dist_round,
+                                                         min_gauge=self.bolt.min_gauge_round,
+                                                         max_spacing=self.bolt.max_spacing_round,
+                                                         max_edge_dist=self.bolt.max_edge_dist_round,
+                                                         shear_load=0, axial_load=self.res_force/2,
+                                                         gap=self.plate.gap,
+                                                         shear_ecc=False, min_bolts_one_line=1,min_bolt_line=2,beta_lg=self.bolt.beta_lg)
+                    else:
+                        self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                                         web_plate_h_min=self.min_plate_height,
+                                                         web_plate_h_max=self.max_plate_height,
+                                                         bolt_capacity=self.bolt.bolt_capacity,
+                                                         min_edge_dist=self.bolt.min_edge_dist_round,
+                                                         min_gauge=self.bolt.min_gauge_round,
+                                                         max_spacing=self.bolt.max_spacing_round,
+                                                         max_edge_dist=self.bolt.max_edge_dist_round,
+                                                         shear_load=0, axial_load=self.res_force,
+                                                         gap=self.plate.gap,
+                                                         shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,beta_lg=self.bolt.beta_lg)
 
 
-            if self.plate.design_status is True:
-                if self.plate.bolts_required > bolts_required_previous and count >= 1:
-                    self.bolt.bolt_diameter_provided = bolt_diameter_previous
-                    self.plate.bolts_required = bolts_required_previous
-                    self.plate.bolt_force = bolt_force_previous
+                if self.plate.design_status is True:
+                    if self.plate.bolts_required > bolts_required_previous and count >= 1:
+                        self.bolt.bolt_diameter_provided = bolt_diameter_previous
+                        self.plate.bolts_required = bolts_required_previous
+                        self.plate.bolt_force = bolt_force_previous
+                        self.bolt_design_status = self.plate.design_status
+                        break
+                    bolts_required_previous = self.plate.bolts_required
+                    bolt_diameter_previous = self.bolt.bolt_diameter_provided
+                    bolt_force_previous = self.plate.bolt_force
+
+                    count += 1
                     self.bolt_design_status = self.plate.design_status
-                    break
-                bolts_required_previous = self.plate.bolts_required
-                bolt_diameter_previous = self.bolt.bolt_diameter_provided
-                bolt_force_previous = self.plate.bolt_force
-
-                count += 1
-                self.bolt_design_status = self.plate.design_status
-            else:
-                pass
-        bolt_capacity_req = self.bolt.bolt_capacity
+                else:
+                    pass
+            bolt_capacity_req = self.bolt.bolt_capacity
 
         if self.plate.design_status == False and self.bolt_design_status !=True:
             self.design_status = False
@@ -1363,7 +1389,8 @@ class Tension_bolted(Member):
 
         else:
             self.design_status = False
-            logger.warning(self.plate.reason)
+            if self.plate.reason != "":
+                logger.warning(self.plate.reason)
             logger.error(": Design is not safe. \n ")
             logger.debug(" :=========End Of design===========")
 
@@ -1403,7 +1430,7 @@ class Tension_bolted(Member):
             bolt_capacity_reduced = self.plate.get_bolt_red(self.plate.bolts_one_line,
                                                             self.plate.gauge_provided, self.plate.bolt_line,
                                                             self.plate.pitch_provided,self.bolt.bolt_capacity,
-                                                            self.bolt.bolt_diameter_provided)
+                                                            self.bolt.bolt_diameter_provided,beta_lg=self.bolt.beta_lg)
             if bolt_capacity_reduced < self.plate.bolt_force and count >= 1:
                 self.bolt.bolt_grade_provided = bolt_grade_previous
                 break
@@ -1429,7 +1456,7 @@ class Tension_bolted(Member):
                                              max_spacing=self.bolt.max_spacing_round,
                                              max_edge_dist=self.bolt.max_edge_dist_round,
                                              shear_load=0, axial_load=self.res_force, gap=self.plate.gap,
-                                             shear_ecc=False, min_bolts_one_line=2,min_bolt_line=2)
+                                             shear_ecc=False, min_bolts_one_line=2,min_bolt_line=2,beta_lg=self.bolt.beta_lg)
         else:
             if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
                 self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -1442,7 +1469,7 @@ class Tension_bolted(Member):
                                                  max_edge_dist=self.bolt.max_edge_dist_round,
                                                  shear_load=0, axial_load=self.res_force / 2,
                                                  gap=self.plate.gap,
-                                                 shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2)
+                                                 shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,beta_lg=self.bolt.beta_lg)
 
             else:
                 self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -1455,7 +1482,7 @@ class Tension_bolted(Member):
                                                  max_edge_dist=self.bolt.max_edge_dist_round,
                                                  shear_load=0, axial_load=self.res_force,
                                                  gap=self.plate.gap,
-                                                 shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2)
+                                                 shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,beta_lg=self.bolt.beta_lg)
 
         self.plate.edge_dist_provided = round(((self.max_plate_height - ((self.plate.bolts_one_line -1) * self.plate.gauge_provided))/2),2)
 
@@ -1539,7 +1566,7 @@ class Tension_bolted(Member):
                                                                                self.plate.bolt_line,
                                                                                self.plate.pitch_provided,
                                                                                self.bolt.bolt_capacity,
-                                                                               self.bolt.bolt_diameter_provided)
+                                                                               self.bolt.bolt_diameter_provided,beta_lg=self.bolt.beta_lg)
                         self.plate.bolt_force = self.res_force/(self.plate.bolt_line * self.plate.bolts_one_line)
                         if self.plate.bolt_force < self.plate.bolt_capacity_red:
                             capacity = True
@@ -1638,29 +1665,29 @@ class Tension_bolted(Member):
 
         self.plate_last = self.plate.thickness[-1]
 
-        "recalculating block shear capacity of the bolt based on the change in pitch while block shear check in member design"
 
-        if design_dictionary[KEY_TYP] == 'Bearing Bolt':
-            self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.bolt_fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
-                e=self.plate.end_dist_provided, p=self.plate.pitch_provided, bolt_hole_type=self.bolt.bolt_hole_type)
+        # if design_dictionary[KEY_TYP] == 'Bearing Bolt':
+        #     self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered, f_ub=self.bolt.bolt_fu, t=self.bolt.thk_considered, d=self.bolt.bolt_diameter_provided,
+        #         e=self.plate.end_dist_provided, p=self.plate.pitch_provided, bolt_hole_type=self.bolt.bolt_hole_type)
+        #
+        #     self.bolt.kb = self.bolt.calculate_kb(e=self.plate.end_dist_provided, p=self.plate.pitch_provided, d_0= self.bolt.dia_hole, f_ub=self.bolt.bolt_fu,f_u=self.bolt.fu_considered)
+        #
+        #     self.bolt.bolt_bearing_capacity = self.bolt_bearing_capacity
+        #
+        #
+        #     self.bolt.bolt_capacity = min(self.bolt.bolt_bearing_capacity,self.bolt.bolt_shear_capacity)
+        # else:
+        #     pass
 
-            self.bolt.kb = self.bolt.calculate_kb(e=self.plate.end_dist_provided, p=self.plate.pitch_provided, d_0= self.bolt.dia_hole, f_ub=self.bolt.bolt_fu,f_u=self.bolt.fu_considered)
-
-            self.bolt.bolt_bearing_capacity = self.bolt_bearing_capacity
-
-
-            self.bolt.bolt_capacity = min(self.bolt.bolt_bearing_capacity,self.bolt.bolt_shear_capacity)
-        else:
-            pass
 
         # capacity = False
         # while capacity == False:
-        self.plate.bolt_capacity_red = self.plate.get_bolt_red(self.plate.bolts_one_line,
-                                                        self.plate.gauge_provided, self.plate.bolt_line,
-                                                        self.plate.pitch_provided, self.bolt.bolt_capacity,
-                                                        self.bolt.bolt_diameter_provided)
-            # if self.plate.bolt_force < self.plate.bolt_capacity_red:
-            #     capacity = True
+        # self.plate.bolt_capacity_red = self.plate.get_bolt_red(self.plate.bolts_one_line,
+        #                                                 self.plate.gauge_provided, self.plate.bolt_line,
+        #                                                 self.plate.pitch_provided, self.bolt.bolt_capacity,
+        #                                                 self.bolt.bolt_diameter_provided,beta_lg=self.bolt.beta_lg)
+        #     # if self.plate.bolt_force < self.plate.bolt_capacity_red:
+        #     #     capacity = True
             #     break
             # else:
             #     self.plate.bolt_line = self.plate.bolt_line + 1
@@ -1757,6 +1784,65 @@ class Tension_bolted(Member):
             #     # logger.debug(" :=========End Of design===========")
             else:
                 pass
+
+
+        "recalculating beta_lg based on the revised thickness"
+
+
+        self.bolt_conn_plates_t_fu_fy = []
+        self.bolt_conn_plates_t_fu_fy.append((self.plate.thickness_provided, self.plate.fu, self.plate.fy))
+        self.bolt_conn_plates_t_fu_fy.append(
+            (self.thick, self.section_size_1.fu, self.section_size_1.fy))
+
+        self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                          bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                          conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                          n_planes=self.planes)
+
+
+        "recalculating block shear capacity of the bolt based on the change in pitch while block shear check in member design"
+
+        if design_dictionary[KEY_TYP] == 'Bearing Bolt':
+            self.bolt_bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=self.bolt.fu_considered,
+                                                                                    f_ub=self.bolt.bolt_fu,
+                                                                                    t=self.bolt.thk_considered,
+                                                                                    d=self.bolt.bolt_diameter_provided,
+                                                                                    e=self.plate.end_dist_provided,
+                                                                                    p=self.plate.pitch_provided,
+                                                                                    bolt_hole_type=self.bolt.bolt_hole_type)
+
+            self.bolt.kb = self.bolt.calculate_kb(e=self.plate.end_dist_provided, p=self.plate.pitch_provided,
+                                                  d_0=self.bolt.dia_hole, f_ub=self.bolt.bolt_fu,
+                                                  f_u=self.bolt.fu_considered)
+
+            self.bolt.bolt_bearing_capacity = self.bolt_bearing_capacity
+
+            self.bolt.bolt_capacity = min(self.bolt.bolt_bearing_capacity, self.bolt.bolt_shear_capacity)
+        else:
+            pass
+
+        self.plate.bolt_capacity_red = self.plate.get_bolt_red(self.plate.bolts_one_line,
+                                                               self.plate.gauge_provided, self.plate.bolt_line,
+                                                               self.plate.pitch_provided, self.bolt.bolt_capacity,
+                                                               self.bolt.bolt_diameter_provided,
+                                                               beta_lg=self.bolt.beta_lg)
+        self.comb_thick = self.plate.thickness_provided + self.thick
+
+        if self.plate.bolt_force > self.plate.bolt_capacity_red or (8* self.bolt.bolt_diameter_provided)<self.comb_thick:
+            if len(self.bolt_diameter_possible) >= 2:
+                dia = self.bolt.bolt_diameter_provided
+                print("recheck", dia)
+                self.select_bolt_dia(self, design_dictionary, dia)
+            else:
+                self.design_status = False
+                logger.warning(" : Design failed due to Long Joint or Large Grip Bolt Reduction")
+
+                logger.error(": Design is not safe. \n ")
+                logger.debug(" :=========End Of design===========")
+        else:
+            pass
+           
+            
 
         if self.plate_tension_capacity > self.res_force:
             # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
@@ -2291,7 +2377,7 @@ class Tension_bolted(Member):
             # self.report_check.append(t2)
             t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt_diameter_min, row_limit), min_gauge, get_pass_fail(self.bolt.min_gauge, min_gauge, relation="leq"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.d_0_min, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.d_0_min,'machine_flame_cut'),
                   self.edge_dist_min_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
             self.report_check.append(t3)
             t3 = (KEY_SPACING, depth_req(self.edge_dist_min_round, self.pitch_round, row, text), depth_max,
@@ -2376,7 +2462,7 @@ class Tension_bolted(Member):
                   self.plate.gauge_provided,
                   get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided, relation="geq"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, 'machine_flame_cut'),
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided, relation='leq'))
             self.report_check.append(t3)

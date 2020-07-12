@@ -116,7 +116,16 @@ Member.Designation:
 - MPC 300*
 - MPC 350
 - MPC 400
-Member.Length: '5000'
+Member.Length: '3000'
 Member.Material: E 250 (Fe 410 W)A
 Member.Profile: Back to Back Channels
 Module: Tension Members Bolted Design
+out_titles_status:
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1

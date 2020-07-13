@@ -340,6 +340,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.tension_capacity_anchor = 0.0
         self.anchors_outside_flange = 0
         self.anchor_inside_flange = 'No'
+        self.stiffener_inside_flange = 'No'
         self.anchor_tension_capa = 0.0
         self.safe = True
         self.max_bearing_stress = 0.0
@@ -3495,6 +3496,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # the governing ratio is D/t_g < 29.30 (Table 2, IS 800:2007)
             if self.connectivity == 'Moment Base Plate':
                 if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
+
+                    self.stiffener_inside_flange = 'Yes'
+
                     self.stiffener_plt_thick_btwn_D = (self.column_D - (2 * self.column_tf)) / 29.30
                     self.stiffener_plt_thick_btwn_D = round_up(self.stiffener_plt_thick_btwn_D, 2, self.column_tf)  # mm
 
@@ -3504,9 +3508,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.stiffener_plt_len_btwn_D = self.column_D - (2 * self.column_tf)  # mm
                     self.stiffener_plt_width_btwn_D = self.column_bf - self.column_tw - (2 * self.column_r1) - (2 * 5)  # mm
                 else:
-                    pass
-            else:
-                pass
+                    self.stiffener_inside_flange = 'No'
+
+                    self.stiffener_plt_len_btwn_D = 'N/A'
+                    self.stiffener_plt_width_btwn_D = 'N/A'
+                    self.stiffener_plt_thick_btwn_D = 'N/A'
 
             # weld checks of the stiffener welds - Combination of stresses [Reference: Cl. 10.5.10.1, IS 800:2007]
 
@@ -4028,6 +4034,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 print(self.shear_capa_stiffener_across_web == 'N/A')
                 print(self.moment_on_stiffener_across_web == 'N/A')
                 print(self.moment_capa_stiffener_across_web == 'N/A')
+
+        # Stiffener plate inside flange
+        if self.connectivity == 'Moment Base Plate':
+            if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
+                if self.stiffener_inside_flange == 'Yes':
+
+                    print(self.stiffener_plt_len_btwn_D)
+                    print(self.stiffener_plt_width_btwn_D)
+                    print(self.stiffener_plt_thick_btwn_D)
 
         # Shear Key Details
         print("Shear key details start")

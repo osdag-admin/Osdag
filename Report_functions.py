@@ -4453,25 +4453,38 @@ def depth_req(e, g, row, sec =None):
 
 # functions for base plate
 
+def eccentricity(moment, axial_load, eccentricity_zz):
+    """ calculate eccentricity along the major axis"""
+    moment = str(moment)
+    axial_load = str(axial_load)
+    eccentricity_zz = str(eccentricity_zz)
 
-def k1(end_distance, bp_length, k1_value):
+    ecc_zz = Math(inline=True)
+    ecc_zz.append(NoEscape(r'\begin{aligned} e_{zz} = \frac{M_{zz}}{P} \\'))
+    ecc_zz.append(NoEscape(r'\begin{aligned}        = \frac{' + moment + r'}{' + axial_load + r'} \\'))
+    ecc_zz.append(NoEscape(r'\begin{aligned}        = ' + eccentricity_zz + r' \\'))
+
+    return ecc_zz
+
+
+def k1(ecc_zz, bp_length, k1_value):
     """ calculate k1
 
     Args:
-        end_distance (e) - end distance in mm (float)
+        ecc_zz (e) - end distance in mm (float)
         bp_length (L) - length of the base plate in mm (float)
         k1_value - value of k1 (float)
 
     Returns:
         k1 [k1 = 3 * (e - L/2)] (float)
     """
-    end_distance = str(end_distance)
+    ecc_zz = str(ecc_zz)
     bp_length = str(bp_length)
     k1_value = str(k1_value)
 
     k1 = Math(inline=True)
-    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(e ~-~\frac{L}{2}\Big) \\'))
-    k1.append(NoEscape(r'\begin{aligned}       = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
+    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(e_{zz} ~-~\frac{L}{2}\Big) \\'))
+    k1.append(NoEscape(r'\begin{aligned}       = 3~\Big(' + ecc_zz + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
     k1.append(NoEscape(r'\begin{aligned}       = ' + k1_value + r' \\'))
     k1.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
 
@@ -4536,13 +4549,15 @@ def k2(n, anchor_area_tension, bp_width, f, e, k2_value):
     """ calculate k2
 
     Args:
-        n (e) - modular ratio (float)\Big(\frac{\pi}{4}\Big)~d^{2}
+        n - modular ratio (float)
         anchor_area_tension (A_s) - total area of the anchor hold down bolts under tension (float)
         bp_width (B) - width of the base plate in mm (float)
-        f = distance between the centre of the base plate and the centre of the anchor bolt(s) under tension
+        f = distance between the centre of the base plate and the centre of the anchor bolt(s) under tension (float)
+        e = eccentricity (float)
+        k2_value (float)
 
     Returns:
-        k1 [k1 = 3 * (e - L/2)] (float)
+        k2 [k2 = (6*n*A_s / B) * (f + e) ] (float)
     """
     n = str(n)
     anchor_area_tension = str(anchor_area_tension)
@@ -4552,9 +4567,65 @@ def k2(n, anchor_area_tension, bp_width, f, e, k2_value):
     k2_value = str(k2_value)
 
     k2 = Math(inline=True)
-    k2.append(NoEscape(r'\begin{aligned} k_{2} = 3~\Big(e ~-~\frac{L}{2}\Big) \\'))
-    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
-    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
-    k1.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+    k2.append(NoEscape(r'\begin{aligned} k_2 = \frac{6~n~A_s}{B}~\Big(f~+~e_{zz}\Big) \\'))
+    k2.append(NoEscape(r'\begin{aligned}     = \frac{6~' + n + r'~' + anchor_area_tension + r'}{' + bp_width + r'}~\Big(' + f + r'~+~' + e + r'\Big) \\'))
+    k2.append(NoEscape(r'\begin{aligned}     = ' + k2_value + r' \\'))
+    k2.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
 
-    return k1
+    return k2
+
+
+def k3(k2_value, bp_length, f, k3_value):
+    """ calculate k3 """
+    k2_value = str(k2_value)
+    bp_length = str(bp_length)
+    f = str(f)
+    k3_value = str(k3_value)
+
+    k3 = Math(inline=True)
+    k3.append(NoEscape(r'\begin{aligned} k_3 = - ~k_2~\Big(\frac{L}{2}~+~f\Big) \\'))
+    k3.append(NoEscape(r'\begin{aligned}     = - ~' + k2_value + r'~\Big(\frac{' + bp_length + r'}{2}~+~' + f + r'\Big) \\'))
+    k3.append(NoEscape(r'\begin{aligned}     = ' + k3_value + r' \\'))
+    k3.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return k3
+
+
+def y(k1_value, k2_value, k3_value, y_value):
+    """ calculate the distance (y) of the base plate under compression"""
+    k1_value = str(k1_value)
+    k2_value = str(k2_value)
+    k3_value = str(k3_value)
+    y_value = str(y_value)
+
+    y = Math(inline=True)
+    y.append(NoEscape(r'\begin{aligned} y^{3}~+~k_{1}~y^{2}~+~k_{2}~y~+~k_{3} = 0 \\'))
+    y.append(NoEscape(r'\begin{aligned} y^{3}~+~' + k1_value + r'~y^{2}~+~' + k2_value + r'~y~+~' + k3_value + r' = 0 \\'))
+    y.append(NoEscape(r'\begin{aligned} y = ' + y_value + r' \\'))
+    y.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return y
+
+
+def total_tension_bolts(axial_load, bp_length, dist_y, ecc_zz, f, anchor_tension):
+    """ calculate total tension demand on the hold down bolt(s)"""
+    axial_load = str(axial_load)
+    bp_length = str(bp_length)
+    dist_y = str(dist_y)
+    ecc_zz = str(ecc_zz)
+    f = str(f)
+    anchor_tension = str(anchor_tension)
+
+    tension_total = Math(inline=True)
+    tension_total.append(NoEscape(r'\begin{aligned} P_t = -~P_c~\Bigg[\frac{\frac{L}{2}-\frac{y}{3}-e_{zz}}{\frac{L}{2}-\frac{y}{3}+f}\Bigg] \\'))
+    tension_total.append(NoEscape(r'\begin{aligned}     = -~P_c~\Bigg[\frac{\frac{' + bp_length + r'}{2}-\frac{' + dist_y + r'}{3}-' + ecc_zz + r'}'
+                                                                r'{\frac{' + bp_length + r'}{2}-\frac{' + dist_y + r'}{3}+' + f + r'}\Bigg] \\'))
+    tension_total.append(NoEscape(r'\begin{aligned}     = ' + anchor_tension + r' \\'))
+    tension_total.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return tension_total
+
+
+
+
+

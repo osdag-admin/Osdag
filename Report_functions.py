@@ -4450,3 +4450,105 @@ def depth_req(e, g, row, sec =None):
 #     shear_capacity_eqn.append(NoEscape(r'[Ref&.~IS~800:2007,~Cl.~6.1]&\end{aligned}'))
 #
 #     return shear_capacity_eqn
+
+# functions for base plate
+
+
+def k1(end_distance, bp_length):
+    """ calculate k1
+
+    Args:
+        end_distance (e) - end distance in mm (float)
+        bp_length (L) - length of the base plate in mm (float)
+
+    Returns:
+        k1 [k1 = 3 * (e - L/2)] (float)
+    """
+    end_distance = str(end_distance)
+    bp_length = str(bp_length)
+
+    k1 = Math(inline=True)
+    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(e ~-~\frac{L}{2}\Big) \\'))
+    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
+    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
+    k1.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return k1
+
+
+def modular_ratio(E_s, f_ck, modular_ratio):
+    """ calculate modular ratio
+
+    """
+    E_s = str(E_s)
+    E_c = round((5000 * math.sqrt(f_ck)), 3)
+    E_c = str(E_c)
+    f_ck = str(f_ck)
+
+    n = Math(inline=True)
+    n.append(NoEscape(r'\begin{aligned} n = \frac{E_{s}}{E_{c}} \\'))
+    n.append(NoEscape(r'\begin{aligned} 2 \times 10 ^ {5}~(N/mm^{2}) \\'))
+    n.append(NoEscape(r'\begin{aligned} E_c = 5000~\sqrt{f_{ck}}~(N/mm^{2}) \\'))
+    n.append(NoEscape(r'\begin{aligned}     = 5000~\sqrt{' + f_ck + r'}~=~' + E_c + r' \\'))
+    n.append(NoEscape(r'\begin{aligned} n = \frac{' + E_s + r'}{' + E_c + r'} \\'))
+    n.append(NoEscape(r'\begin{aligned}   =  ' + modular_ratio + r'\\'))
+    n.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return n
+
+
+def total_anchor_area_tension(anchor_dia, anchor_nos_tension, anchor_area_tension):
+    """
+
+    """
+    anchor_dia = str(anchor_dia)
+    anchor_nos_tension = str(anchor_nos_tension)
+    anchor_area_tension = str(anchor_area_tension)
+
+    total_anchor_area = Math(inline=True)
+    total_anchor_area.append(NoEscape(r'\begin{aligned} n \times~\Big(\frac{\pi}{4}\Big)~d^{2} \\'))
+    total_anchor_area.append(NoEscape(r'\begin{aligned} ' + anchor_nos_tension + r' \times~\Big(\frac{\pi}{4}\Big)~ '
+                                              + anchor_dia + r'^{2} \\'))
+    total_anchor_area.append(NoEscape(r'\begin{aligned} = ' + anchor_area_tension + r' \\'))
+
+    return total_anchor_area
+
+
+def calc_f(end_distance, bp_length, f):
+    """
+
+    """
+    end_distance = str(end_distance)
+    bp_length = str(bp_length)
+
+    dist_f = Math(inline=True)
+    dist_f.append(NoEscape(r'\begin{aligned} f = \Big(\frac{L}{2} - e\Big) \\'))
+    dist_f.append(NoEscape(r'\begin{aligned}   = \Big(\frac{' + bp_length + r'}{2} - ' + end_distance + r'\Big) \\'))
+    dist_f.append(NoEscape(r'\begin{aligned}   = ' + f + r' \\'))
+    dist_f.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+    
+    return dist_f
+
+
+def k2(n, anchor_area_tension, bp_width, f, e):
+    """ calculate k2
+
+    Args:
+        n (e) - modular ratio (float)\Big(\frac{\pi}{4}\Big)~d^{2}
+        anchor_area_tension (A_s) - total area of the anchor hold down bolts under tension (float)
+        bp_width (B) - width of the base plate in mm (float)
+        f = distance between the centre of the base plate and the centre of the anchor bolt(s) under tension
+
+    Returns:
+        k1 [k1 = 3 * (e - L/2)] (float)
+    """
+    end_distance = str(end_distance)
+    bp_length = str(bp_length)
+
+    k1 = Math(inline=True)
+    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(e ~-~\frac{L}{2}\Big) \\'))
+    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
+    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
+    k1.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+
+    return k1

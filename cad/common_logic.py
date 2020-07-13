@@ -19,6 +19,9 @@ from cad.items.grout import Grout
 from cad.items.angle import Angle
 from cad.items.channel import Channel
 from cad.items.Gasset_plate import GassetPlate
+from cad.items.stiffener_flange import Stiffener_flange
+from cad.items.rect_hollow import RectHollow
+from cad.items.circular_hollow import CircularHollow
 
 from cad.ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from cad.ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -939,107 +942,8 @@ class CommonDesignLogic(object):
         """
         BP = self.module_class
 
-        if Isec == True:
-            column_tw = float(BP.column_tw)
-            column_T = float(BP.column_tf)
-            column_d = float(BP.column_D)
-            column_B = float(BP.column_bf)
-            column_R1 = float(BP.column_r1)
-            column_R2 = float(BP.column_r2)
-            column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
-            column_length = 1500
-
-            column = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
-                              alpha=column_alpha, length=column_length, notchObj=None)
-            baseplate = Plate(L=float(BP.bp_length_provided), W=float(BP.bp_width_provided), T=float(BP.plate_thk))
-
-            if filletWeldcolm == True:
-                weldAbvFlang = FilletWeld(b=float(BP.weld_size_flange), h=float(BP.weld_size_flange), L=column.B)
-                weldBelwFlang = FilletWeld(b=float(BP.weld_size_flange), h=float(BP.weld_size_flange),
-                                           L=(column.B - column.t - 2 * (column.R1 + column.R2)) / 2)
-                weldSideWeb = FilletWeld(b=float(BP.weld_size_web), h=float(BP.weld_size_web),
-                                         L=column.D - 2 * (column.t + column.R1))
-            else:
-                weldAbvFlang = GrooveWeld(b= column.T, h=10, L=column.B)
-                weldBelwFlang = GrooveWeld(b= column.T, h=10, L=column.B)
-                weldSideWeb = GrooveWeld(b=column.t, h=10, L=column.D)
-
-            gusset = StiffenerPlate(L=BP.stiffener_plt_len_along_flange, W=BP.stiffener_plt_height_along_flange,
-                                    T=BP.stiffener_plt_thick_along_flange,
-                                    L11=(BP.stiffener_plt_len_along_flange - (column.B + 100)) / 2, L12=BP.stiffener_plt_height_along_flange - 100,
-                                    R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
-            stiffener = StiffenerPlate(L=BP.stiffener_plt_len_along_web, W=BP.stiffener_plt_height_along_web,
-                                       T=BP.stiffener_plt_thick_along_web,
-                                       L11=BP.stiffener_plt_len_along_web - 50, L12=BP.stiffener_plt_height_along_web - 100)
-
-            concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=BP.anchor_length_provided * 1.3)
-            grout = Grout(L=concrete.L, W=concrete.W, T=50)
-
-            stiffener_acrsWeb = StiffenerPlate(L=(baseplate.L - column.D - 2 * gusset.T) / 2 - 10, W=gusset.W, T=gusset.T,
-                                               L11=(baseplate.L - column.D - 2 * gusset.T) / 2 - 50, L12=gusset.W - 100,
-                                               R21=15, R22=15)  # todo: add L21 and L22 as max(15, weldsize + 3)
-
-            stiffener_algflangeL = Stiffener_flange(H=gusset.W, L=(baseplate.W - column.B) / 2 - 10, T=column.T + 5,
-                                                    t_f=column.T, L_h=50, L_v=100, to_left=True)
-            stiffener_algflangeR = Stiffener_flange(H=gusset.W, L=(baseplate.W - column.B) / 2 - 10, T=column.T + 5,
-                                                    t_f=column.T, L_h=50, L_v=100, to_left=False)
-            stiffener_algflange_tapperLength = (stiffener_algflangeR.T - column.T) * 5
-
-            stiffener_insideflange = StiffenerPlate(L=(column.D - 2 * column.T - 2 * 6),
-                                                    W=(column.B - column.t - 2 * column.R1 - 2 * 5) / 2,
-                                                    T=12)  # self.extraspace=5
-
-            weld_stiffener_algflng_v = GrooveWeld(b=column.T, h=10, L=stiffener_algflangeL.H)
-            weld_stiffener_algflng_h = FilletWeld(b=10, h=10,
-                                                  L=stiffener_algflangeL.L)  # Todo: create another weld for inner side of the stiffener
-            weld_stiffener_algflag_gh = GrooveWeld(b=stiffener_algflangeR.T, h=10,
-                                                   L=stiffener_algflangeL.L - stiffener_algflange_tapperLength)
-
-            weld_stiffener_acrsWeb_v = GrooveWeld(b=stiffener_acrsWeb.T, h=10,
-                                                  L=stiffener_acrsWeb.W - stiffener_acrsWeb.R22)
-            weld_stiffener_acrsWeb_h = FilletWeld(b=10, h=10, L=stiffener_acrsWeb.L - stiffener_acrsWeb.R22)
-            weld_stiffener_acrsWeb_gh = GrooveWeld(b=stiffener_acrsWeb.T, h=10,
-                                                   L=stiffener_acrsWeb.L - stiffener_acrsWeb.R22)
-
-            gussetweld = GrooveWeld(b=gusset.T, h=10, L=gusset.L)
-            weld_stiffener_alongWeb_h = FilletWeld(b=10, h=10, L=stiffener.L - stiffener.R22)
-            weld_stiffener_alongWeb_v = GrooveWeld(b=stiffener.T, h=10, L=stiffener.W - stiffener.R22)
-            weld_stiffener_alongWeb_gh = GrooveWeld(b=stiffener.T, h=10, L=stiffener.L - stiffener.R22)
-
-            weld_stiffener_inflange = GrooveWeld(b=stiffener_insideflange.T, h=6, L=stiffener_insideflange.W)
-
-            bolt_d = float(BP.anchor_dia_provided)
-            bolt_r = bolt_d / 2  # Bolt radius (Shank part)
-            bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
-            # bolt_T = self.boltHeadThick_Calculation(bolt_d)      # Bolt head thickness
-            nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
-            nut_HT = nut_T
-
-            ex_length = (50 + 24 + baseplate.T + grout.T)  # nut.T = 24
-            if BP.dp_anchor_type == 'IS 5624-Type A':
-                bolt = AnchorBolt_A(l=float(BP.anchor_length_provided), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
-                                    ex=ex_length)
-            elif BP.dp_anchor_type == 'IS 5624-Type B':
-                bolt = AnchorBolt_B(l=float(BP.anchor_length_provided), r=float(BP.anchor_dia_provided) / 2, ex=ex_length)
-            elif BP.dp_anchor_type == 'End Plate Type':
-                bolt = AnchorBolt_Endplate(l=float(BP.anchor_length_provided), r=float(BP.anchor_dia_provided) / 2,
-                                           ex=ex_length)
-
-            nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)
-            numberOfBolts = 4
-            nutSpace = bolt.c + baseplate.T
-            bolthight = nut.T + 50
-
-            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, nutSpace)
-
-            basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
-                                     concrete, gusset, stiffener, grout, gussetweld, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,
-                                     stiffener_algflangeL, stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh,
-                                     weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange)
-        if hollow_sec == True:
-            rect_hollow = False
-            # circ_hollow = False
-            if rect_hollow == True:
+        if BP.connectivity == 'Hollow/Tubular Column Base':
+            if BP.dp_column_designation[1:4] == 'SHS' or BP.dp_column_designation[1:4] == 'RHS':
                 sec = RectHollow(L=50, W=100, H=1000, T=4)
                 weld_sec = RectHollow(L=sec.L, W=sec.W, H=10, T=sec.T)
 
@@ -1067,7 +971,7 @@ class CommonDesignLogic(object):
                 grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
 
                 column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
-            else:
+            else:       #self.BP.dp_column_designation[1:4] == 'CHS':
                 sec = CircularHollow(r=200 / 2, T=12, H=1500)
                 weld_sec = CircularHollow(r=sec.r, T=sec.T, H=10)
 
@@ -1100,6 +1004,101 @@ class CommonDesignLogic(object):
             basePlate = HollowBasePlateCad(type, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout,
                                            stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v,
                                            weld_stiff_b_h)
+        else:
+            column_tw = float(BP.column_tw)
+            column_T = float(BP.column_tf)
+            column_d = float(BP.column_D)
+            column_B = float(BP.column_bf)
+            column_R1 = float(BP.column_r1)
+            column_R2 = float(BP.column_r2)
+            column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
+            column_length = 1500
+
+            column = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
+                              alpha=column_alpha, length=column_length, notchObj=None)
+            baseplate = Plate(L=float(BP.bp_length_provided), W=float(BP.bp_width_provided), T=float(BP.plate_thk))
+
+            if BP.weld_type == 'Fillet Weld':
+                weldAbvFlang = FilletWeld(b=float(BP.weld_size_flange), h=float(BP.weld_size_flange), L=column.B)
+                weldBelwFlang = FilletWeld(b=float(BP.weld_size_flange), h=float(BP.weld_size_flange),
+                                           L=(column.B - column.t - 2 * (column.R1 + column.R2)) / 2)
+                weldSideWeb = FilletWeld(b=float(BP.weld_size_web), h=float(BP.weld_size_web),
+                                         L=column.D - 2 * (column.t + column.R1))
+            else:
+                weldAbvFlang = GrooveWeld(b= column.T, h=float(BP.weld_size_flange), L=column.B)
+                weldBelwFlang = GrooveWeld(b= column.T, h=float(BP.weld_size_flange), L=column.B)
+                weldSideWeb = GrooveWeld(b=column.t, h=float(BP.weld_size_flange), L=column.D)
+
+            # gusset = StiffenerPlate(L=BP.stiffener_plt_len_along_flange, W=BP.stiffener_plt_height_along_flange,
+            #                         T=BP.stiffener_plt_thick_along_flange,
+            #                         L11=(BP.stiffener_plt_len_along_flange - (column.B + 100)) / 2, L12=BP.stiffener_plt_height_along_flange - 100,
+            #                         R11=(baseplate.W - (column.B + 100)) / 2, R12=200 - 100)
+            stiffener = StiffenerPlate(L=float(BP.stiffener_plt_len_along_web), W=float(BP.stiffener_plt_height_along_web),
+                                       T=float(BP.stiffener_plt_thick_along_web),
+                                       L11=float(BP.stiffener_plt_len_along_web - 50), L12=float(BP.stiffener_plt_height_along_web - 100))
+
+            concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=BP.anchor_length_provided * 1.3)
+            grout = Grout(L=concrete.L, W=concrete.W, T=50)
+
+            stiffener_acrsWeb = StiffenerPlate(L=float(BP.stiffener_plt_len_across_web) - float(BP.weld_size_flange), W=float(BP.stiffener_plt_height_across_web), T=float(BP.stiffener_plt_thick_across_web),
+                                               L11=float(BP.stiffener_plt_len_across_web) - 50, L12=float(BP.stiffener_plt_height_across_web) - 100,
+                                               R21=15, R22=15)  # todo: add L21 and L22 as max(15, weldsize + 3)
+
+            stiffener_algflangeL = Stiffener_flange(H=float(BP.stiffener_plt_height_along_flange), L=BP.stiffener_plt_len_along_flange - float(BP.weld_size_flange), T=BP.stiffener_plt_thick_along_flange,
+                                                    t_f=column.T, L_h=50, L_v=100, to_left=True)
+            stiffener_algflangeR = Stiffener_flange(H=float(BP.stiffener_plt_height_along_flange), L=BP.stiffener_plt_len_along_flange - float(BP.weld_size_flange), T= BP.stiffener_plt_thick_along_flange,
+                                                    t_f=column.T, L_h=50, L_v=100, to_left=False)
+            stiffener_algflange_tapperLength = (stiffener_algflangeR.T - column.T) * 5
+
+            #TODO: add varaiable names to this
+            stiffener_insideflange = StiffenerPlate(L= (column.D - 2*column.T - 2 * 6), W= (column.B- column.t - 2*column.R1 - 2 * 5)/2, T =12)  # self.extraspace=5
+
+            weld_stiffener_algflng_v = GrooveWeld(b=column.T, h=float(BP.weld_size_flange), L=stiffener_algflangeL.H)
+            weld_stiffener_algflng_h = FilletWeld(b=float(BP.weld_size_flange), h=float(BP.weld_size_flange),
+                                                  L=stiffener_algflangeL.L)  # Todo: create another weld for inner side of the stiffener
+            weld_stiffener_algflag_gh = GrooveWeld(b=stiffener_algflangeR.T, h=float(BP.weld_size_flange),
+                                                   L=stiffener_algflangeL.L - stiffener_algflange_tapperLength)
+
+            weld_stiffener_acrsWeb_v = GrooveWeld(b=stiffener_acrsWeb.T, h=float(BP.weld_size_flange),
+                                                  L=stiffener_acrsWeb.W - stiffener_acrsWeb.R22)
+            weld_stiffener_acrsWeb_h = FilletWeld(b=10, h=10, L=stiffener_acrsWeb.L - stiffener_acrsWeb.R22)
+            weld_stiffener_acrsWeb_gh = GrooveWeld(b=stiffener_acrsWeb.T, h=float(BP.weld_size_flange),
+                                                   L=stiffener_acrsWeb.L - stiffener_acrsWeb.R22)
+
+            # gussetweld = GrooveWeld(b=gusset.T, h=float(BP.weld_size_flange), L=gusset.L)
+            weld_stiffener_alongWeb_h = FilletWeld(b=float(BP.weld_size_flange), h=float(BP.weld_size_flange), L=stiffener.L - stiffener.R22)
+            weld_stiffener_alongWeb_v = GrooveWeld(b=stiffener.T, h=float(BP.weld_size_flange), L=stiffener.W - stiffener.R22)
+            weld_stiffener_alongWeb_gh = GrooveWeld(b=stiffener.T, h=float(BP.weld_size_flange), L=stiffener.L - stiffener.R22)
+
+            weld_stiffener_inflange = GrooveWeld(b=stiffener_insideflange.T, h=float(BP.weld_size_flange), L=stiffener_insideflange.W)
+
+            bolt_d = float(BP.anchor_dia_provided)
+            bolt_r = bolt_d / 2  # Bolt radius (Shank part)
+            bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
+            # bolt_T = self.boltHeadThick_Calculation(bolt_d)      # Bolt head thickness
+            nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
+            nut_HT = nut_T
+
+            ex_length = (50 + 24 + baseplate.T + grout.T)  # nut.T = 24
+            if BP.dp_anchor_type == 'IS 5624-Type A':
+                bolt = AnchorBolt_A(l=float(BP.anchor_length_provided), c=125, a=75, r=float(BP.anchor_dia_provided) / 2,
+                                    ex=ex_length)
+            elif BP.dp_anchor_type == 'IS 5624-Type B':
+                bolt = AnchorBolt_B(l=float(BP.anchor_length_provided), r=float(BP.anchor_dia_provided) / 2, ex=ex_length)
+            elif BP.dp_anchor_type == 'End Plate Type':
+                bolt = AnchorBolt_Endplate(l=float(BP.anchor_length_provided), r=float(BP.anchor_dia_provided) / 2,
+                                           ex=ex_length)
+
+            nut = Nut(R=bolt_R, T=nut_T, H=nut_HT, innerR1=bolt_r)
+            nutSpace = bolt.c + baseplate.T
+            bolthight = nut.T + 50
+
+            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, nutSpace)
+
+            basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
+                                     concrete, stiffener, grout, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,
+                                     stiffener_algflangeL, stiffener_algflangeR, stiffener_acrsWeb, weld_stiffener_algflng_v, weld_stiffener_algflng_h, weld_stiffener_algflag_gh,
+                                     weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange)
 
         basePlate.create_3DModel()
 

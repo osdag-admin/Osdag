@@ -269,9 +269,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.stiffener_plt_height_along_web = 0.0
         self.stiffener_plt_height_across_web = 0.0
 
+        self.stiffener_plt_len_btwn_D = 0.0
+        self.stiffener_plt_width_btwn_D = 0.0
+        self.stiffener_plt_thick_btwn_D = 0.0
+
         self.stiffener_along_flange = ''
         self.stiffener_along_web = ''
         self.stiffener_across_web = ''
+        self.stiffener_inside_flange = ''
         self.eff_stiffener_plt_len_along_flange = 0.0
         self.eff_stiffener_plt_len_along_web = 0.0
 
@@ -340,7 +345,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.tension_capacity_anchor = 0.0
         self.anchors_outside_flange = 0
         self.anchor_inside_flange = 'No'
-        self.stiffener_inside_flange = 'No'
         self.anchor_tension_capa = 0.0
         self.safe = True
         self.max_bearing_stress = 0.0
@@ -3083,6 +3087,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.stiffener_along_flange = 'No'
                         self.stiffener_along_web = 'No'
                         self.stiffener_across_web = 'No'
+                        self.stiffener_inside_flange = 'No'
 
                         self.weld_size_flange = self.weld_size  # mm
                         self.weld_size_stiffener = self.weld_size  # mm
@@ -3160,6 +3165,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.stiffener_along_flange = 'Yes'
                     self.stiffener_along_web = 'Yes'
                     self.stiffener_across_web = 'No'
+                    self.stiffener_inside_flange = 'No'
 
                 self.weld_size_flange = self.column_tf  # mm
                 self.weld_size_web = self.column_tw  # mm
@@ -3981,10 +3987,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         #stiffener plate inside flange
         if self.connectivity == 'Moment Base Plate':
             if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
-                if self.stiffener_inside_flange = 'Yes':
+                if self.stiffener_inside_flange == 'Yes':
 
-                    print(self.stiffener_plt_thick_btwn_D)
-                    print(self.stiffener_plt_thick_btwn_D)
+                    print(self.stiffener_plt_len_btwn_D)
+                    print(self.stiffener_plt_width_btwn_D)
                     print(self.stiffener_plt_thick_btwn_D)
 
         else:
@@ -4093,7 +4099,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             if self.stiffener_across_web == 'Yes':
                 print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
-
+            if self.stiffener_inside_flange == 'Yes':
+                print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')
 
         # col properties
         print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)

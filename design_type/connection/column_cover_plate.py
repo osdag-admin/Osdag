@@ -1,3 +1,18 @@
+
+"""
+Started on 1st December, 2019.
+
+@author: Kumari Anjali Jatav
+
+Module: Column-Column Cover Plate Bolted Connection
+
+Reference:
+            1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
+            2) Design of Steel Structures by N. Subramanian
+            3) IS 1367 (Part3):2002 - TECHNICAL SUPPLY CONDITIONS FOR THREADED STEEL FASTENERS
+
+"""
+
 from design_type.connection.moment_connection import MomentConnection
 from utils.common.component import *
 from utils.common.is800_2007 import *
@@ -83,7 +98,7 @@ class ColumnCoverPlate(MomentConnection):
                'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t4)
 
-        t6 = (KEY_DISP_COLSEC, [KEY_SECSIZE], ['Label_21'], TYPE_TEXTBOX, self.change_source)
+        t6 = (KEY_DISP_COLSEC, [KEY_SECSIZE], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t6)
 
         return change_tab
@@ -202,6 +217,21 @@ class ColumnCoverPlate(MomentConnection):
 
         return val
 
+    def out_bolt_bearing(self):
+
+        bolt_type = self[0]
+        if bolt_type != TYP_BEARING:
+            return True
+        else:
+            return False
+
+    def preference_type(self):
+
+        pref_type = self[0]
+        if pref_type == VALUES_FLANGEPLATE_PREFERENCES[0]:
+            return True
+        else:
+            return False
     ####################################
     # Design Preference Functions End
     ####################################
@@ -235,6 +265,33 @@ class ColumnCoverPlate(MomentConnection):
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
+
+    def input_value_changed(self):
+
+        lst = []
+
+        t8 = ([KEY_MATERIAL], KEY_MATERIAL, TYPE_CUSTOM_MATERIAL, self.new_material)
+        lst.append(t8)
+
+        t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_PLATE_HEIGHT,TYPE_OUT_DOCK, self.preference_type)
+        lst.append(t8)
+        t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_PLATE_HEIGHT, TYPE_OUT_LABEL, self.preference_type)
+        lst.append(t8)
+
+        t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_PLATE_LENGTH, TYPE_OUT_DOCK, self.preference_type)
+        lst.append(t8)
+        t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGE_PLATE_LENGTH, TYPE_OUT_LABEL, self.preference_type)
+        lst.append(t8)
+
+        t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGEPLATE_THICKNESS, TYPE_OUT_DOCK, self.preference_type)
+        lst.append(t8)
+        t8 = ([KEY_FLANGEPLATE_PREFERENCES], KEY_INNERFLANGEPLATE_THICKNESS, TYPE_OUT_LABEL, self.preference_type)
+        lst.append(t8)
+
+
+        return lst
+
+
     def input_values(self):
 
         options_list = []
@@ -248,8 +305,8 @@ class ColumnCoverPlate(MomentConnection):
         t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, connectdb("Columns"), True, 'No Validator')
         options_list.append(t4)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, True, 'No Validator')
-        options_list.append(t15)
+        # t15 = (KEY_IMAGE, None, TYPE_IMAGE, None, True, 'No Validator')
+        # options_list.append(t15)
 
         t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
         options_list.append(t5)
@@ -320,6 +377,17 @@ class ColumnCoverPlate(MomentConnection):
 
         flangespacing = []
 
+
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
+        flangespacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/spacing_2.png', 400, 352, ""])  # [image, width, height, caption]
+        flangespacing.append(t99)
+
         t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
                self.flange_plate.pitch_provided)
         flangespacing.append(t21)
@@ -341,6 +409,16 @@ class ColumnCoverPlate(MomentConnection):
     def webspacing(self, flag):
 
         webspacing = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - 3 x 3 pattern considered")
+        webspacing.append(t00)
+
+        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
+        # spacing.append(t99)
+
+        t99 = (None, 'Spacing Details', TYPE_SECTION,
+               ['./ResourceFiles/images/spacing_2.png', 400, 352, ""])  # [image, width, height, caption]
+        webspacing.append(t99)
 
         t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag else '')
         webspacing.append(t8)
@@ -364,9 +442,19 @@ class ColumnCoverPlate(MomentConnection):
         # t99 = (None, "Block Shear in Flange & Flange plate in Axial ", TYPE_SECTION,
         #        './ResourceFiles/images/column_flange_failure.png')
         # flangecapacity.append(t99)
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)- 2 x 3 Bolts pattern considered")
+        flangecapacity.append(t00)
+        t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
+               ['./ResourceFiles/images/2L_V.png', 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
+        flangecapacity.append(t99)
+        # t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
+        #        ['./ResourceFiles/images/L_V.jpg', 211, 349, "Block Shear Pattern"])  # [image, width, height, caption]
+        # flangecapacity.append(t99)
+
         t30 = (KEY_FLANGE_TEN_CAPACITY, KEY_DISP_FLANGE_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_flange / 1000, 2) if flag else '')
         flangecapacity.append(t30)
+
         t30 = (KEY_FLANGE_PLATE_TEN_CAP, KEY_DISP_FLANGE_PLATE_TEN_CAP, TYPE_TEXTBOX,
                round(self.flange_plate.tension_capacity_flange_plate / 1000, 2) if flag else '')
         flangecapacity.append(t30)
@@ -377,8 +465,15 @@ class ColumnCoverPlate(MomentConnection):
 
         webcapacity = []
 
-        # t99 = (None,"Block Shear in Web & web plate in Axial & Shear", TYPE_SECTION, './ResourceFiles/images/column_web_failure.png')
-        # webcapacity.append(t99)
+        t00 = (
+        None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate) - 2 x 3 Bolts pattern considered")
+        webcapacity.append(t00)
+
+        t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/U_V.png', 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
+        webcapacity.append(t99)
+
+
         t30 = (KEY_WEB_TEN_CAPACITY, KEY_DISP_WEB_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_web / 1000, 2) if flag else '')
         webcapacity.append(t30)
@@ -386,6 +481,11 @@ class ColumnCoverPlate(MomentConnection):
         t30 = (KEY_WEB_PLATE_CAPACITY, KEY_DISP_WEB_PLATE_CAPACITY, TYPE_TEXTBOX,
                round(self.web_plate.tension_capacity_web_plate / 1000, 2) if flag else '')
         webcapacity.append(t30)
+
+        t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/L_Vshear.png', 239 , 350,
+                "Block Shear Pattern"])  # [image, width, height, caption]
+        webcapacity.append(t99)
 
         t30 = (KEY_WEBPLATE_SHEAR_CAPACITY_PLATE, KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, TYPE_TEXTBOX,
                round(self.web_plate.shear_capacity_web_plate / 1000, 2) if flag else '')
@@ -459,6 +559,10 @@ class ColumnCoverPlate(MomentConnection):
             KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, bolt_bearing_capacity_disp if flag else '',
             True)
         flange_bolt_capacity.append(t5)
+        if self.flange_plate.beta_lj > 0:
+            self.flange_plate.beta_lj = round(self.flange_plate.beta_lj, 2)
+        else:
+            self.flange_plate.beta_lj = 1
         t5 = (KEY_REDUCTION_FACTOR_FLANGE, KEY_DISP_REDUCTION_FACTOR_FLANGE, TYPE_TEXTBOX,
               round(self.flange_plate.beta_lj, 2) if flag else '', True)
         flange_bolt_capacity.append(t5)
@@ -502,6 +606,10 @@ class ColumnCoverPlate(MomentConnection):
         KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, webbolt_bearing_capacity_disp if flag else '',
         True)
         web_bolt_capacity.append(t5)
+        if self.web_plate.beta_lj > 0:
+            self.web_plate.beta_lj =round(self.web_plate.beta_lj, 2)
+        else:
+            self.web_plate.beta_lj = 1
         t5 = (KEY_REDUCTION_FACTOR_WEB, KEY_DISP_REDUCTION_FACTOR_WEB, TYPE_TEXTBOX,
               round(self.web_plate.beta_lj, 2) if flag else '', True)
         web_bolt_capacity.append(t5)
@@ -590,18 +698,18 @@ class ColumnCoverPlate(MomentConnection):
         KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
         out_list.append(t21)
 
-        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, True)
+        t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, False)
         out_list.append(t17)
         t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-               self.flange_plate.Innerheight if flag else '', True)
+               self.flange_plate.Innerheight if flag else '', False)
         out_list.append(t18)
 
         t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-               self.plate_in_len if flag else '', True)
+               self.plate_in_len if flag else '', False)
         out_list.append(t19)
         # if flag is True:
         t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_in_plate_tk if flag else '', True)
+               self.flange_in_plate_tk if flag else '', False)
         out_list.append(t20)
 
         return out_list
@@ -688,8 +796,8 @@ class ColumnCoverPlate(MomentConnection):
                                material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL],
                                gap=design_dictionary[KEY_DP_DETAILING_GAP])
 
-        self.flange_check_thk = []
-        self.web_check_thk = []
+        # self.flange_check_thk = []
+        # self.web_check_thk = []
         self.member_capacity_status = False
         self.initial_pt_thk_status = False
         self.initial_pt_thk_status_web = False
@@ -701,6 +809,7 @@ class ColumnCoverPlate(MomentConnection):
         self.web_axial_check_status = False
         self.web_plate_axial_check_status = False
         self.web_shear_plate_check_status = False
+        self.shear_yielding_status =False
         self.warn_text(self)
         self.member_capacity(self)
         # self.hard_values(self)
@@ -1658,9 +1767,7 @@ class ColumnCoverPlate(MomentConnection):
                 if self.flange_plate.tension_capacity_flange_plate < self.flange_force:
                     if len(self.flange_plate.thickness) >= 2:
                         thk_f = self.flange_plate.thickness_provided
-                        self.flange_check_thk.append(thk_f)
-                        # print(self.previous_size)
-                        self.initial_pt_thk(self, previous_thk_web=self.flange_check_thk)
+                        self.initial_pt_thk(self, previous_thk_web=thk_f)
                     else:
                         self.flange_plate_check_status = False
                         self.design_status = False
@@ -1802,9 +1909,7 @@ class ColumnCoverPlate(MomentConnection):
                     # self.flange_plate_check_status = False
                     if len(self.flange_plate.thickness) >= 2:
                         thk_f = self.flange_plate.thickness_provided
-                        self.flange_check_thk.append(thk_f)
-                        # print(self.previous_size)
-                        self.initial_pt_thk(self, previous_thk_web=self.flange_check_thk)
+                        self.initial_pt_thk(self, previous_thk_web= thk_f )
                     else:
                         self.flange_plate_check_status = False
                         self.design_status = False
@@ -1980,9 +2085,7 @@ class ColumnCoverPlate(MomentConnection):
                 # self.web_plate_axial_check_status = False
                 if len(self.web_plate.thickness) >= 2:
                     thk = self.web_plate.thickness_provided
-                    self.web_check_thk.append(thk)
-                    # print(self.previous_size)
-                    self.initial_pt_thk(self, previous_thk_web=self.web_check_thk)
+                    self.initial_pt_thk(self, previous_thk_web= thk )
                 else:
                     self.web_plate_axial_check_status = False
                     self.design_status = False
@@ -2007,11 +2110,30 @@ class ColumnCoverPlate(MomentConnection):
     def web_shear_plate_check(self):
         ###### # capacity Check for web plate  in shear = min(block, yielding, rupture)
         self.web_shear_plate_check_status = False
+        self.shear_yielding_status = False
         A_vn_web = 2 * (self.web_plate.height - (self.web_plate.bolts_one_line * self.web_bolt.dia_hole)) * \
                    self.web_plate.thickness_provided
         A_v_web = 2 * self.web_plate.height * self.web_plate.thickness_provided
-        self.web_plate.shear_yielding_capacity = self.shear_yielding(
-            A_v=A_v_web, fy=self.web_plate.fy)
+        self.web_plate.shear_yielding_capacity = round(0.6*self.shear_yielding(
+            A_v=A_v_web, fy=self.web_plate.fy),2)
+        if self.web_plate.shear_yielding_capacity < self.fact_shear_load:
+            # self.web_shear_plate_check_status = False
+            if len(self.web_plate.thickness) >= 2:
+                thk = self.web_plate.thickness_provided
+                self.initial_pt_thk(self, previous_thk_web=thk)
+            else:
+                self.shear_yielding_status = False
+                self.design_status = False
+                logger.warning(
+                    ": Allowable Shear capacity of web plate is less than required factored shear load {} kN.".format(
+                        round(self.fact_shear_load / 1000, 2)))
+                logger.info(": Increase the thickness of the web plate or decrease the applied shear loads")
+                logger.error(" : Design is not safe. \n ")
+                logger.debug(" : =========End Of design===========")
+        else:
+            self.design_status = True
+            self.shear_yielding_status = True
+
         self.web_plate.shear_rupture_capacity = self.shear_rupture_(
             A_vn=A_vn_web, fu=self.web_plate.fu)
         design_status_block_shear = False
@@ -2025,8 +2147,7 @@ class ColumnCoverPlate(MomentConnection):
         #### Block shear capacity of web plate ###
 
         while design_status_block_shear == False:
-            Atg = (((
-                                self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
+            Atg = (((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
             Atn = (((self.web_plate.bolt_line - 1) * self.web_plate.pitch_provided) -
                    ((self.web_plate.bolt_line - 0.5) * self.web_bolt.dia_hole) + self.web_plate.end_dist_provided) * self.web_plate.thickness_provided
             Avg = (self.web_plate.edge_dist_provided + (
@@ -2056,17 +2177,15 @@ class ColumnCoverPlate(MomentConnection):
         #     break
 
         if design_status_block_shear is True:
-            self.web_plate.shear_capacity_web_plate = min(self.web_plate.shear_yielding_capacity,
+            self.web_plate.shear_capacity_web_plate = round(min(self.web_plate.shear_yielding_capacity,
                                                           self.web_plate.shear_rupture_capacity,
-                                                          self.web_plate.block_shear_capacity_shear)
+                                                          self.web_plate.block_shear_capacity_shear),2)
 
             if self.web_plate.shear_capacity_web_plate < self.fact_shear_load:
                 # self.web_shear_plate_check_status = False
                 if len(self.web_plate.thickness) >= 2:
                     thk = self.web_plate.thickness_provided
-                    self.web_check_thk.append(thk)
-                    # print(self.previous_size)
-                    self.initial_pt_thk(self, previous_thk_web=self.web_check_thk)
+                    self.initial_pt_thk(self, previous_thk_web=thk)
                 else:
                     logger.warning(
                         ": Shear capacity of web plate is less than required fact_shear_load  {} kN.".format( self.fact_shear_load))
@@ -2724,7 +2843,11 @@ class ColumnCoverPlate(MomentConnection):
 
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
-        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
+        if self.section.flange_slope == 90:
+            image = "Parallel_Beam"
+        else:
+            image = "Slope_Beam"
+        self.report_supporting = {KEY_DISP_SEC_PROFILE:image,
                                   KEY_DISP_COLSEC: self.section.designation,
                                   KEY_DISP_MATERIAL: self.section.material,
                                   KEY_DISP_FU: self.section.fu,
@@ -2775,7 +2898,8 @@ class ColumnCoverPlate(MomentConnection):
              KEY_DISP_FU: self.flange_plate.fu,
              KEY_DISP_FY: self.flange_plate.fy,
              KEY_DISP_MATERIAL: self.flange_plate.material,
-             KEY_DISP_PLATETHK: str(self.flange_plate.thickness),
+             KEY_DISP_FLANGESPLATE_THICKNESS: str(self.flange_plate.thickness),
+             KEY_DISP_WEBPLATE_THICKNESS: str(self.web_plate.thickness),
              }
 
         self.report_check = []
@@ -2839,12 +2963,18 @@ class ColumnCoverPlate(MomentConnection):
         # self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
         #                               self.section.web_thickness * self.section.fy) / (math.sqrt(3) * gamma_m0), 2)
 
-        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, display_prov(self.load.shear_force, "V"), shear_yield_prov(h=h, t=self.section.web_thickness,
-                                                                                                      f_y=self.section.fy, gamma_m0=gamma_m0,
-                                                                                                      V_dg=round(
-                                                                                     self.shear_capacity1 / 1000, 2)),
-              'Restrict to low shear case')
+        t1 = (KEY_OUT_DISP_SHEAR_CAPACITY, '',
+              shear_yield_prov(h=h, t=self.section.web_thickness, f_y=self.section.fy, gamma_m0=gamma_m0,
+                               V_dg=round(self.shear_capacity1 / 1000 / 0.6, 2)), '')
         self.report_check.append(t1)
+
+        initial_shear_capacity = round(self.shear_capacity1 / 1000 / 0.6, 2)
+        reduced_shear_capacity = round(self.shear_capacity1 / 1000, 2)
+        t1 = (KEY_DISP_ALLOW_SHEAR, display_prov(self.load.shear_force, "V"),
+              allow_shear_capacity(initial_shear_capacity, reduced_shear_capacity),
+              get_pass_fail(self.load.shear_force, reduced_shear_capacity, relation="lesser"))
+        self.report_check.append(t1)
+
         t1 = (KEY_OUT_DISP_PLASTIC_MOMENT_CAPACITY, '', plastic_moment_capacty(beta_b=round(self.beta_b, 2),
                                                                                Z_p=round(self.Z_p, 2),
                                                                                f_y=self.section.fy,
@@ -2892,8 +3022,7 @@ class ColumnCoverPlate(MomentConnection):
         V_dy = round(self.shear_capacity1 / 0.6 / 1000, 2)
         t1 = (KEY_DISP_APPLIED_SHEAR_LOAD, display_prov(self.load.shear_force, "V"),
               prov_shear_load(shear_input=self.load.shear_force, min_sc=round(self.shear_load1 / 1000, 2),
-                              app_shear_load=round(self.fact_shear_load / 1000, 2),
-                              shear_capacity_1=V_dy), "")
+                              app_shear_load=round(self.fact_shear_load / 1000, 2), shear_capacity_1=V_dy), "")
         self.report_check.append(t1)
         t1 = (KEY_DISP_APPLIED_MOMENT_LOAD, display_prov(self.load.moment, "M"),
               prov_moment_load(moment_input=self.load.moment, min_mc=round(self.load_moment_min / 1000000, 2),
@@ -3780,18 +3909,25 @@ class ColumnCoverPlate(MomentConnection):
             t1 = (KEY_DISP_SHEARYIELDINGCAP_WEB_PLATE, '',
                   shear_yield_prov(self.web_plate.height, self.web_plate.thickness_provided,
                                    self.web_plate.fy, gamma_m0,
-                                   round(self.web_plate.shear_yielding_capacity / 1000, 2), 2), '')
+                                   round(self.web_plate.shear_yielding_capacity / 1000 / 0.6, 2), 2), '')
             self.report_check.append(t1)
 
-            t1 = (KEY_DISP_SHEARRUPTURECAP_WEB_PLATE, '',
-                  shear_rupture_prov_beam(self.web_plate.height, self.web_plate.thickness_provided,
-                                          self.web_plate.bolts_one_line, self.web_bolt.dia_hole,
-                                          self.web_plate.fu,
-
-                                          round(self.web_plate.shear_rupture_capacity / 1000, 2),
-                                          gamma_m1, 2), '')
-
+            initial_shear_capacity = round(self.web_plate.shear_yielding_capacity / 1000 / 0.6, 2)
+            reduced_shear_capacity = round(self.web_plate.shear_yielding_capacity / 1000, 2)
+            t1 = (KEY_DISP_ALLOW_SHEAR, display_prov(self.load.shear_force, "V"),
+                  allow_shear_capacity(initial_shear_capacity, reduced_shear_capacity),
+                  get_pass_fail(self.load.shear_force, reduced_shear_capacity, relation="lesser"))
             self.report_check.append(t1)
+            if self.shear_yielding_status == True:
+                t1 = (KEY_DISP_SHEARRUPTURECAP_WEB_PLATE, '',
+                      shear_rupture_prov_beam(self.web_plate.height, self.web_plate.thickness_provided,
+                                              self.web_plate.bolts_one_line, self.web_bolt.dia_hole,
+                                              self.web_plate.fu,
+
+                                              round(self.web_plate.shear_rupture_capacity / 1000, 2),
+                                              gamma_m1, 2), '')
+
+                self.report_check.append(t1)
 
             t1 = (KEY_DISP_BLOCKSHEARCAP_WEB_PLATE, '',
                   blockshear_prov(Tdb=round(self.web_plate.block_shear_capacity_shear / 1000, 2),stress ="shear"), '')

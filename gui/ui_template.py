@@ -20,6 +20,7 @@ from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.column_cover_plate import ColumnCoverPlate
 from PIL import Image
 from texlive.Design_wrapper import init_display as init_display_off_screen
+# from OCC.Display.backend import off
 import os
 import yaml
 import json
@@ -33,15 +34,18 @@ import pdfkit
 import configparser
 import pickle
 import cairosvg
-from update import Update
+
+from update_version_check import Update
 import pandas as pd
+
+
 
 from Common import *
 from utils.common.component import *
 from utils.common.Section_Properties_Calculator import *
 from .customized_popup import Ui_Popup
 # from .ui_summary_popup import Ui_Dialog1
-from .ui_design_preferences import Ui_Dialog
+#from .ui_design_preferences import Ui_Dialog
 
 from gui.ui_summary_popup import Ui_Dialog1
 from design_report.reportGenerator import save_html
@@ -73,6 +77,7 @@ from design_type.tension_member.tension_bolted import Tension_bolted
 from design_type.tension_member.tension_welded import Tension_welded
 import logging
 import subprocess
+from get_DPI_scale import scale
 from cad.cad3dconnection import cadconnection
 
 
@@ -197,7 +202,7 @@ class Window(QMainWindow):
             off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
             self.commLogicObj.display = off_display
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
-            off_display.set_bg_gradient_color([255, 255, 255], [255, 255, 255])
+            # off_display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
             off_display.ExportToImage('./ResourceFiles/images/3d.png')
             off_display.View_Front()
             off_display.FitAll()
@@ -590,7 +595,7 @@ class Window(QMainWindow):
 
                 if lable == 'Material':
                     combo.setCurrentIndex(1)
-                    maxi_width_right = max(maxi_width_right, item_width)
+                    maxi_width_right = max(maxi_width_right+8, item_width)
                 combo.view().setMinimumWidth(item_width + 25)
 
             if type == TYPE_TEXTBOX:
@@ -697,7 +702,8 @@ class Window(QMainWindow):
         maxi_width = maxi_width_left + maxi_width_right
         in_scrollcontent.setMinimumSize(maxi_width,in_scrollcontent.sizeHint().height())
         maxi_width += 82
-        maxi_width = max(maxi_width, 350)    # In case there is no widget
+        print('maxiwidth',maxi_width)
+        maxi_width = max(maxi_width, scale*350)    # In case there is no widget
         self.inputDock.setFixedWidth(maxi_width)
         self.in_widget.setFixedWidth( maxi_width)
         for option in option_list:
@@ -911,7 +917,7 @@ class Window(QMainWindow):
                 b.setFont(font)
                 b.setObjectName(option[0])
                 #b.setFixedSize(b.size())
-                b.resize(b.sizeHint().width(), b.sizeHint().height())
+                b.resize(b.sizeHint().width(), b.sizeHint().height()+100)
                 b.setText(v[0])
                 b.setDisabled(True)
                 fields += 1
@@ -956,7 +962,7 @@ class Window(QMainWindow):
         maxi_width = maxi_width_left + maxi_width_right
 
         maxi_width += 80    # +73 coz of whitespaces
-        maxi_width = max(maxi_width, 350) # in case no widget
+        maxi_width = max(maxi_width, scale*350) # in case no widget
         out_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         out_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
@@ -1230,9 +1236,9 @@ class Window(QMainWindow):
 
 
         self.actionDesign_Preferences = QtWidgets.QAction(MainWindow)
-        font = QtGui.QFont()
-        font.setFamily("DejaVu Serif")
-        self.actionDesign_Preferences.setFont(font)
+        # font = QtGui.QFont()
+        # font.setFamily("DejaVu Serif")
+        # self.actionDesign_Preferences.setFont(font)
         self.actionDesign_Preferences.setObjectName("actionDesign_Preferences")
         self.actionDesign_Preferences.triggered.connect(lambda: self.common_function_for_save_and_design(main, data, "Design_Pref"))
         self.actionDesign_Preferences.triggered.connect(lambda: self.combined_design_prefer(data,main))
@@ -1337,6 +1343,12 @@ class Window(QMainWindow):
         self.btnTop.clicked.connect(lambda: self.display.View_Top())
         self.btnFront.clicked.connect(lambda: self.display.View_Front())
         self.btnSide.clicked.connect(lambda: self.display.View_Right())
+        self.actionSave_Top_View.triggered.connect(lambda: self.display.FitAll())
+        self.actionSave_Front_View.triggered.connect(lambda: self.display.FitAll())
+        self.actionSave_Side_View.triggered.connect(lambda: self.display.FitAll())
+        self.btnTop.clicked.connect(lambda: self.display.FitAll())
+        self.btnFront.clicked.connect(lambda: self.display.FitAll())
+        self.btnSide.clicked.connect(lambda: self.display.FitAll())
 
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
         last_design_file = str(main.module_name(main)).replace(' ', '') + ".osi"
@@ -1361,8 +1373,7 @@ class Window(QMainWindow):
                         if title_name in out_titles:
                             title_name += str(title_repeat)
                             title_repeat += 1
-                        if title_status[title_count] == 0:
-                            self.output_title_fields[title_name][0].setVisible(False)
+                        self.output_title_fields[title_name][0].setVisible(title_status[title_count])
                         title_count += 1
                         out_titles.append(title_name)
         self.ui_loaded = True
@@ -1373,15 +1384,9 @@ class Window(QMainWindow):
         self.fuse_model = None
 
     def notification(self):
-        check=Update(0)
-        print(check.notifi())
-        if check.notifi()==True:
-            msg = QMessageBox.information(self, 'Update available',
-                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
-        elif check.notifi()=="no internet":
-            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
-        else:
-            msg = QMessageBox.information(self, 'Update', 'No Update Available')
+        update_class = Update()
+        msg = update_class.notifi()
+        QMessageBox.information(self, 'Info', msg)
 
     def save_output_to_csv(self, main):
         def save_fun():
@@ -1630,6 +1635,8 @@ class Window(QMainWindow):
             widget = self.dockWidgetContents.findChild(QtWidgets.QWidget, op[0])
             if op[2] == TYPE_COMBOBOX or op[2] == TYPE_COMBOBOX_CUSTOMIZED:
                 widget.setCurrentIndex(0)
+            if op[2] == TYPE_COMBOBOX and op[0] == KEY_MATERIAL:
+                widget.setCurrentIndex(1)
             elif op[2] == TYPE_TEXTBOX:
                 widget.setText('')
             else:
@@ -1908,6 +1915,9 @@ class Window(QMainWindow):
                 else:
                     self.designPrefDialog.flag = True
 
+                if self.prev_inputs != {}:
+                    self.design_pref_inputs = {}
+
         else:
             main.design_button_status = True
             for input_field in self.dockWidgetContents.findChildren(QtWidgets.QWidget):
@@ -1932,9 +1942,9 @@ class Window(QMainWindow):
                     txt = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0])
                     txt.setText(str(option[3]))
                     if status:
-                        txt.setVisible(True if option[3] and txt.isVisible() else False)
+                        txt.setVisible(True if option[3] != "" and txt.isVisible() else False)
                         txt_label = self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]+"_label")
-                        txt_label.setVisible(True if option[3] and txt_label.isVisible() else False)
+                        txt_label.setVisible(True if option[3] != "" and txt_label.isVisible() else False)
 
                 elif option[2] == TYPE_OUT_BUTTON:
                     self.dockWidgetContents_out.findChild(QtWidgets.QWidget, option[0]).setEnabled(True)
@@ -2116,11 +2126,26 @@ class Window(QMainWindow):
                         image_widget.setLayout(image_layout)
                         inner_grid_layout = QtWidgets.QGridLayout(inner_grid_widget)
                         inner_grid_widget.setLayout(inner_grid_layout)
+# <<<<<<< HEAD
+#                         im = QtWidgets.QLabel(image_widget)
+#                         #im.setGeometry(QtCore.QRect(330, 10, 150, 150))
+#                         #im.setFixedSize(im.size())
+#                         # im.setGeometry(QtCore.QRect(330, 10, 100, 100))
+#                         # im.setScaledContents(True)
+#                         # im.setFixedSize(im.size())
+#
+#                         pmap = QPixmap(option[3])
+#                         #im.setScaledContents(1)
+#                         im.setPixmap(pmap.scaled(250,200,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+#                         #im.setPixmap(pmap)
+#                         image_layout.addWidget(im)
+# =======
                         if value is not None and value != "":
                             im = QtWidgets.QLabel(image_widget)
                             im.setFixedSize(value[1], value[2])
                             pmap = QPixmap(value[0])
                             im.setScaledContents(1)
+                            im.setStyleSheet("background-color: white;")
                             im.setPixmap(pmap)
                             image_layout.addWidget(im)
                             caption = QtWidgets.QLabel(image_widget)
@@ -2130,10 +2155,11 @@ class Window(QMainWindow):
                             caption.setAlignment(Qt.AlignCenter)
                             caption.setFont(font)
                             caption.setText(value[3])
-                            caption.setFixedSize(value[1], 12)
+                            caption.setFixedSize(value[1], caption.sizeHint().height())
                             image_layout.addWidget(caption)
                             max_image_width = max(max_image_width, value[1])
                             max_image_height = max(max_image_height, value[2])
+# >>>>>>> 69a22ea10dd18e2df58abc6503be8d6354eaa30a
                         j += 1
 
                         q = QtWidgets.QLabel(scroll_content)
@@ -2155,7 +2181,7 @@ class Window(QMainWindow):
                         font.setPointSize(11)
                         font.setBold(False)
                         font.setWeight(50)
-                        r.setFixedSize(160, 27)
+                        r.setFixedSize(100, 27)
                         r.setFont(font)
                         r.setObjectName(option[0])
                         r.setText(str(value))
@@ -2163,10 +2189,19 @@ class Window(QMainWindow):
 
                     if option_type == TYPE_IMAGE:
                         im = QtWidgets.QLabel(image_widget)
+# <<<<<<< HEAD
+#                         #im.setGeometry(QtCore.QRect(330, 10, 100, 100))
+#                         #im.setScaledContents(True)
+#                         #im.setFixedSize(im.size())
+#                         pmap = QPixmap(option[3])
+#                         im.setPixmap(pmap.scaled(350,350,QtCore.Qt.KeepAspectRatio, QtCore.Qt.FastTransformation))
+# =======
                         im.setScaledContents(True)
                         im.setFixedSize(value[1], value[2])
                         pmap = QPixmap(value[0])
+                        im.setStyleSheet("background-color: white;")
                         im.setPixmap(pmap)
+# >>>>>>> 69a22ea10dd18e2df58abc6503be8d6354eaa30a
                         image_layout.addWidget(im)
                         caption = QtWidgets.QLabel(image_widget)
                         font = QtGui.QFont()
@@ -2197,10 +2232,16 @@ class Window(QMainWindow):
                     outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
                 if image_layout.count() > 0:
                     outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
+# <<<<<<< HEAD
+#                 scroll.setWidget(scrollcontent)
+#                 if section == 0:
+#                     dialog.resize(375, 375)
+#                 #dialog.setFixedSize(dialog.size())
+# =======
 
                 dialog_width += max_label_width
                 dialog_width += max_image_width
-                dialog_height = max(dialog_height, max_image_height)
+                dialog_height = max(dialog_height, max_image_height+125)
                 if not no_note:
                     dialog_height += 40
                 dialog.resize(dialog_width, dialog_height)
@@ -2209,6 +2250,7 @@ class Window(QMainWindow):
                 if no_note:
                     layout1.removeWidget(note_widget)
 
+# >>>>>>> 69a22ea10dd18e2df58abc6503be8d6354eaa30a
                 dialog.exec()
 
     def import_custom_section(self):

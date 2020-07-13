@@ -41,8 +41,9 @@ class ISectionChannel(object):
 
     def compute_params(self):
         self.channel1.compute_params()
+        self.channel1.points = self.rotateZ(self.channel1.points)
         self.isection.compute_params()
-        self.isection.points = self.rotateZ(self.isection.points)
+        # self.isection.points = self.rotateZ(self.isection.points)
 
     def create_model(self):
         prism1 = self.channel1.create_model()
@@ -53,7 +54,7 @@ class ISectionChannel(object):
 
     def rotateZ(self, points):
         rotated_points = []
-        rmatrix = numpy.array([[0, -1, 0],[1, 0, 0],[0, 0, 1]]) 
+        rmatrix = numpy.array([[0, 1, 0],[-1, 0, 0],[0, 0, 1]]) 
         for point in points:
             point = numpy.matmul(rmatrix, point)
             rotated_points.append(point)
@@ -63,24 +64,26 @@ class ISectionChannel(object):
         middel_pnt = []
         line = []
         labels = ["z","y","u","v"]
-        offset = 100
+        offset = self.D
         uvoffset = offset/numpy.sqrt(2)
 
-        z_points = [numpy.array([-offset,self.d/2,self.H/2]), numpy.array([offset,self.d/2,self.H/2])]
+        x = self.B/2 + self.T1
+        z_points = [numpy.array([-offset+x,0,self.H/2]), numpy.array([offset+x,0,self.H/2])]
         line.append(makeEdgesFromPoints(z_points))
 
-        y_points = [numpy.array([0.,-offset+self.d/2,self.H/2]), numpy.array([0,offset+self.d/2,self.H/2])]
+        y_points = [numpy.array([x,-offset,self.H/2]), numpy.array([x,offset,self.H/2])]
         line.append(makeEdgesFromPoints(y_points))
         
-        u_points = [numpy.array([-uvoffset,uvoffset+self.d/2,self.H/2]), numpy.array([uvoffset,-uvoffset+self.d/2,self.H/2])]
+        u_points = [numpy.array([-uvoffset+x,uvoffset,self.H/2]), numpy.array([uvoffset+x,-uvoffset,self.H/2])]
         line.append(makeEdgesFromPoints(u_points))
 
-        v_points = [numpy.array([-uvoffset,-uvoffset+self.d/2,self.H/2]), numpy.array([uvoffset,uvoffset+self.d/2,self.H/2])]
+        v_points = [numpy.array([-uvoffset+x,-uvoffset,self.H/2]), numpy.array([uvoffset+x,uvoffset,self.H/2])]
         line.append(makeEdgesFromPoints(v_points))
 
-        middel_pnt = [[-offset,self.d/2,self.H/2],[0,-offset+self.d/2,self.H/2],[uvoffset,-uvoffset+self.d/2,self.H/2],[uvoffset,uvoffset+self.d/2,self.H/2]]
+        start_pnt = [[-offset+x,0,self.H/2],[x,-offset+1,self.H/2],[uvoffset+x,-uvoffset,self.H/2],[uvoffset+x,uvoffset,self.H/2]]
+        end_pnt = [[offset+x,0,self.H/2],[x,offset-2,self.H/2],[-uvoffset+x,uvoffset,self.H/2],[-uvoffset+x,-uvoffset,self.H/2]]
 
-        return line, middel_pnt, labels
+        return line, [start_pnt, end_pnt], labels
 
 if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
@@ -88,9 +91,10 @@ if __name__ == '__main__':
     display, start_display, add_menu, add_function_to_menu = init_display()
 
     def display_lines(lines, points, labels):
-        for l,p,n in zip(lines,points, labels):
+        for l,p1,p2,n in zip(lines,points[0],points[1], labels):
             display.DisplayShape(l, update=True)
-            display.DisplayMessage(getGpPt(p), n, height=24,message_color=(0,0,0))
+            display.DisplayMessage(getGpPt(p1), n, height=24,message_color=(0,0,0))
+            display.DisplayMessage(getGpPt(p2), n, height=24,message_color=(0,0,0))
     
     B = 20
     T = 2
@@ -112,9 +116,9 @@ if __name__ == '__main__':
     _place = isection_channel.place(origin, uDir, shaftDir)
     point = isection_channel.compute_params()
     prism = isection_channel.create_model()
-    lines, m_pnt, labels = isection_channel.create_marking()
+    lines, pnts, labels = isection_channel.create_marking()
     display.DisplayShape(prism, update=True)
-    display_lines(lines, m_pnt, labels)
+    display_lines(lines, pnts, labels)
     display.View_Top()
     display.FitAll()
     display.DisableAntiAliasing()

@@ -1,4 +1,15 @@
-# from gui.ui_summary_popup import Ui_Dialog
+"""
+Started on 1st January, 2020.
+
+@author: Darshan Vishwakarma
+
+Module: Tension Member Welded Design
+
+Reference:
+            1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
+            2) Design of Steel Structures by N. Subramanian (Fifth impression, 2019, Chapter 6)
+
+"""
 from design_report.reportGenerator_latex import CreateLatex
 from Report_functions import *
 from utils.common.component import *
@@ -113,10 +124,10 @@ class Tension_welded(Member):
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t5)
 
-        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE_SELECTED], ['Label_24'], TYPE_TEXTBOX, self.change_source)
+        t6 = (DISP_TITLE_ANGLE, [KEY_SECSIZE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t6)
 
-        t7 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE_SELECTED], ['Label_23'], TYPE_TEXTBOX, self.change_source)
+        t7 = (DISP_TITLE_CHANNEL, [KEY_SECSIZE_SELECTED], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t7)
 
         return change_tab
@@ -481,6 +492,13 @@ class Tension_welded(Member):
         t10 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, round(self.weld.strength,2) if flag else '', True)
         out_list.append(t10)
 
+        t5 = (KEY_REDUCTION_FACTOR_FLANGE, KEY_DISP_REDUCTION, TYPE_TEXTBOX,round(self.weld.beta_lw, 2) if flag else '', True)
+        out_list.append(t5)
+
+        t10 = (KEY_OUT_WELD_STRENGTH_RED, KEY_OUT_DISP_WELD_STRENGTH_RED, TYPE_TEXTBOX, round(self.weld.strength_red, 2) if flag else '',
+        True)
+        out_list.append(t10)
+
         t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, round(self.weld.stress,2) if flag else '', True)
         out_list.append(t11)
 
@@ -523,6 +541,9 @@ class Tension_welded(Member):
                (round(self.plate.block_shear_capacity / 1000, 2)) if flag else '', True)
         out_list.append(t21)
 
+        t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.plate_pattern], True)
+        out_list.append(t17)
+
         t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
                (round(self.plate_tension_capacity / 1000, 2)) if flag else '', True)
 
@@ -560,6 +581,25 @@ class Tension_welded(Member):
         out_list.append(t21)
 
         return out_list
+
+    def plate_pattern(self, status):
+
+        pattern = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern ")
+        pattern.append(t00)
+
+        t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_SECTION,
+               ['./ResourceFiles/images/Lw.png', 400, 202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
+        pattern.append(t99)
+
+        t9 = (KEY_OUT_Lw, KEY_OUT_DISP_Lw, TYPE_TEXTBOX, round(int(self.plate.length-max((2 * self.weld.size),15)),2) if status else '')
+        pattern.append(t9)
+
+        t10 = (KEY_OUT_Hw, KEY_OUT_DISP_Hw, TYPE_TEXTBOX, round(int(self.plate.height-max((2 * self.weld.size),15)),2) if status else '')
+        pattern.append(t10)
+
+        return pattern
 
     def func_for_validation(self, design_dictionary):
 
@@ -1244,7 +1284,7 @@ class Tension_welded(Member):
         elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
             self.plate.height = 2 * self.section_size_1.min_leg + max((4 * self.weld.size),30)
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
-            self.plate.height =  self.section_size_1.min_leg + max((4 * self.weld.size),30)
+            self.plate.height = self.section_size_1.min_leg + max((4 * self.weld.size),30)
         elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles","Angles"] and design_dictionary[KEY_LOCATION] == "Long Leg":
             self.plate.height = self.section_size_1.max_leg + max((4 * self.weld.size),30)
         else:
@@ -1343,6 +1383,8 @@ class Tension_welded(Member):
         self.plate_thick_weld = self.thickness_possible[-1]
 
         for self.plate.thickness_provided in self.thickness_possible:
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
                 self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
                 self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided

@@ -1,11 +1,12 @@
 {'Section_Designation': 'ChannelSectionBacktoBack',
- 'Section_Parameters': {'parameterText_1': ['Channel Section Type', 'MC 200'],
-                        'parameterText_3': ['Spacing between the Channel '
-                                            'Sections, S(mm)',
+ 'Section_Parameters': {'parameterText_1': ['Type of Channel Section',
+                                            'MC 200'],
+                        'parameterText_3': ['Spacing(web-web) between the '
+                                            'Channel sections, S(mm)',
                                             '50'],
-                        'parameterText_6': ['Cover Plate Length, l(mm)',
+                        'parameterText_6': ['Length of Cover Plate, l(mm)',
                                             '200.0'],
-                        'parameterText_7': ['Cover Plate Thickness, t*(mm)',
+                        'parameterText_7': ['Thickness of Cover Plate, t*(mm)',
                                             '10']},
  'Section_Properties': {'A': '96.8',
                         'Cy': '11.0',

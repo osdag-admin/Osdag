@@ -82,11 +82,12 @@ The Rules/Steps to use the template are(OsdagMainWindow):
 
 import os
 from pathlib import Path
+import re
 from PyQt5.QtWidgets import QMessageBox,QApplication, QDialog, QMainWindow
 import urllib.request
-from update import Update
+from update_version_check import Update
 #from Thread import timer
-
+from get_DPI_scale import scale
 
 ############################ Pre-Build Database Updation/Creation #################
 sqlpath = Path('ResourceFiles/Database/Intg_osdag.sql')
@@ -207,13 +208,13 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         self.rdbtn=QRadioButton()
         self.rdbtn.setObjectName(Object_Name)
         self.rdbtn.setIcon(QIcon(Image_Path))
-        self.rdbtn.setIconSize(QSize(300,300))
+        self.rdbtn.setIconSize(QSize(scale*300, scale*300))
         layout.addWidget(self.rdbtn)
         self.setStyleSheet(
                     '''
                         QLabel{
                             font-family: "Arial", Helvetica, sans-serif;
-                            font-size: 20px;
+                            font-size: 12pt;
                             font-weight: bold;
                               }
                     '''
@@ -231,15 +232,17 @@ class LeftPanelButton(QWidget):          # Custom Button widget for the Left Pan
     def __init__(self,text):
         super().__init__()
         self.ui=Ui_LPButton()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self,scale)
         self.ui.LP_Button.setText(text)  #LP_Button is the QPushButton widget inside the LeftPanelButton Widget
+
+
 class OsdagMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width = resolution.width()
         height = resolution.height()
-        self.resize(width*(0.85),height*(0.75))
+
         self.ui=Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.switch.toggled.connect(self.change_theme)
@@ -267,8 +270,8 @@ class OsdagMainWindow(QMainWindow):
                                                                 self.show_moment_connection_bc
                                                                     ],
                                                     'Column to Column' :[
-                                                                ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded','ResourceFiles/images/coverplate.png','C2C_Cover_Plate_Welded'),
+                                                                ('Cover Plate Bolted','ResourceFiles/images/cccoverplatebolted.png','C2C_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded','ResourceFiles/images/cccoverplatewelded.png','C2C_Cover_Plate_Welded'),
                                                                 ('End Plate Connection','ResourceFiles/images/ccep_flush.png','C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],
@@ -398,6 +401,8 @@ class OsdagMainWindow(QMainWindow):
 
             else:
                 raise ValueError
+
+        self.resize(width * (0.85), height * (0.75))
         self.center()
         self.show()
 
@@ -457,26 +462,11 @@ class OsdagMainWindow(QMainWindow):
         elif loc == "Ask Us a Question":
             self.ask_question()
         elif loc == "Check for Update":
-            self.notification()
+            update_class = Update()
+            msg = update_class.notifi()
+            QMessageBox.information(self, 'Info',msg)
         # elif loc == "FAQ":
         #     pass
-
-    def notification(self):
-        check=Update(0)
-        print(check.notifi())
-        if check.notifi()==True:
-            msg = QMessageBox.information(self, 'Update available',
-                                          '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
-        elif check.notifi()=="no internet":
-            msg= QMessageBox.information(self, 'Error', 'No Internet Connection')
-        else:
-            msg = QMessageBox.information(self, 'Update', 'No Update Available')
-
-    # def notification2(self):
-    #     check=Update(0)
-    #     if check.notifi()==True:
-    #         msg = QMessageBox.information(self, 'Update available',
-    #                                       '<a href=\"https://imatrixhosting.in/deepthi/\">Click to downlaod<a/>')
 
 
     def select_workspace_folder(self):
@@ -490,7 +480,7 @@ class OsdagMainWindow(QMainWindow):
     @staticmethod
     def UnderDevelopmentModule():
         Page= ModulePage()
-        label=QLabel('This Module is Currently Under Devopment')
+        label=QLabel('This Module is Currently Under Development')
         Page.layout.addWidget(label)
         label.setAlignment(Qt.AlignCenter)
         Page.setStyleSheet(
@@ -802,39 +792,28 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
     def exit(self):
         QCoreApplication.exit()
 
-######################### UpDateNotifi ################
 
-class Update(QMainWindow):
-    def __init__(self, old_version):
-        super().__init__()
-        self.old_version=old_version
-    def notifi(self):
-        try:
-            url = "https://anshulsingh-py.github.io/test/version.txt"
-            file = urllib.request.urlopen(url)
-            for line in file:
-                decoded_line = line.decode("utf-8")
-            new_version = decoded_line.split("=")[1]
-            if int(new_version) > self.old_version:
-                print("update")
-                msg = QMessageBox.information(self, 'Update available','<a href=https://google.com>Click to downlaod<a/>')
-        except:
-            print("No internet connection")
 
 
 if __name__ == '__main__':
 
-    app = QApplication(sys.argv)
+    # app = QApplication(sys.argv)
+    # screen = app.screens()[0]
+    # dpi = screen.physicalDotsPerInch()
+    # scale = round(dpi/140.0,1)
+    #
+    # print('scale', dpi, scale,scale*300)
     path = os.path.join(os.path.dirname(__file__), 'themes', 'light.qss')
     file = QFile(path)
     file.open(QFile.ReadOnly | QFile.Text)
     stream = QTextStream(file)
+    app = QApplication(sys.argv)
     app.setStyleSheet(stream.readAll())
     app.setStyle('Fusion')
 
-    path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
+    # path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'images', 'Osdag.png')
     window = OsdagMainWindow()
-    trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
+    # trayIcon = SystemTrayIcon(QtGui.QIcon(path), window)
 
     ############################     Exception Dialog and Error Reporting  ###################
 
@@ -860,14 +839,14 @@ if __name__ == '__main__':
 
     ############################     Exception Dialog and Error Reporting  ###################
 
-    trayIcon.show()
+    # trayIcon.show()
 
     try:
         # window.notification2()
         #update = Update(0)
         #update.notifi()
-        sys.excepthook = hook_exception
 
+        sys.excepthook = hook_exception
         QCoreApplication.exit(app.exec_()) # to properly close the Qt Application use QCoreApplication instead of sys
     except BaseException as e:
         print("ERROR", e)

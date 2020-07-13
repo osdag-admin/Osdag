@@ -49,7 +49,7 @@ class CreateLatex(Document):
         does_design_exist = reportsummary['does_design_exist']
         osdagheader = '/ResourceFiles/images/OsdagHeader.png'
         # Add document header
-        geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt"}
+        geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
         doc = Document(geometry_options=geometry_options,indent=False)
         doc.packages.append(Package('amsmath'))
         doc.packages.append(Package('graphicx'))
@@ -57,8 +57,9 @@ class CreateLatex(Document):
         doc.append(pyl.Command('fontsize', arguments= [8,12]))
         doc.append(pyl.Command('selectfont'))
 
-        doc.add_color('OsdagGreen', 'HTML', 'D5DF93')
-        doc.add_color('PassColor','HTML', '4D6E28')
+
+        doc.add_color('OsdagGreen', 'RGB', '145,176,20')
+        doc.add_color('PassColor','RGB', '145,176,20')
         doc.add_color('FailColor','HTML','933A16')
         header = PageStyle("header")
         # Create center header
@@ -66,10 +67,10 @@ class CreateLatex(Document):
             with header.create(Tabularx('|l|p{4cm}|l|X|')) as table:
                 table.add_hline()
                 # MultiColumn(4)
-                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is'' else StandAloneGraphic(image_options="width=3.5cm,height=1cm",
+                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is'' else StandAloneGraphic(image_options="height=0.95cm",
                                                                                  filename=companylogo))),
                                                MultiColumn(2, align='|c|',
-                                                           data=['Created with',StandAloneGraphic(image_options="width=3.5cm,height=1cm",
+                                                           data=['Created with',StandAloneGraphic(image_options="width=4.0cm,height=1cm",
                                                                                  filename=rel_path + osdagheader)]),))
                 table.add_hline()
                 table.add_row(('Company Name', companyname, 'Project Title', projecttitle), color='OsdagGreen')
@@ -163,19 +164,23 @@ class CreateLatex(Document):
             for i in uiObj:
                 if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST:
                     with doc.create(Subsection("List of Input Section")):
-                        with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
-                                str_len = len(uiObj[i])
-                                loop_len = round_up((str_len/83),1,1)
-                                for j in range(1,loop_len+1):
-                                    table.add_hline()
-                                    b= 83*j+1
-                                    if j ==1:
-                                        table.add_row((MultiColumn(1, align='|c|', data=i, ),
-                                                       MultiColumn(1, align='|c|', data=uiObj[i][0:b]),))
-                                    else:
-                                        table.add_row((MultiColumn(1, align='|c|', data=" ", ),
-                                                       MultiColumn(1, align='|c|', data=uiObj[i][b-83:b]),))
-                                    table.add_hline()
+                        # with doc.create(LongTable('|p{8cm}|p{8cm}|', row_height=1.2)) as table:
+                        with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
+                            table.add_hline()
+                            table.add_row((MultiColumn(1, align='|c|', data=i, ),
+                                           MultiColumn(1, align='|X|', data=uiObj[i].strip("[]")),))
+                            # str_len = len(uiObj[i])
+                            # loop_len = round_up((str_len/100),1,1)
+                            # table.add_hline()
+                            # for j in range(1,loop_len+1):
+                            #     b= 100*j+1
+                            #     if j ==1:
+                            #         table.add_row((MultiColumn(1, align='|c|', data=i, ),
+                            #                        MultiColumn(1, align='|X|', data=uiObj[i][0:b]),))
+                            #     else:
+                            #         table.add_row((MultiColumn(1, align='|c|', data=" ", ),
+                            #                        MultiColumn(1, align='|X|', data=uiObj[i][b-100:b]),))
+                            table.add_hline()
 
         doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
         doc.append(NewPage())
@@ -291,6 +296,8 @@ class CreateLatex(Document):
                     colour='green'
                 elif('ERROR' in msg):
                     colour='red'
+                else:
+                    colour = 'black'
                 doc.append(TextColor(colour,'\n'+msg))
         try:
             doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)

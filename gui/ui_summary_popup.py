@@ -20,7 +20,7 @@ from design_report.reportGenerator_latex import CreateLatex
 
 
 # from design_type.connection.fin_plate_connection import sa
-
+from get_DPI_scale import scale
 class Ui_Dialog1(object):
 
     def __init__(self,design_exist,loggermsg):
@@ -30,7 +30,7 @@ class Ui_Dialog1(object):
     def setupUi(self, Dialog,main):
         self.Dialog = Dialog
         self.Dialog.setObjectName("Dialog")
-        self.Dialog.resize(539, 595)
+        self.Dialog.resize(scale*600, scale*550)
         self.Dialog.setInputMethodHints(QtCore.Qt.ImhNone)
         self.gridLayout = QtWidgets.QGridLayout(self.Dialog)
         self.gridLayout.setObjectName("gridLayout")
@@ -172,7 +172,6 @@ class Ui_Dialog1(object):
     def save_inputSummary(self,main):
         input_summary = self.getPopUpInputs()  # getting all inputs entered by user in PopUp dialog box.
         file_type = "PDF (*.pdf)"
-
         filename, _ = QFileDialog.getSaveFileName(QFileDialog(), "Save File As", os.path.join(str(' '), "untitled.pdf"), file_type)
         # filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type, None, QtWidgets.QFileDialog.DontUseNativeDialog)
         # filename, _ = QFileDialog.getSaveFileName(self.Dialog, "Save File As", '', file_type)
@@ -192,17 +191,19 @@ class Ui_Dialog1(object):
         input_summary['does_design_exist'] = self.design_exist
         input_summary['logger_messages']=self.loggermsg
         main.save_design(main,input_summary)
-        if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
+        # if os.path.isfile(str(filename)) and not os.path.isfile(fname_no_ext+'.log'):
+        if os.path.isfile(str(filename.replace(".pdf", "") + ".pdf")) and not os.path.isfile(fname_no_ext+'.log'):
             self.Dialog.accept()
             QMessageBox.information(QMessageBox(), 'Information', 'Design report saved!')
         else:
             logfile=open(fname_no_ext+'.log','r')
             logs=logfile.read()
-            if(r'! I can\'t write on file' in logs):
-               QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
+
+            if('! I can\'t write on file' in logs):
+                QMessageBox.critical(QMessageBox(), 'Error', 'Please make sure no PDF is open with same name and try again.')
             else:
-               print(logs)
-               QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
+                print(logs)
+                QMessageBox.critical(QMessageBox(), 'Error', 'Latex Creation Error. If this error persists send us the log file created in the same folder choosen for the Design Report.')
             logfile.close()
 
     def call_designreport(self, main,fileName, report_summary, folder):
@@ -215,6 +216,7 @@ class Ui_Dialog1(object):
         # CreateLatex.\
         #     save_latex(CreateLatex(),main.report_result, main.report_input, main.report_check, main.report_supporting,
         #           main.report_supported, report_summary, fileName, folder)
+
     def getPopUpInputs(self):
         input_summary = {}
         input_summary["ProfileSummary"] = {}

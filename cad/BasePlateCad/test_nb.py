@@ -29,7 +29,7 @@ class NutBoltArray():
         self.boltDir = None
 
         self.noOfBolts_outFlange = 4
-        self.noofBolts_inFlange = 0
+        self.noofBolts_inFlange = 2
 
         self.ab1 = copy.deepcopy(self.bolt)
         self.ab2 = copy.deepcopy(self.bolt)
@@ -118,6 +118,7 @@ class NutBoltArray():
         self.pitch1 = 100
         self.stiffener_inflg_thickness = 5
         self.pitch_inflg = (self.column.D - (2*self.column.T + 2*self.column.R1 + self.stiffener_inflg_thickness))/4
+        self.web_thick = self.column.t/2
         self.gauge1 = 100
         # self.edge = 100
         # self.plateedge = 50
@@ -135,7 +136,7 @@ class NutBoltArray():
         self.pitchDir = pitchDir
         self.boltDir = boltDir
 
-        self.calculatePositions()
+        # self.calculatePositions()
         pos = self.origin
         pos1 = pos + self.edgedist * self.gaugeDir + self.enddist * self.pitchDir       #bottom left
         pos2 = pos1 + self.gauge * self.gaugeDir        #bottom right
@@ -213,8 +214,8 @@ class NutBoltArray():
 
         if self.noofBolts_inFlange == 2:
 
-            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir + (self.edgedist-self.gauge / 2) * self.gaugeDir
-            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - (self.edgedist-self.gauge / 2) * self.gaugeDir
+            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
 
             self.ab_inflg1.place(pos_inflg_1 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.ab_inflg2.place(pos_inflg_2 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
@@ -224,10 +225,10 @@ class NutBoltArray():
             
         if self.noofBolts_inFlange == 4:
 
-            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2) * self.gaugeDir
-            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2) * self.gaugeDir
-            pos_inflg_3 = pos2 + self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2) * self.gaugeDir
-            pos_inflg_4 = pos4 - self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2) * self.gaugeDir
+            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_3 = pos2 + self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_4 = pos4 - self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
 
             self.ab_inflg1.place(pos_inflg_1 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.ab_inflg2.place(pos_inflg_2 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
@@ -241,15 +242,15 @@ class NutBoltArray():
 
         if self.noofBolts_inFlange == 8:
 
-            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2) * self.gaugeDir
-            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2) * self.gaugeDir
-            pos_inflg_3 = pos2 + self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2) * self.gaugeDir
-            pos_inflg_4 = pos4 - self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2) * self.gaugeDir
+            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_3 = pos2 + self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_4 = pos4 - self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
 
-            pos_inflg_5 = pos2 + self.pitch / 2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist - self.gauge / 2 + self.gauge1) * self.gaugeDir
-            pos_inflg_6 = pos4 - self.pitch / 2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist - self.gauge / 2 + self.gauge1) * self.gaugeDir
-            pos_inflg_7 = pos2 + self.pitch / 2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist - self.gauge / 2 + self.gauge1) * self.gaugeDir
-            pos_inflg_8 = pos4 - self.pitch / 2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist - self.gauge / 2 + self.gauge1) * self.gaugeDir
+            pos_inflg_5 = pos2 + self.pitch / 2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
+            pos_inflg_6 = pos4 - self.pitch / 2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
+            pos_inflg_7 = pos2 + self.pitch / 2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
+            pos_inflg_8 = pos4 - self.pitch / 2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
 
             self.ab_inflg1.place(pos_inflg_1 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
             self.ab_inflg2.place(pos_inflg_2 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
@@ -415,7 +416,7 @@ if __name__ == '__main__':
     pitchDir = numpy.array([0, 1.0, 0])
     boltDir = numpy.array([0, 0, 1.0])
 
-    numberOfBolts = 12
+    numberOfBolts = 6
     column = ISection(B=250, T=13.7, D=450, t=9.8, R1=14.0, R2=7.0, alpha=94, length=1500, notchObj=None)
     baseplate = Plate(L=700, W=500, T=30)
 

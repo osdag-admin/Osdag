@@ -340,6 +340,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.tension_capacity_anchor = 0.0
         self.anchors_outside_flange = 0
         self.anchor_inside_flange = 'No'
+        self.stiffener_inside_flange = 'No'
         self.anchor_tension_capa = 0.0
         self.safe = True
         self.max_bearing_stress = 0.0
@@ -3495,6 +3496,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # the governing ratio is D/t_g < 29.30 (Table 2, IS 800:2007)
             if self.connectivity == 'Moment Base Plate':
                 if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
+
+                    self.stiffener_inside_flange = 'Yes'
+
                     self.stiffener_plt_thick_btwn_D = (self.column_D - (2 * self.column_tf)) / 29.30
                     self.stiffener_plt_thick_btwn_D = round_up(self.stiffener_plt_thick_btwn_D, 2, self.column_tf)  # mm
 
@@ -3973,6 +3977,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             else:
                 pass
+
+        #stiffener plate inside flange
+        if self.connectivity == 'Moment Base Plate':
+            if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
+                if self.stiffener_inside_flange = 'Yes':
+
+                    print(self.stiffener_plt_thick_btwn_D)
+                    print(self.stiffener_plt_thick_btwn_D)
+                    print(self.stiffener_plt_thick_btwn_D)
 
         else:
             # Stiffener Plate Along Column Flange

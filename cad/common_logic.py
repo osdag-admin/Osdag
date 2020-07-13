@@ -1030,7 +1030,7 @@ class CommonDesignLogic(object):
             nutSpace = bolt.c + baseplate.T
             bolthight = nut.T + 50
 
-            nut_bolt_array = bpNutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
+            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, nutSpace)
 
             basePlate = BasePlateCad(BP, column, nut_bolt_array, bolthight, baseplate, weldAbvFlang, weldBelwFlang, weldSideWeb,
                                      concrete, gusset, stiffener, grout, gussetweld, weld_stiffener_alongWeb_h, weld_stiffener_alongWeb_gh, weld_stiffener_alongWeb_v,
@@ -1095,7 +1095,7 @@ class CommonDesignLogic(object):
                 grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
 
                 column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
-            nut_bolt_array = NutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
+            nut_bolt_array = NutBoltArray(BP, nut, bolt, nutSpace)
 
             basePlate = HollowBasePlateCad(type, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout,
                                            stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v,

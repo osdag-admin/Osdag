@@ -10,36 +10,77 @@ from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from cad.items.ModelUtils import getGpPt
 import copy
 
+
 class NutBoltArray():
     """
     add a diagram here
     """
 
-    def __init__(self, column, baseplate, nut, bolt, numberOfBolts, nutSpace):
-
-
-        self.baseplate = baseplate
-        self.column = column
+    def __init__(self, BP, nut, bolt, nutSpace):
+        self.BP = BP
         self.nut = nut
         self.bolt = bolt
-        self.numberOfBolts = numberOfBolts
         self.gap = nutSpace
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
         self.boltDir = None
 
+        self.noOfBolts_outFlange =self.BP.anchors_outside_flange
+        self.noofBolts_inFlange = self.BP.anchor_inside_flange
+
         self.ab1 = copy.deepcopy(self.bolt)
         self.ab2 = copy.deepcopy(self.bolt)
         self.ab3 = copy.deepcopy(self.bolt)
         self.ab4 = copy.deepcopy(self.bolt)
+
+        self.ab5 = copy.deepcopy(self.bolt)
+        self.ab6 = copy.deepcopy(self.bolt)
+        self.ab7 = copy.deepcopy(self.bolt)
+        self.ab8 = copy.deepcopy(self.bolt)
+
+        self.ab9 = copy.deepcopy(self.bolt)
+        self.ab10 = copy.deepcopy(self.bolt)
+        self.ab11 = copy.deepcopy(self.bolt)
+        self.ab12 = copy.deepcopy(self.bolt)
+
+
+        self.ab_inflg1 = copy.deepcopy(self.bolt)
+        self.ab_inflg2 = copy.deepcopy(self.bolt)
+
+        self.ab_inflg3 = copy.deepcopy(self.bolt)
+        self.ab_inflg4 = copy.deepcopy(self.bolt)
+
+        self.ab_inflg5 = copy.deepcopy(self.bolt)
+        self.ab_inflg6 = copy.deepcopy(self.bolt)
+        self.ab_inflg7 = copy.deepcopy(self.bolt)
+        self.ab_inflg8 = copy.deepcopy(self.bolt)
 
         self.nt1 = copy.deepcopy(self.nut)
         self.nt2 = copy.deepcopy(self.nut)
         self.nt3 = copy.deepcopy(self.nut)
         self.nt4 = copy.deepcopy(self.nut)
 
+        self.nt5 = copy.deepcopy(self.nut)
+        self.nt6 = copy.deepcopy(self.nut)
+        self.nt7 = copy.deepcopy(self.nut)
+        self.nt8 = copy.deepcopy(self.nut)
 
+        self.nt9 = copy.deepcopy(self.nut)
+        self.nt10 = copy.deepcopy(self.nut)
+        self.nt11 = copy.deepcopy(self.nut)
+        self.nt12 = copy.deepcopy(self.nut)
+
+        self.nt_inflg1 = copy.deepcopy(self.nut)
+        self.nt_inflg2 = copy.deepcopy(self.nut)
+
+        self.nt_inflg3 = copy.deepcopy(self.nut)
+        self.nt_inflg4 = copy.deepcopy(self.nut)
+
+        self.nt_inflg5 = copy.deepcopy(self.nut)
+        self.nt_inflg6 = copy.deepcopy(self.nut)
+        self.nt_inflg7 = copy.deepcopy(self.nut)
+        self.nt_inflg8 = copy.deepcopy(self.nut)
         # self.initBoltPlaceParam(plateObj)
         self.initBoltPlaceParam()
 
@@ -50,11 +91,6 @@ class NutBoltArray():
 
         self.models = []
 
-        self.enddist = 50
-        self.edgedist = 50
-        self.clearence = 50
-
-
         self.initialiseNutBolts()
 
     def initialiseNutBolts(self):
@@ -63,54 +99,27 @@ class NutBoltArray():
         :return:
         """
         pass
-        # b = self.bolt
-        # n = self.nut
-        # for i in range(self.row*self.col):
-        #     bolt_len_required = float(self.gap)
-        #     # b.H = bolt_len_required + (5-bolt_len_required) % 5 #Todo : enter the length fo the anchor bolt
-        #     self.bolts.append(AnchorBolt_A(b.l, b.c, b.a, b.r))         #Todo: change this with respect to anchor bolt parameters)
-        #     self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
+
 
     def initBoltPlaceParam(self):
+        self.enddist = self.BP.end_distance
+        self.edgedist = self.BP.edge_distance
+        # self.clearence = 50
 
-        self.enddist = 50
-        self.edgedist = 50
-        self.clearence = 50
+        self.pitch = self.BP.bp_length_provided - 2 * self.enddist
+        self.gauge = self.BP.bp_width_provided - 2 * self.edgedist
 
-        self.pitch = self.baseplate.L - 2*self.enddist
-        self.gauge = self.baseplate.W - 2*self.edgedist
-        # self.edge = 100
-        # self.plateedge = 50
-        # self.end = 50
-        self.row = 2
-        self.col = 2
+        self.pitch1 = self.BP.pitch_distance
+        self.gauge1 = self.BP.gauge_distance
+        if self.BP.connectivity != 'Hollow/Tubular Column Base':
+            self.stiffener_inflg_thickness = self.BP.stiffener_plt_thick_across_web
+            self.pitch_inflg = (self.BP.column_D - (2*self.BP.column_tf + 2*self.BP.column_r1 + self.stiffener_inflg_thickness))/4
+            self.web_thick = self.BP.column_tw/2
+
 
     def calculatePositions(self):
         pass
-        # self.positions = []
-        # # pos = self.origin
-        #
-        # # self.pitch1 = 400
-        # # self.gauge1 = 100
-        #
-        # pos1 =  pos + self.edgedist * self.gaugeDir
-        # pos2 = pos1 + self.gauge * self.gaugeDir
-        # pos3 = pos2 + self.pitch * self.pitchDir
-        # pos4 = pos3 - self.gauge * self.gaugeDir
-        # positions = [pos1, pos2, pos3, pos4]
 
-        # for rw in range(self.col):
-        #     for col in range(self.row):
-        #         pos = self.origin
-        #         pos = pos + self.edgedist*self.gaugeDir
-        #         pos = pos + self.enddist*self.pitchDir
-        #
-        #         self.positions.append(pos)
-
-        # for pos in positions:
-        #     self.positions.append(pos)
-
-        # self.positions = [pos1, pos2, pos3, pos4]
 
     def place(self, origin, gaugeDir, pitchDir, boltDir):
         self.origin = origin
@@ -120,24 +129,141 @@ class NutBoltArray():
 
         # self.calculatePositions()
         pos = self.origin
-        pos1 = pos + self.edgedist * self.gaugeDir + self.enddist * self.pitchDir
-        pos2 = pos1 + self.gauge * self.gaugeDir
-        pos3 = pos2 + self.pitch * self.pitchDir
-        pos4 = pos3 - self.gauge * self.gaugeDir
+        pos1 = pos + self.edgedist * self.gaugeDir + self.enddist * self.pitchDir       #bottom left
+        pos2 = pos1 + self.gauge * self.gaugeDir        #bottom right
+        pos3 = pos2 + self.pitch * self.pitchDir        #top left
+        pos4 = pos3 - self.gauge * self.gaugeDir        #top right
 
-        self.ab1.place(pos1 - (self.bolt.ex )*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
-        self.ab2.place(pos2 - (self.bolt.ex )*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
-        self.ab3.place(pos3 - (self.bolt.ex )*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
-        self.ab4.place(pos4 - (self.bolt.ex )*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
-        self.nt1.place(pos1 - (self.nt1.T+50)*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
-        self.nt2.place(pos2 - (self.nt1.T+50)*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
-        self.nt3.place(pos3 - (self.nt1.T+50)*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
-        self.nt4.place(pos4 - (self.nt1.T+50)*numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
 
-        # for index, pos in enumerate(self.positions):
-        #     self.bolt[index].place(pos, gaugeDir, boltDir)
-        #     self.nut[index].place((pos+self.gap*boltDir), gaugeDir, -boltDir)
+        self.ab1.place(pos1 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.ab2.place(pos2 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.ab3.place(pos3 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.ab4.place(pos4 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+        self.nt1.place(pos1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.nt2.place(pos2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.nt3.place(pos3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+        self.nt4.place(pos4 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+        if self.BP.anchors_outside_flange == 6 :
+            pos5 = pos2 - self.gauge/2 * self.gaugeDir
+            pos6 = pos4 + self.gauge/2 * self.gaugeDir
+
+            self.ab5.place(pos5 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab6.place(pos6 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.nt5.place(pos5 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt6.place(pos6 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+        if self.BP.anchors_outside_flange == 8:
+            pos5 = pos1 + self.pitch1 * self.pitchDir
+            pos6 = pos2 + self.pitch1 * self.pitchDir
+            pos7 = pos3 - self.pitch1 * self.pitchDir
+            pos8 = pos4 - self.pitch1 * self.pitchDir
+
+            self.ab5.place(pos5 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab6.place(pos6 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab7.place(pos7 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab8.place(pos8 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.nt5.place(pos5 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt6.place(pos6 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt7.place(pos7 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt8.place(pos8 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+        if self.BP.anchors_outside_flange == 12:
+            pos5 = pos1 + self.pitch1 * self.pitchDir
+            pos6 = pos2 + self.pitch1 * self.pitchDir
+            pos7 = pos3 - self.pitch1 * self.pitchDir
+            pos8 = pos4 - self.pitch1 * self.pitchDir
+
+            pos9 = pos2 - self.gauge / 2 * self.gaugeDir
+            pos10 = pos4 + self.gauge / 2 * self.gaugeDir
+            pos11 = pos9 + self.pitch1 * self.pitchDir
+            pos12 = pos10 - self.pitch1 * self.pitchDir
+
+            self.ab5.place(pos5 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab6.place(pos6 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab7.place(pos7 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab8.place(pos8 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.ab9.place(pos9 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab10.place(pos10 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab11.place(pos11 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab12.place(pos12 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.nt5.place(pos5 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt6.place(pos6 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt7.place(pos7 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt8.place(pos8 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.nt9.place(pos9 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt10.place(pos10 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt11.place(pos11 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt12.place(pos12 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+        if self.BP.anchor_inside_flange == 2:
+
+            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+
+            self.ab_inflg1.place(pos_inflg_1 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab_inflg2.place(pos_inflg_2 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.nt_inflg1.place(pos_inflg_1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg2.place(pos_inflg_2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+        if self.BP.anchor_inside_flange == 4:
+
+            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_3 = pos2 + self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_4 = pos4 - self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+
+            self.ab_inflg1.place(pos_inflg_1 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab_inflg2.place(pos_inflg_2 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab_inflg3.place(pos_inflg_3 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab_inflg4.place(pos_inflg_4 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.nt_inflg1.place(pos_inflg_1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg2.place(pos_inflg_2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg3 .place(pos_inflg_3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg4.place(pos_inflg_4 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+        if self.BP.anchor_inside_flange == 8:
+
+            pos_inflg_1 = pos2 + self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_2 = pos4 - self.pitch/2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_3 = pos2 + self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+            pos_inflg_4 = pos4 - self.pitch/2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist-self.gauge / 2 + self.web_thick) * self.gaugeDir
+
+            pos_inflg_5 = pos2 + self.pitch / 2 * self.pitchDir - self.pitch_inflg * self.pitchDir + (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
+            pos_inflg_6 = pos4 - self.pitch / 2 * self.pitchDir - self.pitch_inflg * self.pitchDir - (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
+            pos_inflg_7 = pos2 + self.pitch / 2 * self.pitchDir + self.pitch_inflg * self.pitchDir + (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
+            pos_inflg_8 = pos4 - self.pitch / 2 * self.pitchDir + self.pitch_inflg * self.pitchDir - (self.edgedist - self.gauge / 2 + self.web_thick + self.gauge1) * self.gaugeDir
+
+            self.ab_inflg1.place(pos_inflg_1 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab_inflg2.place(pos_inflg_2 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab_inflg3.place(pos_inflg_3 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab_inflg4.place(pos_inflg_4 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.ab_inflg5.place(pos_inflg_5 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab_inflg6.place(pos_inflg_6 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab_inflg7.place(pos_inflg_7 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.ab_inflg8.place(pos_inflg_8 - (self.bolt.ex) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.nt_inflg1.place(pos_inflg_1 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg2.place(pos_inflg_2 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg3 .place(pos_inflg_3 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg4.place(pos_inflg_4 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+            self.nt_inflg5.place(pos_inflg_5 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg6.place(pos_inflg_6 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg7.place(pos_inflg_7 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+            self.nt_inflg8.place(pos_inflg_8 - (self.nt1.T + 50) * numpy.array([0, 0, 1.0]), gaugeDir, boltDir)
+
+
 
     def create_model(self):
         # for bolt in self.bolts:
@@ -155,28 +281,117 @@ class NutBoltArray():
 
         self.models = [self.ab1Model, self.ab2Model, self.ab3Model, self.ab4Model, self.nt1Model, self.nt2Model, self.nt3Model, self.nt4Model]
 
-        # for nut in self.nuts:
-        #     self.models.append(nut.create_model())
+        if self.BP.anchors_outside_flange == 6:
+            self.ab5Model = self.ab5.create_model()
+            self.ab6Model = self.ab6.create_model()
 
-    #     dbg =  self.dbgSphere(self.origin)
-    #     self.models.append(dbg)
-    #
-    # def dbgSphere(self, pt):
-    #     return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Shape()
+            self.nt5Model = self.nt5.create_model()
+            self.nt6Model = self.nt6.create_model()
+            models = [self.ab5Model, self.ab6Model,self.nt5Model, self.nt6Model]
+            self.models.extend(models)
+
+        if self.BP.anchors_outside_flange == 8:
+            self.ab5Model = self.ab5.create_model()
+            self.ab6Model = self.ab6.create_model()
+            self.ab7Model = self.ab7.create_model()
+            self.ab8Model = self.ab8.create_model()
+
+            self.nt5Model = self.nt5.create_model()
+            self.nt6Model = self.nt6.create_model()
+            self.nt7Model = self.nt7.create_model()
+            self.nt8Model = self.nt8.create_model()
+            models = [self.ab5Model, self.ab6Model, self.ab7Model, self.ab8Model, self.nt5Model, self.nt6Model, self.nt7Model, self.nt8Model]
+            self.models.extend(models)
+
+        if self.BP.anchors_outside_flange == 12:
+            self.ab5Model = self.ab5.create_model()
+            self.ab6Model = self.ab6.create_model()
+            self.ab7Model = self.ab7.create_model()
+            self.ab8Model = self.ab8.create_model()
+
+            self.ab9Model = self.ab9.create_model()
+            self.ab10Model = self.ab10.create_model()
+            self.ab11Model = self.ab11.create_model()
+            self.ab12Model = self.ab12.create_model()
+
+            self.nt5Model = self.nt5.create_model()
+            self.nt6Model = self.nt6.create_model()
+            self.nt7Model = self.nt7.create_model()
+            self.nt8Model = self.nt8.create_model()
+
+            self.nt9Model = self.nt9.create_model()
+            self.nt10Model = self.nt10.create_model()
+            self.nt11Model = self.nt11.create_model()
+            self.nt12Model = self.nt12.create_model()
+
+            models = [self.ab5Model, self.ab6Model, self.ab7Model, self.ab8Model, self.ab9Model, self.ab10Model, self.ab11Model, self.ab12Model,
+                      self.nt5Model, self.nt6Model, self.nt7Model, self.nt8Model, self.nt9Model, self.nt10Model, self.nt11Model, self.nt12Model]
+            self.models.extend(models)
+
+        if self.BP.anchor_inside_flange == 2:
+            self.ab_inflg1Model = self.ab_inflg1.create_model()
+            self.ab_inflg2Model = self.ab_inflg2.create_model()
+            self.nt_inflg1Model = self.nt_inflg1.create_model()
+            self.nt_inflg2Model = self.nt_inflg2.create_model()
+
+            models = [ self.ab_inflg1Model, self.ab_inflg2Model, self.nt_inflg1Model, self.nt_inflg2Model]
+            self.models.extend(models)
+
+        if self.BP.anchor_inside_flange == 4:
+            self.ab_inflg1Model = self.ab_inflg1.create_model()
+            self.ab_inflg2Model = self.ab_inflg2.create_model()
+            self.nt_inflg1Model = self.nt_inflg1.create_model()
+            self.nt_inflg2Model = self.nt_inflg2.create_model()
+
+            self.ab_inflg3Model = self.ab_inflg3.create_model()
+            self.ab_inflg4Model = self.ab_inflg4.create_model()
+            self.nt_inflg3Model = self.nt_inflg3.create_model()
+            self.nt_inflg4Model = self.nt_inflg4.create_model()
+
+            models = [ self.ab_inflg1Model, self.ab_inflg2Model, self.ab_inflg3Model, self.ab_inflg4Model, self.nt_inflg1Model, self.nt_inflg2Model, self.nt_inflg3Model, self.nt_inflg4Model]
+            self.models.extend(models)
+
+        if self.BP.anchor_inside_flange == 8:
+            self.ab_inflg1Model = self.ab_inflg1.create_model()
+            self.ab_inflg2Model = self.ab_inflg2.create_model()
+            self.nt_inflg1Model = self.nt_inflg1.create_model()
+            self.nt_inflg2Model = self.nt_inflg2.create_model()
+
+            self.ab_inflg5Model = self.ab_inflg5.create_model()
+            self.ab_inflg6Model = self.ab_inflg6.create_model()
+            self.nt_inflg5Model = self.nt_inflg5.create_model()
+            self.nt_inflg6Model = self.nt_inflg6.create_model()
+
+            self.ab_inflg3Model = self.ab_inflg3.create_model()
+            self.ab_inflg4Model = self.ab_inflg4.create_model()
+            self.nt_inflg3Model = self.nt_inflg3.create_model()
+            self.nt_inflg4Model = self.nt_inflg4.create_model()
+
+            self.ab_inflg7Model = self.ab_inflg7.create_model()
+            self.ab_inflg8Model = self.ab_inflg8.create_model()
+            self.nt_inflg7Model = self.nt_inflg7.create_model()
+            self.nt_inflg8Model = self.nt_inflg8.create_model()
+
+            models = [ self.ab_inflg1Model, self.ab_inflg2Model, self.ab_inflg3Model, self.ab_inflg4Model,
+                       self.ab_inflg5Model, self.ab_inflg6Model, self.ab_inflg7Model, self.ab_inflg8Model,
+                       self.nt_inflg1Model, self.nt_inflg2Model, self.nt_inflg3Model, self.nt_inflg4Model,
+                       self.nt_inflg5Model, self.nt_inflg6Model, self.nt_inflg7Model, self.nt_inflg8Model]
+            self.models.extend(models)
+
 
     def get_models(self):
         return self.models
 
 
 if __name__ == '__main__':
-    
+
     from cad.items.anchor_bolt import *
     from cad.items.nut import Nut
     from cad.items.ISection import ISection
     from cad.items.plate import Plate
 
-    
     from OCC.Display.SimpleGui import init_display
+
     display, start_display, add_menu, add_function_to_menu = init_display()
 
     nutboltArrayOrigin = numpy.array([0., 0., 0.])
@@ -184,29 +399,24 @@ if __name__ == '__main__':
     pitchDir = numpy.array([0, 1.0, 0])
     boltDir = numpy.array([0, 0, 1.0])
 
-
-
-    numberOfBolts = 4
-    column = ISection(B=250, T=13.7, D=450, t=9.8, R1= 14.0, R2= 7.0, alpha= 94, length= 1500, notchObj= None)
-    baseplate = Plate(L=650, W=500, T=30)
+    numberOfBolts = 6
+    column = ISection(B=250, T=13.7, D=450, t=9.8, R1=14.0, R2=7.0, alpha=94, length=1500, notchObj=None)
+    baseplate = Plate(L=700, W=500, T=30)
 
     l = 550
     c = 225
     a = 175
     r = 24
     ex_length = (50 + 24 + baseplate.T)  # nut.T = 24
-    bolt = AnchorBolt_A(l= 250, c= 125, a= 75, r= 12, ex= ex_length)
+    bolt = AnchorBolt_A(l=250, c=125, a=75, r=12, ex=ex_length)
     # bolt = AnchorBolt_B(l= 250, c= 125, a= 75, r= 12)
     # bolt = AnchorBolt_Endplate(l= 250, c= 125, a= 75, r= 12)
 
-    nut = Nut(R= bolt.r*3, T= 24, H= 30, innerR1= bolt.r)
+    nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
 
     nutSpace = bolt.c + baseplate.T
 
-
-    nut_bolt_array = NutBoltArray(column, baseplate,  nut, bolt, numberOfBolts, nutSpace)
-
-
+    nut_bolt_array = NutBoltArray(column, baseplate, nut, bolt, numberOfBolts, nutSpace)
 
     place = nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
@@ -217,7 +427,8 @@ if __name__ == '__main__':
     for comp in nut_bolts:
         array = BRepAlgoAPI_Fuse(comp, array).Shape()
 
-
+    Point = gp_Pnt(0.0, 0.0, 0.0)
+    display.DisplayMessage(Point, "Origin")
     display.DisplayShape(array, update=True)
     display.DisableAntiAliasing()
     start_display()

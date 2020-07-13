@@ -4454,23 +4454,25 @@ def depth_req(e, g, row, sec =None):
 # functions for base plate
 
 
-def k1(end_distance, bp_length):
+def k1(end_distance, bp_length, k1_value):
     """ calculate k1
 
     Args:
         end_distance (e) - end distance in mm (float)
         bp_length (L) - length of the base plate in mm (float)
+        k1_value - value of k1 (float)
 
     Returns:
         k1 [k1 = 3 * (e - L/2)] (float)
     """
     end_distance = str(end_distance)
     bp_length = str(bp_length)
+    k1_value = str(k1_value)
 
     k1 = Math(inline=True)
     k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(e ~-~\frac{L}{2}\Big) \\'))
-    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
-    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
+    k1.append(NoEscape(r'\begin{aligned}       = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
+    k1.append(NoEscape(r'\begin{aligned}       = ' + k1_value + r' \\'))
     k1.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
 
     return k1
@@ -4487,7 +4489,7 @@ def modular_ratio(E_s, f_ck, modular_ratio):
 
     n = Math(inline=True)
     n.append(NoEscape(r'\begin{aligned} n = \frac{E_{s}}{E_{c}} \\'))
-    n.append(NoEscape(r'\begin{aligned} 2 \times 10 ^ {5}~(N/mm^{2}) \\'))
+    n.append(NoEscape(r'\begin{aligned} E_s = 2 \times 10 ^ {5}~(N/mm^{2}) \\'))
     n.append(NoEscape(r'\begin{aligned} E_c = 5000~\sqrt{f_{ck}}~(N/mm^{2}) \\'))
     n.append(NoEscape(r'\begin{aligned}     = 5000~\sqrt{' + f_ck + r'}~=~' + E_c + r' \\'))
     n.append(NoEscape(r'\begin{aligned} n = \frac{' + E_s + r'}{' + E_c + r'} \\'))
@@ -4530,7 +4532,7 @@ def calc_f(end_distance, bp_length, f):
     return dist_f
 
 
-def k2(n, anchor_area_tension, bp_width, f, e):
+def k2(n, anchor_area_tension, bp_width, f, e, k2_value):
     """ calculate k2
 
     Args:
@@ -4542,11 +4544,15 @@ def k2(n, anchor_area_tension, bp_width, f, e):
     Returns:
         k1 [k1 = 3 * (e - L/2)] (float)
     """
-    end_distance = str(end_distance)
-    bp_length = str(bp_length)
+    n = str(n)
+    anchor_area_tension = str(anchor_area_tension)
+    bp_width = str(bp_width)
+    f = str(f)
+    e = str(e)
+    k2_value = str(k2_value)
 
-    k1 = Math(inline=True)
-    k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(e ~-~\frac{L}{2}\Big) \\'))
+    k2 = Math(inline=True)
+    k2.append(NoEscape(r'\begin{aligned} k_{2} = 3~\Big(e ~-~\frac{L}{2}\Big) \\'))
     k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
     k1.append(NoEscape(r'\begin{aligned} k_{1} = 3~\Big(' + end_distance + r'~-~\frac{' + bp_length + r'}{2}\Big) \\'))
     k1.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))

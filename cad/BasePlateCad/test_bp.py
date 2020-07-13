@@ -1111,8 +1111,8 @@ class HollowBasePlateCad(object):
 
         """
 
-        self.stiffener_l = False
-        self.stiffener_b = False
+        self.stiffener_l = True
+        self.stiffener_b = True
         self.BP = BP
         self.column = sec
         self.weld_sec = weld_sec

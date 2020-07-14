@@ -111,7 +111,124 @@ class SaveDesignBP(BasePlateConnection):
 
         # start of checks
 
-        # Check 1: Anchor Bolt - Outside Column Flange
+        # Check 1: Design Parameters
+        t1 = ('SubSection', 'Design Parameters', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t2 = ('Grout Thickness (mm)', '', self.grout_thk, 'N/A')
+        self.report_check.append(t2)
+
+        t3 = ('Plate Washer Size (mm)', '', square_washer_size(self.plate_washer_dim), 'N/A')
+        self.report_check.append(t3)
+
+        t4 = ('Plate Washer Thickness (mm)', '', square_washer_thk(self.plate_washer_thk), 'N/A')
+        self.report_check.append(t4)
+
+        t5 = ('Plate Washer Hole Diameter (mm)', '', square_washer_in_dia(self.plate_washer_inner_dia), 'N/A')
+        self.report_check.append(t5)
+
+        t6 = ('Nut (Hexagon) Thickness (mm)', '', hexagon_nut_thickness(self.nut_thk), 'N/A')
+        self.report_check.append(t6)
+
+        # Check 2-1: Anchor Bolt Details - Outside Column Flange
+        t1 = ('SubSection', 'Anchor Bolt Details - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t2 = ('Diameter (mm)', '', self.anchor_dia_outside_flange, 'N/A')
+        self.report_check.append(t2)
+
+        t3 = ('Property Class', '', self.anchor_grade, 'N/A')
+        self.report_check.append(t3)
+
+        t4 = ('Anchor Length - above concrete footing (mm)', '', self.anchor_length_provided, 'N/A')
+        self.report_check.append(t4)
+
+        t4 = ('Total Length (mm)', '', self.anchor_length_provided, 'N/A')
+        self.report_check.append(t4)
+
+        # Check 2-2: Anchor Bolt Details - Inside Column Flange (only when there is uplift force acting on the column)
+        if self.load_axial_tension > 0:
+
+            t1 = ('SubSection', 'Anchor Bolt Details - Inside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t2 = ('Diameter (mm)', '', self.anchor_dia_inside_flange, 'N/A')
+            self.report_check.append(t2)
+
+            t3 = ('Property Class', '', self.anchor_grade_inside_flange, 'N/A')
+            self.report_check.append(t3)
+
+        # Check 3: Detailing Checks
+        t1 = ('SubSection', 'Detailing Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t2 = ('Min. End Distance (mm)', cl_10_2_4_2_min_edge_end_dist(self.anchor_hole_dia, edge_type=self.dp_detail_edge_type, parameter='end_dist'),
+                                                                                self.end_distance, '')
+        self.report_check.append(t2)
+
+        t3 = ('Max. End Distance (mm)', cl_10_2_4_3_max_edge_end_dist([self.plate_thk, self.dp_bp_fu, self.dp_bp_fy], corrosive_influences=True,
+                                                                      parameter='end_dist'), self.end_distance, '')
+        self.report_check.append(t3)
+
+        t4 = ('Min. Edge Distance (mm)', cl_10_2_4_2_min_edge_end_dist(self.anchor_hole_dia, edge_type=self.dp_detail_edge_type, parameter='edge_dist'),
+                                                                                                self.end_distance, '')
+        self.report_check.append(t4)
+
+        t5 = ('Max. Edge Distance (mm)', cl_10_2_4_3_max_edge_end_dist([self.plate_thk, self.dp_bp_fu, self.dp_bp_fy], corrosive_influences=True,
+                                                                       parameter='edge_dist'), self.end_distance, '')
+        self.report_check.append(t5)
+
+        if (self.anchors_outside_flange == 4) or (self.anchors_outside_flange == 6):
+
+            t6 = ('Min. Pitch Distance (mm)', cl_10_2_2_min_spacing(self.anchor_dia_outside_flange, parameter='pitch'), self.pitch_distance, '')
+            self.report_check.append(t6)
+
+            t7 = ('Max. Pitch Distance (mm)', cl_10_2_3_1_max_spacing([self.plate_thk], parameter=None), self.pitch_distance, '')
+            self.report_check.append(t7)
+        else:
+            t8 = ('Min. Pitch Distance (mm)', 'N/A', self.pitch_distance, 'N/A')
+            self.report_check.append(t8)
+
+            t9 = ('Max. Pitch Distance (mm)', 'N/A', self.pitch_distance, 'N/A')
+            self.report_check.append(t9)
+
+        if self.anchors_inside_flange == 8:
+            t10 = ('Min. Gauge Distance (mm) - for bolts inside column flange', cl_10_2_2_min_spacing(self.anchor_dia_inside_flange,
+                                                                                                      parameter='gauge'), self.gauge_distance, '')
+            self.report_check.append(t10)
+
+            t11 = ('Max. Gauge Distance (mm) - for bolts inside column flange', cl_10_2_3_1_max_spacing([self.plate_thk], parameter=None),
+                   self.gauge_distance, '')
+            self.report_check.append(t11)
+
+        # Check 4: Base Plate Dimensions (only for Moment Base Plate)
+        if self.connectivity == 'Moment Base Plate':
+
+            t1 = ('SubSection', 'Base Plate Dimensions', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t2 = ('Length (mm)', bp_length(self.column_D, self.end_distance, self.bp_length_min), self.bp_length_provided, '')
+            self.report_check.append(t2)
+
+            t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance, self.bp_width_min), self.bp_width_provided, '')
+            self.report_check.append(t3)
+
+        # Check 5: Base Plate Analyses
+
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+        t1 = ('SubSection', 'Base Plate Analyses', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
+
+        t2 = ('Bearing Strength of Concrete (N/mm^2)', '', bearing_strength_concrete(self.footing_grade, self.bearing_strength_concrete), 'N/A')
+        self.report_check.append(t2)
+
+        t3 = ('Eccentricity - about major axis (mm)', '', eccentricity(self.load_moment_major, self.load_axial_compression, self.eccentricity_zz), 'N/A')
+        self.report_check.append(t3)
+
+        t4 = ('Eccentricity - about major axis (mm)', '', eccentricity(self.load_moment_major, self.load_axial_compression, self.eccentricity_zz), 'N/A')
+        self.report_check.append(t4)
+
+        # Check 3: Anchor Bolt - Outside Column Flange
         t1 = ('SubSection', 'Anchor Bolt - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
@@ -120,9 +237,6 @@ class SaveDesignBP(BasePlateConnection):
 
         t2 = (KEY_OUT_DISP_PC_PROVIDED, '', self.anchor_grade, 'N/A')
         self.report_check.append(t2)
-
-        t8 = (KEY_DISP_OUT_ANCHOR_BOLT_NO, '', self.anchors_outside_flange, 'N/A')
-        self.report_check.append(t8)
 
         t4 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.dp_anchor_fu_overwrite, 1, self.anchor_area[1], self.gamma_mb,
                                                            self.shear_capacity_anchor), 'N/A')
@@ -144,11 +258,15 @@ class SaveDesignBP(BasePlateConnection):
         # self.report_check.append(t7)
 
         if self.connectivity == 'Moment Base Plate':
-            t10 = (KEY_OUT_DISP_ANCHOR_BOLT_TENSION, self.tension_demand_anchor, cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
-                                                                                                   self.anchor_area[0], self.anchor_area[1],
-                                                                                                   self.tension_capacity_anchor,
-                                                                                                   safety_factor_parameter=self.dp_weld_fab), '')
+
+            t10 = (KEY_OUT_DISP_ANCHOR_BOLT_TENSION, total_tension_bolts(self.load_axial_compression, self.bp_length_provided, self.y,
+                                                                         self.eccentricity_zz, self.f, self.tension_demand_anchor),
+                   cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1], self.anchor_area[0], self.anchor_area[1],
+                                                             self.tension_capacity_anchor, safety_factor_parameter=self.dp_weld_fab), '')
             self.report_check.append(t10)
+
+        t8 = (KEY_DISP_OUT_ANCHOR_BOLT_NO, '', self.anchors_outside_flange, 'N/A')
+        self.report_check.append(t8)
 
         t3 = (KEY_DISP_OUT_ANCHOR_BOLT_LENGTH, self.anchor_length_min, self.anchor_length_provided, '')
         self.report_check.append(t3)

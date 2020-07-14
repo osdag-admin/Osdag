@@ -196,6 +196,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_bolt = ''
         self.anchor_dia_provided = 'M20'
         self.grout_thk = 50
+        self.plate_washer_details = {}
         self.plate_washer_thk = 1
         self.nut_thk = 1
         self.anchor_length_min = 1
@@ -2899,14 +2900,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if self.anchor_dia_inside_flange == 'N/A':
                 self.anchor_dia_inside_flange = 0
 
-            self.plate_washer_thk = IS6649.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_inside_flange))[
-                'washer_thk']  # washer thickness, mm
+            # washer details - dictionary {inner diameter, side dimension, washer thickness}
+            self.plate_washer_details = IS6649.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_inside_flange))
+
             self.nut_thk = IS1364.nut_thick((max(self.anchor_dia_provided, self.anchor_dia_inside_flange)))  # nut thickness, mm
 
         elif (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
-            self.plate_washer_thk = IS6649.square_washer_dimensions(self.anchor_dia_provided)['washer_thk']  # washer thickness, mm
+            self.plate_washer_details = IS6649.square_washer_dimensions(self.anchor_dia_provided)
+
             self.nut_thk = IS1364.nut_thick(self.anchor_dia_provided)  # nut thickness, mm
 
+        # square plate washer details
+        self.plate_washer_thk = self.plate_washer_details['washer_thk']  # washer thickness, mm
+        self.plate_washer_inner_dia = self.plate_washer_details['dia_in']  # inner dia, mm
+        self.plate_washer_dim = self.plate_washer_details['side']  # dimensions of the square washer plate, mm
+
+        # anchor length
         self.anchor_len_below_footing = self.anchor_length_provided  # mm
         self.anchor_len_above_footing = self.grout_thk + self.plate_thk + self.plate_washer_thk + self.nut_thk + 20  # mm, 20 mm is extra len
 

@@ -53,11 +53,12 @@ def cl_10_2_2_min_spacing(d, parameter='pitch'):#Todo:write condition for pitch 
 
     return min_pitch_eqn
 
-def cl_10_2_3_1_max_spacing(t,parameter=None):#TODO:write condition for pitch and gauge
+
+def cl_10_2_3_1_max_spacing(t, parameter=None):#TODO:write condition for pitch and gauge
     """
      Calculate the maximum pitch distance
      Args:
-         t: Thickness of thinner plate in mm (float)
+         t: Thickness of thinner plate in mm (float) - list
      Returns:
            Max pitch in mm (float)
      Note:
@@ -84,6 +85,7 @@ def cl_10_2_3_1_max_spacing(t,parameter=None):#TODO:write condition for pitch an
     max_pitch_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.3]\end{aligned}'))
 
     return max_pitch_eqn
+
 
 def cl_10_2_4_2_min_edge_end_dist(d_0,edge_type='Sheared or hand flame cut', parameter='end_dist'):
     """
@@ -124,6 +126,7 @@ def cl_10_2_4_2_min_edge_end_dist(d_0,edge_type='Sheared or hand flame cut', par
     end_edge_eqn.append(NoEscape(r'[Ref.~IS~&800:2007,~Cl.~10.2.4.2]\end{aligned}'))
     return end_edge_eqn
 
+
 def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter='end_dist'):
     """
     Calculate maximum end and edge distance(new)
@@ -153,7 +156,7 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
             t_min = t
 
     if corrosive_influences is True:
-        max_edge_dist =  round(40.0 + 4 * t_min,2)
+        max_edge_dist = round(40.0 + 4 * t_min,2)
     else:
         max_edge_dist = round(12 * t_epsilon_considered,2)
 
@@ -190,8 +193,8 @@ def cl_10_2_4_3_max_edge_end_dist(t_fu_fy, corrosive_influences=False, parameter
             max_end_edge_eqn.append(NoEscape(r'e`_{max}&='+max_edge_dist+r'\\'))
         max_end_edge_eqn.append(NoEscape(r'[Ref.~IS&~800:2007,~Cl.~10.2.4.3]\end{aligned}'))
 
-
     return max_end_edge_eqn
+
 
 def row_col_limit(min=1,max=None,parameter ="rows"):
     min = str(min)
@@ -4452,6 +4455,106 @@ def depth_req(e, g, row, sec =None):
 #     return shear_capacity_eqn
 
 # functions for base plate
+
+def square_washer_size(side):
+    """ equation for the size of square plate washer """
+    side = str(side)
+
+    washer_dim = Math(inline=True)
+    washer_dim.append(NoEscape(r'\begin{aligned} Square - ' + side + r' X ' + side + r' \\'))
+    washer_dim.append(NoEscape(r'&[Ref.~IS~6649:1985,~(Table~2)]\end{aligned}'))
+
+    return washer_dim
+
+
+def square_washer_thk(thickness):
+    """ equation for the thickness of square plate washer """
+    thickness = str(thickness)
+
+    washer_thk = Math(inline=True)
+    washer_thk.append(NoEscape(r'\begin{aligned} ' + thickness + r' \\'))
+    washer_thk.append(NoEscape(r'&[Ref.~IS~6649:1985,~(Table~2)]\end{aligned}'))
+
+    return washer_thk
+
+
+def square_washer_in_dia(dia):
+    """ equation for the hole diameter of square plate washer """
+    dia = str(dia)
+
+    washer_in_dia = Math(inline=True)
+    washer_in_dia.append(NoEscape(r'\begin{aligned} ' + dia + r' \\'))
+    washer_in_dia.append(NoEscape(r'&[Ref.~IS~6649:1985,~(Table~2)]\end{aligned}'))
+
+    return washer_in_dia
+
+
+def hexagon_nut_thickness(nut_thick):
+    """ equation for the thickness of the hexagon nut """
+    nut_thick = str(nut_thick)
+
+    nut_thickness = Math(inline=True)
+    nut_thickness.append(NoEscape(r'\begin{aligned} ' + nut_thick + r' \\'))
+    nut_thickness.append(NoEscape(r'&[Ref.~IS~1364-3:2002,~(Table~1)]\end{aligned}'))
+
+    return nut_thickness
+
+
+def anchor_len_above_footing(length):
+    """ equation for the length of the anchor bolt above footing """
+    length = str(length)
+
+    anchor_len = Math(inline=True)
+    anchor_len.append(NoEscape(r'\begin{aligned} grout thickness + thickness of base plate + thickness of plate washer +nut thickness + 20 \\'))
+    anchor_len.append(NoEscape(r'\begin{aligned} = ' + length + r' \\'))
+
+    return anchor_len
+
+
+def bp_length(col_depth, end_distance, length):
+    """ equation for the min length of the base plate"""
+    col_depth = str(col_depth)
+    end_distance = str(end_distance)
+    length = str(length)
+
+    bp_length_min = Math(inline=True)
+    bp_length_min.append(NoEscape(r'\begin{aligned} L = column~depth ~+~2~(e~+~e) \\'))
+    bp_length_min.append(NoEscape(r'\begin{aligned}   = ' + col_depth + r' ~+~2~(' + end_distance + r'~+~' + end_distance + r') \\'))
+    bp_length_min.append(NoEscape(r'\begin{aligned}   = ' + length + r' \\'))
+    bp_length_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement]\end{aligned}'))
+
+    return bp_length_min
+
+
+def bp_width(flange_width, edge_distance, width):
+    """ equation for the min length of the base plate"""
+    flange_width = str(flange_width)
+    edge_distance = str(edge_distance)
+    width = str(width)
+
+    bp_width_min = Math(inline=True)
+    bp_width_min.append(NoEscape(r'\begin{aligned} B = flange~width ~+~2~(1.5 \times e~+~1.5 \times e) \\'))  # TODO add e' instead of e
+    bp_width_min.append(NoEscape(r'\begin{aligned}   = ' + flange_width + r' ~+~2~(1.5 \times ' + edge_distance + r'~+~1.5 \times ' + edge_distance +
+                                 r') \\'))
+    bp_width_min.append(NoEscape(r'\begin{aligned}   = ' + width + r') \\'))
+    bp_width_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement]\end{aligned}'))
+
+    return bp_width_min
+
+
+def bearing_strength_concrete(concrete_grade, bearing_strength_value):
+    """ equation for the bearing strength of concrete"""
+    concrete_grade = str(concrete_grade)
+    bearing_strength_value = str(bearing_strength_value)
+
+    bearing_strength = Math(inline=True)
+    bearing_strength.append(NoEscape(r'\begin{aligned} \sigma_{br} = 0.45f_{ck} \\'))
+    bearing_strength.append(NoEscape(r'\begin{aligned}             = 0.45 ' + concrete_grade + r' \\'))
+    bearing_strength.append(NoEscape(r'\begin{aligned}             = ' + bearing_strength_value + r' \\'))
+    bearing_strength.append(NoEscape(r'&[Ref.~IS~800:2007,~(Cl.7.4.1)]\end{aligned}'))
+
+    return bearing_strength
+
 
 def eccentricity(moment, axial_load, eccentricity_zz):
     """ calculate eccentricity along the major axis"""

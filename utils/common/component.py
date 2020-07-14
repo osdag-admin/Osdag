@@ -588,7 +588,7 @@ class Plate(Material):
         """
         gauge = 0
         if bolts_one_line > 1:
-            gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
+            gauge = round_down((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
 
         web_plate_h = gauge * (bolts_one_line - 1) + edge_dist * 2
 
@@ -706,7 +706,7 @@ class Plate(Material):
                 elif self.beta_lj < 0.75:
                     self.beta_lj = 0.75
                 else:
-                    self.beta_lj = self.beta_lj
+                    self.beta_lj = round(self.beta_lj, 2)
                 bolt_capacity_red = round(self.beta_lj, 2) * bolt_capacity
             else:
                 bolt_capacity_red = bolt_capacity
@@ -725,7 +725,7 @@ class Plate(Material):
                 elif  self.beta_lj < 0.75:
                     self.beta_lj = 0.75
                 else:
-                    self.beta_lj =  self.beta_lj
+                    self.beta_lj =  round(self.beta_lj, 2)
                 bolt_capacity_red = round( self.beta_lj, 2) * bolt_capacity
                 print('beta', round( self.beta_lj, 2))
             else:
@@ -756,7 +756,7 @@ class Plate(Material):
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge,
                               max_spacing, max_edge_dist, shear_load=0.0, axial_load=0.0, web_moment=0.0, gap=0.0,
                               shear_ecc=False, bolt_line_limit=math.inf, min_bolts_one_line=2, min_bolt_line=1,
-                              joint=None, min_pitch=None, beta_lg = None):
+                              joint=None, min_pitch=None, beta_lg = None,min_end_dist =0.0):
 
         """
 
@@ -812,7 +812,10 @@ class Plate(Material):
                 pitch = min_pitch
             else:
                 pitch = min_gauge
-            end_dist = min_edge_dist
+            if min_end_dist ==0.0:
+                end_dist = min_edge_dist
+            else:
+                end_dist = min_end_dist
 
             if shear_ecc is True:
                 # If check for shear eccentricity is true, resultant force in bolt is calculated

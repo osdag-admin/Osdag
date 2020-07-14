@@ -639,6 +639,9 @@ class Tension_bolted(Member):
         t5 = (KEY_REDUCTION_FACTOR_FLANGE, KEY_DISP_REDUCTION_FACTOR_FLANGE, TYPE_TEXTBOX, round(self.plate.beta_lj, 2) if flag else '', True)
         out_list.append(t5)
 
+        t5 = (KEY_REDUCTION_LARGE_GRIP, KEY_DISP_REDUCTION_LARGE_GRIP, TYPE_TEXTBOX, round(self.plate.beta_lg, 2) if flag else '', True)
+        out_list.append(t5)
+
         t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX, round(self.plate.bolt_capacity_red/1000,2) if flag else '', True)
         out_list.append(t13)
 
@@ -1068,9 +1071,8 @@ class Tension_bolted(Member):
             self.section_size = self.select_section(self,design_dictionary,selectedsize)
             self.bolt_diameter_min= min(self.bolt.bolt_diameter)
 
-            self.edge_dist_min = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_min,
-                                                                          design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
-                                                                          design_dictionary[KEY_DP_DETAILING_EDGE_TYPE])
+            self.edge_dist_min = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_min,self.bolt.bolt_hole_type,
+                                                                          'machine_flame_cut')
             self.d_0_min = IS800_2007.cl_10_2_1_bolt_hole_size(self.bolt_diameter_min,
                                                                           design_dictionary[KEY_DP_BOLT_HOLE_TYPE])
 
@@ -1304,6 +1306,7 @@ class Tension_bolted(Member):
             # logger.error(": Design is not safe. \n ")
             # logger.debug(" :=========End Of design===========")
         else:
+            self.bolt_design_status = False
             for self.bolt.bolt_diameter_provided in reversed(self.bolt_diameter_possible):
 
                 # print(self.bolt.bolt_diameter_provided)
@@ -1312,6 +1315,7 @@ class Tension_bolted(Member):
 
                 self.bolt.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type,
                                                              'machine_flame_cut'), 2)
+                self.bolt.min_edge_dist_round = round_up(self.bolt.min_edge_dist, 5)
 
                 self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                   bolt_grade_provided=self.bolt.bolt_grade_provided,
@@ -1328,7 +1332,7 @@ class Tension_bolted(Member):
                                                      max_spacing=self.bolt.max_spacing_round,
                                                      max_edge_dist=self.bolt.max_edge_dist_round,
                                                      shear_load=0, axial_load=self.res_force, gap=self.plate.gap,
-                                                     shear_ecc=False,min_bolts_one_line=2,min_bolt_line=2, beta_lg=self.bolt.beta_lg)
+                                                     shear_ecc=False,min_bolts_one_line=2,min_bolt_line=2, beta_lg=self.bolt.beta_lg,min_end_dist=self.bolt.min_end_dist_round)
                 else:
                     if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
                         self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -1341,7 +1345,7 @@ class Tension_bolted(Member):
                                                          max_edge_dist=self.bolt.max_edge_dist_round,
                                                          shear_load=0, axial_load=self.res_force/2,
                                                          gap=self.plate.gap,
-                                                         shear_ecc=False, min_bolts_one_line=1,min_bolt_line=2,beta_lg=self.bolt.beta_lg)
+                                                         shear_ecc=False, min_bolts_one_line=1,min_bolt_line=2,beta_lg=self.bolt.beta_lg,min_end_dist=self.bolt.min_end_dist_round)
                     else:
                         self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
                                                          web_plate_h_min=self.min_plate_height,
@@ -1353,7 +1357,7 @@ class Tension_bolted(Member):
                                                          max_edge_dist=self.bolt.max_edge_dist_round,
                                                          shear_load=0, axial_load=self.res_force,
                                                          gap=self.plate.gap,
-                                                         shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,beta_lg=self.bolt.beta_lg)
+                                                         shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,beta_lg=self.bolt.beta_lg,min_end_dist=self.bolt.min_end_dist_round)
 
 
                 if self.plate.design_status is True:
@@ -1382,7 +1386,7 @@ class Tension_bolted(Member):
             self.plate.bolt_force = bolt_force_previous
 
 
-        if self.bolt_design_status is True:
+        if self.bolt_design_status == True:
             self.design_status = True
             print("bolt ok")
             self.get_bolt_grade(self, design_dictionary)
@@ -1420,6 +1424,11 @@ class Tension_bolted(Member):
             self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                     conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
+            self.bolt.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type,
+                                                         'machine_flame_cut'), 2)
+
+            self.bolt.min_edge_dist_round = round_up(self.bolt.min_edge_dist, 5)
+
             self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                               bolt_grade_provided=self.bolt.bolt_grade_provided,
                                               conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
@@ -1441,6 +1450,13 @@ class Tension_bolted(Member):
         self.bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                                 conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
 
+        self.bolt.min_edge_dist = round(IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt.bolt_diameter_provided, self.bolt.bolt_hole_type,
+                                                     'machine_flame_cut'), 2)
+
+        self.bolt.min_edge_dist_round = round_up(self.bolt.min_edge_dist, 5)
+
+        print(self.bolt.min_edge_dist_round,self.bolt.min_edge_dist, "gbfhgfbdhhbdg")
+
         self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                           bolt_grade_provided=self.bolt.bolt_grade_provided,
                                           conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
@@ -1456,7 +1472,7 @@ class Tension_bolted(Member):
                                              max_spacing=self.bolt.max_spacing_round,
                                              max_edge_dist=self.bolt.max_edge_dist_round,
                                              shear_load=0, axial_load=self.res_force, gap=self.plate.gap,
-                                             shear_ecc=False, min_bolts_one_line=2,min_bolt_line=2,beta_lg=self.bolt.beta_lg)
+                                             shear_ecc=False, min_bolts_one_line=2,min_bolt_line=2,beta_lg=self.bolt.beta_lg, min_end_dist=self.bolt.min_end_dist_round)
         else:
             if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
                 self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -1469,7 +1485,7 @@ class Tension_bolted(Member):
                                                  max_edge_dist=self.bolt.max_edge_dist_round,
                                                  shear_load=0, axial_load=self.res_force / 2,
                                                  gap=self.plate.gap,
-                                                 shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,beta_lg=self.bolt.beta_lg)
+                                                 shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,beta_lg=self.bolt.beta_lg,min_end_dist=self.bolt.min_end_dist_round)
 
             else:
                 self.plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
@@ -1482,7 +1498,7 @@ class Tension_bolted(Member):
                                                  max_edge_dist=self.bolt.max_edge_dist_round,
                                                  shear_load=0, axial_load=self.res_force,
                                                  gap=self.plate.gap,
-                                                 shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,beta_lg=self.bolt.beta_lg)
+                                                 shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,beta_lg=self.bolt.beta_lg,min_end_dist=self.bolt.min_end_dist_round)
 
         self.plate.edge_dist_provided = round(((self.max_plate_height - ((self.plate.bolts_one_line -1) * self.plate.gauge_provided))/2),2)
 
@@ -1831,7 +1847,7 @@ class Tension_bolted(Member):
         if self.plate.bolt_force > self.plate.bolt_capacity_red or (8* self.bolt.bolt_diameter_provided)<self.comb_thick:
             if len(self.bolt_diameter_possible) >= 2:
                 dia = self.bolt.bolt_diameter_provided
-                print("recheck", dia)
+                print("recheck dia ", dia)
                 self.select_bolt_dia(self, design_dictionary, dia)
             else:
                 self.design_status = False
@@ -1844,7 +1860,7 @@ class Tension_bolted(Member):
            
             
 
-        if self.plate_tension_capacity > self.res_force:
+        if self.plate_tension_capacity > self.res_force and self.plate.design_status == True:
             # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
             if (2 * self.plate.length) > self.length:
                 self.design_status = False
@@ -1909,6 +1925,7 @@ class Tension_bolted(Member):
 
 
     def intermittent_bolt(self, design_dictionary):
+        print(self.bolt.min_edge_dist_round, "gbfhgf")
         # print(round(self.plate.beta_lj, 2), "hcbvhg")
         print(self.bolt.max_edge_dist,"ghxvjhshd")
         self.inter_length = self.length - 2 * (self.plate.end_dist_provided + (self.plate.bolt_line -1)*self.plate.pitch_provided)
@@ -2301,6 +2318,7 @@ class Tension_bolted(Member):
              # KEY_DISP_DP_BOLT_FY: round(self.bolt.bolt_fy,2),
              KEY_DISP_DP_BOLT_SLIP_FACTOR: self.bolt.mu_f,
              KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+             'Type of edges for edge distance': 'Machine flame cut',
              # KEY_DISP_DP_DETAILING_GAP: self.plate.gap,
              KEY_DISP_CORR_INFLUENCES: self.bolt.corrosive_influences,
              "Plate Details": "TITLE",
@@ -2348,18 +2366,21 @@ class Tension_bolted(Member):
         self.report_check.append(t1)
 
         if self.member_design_status == True:
+
             t1 = ('SubSection', 'Spacing Checks', '|p{2.5cm}|p{7.5cm}|p{3cm}|p{2.5cm}|')
             self.report_check.append(t1)
             t6 = (KEY_OUT_DISP_D_MIN, "", display_prov(int(self.bolt.bolt_diameter_provided), "d"), '')
             self.report_check.append(t6)
             t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.bolt.d_0), "d_0"), '')
             self.report_check.append(t8)
+            t8 = (KEY_DISP_MIN_BOLT," ", display_prov(int(row), "r_l"), '')
+            self.report_check.append(t8)
             # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
             # self.report_check.append(t2)
             t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt.bolt_diameter_provided, row_limit), self.bolt.min_gauge_round, get_pass_fail(self.bolt.min_gauge, self.bolt.min_gauge_round, relation="leq"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
-                  self.bolt.min_edge_dist_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, 'machine_flame_cut'),
+                  self.bolt.min_edge_dist_round, get_pass_fail(self.bolt.min_edge_dist, self.bolt.min_edge_dist_round, relation='leq'))
             self.report_check.append(t3)
             t3 = (
             KEY_SPACING, depth_req(self.bolt.min_edge_dist_round, self.bolt.min_pitch_round, row, text), depth_max,
@@ -2373,12 +2394,14 @@ class Tension_bolted(Member):
             self.report_check.append(t6)
             t8 = (KEY_DISP_BOLT_HOLE, " ", display_prov(int(self.d_0_min), "d_0"), '')
             self.report_check.append(t8)
+            t8 = (KEY_DISP_MIN_BOLT, " ", display_prov(int(row), "r_l"), '')
+            self.report_check.append(t8)
             # t2 = (DISP_MIN_GAUGE, min_pitch(self.bolt_diameter_min),display_prov(min_gauge, "g",row_limit),"")
             # self.report_check.append(t2)
             t2 = (DISP_MIN_GAUGE, cl_10_2_2_min_spacing(self.bolt_diameter_min, row_limit), min_gauge, get_pass_fail(self.bolt.min_gauge, min_gauge, relation="leq"))
             self.report_check.append(t2)
             t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.d_0_min,'machine_flame_cut'),
-                  self.edge_dist_min_round, get_pass_fail(self.bolt.min_end_dist, self.bolt.min_edge_dist_round, relation='leq'))
+                  self.edge_dist_min_round, get_pass_fail(self.bolt.min_edge_dist, self.bolt.min_edge_dist_round, relation='leq'))
             self.report_check.append(t3)
             t3 = (KEY_SPACING, depth_req(self.edge_dist_min_round, self.pitch_round, row, text), depth_max,
                   get_pass_fail(depth, depth_max, relation="lesser"))
@@ -2403,7 +2426,7 @@ class Tension_bolted(Member):
             self.report_check.append(t6)
             t1 = (KEY_DISP_AXIAL_FORCE_CON, axial_capacity_req(axial_capacity=round((section_size.tension_yielding_capacity/1000), 2),
                                                                    min_ac=round(((0.3*section_size.tension_yielding_capacity) / 1000), 2)),
-                  display_prov(round((self.res_force/1000),2),"A"),min_prov_max(round(((0.3*section_size.tension_yielding_capacity) / 1000), 2),round(self.res_force/1000,2),round((section_size.tension_yielding_capacity/1000), 2)))
+                  display_prov(round((self.res_force/1000),2),"A_u"),min_prov_max(round(((0.3*section_size.tension_yielding_capacity) / 1000), 2),round(self.res_force/1000,2),round((section_size.tension_yielding_capacity/1000), 2)))
             self.report_check.append(t1)
         else:
             # t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|')
@@ -2462,7 +2485,7 @@ class Tension_bolted(Member):
                   self.plate.gauge_provided,
                   get_pass_fail(self.bolt.max_spacing, self.plate.gauge_provided, relation="geq"))
             self.report_check.append(t2)
-            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, 'machine_flame_cut'),
+            t3 = (DISP_MIN_END, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.min_end_dist, self.plate.end_dist_provided, relation='leq'))
             self.report_check.append(t3)
@@ -2473,7 +2496,7 @@ class Tension_bolted(Member):
                   self.plate.end_dist_provided,
                   get_pass_fail(self.bolt.max_end_dist, self.plate.end_dist_provided, relation='geq'))
             self.report_check.append(t4)
-            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0, self.bolt.edge_type),
+            t3 = (DISP_MIN_EDGE, cl_10_2_4_2_min_edge_end_dist(self.bolt.d_0,'machine_flame_cut' ),
                   self.plate.edge_dist_provided,
                   get_pass_fail(self.bolt.min_edge_dist, self.plate.edge_dist_provided, relation='leq'))
             self.report_check.append(t3)
@@ -2520,9 +2543,9 @@ class Tension_bolted(Member):
             self.report_check.append(t7)
             t10 = (KEY_OUT_LONG_JOINT, long_joint_bolted_req(),long_joint_bolted_prov(self.plate.bolt_line,self.plate.bolts_one_line,self.plate.pitch_provided,self.plate.gauge_provided,self.bolt.bolt_diameter_provided,bolt_capacity_kn,bolt_capacity_red_kn), "")
             self.report_check.append(t10)
-
-
-            t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn, bolt_capacity_red_kn,
+            t10 = (KEY_OUT_LARGE_GRIP, large_grip_req(),large_grip_prov(self.bolt.bolt_diameter_provided, self.plate.thickness_provided, self.thick, self.plate.beta_lj, self.plate.beta_lg), "")
+            self.report_check.append(t10)
+            t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn, bolt_red_capacity_prov(self.plate.beta_lj,self.plate.beta_lg,bolt_capacity_kn,bolt_capacity_red_kn),
                   get_pass_fail(bolt_force_kn, bolt_capacity_red_kn, relation="leq"))
             self.report_check.append(t5)
 
@@ -2588,6 +2611,11 @@ class Tension_bolted(Member):
                   gusset_lt_b_prov(self.plate.bolt_line, self.plate.pitch_provided,self.plate.end_dist_provided,int(self.plate.length))
                   , get_pass_fail(self.length, self.plate.length, relation="geq"))
             self.report_check.append(t4)
+            t4 = (KEY_OUT_DISP_MEMB_MIN_LENGTH, (2 * self.plate.length), self.length, get_pass_fail((2 * self.plate.length), self.length, relation="leq"))
+            self.report_check.append(t4)
+
+
+
             if self.sec_profile in ["Channels", "Back to Back Channels"]:
                 t5 = (KEY_OUT_DISP_PLATETHK_REP, '',display_prov(self.plate.thickness_provided,"T_p"), "")
                 self.report_check.append(t5)

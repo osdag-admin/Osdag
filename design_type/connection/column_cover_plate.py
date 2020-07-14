@@ -445,7 +445,7 @@ class ColumnCoverPlate(MomentConnection):
         t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)- 2 x 3 Bolts pattern considered")
         flangecapacity.append(t00)
         t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
-               ['./ResourceFiles/images/2L_V.jpg', 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
+               ['./ResourceFiles/images/2L_V.png', 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
         flangecapacity.append(t99)
         # t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
         #        ['./ResourceFiles/images/L_V.jpg', 211, 349, "Block Shear Pattern"])  # [image, width, height, caption]
@@ -470,7 +470,7 @@ class ColumnCoverPlate(MomentConnection):
         webcapacity.append(t00)
 
         t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/U_V.jpg', 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
+               ['./ResourceFiles/images/U_V.png', 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 
 
@@ -483,7 +483,7 @@ class ColumnCoverPlate(MomentConnection):
         webcapacity.append(t30)
 
         t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
-               ['./ResourceFiles/images/L_Vshear.jpg', 239 , 350,
+               ['./ResourceFiles/images/L_Vshear.png', 239 , 350,
                 "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 
@@ -2843,7 +2843,11 @@ class ColumnCoverPlate(MomentConnection):
 
     def save_design(self, popup_summary):
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
-        self.report_supporting = {KEY_DISP_SEC_PROFILE: "ISection",
+        if self.section.flange_slope == 90:
+            image = "Parallel_Beam"
+        else:
+            image = "Slope_Beam"
+        self.report_supporting = {KEY_DISP_SEC_PROFILE:image,
                                   KEY_DISP_COLSEC: self.section.designation,
                                   KEY_DISP_MATERIAL: self.section.material,
                                   KEY_DISP_FU: self.section.fu,
@@ -2894,7 +2898,8 @@ class ColumnCoverPlate(MomentConnection):
              KEY_DISP_FU: self.flange_plate.fu,
              KEY_DISP_FY: self.flange_plate.fy,
              KEY_DISP_MATERIAL: self.flange_plate.material,
-             KEY_DISP_PLATETHK: str(self.flange_plate.thickness),
+             KEY_DISP_FLANGESPLATE_THICKNESS: str(self.flange_plate.thickness),
+             KEY_DISP_WEBPLATE_THICKNESS: str(self.web_plate.thickness),
              }
 
         self.report_check = []

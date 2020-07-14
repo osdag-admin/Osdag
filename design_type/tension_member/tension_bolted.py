@@ -1899,8 +1899,6 @@ class Tension_bolted(Member):
                 self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
                                                              r=self.min_radius_gyration)
 
-
-
         else:
             print(self.plate_tension_capacity, "hsdvdhsd")
             if self.plate_tension_capacity < max_tension_yield and self.res_force < max_tension_yield:

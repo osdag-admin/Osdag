@@ -29,6 +29,7 @@ class BasePlateCad(object):
         :param alist: input and output values
         """
         self.BP = BP
+        self.BP.anchors_outside_flange = 6
         self.BP.weld_type = "Groove" # "Fillet"  #
         self.extraspace = 5 #for stiffener inside flange
         # self.BP.stiffener_along_flange = 'Yes'
@@ -266,7 +267,7 @@ class BasePlateCad(object):
 
         if self.BP.stiffener_along_flange == 'Yes':
 
-            x_axis = self.column.B/2 + 10       #todo: add web length here
+            x_axis = self.column.B/2 + self.weld_stiffener_algflng_v.h
             y_axis = self.column.D / 2
             if self.BP.weld_type == "Fillet":
                 z_axis = 0 # self.stiffener_algflangeL1.H / 2 + self.weld_stiffener_alongWeb_h.h
@@ -466,7 +467,7 @@ class BasePlateCad(object):
                     stiffener_gap = 0.0
                     x_axis = 0.0
                     y_axis = self.column.D / 2 + self.stiffener.L + self.weld_stiffener_alongWeb_v.h
-                    z_axis = weld_stiffener_alongWeb_gh.h/2
+                    z_axis = self.weld_stiffener_alongWeb_gh.h/2
 
                     stiffenerweldOrigin_h_11 = numpy.array([-x_axis + stiffener_gap, y_axis, z_axis])
                     uDirAbv_11 = numpy.array([1.0, 0.0, 0.0])
@@ -571,7 +572,7 @@ class BasePlateCad(object):
                     stiffener_gap = self.column.B * 0.4
                     x_axis = 0.0
                     y_axis = self.column.D / 2 + self.stiffener.L + self.weld_stiffener_alongWeb_v.h
-                    z_axis = weld_stiffener_alongWeb_gh.h/2
+                    z_axis = self.weld_stiffener_alongWeb_gh.h/2
 
                     stiffenerweldOrigin_h_11 = numpy.array([-x_axis + stiffener_gap, y_axis, z_axis])
                     uDirAbv_11 = numpy.array([1.0, 0.0, 0.0])
@@ -1103,9 +1104,9 @@ class HollowBasePlateCad(object):
 
         """
 
+        self.BP = BP
         self.stiffener_l = True
         self.stiffener_b = True
-        self.BP = BP
         self.column = sec
         self.weld_sec = weld_sec
         self.nut_bolt_array = nut_bolt_array

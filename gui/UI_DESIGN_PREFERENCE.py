@@ -41,8 +41,12 @@ class Window(QDialog):
         super().__init__()
         self.input_dictionary = input_dictionary
         self.do_not_clear_list = []
+        self.save_changes_list = []
+        self.values_changed = False
+        for t in main.input_dictionary_design_pref(main):
+            self.save_changes_list.extend(t[2])
         self.initUI(main,input_dictionary)
-
+        # self.rejected.connect(self.close_message)
 
     def center(self):
         frameGm = self.frameGeometry()
@@ -50,6 +54,38 @@ class Window(QDialog):
         centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
+
+    def closeEvent(self, event):
+        if self.values_changed:
+            popup = QMessageBox(self)
+            popup.setIcon(QMessageBox.Information)
+            popup.setWindowTitle("Save")
+            popup.setText('Do you want to save the changes?')
+            popup.setStandardButtons(QMessageBox.Yes |
+                                     QMessageBox.No |
+                                     QMessageBox.Cancel)
+            popup.setDefaultButton(QMessageBox.Cancel)
+            answer = popup.exec_()
+            print(answer, "answer")
+            if answer == QMessageBox.Yes:
+                self.accept()
+                event.accept()
+            elif answer == QMessageBox.No:
+                self.reject()
+                event.accept()
+            elif answer == QMessageBox.Cancel:
+                event.ignore()
+        else:
+            QDialog.closeEvent(self, event)
+
+    def connect_widget_for_change(self, widget):
+        if isinstance(widget, QComboBox):
+            widget.currentIndexChanged.connect(self.something_changed)
+        elif isinstance(widget, QLineEdit):
+            widget.textChanged.connect(self.something_changed)
+
+    def something_changed(self):
+        self.values_changed = True
 
     def initUI(self,main,input_dictionary):
 
@@ -190,6 +226,9 @@ class Window(QDialog):
                             regex_validator = QtCore.QRegExp("[1-9][0-9]*[.][0-9]*|[.][0-9]*|N/A|-")
                             line.setValidator(QtGui.QRegExpValidator(regex_validator, line))
 
+                        if element[0] in self.save_changes_list:
+                            self.connect_widget_for_change(line)
+
                         r += 1
 
                     if type == TYPE_COMBOBOX:
@@ -220,6 +259,9 @@ class Window(QDialog):
                             self.do_not_clear_list.append(combo)
                         else:
                             combo.setFixedSize(85,20)
+
+                        if element[0] in self.save_changes_list:
+                            self.connect_widget_for_change(combo)
                         r += 1
 
                     if type == TYPE_TITLE:
@@ -326,6 +368,9 @@ class Window(QDialog):
                             line.setReadOnly(True)
                         if input_dictionary:
                             line.setText(str(element[4]))
+
+                        if element[0] in self.save_changes_list:
+                            self.connect_widget_for_change(line)
                         r += 1
 
                     if type == TYPE_COMBOBOX:
@@ -352,6 +397,8 @@ class Window(QDialog):
                             combo.model().item(2).setEnabled(False)
                         if input_dictionary:
                             combo.setCurrentText(str(element[4]))
+                        if element[0] in self.save_changes_list:
+                            self.connect_widget_for_change(combo)
                         r += 1
 
                     if type == 'Title':

@@ -290,54 +290,75 @@ Osdag Homepage_.
 ---------------------------------
 1.2.1.1.1 Bolted connectivity
 	
-	*Sample problem 1*
+	*(New format-customised)*
+
+
+	| Design a bolted cover plate splice connection for beam as per following input 
+	| Section size : LB 300
+	| Material : E250(Fe 410 W)A
+	| Factored forces acting on the Member : Moment=25 kNm, Shear=50 kN, Axial=100 kN
+	| Bolt Diameter : Customized [12, 16, 20, 24, 30, 36] 
+	| Bolt Type : Friction Bolt
+	| Property Class : Customized [3.6, 4.8, 5.8, 9.8, 12.9]
+	| Preference: Outside + Inside 
+	| Flange Plate Thickness : Customized [10, 16, 22, 25, 28,             32, 40, 50, 80]
+	| Web Plate Thickness : Customized [10, 14, 20, 24, 26, 30, 40, 50,63]
+	| Type of Edges : Hand Flame Cut
+	| Gap between beams : 10mm  
+	| Surface treatment : Sand blast
+
+
+    	**Download:**
+
+    	DesignReport_1.1.4.2.2.pdf_. 
+
+    	Example_1.1.4.2.2.osi_.
 	
-	| Design a bolted cover plate splice connection for beam for the following Inputs,
+	
+	*(Previous format-customised)*
+
+		Design a bolted cover plate splice connection for beam LB 300 with both side cover plate on each flange to transfer a factored external moment of 25 kNm, factored shear of 50 kN and factored axial force of 100 kN. Try customized friction bolts[12, 16, 20, 24, 30, 36], property class[3.6, 4.8, 5.8, 9.8, 12.9], flange plate thickness[10, 16, 22, 25, 28, 32, 40, 50, 80], web plate thickness[10, 14, 20, 24, 26, 30, 40, 50,63]. Take material grade E250(Fe 410 W). Assume bolt hole type as standard, edge as hand flame cut, gap between the beams as 10mm and surface of the metal to be treated with sand blast.
+
+    	**Download:**
+
+    	DesignReport_1.1.4.2.2.pdf_. 
+
+    	Example_1.1.4.2.2.osi_.
+
+	*(New format-All)*
+	
+	| Design a bolted cover plate splice connection for beam as per following input
 	| Section size : WPB 200 x 200 x 34.65
 	| Material : E250(Fe 410 W)A
-	| Forces acting on the Member : Moment=25 kNm, Shear=50 kN, Axial=100 kN
-	| Bolt Diameter : [All]
+	| Factored forces acting on the Member : Moment=25 kNm, Shear=50 kN, Axial=100 kN
+	| Bolt Diameter :All [available bolts] 
 	| Bolt Type : Bearing Bolt
-	| Property Class : [All]
-	| Preference : Outside + Inside 
-	| Flange Plate Thickness : [All]
-	| Web Plate Thickness : [All]
+	| Property Class : All [available property class]
+	| Preference: Outside + Inside 
+	| Flange Plate Thickness : All [available thickness]
+	| Web Plate Thickness : All [available thickness]
 	| Type of Edges : Hand Flame Cut
+	| Gap between beams : 10mm
+	| Surface treatment : Sand blast
 
-	DesignReport_1.2.1.1.1.pdf_.
-	
-	Example_1.2.1.1.1.osi_.
+    	**Download:**
+
+    	DesignReport_1.1.4.2.2.pdf_. 
+
+    	Example_1.1.4.2.2.osi_.
+
+	*(Previous format-customised)*
+
+		Design a bolted cover plate splice connection for beam WPB 200 x 200 x 34.65 with both side cover plate on each flange to transfer a factored external moment of 25 kNm, factored shear of 50 kN and factored axial force of 100 kN. Try all available bearing bolts, property class and plate thickness. Take material grade E250(Fe 410 W). Assume bolt hole type as standard, edge as hand flame cut, gap between the beams as 10mm and surface of the metal to be treated with sand blast.
+
+        **Download:**
+
+    	DesignReport_1.1.4.2.2.pdf_. 
+
+    	Example_1.1.4.2.2.osi_.
 
 
-	
-	*Sample problem 2*
 
-		Design a bolted cover plate splice connection for beam UB 457x191x82 to transfer a factored external moment of 175kNm, factored shear of 115kN and factored axial force of 100kN. Use M20 Friction grip bolts of property class 8.8. Try 16mm thick flange splice plate and 10mm thick web splice plate. Take Fe410 grade steel (f\ :sub:`y` \  = 250 MPa,  f\ :sub:`u` = 410 MPa). Assume bolt hole type as standard, edge as hand flame cut, gap between the beams as 5mm and surface of the metal to be treated with sand blast.
-	
- 	DesignReport_1.2.1.1.1.1.pdf_.
-	
-	Example_1.2.1.1.1.1.osi_.
-
-
-	*Sample problem 3*
-	
-		Design a bolted cover plate splice connection for 
-		beam UB 406x178x67 to transfer a factored external moment of 150kNm, 
-		factored shear of 100kN and factored axial force of 75kN.
- 		Use M20 Friction grip bolts of property class 10.9.
- 		Try 14mm thick flange splice plate and 6mm thick web splice plate. 
-		Take Fe410 grade steel (f\ :sub:`y` \  = 250 MPa,  f\ :sub:`u` = 410 MPa).
- 		Assume bolt hole type as standard, edge as hand flame cut, 
-		gap between the beams as 5mm and surface of the metal to be treated with sand blast.
-		
-	**Download:**
-	
-	DesignReport_1.2.1.1.1.2.pdf_.
-	
-	Example_1.2.1.1.1.2.osi_.
-
-	
-	
 1.2.1.2. End Plate Connection
 --------------------------------
 1.2.1.2.1 Extended Both Ways

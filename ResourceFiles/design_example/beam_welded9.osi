@@ -5,7 +5,7 @@ Connector.Material: E 410 (Fe 540)
 Connector.Web_Plate.Thickness_List:
 - '14'
 Design.Design_Method: Limit State Design
-Detailing.Gap: '10'
+Detailing.Gap: '3'
 Load.Axial: '250'
 Load.Moment: '105'
 Load.Shear: '190'

@@ -25,7 +25,7 @@ Connector.Flange_Plate.Thickness_list: &id001
 Connector.Material: E 410 (Fe 540)
 Connector.Web_Plate.Thickness_List: *id001
 Design.Design_Method: Limit State Design
-Detailing.Gap: '10'
+Detailing.Gap: '3'
 Load.Axial: '1'
 Load.Moment: '1'
 Load.Shear: '1'

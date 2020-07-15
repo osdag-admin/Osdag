@@ -197,6 +197,17 @@ class Bolt:
             self.bolt_bearing_capacity = VALUE_NOT_APPLICABLE
             self.bolt_capacity = self.bolt_shear_capacity
 
+        # def length_grip_bolt_cap_red(self, plate_quantity, parent_tk, plate_tk, diameter, bolt_capacity,vres):
+        #     length_grip_l_g = (plate_quantity * plate_tk) + parent_tk
+        self.beta_lg = IS800_2007.cl_10_3_3_2_bolt_large_grip(d=self.bolt_diameter_provided, l_g=t_sum)
+        # #     bolt_capacity_red =self.beta_lg * bolt_capacity
+        #     if vres > bolt_capacity_red:
+        #         self.design_status = False
+        #         self.reason = " Select higher grade/Diameter or choose different connection"
+        #     else:
+        #         self.design_status = True
+        #     return bolt_capacity_red
+
     def calculate_kb(self, e, p, d_0, f_ub, f_u):
 
         if p > 0.0:
@@ -577,7 +588,7 @@ class Plate(Material):
         """
         gauge = 0
         if bolts_one_line > 1:
-            gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
+            gauge = round_down((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
 
         web_plate_h = gauge * (bolts_one_line - 1) + edge_dist * 2
 
@@ -677,7 +688,7 @@ class Plate(Material):
 
     def get_bolt_red(self, bolts_one_line, gauge, bolts_line,
                      pitch, bolt_capacity, bolt_dia, end_dist=0.0, gap=0.0, edge_dist=0.0, root_radius=0.0,
-                     web_thickness=0.0):
+                     web_thickness=0.0, beta_lg = 1.0):
         """
         :param bolts_one_line: bolts in one line
         :param gauge: gauge
@@ -695,7 +706,7 @@ class Plate(Material):
                 elif self.beta_lj < 0.75:
                     self.beta_lj = 0.75
                 else:
-                    self.beta_lj = self.beta_lj
+                    self.beta_lj = round(self.beta_lj, 2)
                 bolt_capacity_red = round(self.beta_lj, 2) * bolt_capacity
             else:
                 bolt_capacity_red = bolt_capacity
@@ -714,11 +725,20 @@ class Plate(Material):
                 elif  self.beta_lj < 0.75:
                     self.beta_lj = 0.75
                 else:
-                    self.beta_lj =  self.beta_lj
+                    self.beta_lj =  round(self.beta_lj, 2)
                 bolt_capacity_red = round( self.beta_lj, 2) * bolt_capacity
                 print('beta', round( self.beta_lj, 2))
             else:
                 bolt_capacity_red = bolt_capacity
+
+        self.beta_lg = beta_lg
+        if self.beta_lg >= self.beta_lj and self.beta_lg !=1:
+            self.beta_lg = self.beta_lj
+            bolt_capacity_red = bolt_capacity_red * self.beta_lg
+        elif self.beta_lg < self.beta_lj and self.beta_lg !=1:
+            bolt_capacity_red = bolt_capacity_red * self.beta_lg
+        else:
+            bolt_capacity_red = bolt_capacity_red * self.beta_lg
 
         return bolt_capacity_red
 
@@ -736,7 +756,7 @@ class Plate(Material):
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge,
                               max_spacing, max_edge_dist, shear_load=0.0, axial_load=0.0, web_moment=0.0, gap=0.0,
                               shear_ecc=False, bolt_line_limit=math.inf, min_bolts_one_line=2, min_bolt_line=1,
-                              joint=None, min_pitch=None):
+                              joint=None, min_pitch=None, beta_lg = 1.0 ,min_end_dist =0.0):
 
         """
 
@@ -792,7 +812,10 @@ class Plate(Material):
                 pitch = min_pitch
             else:
                 pitch = min_gauge
-            end_dist = min_edge_dist
+            if min_end_dist ==0.0:
+                end_dist = min_edge_dist
+            else:
+                end_dist = min_end_dist
 
             if shear_ecc is True:
                 # If check for shear eccentricity is true, resultant force in bolt is calculated
@@ -808,11 +831,11 @@ class Plate(Material):
 
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,
-                                                      bolt_dia)
+                                                      bolt_dia, beta_lg=beta_lg)
             else:
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,
-                                                      bolt_dia, end_dist, gap)
+                                                      bolt_dia, end_dist, gap, beta_lg=beta_lg)
 
             while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
                 print("entered web plate details loop for bolt force:", vres, "bolt capaity reduced:",
@@ -863,11 +886,11 @@ class Plate(Material):
                 if joint == None:
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                           gauge, bolt_line, pitch, bolt_capacity,
-                                                          bolt_dia)
+                                                          bolt_dia, beta_lg=beta_lg)
                 else:
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                           gauge, bolt_line, pitch, bolt_capacity,
-                                                          bolt_dia, end_dist, gap)
+                                                          bolt_dia, end_dist, gap, beta_lg=beta_lg)
 
             if vres > bolt_capacity_red:
                 self.design_status = False
@@ -892,7 +915,7 @@ class Plate(Material):
 
     def get_flange_plate_details(self, bolt_dia, flange_plate_h_min, flange_plate_h_max, bolt_capacity, min_edge_dist,
                                  min_gauge, max_spacing, max_edge_dist, web_thickness, root_radius,
-                                 shear_load=0.0, axial_load=0.0, gap=0.0, bolt_line_limit=math.inf, joint=None):
+                                 shear_load=0.0, axial_load=0.0, gap=0.0, bolt_line_limit=math.inf, joint=None,beta_lg = None):
         # todo anjali
         """
 
@@ -946,11 +969,11 @@ class Plate(Material):
             if joint == None:
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,
-                                                      bolt_dia)
+                                                      bolt_dia,beta_lg= beta_lg)
             else:
                 bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                       gauge, bolt_line, pitch, bolt_capacity,
-                                                      bolt_dia, end_dist, gap, edge_dist, root_radius, web_thickness)
+                                                      bolt_dia, end_dist, gap, edge_dist, root_radius, web_thickness, beta_lg= beta_lg)
 
             # while bolt_line <= bolt_line_limit and vres > bolt_capacity_red:
             # [gauge, edge_dist, flange_plate_h] = \
@@ -977,12 +1000,12 @@ class Plate(Material):
                 if joint == None:
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                           gauge, bolt_line, pitch, bolt_capacity,
-                                                          bolt_dia)
+                                                          bolt_dia,beta_lg= beta_lg)
                 else:
                     bolt_capacity_red = self.get_bolt_red(bolts_one_line,
                                                           gauge, bolt_line, pitch, bolt_capacity,
                                                           bolt_dia, end_dist, gap, edge_dist, root_radius,
-                                                          web_thickness)
+                                                          web_thickness,beta_lg= beta_lg)
                 print("boltforce", vres, bolt_capacity_red)
                 # convergence = bolt_capacity_red - vres
                 #

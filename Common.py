@@ -1141,7 +1141,13 @@ KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
 
 KEY_REDUCTION_FACTOR_FLANGE ='flange_plate.red,factor'
-KEY_DISP_REDUCTION_FACTOR_FLANGE ="Capacity Red.Factor"
+KEY_REDUCTION_LARGE_GRIP ='bolt.large_grip'
+
+
+KEY_DISP_REDUCTION_FACTOR_FLANGE ="Long Joint Red.Factor"
+KEY_DISP_REDUCTION_LARGE_GRIP ="Large Grip Red.Factor"
+
+
 KEY_DISP_REDUCTION ="Strength Red.Factor"
 KEY_OUT_FLANGE_BOLT_SHEAR ='flange_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity (kN)"
@@ -1316,6 +1322,8 @@ KEY_OUT_DISP_TOT_NO_BOLTS = 'Number of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
+KEY_DISP_MIN_BOLT = 'Minimum Bolts (nos)'
+
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
 KEY_DISP_KB = 'Kb'
 
@@ -1348,7 +1356,8 @@ KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_BOLT_TENSION_CAPACITY1 = 'Bolt Tension Capacity (kN)'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
-KEY_OUT_LONG_JOINT = 'Bolt Capacity post Long Joint (kN)'
+KEY_OUT_LONG_JOINT = 'Long Joint Factor'
+KEY_OUT_LARGE_GRIP = 'Large Grip Factor'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Columns (nos)'
@@ -1446,7 +1455,9 @@ KEY_OUT_DISP_INTERSPACING = 'Spacing (mm)'
 KEY_OUT_PLATE_CAPACITY = 'Plate.Capacity'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
-KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Length (mm)'
+KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Plate Length (mm)'
+KEY_OUT_DISP_MEMB_MIN_LENGTH = 'Min.Member Length (mm)'
+
 KEY_OUT_PLATE_WIDTH = 'Plate.Width'
 KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 c = 'Width (mm)'

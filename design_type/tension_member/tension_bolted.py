@@ -504,9 +504,6 @@ class Tension_bolted(Member):
         t00 = (None, "", TYPE_NOTE, "Representative Image for Spacing Details - (root radius not included in edge distance)")
         spacing.append(t00)
 
-        # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
-        # spacing.append(t99)
-
         t99 = (None, 'Spacing Details', TYPE_SECTION,
                ['./ResourceFiles/images/spacing_1.png', 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
         spacing.append(t99)

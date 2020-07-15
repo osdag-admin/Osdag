@@ -1,0 +1,39 @@
+Connector.Flange_Plate.Preferences: Outside
+Connector.Flange_Plate.Thickness_list:
+- '6'
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '24'
+- '25'
+- '26'
+- '28'
+- '30'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '80'
+Connector.Material: E 410 (Fe 540)
+Connector.Web_Plate.Thickness_List:
+- '14'
+Design.Design_Method: Limit State Design
+Detailing.Gap: '3'
+Load.Axial: '250'
+Load.Moment: '105'
+Load.Shear: '190'
+Material: E 450 (Fe 570)D
+Member.Designation: WPB 340 X 300 X 78.9
+Member.Material: E 410 (Fe 540)
+Module: Beam Coverplate Weld Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '540'
+Weld.Type: Fillet Weld

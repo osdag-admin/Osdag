@@ -1029,6 +1029,7 @@ class CommonDesignLogic(object):
                                  L=float(T.length))
                 if T.sec_profile == 'Channels':
                     nut_space = member.t + plate.T + nut.T  # member.T + plate.T + nut.T
+
                 else:
                     nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
 

@@ -862,7 +862,7 @@ class Tension_bolted(Member):
         self.bolt_design_status = False
         self.plate_design_status = False
         # self.inter_status = False
-
+        self.thk_count =0
 
         print("input values are set. Doing preliminary member checks")
         # self.i = 0
@@ -1267,13 +1267,16 @@ class Tension_bolted(Member):
             bolts_required_previous = 1
             self.thick = self.section_size_1.thickness
 
-        thickness_provided = [i for i in self.plate.thickness if i >= self.thick or i==80.0]
-        if len(thickness_provided) >= 2:
-            self.plate.thickness_provided = min(thickness_provided)
+        if self.thk_count == 0:
+            thickness_provided = [i for i in self.plate.thickness if i >= self.thick or i==80.0]
+            if len(thickness_provided) >= 2:
+                self.plate.thickness_provided = min(thickness_provided)
+            else:
+                # thickness_provided.append(40.0)
+                # print(thickness_provided)
+                self.plate.thickness_provided = thickness_provided[0]
         else:
-            # thickness_provided.append(40.0)
-            # print(thickness_provided)
-            self.plate.thickness_provided = thickness_provided[0]
+            pass
 
 
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Angles', 'Star Angles']:
@@ -1837,28 +1840,7 @@ class Tension_bolted(Member):
         else:
             pass
 
-        self.plate.bolt_capacity_red = self.plate.get_bolt_red(self.plate.bolts_one_line,
-                                                               self.plate.gauge_provided, self.plate.bolt_line,
-                                                               self.plate.pitch_provided, self.bolt.bolt_capacity,
-                                                               self.bolt.bolt_diameter_provided,
-                                                               beta_lg=self.bolt.beta_lg)
         self.comb_thick = self.plate.thickness_provided + self.thick
-
-        if self.plate.bolt_force > self.plate.bolt_capacity_red or (8* self.bolt.bolt_diameter_provided)<self.comb_thick:
-            if len(self.bolt_diameter_possible) >= 2:
-                dia = self.bolt.bolt_diameter_provided
-                print("recheck dia ", dia)
-                self.select_bolt_dia(self, design_dictionary, dia)
-            else:
-                self.design_status = False
-                logger.warning(" : Design failed due to Long Joint or Large Grip Bolt Reduction")
-
-                logger.error(": Design is not safe. \n ")
-                logger.debug(" :=========End Of design===========")
-        else:
-            pass
-           
-            
 
         if self.plate_tension_capacity > self.res_force and self.plate.design_status == True:
             # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
@@ -1868,36 +1850,49 @@ class Tension_bolted(Member):
                 logger.info("Try higher diameter of bolt or increase member length to get a safe design.")
                 logger.error(": Design is not safe. \n ")
                 logger.debug(" :=========End Of design===========")
-            else:
-                self.plate_design_status = True
-                self.design_status = True
-                self.intermittent_bolt(self, design_dictionary)
-                logger.info("In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
-                if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
-                    logger.info("In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
-                else:
-                    pass
-                if self.load.axial_force < (self.res_force/1000):
-                    logger.info("Minimum Design Force based on Member Size is used for Connection Design,i.e.{} kN (IS 800:2007 - Clause 10.7)". format(round(self.res_force/1000,2)))
-                else:
-                    pass
-                logger.info(": Overall bolted tension member design is safe. \n")
-                logger.debug(" :=========End Of design===========")
-                if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-                    self.min_rad_gyration_calc(self,designation=self.section_size_1.designation,
-                                               material_grade=self.material,
-                                               key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
-                                               B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
-                else:
-                    self.min_rad_gyration_calc(self,designation=self.section_size_1.designation,
-                                               material_grade=self.material,
-                                               key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
-                                               B_b=self.section_size_1.flange_width,
-                                               T_t=self.section_size_1.flange_thickness,
-                                               t=self.section_size_1.web_thickness)
+            elif (8 * self.bolt.bolt_diameter_provided) > self.comb_thick:
+                print("bolt check")
+                status = False
+                while status == False:
+                    self.plate.bolt_capacity_red = self.plate.get_bolt_red(self.plate.bolts_one_line,
+                                                                           self.plate.gauge_provided,
+                                                                           self.plate.bolt_line,
+                                                                           self.plate.pitch_provided,
+                                                                           self.bolt.bolt_capacity,
+                                                                           self.bolt.bolt_diameter_provided,
+                                                                           beta_lg=self.bolt.beta_lg)
+                    if self.plate.bolt_force > self.plate.bolt_capacity_red:
+                        self.plate.bolt_line = self.plate.bolt_line + 1
+                        self.plate.bolt_capacity_red = self.plate.get_bolt_red(self.plate.bolts_one_line,
+                                                                               self.plate.gauge_provided,
+                                                                               self.plate.bolt_line,
+                                                                               self.plate.pitch_provided,
+                                                                               self.bolt.bolt_capacity,
+                                                                               self.bolt.bolt_diameter_provided,
+                                                                               beta_lg=self.bolt.beta_lg)
+                        self.plate.bolt_force = self.res_force / (self.plate.bolt_line * self.plate.bolts_one_line)
+                        self.plate.length = (self.plate.bolt_line - 1) * self.plate.pitch_provided + 2 * self.plate.end_dist_provided
+                    else:
+                        status = True
+                        self.status_pass(self, design_dictionary)
 
-                self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
-                                                             r=self.min_radius_gyration)
+            elif (8 * self.bolt.bolt_diameter_provided) < self.comb_thick:
+                if len(self.sizelist) >= 2:
+                    size = self.section_size_1.designation
+                    # dia = self.bolt.bolt_diameter_provided
+                    print("recheck", size)
+                    self.initial_member_capacity(self, design_dictionary, size)
+
+                else:
+                    self.design_status = False
+                    logger.warning(" : Design failed due to Long Joint or Large Grip Bolt Reduction")
+
+                    logger.error(": Design is not safe. \n ")
+                    logger.debug(" :=========End Of design===========")
+
+            else:
+                pass
+
 
         else:
             print(self.plate_tension_capacity, "hsdvdhsd")
@@ -1921,11 +1916,45 @@ class Tension_bolted(Member):
                 logger.debug(" :=========End Of design===========")
                 print(self.design_status)
 
+    def status_pass(self,design_dictionary):
+        self.plate_design_status = True
+        self.design_status = True
+        self.intermittent_bolt(self, design_dictionary)
+        logger.info("In case of Reverse Load, Slenderness Value shall be less than 180 (IS 800:2007 - Table 3).")
+        if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
+            logger.info(
+                "In case of Reverse Load for Double Sections, Spacing of Intermittent Connection shall be less than 600 (IS 800:2007 - Clause 10.2.5.5).")
+        else:
+            pass
+        if self.load.axial_force < (self.res_force / 1000):
+            logger.info(
+                "Minimum Design Force based on Member Size is used for Connection Design,i.e.{} kN (IS 800:2007 - Clause 10.7)".format(
+                    round(self.res_force / 1000, 2)))
+        else:
+            pass
+        logger.info(": Overall bolted tension member design is safe. \n")
+        logger.debug(" :=========End Of design===========")
+        if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
+            self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                                       material_grade=self.material,
+                                       key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
+                                       B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
+        else:
+            self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                                       material_grade=self.material,
+                                       key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
+                                       B_b=self.section_size_1.flange_width,
+                                       T_t=self.section_size_1.flange_thickness,
+                                       t=self.section_size_1.web_thickness)
+
+        self.section_size_1.design_check_for_slenderness(K=self.K, L=design_dictionary[KEY_LENGTH],
+                                                         r=self.min_radius_gyration)
+
 
     def intermittent_bolt(self, design_dictionary):
-        print(self.bolt.min_edge_dist_round, "gbfhgf")
-        # print(round(self.plate.beta_lj, 2), "hcbvhg")
-        print(self.bolt.max_edge_dist,"ghxvjhshd")
+        # print(self.bolt.min_edge_dist_round, "gbfhgf")
+        # # print(round(self.plate.beta_lj, 2), "hcbvhg")
+        # print(self.bolt.max_edge_dist,"ghxvjhshd")
         self.inter_length = self.length - 2 * (self.plate.end_dist_provided + (self.plate.bolt_line -1)*self.plate.pitch_provided)
         if design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
             # print (Angle)
@@ -2605,9 +2634,9 @@ class Tension_bolted(Member):
                                                self.plate.bolts_one_line, self.bolt.dia_hole, self.plate.fu, gamma_m1,
                                                plate_rupture_kn), '')
             self.report_check.append(t3)
-            t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, self.length,
+            t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH, "",
                   gusset_lt_b_prov(self.plate.bolt_line, self.plate.pitch_provided,self.plate.end_dist_provided,int(self.plate.length))
-                  , get_pass_fail(self.length, self.plate.length, relation="geq"))
+                  , '')
             self.report_check.append(t4)
             t4 = (KEY_OUT_DISP_MEMB_MIN_LENGTH, (2 * self.plate.length), self.length, get_pass_fail((2 * self.plate.length), self.length, relation="leq"))
             self.report_check.append(t4)

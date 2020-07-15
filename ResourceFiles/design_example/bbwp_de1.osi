@@ -1,0 +1,29 @@
+Connector.Flange_Plate.Preferences: Outside
+Connector.Flange_Plate.Thickness_list:
+- '30'
+Connector.Material: E 410 (Fe 540)
+Connector.Web_Plate.Thickness_List:
+- '14'
+- '20'
+- '24'
+- '28'
+- '36'
+- '56'
+Design.Design_Method: Limit State Design
+Detailing.Gap: '3'
+Load.Axial: '5'
+Load.Moment: '1'
+Load.Shear: '5'
+Material: E 410 (Fe 540)
+Member.Designation: NPB 500 X 200 X 107.32
+Member.Material: E 410 (Fe 540)
+Module: Beam Coverplate Weld Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '540'
+Weld.Type: Fillet Weld
+out_titles_status:
+- 1
+- 1
+- 1
+- 1
+- 1

@@ -115,6 +115,13 @@ class SaveDesignBP(BasePlateConnection):
         t1 = ('SubSection', 'Design Parameters', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
+        t7 = ('Bearing Strength of Concrete (N/mm^2)', '', bearing_strength_concrete((self.bearing_strength_concrete / 0.45),
+                                                                                     self.bearing_strength_concrete), 'N/A')
+        self.report_check.append(t7)
+
+        t8 = ('Modular Ratio', '', modular_ratio(2 * 10 ** 5, (self.bearing_strength_concrete / 0.45), self.n), 'N/A')
+        self.report_check.append(t8)
+
         t2 = ('Grout Thickness (mm)', '', self.grout_thk, 'N/A')
         self.report_check.append(t2)
 
@@ -146,16 +153,22 @@ class SaveDesignBP(BasePlateConnection):
         t4 = ('Total Length (mm)', '', self.anchor_length_provided, 'N/A')
         self.report_check.append(t4)
 
-        # Check 2-2: Anchor Bolt Details - Inside Column Flange (only when there is uplift force acting on the column)
-        if self.load_axial_tension > 0:
+        # Check 2-2: Anchor Bolt Details - Inside Column Flange
+        t1 = ('SubSection', 'Anchor Bolt Details - Inside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+        self.report_check.append(t1)
 
-            t1 = ('SubSection', 'Anchor Bolt Details - Inside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-            self.report_check.append(t1)
+        if self.load_axial_tension > 0:
 
             t2 = ('Diameter (mm)', '', self.anchor_dia_inside_flange, 'N/A')
             self.report_check.append(t2)
 
             t3 = ('Property Class', '', self.anchor_grade_inside_flange, 'N/A')
+            self.report_check.append(t3)
+        else:
+            t2 = ('Diameter (mm)', 'Factored Uplift Force = 0 kN', 'N/A', 'N/A')
+            self.report_check.append(t2)
+
+            t3 = ('Property Class', 'N/A', 'N/A', 'N/A')
             self.report_check.append(t3)
 
         # Check 3: Detailing Checks
@@ -201,7 +214,7 @@ class SaveDesignBP(BasePlateConnection):
                    self.gauge_distance, '')
             self.report_check.append(t11)
 
-        # Check 4: Base Plate Dimensions (only for Moment Base Plate)
+        # Check 4-1: Base Plate Dimensions (only for Moment Base Plate)
         if self.connectivity == 'Moment Base Plate':
 
             t1 = ('SubSection', 'Base Plate Dimensions', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
@@ -214,19 +227,71 @@ class SaveDesignBP(BasePlateConnection):
             self.report_check.append(t3)
 
         # Check 5: Base Plate Analyses
-
-        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
         t1 = ('SubSection', 'Base Plate Analyses', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)
 
-        t2 = ('Bearing Strength of Concrete (N/mm^2)', '', bearing_strength_concrete(self.footing_grade, self.bearing_strength_concrete), 'N/A')
-        self.report_check.append(t2)
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
 
-        t3 = ('Eccentricity - about major axis (mm)', '', eccentricity(self.load_moment_major, self.load_axial_compression, self.eccentricity_zz), 'N/A')
-        self.report_check.append(t3)
+            t2 = ('Min. Area Required (mm^2)', min_area_req(self.load_axial_compression, self.bearing_strength_concrete, self.min_area_req),
+                                                                                                                    self.bp_area_provided, '')
+            self.report_check.append(t2)
 
-        t4 = ('Eccentricity - about major axis (mm)', '', eccentricity(self.load_moment_major, self.load_axial_compression, self.eccentricity_zz), 'N/A')
-        self.report_check.append(t4)
+            t3 = ('Effective Bearing Area (mm^2)', eff_bearing_area(self.column_D, self.column_bf, self.column_tf, self.column_tw), '', 'N/A')
+            self.report_check.append(t3)
+
+            t4 = ('Projection (mm)', eff_projection(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.min_area_req,
+                                                    self.projection, self.end_distance), self.projection, '')
+            self.report_check.append(t4)
+
+        elif self.connectivity == 'Moment Base Plate':
+
+            t1 = ('Eccentricity - about major axis (mm)', '', eccentricity(self.load_moment_major, self.load_axial_compression, self.eccentricity_zz), 'N/A')
+            self.report_check.append(t1)
+
+            if self.moment_bp_case == 'Case1':
+                t2 = ('Base Plate Type', mom_bp_case(self.moment_bp_case, self.eccentricity_zz, self.bp_length_min),
+                      'Case 1: The base plate is purely under compression/bearing with no tension force acting on the anchor bolts - '
+                      'outside column flange', 'N/A')
+                self.report_check.append(t2)
+            elif self.moment_bp_case == 'Case2':
+                t2 = ('Base Plate Type', mom_bp_case(self.moment_bp_case, self.eccentricity_zz, self.bp_length_min),
+                      'Case 2: The base plate is mostly under compression/bearing with a small tension force acting on the anchor bolts - '
+                      'outside column flange', 'N/A')
+                self.report_check.append(t2)
+            elif self.moment_bp_case == 'Case3':
+                t2 = ('Base Plate Type', mom_bp_case(self.moment_bp_case, self.eccentricity_zz, self.bp_length_min),
+                      'Case 3: A smaller part of the base plate is under compression/bearing with a large tension force acting on the anchor bolts - '
+                      'outside column flange', 'N/A')
+                self.report_check.append(t2)
+
+            if self.moment_bp_case == 'Case1':
+                t3 = ('Elastic Section Modulus of the Base Plate (mm^3)', '', bp_section_modulus(self.bp_length_provided, self.bp_width_provided,
+                                                                                                 self.ze_zz), 'N/A')
+                self.report_check.append(t3)
+
+                t4 = ('Bending Stress (N/mm^2)', self.bearing_strength_concrete, bending_stress(self.load_axial_compression, self.load_moment_major, self.bp_area_provided,
+                                                                    self.ze_zz, self.sigma_max_zz, self.sigma_min_zz), '')
+                self.report_check.append(t4)
+
+        # Check 4-2: Base Plate Dimensions (for Welded Column Base and Hollow/Tubular Sections)
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+
+            t1 = ('SubSection', 'Base Plate Dimensions', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+            self.report_check.append(t1)
+
+            t2 = ('Length (mm)', bp_length_sb(self.column_D, self.end_distance, self.bp_length_min, self.projection), self.bp_length_provided, '')
+            self.report_check.append(t2)
+
+            t3 = ('Width (mm)', bp_width(self.column_bf, self.edge_distance, self.bp_width_min), self.bp_width_provided, '')
+            self.report_check.append(t3)
+
+            t4 = ('Actual Bearing Stress (N/mm^2)', self.bearing_strength_concrete, actual_bearing_pressure(self.load_axial_compression,
+                                                                                                            self.bp_area_provided, self.w), '')
+            self.report_check.append(t4)
+
+            t5 = ('Thickness (mm)', 'max (' + self.column_tf + r', ' + self.column_tw + r')', bp_thk_1(self.plate_thk, self.projection, self.w,
+                                                                                                       self.gamma_m0, self.dp_bp_fy), '')
+            self.report_check.append(t5)
 
         # Check 3: Anchor Bolt - Outside Column Flange
         t1 = ('SubSection', 'Anchor Bolt - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')

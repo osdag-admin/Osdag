@@ -4526,6 +4526,22 @@ def bp_length(col_depth, end_distance, length):
     return bp_length_min
 
 
+def bp_length_sb(col_depth, end_distance, length, projection):
+    """ equation for the min length of the welded slab base/base plate for hollow/tubular sections"""
+    col_depth = str(col_depth)
+    end_distance = str(end_distance)
+    length = str(length)
+    projection = str(projection)
+
+    bp_length_min = Math(inline=True)
+    bp_length_min.append(NoEscape(r'\begin{aligned} L = column~depth ~+~2~(c~+~e) \\'))
+    bp_length_min.append(NoEscape(r'\begin{aligned}   = ' + col_depth + r' ~+~2~(' + projection + r'~+~' + end_distance + r') \\'))
+    bp_length_min.append(NoEscape(r'\begin{aligned}   = ' + length + r' \\'))
+    bp_length_min.append(NoEscape(r'&[Ref.~based~on~detailing~requirement]\end{aligned}'))
+
+    return bp_length_min
+
+
 def bp_width(flange_width, edge_distance, width):
     """ equation for the min length of the base plate"""
     flange_width = str(flange_width)
@@ -4554,6 +4570,37 @@ def bearing_strength_concrete(concrete_grade, bearing_strength_value):
     bearing_strength.append(NoEscape(r'&[Ref.~IS~800:2007,~(Cl.7.4.1)]\end{aligned}'))
 
     return bearing_strength
+
+
+def actual_bearing_pressure(axial_load, bp_area_provided, bearing_pressure):
+    """ """
+    axial_load = str(axial_load)
+    bp_area_provided = str(bp_area_provided)
+    bearing_pressure = str(bearing_pressure)
+
+    bp_bearing_pressure = Math(inline=True)
+    bp_bearing_pressure.append(NoEscape(r'\begin{aligned} {\sigma_{br}}_{actual} = \frac{P}{A_{provided}} \\'))
+    bp_bearing_pressure.append(NoEscape(r'\begin{aligned}                        = \frac{' + axial_load + r'}{' + bp_area_provided + r'} \\'))
+    bp_bearing_pressure.append(NoEscape(r'\begin{aligned}                        = ' + bearing_pressure + r' \\'))
+
+    return bp_bearing_pressure
+
+
+def bp_thk_1(plate_thk, projection, actual_bearing_stress, gamma_m0, fy_plate):
+    """ """
+    plate_thk = str(plate_thk)
+    projection = str(projection)
+    actual_bearing_stress = str(actual_bearing_stress)
+    gamma_m0 = str(gamma_m0)
+    fy_plate = str(fy_plate)
+
+    thk = Math(inline=True)
+    thk.append(NoEscape(r'\begin{aligned} t_p = c~\Bigg[\frac{2.5~{\sigma_{br}}_{actual}~\gamma_{m0}}{{f_{y}}_{plate}}\Bigg]^{0.5} \\'))
+    thk.append(NoEscape(r'\begin{aligned}     = ' + projection + r'~\Bigg[\frac{2.5~' + actual_bearing_stress + r'~' + gamma_m0 + r'}{'
+                                                                                                + fy_plate + r'}\Bigg]^{0.5} \\'))
+    thk.append(NoEscape(r'\begin{aligned}     = ' + plate_thk + r' \\'))
+
+    return thk
 
 
 def eccentricity(moment, axial_load, eccentricity_zz):
@@ -4729,6 +4776,135 @@ def total_tension_bolts(axial_load, bp_length, dist_y, ecc_zz, f, anchor_tension
     return tension_total
 
 
+def eff_bearing_area(col_depth, col_flange_width, col_flange_thk, col_web_thk):
+    """ calculate min area req for base plate (only for axial loads)"""
+    col_depth = str(col_depth)
+    col_flange_width = str(col_flange_width)
+    col_flange_thk = str(col_flange_thk)
+    col_web_thk = str(col_web_thk)
+
+    area = Math(inline=True)
+    area.append(NoEscape(r'\begin{aligned} {A_{br}}_{eff} = (D~+~2 c) (B~+~2 c) - \Big[ \big(D - 2(T~+~c)\big) \big(B - t\big) \Big] \\'))
+    area.append(NoEscape(r'\begin{aligned}                = (' + col_depth + r' ~+~2 c) (' + col_flange_width + r' ~+~2 c) - \Big[ \big('
+                         + col_depth + r' - 2(' + col_flange_thk + r'~+~c)\big) \big(' + col_flange_width + r' - ' + col_web_thk + r'\big) \Big] \\'))
+    area.append(NoEscape(r'\begin{aligned} Note: c is the projection beyond the face of the column \\'))
+    area.append(NoEscape(r'&[Ref.~Design~of~Steel~Structures~-~N.~Subramanian~(Limit~State~Method~-~edition~2019)]\end{aligned}'))
+
+    return area
+
+
+def eff_projection(col_depth, col_flange_width, col_flange_thk, col_web_thk, min_area, projection, end_distance):
+    """ calculate min area req for base plate (only for axial loads)"""
+    col_depth = str(col_depth)
+    col_flange_width = str(col_flange_width)
+    col_flange_thk = str(col_flange_thk)
+    col_web_thk = str(col_web_thk)
+    min_area = str(min_area)
+    projection = str(projection)
+    end_distance = str(end_distance)
+
+    c = Math(inline=True)
+    c.append(NoEscape(r'\begin{aligned} {A_{br}}_{eff} = {A_{req}}_{min} \\'))
+    c.append(NoEscape(r'\begin{aligned}                = ' + min_area + r' \\'))
+    c.append(NoEscape(r'\begin{aligned} Therefore,~ ' + min_area + r' = (' + col_depth + r' ~+~2 c) (' + col_flange_width + r' ~+~2 c) - \Big[ \big('
+                         + col_depth + r' - 2(' + col_flange_thk + r'~+~c)\big) \big(' + col_flange_width + r' - ' + col_web_thk + r'\big) \Big] \\'))
+    c.append(NoEscape(r'\begin{aligned}              c  = ' + projection + r' \\'))
+    c.append(NoEscape(r'\begin{aligned} projection = max(' + projection + r',~' + end_distance + r') \\'))
+    c.append(NoEscape(r'\begin{aligned}            = ' + projection + r' \\'))
+    c.append(NoEscape(r'&[Ref.~Design~of~Steel~Structures~-~N.~Subramanian~(Limit~State~Method~-~edition~2019)]\end{aligned}'))
+
+    return c
+
+
+def min_area_req(axial_load, bearing_strength, bp_min_area):
+    """ calculate min area req for base plate (only for axial loads)"""
+    axial_load = str(axial_load)
+    bearing_strength = str(bearing_strength)
+    bp_min_area = str(bp_min_area)
+
+    area = Math(inline=True)
+    area.append(NoEscape(r'\begin{aligned} {A_{req}}_{min} = \frac{P_c}{\sigma_{br}} \\'))
+    area.append(NoEscape(r'\begin{aligned}                 = \frac{' + axial_load + r'}{' + bearing_strength + r'} \\'))
+    area.append(NoEscape(r'\begin{aligned}        = ' + bp_min_area + r' \end{aligned}'))
+
+    return area
+
+
+def mom_bp_case(case, eccentricity, bp_length):
+    """ """
+    case = str(case)
+    eccentricity = str(eccentricity)
+    bp_length = str(bp_length)
+
+    bp_case = Math(inline=True)
+    if case == 'Case1':
+        bp_length = int(bp_length)
+        value = bp_length / 6
+        value = str(value)
+        bp_length = str(bp_length)
+
+        bp_case.append(NoEscape(r'\begin{aligned} e_{zz} \leq \frac{L_{min}}{6} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} ' + eccentricity + r' \leq \frac{' +bp_length + r'}{6} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} ' + eccentricity + r' \leq ' +value + r' \end{aligned}'))
+    elif case == 'Case2':
+        bp_length = int(bp_length)
+        value1 = bp_length / 6
+        value2 = bp_length / 3
+        value1 = str(value1)
+        value2 = str(value2)
+        bp_length = str(bp_length)
+
+        bp_case.append(NoEscape(r'\begin{aligned} \frac{L_{min}}{6} < e_{zz} < \frac{L_{min}}{3} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} \frac{' + bp_length + r'}{6} < ' + eccentricity + r' < \frac{' + bp_length + r'}{3} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} ' + value1 + r' < ' + eccentricity + r' < ' + value2 + r'\end{aligned}'))
+    elif case == 'Case3':
+        bp_length = int(bp_length)
+        value = bp_length / 3
+        value = str(value)
+        bp_length = str(bp_length)
+
+        bp_case.append(NoEscape(r'\begin{aligned} e_{zz} \geq \frac{L_{min}}{3} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} ' + eccentricity + r' \geq \frac{' + bp_length + r'}{3} \\'))
+        bp_case.append(NoEscape(r'\begin{aligned} ' + eccentricity + r' \leq ' + value + r'\end{aligned}'))
+
+    return bp_case
+
+
+def bp_section_modulus(bp_length, bp_width, section_modulus):
+    """ """
+    bp_length = str(bp_length)
+    bp_width = str(bp_width)
+    section_modulus = str(section_modulus)
+
+    ze_zz = Math(inline=True)
+    ze_zz.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} = \frac{B L^{2}}{6} \\'))
+    ze_zz.append(NoEscape(r'\begin{aligned}                 = \frac{' + bp_width + r' ' + bp_length + r'^{2}}{6} \\'))
+    ze_zz.append(NoEscape(r'\begin{aligned}                 = ' + section_modulus + r'\end{aligned}'))
+
+    return ze_zz
+
+
+def bending_stress(axial_load, moment_major, bp_area, section_modulus, sigma_max, sigma_min):
+    """ """
+    axial_load = str(axial_load)
+    moment_major = str(moment_major)
+    bp_area = str(bp_area)
+    section_modulus = str(section_modulus)
+    sigma_max = str(sigma_max)
+    sigma_min = str(sigma_min)
+
+    sigma = Math(inline=True)
+    sigma.append(NoEscape(r'\begin{aligned} {\sigma_{b}}_{max} = \frac{P_{c}}{A}~+~\frac{M_{zz}}{{z_{e}}_{plate}} \\'))
+    sigma.append(NoEscape(r'\begin{aligned}                    = \frac{' + axial_load + r'}{' + bp_area + r'}~+~\frac{' + moment_major + r'}{' +
+                          section_modulus + r'} \\'))
+    sigma.append(NoEscape(r'\begin{aligned}                 = ' + sigma_max + r' \\'))
+
+    sigma.append(NoEscape(r'\begin{aligned} {\sigma_{b}}_{min} = \frac{P_{c}}{A}~-~\frac{M_{zz}}{{z_{e}}_{plate}} \\'))
+    sigma.append(NoEscape(r'\begin{aligned}                    = \frac{' + axial_load + r'}{' + bp_area + r'}~-~\frac{' + moment_major + r'}{' +
+                          section_modulus + r'} \\'))
+    sigma.append(NoEscape(r'\begin{aligned}                 = ' + sigma_min + r'\end{aligned}'))
+
+    return sigma
 
 
 

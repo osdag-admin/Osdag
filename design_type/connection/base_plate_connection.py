@@ -1854,7 +1854,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
 
                 # calculating the maximum and minimum bending stresses
-                self.ze_zz = self.bp_width_provided * self.bp_length_provided ** 2 / 6  # mm^3, elastic section modulus of plate (BL^2/6)
+                self.ze_zz = (self.bp_width_provided * self.bp_length_provided ** 2) / 6  # mm^3, elastic section modulus of plate (BL^2/6)
 
                 self.sigma_max_zz = (self.load_axial_compression / self.bp_area_provided) + (self.load_moment_major / self.ze_zz)  # N/mm^2
                 self.sigma_min_zz = (self.load_axial_compression / self.bp_area_provided) - (self.load_moment_major / self.ze_zz)  # N/mm^2
@@ -1882,6 +1882,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             else:  # Case 2 and Case 3
                 self.moment_bp_case = 'Case2&3'
+
+                if (self.eccentricity_zz > (self.bp_length_min / 6)) or (self.eccentricity_zz < (self.bp_length_min / 3)):  # Case 2
+                    self.moment_bp_case = 'Case2'
+                elif self.eccentricity_zz >= (self.bp_length_min / 3):  # Case 3
+                    self.moment_bp_case = 'Case3'
 
                 # fixing length and width of the base plate
                 self.bp_length_provided = self.bp_length_min

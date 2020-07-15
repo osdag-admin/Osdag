@@ -265,13 +265,31 @@ class SaveDesignBP(BasePlateConnection):
                 self.report_check.append(t2)
 
             if self.moment_bp_case == 'Case1':
+
                 t3 = ('Elastic Section Modulus of the Base Plate (mm^3)', '', bp_section_modulus(self.bp_length_provided, self.bp_width_provided,
                                                                                                  self.ze_zz), 'N/A')
                 self.report_check.append(t3)
 
+                t5 = ('Critical Section (mm)', critical_section(self.bp_length_provided, self.column_D, self.critical_xx), '', 'N/A')
+                self.report_check.append(t5)
+
                 t4 = ('Bending Stress (N/mm^2)', self.bearing_strength_concrete, bending_stress(self.load_axial_compression, self.load_moment_major, self.bp_area_provided,
                                                                     self.ze_zz, self.sigma_max_zz, self.sigma_min_zz), '')
                 self.report_check.append(t4)
+
+                t6 = ('Bending Stress - at critical section (N/mm^2)', self.bearing_strength_concrete, bending_stress_critical_sec(self.sigma_xx), '')
+                self.report_check.append(t6)
+
+                t7 = ('Bending Moment - at critical section (N-mm)', moment_critical_section(self.sigma_xx, self.sigma_max, self.critical_xx,
+                                                                                             self.critical_M_xx), '', 'N/A')
+                self.report_check.append(t7)
+
+                t8 = ('Moment Capacity of Base Plate', md_plate, '', 'N/A')
+                self.report_check.append(t8)
+
+                t9 = ('Thickness of Base Plate (mm)', 'max (' + self.column_tf + r', ' + self.column_tw + r')', plate_thk1(self.critical_M_xx,
+                                                                                                    self.plate_thk, self.gamma_m0, self.dp_bp_fy), '')
+                self.report_check.append(t9)
 
         # Check 4-2: Base Plate Dimensions (for Welded Column Base and Hollow/Tubular Sections)
         if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):

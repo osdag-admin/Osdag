@@ -4907,4 +4907,71 @@ def bending_stress(axial_load, moment_major, bp_area, section_modulus, sigma_max
     return sigma
 
 
+def critical_section(bp_length, col_depth, critical_len):
+    """ """
+    bp_length = str(bp_length)
+    col_depth = str(col_depth)
+    critical_len = str(critical_len)
 
+    length = Math(inline=True)
+    length.append(NoEscape(r'\begin{aligned} y_{critical} = \frac{L ~- ~(0.95D)}{2} \\'))
+    length.append(NoEscape(r'\begin{aligned}              = \frac{' + bp_length + r' ~- ~(0.95' + col_depth + r')}{2} \\'))
+    length.append(NoEscape(r'\begin{aligned}              = ' + critical_len + r'\end{aligned}'))
+
+    return length
+
+
+def bending_stress_critical_sec(bending_stress_critical):
+    """ """
+    bending_stress_critical = str(bending_stress_critical)
+
+    stress = Math(inline=True)
+    stress.append(NoEscape(r'\begin{aligned} {\sigma_{b}}_{critical} = ' + bending_stress_critical + r'\\'))
+
+    return stress
+
+
+def moment_critical_section(sigma_x, sigma_max, critical_len, moment):
+    """ """
+    sigma_x = str(sigma_x)
+    sigma_max = str(sigma_max)
+    critical_len = str(critical_len)
+    moment = str(moment)
+
+    critical_moment = Math(inline=True)
+    critical_moment.append(NoEscape(r'\begin{aligned} M_{critical} =  \bigg({\sigma_{b}}_{critical} \times y_{critical}\times '
+                                    r'\frac{y_{critical}}{2}\bigg)~ + \bigg(\frac{1}{2}\times y_{critical}\times '
+                                    r'\big({{\sigma_{b}}_{max} - \sigma_{b}}_{critical}\big)\times \frac{2}{3}\times y_{critical}\bigg) \\'))
+
+    critical_moment.append(NoEscape(r'\begin{aligned}              =  \bigg(' + sigma_x + r' \times ' + critical_len + r'\times '
+                                               r'\frac{' + critical_len + r'}{2}\bigg)~ + \bigg(\frac{1}{2}\times ' + critical_len + r'\times '
+                                         r'\big({' + sigma_max + r' - ' + sigma_x + r'\big)\times \frac{2}{3}\times ' + critical_len + r'\bigg) \\'))
+
+    critical_moment.append(NoEscape(r'\begin{aligned}              = ' + moment + r' \end{aligned}'))
+
+    return critical_moment
+
+
+def md_plate():
+    """ """
+    moment_demand = Math(inline=True)
+    moment_demand.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} = \frac{b{t_{p}}^{2}}{6} ,~where~(b = 1) \\'))
+    moment_demand.append(NoEscape(r'\begin{aligned} {M_{d}}_{plate} = \frac{1.5~{f_{y}}_{p}~{z_{e}}_{plate}}{\gamma_{m0}} \\'))
+    moment_demand.append(NoEscape(r'&[Ref.~IS~800:2007,~(Cl.8.2.1.2)]\end{aligned}'))
+
+    return moment_demand
+
+
+def plate_thk1(critical_mom, plate_thk, gamma_m0, f_y_plate):
+    """ """
+    critical_mom = str(critical_mom)
+    plate_thk = str(plate_thk)
+    gamma_m0 = str(gamma_m0)
+    f_y_plate = str(f_y_plate)
+
+    thk = Math(inline=True)
+    thk.append(NoEscape(r'\begin{aligned} {M_{d}}_{plate} = M_{critical} \\'))
+    thk.append(NoEscape(r'\begin{aligned} t_{p} = \bigg[\frac{4~' + critical_mom + r'~' + gamma_m0 + r'}{' + f_y_plate + r'}\bigg]^{0.5}  \\'))
+    thk.append(NoEscape(r'\begin{aligned}       = ' + plate_thk + r' \\'))
+
+    return thk

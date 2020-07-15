@@ -688,7 +688,7 @@ class Plate(Material):
 
     def get_bolt_red(self, bolts_one_line, gauge, bolts_line,
                      pitch, bolt_capacity, bolt_dia, end_dist=0.0, gap=0.0, edge_dist=0.0, root_radius=0.0,
-                     web_thickness=0.0, beta_lg = 0.0):
+                     web_thickness=0.0, beta_lg = 1.0):
         """
         :param bolts_one_line: bolts in one line
         :param gauge: gauge
@@ -738,7 +738,7 @@ class Plate(Material):
         elif self.beta_lg < self.beta_lj and self.beta_lg !=1:
             bolt_capacity_red = bolt_capacity_red * self.beta_lg
         else:
-            pass
+            bolt_capacity_red = bolt_capacity_red * self.beta_lg
 
         return bolt_capacity_red
 
@@ -756,7 +756,7 @@ class Plate(Material):
     def get_web_plate_details(self, bolt_dia, web_plate_h_min, web_plate_h_max, bolt_capacity, min_edge_dist, min_gauge,
                               max_spacing, max_edge_dist, shear_load=0.0, axial_load=0.0, web_moment=0.0, gap=0.0,
                               shear_ecc=False, bolt_line_limit=math.inf, min_bolts_one_line=2, min_bolt_line=1,
-                              joint=None, min_pitch=None, beta_lg = None,min_end_dist =0.0):
+                              joint=None, min_pitch=None, beta_lg = 1.0 ,min_end_dist =0.0):
 
         """
 

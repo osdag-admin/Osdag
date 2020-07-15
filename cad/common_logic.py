@@ -56,7 +56,7 @@ from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_AF import NutB
 from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_BF import NutBoltArray_BF as CCSpliceNutBolt_BF
 from cad.MomentConnections.CCSpliceCoverPlateCAD.nutBoltPlacement_Web import NutBoltArray_Web as CCSpliceNutBolt_Web
 
-from cad.BasePlateCad.baseplateconnection import BasePlateCad
+from cad.BasePlateCad.baseplateconnection import BasePlateCad, HollowBasePlateCad
 from cad.BasePlateCad.nutBoltPlacement import NutBoltArray as bpNutBoltArray
 
 from cad.Tension.WeldedCAD import TensionAngleWeldCAD, TensionChannelWeldCAD
@@ -944,8 +944,8 @@ class CommonDesignLogic(object):
 
         if BP.connectivity == 'Hollow/Tubular Column Base':
             if BP.dp_column_designation[1:4] == 'SHS' or BP.dp_column_designation[1:4] == 'RHS':
-                sec = RectHollow(L=50, W=100, H=1000, T=4)
-                weld_sec = RectHollow(L=sec.L, W=sec.W, H=10, T=sec.T)
+                sec = RectHollow(L=float(BP.column_bf), W=float(BP.column_D), H=1000, T=float(BP.column_tf))
+                weld_sec = RectHollow(L=sec.L, W=sec.W, H=float(BP.weld_size_flange), T=sec.T)
 
                 baseplate = Plate(L=float(BP.bp_length_provided), W=float(BP.bp_width_provided), T=float(BP.plate_thk))
 
@@ -985,10 +985,10 @@ class CommonDesignLogic(object):
                 bolthight = nut.T + 50
 
             else:       #self.BP.dp_column_designation[1:4] == 'CHS':
-                sec = CircularHollow(r=200 / 2, T=12, H=1500)
-                weld_sec = CircularHollow(r=sec.r, T=sec.T, H=10)
+                sec = CircularHollow(r=float(BP.column_D)/ 2, T=float(BP.column_tf), H=1500)
+                weld_sec = CircularHollow(r=sec.r, T=sec.T, H=float(BP.weld_size_flange))
 
-                baseplate = Plate(L=375, W=325, T=18)
+                baseplate = Plate(L=float(BP.bp_length_provided), W=float(BP.bp_width_provided), T=float(BP.plate_thk))
 
                 stiff_alg_l = StiffenerPlate(L=BP.stiffener_plt_len_across_D - BP.weld_size_stiffener, W=BP.stiffener_plt_height, T=BP.stiffener_plt_thk,
                                              L11=BP.stiffener_plt_len_across_D - BP.weld_size_stiffener - 50, L12=BP.stiffener_plt_height - 100, R21=15, R22=15)
@@ -1006,15 +1006,15 @@ class CommonDesignLogic(object):
                 nut = Nut(R=bolt.r * 3, T=24, H=30, innerR1=bolt.r)
                 nutSpace = bolt.c + baseplate.T
                 bolthight = nut.T + 50
-                type = 'rect'
+
 
                 concrete = Plate(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=bolt.l * 1.2)
                 grout = Grout(L=baseplate.L * 1.5, W=baseplate.W * 1.5, T=50)
 
                 column = ISection(B=250, T=13.7, D=450, t=9.8, R1=15.0, R2=7.5, alpha=94, length=1500, notchObj=None)
-            nut_bolt_array = NutBoltArray(BP, nut, bolt, nutSpace)
+            nut_bolt_array = bpNutBoltArray(BP, nut, bolt, nutSpace)
 
-            basePlate = HollowBasePlateCad(type, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout,
+            basePlate = HollowBasePlateCad(BP, sec, weld_sec, nut_bolt_array, bolthight, baseplate, concrete, grout,
                                            stiff_alg_l, stiff_alg_b, weld_stiff_l_v, weld_stiff_l_h, weld_stiff_b_v,
                                            weld_stiff_b_h)
         else:

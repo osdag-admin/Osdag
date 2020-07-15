@@ -29,8 +29,8 @@ class BasePlateCad(object):
         :param alist: input and output values
         """
         self.BP = BP
-        self.BP.anchors_outside_flange = 6
-        self.BP.weld_type = "Groove" # "Fillet"  #
+        # self.BP.anchors_outside_flange = 6
+        # self.BP.weld_type = "Groove" # "Fillet"  #
         self.extraspace = 5 #for stiffener inside flange
         # self.BP.stiffener_along_flange = 'Yes'
         # self.BP.stiffener_along_web = 'Yes'

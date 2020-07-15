@@ -1448,7 +1448,7 @@ class Tension_welded(Member):
                 else:
                     pass
                 logger.info(self.weld.reason)
-                logger.info(": Overall bolted tension member design is safe. \n")
+                logger.info(": Overall welded tension member design is safe. \n")
                 logger.debug(" :=========End Of design===========")
                 if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
                     self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
@@ -2162,8 +2162,12 @@ class Tension_welded(Member):
                                                           self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
                 self.report_check.append(t3)
-                t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH,  self.length,
+                t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH,  '',
                       gusset_lt_w_prov(self.flange_weld, self.clearance,self.plate.length), get_pass_fail(self.length, self.plate.length, relation="greater"))
+                self.report_check.append(t4)
+
+                t4 = (KEY_OUT_DISP_MEMB_MIN_LENGTH, (2 * self.plate.length), self.length,
+                      get_pass_fail((2 * self.plate.length), self.length, relation="leq"))
                 self.report_check.append(t4)
 
                 if self.sec_profile in ["Channels", "Back to Back Channels"]:

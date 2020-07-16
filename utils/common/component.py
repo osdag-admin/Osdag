@@ -576,7 +576,7 @@ class Plate(Material):
             height = 0
             return bolt_line, bolts_one_line, height
 
-    def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist):
+    def get_gauge_edge_dist(self, web_plate_h, bolts_one_line, edge_dist, max_spacing, max_edge_dist,count=1):
         """
 
         :param web_plate_l: height of plate
@@ -587,8 +587,12 @@ class Plate(Material):
         :return: pitch, end distance, height of plate (false if applicable)
         """
         gauge = 0
+
         if bolts_one_line > 1:
-            gauge = round_down((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
+            if count ==0:
+                gauge = round_down((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
+            else:
+                gauge = round_up((web_plate_h - (2 * edge_dist)) / (bolts_one_line - 1), multiplier=5)
 
         web_plate_h = gauge * (bolts_one_line - 1) + edge_dist * 2
 
@@ -805,7 +809,7 @@ class Plate(Material):
             self.reason = "Bolt line limit is reached. Select higher grade/Diameter or choose different connection."
         else:
             [gauge, edge_dist, web_plate_h] = self.get_gauge_edge_dist(web_plate_h, bolts_one_line, min_edge_dist,
-                                                                       max_spacing, max_edge_dist)
+                                                                       max_spacing, max_edge_dist,count=0)
             if bolt_line == 1:
                 pitch = 0.0
             elif min_pitch != None:

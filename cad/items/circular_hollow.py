@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     r = 100
     T = 6
-    H = 100
+    H = 1000
 
     origin = numpy.array([0.,0.,0.])
     uDir = numpy.array([1.,0.,0.])

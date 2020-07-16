@@ -77,7 +77,7 @@ class Ui_MainWindow(object):
         self.gridLayout.setHorizontalSpacing(20)
         self.lbl.setText('Dark Mode  ')
         layout.addWidget(self.lbl)
-        self.switch = Switch(self.centralwidget, thumb_radius=14, track_radius=12)
+        self.switch = Switch(self.centralwidget, thumb_radius=8, track_radius=6)
         layout.addWidget(self.switch)
         self.gridLayout.addLayout(layout,1,1)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)

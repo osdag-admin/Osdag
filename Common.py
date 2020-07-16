@@ -620,7 +620,7 @@ KEY_DISP_EDGEDIST_FLANGE= 'Edge Distance'
 KEY_DISP_FLANGE_PLATE_PITCH = 'Pitch'
 
 KEY_DISP_FLANGE_PLATE_TEN_CAP ="Plate Tension Capacity (kN)"
-DISP_TITLE_SECTION = 'SECTION'
+DISP_TITLE_SECTION = 'Section Details'
 DISP_TITLE_TENSION_SECTION = 'Section Details'
 SECTION_CLASSIFICATION ="Section Classification"
 
@@ -957,6 +957,7 @@ KEY_DISP_It = 'Torsion Constant, I<sub>t</sub> (cm<sup>4</sup>)'
 KEY_DISP_Iw = 'Warping Constant, I<sub>w</sub> (cm<sup>6</sup>)'
 KEY_DISP_IV = 'Internal volume (cm<sup>3</sup>/m)*'
 
+KEY_SOURCE = 'Section.Source'
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
 KEY_DISP_THERMAL_EXP = 'Thermal expansion coeff.a <br>(x10<sup>-6</sup>/ <sup>0</sup>C)'
@@ -1011,6 +1012,7 @@ KEY_SLENDER = "Member.Slenderness"
 KEY_INNERFLANGEPLATE_THICKNESS = 'flange_plate.innerthickness_provided'
 KEY_FLANGE_PLATE_HEIGHT = 'Flange_Plate.Width (mm)'
 KEY_OUT_FLANGESPLATE_THICKNESS = 'flange_plate.Thickness'
+KEY_DISP_FLANGESPLATE_THICKNESS = 'Flange Plate Thickness'
 KEY_FLANGE_PLATE_LENGTH ='flange_plate.Length'
 KEY_OUT_FLANGE_BOLT_SHEAR ="flange_bolt.shear capacity"
 
@@ -1139,7 +1141,8 @@ KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
 
 KEY_REDUCTION_FACTOR_FLANGE ='flange_plate.red,factor'
-KEY_DISP_REDUCTION_FACTOR_FLANGE ="Red.factor"
+KEY_DISP_REDUCTION_FACTOR_FLANGE ="Capacity Red.Factor"
+KEY_DISP_REDUCTION ="Strength Red.Factor"
 KEY_OUT_FLANGE_BOLT_SHEAR ='flange_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity (kN)"
 KEY_OUT_FLANGE_BOLT_BEARING = 'flange_bolt.bolt_bearing_capacity'
@@ -1184,6 +1187,7 @@ KEY_WEB_PLATE_HEIGHT = 'Web_Plate.Height (mm)'
 KEY_DISP_WEB_PLATE_HEIGHT = 'Height (mm)'
 KEY_WEB_PLATE_LENGTH ='Web_Plate.Width'
 KEY_OUT_WEBPLATE_THICKNESS = 'Web_Plate.Thickness'
+KEY_DISP_WEBPLATE_THICKNESS = 'Web Plate Thickness'
 KEY_DISP_WEB_PLATE_LENGTH ='Width (mm)'
 DISP_TITLE_BOLT_CAPACITY_WEB = 'Web Bolt Capacity'
 KEY_BOLT_CAPACITIES_WEB = 'Web Bolt.Capacities'
@@ -1347,7 +1351,7 @@ KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
 KEY_OUT_LONG_JOINT = 'Bolt Capacity post Long Joint (kN)'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
-KEY_OUT_DISP_BOLT_LINE = 'Bolt Lines (nos)'
+KEY_OUT_DISP_BOLT_LINE = 'Columns (nos)'
 KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
 KEY_OUT_DISP_INTER_BOLT_LINE = 'Bolt Lines (nos)'
 KEY_OUT_BOLT_IR = 'Bolt.IR'
@@ -1355,7 +1359,7 @@ KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 
 
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
-KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
+KEY_OUT_DISP_BOLTS_ONE_LINE = 'Rows (nos)'
 KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
 KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Bolts in Lines (nos)'
 
@@ -1365,11 +1369,13 @@ KEY_OUT_DISP_SPACING = 'Spacing'
 KEY_OUT_DISP_PATTERN = 'Pattern'
 KEY_OUT_PITCH = 'Bolt.Pitch'
 KEY_OUT_DISP_PITCH = 'Pitch (mm)'
-KEY_OUT_PATTERN = 'pattern'
+KEY_OUT_PATTERN_1 = 'pattern1'
+KEY_OUT_PATTERN_2 = 'pattern2'
 
-
-
-
+KEY_OUT_Lw = 'Weld.Lw'
+KEY_OUT_DISP_Lw = 'Lw (mm)'
+KEY_OUT_Hw = 'Weld.Hw'
+KEY_OUT_DISP_Hw = 'Hw (mm)'
 
 
 KEY_OUT_END_DIST = 'Bolt.EndDist'
@@ -1527,9 +1533,15 @@ KEY_OUT_DISP_MEMB_BLK_SHEAR = 'Block Shear Capacity'
 
 
 KEY_OUT_NO_BOLTS_FLANGE = 'ColumnEndPlate.nbf'
-KEY_OUT_DISP_NO_BOLTS_FLANGE = 'No. of bolts along Flange'
+KEY_OUT_NO_BOLTS_FLANGE_TOTAL = 'ColumnEndPlate.nbftotal'
+KEY_OUT_DISP_NO_BOLTS_FLANGE = 'No. of bolts along One Side of Flange Overhang (n)'
+KEY_OUT_DISP_NO_BOLTS_FLANGE_TOTAL = 'No. of bolts along Flange'
 KEY_OUT_NO_BOLTS_WEB = 'ColumnEndPlate.nbw'
-KEY_OUT_DISP_NO_BOLTS_WEB = 'No. of bolts along Web'
+KEY_OUT_NO_BOLTS_WEB_TOTAL = 'ColumnEndPlate.nbwtotal'
+
+KEY_OUT_DISP_NO_BOLTS_WEB = 'No. of bolts along One Side of Web (n)'
+KEY_OUT_DISP_NO_BOLTS_WEB_TOTAL = 'No. of bolts along Web'
+
 KEY_OUT_NO_BOLTS = 'ColumnEndPlate.nb'
 KEY_OUT_DISP_NO_BOLTS = 'Total no. of Bolts'
 KEY_PITCH_2_FLANGE = 'ColumnEndPlate.p2_flange'
@@ -1582,7 +1594,8 @@ KEY_OUT_WELD_LENGTH = 'Weld.Length'
 KEY_OUT_DISP_WELD_LENGTH = 'Length (mm)'
 KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
 KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
-
+KEY_OUT_WELD_STRENGTH_RED = 'Weld.Strength_red'
+KEY_OUT_DISP_WELD_STRENGTH_RED = 'Red.Strength (N/mm)'
 
 DISP_OUT_TITLE_SPTDLEG = "Supported Leg"
 DISP_OUT_TITLE_SPTINGLEG = "Supporting Leg"

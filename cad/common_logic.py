@@ -940,6 +940,7 @@ class CommonDesignLogic(object):
         """
         :return: The calculated values/parameters to create 3D CAD model of individual components.
         """
+
         BP = self.module_class
 
         if BP.connectivity == 'Hollow/Tubular Column Base':

@@ -598,14 +598,17 @@ class IS800_2007(object):
             IS 800:2007,  cl 10.3.3.2
         """
         beta_lg = 8.0 / (3.0 + l_g / d)
-        if beta_lg >= IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j):
-            beta_lg = IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j)
+        if l_j != 0.0:
+            if beta_lg >= IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j):
+                beta_lg = IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j)
+        else:
+            pass
         if l_g <= 5.0 * d:
             beta_lg = 1.0
         # TODO: Check the maximum limit of 8d in each individual modules
         # elif l_g > 8.0 * d:
         #     return "GRIP LENGTH TOO LARGE"
-        return beta_lg
+        return round(beta_lg,2)
 
     # 10.3.3.3 Packing Plates
     @staticmethod

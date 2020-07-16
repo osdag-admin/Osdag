@@ -110,8 +110,8 @@ from Common import *
 # from utilities import osdag_display_shape
 
 import OCC.Core.V3d
-from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
-from OCC.Core.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
+from OCC.Core.Quantity import *
+from OCC.Core.Graphic3d import *
 from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
 
 # from Connections.Shear.Finplate.drawing_2D import FinCommonData
@@ -1029,6 +1029,7 @@ class CommonDesignLogic(object):
                                  L=float(T.length))
                 if T.sec_profile == 'Channels':
                     nut_space = member.t + plate.T + nut.T  # member.T + plate.T + nut.T
+
                 else:
                     nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
 
@@ -1210,7 +1211,7 @@ class CommonDesignLogic(object):
                                             color='Blue')
 
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_arrayModels(), update=True,
-                                        color=Quantity_NOC_SADDLEBROWN)
+                                        color='black')
 
                 elif self.component == "Model":
                     osdag_display_shape(self.display, self.CPObj.get_beamsModel(), update=True)
@@ -1224,7 +1225,7 @@ class CommonDesignLogic(object):
                                             color='Blue')
 
                     osdag_display_shape(self.display, self.CPObj.get_nut_bolt_arrayModels(), update=True,
-                                        color=Quantity_NOC_SADDLEBROWN)
+                                        color='black')
 
             elif self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
                 self.B = self.module_class()

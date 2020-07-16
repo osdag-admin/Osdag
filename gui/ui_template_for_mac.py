@@ -18,7 +18,7 @@ from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
 
 from design_type.connection.column_cover_plate import ColumnCoverPlate
-from PIL import Image
+# from PIL import Image
 from texlive.Design_wrapper import init_display as init_display_off_screen
 # from OCC.Display.backend import off
 import os
@@ -30,10 +30,10 @@ import sys
 import sqlite3
 import shutil
 import openpyxl
-#import pdfkit
+# import pdfkit
 import configparser
 import pickle
-#import cairosvg
+# import cairosvg
 
 from update_version_check import Update
 import pandas as pd
@@ -79,7 +79,17 @@ import logging
 import subprocess
 from get_DPI_scale import scale
 from cad.cad3dconnection import cadconnection
+from OCC.Display.backend import load_backend, get_qt_modules
+from osdagMainSettings import backend_name
+used_backend = load_backend(backend_name())
 
+global display, start_display, app, _, USED_BACKEND
+if 'qt' in used_backend:
+    from OCC.Display.qtDisplay import qtViewer3d
+    QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+
+# from OCC.Display.pyqt4Display import qtViewer3d
+from OCC.Display.qtDisplay import qtViewer3d
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -107,14 +117,22 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
     closed = pyqtSignal()
     def  __init__(self, main,folder,parent=None):
         super(Ui_ModuleWindow, self).__init__(parent=parent)
-        resolution = QtWidgets.QDesktopWidget().screenGeometry()
-        width = resolution.width()
-        height = resolution.height()
-        self.resize(width*(0.75),height*(0.7))
-        self.ui = Window()
-        self.ui.setupUi(self,main,folder)
-        #self.showMaximized()
-        #self.showNormal()
+        self.resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        # width = resolution.width()
+        # height = resolution.height()
+        #
+        # # self.ui = Window()
+
+        self.setupUi(self,main,folder)
+        self.showMaximized()
+        self.resize_dockComponents()
+        # self.showNormal()
+        # self.count=1
+        # self.resize_dockComponents()
+        # self.count=2
+
+
+
         self.resized.connect(self.resize_dockComponents)
 
     def center(self):
@@ -129,29 +147,33 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         return super(Ui_ModuleWindow, self).resizeEvent(event)
 
     def resize_dockComponents(self):
-
-        posi = (3/4)*(self.height())
+        # if self.count == 1:
+        #     height = self.resolution.height()
+        # else:
+        #     height = self.height()
+        height = self.height()
+        posi = (3/4)*(height)
 
         # Input Dock
-        width = self.ui.inputDock.width()
-        self.ui.inputDock.resize(width,self.height())
-        self.ui.in_widget.resize(width,posi)
+        width = self.inputDock.width()
+        self.inputDock.resize(width,height)
+        self.in_widget.resize(width,posi)
 
-        self.ui.btn_Reset.move((width/2)-110,posi+8)
-        self.ui.btn_Design.move((width/2)+17,posi+8)
+        self.btn_Reset.move((width/2)-110,posi+8)
+        self.btn_Design.move((width/2)+17,posi+8)
         #self.ui.btn_Design.move(,posi+10)
 
         # Output Dock
-        width = self.ui.outputDock.width()
-        self.ui.outputDock.resize(width,self.height())
-        self.ui.out_widget.resize(width,posi)
-        self.ui.btn_CreateDesign.move((width/2)-(186/2),posi+8)
-        self.ui.save_outputDock.move((width/2)-(186/2),posi+52)
+        width = self.outputDock.width()
+        self.outputDock.resize(width,height)
+        self.out_widget.resize(width,posi)
+        self.btn_CreateDesign.move((width/2)-(186/2),posi+8)
+        self.save_outputDock.move((width/2)-(186/2),posi+52)
 
         # Designed model
-        self.ui.splitter.setSizes([0.85 * posi, 0.15 * posi])
-        self.ui.modelTab.setFocus()
-        self.ui.display.FitAll()
+        self.splitter.setSizes([0.85 * posi, 0.15 * posi])
+        self.modelTab.setFocus()
+        self.display.FitAll()
 
     def closeEvent(self, event):
         '''
@@ -168,15 +190,6 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
             event.accept()
         else:
             event.ignore()
-
-class Window(QMainWindow):
-    #closed = pyqtSignal()
-    def center(self):
-        frameGm = self.frameGeometry()
-        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
-        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
-        frameGm.moveCenter(centerPoint)
-        self.move(frameGm.topLeft())
 
     def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
         """
@@ -201,8 +214,14 @@ class Window(QMainWindow):
             return
 
         if main.design_status:
-            from osdagMainSettings import backend_name
-            off_display, _, _, _ = init_display_off_screen(backend_str=backend_name())
+
+
+            self.modelTab = qtViewer3d(self)
+            self.mytabWidget.addTab(self.modelTab, "")
+            self.show()
+            self.modelTab.InitDriver()
+            off_display = self.modelTab._display
+
             self.commLogicObj.display = off_display
             self.commLogicObj.display_3DModel("Model", "gradient_bg")
             # off_display.set_bg_gradient_color([51, 51, 102], [150, 150, 170])
@@ -247,12 +266,12 @@ class Window(QMainWindow):
 
         return str(filename)
 
-    def desired_location(self, filename, base_type):
-        if base_type == ".svg":
-            cairosvg.svg2png(file_obj=filename,
-                             write_to=os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
-        else:
-            shutil.copyfile(filename, os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
+    # def desired_location(self, filename, base_type):
+    #     if base_type == ".svg":
+    #         cairosvg.svg2png(file_obj=filename,
+    #                          write_to=os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
+    #     else:
+    #         shutil.copyfile(filename, os.path.join(str(self.folder), "images_html", "cmpylogoFin.png"))
 
     def saveUserProfile(self, window):
 
@@ -331,7 +350,6 @@ class Window(QMainWindow):
         main.design_status = False
         main.design_button_status = False
         MainWindow.setObjectName("MainWindow")
-
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/Osdag.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -2626,23 +2644,13 @@ class Window(QMainWindow):
 
     def init_display(self, backend_str=None, size=(1024, 768)):
 
-        from OCC.Display.backend import load_backend, get_qt_modules
 
-        used_backend = load_backend(backend_str)
-
-        global display, start_display, app, _, USED_BACKEND
-        if 'qt' in used_backend:
-            from OCC.Display.qtDisplay import qtViewer3d
-            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
-
-        # from OCC.Display.pyqt4Display import qtViewer3d
-        from OCC.Display.qtDisplay import qtViewer3d
         self.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag Fin Plate")
         #self.mytabWidget.resize(size[0], size[1])
         self.mytabWidget.addTab(self.modelTab, "")
-
+        self.show()
         self.modelTab.InitDriver()
         display = self.modelTab._display
         key_function = {Qt.Key_Up: lambda: self.Pan_Rotate_model("Up"),

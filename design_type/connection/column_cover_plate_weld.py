@@ -296,7 +296,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         options_list.append(t5)
         t19 = (
             KEY_WELD_TYPE, KEY_DISP_WELD_TYPE, TYPE_COMBOBOX,
-            VALUES_WELD_TYPE, True, 'No Validator')
+            ["Fillet Weld"], True, 'No Validator')
         options_list.append(t19)
 
         t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -927,16 +927,23 @@ class ColumnCoverPlateWeld(MomentConnection):
 
         ############################### WEB MENBER CAPACITY CHECK ############################
         ###### # capacity Check for web in axial = yielding
+
         if (previous_thk_flange) == None:
             pass
         else:
-            for i in previous_thk_flange:
-                self.flange_plate.thickness.remove(i)
+            # for i in previous_thk_flange:
+            if previous_thk_flange in self.flange_plate.thickness:
+                self.flange_plate.thickness.remove(previous_thk_flange)
+            else:
+                pass
+
         if (previous_thk_web) == None:
             pass
         else:
-            for i in previous_thk_web:
-                self.web_plate.thickness.remove(i)
+            if previous_thk_web in self.web_plate.thickness:
+                self.web_plate.thickness.remove(previous_thk_web)
+            else:
+                pass
 
         self.initial_pt_thk_status = False
         self.initial_pt_thk_status_web = False
@@ -1397,7 +1404,7 @@ class ColumnCoverPlateWeld(MomentConnection):
             if self.flange_plate.tension_capacity_flange_plate < self.flange_force:
                 if len(self.flange_plate.thickness) >= 2:
                     thk = self.flange_plate.thickness_provided
-                    self.initial_pt_thk(self, previous_thk_web= thk)
+                    self.initial_pt_thk(self, previous_thk_flange= thk)
                 else:
                     self.flange_plate_capacity_axial_status = False
                     self.design_status = False
@@ -1428,7 +1435,7 @@ class ColumnCoverPlateWeld(MomentConnection):
             if self.flange_plate.tension_capacity_flange_plate < self.flange_force:
                 if len(self.flange_plate.thickness) >= 2:
                     thk = self.flange_plate.thickness_provided
-                    self.initial_pt_thk(self, previous_thk_web=thk)
+                    self.initial_pt_thk(self, previous_thk_flange=thk)
                 else:
                     self.flange_plate_capacity_axial_status = False
                     self.design_status = False

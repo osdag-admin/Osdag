@@ -919,7 +919,7 @@ class Plate(Material):
 
     def get_flange_plate_details(self, bolt_dia, flange_plate_h_min, flange_plate_h_max, bolt_capacity, min_edge_dist,
                                  min_gauge, max_spacing, max_edge_dist, web_thickness, root_radius,
-                                 shear_load=0.0, axial_load=0.0, gap=0.0, bolt_line_limit=math.inf, joint=None,beta_lg = None):
+                                 shear_load=0.0, axial_load=0.0, gap=0.0, bolt_line_limit=math.inf, joint=None,beta_lg = 1.0):
         # todo anjali
         """
 

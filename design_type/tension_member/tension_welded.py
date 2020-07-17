@@ -452,6 +452,8 @@ class Tension_welded(Member):
 
         t1 = (None, DISP_TITLE_TENSION_SECTION, TYPE_TITLE, None, True)
         out_list.append(t1)
+        # t1 = (None, DISP_TITLE_TENSION_SECTION, TYPE_TITLE, None, True)
+        # out_list.append(t1)
 
         t2 = (KEY_DESIGNATION, KEY_DISP_DESIGNATION, TYPE_TEXTBOX,
               self.section_size_1.designation if flag else '', True)
@@ -463,6 +465,9 @@ class Tension_welded(Member):
         t4 = (KEY_TENSION_RUPTURECAPACITY, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
               round((self.section_size_1.tension_rupture_capacity/1000),2) if flag else '', True)
         out_list.append(t4)
+
+        # t1 = ("mm", DISP_TITLE_TENSION_SECTION, TYPE_TITLE, None, True)
+        # out_list.append(t1)
 
         # t5 = (KEY_TENSION_BLOCKSHEARCAPACITY, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
         #       round((self.section_size_1.block_shear_capacity_axial/1000),2) if flag else '', True)
@@ -485,6 +490,9 @@ class Tension_welded(Member):
 
         t8 = (None, DISP_TITLE_WELD_DETAILS, TYPE_TITLE, None, True)
         out_list.append(t8)
+
+        t9 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, "Fillet Weld" if flag else '', True)
+        out_list.append(t9)
 
         t9 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.weld.size if flag else '', True)
         out_list.append(t9)
@@ -1448,7 +1456,7 @@ class Tension_welded(Member):
                 else:
                     pass
                 logger.info(self.weld.reason)
-                logger.info(": Overall bolted tension member design is safe. \n")
+                logger.info(": Overall welded tension member design is safe. \n")
                 logger.debug(" :=========End Of design===========")
                 if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
                     self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
@@ -2162,8 +2170,12 @@ class Tension_welded(Member):
                                                           self.plate.fu, gamma_m1, plate_rupture_kn), '')
 
                 self.report_check.append(t3)
-                t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH,  self.length,
+                t4 = (KEY_OUT_DISP_PLATE_MIN_LENGTH,  '',
                       gusset_lt_w_prov(self.flange_weld, self.clearance,self.plate.length), get_pass_fail(self.length, self.plate.length, relation="greater"))
+                self.report_check.append(t4)
+
+                t4 = (KEY_OUT_DISP_MEMB_MIN_LENGTH, (2 * self.plate.length), self.length,
+                      get_pass_fail((2 * self.plate.length), self.length, relation="leq"))
                 self.report_check.append(t4)
 
                 if self.sec_profile in ["Channels", "Back to Back Channels"]:

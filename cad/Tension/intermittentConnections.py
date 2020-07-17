@@ -110,11 +110,9 @@ class IntermittentNutBoltPlateArray():
                     pos = pos + connec * self.spacing * self.pitchDir
                     pos = pos - self.member_web_thickness * self.boltDir
 
-
                     self.positions.append(pos)
 
     def place(self, origin, gaugeDir, pitchDir, boltDir):
-
         self.origin = origin
         self.gaugeDir = gaugeDir
         self.pitchDir = pitchDir
@@ -158,20 +156,7 @@ class IntermittentNutBoltPlateArray():
 
         for plate in self.plates:
             self.platemodels.append(plate.create_model())
-        #
-        # nut_bolts = self.models
-        # nbarray = nut_bolts[0]
-        # for comp in nut_bolts:
-        #     nbarray = BRepAlgoAPI_Fuse(comp, nbarray).Shape()
-        #
-        # plates = self.platemodels
-        # parray = plates[0]
-        # for comp in plates:
-        #     parray = BRepAlgoAPI_Fuse(comp, parray).Shape()
-        #
-        # array = BRepAlgoAPI_Fuse(nbarray, parray).Shape()
-        #
-        # return array
+
 
     def get_nut_bolt_models(self):
         nut_bolts = self.models

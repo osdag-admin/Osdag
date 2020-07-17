@@ -110,6 +110,7 @@ class IntermittentNutBoltPlateArray():
                     pos = pos + connec * self.spacing * self.pitchDir
                     pos = pos - self.member_web_thickness * self.boltDir
 
+
                     self.positions.append(pos)
 
     def place(self, origin, gaugeDir, pitchDir, boltDir):

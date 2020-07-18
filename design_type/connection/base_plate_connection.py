@@ -270,14 +270,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.stiffener_plt_height_along_web = 0.0
         self.stiffener_plt_height_across_web = 0.0
 
-        self.stiffener_plt_len_btwn_D = 0.0
-        self.stiffener_plt_width_btwn_D = 0.0
-        self.stiffener_plt_thick_btwn_D = 0.0
-
         self.stiffener_along_flange = ''
         self.stiffener_along_web = ''
         self.stiffener_across_web = ''
-        self.stiffener_inside_flange = ''
         self.eff_stiffener_plt_len_along_flange = 0.0
         self.eff_stiffener_plt_len_along_web = 0.0
 
@@ -500,8 +495,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t3 = (KEY_OUT_GRD_ANCHOR, KEY_DISP_OUT_GRD_ANCHOR, TYPE_TEXTBOX, self.anchor_grade if flag else '', True)
         out_list.append(t3)
 
-        t4 = (KEY_OUT_ANCHOR_BOLT_NO, KEY_DISP_OUT_ANCHOR_BOLT_NO, TYPE_TEXTBOX,
-              self.anchors_outside_flange if flag else '', True)
+        t4 = (KEY_OUT_ANCHOR_BOLT_NO, KEY_DISP_OUT_ANCHOR_BOLT_NO, TYPE_TEXTBOX, self.anchors_outside_flange if flag else '', True)
         out_list.append(t4)
 
         t5 = (KEY_OUT_ANCHOR_BOLT_SHEAR, KEY_OUT_DISP_ANCHOR_BOLT_SHEAR, TYPE_TEXTBOX,
@@ -1185,7 +1179,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
         change_tab.append(t4)
 
-        t6 = (KEY_DISP_COLSEC, [KEY_SECSIZE], [KEY_SOURCE], TYPE_TEXTBOX, self.change_source)
+        t6 = (KEY_DISP_COLSEC, [KEY_SECSIZE], ['Label_21'], TYPE_TEXTBOX, self.change_source)
         change_tab.append(t6)
 
         return change_tab
@@ -1805,7 +1799,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
             self.plate_thk = self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.dp_bp_fy))  # mm
 
-            self.tension_demand_anchor = 0
+            self.tension_demand_anchor = 0  # there will be no tension acting on the anchor bolts in this case
 
             # total number of anchor bolts provided
             self.anchor_nos_provided = self.anchors_outside_flange
@@ -1826,8 +1820,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 logger.warning("The external factored moment (acting along major axis) is less than the minimum recommended design action effect")
                 logger.info("The minimum recommended design action effect (factored bending moment is {} kN-m)".format(self.load_moment_major))
                 logger.info("The base plate is designed for a column carrying a bending moment of {} kN-m".format(self.load_moment_major))
-            else:
-                pass
 
             if self.load_moment_minor < (0.50 * moment_capacity_column_minor):
                 self.load_moment_minor = 0.50 * moment_capacity_column_minor
@@ -1835,8 +1827,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 logger.warning("The external factored moment (acting along minor axis) is less than the minimum recommended design action effect")
                 logger.info("The minimum recommended design action effect (factored bending moment is {} kN-m)".format(self.load_moment_minor))
                 logger.info("The base plate is designed for a column carrying a bending moment of {} kN-m".format(self.load_moment_minor))
-            else:
-                pass
 
             # calculate eccentricity
             self.eccentricity_zz = self.load_moment_major / self.load_axial_compression  # mm, eccentricity about major (z-z) axis
@@ -1860,9 +1850,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.bp_width_provided = min(self.bp_length_min, width_min)  # mm, assigning minimum dimension to width
                 self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
 
-                # calculating the maximum and minimum bending stresses
-                self.ze_zz = (self.bp_width_provided * self.bp_length_provided ** 2) / 6  # mm^3, elastic section modulus of plate (BL^2/6)
+                # elastic section modulus of plate (BL^2/6)
+                self.ze_zz = (self.bp_width_provided * self.bp_length_provided ** 2) / 6  # mm^3
 
+                # calculating the maximum and minimum bending stresses
                 self.sigma_max_zz = (self.load_axial_compression / self.bp_area_provided) + (self.load_moment_major / self.ze_zz)  # N/mm^2
                 self.sigma_min_zz = (self.load_axial_compression / self.bp_area_provided) - (self.load_moment_major / self.ze_zz)  # N/mm^2
 
@@ -1881,9 +1872,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # Assumption: The bending capacity of the plate is (M_d = 1.5*fy*Z_e/gamma_m0) [Reference: Clause 8.2.1.2, IS 800:2007]
                 # Assumption: Z_e of the plate is = b*tp^2 / 6, where b = 1 for a cantilever strip of unit dimension
 
-                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy))  # mm
+                self.plate_thk = math.sqrt((self.critical_M_xx * self.gamma_m0 * 6) / (1.5 * self.dp_bp_fy * self.bp_width_provided))  # mm
 
                 self.tension_demand_anchor = 0  # there will be no tension acting on the anchor bolts in this case
+                # calculating tension capacity of the anchor bolt
+                self.tension_capacity_anchor = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
+                                                                                              self.anchor_area[0], self.anchor_area[1],
+                                                                                              safety_factor_parameter=self.dp_weld_fab)  # N
+                self.tension_capacity_anchor = round(self.tension_capacity_anchor / 1000, 2)  # kN
+
                 self.anchor_nos_provided = 4
                 self.anchors_outside_flange = self.anchor_nos_provided
 
@@ -1904,14 +1901,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.n = 2 * 10 ** 5 / (5000 * math.sqrt(self.cl_7_4_1_bearing_strength_concrete(self.footing_grade) / 0.45))
                 self.anchor_area_tension = self.anchor_area[0] * (self.anchor_nos_provided / 2)  # mm^2, area of anchor under tension
+                # TODO: update f value for 4 and 6 bolts (should be column centre to the centre of the bolt group)
                 self.f = (self.bp_length_provided / 2) - self.end_distance  # mm
 
-                k1 = 3 * (self.eccentricity_zz - (self.bp_length_provided / 2))
-                k2 = ((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz)
-                k3 = ((self.bp_length_provided / 2) + self.f) * -k2
+                self.k1 = 3 * (self.eccentricity_zz - (self.bp_length_provided / 2))
+                self.k2 = ((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz)
+                self.k3 = ((self.bp_length_provided / 2) + self.f) * -self.k2
 
                 # equation for finding 'y' is: y^3 + k1*y^2 + k2*y + k3 = 0
-                roots = np.roots([1, k1, k2, k3])  # finding roots of the equation
+                roots = np.roots([1, self.k1, self.k2, self.k3])  # finding roots of the equation
                 r_1 = roots[0]
                 r_2 = roots[1]
                 r_3 = roots[2]
@@ -2142,12 +2140,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
                     self.f = (self.bp_length_provided / 2) - self.end_distance  # mm
 
-                    k1 = 3 * (self.eccentricity_zz - (self.bp_length_provided / 2))
-                    k2 = ((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz)
-                    k3 = ((self.bp_length_provided / 2) + self.f) * -k2
+                    self.k1 = 3 * (self.eccentricity_zz - (self.bp_length_provided / 2))
+                    self.k2 = ((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz)
+                    self.k3 = ((self.bp_length_provided / 2) + self.f) * -self.k2
 
                     # equation for finding 'y' is: y^3 + k1*y^2 + k2*y + k3 = 0
-                    roots = np.roots([1, k1, k2, k3])  # finding roots of the equation
+                    roots = np.roots([1, self.k1, self.k2, self.k3])  # finding roots of the equation
                     r_1 = roots[0]
                     r_2 = roots[1]
                     r_3 = roots[2]
@@ -2183,12 +2181,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.anchor_area_tension = self.bolt_area(self.anchor_dia_provided)[0] * self.anchors_outside_flange
                     self.f = (self.bp_length_provided / 2) - self.end_distance  # mm
 
-                    k1 = 3 * (self.eccentricity_zz - (self.bp_length_provided / 2))
-                    k2 = ((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz)
-                    k3 = ((self.bp_length_provided / 2) + self.f) * -k2
+                    self.k1 = 3 * (self.eccentricity_zz - (self.bp_length_provided / 2))
+                    self.k2 = ((6 * self.n * self.anchor_area_tension) / self.bp_width_provided) * (self.f + self.eccentricity_zz)
+                    self.k3 = ((self.bp_length_provided / 2) + self.f) * -self.k2
 
                     # equation for finding 'y' is: y^3 + k1*y^2 + k2*y + k3 = 0
-                    roots = np.roots([1, k1, k2, k3])  # finding roots of the equation
+                    roots = np.roots([1, self.k1, self.k2, self.k3])  # finding roots of the equation
                     r_1 = roots[0]
                     r_2 = roots[1]
                     r_3 = roots[2]
@@ -2447,18 +2445,19 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.critical_xx = self.y
 
                 # moment acting at the critical section due to applied loads
-                # Assumption: The moment acting at the critical section is taken as 0.45*f_ck*B*critical_xx (plastic moment)
+                # Assumption: The moment acting at the critical section is taken as [0.45*f_ck*B*critical_xx * (*critical_xx / 2)] (plastic moment)
                 self.critical_M_xx = (self.critical_xx * self.bearing_strength_concrete * self.bp_width_provided) * \
                                      (self.critical_xx / 2)  # N-mm
 
                 # 2. Yielding of the base plate due to tension in the anchor bolts on the tension side
-                lever_arm = (self.bp_length_provided / 2) - (self.column_D / 2) + (self.column_tf / 2) - self.end_distance  # mm
+                # TODO: add lever arm for 4 & 6 bolts on one side
+                self.lever_arm = (self.bp_length_provided / 2) - (self.column_D / 2) + (self.column_tf / 2) - self.end_distance  # mm
 
                 # moment acting on the plate due to tension in the bolts
-                moment_lever_arm = self.tension_demand_anchor * 1000 * lever_arm  # N-mm
+                self.moment_lever_arm = self.tension_demand_anchor * 1000 * self.lever_arm  # N-mm
 
                 # updating the critical moment
-                self.critical_M_xx = max(self.critical_M_xx, moment_lever_arm)  # N-mm
+                self.critical_M_xx = max(self.critical_M_xx, self.moment_lever_arm)  # N-mm
 
                 # equating critical moment with critical moment to compute the required minimum plate thickness
                 # Assumption: The bending capacity of the plate is (M_d = 1.5*fy*Z_e/gamma_m0) [Reference: Clause 8.2.1.2, IS 800:2007]
@@ -2554,8 +2553,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 # hole diameter
                 self.anchor_hole_dia = self.cl_10_2_1_bolt_hole_size(self.anchor_dia_inside_flange, self.dp_anchor_hole)  # mm
                 self.anchor_grade_inside_flange = self.anchor_grade
-                self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade,
-                                                        self.anchor_dia_provided)  # returns a list with strength values - [bolt_fu, bolt_fy]
+                self.anchor_fu_fy = self.get_bolt_fu_fy(self.anchor_grade, self.anchor_dia_provided)  # returns a list with strength values - [bolt_fu, bolt_fy]
 
                 self.tension_capacity_anchor_uplift = self.cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
                                                                                               self.anchor_area[0], self.anchor_area[1],
@@ -2579,9 +2577,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.anchor_nos_provided = (2 * self.anchors_outside_flange) + self.anchors_inside_flange
                 self.anchor_dia_inside_flange = 'N/A'
                 self.tension_capacity_anchor_uplift = 'N/A'
-
-        else:
-            pass
 
         # design strength of the anchor bolt [Reference: Clause 10.3.2, IS 800:2007; Section 3, IS 5624:1993]
         # Assumption: number of shear planes passing through - the thread is 1 (n_n) and through the shank is 0 (n_s)
@@ -3104,7 +3099,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.stiffener_along_flange = 'No'
                         self.stiffener_along_web = 'No'
                         self.stiffener_across_web = 'No'
-                        self.stiffener_inside_flange = 'No'
 
                         self.weld_size_flange = self.weld_size  # mm
                         self.weld_size_stiffener = self.weld_size  # mm
@@ -3182,7 +3176,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.stiffener_along_flange = 'Yes'
                     self.stiffener_along_web = 'Yes'
                     self.stiffener_across_web = 'No'
-                    self.stiffener_inside_flange = 'No'
 
                 self.weld_size_flange = self.column_tf  # mm
                 self.weld_size_web = self.column_tw  # mm
@@ -3935,7 +3928,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             print(self.tension_demand_anchor)  # Tension Demand (kN)
             print(self.tension_capacity_anchor)  # Tension capacity (kN)
         else:
-            print(self.tension_demand_anchor)
+            print(self.tension_demand_anchor)  # Tension Demand (kN)
+
         print(self.combined_capacity_anchor)  # Combined capacity (kN)
 
         print(self.anchor_len_above_footing)
@@ -4002,15 +3996,6 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             else:
                 pass
-
-        #stiffener plate inside flange
-        elif self.connectivity == 'Moment Base Plate':
-            if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
-                if self.stiffener_inside_flange == 'Yes':
-
-                    print(self.stiffener_plt_len_btwn_D)
-                    print(self.stiffener_plt_width_btwn_D)
-                    print(self.stiffener_plt_thick_btwn_D)
 
         else:
             # Stiffener Plate Along Column Flange
@@ -4127,8 +4112,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             if self.stiffener_across_web == 'Yes':
                 print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
-            if self.stiffener_inside_flange == 'Yes':
-                print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')
+
 
         # col properties
         print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)

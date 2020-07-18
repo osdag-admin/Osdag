@@ -196,6 +196,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_bolt = ''
         self.anchor_dia_provided = 'M20'
         self.grout_thk = 50
+        self.plate_washer_details = {}
         self.plate_washer_thk = 1
         self.nut_thk = 1
         self.anchor_length_min = 1
@@ -269,9 +270,14 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.stiffener_plt_height_along_web = 0.0
         self.stiffener_plt_height_across_web = 0.0
 
+        self.stiffener_plt_len_btwn_D = 0.0
+        self.stiffener_plt_width_btwn_D = 0.0
+        self.stiffener_plt_thick_btwn_D = 0.0
+
         self.stiffener_along_flange = ''
         self.stiffener_along_web = ''
         self.stiffener_across_web = ''
+        self.stiffener_inside_flange = ''
         self.eff_stiffener_plt_len_along_flange = 0.0
         self.eff_stiffener_plt_len_along_web = 0.0
 
@@ -340,6 +346,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.tension_capacity_anchor = 0.0
         self.anchors_outside_flange = 0
         self.anchor_inside_flange = 'No'
+        self.stiffener_inside_flange = 'No'
         self.anchor_tension_capa = 0.0
         self.safe = True
         self.max_bearing_stress = 0.0
@@ -1798,6 +1805,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
             self.plate_thk = self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.dp_bp_fy))  # mm
 
+            self.tension_demand_anchor = 0
+
             # total number of anchor bolts provided
             self.anchor_nos_provided = self.anchors_outside_flange
 
@@ -1852,7 +1861,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 self.bp_area_provided = self.bp_length_provided * self.bp_width_provided  # mm^2
 
                 # calculating the maximum and minimum bending stresses
-                self.ze_zz = self.bp_width_provided * self.bp_length_provided ** 2 / 6  # mm^3, elastic section modulus of plate (BL^2/6)
+                self.ze_zz = (self.bp_width_provided * self.bp_length_provided ** 2) / 6  # mm^3, elastic section modulus of plate (BL^2/6)
 
                 self.sigma_max_zz = (self.load_axial_compression / self.bp_area_provided) + (self.load_moment_major / self.ze_zz)  # N/mm^2
                 self.sigma_min_zz = (self.load_axial_compression / self.bp_area_provided) - (self.load_moment_major / self.ze_zz)  # N/mm^2
@@ -1880,6 +1889,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             else:  # Case 2 and Case 3
                 self.moment_bp_case = 'Case2&3'
+
+                if (self.eccentricity_zz > (self.bp_length_min / 6)) or (self.eccentricity_zz < (self.bp_length_min / 3)):  # Case 2
+                    self.moment_bp_case = 'Case2'
+                elif self.eccentricity_zz >= (self.bp_length_min / 3):  # Case 3
+                    self.moment_bp_case = 'Case3'
 
                 # fixing length and width of the base plate
                 self.bp_length_provided = self.bp_length_min
@@ -2898,14 +2912,22 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if self.anchor_dia_inside_flange == 'N/A':
                 self.anchor_dia_inside_flange = 0
 
-            self.plate_washer_thk = IS6649.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_inside_flange))[
-                'washer_thk']  # washer thickness, mm
+            # washer details - dictionary {inner diameter, side dimension, washer thickness}
+            self.plate_washer_details = IS6649.square_washer_dimensions(max(self.anchor_dia_provided, self.anchor_dia_inside_flange))
+
             self.nut_thk = IS1364.nut_thick((max(self.anchor_dia_provided, self.anchor_dia_inside_flange)))  # nut thickness, mm
 
         elif (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
-            self.plate_washer_thk = IS6649.square_washer_dimensions(self.anchor_dia_provided)['washer_thk']  # washer thickness, mm
+            self.plate_washer_details = IS6649.square_washer_dimensions(self.anchor_dia_provided)
+
             self.nut_thk = IS1364.nut_thick(self.anchor_dia_provided)  # nut thickness, mm
 
+        # square plate washer details
+        self.plate_washer_thk = self.plate_washer_details['washer_thk']  # washer thickness, mm
+        self.plate_washer_inner_dia = self.plate_washer_details['dia_in']  # inner dia, mm
+        self.plate_washer_dim = self.plate_washer_details['side']  # dimensions of the square washer plate, mm
+
+        # anchor length
         self.anchor_len_below_footing = self.anchor_length_provided  # mm
         self.anchor_len_above_footing = self.grout_thk + self.plate_thk + self.plate_washer_thk + self.nut_thk + 20  # mm, 20 mm is extra len
 
@@ -3082,6 +3104,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.stiffener_along_flange = 'No'
                         self.stiffener_along_web = 'No'
                         self.stiffener_across_web = 'No'
+                        self.stiffener_inside_flange = 'No'
 
                         self.weld_size_flange = self.weld_size  # mm
                         self.weld_size_stiffener = self.weld_size  # mm
@@ -3159,6 +3182,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.stiffener_along_flange = 'Yes'
                     self.stiffener_along_web = 'Yes'
                     self.stiffener_across_web = 'No'
+                    self.stiffener_inside_flange = 'No'
 
                 self.weld_size_flange = self.column_tf  # mm
                 self.weld_size_web = self.column_tw  # mm
@@ -3495,6 +3519,9 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # the governing ratio is D/t_g < 29.30 (Table 2, IS 800:2007)
             if self.connectivity == 'Moment Base Plate':
                 if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
+
+                    self.stiffener_inside_flange = 'Yes'
+
                     self.stiffener_plt_thick_btwn_D = (self.column_D - (2 * self.column_tf)) / 29.30
                     self.stiffener_plt_thick_btwn_D = round_up(self.stiffener_plt_thick_btwn_D, 2, self.column_tf)  # mm
 
@@ -3504,9 +3531,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.stiffener_plt_len_btwn_D = self.column_D - (2 * self.column_tf)  # mm
                     self.stiffener_plt_width_btwn_D = self.column_bf - self.column_tw - (2 * self.column_r1) - (2 * 5)  # mm
                 else:
-                    pass
-            else:
-                pass
+                    self.stiffener_inside_flange = 'No'
+
+                    self.stiffener_plt_len_btwn_D = 'N/A'
+                    self.stiffener_plt_width_btwn_D = 'N/A'
+                    self.stiffener_plt_thick_btwn_D = 'N/A'
 
             # weld checks of the stiffener welds - Combination of stresses [Reference: Cl. 10.5.10.1, IS 800:2007]
 
@@ -3906,7 +3935,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             print(self.tension_demand_anchor)  # Tension Demand (kN)
             print(self.tension_capacity_anchor)  # Tension capacity (kN)
         else:
-            pass
+            print(self.tension_demand_anchor)
         print(self.combined_capacity_anchor)  # Combined capacity (kN)
 
         print(self.anchor_len_above_footing)
@@ -3974,6 +4003,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             else:
                 pass
 
+        #stiffener plate inside flange
+        elif self.connectivity == 'Moment Base Plate':
+            if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
+                if self.stiffener_inside_flange == 'Yes':
+
+                    print(self.stiffener_plt_len_btwn_D)
+                    print(self.stiffener_plt_width_btwn_D)
+                    print(self.stiffener_plt_thick_btwn_D)
+
         else:
             # Stiffener Plate Along Column Flange
             if self.stiffener_along_flange == 'Yes':
@@ -4029,6 +4067,15 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 print(self.moment_on_stiffener_across_web == 'N/A')
                 print(self.moment_capa_stiffener_across_web == 'N/A')
 
+        # Stiffener plate inside flange
+        if self.connectivity == 'Moment Base Plate':
+            if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
+                if self.stiffener_inside_flange == 'Yes':
+
+                    print(self.stiffener_plt_len_btwn_D)
+                    print(self.stiffener_plt_width_btwn_D)
+                    print(self.stiffener_plt_thick_btwn_D)
+
         # Shear Key Details
         print("Shear key details start")
 
@@ -4080,7 +4127,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             if self.stiffener_across_web == 'Yes':
                 print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')  # weld size at stiffener along web (mm)
-
+            if self.stiffener_inside_flange == 'Yes':
+                print(self.weld_size_stiffener if self.weld_type != 'Butt Weld' else '')
 
         # col properties
         print(self.column_D, self.column_bf, self.column_tf, self.column_tw, self.column_r1, self.column_r2)

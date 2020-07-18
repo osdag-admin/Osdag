@@ -40,7 +40,7 @@ if __name__ == '__main__':
     from OCC.Display.SimpleGui import init_display
     display, start_display, add_menu, add_function_to_menu = init_display()
 
-    L = 172
+    L = 100
     T = 6
     W = 92
     H = 150

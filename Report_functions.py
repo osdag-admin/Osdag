@@ -4549,7 +4549,7 @@ def bp_width(flange_width, edge_distance, width):
     width = str(width)
 
     bp_width_min = Math(inline=True)
-    bp_width_min.append(NoEscape(r'\begin{aligned} B = flange~width ~+~2~(1.5 \times e~+~1.5 \times e) \\'))  # TODO add e' instead of e
+    bp_width_min.append(NoEscape(r'\begin{aligned} W = flange~width ~+~2~(1.5 \times e~+~1.5 \times e) \\'))  # TODO add e' instead of e
     bp_width_min.append(NoEscape(r'\begin{aligned}   = ' + flange_width + r' ~+~2~(1.5 \times ' + edge_distance + r'~+~1.5 \times ' + edge_distance +
                                  r') \\'))
     bp_width_min.append(NoEscape(r'\begin{aligned}   = ' + width + r') \\'))
@@ -4707,7 +4707,7 @@ def k2(n, anchor_area_tension, bp_width, f, e, k2_value):
         k2_value (float)
 
     Returns:
-        k2 [k2 = (6*n*A_s / B) * (f + e) ] (float)
+        k2 [k2 = (6*n*A_s / W) * (f + e) ] (float)
     """
     n = str(n)
     anchor_area_tension = str(anchor_area_tension)
@@ -4717,7 +4717,7 @@ def k2(n, anchor_area_tension, bp_width, f, e, k2_value):
     k2_value = str(k2_value)
 
     k2 = Math(inline=True)
-    k2.append(NoEscape(r'\begin{aligned} k_2 = \frac{6~n~A_s}{B}~\Big(f~+~e_{zz}\Big) \\'))
+    k2.append(NoEscape(r'\begin{aligned} k_2 = \frac{6~n~A_s}{W}~\Big(f~+~e_{zz}\Big) \\'))
     k2.append(NoEscape(r'\begin{aligned}     = \frac{6~' + n + r'~' + anchor_area_tension + r'}{' + bp_width + r'}~\Big(' + f + r'~+~' + e + r'\Big) \\'))
     k2.append(NoEscape(r'\begin{aligned}     = ' + k2_value + r' \\'))
     k2.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
@@ -4891,7 +4891,7 @@ def bp_section_modulus(bp_length, bp_width, section_modulus):
     section_modulus = str(section_modulus)
 
     ze_zz = Math(inline=True)
-    ze_zz.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} = \frac{B L^{2}}{6} \\'))
+    ze_zz.append(NoEscape(r'\begin{aligned} {z_{e}}_{plate} = \frac{W L^{2}}{6} \\'))
     ze_zz.append(NoEscape(r'\begin{aligned}                 = \frac{' + bp_width + r' ' + bp_length + r'^{2}}{6} \\'))
     ze_zz.append(NoEscape(r'\begin{aligned}                 = ' + section_modulus + r'\end{aligned}'))
 
@@ -4985,7 +4985,7 @@ def moment_critical_section(sigma_x, sigma_max, critical_len, moment, concrete_b
 
         critical_moment.append(NoEscape(r'\begin{aligned}              = ' + moment + r' \end{aligned}'))
     else:
-        critical_moment.append(NoEscape(r'\begin{aligned} {M_{critical}}_{1} = 0.45f_{ck}~B~y_{critical}\times\bigg(\frac{y_{critical}}{2}\bigg) \\'))
+        critical_moment.append(NoEscape(r'\begin{aligned} {M_{critical}}_{1} = 0.45f_{ck}~W~y_{critical}\times\bigg(\frac{y_{critical}}{2}\bigg) \\'))
         critical_moment.append(NoEscape(r'\begin{aligned} {M_{critical}}_{1} = 0.45' + concrete_bearing_stress + r'~' + bp_width + r'~'
                                                                 + critical_len + r'\times\bigg(\frac{' + critical_len + r'}{2}\bigg) \\'))
         critical_moment.append(NoEscape(r'\begin{aligned}                    = ' + moment + r' \end{aligned}'))
@@ -5060,7 +5060,7 @@ def plate_thk1(critical_mom, plate_thk, gamma_m0, f_y_plate, bp_width):
 
     thk = Math(inline=True)
     thk.append(NoEscape(r'\begin{aligned} {M_{d}}_{plate} = M_{critical} \\'))
-    thk.append(NoEscape(r'\begin{aligned} t_{p} = \bigg[\frac{4~M_{critical}~ \gamma_{m0}} { {f_{y}}_{p}~B }\bigg]^{0.5}  \\'))
+    thk.append(NoEscape(r'\begin{aligned} t_{p} = \bigg[\frac{4~M_{critical}~ \gamma_{m0}} { {f_{y}}_{p}~W }\bigg]^{0.5}  \\'))
     thk.append(NoEscape(r'\begin{aligned}       = \bigg[\frac{4~' + critical_mom + r'~' + gamma_m0 + r'}{' + f_y_plate + r'~'
                                                                                     + bp_width + r'}\bigg]^{0.5}  \\'))
     thk.append(NoEscape(r'\begin{aligned}       = ' + plate_thk + r' \\'))
@@ -5136,8 +5136,8 @@ def anchor_length(anchor_len_above, anchor_len_below, anchor_len_total):
     anchor_len_total = str(anchor_len_total)
 
     length = Math(inline=True)
-    length.append(NoEscape(r'\begin{aligned} l_{anchor} = l_{1}~+~l_{2}'))
-    length.append(NoEscape(r'\begin{aligned}            = ' + anchor_len_above + r' ~+~' + anchor_len_below + r''))
+    length.append(NoEscape(r'\begin{aligned} l_{a} = l_{1}~+~l_{2} \\'))
+    length.append(NoEscape(r'\begin{aligned}            = ' + anchor_len_above + r' ~+~' + anchor_len_below + r' \\'))
     length.append(NoEscape(r'\begin{aligned}            = ' + anchor_len_total + r' \end{aligned}'))
 
     return length
@@ -5155,10 +5155,102 @@ def uplift_demand(uplift_tension):
 
 def no_bolts_uplift(uplift_force, tension_capa):
     """ """
+    bolts = uplift_force / tension_capa
+    bolts = str(bolts)
     uplift_force = str(uplift_force)
     tension_capa = str(tension_capa)
 
-    tension = Math(inline=True)
-    tension.append(NoEscape(r'\begin{aligned} P_{up} = ' + uplift_tension + r' \end{aligned}'))
+    n = Math(inline=True)
+    n.append(NoEscape(r'\begin{aligned} n_{up} = \frac{P_{up}}{T_{db}} \\'))
+    n.append(NoEscape(r'\begin{aligned}        = \frac{' + uplift_force + r'}{' + tension_capa + r'} \\'))
+    n.append(NoEscape(r'\begin{aligned}        = ' + bolts + r' \end{aligned}'))
 
-    return tension
+    return n
+
+
+def stiff_len_flange(bp_width, col_flange_width, stiff_length):
+    """ """
+    bp_width = str(bp_width)
+    col_flange_width = str(col_flange_width)
+    stiff_length = str(stiff_length)
+
+    len = Math(inline=True)
+    len.append(NoEscape(r'\begin{aligned} {L_{st}}_{f} = \frac{W - B}{2} \\'))
+    len.append(NoEscape(r'\begin{aligned}              = \frac{' + bp_width + r' - ' + col_flange_width + r'}{2} \\'))
+    len.append(NoEscape(r'\begin{aligned}              = ' + stiff_length + r' \\'))
+    len.append(NoEscape(r'&[Ref.~based~on~detailing~requirement \end{aligned}'))
+
+    return len
+
+
+def stiff_height_flange(stiff_length_flange, stiff_height):
+    """ """
+    stiff_height = str(stiff_height)
+    stiff_length_flange = str(stiff_length_flange)
+
+    height = Math(inline=True)
+    height.append(NoEscape(r'\begin{aligned} {H_{st}}_{f} = {L_{st}}_{f}~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_length_flange + r'~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_height + r' \\'))
+    height.append(NoEscape(r'&[Ref.~stiffener~drawing~attached~below \end{aligned}'))
+
+    return height
+
+
+def stiff_len_web(bp_length, col_depth, stiff_length):
+    """ """
+    bp_length = str(bp_length)
+    col_depth = str(col_depth)
+    stiff_length = str(stiff_length)
+
+    len = Math(inline=True)
+    len.append(NoEscape(r'\begin{aligned} {L_{st}}_{w} = \frac{L - D}{2} \\'))
+    len.append(NoEscape(r'\begin{aligned}              = \frac{' + bp_length + r' - ' + col_depth + r'}{2} \\'))
+    len.append(NoEscape(r'\begin{aligned}              = ' + stiff_length + r' \\'))
+    len.append(NoEscape(r'&[Ref.~based~on~detailing~requirement \end{aligned}'))
+
+    return len
+
+
+def stiff_height_web(stiff_length_web, stiff_height):
+    """ """
+    stiff_height = str(stiff_height)
+    stiff_length_web = str(stiff_length_web)
+
+    height = Math(inline=True)
+    height.append(NoEscape(r'\begin{aligned} {H_{st}}_{w} = {L_{st}}_{w}~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_length_web + r'~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_height + r' \\'))
+    height.append(NoEscape(r'&[Ref.~stiffener~drawing~attached~below \end{aligned}'))
+
+    return height
+
+
+def stiff_len_across_web(stiff_length_flange, stiff_length_web, stiff_length):
+    """ """
+    stiff_length_flange = str(stiff_length_flange)
+    stiff_length_web = str(stiff_length_web)
+    stiff_length = str(stiff_length)
+
+    len = Math(inline=True)
+    # len.append(NoEscape(r'\begin{aligned} {L_{st}}_{w} = \frac{L - D}{2} '))
+    len.append(NoEscape(r'\begin{aligned} {L_{st}}_{aw} = max~(a, ~b) \\'))
+    len.append(NoEscape(r'\begin{aligned}               = max~(' + stiff_length_flange + r', ~' + stiff_length_web + r') \\'))
+    len.append(NoEscape(r'\begin{aligned}               = ' + stiff_length + r' \\'))
+    len.append(NoEscape(r'&[Ref.~based~on~detailing~requirement \end{aligned}'))
+
+    return len
+
+
+def stiff_height_across_web(stiff_length_across_web, stiff_height):
+    """ """
+    stiff_height = str(stiff_height)
+    stiff_length_across_web = str(stiff_length_across_web)
+
+    height = Math(inline=True)
+    height.append(NoEscape(r'\begin{aligned} {H_{st}}_{aw} = {L_{st}}_{aw}~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_length_across_web + r'~+~50 \\'))
+    height.append(NoEscape(r'\begin{aligned}              = ' + stiff_height + r' \\'))
+    height.append(NoEscape(r'&[Ref.~stiffener~drawing~attached~below \end{aligned}'))
+
+    return height

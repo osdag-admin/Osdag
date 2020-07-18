@@ -449,47 +449,70 @@ class SaveDesignBP(BasePlateConnection):
                 self.report_check.append(t6)
 
                 t7 = ('Tension Capacity (kN)', '', cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
-                                                     self.anchor_area[0], self.anchor_area[1], safety_factor_parameter=self.dp_weld_fab), 'N/A')
+                                                                self.anchor_area[0], self.anchor_area[1], self.tension_capacity_anchor_uplift,
+                                                                                             safety_factor_parameter=self.dp_weld_fab), 'N/A')
                 self.report_check.append(t7)
 
-                t8 = ('Anchor Bolts Required (kN)', uplift_demand(self.load_axial_tension), '', 'N/A')
+                t8 = ('Anchor Bolts Required (kN)', no_bolts_uplift(self.load_axial_tension, self.tension_capacity_anchor_uplift),
+                                                                                                  self.anchors_inside_flange, '')
                 self.report_check.append(t8)
 
-                if self.connectivity == 'Moment Base Plate':
-
-                    if (self.moment_bp_case == 'Case2') or (self.moment_bp_case == 'Case3'):
-                        t6 = ('Tension Demand - Anchor Bolt (kN)', self.tension_demand_anchor / (self.anchors_outside_flange / 2),
-                                                                                                self.tension_capacity_anchor, '')
-                        self.report_check.append(t6)
-                    else:
-                        t6 = ('Tension Demand - Anchor Bolt (kN)', '0', self.tension_capacity_anchor, 'N/A')
-                        self.report_check.append(t6)
-
-                else:
-                    t6 = ('Tension Demand - Anchor Bolt (kN)', '0', self.tension_capacity_anchor, 'N/A')
-                    self.report_check.append(t6)
-
-                t7 = ('Anchor Length - above concrete footing (mm)', '', anchor_len_above(self.grout_thk, self.plate_thk, self.plate_washer_thk, self.nut_thk,
+                t9 = ('Anchor Length - above concrete footing (mm)', '', anchor_len_above(self.grout_thk, self.plate_thk, self.plate_washer_thk, self.nut_thk,
                                                                                           self.anchor_len_above_footing), 'N/A')
-                self.report_check.append(t7)
-
-                if self.connectivity == 'Moment Base Plate':
-                    if (self.moment_bp_case == 'Case2') or (self.moment_bp_case == 'Case3'):
-
-                        t8 = ('Anchor Length - below concrete footing (mm)', '', anchor_len_below(self.tension_capacity_anchor, self.bearing_strength_concrete,
-                                                                                                self.anchor_len_below_footing), 'N/A')
-                        self.report_check.append(t8)
-                    else:
-                        t8 = ('Anchor Length - below concrete footing (mm)', '', 'l_{2} = ' + self.anchor_length_provided + '', 'N/A')
-                        self.report_check.append(t8)
-                else:
-                    t8 = ('Anchor Length - below concrete footing (mm)', '', 'l_{2} = ' + self.anchor_length_provided + '', '')
-                    self.report_check.append(t8)
-
-                t9 = ('Anchor Length (total) (mm)', anchor_range(self.anchor_length_min, self.anchor_length_max), anchor_length(self.anchor_len_above_footing,
-                                                                                    self.anchor_len_below_footing, self.anchor_length_provided), '')
                 self.report_check.append(t9)
 
+                if (self.moment_bp_case == 'Case2') or (self.moment_bp_case == 'Case3'):
+                    t10 = ('Anchor Length - below concrete footing (mm)', '', anchor_len_below(self.tension_capacity_anchor,
+                                                                               self.bearing_strength_concrete, self.anchor_len_below_footing), 'N/A')
+                    self.report_check.append(t10)
+                else:
+                    t10 = ('Anchor Length - below concrete footing (mm)', '', 'l_{2} = ' + self.anchor_length_provided + '', 'N/A')
+                    self.report_check.append(t10)
+
+                t11 = ('Anchor Length (total) (mm)', anchor_range(self.anchor_length_min, self.anchor_length_max),
+                       anchor_length(self.anchor_len_above_footing, self.anchor_len_below_footing, self.anchor_length_provided), '')
+                self.report_check.append(t11)
+
+        # Check 8: Stiffener Design - Along Column Flange
+
+        if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Moment Base Plate'):
+
+            if self.stiffener_along_flange == 'Yes':
+
+                t1 = ('SubSection', 'Stiffener Design - Along Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+                self.report_check.append(t1)
+
+                t2 = ('Length of Stiffener (mm)', '', stiff_len_flange(self.bp_width_provided, self.column_bf, self.stiffener_plt_len_along_flange),
+                      'N/A')
+                self.report_check.append(t2)
+
+                t3 = ('Height of Stiffener (mm)', '', stiff_height_flange(self.stiffener_plt_len_along_flange, self.stiffener_plt_height_along_flange),
+                      'N/A')
+                self.report_check.append(t3)
+
+            if self.stiffener_along_web == 'Yes':
+                t1 = ('SubSection', 'Stiffener Design - Along Column Web', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+                self.report_check.append(t1)
+
+                t2 = ('Length of Stiffener (mm)', '', stiff_len_web(self.bp_length_provided, self.column_D, self.stiffener_plt_len_along_web), 'N/A')
+                self.report_check.append(t2)
+
+                t3 = ('Height of Stiffener (mm)', '', stiff_height_web(self.stiffener_plt_len_along_web, self.stiffener_plt_height_along_web), 'N/A')
+                self.report_check.append(t3)
+
+            if self.stiffener_across_web == 'Yes':
+                t1 = ('SubSection', 'Stiffener Design - Across Column Web', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
+                self.report_check.append(t1)
+
+                t2 = ('Length of Stiffener (mm)', '', stiff_len_across_web(self.stiffener_plt_len_along_flange, self.stiffener_plt_len_along_web,
+                                                                           self.stiffener_plt_len_across_web), 'N/A')
+                self.report_check.append(t2)
+
+                t3 = ('Height of Stiffener (mm)', '', stiff_height_across_web(self.stiffener_plt_len_across_web,
+                                                                              self.stiffener_plt_height_across_web), 'N/A')
+                self.report_check.append(t3)
+
+        ##############################################
         # Check 6: Anchor Bolt - Outside Column Flange
         t1 = ('SubSection', 'Anchor Bolt - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
         self.report_check.append(t1)

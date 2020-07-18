@@ -33,7 +33,7 @@ import openpyxl
 import pdfkit
 import configparser
 import pickle
-import cairosvg
+# import cairosvg
 
 from update_version_check import Update
 import pandas as pd

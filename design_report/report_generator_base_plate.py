@@ -132,6 +132,7 @@ class SaveDesignBP(BasePlateConnection):
         self.report_check.append(t4)
 
         t5 = ('Plate Washer Hole Diameter (mm)', '', square_washer_in_dia(self.plate_washer_inner_dia), 'N/A')
+
         self.report_check.append(t5)
 
         t6 = ('Nut (Hexagon) Thickness (mm)', '', hexagon_nut_thickness(self.nut_thk), 'N/A')

@@ -1299,125 +1299,154 @@ class ColumnCoverPlate(MomentConnection):
             (2 * self.web_plate.thickness_provided, self.web_plate.fu, self.web_plate.fy))
         self.bolt_conn_plates_web_t_fu_fy.append(
             (self.section.web_thickness, self.section.fu, self.section.fy))
-        bolt_design_status_1 = False
-        bolt_design_status_2 = False
-        for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
-
-            self.flange_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                           conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
-            print(self.flange_bolt.min_edge_dist, self.flange_bolt.edge_type)
-
-            if self.preference == "Outside":
-                self.flange_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                         bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                                         conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-                                                         n_planes=1)
-            else:
-                self.flange_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                         bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                                         conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
-                                                         n_planes=2)
-
-            self.web_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                        conn_plates_t_fu_fy=self.bolt_conn_plates_web_t_fu_fy)
-
-            self.web_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
-                                                  bolt_grade_provided=self.bolt.bolt_grade_provided,
-                                                  conn_plates_t_fu_fy=self.bolt_conn_plates_web_t_fu_fy,
-                                                  n_planes=2)
-            print("self.flange_bolt.bolt_fu",self.flange_bolt.bolt_fu)
-            print("self.bolt.bolt_fu", self.bolt.bolt_fu)
-
-            self.flange_plate.get_flange_plate_details(bolt_dia=self.flange_bolt.bolt_diameter_provided,
-                                                       flange_plate_h_min=self.min_plate_height,
-                                                       flange_plate_h_max=self.max_plate_height,
-                                                       bolt_capacity=self.flange_bolt.bolt_capacity,
-                                                       min_edge_dist=self.flange_bolt.min_edge_dist_round,
-                                                       min_gauge=self.flange_bolt.min_gauge_round,
-                                                       max_spacing=self.flange_bolt.max_spacing_round,
-                                                       max_edge_dist=self.flange_bolt.max_edge_dist_round,
-                                                       axial_load=self.flange_force, gap=self.flange_plate.gap / 2,
-                                                       web_thickness=self.section.web_thickness,
-                                                       root_radius=self.section.root_radius, joint="half")
-
-
-            self.min_web_plate_height = round(self.section.min_plate_height(),2)
-            if self.preference == "Outside":
-                self.max_web_plate_height = self.section.max_plate_height()
-            else:
-
-                self.max_web_plate_height = self.section.depth - 2 * self.section.flange_thickness - (
-                            2 * self.webclearance)
-
-            self.axial_force_w = ((self.section.depth - (2 * self.section.flange_thickness)) *
-                                  self.section.web_thickness *
-                                  self.factored_axial_load) / (self.section.area)
-
-            self.web_plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
-                                                 web_plate_h_min=self.min_web_plate_height,
-                                                 web_plate_h_max=self.max_web_plate_height,
-                                                 bolt_capacity=self.web_bolt.bolt_capacity,
-                                                 min_edge_dist=self.web_bolt.min_edge_dist_round,
-                                                 min_gauge=self.web_bolt.min_gauge_round,
-                                                 max_spacing=self.web_bolt.max_spacing_round,
-                                                 max_edge_dist=self.web_bolt.max_edge_dist_round
-                                                 , shear_load=self.fact_shear_load,
-                                                 axial_load=self.axial_force_w,
-                                                 web_moment=self.moment_web,
-                                                 gap=(self.web_plate.gap / 2), shear_ecc=True, joint="half")
-
-            if self.flange_plate.design_status is True and self.web_plate.design_status is True:
-                if self.flange_plate.bolts_required > bolts_required_previous_1 and count_1 >= 1:
-                    self.bolt.bolt_diameter_provided = bolt_diameter_previous
-                    self.flange_plate.bolts_required = bolts_required_previous_1
-                    self.flange_plate.bolt_force = bolt_force_previous_1
-                    bolt_design_status_1 = self.flange_plate.design_status
-                    break
-                bolts_required_previous_1 = self.flange_plate.bolts_required
-                bolt_diameter_previous = self.bolt.bolt_diameter_provided
-                bolt_force_previous_1 = self.flange_plate.bolt_force
-                count_1 += 1
-                bolt_design_status_1 = self.flange_plate.design_status
-
-                if self.web_plate.bolts_required > bolts_required_previous_2 and count_2 >= 1:
-                    self.bolt.bolt_diameter_provided = bolt_diameter_previous
-                    self.web_plate.bolts_required = bolts_required_previous_2
-                    self.web_plate.bolt_force = bolt_force_previous_2
-                    bolt_design_status_2 = self.web_plate.design_status
-                    break
-                bolts_required_previous_2 = self.web_plate.bolts_required
-                bolt_diameter_previous = self.bolt.bolt_diameter_provided
-                bolt_force_previous_2 = self.web_plate.bolt_force
-                count_2 += 1
-                bolt_design_status_2 = self.web_plate.design_status
-
-        bolt_capacity_req = self.bolt.bolt_capacity
-
-        if (self.flange_plate.design_status == False and bolt_design_status_1 != True) or (
-                self.web_plate.design_status == False and bolt_design_status_2 != True):
-            self.design_status = False
+        # TO GET BOLT BEARING CAPACITY CORRESPONDING TO PLATE THICKNESS
+        # FOR FLANGE
+        if self.preference == "Outside":
+            t_sum1 = self.flange_plate.thickness_provided + self.section.flange_thickness
         else:
-            self.bolt.bolt_diameter_provided = bolt_diameter_previous
-            self.flange_plate.bolts_required = bolts_required_previous_1
-            self.flange_plate.bolt_force = bolt_force_previous_1
-            self.web_plate.bolts_required = bolts_required_previous_2
-            self.web_plate.bolt_force = bolt_force_previous_2
+            t_sum1 = (2 * self.flange_plate.thickness_provided) + self.section.flange_thickness
 
-        if bolt_design_status_1 is True and bolt_design_status_2 is True:
-            self.flange_plate.spacing_status = True
-            self.web_plate.spacing_status = True
-            self.design_status = True
-            self.select_bolt_dia_status = True
-            self.get_bolt_grade(self)
-        else:
-            if self.flange_plate.spacing_status == False:
-                logger.error(" : Bolt connection is not possible in flange due to spacing ")
-            if self.web_plate.spacing_status == False:
-                logger.error(" : Bolt connection is not possible in web due to spacing ")
+        # FOR WEB
+        t_sum2 = (2 * self.web_plate.thickness_provided) + self.section.web_thickness
+        t_sum_max = max(t_sum1,t_sum2)
+        self.large_grip_status = False
+        self.bolt.bolt_diameter_possible = []
+        for d in self.bolt.bolt_diameter:
+            if 8 * d >= t_sum_max:
+                self.bolt.bolt_diameter_possible.append(d)
+            else:
+                pass
+
+        print("bolt dia ", d, " mm  available bolt list ",
+              self.bolt.bolt_diameter_possible, " mm")
+
+        if len(self.bolt.bolt_diameter_possible) ==0:
+            self.large_grip_status = False
             self.design_status = False
-            logger.error(" : Bolt design not possible")
+            logger.error(" : Connected plate thickness should not be greater than 8 times diameter ")
             logger.error(" : Design is not safe. \n ")
             logger.debug(" : =========End Of design===========")
+
+        else:
+            bolt_design_status_1 = False
+            bolt_design_status_2 = False
+            for self.bolt.bolt_diameter_provided in reversed(self.bolt.bolt_diameter):
+
+                self.flange_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                               conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy)
+                print(self.flange_bolt.min_edge_dist, self.flange_bolt.edge_type)
+
+                if self.preference == "Outside":
+                    self.flange_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                             bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                                             conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                                             n_planes=1)
+                else:
+                    self.flange_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                             bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                                             conn_plates_t_fu_fy=self.bolt_conn_plates_t_fu_fy,
+                                                             n_planes=2)
+
+                self.web_bolt.calculate_bolt_spacing_limits(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                            conn_plates_t_fu_fy=self.bolt_conn_plates_web_t_fu_fy)
+
+                self.web_bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
+                                                      bolt_grade_provided=self.bolt.bolt_grade_provided,
+                                                      conn_plates_t_fu_fy=self.bolt_conn_plates_web_t_fu_fy,
+                                                      n_planes=2)
+                print("self.flange_bolt.bolt_fu",self.flange_bolt.bolt_fu)
+                print("self.bolt.bolt_fu", self.bolt.bolt_fu)
+
+                self.flange_plate.get_flange_plate_details(bolt_dia=self.flange_bolt.bolt_diameter_provided,
+                                                           flange_plate_h_min=self.min_plate_height,
+                                                           flange_plate_h_max=self.max_plate_height,
+                                                           bolt_capacity=self.flange_bolt.bolt_capacity,
+                                                           min_edge_dist=self.flange_bolt.min_edge_dist_round,
+                                                           min_gauge=self.flange_bolt.min_gauge_round,
+                                                           max_spacing=self.flange_bolt.max_spacing_round,
+                                                           max_edge_dist=self.flange_bolt.max_edge_dist_round,
+                                                           axial_load=self.flange_force, gap=self.flange_plate.gap / 2,
+                                                           web_thickness=self.section.web_thickness,
+                                                           root_radius=self.section.root_radius, joint="half")
+
+
+                self.min_web_plate_height = round(self.section.min_plate_height(),2)
+                if self.preference == "Outside":
+                    self.max_web_plate_height = self.section.max_plate_height()
+                else:
+
+                    self.max_web_plate_height = self.section.depth - 2 * self.section.flange_thickness - (
+                                2 * self.webclearance)
+
+                self.axial_force_w = ((self.section.depth - (2 * self.section.flange_thickness)) *
+                                      self.section.web_thickness *
+                                      self.factored_axial_load) / (self.section.area)
+
+                self.web_plate.get_web_plate_details(bolt_dia=self.bolt.bolt_diameter_provided,
+                                                     web_plate_h_min=self.min_web_plate_height,
+                                                     web_plate_h_max=self.max_web_plate_height,
+                                                     bolt_capacity=self.web_bolt.bolt_capacity,
+                                                     min_edge_dist=self.web_bolt.min_edge_dist_round,
+                                                     min_gauge=self.web_bolt.min_gauge_round,
+                                                     max_spacing=self.web_bolt.max_spacing_round,
+                                                     max_edge_dist=self.web_bolt.max_edge_dist_round
+                                                     , shear_load=self.fact_shear_load,
+                                                     axial_load=self.axial_force_w,
+                                                     web_moment=self.moment_web,
+                                                     gap=(self.web_plate.gap / 2), shear_ecc=True, joint="half")
+
+                if self.flange_plate.design_status is True and self.web_plate.design_status is True:
+                    if self.flange_plate.bolts_required > bolts_required_previous_1 and count_1 >= 1:
+                        self.bolt.bolt_diameter_provided = bolt_diameter_previous
+                        self.flange_plate.bolts_required = bolts_required_previous_1
+                        self.flange_plate.bolt_force = bolt_force_previous_1
+                        bolt_design_status_1 = self.flange_plate.design_status
+                        break
+                    bolts_required_previous_1 = self.flange_plate.bolts_required
+                    bolt_diameter_previous = self.bolt.bolt_diameter_provided
+                    bolt_force_previous_1 = self.flange_plate.bolt_force
+                    count_1 += 1
+                    bolt_design_status_1 = self.flange_plate.design_status
+
+                    if self.web_plate.bolts_required > bolts_required_previous_2 and count_2 >= 1:
+                        self.bolt.bolt_diameter_provided = bolt_diameter_previous
+                        self.web_plate.bolts_required = bolts_required_previous_2
+                        self.web_plate.bolt_force = bolt_force_previous_2
+                        bolt_design_status_2 = self.web_plate.design_status
+                        break
+                    bolts_required_previous_2 = self.web_plate.bolts_required
+                    bolt_diameter_previous = self.bolt.bolt_diameter_provided
+                    bolt_force_previous_2 = self.web_plate.bolt_force
+                    count_2 += 1
+                    bolt_design_status_2 = self.web_plate.design_status
+
+            bolt_capacity_req = self.bolt.bolt_capacity
+
+            if (self.flange_plate.design_status == False and bolt_design_status_1 != True) or (
+                    self.web_plate.design_status == False and bolt_design_status_2 != True):
+                self.design_status = False
+            else:
+                self.bolt.bolt_diameter_provided = bolt_diameter_previous
+                self.flange_plate.bolts_required = bolts_required_previous_1
+                self.flange_plate.bolt_force = bolt_force_previous_1
+                self.web_plate.bolts_required = bolts_required_previous_2
+                self.web_plate.bolt_force = bolt_force_previous_2
+
+            if bolt_design_status_1 is True and bolt_design_status_2 is True:
+                self.flange_plate.spacing_status = True
+                self.web_plate.spacing_status = True
+                self.design_status = True
+                self.select_bolt_dia_status = True
+                self.get_bolt_grade(self)
+            else:
+                if self.flange_plate.spacing_status == False:
+                    logger.error(" : Bolt connection is not possible in flange due to spacing ")
+                if self.web_plate.spacing_status == False:
+                    logger.error(" : Bolt connection is not possible in web due to spacing ")
+                self.design_status = False
+                logger.error(" : Bolt design not possible")
+                logger.error(" : Design is not safe. \n ")
+                logger.debug(" : =========End Of design===========")
 
     def get_bolt_grade(self):
         print(self.design_status, "Getting bolt grade")

@@ -128,6 +128,7 @@ class IntermittentNutBoltPlateArray():
                 self.nutsabv[index].place((pos + (- self.nut.T + self.member_web_thickness) * self.boltDir - (self.member_thickness + self.root_radius + self.memberdeepth/2) * self.gaugeDir), self.gaugeDir, self.boltDir)
 
 
+
             for index, pltpos in enumerate(self.platePositions):
                 self.plates[index].place(pltpos, self.boltDir, self.pitchDir)
 

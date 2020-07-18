@@ -919,6 +919,10 @@ KEY_DISP_GAP = 'Gap between Members'
 KEY_DISP_MECH_PROP = 'Mechanical Properties'
 KEY_DISP_DIMENSIONS = 'Dimensions'
 KEY_DISP_DEPTH = 'Depth, D (mm)*'
+KEY_DISP_WIDTH = 'Width, B (mm)*'
+KEY_DISP_THICKNESS = 'Thickness, T (mm)*'
+KEY_DISP_NB = 'Nominal bore, NB (mm)*'
+KEY_DISP_OD = 'Outside diameter, OD (mm)*'
 KEY_DISP_FLANGE_W = 'Flange width, B (mm)*'
 KEY_DISP_FLANGE_T = 'Flange thickness, T (mm)*'
 KEY_DISP_WEB_HEIGHT = 'Web Height, D (mm*)'
@@ -934,20 +938,25 @@ KEY_DISP_MASS = 'Mass, M (Kg/m)'
 KEY_DISP_Cz = 'Cz (cm)'
 KEY_DISP_Cy = 'Cy (cm)'
 KEY_DISP_AREA = 'Sectional area, a (cm<sup>2</sup>)'
+KEY_DISP_MOA = '2nd Moment of area, I (cm<sup>4</sup>/m)*'
 KEY_DISP_MOA_IZ = '2nd Moment of area, I<sub>z</sub> (cm<sup>4</sup>)'
 KEY_DISP_MOA_IY = '2nd Moment of area, I<sub>y</sub> (cm<sup>4</sup>)'
 KEY_DISP_MOA_IU = '2nd Moment of area, I<sub>u</sub> (cm<sup>4</sup>)'
 KEY_DISP_MOA_IV = '2nd Moment of area, I<sub>v</sub> (cm<sup>4</sup>)'
+KEY_DISP_ROG = 'Radius of gyration, r (cm)*'
 KEY_DISP_ROG_RZ = 'Radius of gyration, r<sub>z</sub> (cm)'
 KEY_DISP_ROG_RY = 'Radius of gyration, r<sub>y</sub> (cm)'
 KEY_DISP_ROG_RU = 'Radius of gyration, r<sub>u</sub> (cm)'
 KEY_DISP_ROG_RV = 'Radius of gyration, r<sub>v</sub> (cm)'
+KEY_DISP_SM = 'Modulus of section, Z (cm<sup>3</sup>)*'
 KEY_DISP_EM_ZZ = 'Elastic modulus, Z<sub>z</sub> (cm<sup>3</sup>)'
 KEY_DISP_EM_ZY = 'Elastic modulus, Z<sub>y</sub> (ccm<sup>3</sup>)'
 KEY_DISP_PM_ZPZ = 'Plastic modulus, Z<sub>pz</sub> (cm<sup>3</sup>)'
 KEY_DISP_PM_ZPY = 'Plastic modulus, Z<sub>py</sub> (cm<sup>3</sup>)'
 KEY_DISP_It = 'Torsion Constant, I<sub>t</sub> (cm<sup>4</sup>)'
 KEY_DISP_Iw = 'Warping Constant, I<sub>w</sub> (cm<sup>6</sup>)'
+KEY_DISP_IV = 'Internal volume (cm<sup>3</sup>/m)*'
+
 KEY_SOURCE = 'Section.Source'
 KEY_DISP_SOURCE = 'Source'
 KEY_DISP_POISSON_RATIO = 'Poissons ratio, v'
@@ -1132,7 +1141,13 @@ KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
 
 KEY_REDUCTION_FACTOR_FLANGE ='flange_plate.red,factor'
-KEY_DISP_REDUCTION_FACTOR_FLANGE ="Capacity Red.Factor"
+KEY_REDUCTION_LARGE_GRIP ='bolt.large_grip'
+
+
+KEY_DISP_REDUCTION_FACTOR_FLANGE ="Long Joint Red.Factor"
+KEY_DISP_REDUCTION_LARGE_GRIP ="Large Grip Red.Factor"
+
+
 KEY_DISP_REDUCTION ="Strength Red.Factor"
 KEY_OUT_FLANGE_BOLT_SHEAR ='flange_bolt.bolt_shear_capacity'
 KEY_OUT_DISP_FLANGE_BOLT_SHEAR = "Shear Capacity (kN)"
@@ -1307,6 +1322,8 @@ KEY_OUT_DISP_TOT_NO_BOLTS = 'Number of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
+KEY_DISP_MIN_BOLT = 'Minimum Bolts (nos)'
+
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
 KEY_DISP_KB = 'Kb'
 
@@ -1440,7 +1457,9 @@ KEY_OUT_DISP_INTERSPACING = 'Spacing (mm)'
 KEY_OUT_PLATE_CAPACITY = 'Plate.Capacity'
 KEY_OUT_PLATE_LENGTH = 'Plate.Length'
 KEY_OUT_DISP_PLATE_LENGTH = 'Length (mm)'
-KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Length (mm)'
+KEY_OUT_DISP_PLATE_MIN_LENGTH = 'Min.Plate Length (mm)'
+KEY_OUT_DISP_MEMB_MIN_LENGTH = 'Min.Member Length (mm)'
+
 KEY_OUT_PLATE_WIDTH = 'Plate.Width'
 KEY_OUT_DISP_PLATE_WIDTH = 'Width (mm)'
 c = 'Width (mm)'
@@ -1579,7 +1598,9 @@ KEY_PLATE_MOMENT = 'Plate.m_ep'
 
 DISP_TITLE_WELD = 'Weld'
 KEY_OUT_WELD_SIZE = 'Weld.Size'
+KEY_OUT_WELD_TYPE = 'Weld.Type'
 KEY_OUT_DISP_WELD_SIZE = 'Size (mm)'
+KEY_OUT_DISP_WELD_TYPE = 'Type'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
 KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
 KEY_OUT_WELD_STRESS = 'Weld.Stress'

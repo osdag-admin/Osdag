@@ -27,7 +27,7 @@ Connector.Web_Plate.Thickness_List:
 - '16'
 - '25'
 Design.Design_Method: Limit State Design
-Detailing.Gap: '10'
+Detailing.Gap: '3'
 Load.Axial: '52'
 Load.Moment: '10'
 Load.Shear: '80'

@@ -39,10 +39,14 @@ class Window(QDialog):
 
     def __init__(self, main, input_dictionary):
         super().__init__()
-
+        self.input_dictionary = input_dictionary
         self.do_not_clear_list = []
+        self.save_changes_list = []
+        self.values_changed = False
+        for t in main.input_dictionary_design_pref(main):
+            self.save_changes_list.extend(t[2])
         self.initUI(main,input_dictionary)
-
+        # self.rejected.connect(self.close_message)
 
     def center(self):
         frameGm = self.frameGeometry()
@@ -50,6 +54,38 @@ class Window(QDialog):
         centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
+
+    def closeEvent(self, event):
+        if self.values_changed:
+            popup = QMessageBox(self)
+            popup.setIcon(QMessageBox.Information)
+            popup.setWindowTitle("Save")
+            popup.setText('Do you want to save the changes?')
+            popup.setStandardButtons(QMessageBox.Yes |
+                                     QMessageBox.No |
+                                     QMessageBox.Cancel)
+            popup.setDefaultButton(QMessageBox.Cancel)
+            answer = popup.exec_()
+            print(answer, "answer")
+            if answer == QMessageBox.Yes:
+                self.accept()
+                event.accept()
+            elif answer == QMessageBox.No:
+                self.reject()
+                event.accept()
+            elif answer == QMessageBox.Cancel:
+                event.ignore()
+        else:
+            QDialog.closeEvent(self, event)
+
+    def connect_widget_for_change(self, widget):
+        if isinstance(widget, QComboBox):
+            widget.currentIndexChanged.connect(self.something_changed)
+        elif isinstance(widget, QLineEdit):
+            widget.textChanged.connect(self.something_changed)
+
+    def something_changed(self):
+        self.values_changed = True
 
     def initUI(self,main,input_dictionary):
 
@@ -190,6 +226,9 @@ class Window(QDialog):
                             regex_validator = QtCore.QRegExp("[1-9][0-9]*[.][0-9]*|[.][0-9]*|N/A|-")
                             line.setValidator(QtGui.QRegExpValidator(regex_validator, line))
 
+                        if element[0] in self.save_changes_list:
+                            self.connect_widget_for_change(line)
+
                         r += 1
 
                     if type == TYPE_COMBOBOX:
@@ -220,6 +259,9 @@ class Window(QDialog):
                             self.do_not_clear_list.append(combo)
                         else:
                             combo.setFixedSize(85,20)
+
+                        if element[0] in self.save_changes_list:
+                            self.connect_widget_for_change(combo)
                         r += 1
 
                     if type == TYPE_TITLE:
@@ -326,6 +368,9 @@ class Window(QDialog):
                             line.setReadOnly(True)
                         if input_dictionary:
                             line.setText(str(element[4]))
+
+                        if element[0] in self.save_changes_list:
+                            self.connect_widget_for_change(line)
                         r += 1
 
                     if type == TYPE_COMBOBOX:
@@ -352,6 +397,8 @@ class Window(QDialog):
                             combo.model().item(2).setEnabled(False)
                         if input_dictionary:
                             combo.setCurrentText(str(element[4]))
+                        if element[0] in self.save_changes_list:
+                            self.connect_widget_for_change(combo)
                         r += 1
 
                     if type == 'Title':
@@ -572,6 +619,108 @@ class Window(QDialog):
                     c.setCurrentIndex(0)
                 elif isinstance(c, QtWidgets.QLineEdit):
                     c.clear()
+
+    def add_baseplate_tab_column(self):
+        '''
+        @author: Umair
+        '''
+        tab_Column = self.tabWidget.tabs.findChild(QtWidgets.QWidget, KEY_DISP_COLSEC)
+        rhs = connectdb("RHS", call_type="popup")
+        shs = connectdb("SHS", call_type="popup")
+        chs = connectdb("CHS", call_type="popup")
+        hs = rhs + shs
+        input_section = self.input_dictionary[KEY_SECSIZE]
+
+        if input_section in hs:
+            table = "RHS" if input_section in rhs else "SHS"
+            values = {KEY_SECSIZE: '', 'Label_21': ''}
+            for i in [1, 2, 3, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]:
+                key = "Label_HS_"+str(i)
+                values.update({key: ''})
+        elif input_section in chs:
+            table = "CHS"
+            values = {KEY_SECSIZE: '', 'Label_21': ''}
+            for i in [1, 2, 3, 11, 12, 13, 14, 15, 16]:
+                key = "Label_CHS_" + str(i)
+                values.update({key: ''})
+        else:
+            table = "Columns"
+            values = {KEY_SECSIZE: '', 'Label_8': '', 'Label_21': ''}
+            for i in [1, 2, 3, 11, 12, 13, 14, 15, 16]:
+                key = "Label_" + str(i)
+                values.update({key: ''})
+
+        keys_to_add = values.keys()
+
+        for ch in tab_Column.findChildren(QtWidgets.QWidget):
+            if isinstance(ch, QtWidgets.QLineEdit) and ch.text() == "":
+                QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+                return
+            elif isinstance(ch, QtWidgets.QLineEdit) and ch.text() != "":
+                if ch.objectName() in keys_to_add:
+                    values[ch.objectName()] = ch.text()
+            elif isinstance(ch, QtWidgets.QComboBox):
+                if ch.objectName() in keys_to_add:
+                    values[ch.objectName()] = ch.currentText()
+
+        for k in keys_to_add:
+            if k in [KEY_SECSIZE, "Label_21", "Label_8"]:
+                continue
+            else:
+                values[key] = float(values[key])
+
+        if ch:
+            conn = sqlite3.connect(PATH_TO_DATABASE)
+            c = conn.cursor()
+            query = "SELECT count(*) FROM "+table+" WHERE Designation = ?"
+            c.execute(query, (values[KEY_SECSIZE],))
+            data = c.fetchone()[0]
+            if data == 0:
+                if table == "RHS":
+                    c.execute('''INSERT INTO RHS (Designation,D,B,T,W,A,Izz,Iyy,Rzz,Ryy,
+                        Zzz,Zyy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (values[KEY_SECSIZE], values["Label_HS_1"], values["Label_HS_2"],
+                               values["Label_HS_3"], values["Label_HS_11"], values["Label_HS_12"],
+                               values["Label_HS_13"], values["Label_HS_14"], values["Label_HS_15"],
+                               values["Label_HS_16"], values["Label_HS_17"], values["Label_HS_18"],
+                               values["Label_HS_19"], values["Label_HS_20"], values["Label_HS_21"],
+                               ))
+                    conn.commit()
+                elif table == "SHS":
+                    c.execute('''INSERT INTO SHS (Designation,D,B,T,W,A,Izz,Iyy,Rzz,Ryy,
+                        Zzz,Zyy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (values[KEY_SECSIZE], values["Label_HS_1"], values["Label_HS_2"],
+                               values["Label_HS_3"], values["Label_HS_11"], values["Label_HS_12"],
+                               values["Label_HS_13"], values["Label_HS_14"], values["Label_HS_15"],
+                               values["Label_HS_16"], values["Label_HS_17"], values["Label_HS_18"],
+                               values["Label_HS_19"], values["Label_HS_20"], values["Label_HS_21"],
+                               ))
+                    conn.commit()
+                elif table == "CHS":
+                    c.execute('''INSERT INTO CHS (Designation,NB,OD,T,W,A,V,Ves,Vis,I,
+                        Z,R,Rsq,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (values[KEY_SECSIZE], values["Label_CHS_1"], values["Label_CHS_2"],
+                               values["Label_CHS_3"], values["Label_HS_11"], values["Label_HS_12"],
+                               values["Label_HS_13"], values["Label_HS_14"], values["Label_HS_15"],
+                               values["Label_HS_16"], values["Label_HS_17"], values["Label_HS_18"],
+                               values["Label_HS_19"], values["Label_HS_20"], values["Label_HS_21"],
+                               ))
+                    conn.commit()
+                else:
+                    c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+                        Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                              (Designation_c, Mass_c, Area_c,
+                               D_c, B_c, tw_c, T_c,FlangeSlope_c,
+                               R1_c, R2_c, Iz_c, Iy_c, rz_c,
+                               ry_c, Zz_c, Zy_c,
+                               Zpz_c, Zpy_c, It_c,Iw_c,Source_c, Type))
+                    conn.commit()
+                c.close()
+                conn.close()
+                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
+
+            else:
+                QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
 
     def add_tab_column(self):
         '''
@@ -1293,7 +1442,7 @@ class DesignPreferences():
         self.sectionalprop = I_sectional_Properties()
         #self.ui.btn_save.hide()
         self.ui.btn_save.clicked.connect(self.close_designPref)
-        self.ui.btn_defaults.clicked.connect(self.default_fn)
+        self.ui.btn_defaults.clicked.connect(lambda: self.default_fn(main, input_dictionary))
         self.module = main.module_name(main)
         self.main = main
         self.window_close_flag = True
@@ -1315,62 +1464,79 @@ class DesignPreferences():
             self.flag = False
         self.module_window.prev_inputs = self.module_window.input_dock_inputs
 
-    def default_fn(self):
+    def default_fn(self, main, input_dictionary):
         '''
         @author: Umair
         '''
-        tab_Bolt = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Bolt")
-        tab_Weld = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Weld")
-        tab_Detailing = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Detailing")
-        tab_Design = self.ui.tabWidget.findChild(QtWidgets.QWidget, "Design")
+        tab_Bolt = self.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, "Bolt")
+        tab_Weld = self.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, "Weld")
+        tab_Detailing = self.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, "Detailing")
+        tab_Design = self.ui.tabWidget.tabs.findChild(QtWidgets.QWidget, "Design")
 
-        try:
+        bolt_values_dictionary = {}
+        weld_values_dictionary = {}
+        design_values_dictionary = {}
+        detailing_values_dictionary = {}
+
+        if tab_Bolt is not None:
+            for i in main.bolt_values(main, input_dictionary):
+                if i[2] in [TYPE_TEXTBOX, TYPE_COMBOBOX]:
+                    bolt_values_dictionary.update(
+                        {i[0]: str(main.get_values_for_design_pref(main, i[0], input_dictionary))})
+
             for children in tab_Bolt.findChildren(QtWidgets.QWidget):
-                if children.objectName() == KEY_DP_BOLT_TYPE:
-                    children.setCurrentIndex(0)
-                elif children.objectName() == KEY_DP_BOLT_HOLE_TYPE:
-                    children.setCurrentIndex(0)
-                elif children.objectName() == KEY_DP_BOLT_MATERIAL_G_O:
-                    children.setText('410')
-                elif children.objectName() == KEY_DP_BOLT_SLIP_FACTOR:
-                    children.setCurrentIndex(4)
-                else:
-                    pass
-        except:
-            pass
+                if children.objectName() in bolt_values_dictionary.keys():
+                    if type(children) == QLineEdit:
+                        children.setText(bolt_values_dictionary[children.objectName()])
+                    elif type(children) == QComboBox:
+                        children.setCurrentText(bolt_values_dictionary[children.objectName()])
+                    else:
+                        pass
 
-        try:
+        if tab_Weld is not None:
+            for i in main.weld_values(main, input_dictionary):
+                if i[2] in [TYPE_TEXTBOX, TYPE_COMBOBOX]:
+                    weld_values_dictionary.update(
+                        {i[0]: str(main.get_values_for_design_pref(main, i[0], input_dictionary))})
+
             for children in tab_Weld.findChildren(QtWidgets.QWidget):
-                if children.objectName() == KEY_DP_WELD_FAB:
-                    children.setCurrentIndex(0)
-                elif children.objectName() == KEY_DP_WELD_MATERIAL_G_O:
-                    children.setText('410')
-                else:
-                    pass
-        except:
-            pass
+                if children.objectName() in weld_values_dictionary.keys():
+                    if type(children) == QLineEdit:
+                        children.setText(weld_values_dictionary[children.objectName()])
+                    elif type(children) == QComboBox:
+                        children.setCurrentText(weld_values_dictionary[children.objectName()])
+                    else:
+                        pass
 
-        try:
+        if tab_Detailing is not None:
+            for i in main.detailing_values(main, input_dictionary):
+                if i[2] in [TYPE_TEXTBOX, TYPE_COMBOBOX]:
+                    detailing_values_dictionary.update(
+                        {i[0]: str(main.get_values_for_design_pref(main, i[0], input_dictionary))})
+
             for children in tab_Detailing.findChildren(QtWidgets.QWidget):
-                if children.objectName() == KEY_DP_DETAILING_EDGE_TYPE:
-                    children.setCurrentIndex(0)
-                elif children.objectName() == KEY_DP_DETAILING_GAP:
-                    children.setText('10')
-                elif children.objectName() == KEY_DP_DETAILING_CORROSIVE_INFLUENCES:
-                    children.setCurrentIndex(0)
-                else:
-                    pass
-        except:
-            pass
-        try:
-            for children in tab_Design.findChildren(QtWidgets.QWidget):
-                if children.objectName() == KEY_DP_DESIGN_METHOD:
-                    children.setCurrentIndex(0)
-                else:
-                    pass
-        except:
-            pass
+                if children.objectName() in detailing_values_dictionary.keys():
+                    if type(children) == QLineEdit:
+                        children.setText(detailing_values_dictionary[children.objectName()])
+                    elif type(children) == QComboBox:
+                        children.setCurrentText(detailing_values_dictionary[children.objectName()])
+                    else:
+                        pass
 
+        if tab_Design is not None:
+            for i in main.design_values(main, input_dictionary):
+                if i[2] in [TYPE_TEXTBOX, TYPE_COMBOBOX]:
+                    design_values_dictionary.update(
+                        {i[0]: str(main.get_values_for_design_pref(main, i[0], input_dictionary))})
+
+            for children in tab_Design.findChildren(QtWidgets.QWidget):
+                if children.objectName() in design_values_dictionary.keys():
+                    if type(children) == QLineEdit:
+                        children.setText(design_values_dictionary[children.objectName()])
+                    elif type(children) == QComboBox:
+                        children.setCurrentText(design_values_dictionary[children.objectName()])
+                    else:
+                        pass
 
     def highlight_slipfactor_description(self):
         """Highlight the description of currosponding slipfactor on selection of inputs

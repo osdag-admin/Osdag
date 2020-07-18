@@ -1,9 +1,10 @@
 {'Section_Designation': 'StarConfig4Angles',
- 'Section_Parameters': {'parameterText_1': ['Angle Section Type',
+ 'Section_Parameters': {'parameterText_1': ['Type of Angle Section',
                                             '60 x 60 x 6'],
-                        'parameterText_6': ['Gusset Plate Length, l(mm)',
+                        'parameterText_6': ['Length of the Gusset Plate, l(mm)',
                                             '120.0'],
-                        'parameterText_7': ['Gusset Plate Thickness, t*(mm)',
+                        'parameterText_7': ['Thickness of the Gusset Plate, '
+                                            't*(mm)',
                                             '10']},
  'Section_Properties': {'A': '39.72',
                         'Cy': '6.0',

@@ -150,6 +150,11 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         self.ui.btn_CreateDesign.move((width/2)-(186/2),posi+8)
         self.ui.save_outputDock.move((width/2)-(186/2),posi+52)
 
+        # Designed model
+        self.ui.splitter.setSizes([0.85 * posi, 0.15 * posi])
+        self.ui.modelTab.setFocus()
+        self.ui.display.FitAll()
+
     def closeEvent(self, event):
         '''
         Closing module window.
@@ -419,17 +424,17 @@ class Window(QMainWindow):
         self.splitter = QtWidgets.QSplitter(self.centralwidget)
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setObjectName("splitter")
-        self.frame_2 = QtWidgets.QFrame(self.splitter)
-        self.frame_2.setMinimumSize(QtCore.QSize(0, 100))
-        self.frame_2.setFrameShape(QtWidgets.QFrame.Box)
-        self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
-        #self.frame_2.setLineWidth(1)
-        #self.frame_2.setMidLineWidth(1)
-        self.frame_2.setObjectName("frame_2")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.frame_2)
-        self.verticalLayout.setContentsMargins(1, 1, 1, 1)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.mytabWidget = QtWidgets.QTabWidget(self.frame_2)
+        # self.frame_2 = QtWidgets.QFrame(self.splitter)
+        # self.frame_2.setMinimumSize(QtCore.QSize(0, 100))
+        # self.frame_2.setFrameShape(QtWidgets.QFrame.Box)
+        # self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
+        # #self.frame_2.setLineWidth(1)
+        # #self.frame_2.setMidLineWidth(1)
+        # self.frame_2.setObjectName("frame_2")
+        # self.verticalLayout = QtWidgets.QVBoxLayout(self.frame_2)
+        # self.verticalLayout.setContentsMargins(1, 1, 1, 1)
+        # self.verticalLayout.setObjectName("verticalLayout")
+        self.mytabWidget = QtWidgets.QTabWidget(self.splitter)
         self.mytabWidget.setMinimumSize(QtCore.QSize(0, 450))
         font = QtGui.QFont()
         font.setPointSize(8)
@@ -441,14 +446,20 @@ class Window(QMainWindow):
         self.mytabWidget.setStyleSheet("QTabBar::tab { height: 75px; width: 1px;  }")
         self.mytabWidget.setTabPosition(QtWidgets.QTabWidget.East)
         self.mytabWidget.setObjectName("mytabWidget")
-        self.verticalLayout.addWidget(self.mytabWidget)
+        # self.verticalLayout.addWidget(self.mytabWidget)
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
-        self.textEdit.setMinimumSize(QtCore.QSize(0, 125))
-        self.textEdit.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        # self.textEdit.setMinimumSize(QtCore.QSize(0, 125))
+        # self.textEdit.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.textEdit.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
         self.textEdit.setObjectName("textEdit")
+
+        self.mytabWidget.setMinimumSize(0, 0)
+        self.textEdit.setMinimumSize(0, 0)
+        self.splitter.addWidget(self.mytabWidget)
+        self.splitter.addWidget(self.textEdit)
+        self.splitter.setStretchFactor(1, 1)
 
         main.set_osdaglogger(self.textEdit)
         # self.textEdit.setStyleSheet("QTextEdit {color:red}")
@@ -534,6 +545,9 @@ class Window(QMainWindow):
         in_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         in_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
+        input_dp_conn_list = main.input_dictionary_without_design_pref(main)
+        input_dp_conn_list = [i[0] for i in input_dp_conn_list if i[2] == "Input Dock"]
+        print(input_dp_conn_list)
 
         """
         This routine takes the returned list from input_values function of corresponding module
@@ -583,7 +597,8 @@ class Window(QMainWindow):
                 combo.setStyleSheet("QComboBox { combobox-popup: 0; }")
                 combo.setMaxVisibleItems(5)
                 combo.setObjectName(option[0])
-
+                if option[0] in input_dp_conn_list:
+                    self.input_dp_connection(combo)
                 metrices = QtGui.QFontMetrics(font)
                 item_width = 10
 
@@ -606,6 +621,8 @@ class Window(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
+                if option[0] in input_dp_conn_list:
+                    self.input_dp_connection(r)
                 # if option[0] in [KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR] and module == KEY_DISP_BASE_PLATE:
                 #     r.setGeometry(QtCore.QRect(160, 10 + i, 150, 27))
                 #     r.setDisabled(True)
@@ -1619,7 +1636,15 @@ class Window(QMainWindow):
 
         return title_repeat
 
+    def input_dp_connection(self, widget):
+        if isinstance(widget, QComboBox):
+            widget.currentIndexChanged.connect(self.clear_design_pref_dictionary)
+        elif isinstance(widget, QLineEdit):
+            widget.textChanged.connect(self.clear_design_pref_dictionary)
 
+    def clear_design_pref_dictionary(self):
+        if self.ui_loaded:
+            self.design_pref_inputs = {}
 
 
     # Function for Reset Button
@@ -1810,7 +1835,10 @@ class Window(QMainWindow):
             selected_module = main.module_name(main)
             if selected_module == module:
                 # print(uiObj, op_list, data, new)
+                self.ui_loaded = False
                 self.setDictToUserInputs(uiObj, op_list, data, new)
+                self.ui_loaded = True
+                self.output_title_change(main)
             else:
                 QMessageBox.information(self, "Information",
                                         "Please load the appropriate Input")
@@ -1915,8 +1943,8 @@ class Window(QMainWindow):
                 else:
                     self.designPrefDialog.flag = True
 
-                if self.prev_inputs != {}:
-                    self.design_pref_inputs = {}
+                # if self.prev_inputs != {}:
+                #     self.design_pref_inputs = {}
 
         else:
             main.design_button_status = True

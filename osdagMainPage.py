@@ -208,7 +208,9 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         self.rdbtn=QRadioButton()
         self.rdbtn.setObjectName(Object_Name)
         self.rdbtn.setIcon(QIcon(Image_Path))
-        self.rdbtn.setIconSize(QSize(scale*300, scale*300))
+
+        self.rdbtn.setIconSize(QSize(scale*500, scale*500))
+
         layout.addWidget(self.rdbtn)
         self.setStyleSheet(
                     '''
@@ -260,8 +262,8 @@ class OsdagMainWindow(QMainWindow):
                                                     ],
                                 'Moment Connection' :{
                                                     'Beam to Beam' :[
-                                                                ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','B2B_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded','ResourceFiles/images/coverplate.png','B2B_Cover_Plate_Welded'),
+                                                                ('Cover Plate Bolted','ResourceFiles/images/bbcoverplatebolted.png','B2B_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded','ResourceFiles/images/bbcoverplatewelded.png','B2B_Cover_Plate_Welded'),
                                                                 ('End Plate Connection','ResourceFiles/images/endplate.png','B2B_End_Plate_Connection'),
                                                                 self.show_moment_connection,
                                                                     ],

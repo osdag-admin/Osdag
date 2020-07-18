@@ -81,6 +81,7 @@ class MomentConnection(Connection, IS800_2007):
                 elast_sec_mod_y = str(round((RHS_sec_attributes.elast_sec_mod_y / 10 ** 3), 2))
                 plast_sec_mod_z = str(round((RHS_sec_attributes.plast_sec_mod_z / 10 ** 3), 2))
                 plast_sec_mod_y = str(round((RHS_sec_attributes.plast_sec_mod_y / 10 ** 3), 2))
+                image = VALUES_IMG_HOLLOWSECTION[1]
             elif designation in connectdb("SHS", call_type="popup"):
                 SHS_sec_attributes = SHS(designation, material_grade)
                 fu = str(SHS_sec_attributes.fu)
@@ -99,6 +100,7 @@ class MomentConnection(Connection, IS800_2007):
                 elast_sec_mod_y = str(round((SHS_sec_attributes.elast_sec_mod_y / 10 ** 3), 2))
                 plast_sec_mod_z = str(round((SHS_sec_attributes.plast_sec_mod_z / 10 ** 3), 2))
                 plast_sec_mod_y = str(round((SHS_sec_attributes.plast_sec_mod_y / 10 ** 3), 2))
+                image = VALUES_IMG_HOLLOWSECTION[0]
             elif designation in connectdb("CHS", call_type="popup"):
                 CHS_sec_attributes = CHS(designation, material_grade)
                 fu = str(CHS_sec_attributes.fu)
@@ -113,6 +115,7 @@ class MomentConnection(Connection, IS800_2007):
                 mom_inertia = str(CHS_sec_attributes.mom_inertia)
                 rad_of_gy = str(round((CHS_sec_attributes.rad_of_gy / 10), 2))
                 elast_sec_mod = str(round((CHS_sec_attributes.elast_sec_mod / 10 ** 3), 2))
+                image = VALUES_IMG_HOLLOWSECTION[2]
             else:
                 I_sec_attributes = ISection(designation)
                 table = "Beams" if designation in connectdb("Beams", "popup") else "Columns"
@@ -173,7 +176,7 @@ class MomentConnection(Connection, IS800_2007):
         t16 = ('Label_10', KEY_DISP_MOD_OF_RIGID, TYPE_TEXTBOX, None, m_o_r)
         section.append(t16)
 
-        t31 = ('Label_22', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
+        t31 = ('Label_24', KEY_DISP_POISSON_RATIO, TYPE_TEXTBOX, None, p_r)
         section.append(t31)
 
         t32 = ('Label_23', KEY_DISP_THERMAL_EXP, TYPE_TEXTBOX, None, t_e)
@@ -347,10 +350,10 @@ class MomentConnection(Connection, IS800_2007):
             t27 = ('Label_20', KEY_DISP_PM_ZPY, TYPE_TEXTBOX, None, plast_sec_mod_y)
             section.append(t27)
 
-            t26 = ('Label_24', KEY_DISP_It, TYPE_TEXTBOX, None, torsion_const)
+            t26 = ('Label_21', KEY_DISP_It, TYPE_TEXTBOX, None, torsion_const)
             section.append(t26)
 
-            t27 = ('Label_25', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
+            t27 = ('Label_22', KEY_DISP_Iw, TYPE_TEXTBOX, None, warping_const)
             section.append(t27)
 
         return section

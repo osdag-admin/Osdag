@@ -113,7 +113,6 @@ class IntermittentNutBoltPlateArray():
                     self.positions.append(pos)
 
     def place(self, origin, gaugeDir, pitchDir, boltDir):
-
         self.origin = origin
         self.gaugeDir = gaugeDir
         self.pitchDir = pitchDir
@@ -125,8 +124,10 @@ class IntermittentNutBoltPlateArray():
             for index, pos in enumerate(self.positions):
                 self.bolts[index].place(pos + self.memberdeepth/2 * self.gaugeDir , self.gaugeDir, self.boltDir)
                 self.nuts[index].place((pos + (self.gap) * self.boltDir + self.memberdeepth/2 * self.gaugeDir), self.gaugeDir, -self.boltDir)
-                self.boltsabv[index].place(pos + (self.gap - self.nut.T + self.bolt.T - self.member_web_thickness) * self.boltDir - (self.member_thickness + self.root_radius + self.memberdeepth/2) * self.gaugeDir, self.gaugeDir, -self.boltDir)
-                self.nutsabv[index].place((pos - (self.member_thickness + self.root_radius + self.memberdeepth/2) * self.gaugeDir - self.member_web_thickness * self.boltDir), self.gaugeDir, self.boltDir)
+                self.boltsabv[index].place(pos + (self.gap - self.nut.T + self.member_web_thickness) * self.boltDir - (self.member_thickness + self.root_radius + self.memberdeepth/2) * self.gaugeDir, self.gaugeDir, -self.boltDir)
+                self.nutsabv[index].place((pos + (- self.nut.T + self.member_web_thickness) * self.boltDir - (self.member_thickness + self.root_radius + self.memberdeepth/2) * self.gaugeDir), self.gaugeDir, self.boltDir)
+
+
 
             for index, pltpos in enumerate(self.platePositions):
                 self.plates[index].place(pltpos, self.boltDir, self.pitchDir)
@@ -156,20 +157,7 @@ class IntermittentNutBoltPlateArray():
 
         for plate in self.plates:
             self.platemodels.append(plate.create_model())
-        #
-        # nut_bolts = self.models
-        # nbarray = nut_bolts[0]
-        # for comp in nut_bolts:
-        #     nbarray = BRepAlgoAPI_Fuse(comp, nbarray).Shape()
-        #
-        # plates = self.platemodels
-        # parray = plates[0]
-        # for comp in plates:
-        #     parray = BRepAlgoAPI_Fuse(comp, parray).Shape()
-        #
-        # array = BRepAlgoAPI_Fuse(nbarray, parray).Shape()
-        #
-        # return array
+
 
     def get_nut_bolt_models(self):
         nut_bolts = self.models

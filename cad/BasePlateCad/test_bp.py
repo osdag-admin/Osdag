@@ -1548,7 +1548,7 @@ if __name__ == '__main__':
                                  weld_stiffener_acrsWeb_v, weld_stiffener_acrsWeb_h, weld_stiffener_acrsWeb_gh, stiffener_insideflange, weld_stiffener_inflange)
 
     if hollow_sec == True:
-        rect_hollow = False
+        rect_hollow = True
         # circ_hollow = False
         if rect_hollow == True:
             sec = RectHollow(L= 50, W= 100, H=1000, T=4)

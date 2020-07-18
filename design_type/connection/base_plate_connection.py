@@ -1805,6 +1805,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             # thickness of the base plate [Reference: Clause 7.4.3.1, IS 800:2007]
             self.plate_thk = self.projection * (math.sqrt((2.5 * self.w * self.gamma_m0) / self.dp_bp_fy))  # mm
 
+            self.tension_demand_anchor = 0
+
             # total number of anchor bolts provided
             self.anchor_nos_provided = self.anchors_outside_flange
 
@@ -3933,7 +3935,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             print(self.tension_demand_anchor)  # Tension Demand (kN)
             print(self.tension_capacity_anchor)  # Tension capacity (kN)
         else:
-            pass
+            print(self.tension_demand_anchor)
         print(self.combined_capacity_anchor)  # Combined capacity (kN)
 
         print(self.anchor_len_above_footing)
@@ -4002,7 +4004,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                 pass
 
         #stiffener plate inside flange
-        if self.connectivity == 'Moment Base Plate':
+        elif self.connectivity == 'Moment Base Plate':
             if (self.anchors_outside_flange == 3) or (self.anchors_outside_flange == 6):
                 if self.stiffener_inside_flange == 'Yes':
 

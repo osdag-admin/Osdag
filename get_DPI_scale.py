@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets
 import sys
 
 app = QApplication(sys.argv)
+
 # screen = app.screens()[0]
 # dpi = screen.physicalDotsPerInch()
 # image_inch = 300/140
@@ -20,3 +21,4 @@ print(width,height)
 # width = min(width, height)
 scale = round(min(height/refHeight, width/refWidth),1)
 print(scale)
+

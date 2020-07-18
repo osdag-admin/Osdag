@@ -186,12 +186,20 @@ class BasePlateCad(object):
 
         :return: Geometric Orientation of this component
         """
-        columnOriginL = numpy.array([0.0, 0.0, self.weldSideWeb.h])
-        columnL_uDir = numpy.array([1.0, 0.0, 0.0])
-        columnL_wDir = numpy.array([0.0, 0.0, 1.0])
-        self.column.place(columnOriginL, columnL_uDir, columnL_wDir)
+        if self.BP.weld_type == 'Fillet Weld':
+            columnOriginL = numpy.array([0.0, 0.0, 0.0])
+            columnL_uDir = numpy.array([1.0, 0.0, 0.0])
+            columnL_wDir = numpy.array([0.0, 0.0, 1.0])
+            self.column.place(columnOriginL, columnL_uDir, columnL_wDir)
 
-        self.columnModel = self.column.create_model()
+            self.columnModel = self.column.create_model()
+        else:
+            columnOriginL = numpy.array([0.0, 0.0, self.weldAbvFlang.h])
+            columnL_uDir = numpy.array([1.0, 0.0, 0.0])
+            columnL_wDir = numpy.array([0.0, 0.0, 1.0])
+            self.column.place(columnOriginL, columnL_uDir, columnL_wDir)
+
+            self.columnModel = self.column.create_model()
 
     def createBasePlateGeometry(self):
         baseplateOriginL = numpy.array([-self.baseplate.W / 2, 0.0, -self.baseplate.T / 2])
@@ -407,21 +415,21 @@ class BasePlateCad(object):
             self.weldSideWeb_12Model = self.weldSideWeb_12.create_model()
 
         else:
-            weldAbvFlangOrigin_11 = numpy.array([self.column.B / 2, -self.column.D / 2 + self.weldAbvFlang.b/2, self.weldSideWeb.h/2])
+            weldAbvFlangOrigin_11 = numpy.array([self.column.B / 2, -self.column.D / 2 + self.weldAbvFlang.b/2, self.weldAbvFlang.h/2])
             uDirAbv_11 = numpy.array([0, -1.0, 0.0])
             wDirAbv_11 = numpy.array([-1.0, 0, 0])
             self.weldAbvFlang_11.place(weldAbvFlangOrigin_11, uDirAbv_11, wDirAbv_11)
 
             self.weldAbvFlang_11Model = self.weldAbvFlang_11.create_model()
 
-            weldAbvFlangOrigin_12 = numpy.array([-self.column.B / 2, self.column.D / 2 - self.weldAbvFlang.b/2, self.weldSideWeb.h/2])
+            weldAbvFlangOrigin_12 = numpy.array([-self.column.B / 2, self.column.D / 2 - self.weldAbvFlang.b/2, self.weldAbvFlang.h/2])
             uDirAbv_12 = numpy.array([0, 1.0, 0.0])
             wDirAbv_12 = numpy.array([1.0, 0, 0])
             self.weldAbvFlang_12.place(weldAbvFlangOrigin_12, uDirAbv_12, wDirAbv_12)
 
             self.weldAbvFlang_12Model = self.weldAbvFlang_12.create_model()
 
-            weldSideWebOrigin_11 = numpy.array([-self.column.t / 2 + self.weldSideWeb.b/2, self.weldSideWeb_11.L / 2, self.weldSideWeb.h/2])
+            weldSideWebOrigin_11 = numpy.array([-self.column.t / 2 + self.weldSideWeb.b/2, self.weldSideWeb_11.L / 2, self.weldAbvFlang.h/2])
             uDirWeb_11 = numpy.array([1.0, 0.0, 0.0])
             wDirWeb_11 = numpy.array([0, -1.0, 0.0])
             self.weldSideWeb_11.place(weldSideWebOrigin_11, uDirWeb_11, wDirWeb_11)
@@ -1169,7 +1177,7 @@ class HollowBasePlateCad(object):
 
         if self.stiffener_l == True:
 
-            if rect_hollow == True:
+            if self.BP.dp_column_designation[1:4] == 'SHS' or self.BP.dp_column_designation[1:4] == 'RHS':
                 D = self.column.W
                 B = self.column.L
             else:
@@ -1195,7 +1203,7 @@ class HollowBasePlateCad(object):
             self.stiff_alg_l2Model = self.stiff_alg_l2.create_model()
 
         if self.stiffener_b == True:
-            if rect_hollow == True:
+            if self.BP.dp_column_designation[1:4] == 'SHS' or self.BP.dp_column_designation[1:4] == 'RHS':
                 D = self.column.W
                 B = self.column.L
             else:
@@ -1223,12 +1231,13 @@ class HollowBasePlateCad(object):
         weld_secOriginL = numpy.array([0.0, 0.0, self.weld_sec.H/2])
         weld_secL_uDir = numpy.array([1.0, 0.0, 0.0])
         weld_secL_wDir = numpy.array([0.0, 0.0, 1.0])
+
         self.weld_sec.place(weld_secOriginL, weld_secL_uDir, weld_secL_wDir)
 
         self.weld_secModel = self.weld_sec.create_model()
 
         if self.stiffener_l == True:
-            if rect_hollow == True:
+            if self.BP.dp_column_designation[1:4] == 'SHS' or self.BP.dp_column_designation[1:4] == 'RHS':
                 D = self.column.W
                 B = self.column.L
             else:
@@ -1274,7 +1283,7 @@ class HollowBasePlateCad(object):
             self.weld_stiff_l_v2Model = self.weld_stiff_l_v2.create_model()
 
         if self.stiffener_b == True:
-            if rect_hollow == True:
+            if self.BP.dp_column_designation[1:4] == 'SHS' or self.BP.dp_column_designation[1:4] == 'RHS':
                 D = self.column.W
                 B = self.column.L
             else:

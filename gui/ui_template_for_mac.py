@@ -130,9 +130,6 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         # self.count=1
         # self.resize_dockComponents()
         # self.count=2
-
-
-
         self.resized.connect(self.resize_dockComponents)
 
     def center(self):

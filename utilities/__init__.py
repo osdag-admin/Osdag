@@ -11,15 +11,15 @@ def color_the_edges(shp, display, color, width):
     ctx = display.Context
     while Ex.More():
         aEdge = topods.Edge(Ex.Current())
-        # ais_shape = AIS_Shape(aEdge).GetHandle()
-        # ctx.SetColor(ais_shape, color, False)
-        # ctx.SetWidth(ais_shape, width, False)
+        ais_shape = AIS_Shape(aEdge)
+        # ctx.SetColor(ais_shape, color, True)
+        ctx.SetWidth(ais_shape, width, False)
         # ctx.Display(ais_shape, False)
         Ex.Next()
 
 
 def set_default_edge_style(shp, display):
-    color_the_edges(shp, display, Quantity_NOC_BLACK, 1.5)
+    color_the_edges(shp, display, Quantity_NOC_BLACK, 0.5)
     # return shps
     
     

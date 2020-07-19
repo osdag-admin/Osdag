@@ -209,7 +209,7 @@ class Submodule_Widget(QWidget):            # Module Variant widget with a Name,
         self.rdbtn.setObjectName(Object_Name)
         self.rdbtn.setIcon(QIcon(Image_Path))
 
-        self.rdbtn.setIconSize(QSize(scale*500, scale*500))
+        self.rdbtn.setIconSize(QSize(scale*300, scale*300))
 
         layout.addWidget(self.rdbtn)
         self.setStyleSheet(

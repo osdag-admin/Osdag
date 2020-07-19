@@ -18,7 +18,7 @@ from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
 
 from design_type.connection.column_cover_plate import ColumnCoverPlate
-from PIL import Image
+# from PIL import Image
 from texlive.Design_wrapper import init_display as init_display_off_screen
 # from OCC.Display.backend import off
 import os
@@ -29,11 +29,11 @@ from drawing_2D.Svg_Window import SvgWindow
 import sys
 import sqlite3
 import shutil
-import openpyxl
-import pdfkit
+# import openpyxl
+# import pdfkit
 import configparser
 import pickle
-import cairosvg
+# import cairosvg
 
 from update_version_check import Update
 import pandas as pd

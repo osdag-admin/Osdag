@@ -4657,9 +4657,22 @@ def modular_ratio(E_s, f_ck, modular_ratio):
     n.append(NoEscape(r'\begin{aligned}     = 5000~\sqrt{' + f_ck + r'}~=~' + E_c + r' \\'))
     n.append(NoEscape(r'\begin{aligned} n = \frac{' + E_s + r'}{' + E_c + r'} \\'))
     n.append(NoEscape(r'\begin{aligned}   =  ' + modular_ratio + r'\\'))
-    n.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)]\end{aligned}'))
+    n.append(NoEscape(r'&[Ref.~Design~of~Welded~Structures~-~Omer~W~Blodgett~(section~3.3)] \end{aligned}'))
 
     return n
+
+
+def epsilon(yield_stress, epsilon_value):
+    """ """
+    yield_stress = str(yield_stress)
+    epsilon_value = str(epsilon_value)
+
+    value = Math(inline=True)
+    value.append(NoEscape(r'\begin{aligned} \epsilon_{st} = \sqrt{\frac{250}{f_{y}}} \\'))
+    value.append(NoEscape(r'\begin{aligned}               = \sqrt{\frac{250}{' + yield_stress + r'}} \\'))
+    value.append(NoEscape(r'\begin{aligned}               = ' + epsilon_value + r' \end{aligned}'))
+
+    return value
 
 
 def total_anchor_area_tension(anchor_dia, anchor_nos_tension, anchor_area_tension):
@@ -5197,6 +5210,24 @@ def stiff_height_flange(stiff_length_flange, stiff_height):
     return height
 
 
+def stiff_thk_flange(stiff_length_flange, epsilon, col_flange_thk):
+    """ """
+    stiff_thk = stiff_length_flange / (8.4 * epsilon)
+    stiff_thk = str(stiff_thk)
+    stiff_length_flange = str(stiff_length_flange)
+    epsilon = str(epsilon)
+    col_flange_thk = str(col_flange_thk)
+
+    thickness = Math(inline=True)
+    thickness.append(NoEscape(r'\begin{aligned} {t_{st}}_{f} = \bigg(\frac{{L_{st}}_{f}}{8.4\times \epsilon_{st}}\bigg) \geq T \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = \bigg(\frac{' + stiff_length_flange + r'}{8.4\times ' + epsilon + r'}\bigg) \geq '
+                                                                                                             + col_flange_thk + r' \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = ' + stiff_thk + r' \geq ' + col_flange_thk + r' \\'))
+    thickness.append(NoEscape(r'&[Ref.~IS~800:2007~(Table~2) \end{aligned}'))
+
+    return thickness
+
+
 def stiff_len_web(bp_length, col_depth, stiff_length):
     """ """
     bp_length = str(bp_length)
@@ -5224,6 +5255,24 @@ def stiff_height_web(stiff_length_web, stiff_height):
     height.append(NoEscape(r'&[Ref.~stiffener~drawing~attached~below \end{aligned}'))
 
     return height
+
+
+def stiff_thk_web(stiff_length_web, epsilon, col_web_thk):
+    """ """
+    stiff_thk = stiff_length_web / (8.4 * epsilon)
+    stiff_thk = str(stiff_thk)
+    stiff_length_web = str(stiff_length_web)
+    epsilon = str(epsilon)
+    col_web_thk = str(col_web_thk)
+
+    thickness = Math(inline=True)
+    thickness.append(NoEscape(r'\begin{aligned} {t_{st}}_{w} = \bigg(\frac{{L_{st}}_{w}}{8.4\times \epsilon_{st}}\bigg) \geq t \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = \bigg(\frac{' + stiff_length_web + r'}{8.4\times ' + epsilon + r'}\bigg) \geq '
+                                                                                                             + col_web_thk + r' \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = ' + stiff_thk + r' \geq ' + col_web_thk + r' \\'))
+    thickness.append(NoEscape(r'&[Ref.~IS~800:2007~(Table~2) \end{aligned}'))
+
+    return thickness
 
 
 def stiff_len_across_web(stiff_length_flange, stiff_length_web, stiff_length):
@@ -5254,3 +5303,133 @@ def stiff_height_across_web(stiff_length_across_web, stiff_height):
     height.append(NoEscape(r'&[Ref.~stiffener~drawing~attached~below \end{aligned}'))
 
     return height
+
+
+def stiff_thk_across_web(stiff_length_across_web, epsilon, col_web_thk):
+    """ """
+    stiff_thk = stiff_length_across_web / (8.4 * epsilon)
+    stiff_thk = str(stiff_thk)
+    stiff_length_across_web = str(stiff_length_across_web)
+    epsilon = str(epsilon)
+    col_web_thk = str(col_web_thk)
+
+    thickness = Math(inline=True)
+    thickness.append(NoEscape(r'\begin{aligned} {t_{st}}_{aw} = \bigg(\frac{{L_{st}}_{aw}}{8.4\times \epsilon_{st}}\bigg) \geq t \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = \bigg(\frac{' + stiff_length_across_web + r'}{8.4\times ' + epsilon + r'}\bigg) \geq '
+                                                                                                             + col_web_thk + r' \\'))
+    thickness.append(NoEscape(r'\begin{aligned}        = ' + stiff_thk + r' \geq ' + col_web_thk + r' \\'))
+    thickness.append(NoEscape(r'&[Ref.~IS~800:2007~(Table~2) \end{aligned}'))
+
+    return thickness
+
+
+def stiffener_stress_flange(sigma_crit):
+    """ """
+    sigma_crit = str(sigma_crit)
+
+    stress_along_flange = Math(inline=True)
+    stress_along_flange.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{f} = {\sigma_{br}}_{critical} \\'))
+    stress_along_flange.append(NoEscape(r'\begin{aligned}                   = ' + sigma_crit + r' \end{aligned}'))
+
+    return stress_along_flange
+
+
+def stiffener_stress_web(sigma_max, sigma_crit, sigma_val, f_ck, type='welded_hollow_bp', case='None'):
+    """ """
+    sigma_val = str(sigma_val)
+
+    stress_along_web = Math(inline=True)
+
+    if (type == 'welded_hollow_bp') and (case == 'None'):
+        stress_along_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{w} = {\sigma_{br}}_{actual} \\'))
+        stress_along_web.append(NoEscape(r'\begin{aligned}                   = ' + sigma_val + r' \end{aligned}'))
+
+    elif (type == 'moment_bp') and (case == 'Case2&3'):
+        f_ck = str(f_ck)
+        stress_along_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{w} = 0.45f_{ck} \\'))
+        stress_along_web.append(NoEscape(r'\begin{aligned}                   = 0.45' + f_ck + r' \\'))
+        stress_along_web.append(NoEscape(r'\begin{aligned}                   = ' + sigma_val + r'\end{aligned}'))
+
+    else:
+        sigma_val = (sigma_max + sigma_crit) / 2
+        sigma_val = str(sigma_val)
+        sigma_max = str(sigma_max)
+        sigma_crit = str(sigma_crit)
+
+        stress_along_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{w} = \frac{{\sigma_{b}}_{max} + {\sigma_{b}}_{critical}}{2} \\'))
+        stress_along_web.append(NoEscape(r'\begin{aligned}                   = \frac{' + sigma_max + r' + ' + sigma_crit + r'}{2} \\'))
+        stress_along_web.append(NoEscape(r'\begin{aligned}                   = ' + sigma_val + r' \end{aligned}'))
+
+    return stress_along_web
+
+
+def stiffener_stress_across_web(sigma, sigma_max, sigma_min, type='welded_hollow_bp', case='None'):
+    """ """
+    sigma = str(sigma)
+
+    stress_across_web = Math(inline=True)
+
+    if (type == 'welded_hollow_bp') and (case == 'None'):
+        stress_across_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{aw} = {\sigma_{br}}_{actual} \\'))
+    elif (type == 'moment_bp') and (case == 'Case2&3'):
+        stress_across_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{aw} = {\sigma_{br}}_{actual} \\'))
+    else:
+        sigma_max = str(sigma_max)
+        sigma_min = str(sigma_min)
+
+        stress_across_web.append(NoEscape(r'\begin{aligned} {\sigma_{st}}_{aw} = \frac{{\sigma_{b}}_{max}~ - ~{\sigma_{b}}_{min}}{2} \\'))
+        stress_across_web.append(NoEscape(r'\begin{aligned}                    = \frac{' + sigma_max + r'~ - ~' + sigma_min + r'}{2} \\'))
+
+    stress_across_web.append(NoEscape(r'\begin{aligned}                    = ' + sigma + r' \end{aligned}'))
+
+    return stress_across_web
+
+
+def shear_demand_stiffener(sigma, stiff_length, stiff_height, shear, location='flange'):
+    """ """
+    sigma = str(sigma)
+    stiff_length = str(stiff_length)
+    stiff_height = str(stiff_height)
+    shear = str(shear)
+
+    shear_demand = Math(inline=True)
+
+    if location == 'flange':
+        shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{f} =  {\sigma_{st}}_{f} \times {L_{st}}_{f}~{H_{st}}_{f} \\'))
+    elif location == 'web':
+        shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{w} =  {\sigma_{st}}_{w} \times {L_{st}}_{w}~{H_{st}}_{w} \\'))
+    else:
+        shear_demand.append(NoEscape(r'\begin{aligned} {V_{st}}_{aw} =  {\sigma_{st}}_{aw} \times {L_{st}}_{aw}~{H_{st}}_{aw} \\'))
+
+    shear_demand.append(NoEscape(r'\begin{aligned}              =  ' + sigma + r' \times ' + stiff_length + r'~' + stiff_height + r' \\'))
+    shear_demand.append(NoEscape(r'\begin{aligned}              =  ' + shear + r' \end{aligned}'))
+
+    return shear_demand
+
+
+def shear_capacity_stiffener(stiff_thk, stiff_height, stiff_fy, shear_capa, gamma_m0, location='flange'):
+    """ """
+    stiff_thk = str(stiff_thk)
+    stiff_height = str(stiff_height)
+    stiff_fy = str(stiff_fy)
+    shear_capa = str(shear_capa)
+    gamma_m0 = str(gamma_m0)
+
+    shear_capacity = Math(inline=True)
+
+    if location == 'flange':
+        shear_capacity.append(NoEscape(r'\begin{aligned} {V_{d}}_{f} =  \frac{A_{vg}~f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+        shear_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{{(H_{st}}_{f}\times {t_{st}}_{f})f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+    elif location == 'web':
+        shear_capacity.append(NoEscape(r'\begin{aligned} {V_{d}}_{w} =  \frac{A_{vg}~f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+        shear_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{{(H_{st}}_{w}\times {t_{st}}_{w})f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+    else:
+        shear_capacity.append(NoEscape(r'\begin{aligned} {V_{d}}_{aw} =  \frac{A_{vg}~f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+        shear_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{{(H_{st}}_{aw}\times {t_{st}}_{aw})f_{y}}{\sqrt{3}~\gamma_{m0}} \\'))
+
+    shear_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{' + stiff_height + r' \times ' + stiff_thk + r')' + stiff_fy + r'}'
+                                                                                                     r'{\sqrt{3}~' + gamma_m0 + r'} \\'))
+
+    shear_capacity.append(NoEscape(r'\begin{aligned}              =  ' + shear_capa + r' \end{aligned}'))
+
+    return shear_capacity

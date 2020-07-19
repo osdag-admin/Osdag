@@ -119,10 +119,6 @@ class SaveDesignBP(BasePlateConnection):
                                                                                      self.bearing_strength_concrete), 'N/A')
         self.report_check.append(t7)
 
-        if self.connectivity == 'Moment Base Plate':
-            t8 = ('Modular Ratio', '', modular_ratio(2 * 10 ** 5, (self.bearing_strength_concrete / 0.45), self.n), 'N/A')
-            self.report_check.append(t8)
-
         t2 = ('Grout Thickness (mm)', '', 't_g = ' + self.grout_thk + '', 'N/A')
         self.report_check.append(t2)
 
@@ -137,6 +133,13 @@ class SaveDesignBP(BasePlateConnection):
 
         t6 = ('Nut (Hexagon) Thickness (mm)', '', hexagon_nut_thickness(self.nut_thk), 'N/A')
         self.report_check.append(t6)
+
+        if self.connectivity == 'Moment Base Plate':
+            t8 = ('Modular Ratio', '', modular_ratio(2 * 10 ** 5, (self.bearing_strength_concrete / 0.45), self.n), 'N/A')
+            self.report_check.append(t8)
+
+        t9 = ('Epsilon - Stiffener Plate', '', epsilon(self.stiffener_fy, self.epsilon), 'N/A')
+        self.report_check.append(t9)
 
         # Check 2-1: Anchor Bolt Details - Outside Column Flange
         t1 = ('SubSection', 'Anchor Bolt Details - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
@@ -490,7 +493,22 @@ class SaveDesignBP(BasePlateConnection):
                       'N/A')
                 self.report_check.append(t3)
 
+                t4 = ('Thickness of Stiffener (mm)', stiff_thk_flange(self.stiffener_plt_len_along_flange, self.epsilon, self.column_tf),
+                                                                                            self.stiffener_plt_thick_along_flange, '')
+                self.report_check.append(t4)
+
+                t5 = ('Max. Stress at Stiffener (N/mm^2)', self.bearing_strength_concrete, stiffener_stress_flange(self.sigma_xx), '')
+                self.report_check.append(t5)
+
+                t6 = ('Shear on Stiffener (kN)', shear_demand_stiffener(self.sigma_xx, self.stiffener_plt_len_along_flange,
+                                                                        self.stiffener_plt_height_along_flange, self.shear_on_stiffener_along_flange,
+                                                                        location='flange'),
+                      shear_capacity_stiffener(self.stiffener_plt_thick_along_flange, self.stiffener_plt_height_along_flange, self.stiffener_fy,
+                                               self.shear_capa_stiffener_along_flange, self.gamma_m0, location='flange'), '')
+                self.report_check.append(t6)
+
             if self.stiffener_along_web == 'Yes':
+
                 t1 = ('SubSection', 'Stiffener Design - Along Column Web', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
@@ -500,7 +518,36 @@ class SaveDesignBP(BasePlateConnection):
                 t3 = ('Height of Stiffener (mm)', '', stiff_height_web(self.stiffener_plt_len_along_web, self.stiffener_plt_height_along_web), 'N/A')
                 self.report_check.append(t3)
 
+                t4 = ('Thickness of Stiffener (mm)', stiff_thk_web(self.stiffener_plt_len_along_web, self.epsilon, self.column_tw),
+                                                                                            self.stiffener_plt_thick_along_web, '')
+                self.report_check.append(t4)
+
+                if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+                    t5 = ('Max. Stress at Stiffener (mm)', self.bearing_strength_concrete, stiffener_stress_web(0, 0, self.sigma_xx, 0,
+                                                                                                            type='welded_hollow_bp', case='None'), '')
+                    self.report_check.append(t5)
+
+                if self.connectivity == 'Moment Base Plate':
+
+                    if (self.moment_bp_case == 'Case2') or (self.moment_bp_case == 'Case3'):
+                        t5 = ('Max. Stress at Stiffener (mm)', self.bearing_strength_concrete, stiffener_stress_web(0, 0, self.sigma_max_zz,
+                                                                    (self.bearing_strength_concrete / 0.45), type='moment_bp', case='Case2&3'), '')
+                        self.report_check.append(t5)
+
+                    else:
+                        t5 = ('Max. Stress at Stiffener (mm)', self.bearing_strength_concrete, stiffener_stress_web(self.sigma_max_zz, self.sigma_xx,
+                                                                                                        0, 0, type='moment_bp', case='Case1'), '')
+                        self.report_check.append(t5)
+
+                t6 = ('Shear on Stiffener (kN)', shear_demand_stiffener(((self.sigma_max_zz + self.sigma_xx) / 2), self.stiffener_plt_len_along_web,
+                                                                        self.stiffener_plt_height_along_web, self.shear_on_stiffener_along_web,
+                                                                        location='web'),
+                      shear_capacity_stiffener(self.stiffener_plt_thick_along_web, self.stiffener_plt_height_along_web, self.stiffener_fy,
+                                               self.shear_capa_stiffener_along_web, self.gamma_m0, location='web'), '')
+                self.report_check.append(t6)
+
             if self.stiffener_across_web == 'Yes':
+
                 t1 = ('SubSection', 'Stiffener Design - Across Column Web', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
@@ -511,6 +558,36 @@ class SaveDesignBP(BasePlateConnection):
                 t3 = ('Height of Stiffener (mm)', '', stiff_height_across_web(self.stiffener_plt_len_across_web,
                                                                               self.stiffener_plt_height_across_web), 'N/A')
                 self.report_check.append(t3)
+
+                t4 = ('Thickness of Stiffener (mm)', stiff_thk_across_web(self.stiffener_plt_len_across_web, self.epsilon, self.column_tw),
+                                                                                            self.stiffener_plt_thick_across_web, '')
+                self.report_check.append(t4)
+
+                if (self.connectivity == 'Welded Column Base') or (self.connectivity == 'Hollow/Tubular Column Base'):
+                    t5 = ('Max. Stress at Stiffener (mm)', self.bearing_strength_concrete, stiffener_stress_across_web(self.sigma_web, 0, 0,
+                                                                                                                       type='welded_hollow_bp',
+                                                                                                                       case='None'), '')
+                    self.report_check.append(t5)
+
+                if self.connectivity == 'Moment Base Plate':
+
+                    if (self.moment_bp_case == 'Case2') or (self.moment_bp_case == 'Case3'):
+                        t5 = ('Max. Stress at Stiffener (mm)', self.bearing_strength_concrete, stiffener_stress_across_web(self.sigma_web, 0, 0,
+                                                                                                                           type='moment_bp',
+                                                                                                                           case='Case2&3'), '')
+                        self.report_check.append(t5)
+
+                    else:
+                        t5 = ('Max. Stress at Stiffener (mm)', self.bearing_strength_concrete, stiffener_stress_across_web(self.sigma_web,
+                                                                   self.sigma_max_zz, self.sigma_min_zz, type='moment_bp', case='Case1'), '')
+                        self.report_check.append(t5)
+
+                t6 = ('Shear on Stiffener (kN)', shear_demand_stiffener(((self.sigma_max_zz + self.sigma_xx) / 2), self.stiffener_plt_len_across_web,
+                                                                        self.stiffener_plt_height_across_web, self.shear_on_stiffener_across_web,
+                                                                        location='across_web'),
+                      shear_capacity_stiffener(self.stiffener_plt_thick_across_web, self.stiffener_plt_height_across_web, self.stiffener_fy,
+                                               self.shear_capa_stiffener_across_web, self.gamma_m0, location='across_web'), '')
+                self.report_check.append(t6)
 
         ##############################################
         # Check 6: Anchor Bolt - Outside Column Flange

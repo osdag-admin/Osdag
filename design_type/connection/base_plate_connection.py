@@ -3236,7 +3236,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             if (self.stiffener_along_flange == 'Yes') or (self.stiffener_along_web == 'Yes') or (self.stiffener_across_web == 'Yes'):
 
                 # thickness of the stiffener plate as per Table 2 of IS 800:2007 [b/t_f <= 8.4 * epsilon]
-                if self.bolt_columns_outside_flange == 2:
+                if self.bolt_columns_outside_flange == 2:  # TODO: CAD for this?
                     thk_req_stiffener_along_flange = (self.stiffener_plt_len_along_flange / 2) / (8.4 * self.epsilon)  # mm
                     thk_req_stiffener_along_web = (self.stiffener_plt_len_along_web / 2) / (8.4 * self.epsilon)  # mm
                     thk_req_stiffener_across_web = (self.stiffener_plt_len_across_web / 2) / (8.4 * self.epsilon)  # mm
@@ -3269,7 +3269,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     if self.moment_bp_case == 'Case1':
                         self.sigma_max_zz = self.sigma_max_zz
                         self.sigma_xx = self.sigma_xx
-                        self.sigma_web = 0.50 * self.sigma_max_zz
+                        self.sigma_web = (self.sigma_max_zz - self.sigma_min_zz) / 2
                     else:
                         self.sigma_max_zz = 0.45 * self.bearing_strength_concrete
                         self.sigma_xx = 0.45 * self.bearing_strength_concrete

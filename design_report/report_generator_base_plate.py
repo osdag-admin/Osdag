@@ -507,6 +507,15 @@ class SaveDesignBP(BasePlateConnection):
                                                self.shear_capa_stiffener_along_flange, self.gamma_m0, location='flange'), '')
                 self.report_check.append(t6)
 
+                t7 = ('Plastic Section Modulus of Stiffener (mm^3)', '', zp_stiffener(self.z_p_stiffener_along_flange), 'N/A')
+                self.report_check.append(t7)
+
+                t8 = ('Moment on Stiffener (kN-m)', moment_demand_stiffener(self.sigma_xx, self.stiffener_plt_thick_along_flange,
+                                                    self.stiffener_plt_len_along_flange, self.moment_on_stiffener_along_flange, location='flange'),
+                      moment_capacity_stiffener(self.z_p_stiffener_along_flange, self.stiffener_fy, self.gamma_m0,
+                                                self.moment_capa_stiffener_along_flange, location='flange'), '')
+                self.report_check.append(t8)
+
             if self.stiffener_along_web == 'Yes':
 
                 t1 = ('SubSection', 'Stiffener Design - Along Column Web', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
@@ -545,6 +554,15 @@ class SaveDesignBP(BasePlateConnection):
                       shear_capacity_stiffener(self.stiffener_plt_thick_along_web, self.stiffener_plt_height_along_web, self.stiffener_fy,
                                                self.shear_capa_stiffener_along_web, self.gamma_m0, location='web'), '')
                 self.report_check.append(t6)
+
+                t7 = ('Plastic Section Modulus of Stiffener (mm^3)', '', zp_stiffener(self.z_p_stiffener_along_web), 'N/A')
+                self.report_check.append(t7)
+
+                t8 = ('Moment on Stiffener (kN-m)', moment_demand_stiffener(((self.sigma_max_zz + self.sigma_xx) / 2),
+                    self.stiffener_plt_thick_along_web, self.stiffener_plt_len_along_web, self.moment_on_stiffener_along_web, location='web'),
+                      moment_capacity_stiffener(self.z_p_stiffener_along_web, self.stiffener_fy, self.gamma_m0,
+                                                self.moment_capa_stiffener_along_web, location='web'), '')
+                self.report_check.append(t8)
 
             if self.stiffener_across_web == 'Yes':
 
@@ -589,190 +607,14 @@ class SaveDesignBP(BasePlateConnection):
                                                self.shear_capa_stiffener_across_web, self.gamma_m0, location='across_web'), '')
                 self.report_check.append(t6)
 
-        ##############################################
-        # Check 6: Anchor Bolt - Outside Column Flange
-        t1 = ('SubSection', 'Anchor Bolt - Outside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
+                t7 = ('Plastic Section Modulus of Stiffener (mm^3)', '', zp_stiffener(self.z_p_stiffener_across_web), 'N/A')
+                self.report_check.append(t7)
 
-        t1 = (KEY_OUT_DISP_D_PROVIDED, '', self.anchor_dia_outside_flange, 'N/A')
-        self.report_check.append(t1)
-
-        t2 = (KEY_OUT_DISP_PC_PROVIDED, '', self.anchor_grade, 'N/A')
-        self.report_check.append(t2)
-
-        t4 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.dp_anchor_fu_overwrite, 1, self.anchor_area[1], self.gamma_mb,
-                                                           self.shear_capacity_anchor), 'N/A')
-        self.report_check.append(t4)
-
-        t9 = (KEY_DISP_KB, '', kb_prov(self.end_distance, self.pitch_distance, self.anchor_hole_dia, self.dp_anchor_fu_overwrite,
-                                       self.dp_column_fu), 'N/A')
-        self.report_check.append(t9)
-
-        t5 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(k_b, self.anchor_dia_provided, [self.plate_thk, self.dp_bp_fu, self.dp_bp_fy],
-                                                               self.gamma_mb, self.bearing_capacity_anchor), 'N/A')
-        self.report_check.append(t5)
-
-        t6 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
-        self.report_check.append(t6)
-
-        # t7 = (KEY_OUT_DISP_ANCHOR_BOLT_COMBINED, '', cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db,
-        #                                                                                                self.combined_capacity_anchor), '')
-        # self.report_check.append(t7)
-
-        if self.connectivity == 'Moment Base Plate':
-
-            t10 = (KEY_OUT_DISP_ANCHOR_BOLT_TENSION, total_tension_bolts(self.load_axial_compression, self.bp_length_provided, self.y,
-                                                                         self.eccentricity_zz, self.f, self.tension_demand_anchor),
-                   cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1], self.anchor_area[0], self.anchor_area[1],
-                                                             self.tension_capacity_anchor, safety_factor_parameter=self.dp_weld_fab), '')
-            self.report_check.append(t10)
-
-        t8 = (KEY_DISP_OUT_ANCHOR_BOLT_NO, '', self.anchors_outside_flange, 'N/A')
-        self.report_check.append(t8)
-
-        t3 = (KEY_DISP_OUT_ANCHOR_BOLT_LENGTH, self.anchor_length_min, self.anchor_length_provided, '')
-        self.report_check.append(t3)
-
-        # Check 2: Anchor Bolt - Inside Column Flange
-        # This check is applicable only when there is an uplift force acting on the column
-
-        if (self.connectivity == 'Moment Base Plate') and (self.load_axial_tension > 0):
-
-            t1 = ('SubSection', 'Anchor Bolt - Inside Column Flange', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-            self.report_check.append(t1)
-
-            t1 = (KEY_OUT_DISP_INTER_D_PROVIDED, '', self.anchor_dia_inside_flange, 'N/A')
-            self.report_check.append(t1)
-
-            t2 = (KEY_OUT_DISP_PC_PROVIDED, '', self.anchor_grade_inside_flange, 'N/A')
-            self.report_check.append(t2)
-
-            t8 = (KEY_DISP_OUT_ANCHOR_BOLT_NO, '', self.anchors_inside_flange, 'N/A')
-            self.report_check.append(t8)
-
-            # t4 = (KEY_OUT_DISP_BOLT_SHEAR, '', bolt_shear_prov(self.dp_anchor_fu_overwrite, 1, self.anchor_area[1], self.gamma_mb,
-            #                                                    self.shear_capacity_anchor), 'N/A')
-            # self.report_check.append(t4)
-
-            # t9 = (KEY_DISP_KB, '', kb_prov(self.end_distance, self.pitch_distance, self.anchor_hole_dia, self.dp_anchor_fu_overwrite,
-            #                                self.dp_column_fu), 'N/A')
-            # self.report_check.append(t9)
-
-            # t5 = (KEY_OUT_DISP_BOLT_BEARING, '', bolt_bearing_prov(k_b, self.anchor_dia_provided, [self.plate_thk, self.dp_bp_fu, self.dp_bp_fy],
-            #                                                        self.gamma_mb, self.bearing_capacity_anchor), 'N/A')
-            # self.report_check.append(t5)
-
-            # t6 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_capacity_prov(self.shear_capacity_anchor, self.bearing_capacity_anchor, self.anchor_capacity), '')
-            # self.report_check.append(t6)
-
-            # t7 = (KEY_OUT_DISP_ANCHOR_BOLT_COMBINED, '', cl_10_3_6_bearing_bolt_combined_shear_and_tension(self.v_sb, self.v_db, self.t_b, self.t_db,
-            #                                                                                                self.combined_capacity_anchor), '')
-            # self.report_check.append(t7)
-
-            t10 = (KEY_OUT_DISP_ANCHOR_BOLT_TENSION, self.tension_demand_anchor_uplift, cl_10_3_5_bearing_bolt_tension_resistance(self.anchor_fu_fy[0], self.anchor_fu_fy[1],
-                                                                                                   self.anchor_area[0], self.anchor_area[1],
-                                                                                                   self.tension_capacity_anchor_uplift,
-                                                                                                   safety_factor_parameter=self.dp_weld_fab), '')
-            self.report_check.append(t10)
-
-            t3 = (KEY_DISP_OUT_ANCHOR_BOLT_LENGTH, self.anchor_length_min, self.anchor_length_provided, '')
-            self.report_check.append(t3)
-
-        # Check 3: Base Plate - Design Checks
-        t1 = ('SubSection', 'Base Plate - Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-
-        t1 = (KEY_OUT_DISP_BASEPLATE_THICKNNESS, '', self.plate_thk, '')
-        self.report_check.append(t1)
-
-        t2 = (KEY_OUT_DISP_BASEPLATE_LENGTH, '', self.bp_length_provided, '')
-        self.report_check.append(t2)
-
-        t3 = (KEY_OUT_DISP_BASEPLATE_WIDTH, '', self.bp_width_provided, '')
-        self.report_check.append(t3)
-
-        # Check 4: Base Plate - Detailing Checks
-        t1 = ('SubSection', 'Base Plate - Detailing Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-
-        t1 = (KEY_OUT_DISP_DETAILING_NO_OF_ANCHOR_BOLT, '', self.anchor_nos_provided + self.anchor_nos_tension, '')
-        self.report_check.append(t1)
-
-        t2 = (KEY_OUT_DISP_DETAILING_PITCH_DISTANCE, cl_10_2_2_min_spacing(self.anchor_dia_provided, parameter='pitch'), 'N/A', '')
-        self.report_check.append(t2)
-
-        t3 = (KEY_OUT_DISP_DETAILING_PITCH_DISTANCE, cl_10_2_3_1_max_spacing(self.plate_thk, parameter='pitch'), 'N/A', '')
-        self.report_check.append(t3)
-
-        t4 = (KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, cl_10_2_2_min_spacing(self.anchor_dia_provided, parameter='gauge'), 'N/A', '')
-        self.report_check.append(t4)
-
-        t5 = (KEY_OUT_DISP_DETAILING_GAUGE_DISTANCE, cl_10_2_3_1_max_spacing(self.plate_thk, parameter='gauge'), 'N/A', '')
-        self.report_check.append(t5)
-
-        bolt_hole = d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(self.anchor_dia_provided, self.dp_anchor_hole)
-        t6 = (KEY_OUT_DISP_DETAILING_END_DISTANCE, cl_10_2_4_2_min_edge_end_dist(bolt_hole, self.dp_detail_edge_type,
-                                                                                 parameter='end_dist'), self.end_distance, '')
-        self.report_check.append(t6)
-
-        # t7 = (KEY_OUT_DISP_DETAILING_END_DISTANCE, cl_10_2_4_3_max_edge_dist_old([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive,
-        #                                                                          parameter='end_dist'), 'N/A', '')
-
-        t_fu_fy = [(self.plate_thk, self.dp_bp_fu,self.dp_bp_fy)]
-        t7 = (KEY_OUT_DISP_DETAILING_END_DISTANCE, cl_10_2_4_3_max_edge_end_dist(t_fu_fy, self.dp_detail_is_corrosive,
-                                                                                 parameter='end_dist'), 'N/A', '')
-        self.report_check.append(t7)
-
-        t8 = (KEY_OUT_DISP_DETAILING_EDGE_DISTANCE, cl_10_2_4_2_min_edge_end_dist(bolt_hole,self.dp_detail_edge_type,
-                                                                                  parameter='edge_dist'), self.end_distance, '')
-        self.report_check.append(t8)
-
-        # t9 = (KEY_OUT_DISP_DETAILING_EDGE_DISTANCE, cl_10_2_4_3_max_edge_dist_old([self.plate_thk], self.dp_bp_fy, self.dp_detail_is_corrosive,
-        #                                                                           parameter='edge_dist'), 'N/A', '')
-        t9 = (KEY_OUT_DISP_DETAILING_EDGE_DISTANCE, cl_10_2_4_3_max_edge_end_dist(t_fu_Fy, self.dp_detail_is_corrosive,
-                                                                                  parameter='edge_dist'), 'N/A', '')
-        self.report_check.append(t9)
-
-        if self.connectivity == 'Welded-Slab Base':
-            t10 = (KEY_OUT_DISP_DETAILING_PROJECTION, '', self.projection, 'N/A')
-            self.report_check.append(t10)
-        else:
-            pass
-
-        # Check 5: Stiffener Plate Along Flange - Design Checks
-        t1 = ('SubSection', 'Stiffener Plate Along Flange - Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-
-        # Check 6: Stiffener Plate Along Web - Design Checks
-        t1 = ('SubSection', 'Stiffener Plate Along Flange - Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-
-        # Check 7: Stiffener Plate Across Web - Design Checks
-        t1 = ('SubSection', 'Stiffener Plate Along Flange - Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-
-        # Check 8: Stiffener Plate Inside Flange - Design Checks
-        t1 = ('SubSection', 'Stiffener Plate Along Flange - Design Checks', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-
-        # Check 9: Weld Design
-        t1 = ('SubSection', 'Weld Design', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
-        self.report_check.append(t1)
-
-        t1 = (KEY_OUT_DISP_WELD_SIZE_FLANGE, '', self.weld_size_flange, '')
-        self.report_check.append(t1)
-
-        t2 = (KEY_OUT_DISP_WELD_SIZE_WEB, '', self.weld_size_web, '')
-        self.report_check.append(t2)
-
-        t3 = (KEY_OUT_DISP_WELD_SIZE_STIFFENER, '', self.weld_size_stiffener, '')
-        self.report_check.append(t3)
-
-        t4 = (KEY_OUT_DISP_WELD_SIZE_STIFFENER, '', self.weld_size_vertical_flange, '')
-        self.report_check.append(t4)
-
-        t5 = (KEY_OUT_DISP_WELD_SIZE_STIFFENER, '', self.weld_size_vertical_web, '')
-        self.report_check.append(t5)
+                t8 = ('Moment on Stiffener (kN-m)', moment_demand_stiffener(((self.sigma_max_zz + self.sigma_xx) / 2),
+                self.stiffener_plt_thick_across_web, self.stiffener_plt_len_across_web, self.moment_on_stiffener_across_web, location='across_web'),
+                      moment_capacity_stiffener(self.z_p_stiffener_across_web, self.stiffener_fy, self.gamma_m0,
+                                                self.moment_capa_stiffener_across_web, location='across_web'), '')
+                self.report_check.append(t8)
 
         # End of checks
 

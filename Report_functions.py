@@ -5430,6 +5430,65 @@ def shear_capacity_stiffener(stiff_thk, stiff_height, stiff_fy, shear_capa, gamm
     shear_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{' + stiff_height + r' \times ' + stiff_thk + r')' + stiff_fy + r'}'
                                                                                                      r'{\sqrt{3}~' + gamma_m0 + r'} \\'))
 
-    shear_capacity.append(NoEscape(r'\begin{aligned}              =  ' + shear_capa + r' \end{aligned}'))
+    shear_capacity.append(NoEscape(r'\begin{aligned}              =  ' + shear_capa + r' \\'))
+    shear_capacity.append(NoEscape(r'&[Ref.~IS~800:2007~(Cl.~8.4.1) \end{aligned}'))
 
     return shear_capacity
+
+
+def moment_demand_stiffener(sigma, stiff_thk, stiff_length, moment, location='flange'):
+    """ """
+    sigma = str(sigma)
+    stiff_length = str(stiff_length)
+    stiff_thk = str(stiff_thk)
+    moment = str(moment)
+
+    moment_demand = Math(inline=True)
+
+    if location == 'flange':
+        moment_demand.append(NoEscape(r'\begin{aligned} {M_{st}}_{f} =  {\sigma_{st}}_{f} \times {t_{st}}_{f}~\frac{{{L_{st}}_{f}}^{2}}{2} \\'))
+    elif location == 'web':
+        moment_demand.append(NoEscape(r'\begin{aligned} {M_{st}}_{w} =  {\sigma_{st}}_{w} \times {t_{st}}_{f}~\frac{{{L_{st}}_{f}}^{2}}{2} \\'))
+    else:
+        moment_demand.append(NoEscape(r'\begin{aligned} {M_{st}}_{aw} =  {\sigma_{st}}_{aw} \times {t_{st}}_{f}~\frac{{{L_{st}}_{f}}^{2}}{2} \\'))
+
+    moment_demand.append(NoEscape(r'\begin{aligned}              =  ' + sigma + r' \times ' + stiff_thk + r'~\frac{' + stiff_length + r'^{2}}{2} \\'))
+    moment_demand.append(NoEscape(r'\begin{aligned}              =  ' + moment + r' \end{aligned}'))
+
+    return moment_demand
+
+
+def zp_stiffener(zp_val):
+    """ """
+    zp_val = str(zp_val)
+
+    zp = Math(inline=True)
+    zp.append(NoEscape(r'\begin{aligned} {z_{p}}_{st} = ' + zp_val + r' \end{aligned}'))
+
+    return zp
+
+
+def moment_capacity_stiffener(zp, stiff_fy, gamma_m0, moment_capa, location='flange'):
+    """ """
+    zp = str(zp)
+    stiff_fy = str(stiff_fy)
+    moment_capa = str(moment_capa)
+    gamma_m0 = str(gamma_m0)
+
+    moment_capacity = Math(inline=True)
+
+    if location == 'flange':
+        moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{f} =  \frac{\beta_{b}~ {z_{p}}_{st}~f_{y}}{\gamma_{m0}} \\'))
+    elif location == 'web':
+        moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{w} =  \frac{\beta_{b}~ {z_{p}}_{st}~f_{y}}{\gamma_{m0}} \\'))
+    else:
+        moment_capacity.append(NoEscape(r'\begin{aligned} {M_{d}}_{aw} =  \frac{\beta_{b}~ {z_{p}}_{st}~f_{y}}{\gamma_{m0}} \\'))
+
+    moment_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{1\times~ {z_{p}}_{st}~f_{y}}{\gamma_{m0}}~~~~(\beta_{b} = 1) \\'))
+    moment_capacity.append(NoEscape(r'\begin{aligned}             =  \frac{1\times~' + zp + r'~' + stiff_fy + r'}{' + gamma_m0 + r'} \\'))
+    moment_capacity.append(NoEscape(r'\begin{aligned}              =  ' + moment_capa + r' \\'))
+    moment_capacity.append(NoEscape(r'&[Ref.~IS~800:2007~(Cl.~8.2.1.2) \end{aligned}'))
+
+    return moment_capacity
+
+

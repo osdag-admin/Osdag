@@ -523,8 +523,10 @@ class BeamCoverPlate(MomentConnection):
         else:
             self.flange_plate.beta_lj = 1
 
-
-        t5 = (KEY_REDUCTION_FACTOR_FLANGE,KEY_DISP_REDUCTION_FACTOR_FLANGE,TYPE_TEXTBOX,
+        t5 = (KEY_REDUCTION_LARGE_GRIP_FLANGE, KEY_DISP_REDUCTION_LARGE_GRIP_FLANGE, TYPE_TEXTBOX,
+              round(self.flange_plate.beta_lg, 2) if flag else '', True)
+        flange_bolt_capacity.append(t5)
+        t5 = (KEY_REDUCTION_FACTOR_LONG_FLANGE, KEY_DISP_REDUCTION_FACTOR_FLANGE, TYPE_TEXTBOX,
               round(self.flange_plate.beta_lj, 2) if flag else '', True)
         flange_bolt_capacity.append(t5)
         t13 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_CAPACITY, TYPE_TEXTBOX,
@@ -1673,24 +1675,45 @@ class BeamCoverPlate(MomentConnection):
         #                                                                ((self.flange_plate.bolts_one_line/2) -1)))/2
         #
         # self.web_spacing_status = True
-        if self.flange_plate.design_status is False or self.flange_plate.design_status is False :
+        if self.flange_plate.design_status is False or self.web_plate.design_status is False :
             self.design_status = False
             self.get_plate_details_status = False
             logger.error(" : Bolt connection is not possible")
             logger.error(" : Design is not safe. \n ")
             logger.debug(" : =========End Of design===========")
         else:
-            self.max_possible_tk = int(self.flange_plate.edge_dist_provided / 2 + self.section.root_radius)
-            if self.web_plate.thickness_provided >= (self.flange_plate.edge_dist_provided / 2 + self.section.root_radius):
-                self.design_status = False
-                logger.error(" : Maximum web plate thickness exceeded. ")
-                logger.warning(" : Maximum possible web plate thickness should not be greater than {} mm, to avoid fouling between plates" .format(self.max_possible_tk))
-                logger.error(" : Design is not safe. \n ")
-                logger.debug(" : =========End Of design===========")
-            else:
+            if self.preference == "Outside":
                 self.design_status = True
                 self.get_plate_details_status = True
                 self.flange_check_axial(self)
+
+            else:
+                self.max_possible_tk = int(self.flange_plate.edge_dist_provided / 2 + self.section.root_radius)
+                if self.web_plate.thickness_provided >= (
+                        self.flange_plate.edge_dist_provided / 2 + self.section.root_radius):
+                    self.design_status = False
+                    logger.error(" : Maximum web plate thickness exceeded. ")
+                    logger.warning(
+                        " : Maximum possible web plate thickness should not be greater than {} mm, to avoid fouling between plates".format(
+                            self.max_possible_tk))
+                    logger.error(" : Design is not safe. \n ")
+                    logger.debug(" : =========End Of design===========")
+                else:
+                    self.design_status = True
+                    self.get_plate_details_status = True
+                    self.flange_check_axial(self)
+
+            # self.max_possible_tk = int(self.flange_plate.edge_dist_provided / 2 + self.section.root_radius)
+            # if self.web_plate.thickness_provided >= (self.flange_plate.edge_dist_provided / 2 + self.section.root_radius):
+            #     self.design_status = False
+            #     logger.error(" : Maximum web plate thickness exceeded. ")
+            #     logger.warning(" : Maximum possible web plate thickness should not be greater than {} mm, to avoid fouling between plates" .format(self.max_possible_tk))
+            #     logger.error(" : Design is not safe. \n ")
+            #     logger.debug(" : =========End Of design===========")
+            # else:
+            #     self.design_status = True
+            #     self.get_plate_details_status = True
+            #     self.flange_check_axial(self)
 
 
         ################################################################
@@ -3392,22 +3415,32 @@ class BeamCoverPlate(MomentConnection):
                                           self.flange_plate.gap,self.flange_plate.edge_dist_provided,
                                           self.section.web_thickness,self.section.root_radius,conn="beam_beam"), "")
             self.report_check.append(t10)
+            if self.preference == "Outside":
+                t10 = (KEY_OUT_LARGE_GRIP, large_grip_req(),
+                       large_grip_prov(self.flange_bolt.bolt_diameter_provided, self.flange_plate.thickness_provided,
+                                       self.section.flange_thickness,
+                                       self.flange_plate.beta_lj, self.flange_plate.beta_lg), "")
+                self.report_check.append(t10)
+            else:
+                t10 = (KEY_OUT_LARGE_GRIP, large_grip_req(),
+                       large_grip_prov(self.flange_bolt.bolt_diameter_provided,
+                                       (2 * self.flange_plate.thickness_provided),
+                                       self.section.flange_thickness,
+                                       self.flange_plate.beta_lj, self.flange_plate.beta_lg), "")
+                self.report_check.append(t10)
 
             t5 = (KEY_OUT_DISP_BOLT_CAPACITY, vres_cap_bolt_check(V_u=0.0, A_u=(round(self.flange_force / 1000, 2)),
                                                                   bolt_capacity=round(
                                                                       self.flange_plate.bolt_force / 1000, 2),
                                                                   bolt_req=self.flange_plate.bolts_required, multiple=2,
-                                                                  conn="flange_web"), flange_bolt_capacity_red_kn,
+                                                                  conn="flange_web"),
+                  bolt_red_capacity_prov(self.flange_plate.beta_lj,
+                                         self.flange_plate.beta_lg,
+                                         flange_bolt_capacity_kn,
+                                         flange_bolt_capacity_red_kn),
                   get_pass_fail(round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
                                 relation="lesser"))
             self.report_check.append(t5)
-
-
-            # t5 = (KEY_OUT_DISP_BOLT_CAPACITY, round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
-            #       get_pass_fail(round(self.flange_plate.bolt_force / 1000, 2), flange_bolt_capacity_red_kn,
-            #                     relation="lesser"))
-            # self.report_check.append(t5)
-
 
         if self.web_plate.spacing_status == True and self.flange_plate.spacing_status == True:
 

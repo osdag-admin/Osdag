@@ -837,7 +837,7 @@ class CommonDesignLogic(object):
                 nut_spaceW = 2 * webPlate.T + column.t
             else:
                 nut_space = flangePlate.T + column.T
-                nut_spaceW = webPlate.T + column.t
+                nut_spaceW = 2*webPlate.T + column.t
 
             numOfboltsF = C.flange_plate.bolts_required
             numOfboltsW = C.web_plate.bolts_required

@@ -1139,13 +1139,27 @@ KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
 KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
 
+# FLANGE AND WEB -REDUCTION FACTOR
 
-KEY_REDUCTION_FACTOR_FLANGE ='flange_plate.red,factor'
-KEY_REDUCTION_LARGE_GRIP ='bolt.large_grip'
-
-
+KEY_REDUCTION_FACTOR_LONG_FLANGE ='flange_plate.red,factor'
 KEY_DISP_REDUCTION_FACTOR_FLANGE ="Long Joint Red.Factor"
+
+KEY_REDUCTION_FACTOR_LONG_WEB ='web_plate.red,factor'
+KEY_DISP_REDUCTION_FACTOR_LONG_WEB ="Long Joint Red.Factor"
+
+KEY_REDUCTION_LARGE_GRIP_WEB = 'web_bolt.large_grip'
+KEY_DISP_REDUCTION_LARGE_GRIP_WEB = "Large Grip Red.Factor"
+
+KEY_REDUCTION_LARGE_GRIP_FLANGE = 'flange_bolt.large_grip'
+KEY_DISP_REDUCTION_LARGE_GRIP_FLANGE = "Large Grip Red.Factor"
+
+# COMMON -REDUCTION FACTOR
+KEY_REDUCTION_LONG_JOINT ="bolt.long_joint"
+KEY_DISP_REDUCTION_LONG_JOINT ="Long Joint Red.Factor"
+
+KEY_REDUCTION_LARGE_GRIP ="bolt.large_grip"
 KEY_DISP_REDUCTION_LARGE_GRIP ="Large Grip Red.Factor"
+
 
 
 KEY_DISP_REDUCTION ="Strength Red.Factor"

@@ -633,7 +633,7 @@ class Tension_bolted(Member):
         t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX,  bolt_bearing_capacity_disp if flag else '', True)
         out_list.append(t5)
 
-        t5 = (KEY_REDUCTION_FACTOR_FLANGE, KEY_DISP_REDUCTION_FACTOR_FLANGE, TYPE_TEXTBOX, round(self.plate.beta_lj, 2) if flag else '', True)
+        t5 = (KEY_REDUCTION_LONG_JOINT, KEY_DISP_REDUCTION_LONG_JOINT, TYPE_TEXTBOX, round(self.plate.beta_lj, 2) if flag else '', True)
         out_list.append(t5)
 
         t5 = (KEY_REDUCTION_LARGE_GRIP, KEY_DISP_REDUCTION_LARGE_GRIP, TYPE_TEXTBOX, round(self.plate.beta_lg, 2) if flag else '', True)

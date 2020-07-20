@@ -210,7 +210,8 @@ def row_col_limit(min=1,max=None,parameter ="rows"):
 
     return row_col_limit_eqn
 
-def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
+
+def bolt_shear_prov(f_ub, n_n, a_nb, gamma_mb, bolt_shear_capacity):
     """
     Calculate bolt shearing capacity
     Args:
@@ -231,14 +232,13 @@ def bolt_shear_prov(f_ub,n_n,a_nb,gamma_mb,bolt_shear_capacity):
     f_ub = str(f_ub)
     n_n = str(n_n)
     a_nb = str(a_nb)
-    gamma_mb= str(gamma_mb)
-    bolt_shear_capacity=str(bolt_shear_capacity)
+    gamma_mb = str(gamma_mb)
+    bolt_shear_capacity = str(bolt_shear_capacity)
     bolt_shear_eqn = Math(inline=True)
     bolt_shear_eqn.append(NoEscape(r'\begin{aligned}V_{dsb} &= \frac{f_{ub} ~n_n~ A_{nb}}{1000*\sqrt{3} ~\gamma_{mb}}\\'))
     bolt_shear_eqn.append(NoEscape(r'&= \frac{'+f_ub+'*'+n_n+'*'+a_nb+'}{1000*\sqrt{3}~*~'+ gamma_mb+r'}\\'))
     bolt_shear_eqn.append(NoEscape(r'&= '+bolt_shear_capacity+r'\\'))
     bolt_shear_eqn.append(NoEscape(r'[Ref.&~IS~800:2007,~Cl.~10.3.3]\end{aligned}'))
-
 
     return bolt_shear_eqn
 
@@ -270,6 +270,7 @@ def end_plate_gauge(connection,e_min,s,t_w,T_w,R_r,module='None'):
         end_plate_gauge.append(NoEscape(r'&=' + g1 + r' \end{aligned}'))
 
     return end_plate_gauge
+
 
 def bolt_bearing_prov(k_b,d,conn_plates_t_fu_fy,gamma_mb,bolt_bearing_capacity):
     """
@@ -314,7 +315,7 @@ def bolt_bearing_prov(k_b,d,conn_plates_t_fu_fy,gamma_mb,bolt_bearing_capacity):
     return bolt_bearing_eqn
 
 
-def bolt_capacity_prov(bolt_shear_capacity,bolt_bearing_capacity,bolt_capacity):
+def bolt_capacity_prov(bolt_shear_capacity, bolt_bearing_capacity, bolt_capacity):
     """
     Calculate bolt  capacity (min of bearing and shearing)
 
@@ -346,7 +347,7 @@ def bolt_capacity_prov(bolt_shear_capacity,bolt_bearing_capacity,bolt_capacity):
     return bolt_capacity_eqn
 
 
-def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
+def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, tension_capacity, safety_factor_parameter=KEY_DP_WELD_FAB_FIELD):
     """
     Calculate design tensile strength of bearing bolt
     Args:
@@ -354,6 +355,7 @@ def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_fact
         f_yb - Yield strength of the bolt in MPa (float)
         A_sb - Shank area of bolt in sq. mm  (float)
         A_n - Net tensile stress area of the bolts as per IS 1367 in sq. mm  (float)
+        tension_capacity - Tension resistance/capacity of a bolt in KN (float)
     return:
         T_db - Design tensile strength of bearing bolt in N (float)
     Note:
@@ -366,10 +368,12 @@ def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n, safety_fact
     A_n = str(A_n)
     gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
     gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+    tension_capacity = str(tension_capacity)
     tension_resistance = Math(inline=True)
     tension_resistance.append(NoEscape(r'\begin{aligned} T_{db} &= 0.90~f_{ub}~A_n < f_{yb}~A_{sb}~(\gamma_{mb}~/~\gamma_{m0}) \\'))
     tension_resistance.append(NoEscape(r'\begin &= 0.90~' + f_ub + '~ ' + A_n + '< ' + f_yb + '~ ' + A_sb + '~(' + gamma_mb + '~/~' + gamma_m0 + ''))
     tension_resistance.append(NoEscape(r'\begin &= 0.90~' + f_ub + '~ ' + A_n + ''))
+    tension_resistance.append(NoEscape(r'&= '+ tension_capacity + r'\\'))
     tension_resistance.append(NoEscape(r'&[Ref.~IS~&800:2007,~Cl.~10.3.5]\end{aligned}'))
 
     return tension_resistance
@@ -4484,7 +4488,7 @@ def kb_prov(e, p, d, fub, fu):
     kb_1 = str(kb_1)
     kb_2 = str(kb_2)
     kb_eqn = Math(inline=True)
-    if pitch != 0 :
+    if pitch != 0:
         kb_eqn.append(NoEscape(r'\begin{aligned} k_b & = min(\frac{e}{3*d_0},\frac{p}{3*d_0}-0.25,\frac{f_{ub}}{f_u},1.0)\\' ))
         kb_eqn.append(NoEscape(r'& = min(\frac{'+e+'}{3*'+d+r'},\frac{'+p+'}{3*'+d+r'}-0.25,\frac{'+fub+'}{'+fu+r'},1.0)\\'))
         kb_eqn.append(NoEscape(r'& = min('+kb1+','+kb2+','+kb3+','+kb4+r')\\'))

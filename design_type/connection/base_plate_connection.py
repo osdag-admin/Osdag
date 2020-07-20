@@ -2429,9 +2429,17 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         self.bp_width_provided = max(self.bp_width_provided, bp_width)
 
                 # tension demand - updated
-                #TODO: check the below statements
-                self.tension_demand_anchor = self.load_axial_tension / self.anchors_outside_flange
-                self.tension_demand_anchor = round((self.tension_demand_anchor / 1000), 2)  # kN
+                # TODO: check the below statements - if recalculation is required
+
+                self.tension_demand_anchor = (- self.load_axial_compression) * (((self.bp_length_provided / 2) - (self.y / 3) - self.eccentricity_zz) /
+                                                                                ((self.bp_length_provided / 2) - (self.y / 3) + self.f))  # N
+                if self.tension_demand_anchor < 0:
+                    self.tension_demand_anchor = (- 1 * self.tension_demand_anchor)
+
+                self.tension_demand_anchor = round(self.tension_demand_anchor / 1000, 2)  # kN
+
+                # self.tension_demand_anchor = self.load_axial_tension / self.anchors_outside_flange
+                # self.tension_demand_anchor = round((self.tension_demand_anchor / 1000), 2)  # kN
 
                 # detailing
                 if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
@@ -2877,6 +2885,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             self.shear_key_len_ColWidth = 'N/A'
             self.shear_key_depth_ColWidth = 'N/A'
             self.shear_key_stress_ColWidth = 'N/A'
+
+        # anchor columns outside flange
+        if (self.anchors_outside_flange == 2) or (self.anchors_outside_flange == 3):
+            self.bolt_columns_outside_flange = 1
+        else:
+            self.bolt_columns_outside_flange = 2
 
         # validation of anchor bolt length [Reference: IS 5624:1993, Table 1]
         self.anchor_length_min = self.table1(self.anchor_bolt)[1]
@@ -3577,6 +3591,12 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     self.stiffener_plt_len_btwn_D = 'N/A'
                     self.stiffener_plt_width_btwn_D = 'N/A'
                     self.stiffener_plt_thick_btwn_D = 'N/A'
+            else:
+                self.stiffener_inside_flange = 'No'
+
+                self.stiffener_plt_len_btwn_D = 'N/A'
+                self.stiffener_plt_width_btwn_D = 'N/A'
+                self.stiffener_plt_thick_btwn_D = 'N/A'
 
             # weld checks of the stiffener welds - Combination of stresses [Reference: Cl. 10.5.10.1, IS 800:2007]
 

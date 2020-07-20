@@ -170,7 +170,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
             event.ignore()
 
 class Window(QMainWindow):
-    #closed = pyqtSignal()
+    closed = QtCore.pyqtSignal()
     def center(self):
         frameGm = self.frameGeometry()
         screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())

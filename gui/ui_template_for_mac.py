@@ -114,22 +114,18 @@ class MyAskQuestion(QDialog):
 
 class Ui_ModuleWindow(QtWidgets.QMainWindow):
     resized = QtCore.pyqtSignal()
-    closed = pyqtSignal()
-    def  __init__(self, main,folder,parent=None):
-        super(Ui_ModuleWindow, self).__init__(parent=parent)
-        self.resolution = QtWidgets.QDesktopWidget().screenGeometry()
-        # width = resolution.width()
-        # height = resolution.height()
-        #
-        # # self.ui = Window()
+    closed = QtCore.pyqtSignal()
 
-        self.setupUi(self,main,folder)
-        self.showMaximized()
-        self.resize_dockComponents()
+    def __init__(self, main, folder, parent=None):
+        super(Ui_ModuleWindow, self).__init__(parent=parent)
+        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        width = resolution.width()
+        height = resolution.height()
+        self.resize(width * (0.75), height * (0.7))
+        self.ui = Window()
+        self.ui.setupUi(self, main, folder)
+        # self.showMaximized()
         # self.showNormal()
-        # self.count=1
-        # self.resize_dockComponents()
-        # self.count=2
         self.resized.connect(self.resize_dockComponents)
 
     def center(self):
@@ -144,33 +140,29 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         return super(Ui_ModuleWindow, self).resizeEvent(event)
 
     def resize_dockComponents(self):
-        # if self.count == 1:
-        #     height = self.resolution.height()
-        # else:
-        #     height = self.height()
-        height = self.height()
-        posi = (3/4)*(height)
+
+        posi = (3 / 4) * (self.height())
 
         # Input Dock
-        width = self.inputDock.width()
-        self.inputDock.resize(width,height)
-        self.in_widget.resize(width,posi)
+        width = self.ui.inputDock.width()
+        self.ui.inputDock.resize(width, self.height())
+        self.ui.in_widget.resize(width, posi)
 
-        self.btn_Reset.move((width/2)-110,posi+8)
-        self.btn_Design.move((width/2)+17,posi+8)
-        #self.ui.btn_Design.move(,posi+10)
+        self.ui.btn_Reset.move((width / 2) - 110, posi + 8)
+        self.ui.btn_Design.move((width / 2) + 17, posi + 8)
+        # self.ui.btn_Design.move(,posi+10)
 
         # Output Dock
-        width = self.outputDock.width()
-        self.outputDock.resize(width,height)
-        self.out_widget.resize(width,posi)
-        self.btn_CreateDesign.move((width/2)-(186/2),posi+8)
-        self.save_outputDock.move((width/2)-(186/2),posi+52)
+        width = self.ui.outputDock.width()
+        self.ui.outputDock.resize(width, self.height())
+        self.ui.out_widget.resize(width, posi)
+        self.ui.btn_CreateDesign.move((width / 2) - (186 / 2), posi + 8)
+        self.ui.save_outputDock.move((width / 2) - (186 / 2), posi + 52)
 
         # Designed model
-        self.splitter.setSizes([0.85 * posi, 0.15 * posi])
-        self.modelTab.setFocus()
-        self.display.FitAll()
+        self.ui.splitter.setSizes([0.85 * posi, 0.15 * posi])
+        self.ui.modelTab.setFocus()
+        self.ui.display.FitAll()
 
     def closeEvent(self, event):
         '''
@@ -180,13 +172,22 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
                                      "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-            logger = logging.getLogger('osdag')  #  Remove all the previous handlers
+            logger = logging.getLogger('osdag')  # Remove all the previous handlers
             for handler in logger.handlers[:]:
                 logger.removeHandler(handler)
             self.closed.emit()
             event.accept()
         else:
             event.ignore()
+
+class Window(QMainWindow):
+    # closed = pyqtSignal()
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     def open_customized_popup(self, op, KEYEXISTING_CUSTOMIZED):
         """
@@ -1409,7 +1410,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         self.ui_loaded = True
 
         from osdagMainSettings import backend_name
-        self.display, _ = self.init_display(backend_str=backend_name())
+        self.display, _ = self.init_display(backend_str=backend_name(),window=MainWindow)
         self.connectivity = None
         self.fuse_model = None
 
@@ -2639,7 +2640,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         b = colorTup[2]
         self.display.set_bg_gradient_color([r, g, b], [255, 255, 255])
 
-    def init_display(self, backend_str=None, size=(1024, 768)):
+    def init_display(self, backend_str=None, window=None,size=(1024, 768)):
 
 
         self.modelTab = qtViewer3d(self)
@@ -2647,7 +2648,7 @@ class Ui_ModuleWindow(QtWidgets.QMainWindow):
         # self.setWindowTitle("Osdag Fin Plate")
         #self.mytabWidget.resize(size[0], size[1])
         self.mytabWidget.addTab(self.modelTab, "")
-        self.show()
+        window.show()
         self.modelTab.InitDriver()
         display = self.modelTab._display
         key_function = {Qt.Key_Up: lambda: self.Pan_Rotate_model("Up"),

@@ -58,8 +58,8 @@ class CreateLatex(Document):
         doc.append(pyl.Command('selectfont'))
 
 
-        doc.add_color('OsdagGreen', 'RGB', '145,176,20')
-        doc.add_color('PassColor','RGB', '145,176,20')
+        doc.add_color('OsdagGreen', 'RGB', '127,146,51')
+        doc.add_color('PassColor','RGB', '127,146,51')
         doc.add_color('FailColor','HTML','933A16')
         header = PageStyle("header")
         # Create center header

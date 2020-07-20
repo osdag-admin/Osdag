@@ -262,8 +262,8 @@ class OsdagMainWindow(QMainWindow):
                                                     ],
                                 'Moment Connection' :{
                                                     'Beam to Beam' :[
-                                                                ('Cover Plate Bolted','ResourceFiles/images/coverplate.png','B2B_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded','ResourceFiles/images/coverplate.png','B2B_Cover_Plate_Welded'),
+                                                                ('Cover Plate Bolted','ResourceFiles/images/bbcoverplatebolted.png','B2B_Cover_Plate_Bolted'),
+                                                                ('Cover Plate Welded','ResourceFiles/images/bbcoverplatewelded.png','B2B_Cover_Plate_Welded'),
                                                                 ('End Plate Connection','ResourceFiles/images/endplate.png','B2B_End_Plate_Connection'),
                                                                 self.show_moment_connection,
                                                                     ],

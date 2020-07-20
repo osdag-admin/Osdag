@@ -487,6 +487,7 @@ VALUES_IMG_TENSIONBOLTED_DF02 = ["ResourceFiles/images/unequaldp.png","ResourceF
 VALUES_IMG_TENSIONBOLTED_DF03 = ["ResourceFiles/images/Slope_Channel.png","ResourceFiles/images/Parallel_Channel.png","ResourceFiles/images/Slope_BBChannel.png","ResourceFiles/images/Parallel_BBChannel.png"]
 
 VALUES_IMG_BEAM = ["ResourceFiles/images/Slope_Beam.png","ResourceFiles/images/Parallel_Beam.png"]
+VALUES_IMG_HOLLOWSECTION = ["ResourceFiles/images/SHS.png","ResourceFiles/images/RHS.png","ResourceFiles/images/CHS.png"]
 
 VALUES_BEAMSEC = connectdb("Beams")
 VALUES_SECBM = connectdb("Beams")
@@ -1356,8 +1357,10 @@ KEY_OUT_BOLT_TENSION_CAPACITY = 'Bolt.Tension'
 KEY_OUT_BOLT_TENSION_CAPACITY1 = 'Bolt Tension Capacity (kN)'
 KEY_OUT_DISP_BOLT_TENSION_CAPACITY = 'Bolt Tension Capacity (kN)'
 KEY_OUT_BOLTS_REQUIRED = 'Bolt.Required'
-KEY_OUT_LONG_JOINT = 'Long Joint Factor'
-KEY_OUT_LARGE_GRIP = 'Large Grip Factor'
+KEY_OUT_LONG_JOINT = 'Long joint reduction factor'
+KEY_OUT_LARGE_GRIP = 'Large grip length reduction factor'
+KEY_OUT_PACKING_PLATE = 'Packing plate reduction factor'
+KEY_OUT_BOLT_CAPACITY_REDUCED = 'Bolt Capacity post reduction factors (kN)'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Columns (nos)'

@@ -625,6 +625,12 @@ class ColumnCoverPlate(MomentConnection):
     def output_values(self, flag):
 
         out_list = []
+        t4 = (None, DISP_TITLE_MEMBER_CAPACITY, TYPE_TITLE, None, True)
+        out_list.append(t4)
+        t21 = (
+        KEY_MEMBER_CAPACITY, KEY_DISP_MEMBER_CAPACITY, TYPE_OUT_BUTTON, ['Member Capacity', self.member_capacityoutput],
+        True)
+        out_list.append(t21)
 
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
@@ -646,12 +652,12 @@ class ColumnCoverPlate(MomentConnection):
         t21 = (KEY_BOLT_CAPACITIES_WEB, DISP_TITLE_BOLT_CAPACITY_WEB, TYPE_OUT_BUTTON,
                ['Web Bolt Capacity', self.web_bolt_capacity], True)
         out_list.append(t21)
-        t4 = (None, DISP_TITLE_MEMBER_CAPACITY, TYPE_TITLE, None, True)
-        out_list.append(t4)
-        t21 = (
-        KEY_MEMBER_CAPACITY, KEY_DISP_MEMBER_CAPACITY, TYPE_OUT_BUTTON, ['Member Capacity', self.member_capacityoutput],
-        True)
-        out_list.append(t21)
+        # t4 = (None, DISP_TITLE_MEMBER_CAPACITY, TYPE_TITLE, None, True)
+        # out_list.append(t4)
+        # t21 = (
+        # KEY_MEMBER_CAPACITY, KEY_DISP_MEMBER_CAPACITY, TYPE_OUT_BUTTON, ['Member Capacity', self.member_capacityoutput],
+        # True)
+        # out_list.append(t21)
 
         t4 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None, True)
         out_list.append(t4)
@@ -1056,16 +1062,23 @@ class ColumnCoverPlate(MomentConnection):
 
         ############################### WEB MENBER CAPACITY CHECK ############################
         ###### # capacity Check for web in axial = yielding
+
         if (previous_thk_flange) == None:
             pass
         else:
-            for i in previous_thk_flange:
-                self.flange_plate.thickness.remove(i)
+            # for i in previous_thk_flange:
+            if previous_thk_flange in self.flange_plate.thickness:
+                self.flange_plate.thickness.remove(previous_thk_flange)
+            else:
+                pass
+
         if (previous_thk_web) == None:
             pass
         else:
-            for i in previous_thk_web:
-                self.web_plate.thickness.remove(i)
+            if previous_thk_web in self.web_plate.thickness:
+                self.web_plate.thickness.remove(previous_thk_web)
+            else:
+                pass
 
         self.initial_pt_thk_status = False
         self.initial_pt_thk_status_web = False

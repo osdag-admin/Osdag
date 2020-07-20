@@ -656,7 +656,11 @@ class Connection(Main):
             return False
 
     def save_design(self):
-        self.report_supporting = {KEY_DISP_SEC_PROFILE:"ISection",
+        if self.supporting_section.flange_slope != 90:
+            section1 = "Slope_Beam"
+        else:
+            section1 = "Parallel_Beam"
+        self.report_supporting = {KEY_DISP_SEC_PROFILE: section1,
                                   KEY_DISP_SUPTNGSEC: self.supporting_section.designation,
                                   KEY_DISP_MATERIAL: self.supporting_section.material,
                                   KEY_DISP_FU: self.supporting_section.fu,
@@ -679,8 +683,12 @@ class Connection(Main):
                                   'Zpz(cm3)': round(self.supporting_section.plast_sec_mod_z/1000,2),
                                   'Zpy(cm3)': round(self.supporting_section.elast_sec_mod_y/1000,2)}
 
+        if self.supported_section.flange_slope != 90:
+            section2 = "Slope_Beam"
+        else:
+            section2 = "Parallel_Beam"
         self.report_supported = {
-            KEY_DISP_SEC_PROFILE:"ISection", #Image shall be save with this name.png in resource files
+            KEY_DISP_SEC_PROFILE: section2,  # Image shall be saved with this name.png in resource files
             KEY_DISP_SUPTDSEC: self.supported_section.designation,
             KEY_DISP_MATERIAL: self.supported_section.material,
             KEY_DISP_FU: self.supported_section.fu,

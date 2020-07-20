@@ -16,7 +16,7 @@ from drawing_2D.Svg_Window import SvgWindow
 import sys
 import sqlite3
 import shutil
-import openpyxl
+# import openpyxl
 from get_DPI_scale import scale,width,height
 
 

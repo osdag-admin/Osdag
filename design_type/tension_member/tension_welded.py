@@ -500,7 +500,7 @@ class Tension_welded(Member):
         t10 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, round(self.weld.strength,2) if flag else '', True)
         out_list.append(t10)
 
-        t5 = (KEY_REDUCTION_FACTOR_FLANGE, KEY_DISP_REDUCTION, TYPE_TEXTBOX,round(self.weld.beta_lw, 2) if flag else '', True)
+        t5 = (KEY_REDUCTION_LONG_JOINT, KEY_DISP_REDUCTION_LONG_JOINT, TYPE_TEXTBOX,round(self.weld.beta_lw, 2) if flag else '', True)
         out_list.append(t5)
 
         t10 = (KEY_OUT_WELD_STRENGTH_RED, KEY_OUT_DISP_WELD_STRENGTH_RED, TYPE_TEXTBOX, round(self.weld.strength_red, 2) if flag else '',

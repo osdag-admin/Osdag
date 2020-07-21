@@ -1134,7 +1134,7 @@ class CommonDesignLogic(object):
 
             plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
                                 T=float(T.plate.thickness_provided), degree=30)
-            intermittentPlates = Plate(L=float(T.inter_plate_height), W=float(T.inter_plate_length), T=plate.T)
+            intermittentPlates = Plate(L=float(T.inter_plate_height), W=float(T.inter_plate_length), T=float(plate.T))
 
 
             if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
